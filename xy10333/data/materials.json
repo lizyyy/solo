@@ -1,0 +1,127 @@
+{
+  "materials": [
+    {
+      "id": "mat1",
+      "name": "普通地砖",
+      "type": "floor",
+      "unit": "㎡",
+      "unitPrice": 85,
+      "category": "地面材料",
+      "spec": "800x800mm"
+    },
+    {
+      "id": "mat2",
+      "name": "抛光地砖",
+      "type": "floor",
+      "unit": "㎡",
+      "unitPrice": 150,
+      "category": "地面材料",
+      "spec": "800x800mm"
+    },
+    {
+      "id": "mat3",
+      "name": "实木地板",
+      "type": "floor",
+      "unit": "㎡",
+      "unitPrice": 280,
+      "category": "地面材料",
+      "spec": "910x122mm"
+    },
+    {
+      "id": "mat4",
+      "name": "普通乳胶漆",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 35,
+      "category": "墙面材料",
+      "spec": "5L"
+    },
+    {
+      "id": "mat5",
+      "name": "进口乳胶漆",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 68,
+      "category": "墙面材料",
+      "spec": "5L"
+    },
+    {
+      "id": "mat6",
+      "name": "墙纸",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 120,
+      "category": "墙面材料",
+      "spec": "0.53x10m"
+    },
+    {
+      "id": "mat7",
+      "name": "水泥",
+      "type": "other",
+      "unit": "袋",
+      "unitPrice": 45,
+      "category": "基础材料",
+      "spec": "50kg"
+    },
+    {
+      "id": "mat8",
+      "name": "砂子",
+      "type": "other",
+      "unit": "m³",
+      "unitPrice": 120,
+      "category": "基础材料",
+      "spec": "1m³"
+    }
+  ],
+  "laborItems": [
+    {
+      "id": "lab1",
+      "name": "地砖铺贴",
+      "type": "floor",
+      "unit": "㎡",
+      "unitPrice": 45
+    },
+    {
+      "id": "lab2",
+      "name": "地板安装",
+      "type": "floor",
+      "unit": "㎡",
+      "unitPrice": 25
+    },
+    {
+      "id": "lab3",
+      "name": "墙面基层处理",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 18
+    },
+    {
+      "id": "lab4",
+      "name": "乳胶漆涂刷",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 12
+    },
+    {
+      "id": "lab5",
+      "name": "墙纸铺贴",
+      "type": "wall",
+      "unit": "㎡",
+      "unitPrice": 28
+    },
+    {
+      "id": "lab6",
+      "name": "拆墙",
+      "type": "other",
+      "unit": "㎡",
+      "unitPrice": 80
+    },
+    {
+      "id": "lab7",
+      "name": "砌墙",
+      "type": "other",
+      "unit": "㎡",
+      "unitPrice": 120
+    }
+  ]
+}

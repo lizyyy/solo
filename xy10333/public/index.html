@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家装量房报价协同台</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/polyfills.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar .logo {
+            padding: 0 20px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar .nav-item {
+            padding: 12px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar .nav-item.active {
+            background: #3498db;
+            border-left: 4px solid #2980b9;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 240px;
+            padding: 20px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-default {
+            background: #ecf0f1;
+            color: #333;
+        }
+        
+        .btn-default:hover {
+            background: #bdc3c7;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-draft {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-pending_approval {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-approved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-confirmed {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .status-signed {
+            background: #e0f2f1;
+            color: #00695c;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .stat-primary .stat-value {
+            color: #3498db;
+        }
+        
+        .stat-success .stat-value {
+            color: #27ae60;
+        }
+        
+        .stat-warning .stat-value {
+            color: #f39c12;
+        }
+        
+        .stat-danger .stat-value {
+            color: #e74c3c;
+        }
+        
+        .space-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .space-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .space-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .space-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .space-area {
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .quote-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .compare-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .compare-col {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .diff-added {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .diff-removed {
+            background: #ffebee;
+            color: #c62828;
+            text-decoration: line-through;
+        }
+        
+        .diff-changed {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #7f8c8d;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #3498db;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .project-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .project-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .project-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .project-info {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-bar .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .approval-card {
+            border-left: 4px solid #f39c12;
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .approval-approved {
+            border-left-color: #27ae60;
+            background: #e8f5e9;
+        }
+        
+        .approval-rejected {
+            border-left-color: #e74c3c;
+            background: #ffebee;
+        }
+        
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.3s;
+        }
+        
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast-success {
+            background: #27ae60;
+        }
+        
+        .toast-error {
+            background: #e74c3c;
+        }
+        
+        .toast-info {
+            background: #3498db;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .material-tag {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .version-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .version-item {
+            padding: 8px 16px;
+            background: #ecf0f1;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .version-item:hover {
+            background: #bdc3c7;
+        }
+        
+        .version-item.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .filter-bar {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .activity-item {
+            padding: 12px;
+            border-left: 3px solid #3498db;
+            background: #f8f9fa;
+            margin-bottom: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .activity-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="app-container">
+            <div class="sidebar">
+                <div class="logo">🏠 家装报价协同台</div>
+                <div class="nav-item" :class="{ active: currentPage === 'dashboard' }" @click="currentPage = 'dashboard'">
+                    <span>📊</span> 数据复盘
+                </div>
+                <div class="nav-item" :class="{ active: currentPage === 'projects' }" @click="currentPage = 'projects'">
+                    <span>🏗️</span> 项目/空间列表
+                </div>
+                <div class="nav-item" :class="{ active: currentPage === 'materials' }" @click="currentPage = 'materials'">
+                    <span>🧱</span> 材料明细
+                </div>
+                <div class="nav-item" :class="{ active: currentPage === 'approvals' }" @click="currentPage = 'approvals'">
+                    <span>✅</span> 优惠审批
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div v-if="currentPage === 'dashboard'">
+                    <div class="page-header">
+                        <h1 class="page-title">📊 数据复盘视图</h1>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <div class="search-bar">
+                            <div class="form-group">
+                                <label class="form-label">开始日期</label>
+                                <input type="date" v-model="reportFilter.startDate" class="form-input" @change="loadReport">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">结束日期</label>
+                                <input type="date" v-model="reportFilter.endDate" class="form-input" @change="loadReport">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">设计师</label>
+                                <select v-model="reportFilter.designer" class="form-select" @change="loadReport">
+                                    <option value="">全部设计师</option>
+                                    <option v-for="designer in designers" :key="designer" :value="designer">{{ designer }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">客户/项目搜索</label>
+                                <input type="text" v-model="reportFilter.client" class="form-input" placeholder="输入客户名或项目名" @input="loadReport">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-4" style="margin-bottom: 20px;">
+                        <div class="stat-card stat-primary">
+                            <div class="stat-value">{{ report.overview.totalProjects }}</div>
+                            <div class="stat-label">项目总数</div>
+                        </div>
+                        <div class="stat-card stat-warning">
+                            <div class="stat-value">{{ report.overview.totalQuotes }}</div>
+                            <div class="stat-label">报价版本数</div>
+                        </div>
+                        <div class="stat-card stat-success">
+                            <div class="stat-value">{{ report.overview.signedQuotes }}</div>
+                            <div class="stat-label">已签约报价</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">¥{{ formatMoney(report.overview.totalValue) }}</div>
+                            <div class="stat-label">总报价金额</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <h3 class="card-title">报价状态分布</h3>
+                            <div class="grid grid-3">
+                                <div class="stat-card">
+                                    <div class="stat-value">{{ report.byStatus.draft }}</div>
+                                    <div class="stat-label">草稿</div>
+                                </div>
+                                <div class="stat-card stat-warning">
+                                    <div class="stat-value">{{ report.byStatus.pending_approval }}</div>
+                                    <div class="stat-label">待审批</div>
+                                </div>
+                                <div class="stat-card stat-success">
+                                    <div class="stat-value">{{ report.byStatus.signed }}</div>
+                                    <div class="stat-label">已签约</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3 class="card-title">审批统计</h3>
+                            <div class="grid grid-3">
+                                <div class="stat-card stat-warning">
+                                    <div class="stat-value">{{ report.approvalStats.pending }}</div>
+                                    <div class="stat-label">待处理</div>
+                                </div>
+                                <div class="stat-card stat-success">
+                                    <div class="stat-value">{{ report.approvalStats.approved }}</div>
+                                    <div class="stat-label">已通过</div>
+                                </div>
+                                <div class="stat-card stat-danger">
+                                    <div class="stat-value">{{ report.approvalStats.rejected }}</div>
+                                    <div class="stat-label">已拒绝</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" v-if="Object.keys(report.byDesigner).length > 0">
+                        <h3 class="card-title">按设计师统计</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>设计师</th>
+                                    <th>项目数</th>
+                                    <th>报价版本数</th>
+                                    <th>已签约数</th>
+                                    <th>总报价金额</th>
+                                    <th>签约金额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(stats, designer) in report.byDesigner" :key="designer">
+                                    <td><strong>{{ designer }}</strong></td>
+                                    <td>{{ stats.projectCount }}</td>
+                                    <td>{{ stats.quoteCount }}</td>
+                                    <td>{{ stats.signedQuoteCount }}</td>
+                                    <td>¥{{ formatMoney(stats.totalValue) }}</td>
+                                    <td>¥{{ formatMoney(stats.signedValue) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 class="card-title">最近活动</h3>
+                        <div v-if="report.recentActivity.length === 0" class="empty-state">
+                            暂无活动记录
+                        </div>
+                        <div v-else>
+                            <div v-for="(activity, index) in report.recentActivity.slice(0, 10)" :key="index" class="activity-item">
+                                <div>
+                                    <strong>{{ activity.projectName }}</strong> - {{ activity.action }}
+                                </div>
+                                <div class="activity-time">
+                                    操作人: {{ activity.by }} | {{ formatDate(activity.at) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="currentPage === 'projects'">
+                    <div class="page-header">
+                        <h1 class="page-title">🏗️ 项目/空间列表</h1>
+                        <button class="btn btn-primary" @click="showNewProjectModal = true">+ 新建项目</button>
+                    </div>
+                    
+                    <div v-if="!selectedProject">
+                        <div class="search-bar">
+                            <input type="text" v-model="projectSearch" class="form-input" placeholder="搜索项目名称、客户、地址...">
+                        </div>
+                        
+                        <div v-if="filteredProjects.length === 0" class="empty-state">
+                            <div class="empty-icon">🏠</div>
+                            <p>暂无项目，点击右上角新建项目</p>
+                        </div>
+                        
+                        <div class="grid grid-2">
+                            <div v-for="project in filteredProjects" :key="project.id" class="card project-card">
+                                <div class="project-header">
+                                    <div>
+                                        <div class="project-name">{{ project.name }}</div>
+                                        <div class="project-info">客户: {{ project.client }}</div>
+                                        <div class="project-info">设计师: {{ project.designer }}</div>
+                                    </div>
+                                    <span class="status-badge" :class="'status-' + (project.latestQuote?.status || 'draft')">
+                                        {{ getStatusText(project.latestQuote?.status || 'draft') }}
+                                    </span>
+                                </div>
+                                <div class="project-info">
+                                    <span class="material-tag">总面积: {{ project.totalArea }}㎡</span>
+                                    <span class="material-tag">空间数: {{ project.spaces?.length || 0 }}</span>
+                                    <span class="material-tag">报价版本: {{ project.quoteCount || 0 }}</span>
+                                </div>
+                                <div class="project-actions">
+                                    <button class="btn btn-primary" @click="selectProject(project)">查看报价</button>
+                                    <button class="btn btn-default" @click="editProject(project)">编辑空间</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-else>
+                        <div style="margin-bottom: 20px;">
+                            <button class="btn btn-default" @click="selectedProject = null">← 返回项目列表</button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="page-header">
+                                <div>
+                                    <h2 style="margin-bottom: 5px;">{{ selectedProject.name }}</h2>
+                                    <p style="color: #7f8c8d;">客户: {{ selectedProject.client }} | 设计师: {{ selectedProject.designer }} | 总面积: {{ selectedProject.totalArea }}㎡</p>
+                                </div>
+                                <button class="btn btn-success" @click="createNewQuote">+ 新建报价版本</button>
+                            </div>
+                            
+                            <div class="tabs">
+                                <div class="tab" :class="{ active: quoteTab === 'versions' }" @click="quoteTab = 'versions'">报价版本</div>
+                                <div class="tab" :class="{ active: quoteTab === 'compare' }" @click="quoteTab = 'compare'">版本对比</div>
+                                <div class="tab" :class="{ active: quoteTab === 'spaces' }" @click="quoteTab = 'spaces'">空间明细</div>
+                            </div>
+                            
+                            <div v-if="quoteTab === 'versions'">
+                                <div v-if="quotes.length === 0" class="empty-state">
+                                    <div class="empty-icon">📋</div>
+                                    <p>暂无报价版本，点击上方新建报价</p>
+                                </div>
+                                
+                                <div v-else>
+                                    <div class="version-selector">
+                                        <div v-for="quote in quotes" :key="quote.id" 
+                                             class="version-item" 
+                                             :class="{ active: selectedQuote?.id === quote.id }"
+                                             @click="selectQuote(quote)">
+                                            v{{ quote.version }} - {{ quote.versionName }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="selectedQuote">
+                                        <div class="card" style="border: 2px solid #3498db;">
+                                            <div class="page-header">
+                                                <div>
+                                                    <h3>{{ selectedQuote.versionName }}</h3>
+                                                    <p style="color: #7f8c8d;">
+                                                        创建时间: {{ formatDate(selectedQuote.createdAt) }} | 
+                                                        创建人: {{ selectedQuote.createdBy }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <span class="status-badge" :class="'status-' + selectedQuote.status" style="margin-right: 10px;">
+                                                        {{ getStatusText(selectedQuote.status) }}
+                                                    </span>
+                                                    <span v-if="selectedQuote.isSigned" class="status-badge status-signed">已签约</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <h4 style="margin-bottom: 15px;">📦 报价明细</h4>
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>空间</th>
+                                                        <th>项目</th>
+                                                        <th>材料</th>
+                                                        <th>规格</th>
+                                                        <th>数量</th>
+                                                        <th>材料单价</th>
+                                                        <th>人工单价</th>
+                                                        <th>小计</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="item in selectedQuote.items" :key="item.id">
+                                                        <td>{{ item.spaceName }}</td>
+                                                        <td>{{ item.name }}</td>
+                                                        <td>{{ item.material.name }}</td>
+                                                        <td>{{ item.material.spec }}</td>
+                                                        <td>{{ item.quantity }}{{ item.material.unit }}</td>
+                                                        <td>¥{{ item.material.unitPrice }}</td>
+                                                        <td>¥{{ item.labor.unitPrice }}</td>
+                                                        <td><strong>¥{{ formatMoney(item.total) }}</strong></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            
+                                            <div class="quote-summary">
+                                                <div class="summary-row">
+                                                    <span>材料费合计</span>
+                                                    <span>¥{{ formatMoney(selectedQuote.summary.totalMaterialCost) }}</span>
+                                                </div>
+                                                <div class="summary-row">
+                                                    <span>人工费合计</span>
+                                                    <span>¥{{ formatMoney(selectedQuote.summary.totalLaborCost) }}</span>
+                                                </div>
+                                                <div class="summary-row">
+                                                    <span>小计</span>
+                                                    <span>¥{{ formatMoney(selectedQuote.summary.subtotal) }}</span>
+                                                </div>
+                                                <div class="summary-row" v-if="selectedQuote.discount > 0">
+                                                    <span>优惠 ({{ selectedQuote.discount }}%)</span>
+                                                    <span style="color: #e74c3c;">-¥{{ formatMoney(selectedQuote.summary.discountAmount || 0) }}</span>
+                                                </div>
+                                                <div class="summary-row">
+                                                    <span>最终总价</span>
+                                                    <span style="color: #e74c3c; font-size: 20px;">¥{{ formatMoney(selectedQuote.summary.finalTotal) }}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                                <button class="btn btn-primary" @click="exportQuote(selectedQuote)" :disabled="selectedQuote.status !== 'confirmed' && !selectedQuote.isSigned">
+                                                    📄 导出报价单
+                                                </button>
+                                                <button class="btn btn-warning" v-if="selectedQuote.status === 'draft' && !selectedQuote.isSigned" @click="confirmQuote(selectedQuote)">
+                                                    ✅ 确认报价
+                                                </button>
+                                                <button class="btn btn-success" v-if="selectedQuote.status === 'confirmed' && !selectedQuote.isSigned" @click="signQuote(selectedQuote)">
+                                                    📝 签约
+                                                </button>
+                                                <button class="btn btn-default" v-if="!selectedQuote.isSigned" @click="editQuote(selectedQuote)">
+                                                    ✏️ 编辑
+                                                </button>
+                                                <button class="btn btn-default" @click="copyAsNewVersion(selectedQuote)">
+                                                    📋 复制为新版本
+                                                </button>
+                                            </div>
+                                            
+                                            <div v-if="selectedQuote.needsApproval" style="margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 5px;">
+                                                <strong>⚠️ 优惠说明:</strong> 优惠比例 {{ selectedQuote.discount }}% 超过审批阈值 {{ config.discountThreshold }}%
+                                                <span v-if="selectedQuote.discountReason">，原因: {{ selectedQuote.discountReason }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div v-if="quoteTab === 'compare'">
+                                <div v-if="quotes.length < 2" class="empty-state">
+                                    <div class="empty-icon">🔄</div>
+                                    <p>需要至少2个报价版本才能进行对比</p>
+                                </div>
+                                
+                                <div v-else>
+                                    <div class="form-row" style="margin-bottom: 20px;">
+                                        <div class="form-group">
+                                            <label class="form-label">版本 1</label>
+                                            <select v-model="compareVersion1" class="form-select" @change="loadComparison">
+                                                <option v-for="quote in quotes" :key="quote.id" :value="quote.id">
+                                                    v{{ quote.version }} - {{ quote.versionName }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">版本 2</label>
+                                            <select v-model="compareVersion2" class="form-select" @change="loadComparison">
+                                                <option v-for="quote in quotes" :key="quote.id" :value="quote.id">
+                                                    v{{ quote.version }} - {{ quote.versionName }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div v-if="comparisonData">
+                                        <div class="compare-container">
+                                            <div class="compare-col">
+                                                <h4 style="margin-bottom: 15px;">v{{ comparisonData.quote1.version }} - {{ comparisonData.quote1.versionName }}</h4>
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>项目</th>
+                                                            <th>数量</th>
+                                                            <th>小计</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="item in comparisonData.quote1.items" :key="item.id">
+                                                            <td :class="getItemDiffClass(item, comparisonData.quote2.items)">
+                                                                {{ item.spaceName }} - {{ item.name }}
+                                                            </td>
+                                                            <td>{{ item.quantity }}{{ item.material.unit }}</td>
+                                                            <td>¥{{ formatMoney(item.total) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="summary-row" style="margin-top: 15px;">
+                                                    <span>总价</span>
+                                                    <span><strong>¥{{ formatMoney(comparisonData.quote1.summary.finalTotal) }}</strong></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="compare-col">
+                                                <h4 style="margin-bottom: 15px;">v{{ comparisonData.quote2.version }} - {{ comparisonData.quote2.versionName }}</h4>
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>项目</th>
+                                                            <th>数量</th>
+                                                            <th>小计</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="item in comparisonData.quote2.items" :key="item.id">
+                                                            <td :class="getItemDiffClass(item, comparisonData.quote1.items)">
+                                                                {{ item.spaceName }} - {{ item.name }}
+                                                            </td>
+                                                            <td>{{ item.quantity }}{{ item.material.unit }}</td>
+                                                            <td>¥{{ formatMoney(item.total) }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="summary-row" style="margin-top: 15px;">
+                                                    <span>总价</span>
+                                                    <span><strong>¥{{ formatMoney(comparisonData.quote2.summary.finalTotal) }}</strong></span>
+                                                </div>
+                                                <div style="margin-top: 10px; padding: 10px; background: #e8f5e9; border-radius: 5px;">
+                                                    <strong>差异:</strong> 
+                                                    {{ comparisonData.quote2.summary.finalTotal >= comparisonData.quote1.summary.finalTotal ? '增加' : '减少' }} 
+                                                    ¥{{ formatMoney(Math.abs(comparisonData.quote2.summary.finalTotal - comparisonData.quote1.summary.finalTotal)) }}
+                                                    ({{ ((comparisonData.quote2.summary.finalTotal - comparisonData.quote1.summary.finalTotal) / comparisonData.quote1.summary.finalTotal * 100).toFixed(2) }}%)
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card" style="margin-top: 20px;">
+                                            <h4>变更说明</h4>
+                                            <p v-if="comparisonData.quote2.notes">{{ comparisonData.quote2.notes }}</p>
+                                            <p v-else>无变更说明</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div v-if="quoteTab === 'spaces'">
+                                <div class="grid grid-2">
+                                    <div v-for="space in selectedProject.spaces" :key="space.id" class="space-card">
+                                        <div class="space-header">
+                                            <span class="space-name">{{ getSpaceTypeIcon(space.type) }} {{ space.name }}</span>
+                                            <span class="space-area">{{ space.area }}㎡</span>
+                                        </div>
+                                        <p style="color: #7f8c8d;">类型: {{ getSpaceTypeName(space.type) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="currentPage === 'materials'">
+                    <div class="page-header">
+                        <h1 class="page-title">🧱 材料明细</h1>
+                        <button class="btn btn-primary" @click="showNewMaterialModal = true">+ 新增材料</button>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab" :class="{ active: materialTab === 'materials' }" @click="materialTab = 'materials'">材料库</div>
+                        <div class="tab" :class="{ active: materialTab === 'labor' }" @click="materialTab = 'labor'">人工费</div>
+                    </div>
+                    
+                    <div v-if="materialTab === 'materials'">
+                        <div class="card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>材料名称</th>
+                                        <th>类型</th>
+                                        <th>规格</th>
+                                        <th>单位</th>
+                                        <th>单价</th>
+                                        <th>分类</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="mat in materialData.materials" :key="mat.id">
+                                        <td><strong>{{ mat.name }}</strong></td>
+                                        <td>{{ getMaterialTypeName(mat.type) }}</td>
+                                        <td>{{ mat.spec }}</td>
+                                        <td>{{ mat.unit }}</td>
+                                        <td>¥{{ mat.unitPrice }}</td>
+                                        <td>{{ mat.category }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div v-if="materialTab === 'labor'">
+                        <div class="card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>项目名称</th>
+                                        <th>类型</th>
+                                        <th>单位</th>
+                                        <th>单价</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="labor in materialData.laborItems" :key="labor.id">
+                                        <td><strong>{{ labor.name }}</strong></td>
+                                        <td>{{ getMaterialTypeName(labor.type) }}</td>
+                                        <td>{{ labor.unit }}</td>
+                                        <td>¥{{ labor.unitPrice }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div v-if="currentPage === 'approvals'">
+                    <div class="page-header">
+                        <h1 class="page-title">✅ 优惠审批</h1>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab" :class="{ active: approvalTab === 'pending' }" @click="approvalTab = 'pending'">待处理</div>
+                        <div class="tab" :class="{ active: approvalTab === 'history' }" @click="approvalTab = 'history'">审批记录</div>
+                    </div>
+                    
+                    <div v-if="approvalTab === 'pending'">
+                        <div v-if="pendingApprovals.length === 0" class="empty-state">
+                            <div class="empty-icon">✅</div>
+                            <p>暂无待处理的审批</p>
+                        </div>
+                        
+                        <div v-else>
+                            <div v-for="approval in pendingApprovals" :key="approval.id" class="card">
+                                <div class="page-header">
+                                    <div>
+                                        <h3>{{ approval.project?.name || '未知项目' }}</h3>
+                                        <p style="color: #7f8c8d;">
+                                            报价版本: v{{ approval.quote?.version }} - {{ approval.quote?.versionName }} | 
+                                            申请人: {{ approval.requester }} | 
+                                            申请时间: {{ formatDate(approval.createdAt) }}
+                                        </p>
+                                    </div>
+                                    <span class="status-badge status-pending_approval">待审批</span>
+                                </div>
+                                
+                                <div style="background: #fff8e1; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                                    <p><strong>优惠申请:</strong> {{ approval.discountRequested }}%</p>
+                                    <p><strong>审批阈值:</strong> {{ approval.discountThreshold }}%</p>
+                                    <p><strong>原因:</strong> {{ approval.quote?.discountReason || '未提供' }}</p>
+                                    <p style="margin-top: 10px;"><strong>优惠金额:</strong> ¥{{ formatMoney(approval.quote?.summary?.discountAmount || 0) }}</p>
+                                    <p><strong>优惠后总价:</strong> ¥{{ formatMoney(approval.quote?.summary?.finalTotal || 0) }}</p>
+                                </div>
+                                
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-success" @click="approveApproval(approval)">通过</button>
+                                    <button class="btn btn-danger" @click="showRejectModal(approval)">拒绝</button>
+                                    <button class="btn btn-default" @click="viewQuoteDetail(approval.quote)">查看报价</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="approvalTab === 'history'">
+                        <div v-if="historyApprovals.length === 0" class="empty-state">
+                            <div class="empty-icon">📜</div>
+                            <p>暂无审批记录</p>
+                        </div>
+                        
+                        <div v-else>
+                            <div v-for="approval in historyApprovals" :key="approval.id" 
+                                 class="approval-card" 
+                                 :class="{ 'approval-approved': approval.status === 'approved', 'approval-rejected': approval.status === 'rejected' }">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <div>
+                                        <strong>{{ approval.project?.name || '未知项目' }}</strong> - v{{ approval.quote?.version }}
+                                        <span class="status-badge" :class="'status-' + approval.status" style="margin-left: 10px;">
+                                            {{ approval.status === 'approved' ? '已通过' : '已拒绝' }}
+                                        </span>
+                                    </div>
+                                    <span style="color: #7f8c8d;">{{ formatDate(approval.reviewedAt) }}</span>
+                                </div>
+                                <p style="margin-top: 5px;">
+                                    申请人: {{ approval.requester }} | 审批人: {{ approval.reviewedBy }} | 优惠: {{ approval.discountRequested }}%
+                                </p>
+                                <p v-if="approval.rejectionReason" style="margin-top: 5px; color: #e74c3c;">
+                                    拒绝原因: {{ approval.rejectionReason }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <transition name="fade">
+            <div v-if="showNewProjectModal" class="modal-overlay" @click.self="showNewProjectModal = false">
+                <div class="modal" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">{{ editingProject ? '编辑项目' : '新建项目' }}</h3>
+                        <button class="btn btn-default" @click="closeProjectModal">关闭</button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">项目名称 *</label>
+                            <input type="text" v-model="newProject.name" class="form-input" placeholder="如：阳光小区两居室">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">客户姓名 *</label>
+                            <input type="text" v-model="newProject.client" class="form-input" placeholder="如：张先生">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">联系电话</label>
+                            <input type="text" v-model="newProject.phone" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">设计师 *</label>
+                            <input type="text" v-model="newProject.designer" class="form-input" placeholder="如：李设计师">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">项目地址</label>
+                        <input type="text" v-model="newProject.address" class="form-input">
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px;">空间明细</h4>
+                    <div v-for="(space, index) in newProject.spaces" :key="index" class="space-card">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">空间名称</label>
+                                <input type="text" v-model="space.name" class="form-input" placeholder="如：客厅">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">面积 (㎡)</label>
+                                <input type="number" v-model.number="space.area" class="form-input" @change="updateTotalArea">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">类型</label>
+                                <select v-model="space.type" class="form-select">
+                                    <option value="living">客厅</option>
+                                    <option value="bedroom">卧室</option>
+                                    <option value="kitchen">厨房</option>
+                                    <option value="bathroom">卫生间</option>
+                                    <option value="balcony">阳台</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 0 0 auto;">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-danger" @click="removeSpace(index)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-default" @click="addSpace" style="margin-bottom: 20px;">+ 添加空间</button>
+                    
+                    <div class="form-group">
+                        <label class="form-label">总面积 (㎡)</label>
+                        <input type="number" v-model.number="newProject.totalArea" class="form-input" readonly>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-default" @click="closeProjectModal">取消</button>
+                        <button class="btn btn-primary" @click="saveProject">保存</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        
+        <transition name="fade">
+            <div v-if="showQuoteModal" class="modal-overlay" @click.self="showQuoteModal = false">
+                <div class="modal" style="max-width: 1000px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">{{ editingQuote ? '编辑报价' : '新建报价版本' }}</h3>
+                        <button class="btn btn-default" @click="closeQuoteModal">关闭</button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">版本名称 *</label>
+                            <input type="text" v-model="newQuote.versionName" class="form-input" placeholder="如：初始报价">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">创建人</label>
+                            <input type="text" v-model="newQuote.createdBy" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px;">报价项目</h4>
+                    
+                    <div v-for="(item, index) in newQuote.items" :key="index" class="space-card">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">空间</label>
+                                <select v-model="item.spaceId" class="form-select" @change="updateSpaceName(index)">
+                                    <option v-for="space in selectedProject.spaces" :key="space.id" :value="space.id">
+                                        {{ space.name }} ({{ space.area }}㎡)
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">项目名称</label>
+                                <input type="text" v-model="item.name" class="form-input" placeholder="如：地砖铺贴">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">材料</label>
+                                <select v-model="item.materialId" class="form-select" @change="updateMaterial(index)">
+                                    <option value="">请选择材料</option>
+                                    <option v-for="mat in materialData.materials" :key="mat.id" :value="mat.id">
+                                        {{ mat.name }} - ¥{{ mat.unitPrice }}/{{ mat.unit }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">人工项目</label>
+                                <select v-model="item.laborId" class="form-select" @change="updateLabor(index)">
+                                    <option value="">请选择</option>
+                                    <option v-for="labor in materialData.laborItems" :key="labor.id" :value="labor.id">
+                                        {{ labor.name }} - ¥{{ labor.unitPrice }}/{{ labor.unit }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">数量</label>
+                                <input type="number" v-model.number="item.quantity" class="form-input" @change="calculateItemTotal(index)">
+                            </div>
+                        </div>
+                        
+                        <div v-if="item.material || item.labor" style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                            <div v-if="item.material">
+                                材料: {{ item.material.name }} ({{ item.material.spec }}) - ¥{{ item.material.unitPrice }}/{{ item.material.unit }}
+                            </div>
+                            <div v-if="item.labor">
+                                人工: {{ item.labor.name }} - ¥{{ item.labor.unitPrice }}/{{ item.labor.unit }}
+                            </div>
+                            <div style="margin-top: 5px;">
+                                <strong>
+                                    材料费用: ¥{{ formatMoney(item.materialCost || 0) }} | 
+                                    人工费用: ¥{{ formatMoney(item.laborCost || 0) }} | 
+                                    小计: ¥{{ formatMoney(item.total || 0) }}
+                                </strong>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-danger" @click="removeQuoteItem(index)" style="margin-top: 10px;">删除此项</button>
+                    </div>
+                    
+                    <button class="btn btn-default" @click="addQuoteItem" style="margin-bottom: 20px;">+ 添加报价项目</button>
+                    
+                    <h4 style="margin: 20px 0 10px;">优惠设置</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">优惠比例 (%)</label>
+                            <input type="number" v-model.number="newQuote.discount" class="form-input" min="0" max="100" @change="calculateSummary">
+                            <small v-if="newQuote.discount > config.discountThreshold" style="color: #e74c3c;">
+                                ⚠️ 超过{{ config.discountThreshold }}%需要审批
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">优惠原因</label>
+                            <input type="text" v-model="newQuote.discountReason" class="form-input" placeholder="如：老客户优惠">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea v-model="newQuote.notes" class="form-textarea"></textarea>
+                    </div>
+                    
+                    <div class="quote-summary">
+                        <div class="summary-row">
+                            <span>材料费合计</span>
+                            <span>¥{{ formatMoney(newQuote.summary.totalMaterialCost) }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>人工费合计</span>
+                            <span>¥{{ formatMoney(newQuote.summary.totalLaborCost) }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>小计</span>
+                            <span>¥{{ formatMoney(newQuote.summary.subtotal) }}</span>
+                        </div>
+                        <div class="summary-row" v-if="newQuote.discount > 0">
+                            <span>优惠 ({{ newQuote.discount }}%)</span>
+                            <span style="color: #e74c3c;">-¥{{ formatMoney(newQuote.summary.discountAmount || 0) }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>最终总价</span>
+                            <span style="color: #e74c3c; font-size: 18px;">¥{{ formatMoney(newQuote.summary.finalTotal) }}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-default" @click="closeQuoteModal">取消</button>
+                        <button class="btn btn-primary" @click="saveQuote">保存</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        
+        <transition name="fade">
+            <div v-if="showRejectModal" class="modal-overlay" @click.self="showRejectModal = false">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">拒绝审批</h3>
+                        <button class="btn btn-default" @click="showRejectModal = false">关闭</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">拒绝原因 *</label>
+                        <textarea v-model="rejectReason" class="form-textarea" placeholder="请输入拒绝原因"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-default" @click="showRejectModal = false">取消</button>
+                        <button class="btn btn-danger" @click="rejectApproval">确认拒绝</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        
+        <transition name="fade">
+            <div v-if="showMaterialModal" class="modal-overlay" @click.self="showMaterialModal = false">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">新增材料</h3>
+                        <button class="btn btn-default" @click="showMaterialModal = false">关闭</button>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">材料名称 *</label>
+                            <input type="text" v-model="newMaterial.name" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">类型</label>
+                            <select v-model="newMaterial.type" class="form-select">
+                                <option value="floor">地面</option>
+                                <option value="wall">墙面</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">规格</label>
+                            <input type="text" v-model="newMaterial.spec" class="form-input" placeholder="如：800x800mm">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">单位</label>
+                            <input type="text" v-model="newMaterial.unit" class="form-input" placeholder="如：㎡">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">单价 *</label>
+                            <input type="number" v-model.number="newMaterial.unitPrice" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">分类</label>
+                            <input type="text" v-model="newMaterial.category" class="form-input" placeholder="如：地面材料">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-default" @click="showMaterialModal = false">取消</button>
+                        <button class="btn btn-primary" @click="saveMaterial">保存</button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+        
+        <transition name="fade">
+            <div v-if="toast.show" class="toast" :class="'toast-' + toast.type">
+                {{ toast.message }}
+            </div>
+        </transition>
+    </div>
+    
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    currentPage: 'projects',
+                    projects: [],
+                    projectSearch: '',
+                    selectedProject: null,
+                    quotes: [],
+                    selectedQuote: null,
+                    quoteTab: 'versions',
+                    materialTab: 'materials',
+                    approvalTab: 'pending',
+                    materialData: { materials: [], laborItems: [] },
+                    approvals: [],
+                    compareVersion1: '',
+                    compareVersion2: '',
+                    comparisonData: null,
+                    config: { discountThreshold: 10 },
+                    designers: [],
+                    
+                    report: {
+                        overview: { totalProjects: 0, totalQuotes: 0, signedQuotes: 0, totalValue: 0, signedValue: 0 },
+                        byDesigner: {},
+                        byStatus: {},
+                        approvalStats: { total: 0, approved: 0, rejected: 0, pending: 0 },
+                        recentActivity: []
+                    },
+                    reportFilter: {
+                        startDate: '',
+                        endDate: '',
+                        designer: '',
+                        client: ''
+                    },
+                    
+                    showNewProjectModal: false,
+                    editingProject: null,
+                    newProject: {
+                        name: '',
+                        client: '',
+                        phone: '',
+                        address: '',
+                        designer: '',
+                        totalArea: 0,
+                        spaces: []
+                    },
+                    
+                    showQuoteModal: false,
+                    editingQuote: null,
+                    newQuote: {
+                        versionName: '',
+                        createdBy: '',
+                        discount: 0,
+                        discountReason: '',
+                        notes: '',
+                        items: [],
+                        summary: {
+                            totalMaterialCost: 0,
+                            totalLaborCost: 0,
+                            subtotal: 0,
+                            finalTotal: 0
+                        }
+                    },
+                    
+                    showRejectModal: false,
+                    currentApproval: null,
+                    rejectReason: '',
+                    
+                    showNewMaterialModal: false,
+                    newMaterial: {
+                        name: '',
+                        type: 'floor',
+                        spec: '',
+                        unit: '㎡',
+                        unitPrice: 0,
+                        category: ''
+                    },
+                    
+                    toast: {
+                        show: false,
+                        message: '',
+                        type: 'success'
+                    }
+                };
+            },
+            computed: {
+                filteredProjects() {
+                    if (!this.projectSearch) return this.projects;
+                    const search = this.projectSearch.toLowerCase();
+                    return this.projects.filter(p => 
+                        p.name.toLowerCase().includes(search) ||
+                        p.client.toLowerCase().includes(search) ||
+                        (p.address && p.address.toLowerCase().includes(search))
+                    );
+                },
+                pendingApprovals() {
+                    return this.approvals.filter(a => a.status === 'pending');
+                },
+                historyApprovals() {
+                    return this.approvals.filter(a => a.status !== 'pending');
+                }
+            },
+            mounted() {
+                this.loadConfig();
+                this.loadProjects();
+                this.loadMaterials();
+                this.loadApprovals();
+                this.loadReport();
+            },
+            methods: {
+                async apiCall(url, options = {}) {
+                    try {
+                        const response = await fetch('/api' + url, {
+                            headers: { 'Content-Type': 'application/json' },
+                            ...options
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.error || '请求失败');
+                        return data;
+                    } catch (e) {
+                        this.showToast(e.message, 'error');
+                        throw e;
+                    }
+                },
+                
+                async loadConfig() {
+                    try {
+                        this.config = await this.apiCall('/config');
+                    } catch (e) {}
+                },
+                
+                async loadProjects() {
+                    this.projects = await this.apiCall('/projects');
+                    this.designers = [...new Set(this.projects.map(p => p.designer).filter(Boolean))];
+                },
+                
+                async loadMaterials() {
+                    this.materialData = await this.apiCall('/materials');
+                },
+                
+                async loadApprovals() {
+                    this.approvals = await this.apiCall('/approvals');
+                },
+                
+                async loadReport() {
+                    const params = new URLSearchParams();
+                    if (this.reportFilter.startDate) params.append('startDate', this.reportFilter.startDate);
+                    if (this.reportFilter.endDate) params.append('endDate', this.reportFilter.endDate);
+                    if (this.reportFilter.designer) params.append('designer', this.reportFilter.designer);
+                    if (this.reportFilter.client) params.append('client', this.reportFilter.client);
+                    
+                    const queryString = params.toString();
+                    this.report = await this.apiCall('/reports/overview' + (queryString ? '?' + queryString : ''));
+                },
+                
+                async selectProject(project) {
+                    this.selectedProject = project;
+                    this.quotes = await this.apiCall('/quotes/project/' + project.id);
+                    if (this.quotes.length > 0) {
+                        this.selectedQuote = this.quotes[0];
+                        this.compareVersion1 = this.quotes[0].id;
+                        if (this.quotes.length > 1) {
+                            this.compareVersion2 = this.quotes[1].id;
+                        }
+                    } else {
+                        this.selectedQuote = null;
+                    }
+                },
+                
+                selectQuote(quote) {
+                    this.selectedQuote = quote;
+                },
+                
+                async loadComparison() {
+                    if (this.compareVersion1 && this.compareVersion2) {
+                        this.comparisonData = await this.apiCall(`/quotes/compare/${this.compareVersion1}/${this.compareVersion2}`);
+                    }
+                },
+                
+                editProject(project) {
+                    this.editingProject = project;
+                    this.newProject = {
+                        ...project,
+                        spaces: project.spaces ? [...project.spaces] : []
+                    };
+                    this.showNewProjectModal = true;
+                },
+                
+                closeProjectModal() {
+                    this.showNewProjectModal = false;
+                    this.editingProject = null;
+                    this.newProject = {
+                        name: '',
+                        client: '',
+                        phone: '',
+                        address: '',
+                        designer: '',
+                        totalArea: 0,
+                        spaces: []
+                    };
+                },
+                
+                addSpace() {
+                    this.newProject.spaces.push({
+                        id: 'space-' + Date.now(),
+                        name: '',
+                        area: 0,
+                        type: 'living'
+                    });
+                },
+                
+                removeSpace(index) {
+                    this.newProject.spaces.splice(index, 1);
+                    this.updateTotalArea();
+                },
+                
+                updateTotalArea() {
+                    this.newProject.totalArea = this.newProject.spaces.reduce((sum, s) => sum + (Number(s.area) || 0), 0);
+                },
+                
+                async saveProject() {
+                    if (!this.newProject.name || !this.newProject.client || !this.newProject.designer) {
+                        this.showToast('请填写必填项', 'error');
+                        return;
+                    }
+                    
+                    if (this.editingProject) {
+                        await this.apiCall('/projects/' + this.editingProject.id, {
+                            method: 'PUT',
+                            body: JSON.stringify(this.newProject)
+                        });
+                        this.showToast('项目更新成功', 'success');
+                    } else {
+                        await this.apiCall('/projects', {
+                            method: 'POST',
+                            body: JSON.stringify(this.newProject)
+                        });
+                        this.showToast('项目创建成功', 'success');
+                    }
+                    
+                    this.closeProjectModal();
+                    this.loadProjects();
+                },
+                
+                createNewQuote() {
+                    this.editingQuote = null;
+                    this.newQuote = {
+                        versionName: '',
+                        createdBy: this.selectedProject.designer || '',
+                        discount: 0,
+                        discountReason: '',
+                        notes: '',
+                        items: [],
+                        summary: {
+                            totalMaterialCost: 0,
+                            totalLaborCost: 0,
+                            subtotal: 0,
+                            finalTotal: 0
+                        }
+                    };
+                    this.showQuoteModal = true;
+                },
+                
+                copyAsNewVersion(quote) {
+                    this.editingQuote = null;
+                    this.newQuote = {
+                        versionName: quote.versionName + ' (副本)',
+                        createdBy: quote.createdBy || '',
+                        discount: quote.discount || 0,
+                        discountReason: quote.discountReason || '',
+                        notes: '',
+                        basedOn: quote.id,
+                        items: quote.items.map(item => ({
+                            ...item,
+                            id: 'item-' + Date.now() + Math.random(),
+                            materialId: item.material.id,
+                            laborId: item.labor?.id || ''
+                        })),
+                        summary: { ...quote.summary }
+                    };
+                    this.showQuoteModal = true;
+                },
+                
+                editQuote(quote) {
+                    this.editingQuote = quote;
+                    this.newQuote = {
+                        versionName: quote.versionName,
+                        createdBy: quote.createdBy,
+                        discount: quote.discount || 0,
+                        discountReason: quote.discountReason || '',
+                        notes: quote.notes || '',
+                        items: quote.items.map(item => ({
+                            ...item,
+                            materialId: item.material.id,
+                            laborId: item.labor?.id || ''
+                        })),
+                        summary: { ...quote.summary }
+                    };
+                    this.showQuoteModal = true;
+                },
+                
+                closeQuoteModal() {
+                    this.showQuoteModal = false;
+                    this.editingQuote = null;
+                },
+                
+                addQuoteItem() {
+                    this.newQuote.items.push({
+                        id: 'item-' + Date.now(),
+                        spaceId: this.selectedProject.spaces[0]?.id || '',
+                        name: '',
+                        materialId: '',
+                        laborId: '',
+                        quantity: 0,
+                        material: null,
+                        labor: null,
+                        materialCost: 0,
+                        laborCost: 0,
+                        total: 0
+                    });
+                },
+                
+                removeQuoteItem(index) {
+                    this.newQuote.items.splice(index, 1);
+                    this.calculateSummary();
+                },
+                
+                updateSpaceName(index) {
+                    const space = this.selectedProject.spaces.find(s => s.id === this.newQuote.items[index].spaceId);
+                    if (space) {
+                        this.newQuote.items[index].spaceName = space.name;
+                    }
+                },
+                
+                updateMaterial(index) {
+                    const item = this.newQuote.items[index];
+                    const material = this.materialData.materials.find(m => m.id === item.materialId);
+                    if (material) {
+                        item.material = { ...material };
+                    } else {
+                        item.material = null;
+                    }
+                    this.calculateItemTotal(index);
+                },
+                
+                updateLabor(index) {
+                    const item = this.newQuote.items[index];
+                    const labor = this.materialData.laborItems.find(l => l.id === item.laborId);
+                    if (labor) {
+                        item.labor = { ...labor };
+                    } else {
+                        item.labor = null;
+                    }
+                    this.calculateItemTotal(index);
+                },
+                
+                calculateItemTotal(index) {
+                    const item = this.newQuote.items[index];
+                    item.materialCost = (item.material?.unitPrice || 0) * item.quantity;
+                    item.laborCost = (item.labor?.unitPrice || 0) * item.quantity;
+                    item.unitPrice = (item.material?.unitPrice || 0) + (item.labor?.unitPrice || 0);
+                    item.total = item.materialCost + item.laborCost;
+                    this.calculateSummary();
+                },
+                
+                calculateSummary() {
+                    const summary = this.newQuote.summary;
+                    summary.totalMaterialCost = this.newQuote.items.reduce((sum, item) => sum + (item.materialCost || 0), 0);
+                    summary.totalLaborCost = this.newQuote.items.reduce((sum, item) => sum + (item.laborCost || 0), 0);
+                    summary.subtotal = summary.totalMaterialCost + summary.totalLaborCost;
+                    summary.discountAmount = summary.subtotal * (this.newQuote.discount / 100);
+                    summary.finalTotal = summary.subtotal - summary.discountAmount;
+                },
+                
+                async saveQuote() {
+                    if (!this.newQuote.versionName) {
+                        this.showToast('请填写版本名称', 'error');
+                        return;
+                    }
+                    
+                    if (this.newQuote.items.length === 0) {
+                        this.showToast('请至少添加一个报价项目', 'error');
+                        return;
+                    }
+                    
+                    const quoteData = {
+                        ...this.newQuote,
+                        projectId: this.selectedProject.id
+                    };
+                    
+                    if (this.editingQuote) {
+                        await this.apiCall('/quotes/' + this.editingQuote.id, {
+                            method: 'PUT',
+                            body: JSON.stringify(quoteData)
+                        });
+                        this.showToast('报价更新成功', 'success');
+                    } else {
+                        await this.apiCall('/quotes', {
+                            method: 'POST',
+                            body: JSON.stringify(quoteData)
+                        });
+                        this.showToast('报价创建成功', 'success');
+                    }
+                    
+                    this.closeQuoteModal();
+                    await this.selectProject(this.selectedProject);
+                    this.loadApprovals();
+                    this.loadReport();
+                },
+                
+                async confirmQuote(quote) {
+                    try {
+                        await this.apiCall('/quotes/' + quote.id + '/confirm', {
+                            method: 'PUT',
+                            body: JSON.stringify({ confirmedBy: quote.createdBy || '管理员' })
+                        });
+                        this.showToast('报价确认成功', 'success');
+                        await this.selectProject(this.selectedProject);
+                        this.loadReport();
+                    } catch (e) {}
+                },
+                
+                async signQuote(quote) {
+                    try {
+                        await this.apiCall('/quotes/' + quote.id + '/sign', {
+                            method: 'PUT',
+                            body: JSON.stringify({ signedBy: '客户' })
+                        });
+                        this.showToast('签约成功', 'success');
+                        await this.selectProject(this.selectedProject);
+                        this.loadReport();
+                    } catch (e) {}
+                },
+                
+                viewQuoteDetail(quote) {
+                    this.apiCall('/projects/' + quote.projectId).then(project => {
+                        this.selectProject(project);
+                        this.currentPage = 'projects';
+                        setTimeout(() => {
+                            this.selectedQuote = this.quotes.find(q => q.id === quote.id) || this.quotes[0];
+                        }, 100);
+                    });
+                },
+                
+                showRejectModal(approval) {
+                    this.currentApproval = approval;
+                    this.rejectReason = '';
+                    this.showRejectModal = true;
+                },
+                
+                async approveApproval(approval) {
+                    try {
+                        await this.apiCall('/approvals/' + approval.id + '/approve', {
+                            method: 'PUT',
+                            body: JSON.stringify({ reviewedBy: '管理员' })
+                        });
+                        this.showToast('审批通过', 'success');
+                        this.loadApprovals();
+                        this.loadReport();
+                    } catch (e) {}
+                },
+                
+                async rejectApproval() {
+                    if (!this.rejectReason) {
+                        this.showToast('请填写拒绝原因', 'error');
+                        return;
+                    }
+                    
+                    try {
+                        await this.apiCall('/approvals/' + this.currentApproval.id + '/reject', {
+                            method: 'PUT',
+                            body: JSON.stringify({ 
+                                reviewedBy: '管理员',
+                                rejectionReason: this.rejectReason 
+                            })
+                        });
+                        this.showToast('已拒绝', 'success');
+                        this.showRejectModal = false;
+                        this.loadApprovals();
+                        this.loadReport();
+                    } catch (e) {}
+                },
+                
+                async saveMaterial() {
+                    if (!this.newMaterial.name || !this.newMaterial.unitPrice) {
+                        this.showToast('请填写必填项', 'error');
+                        return;
+                    }
+                    
+                    await this.apiCall('/materials', {
+                        method: 'POST',
+                        body: JSON.stringify(this.newMaterial)
+                    });
+                    
+                    this.showToast('材料添加成功', 'success');
+                    this.showNewMaterialModal = false;
+                    this.loadMaterials();
+                },
+                
+                exportQuote(quote) {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFontSize(18);
+                    doc.text('家装报价单', 105, 20, { align: 'center' });
+                    
+                    doc.setFontSize(12);
+                    doc.text('项目名称: ' + this.selectedProject.name, 20, 35);
+                    doc.text('客户: ' + this.selectedProject.client, 20, 42);
+                    doc.text('报价版本: v' + quote.version + ' - ' + quote.versionName, 20, 49);
+                    doc.text('创建时间: ' + this.formatDate(quote.createdAt), 20, 56);
+                    
+                    doc.setLineWidth(0.5);
+                    doc.line(20, 62, 190, 62);
+                    
+                    let y = 70;
+                    doc.setFontSize(10);
+                    
+                    const headers = ['空间', '项目', '材料', '规格', '数量', '单价', '金额'];
+                    const colWidths = [25, 30, 35, 20, 15, 20, 25];
+                    
+                    let x = 20;
+                    headers.forEach((header, i) => {
+                        doc.text(header, x, y);
+                        x += colWidths[i];
+                    });
+                    
+                    y += 8;
+                    doc.line(20, y, 190, y);
+                    y += 5;
+                    
+                    quote.items.forEach(item => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        
+                        let xPos = 20;
+                        const values = [
+                            item.spaceName,
+                            item.name,
+                            item.material.name,
+                            item.material.spec,
+                            item.quantity + item.material.unit,
+                            '¥' + item.unitPrice,
+                            '¥' + this.formatMoney(item.total)
+                        ];
+                        
+                        values.forEach((val, i) => {
+                            doc.text(String(val), xPos, y);
+                            xPos += colWidths[i];
+                        });
+                        y += 7;
+                    });
+                    
+                    y += 5;
+                    doc.line(20, y, 190, y);
+                    y += 8;
+                    
+                    const summaryItems = [
+                        ['材料费合计:', '¥' + this.formatMoney(quote.summary.totalMaterialCost)],
+                        ['人工费合计:', '¥' + this.formatMoney(quote.summary.totalLaborCost)],
+                        ['小计:', '¥' + this.formatMoney(quote.summary.subtotal)]
+                    ];
+                    
+                    if (quote.discount > 0) {
+                        summaryItems.push(['优惠 (' + quote.discount + '%):', '-¥' + this.formatMoney(quote.summary.discountAmount || 0)]);
+                    }
+                    
+                    summaryItems.forEach(item => {
+                        doc.text(item[0], 130, y);
+                        doc.text(item[1], 170, y, { align: 'right' });
+                        y += 7;
+                    });
+                    
+                    y += 3;
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('最终总价:', 130, y);
+                    doc.text('¥' + this.formatMoney(quote.summary.finalTotal), 170, y, { align: 'right' });
+                    
+                    if (quote.notes) {
+                        y += 15;
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        doc.text('备注: ' + quote.notes, 20, y);
+                    }
+                    
+                    doc.save('报价单_' + this.selectedProject.name + '_v' + quote.version + '.pdf');
+                    this.showToast('报价单导出成功', 'success');
+                },
+                
+                showToast(message, type = 'success') {
+                    this.toast = { show: true, message, type };
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 3000);
+                },
+                
+                formatMoney(num) {
+                    return Number(num || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                },
+                
+                formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    const d = new Date(dateStr);
+                    return d.toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                },
+                
+                getStatusText(status) {
+                    const map = {
+                        draft: '草稿',
+                        pending_approval: '待审批',
+                        approved: '已通过',
+                        confirmed: '已确认',
+                        rejected: '已拒绝',
+                        signed: '已签约'
+                    };
+                    return map[status] || status;
+                },
+                
+                getSpaceTypeName(type) {
+                    const map = {
+                        living: '客厅',
+                        bedroom: '卧室',
+                        kitchen: '厨房',
+                        bathroom: '卫生间',
+                        balcony: '阳台',
+                        other: '其他'
+                    };
+                    return map[type] || type;
+                },
+                
+                getSpaceTypeIcon(type) {
+                    const map = {
+                        living: '🛋️',
+                        bedroom: '🛏️',
+                        kitchen: '🍳',
+                        bathroom: '🚿',
+                        balcony: '🌿',
+                        other: '📦'
+                    };
+                    return map[type] || '🏠';
+                },
+                
+                getMaterialTypeName(type) {
+                    const map = {
+                        floor: '地面',
+                        wall: '墙面',
+                        other: '其他'
+                    };
+                    return map[type] || type;
+                },
+                
+                getItemDiffClass(item, otherItems) {
+                    const other = otherItems.find(i => i.spaceId === item.spaceId && i.name === item.name);
+                    if (!other) return 'diff-added';
+                    if (item.material.id !== other.material.id || 
+                        item.quantity !== other.quantity ||
+                        item.total !== other.total) {
+                        return 'diff-changed';
+                    }
+                    return '';
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

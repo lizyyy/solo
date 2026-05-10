@@ -1,0 +1,524 @@
+[
+  {
+    "id": "quote1-v1",
+    "projectId": "proj1",
+    "version": 1,
+    "versionName": "初始报价",
+    "createdAt": "2024-01-15T09:30:00.000Z",
+    "createdBy": "李设计师",
+    "status": "draft",
+    "discount": 0,
+    "discountReason": "",
+    "needsApproval": false,
+    "isSigned": false,
+    "items": [
+      {
+        "id": "item1",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "floor",
+        "name": "地砖铺贴",
+        "material": {
+          "id": "mat1",
+          "name": "普通地砖",
+          "unitPrice": 85,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 28,
+        "unitPrice": 130,
+        "materialCost": 2380,
+        "laborCost": 1260,
+        "total": 3640
+      },
+      {
+        "id": "item2",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat4",
+          "name": "普通乳胶漆",
+          "unitPrice": 35,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 84,
+        "unitPrice": 65,
+        "materialCost": 2940,
+        "laborCost": 1008,
+        "total": 3948
+      },
+      {
+        "id": "item3",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "floor",
+        "name": "地板安装",
+        "material": {
+          "id": "mat1",
+          "name": "普通地砖",
+          "unitPrice": 85,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 18,
+        "unitPrice": 130,
+        "materialCost": 1530,
+        "laborCost": 810,
+        "total": 2340
+      },
+      {
+        "id": "item4",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat4",
+          "name": "普通乳胶漆",
+          "unitPrice": 35,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 54,
+        "unitPrice": 65,
+        "materialCost": 1890,
+        "laborCost": 648,
+        "total": 2538
+      },
+      {
+        "id": "item5",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "floor",
+        "name": "地板安装",
+        "material": {
+          "id": "mat1",
+          "name": "普通地砖",
+          "unitPrice": 85,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 14,
+        "unitPrice": 130,
+        "materialCost": 1190,
+        "laborCost": 630,
+        "total": 1820
+      },
+      {
+        "id": "item6",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat4",
+          "name": "普通乳胶漆",
+          "unitPrice": 35,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 42,
+        "unitPrice": 65,
+        "materialCost": 1470,
+        "laborCost": 504,
+        "total": 1974
+      }
+    ],
+    "summary": {
+      "totalMaterialCost": 11400,
+      "totalLaborCost": 4860,
+      "subtotal": 16260,
+      "discount": 0,
+      "finalTotal": 16260
+    },
+    "notes": "普通两居室基础装修报价"
+  },
+  {
+    "id": "quote1-v2",
+    "projectId": "proj1",
+    "version": 2,
+    "versionName": "材料升级版本",
+    "createdAt": "2024-01-18T14:00:00.000Z",
+    "createdBy": "李设计师",
+    "status": "draft",
+    "discount": 0,
+    "discountReason": "",
+    "needsApproval": false,
+    "isSigned": false,
+    "basedOn": "quote1-v1",
+    "items": [
+      {
+        "id": "item1",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "floor",
+        "name": "地砖铺贴",
+        "material": {
+          "id": "mat2",
+          "name": "抛光地砖",
+          "unitPrice": 150,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 28,
+        "unitPrice": 195,
+        "materialCost": 4200,
+        "laborCost": 1260,
+        "total": 5460
+      },
+      {
+        "id": "item2",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 84,
+        "unitPrice": 98,
+        "materialCost": 5712,
+        "laborCost": 1008,
+        "total": 6720
+      },
+      {
+        "id": "item3",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "floor",
+        "name": "实木地板",
+        "material": {
+          "id": "mat3",
+          "name": "实木地板",
+          "unitPrice": 280,
+          "unit": "㎡",
+          "spec": "910x122mm"
+        },
+        "labor": {
+          "id": "lab2",
+          "name": "地板安装",
+          "unitPrice": 25,
+          "unit": "㎡"
+        },
+        "quantity": 18,
+        "unitPrice": 305,
+        "materialCost": 5040,
+        "laborCost": 450,
+        "total": 5490
+      },
+      {
+        "id": "item4",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 54,
+        "unitPrice": 98,
+        "materialCost": 3672,
+        "laborCost": 648,
+        "total": 4320
+      },
+      {
+        "id": "item5",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "floor",
+        "name": "地板安装",
+        "material": {
+          "id": "mat2",
+          "name": "抛光地砖",
+          "unitPrice": 150,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 14,
+        "unitPrice": 195,
+        "materialCost": 2100,
+        "laborCost": 630,
+        "total": 2730
+      },
+      {
+        "id": "item6",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 42,
+        "unitPrice": 98,
+        "materialCost": 2856,
+        "laborCost": 504,
+        "total": 3360
+      }
+    ],
+    "summary": {
+      "totalMaterialCost": 23580,
+      "totalLaborCost": 4500,
+      "subtotal": 28080,
+      "discount": 0,
+      "finalTotal": 28080
+    },
+    "notes": "客户要求升级材料：地砖升级为抛光砖，乳胶漆升级为进口品牌，主卧改为实木地板"
+  },
+  {
+    "id": "quote1-v3",
+    "projectId": "proj1",
+    "version": 3,
+    "versionName": "大优惠申请版本",
+    "createdAt": "2024-01-20T10:00:00.000Z",
+    "createdBy": "李设计师",
+    "status": "pending_approval",
+    "discount": 15,
+    "discountReason": "客户是老客户介绍，希望给予特别优惠",
+    "needsApproval": true,
+    "isSigned": false,
+    "basedOn": "quote1-v2",
+    "items": [
+      {
+        "id": "item1",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "floor",
+        "name": "地砖铺贴",
+        "material": {
+          "id": "mat2",
+          "name": "抛光地砖",
+          "unitPrice": 150,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 28,
+        "unitPrice": 195,
+        "materialCost": 4200,
+        "laborCost": 1260,
+        "total": 5460
+      },
+      {
+        "id": "item2",
+        "spaceId": "sp1",
+        "spaceName": "客厅",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 84,
+        "unitPrice": 98,
+        "materialCost": 5712,
+        "laborCost": 1008,
+        "total": 6720
+      },
+      {
+        "id": "item3",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "floor",
+        "name": "实木地板",
+        "material": {
+          "id": "mat3",
+          "name": "实木地板",
+          "unitPrice": 280,
+          "unit": "㎡",
+          "spec": "910x122mm"
+        },
+        "labor": {
+          "id": "lab2",
+          "name": "地板安装",
+          "unitPrice": 25,
+          "unit": "㎡"
+        },
+        "quantity": 18,
+        "unitPrice": 305,
+        "materialCost": 5040,
+        "laborCost": 450,
+        "total": 5490
+      },
+      {
+        "id": "item4",
+        "spaceId": "sp2",
+        "spaceName": "主卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 54,
+        "unitPrice": 98,
+        "materialCost": 3672,
+        "laborCost": 648,
+        "total": 4320
+      },
+      {
+        "id": "item5",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "floor",
+        "name": "地板安装",
+        "material": {
+          "id": "mat2",
+          "name": "抛光地砖",
+          "unitPrice": 150,
+          "unit": "㎡",
+          "spec": "800x800mm"
+        },
+        "labor": {
+          "id": "lab1",
+          "name": "地砖铺贴",
+          "unitPrice": 45,
+          "unit": "㎡"
+        },
+        "quantity": 14,
+        "unitPrice": 195,
+        "materialCost": 2100,
+        "laborCost": 630,
+        "total": 2730
+      },
+      {
+        "id": "item6",
+        "spaceId": "sp3",
+        "spaceName": "次卧",
+        "type": "wall",
+        "name": "墙面乳胶漆",
+        "material": {
+          "id": "mat5",
+          "name": "进口乳胶漆",
+          "unitPrice": 68,
+          "unit": "㎡",
+          "spec": "5L"
+        },
+        "labor": {
+          "id": "lab4",
+          "name": "乳胶漆涂刷",
+          "unitPrice": 12,
+          "unit": "㎡"
+        },
+        "quantity": 42,
+        "unitPrice": 98,
+        "materialCost": 2856,
+        "laborCost": 504,
+        "total": 3360
+      }
+    ],
+    "summary": {
+      "totalMaterialCost": 23580,
+      "totalLaborCost": 4500,
+      "subtotal": 28080,
+      "discount": 15,
+      "discountAmount": 4212,
+      "finalTotal": 23868
+    },
+    "notes": "申请15%的优惠额度，超过常规10%的审批阈值"
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "appr1",
+    "quoteId": "quote1-v3",
+    "projectId": "proj1",
+    "requester": "李设计师",
+    "createdAt": "2024-01-20T10:00:00.000Z",
+    "status": "rejected",
+    "reviewedBy": "王经理",
+    "reviewedAt": "2024-01-20T11:30:00.000Z",
+    "rejectionReason": "优惠力度过大，建议调整为10%以内或提供更多客户价值说明",
+    "discountRequested": 15,
+    "discountThreshold": 10
+  }
+]

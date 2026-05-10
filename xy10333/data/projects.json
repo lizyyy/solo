@@ -1,0 +1,51 @@
+[
+  {
+    "id": "proj1",
+    "name": "阳光小区两居室",
+    "client": "张先生",
+    "phone": "13800138001",
+    "address": "阳光小区A栋1203",
+    "totalArea": 98,
+    "spaces": [
+      {
+        "id": "sp1",
+        "name": "客厅",
+        "area": 28,
+        "type": "living"
+      },
+      {
+        "id": "sp2",
+        "name": "主卧",
+        "area": 18,
+        "type": "bedroom"
+      },
+      {
+        "id": "sp3",
+        "name": "次卧",
+        "area": 14,
+        "type": "bedroom"
+      },
+      {
+        "id": "sp4",
+        "name": "厨房",
+        "area": 8,
+        "type": "kitchen"
+      },
+      {
+        "id": "sp5",
+        "name": "卫生间",
+        "area": 6,
+        "type": "bathroom"
+      },
+      {
+        "id": "sp6",
+        "name": "阳台",
+        "area": 4,
+        "type": "balcony"
+      }
+    ],
+    "designer": "李设计师",
+    "createdAt": "2024-01-15T09:00:00.000Z",
+    "status": "active"
+  }
+]
