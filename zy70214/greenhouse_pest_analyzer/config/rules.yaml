@@ -1,0 +1,151 @@
+# 温室虫害诱捕分析器 - 规则配置
+
+# 虫害类型定义
+pest_types:
+  aphid:
+    name: "蚜虫"
+    chinese_name: "蚜虫"
+    color_range: ["绿色", "黑色", "黄色"]
+    size_range: [1.0, 3.0]
+  whitefly:
+    name: "粉虱"
+    chinese_name: "粉虱"
+    color_range: ["白色", "淡黄色"]
+    size_range: [1.0, 2.0]
+  thrips:
+    name: "蓟马"
+    chinese_name: "蓟马"
+    color_range: ["棕色", "黑色", "黄色"]
+    size_range: [1.0, 2.0]
+  spider_mite:
+    name: "红蜘蛛"
+    chinese_name: "红蜘蛛"
+    color_range: ["红色", "红褐色"]
+    size_range: [0.3, 0.8]
+  leafminer:
+    name: "潜叶蝇"
+    chinese_name: "潜叶蝇"
+    color_range: ["黑色", "灰色"]
+    size_range: [1.5, 3.0]
+
+# 诱捕板类型
+trap_board_types:
+  yellow:
+    name: "黄板"
+    chinese_name: "黄板"
+    target_pests: ["蚜虫", "粉虱", "蓟马"]
+  blue:
+    name: "蓝板"
+    chinese_name: "蓝板"
+    target_pests: ["蓟马", "叶蝉"]
+
+# 校验规则等级
+validation_rules:
+  level_critical:
+    name: "严重错误"
+    description: "必须修正，否则数据不可用"
+    color: "red"
+    rules:
+      - id: "MISSING_REQUIRED_FIELD"
+        name: "缺少必填字段"
+        condition: "缺少诱捕板编号、拍摄日期、温室编号、板类型中的任意一项"
+        score_penalty: 100
+      - id: "DUPLICATE_RECORD"
+        name: "重复记录"
+        condition: "同一诱捕板在同一天存在多条记录"
+        score_penalty: 80
+      - id: "NEGATIVE_COUNT"
+        name: "负数计数"
+        condition: "虫害数量为负数"
+        score_penalty: 100
+      - id: "INVALID_DATE"
+        name: "日期无效"
+        condition: "拍摄日期格式错误或未来日期"
+        score_penalty: 90
+
+  level_high:
+    name: "高优先级问题"
+    description: "严重影响分析结果，建议立即修正"
+    color: "orange"
+    rules:
+      - id: "COUNT_EXCEEDS_THRESHOLD"
+        name: "计数异常偏高"
+        condition: "单种虫害数量超过200（人工计数上限阈值）"
+        score_penalty: 50
+      - id: "BOARD_TYPE_MISMATCH"
+        name: "诱捕板类型与目标虫害不匹配"
+        condition: "黄板/蓝板捕获的主要虫害与其目标类型不符"
+        score_penalty: 40
+      - id: "INCONSISTENT_COUNT_SUM"
+        name: "计数总和不一致"
+        condition: "分项计数之和与总数不符"
+        score_penalty: 60
+      - id: "MANUAL_CORRECTION_LARGE"
+        name: "人工改幅度过大"
+        condition: "人工修正值与初始计数差异超过50%"
+        score_penalty: 45
+
+  level_medium:
+    name: "中优先级问题"
+    description: "可能影响分析结果，建议检查"
+    color: "yellow"
+    rules:
+      - id: "MISSING_OPTIONAL_FIELD"
+        name: "缺少可选字段"
+        condition: "缺少拍摄时间、操作员、备注等信息"
+        score_penalty: 15
+      - id: "COUNT_MISMATCH_BETWEEN_ROUNDS"
+        name: "多轮复核计数不一致"
+        condition: "第一轮与第二轮人工计数差异超过10%"
+        score_penalty: 30
+      - id: "UNEXPECTED_PEST_TYPE"
+        name: "非预期虫害类型"
+        condition: "出现未在规则库中定义的虫害类型"
+        score_penalty: 25
+      - id: "MANUAL_CORRECTION_SMALL"
+        name: "人工改幅度过小"
+        condition: "人工修正值与初始计数差异在10%-50%之间"
+        score_penalty: 20
+
+  level_low:
+    name: "低优先级提醒"
+    description: "不影响结果，但建议优化"
+    color: "blue"
+    rules:
+      - id: "COUNT_MISMATCH_MINOR"
+        name: "轻微计数差异"
+        condition: "多轮复核计数差异在5%-10%之间"
+        score_penalty: 10
+      - id: "MISSING_IMAGE"
+        name: "缺少图片信息"
+        condition: "记录中未包含图片路径或标识"
+        score_penalty: 5
+      - id: "REMARK_TOO_SHORT"
+        name: "备注信息不足"
+        condition: "有异常但备注信息过于简短"
+        score_penalty: 5
+
+# 虫害预警阈值
+alert_thresholds:
+  low: 10
+  medium: 50
+  high: 150
+
+# 分析结果评级
+result_grades:
+  A:
+    name: "优秀"
+    min_score: 90
+    description: "数据质量高，可直接用于分析决策"
+  B:
+    name: "良好"
+    min_score: 75
+    description: "数据质量较好，可用于分析但需注意小问题"
+  C:
+    name: "合格"
+    min_score: 60
+    description: "数据质量合格，但存在较明显问题"
+  D:
+    name: "不合格"
+    min_score: 0
+    description: "数据质量较差，建议重新采集或复核"

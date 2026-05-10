@@ -1,0 +1,836 @@
+{
+  "batch_id": "SAMPLE_ALL_20260510_215410",
+  "summary": {
+    "total_records": 12,
+    "valid_records": 8,
+    "invalid_records": 4,
+    "grade_distribution": {
+      "A": 4,
+      "B": 1,
+      "C": 0,
+      "D": 7
+    },
+    "issue_summary": {
+      "MANUAL_CORRECTION_LARGE": 2,
+      "INCONSISTENT_COUNT_SUM": 2,
+      "DUPLICATE_RECORD": 1,
+      "MISSING_REQUIRED_FIELD": 1,
+      "MISSING_OPTIONAL_FIELD": 1,
+      "MANUAL_CORRECTION_SMALL": 1,
+      "COUNT_MISMATCH_BETWEEN_ROUNDS": 1,
+      "INVALID_DATE": 1,
+      "NEGATIVE_COUNT": 1,
+      "COUNT_EXCEEDS_THRESHOLD": 1,
+      "COUNT_MISMATCH_MINOR": 1,
+      "UNEXPECTED_PEST_TYPE": 1
+    }
+  },
+  "results": [
+    {
+      "record_id": "REC_0001",
+      "trap_board_id": "GH01-Y01",
+      "greenhouse_id": "GH01",
+      "capture_date": "2026-05-09",
+      "quality_score": 100.0,
+      "quality_grade": "A",
+      "quality_grade_name": "优秀",
+      "total_penalty": 0,
+      "issues_count": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 28,
+          "final_count": 28,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 12,
+          "final_count": 12,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "thrips": {
+          "name": "蓟马",
+          "ai_count": 5,
+          "final_count": 5,
+          "manual_corrected": false,
+          "alert_level": "normal"
+        },
+        "_total": {
+          "ai_count": 45,
+          "final_count": 45
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 45 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "✅ 数据质量良好，未发现明显问题。"
+      ]
+    },
+    {
+      "record_id": "REC_0002",
+      "trap_board_id": "GH02-B01",
+      "greenhouse_id": "GH02",
+      "capture_date": "2026-05-09",
+      "quality_score": 100.0,
+      "quality_grade": "A",
+      "quality_grade_name": "优秀",
+      "total_penalty": 0,
+      "issues_count": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [],
+      "pest_summary": {
+        "thrips": {
+          "name": "蓟马",
+          "ai_count": 18,
+          "final_count": 18,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 5,
+          "final_count": 5,
+          "manual_corrected": false,
+          "alert_level": "normal"
+        },
+        "_total": {
+          "ai_count": 23,
+          "final_count": 23
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 23 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "✅ 数据质量良好，未发现明显问题。"
+      ]
+    },
+    {
+      "record_id": "REC_0003",
+      "trap_board_id": "GH01-Y01",
+      "greenhouse_id": "GH01",
+      "capture_date": "2026-05-09",
+      "quality_score": 20.0,
+      "quality_grade": "A",
+      "quality_grade_name": "优秀",
+      "total_penalty": 80,
+      "issues_count": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "DUP_REC_0003",
+          "rule_id": "DUPLICATE_RECORD",
+          "rule_name": "重复记录",
+          "level": "critical",
+          "level_name": "严重错误",
+          "severity": "必须修正",
+          "description": "诱捕板 GH01-Y01 在 2026-05-09 存在重复记录",
+          "reason": "系统检测到同一诱捕板在同一天存在多条记录。原始记录ID: REC_0001，重复记录ID: REC_0003。",
+          "suggestion": "请删除重复记录或合并数据。诱捕板 GH01-Y01 在 2026-05-09 应该只有一条记录。",
+          "related_fields": [
+            "trap_board_id",
+            "capture_date"
+          ],
+          "related_values": {
+            "trap_board_id": "GH01-Y01",
+            "capture_date": "2026-05-09",
+            "original_record_id": "REC_0001",
+            "duplicate_record_id": "REC_0003"
+          },
+          "score_penalty": 80
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 28,
+          "final_count": 28,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 12,
+          "final_count": 12,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "thrips": {
+          "name": "蓟马",
+          "ai_count": 5,
+          "final_count": 5,
+          "manual_corrected": false,
+          "alert_level": "normal"
+        },
+        "_total": {
+          "ai_count": 45,
+          "final_count": 45
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 45 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "✅ 数据质量良好，未发现明显问题。"
+      ]
+    },
+    {
+      "record_id": "REC_0004",
+      "trap_board_id": "",
+      "greenhouse_id": "GH03",
+      "capture_date": "2026-05-09",
+      "quality_score": 0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 115,
+      "issues_count": {
+        "critical": 1,
+        "high": 0,
+        "medium": 1,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "REQ_REC_0004",
+          "rule_id": "MISSING_REQUIRED_FIELD",
+          "rule_name": "缺少必填字段",
+          "level": "critical",
+          "level_name": "严重错误",
+          "severity": "必须修正",
+          "description": "记录缺少必要的关键字段",
+          "reason": "缺少以下必填字段: 诱捕板编号, 诱捕板类型。这些字段是识别诱捕板和进行数据分析的基础信息。",
+          "suggestion": "请补充缺失的字段: 诱捕板编号, 诱捕板类型。诱捕板编号用于定位具体设备，温室编号用于区域分析，拍摄日期用于时间序列追踪，板类型用于虫害类型判断。",
+          "related_fields": [
+            "诱捕板编号",
+            "诱捕板类型"
+          ],
+          "related_values": {},
+          "score_penalty": 100
+        },
+        {
+          "issue_id": "OPT_REC_0004",
+          "rule_id": "MISSING_OPTIONAL_FIELD",
+          "rule_name": "缺少可选字段",
+          "level": "medium",
+          "level_name": "中优先级问题",
+          "severity": "建议补充",
+          "description": "记录缺少辅助信息字段",
+          "reason": "缺少以下可选字段: 拍摄时间, 操作员, 图片路径。这些信息有助于追踪和复核数据。",
+          "suggestion": "建议补充以下信息: 拍摄时间, 操作员, 图片路径。拍摄时间用于精确追踪，操作员用于责任追溯，图片路径用于后续复核。",
+          "related_fields": [
+            "拍摄时间",
+            "操作员",
+            "图片路径"
+          ],
+          "related_values": {},
+          "score_penalty": 15
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 10,
+          "final_count": 10,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 5,
+          "final_count": 5,
+          "manual_corrected": false,
+          "alert_level": "normal"
+        },
+        "_total": {
+          "ai_count": 15,
+          "final_count": 15
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 15 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "⚠️ 存在严重错误，数据质量无法保证，建议修正后重新分析。",
+        "🔴 严重问题 1 个：必须修正，否则数据不可用。",
+        "🟡 中优先级问题 1 个：建议核查确认。"
+      ]
+    },
+    {
+      "record_id": "REC_0005",
+      "trap_board_id": "GH03-Y02",
+      "greenhouse_id": "GH03",
+      "capture_date": "2026-05-09",
+      "quality_score": 55.0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 45,
+      "issues_count": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "MC_LG_REC_0005_whitefly",
+          "rule_id": "MANUAL_CORRECTION_LARGE",
+          "rule_name": "人工改幅度过大",
+          "level": "high",
+          "level_name": "高优先级问题",
+          "severity": "建议检查",
+          "description": "粉虱的人工修正幅度过大",
+          "reason": "AI计数为 10，人工修正后为 63，差异 530.0%。过大的修正可能意味着AI识别存在系统性问题或人工修正有误。",
+          "suggestion": "请重新检查 粉虱 的计数。AI: 10，人工: 63。如果修正理由充分，请添加详细备注说明。",
+          "related_fields": [
+            "whitefly_ai_count",
+            "whitefly_final_count"
+          ],
+          "related_values": {
+            "pest_type": "whitefly",
+            "ai_count": 10,
+            "final_count": 63,
+            "difference_percent": 530.0,
+            "threshold": 50
+          },
+          "score_penalty": 45
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 20,
+          "final_count": 22,
+          "manual_corrected": true,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 10,
+          "final_count": 63,
+          "manual_corrected": true,
+          "alert_level": "medium"
+        },
+        "_total": {
+          "ai_count": 30,
+          "final_count": 85
+        }
+      },
+      "alert_level": "medium",
+      "alert_message": "中预警！总虫量 85 头，超过中风险阈值 50 头，建议加强监测。",
+      "confidence_notes": [
+        "🟠 高优先级问题 1 个：建议立即检查。"
+      ]
+    },
+    {
+      "record_id": "REC_0006",
+      "trap_board_id": "GH04-Y01",
+      "greenhouse_id": "GH04",
+      "capture_date": "2026-05-09",
+      "quality_score": 50.0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 50,
+      "issues_count": {
+        "critical": 0,
+        "high": 0,
+        "medium": 2,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "MC_SM_REC_0006_thrips",
+          "rule_id": "MANUAL_CORRECTION_SMALL",
+          "rule_name": "人工改幅度过小",
+          "level": "medium",
+          "level_name": "中优先级问题",
+          "severity": "建议检查",
+          "description": "蓟马的人工修正有一定差异",
+          "reason": "AI计数为 50，人工修正后为 70，差异 40.0%。",
+          "suggestion": "确认 蓟马 的人工修正是否正确。AI: 50，人工: 70。",
+          "related_fields": [
+            "thrips_ai_count",
+            "thrips_final_count"
+          ],
+          "related_values": {
+            "pest_type": "thrips",
+            "ai_count": 50,
+            "final_count": 70,
+            "difference_percent": 40.0
+          },
+          "score_penalty": 20
+        },
+        {
+          "issue_id": "ROUND_REC_0006_thrips",
+          "rule_id": "COUNT_MISMATCH_BETWEEN_ROUNDS",
+          "rule_name": "多轮复核计数不一致",
+          "level": "medium",
+          "level_name": "中优先级问题",
+          "severity": "建议检查",
+          "description": "蓟马的两轮复核计数差异较大",
+          "reason": "第一轮复核: 60，第二轮复核: 70，差异 16.7%。",
+          "suggestion": "请进行第三轮复核以确定 蓟马 的正确数量。第一轮: 60，第二轮: 70。",
+          "related_fields": [
+            "thrips_round1",
+            "thrips_round2"
+          ],
+          "related_values": {
+            "pest_type": "thrips",
+            "round1": 60,
+            "round2": 70,
+            "difference_percent": 16.7,
+            "threshold": 10
+          },
+          "score_penalty": 30
+        }
+      ],
+      "pest_summary": {
+        "thrips": {
+          "name": "蓟马",
+          "ai_count": 50,
+          "final_count": 70,
+          "manual_corrected": true,
+          "alert_level": "medium"
+        },
+        "_total": {
+          "ai_count": 50,
+          "final_count": 70
+        }
+      },
+      "alert_level": "medium",
+      "alert_message": "中预警！总虫量 70 头，超过中风险阈值 50 头，建议加强监测。",
+      "confidence_notes": [
+        "🟡 中优先级问题 2 个：建议核查确认。"
+      ]
+    },
+    {
+      "record_id": "REC_0007",
+      "trap_board_id": "GH05-Y01",
+      "greenhouse_id": "GH05",
+      "capture_date": "2030-01-01",
+      "quality_score": 10.0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 90,
+      "issues_count": {
+        "critical": 1,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "FUTURE_REC_0007",
+          "rule_id": "INVALID_DATE",
+          "rule_name": "日期无效",
+          "level": "critical",
+          "level_name": "严重错误",
+          "severity": "必须修正",
+          "description": "拍摄日期是未来日期",
+          "reason": "日期 '2030-01-01' 是未来日期，超出当前时间范围。",
+          "suggestion": "请检查日期是否输入错误。诱捕板数据应该是历史数据，不应该是未来日期。",
+          "related_fields": [
+            "capture_date"
+          ],
+          "related_values": {
+            "capture_date": "2030-01-01",
+            "current_date": "2026-05-10"
+          },
+          "score_penalty": 90
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 15,
+          "final_count": 15,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 10,
+          "final_count": 10,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "_total": {
+          "ai_count": 25,
+          "final_count": 25
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 25 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "⚠️ 存在严重错误，数据质量无法保证，建议修正后重新分析。",
+        "🔴 严重问题 1 个：必须修正，否则数据不可用。"
+      ]
+    },
+    {
+      "record_id": "REC_0008",
+      "trap_board_id": "GH06-Y01",
+      "greenhouse_id": "GH06",
+      "capture_date": "2026-05-09",
+      "quality_score": 0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 160,
+      "issues_count": {
+        "critical": 1,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "NEG_REC_0008_spider_mite_ai",
+          "rule_id": "NEGATIVE_COUNT",
+          "rule_name": "负数计数",
+          "level": "critical",
+          "level_name": "严重错误",
+          "severity": "必须修正",
+          "description": "红蜘蛛的AI计数为负数",
+          "reason": "红蜘蛛的AI计数为 -5。虫害数量不能为负数。",
+          "suggestion": "请检查 红蜘蛛 的AI计数。如果是输入错误，请修正为正确的非负整数。",
+          "related_fields": [
+            "spider_mite_ai_count"
+          ],
+          "related_values": {
+            "pest_type": "spider_mite",
+            "ai_count": -5
+          },
+          "score_penalty": 100
+        },
+        {
+          "issue_id": "SUM_AI_REC_0008",
+          "rule_id": "INCONSISTENT_COUNT_SUM",
+          "rule_name": "计数总和不一致",
+          "level": "high",
+          "level_name": "高优先级问题",
+          "severity": "建议立即修正",
+          "description": "AI计数总和与分项之和不符",
+          "reason": "记录中AI计数总和为 5，但分项求和为 -5，相差 10。",
+          "suggestion": "请检查AI计数的总和是否正确。分项之和: -5，记录总和: 5。",
+          "related_fields": [
+            "total_ai_count"
+          ],
+          "related_values": {
+            "record_total": 5,
+            "calculated_total": -5,
+            "difference": 10
+          },
+          "score_penalty": 60
+        }
+      ],
+      "pest_summary": {
+        "spider_mite": {
+          "name": "红蜘蛛",
+          "ai_count": -5,
+          "final_count": 5,
+          "manual_corrected": true,
+          "alert_level": "normal"
+        },
+        "_total": {
+          "ai_count": -5,
+          "final_count": 5
+        }
+      },
+      "alert_level": "normal",
+      "alert_message": "正常。总虫量 5 头，在安全范围内。",
+      "confidence_notes": [
+        "⚠️ 存在严重错误，数据质量无法保证，建议修正后重新分析。",
+        "🔴 严重问题 1 个：必须修正，否则数据不可用。",
+        "🟠 高优先级问题 1 个：建议立即检查。"
+      ]
+    },
+    {
+      "record_id": "REC_0009",
+      "trap_board_id": "GH07-Y01",
+      "greenhouse_id": "GH07",
+      "capture_date": "2026-05-09",
+      "quality_score": 0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 105,
+      "issues_count": {
+        "critical": 0,
+        "high": 2,
+        "medium": 0,
+        "low": 1
+      },
+      "issues": [
+        {
+          "issue_id": "EXC_REC_0009_aphid_ai",
+          "rule_id": "COUNT_EXCEEDS_THRESHOLD",
+          "rule_name": "计数异常偏高",
+          "level": "high",
+          "level_name": "高优先级问题",
+          "severity": "建议立即修正",
+          "description": "蚜虫的AI计数异常偏高",
+          "reason": "蚜虫的AI计数为 350，超过合理阈值 200。人工计数通常不会超过这个数量。",
+          "suggestion": "请复核 蚜虫 的AI计数 350。可能是AI误识别、图片重叠或数据录入错误。",
+          "related_fields": [
+            "aphid_ai_count"
+          ],
+          "related_values": {
+            "pest_type": "aphid",
+            "ai_count": 350,
+            "threshold": 200
+          },
+          "score_penalty": 50
+        },
+        {
+          "issue_id": "MC_LG_REC_0009_aphid",
+          "rule_id": "MANUAL_CORRECTION_LARGE",
+          "rule_name": "人工改幅度过大",
+          "level": "high",
+          "level_name": "高优先级问题",
+          "severity": "建议检查",
+          "description": "蚜虫的人工修正幅度过大",
+          "reason": "AI计数为 350，人工修正后为 45，差异 87.1%。过大的修正可能意味着AI识别存在系统性问题或人工修正有误。",
+          "suggestion": "请重新检查 蚜虫 的计数。AI: 350，人工: 45。如果修正理由充分，请添加详细备注说明。",
+          "related_fields": [
+            "aphid_ai_count",
+            "aphid_final_count"
+          ],
+          "related_values": {
+            "pest_type": "aphid",
+            "ai_count": 350,
+            "final_count": 45,
+            "difference_percent": 87.1,
+            "threshold": 50
+          },
+          "score_penalty": 45
+        },
+        {
+          "issue_id": "ROUND_MN_REC_0009_aphid",
+          "rule_id": "COUNT_MISMATCH_MINOR",
+          "rule_name": "轻微计数差异",
+          "level": "low",
+          "level_name": "低优先级提醒",
+          "severity": "建议注意",
+          "description": "蚜虫的两轮复核存在轻微差异",
+          "reason": "第一轮复核: 42，第二轮复核: 45，差异 7.1%。",
+          "suggestion": "建议确认 蚜虫 的最终计数。",
+          "related_fields": [
+            "aphid_round1",
+            "aphid_round2"
+          ],
+          "related_values": {
+            "pest_type": "aphid",
+            "round1": 42,
+            "round2": 45,
+            "difference_percent": 7.1
+          },
+          "score_penalty": 10
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 350,
+          "final_count": 45,
+          "manual_corrected": true,
+          "alert_level": "low"
+        },
+        "_total": {
+          "ai_count": 350,
+          "final_count": 45
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 45 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "🟠 高优先级问题 2 个：建议立即检查。",
+        "🔵 低优先级提醒 1 个：建议优化但不影响核心分析。"
+      ]
+    },
+    {
+      "record_id": "REC_0010",
+      "trap_board_id": "GH08-Y01",
+      "greenhouse_id": "GH08",
+      "capture_date": "2026-05-09",
+      "quality_score": 75.0,
+      "quality_grade": "B",
+      "quality_grade_name": "良好",
+      "total_penalty": 25,
+      "issues_count": {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "PEST_REC_0010_unknown_bug",
+          "rule_id": "UNEXPECTED_PEST_TYPE",
+          "rule_name": "非预期虫害类型",
+          "level": "medium",
+          "level_name": "中优先级问题",
+          "severity": "建议确认",
+          "description": "检测到未定义的虫害类型: 未知甲虫",
+          "reason": "虫害类型 '未知甲虫' (代码: unknown_bug) 不在规则库中定义。可能是新虫害类型或数据录入错误。",
+          "suggestion": "请确认虫害类型 '未知甲虫' 是否正确。如果是新发现的虫害类型，请联系管理员更新规则库。",
+          "related_fields": [
+            "pest_type"
+          ],
+          "related_values": {
+            "pest_type_code": "unknown_bug",
+            "pest_type_name": "未知甲虫"
+          },
+          "score_penalty": 25
+        }
+      ],
+      "pest_summary": {
+        "unknown_bug": {
+          "name": "未知甲虫",
+          "ai_count": 15,
+          "final_count": 15,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 15,
+          "final_count": 15,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "_total": {
+          "ai_count": 30,
+          "final_count": 30
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 30 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "🟡 中优先级问题 1 个：建议核查确认。"
+      ]
+    },
+    {
+      "record_id": "REC_0011",
+      "trap_board_id": "GH09-Y01",
+      "greenhouse_id": "GH09",
+      "capture_date": "2026-05-09",
+      "quality_score": 40.0,
+      "quality_grade": "D",
+      "quality_grade_name": "不合格",
+      "total_penalty": 60,
+      "issues_count": {
+        "critical": 0,
+        "high": 1,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "issue_id": "SUM_AI_REC_0011",
+          "rule_id": "INCONSISTENT_COUNT_SUM",
+          "rule_name": "计数总和不一致",
+          "level": "high",
+          "level_name": "高优先级问题",
+          "severity": "建议立即修正",
+          "description": "AI计数总和与分项之和不符",
+          "reason": "记录中AI计数总和为 100，但分项求和为 45，相差 55。",
+          "suggestion": "请检查AI计数的总和是否正确。分项之和: 45，记录总和: 100。",
+          "related_fields": [
+            "total_ai_count"
+          ],
+          "related_values": {
+            "record_total": 100,
+            "calculated_total": 45,
+            "difference": 55
+          },
+          "score_penalty": 60
+        }
+      ],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 20,
+          "final_count": 20,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 15,
+          "final_count": 15,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "thrips": {
+          "name": "蓟马",
+          "ai_count": 10,
+          "final_count": 10,
+          "manual_corrected": false,
+          "alert_level": "low"
+        },
+        "_total": {
+          "ai_count": 45,
+          "final_count": 45
+        }
+      },
+      "alert_level": "low",
+      "alert_message": "低预警！总虫量 45 头，超过低风险阈值 10 头，建议继续观察。",
+      "confidence_notes": [
+        "🟠 高优先级问题 1 个：建议立即检查。"
+      ]
+    },
+    {
+      "record_id": "REC_0012",
+      "trap_board_id": "GH10-Y01",
+      "greenhouse_id": "GH10",
+      "capture_date": "2026-05-09",
+      "quality_score": 100.0,
+      "quality_grade": "A",
+      "quality_grade_name": "优秀",
+      "total_penalty": 0,
+      "issues_count": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [],
+      "pest_summary": {
+        "aphid": {
+          "name": "蚜虫",
+          "ai_count": 150,
+          "final_count": 150,
+          "manual_corrected": false,
+          "alert_level": "high"
+        },
+        "whitefly": {
+          "name": "粉虱",
+          "ai_count": 50,
+          "final_count": 50,
+          "manual_corrected": false,
+          "alert_level": "medium"
+        },
+        "_total": {
+          "ai_count": 200,
+          "final_count": 200
+        }
+      },
+      "alert_level": "high",
+      "alert_message": "高预警！总虫量 200 头，超过高风险阈值 150 头，请立即采取防治措施。",
+      "confidence_notes": [
+        "✅ 数据质量良好，未发现明显问题。"
+      ]
+    }
+  ]
+}
