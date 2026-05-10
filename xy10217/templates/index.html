@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>茶叶拼配批次试算器</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>茶叶拼配批次试算器</h1>
+            <p class="subtitle">平衡香气评分、成本与库存约束的智能拼配决策系统</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('inventory')">原料库存</button>
+            <button class="tab-btn" onclick="showTab('blending')">拼配试算</button>
+            <button class="tab-btn" onclick="showTab('optimize')">方案优化</button>
+            <button class="tab-btn" onclick="showTab('saved')">已存方案</button>
+            <button class="tab-btn" onclick="showTab('assumptions')">关键假设</button>
+        </div>
+
+        <div id="inventory" class="tab-content active">
+            <h2>原料库存管理</h2>
+            <div class="card">
+                <h3>当前库存</h3>
+                <div class="inventory-summary" id="inventorySummary"></div>
+                <div class="table-container">
+                    <table class="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>等级</th>
+                                <th>香气评分</th>
+                                <th>单价(元/kg)</th>
+                                <th>库存(kg)</th>
+                                <th>描述</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>添加新原料</h3>
+                <form id="addMaterialForm" class="form-grid">
+                    <div class="form-group">
+                        <label>原料ID</label>
+                        <input type="text" id="newMaterialId" placeholder="如 M007" required>
+                    </div>
+                    <div class="form-group">
+                        <label>名称</label>
+                        <input type="text" id="newMaterialName" placeholder="如 高级铁观音" required>
+                    </div>
+                    <div class="form-group">
+                        <label>等级</label>
+                        <select id="newMaterialGrade" required>
+                            <option value="特级">特级</option>
+                            <option value="一级">一级</option>
+                            <option value="二级">二级</option>
+                            <option value="三级">三级</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>香气评分</label>
+                        <input type="number" id="newMaterialScore" min="0" max="100" step="0.1" placeholder="0-100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>单价(元/kg)</label>
+                        <input type="number" id="newMaterialCost" min="0" step="0.01" placeholder="如 300" required>
+                    </div>
+                    <div class="form-group">
+                        <label>库存(kg)</label>
+                        <input type="number" id="newMaterialStock" min="0" step="0.1" placeholder="如 50" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>描述</label>
+                        <input type="text" id="newMaterialDesc" placeholder="可选描述">
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn btn-primary">添加原料</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="blending" class="tab-content">
+            <h2>拼配试算</h2>
+            <div class="card">
+                <h3>批次设置</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>批次名称</label>
+                        <input type="text" id="batchName" value="试生产批次001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>目标重量(kg)</label>
+                        <input type="number" id="targetWeight" value="100" min="1" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>目标香气评分</label>
+                        <input type="number" id="targetAroma" value="85" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>最高单价(元/kg)</label>
+                        <input type="number" id="maxCost" value="400" min="0" step="0.01" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>拼配比例设置</h3>
+                <div id="componentsContainer">
+                    <div class="component-row" data-index="0">
+                        <select class="material-select">
+                            <option value="">选择原料</option>
+                        </select>
+                        <input type="number" class="proportion-input" min="0" max="100" step="1" placeholder="比例%">
+                        <button class="btn btn-danger btn-sm" onclick="removeComponent(this)">删除</button>
+                    </div>
+                </div>
+                <div class="component-actions">
+                    <button class="btn btn-secondary" onclick="addComponent()">添加原料</button>
+                    <span id="totalProportion" class="proportion-total">总比例: 0%</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <button class="btn btn-primary btn-lg" onclick="calculatePlan()">计算拼配方案</button>
+            </div>
+
+            <div id="resultContainer" class="hidden">
+                <div class="card" id="resultCard">
+                    <h3>计算结果</h3>
+                    <div id="resultContent"></div>
+                    <div class="result-actions">
+                        <button class="btn btn-success" onclick="saveCurrentPlan()">保存方案</button>
+                        <button class="btn btn-info" onclick="exportCurrentPlan()">导出报告</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="optimize" class="tab-content">
+            <h2>智能方案优化</h2>
+            <div class="card">
+                <h3>优化参数</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>目标重量(kg)</label>
+                        <input type="number" id="optTargetWeight" value="100" min="1" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>目标香气评分</label>
+                        <input type="number" id="optTargetAroma" value="85" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>最高单价(元/kg)</label>
+                        <input type="number" id="optMaxCost" value="400" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg" onclick="optimizePlans()">生成优化方案</button>
+            </div>
+
+            <div id="optimizeResults" class="hidden">
+                <div class="card">
+                    <h3>可行方案</h3>
+                    <div id="feasiblePlans"></div>
+                </div>
+                <div class="card">
+                    <h3>不可行方案（含问题说明）</h3>
+                    <div id="infeasiblePlans"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="saved" class="tab-content">
+            <h2>已保存的方案</h2>
+            <div id="savedPlansList">
+                <p class="empty-message">暂无保存的方案</p>
+            </div>
+            <div id="compareSection" class="card hidden">
+                <h3>方案比较</h3>
+                <p>选择2个以上方案进行比较</p>
+                <button class="btn btn-primary" onclick="comparePlans()">比较选中方案</button>
+                <div id="compareResults" class="hidden"></div>
+            </div>
+        </div>
+
+        <div id="assumptions" class="tab-content">
+            <h2>关键假设与说明</h2>
+            <div class="card">
+                <h3>评分计算假设</h3>
+                <ul>
+                    <li><strong>加权平均法：</strong>平均香气评分 = Σ(原料评分 × 拼配比例)</li>
+                    <li>例如：特级茶(95分)占60% + 一级茶(88分)占40% = 92.2分</li>
+                    <li>评分为0-100分，越高表示香气越好</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>成本计算假设</h3>
+                <ul>
+                    <li><strong>直接成本：</strong>仅计算原料采购成本</li>
+                    <li><strong>不含加工费：</strong>人工、能耗、包装等费用需另行计算</li>
+                    <li>总成本 = Σ(原料单价 × 使用量)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>库存约束</h3>
+                <ul>
+                    <li><strong>实时库存：</strong>基于当前显示的库存量</li>
+                    <li><strong>使用量检查：</strong>各原料使用量不能超过库存</li>
+                    <li>使用量 = 目标重量 × 拼配比例</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>可行性判定标准</h3>
+                <ul>
+                    <li>✅ 平均香气评分 ≥ 目标香气评分</li>
+                    <li>✅ 平均单价 ≤ 最高单价限制</li>
+                    <li>✅ 所有原料使用量 ≤ 库存量</li>
+                    <li>✅ 拼配比例合计 = 100%</li>
+                    <li><strong>必须全部满足才能判定为可行方案</strong></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>茶叶等级说明</h3>
+                <table class="grade-table">
+                    <thead>
+                        <tr>
+                            <th>等级</th>
+                            <th>典型香气评分范围</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="grade-super">特级</td>
+                            <td>90-100分</td>
+                            <td>顶级原料，香气浓郁持久</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-1">一级</td>
+                            <td>85-90分</td>
+                            <td>优质原料，香气明显</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-2">二级</td>
+                            <td>75-85分</td>
+                            <td>中等原料，香气一般</td>
+                        </tr>
+                        <tr>
+                            <td class="grade-3">三级</td>
+                            <td>70-75分</td>
+                            <td>基础原料，香气较淡</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="notification" class="notification hidden"></div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

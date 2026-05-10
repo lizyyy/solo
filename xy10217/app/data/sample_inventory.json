@@ -1,0 +1,58 @@
+{
+    "materials": [
+        {
+            "id": "M001",
+            "name": "明前龙井",
+            "grade": "特级",
+            "aroma_score": 95.0,
+            "cost_per_kg": 680.0,
+            "stock_kg": 50.0,
+            "description": "特级明前龙井，豆香浓郁，滋味醇厚"
+        },
+        {
+            "id": "M002",
+            "name": "雨前龙井",
+            "grade": "一级",
+            "aroma_score": 88.0,
+            "cost_per_kg": 420.0,
+            "stock_kg": 120.0,
+            "description": "一级雨前龙井，清香持久，回甘明显"
+        },
+        {
+            "id": "M003",
+            "name": "二级龙井",
+            "grade": "二级",
+            "aroma_score": 80.0,
+            "cost_per_kg": 280.0,
+            "stock_kg": 200.0,
+            "description": "二级龙井，香气尚可，性价比高"
+        },
+        {
+            "id": "M004",
+            "name": "三级龙井",
+            "grade": "三级",
+            "aroma_score": 72.0,
+            "cost_per_kg": 150.0,
+            "stock_kg": 350.0,
+            "description": "三级龙井，香气较淡，适合拼配基底"
+        },
+        {
+            "id": "M005",
+            "name": "明前碧螺春",
+            "grade": "特级",
+            "aroma_score": 92.0,
+            "cost_per_kg": 580.0,
+            "stock_kg": 30.0,
+            "description": "特级明前碧螺春，花果香明显，鲜爽甘醇"
+        },
+        {
+            "id": "M006",
+            "name": "一级碧螺春",
+            "grade": "一级",
+            "aroma_score": 85.0,
+            "cost_per_kg": 380.0,
+            "stock_kg": 80.0,
+            "description": "一级碧螺春，香气清雅，滋味鲜醇"
+        }
+    ]
+}
