@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-05-10T14:59:37.605184",
+  "stats": {
+    "total_devices": 2,
+    "active_devices": 2,
+    "total_volunteers": 2,
+    "active_volunteers": 1,
+    "total_plans": 3,
+    "completed_plans": 1,
+    "missed_plans": 0,
+    "completion_rate": 33.3,
+    "expiring_supplies_count": 3,
+    "critical_expiring": 2,
+    "unresolved_exceptions": 3,
+    "pending_reviews": 0
+  },
+  "expiring_supplies": [
+    {
+      "supplies_id": "SUP-E01",
+      "device_id": "AED-E01",
+      "device_location": "幸福花园1号楼",
+      "supplies_type": "电极片",
+      "batch_number": "BATCH-EXPIRED-001",
+      "expiration_date": "2025-12-15",
+      "days_left": -147,
+      "severity": "critical"
+    },
+    {
+      "supplies_id": "SUP-E02",
+      "device_id": "AED-E01",
+      "device_location": "幸福花园1号楼",
+      "supplies_type": "电池",
+      "batch_number": "BAT-EXPIRED-001",
+      "expiration_date": "2026-04-20",
+      "days_left": -21,
+      "severity": "critical"
+    },
+    {
+      "supplies_id": "SUP-E03",
+      "device_id": "AED-E02",
+      "device_location": "幸福花园2号楼",
+      "supplies_type": "电极片",
+      "batch_number": "BATCH-WARN-001",
+      "expiration_date": "2026-06-01",
+      "days_left": 21,
+      "severity": "warning"
+    }
+  ],
+  "missed_inspections": [],
+  "pending_reviews": []
+}

@@ -1,0 +1,35 @@
+[
+  {
+    "device_id": "AED-001",
+    "location": "阳光社区1号楼",
+    "floor": "1",
+    "room": "大厅入口处",
+    "model": "Philips HeartStart FRx",
+    "serial_number": "SNF12345678",
+    "installation_date": "2024-01-15",
+    "status": "active",
+    "assigned_volunteer_id": "VOL-001"
+  },
+  {
+    "device_id": "AED-002",
+    "location": "阳光社区2号楼",
+    "floor": "2",
+    "room": "健身中心",
+    "model": "Philips HeartStart FRx",
+    "serial_number": "SNF87654321",
+    "installation_date": "2024-02-20",
+    "status": "active",
+    "assigned_volunteer_id": "VOL-002"
+  },
+  {
+    "device_id": "AED-003",
+    "location": "阳光社区3号楼",
+    "floor": "1",
+    "room": "物业办公室旁",
+    "model": "ZOLL AED Plus",
+    "serial_number": "SNZ11223344",
+    "installation_date": "2024-03-10",
+    "status": "active",
+    "assigned_volunteer_id": "VOL-001"
+  }
+]

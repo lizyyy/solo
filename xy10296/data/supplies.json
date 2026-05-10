@@ -1,0 +1,32 @@
+[
+  {
+    "supplies_id": "SUP-E01",
+    "device_id": "AED-E01",
+    "supplies_type": "electrode_pads",
+    "batch_number": "BATCH-EXPIRED-001",
+    "expiration_date": "2025-12-15",
+    "installation_date": "2024-12-15",
+    "replacement_date": null,
+    "created_at": "2026-05-10T14:58:15.265070"
+  },
+  {
+    "supplies_id": "SUP-E02",
+    "device_id": "AED-E01",
+    "supplies_type": "battery",
+    "batch_number": "BAT-EXPIRED-001",
+    "expiration_date": "2026-04-20",
+    "installation_date": "2024-12-15",
+    "replacement_date": null,
+    "created_at": "2026-05-10T14:58:15.265266"
+  },
+  {
+    "supplies_id": "SUP-E03",
+    "device_id": "AED-E02",
+    "supplies_type": "electrode_pads",
+    "batch_number": "BATCH-WARN-001",
+    "expiration_date": "2026-06-01",
+    "installation_date": "2025-01-20",
+    "replacement_date": null,
+    "created_at": "2026-05-10T14:58:15.265420"
+  }
+]

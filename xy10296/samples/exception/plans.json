@@ -1,0 +1,34 @@
+[
+  {
+    "plan_id": "PLAN-E001",
+    "device_id": "AED-E01",
+    "volunteer_id": "VOL-E01",
+    "plan_date": "2026-04-28",
+    "frequency_days": 7,
+    "notes": "已过期计划 - 用于漏检测试"
+  },
+  {
+    "plan_id": "PLAN-E002",
+    "device_id": "AED-E01",
+    "volunteer_id": "VOL-E01",
+    "plan_date": "2026-05-03",
+    "frequency_days": 7,
+    "notes": "已过期计划 - 用于漏检测试"
+  },
+  {
+    "plan_id": "PLAN-E003",
+    "device_id": "AED-E02",
+    "volunteer_id": "VOL-E02",
+    "plan_date": "2026-05-15",
+    "frequency_days": 7,
+    "notes": "志愿者已停用 - 创建时应被拦截"
+  },
+  {
+    "plan_id": "PLAN-E004",
+    "device_id": "AED-E01",
+    "volunteer_id": "VOL-E01",
+    "plan_date": "2026-05-10",
+    "frequency_days": 7,
+    "notes": "今日计划 - 用于提交有问题的报告"
+  }
+]

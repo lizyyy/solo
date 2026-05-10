@@ -1,0 +1,38 @@
+[
+  {
+    "exception_id": "EXC-57e0d908",
+    "device_id": "AED-E01",
+    "exception_type": "missed_inspection",
+    "exception_date": "2026-05-10T14:58:46.582360",
+    "description": "志愿者 赵大伟 未按时完成点检",
+    "severity": "high",
+    "resolved": false,
+    "resolution_notes": null,
+    "resolved_at": null,
+    "created_at": "2026-05-10T14:58:46.582366"
+  },
+  {
+    "exception_id": "EXC-7682aa4e",
+    "device_id": "AED-E01",
+    "exception_type": "missed_inspection",
+    "exception_date": "2026-05-10T14:58:46.582927",
+    "description": "志愿者 赵大伟 未按时完成点检",
+    "severity": "high",
+    "resolved": false,
+    "resolution_notes": null,
+    "resolved_at": null,
+    "created_at": "2026-05-10T14:58:46.582931"
+  },
+  {
+    "exception_id": "EXC-3a4164a8",
+    "device_id": "AED-E01",
+    "exception_type": "inspection_issue",
+    "exception_date": "2026-05-10T14:59:00.058586",
+    "description": "电极片检查不通过; 电池检查不通过",
+    "severity": "high",
+    "resolved": false,
+    "resolution_notes": null,
+    "resolved_at": null,
+    "created_at": "2026-05-10T14:59:00.058596"
+  }
+]
