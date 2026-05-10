@@ -1,0 +1,99 @@
+[
+  {
+    "id": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+    "courseName": "高等数学",
+    "bookTitle": "同济大学高等数学",
+    "desiredEdition": "7",
+    "acceptableConditions": [
+      "good",
+      "like_new"
+    ],
+    "maxPrice": 40,
+    "preferredPickupLocations": [
+      "东校区图书馆",
+      "计算机学院"
+    ],
+    "buyerId": "B001",
+    "buyerName": "小明",
+    "status": "available",
+    "createdAt": "2026-05-10T18:11:05.830Z",
+    "updatedAt": "2026-05-10T18:12:09.073Z"
+  },
+  {
+    "id": "a7857d12-15e4-4967-bae5-e158804c3246",
+    "courseName": "高等数学",
+    "bookTitle": "同济大学高等数学",
+    "desiredEdition": "7",
+    "acceptableConditions": [
+      "good",
+      "like_new"
+    ],
+    "maxPrice": 45,
+    "preferredPickupLocations": [
+      "西校区宿舍"
+    ],
+    "buyerId": "B002",
+    "buyerName": "小红",
+    "status": "locked",
+    "createdAt": "2026-05-10T18:11:05.830Z",
+    "updatedAt": "2026-05-10T18:12:23.547Z",
+    "lockedListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+    "lockedAt": "2026-05-10T18:12:23.547Z"
+  },
+  {
+    "id": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+    "courseName": "线性代数",
+    "bookTitle": "线性代数及其应用",
+    "desiredEdition": "5",
+    "acceptableConditions": [
+      "good",
+      "fair"
+    ],
+    "maxPrice": 35,
+    "preferredPickupLocations": [
+      "东校区图书馆"
+    ],
+    "buyerId": "B003",
+    "buyerName": "小刚",
+    "status": "available",
+    "createdAt": "2026-05-10T18:11:05.830Z",
+    "updatedAt": "2026-05-10T18:11:05.830Z"
+  },
+  {
+    "id": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+    "courseName": "概率论",
+    "bookTitle": "概率论与数理统计",
+    "desiredEdition": "5",
+    "acceptableConditions": [
+      "new",
+      "like_new"
+    ],
+    "maxPrice": 50,
+    "preferredPickupLocations": [
+      "北校区教学楼"
+    ],
+    "buyerId": "B004",
+    "buyerName": "小丽",
+    "status": "available",
+    "createdAt": "2026-05-10T18:11:05.830Z",
+    "updatedAt": "2026-05-10T18:11:05.830Z"
+  },
+  {
+    "id": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+    "courseName": "数据结构",
+    "bookTitle": "数据结构与算法分析",
+    "desiredEdition": "3",
+    "acceptableConditions": [
+      "good"
+    ],
+    "maxPrice": 35,
+    "preferredPickupLocations": [
+      "计算机学院"
+    ],
+    "buyerId": "B005",
+    "buyerName": "小华",
+    "status": "available",
+    "createdAt": "2026-05-10T18:11:05.830Z",
+    "updatedAt": "2026-05-10T18:11:05.830Z"
+  }
+]

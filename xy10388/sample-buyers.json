@@ -1,0 +1,52 @@
+[
+  {
+    "courseName": "高等数学",
+    "bookTitle": "同济大学高等数学",
+    "desiredEdition": "7",
+    "acceptableConditions": ["良好", "几乎全新"],
+    "maxPrice": 40,
+    "preferredPickupLocations": ["东校区图书馆", "计算机学院"],
+    "buyerId": "B001",
+    "buyerName": "小明"
+  },
+  {
+    "courseName": "高等数学",
+    "bookTitle": "同济大学高等数学",
+    "desiredEdition": "7",
+    "acceptableConditions": ["良好", "几乎全新"],
+    "maxPrice": 45,
+    "preferredPickupLocations": ["西校区宿舍"],
+    "buyerId": "B002",
+    "buyerName": "小红"
+  },
+  {
+    "courseName": "线性代数",
+    "bookTitle": "线性代数及其应用",
+    "desiredEdition": "5",
+    "acceptableConditions": ["良好", "一般"],
+    "maxPrice": 35,
+    "preferredPickupLocations": ["东校区图书馆"],
+    "buyerId": "B003",
+    "buyerName": "小刚"
+  },
+  {
+    "courseName": "概率论",
+    "bookTitle": "概率论与数理统计",
+    "desiredEdition": "5",
+    "acceptableConditions": ["全新", "几乎全新"],
+    "maxPrice": 50,
+    "preferredPickupLocations": ["北校区教学楼"],
+    "buyerId": "B004",
+    "buyerName": "小丽"
+  },
+  {
+    "courseName": "数据结构",
+    "bookTitle": "数据结构与算法分析",
+    "desiredEdition": "3",
+    "acceptableConditions": ["良好"],
+    "maxPrice": 35,
+    "preferredPickupLocations": ["计算机学院"],
+    "buyerId": "B005",
+    "buyerName": "小华"
+  }
+]

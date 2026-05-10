@@ -1,0 +1,955 @@
+{
+  "generatedAt": "2026-05-10T18:11:19.439Z",
+  "statistics": {
+    "total": 30,
+    "matchable": 3,
+    "unmatchable": 27
+  },
+  "matchableResults": [
+    {
+      "id": "b1c67fc8-5d6e-4c53-aa09-2fa17cab2017",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+      "buyerName": "小明",
+      "sellerName": "张三",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 40,
+      "sellerPrice": 35,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "perfect_match"
+      ],
+      "matchScore": 79,
+      "canBeMatched": true,
+      "explanation": "【匹配度 79%】\n✓ 匹配点：版本匹配：第7版；成色符合：良好；价格合适：35元（您预算40元，可省5元）；取书方便：东校区图书馆\n\n推荐理由：这本书基本符合您的所有需求，可以考虑锁定交易！",
+      "missingConditions": []
+    },
+    {
+      "id": "096c9269-ba9b-4705-ad3a-e24a9de27ab5",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "57f37b5c-0582-431f-af10-f8780e1d7114",
+      "buyerName": "小刚",
+      "sellerName": "赵六",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "5",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 30,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "perfect_match"
+      ],
+      "matchScore": 79,
+      "canBeMatched": true,
+      "explanation": "【匹配度 79%】\n✓ 匹配点：版本匹配：第5版；成色符合：良好；价格合适：30元（您预算35元，可省5元）；取书方便：东校区图书馆\n\n推荐理由：这本书基本符合您的所有需求，可以考虑锁定交易！",
+      "missingConditions": []
+    },
+    {
+      "id": "b6b1d772-64c9-46b0-9165-152a26663ad9",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+      "buyerName": "小红",
+      "sellerName": "张三",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 45,
+      "sellerPrice": 35,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "perfect_match",
+        "location_mismatch"
+      ],
+      "matchScore": 70,
+      "canBeMatched": true,
+      "explanation": "【匹配度 70%】\n✓ 匹配点：版本匹配：第7版；成色符合：良好；价格合适：35元（您预算45元，可省10元）\n⚠ 提醒：注意：取书地点是东校区图书馆，不在您的偏好列表中\n\n推荐理由：这本书基本符合您的所有需求，可以考虑锁定交易！",
+      "missingConditions": [
+        "取书地点不匹配: 您偏好西校区宿舍，该书在东校区图书馆取书"
+      ]
+    }
+  ],
+  "unmatchableResults": [
+    {
+      "id": "ff4c19bb-1e23-4f1c-a5b5-21a5679019cf",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "a2605c26-1f8a-4dbd-8058-5928c177a012",
+      "buyerName": "小华",
+      "sellerName": "周八",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "3",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "计算机学院",
+      "reasons": [
+        "perfect_match",
+        "price_over_budget"
+      ],
+      "matchScore": 65,
+      "canBeMatched": false,
+      "explanation": "【不可交易】价格超预算: 您的预算是35元，该书售价40元，超出5元",
+      "missingConditions": [
+        "价格超预算: 您的预算是35元，该书售价40元，超出5元"
+      ]
+    },
+    {
+      "id": "94903b2b-2ecd-407c-948a-77ef2e5d7030",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "c55426b5-1009-45e2-8ebd-475d1588ffbe",
+      "buyerName": "小丽",
+      "sellerName": "孙七",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "4",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "new",
+      "buyerPrice": 50,
+      "sellerPrice": 45,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "北校区教学楼",
+      "reasons": [
+        "version_mismatch",
+        "perfect_match"
+      ],
+      "matchScore": 49,
+      "canBeMatched": false,
+      "explanation": "【不可交易】版本不匹配: 您需要第5版，该书是第4版",
+      "missingConditions": [
+        "版本不匹配: 您需要第5版，该书是第4版"
+      ]
+    },
+    {
+      "id": "7108e09c-a9e8-4e80-9497-ddab9952f21b",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "1964981e-0b97-4157-837b-e4ac185f9d85",
+      "buyerName": "小红",
+      "sellerName": "李四",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "6",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "like_new",
+      "buyerPrice": 45,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "西校区宿舍",
+      "reasons": [
+        "version_mismatch",
+        "perfect_match"
+      ],
+      "matchScore": 44,
+      "canBeMatched": false,
+      "explanation": "【不可交易】版本不匹配: 您需要第7版，该书是第6版",
+      "missingConditions": [
+        "版本不匹配: 您需要第7版，该书是第6版"
+      ]
+    },
+    {
+      "id": "d8646a57-5e63-43e5-b902-ca03e728e1b8",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "fd82273b-1bc5-4d0a-942d-f1d22c4535e8",
+      "buyerName": "小明",
+      "sellerName": "王五",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "fair",
+      "buyerPrice": 40,
+      "sellerPrice": 55,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "南校区食堂",
+      "reasons": [
+        "perfect_match",
+        "condition_mismatch",
+        "price_over_budget",
+        "location_mismatch"
+      ],
+      "matchScore": 40,
+      "canBeMatched": false,
+      "explanation": "【不可交易】成色不匹配: 您接受良好、几乎全新，该书是一般",
+      "missingConditions": [
+        "成色不匹配: 您接受良好、几乎全新，该书是一般",
+        "价格超预算: 您的预算是40元，该书售价55元，超出15元",
+        "取书地点不匹配: 您偏好东校区图书馆、计算机学院，该书在南校区食堂取书"
+      ]
+    },
+    {
+      "id": "3377cd7e-09c5-4a14-889f-b2b28aa02d8c",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "fd82273b-1bc5-4d0a-942d-f1d22c4535e8",
+      "buyerName": "小红",
+      "sellerName": "王五",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "fair",
+      "buyerPrice": 45,
+      "sellerPrice": 55,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "南校区食堂",
+      "reasons": [
+        "perfect_match",
+        "condition_mismatch",
+        "price_over_budget",
+        "location_mismatch"
+      ],
+      "matchScore": 40,
+      "canBeMatched": false,
+      "explanation": "【不可交易】成色不匹配: 您接受良好、几乎全新，该书是一般",
+      "missingConditions": [
+        "成色不匹配: 您接受良好、几乎全新，该书是一般",
+        "价格超预算: 您的预算是45元，该书售价55元，超出10元",
+        "取书地点不匹配: 您偏好西校区宿舍，该书在南校区食堂取书"
+      ]
+    },
+    {
+      "id": "f00d9b2f-1881-476a-817b-d792d8be9302",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "1964981e-0b97-4157-837b-e4ac185f9d85",
+      "buyerName": "小明",
+      "sellerName": "李四",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "6",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "like_new",
+      "buyerPrice": 40,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "西校区宿舍",
+      "reasons": [
+        "version_mismatch",
+        "perfect_match",
+        "location_mismatch"
+      ],
+      "matchScore": 33,
+      "canBeMatched": false,
+      "explanation": "【不可交易】版本不匹配: 您需要第7版，该书是第6版",
+      "missingConditions": [
+        "版本不匹配: 您需要第7版，该书是第6版",
+        "取书地点不匹配: 您偏好东校区图书馆、计算机学院，该书在西校区宿舍取书"
+      ]
+    },
+    {
+      "id": "580aff94-8833-444b-9775-b973490a0c91",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "57f37b5c-0582-431f-af10-f8780e1d7114",
+      "buyerName": "小明",
+      "sellerName": "赵六",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "5",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 40,
+      "sellerPrice": 30,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "24643a3f-564f-41e3-8687-59bbd937f27a",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "c55426b5-1009-45e2-8ebd-475d1588ffbe",
+      "buyerName": "小明",
+      "sellerName": "孙七",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "4",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "new",
+      "buyerPrice": 40,
+      "sellerPrice": 45,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "北校区教学楼",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "db20662e-eb5d-44f2-babd-52458fa62319",
+      "buyerRequestId": "cf811704-3032-49b8-9c5d-1e6cbfe35a10",
+      "sellerListingId": "a2605c26-1f8a-4dbd-8058-5928c177a012",
+      "buyerName": "小明",
+      "sellerName": "周八",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "3",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 40,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "东校区图书馆",
+        "计算机学院"
+      ],
+      "sellerLocation": "计算机学院",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "eb91087f-fec2-43ec-9663-9a60c8341503",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "57f37b5c-0582-431f-af10-f8780e1d7114",
+      "buyerName": "小红",
+      "sellerName": "赵六",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "5",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 45,
+      "sellerPrice": 30,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "35adb090-c20b-4bd3-b61a-fc3d0bd54f06",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "c55426b5-1009-45e2-8ebd-475d1588ffbe",
+      "buyerName": "小红",
+      "sellerName": "孙七",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "4",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "new",
+      "buyerPrice": 45,
+      "sellerPrice": 45,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "北校区教学楼",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "3eebd3c1-3e9a-465f-a24b-e0dba9b2a7e5",
+      "buyerRequestId": "a7857d12-15e4-4967-bae5-e158804c3246",
+      "sellerListingId": "a2605c26-1f8a-4dbd-8058-5928c177a012",
+      "buyerName": "小红",
+      "sellerName": "周八",
+      "courseName": "高等数学",
+      "bookTitle": "同济大学高等数学",
+      "buyerEdition": "7",
+      "sellerEdition": "3",
+      "buyerCondition": [
+        "good",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 45,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "西校区宿舍"
+      ],
+      "sellerLocation": "计算机学院",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "5920b2b7-b2f6-41c3-94a6-f455c9dc8450",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+      "buyerName": "小刚",
+      "sellerName": "张三",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 35,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "4d69a6ed-bc25-4867-9670-d63f82d0eb91",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "1964981e-0b97-4157-837b-e4ac185f9d85",
+      "buyerName": "小刚",
+      "sellerName": "李四",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "6",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "like_new",
+      "buyerPrice": 35,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "西校区宿舍",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "3bf94e5b-7d9b-4801-9fe5-b81a4f304897",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "fd82273b-1bc5-4d0a-942d-f1d22c4535e8",
+      "buyerName": "小刚",
+      "sellerName": "王五",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "fair",
+      "buyerPrice": 35,
+      "sellerPrice": 55,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "南校区食堂",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "a9d225f3-b3ae-489a-934c-f54780ec6e66",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "c55426b5-1009-45e2-8ebd-475d1588ffbe",
+      "buyerName": "小刚",
+      "sellerName": "孙七",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "4",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "new",
+      "buyerPrice": 35,
+      "sellerPrice": 45,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "北校区教学楼",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "6859ffa3-b81b-4d61-baeb-bda33bce8897",
+      "buyerRequestId": "640a79ee-0c4b-4da5-b8f2-99b7e7ed7aa1",
+      "sellerListingId": "a2605c26-1f8a-4dbd-8058-5928c177a012",
+      "buyerName": "小刚",
+      "sellerName": "周八",
+      "courseName": "线性代数",
+      "bookTitle": "线性代数及其应用",
+      "buyerEdition": "5",
+      "sellerEdition": "3",
+      "buyerCondition": [
+        "good",
+        "fair"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "东校区图书馆"
+      ],
+      "sellerLocation": "计算机学院",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "62e83040-1838-47e2-957d-db60e8e90a78",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+      "buyerName": "小丽",
+      "sellerName": "张三",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 50,
+      "sellerPrice": 35,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "28487698-2df9-4f52-8a83-79102e403c74",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "1964981e-0b97-4157-837b-e4ac185f9d85",
+      "buyerName": "小丽",
+      "sellerName": "李四",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "6",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "like_new",
+      "buyerPrice": 50,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "西校区宿舍",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "4c42cbca-0644-45c1-8695-b82c6638a124",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "fd82273b-1bc5-4d0a-942d-f1d22c4535e8",
+      "buyerName": "小丽",
+      "sellerName": "王五",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "fair",
+      "buyerPrice": 50,
+      "sellerPrice": 55,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "南校区食堂",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "246ab596-1e74-4d31-94d7-4e2da41a02e8",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "57f37b5c-0582-431f-af10-f8780e1d7114",
+      "buyerName": "小丽",
+      "sellerName": "赵六",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "5",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 50,
+      "sellerPrice": 30,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "88a4adcc-fe7a-407b-b0cf-d0968887234d",
+      "buyerRequestId": "7c36864f-1d1e-45d8-9f7a-b90a08d1136c",
+      "sellerListingId": "a2605c26-1f8a-4dbd-8058-5928c177a012",
+      "buyerName": "小丽",
+      "sellerName": "周八",
+      "courseName": "概率论",
+      "bookTitle": "概率论与数理统计",
+      "buyerEdition": "5",
+      "sellerEdition": "3",
+      "buyerCondition": [
+        "new",
+        "like_new"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 50,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "北校区教学楼"
+      ],
+      "sellerLocation": "计算机学院",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "3150da8d-655d-4e1c-b426-683e28fd49d8",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "3da67efd-a493-4e2f-b4dc-935e64fcbd0d",
+      "buyerName": "小华",
+      "sellerName": "张三",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 35,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "48a410a5-c292-44ec-b01c-8ba88a10804c",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "1964981e-0b97-4157-837b-e4ac185f9d85",
+      "buyerName": "小华",
+      "sellerName": "李四",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "6",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "like_new",
+      "buyerPrice": 35,
+      "sellerPrice": 40,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "西校区宿舍",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "1141bc92-7136-492f-9916-ab365a3c0428",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "fd82273b-1bc5-4d0a-942d-f1d22c4535e8",
+      "buyerName": "小华",
+      "sellerName": "王五",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "7",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "fair",
+      "buyerPrice": 35,
+      "sellerPrice": 55,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "南校区食堂",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "db404fae-1767-4825-bf51-c0a5094a0add",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "57f37b5c-0582-431f-af10-f8780e1d7114",
+      "buyerName": "小华",
+      "sellerName": "赵六",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "5",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "good",
+      "buyerPrice": 35,
+      "sellerPrice": 30,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "东校区图书馆",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    },
+    {
+      "id": "96bb5970-6ffb-44da-9c5c-386e9ffbd976",
+      "buyerRequestId": "d34ab4c7-0ff1-4413-a36b-5590054ddfbf",
+      "sellerListingId": "c55426b5-1009-45e2-8ebd-475d1588ffbe",
+      "buyerName": "小华",
+      "sellerName": "孙七",
+      "courseName": "数据结构",
+      "bookTitle": "数据结构与算法分析",
+      "buyerEdition": "3",
+      "sellerEdition": "4",
+      "buyerCondition": [
+        "good"
+      ],
+      "sellerCondition": "new",
+      "buyerPrice": 35,
+      "sellerPrice": 45,
+      "buyerLocations": [
+        "计算机学院"
+      ],
+      "sellerLocation": "北校区教学楼",
+      "reasons": [
+        "location_mismatch"
+      ],
+      "matchScore": 0,
+      "canBeMatched": false,
+      "explanation": "【不可交易】课程不匹配",
+      "missingConditions": [
+        "课程不匹配"
+      ]
+    }
+  ]
+}
