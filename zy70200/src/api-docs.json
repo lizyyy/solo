@@ -1,0 +1,354 @@
+{
+  "info": {
+    "title": "试用期转正管理 API",
+    "version": "1.0.0",
+    "description": "完整的试用期转正后端闭环系统，包含绩效评价、导师意见、薪资调整、延期审批等功能"
+  },
+  "baseUrl": "/api",
+  "successScenarios": {
+    "description": "以下情况判定为处理成功，系统自动完成流程",
+    "cases": [
+      {
+        "name": "正常转正",
+        "conditions": [
+          "绩效评价已批准且分数 >= 3.0",
+          "导师意见已提交且分数 >= 3.0",
+          "导师建议为 'confirm'",
+          "没有超过延期次数限制",
+          "试用期计划状态为 'evaluation_completed'"
+        ],
+        "actions": [
+          "状态自动流转: evaluation_completed -> awaiting_approval -> approved -> confirmed",
+          "薪资调整（如有）自动调度到生效日期执行",
+          "所有操作记录到转正历史"
+        ],
+        "outputs": [
+          "试用期状态变为 'confirmed'",
+          "员工 currentSalary 更新为新薪资",
+          "薪资调整记录状态变为 'effective'",
+          "HR 报表显示转正成功"
+        ]
+      },
+      {
+        "name": "延期审批通过",
+        "conditions": [
+          "延期次数 < 1",
+          "延期月数 <= 3",
+          "当前状态在允许申请延期的列表中",
+          "有明确的延期原因和改进计划"
+        ],
+        "actions": [
+          "状态流转: in_progress/awaiting_evaluation -> extension_requested -> extension_approved -> in_progress",
+          "currentEndDate 自动延长指定月数",
+          "extensionCount 自动加 1"
+        ],
+        "outputs": [
+          "试用期状态恢复为 'in_progress'",
+          "延期记录保存到 extension_requests 表",
+          "历史记录包含延期原因和改进计划"
+        ]
+      },
+      {
+        "name": "薪资调整生效",
+        "conditions": [
+          "薪资调整状态为 'approved'",
+          "生效日期已到达",
+          "员工状态为 active",
+          "后台任务执行成功"
+        ],
+        "actions": [
+          "BullMQ 任务在生效日期自动触发",
+          "更新员工 currentSalary",
+          "更新薪资调整记录状态为 'effective'",
+          "记录薪资调整历史"
+        ],
+        "outputs": [
+          "员工薪资已更新",
+          "薪资调整记录包含 effectiveAt 和 taskId",
+          "历史记录可追溯"
+        ]
+      }
+    ]
+  },
+  "manualReviewScenarios": {
+    "description": "以下情况需要进入人工复核，系统标记并提醒",
+    "cases": [
+      {
+        "name": "绩效分数不达标",
+        "trigger": "绩效评价分数 < 3.0",
+        "rule": "MIN_PERFORMANCE_SCORE = 3.0",
+        "recommendedAction": "根据导师建议决定：延期或终止",
+        "whereToCheck": [
+          "GET /api/reports/pending-reviews - needsManualReview 列表",
+          "GET /api/reports/audit/probation/:id - 规则检查记录",
+          "POST /api/probation/:id/submit-approval - 返回 shouldReview=true"
+        ],
+        "managerOptions": [
+          "POST /api/probation/extensions - 申请延期",
+          "POST /api/probation/:id/terminate - 终止试用期"
+        ]
+      },
+      {
+        "name": "导师评分不达标",
+        "trigger": "导师意见分数 < 3.0",
+        "rule": "MIN_MENTOR_FEEDBACK_SCORE = 3.0",
+        "recommendedAction": "参考导师建议决定",
+        "whereToCheck": [
+          "GET /api/reports/pending-reviews",
+          "试用期详情中的 mentorFeedbacks"
+        ]
+      },
+      {
+        "name": "导师建议延期",
+        "trigger": "mentorFeedback.recommendation = 'extend'",
+        "rule": "导师建议权重较高",
+        "recommendedAction": "考虑延期申请",
+        "whereToCheck": [
+          "规则检查详情中的 recommendedAction = 'consider_extension'"
+        ]
+      },
+      {
+        "name": "导师建议终止",
+        "trigger": "mentorFeedback.recommendation = 'terminate'",
+        "rule": "导师建议权重较高",
+        "recommendedAction": "考虑终止试用期",
+        "whereToCheck": [
+          "规则检查详情中的 recommendedAction = 'consider_termination'"
+        ]
+      },
+      {
+        "name": "缺少必要评价",
+        "trigger": "缺少已批准的绩效评价或已提交的导师意见",
+        "rule": "必须两者都齐全才能审批",
+        "recommendedAction": "催促相关人员提交评价",
+        "whereToCheck": [
+          "GET /api/reports/pending-reviews - pendingEvaluations 和 pendingMentorFeedbacks"
+        ]
+      },
+      {
+        "name": "延期超过限制",
+        "trigger": "延期次数 >= 1 或延期月数 > 3",
+        "rule": "MAX_EXTENSION_COUNT = 1, MAX_EXTENSION_MONTHS = 3",
+        "recommendedAction": "特殊审批或终止试用期",
+        "whereToCheck": [
+          "POST /api/probation/extensions - 返回错误信息包含失败规则"
+        ]
+      }
+    ]
+  },
+  "backgroundTasks": {
+    "description": "后台任务处理机制",
+    "tasks": [
+      {
+        "name": "薪资生效任务 (salary-effect)",
+        "queue": "BullMQ Queue",
+        "trigger": "薪资调整审批通过后自动调度",
+        "delay": "根据 effectiveDate 计算，最少 0 毫秒（立即执行）",
+        "retryStrategy": {
+          "maxAttempts": 5,
+          "backoff": "exponential",
+          "initialDelay": "60 秒",
+          "subsequentDelays": "120s, 240s, 480s, 960s"
+        },
+        "failureBehavior": {
+          "whatHappens": [
+            "任务保留在队列中（removeOnFail: false）",
+            "错误信息记录到 probation_histories 表",
+            "action = 'SALARY_EFFECT_FAILED'",
+            "metadata 包含 jobId、错误信息、尝试次数、失败时间"
+          ],
+          "howToDetect": [
+            "GET /api/reports/salary-adjustments - 状态为 'approved' 但 effectiveAt 为 null",
+            "GET /api/reports/audit/probation/:id - 查找 SALARY_EFFECT_FAILED 记录"
+          ],
+          "retryProcedure": [
+            "BullMQ 会自动重试最多 5 次",
+            "如果 5 次都失败，需要人工介入",
+            "人工可通过 BullMQ Dashboard 或 API 重新入队",
+            "任务具有幂等性：已生效的薪资调整会被跳过（status = 'already_effective'）"
+          ]
+        },
+        "successBehavior": {
+          "whatHappens": [
+            "任务从队列中移除（removeOnComplete: true）",
+            "薪资调整记录状态变为 'effective'",
+            "记录 effectiveAt 和 taskId",
+            "员工 currentSalary 已更新",
+            "probation_histories 记录 SALARY_ADJUSTMENT"
+          ],
+          "progressTracking": [
+            "10%: 开始处理",
+            "30%: 验证薪资调整记录",
+            "50%: 验证员工信息",
+            "70%: 更新薪资记录",
+            "80%: 记录历史",
+            "100%: 完成"
+          ]
+        }
+      }
+    ]
+  },
+  "statusTransitions": {
+    "description": "试用期状态流转图（可复查）",
+    "transitions": {
+      "pending": ["in_progress"],
+      "in_progress": ["awaiting_evaluation", "extension_requested", "terminated"],
+      "awaiting_evaluation": ["evaluation_completed", "extension_requested"],
+      "evaluation_completed": ["awaiting_approval", "extension_requested"],
+      "awaiting_approval": ["approved", "rejected", "extension_requested"],
+      "extension_requested": ["extension_approved", "extension_rejected"],
+      "extension_approved": ["in_progress"],
+      "extension_rejected": ["awaiting_approval", "terminated"],
+      "approved": ["confirmed"],
+      "rejected": ["terminated"],
+      "confirmed": [],
+      "terminated": []
+    },
+    "terminalStatuses": ["confirmed", "terminated"],
+    "note": "终态后无法再变更状态"
+  },
+  "businessRules": {
+    "description": "所有业务规则定义在 src/constants/index.js 中，可通过 API 查看",
+    "endpoint": "GET /api/reports/rules",
+    "rules": {
+      "performance": {
+        "minScore": 3.0,
+        "description": "绩效评价最低分数要求"
+      },
+      "mentor": {
+        "minScore": 3.0,
+        "description": "导师意见最低分数要求"
+      },
+      "extension": {
+        "maxCount": 1,
+        "maxMonths": 3,
+        "description": "延期次数和月数限制"
+      },
+      "autoConfirm": {
+        "daysAfterApproval": 0,
+        "description": "审批通过后自动转正的天数"
+      }
+    }
+  },
+  "auditTrail": {
+    "description": "所有关键操作都有完整的审计追踪",
+    "recordedActions": [
+      "PLAN_CREATED - 试用期计划创建",
+      "STATUS_CHANGE - 状态变更（含前后状态）",
+      "RULE_CHECK - 规则检查结果",
+      "EVALUATION_SUBMITTED - 绩效评价提交",
+      "MENTOR_FEEDBACK_SUBMITTED - 导师意见提交",
+      "EXTENSION_REQUESTED - 延期申请",
+      "SALARY_ADJUSTMENT - 薪资调整",
+      "SALARY_EFFECT_FAILED - 薪资生效失败"
+    ],
+    "historyFields": {
+      "action": "操作类型",
+      "previousStatus": "变更前状态",
+      "newStatus": "变更后状态",
+      "performedBy": "操作人",
+      "performedByRole": "操作人角色",
+      "comment": "备注",
+      "metadata": "详细信息（JSON）",
+      "timestamp": "时间戳"
+    },
+    "queryEndpoints": [
+      "GET /api/probation/:id/history - 单个试用期计划的历史",
+      "GET /api/probation/employee/:employeeId/history - 员工的所有试用期历史",
+      "GET /api/reports/audit/employee/:employeeId - 员工审计追踪",
+      "GET /api/reports/audit/probation/:probationPlanId - 试用期审计追踪"
+    ]
+  },
+  "hrReports": {
+    "description": "HR 可检查的报表输出",
+    "endpoints": [
+      {
+        "name": "仪表盘概览",
+        "endpoint": "GET /api/reports/dashboard",
+        "outputs": [
+          "各状态试用期数量统计",
+          "7天内到期的试用期列表（含剩余天数）",
+          "延期使用统计",
+          "转正率计算"
+        ]
+      },
+      {
+        "name": "待处理评审",
+        "endpoint": "GET /api/reports/pending-reviews",
+        "outputs": [
+          "待审批的绩效评价列表",
+          "待提交的导师意见列表",
+          "待审批的转正申请数量",
+          "需要人工复核的试用期列表（含规则检查结果）"
+        ]
+      },
+      {
+        "name": "薪资调整报告",
+        "endpoint": "GET /api/reports/salary-adjustments",
+        "outputs": [
+          "薪资调整总数",
+          "已生效/待生效数量",
+          "调整总金额",
+          "平均调整百分比",
+          "每条调整的详细信息（员工、调整前后薪资、状态、生效时间）"
+        ]
+      },
+      {
+        "name": "转正历史报告",
+        "endpoint": "GET /api/reports/confirmation-history",
+        "outputs": [
+          "已完成试用期总数",
+          "转正/拒绝/终止数量",
+          "转正率",
+          "每条记录包含：员工信息、绩效分数、导师评分、导师建议、薪资调整详情"
+        ]
+      }
+    ]
+  },
+  "apiEndpoints": {
+    "employees": {
+      "POST /api/employees": "创建员工",
+      "GET /api/employees": "获取员工列表",
+      "GET /api/employees/:id": "获取员工详情"
+    },
+    "probation": {
+      "POST /api/probation": "创建试用期计划",
+      "POST /api/probation/:id/start": "启动试用期",
+      "GET /api/probation": "获取试用期列表（支持 status 和 employeeId 过滤）",
+      "GET /api/probation/:id": "获取试用期详情（含所有关联数据）",
+      "POST /api/probation/evaluations": "提交绩效评价",
+      "POST /api/probation/evaluations/:id/approve": "批准绩效评价",
+      "POST /api/probation/mentor-feedbacks": "提交导师意见",
+      "POST /api/probation/:id/submit-approval": "提交转正审批（触发规则检查）",
+      "POST /api/probation/:id/approve": "批准转正（可选薪资调整）",
+      "POST /api/probation/:id/reject": "拒绝转正",
+      "POST /api/probation/extensions": "申请延期",
+      "POST /api/probation/extensions/:id/approve": "批准延期",
+      "POST /api/probation/extensions/:id/reject": "拒绝延期",
+      "POST /api/probation/:id/terminate": "终止试用期",
+      "GET /api/probation/:id/history": "获取试用期历史记录",
+      "GET /api/probation/employee/:employeeId/history": "获取员工试用期历史"
+    },
+    "reports": {
+      "GET /api/reports/dashboard": "仪表盘概览",
+      "GET /api/reports/pending-reviews": "待处理评审",
+      "GET /api/reports/salary-adjustments": "薪资调整报告",
+      "GET /api/reports/confirmation-history": "转正历史报告",
+      "GET /api/reports/audit/employee/:employeeId": "员工审计追踪",
+      "GET /api/reports/audit/probation/:probationPlanId": "试用期审计追踪",
+      "GET /api/reports/rules": "查看系统规则"
+    }
+  },
+  "requestHeaders": {
+    "description": "操作人信息通过请求头传递（简化版，后续可替换为 JWT）",
+    "headers": {
+      "createdBy": "创建人 ID",
+      "startedBy": "启动人 ID",
+      "submittedBy": "提交人 ID",
+      "approvedBy": "批准人 ID",
+      "rejectedBy": "拒绝人 ID",
+      "terminatedBy": "终止人 ID",
+      "mentorId": "导师 ID（仅用于导师意见）"
+    }
+  }
+}
