@@ -1,0 +1,62 @@
+[
+  {
+    "containerNo": "MSKU1234567",
+    "originalPosition": "A01-01-01",
+    "currentPosition": "A01-01-01",
+    "timestamp": "2024-01-15T08:30:00Z",
+    "isShifted": false,
+    "metadata": {
+      "shipVoyage": "MAERSK E-DISCOVERY / 123E",
+      "weight": 23500,
+      "size": "40HQ"
+    }
+  },
+  {
+    "containerNo": "HLCU9876543",
+    "originalPosition": "B02-03-04",
+    "currentPosition": "C05-06-07",
+    "timestamp": "2024-01-15T09:15:00Z",
+    "isShifted": true,
+    "metadata": {
+      "shipVoyage": "HAMBURG EXPRESS / 456W",
+      "weight": 18200,
+      "size": "20GP"
+    }
+  },
+  {
+    "containerNo": "OOCU1122334",
+    "originalPosition": "D10-05-03",
+    "currentPosition": "D10-05-03",
+    "timestamp": "2024-01-15T10:00:00Z",
+    "isShifted": false,
+    "metadata": {
+      "shipVoyage": "OOCL HONG KONG / 789E",
+      "weight": 28900,
+      "size": "40HQ"
+    }
+  },
+  {
+    "containerNo": "YMLU5566778",
+    "originalPosition": "E03-12-08",
+    "currentPosition": "F07-02-05",
+    "timestamp": "2024-01-15T10:45:00Z",
+    "isShifted": true,
+    "metadata": {
+      "shipVoyage": "YM EFFICIENCY / 321W",
+      "weight": 15600,
+      "size": "20GP"
+    }
+  },
+  {
+    "containerNo": "KMTU9900112",
+    "originalPosition": "G06-09-04",
+    "currentPosition": "G06-09-04",
+    "timestamp": "2024-01-15T11:30:00Z",
+    "isShifted": false,
+    "metadata": {
+      "shipVoyage": "KMTC BANGKOK / 654E",
+      "weight": 21400,
+      "size": "40GP"
+    }
+  }
+]

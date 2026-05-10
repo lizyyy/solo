@@ -1,0 +1,14 @@
+{
+  "name": "yard-position-corrector",
+  "version": "1.0.0",
+  "description": "码头堆场箱位纠错CLI工具 - 处理集装箱临时移位后的多源数据一致性校验",
+  "bin": {
+    "yardc": "./bin/yardc.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": ["container", "yard", "correction", "cli", "logistics"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "containerNo": "MSKU1234567",
+    "originalPosition": "A01-01-01",
+    "currentPosition": "A01-01-01",
+    "timestamp": "2024-01-15T14:00:00Z",
+    "isShifted": false,
+    "metadata": {
+      "lastCheck": "2024-01-15T13:30:00Z",
+      "bayOccupancy": 85
+    }
+  },
+  {
+    "containerNo": "HLCU9876543",
+    "originalPosition": "B02-03-04",
+    "currentPosition": "C05-06-07",
+    "timestamp": "2024-01-15T14:00:00Z",
+    "isShifted": true,
+    "metadata": {
+      "lastCheck": "2024-01-15T13:45:00Z",
+      "bayOccupancy": 72
+    }
+  },
+  {
+    "containerNo": "OOCU1122334",
+    "originalPosition": "D10-05-03",
+    "currentPosition": "D10-05-03",
+    "timestamp": "2024-01-15T14:00:00Z",
+    "isShifted": false,
+    "metadata": {
+      "lastCheck": "2024-01-15T13:50:00Z",
+      "bayOccupancy": 90
+    }
+  },
+  {
+    "containerNo": "YMLU5566778",
+    "originalPosition": "E03-12-08",
+    "currentPosition": "F07-02-05",
+    "timestamp": "2024-01-15T14:00:00Z",
+    "isShifted": true,
+    "metadata": {
+      "lastCheck": "2024-01-15T13:55:00Z",
+      "bayOccupancy": 60
+    }
+  },
+  {
+    "containerNo": "KMTU9900112",
+    "originalPosition": "G06-09-04",
+    "currentPosition": "G06-09-04",
+    "timestamp": "2024-01-15T14:00:00Z",
+    "isShifted": false,
+    "metadata": {
+      "lastCheck": "2024-01-15T13:58:00Z",
+      "bayOccupancy": 78
+    }
+  }
+]

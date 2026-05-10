@@ -1,0 +1,29 @@
+[
+  {
+    "containerNo": "HLCU9876543",
+    "fromPosition": "B02-03-04",
+    "toPosition": "C05-06-07",
+    "operator": "ZHANG_SAN",
+    "timestamp": "2024-01-15T09:30:00Z",
+    "reason": "舱位调整",
+    "sequence": 1
+  },
+  {
+    "containerNo": "YMLU5566778",
+    "fromPosition": "E03-12-08",
+    "toPosition": "E05-09-03",
+    "operator": "LI_SI",
+    "timestamp": "2024-01-15T11:00:00Z",
+    "reason": "提箱前置准备",
+    "sequence": 1
+  },
+  {
+    "containerNo": "YMLU5566778",
+    "fromPosition": "E05-09-03",
+    "toPosition": "F07-02-05",
+    "operator": "LI_SI",
+    "timestamp": "2024-01-15T11:30:00Z",
+    "reason": "临时存放区调整",
+    "sequence": 2
+  }
+]
