@@ -9,12 +9,20 @@ import com.resiliencehub.tracing.TraceContext;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/api/v1/demo")
@@ -23,13 +31,16 @@ public class DemoController {
     private final RateLimitService rateLimitService;
     private final CircuitBreakerService circuitBreakerService;
     private final FaultInjector faultInjector;
+    private final ExecutorService simulationExecutor;
     
     public DemoController(RateLimitService rateLimitService,
                          CircuitBreakerService circuitBreakerService,
-                         FaultInjector faultInjector) {
+                         FaultInjector faultInjector,
+                         @Qualifier("simulationExecutor") ExecutorService simulationExecutor) {
         this.rateLimitService = rateLimitService;
         this.circuitBreakerService = circuitBreakerService;
         this.faultInjector = faultInjector;
+        this.simulationExecutor = simulationExecutor;
     }
     
     @GetMapping("/rate-limit")
@@ -165,31 +176,93 @@ public class DemoController {
         result.put("totalRequests", requests);
         result.put("maxConcurrency", concurrency);
         result.put("traceId", TraceContext.getTraceId());
+        result.put("executionType", "concurrent");
         
-        int successCount = 0;
-        int failCount = 0;
-        int rateLimitedCount = 0;
+        AtomicInteger successCount = new AtomicInteger(0);
+        AtomicInteger failCount = new AtomicInteger(0);
+        AtomicInteger rateLimitedCount = new AtomicInteger(0);
+        AtomicInteger actualConcurrentCount = new AtomicInteger(0);
+        AtomicInteger maxObservedConcurrent = new AtomicInteger(0);
+        List<Map<String, Object>> requestDetails = new ArrayList<>();
         
-        for (int i = 0; i < requests; i++) {
-            boolean allowed = rateLimitService.tryAcquireTokenBucket(
-                "high-concurrency-demo", 
-                concurrency, 
-                1);
-            if (allowed) {
+        String limitKey = "high-concurrency-demo:" + UUID.randomUUID().toString().substring(0, 8);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(requests);
+        
+        long startTime = System.currentTimeMillis();
+        
+        IntStream.range(0, requests).forEach(i -> {
+            simulationExecutor.submit(() -> {
+                int currentConcurrent = actualConcurrentCount.incrementAndGet();
+                maxObservedConcurrent.updateAndGet(current -> Math.max(current, currentConcurrent));
+                
                 try {
-                    Thread.sleep(10);
-                    successCount++;
+                    startLatch.await();
+                    
+                    long requestStart = System.currentTimeMillis();
+                    Map<String, Object> detail = new HashMap<>();
+                    detail.put("requestIndex", i);
+                    detail.put("startTime", requestStart);
+                    detail.put("thread", Thread.currentThread().getName());
+                    
+                    boolean allowed = rateLimitService.tryAcquireTokenBucket(
+                        limitKey, 
+                        concurrency, 
+                        1);
+                    
+                    if (allowed) {
+                        try {
+                            Thread.sleep(10 + (long)(Math.random() * 10));
+                            successCount.incrementAndGet();
+                            detail.put("status", "SUCCESS");
+                        } catch (InterruptedException e) {
+                            failCount.incrementAndGet();
+                            detail.put("status", "FAILED");
+                            Thread.currentThread().interrupt();
+                        }
+                    } else {
+                        rateLimitedCount.incrementAndGet();
+                        detail.put("status", "RATE_LIMITED");
+                    }
+                    
+                    detail.put("durationMs", System.currentTimeMillis() - requestStart);
+                    synchronized(requestDetails) {
+                        requestDetails.add(detail);
+                    }
                 } catch (InterruptedException e) {
-                    failCount++;
+                    failCount.incrementAndGet();
+                    Thread.currentThread().interrupt();
+                } finally {
+                    actualConcurrentCount.decrementAndGet();
+                    doneLatch.countDown();
                 }
-            } else {
-                rateLimitedCount++;
-            }
+            });
+        });
+        
+        startLatch.countDown();
+        
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         
-        result.put("successCount", successCount);
-        result.put("failCount", failCount);
-        result.put("rateLimitedCount", rateLimitedCount);
+        long duration = System.currentTimeMillis() - startTime;
+        rateLimitService.reset(limitKey);
+        
+        result.put("successCount", successCount.get());
+        result.put("failCount", failCount.get());
+        result.put("rateLimitedCount", rateLimitedCount.get());
+        result.put("maxObservedConcurrent", maxObservedConcurrent.get());
+        result.put("durationMs", duration);
+        result.put("actualQps", requests > 0 ? (double) requests / (duration / 1000.0) : 0);
+        
+        int showDetails = Math.min(requests, 20);
+        List<Map<String, Object>> sampleDetails = requestDetails.stream()
+            .limit(showDetails)
+            .collect(Collectors.toList());
+        result.put("sampleDetails", sampleDetails);
+        result.put("totalDetailsCount", requestDetails.size());
         
         return Result.success(result);
     }
@@ -222,28 +295,80 @@ public class DemoController {
         result.put("concurrentUsers", concurrentUsers);
         result.put("qpsLimit", qpsLimit);
         result.put("traceId", TraceContext.getTraceId());
+        result.put("executionType", "concurrent-peak");
         
-        int success = 0;
-        int rateLimited = 0;
+        AtomicInteger success = new AtomicInteger(0);
+        AtomicInteger rateLimited = new AtomicInteger(0);
+        AtomicInteger activeThreads = new AtomicInteger(0);
+        AtomicInteger maxActiveThreads = new AtomicInteger(0);
+        List<Long> latencyTimes = new ArrayList<>();
+        
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(totalRequests);
+        
         long startTime = System.currentTimeMillis();
         
-        for (int i = 0; i < totalRequests; i++) {
-            boolean allowed = rateLimitService.tryAcquireSlidingWindow(limitKey, qpsLimit, 1);
-            if (allowed) {
-                success++;
-            } else {
-                rateLimited++;
-            }
+        IntStream.range(0, totalRequests).forEach(i -> {
+            simulationExecutor.submit(() -> {
+                int currentActive = activeThreads.incrementAndGet();
+                maxActiveThreads.updateAndGet(cur -> Math.max(cur, currentActive));
+                
+                try {
+                    startLatch.await();
+                    
+                    long reqStart = System.currentTimeMillis();
+                    boolean allowed = rateLimitService.tryAcquireSlidingWindow(limitKey, qpsLimit, 1);
+                    
+                    if (allowed) {
+                        try {
+                            Thread.sleep(5 + (long)(Math.random() * 5));
+                            success.incrementAndGet();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    } else {
+                        rateLimited.incrementAndGet();
+                    }
+                    
+                    long latency = System.currentTimeMillis() - reqStart;
+                    synchronized(latencyTimes) {
+                        latencyTimes.add(latency);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    activeThreads.decrementAndGet();
+                    doneLatch.countDown();
+                }
+            });
+        });
+        
+        startLatch.countDown();
+        
+        try {
+            doneLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         
         long duration = System.currentTimeMillis() - startTime;
-        
-        result.put("successCount", success);
-        result.put("rateLimitedCount", rateLimited);
-        result.put("durationMs", duration);
-        result.put("actualQps", (double) totalRequests / (duration / 1000.0));
-        
         rateLimitService.reset(limitKey);
+        
+        result.put("successCount", success.get());
+        result.put("rateLimitedCount", rateLimited.get());
+        result.put("durationMs", duration);
+        result.put("actualQps", duration > 0 ? (double) totalRequests / (duration / 1000.0) : 0);
+        result.put("maxActiveThreads", maxActiveThreads.get());
+        
+        if (!latencyTimes.isEmpty()) {
+            latencyTimes.sort(Long::compare);
+            result.put("minLatencyMs", latencyTimes.get(0));
+            result.put("maxLatencyMs", latencyTimes.get(latencyTimes.size() - 1));
+            result.put("avgLatencyMs", latencyTimes.stream().mapToLong(Long::longValue).average().orElse(0));
+            result.put("p50LatencyMs", latencyTimes.get((int)(latencyTimes.size() * 0.5)));
+            result.put("p95LatencyMs", latencyTimes.get((int)(latencyTimes.size() * 0.95)));
+            result.put("p99LatencyMs", latencyTimes.get((int)(latencyTimes.size() * 0.99)));
+        }
         
         return Result.success(result);
     }

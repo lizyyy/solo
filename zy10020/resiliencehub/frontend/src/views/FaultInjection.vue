@@ -149,7 +149,7 @@
             title="选择一个端点进行测试，查看故障注入效果"
             style="margin-bottom: 15px;"
           />
-          <el-select v-model="testEndpoint" placeholder="选择测试端点" style="width: 100%;">
+          <el-select v-model="selectedTestEndpoint" placeholder="选择测试端点" style="width: 100%;">
             <el-option 
               v-for="ep in defaultEndpoints" 
               :key="ep.value" 
@@ -160,7 +160,7 @@
           <el-button 
             type="primary" 
             style="margin-top: 10px; width: 100%;"
-            @click="testEndpoint"
+            @click="runEndpointTest"
             :loading="testLoading"
           >
             <el-icon><VideoPlay /></el-icon> 执行测试
@@ -237,7 +237,7 @@ const defaultEndpoints = [
 ]
 
 const customEndpoint = ref('')
-const testEndpoint = ref('')
+const selectedTestEndpoint = ref('')
 const testLoading = ref(false)
 const testResult = ref(null)
 const activeFaults = ref([])
@@ -342,8 +342,8 @@ const resetForm = () => {
   customEndpoint.value = ''
 }
 
-const testEndpoint = async () => {
-  if (!testEndpoint.value) {
+const runEndpointTest = async () => {
+  if (!selectedTestEndpoint.value) {
     ElMessage.warning('请选择测试端点')
     return
   }
@@ -352,7 +352,7 @@ const testEndpoint = async () => {
   testResult.value = null
   
   try {
-    const res = await axios.get(testEndpoint.value)
+    const res = await axios.get(selectedTestEndpoint.value)
     testResult.value = res.data
     ElMessage.success('测试成功')
   } catch (error) {
