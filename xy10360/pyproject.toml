@@ -1,0 +1,21 @@
+[project]
+name = "inspection-cli"
+version = "0.1.0"
+description = "设备巡检二维码补录 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "pandas>=1.3",
+    "openpyxl>=3.0",
+    "rich>=10.0",
+]
+
+[project.scripts]
+inspection = "inspection_cli.main:cli"
+
+[tool.setuptools.packages.find]
+include = ["inspection_cli*"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
