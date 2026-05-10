@@ -1,0 +1,35 @@
+{
+  "name": "gift-rule-replay-cli",
+  "version": "1.0.0",
+  "description": "电商赠品规则回放 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "gift-replay": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecommerce",
+    "gift",
+    "promotion",
+    "replay",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  }
+}

@@ -1,0 +1,103 @@
+[
+  {
+    "id": "RULE-001",
+    "name": "双11预热满1000送赠品A",
+    "description": "11月1日-11月10日，满1000元送赠品A",
+    "version": 1,
+    "priority": 10,
+    "effectiveTime": "2024-11-01T00:00:00.000Z",
+    "expireTime": "2024-11-10T23:59:59.000Z",
+    "conditions": {
+      "minAmount": 1000
+    },
+    "gifts": [
+      {
+        "giftSku": "GIFT-A",
+        "giftName": "精美礼盒套装",
+        "quantity": 1
+      }
+    ],
+    "createdAt": "2024-10-15T00:00:00.000Z"
+  },
+  {
+    "id": "RULE-002",
+    "name": "双11预热满2000送赠品B",
+    "description": "11月1日-11月10日，满2000元送赠品B（与满1000赠可叠加）",
+    "version": 1,
+    "priority": 15,
+    "effectiveTime": "2024-11-01T00:00:00.000Z",
+    "expireTime": "2024-11-10T23:59:59.000Z",
+    "conditions": {
+      "minAmount": 2000
+    },
+    "gifts": [
+      {
+        "giftSku": "GIFT-B",
+        "giftName": "高级保温杯",
+        "quantity": 1
+      }
+    ],
+    "createdAt": "2024-10-15T00:00:00.000Z"
+  },
+  {
+    "id": "RULE-003",
+    "name": "双11正式满1500送赠品C",
+    "description": "11月11日-11月12日，满1500元送赠品C（替换旧规则）",
+    "version": 2,
+    "priority": 20,
+    "effectiveTime": "2024-11-11T00:00:00.000Z",
+    "expireTime": "2024-11-12T23:59:59.000Z",
+    "conditions": {
+      "minAmount": 1500
+    },
+    "gifts": [
+      {
+        "giftSku": "GIFT-C",
+        "giftName": "限量版手办",
+        "quantity": 1
+      }
+    ],
+    "createdAt": "2024-11-01T00:00:00.000Z"
+  },
+  {
+    "id": "RULE-004",
+    "name": "指定品类（数码）送赠品D",
+    "description": "11月1日-11月30日，购买数码品类商品送赠品D",
+    "version": 1,
+    "priority": 5,
+    "effectiveTime": "2024-11-01T00:00:00.000Z",
+    "expireTime": "2024-11-30T23:59:59.000Z",
+    "conditions": {
+      "includeCategories": ["数码", "手机", "电脑"]
+    },
+    "gifts": [
+      {
+        "giftSku": "GIFT-D",
+        "giftName": "数据线套装",
+        "quantity": 1
+      }
+    ],
+    "createdAt": "2024-10-20T00:00:00.000Z"
+  },
+  {
+    "id": "RULE-005",
+    "name": "双11数码专属满2000送赠品E",
+    "description": "11月11日，数码品类满2000元送赠品E（与RULE-003时间重叠）",
+    "version": 1,
+    "priority": 25,
+    "effectiveTime": "2024-11-11T00:00:00.000Z",
+    "expireTime": "2024-11-11T23:59:59.000Z",
+    "conditions": {
+      "minAmount": 2000,
+      "includeCategories": ["数码", "手机", "电脑"]
+    },
+    "gifts": [
+      {
+        "giftSku": "GIFT-E",
+        "giftName": "蓝牙耳机",
+        "quantity": 1
+      }
+    ],
+    "createdAt": "2024-11-05T00:00:00.000Z"
+  }
+]

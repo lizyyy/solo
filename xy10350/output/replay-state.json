@@ -1,0 +1,175 @@
+{
+  "lastReplayTime": "2026-05-10T13:20:31.662Z",
+  "processedOrders": [
+    "ORDER-001",
+    "ORDER-002",
+    "ORDER-003",
+    "ORDER-004",
+    "ORDER-005",
+    "ORDER-006",
+    "ORDER-007",
+    "ORDER-008",
+    "ORDER-009",
+    "ORDER-010"
+  ],
+  "inventorySnapshot": [
+    {
+      "giftSku": "GIFT-A",
+      "giftName": "精美礼盒套装",
+      "totalQuantity": 5,
+      "availableQuantity": 2
+    },
+    {
+      "giftSku": "GIFT-B",
+      "giftName": "高级保温杯",
+      "totalQuantity": 10,
+      "availableQuantity": 8
+    },
+    {
+      "giftSku": "GIFT-C",
+      "giftName": "限量版手办",
+      "totalQuantity": 2,
+      "availableQuantity": 0
+    },
+    {
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "totalQuantity": 20,
+      "availableQuantity": 14
+    },
+    {
+      "giftSku": "GIFT-E",
+      "giftName": "蓝牙耳机",
+      "totalQuantity": 1,
+      "availableQuantity": 0
+    }
+  ],
+  "grants": [
+    {
+      "orderId": "ORDER-001",
+      "giftSku": "GIFT-A",
+      "giftName": "精美礼盒套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.656Z",
+      "ruleId": "RULE-001",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-002",
+      "giftSku": "GIFT-B",
+      "giftName": "高级保温杯",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-002",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-002",
+      "giftSku": "GIFT-A",
+      "giftName": "精美礼盒套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-001",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-004",
+      "giftSku": "GIFT-B",
+      "giftName": "高级保温杯",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-002",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-004",
+      "giftSku": "GIFT-A",
+      "giftName": "精美礼盒套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-001",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-004",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-005",
+      "giftSku": "GIFT-C",
+      "giftName": "限量版手办",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-003",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-006",
+      "giftSku": "GIFT-E",
+      "giftName": "蓝牙耳机",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-005",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-006",
+      "giftSku": "GIFT-C",
+      "giftName": "限量版手办",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-003",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-006",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-007",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-008",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-009",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    },
+    {
+      "orderId": "ORDER-010",
+      "giftSku": "GIFT-D",
+      "giftName": "数据线套装",
+      "quantity": 1,
+      "grantedAt": "2026-05-10T13:20:31.657Z",
+      "ruleId": "RULE-004",
+      "replayId": "b2959758-095e-4c7d-a7a2-7f817018665e"
+    }
+  ]
+}

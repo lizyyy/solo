@@ -1,0 +1,272 @@
+[
+  {
+    "orderId": "ORDER-001",
+    "userId": "USER-001",
+    "createTime": "2024-11-05T10:30:00.000Z",
+    "totalAmount": 1200,
+    "items": [
+      {
+        "sku": "SKU-001",
+        "name": "T恤",
+        "category": "服饰",
+        "quantity": 2,
+        "unitPrice": 600,
+        "totalPrice": 1200
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-A",
+        "giftName": "精美礼盒套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-001"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-002",
+    "userId": "USER-002",
+    "createTime": "2024-11-06T14:20:00.000Z",
+    "totalAmount": 2500,
+    "items": [
+      {
+        "sku": "SKU-002",
+        "name": "运动鞋",
+        "category": "服饰",
+        "quantity": 1,
+        "unitPrice": 1500,
+        "totalPrice": 1500
+      },
+      {
+        "sku": "SKU-003",
+        "name": "运动裤",
+        "category": "服饰",
+        "quantity": 1,
+        "unitPrice": 1000,
+        "totalPrice": 1000
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-A",
+        "giftName": "精美礼盒套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-001"
+      },
+      {
+        "giftSku": "GIFT-B",
+        "giftName": "高级保温杯",
+        "quantity": 1,
+        "sourceRuleId": "RULE-002"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-003",
+    "userId": "USER-003",
+    "createTime": "2024-11-07T09:15:00.000Z",
+    "totalAmount": 800,
+    "items": [
+      {
+        "sku": "SKU-004",
+        "name": "短袖",
+        "category": "服饰",
+        "quantity": 2,
+        "unitPrice": 400,
+        "totalPrice": 800
+      }
+    ],
+    "actualGifts": []
+  },
+  {
+    "orderId": "ORDER-004",
+    "userId": "USER-004",
+    "createTime": "2024-11-08T16:45:00.000Z",
+    "totalAmount": 3500,
+    "items": [
+      {
+        "sku": "SKU-005",
+        "name": "iPhone 15",
+        "category": "手机",
+        "quantity": 1,
+        "unitPrice": 3500,
+        "totalPrice": 3500
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-A",
+        "giftName": "精美礼盒套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-001"
+      },
+      {
+        "giftSku": "GIFT-B",
+        "giftName": "高级保温杯",
+        "quantity": 1,
+        "sourceRuleId": "RULE-002"
+      },
+      {
+        "giftSku": "GIFT-D",
+        "giftName": "数据线套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-004"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-005",
+    "userId": "USER-005",
+    "createTime": "2024-11-11T00:05:00.000Z",
+    "totalAmount": 1800,
+    "items": [
+      {
+        "sku": "SKU-006",
+        "name": "外套",
+        "category": "服饰",
+        "quantity": 1,
+        "unitPrice": 1800,
+        "totalPrice": 1800
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-C",
+        "giftName": "限量版手办",
+        "quantity": 1,
+        "sourceRuleId": "RULE-003"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-006",
+    "userId": "USER-006",
+    "createTime": "2024-11-11T12:30:00.000Z",
+    "totalAmount": 2800,
+    "items": [
+      {
+        "sku": "SKU-007",
+        "name": "MacBook Pro",
+        "category": "电脑",
+        "quantity": 1,
+        "unitPrice": 2800,
+        "totalPrice": 2800
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-C",
+        "giftName": "限量版手办",
+        "quantity": 1,
+        "sourceRuleId": "RULE-003"
+      },
+      {
+        "giftSku": "GIFT-D",
+        "giftName": "数据线套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-004"
+      },
+      {
+        "giftSku": "GIFT-E",
+        "giftName": "蓝牙耳机",
+        "quantity": 1,
+        "sourceRuleId": "RULE-005"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-007",
+    "userId": "USER-007",
+    "createTime": "2024-11-11T18:00:00.000Z",
+    "totalAmount": 2200,
+    "items": [
+      {
+        "sku": "SKU-008",
+        "name": "iPad",
+        "category": "数码",
+        "quantity": 1,
+        "unitPrice": 2200,
+        "totalPrice": 2200
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-C",
+        "giftName": "限量版手办",
+        "quantity": 1,
+        "sourceRuleId": "RULE-003"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-008",
+    "userId": "USER-008",
+    "createTime": "2024-11-11T20:30:00.000Z",
+    "totalAmount": 2500,
+    "items": [
+      {
+        "sku": "SKU-009",
+        "name": "iPhone 14",
+        "category": "手机",
+        "quantity": 1,
+        "unitPrice": 2500,
+        "totalPrice": 2500
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-C",
+        "giftName": "限量版手办",
+        "quantity": 1,
+        "sourceRuleId": "RULE-003"
+      },
+      {
+        "giftSku": "GIFT-D",
+        "giftName": "数据线套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-004"
+      }
+    ]
+  },
+  {
+    "orderId": "ORDER-009",
+    "userId": "USER-009",
+    "createTime": "2024-11-12T10:00:00.000Z",
+    "totalAmount": 1600,
+    "items": [
+      {
+        "sku": "SKU-010",
+        "name": "耳机",
+        "category": "数码",
+        "quantity": 2,
+        "unitPrice": 800,
+        "totalPrice": 1600
+      }
+    ],
+    "actualGifts": []
+  },
+  {
+    "orderId": "ORDER-010",
+    "userId": "USER-010",
+    "createTime": "2024-11-15T09:00:00.000Z",
+    "totalAmount": 5000,
+    "items": [
+      {
+        "sku": "SKU-011",
+        "name": "相机",
+        "category": "数码",
+        "quantity": 1,
+        "unitPrice": 5000,
+        "totalPrice": 5000
+      }
+    ],
+    "actualGifts": [
+      {
+        "giftSku": "GIFT-D",
+        "giftName": "数据线套装",
+        "quantity": 1,
+        "sourceRuleId": "RULE-004"
+      }
+    ]
+  }
+]
