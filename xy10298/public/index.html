@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>儿童绘本借阅主题推荐器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>📚 儿童绘本借阅主题推荐器</h1>
+      <div class="header-tabs">
+        <button class="tab-btn active" data-tab="recommend">推荐生成</button>
+        <button class="tab-btn" data-tab="demo">演示场景</button>
+        <button class="tab-btn" data-tab="rules">规则验证</button>
+        <button class="tab-btn" data-tab="history">推荐历史</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <section id="recommend-tab" class="tab-content active">
+        <div class="grid-layout">
+          <div class="left-panel">
+            <div class="card">
+              <h2>输入参数</h2>
+              
+              <div class="form-group">
+                <label>孩子年龄 <span class="required">*</span></label>
+                <input type="number" id="childAge" min="0" max="12" placeholder="0-12岁">
+                <div class="hint">输入孩子的实际年龄，系统会根据年龄分层推荐</div>
+              </div>
+
+              <div class="form-group">
+                <label>家长目标</label>
+                <div id="parentGoals" class="checkbox-group"></div>
+                <div class="hint">选择1-3个发展目标，推荐会更精准</div>
+              </div>
+
+              <div class="form-group">
+                <label>借阅历史</label>
+                <div id="borrowingHistory" class="history-list">
+                  <div class="empty-hint">暂无借阅记录</div>
+                </div>
+                <button id="addHistoryBtn" class="btn btn-secondary">+ 添加借阅记录</button>
+              </div>
+
+              <div class="form-actions">
+                <button id="generateBtn" class="btn btn-primary">生成推荐</button>
+                <button id="clearBtn" class="btn btn-secondary">清空</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-panel">
+            <div class="card status-card">
+              <h2>业务状态</h2>
+              <div id="pipelineStatus" class="pipeline-visual">
+                <div class="pipeline-step" data-step="input_validation">
+                  <div class="step-icon">📝</div>
+                  <div class="step-label">输入验证</div>
+                  <div class="step-status pending">待执行</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" data-step="age_analysis">
+                  <div class="step-icon">👶</div>
+                  <div class="step-label">年龄分析</div>
+                  <div class="step-status pending">待执行</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" data-step="goal_analysis">
+                  <div class="step-icon">🎯</div>
+                  <div class="step-label">目标分析</div>
+                  <div class="step-status pending">待执行</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" data-step="history_analysis">
+                  <div class="step-icon">📖</div>
+                  <div class="step-label">历史分析</div>
+                  <div class="step-status pending">待执行</div>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step" data-step="recommendation">
+                  <div class="step-icon">✨</div>
+                  <div class="step-label">推荐生成</div>
+                  <div class="step-status pending">待执行</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="issuesSection" class="card hidden">
+              <h2>⚠️ 问题列表</h2>
+              <div id="issuesList" class="issues-list"></div>
+            </div>
+
+            <div id="suggestionsSection" class="card hidden">
+              <h2>💡 处理建议</h2>
+              <div id="suggestionsList" class="suggestions-list"></div>
+            </div>
+
+            <div id="recommendationsSection" class="card hidden">
+              <h2>📚 推荐书单</h2>
+              <div id="recommendationsSummary" class="summary-box"></div>
+              <div id="themeGroups" class="theme-groups"></div>
+              <div id="recommendationsList" class="books-list"></div>
+            </div>
+
+            <div id="traceSection" class="card hidden">
+              <div class="card-header">
+                <h2>🔍 决策追踪</h2>
+                <button id="toggleTraceBtn" class="btn btn-link">展开详情</button>
+              </div>
+              <div id="traceContent" class="trace-content hidden"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo-tab" class="tab-content">
+        <div class="demo-container">
+          <h2>演示场景</h2>
+          <p class="section-desc">选择一个预设场景，一键演示系统的各种规则效果</p>
+          <div id="demoList" class="demo-list"></div>
+        </div>
+      </section>
+
+      <section id="rules-tab" class="tab-content">
+        <div class="rules-container">
+          <h2>规则验证面板</h2>
+          <p class="section-desc">验证核心规则是否正确生效，无需阅读源码即可确认</p>
+          
+          <button id="runAllRulesBtn" class="btn btn-primary">执行全部规则验证</button>
+          
+          <div id="rulesSummary" class="rules-summary hidden"></div>
+          <div id="rulesList" class="rules-list"></div>
+        </div>
+      </section>
+
+      <section id="history-tab" class="tab-content">
+        <div class="history-container">
+          <h2>推荐历史</h2>
+          <p class="section-desc">查看历史推荐记录，追踪输入和结果变化</p>
+          <div id="historyList" class="history-records"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>儿童绘本借阅主题推荐器 v1.0 | 专注于年龄分层、家长目标、借阅历史三大维度</p>
+    </footer>
+  </div>
+
+  <div id="historyModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>添加借阅记录</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>书籍 <span class="required">*</span></label>
+          <select id="historyBookSelect">
+            <option value="">请选择书籍</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>借阅日期 <span class="required">*</span></label>
+          <input type="date" id="historyDate">
+        </div>
+        <div class="form-group">
+          <label>评分（可选）</label>
+          <select id="historyRating">
+            <option value="">未评分</option>
+            <option value="5">5星 - 非常喜欢</option>
+            <option value="4">4星 - 比较喜欢</option>
+            <option value="3">3星 - 一般</option>
+            <option value="2">2星 - 不太喜欢</option>
+            <option value="1">1星 - 不喜欢</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelHistoryBtn" class="btn btn-secondary">取消</button>
+        <button id="saveHistoryBtn" class="btn btn-primary">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
