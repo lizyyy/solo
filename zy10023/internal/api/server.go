@@ -228,6 +228,8 @@ func (s *Server) createAPI(w http.ResponseWriter, r *http.Request) {
 
 	if err := s.mockService.AddMapping(r.Context(), &api); err != nil {
 		logger.Error("Failed to add mapping to mock service", zap.Error(err))
+		writeError(w, http.StatusInternalServerError, "Failed to register mock mapping: "+err.Error())
+		return
 	}
 
 	writeJSON(w, http.StatusCreated, api)
@@ -273,7 +275,11 @@ func (s *Server) updateAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.mockService.UpdateMapping(r.Context(), &api)
+	if err := s.mockService.UpdateMapping(r.Context(), &api); err != nil {
+		logger.Error("Failed to update mapping in mock service", zap.Error(err))
+		writeError(w, http.StatusInternalServerError, "Failed to update mock mapping: "+err.Error())
+		return
+	}
 
 	writeJSON(w, http.StatusOK, api)
 }
@@ -291,8 +297,12 @@ func (s *Server) deleteAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.db.Delete(&api)
-	s.mockService.RemoveMapping(r.Context(), api.Method, api.Path)
+	if err := s.db.Delete(&api).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	s.mockService.RemoveMappingByID(r.Context(), id)
 
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -307,6 +317,10 @@ func (s *Server) createMock(w http.ResponseWriter, r *http.Request) {
 	if err := s.db.Create(&mock).Error; err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if err := s.mockService.RefreshMapping(r.Context(), mock.APIDefinitionID); err != nil {
+		logger.Error("Failed to refresh mock mapping after creating response", zap.Error(err), zap.Uint("api_id", mock.APIDefinitionID))
 	}
 
 	writeJSON(w, http.StatusCreated, mock)
@@ -346,10 +360,15 @@ func (s *Server) updateMock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	apiID := mock.APIDefinitionID
 	mock.ID = id
 	if err := s.db.Save(&mock).Error; err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if err := s.mockService.RefreshMapping(r.Context(), apiID); err != nil {
+		logger.Error("Failed to refresh mock mapping after updating response", zap.Error(err), zap.Uint("api_id", apiID))
 	}
 
 	writeJSON(w, http.StatusOK, mock)
@@ -362,7 +381,23 @@ func (s *Server) deleteMock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.db.Delete(&models.MockResponse{}, id)
+	var mock models.MockResponse
+	if err := s.db.First(&mock, id).Error; err != nil {
+		writeError(w, http.StatusNotFound, "Mock not found")
+		return
+	}
+
+	apiID := mock.APIDefinitionID
+
+	if err := s.db.Delete(&mock).Error; err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := s.mockService.RefreshMapping(r.Context(), apiID); err != nil {
+		logger.Error("Failed to refresh mock mapping after deleting response", zap.Error(err), zap.Uint("api_id", apiID))
+	}
+
 	w.WriteHeader(http.StatusNoContent)
 }
 

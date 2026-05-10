@@ -24,11 +24,11 @@ import (
 )
 
 type MockService struct {
-	db        *gorm.DB
-	cfg       config.MockConfig
-	router    *chi.Mux
-	mappings  sync.Map
-	server    *http.Server
+	db       *gorm.DB
+	cfg      config.MockConfig
+	router   *chi.Mux
+	mappings sync.Map
+	server   *http.Server
 }
 
 func NewMockService(cfg config.MockConfig) *MockService {
@@ -259,21 +259,31 @@ func (s *MockService) Stop(ctx context.Context) error {
 }
 
 func (s *MockService) AddMapping(ctx context.Context, api *models.APIDefinition) error {
-	if err := s.db.Create(api).Error; err != nil {
-		return err
+	if api == nil {
+		return fmt.Errorf("api definition is nil")
 	}
 	key := s.buildMappingKey(api.Method, api.Path)
 	s.mappings.Store(key, api)
-	logger.Info("Added mock mapping", zap.String("key", key))
+	logger.Info("Added mock mapping",
+		zap.String("key", key),
+		zap.String("method", api.Method),
+		zap.String("path", api.Path),
+		zap.Int("mock_responses", len(api.MockResponses)),
+	)
 	return nil
 }
 
 func (s *MockService) UpdateMapping(ctx context.Context, api *models.APIDefinition) error {
-	if err := s.db.Save(api).Error; err != nil {
-		return err
+	if api == nil {
+		return fmt.Errorf("api definition is nil")
 	}
 	key := s.buildMappingKey(api.Method, api.Path)
 	s.mappings.Store(key, api)
+	logger.Info("Updated mock mapping",
+		zap.String("key", key),
+		zap.String("method", api.Method),
+		zap.String("path", api.Path),
+	)
 	return nil
 }
 
@@ -281,6 +291,49 @@ func (s *MockService) RemoveMapping(ctx context.Context, method, path string) er
 	key := s.buildMappingKey(method, path)
 	s.mappings.Delete(key)
 	logger.Info("Removed mock mapping", zap.String("key", key))
+	return nil
+}
+
+func (s *MockService) RemoveMappingByID(ctx context.Context, apiID uint) error {
+	var found bool
+	s.mappings.Range(func(key, value interface{}) bool {
+		api := value.(*models.APIDefinition)
+		if api.ID == apiID {
+			s.mappings.Delete(key)
+			found = true
+			return false
+		}
+		return true
+	})
+	if found {
+		logger.Info("Removed mock mapping by ID", zap.Uint("api_id", apiID))
+	}
+	return nil
+}
+
+func (s *MockService) RefreshMapping(ctx context.Context, apiID uint) error {
+	var api models.APIDefinition
+	if err := s.db.Preload("MockResponses").First(&api, apiID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			s.RemoveMappingByID(ctx, apiID)
+			return nil
+		}
+		return err
+	}
+
+	if !api.IsActive {
+		s.RemoveMappingByID(ctx, apiID)
+		return nil
+	}
+
+	key := s.buildMappingKey(api.Method, api.Path)
+	s.mappings.Store(key, &api)
+	logger.Info("Refreshed mock mapping",
+		zap.Uint("api_id", apiID),
+		zap.String("method", api.Method),
+		zap.String("path", api.Path),
+		zap.Int("mock_responses", len(api.MockResponses)),
+	)
 	return nil
 }
 
