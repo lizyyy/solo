@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童托管接送授权台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        header h1 { font-size: 28px; margin-bottom: 5px; }
+        header p { opacity: 0.9; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-btn { padding: 12px 24px; border: none; background: #f0f0f0; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+        .tab-btn:hover { background: #e0e0e0; }
+        .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .card-title { font-size: 18px; font-weight: 600; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-success { background: #10b981; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-group { display: flex; gap: 8px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; }
+        tr:hover { background: #f9fafb; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-inactive { background: #f3f4f6; color: #6b7280; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #dbeafe; color: #1e40af; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-expired { background: #f3f4f6; color: #6b7280; }
+        .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; }
+        .filter-item { display: flex; flex-direction: column; gap: 5px; }
+        .filter-label { font-size: 12px; color: #6b7280; font-weight: 500; }
+        input, select, textarea { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; width: 100%; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 32px; font-weight: 700; color: #667eea; }
+        .stat-label { font-size: 14px; color: #6b7280; margin-top: 5px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 16px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; color: #374151; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
+        .alert-danger { background: #fee2e2; color: #991b1b; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h3 { font-size: 14px; font-weight: 600; color: #6b7280; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detail-item { background: #f9fafb; padding: 12px; border-radius: 8px; }
+        .detail-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+        .detail-value { font-size: 14px; font-weight: 500; }
+        .history-item { border-left: 3px solid #667eea; padding: 15px; margin-bottom: 10px; background: #f9fafb; border-radius: 0 8px 8px 0; }
+        .history-time { font-size: 12px; color: #6b7280; }
+        .history-action { font-weight: 500; margin: 5px 0; }
+        .history-changes { font-size: 13px; color: #374151; margin-top: 8px; }
+        .change-before { color: #ef4444; text-decoration: line-through; }
+        .change-after { color: #10b981; font-weight: 500; }
+        .timeline { border-left: 2px solid #e5e7eb; padding-left: 20px; margin-left: 10px; }
+        .timeline-item { position: relative; padding-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -26px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: #667eea; }
+        .demo-path { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .demo-path h3 { color: #92400e; margin-bottom: 10px; }
+        .demo-path ol { margin-left: 20px; color: #78350f; }
+        .demo-path li { margin-bottom: 8px; }
+        .error-path { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .error-path h3 { color: #991b1b; margin-bottom: 10px; }
+        .error-path ol { margin-left: 20px; color: #7f1d1d; }
+        .error-path li { margin-bottom: 8px; }
+        .hidden { display: none; }
+        .action-cell { white-space: nowrap; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .child-card { display: flex; gap: 15px; align-items: center; }
+        .child-info h4 { font-size: 16px; margin-bottom: 2px; }
+        .child-info p { font-size: 13px; color: #6b7280; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+        .empty-state h3 { margin-bottom: 10px; color: #374151; }
+        .empty-state p { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>儿童托管接送授权台</h1>
+            <p>托管班临时换人接送授权管理系统 | 确保每一次接送都安全可追溯</p>
+        </header>
+
+        <div class="demo-path">
+            <h3>🚀 最短演示路径</h3>
+            <ol>
+                <li>在「儿童档案」点击「新增儿童」，录入一个孩子的基本信息</li>
+                <li>在「接送授权」点击「新增长期授权」，为该孩子添加固定接送人（如妈妈）</li>
+                <li>在「临时委托」点击「新建委托」，模拟临时换人场景：爸爸出差，让同事帮忙接</li>
+                <li>点击待审核委托的「详情」，再点击「审核通过」完成授权链</li>
+                <li>回到「临时委托」列表，看到已通过的委托，可点击「查看历史」追溯</li>
+            </ol>
+        </div>
+
+        <div class="error-path">
+            <h3>⚠️ 异常触发路径</h3>
+            <ol>
+                <li>在「临时委托」新建一个委托，但不选择任何儿童（留空）</li>
+                <li>点击「保存」，会触发必填项校验错误</li>
+                <li>或者：创建一个委托后，点击「撤回」，再尝试「再次审核」</li>
+                <li>或者：在「接送授权」中尝试添加与儿童关系为「陌生人」的授权人（风险提示）</li>
+            </ol>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-tab="children">儿童档案</button>
+            <button class="tab-btn" data-tab="authorizations">接送授权</button>
+            <button class="tab-btn" data-tab="delegations">临时委托</button>
+            <button class="tab-btn" data-tab="history">操作历史</button>
+        </div>
+
+        <div id="dashboard" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-children">0</div>
+                    <div class="stat-label">在籍儿童</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-active-auth">0</div>
+                    <div class="stat-label">有效授权</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending-delegation">0</div>
+                    <div class="stat-label">待审核委托</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-today">0</div>
+                    <div class="stat-label">今日接送</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">最近活动</h3>
+                    <button class="btn btn-secondary btn-sm" onclick="switchTab('history')">查看全部</button>
+                </div>
+                <div id="recent-activity"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">快捷操作</h3>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="openModal('child-modal')">新增儿童</button>
+                    <button class="btn btn-success" onclick="openModal('authorization-modal')">新增授权</button>
+                    <button class="btn btn-warning" onclick="openModal('delegation-modal')">新建委托</button>
+                    <button class="btn btn-secondary" onclick="exportAllData()">导出全部数据</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="children" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">儿童档案列表</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary btn-sm" onclick="openModal('import-modal')">📥 导入</button>
+                        <button class="btn btn-primary" onclick="openModal('child-modal')">➕ 新增儿童</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item" style="flex: 1; min-width: 200px;">
+                        <label class="filter-label">搜索</label>
+                        <input type="text" id="child-search" placeholder="搜索姓名、班级...">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">班级</label>
+                        <select id="child-class-filter">
+                            <option value="">全部班级</option>
+                            <option value="小班">小班</option>
+                            <option value="中班">中班</option>
+                            <option value="大班">大班</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">状态</label>
+                        <select id="child-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="active">在籍</option>
+                            <option value="inactive">已离园</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">操作</label>
+                        <button class="btn btn-primary btn-sm" onclick="renderChildren()">筛选</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="children-table">
+                        <thead>
+                            <tr>
+                                <th>儿童信息</th>
+                                <th>班级</th>
+                                <th>年龄</th>
+                                <th>在园状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="authorizations" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">长期接送授权</h3>
+                    <button class="btn btn-primary" onclick="openModal('authorization-modal')">➕ 新增授权</button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item" style="flex: 1; min-width: 200px;">
+                        <label class="filter-label">搜索授权人</label>
+                        <input type="text" id="auth-search" placeholder="搜索姓名、关系...">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">授权状态</label>
+                        <select id="auth-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="active">有效</option>
+                            <option value="expired">已过期</option>
+                            <option value="revoked">已撤回</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">操作</label>
+                        <button class="btn btn-primary btn-sm" onclick="renderAuthorizations()">筛选</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="authorizations-table">
+                        <thead>
+                            <tr>
+                                <th>儿童</th>
+                                <th>授权人</th>
+                                <th>与儿童关系</th>
+                                <th>有效期</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="delegations" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">临时委托管理</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary btn-sm" onclick="exportDelegations()">📤 导出</button>
+                        <button class="btn btn-primary" onclick="openModal('delegation-modal')">➕ 新建委托</button>
+                    </div>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item" style="flex: 1; min-width: 200px;">
+                        <label class="filter-label">搜索</label>
+                        <input type="text" id="delegation-search" placeholder="搜索儿童、委托人...">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">审核状态</label>
+                        <select id="delegation-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="pending">待审核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已拒绝</option>
+                            <option value="revoked">已撤回</option>
+                            <option value="used">已使用</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">委托日期</label>
+                        <input type="date" id="delegation-date-filter">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">操作</label>
+                        <button class="btn btn-primary btn-sm" onclick="renderDelegations()">筛选</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="delegations-table">
+                        <thead>
+                            <tr>
+                                <th>委托编号</th>
+                                <th>儿童</th>
+                                <th>被委托人</th>
+                                <th>委托日期</th>
+                                <th>审核状态</th>
+                                <th>异常备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content hidden">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">操作历史记录</h3>
+                    <button class="btn btn-secondary" onclick="clearHistory()">清空历史</button>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="filter-item" style="flex: 1; min-width: 200px;">
+                        <label class="filter-label">搜索</label>
+                        <input type="text" id="history-search" placeholder="搜索操作内容...">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">操作类型</label>
+                        <select id="history-type-filter">
+                            <option value="">全部类型</option>
+                            <option value="child">儿童档案</option>
+                            <option value="authorization">接送授权</option>
+                            <option value="delegation">临时委托</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label">操作动作</label>
+                        <select id="history-action-filter">
+                            <option value="">全部动作</option>
+                            <option value="create">创建</option>
+                            <option value="update">修改</option>
+                            <option value="delete">删除</option>
+                            <option value="approve">审核通过</option>
+                            <option value="reject">审核拒绝</option>
+                            <option value="revoke">撤回</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="child-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="child-modal-title">新增儿童</h3>
+                <button class="close-btn" onclick="closeModal('child-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="child-form">
+                    <input type="hidden" id="child-id">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">姓名 *</label>
+                            <input type="text" id="child-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">性别 *</label>
+                            <select id="child-gender" required>
+                                <option value="">请选择</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">出生日期 *</label>
+                            <input type="date" id="child-birthdate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">班级 *</label>
+                            <select id="child-class" required>
+                                <option value="">请选择</option>
+                                <option value="小班">小班</option>
+                                <option value="中班">中班</option>
+                                <option value="大班">大班</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">家庭住址</label>
+                        <input type="text" id="child-address" placeholder="请输入家庭住址">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">家长姓名</label>
+                            <input type="text" id="child-parent-name" placeholder="主要联系人">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" id="child-parent-phone" placeholder="紧急联系电话">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea id="child-notes" rows="3" placeholder="特殊需求、过敏史等"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('child-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveChild()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="authorization-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">新增长期授权</h3>
+                <button class="close-btn" onclick="closeModal('authorization-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    💡 长期授权：固定接送人，如父母、祖父母等日常接送人员
+                </div>
+                <form id="authorization-form">
+                    <input type="hidden" id="authorization-id">
+                    <div class="form-group">
+                        <label class="form-label">选择儿童 *</label>
+                        <select id="auth-child" required>
+                            <option value="">请选择儿童</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">授权人姓名 *</label>
+                            <input type="text" id="auth-person-name" required placeholder="如：张三">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">与儿童关系 *</label>
+                            <select id="auth-relationship" required onchange="checkRelationshipRisk()">
+                                <option value="">请选择</option>
+                                <option value="父亲">父亲</option>
+                                <option value="母亲">母亲</option>
+                                <option value="爷爷">爷爷</option>
+                                <option value="奶奶">奶奶</option>
+                                <option value="外公">外公</option>
+                                <option value="外婆">外婆</option>
+                                <option value="其他亲属">其他亲属</option>
+                                <option value="保姆">保姆</option>
+                                <option value="陌生人">陌生人 ⚠️</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="risk-warning" class="alert alert-warning hidden">
+                        ⚠️ 选择"陌生人"作为关系，系统将标记为高风险，请确认是否真的需要添加此授权
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">联系电话 *</label>
+                            <input type="tel" id="auth-phone" required placeholder="11位手机号">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">身份证号</label>
+                            <input type="text" id="auth-id-card" placeholder="用于身份验证（选填）">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">有效期开始 *</label>
+                            <input type="date" id="auth-start-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">有效期结束 *</label>
+                            <input type="date" id="auth-end-date" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">授权说明</label>
+                        <textarea id="auth-notes" rows="2" placeholder="备注授权范围、特殊说明等"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('authorization-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveAuthorization()">保存授权</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delegation-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="delegation-modal-title">新建临时委托</h3>
+                <button class="close-btn" onclick="closeModal('delegation-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    💡 临时委托：非常规接送人，如临时委托同事、朋友等，需老师审核确认
+                </div>
+                <form id="delegation-form">
+                    <input type="hidden" id="delegation-id">
+                    <div class="form-group">
+                        <label class="form-label">选择儿童 *</label>
+                        <select id="delegation-child" required>
+                            <option value="">请选择儿童</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">委托人（家长）*</label>
+                            <input type="text" id="delegation-requester" required placeholder="发起委托的家长姓名">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">家长电话</label>
+                            <input type="tel" id="delegation-requester-phone" placeholder="方便老师核实">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">被委托人（实际接送人）*</label>
+                            <input type="text" id="delegation-delegatee" required placeholder="临时接孩子的人">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">被委托人电话 *</label>
+                            <input type="tel" id="delegation-delegatee-phone" required placeholder="方便老师联系">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">委托日期 *</label>
+                            <input type="date" id="delegation-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">接送时段 *</label>
+                            <select id="delegation-time" required>
+                                <option value="">请选择</option>
+                                <option value="上午送园">上午送园</option>
+                                <option value="下午接园">下午接园</option>
+                                <option value="全天">全天</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">委托原因</label>
+                        <textarea id="delegation-reason" rows="2" placeholder="如：家长出差、临时有事等"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">异常/特殊备注</label>
+                        <textarea id="delegation-special-notes" rows="2" placeholder="如有迟到、特殊需求等请在此说明"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('delegation-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveDelegation()">提交审核</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="child-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">儿童详情</h3>
+                <button class="close-btn" onclick="closeModal('child-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="child-detail-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('child-detail-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="delegation-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">临时委托详情</h3>
+                <button class="close-btn" onclick="closeModal('delegation-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="delegation-detail-content"></div>
+            <div class="modal-footer" id="delegation-detail-footer"></div>
+        </div>
+    </div>
+
+    <div id="history-detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">历史记录详情</h3>
+                <button class="close-btn" onclick="closeModal('history-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="history-detail-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('history-detail-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="review-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">审核临时委托</h3>
+                <button class="close-btn" onclick="closeModal('review-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="review-delegation-id">
+                <div class="form-group">
+                    <label class="form-label">审核结果 *</label>
+                    <select id="review-result" required>
+                        <option value="approved">审核通过</option>
+                        <option value="rejected">审核拒绝</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">审核意见 *</label>
+                    <textarea id="review-comments" rows="3" required placeholder="请填写审核意见..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('review-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">确认审核</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">导入儿童档案</h3>
+                <button class="close-btn" onclick="closeModal('import-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    💡 支持导入 JSON 格式的数据，请确保数据格式正确
+                </div>
+                <div class="form-group">
+                    <label class="form-label">粘贴 JSON 数据</label>
+                    <textarea id="import-json" rows="10" placeholder='[{"name":"张三","gender":"男","birthdate":"2020-01-01","class":"小班"...}]'></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('import-modal')">取消</button>
+                <button class="btn btn-primary" onclick="importChildren()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEYS = {
+            CHILDREN: 'daycare_children',
+            AUTHORIZATIONS: 'daycare_authorizations',
+            DELEGATIONS: 'daycare_delegations',
+            HISTORY: 'daycare_history'
+        };
+
+        function loadData(key) {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('zh-CN');
+        }
+
+        function formatDateTime(date) {
+            return new Date(date).toLocaleString('zh-CN');
+        }
+
+        function calculateAge(birthdate) {
+            const today = new Date();
+            const birth = new Date(birthdate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age + '岁';
+        }
+
+        function addHistory(type, action, entityId, entityName, before = null, after = null) {
+            const history = loadData(STORAGE_KEYS.HISTORY);
+            const record = {
+                id: generateId(),
+                type,
+                action,
+                entityId,
+                entityName,
+                before,
+                after,
+                timestamp: new Date().toISOString(),
+                operator: '当前用户'
+            };
+            history.unshift(record);
+            saveData(STORAGE_KEYS.HISTORY, history);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.remove('hidden');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            renderCurrentTab();
+        }
+
+        function renderCurrentTab() {
+            const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+            if (activeTab === 'dashboard') renderDashboard();
+            else if (activeTab === 'children') renderChildren();
+            else if (activeTab === 'authorizations') renderAuthorizations();
+            else if (activeTab === 'delegations') renderDelegations();
+            else if (activeTab === 'history') renderHistory();
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            if (modalId === 'authorization-modal') populateChildSelect('auth-child');
+            if (modalId === 'delegation-modal') {
+                populateChildSelect('delegation-child');
+                document.getElementById('delegation-modal-title').textContent = '新建临时委托';
+                document.getElementById('delegation-id').value = '';
+                document.getElementById('delegation-form').reset();
+            }
+            if (modalId === 'child-modal') {
+                document.getElementById('child-modal-title').textContent = '新增儿童';
+                document.getElementById('child-id').value = '';
+                document.getElementById('child-form').reset();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function populateChildSelect(selectId) {
+            const children = loadData(STORAGE_KEYS.CHILDREN).filter(c => c.status === 'active');
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">请选择儿童</option>';
+            children.forEach(child => {
+                const option = document.createElement('option');
+                option.value = child.id;
+                option.textContent = `${child.name} (${child.class})`;
+                select.appendChild(option);
+            });
+            if (currentValue) select.value = currentValue;
+        }
+
+        function checkRelationshipRisk() {
+            const relationship = document.getElementById('auth-relationship').value;
+            const warning = document.getElementById('risk-warning');
+            if (relationship === '陌生人') {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        }
+
+        function renderDashboard() {
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS);
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const today = new Date().toISOString().split('T')[0];
+
+            document.getElementById('stat-children').textContent = children.filter(c => c.status === 'active').length;
+            document.getElementById('stat-active-auth').textContent = authorizations.filter(a => a.status === 'active').length;
+            document.getElementById('stat-pending-delegation').textContent = delegations.filter(d => d.status === 'pending').length;
+            document.getElementById('stat-today').textContent = delegations.filter(d => d.delegationDate === today && d.status === 'approved').length;
+
+            const history = loadData(STORAGE_KEYS.HISTORY).slice(0, 5);
+            const activityEl = document.getElementById('recent-activity');
+            
+            if (history.length === 0) {
+                activityEl.innerHTML = '<div class="empty-state"><h3>暂无活动记录</h3><p>开始使用系统后，操作记录将显示在这里</p></div>';
+                return;
+            }
+
+            activityEl.innerHTML = '<div class="timeline">' + history.map(h => `
+                <div class="timeline-item">
+                    <div class="history-time">${formatDateTime(h.timestamp)}</div>
+                    <div class="history-action">${getActionText(h)} - ${h.entityName}</div>
+                    <div class="history-changes">${getChangesText(h)}</div>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function getActionText(history) {
+            const actionMap = {
+                'create': '创建',
+                'update': '修改',
+                'delete': '删除',
+                'approve': '审核通过',
+                'reject': '审核拒绝',
+                'revoke': '撤回',
+                'use': '使用'
+            };
+            const typeMap = {
+                'child': '儿童档案',
+                'authorization': '接送授权',
+                'delegation': '临时委托'
+            };
+            return `${actionMap[history.action] || history.action}${typeMap[history.type] || history.type}`;
+        }
+
+        function getChangesText(history) {
+            if (!history.before && !history.after) return '无内容变更';
+            if (!history.before) return '新建记录';
+            if (!history.after) return '删除记录';
+            
+            const changes = [];
+            Object.keys(history.after).forEach(key => {
+                if (history.before[key] !== history.after[key]) {
+                    changes.push(`${key}: <span class="change-before">${history.before[key] || '空'}</span> → <span class="change-after">${history.after[key] || '空'}</span>`);
+                }
+            });
+            return changes.length > 0 ? changes.join('<br>') : '无内容变更';
+        }
+
+        function renderChildren() {
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const search = document.getElementById('child-search').value.toLowerCase();
+            const classFilter = document.getElementById('child-class-filter').value;
+            const statusFilter = document.getElementById('child-status-filter').value;
+
+            const filtered = children.filter(child => {
+                const matchSearch = child.name.toLowerCase().includes(search) || 
+                                   child.class.toLowerCase().includes(search) ||
+                                   (child.parentName && child.parentName.toLowerCase().includes(search));
+                const matchClass = !classFilter || child.class === classFilter;
+                const matchStatus = !statusFilter || child.status === statusFilter;
+                return matchSearch && matchClass && matchStatus;
+            });
+
+            const tbody = document.querySelector('#children-table tbody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><h3>暂无儿童档案</h3><p>点击"新增儿童"开始录入第一个孩子的信息</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(child => `
+                <tr>
+                    <td>
+                        <div class="child-card">
+                            <div class="avatar">${child.name.charAt(0)}</div>
+                            <div class="child-info">
+                                <h4>${child.name}</h4>
+                                <p>${child.gender} | ${calculateAge(child.birthdate)}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${child.class}</td>
+                    <td>${calculateAge(child.birthdate)}</td>
+                    <td><span class="status-badge ${child.status === 'active' ? 'status-active' : 'status-inactive'}">${child.status === 'active' ? '在籍' : '已离园'}</span></td>
+                    <td class="action-cell">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm" onclick="viewChildDetail('${child.id}')">详情</button>
+                            <button class="btn btn-primary btn-sm" onclick="editChild('${child.id}')">编辑</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteChild('${child.id}')">删除</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function saveChild() {
+            const form = document.getElementById('child-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const id = document.getElementById('child-id').value;
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            
+            const childData = {
+                name: document.getElementById('child-name').value,
+                gender: document.getElementById('child-gender').value,
+                birthdate: document.getElementById('child-birthdate').value,
+                class: document.getElementById('child-class').value,
+                address: document.getElementById('child-address').value,
+                parentName: document.getElementById('child-parent-name').value,
+                parentPhone: document.getElementById('child-parent-phone').value,
+                notes: document.getElementById('child-notes').value,
+                status: 'active',
+                updatedAt: new Date().toISOString()
+            };
+
+            if (id) {
+                const index = children.findIndex(c => c.id === id);
+                const before = { ...children[index] };
+                children[index] = { ...children[index], ...childData };
+                addHistory('child', 'update', id, childData.name, before, children[index]);
+            } else {
+                const newChild = { id: generateId(), ...childData, createdAt: new Date().toISOString() };
+                children.push(newChild);
+                addHistory('child', 'create', newChild.id, newChild.name, null, newChild);
+            }
+
+            saveData(STORAGE_KEYS.CHILDREN, children);
+            closeModal('child-modal');
+            renderCurrentTab();
+        }
+
+        function editChild(id) {
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const child = children.find(c => c.id === id);
+            if (!child) return;
+
+            document.getElementById('child-modal-title').textContent = '编辑儿童';
+            document.getElementById('child-id').value = child.id;
+            document.getElementById('child-name').value = child.name;
+            document.getElementById('child-gender').value = child.gender;
+            document.getElementById('child-birthdate').value = child.birthdate;
+            document.getElementById('child-class').value = child.class;
+            document.getElementById('child-address').value = child.address || '';
+            document.getElementById('child-parent-name').value = child.parentName || '';
+            document.getElementById('child-parent-phone').value = child.parentPhone || '';
+            document.getElementById('child-notes').value = child.notes || '';
+            
+            openModal('child-modal');
+        }
+
+        function deleteChild(id) {
+            if (!confirm('确定要删除这个儿童档案吗？相关的授权和委托记录也会失效。')) return;
+
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const child = children.find(c => c.id === id);
+            const before = { ...child };
+            const newChildren = children.filter(c => c.id !== id);
+            
+            saveData(STORAGE_KEYS.CHILDREN, newChildren);
+            addHistory('child', 'delete', id, child.name, before, null);
+
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS);
+            const updatedAuths = authorizations.map(a => 
+                a.childId === id ? { ...a, status: 'revoked', updatedAt: new Date().toISOString() } : a
+            );
+            saveData(STORAGE_KEYS.AUTHORIZATIONS, updatedAuths);
+
+            renderCurrentTab();
+        }
+
+        function viewChildDetail(id) {
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const child = children.find(c => c.id === id);
+            if (!child) return;
+
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS).filter(a => a.childId === id);
+
+            document.getElementById('child-detail-content').innerHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">姓名</div><div class="detail-value">${child.name}</div></div>
+                        <div class="detail-item"><div class="detail-label">性别</div><div class="detail-value">${child.gender}</div></div>
+                        <div class="detail-item"><div class="detail-label">出生日期</div><div class="detail-value">${formatDate(child.birthdate)}</div></div>
+                        <div class="detail-item"><div class="detail-label">年龄</div><div class="detail-value">${calculateAge(child.birthdate)}</div></div>
+                        <div class="detail-item"><div class="detail-label">班级</div><div class="detail-value">${child.class}</div></div>
+                        <div class="detail-item"><div class="detail-label">状态</div><div class="detail-value"><span class="status-badge ${child.status === 'active' ? 'status-active' : 'status-inactive'}">${child.status === 'active' ? '在籍' : '已离园'}</span></div></div>
+                    </div>
+                </div>
+                ${child.address || child.parentName ? `
+                <div class="detail-section">
+                    <h3>家庭信息</h3>
+                    <div class="detail-grid">
+                        ${child.address ? `<div class="detail-item"><div class="detail-label">家庭住址</div><div class="detail-value">${child.address}</div></div>` : ''}
+                        ${child.parentName ? `<div class="detail-item"><div class="detail-label">家长姓名</div><div class="detail-value">${child.parentName}</div></div>` : ''}
+                        ${child.parentPhone ? `<div class="detail-item"><div class="detail-label">联系电话</div><div class="detail-value">${child.parentPhone}</div></div>` : ''}
+                    </div>
+                </div>
+                ` : ''}
+                ${child.notes ? `
+                <div class="detail-section">
+                    <h3>备注</h3>
+                    <div class="detail-item"><div class="detail-value">${child.notes}</div></div>
+                </div>
+                ` : ''}
+                <div class="detail-section">
+                    <h3>关联授权</h3>
+                    ${authorizations.length > 0 ? authorizations.map(a => `
+                        <div class="history-item">
+                            <div><strong>${a.authorizedPerson}</strong> (${a.relationship})</div>
+                            <div class="history-time">有效期: ${formatDate(a.startDate)} - ${formatDate(a.endDate)}</div>
+                            <div><span class="status-badge ${a.status === 'active' ? 'status-active' : 'status-inactive'}">${a.status === 'active' ? '有效' : a.status}</span></div>
+                        </div>
+                    `).join('') : '<p class="text-gray-500">暂无授权记录</p>'}
+                </div>
+            `;
+            openModal('child-detail-modal');
+        }
+
+        function importChildren() {
+            const jsonText = document.getElementById('import-json').value;
+            if (!jsonText.trim()) {
+                alert('请输入要导入的数据');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(jsonText);
+                if (!Array.isArray(data)) {
+                    alert('数据格式错误：应为数组');
+                    return;
+                }
+
+                const children = loadData(STORAGE_KEYS.CHILDREN);
+                let imported = 0;
+
+                data.forEach(item => {
+                    if (item.name && item.gender && item.birthdate && item.class) {
+                        const newChild = {
+                            id: generateId(),
+                            name: item.name,
+                            gender: item.gender,
+                            birthdate: item.birthdate,
+                            class: item.class,
+                            address: item.address || '',
+                            parentName: item.parentName || '',
+                            parentPhone: item.parentPhone || '',
+                            notes: item.notes || '',
+                            status: item.status || 'active',
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        children.push(newChild);
+                        addHistory('child', 'create', newChild.id, newChild.name, null, newChild);
+                        imported++;
+                    }
+                });
+
+                saveData(STORAGE_KEYS.CHILDREN, children);
+                closeModal('import-modal');
+                document.getElementById('import-json').value = '';
+                alert(`成功导入 ${imported} 条儿童档案`);
+                renderCurrentTab();
+            } catch (e) {
+                alert('JSON 解析错误：' + e.message);
+            }
+        }
+
+        function renderAuthorizations() {
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS);
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const search = document.getElementById('auth-search').value.toLowerCase();
+            const statusFilter = document.getElementById('auth-status-filter').value;
+
+            const childMap = {};
+            children.forEach(c => childMap[c.id] = c);
+
+            const filtered = authorizations.filter(auth => {
+                const matchSearch = auth.authorizedPerson.toLowerCase().includes(search) ||
+                                   auth.relationship.toLowerCase().includes(search) ||
+                                   (childMap[auth.childId] && childMap[auth.childId].name.toLowerCase().includes(search));
+                const matchStatus = !statusFilter || auth.status === statusFilter;
+                return matchSearch && matchStatus;
+            });
+
+            const tbody = document.querySelector('#authorizations-table tbody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><h3>暂无接送授权</h3><p>点击"新增授权"为孩子添加固定接送人</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(auth => {
+                const child = childMap[auth.childId] || { name: '已删除' };
+                return `
+                <tr>
+                    <td>${child.name}</td>
+                    <td>
+                        <div class="child-info">
+                            <h4>${auth.authorizedPerson}</h4>
+                            <p>${auth.phone}</p>
+                        </div>
+                    </td>
+                    <td>${auth.relationship}</td>
+                    <td>
+                        <div>${formatDate(auth.startDate)}</div>
+                        <div class="history-time">至 ${formatDate(auth.endDate)}</div>
+                    </td>
+                    <td><span class="status-badge ${auth.status === 'active' ? 'status-active' : 'status-inactive'}">${getStatusText(auth.status)}</span></td>
+                    <td class="action-cell">
+                        <div class="btn-group">
+                            <button class="btn btn-warning btn-sm" onclick="toggleAuthorizationStatus('${auth.id}')">${auth.status === 'active' ? '撤回' : '恢复'}</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'active': '有效',
+                'expired': '已过期',
+                'revoked': '已撤回'
+            };
+            return map[status] || status;
+        }
+
+        function saveAuthorization() {
+            const form = document.getElementById('authorization-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const childId = document.getElementById('auth-child').value;
+            if (!childId) {
+                alert('请选择儿童');
+                return;
+            }
+
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const child = children.find(c => c.id === childId);
+
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS);
+            const authData = {
+                id: generateId(),
+                childId: childId,
+                childName: child.name,
+                authorizedPerson: document.getElementById('auth-person-name').value,
+                relationship: document.getElementById('auth-relationship').value,
+                phone: document.getElementById('auth-phone').value,
+                idCard: document.getElementById('auth-id-card').value,
+                startDate: document.getElementById('auth-start-date').value,
+                endDate: document.getElementById('auth-end-date').value,
+                notes: document.getElementById('auth-notes').value,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            if (authData.relationship === '陌生人') {
+                if (!confirm('⚠️ 警告：您正在添加一个"陌生人"作为接送授权人。这可能存在安全风险，确定要继续吗？')) {
+                    return;
+                }
+            }
+
+            authorizations.push(authData);
+            saveData(STORAGE_KEYS.AUTHORIZATIONS, authorizations);
+            addHistory('authorization', 'create', authData.id, `${child.name} - ${authData.authorizedPerson}`, null, authData);
+
+            closeModal('authorization-modal');
+            document.getElementById('authorization-form').reset();
+            renderCurrentTab();
+        }
+
+        function toggleAuthorizationStatus(id) {
+            const authorizations = loadData(STORAGE_KEYS.AUTHORIZATIONS);
+            const index = authorizations.findIndex(a => a.id === id);
+            if (index === -1) return;
+
+            const before = { ...authorizations[index] };
+            const newStatus = authorizations[index].status === 'active' ? 'revoked' : 'active';
+            authorizations[index].status = newStatus;
+            authorizations[index].updatedAt = new Date().toISOString();
+
+            saveData(STORAGE_KEYS.AUTHORIZATIONS, authorizations);
+            addHistory('authorization', 'update', id, `${authorizations[index].childName} - ${authorizations[index].authorizedPerson}`, before, authorizations[index]);
+
+            renderCurrentTab();
+        }
+
+        function renderDelegations() {
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const search = document.getElementById('delegation-search').value.toLowerCase();
+            const statusFilter = document.getElementById('delegation-status-filter').value;
+            const dateFilter = document.getElementById('delegation-date-filter').value;
+
+            const childMap = {};
+            children.forEach(c => childMap[c.id] = c);
+
+            const filtered = delegations.filter(d => {
+                const matchSearch = d.childName.toLowerCase().includes(search) ||
+                                   d.delegatee.toLowerCase().includes(search) ||
+                                   d.requester.toLowerCase().includes(search);
+                const matchStatus = !statusFilter || d.status === statusFilter;
+                const matchDate = !dateFilter || d.delegationDate === dateFilter;
+                return matchSearch && matchStatus && matchDate;
+            });
+
+            const tbody = document.querySelector('#delegations-table tbody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><h3>暂无临时委托</h3><p>点击"新建委托"处理临时换人接送场景</p></div></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(d => `
+                <tr>
+                    <td><strong>#${d.id.slice(-6)}</strong></td>
+                    <td>${d.childName}</td>
+                    <td>
+                        <div class="child-info">
+                            <h4>${d.delegatee}</h4>
+                            <p>${d.delegateePhone}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div>${formatDate(d.delegationDate)}</div>
+                        <div class="history-time">${d.timeSlot}</div>
+                    </td>
+                    <td><span class="status-badge ${getDelegationStatusClass(d.status)}">${getDelegationStatusText(d.status)}</span></td>
+                    <td>${d.specialNotes ? d.specialNotes.substring(0, 20) + (d.specialNotes.length > 20 ? '...' : '') : '无'}</td>
+                    <td class="action-cell">
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-sm" onclick="viewDelegationDetail('${d.id}')">详情</button>
+                            ${d.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="openReviewModal('${d.id}')">审核</button>` : ''}
+                            ${d.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="revokeDelegation('${d.id}')">撤回</button>` : ''}
+                            ${d.status === 'approved' ? `<button class="btn btn-warning btn-sm" onclick="useDelegation('${d.id}')">标记使用</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getDelegationStatusClass(status) {
+            const map = {
+                'pending': 'status-pending',
+                'approved': 'status-approved',
+                'rejected': 'status-rejected',
+                'revoked': 'status-inactive',
+                'used': 'status-active'
+            };
+            return map[status] || 'status-inactive';
+        }
+
+        function getDelegationStatusText(status) {
+            const map = {
+                'pending': '待审核',
+                'approved': '已通过',
+                'rejected': '已拒绝',
+                'revoked': '已撤回',
+                'used': '已使用'
+            };
+            return map[status] || status;
+        }
+
+        function saveDelegation() {
+            const form = document.getElementById('delegation-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const childId = document.getElementById('delegation-child').value;
+            if (!childId) {
+                alert('⚠️ 异常触发：必须选择儿童！这是演示路径中的异常场景之一。');
+                return;
+            }
+
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            const child = children.find(c => c.id === childId);
+
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const delegationData = {
+                id: generateId(),
+                childId: childId,
+                childName: child.name,
+                requester: document.getElementById('delegation-requester').value,
+                requesterPhone: document.getElementById('delegation-requester-phone').value,
+                delegatee: document.getElementById('delegation-delegatee').value,
+                delegateePhone: document.getElementById('delegation-delegatee-phone').value,
+                delegationDate: document.getElementById('delegation-date').value,
+                timeSlot: document.getElementById('delegation-time').value,
+                reason: document.getElementById('delegation-reason').value,
+                specialNotes: document.getElementById('delegation-special-notes').value,
+                status: 'pending',
+                reviewComments: '',
+                reviewedBy: '',
+                reviewedAt: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            delegations.push(delegationData);
+            saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+            addHistory('delegation', 'create', delegationData.id, `${child.name} - ${delegationData.delegatee}`, null, delegationData);
+
+            closeModal('delegation-modal');
+            document.getElementById('delegation-form').reset();
+            renderCurrentTab();
+        }
+
+        function viewDelegationDetail(id) {
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const history = loadData(STORAGE_KEYS.HISTORY).filter(h => h.entityId === id);
+            const delegation = delegations.find(d => d.id === id);
+            if (!delegation) return;
+
+            document.getElementById('delegation-detail-content').innerHTML = `
+                <div class="detail-section">
+                    <h3>委托信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">委托编号</div><div class="detail-value">#${delegation.id.slice(-6)}</div></div>
+                        <div class="detail-item"><div class="detail-label">状态</div><div class="detail-value"><span class="status-badge ${getDelegationStatusClass(delegation.status)}">${getDelegationStatusText(delegation.status)}</span></div></div>
+                        <div class="detail-item"><div class="detail-label">儿童</div><div class="detail-value">${delegation.childName}</div></div>
+                        <div class="detail-item"><div class="detail-label">委托日期</div><div class="detail-value">${formatDate(delegation.delegationDate)}</div></div>
+                        <div class="detail-item"><div class="detail-label">接送时段</div><div class="detail-value">${delegation.timeSlot}</div></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>人员信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">委托人（家长）</div><div class="detail-value">${delegation.requester}</div></div>
+                        <div class="detail-item"><div class="detail-label">家长电话</div><div class="detail-value">${delegation.requesterPhone || '未填写'}</div></div>
+                        <div class="detail-item"><div class="detail-label">被委托人（接送人）</div><div class="detail-value">${delegation.delegatee}</div></div>
+                        <div class="detail-item"><div class="detail-label">接送人电话</div><div class="detail-value">${delegation.delegateePhone}</div></div>
+                    </div>
+                </div>
+                ${delegation.reason ? `
+                <div class="detail-section">
+                    <h3>委托原因</h3>
+                    <div class="detail-item"><div class="detail-value">${delegation.reason}</div></div>
+                </div>
+                ` : ''}
+                ${delegation.specialNotes ? `
+                <div class="detail-section">
+                    <h3>异常/特殊备注</h3>
+                    <div class="alert alert-warning">${delegation.specialNotes}</div>
+                </div>
+                ` : ''}
+                ${delegation.reviewComments ? `
+                <div class="detail-section">
+                    <h3>审核意见</h3>
+                    <div class="detail-item"><div class="detail-value">${delegation.reviewComments}</div></div>
+                </div>
+                ` : ''}
+                ${history.length > 0 ? `
+                <div class="detail-section">
+                    <h3>变更历史（${history.length}条）</h3>
+                    <div class="timeline">
+                        ${history.map(h => `
+                            <div class="timeline-item">
+                                <div class="history-time">${formatDateTime(h.timestamp)}</div>
+                                <div class="history-action">${getActionText(h)}</div>
+                                <div class="history-changes">${getChangesText(h)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('delegation-detail-footer').innerHTML = `
+                ${delegation.status === 'pending' ? `<button class="btn btn-success" onclick="openReviewModal('${delegation.id}')">审核</button>` : ''}
+                ${delegation.status === 'pending' ? `<button class="btn btn-danger" onclick="revokeDelegation('${delegation.id}'); closeModal('delegation-detail-modal');">撤回</button>` : ''}
+                ${delegation.status === 'approved' ? `<button class="btn btn-warning" onclick="useDelegation('${delegation.id}'); closeModal('delegation-detail-modal');">标记使用</button>` : ''}
+                <button class="btn btn-secondary" onclick="closeModal('delegation-detail-modal')">关闭</button>
+            `;
+
+            openModal('delegation-detail-modal');
+        }
+
+        function openReviewModal(id) {
+            closeModal('delegation-detail-modal');
+            document.getElementById('review-delegation-id').value = id;
+            document.getElementById('review-result').value = 'approved';
+            document.getElementById('review-comments').value = '';
+            openModal('review-modal');
+        }
+
+        function submitReview() {
+            const id = document.getElementById('review-delegation-id').value;
+            const result = document.getElementById('review-result').value;
+            const comments = document.getElementById('review-comments').value;
+
+            if (!comments.trim()) {
+                alert('请填写审核意见');
+                return;
+            }
+
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const index = delegations.findIndex(d => d.id === id);
+            if (index === -1) return;
+
+            const before = { ...delegations[index] };
+            delegations[index].status = result;
+            delegations[index].reviewComments = comments;
+            delegations[index].reviewedBy = '当前用户';
+            delegations[index].reviewedAt = new Date().toISOString();
+            delegations[index].updatedAt = new Date().toISOString();
+
+            saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+            addHistory('delegation', result, id, `${delegations[index].childName} - ${delegations[index].delegatee}`, before, delegations[index]);
+
+            closeModal('review-modal');
+            renderCurrentTab();
+        }
+
+        function revokeDelegation(id) {
+            if (!confirm('确定要撤回这个临时委托吗？')) return;
+
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const index = delegations.findIndex(d => d.id === id);
+            if (index === -1) return;
+
+            if (delegations[index].status !== 'pending') {
+                alert('⚠️ 异常场景：只有"待审核"状态的委托才能撤回！当前状态：' + getDelegationStatusText(delegations[index].status));
+                return;
+            }
+
+            const before = { ...delegations[index] };
+            delegations[index].status = 'revoked';
+            delegations[index].updatedAt = new Date().toISOString();
+
+            saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+            addHistory('delegation', 'revoke', id, `${delegations[index].childName} - ${delegations[index].delegatee}`, before, delegations[index]);
+
+            renderCurrentTab();
+        }
+
+        function useDelegation(id) {
+            if (!confirm('标记为已使用？')) return;
+
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const index = delegations.findIndex(d => d.id === id);
+            if (index === -1) return;
+
+            const before = { ...delegations[index] };
+            delegations[index].status = 'used';
+            delegations[index].usedAt = new Date().toISOString();
+            delegations[index].updatedAt = new Date().toISOString();
+
+            saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+            addHistory('delegation', 'use', id, `${delegations[index].childName} - ${delegations[index].delegatee}`, before, delegations[index]);
+
+            renderCurrentTab();
+        }
+
+        function renderHistory() {
+            const history = loadData(STORAGE_KEYS.HISTORY);
+            const search = document.getElementById('history-search').value.toLowerCase();
+            const typeFilter = document.getElementById('history-type-filter').value;
+            const actionFilter = document.getElementById('history-action-filter').value;
+
+            const filtered = history.filter(h => {
+                const matchSearch = h.entityName.toLowerCase().includes(search) ||
+                                   JSON.stringify(h).toLowerCase().includes(search);
+                const matchType = !typeFilter || h.type === typeFilter;
+                const matchAction = !actionFilter || h.action === actionFilter;
+                return matchSearch && matchType && matchAction;
+            });
+
+            const container = document.getElementById('history-list');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>暂无操作历史</h3><p>系统的所有操作都会记录在这里</p></div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(h => `
+                <div class="history-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <div class="history-action">${getActionText(h)}</div>
+                            <div style="margin-top: 5px;"><strong>${h.entityName}</strong></div>
+                            <div class="history-time">${formatDateTime(h.timestamp)} | 操作人：${h.operator}</div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="viewHistoryDetail('${h.id}')">查看变更</button>
+                    </div>
+                    <div class="history-changes" style="margin-top: 10px;">${getChangesText(h)}</div>
+                </div>
+            `).join('');
+        }
+
+        function viewHistoryDetail(id) {
+            const history = loadData(STORAGE_KEYS.HISTORY);
+            const record = history.find(h => h.id === id);
+            if (!record) return;
+
+            document.getElementById('history-detail-content').innerHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">操作类型</div><div class="detail-value">${getActionText(record)}</div></div>
+                        <div class="detail-item"><div class="detail-label">操作时间</div><div class="detail-value">${formatDateTime(record.timestamp)}</div></div>
+                        <div class="detail-item"><div class="detail-label">操作人</div><div class="detail-value">${record.operator}</div></div>
+                        <div class="detail-item"><div class="detail-label">实体名称</div><div class="detail-value">${record.entityName}</div></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>变更对比</h3>
+                    <div class="detail-grid">
+                        ${record.before ? `
+                        <div class="detail-item">
+                            <div class="detail-label" style="color: #ef4444;">变更前</div>
+                            <pre style="font-size: 12px; white-space: pre-wrap; word-break: break-all;">${JSON.stringify(record.before, null, 2)}</pre>
+                        </div>
+                        ` : '<div class="detail-item"><div class="detail-label">变更前</div><div class="detail-value">（新记录，无变更前数据）</div></div>'}
+                        ${record.after ? `
+                        <div class="detail-item">
+                            <div class="detail-label" style="color: #10b981;">变更后</div>
+                            <pre style="font-size: 12px; white-space: pre-wrap; word-break: break-all;">${JSON.stringify(record.after, null, 2)}</pre>
+                        </div>
+                        ` : '<div class="detail-item"><div class="detail-label">变更后</div><div class="detail-value">（已删除）</div></div>'}
+                    </div>
+                </div>
+            `;
+            openModal('history-detail-modal');
+        }
+
+        function clearHistory() {
+            if (!confirm('确定要清空所有操作历史吗？此操作不可恢复！')) return;
+            saveData(STORAGE_KEYS.HISTORY, []);
+            renderCurrentTab();
+        }
+
+        function exportDelegations() {
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            if (delegations.length === 0) {
+                alert('没有数据可导出');
+                return;
+            }
+
+            let csv = '委托编号,儿童,委托人,被委托人,委托日期,时段,状态,原因,特殊备注\n';
+            delegations.forEach(d => {
+                csv += `"#${d.id.slice(-6)}","${d.childName}","${d.requester}","${d.delegatee}","${d.delegationDate}","${d.timeSlot}","${getDelegationStatusText(d.status)}","${d.reason || ''}","${(d.specialNotes || '').replace(/"/g, '""')}"\n`;
+            });
+
+            downloadFile(csv, `临时委托记录_${new Date().toISOString().split('T')[0]}.csv`, 'text/csv;charset=utf-8');
+        }
+
+        function exportAllData() {
+            const data = {
+                children: loadData(STORAGE_KEYS.CHILDREN),
+                authorizations: loadData(STORAGE_KEYS.AUTHORIZATIONS),
+                delegations: loadData(STORAGE_KEYS.DELEGATIONS),
+                history: loadData(STORAGE_KEYS.HISTORY),
+                exportedAt: new Date().toISOString()
+            };
+            downloadFile(JSON.stringify(data, null, 2), `托管接送系统数据_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob(['\ufeff' + content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function initDemoData() {
+            const children = loadData(STORAGE_KEYS.CHILDREN);
+            if (children.length > 0) return;
+
+            const demoChildren = [
+                {
+                    id: generateId(),
+                    name: '张小明',
+                    gender: '男',
+                    birthdate: '2020-03-15',
+                    class: '中班',
+                    address: '北京市朝阳区XX小区',
+                    parentName: '张伟',
+                    parentPhone: '13800138001',
+                    notes: '对花生过敏',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    name: '李朵朵',
+                    gender: '女',
+                    birthdate: '2021-07-22',
+                    class: '小班',
+                    address: '北京市海淀区XX小区',
+                    parentName: '李芳',
+                    parentPhone: '13800138002',
+                    notes: '',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                }
+            ];
+
+            const demoAuths = [
+                {
+                    id: generateId(),
+                    childId: demoChildren[0].id,
+                    childName: '张小明',
+                    authorizedPerson: '张伟',
+                    relationship: '父亲',
+                    phone: '13800138001',
+                    idCard: '',
+                    startDate: '2026-01-01',
+                    endDate: '2026-12-31',
+                    notes: '日常接送',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                },
+                {
+                    id: generateId(),
+                    childId: demoChildren[0].id,
+                    childName: '张小明',
+                    authorizedPerson: '王秀兰',
+                    relationship: '奶奶',
+                    phone: '13800138003',
+                    idCard: '',
+                    startDate: '2026-01-01',
+                    endDate: '2026-12-31',
+                    notes: '偶尔帮忙接送',
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                }
+            ];
+
+            const demoDelegations = [
+                {
+                    id: generateId(),
+                    childId: demoChildren[0].id,
+                    childName: '张小明',
+                    requester: '张伟',
+                    requesterPhone: '13800138001',
+                    delegatee: '刘强',
+                    delegateePhone: '13800138004',
+                    delegationDate: new Date().toISOString().split('T')[0],
+                    timeSlot: '下午接园',
+                    reason: '出差，委托同事帮忙接',
+                    specialNotes: '可能会迟到10分钟',
+                    status: 'pending',
+                    reviewComments: '',
+                    reviewedBy: '',
+                    reviewedAt: null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                }
+            ];
+
+            saveData(STORAGE_KEYS.CHILDREN, demoChildren);
+            saveData(STORAGE_KEYS.AUTHORIZATIONS, demoAuths);
+            saveData(STORAGE_KEYS.DELEGATIONS, demoDelegations);
+
+            demoChildren.forEach(c => addHistory('child', 'create', c.id, c.name, null, c));
+            demoAuths.forEach(a => addHistory('authorization', 'create', a.id, `${a.childName} - ${a.authorizedPerson}`, null, a));
+            demoDelegations.forEach(d => addHistory('delegation', 'create', d.id, `${d.childName} - ${d.delegatee}`, null, d));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initDemoData();
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('show');
+                    }
+                });
+            });
+
+            renderDashboard();
+        });
+    </script>
+</body>
+</html>
