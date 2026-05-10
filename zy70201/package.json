@@ -1,0 +1,14 @@
+{
+  "name": "snow-grooming-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "description": "滑雪场雪道压雪排程台 - 夜间压雪车作业排程管理系统",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:backend": "cd backend && npm run dev",
+    "start:frontend": "cd frontend && npm run dev",
+    "seed": "cd backend && npm run seed",
+    "test": "cd backend && npm run test",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build"
+  }
+}

@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Slope {
+  id                   String   @id @default(uuid())
+  name                 String
+  difficulty           String
+  length               Float
+  area                 Float
+  openWindowStart      String
+  openWindowEnd        String
+  minSnowThickness     Int
+  targetSnowThickness  Int
+  currentSnowThickness Int
+  status               String   @default("OPEN")
+  priority             Int
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  tasks                Task[]
+}
+
+model Vehicle {
+  id               String   @id @default(uuid())
+  name             String
+  model            String
+  status           String   @default("AVAILABLE")
+  capacityPerHour  Float
+  currentLocation  String
+  lastMaintenance  DateTime?
+  assignedTaskId   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  tasks            Task[]
+}
+
+model Task {
+  id                  String   @id @default(uuid())
+  slopeId             String
+  vehicleId           String?
+  scheduledStartTime  DateTime
+  scheduledEndTime    DateTime
+  actualStartTime     DateTime?
+  actualEndTime       DateTime?
+  status              String   @default("PENDING_ASSIGNMENT")
+  reason              String?
+  snowThicknessBefore Int?
+  snowThicknessAfter  Int?
+  qualityScore        Int?
+  notes               String?
+  isReassigned        Boolean  @default(false)
+  originalVehicleId   String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  slope               Slope    @relation(fields: [slopeId], references: [id])
+  vehicle             Vehicle? @relation(fields: [vehicleId], references: [id])
+  report              Report?
+}
+
+model Report {
+  id               String   @id @default(uuid())
+  taskId           String   @unique
+  reporter         String
+  reportTime       DateTime @default(now())
+  snowThicknessBefore Int
+  snowThicknessAfter  Int
+  qualityScore     Int
+  issues           String
+  remarks          String?
+  isApproved       Boolean  @default(false)
+  approver         String?
+  approveTime      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  task             Task     @relation(fields: [taskId], references: [id])
+}
