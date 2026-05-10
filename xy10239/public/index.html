@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区团购缺斤少两申诉台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+    .tab.active { background: #667eea; color: white; }
+    .panel { display: none; background: white; padding: 20px; border-radius: 10px; }
+    .panel.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 600; }
+    .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 13px; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-warning { background: #ffc107; color: #212529; }
+    .btn-info { background: #17a2b8; color: white; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+    input, select, textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+    textarea { resize: vertical; min-height: 80px; }
+    .row { display: flex; gap: 15px; flex-wrap: wrap; }
+    .col { flex: 1; min-width: 200px; }
+    .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 28px; font-weight: bold; color: #667eea; }
+    .stat-label { font-size: 14px; color: #666; margin-top: 5px; }
+    .status { padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-confirmed { background: #d4edda; color: #155724; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .message { padding: 10px 15px; border-radius: 5px; margin-bottom: 15px; display: none; }
+    .message.success { background: #d4edda; color: #155724; display: block; }
+    .message.error { background: #f8d7da; color: #721c24; display: block; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.active { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 10px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .close { cursor: pointer; font-size: 24px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>社区团购缺斤少两申诉台</h1>
+      <p style="margin-top: 10px; opacity: 0.9;">订单批次 → 称重记录 → 申诉处理 → 结果统计</p>
+    </header>
+
+    <div id="message" class="message"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('dashboard')">数据概览</button>
+      <button class="tab" onclick="switchTab('batches')">订单批次</button>
+      <button class="tab" onclick="switchTab('weighing')">称重记录</button>
+      <button class="tab" onclick="switchTab('complaints')">申诉管理</button>
+      <button class="tab" onclick="switchTab('sample')">样例数据</button>
+    </div>
+
+    <div id="dashboard" class="panel active">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-value" id="totalBatches">0</div>
+          <div class="stat-label">订单批次</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalWeighing">0</div>
+          <div class="stat-label">称重记录</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalComplaints">0</div>
+          <div class="stat-label">总申诉数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pendingComplaints">0</div>
+          <div class="stat-label">待处理申诉</div>
+        </div>
+      </div>
+      <h3 style="margin-bottom: 15px;">批次统计</h3>
+      <table id="statsTable">
+        <thead>
+          <tr>
+            <th>批次号</th>
+            <th>商品</th>
+            <th>供应商</th>
+            <th>订单重量</th>
+            <th>实际称重</th>
+            <th>重量差异</th>
+            <th>申诉数</th>
+            <th>待处理</th>
+            <th>已确认</th>
+            <th>已拒绝</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="batches" class="panel">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="openModal('batchModal')">新增批次</button>
+        <button class="btn btn-info" onclick="refreshData()">刷新</button>
+      </div>
+      <table id="batchesTable">
+        <thead>
+          <tr>
+            <th>批次号</th>
+            <th>商品名称</th>
+            <th>供应商</th>
+            <th>订单数量</th>
+            <th>订单重量</th>
+            <th>单位</th>
+            <th>到货日期</th>
+            <th>创建时间</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="weighing" class="panel">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="openModal('weighingModal')">新增称重</button>
+        <button class="btn btn-info" onclick="refreshData()">刷新</button>
+      </div>
+      <table id="weighingTable">
+        <thead>
+          <tr>
+            <th>批次号</th>
+            <th>商品</th>
+            <th>团长</th>
+            <th>称重时间</th>
+            <th>实际数量</th>
+            <th>实际重量</th>
+            <th>数量差异</th>
+            <th>重量差异</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="complaints" class="panel">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="openModal('complaintModal')">新增申诉</button>
+        <button class="btn btn-info" onclick="refreshData()">刷新</button>
+        <button class="btn btn-warning" onclick="exportData()">导出数据</button>
+      </div>
+      <table id="complaintsTable">
+        <thead>
+          <tr>
+            <th>申诉编号</th>
+            <th>批次号</th>
+            <th>商品</th>
+            <th>用户</th>
+            <th>类型</th>
+            <th>期望重量</th>
+            <th>实际重量</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="sample" class="panel">
+      <h3>样例数据入口</h3>
+      <p style="margin: 15px 0; color: #666;">点击下方按钮一键导入样例数据，包含3个订单批次、3条称重记录、3条申诉单。重跑不会重复添加。</p>
+      <button class="btn btn-primary btn-lg" style="padding: 15px 30px; font-size: 16px;" onclick="loadSampleData()">导入样例数据</button>
+      
+      <div style="margin-top: 30px;">
+        <h4>样例数据说明</h4>
+        <ul style="margin-top: 15px; color: #666; line-height: 1.8;">
+          <li><strong>批次1 (BATCH20260510001)</strong>：山东大樱桃，订单50斤，实际称重47.5斤，差异-2.5斤</li>
+          <li><strong>批次2 (BATCH20260510002)</strong>：有机西红柿，订单80斤，实际称重79.2斤，差异-0.8斤</li>
+          <li><strong>批次3 (BATCH20260510003)</strong>：鲜活基围虾，订单30斤，实际称重27.8斤，差异-2.2斤</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="batchModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>新增订单批次</h3>
+        <span class="close" onclick="closeModal('batchModal')">&times;</span>
+      </div>
+      <form id="batchForm">
+        <div class="form-group">
+          <label>批次号</label>
+          <input type="text" name="batch_no" required placeholder="如：BATCH20260510001">
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>商品名称</label>
+              <input type="text" name="product_name" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>供应商</label>
+              <input type="text" name="supplier" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>订单数量</label>
+              <input type="number" step="0.01" name="order_quantity" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>订单重量</label>
+              <input type="number" step="0.01" name="order_weight" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>单位</label>
+              <input type="text" name="unit" required placeholder="如：斤">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>到货日期</label>
+          <input type="date" name="arrival_date" required>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="weighingModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>新增称重记录</h3>
+        <span class="close" onclick="closeModal('weighingModal')">&times;</span>
+      </div>
+      <form id="weighingForm">
+        <div class="form-group">
+          <label>批次号</label>
+          <select name="batch_no" id="weighingBatchSelect" required></select>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>团长</label>
+              <input type="text" name="group_leader" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>称重时间</label>
+              <input type="datetime-local" name="weighing_time" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>实际数量</label>
+              <input type="number" step="0.01" name="actual_quantity" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>实际重量</label>
+              <input type="number" step="0.01" name="actual_weight" required>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea name="notes"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="complaintModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>新增申诉单</h3>
+        <span class="close" onclick="closeModal('complaintModal')">&times;</span>
+      </div>
+      <form id="complaintForm">
+        <div class="form-group">
+          <label>批次号</label>
+          <select name="batch_no" id="complaintBatchSelect" required></select>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>用户姓名</label>
+              <input type="text" name="user_name" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>联系电话</label>
+              <input type="text" name="user_phone" required>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>申诉时间</label>
+              <input type="datetime-local" name="complaint_time" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>申诉类型</label>
+              <select name="complaint_type" required>
+                <option value="缺斤少两">缺斤少两</option>
+                <option value="质量问题">质量问题</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>申诉内容</label>
+          <textarea name="complaint_content" required></textarea>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>期望数量</label>
+              <input type="number" step="0.01" name="expected_quantity">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>期望重量</label>
+              <input type="number" step="0.01" name="expected_weight">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>实际数量</label>
+              <input type="number" step="0.01" name="actual_quantity">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>实际重量</label>
+              <input type="number" step="0.01" name="actual_weight">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="handleModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="handleModalTitle">处理申诉</h3>
+        <span class="close" onclick="closeModal('handleModal')">&times;</span>
+      </div>
+      <form id="handleForm">
+        <input type="hidden" name="id">
+        <input type="hidden" name="action">
+        <div class="form-group">
+          <label>处理人</label>
+          <input type="text" name="handler" required>
+        </div>
+        <div class="form-group">
+          <label>处理结果</label>
+          <textarea name="handle_result" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea name="handle_notes"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>修改申诉单</h3>
+        <span class="close" onclick="closeModal('editModal')">&times;</span>
+      </div>
+      <form id="editForm">
+        <input type="hidden" name="id">
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>用户姓名</label>
+              <input type="text" name="user_name" required>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>联系电话</label>
+              <input type="text" name="user_phone" required>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>申诉内容</label>
+          <textarea name="complaint_content" required></textarea>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>期望数量</label>
+              <input type="number" step="0.01" name="expected_quantity">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>期望重量</label>
+              <input type="number" step="0.01" name="expected_weight">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="form-group">
+              <label>实际数量</label>
+              <input type="number" step="0.01" name="actual_quantity">
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-group">
+              <label>实际重量</label>
+              <input type="number" step="0.01" name="actual_weight">
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+
+    function showMessage(msg, type = 'success') {
+      const el = document.getElementById('message');
+      el.textContent = msg;
+      el.className = `message ${type}`;
+      setTimeout(() => { el.className = 'message'; }, 3000);
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+      if (tabName === 'dashboard') refreshStats();
+      else if (tabName === 'batches') refreshBatches();
+      else if (tabName === 'weighing') refreshWeighing();
+      else if (tabName === 'complaints') refreshComplaints();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      if (id === 'weighingModal') loadBatchSelects();
+      if (id === 'complaintModal') loadBatchSelects();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    async function loadBatchSelects() {
+      try {
+        const res = await fetch(`${API_BASE}/api/batches`);
+        const batches = await res.json();
+        const options = batches.map(b => `<option value="${b.batch_no}">${b.batch_no} - ${b.product_name}</option>`).join('');
+        document.getElementById('weighingBatchSelect').innerHTML = options;
+        document.getElementById('complaintBatchSelect').innerHTML = options;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function refreshData() {
+      await refreshStats();
+      await refreshBatches();
+      await refreshWeighing();
+      await refreshComplaints();
+      showMessage('数据已刷新');
+    }
+
+    async function refreshStats() {
+      try {
+        const batches = await fetch(`${API_BASE}/api/batches`).then(r => r.json());
+        const weighing = await fetch(`${API_BASE}/api/weighing`).then(r => r.json());
+        const complaints = await fetch(`${API_BASE}/api/complaints`).then(r => r.json());
+        const stats = await fetch(`${API_BASE}/api/statistics`).then(r => r.json());
+
+        document.getElementById('totalBatches').textContent = batches.length;
+        document.getElementById('totalWeighing').textContent = weighing.length;
+        document.getElementById('totalComplaints').textContent = complaints.length;
+        document.getElementById('pendingComplaints').textContent = complaints.filter(c => c.status === 'pending').length;
+
+        const tbody = document.querySelector('#statsTable tbody');
+        tbody.innerHTML = stats.map(s => `
+          <tr>
+            <td>${s.batch_no}</td>
+            <td>${s.product_name}</td>
+            <td>${s.supplier}</td>
+            <td>${s.order_weight}</td>
+            <td>${s.weighed_weight}</td>
+            <td style="color: ${s.total_difference_weight < 0 ? '#dc3545' : '#28a745'}">${s.total_difference_weight}</td>
+            <td>${s.total_complaints}</td>
+            <td>${s.pending_complaints}</td>
+            <td>${s.confirmed_complaints}</td>
+            <td>${s.rejected_complaints}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function refreshBatches() {
+      try {
+        const res = await fetch(`${API_BASE}/api/batches`);
+        const data = await res.json();
+        const tbody = document.querySelector('#batchesTable tbody');
+        tbody.innerHTML = data.map(b => `
+          <tr>
+            <td>${b.batch_no}</td>
+            <td>${b.product_name}</td>
+            <td>${b.supplier}</td>
+            <td>${b.order_quantity}</td>
+            <td>${b.order_weight}</td>
+            <td>${b.unit}</td>
+            <td>${b.arrival_date}</td>
+            <td>${b.created_at}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function refreshWeighing() {
+      try {
+        const res = await fetch(`${API_BASE}/api/weighing`);
+        const data = await res.json();
+        const tbody = document.querySelector('#weighingTable tbody');
+        tbody.innerHTML = data.map(w => `
+          <tr>
+            <td>${w.batch_no}</td>
+            <td>${w.product_name}</td>
+            <td>${w.group_leader}</td>
+            <td>${w.weighing_time}</td>
+            <td>${w.actual_quantity}</td>
+            <td>${w.actual_weight}</td>
+            <td style="color: ${w.difference_quantity < 0 ? '#dc3545' : '#28a745'}">${w.difference_quantity}</td>
+            <td style="color: ${w.difference_weight < 0 ? '#dc3545' : '#28a745'}">${w.difference_weight}</td>
+            <td>${w.notes || '-'}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function getStatusText(status) {
+      const map = { pending: '待处理', confirmed: '已确认', rejected: '已拒绝' };
+      return map[status] || status;
+    }
+
+    function getStatusClass(status) {
+      const map = { pending: 'status-pending', confirmed: 'status-confirmed', rejected: 'status-rejected' };
+      return map[status] || '';
+    }
+
+    async function refreshComplaints() {
+      try {
+        const res = await fetch(`${API_BASE}/api/complaints`);
+        const data = await res.json();
+        const tbody = document.querySelector('#complaintsTable tbody');
+        tbody.innerHTML = data.map(c => `
+          <tr>
+            <td>${c.complaint_no}</td>
+            <td>${c.batch_no}</td>
+            <td>${c.product_name}</td>
+            <td>${c.user_name}</td>
+            <td>${c.complaint_type}</td>
+            <td>${c.expected_weight || '-'}</td>
+            <td>${c.actual_weight || '-'}</td>
+            <td><span class="status ${getStatusClass(c.status)}">${getStatusText(c.status)}</span></td>
+            <td>
+              ${c.status === 'pending' ? `
+                <button class="btn btn-warning" onclick="editComplaint(${c.id})">修改</button>
+                <button class="btn btn-success" onclick="handleComplaint(${c.id}, 'confirm')">确认</button>
+                <button class="btn btn-danger" onclick="handleComplaint(${c.id}, 'reject')">拒绝</button>
+              ` : '-'}
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadSampleData() {
+      try {
+        const res = await fetch(`${API_BASE}/api/sample-data`, { method: 'POST' });
+        const data = await res.json();
+        showMessage(`样例数据导入完成！批次: ${data.batches.length}, 称重: ${data.weighing.length}, 申诉: ${data.complaints.length}`);
+        await refreshData();
+      } catch (e) {
+        showMessage('导入失败', 'error');
+      }
+    }
+
+    async function exportData() {
+      try {
+        const res = await fetch(`${API_BASE}/api/export`);
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `complaint_export_${Date.now()}.xlsx`;
+        a.click();
+        showMessage('导出成功');
+      } catch (e) {
+        showMessage('导出失败', 'error');
+      }
+    }
+
+    document.getElementById('batchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        const res = await fetch(`${API_BASE}/api/batches`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        showMessage(result.isNew ? '批次添加成功' : '批次已存在');
+        closeModal('batchModal');
+        e.target.reset();
+        await refreshData();
+      } catch (err) {
+        showMessage('操作失败', 'error');
+      }
+    });
+
+    document.getElementById('weighingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        const res = await fetch(`${API_BASE}/api/weighing`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        showMessage(result.isNew ? '称重记录添加成功' : '称重记录已更新');
+        closeModal('weighingModal');
+        e.target.reset();
+        await refreshData();
+      } catch (err) {
+        showMessage('操作失败', 'error');
+      }
+    });
+
+    document.getElementById('complaintForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      try {
+        const res = await fetch(`${API_BASE}/api/complaints`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        showMessage(`申诉单创建成功：${result.complaint_no}`);
+        closeModal('complaintModal');
+        e.target.reset();
+        await refreshData();
+      } catch (err) {
+        showMessage('操作失败', 'error');
+      }
+    });
+
+    function handleComplaint(id, action) {
+      document.getElementById('handleModalTitle').textContent = action === 'confirm' ? '确认申诉' : '拒绝申诉';
+      document.querySelector('#handleForm [name="id"]').value = id;
+      document.querySelector('#handleForm [name="action"]').value = action;
+      openModal('handleModal');
+    }
+
+    document.getElementById('handleForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const id = data.id;
+      const action = data.action;
+      delete data.id;
+      delete data.action;
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/complaints/${id}/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        showMessage(result.message);
+        closeModal('handleModal');
+        e.target.reset();
+        await refreshData();
+      } catch (err) {
+        showMessage('操作失败', 'error');
+      }
+    });
+
+    async function editComplaint(id) {
+      try {
+        const res = await fetch(`${API_BASE}/api/complaints`);
+        const complaints = await res.json();
+        const complaint = complaints.find(c => c.id === id);
+        if (!complaint) return;
+        
+        document.querySelector('#editForm [name="id"]').value = id;
+        document.querySelector('#editForm [name="user_name"]').value = complaint.user_name;
+        document.querySelector('#editForm [name="user_phone"]').value = complaint.user_phone;
+        document.querySelector('#editForm [name="complaint_content"]').value = complaint.complaint_content;
+        document.querySelector('#editForm [name="expected_quantity"]').value = complaint.expected_quantity || '';
+        document.querySelector('#editForm [name="expected_weight"]').value = complaint.expected_weight || '';
+        document.querySelector('#editForm [name="actual_quantity"]').value = complaint.actual_quantity || '';
+        document.querySelector('#editForm [name="actual_weight"]').value = complaint.actual_weight || '';
+        
+        openModal('editModal');
+      } catch (e) {
+        showMessage('加载失败', 'error');
+      }
+    }
+
+    document.getElementById('editForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const id = data.id;
+      delete data.id;
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/complaints/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        showMessage(result.message);
+        closeModal('editModal');
+        e.target.reset();
+        await refreshData();
+      } catch (err) {
+        showMessage('操作失败', 'error');
+      }
+    });
+
+    refreshData();
+    loadBatchSelects();
+  </script>
+</body>
+</html>
