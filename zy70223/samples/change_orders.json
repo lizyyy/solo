@@ -1,0 +1,32 @@
+[
+  {
+    "order_id": "CO-001",
+    "date": "2026-05-10",
+    "operations": [
+      {
+        "type": "connect",
+        "from_port": "P001",
+        "to_port": "P003",
+        "reason": "服务器上线"
+      },
+      {
+        "type": "disconnect",
+        "from_port": "P007",
+        "to_port": "P008",
+        "reason": "服务器下线"
+      }
+    ]
+  },
+  {
+    "order_id": "CO-002",
+    "date": "2026-05-11",
+    "operations": [
+      {
+        "type": "connect",
+        "from_port": "P002",
+        "to_port": "P006",
+        "reason": "交换机互联"
+      }
+    ]
+  }
+]

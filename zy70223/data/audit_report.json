@@ -1,0 +1,41 @@
+{
+  "imports": [
+    {
+      "file": "samples/port_ledger.csv",
+      "hash": "babee4d0fbd89aaa048cdfe157bab63f4beb4e94ae1f643c28bc913f1c6f3b6d",
+      "total_rows": 8,
+      "valid_ports": 8,
+      "skipped_rows": [],
+      "needs_confirmation": []
+    }
+  ],
+  "changes": [
+    {
+      "file": "samples/change_orders.json",
+      "hash": "e2082cc7b662f33d38974e023673e9539fbb5e5c63144d081a78c603952a1790",
+      "total_operations": 3,
+      "valid_operations": 3,
+      "skipped_operations": [],
+      "needs_confirmation": []
+    }
+  ],
+  "verifications": [
+    {
+      "file": "samples/expected_links.csv",
+      "hash": "5cc3959107f10e96d81cdfac1f5c23008458eeebf9738f43c5c2828e96d47ba8",
+      "total_expected": 3,
+      "verified": 2,
+      "mismatches": [],
+      "missing_links": [
+        {
+          "type": "missing_link",
+          "link_id": "L003",
+          "port_a": "P005",
+          "port_b": "P006",
+          "message": "链路L003缺失: P005未连接P006"
+        }
+      ],
+      "extra_links": []
+    }
+  ]
+}

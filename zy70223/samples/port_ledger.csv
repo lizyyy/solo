@@ -1,0 +1,9 @@
+port_id,device_id,rack,slot,port,status,connected_to
+P001,SW-A-01,Rack01,Slot01,Port01,active,
+P002,SW-A-01,Rack01,Slot01,Port02,active,
+P003,SRV-B-02,Rack02,Slot01,Port01,active,
+P004,SRV-B-02,Rack02,Slot01,Port02,inactive,
+P005,SW-C-03,Rack03,Slot01,Port01,active,
+P006,SW-C-03,Rack03,Slot01,Port02,active,
+P007,SRV-D-04,Rack04,Slot01,Port01,inactive,
+P008,SRV-D-04,Rack04,Slot01,Port02,inactive,

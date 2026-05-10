@@ -1,0 +1,87 @@
+{
+  "ports": {
+    "P001": {
+      "device_id": "SW-A-01",
+      "rack": "Rack01",
+      "slot": "Slot01",
+      "port": "Port01",
+      "status": "active",
+      "connected_to": "P003"
+    },
+    "P002": {
+      "device_id": "SW-A-01",
+      "rack": "Rack01",
+      "slot": "Slot01",
+      "port": "Port02",
+      "status": "active",
+      "connected_to": "P006"
+    },
+    "P003": {
+      "device_id": "SRV-B-02",
+      "rack": "Rack02",
+      "slot": "Slot01",
+      "port": "Port01",
+      "status": "active",
+      "connected_to": "P001"
+    },
+    "P004": {
+      "device_id": "SRV-B-02",
+      "rack": "Rack02",
+      "slot": "Slot01",
+      "port": "Port02",
+      "status": "inactive",
+      "connected_to": ""
+    },
+    "P005": {
+      "device_id": "SW-C-03",
+      "rack": "Rack03",
+      "slot": "Slot01",
+      "port": "Port01",
+      "status": "active",
+      "connected_to": ""
+    },
+    "P006": {
+      "device_id": "SW-C-03",
+      "rack": "Rack03",
+      "slot": "Slot01",
+      "port": "Port02",
+      "status": "active",
+      "connected_to": "P002"
+    },
+    "P007": {
+      "device_id": "SRV-D-04",
+      "rack": "Rack04",
+      "slot": "Slot01",
+      "port": "Port01",
+      "status": "inactive",
+      "connected_to": ""
+    },
+    "P008": {
+      "device_id": "SRV-D-04",
+      "rack": "Rack04",
+      "slot": "Slot01",
+      "port": "Port02",
+      "status": "inactive",
+      "connected_to": ""
+    }
+  },
+  "links": [
+    {
+      "a": "P001",
+      "b": "P003",
+      "order_id": "CO-001",
+      "reason": "服务器上线"
+    },
+    {
+      "a": "P002",
+      "b": "P006",
+      "order_id": "CO-002",
+      "reason": "交换机互联"
+    }
+  ],
+  "change_orders_applied": [],
+  "port_ledger_hash": "babee4d0fbd89aaa048cdfe157bab63f4beb4e94ae1f643c28bc913f1c6f3b6d",
+  "change_order_hashes": [
+    "e2082cc7b662f33d38974e023673e9539fbb5e5c63144d081a78c603952a1790"
+  ]
+}
