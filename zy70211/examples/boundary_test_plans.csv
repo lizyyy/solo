@@ -1,0 +1,4 @@
+plan_id,barn_id,plan_date,estimated_duration_hours,target_pests,operator,chemicals_json,evacuations_json,status,remarks
+FP001,B001,2026-05-15,72,玉米象、谷蠹,张三,"[{""chemical_name"":""磷化铝""}]","[]",已批准,重复计划ID测试
+FP999,NONEXIST,2026-06-01,48,害虫,测试人,"[]","[]",已提交,来源仓房不存在测试
+FP005,B001,2026-05-25,48,玉米象,李四,"[{""chemical_name"":""磷化铝""}]","[]",已提交,同一仓房多计划状态冲突测试
