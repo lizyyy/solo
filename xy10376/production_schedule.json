@@ -1,0 +1,152 @@
+{
+  "export_time": "2026-05-11T01:26:11.724304",
+  "schedules": [
+    {
+      "order_id": "ORD-002",
+      "workstation_id": "WS-001",
+      "workstation_name": "包装工位A（花束）",
+      "flowers_required": {
+        "粉玫瑰": 8,
+        "百合": 2,
+        "满天星": 2
+      },
+      "flowers_reserved": {
+        "粉玫瑰": 8,
+        "百合": 2,
+        "满天星": 2
+      },
+      "flowers_replaced": {},
+      "delivery_slot": "SLOT-002",
+      "status": "scheduled"
+    },
+    {
+      "order_id": "ORD-004",
+      "workstation_id": "WS-002",
+      "workstation_name": "包装工位B（花盒）",
+      "flowers_required": {
+        "康乃馨": 15,
+        "百合": 3
+      },
+      "flowers_reserved": {
+        "康乃馨": 15,
+        "百合": 3
+      },
+      "flowers_replaced": {},
+      "delivery_slot": "SLOT-001",
+      "status": "scheduled"
+    },
+    {
+      "order_id": "ORD-005",
+      "workstation_id": "WS-001",
+      "workstation_name": "包装工位A（花束）",
+      "flowers_required": {
+        "向日葵": 5,
+        "康乃馨": 5
+      },
+      "flowers_reserved": {
+        "向日葵": 5,
+        "康乃馨": 5
+      },
+      "flowers_replaced": {},
+      "delivery_slot": "SLOT-001",
+      "status": "scheduled"
+    },
+    {
+      "order_id": "ORD-006",
+      "workstation_id": "WS-001",
+      "workstation_name": "包装工位A（花束）",
+      "flowers_required": {
+        "郁金香": 3,
+        "白玫瑰": 5
+      },
+      "flowers_reserved": {
+        "郁金香": 3,
+        "白玫瑰": 5
+      },
+      "flowers_replaced": {},
+      "delivery_slot": "SLOT-001",
+      "status": "scheduled"
+    },
+    {
+      "order_id": "ORD-007",
+      "workstation_id": "WS-002",
+      "workstation_name": "包装工位B（花盒）",
+      "flowers_required": {
+        "百合": 5,
+        "向日葵": 3
+      },
+      "flowers_reserved": {
+        "百合": 5,
+        "向日葵": 3
+      },
+      "flowers_replaced": {},
+      "delivery_slot": "SLOT-001",
+      "status": "scheduled"
+    }
+  ],
+  "waitlist_orders": [],
+  "orders_needing_attention": [
+    {
+      "order_id": "ORD-003",
+      "customer": "王五",
+      "phone": "13800138003",
+      "issues": []
+    },
+    {
+      "order_id": "ORD-008",
+      "customer": "周九",
+      "phone": "13800138008",
+      "issues": [
+        {
+          "flower": "红玫瑰",
+          "type": "no_replacement_available",
+          "message": "花材'红玫瑰'缺货，且替换花材均不可用"
+        }
+      ]
+    },
+    {
+      "order_id": "ORD-009",
+      "customer": "吴十",
+      "phone": "13800138009",
+      "issues": [
+        {
+          "flower": "红玫瑰",
+          "type": "specified_out_of_stock",
+          "message": "指定花材'红玫瑰'缺货（需要15，仅有0）"
+        },
+        {
+          "flower": "郁金香",
+          "type": "specified_out_of_stock",
+          "message": "指定花材'郁金香'缺货（需要10，仅有5）"
+        }
+      ]
+    },
+    {
+      "order_id": "ORD-001",
+      "customer": "张三",
+      "phone": "13800138001",
+      "issues": []
+    }
+  ],
+  "procurement_gaps": [
+    {
+      "flower_name": "红玫瑰",
+      "required": 45,
+      "available": 0,
+      "gap": 30,
+      "affected_orders": [
+        "ORD-008",
+        "ORD-009"
+      ]
+    },
+    {
+      "flower_name": "郁金香",
+      "required": 10,
+      "available": 5,
+      "gap": 5,
+      "affected_orders": [
+        "ORD-009"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+[
+    {
+        "original": "红玫瑰",
+        "alternatives": ["粉玫瑰", "白玫瑰", "洋牡丹"],
+        "priority": 1
+    },
+    {
+        "original": "白玫瑰",
+        "alternatives": ["粉玫瑰", "桔梗", "洋牡丹"],
+        "priority": 1
+    },
+    {
+        "original": "粉玫瑰",
+        "alternatives": ["红玫瑰", "白玫瑰", "洋牡丹"],
+        "priority": 1
+    },
+    {
+        "original": "百合",
+        "alternatives": ["向日葵", "郁金香"],
+        "priority": 1
+    },
+    {
+        "original": "郁金香",
+        "alternatives": ["百合", "洋牡丹"],
+        "priority": 1
+    },
+    {
+        "original": "向日葵",
+        "alternatives": ["百合", "桔梗"],
+        "priority": 1
+    }
+]

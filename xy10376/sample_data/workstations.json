@@ -1,0 +1,20 @@
+[
+    {
+        "workstation_id": "WS-001",
+        "name": "包装工位A（花束）",
+        "capacity": 10,
+        "packaging_types": ["普通包装", "精美包装", "礼盒包装"]
+    },
+    {
+        "workstation_id": "WS-002",
+        "name": "包装工位B（花盒）",
+        "capacity": 8,
+        "packaging_types": ["花盒包装", "花篮包装"]
+    },
+    {
+        "workstation_id": "WS-003",
+        "name": "包装工位C（加急）",
+        "capacity": 5,
+        "packaging_types": ["普通包装", "精美包装", "礼盒包装", "花盒包装"]
+    }
+]

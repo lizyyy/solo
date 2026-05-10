@@ -1,0 +1,59 @@
+[
+    {
+        "order_id": "ORD-001",
+        "customer_name": "张三",
+        "phone": "13800138001",
+        "order_type": "普通花束",
+        "is_urgent": false,
+        "packaging": "普通包装",
+        "preferred_delivery": "2025-05-12T09:00:00",
+        "batch_id": "BATCH-20250510-A",
+        "flowers": [
+            {"name": "红玫瑰", "quantity": 10, "is_specified": false},
+            {"name": "满天星", "quantity": 3, "is_specified": false}
+        ]
+    },
+    {
+        "order_id": "ORD-002",
+        "customer_name": "李四",
+        "phone": "13800138002",
+        "order_type": "生日花束",
+        "is_urgent": false,
+        "packaging": "精美包装",
+        "preferred_delivery": "2025-05-12T10:00:00",
+        "batch_id": "BATCH-20250510-A",
+        "flowers": [
+            {"name": "粉玫瑰", "quantity": 8, "is_specified": false},
+            {"name": "百合", "quantity": 2, "is_specified": false},
+            {"name": "满天星", "quantity": 2, "is_specified": false}
+        ]
+    },
+    {
+        "order_id": "ORD-003",
+        "customer_name": "王五",
+        "phone": "13800138003",
+        "order_type": "求婚花束",
+        "is_urgent": true,
+        "packaging": "礼盒包装",
+        "preferred_delivery": "2025-05-12T09:00:00",
+        "batch_id": "BATCH-20250510-B",
+        "flowers": [
+            {"name": "红玫瑰", "quantity": 20, "is_specified": false},
+            {"name": "白玫瑰", "quantity": 10, "is_specified": false}
+        ]
+    },
+    {
+        "order_id": "ORD-004",
+        "customer_name": "赵六",
+        "phone": "13800138004",
+        "order_type": "母亲节花束",
+        "is_urgent": false,
+        "packaging": "花盒包装",
+        "preferred_delivery": "2025-05-12T09:00:00",
+        "batch_id": "BATCH-20250510-B",
+        "flowers": [
+            {"name": "康乃馨", "quantity": 15, "is_specified": false},
+            {"name": "百合", "quantity": 3, "is_specified": false}
+        ]
+    }
+]

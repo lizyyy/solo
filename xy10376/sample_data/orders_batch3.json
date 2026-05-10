@@ -1,0 +1,30 @@
+[
+    {
+        "order_id": "ORD-001",
+        "customer_name": "张三",
+        "phone": "13800138001",
+        "order_type": "普通花束",
+        "is_urgent": false,
+        "packaging": "普通包装",
+        "preferred_delivery": "2025-05-12T09:00:00",
+        "batch_id": "BATCH-20250510-A",
+        "flowers": [
+            {"name": "红玫瑰", "quantity": 10, "is_specified": false},
+            {"name": "满天星", "quantity": 3, "is_specified": false}
+        ]
+    },
+    {
+        "order_id": "ORD-009",
+        "customer_name": "吴十",
+        "phone": "13800138009",
+        "order_type": "加急花束",
+        "is_urgent": true,
+        "packaging": "普通包装",
+        "preferred_delivery": "2025-05-12T09:00:00",
+        "batch_id": "BATCH-20250510-E",
+        "flowers": [
+            {"name": "红玫瑰", "quantity": 15, "is_specified": true},
+            {"name": "郁金香", "quantity": 10, "is_specified": true}
+        ]
+    }
+]

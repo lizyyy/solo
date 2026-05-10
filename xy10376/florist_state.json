@@ -1,0 +1,489 @@
+{
+  "orders": {
+    "ORD-001": {
+      "order_id": "ORD-001",
+      "customer_name": "张三",
+      "phone": "13800138001",
+      "order_type": "普通花束",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "红玫瑰",
+          "quantity": 10,
+          "is_specified": false
+        },
+        {
+          "name": "满天星",
+          "quantity": 3,
+          "is_specified": false
+        }
+      ],
+      "packaging": "普通包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-A",
+      "source_file": "sample_data/orders_batch1.json",
+      "import_time": "2026-05-11T01:25:04.189758",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-002": {
+      "order_id": "ORD-002",
+      "customer_name": "李四",
+      "phone": "13800138002",
+      "order_type": "生日花束",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "粉玫瑰",
+          "quantity": 8,
+          "is_specified": false
+        },
+        {
+          "name": "百合",
+          "quantity": 2,
+          "is_specified": false
+        },
+        {
+          "name": "满天星",
+          "quantity": 2,
+          "is_specified": false
+        }
+      ],
+      "packaging": "精美包装",
+      "preferred_delivery": "2025-05-12T10:00:00",
+      "batch_id": "BATCH-20250510-A",
+      "source_file": "sample_data/orders_batch1.json",
+      "import_time": "2026-05-11T01:25:04.189758",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-003": {
+      "order_id": "ORD-003",
+      "customer_name": "王五",
+      "phone": "13800138003",
+      "order_type": "求婚花束",
+      "is_urgent": true,
+      "flowers": [
+        {
+          "name": "红玫瑰",
+          "quantity": 20,
+          "is_specified": false
+        },
+        {
+          "name": "白玫瑰",
+          "quantity": 10,
+          "is_specified": false
+        }
+      ],
+      "packaging": "礼盒包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-B",
+      "source_file": "sample_data/orders_batch1.json",
+      "import_time": "2026-05-11T01:25:04.189758",
+      "status": "confirmed",
+      "workstation_id": "WS-001",
+      "delivery_slot_id": "SLOT-001",
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-004": {
+      "order_id": "ORD-004",
+      "customer_name": "赵六",
+      "phone": "13800138004",
+      "order_type": "母亲节花束",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "康乃馨",
+          "quantity": 15,
+          "is_specified": false
+        },
+        {
+          "name": "百合",
+          "quantity": 3,
+          "is_specified": false
+        }
+      ],
+      "packaging": "花盒包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-B",
+      "source_file": "sample_data/orders_batch1.json",
+      "import_time": "2026-05-11T01:25:04.189758",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-005": {
+      "order_id": "ORD-005",
+      "customer_name": "张三",
+      "phone": "13800138005",
+      "order_type": "普通花束",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "向日葵",
+          "quantity": 5,
+          "is_specified": false
+        },
+        {
+          "name": "康乃馨",
+          "quantity": 5,
+          "is_specified": false
+        }
+      ],
+      "packaging": "普通包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-C",
+      "source_file": "sample_data/orders_batch2.json",
+      "import_time": "2026-05-11T01:25:24.173466",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-006": {
+      "order_id": "ORD-006",
+      "customer_name": "钱七",
+      "phone": "13800138001",
+      "order_type": "生日花束",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "郁金香",
+          "quantity": 3,
+          "is_specified": true
+        },
+        {
+          "name": "白玫瑰",
+          "quantity": 5,
+          "is_specified": false
+        }
+      ],
+      "packaging": "精美包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-C",
+      "source_file": "sample_data/orders_batch2.json",
+      "import_time": "2026-05-11T01:25:24.173466",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-007": {
+      "order_id": "ORD-007",
+      "customer_name": "孙八",
+      "phone": "13800138007",
+      "order_type": "商务花篮",
+      "is_urgent": false,
+      "flowers": [
+        {
+          "name": "百合",
+          "quantity": 5,
+          "is_specified": true
+        },
+        {
+          "name": "向日葵",
+          "quantity": 3,
+          "is_specified": false
+        }
+      ],
+      "packaging": "花篮包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-A",
+      "source_file": "sample_data/orders_batch2.json",
+      "import_time": "2026-05-11T01:25:24.173466",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-008": {
+      "order_id": "ORD-008",
+      "customer_name": "周九",
+      "phone": "13800138008",
+      "order_type": "节日花束",
+      "is_urgent": true,
+      "flowers": [
+        {
+          "name": "红玫瑰",
+          "quantity": 30,
+          "is_specified": false
+        },
+        {
+          "name": "洋牡丹",
+          "quantity": 5,
+          "is_specified": false
+        }
+      ],
+      "packaging": "礼盒包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-D",
+      "source_file": "sample_data/orders_batch2.json",
+      "import_time": "2026-05-11T01:25:24.173466",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {},
+      "notes": ""
+    },
+    "ORD-009": {
+      "order_id": "ORD-009",
+      "customer_name": "吴十",
+      "phone": "13800138009",
+      "order_type": "加急花束",
+      "is_urgent": true,
+      "flowers": [
+        {
+          "name": "红玫瑰",
+          "quantity": 15,
+          "is_specified": true
+        },
+        {
+          "name": "郁金香",
+          "quantity": 10,
+          "is_specified": true
+        }
+      ],
+      "packaging": "普通包装",
+      "preferred_delivery": "2025-05-12T09:00:00",
+      "batch_id": "BATCH-20250510-E",
+      "source_file": "sample_data/orders_batch3.json",
+      "import_time": "2026-05-11T01:25:49.796506",
+      "status": "pending",
+      "workstation_id": null,
+      "delivery_slot_id": null,
+      "flower_replacements": {
+        "红玫瑰": "粉玫瑰"
+      },
+      "notes": ""
+    }
+  },
+  "inventory": {
+    "红玫瑰": {
+      "name": "红玫瑰",
+      "quantity": 0,
+      "unit": "束"
+    },
+    "白玫瑰": {
+      "name": "白玫瑰",
+      "quantity": 15,
+      "unit": "束"
+    },
+    "粉玫瑰": {
+      "name": "粉玫瑰",
+      "quantity": 40,
+      "unit": "束"
+    },
+    "百合": {
+      "name": "百合",
+      "quantity": 20,
+      "unit": "束"
+    },
+    "康乃馨": {
+      "name": "康乃馨",
+      "quantity": 60,
+      "unit": "束"
+    },
+    "向日葵": {
+      "name": "向日葵",
+      "quantity": 15,
+      "unit": "束"
+    },
+    "满天星": {
+      "name": "满天星",
+      "quantity": 25,
+      "unit": "束"
+    },
+    "桔梗": {
+      "name": "桔梗",
+      "quantity": 20,
+      "unit": "束"
+    },
+    "洋牡丹": {
+      "name": "洋牡丹",
+      "quantity": 10,
+      "unit": "束"
+    },
+    "郁金香": {
+      "name": "郁金香",
+      "quantity": 5,
+      "unit": "束"
+    }
+  },
+  "workstations": {
+    "WS-001": {
+      "workstation_id": "WS-001",
+      "name": "包装工位A（花束）",
+      "capacity": 10,
+      "packaging_types": [
+        "普通包装",
+        "精美包装",
+        "礼盒包装"
+      ],
+      "current_orders": [
+        "ORD-003"
+      ]
+    },
+    "WS-002": {
+      "workstation_id": "WS-002",
+      "name": "包装工位B（花盒）",
+      "capacity": 8,
+      "packaging_types": [
+        "花盒包装",
+        "花篮包装"
+      ],
+      "current_orders": []
+    },
+    "WS-003": {
+      "workstation_id": "WS-003",
+      "name": "包装工位C（加急）",
+      "capacity": 5,
+      "packaging_types": [
+        "普通包装",
+        "精美包装",
+        "礼盒包装",
+        "花盒包装"
+      ],
+      "current_orders": []
+    }
+  },
+  "delivery_slots": {
+    "SLOT-001": {
+      "slot_id": "SLOT-001",
+      "time": "2025-05-12T09:00:00",
+      "capacity": 3,
+      "current_orders": [
+        "ORD-003"
+      ]
+    },
+    "SLOT-002": {
+      "slot_id": "SLOT-002",
+      "time": "2025-05-12T10:00:00",
+      "capacity": 3,
+      "current_orders": []
+    },
+    "SLOT-003": {
+      "slot_id": "SLOT-003",
+      "time": "2025-05-12T11:00:00",
+      "capacity": 3,
+      "current_orders": []
+    },
+    "SLOT-004": {
+      "slot_id": "SLOT-004",
+      "time": "2025-05-12T14:00:00",
+      "capacity": 5,
+      "current_orders": []
+    },
+    "SLOT-005": {
+      "slot_id": "SLOT-005",
+      "time": "2025-05-12T15:00:00",
+      "capacity": 5,
+      "current_orders": []
+    },
+    "SLOT-006": {
+      "slot_id": "SLOT-006",
+      "time": "2025-05-12T16:00:00",
+      "capacity": 5,
+      "current_orders": []
+    },
+    "SLOT-007": {
+      "slot_id": "SLOT-007",
+      "time": "2025-05-12T17:00:00",
+      "capacity": 3,
+      "current_orders": []
+    },
+    "SLOT-008": {
+      "slot_id": "SLOT-008",
+      "time": "2025-05-12T18:00:00",
+      "capacity": 3,
+      "current_orders": []
+    },
+    "SLOT-009": {
+      "slot_id": "SLOT-009",
+      "time": "2025-05-13T09:00:00",
+      "capacity": 3,
+      "current_orders": []
+    }
+  },
+  "replacement_rules": {
+    "红玫瑰": {
+      "original": "红玫瑰",
+      "alternatives": [
+        "粉玫瑰",
+        "白玫瑰",
+        "洋牡丹"
+      ],
+      "priority": 1
+    },
+    "白玫瑰": {
+      "original": "白玫瑰",
+      "alternatives": [
+        "粉玫瑰",
+        "桔梗",
+        "洋牡丹"
+      ],
+      "priority": 1
+    },
+    "粉玫瑰": {
+      "original": "粉玫瑰",
+      "alternatives": [
+        "红玫瑰",
+        "白玫瑰",
+        "洋牡丹"
+      ],
+      "priority": 1
+    },
+    "百合": {
+      "original": "百合",
+      "alternatives": [
+        "向日葵",
+        "郁金香"
+      ],
+      "priority": 1
+    },
+    "郁金香": {
+      "original": "郁金香",
+      "alternatives": [
+        "百合",
+        "洋牡丹"
+      ],
+      "priority": 1
+    },
+    "向日葵": {
+      "original": "向日葵",
+      "alternatives": [
+        "百合",
+        "桔梗"
+      ],
+      "priority": 1
+    }
+  },
+  "import_sources": {
+    "sample_data/orders_batch1.json": [
+      "ORD-001",
+      "ORD-002",
+      "ORD-003",
+      "ORD-004"
+    ],
+    "sample_data/orders_batch2.json": [
+      "ORD-005",
+      "ORD-006",
+      "ORD-007",
+      "ORD-008"
+    ],
+    "sample_data/orders_batch3.json": [
+      "ORD-009"
+    ]
+  }
+}
