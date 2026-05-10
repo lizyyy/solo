@@ -1,0 +1,62 @@
+[
+  {
+    "id": "INV-1778387570091-380m0u",
+    "invoiceNumber": "O18130703",
+    "invoiceType": "蓝票",
+    "amount": 1000,
+    "taxAmount": 130,
+    "totalAmount": 1130,
+    "customerName": "北京科技有限公司",
+    "status": "正常",
+    "createdAt": "2026-05-10T04:32:50.091Z",
+    "relatedInvoices": [],
+    "isOriginal": true,
+    "originalInvoiceId": null,
+    "redemptionStatus": "未红冲"
+  },
+  {
+    "id": "INV-1778387570093-uplexl",
+    "invoiceNumber": "I90505338",
+    "invoiceType": "蓝票",
+    "amount": 2500,
+    "taxAmount": 325,
+    "totalAmount": 2825,
+    "customerName": "上海贸易公司",
+    "status": "正常",
+    "createdAt": "2026-05-10T04:32:50.093Z",
+    "relatedInvoices": [],
+    "isOriginal": true,
+    "originalInvoiceId": null,
+    "redemptionStatus": "未红冲"
+  },
+  {
+    "id": "INV-1778387570094-66iddh",
+    "invoiceNumber": "J82630148",
+    "invoiceType": "蓝票",
+    "amount": 5000,
+    "taxAmount": 650,
+    "totalAmount": 5650,
+    "customerName": "广州电子科技",
+    "status": "正常",
+    "createdAt": "2026-05-10T04:32:50.094Z",
+    "relatedInvoices": [],
+    "isOriginal": true,
+    "originalInvoiceId": null,
+    "redemptionStatus": "未红冲"
+  },
+  {
+    "id": "INV-1778387570094-cbyic9",
+    "invoiceNumber": "Q41557655",
+    "invoiceType": "蓝票",
+    "amount": 800,
+    "taxAmount": 104,
+    "totalAmount": 904,
+    "customerName": "深圳网络公司",
+    "status": "正常",
+    "createdAt": "2026-05-10T04:32:50.094Z",
+    "relatedInvoices": [],
+    "isOriginal": true,
+    "originalInvoiceId": null,
+    "redemptionStatus": "未红冲"
+  }
+]

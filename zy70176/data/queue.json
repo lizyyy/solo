@@ -1,0 +1,24 @@
+[
+  {
+    "id": "QUE-1778387570096-ybaant",
+    "redemptionId": "RED-1778387570095-ng2zal",
+    "originalInvoiceId": "INV-1778387570091-380m0u",
+    "status": "失败",
+    "queuePosition": 1,
+    "createdAt": "2026-05-10T04:32:50.097Z",
+    "startedAt": "2026-05-10T04:32:50.097Z",
+    "completedAt": null,
+    "error": "税控系统返回：发票状态校验失败，请检查原发票信息"
+  },
+  {
+    "id": "QUE-1778387570103-cfzyc2",
+    "redemptionId": "RED-1778387570100-8a0116",
+    "originalInvoiceId": "INV-1778387570094-66iddh",
+    "status": "已取消",
+    "queuePosition": 2,
+    "createdAt": "2026-05-10T04:32:50.103Z",
+    "startedAt": null,
+    "completedAt": null,
+    "cancelledAt": "2026-05-10T04:32:50.105Z"
+  }
+]
