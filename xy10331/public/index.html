@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>露营装备租赁押金台</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏕️ 露营装备租赁押金台</h1>
+      <p class="subtitle">装备套装管理 · 租赁订单 · 押金冻结 · 归还验收 · 扣费结算</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="equipment">装备套装</button>
+      <button class="tab-btn" data-tab="orders">订单管理</button>
+      <button class="tab-btn" data-tab="new-order">创建订单</button>
+      <button class="tab-btn" data-tab="history">历史与对账</button>
+      <button class="tab-btn" data-tab="guide">使用说明</button>
+    </nav>
+
+    <main>
+      <section id="equipment" class="tab-content active">
+        <div class="section-header">
+          <h2>装备套装管理</h2>
+          <button class="btn btn-primary" id="addEquipmentBtn">+ 添加装备套装</button>
+        </div>
+        <div class="equipment-list" id="equipmentList">
+          <p class="empty">暂无装备套装，请先添加</p>
+        </div>
+      </section>
+
+      <section id="orders" class="tab-content">
+        <div class="section-header">
+          <h2>订单管理</h2>
+          <div class="filters">
+            <input type="text" id="searchOrder" placeholder="搜索订单号或客户姓名...">
+            <select id="filterStatus">
+              <option value="">全部状态</option>
+              <option value="待支付押金">待支付押金</option>
+              <option value="已借出">已借出</option>
+              <option value="已逾期">已逾期</option>
+              <option value="部分归还">部分归还</option>
+              <option value="已完成">已完成</option>
+            </select>
+          </div>
+        </div>
+        <div class="orders-list" id="ordersList">
+          <p class="empty">暂无订单</p>
+        </div>
+      </section>
+
+      <section id="new-order" class="tab-content">
+        <h2>创建租赁订单</h2>
+        <form id="orderForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>客户姓名 *</label>
+              <input type="text" id="customerName" required>
+            </div>
+            <div class="form-group">
+              <label>联系电话 *</label>
+              <input type="tel" id="customerPhone" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>选择装备套装 *</label>
+            <select id="equipmentSelect" required>
+              <option value="">请选择装备套装</option>
+            </select>
+          </div>
+          
+          <div id="equipmentPreview" class="equipment-preview"></div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>租赁开始日期</label>
+              <input type="date" id="rentalStart">
+            </div>
+            <div class="form-group">
+              <label>租赁结束日期</label>
+              <input type="date" id="rentalEnd">
+            </div>
+            <div class="form-group">
+              <label>租赁天数</label>
+              <input type="number" id="rentalDays" min="1" value="1">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>实际支付押金</label>
+              <input type="number" id="actualDeposit" min="0" step="0.01" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <div class="fee-preview" id="depositPreview">
+                <p>应交押金：<span id="requiredDeposit">0</span> 元</p>
+                <p>押金状态：<span id="depositStatus" class="status-tag">未计算</span></p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="fee-preview" id="rentalFeePreview">
+            <h4>费用预览</h4>
+            <p>租赁费：<span id="rentalFeePreviewAmount">0</span> 元</p>
+            <p>应交押金：<span id="requiredDepositPreview">0</span> 元</p>
+            <p class="total">合计：<span id="totalPreview">0</span> 元</p>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-lg">创建订单</button>
+        </form>
+      </section>
+
+      <section id="return-order" class="tab-content">
+        <h2>归还验收</h2>
+        <div id="returnOrderDetail"></div>
+      </section>
+
+      <section id="history" class="tab-content">
+        <div class="section-header">
+          <h2>历史订单与对账</h2>
+          <button class="btn btn-secondary" id="exportBtn">📥 导出对账单 (Excel)</button>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>开始日期</label>
+            <input type="date" id="exportStartDate">
+          </div>
+          <div class="form-group">
+            <label>结束日期</label>
+            <input type="date" id="exportEndDate">
+          </div>
+        </div>
+        
+        <div id="historyOrdersList"></div>
+      </section>
+
+      <section id="guide" class="tab-content">
+        <h2>📖 使用说明</h2>
+        <div class="guide-content">
+          <div class="guide-step">
+            <h3>第一步：准备装备套装</h3>
+            <p>在「装备套装」页面添加您的装备套装，每个套装包含多个装备物品，每个物品设置押金和租赁费用。</p>
+            <div class="example-box">
+              <h4>示例：基础露营套装</h4>
+              <ul>
+                <li>帐篷 1顶 - 押金300元，租赁费50元/天</li>
+                <li>睡袋 2个 - 押金100元/个，租赁费20元/个/天</li>
+                <li>炉头 1个 - 押金80元，租赁费10元/天</li>
+                <li>防潮垫 2个 - 押金50元/个，租赁费5元/个/天</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <h3>第二步：创建租赁订单</h3>
+            <p>在「创建订单」页面：</p>
+            <ol>
+              <li>填写客户姓名和电话</li>
+              <li>选择装备套装</li>
+              <li>设置租赁天数或起止日期</li>
+              <li>输入实际支付的押金金额</li>
+              <li>系统会自动计算：租赁费、应交押金、押金状态</li>
+            </ol>
+            <div class="tip">
+              <strong>💡 押金不足处理：</strong>如果客户支付的押金低于应交押金，系统会标记为「押金不足」，您可以后续在订单详情中让客户补交押金。
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <h3>第三步：归还验收</h3>
+            <p>在「订单管理」页面找到需要归还的订单，点击「归还验收」按钮：</p>
+            <ol>
+              <li>系统会显示该订单的所有装备明细</li>
+              <li>对每件装备勾选「已归还」</li>
+              <li>如有需要清洗的，勾选「需要清洗」并设置清洗费（默认20元）</li>
+              <li>如有损坏，勾选「已损坏」，填写损坏描述并设置赔偿金额</li>
+              <li>可以手动添加其他费用</li>
+              <li>系统会自动预览扣费明细和退还金额</li>
+            </ol>
+          </div>
+          
+          <div class="guide-step">
+            <h3>第四步：结算完成</h3>
+            <p>点击「确认归还」后：</p>
+            <ul>
+              <li>系统计算最终退还金额：实际押金 - 租赁费 - 各项扣费</li>
+              <li>订单状态更新为「已完成」（全部归还）或「部分归还」</li>
+              <li>装备库存自动恢复</li>
+              <li>所有扣费记录保存在历史中</li>
+            </ul>
+          </div>
+          
+          <div class="guide-step">
+            <h3>📋 样例场景</h3>
+            
+            <div class="example-box">
+              <h4>样例1：完整归还</h4>
+              <p><strong>场景：</strong>客户按时归还所有装备，无损坏无清洗需求</p>
+              <p><strong>操作：</strong>在归还验收时，将所有装备标记为「已归还」，不勾选清洗或损坏</p>
+              <p><strong>结果：</strong>只扣除租赁费，其余押金退还</p>
+            </div>
+            
+            <div class="example-box">
+              <h4>样例2：少还一个炉头</h4>
+              <p><strong>场景：</strong>客户归还时发现炉头不见了</p>
+              <p><strong>操作：</strong>在归还验收时，炉头不勾选「已归还」，其他装备正常归还</p>
+              <p><strong>结果：</strong>系统自动标记为「部分归还」，炉头按押金全额扣除（遗失赔偿）</p>
+              <p><strong>后续：</strong>如果客户后续找到炉头，可以在「部分归还」状态的订单中再次点击「归还验收」完成剩余归还</p>
+            </div>
+            
+            <div class="example-box">
+              <h4>样例3：睡袋需清洗</h4>
+              <p><strong>场景：</strong>客户归还的睡袋有污渍需要清洗</p>
+              <p><strong>操作：</strong>在归还验收时，勾选睡袋的「需要清洗」选项，设置清洗费20元</p>
+              <p><strong>结果：</strong>扣除租赁费 + 20元清洗费</p>
+            </div>
+            
+            <div class="example-box">
+              <h4>样例4：押金不足</h4>
+              <p><strong>场景：</strong>客户只带了部分押金，承诺后续补交</p>
+              <p><strong>操作：</strong>创建订单时，在「实际支付押金」中输入客户实际支付的金额</p>
+              <p><strong>结果：</strong>订单状态为「已借出」，但标记「押金不足」，后续可在订单详情中让客户补交</p>
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <h3>🔄 批量导入订单</h3>
+            <p>如果需要批量创建订单，可以使用 Excel 导入功能：</p>
+            <ol>
+              <li>准备 Excel 文件，包含以下列：客户姓名、联系电话、装备套装、租赁天数、实际押金、开始日期、结束日期</li>
+              <li>在「创建订单」页面点击「批量导入」</li>
+              <li>上传文件后，系统会逐行处理</li>
+              <li>结果会分开显示：全部成功、部分成功（如库存不足）、全部失败</li>
+            </ol>
+            <div class="tip">
+              <strong>✓ 容错机制：</strong>坏数据不会影响好数据，每行独立处理，失败的行会显示具体原因。
+            </div>
+          </div>
+          
+          <div class="guide-step">
+            <h3>📊 对账导出</h3>
+            <p>在「历史与对账」页面可以：</p>
+            <ul>
+              <li>查看所有历史订单及其扣费明细</li>
+              <li>按日期范围筛选</li>
+              <li>导出 Excel 对账单，包含所有订单和扣费记录</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

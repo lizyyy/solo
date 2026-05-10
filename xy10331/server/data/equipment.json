@@ -1,0 +1,122 @@
+[
+  {
+    "id": "mozpma52c4uyivy7d3k",
+    "name": "基础露营套装",
+    "description": "适合2人基础露营需求",
+    "items": [
+      {
+        "id": "mozpma52ij89tniyytr",
+        "name": "双人帐篷",
+        "quantity": 1,
+        "deposit": 300,
+        "rentalFee": 50
+      },
+      {
+        "id": "mozpma52npuhr7j34if",
+        "name": "睡袋",
+        "quantity": 2,
+        "deposit": 100,
+        "rentalFee": 20
+      },
+      {
+        "id": "mozpma523eoys8yxdp2",
+        "name": "炉头",
+        "quantity": 1,
+        "deposit": 80,
+        "rentalFee": 10
+      },
+      {
+        "id": "mozpma520349hulrlpwj",
+        "name": "防潮垫",
+        "quantity": 2,
+        "deposit": 50,
+        "rentalFee": 5
+      }
+    ],
+    "totalDeposit": 680,
+    "totalRentalFee": 110,
+    "stock": 4,
+    "createdAt": "2026-05-10T11:48:52.310Z",
+    "updatedAt": "2026-05-10T11:48:52.311Z"
+  },
+  {
+    "id": "mozpma53trekqi2ztsb",
+    "name": "豪华露营套装",
+    "description": "适合3-4人舒适露营",
+    "items": [
+      {
+        "id": "mozpma52mtho54p4s9",
+        "name": "家庭帐篷",
+        "quantity": 1,
+        "deposit": 500,
+        "rentalFee": 100
+      },
+      {
+        "id": "mozpma52vcc1m607cp",
+        "name": "睡袋",
+        "quantity": 4,
+        "deposit": 100,
+        "rentalFee": 20
+      },
+      {
+        "id": "mozpma52eqdmooa3s0r",
+        "name": "炉头",
+        "quantity": 2,
+        "deposit": 80,
+        "rentalFee": 10
+      },
+      {
+        "id": "mozpma529ibdrjrqy6",
+        "name": "防潮垫",
+        "quantity": 4,
+        "deposit": 50,
+        "rentalFee": 5
+      },
+      {
+        "id": "mozpma52h0tr90g3z5",
+        "name": "折叠桌椅",
+        "quantity": 1,
+        "deposit": 200,
+        "rentalFee": 30
+      }
+    ],
+    "totalDeposit": 1460,
+    "totalRentalFee": 250,
+    "stock": 3,
+    "createdAt": "2026-05-10T11:48:52.311Z",
+    "updatedAt": "2026-05-10T11:48:52.311Z"
+  },
+  {
+    "id": "mozpma53sj896wt0ue",
+    "name": "轻量化徒步套装",
+    "description": "适合单人徒步露营",
+    "items": [
+      {
+        "id": "mozpma52x8lroftgivp",
+        "name": "单人帐篷",
+        "quantity": 1,
+        "deposit": 400,
+        "rentalFee": 60
+      },
+      {
+        "id": "mozpma528fspege45yv",
+        "name": "羽绒睡袋",
+        "quantity": 1,
+        "deposit": 300,
+        "rentalFee": 40
+      },
+      {
+        "id": "mozpma52oo4eajd59bi",
+        "name": "轻量化炉头",
+        "quantity": 1,
+        "deposit": 120,
+        "rentalFee": 15
+      }
+    ],
+    "totalDeposit": 820,
+    "totalRentalFee": 115,
+    "stock": 8,
+    "createdAt": "2026-05-10T11:48:52.311Z",
+    "updatedAt": "2026-05-10T11:48:52.311Z"
+  }
+]

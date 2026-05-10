@@ -1,0 +1,63 @@
+[
+  {
+    "id": "mozpv3epmofvged2igl",
+    "orderNumber": "R202605107820",
+    "customerName": "张三",
+    "phone": "13800138000",
+    "equipmentId": "mozpma52c4uyivy7d3k",
+    "equipmentName": "基础露营套装",
+    "items": [
+      {
+        "id": "mozpma52ij89tniyytr",
+        "name": "双人帐篷",
+        "quantity": 1,
+        "deposit": 300,
+        "rentalFee": 50,
+        "status": "未归还",
+        "returnedQuantity": 0
+      },
+      {
+        "id": "mozpma52npuhr7j34if",
+        "name": "睡袋",
+        "quantity": 2,
+        "deposit": 100,
+        "rentalFee": 20,
+        "status": "未归还",
+        "returnedQuantity": 0
+      },
+      {
+        "id": "mozpma523eoys8yxdp2",
+        "name": "炉头",
+        "quantity": 1,
+        "deposit": 80,
+        "rentalFee": 10,
+        "status": "未归还",
+        "returnedQuantity": 0
+      },
+      {
+        "id": "mozpma520349hulrlpwj",
+        "name": "防潮垫",
+        "quantity": 2,
+        "deposit": 50,
+        "rentalFee": 5,
+        "status": "未归还",
+        "returnedQuantity": 0
+      }
+    ],
+    "rentalDays": 1,
+    "rentalStart": "2026-05-10",
+    "rentalEnd": "2026-05-11",
+    "dueDate": "2026-05-11",
+    "totalRentalFee": 110,
+    "requiredDeposit": 680,
+    "actualDeposit": 680,
+    "depositStatus": "足额",
+    "depositShortage": 0,
+    "status": "已借出",
+    "fees": [],
+    "totalFees": 0,
+    "refundAmount": 0,
+    "createdAt": "2026-05-10T11:55:43.489Z",
+    "updatedAt": "2026-05-10T11:55:43.489Z"
+  }
+]
