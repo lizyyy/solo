@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model ReceivingInstitution {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  contact   String
+  phone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipients Recipient[]
+  shipments  Shipment[]
+}
+
+model Recipient {
+  id                String   @id @default(uuid())
+  institutionId     String
+  name              String
+  idNumber          String
+  qualificationType String
+  qualificationNum  String
+  issueDate         DateTime
+  expiryDate        DateTime
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  institution ReceivingInstitution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  shipments   Shipment[]
+}
+
+model SampleBatch {
+  id            String   @id @default(uuid())
+  batchNumber   String   @unique
+  sampleName    String
+  quantity      Int
+  manufacturer  String
+  productionDate DateTime
+  expiryDate    DateTime
+  storageTempMin Float?
+  storageTempMax Float?
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  shipments Shipment[]
+}
+
+model Shipment {
+  id              String   @id @default(uuid())
+  shipmentNumber  String   @unique
+  batchId         String
+  institutionId   String
+  recipientId     String
+  applicant       String
+  applicationDate DateTime @default(now())
+  status          String   @default("PENDING")
+  purpose         String
+  remark          String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectReason    String?
+  closedAt        DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  batch           SampleBatch            @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  institution     ReceivingInstitution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  recipient       Recipient              @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  tempRecords     TemperatureRecord[]
+  destruction     DestructionReceipt?
+  histories       AuditHistory[]
+}
+
+model TemperatureRecord {
+  id           String   @id @default(uuid())
+  shipmentId   String
+  recordTime   DateTime
+  temperature  Float
+  status       String   @default("NORMAL")
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  reviewRemark String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model DestructionReceipt {
+  id            String   @id @default(uuid())
+  shipmentId    String   @unique
+  destructionDate DateTime
+  destructionMethod String
+  witnessName   String
+  receiptNumber String?
+  attachmentUrl String?
+  remark        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model AuditHistory {
+  id             String      @id @default(uuid())
+  shipmentId     String?
+  batchId        String?
+  recipientId    String?
+  tempRecordId   String?
+  destructionId  String?
+  action         String
+  operator       String
+  actionTime     DateTime    @default(now())
+  description    String
+  beforeSnapshot String?
+  afterSnapshot  String?
+  createdAt      DateTime    @default(now())
+
+  shipment Shipment? @relation(fields: [shipmentId], references: [id], onDelete: SetNull)
+}

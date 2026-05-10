@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>药企样本寄送合规管理系统</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js" crossorigin></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.5/babel.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-approved { background: #d1fae5; color: #065f46; }
+    .status-rejected, .status-closed { background: #fee2e2; color: #991b1b; }
+    .status-shipped { background: #dbeafe; color: #1e40af; }
+    .status-delivered { background: #ede9fe; color: #5b21b6; }
+    .status-destroyed { background: #fce7f3; color: #9d174d; }
+    .qualification-expired { background: #fee2e2; color: #991b1b; }
+    .qualification-active { background: #d1fae5; color: #065f46; }
+    .qualification-expiring-soon { background: #fef3c7; color: #92400e; }
+    .qualification-inactive { background: #e5e7eb; color: #374151; }
+    .temp-normal { background: #d1fae5; color: #065f46; }
+    .temp-warning { background: #fef3c7; color: #92400e; }
+    .temp-exceeded { background: #fee2e2; color: #991b1b; }
+    .temp-reviewed { background: #dbeafe; color: #1e40af; }
+    .modal-backdrop { background: rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
+  <script type="text/babel" src="/app.js"></script>
+</body>
+</html>
