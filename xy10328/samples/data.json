@@ -1,0 +1,157 @@
+{
+  "products": [
+    {
+      "code": "VEG001",
+      "name": "生菜",
+      "unit": "斤",
+      "basePrice": 5.99
+    },
+    {
+      "code": "VEG002",
+      "name": "西红柿",
+      "unit": "斤",
+      "basePrice": 4.99
+    },
+    {
+      "code": "FRU001",
+      "name": "草莓",
+      "unit": "盒",
+      "basePrice": 29.99
+    }
+  ],
+  "purchases": [
+    {
+      "id": "PURCHASE_001",
+      "type": "purchase",
+      "timestamp": 1715299200000,
+      "productCode": "VEG001",
+      "batchId": "BATCH_VEG001_20240510",
+      "quantity": 50,
+      "unitCost": 2.5,
+      "expirationDate": "2024-05-15",
+      "supplier": "绿叶蔬菜合作社"
+    },
+    {
+      "id": "PURCHASE_002",
+      "type": "purchase",
+      "timestamp": 1715299200000,
+      "productCode": "VEG002",
+      "batchId": "BATCH_VEG002_20240510",
+      "quantity": 80,
+      "unitCost": 2.0,
+      "expirationDate": "2024-05-18",
+      "supplier": "番茄种植基地"
+    },
+    {
+      "id": "PURCHASE_003",
+      "type": "purchase",
+      "timestamp": 1715299200000,
+      "productCode": "FRU001",
+      "batchId": "BATCH_FRU001_20240510",
+      "quantity": 30,
+      "unitCost": 18.0,
+      "expirationDate": "2024-05-12",
+      "supplier": "草莓农场"
+    }
+  ],
+  "sales": [
+    {
+      "id": "SALE_001",
+      "type": "sale",
+      "timestamp": 1715342400000,
+      "productCode": "VEG001",
+      "batchId": "BATCH_VEG001_20240510",
+      "quantity": 25,
+      "unitPrice": 5.99,
+      "saleTime": 1715342400000
+    },
+    {
+      "id": "SALE_002",
+      "type": "sale",
+      "timestamp": 1715342400000,
+      "productCode": "VEG002",
+      "batchId": "BATCH_VEG002_20240510",
+      "quantity": 40,
+      "unitPrice": 4.99,
+      "saleTime": 1715342400000
+    },
+    {
+      "id": "SALE_003",
+      "type": "sale",
+      "timestamp": 1715364000000,
+      "productCode": "FRU001",
+      "batchId": "BATCH_FRU001_20240510",
+      "quantity": 10,
+      "unitPrice": 29.99,
+      "saleTime": 1715364000000
+    },
+    {
+      "id": "SALE_004",
+      "type": "sale",
+      "timestamp": 1715385600000,
+      "productCode": "FRU001",
+      "batchId": "BATCH_FRU001_20240510",
+      "quantity": 8,
+      "unitPrice": 20.99,
+      "discountRate": 0.3,
+      "originalPrice": 29.99,
+      "saleTime": 1715385600000
+    }
+  ],
+  "losses": [
+    {
+      "id": "LOSS_001",
+      "type": "loss",
+      "timestamp": 1715385600000,
+      "productCode": "VEG001",
+      "batchId": "BATCH_VEG001_20240510",
+      "quantity": 3,
+      "lossReason": "叶部发黄腐烂",
+      "lossTime": 1715385600000,
+      "reporter": "张师傅"
+    },
+    {
+      "id": "LOSS_002",
+      "type": "loss",
+      "timestamp": 1715389200000,
+      "productCode": "VEG002",
+      "batchId": "BATCH_VEG002_20240510",
+      "quantity": 2,
+      "lossReason": "挤压破损",
+      "lossTime": 1715389200000,
+      "reporter": "张师傅"
+    }
+  ],
+  "inventories": [
+    {
+      "id": "INV_001",
+      "type": "inventory",
+      "timestamp": 1715392800000,
+      "productCode": "VEG001",
+      "batchId": "BATCH_VEG001_20240510",
+      "countedQuantity": 20,
+      "inventoryDate": 1715392800000,
+      "operator": "李店长"
+    },
+    {
+      "id": "INV_002",
+      "type": "inventory",
+      "timestamp": 1715392800000,
+      "productCode": "VEG002",
+      "batchId": "BATCH_VEG002_20240510",
+      "countedQuantity": 35,
+      "inventoryDate": 1715392800000,
+      "operator": "李店长"
+    },
+    {
+      "id": "INV_003",
+      "type": "inventory",
+      "timestamp": 1715392800000,
+      "productCode": "FRU001",
+      "batchId": "BATCH_FRU001_20240510",
+      "countedQuantity": 12,
+      "inventoryDate": 1715392800000,
+      "operator": "李店长"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "generatedAt": 1778413433336,
+  "summary": {
+    "totalProducts": 3,
+    "totalBatches": 3,
+    "totalPurchased": 160,
+    "totalSold": 83,
+    "totalLoss": 5,
+    "expectedInventory": 72,
+    "actualInventory": 67,
+    "totalDiscrepancy": -5,
+    "totalCost": 825,
+    "totalRevenue": 817.17,
+    "totalGrossProfit": -7.830000000000041,
+    "overallLossRate": 3.125
+  },
+  "productSummaries": [
+    {
+      "productCode": "VEG001",
+      "productName": "生菜",
+      "totalPurchased": 50,
+      "totalSold": 25,
+      "totalLoss": 3,
+      "expectedInventory": 22,
+      "actualInventory": 20,
+      "totalDiscrepancy": -2,
+      "totalCost": 125,
+      "totalRevenue": 149.75,
+      "totalGrossProfit": 24.75,
+      "overallLossRate": 6,
+      "batches": [
+        "BATCH_VEG001_20240510"
+      ]
+    },
+    {
+      "productCode": "VEG002",
+      "productName": "西红柿",
+      "totalPurchased": 80,
+      "totalSold": 40,
+      "totalLoss": 2,
+      "expectedInventory": 38,
+      "actualInventory": 35,
+      "totalDiscrepancy": -3,
+      "totalCost": 160,
+      "totalRevenue": 199.60000000000002,
+      "totalGrossProfit": 39.60000000000002,
+      "overallLossRate": 2.5,
+      "batches": [
+        "BATCH_VEG002_20240510"
+      ]
+    },
+    {
+      "productCode": "FRU001",
+      "productName": "草莓",
+      "totalPurchased": 30,
+      "totalSold": 18,
+      "totalLoss": 0,
+      "expectedInventory": 12,
+      "actualInventory": 12,
+      "totalDiscrepancy": 0,
+      "totalCost": 540,
+      "totalRevenue": 467.81999999999994,
+      "totalGrossProfit": -72.18000000000006,
+      "overallLossRate": 0,
+      "batches": [
+        "BATCH_FRU001_20240510"
+      ]
+    }
+  ],
+  "batchCalculations": [
+    {
+      "productCode": "VEG001",
+      "productName": "生菜",
+      "batchId": "BATCH_VEG001_20240510",
+      "totalCost": 125,
+      "totalRevenue": 149.75,
+      "grossProfit": 24.75,
+      "grossProfitMargin": 16.52754590984975,
+      "lossQuantity": 3,
+      "lossCost": 7.5,
+      "lossRate": 6,
+      "expectedInventory": 22,
+      "actualInventory": 20,
+      "inventoryDiscrepancy": -2,
+      "inventoryDiscrepancyCost": 5
+    },
+    {
+      "productCode": "VEG002",
+      "productName": "西红柿",
+      "batchId": "BATCH_VEG002_20240510",
+      "totalCost": 160,
+      "totalRevenue": 199.60000000000002,
+      "grossProfit": 39.60000000000002,
+      "grossProfitMargin": 19.839679358717444,
+      "lossQuantity": 2,
+      "lossCost": 4,
+      "lossRate": 2.5,
+      "expectedInventory": 38,
+      "actualInventory": 35,
+      "inventoryDiscrepancy": -3,
+      "inventoryDiscrepancyCost": 6
+    },
+    {
+      "productCode": "FRU001",
+      "productName": "草莓",
+      "batchId": "BATCH_FRU001_20240510",
+      "totalCost": 540,
+      "totalRevenue": 467.81999999999994,
+      "grossProfit": -72.18000000000006,
+      "grossProfitMargin": -15.429011158137762,
+      "lossQuantity": 0,
+      "lossCost": 0,
+      "lossRate": 0,
+      "expectedInventory": 12,
+      "actualInventory": 12,
+      "inventoryDiscrepancy": 0,
+      "inventoryDiscrepancyCost": 0
+    }
+  ],
+  "exceptions": [
+    {
+      "code": "INVENTORY_DISCREPANCY",
+      "message": "盘点不一致",
+      "details": "商品 生菜(VEG001) 批次 BATCH_VEG001_20240510：理论库存 22，实际盘点 20，差异 -2",
+      "productCode": "VEG001",
+      "batchId": "BATCH_VEG001_20240510"
+    },
+    {
+      "code": "INVENTORY_DISCREPANCY",
+      "message": "盘点不一致",
+      "details": "商品 西红柿(VEG002) 批次 BATCH_VEG002_20240510：理论库存 38，实际盘点 35，差异 -3",
+      "productCode": "VEG002",
+      "batchId": "BATCH_VEG002_20240510"
+    },
+    {
+      "code": "NEGATIVE_PROFIT",
+      "message": "负毛利",
+      "details": "商品 草莓(FRU001) 批次 BATCH_FRU001_20240510 出现亏损，毛利 -72.18 元",
+      "productCode": "FRU001",
+      "batchId": "BATCH_FRU001_20240510"
+    }
+  ],
+  "needsReview": {
+    "batches": [
+      "BATCH_VEG001_20240510",
+      "BATCH_VEG002_20240510",
+      "BATCH_FRU001_20240510"
+    ],
+    "records": []
+  }
+}
