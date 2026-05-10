@@ -139,6 +139,8 @@ def cmd_import(args):
                 "status": item.get("status", "pending"),
                 "source": "import"
             }
+            if "id" in item:
+                booking["id"] = item["id"]
             
             import_hash = generate_import_hash(booking)
             booking["import_hash"] = import_hash

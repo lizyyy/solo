@@ -31,7 +31,7 @@ python3 theater-cli report conflicts
 
 ## 5. 人工修正（改期）
 ```bash
-python3 theater-cli fix --booking-id 7796e472 reschedule \
+python3 theater-cli fix --booking-id b002 reschedule \
   --new-start "2026-05-13 14:00" \
   --new-end "2026-05-13 18:00" \
   --reason "与《雷雨》剧组时间冲突，导演协调后改期"
@@ -54,18 +54,18 @@ python3 theater-cli report reschedule
 
 ## 8. 领取钥匙
 ```bash
-python3 theater-cli key pickup --booking-id 7b870d56 --contact-id c001
+python3 theater-cli key pickup --booking-id b001 --contact-id c001
 ```
 
 ## 9. 测试钥匙保护（尝试删除已领钥匙的预约）
 ```bash
-python3 theater-cli fix --booking-id 7b870d56 delete
+python3 theater-cli fix --booking-id b001 delete
 ```
 输出："该预约已有钥匙领取记录，无法直接删除。请先处理钥匙领取记录。"
 
 ## 10. 最终确认预约
 ```bash
-python3 theater-cli confirm 7b870d56
+python3 theater-cli confirm b001
 ```
 
 ## 11. 查看可排时段
