@@ -1,0 +1,12 @@
+{
+  "name": "freezer-billing-system",
+  "version": "1.0.0",
+  "description": "市集共享冷柜占用结算台",
+  "scripts": {
+    "setup": "cd backend && npm install && cd ../frontend && npm install",
+    "backend": "cd backend && npm start",
+    "frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "test": "echo \"请手动访问 http://localhost:3000 进行测试\" && exit 1"
+  }
+}

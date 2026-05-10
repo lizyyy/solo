@@ -1,0 +1,12 @@
+{
+  "name": "freezer-billing-frontend",
+  "version": "1.0.0",
+  "description": "市集共享冷柜占用结算台 - 前端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
