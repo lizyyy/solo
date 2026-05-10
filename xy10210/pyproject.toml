@@ -1,0 +1,19 @@
+[project]
+name = "rare-book-scheduler"
+version = "1.0.0"
+description = "图书馆善本修复排程系统"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+rbs = "rare_book_scheduler.cli:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]

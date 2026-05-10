@@ -1,0 +1,11 @@
+book_id,title,damage_level,required_skills,estimated_repair_days,notes
+B001,永乐大典,CRITICAL,"paper_repair,binding",21,明代珍稀善本，书脊开裂
+B002,四库全书,HIGH,"deacidification,paper_repair",14,需要脱酸处理
+B003,红楼梦,MEDIUM,binding,7,清代抄本
+B004,本草纲目,LOW,paper_repair,3,轻微页边破损
+B005,史记,CRITICAL,"color_restoration,paper_repair",21,彩图褪色严重
+B006,资治通鉴,HIGH,"digitalization,binding",10,需数字化备份后修复
+B007,西游记,MEDIUM,paper_repair,8,部分页面粘连
+B008,三国演义,,paper_repair,,缺少破损等级，测试默认值
+B009,水浒传,INVALID,纸张修复,7,测试无效破损等级
+B010,,HIGH,paper_repair,7,测试空书名

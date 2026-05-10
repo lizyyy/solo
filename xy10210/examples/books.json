@@ -1,0 +1,82 @@
+[
+  {
+    "book_id": "B001",
+    "title": "永乐大典",
+    "damage_level": "CRITICAL",
+    "required_skills": ["paper_repair", "binding"],
+    "estimated_repair_days": 21,
+    "notes": "明代珍稀善本，书脊开裂"
+  },
+  {
+    "book_id": "B002",
+    "title": "四库全书",
+    "damage_level": "HIGH",
+    "required_skills": ["deacidification", "paper_repair"],
+    "estimated_repair_days": 14,
+    "notes": "需要脱酸处理"
+  },
+  {
+    "book_id": "B003",
+    "title": "红楼梦",
+    "damage_level": "MEDIUM",
+    "required_skills": ["binding"],
+    "estimated_repair_days": 7,
+    "notes": "清代抄本"
+  },
+  {
+    "book_id": "B004",
+    "title": "本草纲目",
+    "damage_level": "LOW",
+    "required_skills": ["paper_repair"],
+    "estimated_repair_days": 3,
+    "notes": "轻微页边破损"
+  },
+  {
+    "book_id": "B005",
+    "title": "史记",
+    "damage_level": "CRITICAL",
+    "required_skills": ["color_restoration", "paper_repair"],
+    "estimated_repair_days": 21,
+    "notes": "彩图褪色严重"
+  },
+  {
+    "book_id": "B006",
+    "title": "资治通鉴",
+    "damage_level": "HIGH",
+    "required_skills": ["digitalization", "binding"],
+    "estimated_repair_days": 10,
+    "notes": "需数字化备份后修复"
+  },
+  {
+    "book_id": "B007",
+    "title": "西游记",
+    "damage_level": "MEDIUM",
+    "required_skills": ["paper_repair"],
+    "estimated_repair_days": 8,
+    "notes": "部分页面粘连"
+  },
+  {
+    "book_id": "B008",
+    "title": "三国演义",
+    "damage_level": "",
+    "required_skills": ["paper_repair"],
+    "estimated_repair_days": "",
+    "notes": "缺少破损等级，测试默认值"
+  },
+  {
+    "book_id": "B009",
+    "title": "水浒传",
+    "damage_level": "INVALID",
+    "required_skills": ["纸张修复"],
+    "estimated_repair_days": 7,
+    "notes": "测试无效破损等级"
+  },
+  {
+    "book_id": "B010",
+    "title": "",
+    "damage_level": "HIGH",
+    "required_skills": ["paper_repair"],
+    "estimated_repair_days": 7,
+    "notes": "测试空书名"
+  }
+]

@@ -1,0 +1,8 @@
+restorer_id,name,skills,max_damage_level,vacation_days
+R001,张大师,"paper_repair,binding,color_restoration",CRITICAL,2026-05-15,2026-05-16
+R002,李师傅,"deacidification,paper_repair",HIGH,2026-05-20
+R003,王技师,"binding,digitalization",MEDIUM,
+R004,赵修复师,"paper_repair,color_restoration",CRITICAL,
+R005,刘助理,paper_repair,LOW,
+R006,,binding,MEDIUM,测试空姓名
+R007,陈师傅,invalid_skill,HIGH,测试无效技能
