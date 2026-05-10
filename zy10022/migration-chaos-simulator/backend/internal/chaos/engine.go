@@ -80,12 +80,12 @@ func (e *ChaosEngine) StartExperiment(ctx context.Context, name string, chaosTyp
 		Metadata:  make(map[string]interface{}),
 	}
 
-	_, traceCtx := e.tracer.StartTrace(name, map[string]interface{}{
+	trace, traceCtx := e.tracer.StartTrace(name, map[string]interface{}{
 		"experiment_id": experiment.ID,
 		"chaos_type":    string(chaosType),
 		"config":        cfg,
 	})
-	experiment.TraceID = ""
+	experiment.TraceID = trace.ID
 
 	e.experiments.Store(experiment.ID, experiment)
 	atomic.AddInt32(&e.activeCount, 1)

@@ -18,17 +18,17 @@ import (
 type SpanStatus string
 
 const (
-	SpanStatusOk       SpanStatus = "ok"
-	SpanStatusError    SpanStatus = "error"
+	SpanStatusOk        SpanStatus = "ok"
+	SpanStatusError     SpanStatus = "error"
 	SpanStatusCancelled SpanStatus = "cancelled"
 )
 
 type EventLevel string
 
 const (
-	EventLevelInfo    EventLevel = "info"
-	EventLevelWarn    EventLevel = "warn"
-	EventLevelError   EventLevel = "error"
+	EventLevelInfo     EventLevel = "info"
+	EventLevelWarn     EventLevel = "warn"
+	EventLevelError    EventLevel = "error"
 	EventLevelCritical EventLevel = "critical"
 )
 
@@ -43,17 +43,17 @@ type Trace struct {
 }
 
 type Span struct {
-	ID           string
-	TraceID      string
-	ParentID     string
-	Name         string
-	StartTime    time.Time
-	EndTime      time.Time
-	Status       SpanStatus
-	Error        string
-	Events       []*Event
-	Attributes   map[string]interface{}
-	Children     []*Span
+	ID         string
+	TraceID    string
+	ParentID   string
+	Name       string
+	StartTime  time.Time
+	EndTime    time.Time
+	Status     SpanStatus
+	Error      string
+	Events     []*Event
+	Attributes map[string]interface{}
+	Children   []*Span
 }
 
 type Event struct {
@@ -64,11 +64,12 @@ type Event struct {
 }
 
 type Tracer struct {
-	cfg           config.TracerConfig
-	activeTraces  sync.Map
-	buffer        chan *Span
-	flushTicker   *time.Ticker
-	onSpanFinish  func(span *Span)
+	cfg             config.TracerConfig
+	activeTraces    sync.Map
+	completedTraces sync.Map
+	buffer          chan *Span
+	flushTicker     *time.Ticker
+	onSpanFinish    func(span *Span)
 }
 
 var (
@@ -175,11 +176,13 @@ func (t *Tracer) GetTrace(traceID string) (*Trace, bool) {
 	if !t.cfg.Enabled {
 		return nil, false
 	}
-	v, ok := t.activeTraces.Load(traceID)
-	if !ok {
-		return nil, false
+	if v, ok := t.activeTraces.Load(traceID); ok {
+		return v.(*Trace), true
 	}
-	return v.(*Trace), true
+	if v, ok := t.completedTraces.Load(traceID); ok {
+		return v.(*Trace), true
+	}
+	return nil, false
 }
 
 func (t *Tracer) EndTrace(traceID string, status SpanStatus) {
@@ -199,6 +202,7 @@ func (t *Tracer) EndTrace(traceID string, status SpanStatus) {
 	trace.mu.Unlock()
 
 	t.activeTraces.Delete(traceID)
+	t.completedTraces.Store(traceID, trace)
 
 	logger.Info("Trace ended",
 		zap.String("trace_id", traceID),

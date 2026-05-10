@@ -460,6 +460,10 @@ func (r *Reporter) generateChaosRecommendations(exp *chaos.ChaosExperiment, trac
 func (r *Reporter) analyzeErrors(trace *tracer.Trace) []ErrorOccurrence {
 	errorMap := make(map[string]*ErrorOccurrence)
 
+	if trace == nil {
+		return make([]ErrorOccurrence, 0)
+	}
+
 	for _, span := range trace.Spans {
 		for _, event := range span.Events {
 			if event.Level == tracer.EventLevelError || event.Level == tracer.EventLevelCritical {
