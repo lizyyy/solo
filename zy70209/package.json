@@ -1,0 +1,27 @@
+{
+  "name": "breast-milk-bank-tracking-api",
+  "version": "1.0.0",
+  "description": "母乳库冻存批次追踪 API - 追踪捐赠、检测、冻存和发放流程",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "jest --runInBand --verbose",
+    "init-db": "node db/init.js",
+    "demo": "node demo/main-flow.js",
+    "demo-errors": "node demo/error-cases.js"
+  },
+  "keywords": ["breast-milk", "bank", "tracking", "api", "donation"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3"
+  }
+}
