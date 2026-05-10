@@ -1,0 +1,50 @@
+[
+  {
+    "supplierCode": "SUP001",
+    "orderNumber": "PO2025-0001",
+    "orderDate": "2025-01-15",
+    "description": "电子元器件采购",
+    "amount": 50000.00,
+    "status": "approved"
+  },
+  {
+    "supplierCode": "SUP002",
+    "orderNumber": "PO2025-0002",
+    "orderDate": "2025-02-20",
+    "description": "办公设备采购",
+    "amount": 32000.00,
+    "status": "approved"
+  },
+  {
+    "supplierCode": "SUP003",
+    "orderNumber": "PO2025-0003",
+    "orderDate": "2025-02-01",
+    "description": "原材料采购",
+    "amount": 120000.00,
+    "status": "pending"
+  },
+  {
+    "supplierCode": "SUP003",
+    "orderNumber": "PO2025-0004",
+    "orderDate": "2024-07-20",
+    "description": "紧急订单 - 过期资质",
+    "amount": 45000.00,
+    "status": "approved"
+  },
+  {
+    "supplierCode": "SUP004",
+    "orderNumber": "PO2025-0005",
+    "orderDate": "2025-03-10",
+    "description": "机械部件采购",
+    "amount": 88000.00,
+    "status": "approved"
+  },
+  {
+    "supplierCode": "SUP005",
+    "orderNumber": "PO2025-0006",
+    "orderDate": "2025-02-25",
+    "description": "物流服务",
+    "amount": 15000.00,
+    "status": "approved"
+  }
+]
