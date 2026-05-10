@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园广播节目单发布门禁系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🎙️ 校园广播节目单发布门禁</h1>
+            <div class="header-info">
+                <span class="status-badge" id="systemStatus">系统就绪</span>
+                <span class="demo-hint">📋 演示模式 - 内置样例数据</span>
+            </div>
+        </header>
+
+        <div class="main-layout">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>📚 内置样例</h3>
+                    <div class="sample-list" id="sampleList"></div>
+                </div>
+                <div class="sidebar-section">
+                    <h3>⚙️ 门禁规则</h3>
+                    <div class="rules-panel" id="rulesPanel"></div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="workflow-tabs">
+                    <button class="tab-btn active" data-tab="editor">📝 节目单编辑</button>
+                    <button class="tab-btn" data-tab="duration">⏱️ 时长校验</button>
+                    <button class="tab-btn" data-tab="sensitive">🔍 敏感词扫描</button>
+                    <button class="tab-btn" data-tab="publish">🚪 发布门禁</button>
+                    <button class="tab-btn" data-tab="issues">⚠️ 问题列表</button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab-editor">
+                        <div class="section-header">
+                            <h2>节目单编辑器</h2>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" id="btnLoadSample">加载样例</button>
+                                <button class="btn btn-primary" id="btnValidateDuration">检查时长 →</button>
+                            </div>
+                        </div>
+                        <div class="schedule-editor">
+                            <div class="schedule-info">
+                                <label>日期：</label>
+                                <input type="date" id="scheduleDate">
+                                <label>时段：</label>
+                                <select id="scheduleSlot">
+                                    <option value="morning">早间 (07:00-08:00)</option>
+                                    <option value="noon">午间 (12:00-12:30)</option>
+                                    <option value="evening">晚间 (18:00-19:00)</option>
+                                </select>
+                            </div>
+                            <div class="program-list" id="programList"></div>
+                            <button class="btn btn-secondary" id="btnAddProgram">+ 添加节目</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-duration">
+                        <div class="section-header">
+                            <h2>时长校验</h2>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" id="btnBackToEditor">← 返回编辑</button>
+                                <button class="btn btn-primary" id="btnRunDurationCheck">运行时长校验</button>
+                                <button class="btn btn-primary" id="btnNextSensitive">敏感词扫描 →</button>
+                            </div>
+                        </div>
+                        <div class="duration-panel" id="durationPanel"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-sensitive">
+                        <div class="section-header">
+                            <h2>敏感词扫描</h2>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" id="btnBackToDuration">← 返回时长</button>
+                                <button class="btn btn-primary" id="btnRunSensitiveCheck">运行敏感词扫描</button>
+                                <button class="btn btn-primary" id="btnNextPublish">发布门禁 →</button>
+                            </div>
+                        </div>
+                        <div class="sensitive-panel" id="sensitivePanel"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-publish">
+                        <div class="section-header">
+                            <h2>发布门禁</h2>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" id="btnBackToSensitive">← 返回扫描</button>
+                                <button class="btn btn-success" id="btnPublish">✅ 发布节目单</button>
+                                <button class="btn btn-danger" id="btnWithdraw">❌ 撤回发布</button>
+                            </div>
+                        </div>
+                        <div class="publish-panel" id="publishPanel"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-issues">
+                        <div class="section-header">
+                            <h2>问题列表</h2>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary" id="btnClearIssues">清空问题</button>
+                            </div>
+                        </div>
+                        <div class="issues-panel" id="issuesPanel"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div class="audit-trail">
+            <h3>📊 执行日志</h3>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script src="data/samples.js"></script>
+    <script src="core/constants.js"></script>
+    <script src="core/durationValidator.js"></script>
+    <script src="core/sensitiveScanner.js"></script>
+    <script src="core/publishGate.js"></script>
+    <script src="core/issueManager.js"></script>
+    <script src="ui/components.js"></script>
+    <script src="ui/app.js"></script>
+</body>
+</html>
