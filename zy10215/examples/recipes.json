@@ -1,0 +1,192 @@
+[
+  {
+    "recipeId": "BRD001",
+    "productName": "法式长棍面包",
+    "category": "面包",
+    "batchSize": 20,
+    "unit": "个",
+    "description": "经典法式长棍",
+    "ingredients": [
+      {
+        "itemId": "MAT001",
+        "itemName": "高筋面粉",
+        "quantityPerBatch": 5,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT002",
+        "itemName": "饮用水",
+        "quantityPerBatch": 3,
+        "unit": "L"
+      },
+      {
+        "itemId": "MAT003",
+        "itemName": "新鲜酵母",
+        "quantityPerBatch": 0.1,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT004",
+        "itemName": "食用盐",
+        "quantityPerBatch": 0.1,
+        "unit": "kg"
+      }
+    ]
+  },
+  {
+    "recipeId": "BRD002",
+    "productName": "红豆面包",
+    "category": "甜面包",
+    "batchSize": 30,
+    "unit": "个",
+    "description": "红豆沙馅甜面包",
+    "ingredients": [
+      {
+        "itemId": "MAT001",
+        "itemName": "高筋面粉",
+        "quantityPerBatch": 4,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT005",
+        "itemName": "全脂牛奶",
+        "quantityPerBatch": 1.5,
+        "unit": "L"
+      },
+      {
+        "itemId": "MAT006",
+        "itemName": "鸡蛋",
+        "quantityPerBatch": 0.6,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT007",
+        "itemName": "白砂糖",
+        "quantityPerBatch": 0.6,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT003",
+        "itemName": "新鲜酵母",
+        "quantityPerBatch": 0.08,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT004",
+        "itemName": "食用盐",
+        "quantityPerBatch": 0.05,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT008",
+        "itemName": "红豆沙",
+        "quantityPerBatch": 4.5,
+        "unit": "kg"
+      }
+    ]
+  },
+  {
+    "recipeId": "BRD003",
+    "productName": "全麦吐司",
+    "category": "吐司",
+    "batchSize": 8,
+    "unit": "条",
+    "description": "健康全麦吐司",
+    "ingredients": [
+      {
+        "itemId": "MAT009",
+        "itemName": "全麦面粉",
+        "quantityPerBatch": 3,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT001",
+        "itemName": "高筋面粉",
+        "quantityPerBatch": 1.5,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT005",
+        "itemName": "全脂牛奶",
+        "quantityPerBatch": 1.8,
+        "unit": "L"
+      },
+      {
+        "itemId": "MAT007",
+        "itemName": "白砂糖",
+        "quantityPerBatch": 0.2,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT003",
+        "itemName": "新鲜酵母",
+        "quantityPerBatch": 0.06,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT004",
+        "itemName": "食用盐",
+        "quantityPerBatch": 0.04,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT010",
+        "itemName": "黄油",
+        "quantityPerBatch": 0.3,
+        "unit": "kg"
+      }
+    ]
+  },
+  {
+    "recipeId": "BRD004",
+    "productName": "奶油芝士丹麦",
+    "category": "丹麦酥",
+    "batchSize": 24,
+    "unit": "个",
+    "description": "奶油芝士馅丹麦酥",
+    "ingredients": [
+      {
+        "itemId": "MAT001",
+        "itemName": "高筋面粉",
+        "quantityPerBatch": 3,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT010",
+        "itemName": "黄油",
+        "quantityPerBatch": 2,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT005",
+        "itemName": "全脂牛奶",
+        "quantityPerBatch": 0.6,
+        "unit": "L"
+      },
+      {
+        "itemId": "MAT006",
+        "itemName": "鸡蛋",
+        "quantityPerBatch": 0.3,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT007",
+        "itemName": "白砂糖",
+        "quantityPerBatch": 0.3,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT003",
+        "itemName": "新鲜酵母",
+        "quantityPerBatch": 0.06,
+        "unit": "kg"
+      },
+      {
+        "itemId": "MAT011",
+        "itemName": "奶油芝士",
+        "quantityPerBatch": 2.4,
+        "unit": "kg"
+      }
+    ]
+  }
+]

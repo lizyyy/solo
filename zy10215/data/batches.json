@@ -1,0 +1,316 @@
+[
+  {
+    "batchNo": "B20260510-001",
+    "createdAt": "2026-05-10T19:11:39.201Z",
+    "status": "confirmed",
+    "orderIds": [
+      "ORD-20260511-001",
+      "ORD-20260511-002",
+      "ORD-20260511-003"
+    ],
+    "productPlan": [
+      {
+        "productId": "BRD001",
+        "productName": "法式长棍面包",
+        "batchSize": 20,
+        "exactMultiplier": 3,
+        "roundedMultiplier": 3,
+        "actualOutput": 60,
+        "demand": 60,
+        "surplus": 0,
+        "surplusPercent": 0,
+        "costPerBatch": 38.82,
+        "exactCost": 116.46,
+        "roundedCost": 116.46,
+        "costVariance": 0,
+        "costVariancePercent": 0,
+        "lossRate": 5,
+        "storeOrders": [
+          {
+            "storeId": "ST001",
+            "storeName": "中山公园店",
+            "quantity": 35
+          },
+          {
+            "storeId": "ST002",
+            "storeName": "人民广场店",
+            "quantity": 25
+          }
+        ]
+      },
+      {
+        "productId": "BRD002",
+        "productName": "红豆面包",
+        "batchSize": 30,
+        "exactMultiplier": 3.5,
+        "roundedMultiplier": 4,
+        "actualOutput": 120,
+        "demand": 105,
+        "surplus": 15,
+        "surplusPercent": 14.29,
+        "costPerBatch": 131.16,
+        "exactCost": 459.06,
+        "roundedCost": 524.64,
+        "costVariance": 65.58,
+        "costVariancePercent": 14.29,
+        "lossRate": 1.7,
+        "storeOrders": [
+          {
+            "storeId": "ST001",
+            "storeName": "中山公园店",
+            "quantity": 60
+          },
+          {
+            "storeId": "ST003",
+            "storeName": "陆家嘴店",
+            "quantity": 45
+          }
+        ]
+      },
+      {
+        "productId": "BRD003",
+        "productName": "全麦吐司",
+        "batchSize": 8,
+        "exactMultiplier": 4.625,
+        "roundedMultiplier": 5,
+        "actualOutput": 40,
+        "demand": 37,
+        "surplus": 3,
+        "surplusPercent": 8.11,
+        "costPerBatch": 78.78,
+        "exactCost": 364.35,
+        "roundedCost": 393.89,
+        "costVariance": 29.54,
+        "costVariancePercent": 8.11,
+        "lossRate": 6,
+        "storeOrders": [
+          {
+            "storeId": "ST001",
+            "storeName": "中山公园店",
+            "quantity": 15
+          },
+          {
+            "storeId": "ST002",
+            "storeName": "人民广场店",
+            "quantity": 10
+          },
+          {
+            "storeId": "ST003",
+            "storeName": "陆家嘴店",
+            "quantity": 12
+          }
+        ]
+      },
+      {
+        "productId": "BRD004",
+        "productName": "奶油芝士丹麦",
+        "batchSize": 24,
+        "exactMultiplier": 2.917,
+        "roundedMultiplier": 3,
+        "actualOutput": 72,
+        "demand": 70,
+        "surplus": 2,
+        "surplusPercent": 2.86,
+        "costPerBatch": 303.35,
+        "exactCost": 884.77,
+        "roundedCost": 910.05,
+        "costVariance": 25.28,
+        "costVariancePercent": 2.86,
+        "lossRate": 12.5,
+        "storeOrders": [
+          {
+            "storeId": "ST002",
+            "storeName": "人民广场店",
+            "quantity": 30
+          },
+          {
+            "storeId": "ST003",
+            "storeName": "陆家嘴店",
+            "quantity": 40
+          }
+        ]
+      }
+    ],
+    "ingredientUsage": {
+      "MAT001": {
+        "itemId": "MAT001",
+        "itemName": "高筋面粉",
+        "unit": "kg",
+        "originalUsage": 50.097,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 50.097
+      },
+      "MAT002": {
+        "itemId": "MAT002",
+        "itemName": "饮用水",
+        "unit": "L",
+        "originalUsage": 9.450000000000001,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 9.451
+      },
+      "MAT003": {
+        "itemId": "MAT003",
+        "itemName": "新鲜酵母",
+        "unit": "kg",
+        "originalUsage": 1.1609399999999999,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 1.161
+      },
+      "MAT004": {
+        "itemId": "MAT004",
+        "itemName": "食用盐",
+        "unit": "kg",
+        "originalUsage": 0.7304000000000002,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 0.731
+      },
+      "MAT005": {
+        "itemId": "MAT005",
+        "itemName": "全脂牛奶",
+        "unit": "L",
+        "originalUsage": 17.666999999999998,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 17.667
+      },
+      "MAT006": {
+        "itemId": "MAT006",
+        "itemName": "鸡蛋",
+        "unit": "kg",
+        "originalUsage": 3.4532999999999996,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 3.454
+      },
+      "MAT007": {
+        "itemId": "MAT007",
+        "itemName": "白砂糖",
+        "unit": "kg",
+        "originalUsage": 4.5133,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 4.514
+      },
+      "MAT008": {
+        "itemId": "MAT008",
+        "itemName": "红豆沙",
+        "unit": "kg",
+        "originalUsage": 18.305999999999997,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 18.306
+      },
+      "MAT009": {
+        "itemId": "MAT009",
+        "itemName": "全麦面粉",
+        "unit": "kg",
+        "originalUsage": 15.900000000000002,
+        "substitutionUsed": true,
+        "substituteDetails": {
+          "originalId": "MAT009",
+          "originalName": "全麦面粉",
+          "substituteId": "MAT012",
+          "substituteName": "多谷物混合粉",
+          "originalDeficit": 5.901,
+          "substituteUsed": 6.491,
+          "conversionRatio": 1.1
+        },
+        "originalDeducted": 15.901
+      },
+      "MAT010": {
+        "itemId": "MAT010",
+        "itemName": "黄油",
+        "unit": "kg",
+        "originalUsage": 8.34,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 8.34
+      },
+      "MAT011": {
+        "itemId": "MAT011",
+        "itemName": "奶油芝士",
+        "unit": "kg",
+        "originalUsage": 8.1,
+        "substitutionUsed": false,
+        "substituteDetails": null,
+        "actualDeducted": 8.1
+      }
+    },
+    "substitutionsApplied": [
+      {
+        "originalId": "MAT009",
+        "originalName": "全麦面粉",
+        "substituteId": "MAT012",
+        "substituteName": "多谷物混合粉",
+        "originalDeficit": 5.901,
+        "substituteUsed": 6.491,
+        "conversionRatio": 1.1
+      }
+    ],
+    "costSummary": {
+      "canProduce": true,
+      "totalExactCost": 1824.64,
+      "totalRoundedCost": 1945.04,
+      "totalCostVariance": 120.4,
+      "variancePercent": 6.6,
+      "shortageCount": 0,
+      "productCount": 4
+    },
+    "originalShortages": [],
+    "allergenWarnings": [
+      {
+        "originalId": "MAT009",
+        "originalName": "全麦面粉",
+        "substituteId": "MAT012",
+        "substituteName": "多谷物混合粉",
+        "reason": "替代原料过敏标识缺失（原原料有过敏原，但替代原料未标注）",
+        "originalAllergens": [
+          "小麦"
+        ],
+        "substituteAllergens": []
+      }
+    ],
+    "roundingVariances": [
+      {
+        "productId": "BRD002",
+        "productName": "红豆面包",
+        "exactMultiplier": 3.5,
+        "roundedMultiplier": 4,
+        "exactCost": 459.06,
+        "roundedCost": 524.64,
+        "costVariance": 65.58,
+        "costVariancePercent": 14.29,
+        "surplus": 15,
+        "surplusPercent": 14.29
+      },
+      {
+        "productId": "BRD003",
+        "productName": "全麦吐司",
+        "exactMultiplier": 4.625,
+        "roundedMultiplier": 5,
+        "exactCost": 364.35,
+        "roundedCost": 393.89,
+        "costVariance": 29.54,
+        "costVariancePercent": 8.11,
+        "surplus": 3,
+        "surplusPercent": 8.11
+      },
+      {
+        "productId": "BRD004",
+        "productName": "奶油芝士丹麦",
+        "exactMultiplier": 2.917,
+        "roundedMultiplier": 3,
+        "exactCost": 884.77,
+        "roundedCost": 910.05,
+        "costVariance": 25.28,
+        "costVariancePercent": 2.86,
+        "surplus": 2,
+        "surplusPercent": 2.86
+      }
+    ]
+  }
+]

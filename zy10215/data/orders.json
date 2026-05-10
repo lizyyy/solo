@@ -1,0 +1,83 @@
+[
+  {
+    "orderId": "ORD-20260511-001",
+    "storeId": "ST001",
+    "storeName": "中山公园店",
+    "deliveryDate": "2026-05-11",
+    "status": "processed",
+    "items": [
+      {
+        "productId": "BRD001",
+        "productName": "法式长棍面包",
+        "quantity": 35
+      },
+      {
+        "productId": "BRD002",
+        "productName": "红豆面包",
+        "quantity": 60
+      },
+      {
+        "productId": "BRD003",
+        "productName": "全麦吐司",
+        "quantity": 15
+      }
+    ],
+    "createdAt": "2026-05-10T19:10:58.671Z",
+    "processedAt": "2026-05-10T19:11:39.199Z",
+    "batchNo": "B20260510-001"
+  },
+  {
+    "orderId": "ORD-20260511-002",
+    "storeId": "ST002",
+    "storeName": "人民广场店",
+    "deliveryDate": "2026-05-11",
+    "status": "processed",
+    "items": [
+      {
+        "productId": "BRD001",
+        "productName": "法式长棍面包",
+        "quantity": 25
+      },
+      {
+        "productId": "BRD003",
+        "productName": "全麦吐司",
+        "quantity": 10
+      },
+      {
+        "productId": "BRD004",
+        "productName": "奶油芝士丹麦",
+        "quantity": 30
+      }
+    ],
+    "createdAt": "2026-05-10T19:10:58.672Z",
+    "processedAt": "2026-05-10T19:11:39.200Z",
+    "batchNo": "B20260510-001"
+  },
+  {
+    "orderId": "ORD-20260511-003",
+    "storeId": "ST003",
+    "storeName": "陆家嘴店",
+    "deliveryDate": "2026-05-11",
+    "status": "processed",
+    "items": [
+      {
+        "productId": "BRD002",
+        "productName": "红豆面包",
+        "quantity": 45
+      },
+      {
+        "productId": "BRD003",
+        "productName": "全麦吐司",
+        "quantity": 12
+      },
+      {
+        "productId": "BRD004",
+        "productName": "奶油芝士丹麦",
+        "quantity": 40
+      }
+    ],
+    "createdAt": "2026-05-10T19:10:58.672Z",
+    "processedAt": "2026-05-10T19:11:39.200Z",
+    "batchNo": "B20260510-001"
+  }
+]

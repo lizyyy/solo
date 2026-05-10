@@ -1,0 +1,46 @@
+[
+  {
+    "lossId": "LOSS001",
+    "recipeId": "BRD001",
+    "recipeName": "法式长棍面包",
+    "batchNo": "B20260510-001",
+    "producedQuantity": 40,
+    "actualLoss": 2,
+    "lossRate": 0.05,
+    "notes": "烤炉温度偏高导致少量干裂",
+    "recordedAt": "2026-05-10T08:30:00Z"
+  },
+  {
+    "lossId": "LOSS002",
+    "recipeId": "BRD002",
+    "recipeName": "红豆面包",
+    "batchNo": "B20260510-001",
+    "producedQuantity": 60,
+    "actualLoss": 1,
+    "lossRate": 0.017,
+    "notes": "正常损耗",
+    "recordedAt": "2026-05-10T09:00:00Z"
+  },
+  {
+    "lossId": "LOSS003",
+    "recipeId": "BRD003",
+    "recipeName": "全麦吐司",
+    "batchNo": "B20260509-003",
+    "producedQuantity": 16,
+    "actualLoss": 1,
+    "lossRate": 0.06,
+    "notes": "整形不规范导致一炉作废",
+    "recordedAt": "2026-05-09T07:45:00Z"
+  },
+  {
+    "lossId": "LOSS004",
+    "recipeId": "BRD004",
+    "recipeName": "奶油芝士丹麦",
+    "batchNo": "B20260508-002",
+    "producedQuantity": 24,
+    "actualLoss": 3,
+    "lossRate": 0.125,
+    "notes": "丹麦酥开酥失败，三炉作废",
+    "recordedAt": "2026-05-08T06:20:00Z"
+  }
+]

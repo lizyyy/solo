@@ -1,0 +1,167 @@
+[
+  {
+    "itemId": "MAT001",
+    "itemName": "高筋面粉",
+    "category": "面粉类",
+    "unit": "kg",
+    "quantity": 4.902999999999999,
+    "unitCost": 6.5,
+    "allergens": [
+      "小麦"
+    ],
+    "supplier": "益海嘉里",
+    "expiryDate": "2026-06-15",
+    "createdAt": "2026-05-10T19:10:58.428Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT002",
+    "itemName": "饮用水",
+    "category": "水",
+    "unit": "L",
+    "quantity": 90.549,
+    "unitCost": 0.5,
+    "allergens": [],
+    "supplier": "本地供水",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT003",
+    "itemName": "新鲜酵母",
+    "category": "酵母",
+    "unit": "kg",
+    "quantity": 0.33899999999999997,
+    "unitCost": 45,
+    "allergens": [],
+    "supplier": "乐斯福",
+    "expiryDate": "2026-05-20",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT004",
+    "itemName": "食用盐",
+    "category": "调味品",
+    "unit": "kg",
+    "quantity": 4.269,
+    "unitCost": 3.2,
+    "allergens": [],
+    "supplier": "中盐",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT005",
+    "itemName": "全脂牛奶",
+    "category": "乳制品",
+    "unit": "L",
+    "quantity": 2.3329999999999984,
+    "unitCost": 12,
+    "allergens": [
+      "乳制品"
+    ],
+    "supplier": "光明",
+    "expiryDate": "2026-05-18",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT006",
+    "itemName": "鸡蛋",
+    "category": "蛋类",
+    "unit": "kg",
+    "quantity": 6.545999999999999,
+    "unitCost": 18,
+    "allergens": [
+      "鸡蛋"
+    ],
+    "supplier": "本地农场",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT007",
+    "itemName": "白砂糖",
+    "category": "糖类",
+    "unit": "kg",
+    "quantity": 10.486,
+    "unitCost": 8.5,
+    "allergens": [],
+    "supplier": "中粮",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT008",
+    "itemName": "红豆沙",
+    "category": "馅料",
+    "unit": "kg",
+    "quantity": 6.693999999999999,
+    "unitCost": 15,
+    "allergens": [],
+    "supplier": "广州酒家",
+    "expiryDate": "2026-07-01",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT009",
+    "itemName": "全麦面粉",
+    "category": "面粉类",
+    "unit": "kg",
+    "quantity": 0,
+    "unitCost": 8.8,
+    "allergens": [
+      "小麦"
+    ],
+    "supplier": "金像",
+    "expiryDate": "2026-06-20",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT010",
+    "itemName": "黄油",
+    "category": "乳制品",
+    "unit": "kg",
+    "quantity": 6.66,
+    "unitCost": 55,
+    "allergens": [
+      "乳制品"
+    ],
+    "supplier": "安佳",
+    "expiryDate": "2026-08-15",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT011",
+    "itemName": "奶油芝士",
+    "category": "乳制品",
+    "unit": "kg",
+    "quantity": 3.9000000000000004,
+    "unitCost": 65,
+    "allergens": [
+      "乳制品"
+    ],
+    "supplier": "卡夫",
+    "expiryDate": "2026-06-30",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  },
+  {
+    "itemId": "MAT012",
+    "itemName": "多谷物混合粉",
+    "category": "面粉类",
+    "unit": "kg",
+    "quantity": 13.509,
+    "unitCost": 12,
+    "allergens": [],
+    "supplier": "有机农场",
+    "expiryDate": "2026-05-30",
+    "notes": "全麦面粉的健康替代选择，但过敏原信息不完整",
+    "createdAt": "2026-05-10T19:10:58.429Z",
+    "updatedAt": "2026-05-10T19:10:58.429Z"
+  }
+]

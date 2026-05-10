@@ -1,0 +1,24 @@
+[
+  {
+    "substituteId": "SUB001",
+    "originalId": "MAT009",
+    "originalName": "全麦面粉",
+    "substituteId": "MAT012",
+    "substituteName": "多谷物混合粉",
+    "conversionRatio": 1.1,
+    "priority": 1,
+    "status": "active",
+    "notes": "全麦面粉缺货时使用，注意：多谷物混合粉的过敏原标识不完整，原全麦面粉含小麦过敏原"
+  },
+  {
+    "substituteId": "SUB002",
+    "originalId": "MAT010",
+    "originalName": "黄油",
+    "substituteId": "MAT005",
+    "substituteName": "全脂牛奶",
+    "conversionRatio": 1.5,
+    "priority": 2,
+    "status": "active",
+    "notes": "黄油缺货时用部分牛奶替代，会影响口感"
+  }
+]

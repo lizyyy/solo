@@ -1,0 +1,50 @@
+[
+  {
+    "type": "recipes",
+    "filePath": "./examples/recipes.json",
+    "dataHash": "e9c751867016632c70fd8b0b477d0854190674bce12ec952dbd8575973ff1f54",
+    "recordCount": 4,
+    "timestamp": "2026-05-10T19:10:53.006Z",
+    "forced": false
+  },
+  {
+    "type": "inventory",
+    "filePath": "./examples/inventory.json",
+    "dataHash": "9432dc7e6029e945b833c4fcd574a39823bf6c403f2e2df6c143c77f5e6bd97b",
+    "recordCount": 12,
+    "timestamp": "2026-05-10T19:10:58.429Z",
+    "forced": false
+  },
+  {
+    "type": "substitutes",
+    "filePath": "./examples/substitutes.json",
+    "dataHash": "dddff10478a8d2a4078174101e1b726e78a82c4132bff5130700761ac2754c67",
+    "recordCount": 2,
+    "timestamp": "2026-05-10T19:10:58.505Z",
+    "forced": false
+  },
+  {
+    "type": "losses",
+    "filePath": "./examples/losses.json",
+    "dataHash": "ef78233a66ce9401a817ae5fe768191a241ff23de646393c4698bd7875e738d8",
+    "recordCount": 4,
+    "timestamp": "2026-05-10T19:10:58.580Z",
+    "forced": false
+  },
+  {
+    "type": "orders",
+    "filePath": "./examples/orders.json",
+    "dataHash": "85b65f6967c441894793967ad7271d2145c1b1d66b91b582d2c6c34be1166220",
+    "recordCount": 3,
+    "timestamp": "2026-05-10T19:10:58.674Z",
+    "forced": false
+  },
+  {
+    "type": "orders",
+    "filePath": "./examples/orders.json",
+    "dataHash": "f90a1080fdaed9bc8b4a00be325c4bb47a7fe1282fe8c353828c973d75d19ef7",
+    "recordCount": 3,
+    "timestamp": "2026-05-10T19:11:02.079Z",
+    "forced": false
+  }
+]
