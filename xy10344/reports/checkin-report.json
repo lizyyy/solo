@@ -1,0 +1,315 @@
+{
+  "summary": {
+    "totalAthletes": 8,
+    "approved": 1,
+    "pending": 3,
+    "pendingEquipment": 3,
+    "waived": 1,
+    "rejected": 0,
+    "bibIssued": 5,
+    "supplyIssued": 1,
+    "hasWaiving": 1,
+    "withMissingEquipment": 6,
+    "approvalRate": "25.0",
+    "anomaliesCount": 3
+  },
+  "anomalies": [
+    {
+      "bib": "1006",
+      "name": "赵阳",
+      "status": "pending",
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": [
+        "补给包已发放但未完成检录"
+      ]
+    },
+    {
+      "bib": "1007",
+      "name": "孙丽",
+      "status": "pending",
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    },
+    {
+      "bib": "1008",
+      "name": "周杰",
+      "status": "pending",
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    }
+  ],
+  "details": [
+    {
+      "bib": "1001",
+      "name": "张伟",
+      "category": "50KM",
+      "gender": "男",
+      "status": "approved",
+      "statusText": "允许通过",
+      "hasBib": true,
+      "hasSupply": false,
+      "missingEquipment": [],
+      "hasWaiving": false,
+      "issues": [],
+      "warnings": []
+    },
+    {
+      "bib": "1002",
+      "name": "李明",
+      "category": "50KM",
+      "gender": "男",
+      "status": "pending_equipment",
+      "statusText": "待补装备",
+      "hasBib": true,
+      "hasSupply": false,
+      "missingEquipment": [
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "缺少装备: 头灯, 救生衣"
+      ],
+      "warnings": []
+    },
+    {
+      "bib": "1003",
+      "name": "王芳",
+      "category": "50KM",
+      "gender": "女",
+      "status": "waived",
+      "statusText": "人工豁免",
+      "hasBib": true,
+      "hasSupply": false,
+      "missingEquipment": [],
+      "hasWaiving": true,
+      "issues": [],
+      "warnings": []
+    },
+    {
+      "bib": "1004",
+      "name": "刘强",
+      "category": "30KM",
+      "gender": "男",
+      "status": "pending_equipment",
+      "statusText": "待补装备",
+      "hasBib": true,
+      "hasSupply": false,
+      "missingEquipment": [
+        {
+          "id": "helmet",
+          "name": "头盔"
+        },
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        },
+        {
+          "id": "water_bag",
+          "name": "水袋"
+        },
+        {
+          "id": "energy_food",
+          "name": "能量食品"
+        },
+        {
+          "id": "first_aid",
+          "name": "急救包"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    },
+    {
+      "bib": "1005",
+      "name": "陈静",
+      "category": "30KM",
+      "gender": "女",
+      "status": "pending_equipment",
+      "statusText": "待补装备",
+      "hasBib": true,
+      "hasSupply": false,
+      "missingEquipment": [
+        {
+          "id": "helmet",
+          "name": "头盔"
+        },
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        },
+        {
+          "id": "water_bag",
+          "name": "水袋"
+        },
+        {
+          "id": "energy_food",
+          "name": "能量食品"
+        },
+        {
+          "id": "first_aid",
+          "name": "急救包"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    },
+    {
+      "bib": "1006",
+      "name": "赵阳",
+      "category": "50KM",
+      "gender": "男",
+      "status": "pending",
+      "statusText": "待检录",
+      "hasBib": false,
+      "hasSupply": true,
+      "missingEquipment": [
+        {
+          "id": "helmet",
+          "name": "头盔"
+        },
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        },
+        {
+          "id": "water_bag",
+          "name": "水袋"
+        },
+        {
+          "id": "energy_food",
+          "name": "能量食品"
+        },
+        {
+          "id": "first_aid",
+          "name": "急救包"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": [
+        "补给包已发放但未完成检录"
+      ]
+    },
+    {
+      "bib": "1007",
+      "name": "孙丽",
+      "category": "30KM",
+      "gender": "女",
+      "status": "pending",
+      "statusText": "待检录",
+      "hasBib": false,
+      "hasSupply": false,
+      "missingEquipment": [
+        {
+          "id": "helmet",
+          "name": "头盔"
+        },
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        },
+        {
+          "id": "water_bag",
+          "name": "水袋"
+        },
+        {
+          "id": "energy_food",
+          "name": "能量食品"
+        },
+        {
+          "id": "first_aid",
+          "name": "急救包"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    },
+    {
+      "bib": "1008",
+      "name": "周杰",
+      "category": "50KM",
+      "gender": "男",
+      "status": "pending",
+      "statusText": "待检录",
+      "hasBib": false,
+      "hasSupply": false,
+      "missingEquipment": [
+        {
+          "id": "helmet",
+          "name": "头盔"
+        },
+        {
+          "id": "headlamp",
+          "name": "头灯"
+        },
+        {
+          "id": "vest",
+          "name": "救生衣"
+        },
+        {
+          "id": "water_bag",
+          "name": "水袋"
+        },
+        {
+          "id": "energy_food",
+          "name": "能量食品"
+        },
+        {
+          "id": "first_aid",
+          "name": "急救包"
+        }
+      ],
+      "hasWaiving": false,
+      "issues": [
+        "号码布未发放",
+        "缺少装备: 头盔, 头灯, 救生衣, 水袋, 能量食品, 急救包"
+      ],
+      "warnings": []
+    }
+  ]
+}

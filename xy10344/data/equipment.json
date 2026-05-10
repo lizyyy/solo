@@ -1,0 +1,50 @@
+[
+  {
+    "id": "helmet",
+    "name": "头盔",
+    "category": "safety",
+    "required": true
+  },
+  {
+    "id": "headlamp",
+    "name": "头灯",
+    "category": "safety",
+    "required": true
+  },
+  {
+    "id": "vest",
+    "name": "救生衣",
+    "category": "safety",
+    "required": true
+  },
+  {
+    "id": "water_bag",
+    "name": "水袋",
+    "category": "gear",
+    "required": true
+  },
+  {
+    "id": "energy_food",
+    "name": "能量食品",
+    "category": "gear",
+    "required": true
+  },
+  {
+    "id": "first_aid",
+    "name": "急救包",
+    "category": "safety",
+    "required": true
+  },
+  {
+    "id": "gloves",
+    "name": "手套",
+    "category": "gear",
+    "required": false
+  },
+  {
+    "id": "knee_pads",
+    "name": "护膝",
+    "category": "gear",
+    "required": false
+  }
+]

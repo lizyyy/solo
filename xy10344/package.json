@@ -1,0 +1,23 @@
+{
+  "name": "race-checkin-cli",
+  "version": "1.0.0",
+  "description": "赛事装备检录 CLI 工具 - 适用于越野赛和骑行赛现场",
+  "main": "index.js",
+  "bin": {
+    "race-checkin": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "demo": "./demo.sh"
+  },
+  "keywords": ["race", "checkin", "equipment", "off-road", "cycling"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.4",
+    "inquirer": "^8.2.6"
+  }
+}
