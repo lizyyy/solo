@@ -1,0 +1,13 @@
+{
+  "name": "food-allergen-recall-api",
+  "version": "1.0.0",
+  "description": "食品过敏源召回 API 服务端原型",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-scenarios.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
