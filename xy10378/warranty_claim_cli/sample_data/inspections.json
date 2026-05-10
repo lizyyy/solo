@@ -1,0 +1,26 @@
+[
+  {
+    "inspection_id": "I-001",
+    "failure_id": "F-001",
+    "is_human_damage": false,
+    "inspector": "李工程师",
+    "inspection_reason": "经检测，主板芯片故障，属于自然老化/质量问题，非人为损坏",
+    "inspection_date": "2025-03-12"
+  },
+  {
+    "inspection_id": "I-002",
+    "failure_id": "F-002",
+    "is_human_damage": false,
+    "inspector": "王工程师",
+    "inspection_reason": "电池正常损耗导致鼓包，属于自然损坏，但设备已过保",
+    "inspection_date": "2025-01-18"
+  },
+  {
+    "inspection_id": "I-003",
+    "failure_id": "F-003",
+    "is_human_damage": true,
+    "inspector": "张工程师",
+    "inspection_reason": "屏幕外部受力痕迹明显，机壳有摔落凹痕，判定为人为意外损坏",
+    "inspection_date": "2025-04-22"
+  }
+]

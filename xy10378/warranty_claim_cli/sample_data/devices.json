@@ -1,0 +1,62 @@
+[
+  {
+    "device_id": "DEV-001",
+    "device_name": "联想ThinkPad X1 Carbon",
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "model": "ThinkPad X1 Carbon",
+    "serial_number": "SN-LX1C2024001",
+    "purchase_date": "2024-01-15",
+    "supplier": "联想官方旗舰店",
+    "purchase_price": "8999",
+    "notes": "行政部张三使用，2年保修期，保内正常故障"
+  },
+  {
+    "device_id": "DEV-002",
+    "device_name": "戴尔Latitude 5420",
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "model": "Latitude 5420",
+    "serial_number": "SN-DL54202022001",
+    "purchase_date": "2022-03-20",
+    "supplier": "戴尔官网",
+    "purchase_price": "6500",
+    "notes": "研发部李四使用，已过保，超保拒绝"
+  },
+  {
+    "device_id": "DEV-003",
+    "device_name": "联想ThinkBook 14",
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "model": "ThinkBook 14",
+    "serial_number": "SN-LTB142024003",
+    "purchase_date": "2024-05-10",
+    "supplier": "京东自营",
+    "purchase_price": "5999",
+    "notes": "市场部王五使用，人为损坏，拒绝索赔"
+  },
+  {
+    "device_id": "DEV-004",
+    "device_name": "惠普ProBook 440",
+    "device_type": "笔记本电脑",
+    "brand": "惠普",
+    "model": "ProBook 440",
+    "serial_number": "SN-HP4402024004",
+    "purchase_date": "2024-02-28",
+    "supplier": "惠普专卖店",
+    "purchase_price": "4999",
+    "notes": "财务部赵六使用，材料缺失场景"
+  },
+  {
+    "device_id": "DEV-005",
+    "device_name": "华为MateBook 16",
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "model": "MateBook 16",
+    "serial_number": "SN-HWM162024005",
+    "purchase_date": "2099-01-01",
+    "supplier": "测试供应商",
+    "purchase_price": "7999",
+    "notes": "采购日期异常测试（未来日期）"
+  }
+]

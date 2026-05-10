@@ -1,0 +1,43 @@
+{
+  "claim_id": "CLAIM-20260511-4e4655c6",
+  "failure_id": "F-001",
+  "status": "已提交",
+  "submit_date": "2026-05-11 01:28:07",
+  "device": {
+    "device_id": "DEV-001",
+    "device_name": "联想ThinkPad X1 Carbon",
+    "serial_number": "SN-LX1C2024001",
+    "brand": "联想",
+    "model": "ThinkPad X1 Carbon",
+    "purchase_date": "2024-01-15"
+  },
+  "failure": {
+    "failure_date": "2025-03-10",
+    "description": "正常使用中突然无法开机，按电源键无反应，排除电源问题"
+  },
+  "inspection": {
+    "is_human_damage": false,
+    "inspector": "李工程师",
+    "inspection_reason": "经检测，主板芯片故障，属于自然老化/质量问题，非人为损坏"
+  },
+  "warranty": {
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "warranty_months": 24
+  },
+  "materials": {
+    "provided": [
+      "维修鉴定报告",
+      "故障照片",
+      "维修申请单"
+    ],
+    "missing": []
+  },
+  "evaluation": {
+    "status_before_submit": "可索赔",
+    "reasons": [],
+    "details": {
+      "summary": "设备 联想ThinkPad X1 Carbon (SN-LX1C2024001) 在保修期内发生自然故障，材料齐全，符合索赔条件"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "failure_id": "F-001",
+    "device_id": "DEV-001",
+    "failure_date": "2025-03-10",
+    "failure_type": "无法开机",
+    "description": "正常使用中突然无法开机，按电源键无反应，排除电源问题",
+    "reporter": "张三",
+    "status": "待鉴定",
+    "notes": "场景1：保内正常故障，预计可索赔"
+  },
+  {
+    "failure_id": "F-002",
+    "device_id": "DEV-002",
+    "failure_date": "2025-01-15",
+    "failure_type": "电池鼓包",
+    "description": "笔记本电池鼓包，无法正常充电",
+    "reporter": "李四",
+    "status": "待鉴定",
+    "notes": "场景2：已过保，超保拒绝"
+  },
+  {
+    "failure_id": "F-003",
+    "device_id": "DEV-003",
+    "failure_date": "2025-04-20",
+    "failure_type": "屏幕碎裂",
+    "description": "笔记本屏幕碎裂，显示异常",
+    "reporter": "王五",
+    "status": "待鉴定",
+    "notes": "场景3：人为损坏（摔落），拒绝索赔"
+  },
+  {
+    "failure_id": "F-004",
+    "device_id": "DEV-004",
+    "failure_date": "2025-02-15",
+    "failure_type": "键盘失灵",
+    "description": "键盘部分按键失灵，影响正常输入",
+    "reporter": "赵六",
+    "status": "待鉴定",
+    "notes": "场景4：材料缺失，需要补充后再检查"
+  },
+  {
+    "failure_id": "F-005",
+    "device_id": "DEV-005",
+    "failure_date": "2025-05-01",
+    "failure_type": "无法启动",
+    "description": "设备无法正常启动",
+    "reporter": "测试用户",
+    "status": "待鉴定",
+    "notes": "场景5：采购日期异常（未来日期）"
+  }
+]

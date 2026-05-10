@@ -1,0 +1,64 @@
+[
+  {
+    "warranty_id": "W-001",
+    "device_type": "笔记本电脑",
+    "brand": "联想",
+    "warranty_months": 24,
+    "description": "联想笔记本电脑整机保修2年",
+    "required_materials": [
+      "维修申请单",
+      "故障照片",
+      "维修鉴定报告"
+    ]
+  },
+  {
+    "warranty_id": "W-005",
+    "device_type": "笔记本电脑",
+    "brand": "惠普",
+    "warranty_months": 12,
+    "description": "惠普笔记本电脑整机保修1年",
+    "required_materials": [
+      "维修申请单",
+      "故障照片",
+      "维修鉴定报告"
+    ]
+  },
+  {
+    "warranty_id": "W-002",
+    "device_type": "笔记本电脑",
+    "brand": "戴尔",
+    "warranty_months": 12,
+    "description": "戴尔笔记本电脑整机保修1年",
+    "required_materials": [
+      "维修申请单",
+      "故障照片",
+      "维修鉴定报告",
+      "购机发票"
+    ]
+  },
+  {
+    "warranty_id": "W-003",
+    "device_type": "服务器",
+    "brand": "*",
+    "warranty_months": 36,
+    "description": "服务器整机保修3年",
+    "required_materials": [
+      "维修申请单",
+      "故障照片",
+      "维修鉴定报告",
+      "设备日志"
+    ]
+  },
+  {
+    "warranty_id": "W-004",
+    "device_type": "打印机",
+    "brand": "*",
+    "warranty_months": 12,
+    "description": "打印机整机保修1年",
+    "required_materials": [
+      "维修申请单",
+      "故障照片",
+      "维修鉴定报告"
+    ]
+  }
+]
