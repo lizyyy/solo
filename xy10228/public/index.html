@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二手相机寄卖质检台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f1f5f9; }
+    
+    .app { min-height: 100vh; }
+    .header { background: #1e293b; color: white; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+    .header h1 { font-size: 20px; font-weight: 600; }
+    .nav { display: flex; gap: 8px; margin-left: 32px; }
+    .nav button { background: transparent; border: none; color: #94a3b8; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+    .nav button.active { background: #334155; color: white; }
+    
+    .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    
+    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #1e293b; }
+    
+    .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; font-size: 14px; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .table th { background: #f8fafc; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; }
+    .table tr:hover { background: #f8fafc; }
+    
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    
+    .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    
+    .progress-bar { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+    .progress-fill { height: 100%; background: #3b82f6; border-radius: 4px; transition: width 0.3s; }
+    
+    .suggestion { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
+    .suggestion.required { background: #fef2f2; border-left: 3px solid #ef4444; }
+    .suggestion.warning { background: #fffbeb; border-left: 3px solid #f59e0b; }
+    .suggestion.info { background: #eff6ff; border-left: 3px solid #3b82f6; }
+    
+    .defect-item { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; }
+    .defect-header { display: flex; justify-content: space-between; align-items: center; }
+    .defect-meta { display: flex; gap: 12px; font-size: 12px; color: #64748b; margin-top: 4px; }
+    
+    .accessory-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e2e8f0; }
+    .accessory-row:last-child { border-bottom: none; }
+    
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -22px; top: 4px; width: 14px; height: 14px;
+      border-radius: 50%; background: #3b82f6; border: 3px solid #dbeafe;
+    }
+    .timeline-time { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+    .timeline-action { font-weight: 600; margin-bottom: 4px; }
+    .diff-box { background: #f8fafc; padding: 8px 12px; border-radius: 6px; font-size: 13px; margin-top: 8px; }
+    .diff-old { color: #ef4444; text-decoration: line-through; }
+    .diff-new { color: #10b981; }
+    
+    .stepper { display: flex; margin-bottom: 24px; }
+    .step { flex: 1; text-align: center; position: relative; }
+    .step::before {
+      content: ''; position: absolute; top: 14px; left: -50%; right: 50%; height: 2px; background: #e2e8f0; z-index: 0;
+    }
+    .step:first-child::before { display: none; }
+    .step-done::before, .step-active::before { background: #10b981; }
+    .step-circle {
+      width: 30px; height: 30px; border-radius: 50%; background: #e2e8f0; color: #64748b;
+      display: inline-flex; align-items: center; justify-content: center; font-weight: 600; position: relative; z-index: 1;
+    }
+    .step-done .step-circle { background: #10b981; color: white; }
+    .step-active .step-circle { background: #3b82f6; color: white; }
+    .step-label { font-size: 12px; margin-top: 8px; color: #64748b; }
+    .step-active .step-label { color: #1e293b; font-weight: 600; }
+    
+    .empty { text-align: center; padding: 48px; color: #94a3b8; }
+    .hidden { display: none !important; }
+    
+    .tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; }
+    .tab { padding: 12px 20px; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; }
+    .tab.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 600; }
+    
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: white; border-radius: 12px; width: 500px; max-height: 80vh; overflow: auto; }
+    .modal-header { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px; }
+    
+    .toast {
+      position: fixed; top: 80px; right: 24px; background: #1e293b; color: white;
+      padding: 12px 20px; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s ease;
+    }
+    .toast.error { background: #ef4444; }
+    .toast.success { background: #10b981; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .info-item { display: flex; flex-direction: column; }
+    .info-label { font-size: 12px; color: #64748b; }
+    .info-value { font-weight: 500; margin-top: 2px; }
+    
+    .blocker { background: #fef2f2; border: 1px solid #fecaca; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .blocker-icon { font-size: 20px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>📷 二手相机寄卖质检台</h1>
+      <div class="nav">
+        <button class="active" onclick="switchPage('list')">寄卖单列表</button>
+        <button onclick="switchPage('workbench')">质检工作台</button>
+        <button onclick="switchPage('history')">历史记录</button>
+        <button onclick="showDemoPaths()">🎬 演示路径</button>
+      </div>
+    </div>
+    
+    <div class="container">
+      <div id="page-list" class="page active">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2>寄卖单列表</h2>
+            <button class="btn btn-primary" onclick="showCreateModal()">+ 新建寄卖单</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>订单号</th>
+                <th>相机信息</th>
+                <th>客户</th>
+                <th>期望价格</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="consignment-list"></tbody>
+          </table>
+          <div id="list-empty" class="empty hidden">暂无寄卖单，点击上方按钮新建</div>
+        </div>
+      </div>
+      
+      <div id="page-workbench" class="page">
+        <div id="workbench-content"></div>
+      </div>
+      
+      <div id="page-history" class="page">
+        <div id="history-content">
+          <div class="empty">请先从列表选择一个寄卖单查看历史记录</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast-container"></div>
+  
+  <script>
+    const API = 'http://localhost:3001/api';
+    let currentConsignmentId = null;
+    
+    async function loadConsignments() {
+      const res = await fetch(`${API}/consignments`);
+      const list = await res.json();
+      const tbody = document.getElementById('consignment-list');
+      const empty = document.getElementById('list-empty');
+      
+      if (list.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      
+      tbody.innerHTML = list.map(c => `
+        <tr>
+          <td><strong>${c.order_no}</strong></td>
+          <td>${c.camera_brand} ${c.camera_model}</td>
+          <td>${c.customer_name} ${c.customer_phone || ''}</td>
+          <td>¥${c.expected_price || '-'}</td>
+          <td><span class="status-badge" style="background: ${c.status_info.color}20; color: ${c.status_info.color}">${c.status_info.label}</span></td>
+          <td>${new Date(c.created_at).toLocaleString('zh-CN')}</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="openWorkbench(${c.id})">质检</button>
+            <button class="btn btn-secondary btn-sm" onclick="openHistory(${c.id})">历史</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function switchPage(page) {
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      
+      if (page === 'list') {
+        document.querySelectorAll('.nav button')[0].classList.add('active');
+        document.getElementById('page-list').classList.add('active');
+        loadConsignments();
+      } else if (page === 'workbench') {
+        document.querySelectorAll('.nav button')[1].classList.add('active');
+        document.getElementById('page-workbench').classList.add('active');
+        if (currentConsignmentId) loadWorkbench(currentConsignmentId);
+      } else if (page === 'history') {
+        document.querySelectorAll('.nav button')[2].classList.add('active');
+        document.getElementById('page-history').classList.add('active');
+        if (currentConsignmentId) loadHistory(currentConsignmentId);
+      }
+    }
+    
+    async function openWorkbench(id) {
+      currentConsignmentId = id;
+      switchPage('workbench');
+    }
+    
+    async function openHistory(id) {
+      currentConsignmentId = id;
+      switchPage('history');
+    }
+    
+    async function loadWorkbench(id) {
+      const [consignmentRes, inspectionRes] = await Promise.all([
+        fetch(`${API}/consignments/${id}`),
+        fetch(`${API}/inspections/${id}`)
+      ]);
+      const consignment = await consignmentRes.json();
+      const inspection = await inspectionRes.json();
+      
+      const container = document.getElementById('workbench-content');
+      const status = consignment.status_info;
+      const overall = inspection.overall_status;
+      
+      container.innerHTML = `
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <h2 style="margin: 0;">${consignment.order_no}</h2>
+              <span class="status-badge" style="background: ${status.color}20; color: ${status.color}">${status.label}</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-danger btn-sm" onclick="withdrawConsignment(${id})">撤回</button>
+            </div>
+          </div>
+          <div class="info-grid">
+            <div class="info-item"><span class="info-label">相机型号</span><span class="info-value">${consignment.camera_brand} ${consignment.camera_model}</span></div>
+            <div class="info-item"><span class="info-label">序列号</span><span class="info-value">${consignment.serial_number || '-'}</span></div>
+            <div class="info-item"><span class="info-label">客户</span><span class="info-value">${consignment.customer_name}</span></div>
+            <div class="info-item"><span class="info-label">期望价格</span><span class="info-value">¥${consignment.expected_price || '-'}</span></div>
+            <div class="info-item"><span class="info-label">质检进度</span><span class="info-value">${overall.progress}%</span></div>
+            <div class="info-item"><span class="info-label">当前卡点</span><span class="info-value">${overall.blocker ? getBlockerLabel(overall.blocker) : '无'}</span></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" style="width: ${overall.progress}%"></div></div>
+        </div>
+        
+        ${inspection.suggestions.length > 0 ? `
+          <div class="card">
+            <h2>处理建议</h2>
+            ${inspection.suggestions.map(s => `
+              <div class="suggestion ${s.type}">
+                <span>${s.type === 'required' ? '⚠️' : s.type === 'warning' ? '⚡' : 'ℹ️'}</span>
+                <span>${s.message}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <div class="card">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('shutter')">1️⃣ 快门数</div>
+            <div class="tab" onclick="switchTab('appearance')">2️⃣ 外观瑕疵</div>
+            <div class="tab" onclick="switchTab('accessories')">3️⃣ 配件</div>
+            <div class="tab" onclick="switchTab('pricing')">4️⃣ 定价</div>
+          </div>
+          
+          <div id="tab-shutter" class="tab-content">
+            <h3>快门数核对</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>快门次数</label>
+                <input type="number" id="shutter-count" value="${inspection.shutter?.value || ''}" placeholder="如: 12500">
+              </div>
+              <div class="form-group">
+                <label>备注</label>
+                <input type="text" id="shutter-notes" value="${inspection.shutter?.notes || ''}" placeholder="可选">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveShutter(${id})">保存快门数</button>
+          </div>
+          
+          <div id="tab-appearance" class="tab-content hidden">
+            <h3>外观瑕疵记录</h3>
+            <div style="margin-bottom: 16px;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>瑕疵类型</label>
+                  <select id="defect-type">
+                    <option value="appearance">外观划痕</option>
+                    <option value="paint">掉漆</option>
+                    <option value="dent">磕碰凹陷</option>
+                    <option value="screen">屏幕瑕疵</option>
+                    <option value="lens">镜头瑕疵</option>
+                    <option value="sensor">传感器瑕疵</option>
+                    <option value="other">其他</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>瑕疵等级</label>
+                  <select id="defect-level">
+                    <option value="none">无瑕疵</option>
+                    <option value="minor">轻微</option>
+                    <option value="moderate">中度</option>
+                    <option value="severe">严重</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>瑕疵描述</label>
+                  <input type="text" id="defect-desc" placeholder="详细描述瑕疵情况">
+                </div>
+                <div class="form-group">
+                  <label>位置</label>
+                  <input type="text" id="defect-loc" placeholder="如: 机身左侧">
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="addDefect(${id})">+ 添加瑕疵</button>
+            </div>
+            <div id="defect-list">
+              ${inspection.defects.length === 0 ? '<div class="empty" style="padding: 24px;">暂无瑕疵记录</div>' : 
+                inspection.defects.map(d => `
+                  <div class="defect-item">
+                    <div class="defect-header">
+                      <div>
+                        <span class="status-badge" style="background: ${d.level_info.color}20; color: ${d.level_info.color}">${d.level_info.label}</span>
+                        <strong style="margin-left: 8px;">${d.defect_type}</strong>
+                      </div>
+                      <button class="btn btn-danger btn-sm" onclick="removeDefect(${id}, ${d.id})">删除</button>
+                    </div>
+                    <div class="defect-meta">
+                      <span>${d.description}</span>
+                      ${d.location ? `<span>📍 ${d.location}</span>` : ''}
+                      <span>${new Date(d.created_at).toLocaleString('zh-CN')}</span>
+                    </div>
+                  </div>
+                `).join('')}
+            </div>
+          </div>
+          
+          <div id="tab-accessories" class="tab-content hidden">
+            <h3>配件核对</h3>
+            ${inspection.accessories.map(a => `
+              <div class="accessory-row">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <input type="checkbox" id="acc-${a.id}" ${a.present ? 'checked' : ''} onchange="updateAccessory(${id}, ${a.id}, 'present', this.checked)">
+                  <span style="font-weight: 500;">${a.name}</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <select style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0;" onchange="updateAccessory(${id}, ${a.id}, 'condition', this.value)">
+                    <option value="">状态</option>
+                    <option value="new" ${a.condition === 'new' ? 'selected' : ''}>全新</option>
+                    <option value="good" ${a.condition === 'good' ? 'selected' : ''}>良好</option>
+                    <option value="worn" ${a.condition === 'worn' ? 'selected' : ''}>磨损</option>
+                    <option value="damaged" ${a.condition === 'damaged' ? 'selected' : ''}>损坏</option>
+                  </select>
+                  <input type="text" placeholder="备注" value="${a.notes || ''}" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0;" onchange="updateAccessory(${id}, ${a.id}, 'notes', this.value)">
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          
+          <div id="tab-pricing" class="tab-content hidden">
+            <h3>定价记录</h3>
+            ${inspection.pricing ? `
+              <div class="info-grid" style="margin-bottom: 16px;">
+                <div class="info-item"><span class="info-label">市场价</span><span class="info-value">¥${inspection.pricing.market_price || '-'}</span></div>
+                <div class="info-item"><span class="info-label">质检评估价</span><span class="info-value">¥${inspection.pricing.inspection_price || '-'}</span></div>
+                <div class="info-item"><span class="info-label">最终定价</span><span class="info-value" style="color: #10b981; font-size: 18px;">¥${inspection.pricing.final_price}</span></div>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <span class="info-label">定价依据</span>
+                <p style="margin-top: 4px;">${inspection.pricing.pricing_basis || '无'}</p>
+              </div>
+              <div style="margin-bottom: 16px;">
+                <span class="info-label">定价时间</span>
+                <p style="margin-top: 4px;">${new Date(inspection.pricing.created_at).toLocaleString('zh-CN')}</p>
+              </div>
+            ` : ''}
+            <div class="form-row">
+              <div class="form-group">
+                <label>市场参考价 (元)</label>
+                <input type="number" id="price-market" placeholder="如: 8000">
+              </div>
+              <div class="form-group">
+                <label>质检评估价 (元)</label>
+                <input type="number" id="price-inspection" placeholder="如: 6500">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>最终定价 (元) *</label>
+                <input type="number" id="price-final" placeholder="必填">
+              </div>
+              <div class="form-group">
+                <label>定价依据</label>
+                <input type="text" id="price-basis" placeholder="如: 快门数少 + 轻微掉漆">
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary" onclick="savePricing(${id})">保存定价</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2>状态流转</h2>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            ${['inspecting', 'inspected', 'pricing', 'listed'].includes(consignment.status) ? `
+              ${consignment.status === 'inspecting' ? `<button class="btn btn-success" onclick="completeInspection(${id})">✅ 完成质检</button>` : ''}
+              ${consignment.status === 'pricing' ? `<button class="btn btn-success" onclick="listConsignment(${id})">📦 上架寄卖</button>` : ''}
+              ${!['rejected', 'sold', 'withdrawn'].includes(consignment.status) ? `<button class="btn btn-danger" onclick="rejectConsignment(${id})">❌ 拒绝/退回</button>` : ''}
+            ` : `<span style="color: #94a3b8;">当前状态下无可用流转操作</span>`}
+          </div>
+        </div>
+      `;
+    }
+    
+    function getBlockerLabel(blocker) {
+      const labels = { shutter: '未录入快门数', severe_defect: '存在严重瑕疵' };
+      return labels[blocker] || blocker;
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.querySelectorAll('.tab')[['shutter', 'appearance', 'accessories', 'pricing'].indexOf(tabName)].classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    }
+    
+    async function saveShutter(id) {
+      const count = parseInt(document.getElementById('shutter-count').value);
+      const notes = document.getElementById('shutter-notes').value;
+      
+      if (!count || count < 0) { toast('请输入有效的快门数', 'error'); return; }
+      
+      const res = await fetch(`${API}/inspections/${id}/shutter`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ count, notes })
+      });
+      const data = await res.json();
+      if (res.ok) { toast('快门数已保存'); loadWorkbench(id); }
+      else toast(data.error, 'error');
+    }
+    
+    async function addDefect(id) {
+      const defect_type = document.getElementById('defect-type').value;
+      const defect_level = document.getElementById('defect-level').value;
+      const description = document.getElementById('defect-desc').value;
+      const location = document.getElementById('defect-loc').value;
+      
+      if (!description) { toast('请填写瑕疵描述', 'error'); return; }
+      
+      const res = await fetch(`${API}/inspections/${id}/defects`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ defect_type, defect_level, description, location })
+      });
+      const data = await res.json();
+      if (res.ok) { toast('瑕疵已记录'); loadWorkbench(id); }
+      else toast(data.error, 'error');
+    }
+    
+    async function removeDefect(consignmentId, defectId) {
+      const res = await fetch(`${API}/inspections/${consignmentId}/defects/${defectId}`, { method: 'DELETE' });
+      if (res.ok) { toast('瑕疵已删除'); loadWorkbench(consignmentId); }
+    }
+    
+    async function updateAccessory(consignmentId, accessoryId, field, value) {
+      const body = {};
+      body[field] = field === 'present' ? value : value;
+      await fetch(`${API}/inspections/${consignmentId}/accessories/${accessoryId}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    }
+    
+    async function savePricing(id) {
+      const market_price = parseFloat(document.getElementById('price-market').value) || null;
+      const inspection_price = parseFloat(document.getElementById('price-inspection').value) || null;
+      const final_price = parseFloat(document.getElementById('price-final').value);
+      const pricing_basis = document.getElementById('price-basis').value;
+      
+      if (!final_price) { toast('请输入最终定价', 'error'); return; }
+      
+      const res = await fetch(`${API}/inspections/${id}/pricing`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ market_price, inspection_price, final_price, pricing_basis })
+      });
+      const data = await res.json();
+      if (res.ok) { toast('定价已保存'); loadWorkbench(id); }
+      else toast(data.error, 'error');
+    }
+    
+    async function completeInspection(id) {
+      const res = await fetch(`${API}/inspections/${id}/complete`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) { toast('质检已完成，进入定价环节'); loadWorkbench(id); }
+      else toast(data.error, 'error');
+    }
+    
+    async function listConsignment(id) {
+      const res = await fetch(`${API}/inspections/${id}/list`, { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) { toast('已上架寄卖'); loadWorkbench(id); }
+      else toast(data.error, 'error');
+    }
+    
+    async function rejectConsignment(id) {
+      const reason = prompt('请输入拒绝/退回原因:');
+      if (reason === null) return;
+      const res = await fetch(`${API}/inspections/${id}/reject`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      if (res.ok) { toast('已退回'); loadWorkbench(id); }
+    }
+    
+    async function withdrawConsignment(id) {
+      if (!confirm('确定要撤回此寄卖单吗？此操作将结束流程。')) return;
+      const notes = prompt('撤回原因 (可选):');
+      const res = await fetch(`${API}/consignments/${id}/withdraw`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes })
+      });
+      if (res.ok) { toast('已撤回'); loadWorkbench(id); }
+    }
+    
+    async function loadHistory(id) {
+      const [historyRes, diffRes] = await Promise.all([
+        fetch(`${API}/history/${id}`),
+        fetch(`${API}/history/${id}/diff`)
+      ]);
+      const history = await historyRes.json();
+      const diff = await diffRes.json();
+      
+      const container = document.getElementById('history-content');
+      if (history.length === 0) {
+        container.innerHTML = '<div class="empty">暂无历史记录</div>';
+        return;
+      }
+      
+      container.innerHTML = `
+        <div class="card">
+          <h2>变更记录 (共 ${diff.total_changes} 次变更)</h2>
+          <div class="timeline">
+            ${history.map(h => `
+              <div class="timeline-item">
+                <div class="timeline-time">${new Date(h.created_at).toLocaleString('zh-CN')}</div>
+                <div class="timeline-action">${h.action_label}</div>
+                ${h.field_name ? `<div style="font-size: 13px; color: #64748b;">字段: ${h.field_name}</div>` : ''}
+                ${h.notes ? `<div style="font-size: 13px; color: #64748b;">${h.notes}</div>` : ''}
+                ${(h.old_value_parsed !== null || h.new_value_parsed !== null) ? `
+                  <div class="diff-box">
+                    ${h.old_value_parsed !== null ? `<div class="diff-old">之前: ${formatValue(h.old_value_parsed)}</div>` : ''}
+                    ${h.new_value_parsed !== null ? `<div class="diff-new">之后: ${formatValue(h.new_value_parsed)}</div>` : ''}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    function formatValue(v) {
+      if (typeof v === 'object') return JSON.stringify(v);
+      return String(v);
+    }
+    
+    function showCreateModal() {
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.id = 'create-modal';
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="modal-header">
+            <h3>新建寄卖单</h3>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('create-modal')">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group"><label>相机品牌 *</label><input type="text" id="new-brand" placeholder="如: 索尼"></div>
+              <div class="form-group"><label>相机型号 *</label><input type="text" id="new-model" placeholder="如: A7M4"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>序列号</label><input type="text" id="new-serial"></div>
+              <div class="form-group"><label>客户姓名 *</label><input type="text" id="new-customer"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>联系电话</label><input type="text" id="new-phone"></div>
+              <div class="form-group"><label>期望价格 (元)</label><input type="number" id="new-price"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('create-modal')">取消</button>
+            <button class="btn btn-primary" onclick="createConsignment()">创建</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    async function createConsignment() {
+      const data = {
+        camera_brand: document.getElementById('new-brand').value,
+        camera_model: document.getElementById('new-model').value,
+        serial_number: document.getElementById('new-serial').value,
+        customer_name: document.getElementById('new-customer').value,
+        customer_phone: document.getElementById('new-phone').value,
+        expected_price: parseFloat(document.getElementById('new-price').value) || null
+      };
+      
+      if (!data.camera_brand || !data.camera_model || !data.customer_name) {
+        toast('请填写必填字段', 'error'); return;
+      }
+      
+      const res = await fetch(`${API}/consignments`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (res.ok) {
+        toast('寄卖单创建成功');
+        closeModal('create-modal');
+        loadConsignments();
+      } else {
+        toast(result.error, 'error');
+      }
+    }
+    
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.remove();
+    }
+    
+    function toast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.textContent = message;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+    
+    function showDemoPaths() {
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.id = 'demo-modal';
+      modal.innerHTML = `
+        <div class="modal" style="width: 600px;">
+          <div class="modal-header">
+            <h3>🎬 演示路径说明</h3>
+            <button class="btn btn-secondary btn-sm" onclick="closeModal('demo-modal')">×</button>
+          </div>
+          <div class="modal-body">
+            <div style="margin-bottom: 20px;">
+              <h4 style="margin-bottom: 8px; color: #10b981;">✅ 最短正常演示路径</h4>
+              <ol style="padding-left: 20px; line-height: 2;">
+                <li><strong>新建寄卖单</strong> - 填写品牌、型号、客户姓名</li>
+                <li><strong>进入质检工作台</strong> - 点击"质检"按钮</li>
+                <li><strong>录入快门数</strong> - 输入数值后保存 (状态自动变为"质检中")</li>
+                <li><strong>记录瑕疵</strong> - 如"轻微划痕" (可添加多条)</li>
+                <li><strong>核对配件</strong> - 勾选"机身盖"、"电池"等</li>
+                <li><strong>完成质检</strong> - 点击"完成质检"按钮</li>
+                <li><strong>定价</strong> - 填写最终定价后保存</li>
+                <li><strong>上架</strong> - 点击"上架寄卖"完成流程</li>
+              </ol>
+            </div>
+            
+            <div>
+              <h4 style="margin-bottom: 8px; color: #ef4444;">⚠️ 异常触发路径</h4>
+              <ol style="padding-left: 20px; line-height: 2;">
+                <li><strong>新建寄卖单</strong> - 创建后不录入快门数</li>
+                <li><strong>直接点击"完成质检"</strong> - 系统会报错："请先录入快门数"</li>
+                <li><strong>或:</strong> 录入快门数后，添加一个"严重"等级的瑕疵</li>
+                <li><strong>查看处理建议</strong> - 系统会提示"发现严重瑕疵，建议与客户确认"</li>
+                <li><strong>或:</strong> 在"已上架"状态尝试录入快门数</li>
+                <li><strong>查看报错</strong> - 系统提示"当前状态不允许质检"</li>
+              </ol>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+              <strong>💡 提示:</strong> 所有操作都会记录在"历史记录"中，可查看每次修改的前后变化。
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" onclick="closeModal('demo-modal'); loadConsignments();">开始演示</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    loadConsignments();
+  </script>
+</body>
+</html>
