@@ -1,0 +1,23 @@
+{
+  "name": "rebate-accounting-api",
+  "version": "1.0.0",
+  "description": "采购返利核算API服务",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "node tests/acceptance.js",
+    "seed": "node database/seed.js",
+    "concurrency": "node tests/concurrency.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "moment": "^2.30.1",
+    "uuid": "^9.0.1",
+    "body-parser": "^1.20.2",
+    "lowdb": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
