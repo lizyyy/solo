@@ -1,0 +1,75 @@
+{
+  "users": [
+    [
+      "f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+      {
+        "id": "f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+        "name": "用户A",
+        "isVerified": true,
+        "isFrozen": false,
+        "createdAt": 1778376786610,
+        "updatedAt": 1778376786610
+      }
+    ],
+    [
+      "4685e113-5eee-4319-9c63-191b0baba4fd",
+      {
+        "id": "4685e113-5eee-4319-9c63-191b0baba4fd",
+        "name": "管理员",
+        "isVerified": true,
+        "isFrozen": false,
+        "createdAt": 1778376786610,
+        "updatedAt": 1778376786610
+      }
+    ]
+  ],
+  "collections": [],
+  "transferRecords": [],
+  "transferHistories": [],
+  "freezeRecords": [
+    [
+      "user:f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+      {
+        "id": "e96e1ee4-fedc-43d9-9bea-c2c99b2c5392",
+        "targetType": "user",
+        "targetId": "f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+        "reason": "风控检测",
+        "operatorId": "4685e113-5eee-4319-9c63-191b0baba4fd",
+        "isActive": false,
+        "createdAt": 1778376786610,
+        "releasedAt": 1778376786610
+      }
+    ]
+  ],
+  "auditLogs": [
+    [
+      "user:f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+      [
+        {
+          "id": "ceec2878-2f8c-4aa3-9889-99cc33551d41",
+          "action": "freeze",
+          "actorId": "4685e113-5eee-4319-9c63-191b0baba4fd",
+          "actorType": "admin",
+          "targetType": "user",
+          "targetId": "f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+          "beforeState": "{\"isFrozen\":false}",
+          "afterState": "{\"isFrozen\":true,\"reason\":\"风控检测\"}",
+          "timestamp": 1778376786610,
+          "requestId": "8a73fc86-6e1a-42f8-a78d-61b14a0882b4"
+        },
+        {
+          "id": "bd375d22-af6b-4875-b5d5-e317d509dd03",
+          "action": "unfreeze",
+          "actorId": "4685e113-5eee-4319-9c63-191b0baba4fd",
+          "actorType": "admin",
+          "targetType": "user",
+          "targetId": "f9ae3dea-713e-4958-8b19-f9e80d8d0d94",
+          "beforeState": "{\"isFrozen\":true}",
+          "afterState": "{\"isFrozen\":false}",
+          "timestamp": 1778376786610,
+          "requestId": "25de1df1-41c2-4558-b734-a363802c39fc"
+        }
+      ]
+    ]
+  ]
+}
