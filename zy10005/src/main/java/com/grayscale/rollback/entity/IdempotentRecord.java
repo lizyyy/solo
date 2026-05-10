@@ -38,6 +38,9 @@ public class IdempotentRecord {
     @Column(columnDefinition = "TEXT")
     private String responseData;
     
+    @Column(columnDefinition = "TEXT")
+    private String errorMessage;
+    
     @Column(nullable = false)
     private Boolean processed;
     

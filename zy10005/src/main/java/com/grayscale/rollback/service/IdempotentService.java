@@ -7,6 +7,7 @@ import com.grayscale.rollback.entity.IdempotentRecord;
 import com.grayscale.rollback.repository.IdempotentRecordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
@@ -59,7 +60,50 @@ public class IdempotentService {
         }
     }
     
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public IdempotentRecord createIdempotentRecordInNewTransaction(String idempotentKey, 
+                                                                     String releaseId, 
+                                                                     String operationType, 
+                                                                     String requestHash) {
+        IdempotentRecord newRecord = IdempotentRecord.builder()
+                .idempotentKey(idempotentKey)
+                .releaseId(releaseId)
+                .operationType(operationType)
+                .requestHash(requestHash)
+                .processed(false)
+                .expiresAt(LocalDateTime.now().plusSeconds(config.getIdempotentTtlSeconds()))
+                .build();
+        IdempotentRecord saved = repository.save(newRecord);
+        log.info("Idempotent record created in NEW transaction: key={}", idempotentKey);
+        return saved;
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markIdempotentSuccessInNewTransaction(String idempotentKey, String responseData) {
+        Optional<IdempotentRecord> recordOpt = repository.findByIdempotentKey(idempotentKey);
+        if (recordOpt.isPresent()) {
+            IdempotentRecord record = recordOpt.get();
+            record.setProcessed(true);
+            record.setResponseData(responseData);
+            repository.save(record);
+            log.info("Idempotent record marked as success in NEW transaction: key={}", idempotentKey);
+        }
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markIdempotentFailedInNewTransaction(String idempotentKey, String errorMessage) {
+        Optional<IdempotentRecord> recordOpt = repository.findByIdempotentKey(idempotentKey);
+        if (recordOpt.isPresent()) {
+            IdempotentRecord record = recordOpt.get();
+            record.setProcessed(false);
+            record.setErrorMessage(errorMessage);
+            repository.save(record);
+            log.info("Idempotent record marked as failed in NEW transaction: key={}, error={}", 
+                    idempotentKey, errorMessage);
+        }
+    }
+    
+    @Transactional(propagation = Propagation.REQUIRED)
     public <T> T executeIdempotent(String releaseId, String operationType, Object request,
                                     Supplier<T> action, Class<T> responseType) {
         String idempotentKey = generateIdempotentKey(releaseId, operationType, request);
@@ -81,27 +125,16 @@ public class IdempotentService {
             }
         }
         
-        IdempotentRecord newRecord = IdempotentRecord.builder()
-                .idempotentKey(idempotentKey)
-                .releaseId(releaseId)
-                .operationType(operationType)
-                .requestHash(requestHash)
-                .processed(false)
-                .expiresAt(LocalDateTime.now().plusSeconds(config.getIdempotentTtlSeconds()))
-                .build();
-        repository.save(newRecord);
+        createIdempotentRecordInNewTransaction(idempotentKey, releaseId, operationType, requestHash);
         
         try {
             T result = action.get();
             
-            newRecord.setProcessed(true);
-            newRecord.setResponseData(objectMapper.writeValueAsString(result));
-            repository.save(newRecord);
+            markIdempotentSuccessInNewTransaction(idempotentKey, objectMapper.writeValueAsString(result));
             
             return result;
         } catch (Exception e) {
-            newRecord.setProcessed(false);
-            repository.save(newRecord);
+            markIdempotentFailedInNewTransaction(idempotentKey, e.getMessage());
             throw e;
         }
     }

@@ -9,6 +9,7 @@ import com.grayscale.rollback.enums.ReleaseStatus;
 import com.grayscale.rollback.repository.OperationLogRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ public class OperationLogService {
         this.objectMapper = objectMapper;
     }
     
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public OperationLog logOperation(String releaseId, OperationType operationType,
                                       Release beforeRelease, Release afterRelease,
                                       boolean success, String errorMessage,
@@ -52,7 +53,7 @@ public class OperationLogService {
         return repository.save(logEntry);
     }
     
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public OperationLog logSuccess(String releaseId, OperationType operationType,
                                     Release beforeRelease, Release afterRelease,
                                     String operator, String requestDetails, long durationMs) {
@@ -60,13 +61,33 @@ public class OperationLogService {
                 true, null, operator, requestDetails, durationMs);
     }
     
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OperationLog logFailure(String releaseId, OperationType operationType,
                                     Release beforeRelease, Release afterRelease,
                                     String errorMessage, String operator,
                                     String requestDetails, long durationMs) {
-        return logOperation(releaseId, operationType, beforeRelease, afterRelease,
-                false, errorMessage, operator, requestDetails, durationMs);
+        log.info("Logging failure in NEW transaction: releaseId={}, type={}, error={}", 
+                releaseId, operationType, errorMessage);
+        
+        OperationLog logEntry = OperationLog.builder()
+                .operationId(UUID.randomUUID().toString())
+                .releaseId(releaseId)
+                .operationType(operationType)
+                .beforeState(serializeRelease(beforeRelease))
+                .afterState(serializeRelease(afterRelease))
+                .statusBefore(beforeRelease != null ? beforeRelease.getStatus() : null)
+                .statusAfter(afterRelease != null ? afterRelease.getStatus() : null)
+                .success(false)
+                .errorMessage(errorMessage)
+                .operator(operator != null ? operator : "system")
+                .requestDetails(requestDetails)
+                .durationMs(durationMs)
+                .createdAt(LocalDateTime.now())
+                .build();
+        
+        OperationLog saved = repository.save(logEntry);
+        log.info("Failure log persisted in NEW transaction: logId={}", saved.getId());
+        return saved;
     }
     
     public List<OperationLog> getLogsForRelease(String releaseId) {
