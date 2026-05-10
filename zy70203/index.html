@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区血压筛查随访器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>社区血压筛查随访器</h1>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-page="dashboard">数据看板</button>
+                <button class="nav-btn" data-page="residents">居民档案</button>
+                <button class="nav-btn" data-page="screenings">筛查记录</button>
+                <button class="nav-btn" data-page="retests">复测管理</button>
+                <button class="nav-btn" data-page="followups">随访管理</button>
+                <button class="nav-btn" data-page="guide">使用说明</button>
+            </nav>
+        </header>
+
+        <main class="app-main">
+            <div id="page-dashboard" class="page active"></div>
+            <div id="page-residents" class="page"></div>
+            <div id="page-screenings" class="page"></div>
+            <div id="page-retests" class="page"></div>
+            <div id="page-followups" class="page"></div>
+            <div id="page-guide" class="page"></div>
+        </main>
+
+        <div id="modal-container" class="modal-container hidden"></div>
+        <div id="toast-container" class="toast-container"></div>
+    </div>
+
+    <script src="data-service.js"></script>
+    <script src="utils.js"></script>
+    <script src="pages/dashboard.js"></script>
+    <script src="pages/residents.js"></script>
+    <script src="pages/screenings.js"></script>
+    <script src="pages/retests.js"></script>
+    <script src="pages/followups.js"></script>
+    <script src="pages/guide.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
