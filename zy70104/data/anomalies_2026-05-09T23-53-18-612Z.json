@@ -1,0 +1,35 @@
+{
+  "exportId": "a37f3b43-ca16-4868-b04c-394428494ad1",
+  "exportTime": "2026-05-09T23:53:18.611Z",
+  "totalCount": 2,
+  "type": "all",
+  "anomalies": [
+    {
+      "id": "716e0d06-aefd-40d5-b16b-892c032c8ca2",
+      "batchNo": "ANOMALY-TEST-001",
+      "type": "weight",
+      "message": "重量异常：理论出仓重量应为 8362.57kg，实际 5000.00kg，偏差 40.21%",
+      "details": {
+        "isAnomaly": true,
+        "expectedWeight": 8362.573099415205,
+        "actualWeight": 5000,
+        "diffPercent": 40.209790209790214,
+        "message": "重量异常：理论出仓重量应为 8362.57kg，实际 5000.00kg，偏差 40.21%"
+      },
+      "detectedAt": "2026-05-09T23:52:26.840Z",
+      "status": "open"
+    },
+    {
+      "id": "94453227-29eb-4516-adec-13fc283cff6e",
+      "batchNo": "ANOMALY-TEST-001",
+      "type": "time_mismatch",
+      "message": "有能耗数据但无烘干时间记录",
+      "details": {
+        "type": "time_mismatch",
+        "message": "有能耗数据但无烘干时间记录"
+      },
+      "detectedAt": "2026-05-09T23:53:11.925Z",
+      "status": "open"
+    }
+  ]
+}

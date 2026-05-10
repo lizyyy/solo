@@ -1,0 +1,28 @@
+{
+  "name": "grain-drying-settlement",
+  "version": "1.0.0",
+  "description": "粮食烘干批次结算服务",
+  "main": "src/index.js",
+  "bin": {
+    "grain-settle": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "grain",
+    "drying",
+    "settlement"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^10.0.0",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

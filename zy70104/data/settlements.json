@@ -1,0 +1,89 @@
+[
+  {
+    "id": "562a179d-bca9-4768-994f-887f4552fc62",
+    "batchNo": "DEMO-676177",
+    "batchSnapshot": {
+      "batchNo": "DEMO-676177",
+      "grainType": "玉米",
+      "inWeight": 10000,
+      "inMoisture": 28.5,
+      "outWeight": 8500,
+      "outMoisture": 14.5,
+      "dryingTime": 480,
+      "fuelUsed": 500,
+      "powerUsed": 320,
+      "version": 4
+    },
+    "status": "completed",
+    "moistureRemoved": 1637.4269005847948,
+    "moistureLossRatio": 49.122807017543856,
+    "weightLossRatio": 15,
+    "dryingAmount": 1500,
+    "energyCost": 856.3045454545454,
+    "fuelCost": 600,
+    "powerCost": 256,
+    "directEnergyCost": 856,
+    "sharedEnergyCost": 0.3045454545454545,
+    "baseAmount": 1275,
+    "moistureReductionAmount": 0.9824561403508771,
+    "serviceFee": 856.3045454545454,
+    "settlementAmount": 419.6779106858055,
+    "energyEfficiency": {
+      "timePerPercent": 0.29314285714285726,
+      "energyPerKgWater": 0.19542857142857148,
+      "rating": "优秀"
+    },
+    "hasEnergyAnomaly": false,
+    "energyAnomalies": [],
+    "calculateTime": "2026-05-09T23:51:16.181Z",
+    "rollbackTime": null,
+    "createdAt": "2026-05-09T23:51:16.181Z",
+    "updatedAt": "2026-05-09T23:51:16.181Z"
+  },
+  {
+    "id": "e7327d79-1390-402f-af73-482c1297f429",
+    "batchNo": "ANOMALY-TEST-001",
+    "batchSnapshot": {
+      "batchNo": "ANOMALY-TEST-001",
+      "grainType": "玉米",
+      "inWeight": 10000,
+      "inMoisture": 28.5,
+      "outWeight": 5000,
+      "outMoisture": 14.5,
+      "dryingTime": 0,
+      "fuelUsed": 500,
+      "powerUsed": 0,
+      "version": 4
+    },
+    "status": "completed",
+    "moistureRemoved": 1637.4269005847948,
+    "moistureLossRatio": 49.122807017543856,
+    "weightLossRatio": 50,
+    "dryingAmount": 5000,
+    "energyCost": 600.0697674418604,
+    "fuelCost": 600,
+    "powerCost": 0,
+    "directEnergyCost": 600,
+    "sharedEnergyCost": 0.06976744186046512,
+    "baseAmount": 750,
+    "moistureReductionAmount": 0.9824561403508771,
+    "serviceFee": 600.0697674418604,
+    "settlementAmount": 150.91268869849046,
+    "energyEfficiency": {
+      "timePerPercent": 0,
+      "energyPerKgWater": 0,
+      "rating": "未知"
+    },
+    "hasEnergyAnomaly": true,
+    "energyAnomalies": [
+      {
+        "type": "time_mismatch",
+        "message": "有能耗数据但无烘干时间记录"
+      }
+    ],
+    "calculateTime": "2026-05-09T23:53:11.926Z",
+    "rollbackTime": null,
+    "createdAt": "2026-05-09T23:53:11.926Z",
+    "updatedAt": "2026-05-09T23:53:11.926Z"
+  }
+]

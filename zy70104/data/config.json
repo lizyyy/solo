@@ -1,0 +1,21 @@
+{
+  "settlement": {
+    "basePricePerKg": 0.15,
+    "moistureReductionBonus": 0.02,
+    "fuelCostPerUnit": 1.2,
+    "powerCostPerKWh": 0.8,
+    "energyShareRatio": 0.6
+  },
+  "validation": {
+    "maxInMoisture": 35,
+    "minOutMoisture": 10,
+    "maxMoistureLoss": 20,
+    "maxDryingTime": 1440,
+    "weightLossTolerance": 0.2
+  },
+  "retry": {
+    "maxAttempts": 3,
+    "backoffMs": 1000,
+    "timeoutMs": 5000
+  }
+}

@@ -1,0 +1,883 @@
+[
+  {
+    "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+    "batchNo": "TEST-1778370652480",
+    "grainType": "玉米",
+    "inWeight": 10000,
+    "inMoisture": 28.5,
+    "inTemp": 22,
+    "inTime": "2026-05-09T23:50:52.481Z",
+    "outWeight": 8000,
+    "outMoisture": 14.5,
+    "outTemp": 35,
+    "outTime": "2026-05-09T23:50:52.481Z",
+    "dryingTime": 480,
+    "fuelUsed": 500,
+    "powerUsed": 320,
+    "status": "pending_review",
+    "version": 4,
+    "history": [
+      {
+        "version": 1,
+        "snapshot": {
+          "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+          "batchNo": "TEST-1778370652480",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:50:52.481Z",
+          "status": "created",
+          "version": 1,
+          "history": [],
+          "createdAt": "2026-05-09T23:50:52.481Z",
+          "updatedAt": "2026-05-09T23:50:52.481Z"
+        },
+        "changedAt": "2026-05-09T23:50:52.481Z"
+      },
+      {
+        "version": 2,
+        "snapshot": {
+          "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+          "batchNo": "TEST-1778370652480",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:50:52.481Z",
+          "outWeight": 8500,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:50:52.481Z",
+          "dryingTime": 480,
+          "fuelUsed": 500,
+          "powerUsed": 320,
+          "status": "data_complete",
+          "version": 2,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+                "batchNo": "TEST-1778370652480",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:50:52.481Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:50:52.481Z",
+                "updatedAt": "2026-05-09T23:50:52.481Z"
+              },
+              "changedAt": "2026-05-09T23:50:52.481Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:50:52.481Z",
+          "updatedAt": "2026-05-09T23:50:52.481Z"
+        },
+        "changedAt": "2026-05-09T23:50:52.481Z"
+      },
+      {
+        "version": 3,
+        "snapshot": {
+          "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+          "batchNo": "TEST-1778370652480",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:50:52.481Z",
+          "outWeight": 8500,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:50:52.481Z",
+          "dryingTime": 480,
+          "fuelUsed": 500,
+          "powerUsed": 320,
+          "status": "pending_review",
+          "version": 3,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+                "batchNo": "TEST-1778370652480",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:50:52.481Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:50:52.481Z",
+                "updatedAt": "2026-05-09T23:50:52.481Z"
+              },
+              "changedAt": "2026-05-09T23:50:52.481Z"
+            },
+            {
+              "version": 2,
+              "snapshot": {
+                "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+                "batchNo": "TEST-1778370652480",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:50:52.481Z",
+                "outWeight": 8500,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:50:52.481Z",
+                "dryingTime": 480,
+                "fuelUsed": 500,
+                "powerUsed": 320,
+                "status": "data_complete",
+                "version": 2,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "3aa69153-27dd-4055-b908-bd3ea2b9e30f",
+                      "batchNo": "TEST-1778370652480",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 22,
+                      "inTime": "2026-05-09T23:50:52.481Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:50:52.481Z",
+                      "updatedAt": "2026-05-09T23:50:52.481Z"
+                    },
+                    "changedAt": "2026-05-09T23:50:52.481Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:50:52.481Z",
+                "updatedAt": "2026-05-09T23:50:52.481Z"
+              },
+              "changedAt": "2026-05-09T23:50:52.481Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:50:52.481Z",
+          "updatedAt": "2026-05-09T23:50:52.482Z"
+        },
+        "changedAt": "2026-05-09T23:50:52.482Z"
+      }
+    ],
+    "createdAt": "2026-05-09T23:50:52.481Z",
+    "updatedAt": "2026-05-09T23:50:52.482Z"
+  },
+  {
+    "id": "4a4c044c-ff3e-490e-b2f4-91de8628be79",
+    "batchNo": "BAD-1778370652482",
+    "grainType": "玉米",
+    "inWeight": 10000,
+    "inMoisture": 30,
+    "inTime": "2026-05-09T23:50:52.482Z",
+    "status": "created",
+    "version": 1,
+    "history": [],
+    "createdAt": "2026-05-09T23:50:52.482Z",
+    "updatedAt": "2026-05-09T23:50:52.482Z"
+  },
+  {
+    "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+    "batchNo": "DEMO-676177",
+    "grainType": "玉米",
+    "inWeight": 10000,
+    "inMoisture": 28.5,
+    "inTemp": 25,
+    "inTime": "2026-05-09T23:51:16.178Z",
+    "outWeight": 8500,
+    "outMoisture": 14.5,
+    "outTemp": 35,
+    "outTime": "2026-05-09T23:51:16.180Z",
+    "dryingTime": 480,
+    "fuelUsed": 500,
+    "powerUsed": 320,
+    "status": "settled",
+    "version": 5,
+    "history": [
+      {
+        "version": 1,
+        "snapshot": {
+          "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+          "batchNo": "DEMO-676177",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 25,
+          "inTime": "2026-05-09T23:51:16.178Z",
+          "status": "created",
+          "version": 1,
+          "history": [],
+          "createdAt": "2026-05-09T23:51:16.179Z",
+          "updatedAt": "2026-05-09T23:51:16.179Z"
+        },
+        "changedAt": "2026-05-09T23:51:16.179Z"
+      },
+      {
+        "version": 2,
+        "snapshot": {
+          "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+          "batchNo": "DEMO-676177",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 25,
+          "inTime": "2026-05-09T23:51:16.178Z",
+          "outWeight": 8500,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:51:16.180Z",
+          "dryingTime": 480,
+          "fuelUsed": 500,
+          "powerUsed": 320,
+          "status": "data_complete",
+          "version": 2,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.179Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.179Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:51:16.179Z",
+          "updatedAt": "2026-05-09T23:51:16.180Z"
+        },
+        "changedAt": "2026-05-09T23:51:16.180Z"
+      },
+      {
+        "version": 3,
+        "snapshot": {
+          "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+          "batchNo": "DEMO-676177",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 25,
+          "inTime": "2026-05-09T23:51:16.178Z",
+          "outWeight": 8500,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:51:16.180Z",
+          "dryingTime": 480,
+          "fuelUsed": 500,
+          "powerUsed": 320,
+          "status": "pending_review",
+          "version": 3,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.179Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.179Z"
+            },
+            {
+              "version": 2,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "outWeight": 8500,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:51:16.180Z",
+                "dryingTime": 480,
+                "fuelUsed": 500,
+                "powerUsed": 320,
+                "status": "data_complete",
+                "version": 2,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                      "batchNo": "DEMO-676177",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 25,
+                      "inTime": "2026-05-09T23:51:16.178Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:51:16.179Z",
+                      "updatedAt": "2026-05-09T23:51:16.179Z"
+                    },
+                    "changedAt": "2026-05-09T23:51:16.179Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.180Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.180Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:51:16.179Z",
+          "updatedAt": "2026-05-09T23:51:16.180Z"
+        },
+        "changedAt": "2026-05-09T23:51:16.180Z"
+      },
+      {
+        "version": 4,
+        "snapshot": {
+          "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+          "batchNo": "DEMO-676177",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 25,
+          "inTime": "2026-05-09T23:51:16.178Z",
+          "outWeight": 8500,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:51:16.180Z",
+          "dryingTime": 480,
+          "fuelUsed": 500,
+          "powerUsed": 320,
+          "status": "approved",
+          "version": 4,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.179Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.179Z"
+            },
+            {
+              "version": 2,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "outWeight": 8500,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:51:16.180Z",
+                "dryingTime": 480,
+                "fuelUsed": 500,
+                "powerUsed": 320,
+                "status": "data_complete",
+                "version": 2,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                      "batchNo": "DEMO-676177",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 25,
+                      "inTime": "2026-05-09T23:51:16.178Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:51:16.179Z",
+                      "updatedAt": "2026-05-09T23:51:16.179Z"
+                    },
+                    "changedAt": "2026-05-09T23:51:16.179Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.180Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.180Z"
+            },
+            {
+              "version": 3,
+              "snapshot": {
+                "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                "batchNo": "DEMO-676177",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 25,
+                "inTime": "2026-05-09T23:51:16.178Z",
+                "outWeight": 8500,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:51:16.180Z",
+                "dryingTime": 480,
+                "fuelUsed": 500,
+                "powerUsed": 320,
+                "status": "pending_review",
+                "version": 3,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                      "batchNo": "DEMO-676177",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 25,
+                      "inTime": "2026-05-09T23:51:16.178Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:51:16.179Z",
+                      "updatedAt": "2026-05-09T23:51:16.179Z"
+                    },
+                    "changedAt": "2026-05-09T23:51:16.179Z"
+                  },
+                  {
+                    "version": 2,
+                    "snapshot": {
+                      "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                      "batchNo": "DEMO-676177",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 25,
+                      "inTime": "2026-05-09T23:51:16.178Z",
+                      "outWeight": 8500,
+                      "outMoisture": 14.5,
+                      "outTemp": 35,
+                      "outTime": "2026-05-09T23:51:16.180Z",
+                      "dryingTime": 480,
+                      "fuelUsed": 500,
+                      "powerUsed": 320,
+                      "status": "data_complete",
+                      "version": 2,
+                      "history": [
+                        {
+                          "version": 1,
+                          "snapshot": {
+                            "id": "5d2e855e-c78c-43a3-861f-58f10a3f50e1",
+                            "batchNo": "DEMO-676177",
+                            "grainType": "玉米",
+                            "inWeight": 10000,
+                            "inMoisture": 28.5,
+                            "inTemp": 25,
+                            "inTime": "2026-05-09T23:51:16.178Z",
+                            "status": "created",
+                            "version": 1,
+                            "history": [],
+                            "createdAt": "2026-05-09T23:51:16.179Z",
+                            "updatedAt": "2026-05-09T23:51:16.179Z"
+                          },
+                          "changedAt": "2026-05-09T23:51:16.179Z"
+                        }
+                      ],
+                      "createdAt": "2026-05-09T23:51:16.179Z",
+                      "updatedAt": "2026-05-09T23:51:16.180Z"
+                    },
+                    "changedAt": "2026-05-09T23:51:16.180Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:51:16.179Z",
+                "updatedAt": "2026-05-09T23:51:16.180Z"
+              },
+              "changedAt": "2026-05-09T23:51:16.180Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:51:16.179Z",
+          "updatedAt": "2026-05-09T23:51:16.181Z"
+        },
+        "changedAt": "2026-05-09T23:51:16.181Z"
+      }
+    ],
+    "createdAt": "2026-05-09T23:51:16.179Z",
+    "updatedAt": "2026-05-09T23:51:16.182Z"
+  },
+  {
+    "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+    "batchNo": "ANOMALY-TEST-001",
+    "grainType": "玉米",
+    "inWeight": 10000,
+    "inMoisture": 28.5,
+    "inTemp": 22,
+    "inTime": "2026-05-09T23:52:04.673Z",
+    "outWeight": 5000,
+    "outMoisture": 14.5,
+    "outTemp": 35,
+    "outTime": "2026-05-09T23:52:26.841Z",
+    "dryingTime": 0,
+    "fuelUsed": 500,
+    "powerUsed": 0,
+    "status": "settled",
+    "version": 5,
+    "history": [
+      {
+        "version": 1,
+        "snapshot": {
+          "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+          "batchNo": "ANOMALY-TEST-001",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:52:04.673Z",
+          "status": "created",
+          "version": 1,
+          "history": [],
+          "createdAt": "2026-05-09T23:52:04.674Z",
+          "updatedAt": "2026-05-09T23:52:04.674Z"
+        },
+        "changedAt": "2026-05-09T23:52:04.674Z"
+      },
+      {
+        "version": 2,
+        "snapshot": {
+          "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+          "batchNo": "ANOMALY-TEST-001",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:52:04.673Z",
+          "outWeight": 5000,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:52:26.841Z",
+          "dryingTime": 0,
+          "fuelUsed": 500,
+          "powerUsed": 0,
+          "status": "data_complete",
+          "version": 2,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:04.674Z"
+              },
+              "changedAt": "2026-05-09T23:52:04.674Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:52:04.674Z",
+          "updatedAt": "2026-05-09T23:52:26.841Z"
+        },
+        "changedAt": "2026-05-09T23:52:26.841Z"
+      },
+      {
+        "version": 3,
+        "snapshot": {
+          "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+          "batchNo": "ANOMALY-TEST-001",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:52:04.673Z",
+          "outWeight": 5000,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:52:26.841Z",
+          "dryingTime": 0,
+          "fuelUsed": 500,
+          "powerUsed": 0,
+          "status": "pending_review",
+          "version": 3,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:04.674Z"
+              },
+              "changedAt": "2026-05-09T23:52:04.674Z"
+            },
+            {
+              "version": 2,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "outWeight": 5000,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:52:26.841Z",
+                "dryingTime": 0,
+                "fuelUsed": 500,
+                "powerUsed": 0,
+                "status": "data_complete",
+                "version": 2,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                      "batchNo": "ANOMALY-TEST-001",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 22,
+                      "inTime": "2026-05-09T23:52:04.673Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:52:04.674Z",
+                      "updatedAt": "2026-05-09T23:52:04.674Z"
+                    },
+                    "changedAt": "2026-05-09T23:52:04.674Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:26.841Z"
+              },
+              "changedAt": "2026-05-09T23:52:26.841Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:52:04.674Z",
+          "updatedAt": "2026-05-09T23:52:48.342Z"
+        },
+        "changedAt": "2026-05-09T23:52:48.342Z"
+      },
+      {
+        "version": 4,
+        "snapshot": {
+          "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+          "batchNo": "ANOMALY-TEST-001",
+          "grainType": "玉米",
+          "inWeight": 10000,
+          "inMoisture": 28.5,
+          "inTemp": 22,
+          "inTime": "2026-05-09T23:52:04.673Z",
+          "outWeight": 5000,
+          "outMoisture": 14.5,
+          "outTemp": 35,
+          "outTime": "2026-05-09T23:52:26.841Z",
+          "dryingTime": 0,
+          "fuelUsed": 500,
+          "powerUsed": 0,
+          "status": "approved",
+          "version": 4,
+          "history": [
+            {
+              "version": 1,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "status": "created",
+                "version": 1,
+                "history": [],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:04.674Z"
+              },
+              "changedAt": "2026-05-09T23:52:04.674Z"
+            },
+            {
+              "version": 2,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "outWeight": 5000,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:52:26.841Z",
+                "dryingTime": 0,
+                "fuelUsed": 500,
+                "powerUsed": 0,
+                "status": "data_complete",
+                "version": 2,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                      "batchNo": "ANOMALY-TEST-001",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 22,
+                      "inTime": "2026-05-09T23:52:04.673Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:52:04.674Z",
+                      "updatedAt": "2026-05-09T23:52:04.674Z"
+                    },
+                    "changedAt": "2026-05-09T23:52:04.674Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:26.841Z"
+              },
+              "changedAt": "2026-05-09T23:52:26.841Z"
+            },
+            {
+              "version": 3,
+              "snapshot": {
+                "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                "batchNo": "ANOMALY-TEST-001",
+                "grainType": "玉米",
+                "inWeight": 10000,
+                "inMoisture": 28.5,
+                "inTemp": 22,
+                "inTime": "2026-05-09T23:52:04.673Z",
+                "outWeight": 5000,
+                "outMoisture": 14.5,
+                "outTemp": 35,
+                "outTime": "2026-05-09T23:52:26.841Z",
+                "dryingTime": 0,
+                "fuelUsed": 500,
+                "powerUsed": 0,
+                "status": "pending_review",
+                "version": 3,
+                "history": [
+                  {
+                    "version": 1,
+                    "snapshot": {
+                      "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                      "batchNo": "ANOMALY-TEST-001",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 22,
+                      "inTime": "2026-05-09T23:52:04.673Z",
+                      "status": "created",
+                      "version": 1,
+                      "history": [],
+                      "createdAt": "2026-05-09T23:52:04.674Z",
+                      "updatedAt": "2026-05-09T23:52:04.674Z"
+                    },
+                    "changedAt": "2026-05-09T23:52:04.674Z"
+                  },
+                  {
+                    "version": 2,
+                    "snapshot": {
+                      "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                      "batchNo": "ANOMALY-TEST-001",
+                      "grainType": "玉米",
+                      "inWeight": 10000,
+                      "inMoisture": 28.5,
+                      "inTemp": 22,
+                      "inTime": "2026-05-09T23:52:04.673Z",
+                      "outWeight": 5000,
+                      "outMoisture": 14.5,
+                      "outTemp": 35,
+                      "outTime": "2026-05-09T23:52:26.841Z",
+                      "dryingTime": 0,
+                      "fuelUsed": 500,
+                      "powerUsed": 0,
+                      "status": "data_complete",
+                      "version": 2,
+                      "history": [
+                        {
+                          "version": 1,
+                          "snapshot": {
+                            "id": "f9d31149-0cce-4032-ac5a-2692d1a19879",
+                            "batchNo": "ANOMALY-TEST-001",
+                            "grainType": "玉米",
+                            "inWeight": 10000,
+                            "inMoisture": 28.5,
+                            "inTemp": 22,
+                            "inTime": "2026-05-09T23:52:04.673Z",
+                            "status": "created",
+                            "version": 1,
+                            "history": [],
+                            "createdAt": "2026-05-09T23:52:04.674Z",
+                            "updatedAt": "2026-05-09T23:52:04.674Z"
+                          },
+                          "changedAt": "2026-05-09T23:52:04.674Z"
+                        }
+                      ],
+                      "createdAt": "2026-05-09T23:52:04.674Z",
+                      "updatedAt": "2026-05-09T23:52:26.841Z"
+                    },
+                    "changedAt": "2026-05-09T23:52:26.841Z"
+                  }
+                ],
+                "createdAt": "2026-05-09T23:52:04.674Z",
+                "updatedAt": "2026-05-09T23:52:48.342Z"
+              },
+              "changedAt": "2026-05-09T23:52:48.342Z"
+            }
+          ],
+          "createdAt": "2026-05-09T23:52:04.674Z",
+          "updatedAt": "2026-05-09T23:53:11.843Z"
+        },
+        "changedAt": "2026-05-09T23:53:11.843Z"
+      }
+    ],
+    "createdAt": "2026-05-09T23:52:04.674Z",
+    "updatedAt": "2026-05-09T23:53:11.926Z"
+  }
+]
