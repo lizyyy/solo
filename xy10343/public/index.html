@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>连锁洗衣取送派单台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; color: #333; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .header .subtitle { font-size: 0.9rem; opacity: 0.9; }
+    
+    .nav { display: flex; gap: 1rem; padding: 0 2rem; background: white; border-bottom: 1px solid #e0e0e0; }
+    .nav button { padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-size: 0.95rem; color: #666; border-bottom: 3px solid transparent; transition: all 0.2s; }
+    .nav button:hover { color: #667eea; }
+    .nav button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 500; }
+    
+    .main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+    
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-card .value { font-size: 2rem; font-weight: 600; color: #667eea; }
+    .stat-card .label { font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+    .stat-card.urgent .value { color: #e74c3c; }
+    .stat-card.dispute .value { color: #f39c12; }
+    
+    .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+    .card h2 { font-size: 1.2rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #eee; }
+    
+    .filters { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .filter-group label { font-size: 0.85rem; color: #666; }
+    .filter-group input, .filter-group select { padding: 0.6rem 1rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; min-width: 150px; }
+    .filter-group input:focus, .filter-group select:focus { outline: none; border-color: #667eea; }
+    
+    .btn { padding: 0.6rem 1.2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a6fd6; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-success:hover { background: #229954; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-warning:hover { background: #e67e22; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-secondary { background: #95a5a6; color: white; }
+    .btn-secondary:hover { background: #7f8c8d; }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+    th { background: #f8f9fa; font-weight: 500; color: #555; font-size: 0.9rem; }
+    tr:hover { background: #f8f9fa; }
+    
+    .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+    .status-created { background: #e3f2fd; color: #1976d2; }
+    .status-assigned { background: #fff3e0; color: #f57c00; }
+    .status-picked_up { background: #e8f5e9; color: #388e3c; }
+    .status-in_wash { background: #f3e5f5; color: #7b1fa2; }
+    .status-washed { background: #e0f7fa; color: #00796b; }
+    .status-dispatching { background: #fff8e1; color: #ff8f00; }
+    .status-delivered { background: #e8f5e9; color: #2e7d32; }
+    .status-cancelled { background: #ffebee; color: #d32f2f; }
+    .status-dispute { background: #fbe9e7; color: #e64a19; }
+    .status-resolved { background: #e8f5e9; color: #2e7d32; }
+    
+    .urgent-badge { display: inline-block; padding: 0.2rem 0.6rem; background: #e74c3c; color: white; border-radius: 4px; font-size: 0.75rem; margin-left: 0.5rem; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.2rem; }
+    .modal-body { padding: 1.5rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #eee; display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+    
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+    
+    .route-card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+    .route-card .route-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .route-card .route-title { font-size: 1.1rem; font-weight: 600; }
+    .route-card .route-meta { color: #666; font-size: 0.85rem; }
+    .route-card .order-list { list-style: none; }
+    .route-card .order-item { padding: 1rem; border: 1px solid #eee; border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
+    .route-card .order-item.urgent { border-left: 4px solid #e74c3c; }
+    
+    .history-item { padding: 1rem; border-left: 3px solid #667eea; background: #f8f9fa; margin-bottom: 0.75rem; border-radius: 0 8px 8px 0; }
+    .history-item .time { font-size: 0.8rem; color: #999; }
+    .history-item .operator { font-weight: 500; color: #555; }
+    .history-item .change { margin-top: 0.5rem; font-size: 0.9rem; }
+    
+    .defect-item { padding: 1rem; border: 1px solid #eee; border-radius: 8px; margin-bottom: 1rem; }
+    .defect-item.pending { border-left: 4px solid #f39c12; }
+    .defect-item.resolved { border-left: 4px solid #27ae60; }
+    
+    .conflict-warning { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+    .conflict-warning h4 { color: #d68910; margin-bottom: 0.5rem; }
+    
+    .order-detail-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .order-detail-row label { color: #666; font-size: 0.85rem; display: block; margin-bottom: 0.25rem; }
+    .order-detail-row .value { font-weight: 500; }
+    
+    .items-table { width: 100%; margin-top: 0.5rem; }
+    .items-table th, .items-table td { padding: 0.5rem; font-size: 0.85rem; }
+    
+    .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-danger { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    
+    .actions { display: flex; gap: 0.5rem; }
+    
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .nav button { padding: 0.75rem 1rem; font-size: 0.85rem; }
+      .order-detail-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>连锁洗衣取送派单台</h1>
+    <div class="subtitle">专业洗衣 · 上门取送 · 全程追踪</div>
+  </div>
+  
+  <div class="nav">
+    <button class="active" data-tab="orders">订单列表</button>
+    <button data-tab="routes">路线分配</button>
+    <button data-tab="address-changes">改址审核</button>
+    <button data-tab="defects">瑕疵争议</button>
+    <button data-tab="export">数据导出</button>
+  </div>
+  
+  <div class="main">
+    <div id="stats"></div>
+    <div id="tab-content"></div>
+  </div>
+  
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">详情</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api';
+    let currentTab = 'orders';
+    let orders = [];
+    let routes = [];
+    let stats = {};
+    let addressChangeRequests = [];
+
+    async function loadData() {
+      const [ordersRes, routesRes, statsRes] = await Promise.all([
+        fetch(`${API}/orders`),
+        fetch(`${API}/routes`),
+        fetch(`${API}/stats`)
+      ]);
+      orders = await ordersRes.json();
+      routes = await routesRes.json();
+      stats = await statsRes.json();
+      
+      renderStats();
+      renderCurrentTab();
+    }
+
+    function renderStats() {
+      document.getElementById('stats').innerHTML = `
+        <div class="stats">
+          <div class="stat-card">
+            <div class="value">${stats.totalOrders}</div>
+            <div class="label">总订单数</div>
+          </div>
+          <div class="stat-card">
+            <div class="value">${stats.todayOrders}</div>
+            <div class="label">今日新增</div>
+          </div>
+          <div class="stat-card urgent">
+            <div class="value">${stats.urgentCount}</div>
+            <div class="label">加急订单</div>
+          </div>
+          <div class="stat-card dispute">
+            <div class="value">${stats.disputeCount}</div>
+            <div class="label">瑕疵争议</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getStatusBadge(status) {
+      const statusMap = {
+        'created': '待分配',
+        'assigned': '待取件',
+        'picked_up': '已取件',
+        'in_wash': '洗护中',
+        'washed': '待派送',
+        'dispatching': '派送中',
+        'delivered': '已完成',
+        'cancelled': '已取消',
+        'dispute': '瑕疵争议',
+        'resolved': '争议解决'
+      };
+      return `<span class="status-badge status-${status}">${statusMap[status] || status}</span>`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderOrders() {
+      const html = `
+        <div class="card">
+          <h2>订单列表</h2>
+          <div class="filters">
+            <div class="filter-group">
+              <label>搜索</label>
+              <input type="text" id="search-input" placeholder="订单号/姓名/电话/地址" oninput="filterOrders()">
+            </div>
+            <div class="filter-group">
+              <label>状态</label>
+              <select id="status-filter" onchange="filterOrders()">
+                <option value="">全部状态</option>
+                <option value="created">待分配</option>
+                <option value="assigned">待取件</option>
+                <option value="picked_up">已取件</option>
+                <option value="in_wash">洗护中</option>
+                <option value="washed">待派送</option>
+                <option value="dispatching">派送中</option>
+                <option value="delivered">已完成</option>
+                <option value="dispute">瑕疵争议</option>
+                <option value="cancelled">已取消</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>路线</label>
+              <select id="route-filter" onchange="filterOrders()">
+                <option value="">全部路线</option>
+                ${routes.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+              <button class="btn btn-primary" onclick="showCreateOrderModal()">+ 新建订单</button>
+            </div>
+          </div>
+          <div id="orders-table-container">
+            ${renderOrdersTable(orders)}
+          </div>
+        </div>
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    function renderOrdersTable(orderList) {
+      if (orderList.length === 0) {
+        return '<p style="text-align: center; padding: 3rem; color: #999;">暂无订单</p>';
+      }
+      
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>订单号</th>
+              <th>客户信息</th>
+              <th>地址</th>
+              <th>费用</th>
+              <th>路线/司机</th>
+              <th>状态</th>
+              <th>预计送达</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${orderList.map(o => `
+              <tr>
+                <td>
+                  <strong>${o.id}</strong>
+                  ${o.isUrgent ? '<span class="urgent-badge">加急</span>' : ''}
+                  <br><small>批次: ${o.batchNo}</small>
+                </td>
+                <td>
+                  <strong>${o.customerName}</strong><br>
+                  <small>${o.phone}</small>
+                </td>
+                <td><small>${o.area} - ${o.address}</small></td>
+                <td>
+                  <strong>¥${o.totalFee}</strong>
+                  ${o.urgentFee > 0 ? `<br><small>加急: ¥${o.urgentFee}</small>` : ''}
+                </td>
+                <td>
+                  ${o.routeName ? `<div>${o.routeName}</div><small>${o.driver} · ${o.vehicle}</small>` : '<small style="color:#999;">未分配</small>'}
+                </td>
+                <td>${getStatusBadge(o.status)}</td>
+                <td><small>${formatDate(o.estimatedDelivery)}</small></td>
+                <td>
+                  <div class="actions">
+                    <button class="btn btn-sm btn-secondary" onclick="showOrderDetail('${o.id}')">详情</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function filterOrders() {
+      const search = document.getElementById('search-input')?.value || '';
+      const status = document.getElementById('status-filter')?.value || '';
+      const routeId = document.getElementById('route-filter')?.value || '';
+      
+      let params = [];
+      if (search) params.push(`search=${encodeURIComponent(search)}`);
+      if (status) params.push(`status=${status}`);
+      if (routeId) params.push(`routeId=${routeId}`);
+      
+      const url = `${API}/orders${params.length ? '?' + params.join('&') : ''}`;
+      const res = await fetch(url);
+      orders = await res.json();
+      document.getElementById('orders-table-container').innerHTML = renderOrdersTable(orders);
+    }
+
+    function renderRoutes() {
+      const unassignedOrders = orders.filter(o => !o.routeId && o.status !== 'cancelled');
+      
+      const html = `
+        ${unassignedOrders.length > 0 ? `
+        <div class="card">
+          <h2>待分配订单 (${unassignedOrders.length})</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>订单号</th>
+                <th>客户</th>
+                <th>区域</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${unassignedOrders.map(o => `
+                <tr>
+                  <td><strong>${o.id}</strong>${o.isUrgent ? '<span class="urgent-badge">加急</span>' : ''}</td>
+                  <td>${o.customerName}<br><small>${o.phone}</small></td>
+                  <td>${o.area}</td>
+                  <td>${getStatusBadge(o.status)}</td>
+                  <td>
+                    <button class="btn btn-sm btn-primary" onclick="showAssignRouteModal('${o.id}')">分配路线</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        ` : ''}
+        
+        <h2 style="margin-bottom: 1rem;">路线视图</h2>
+        ${routes.map(route => `
+          <div class="route-card">
+            <div class="route-header">
+              <div>
+                <div class="route-title">${route.name}</div>
+                <div class="route-meta">
+                  司机: ${route.driver} | 车辆: ${route.vehicle}
+                  | 覆盖区域: ${route.areas.join('、')}
+                </div>
+              </div>
+              <div style="color: #667eea; font-weight: 500;">
+                ${route.orders.length} 个订单
+              </div>
+            </div>
+            ${route.orders.length === 0 ? '<p style="color:#999; padding: 1rem;">暂无订单</p>' : `
+            <ul class="order-list">
+              ${route.orders.map(o => `
+                <li class="order-item ${o.isUrgent ? 'urgent' : ''}">
+                  <div>
+                    <strong>${o.id}</strong>
+                    ${o.isUrgent ? '<span class="urgent-badge">加急</span>' : ''}
+                    - ${o.customerName}
+                    <br><small>${o.address}</small>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    ${getStatusBadge(o.status)}
+                    <button class="btn btn-sm btn-secondary" onclick="showOrderDetail('${o.id}')">详情</button>
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+            `}
+          </div>
+        `).join('')}
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function renderAddressChanges() {
+      const res = await fetch(`${API}/address-change-requests`);
+      addressChangeRequests = await res.json();
+      
+      const pending = addressChangeRequests.filter(r => r.status === 'pending');
+      const history = addressChangeRequests.filter(r => r.status !== 'pending');
+      
+      const html = `
+        <div class="card">
+          <h2>待审核改址申请 (${pending.length})</h2>
+          ${pending.length === 0 ? '<p style="color:#999; padding: 1rem;">暂无待审核申请</p>' : `
+          <table>
+            <thead>
+              <tr>
+                <th>订单号</th>
+                <th>申请人</th>
+                <th>原地址</th>
+                <th>新地址</th>
+                <th>路线变更</th>
+                <th>申请时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pending.map(r => `
+                <tr>
+                  <td><strong>${r.orderId}</strong></td>
+                  <td>${r.userName}</td>
+                  <td><small>${r.oldArea} - ${r.oldAddress}</small></td>
+                  <td><small>${r.newArea} - ${r.newAddress}</small></td>
+                  <td>${r.routeChanged ? '<span class="status-badge status-warning">是</span>' : '<span class="status-badge status-created">否</span>'}</td>
+                  <td><small>${formatDate(r.requestTime)}</small></td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn btn-sm btn-success" onclick="approveAddressChange('${r.id}')">通过</button>
+                      <button class="btn btn-sm btn-danger" onclick="rejectAddressChange('${r.id}')">拒绝</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+        
+        <div class="card">
+          <h2>已处理记录 (${history.length})</h2>
+          ${history.length === 0 ? '<p style="color:#999; padding: 1rem;">暂无处理记录</p>' : `
+          <table>
+            <thead>
+              <tr>
+                <th>订单号</th>
+                <th>原地址</th>
+                <th>新地址</th>
+                <th>状态</th>
+                <th>处理时间</th>
+                <th>处理人</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${history.map(r => `
+                <tr>
+                  <td><strong>${r.orderId}</strong></td>
+                  <td><small>${r.oldAddress}</small></td>
+                  <td><small>${r.newAddress}</small></td>
+                  <td>${r.status === 'approved' ? '<span class="status-badge status-delivered">已通过</span>' : '<span class="status-badge status-cancelled">已拒绝</span>'}</td>
+                  <td><small>${formatDate(r.approveTime || r.rejectTime)}</small></td>
+                  <td>${r.approvedByName || r.rejectedByName || '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    function renderDefects() {
+      const defectOrders = orders.filter(o => o.defects && o.defects.length > 0);
+      
+      const html = `
+        <div class="card">
+          <h2>瑕疵争议订单</h2>
+          ${defectOrders.length === 0 ? '<p style="color:#999; padding: 1rem;">暂无瑕疵争议订单</p>' : `
+          ${defectOrders.map(o => `
+            <div class="defect-item ${o.status === 'dispute' ? 'pending' : 'resolved'}" style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <strong style="font-size: 1.1rem;">${o.id}</strong>
+                  <span style="margin-left: 0.5rem;">${o.customerName}</span>
+                  ${o.isUrgent ? '<span class="urgent-badge">加急</span>' : ''}
+                </div>
+                ${getStatusBadge(o.status)}
+              </div>
+              <div style="margin-bottom: 1rem;">
+                <small style="color:#666;">地址: ${o.address}</small><br>
+                <small style="color:#666;">费用: ¥${o.totalFee} | 批次: ${o.batchNo}</small>
+              </div>
+              ${o.defects.map(d => `
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <strong>报告人: ${d.reportedBy}</strong>
+                    <small style="color:#666;">${formatDate(d.reportTime)}</small>
+                  </div>
+                  <p style="margin-bottom: 0.5rem;">${d.description}</p>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    ${d.status === 'pending' ? `
+                      <span class="status-badge status-warning">待处理</span>
+                      <button class="btn btn-sm btn-success" onclick="resolveDefect('${o.id}', '${d.id}')">标记解决</button>
+                    ` : `
+                      <span class="status-badge status-delivered">已解决</span>
+                      <small style="color:#666;">${d.resolution}</small>
+                    `}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+          `}
+        </div>
+        
+        <div class="card">
+          <h2>报告瑕疵</h2>
+          <div class="form-group">
+            <label>选择订单</label>
+            <select id="defect-order-select">
+              <option value="">-- 请选择订单 --</option>
+              ${orders.filter(o => o.status !== 'cancelled').map(o => `
+                <option value="${o.id}">${o.id} - ${o.customerName} (${getStatusBadge(o.status).replace(/<[^>]*>/g, '')})</option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>瑕疵描述</label>
+            <textarea id="defect-description" placeholder="请详细描述瑕疵情况..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>报告人</label>
+            <input type="text" id="defect-reporter" value="调度员">
+          </div>
+          <button class="btn btn-warning" onclick="reportDefect()">提交瑕疵报告</button>
+        </div>
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    function renderExport() {
+      const html = `
+        <div class="card">
+          <h2>数据导出</h2>
+          <div class="filters">
+            <div class="filter-group">
+              <label>路线筛选</label>
+              <select id="export-route-filter">
+                <option value="">全部路线</option>
+                ${routes.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="filter-group" style="align-self: flex-end;">
+              <button class="btn btn-primary" onclick="exportDailyReport()">导出当日派单报表</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2>示例场景说明</h2>
+          <div style="line-height: 1.8;">
+            <h3 style="margin-bottom: 0.75rem; color: #667eea;">系统包含以下示例数据:</h3>
+            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+              <li><strong>普通订单 (ORD001, ORD002)</strong>: 同名同客户的两个独立订单，展示系统如何防止误合并</li>
+              <li><strong>加急订单 (ORD003)</strong>: 已设置加急，费用增加30%，预计送达缩短一半</li>
+              <li><strong>已取件订单 (ORD004)</strong>: 已取件状态，无法取消</li>
+              <li><strong>送前改址订单 (ORD005)</strong>: 客户送前更改地址，路线未变更</li>
+              <li><strong>瑕疵争议订单 (ORD006)</strong>: 记录了瑕疵，处于争议状态</li>
+              <li><strong>已完成加急订单 (ORD007)</strong>: 有多次变更历史记录</li>
+            </ul>
+            
+            <h3 style="margin-bottom: 0.75rem; color: #667eea;">冲突检测机制:</h3>
+            <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+              <li><strong>同名冲突</strong>: 创建订单时检查是否存在同名客户</li>
+              <li><strong>同号冲突</strong>: 检查是否存在相同手机号</li>
+              <li><strong>批次冲突</strong>: 检查批次号是否重复</li>
+              <li>发现冲突时阻止创建，需手动确认是否为同一客户</li>
+            </ul>
+            
+            <h3 style="margin-bottom: 0.75rem; color: #667eea;">业务规则:</h3>
+            <ul style="padding-left: 1.5rem;">
+              <li>已取件订单不可取消</li>
+              <li>加急费用 = 基础费用 × 30%</li>
+              <li>加急预计送达时间减半</li>
+              <li>改地址可能触发路线重新分配</li>
+              <li>所有操作都记录变更历史</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div id="export-preview" class="card" style="display: none;">
+          <h2>导出预览</h2>
+          <div id="export-content"></div>
+        </div>
+      `;
+      document.getElementById('tab-content').innerHTML = html;
+    }
+
+    async function exportDailyReport() {
+      const routeId = document.getElementById('export-route-filter').value;
+      let url = `${API}/export/daily`;
+      if (routeId) url += `?routeId=${routeId}`;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      const preview = document.getElementById('export-preview');
+      preview.style.display = 'block';
+      
+      let html = `
+        <div class="alert alert-success" style="margin-bottom: 1rem;">
+          <strong>导出日期:</strong> ${data.date} | 
+          <strong>总订单数:</strong> ${data.totalOrders} | 
+          <strong>异常订单:</strong> ${data.abnormalCount}
+        </div>
+        
+        ${data.orders.length === 0 ? '<p style="color:#999; padding: 1rem;">今日暂无订单</p>' : `
+        <table>
+          <thead>
+            <tr>
+              <th>订单号</th>
+              <th>批次</th>
+              <th>客户</th>
+              <th>路线</th>
+              <th>司机</th>
+              <th>状态</th>
+              <th>加急</th>
+              <th>费用</th>
+              <th>异常</th>
+              <th>变更记录</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.orders.map(o => `
+              <tr>
+                <td><strong>${o.orderId}</strong></td>
+                <td><small>${o.batchNo}</small></td>
+                <td>${o.customerName}<br><small>${o.phone}</small></td>
+                <td>${o.routeName}</td>
+                <td>${o.driver || '-'}</td>
+                <td>${o.status}</td>
+                <td>${o.isUrgent}</td>
+                <td>¥${o.totalFee}</td>
+                <td>${o.defects !== '无' ? '<span class="status-badge status-dispute">有</span>' : '-'}</td>
+                <td><small style="max-width: 200px; display: block; overflow: hidden; text-overflow: ellipsis;">${o.changes}</small></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        `}
+      `;
+      
+      document.getElementById('export-content').innerHTML = html;
+    }
+
+    async function showOrderDetail(orderId) {
+      const res = await fetch(`${API}/orders/${orderId}`);
+      const order = await res.json();
+      
+      const itemsTotal = order.items.reduce((sum, i) => sum + (i.quantity * i.unitPrice), 0);
+      
+      let html = `
+        <div class="order-detail-row">
+          <div>
+            <label>订单号</label>
+            <div class="value">
+              ${order.id}
+              ${order.isUrgent ? '<span class="urgent-badge">加急</span>' : ''}
+            </div>
+          </div>
+          <div>
+            <label>批次号</label>
+            <div class="value">${order.batchNo}</div>
+          </div>
+        </div>
+        
+        <div class="order-detail-row">
+          <div>
+            <label>客户姓名</label>
+            <div class="value">${order.customerName}</div>
+          </div>
+          <div>
+            <label>联系电话</label>
+            <div class="value">${order.phone}</div>
+          </div>
+        </div>
+        
+        <div class="order-detail-row">
+          <div>
+            <label>取送地址</label>
+            <div class="value">${order.area} - ${order.address}</div>
+          </div>
+          <div>
+            <label>当前状态</label>
+            <div class="value">${getStatusBadge(order.status)}</div>
+          </div>
+        </div>
+        
+        <div class="order-detail-row">
+          <div>
+            <label>路线</label>
+            <div class="value">${order.routeName || '未分配'}</div>
+          </div>
+          <div>
+            <label>司机/车辆</label>
+            <div class="value">${order.driver ? `${order.driver} (${order.vehicle})` : '-'}</div>
+          </div>
+        </div>
+        
+        <div class="order-detail-row">
+          <div>
+            <label>下单时间</label>
+            <div class="value">${formatDate(order.orderTime)}</div>
+          </div>
+          <div>
+            <label>预计送达</label>
+            <div class="value">${formatDate(order.estimatedDelivery)}</div>
+          </div>
+        </div>
+        
+        <h4 style="margin: 1.5rem 0 0.75rem;">衣物明细</h4>
+        <table class="items-table">
+          <thead>
+            <tr><th>项目</th><th>数量</th><th>单价</th><th>小计</th></tr>
+          </thead>
+          <tbody>
+            ${order.items.map(i => `
+              <tr>
+                <td>${i.name}</td>
+                <td>${i.quantity}</td>
+                <td>¥${i.unitPrice}</td>
+                <td>¥${i.quantity * i.unitPrice}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight: 500;">
+              <td colspan="3" style="text-align: right;">基础费用:</td>
+              <td>¥${itemsTotal}</td>
+            </tr>
+            ${order.urgentFee > 0 ? `
+            <tr style="font-weight: 500;">
+              <td colspan="3" style="text-align: right;">加急费用:</td>
+              <td style="color: #e74c3c;">+¥${order.urgentFee}</td>
+            </tr>
+            ` : ''}
+            <tr style="font-weight: 600; font-size: 1.1rem;">
+              <td colspan="3" style="text-align: right;">总计:</td>
+              <td style="color: #667eea;">¥${order.totalFee}</td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <h4 style="margin: 1.5rem 0 0.75rem;">变更历史</h4>
+        ${order.changes.length === 0 ? '<p style="color:#999;">暂无变更记录</p>' : `
+        ${order.changes.map(c => `
+          <div class="history-item">
+            <div class="time">${formatDate(c.timestamp)}</div>
+            <div class="operator">${c.operatorName}</div>
+            <div class="change">
+              <strong>${getChangeTypeLabel(c.type)}</strong>: ${c.reason}
+              ${renderChangeDetail(c)}
+            </div>
+          </div>
+        `).join('')}
+        `}
+        
+        ${order.defects && order.defects.length > 0 ? `
+        <h4 style="margin: 1.5rem 0 0.75rem;">瑕疵记录</h4>
+        ${order.defects.map(d => `
+          <div class="defect-item ${d.status}">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <strong>${d.reportedBy}</strong>
+              <small>${formatDate(d.reportTime)}</small>
+            </div>
+            <p>${d.description}</p>
+            <div style="margin-top: 0.5rem;">
+              ${d.status === 'pending' ? 
+                '<span class="status-badge status-warning">待处理</span>' : 
+                `<span class="status-badge status-delivered">已解决</span> <small>${d.resolution}</small>`
+              }
+            </div>
+          </div>
+        `).join('')}
+        ` : ''}
+      `;
+      
+      let footerHtml = '';
+      
+      if (order.canCancel) {
+        footerHtml += `<button class="btn btn-danger" onclick="cancelOrder('${order.id}')">取消订单</button>`;
+      }
+      
+      if (['created', 'assigned', 'picked_up', 'in_wash', 'washed'].includes(order.status)) {
+        footerHtml += `<button class="btn btn-primary" onclick="advanceStatus('${order.id}')">推进状态</button>`;
+      }
+      
+      if (!order.isUrgent && ['created', 'assigned', 'picked_up', 'in_wash'].includes(order.status)) {
+        footerHtml += `<button class="btn btn-warning" onclick="setUrgent('${order.id}', true)">设为加急</button>`;
+      } else if (order.isUrgent && ['created', 'assigned', 'picked_up', 'in_wash'].includes(order.status)) {
+        footerHtml += `<button class="btn btn-secondary" onclick="setUrgent('${order.id}', false)">取消加急</button>`;
+      }
+      
+      if (!order.routeId) {
+        footerHtml += `<button class="btn btn-primary" onclick="showAssignRouteModal('${order.id}')">分配路线</button>`;
+      }
+      
+      openModal('订单详情 - ' + order.id, html, footerHtml);
+    }
+
+    function getChangeTypeLabel(type) {
+      const labels = {
+        'route': '路线变更',
+        'status': '状态变更',
+        'urgent': '加急变更',
+        'address': '地址变更',
+        'defect': '瑕疵记录',
+        'defect_resolve': '瑕疵解决'
+      };
+      return labels[type] || type;
+    }
+
+    function renderChangeDetail(c) {
+      if (c.type === 'route') {
+        return `<br><small>从 "${c.oldValue.routeName || '未分配'}" → "${c.newValue.routeName}"</small>`;
+      }
+      if (c.type === 'status') {
+        return `<br><small>从 "${c.oldValue.statusName}" → "${c.newValue.statusName}"</small>`;
+      }
+      if (c.type === 'urgent') {
+        return `<br><small>加急: ${c.oldValue.isUrgent ? '是' : '否'} → ${c.newValue.isUrgent ? '是' : '否'} | 费用: ¥${c.oldValue.totalFee} → ¥${c.newValue.totalFee}</small>`;
+      }
+      if (c.type === 'address') {
+        return `<br><small>从 "${c.oldValue.address}" → "${c.newValue.address}"</small>`;
+      }
+      return '';
+    }
+
+    function showCreateOrderModal() {
+      const html = `
+        <div id="create-order-form">
+          <div class="form-group">
+            <label>客户姓名 *</label>
+            <input type="text" id="new-customer-name" placeholder="请输入客户姓名">
+          </div>
+          <div class="form-group">
+            <label>联系电话 *</label>
+            <input type="text" id="new-phone" placeholder="请输入手机号">
+          </div>
+          <div class="form-group">
+            <label>所在区域 *</label>
+            <select id="new-area">
+              <option value="">-- 请选择区域 --</option>
+              ${['市中心', '东城区', '西城区', '科技园', '软件园', '创新街', '幸福小区', '阳光花园', '碧水湾'].map(a => `<option value="${a}">${a}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>详细地址 *</label>
+            <input type="text" id="new-address" placeholder="请输入详细地址">
+          </div>
+          <div class="form-group">
+            <label>批次号</label>
+            <input type="text" id="new-batch-no" placeholder="可选，留空则自动生成">
+          </div>
+          <div class="form-group">
+            <label>是否加急</label>
+            <select id="new-is-urgent">
+              <option value="false">普通订单</option>
+              <option value="true">加急订单 (+30%费用)</option>
+            </select>
+          </div>
+          
+          <h4 style="margin: 1.5rem 0 0.75rem;">衣物明细</h4>
+          <div id="items-container">
+            <div class="item-row" style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <input type="text" style="flex: 2;" class="item-name" placeholder="项目名称">
+              <input type="number" style="flex: 1;" class="item-qty" placeholder="数量" min="1" value="1">
+              <input type="number" style="flex: 1;" class="item-price" placeholder="单价" min="0" step="1">
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addItemRow()">+ 添加项目</button>
+          
+          <div id="conflict-warning" class="conflict-warning" style="display: none; margin-top: 1rem;">
+          </div>
+        </div>
+      `;
+      
+      const footerHtml = `
+        <button class="btn btn-secondary" onclick="checkConflicts()">检查冲突</button>
+        <button class="btn btn-primary" onclick="createOrder()">创建订单</button>
+      `;
+      
+      openModal('新建订单', html, footerHtml);
+    }
+
+    function addItemRow() {
+      const container = document.getElementById('items-container');
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem;';
+      row.innerHTML = `
+        <input type="text" style="flex: 2;" class="item-name" placeholder="项目名称">
+        <input type="number" style="flex: 1;" class="item-qty" placeholder="数量" min="1" value="1">
+        <input type="number" style="flex: 1;" class="item-price" placeholder="单价" min="0" step="1">
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
+      `;
+      container.appendChild(row);
+    }
+
+    async function checkConflicts() {
+      const customerName = document.getElementById('new-customer-name').value;
+      const phone = document.getElementById('new-phone').value;
+      const batchNo = document.getElementById('new-batch-no').value;
+      
+      if (!customerName && !phone && !batchNo) {
+        alert('请至少输入一项用于冲突检查');
+        return;
+      }
+      
+      const res = await fetch(`${API}/orders/check-conflicts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerName, phone, batchNo })
+      });
+      const data = await res.json();
+      
+      const warning = document.getElementById('conflict-warning');
+      if (data.hasConflict) {
+        warning.style.display = 'block';
+        warning.innerHTML = `
+          <h4>⚠️ 检测到潜在冲突</h4>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            ${data.details.map(d => `<li>${d.message}</li>`).join('')}
+          </ul>
+          <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #666;">
+            请确认这些是否为同一客户。同名/同号订单不会自动合并，保持独立管理。
+          </p>
+        `;
+      } else {
+        warning.style.display = 'block';
+        warning.innerHTML = `
+          <h4 style="color: #27ae60;">✅ 未检测到冲突</h4>
+          <p style="margin-top: 0.5rem;">可以安全创建订单。</p>
+        `;
+        warning.style.background = '#d4edda';
+        warning.style.borderColor = '#c3e6cb';
+      }
+    }
+
+    async function createOrder() {
+      const customerName = document.getElementById('new-customer-name').value.trim();
+      const phone = document.getElementById('new-phone').value.trim();
+      const area = document.getElementById('new-area').value;
+      const address = document.getElementById('new-address').value.trim();
+      const batchNo = document.getElementById('new-batch-no').value.trim();
+      const isUrgent = document.getElementById('new-is-urgent').value === 'true';
+      
+      const items = [];
+      document.querySelectorAll('.item-row').forEach(row => {
+        const name = row.querySelector('.item-name').value.trim();
+        const qty = parseInt(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        if (name && qty > 0 && price > 0) {
+          items.push({ name, quantity: qty, unitPrice: price });
+        }
+      });
+      
+      if (!customerName || !phone || !area || !address || items.length === 0) {
+        alert('请填写完整的订单信息（带*号为必填项，并至少添加一个衣物项目）');
+        return;
+      }
+      
+      const res = await fetch(`${API}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerName, phone, area, address, batchNo, isUrgent, items })
+      });
+      
+      if (res.status === 409) {
+        const data = await res.json();
+        const warning = document.getElementById('conflict-warning');
+        warning.style.display = 'block';
+        warning.innerHTML = `
+          <h4>⚠️ 检测到冲突，无法创建订单</h4>
+          <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            ${data.conflictDetails.map(d => `<li>${d}</li>`).join('')}
+          </ul>
+          <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+            请确认后再创建。系统防止同名/同号/同批次订单误合并。
+          </p>
+        `;
+        return;
+      }
+      
+      if (res.ok) {
+        closeModal();
+        await loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || '创建失败');
+      }
+    }
+
+    function showAssignRouteModal(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return;
+      
+      const html = `
+        <div class="form-group">
+          <label>订单号</label>
+          <div class="value"><strong>${order.id}</strong> - ${order.customerName}</div>
+        </div>
+        <div class="form-group">
+          <label>当前区域</label>
+          <div class="value">${order.area}</div>
+        </div>
+        <div class="form-group">
+          <label>选择路线</label>
+          <select id="assign-route-select">
+            ${routes.map(r => `
+              <option value="${r.id}" ${order.routeId === r.id ? 'selected' : ''}>
+                ${r.name} (覆盖: ${r.areas.join(', ')})
+              </option>
+            `).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>变更原因</label>
+          <input type="text" id="assign-route-reason" placeholder="可选">
+        </div>
+      `;
+      
+      const footerHtml = `
+        <button class="btn btn-primary" onclick="assignRoute('${orderId}')">确认分配</button>
+      `;
+      
+      openModal('分配路线', html, footerHtml);
+    }
+
+    async function assignRoute(orderId) {
+      const routeId = document.getElementById('assign-route-select').value;
+      const reason = document.getElementById('assign-route-reason').value;
+      
+      const res = await fetch(`${API}/orders/${orderId}/assign-route`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ routeId, reason })
+      });
+      
+      if (res.ok) {
+        closeModal();
+        await loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || '分配失败');
+      }
+    }
+
+    async function cancelOrder(orderId) {
+      if (!confirm('确定要取消此订单吗？')) return;
+      
+      const reason = prompt('取消原因:', '客户取消');
+      if (reason === null) return;
+      
+      const res = await fetch(`${API}/orders/${orderId}/cancel`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      
+      if (res.ok) {
+        closeModal();
+        await loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || '取消失败');
+      }
+    }
+
+    async function advanceStatus(orderId) {
+      const reason = prompt('推进原因 (可选):', '正常流程');
+      if (reason === null) return;
+      
+      const res = await fetch(`${API}/orders/${orderId}/advance-status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      
+      if (res.ok) {
+        closeModal();
+        await loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || '推进失败');
+      }
+    }
+
+    async function setUrgent(orderId, isUrgent) {
+      const reason = prompt(isUrgent ? '设置加急原因:' : '取消加急原因:', isUrgent ? '客户要求' : '客户取消加急');
+      if (reason === null) return;
+      
+      const res = await fetch(`${API}/orders/${orderId}/set-urgent`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isUrgent, reason })
+      });
+      
+      if (res.ok) {
+        closeModal();
+        await loadData();
+      } else {
+        const data = await res.json();
+        alert(data.error || '操作失败');
+      }
+    }
+
+    async function approveAddressChange(requestId) {
+      if (!confirm('确定通过此改址申请？')) return;
+      
+      const res = await fetch(`${API}/address-change-requests/${requestId}/approve`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (res.ok) {
+        await loadData();
+        renderAddressChanges();
+      } else {
+        const data = await res.json();
+        alert(data.error || '操作失败');
+      }
+    }
+
+    async function rejectAddressChange(requestId) {
+      const reason = prompt('拒绝原因:');
+      if (reason === null) return;
+      
+      const res = await fetch(`${API}/address-change-requests/${requestId}/reject`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason })
+      });
+      
+      if (res.ok) {
+        await loadData();
+        renderAddressChanges();
+      } else {
+        const data = await res.json();
+        alert(data.error || '操作失败');
+      }
+    }
+
+    async function reportDefect() {
+      const orderId = document.getElementById('defect-order-select').value;
+      const description = document.getElementById('defect-description').value.trim();
+      const reportedBy = document.getElementById('defect-reporter').value.trim();
+      
+      if (!orderId || !description) {
+        alert('请选择订单并填写瑕疵描述');
+        return;
+      }
+      
+      const res = await fetch(`${API}/orders/${orderId}/defect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description, reportedBy })
+      });
+      
+      if (res.ok) {
+        await loadData();
+        renderDefects();
+        alert('瑕疵记录已提交');
+      } else {
+        const data = await res.json();
+        alert(data.error || '提交失败');
+      }
+    }
+
+    async function resolveDefect(orderId, defectId) {
+      const resolution = prompt('解决方案:');
+      if (resolution === null) return;
+      
+      const res = await fetch(`${API}/orders/${orderId}/resolve-defect`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ defectId, resolution })
+      });
+      
+      if (res.ok) {
+        await loadData();
+        renderDefects();
+      } else {
+        const data = await res.json();
+        alert(data.error || '操作失败');
+      }
+    }
+
+    function openModal(title, bodyHtml, footerHtml = '') {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = bodyHtml;
+      document.getElementById('modal-footer').innerHTML = footerHtml;
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    function renderCurrentTab() {
+      switch (currentTab) {
+        case 'orders': renderOrders(); break;
+        case 'routes': renderRoutes(); break;
+        case 'address-changes': renderAddressChanges(); break;
+        case 'defects': renderDefects(); break;
+        case 'export': renderExport(); break;
+      }
+    }
+
+    document.querySelectorAll('.nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        renderCurrentTab();
+      });
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
