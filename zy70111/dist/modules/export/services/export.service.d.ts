@@ -1,0 +1,36 @@
+import { Repository, DataSource } from 'typeorm';
+import { ExportTask } from '../entities/export-task.entity';
+import { Certificate } from '../../certificate/entities/certificate.entity';
+import { CertificateDuplicate } from '../../certificate/entities/certificate-duplicate.entity';
+import { FlowHistory } from '../../history/entities/flow-history.entity';
+import { ReviewTask } from '../../review/entities/review-task.entity';
+import { ProcessingResult, UserContext, PaginatedResult } from '../../../common/types';
+import { CreateExportTaskDto, ExportQueryDto } from '../dto/export.dto';
+import { AuditLogService } from '../../history/services/audit-log.service';
+export declare class ExportService {
+    private readonly exportRepository;
+    private readonly certificateRepository;
+    private readonly duplicateRepository;
+    private readonly flowHistoryRepository;
+    private readonly reviewRepository;
+    private readonly dataSource;
+    private readonly auditLogService;
+    private readonly logger;
+    constructor(exportRepository: Repository<ExportTask>, certificateRepository: Repository<Certificate>, duplicateRepository: Repository<CertificateDuplicate>, flowHistoryRepository: Repository<FlowHistory>, reviewRepository: Repository<ReviewTask>, dataSource: DataSource, auditLogService: AuditLogService);
+    createTask(dto: CreateExportTaskDto, user: UserContext): Promise<ProcessingResult<ExportTask>>;
+    private getExportDescription;
+    private processExportTask;
+    private generateDuplicateAnalysis;
+    private generateFlowHistory;
+    private generateReviewSummary;
+    private generateComplianceCheck;
+    private generateDailyReport;
+    private translateStatus;
+    private translatePriority;
+    private translateCertStatus;
+    private translateAction;
+    private translateSource;
+    private createExcelFile;
+    findById(id: string): Promise<ExportTask>;
+    query(query: ExportQueryDto): Promise<PaginatedResult<ExportTask>>;
+}

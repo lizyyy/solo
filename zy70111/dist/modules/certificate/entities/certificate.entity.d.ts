@@ -1,0 +1,35 @@
+import { CertificateStatus, CertificateSource } from '../../../common/types';
+import { CertificateDuplicate } from './certificate-duplicate.entity';
+import { FlowHistory } from '../../history/entities/flow-history.entity';
+export declare class Certificate {
+    id: string;
+    certificateNumber: string;
+    status: CertificateStatus;
+    source: CertificateSource;
+    farmName: string;
+    farmId: string;
+    slaughterhouseName: string;
+    slaughterhouseId: string;
+    animalType: string;
+    animalQuantity: number;
+    totalWeight: number;
+    slaughterDate: Date;
+    inspectionDate: Date;
+    inspectorName: string;
+    issuerId: string;
+    issuerName: string;
+    batchId: string;
+    batchNumber: string;
+    hasDuplicate: boolean;
+    hasManualCorrection: boolean;
+    originalCertificateId: string;
+    reissuedCertificateId: string;
+    remarks: string;
+    metadata: Record<string, any>;
+    duplicates: CertificateDuplicate[];
+    flowHistories: FlowHistory[];
+    createdAt: Date;
+    updatedAt: Date;
+    lastOperatorId: string;
+    lastOperatorName: string;
+}
