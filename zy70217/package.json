@@ -1,0 +1,18 @@
+{
+  "name": "clinic-vaccine-cold-chain-api",
+  "version": "1.0.0",
+  "description": "诊所疫苗预约冷链 API - 疫苗预约与冷链库存绑定的可运行原型",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node test/main-flow.js && node test/exception-scenarios.js"
+  },
+  "keywords": ["vaccine", "cold-chain", "appointment", "clinic"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  }
+}
