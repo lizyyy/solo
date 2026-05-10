@@ -1,0 +1,11 @@
+import { ApiResponse, CreateRiskEventRequest, AssessSiteRequest, CreateRebookingRequest, ProcessRebookingRequest, CancelEventRequest, ModifyEventRequest, QuerySummaryRequest } from './types';
+export declare function handleCreateRiskEvent(request: CreateRiskEventRequest): ApiResponse;
+export declare function handleAssessSite(request: AssessSiteRequest): ApiResponse;
+export declare function handleCreateRebooking(request: CreateRebookingRequest): ApiResponse;
+export declare function handleProcessRebooking(request: ProcessRebookingRequest): ApiResponse;
+export declare function handleCancelEvent(request: CancelEventRequest): ApiResponse;
+export declare function handleModifyEvent(request: ModifyEventRequest): ApiResponse;
+export declare function handleQuerySummary(request: QuerySummaryRequest): ApiResponse;
+export declare function handleQueryProblems(): ApiResponse;
+export declare function handleQuerySites(): ApiResponse;
+export declare function handleQueryOrders(): ApiResponse;
