@@ -70,11 +70,16 @@ class TaskScheduler:
             
             for source in sources:
                 try:
-                    existing_task = db.query(Task).filter(
+                    candidate_tasks = db.query(Task).filter(
                         Task.task_type == "collect_logs",
-                        Task.data["source_id"].astext == str(source.id),
                         Task.status.in_(["pending", "running", "retrying"])
-                    ).first()
+                    ).all()
+                    
+                    existing_task = None
+                    for task in candidate_tasks:
+                        if task.data and task.data.get("source_id") == source.id:
+                            existing_task = task
+                            break
                     
                     if not existing_task:
                         TaskService.create_task(

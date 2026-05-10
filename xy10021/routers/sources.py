@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from typing import List
 from database import get_db, LogSource, Task
 from schemas import LogSourceCreate, LogSourceUpdate, LogSourceResponse
@@ -170,11 +171,16 @@ def trigger_collection(
     if not source.is_active:
         raise HTTPException(status_code=400, detail="日志源未激活")
     
-    existing_task = db.query(Task).filter(
+    candidate_tasks = db.query(Task).filter(
         Task.task_type == "collect_logs",
-        Task.data["source_id"].astext == str(source_id),
         Task.status.in_(["pending", "running", "retrying"])
-    ).first()
+    ).all()
+    
+    existing_task = None
+    for task in candidate_tasks:
+        if task.data and task.data.get("source_id") == source_id:
+            existing_task = task
+            break
     
     if existing_task:
         return {
