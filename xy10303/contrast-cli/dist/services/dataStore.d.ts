@@ -1,0 +1,31 @@
+import { Appointment, Batch, UsageRecord, ManualCorrection, ImportResult } from '../models';
+export declare class DataStore {
+    private dataPath;
+    private appointments;
+    private batches;
+    private usageRecords;
+    private manualCorrections;
+    private appointmentFingerprints;
+    private batchFingerprints;
+    private usageFingerprints;
+    constructor(dataPath?: string);
+    private ensureDataDirectory;
+    private loadData;
+    private populateData;
+    private saveData;
+    private generateAppointmentFingerprint;
+    private generateBatchFingerprint;
+    private generateUsageFingerprint;
+    importAppointments(items: Appointment[]): ImportResult;
+    importBatches(items: Batch[]): ImportResult;
+    importUsageRecords(items: UsageRecord[]): ImportResult;
+    addManualCorrection(correction: Omit<ManualCorrection, 'id' | 'createdAt'>): ManualCorrection;
+    getAppointmentsByDate(date: string): Appointment[];
+    getUsageByDate(date: string): UsageRecord[];
+    getBatches(): Batch[];
+    getBatch(batchNumber: string): Batch | undefined;
+    getUsageByAppointment(appointmentId: string): UsageRecord[];
+    getManualCorrections(date?: string): ManualCorrection[];
+    getAppointment(appointmentId: string): Appointment | undefined;
+    clear(): void;
+}

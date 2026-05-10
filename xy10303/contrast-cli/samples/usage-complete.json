@@ -1,0 +1,67 @@
+[
+  {
+    "appointmentId": "APT20260510001",
+    "batchNumber": "IH202605001",
+    "openedAt": "2026-05-10T08:35:00",
+    "actualDose": 100,
+    "isRefund": false,
+    "operator": "护士A"
+  },
+  {
+    "appointmentId": "APT20260510002",
+    "batchNumber": "IH202605001",
+    "openedAt": "2026-05-10T09:05:00",
+    "actualDose": 95,
+    "isRefund": false,
+    "operator": "护士A"
+  },
+  {
+    "appointmentId": "APT20260510003",
+    "batchNumber": "IP202605001",
+    "openedAt": "2026-05-10T09:35:00",
+    "actualDose": 80,
+    "isRefund": false,
+    "operator": "护士B"
+  },
+  {
+    "appointmentId": "APT20260510004",
+    "batchNumber": "GD202605001",
+    "openedAt": "2026-05-10T10:05:00",
+    "actualDose": 20,
+    "isRefund": false,
+    "operator": "护士B"
+  },
+  {
+    "appointmentId": "APT20260510005",
+    "batchNumber": "IH202605002",
+    "openedAt": "2026-05-10T10:35:00",
+    "actualDose": 100,
+    "isRefund": true,
+    "operator": "护士A",
+    "notes": "患者取消检查，退费"
+  },
+  {
+    "appointmentId": "APT20260510006",
+    "batchNumber": "IP202605001",
+    "openedAt": "2026-05-10T11:05:00",
+    "actualDose": 80,
+    "isRefund": false,
+    "operator": "护士B"
+  },
+  {
+    "appointmentId": "APT20260510007",
+    "batchNumber": "IH202605002",
+    "openedAt": "2026-05-10T14:05:00",
+    "actualDose": 100,
+    "isRefund": false,
+    "operator": "护士A"
+  },
+  {
+    "appointmentId": "APT20260510008",
+    "batchNumber": "GD202605001",
+    "openedAt": "2026-05-10T14:35:00",
+    "actualDose": 20,
+    "isRefund": false,
+    "operator": "护士B"
+  }
+]

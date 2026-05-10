@@ -1,0 +1,27 @@
+{
+  "name": "contrast-cli",
+  "version": "1.0.0",
+  "description": "影像科增强药剂核销 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "contrast-cli": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": ["imaging", "contrast-agent", "reconciliation", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "csv-parse": "^5.5.5",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  }
+}

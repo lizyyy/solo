@@ -1,0 +1,90 @@
+[
+  {
+    "appointmentId": "APT20260510001",
+    "patientName": "张三",
+    "patientId": "P001",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "08:30",
+    "contrastAgent": "碘海醇",
+    "plannedDose": 100,
+    "department": "放射科",
+    "doctor": "王医生"
+  },
+  {
+    "appointmentId": "APT20260510002",
+    "patientName": "李四",
+    "patientId": "P002",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "09:00",
+    "contrastAgent": "碘海醇",
+    "plannedDose": 100,
+    "department": "放射科",
+    "doctor": "王医生"
+  },
+  {
+    "appointmentId": "APT20260510003",
+    "patientName": "王五",
+    "patientId": "P003",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "09:30",
+    "contrastAgent": "碘帕醇",
+    "plannedDose": 80,
+    "department": "放射科",
+    "doctor": "李医生"
+  },
+  {
+    "appointmentId": "APT20260510004",
+    "patientName": "赵六",
+    "patientId": "P004",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "10:00",
+    "contrastAgent": "钆喷酸葡胺",
+    "plannedDose": 20,
+    "department": "放射科",
+    "doctor": "李医生"
+  },
+  {
+    "appointmentId": "APT20260510005",
+    "patientName": "钱七",
+    "patientId": "P005",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "10:30",
+    "contrastAgent": "碘海醇",
+    "plannedDose": 100,
+    "department": "放射科",
+    "doctor": "王医生"
+  },
+  {
+    "appointmentId": "APT20260510006",
+    "patientName": "孙八",
+    "patientId": "P006",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "11:00",
+    "contrastAgent": "碘帕醇",
+    "plannedDose": 80,
+    "department": "放射科",
+    "doctor": "李医生"
+  },
+  {
+    "appointmentId": "APT20260510007",
+    "patientName": "周九",
+    "patientId": "P007",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "14:00",
+    "contrastAgent": "碘海醇",
+    "plannedDose": 100,
+    "department": "放射科",
+    "doctor": "王医生"
+  },
+  {
+    "appointmentId": "APT20260510008",
+    "patientName": "吴十",
+    "patientId": "P008",
+    "scheduledDate": "2026-05-10",
+    "scheduledTime": "14:30",
+    "contrastAgent": "钆喷酸葡胺",
+    "plannedDose": 20,
+    "department": "放射科",
+    "doctor": "李医生"
+  }
+]
