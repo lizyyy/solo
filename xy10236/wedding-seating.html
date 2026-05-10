@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>婚礼座次关系冲突器</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; padding: 20px; }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        .app-container { max-width: 1400px; margin: 0 auto; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+        .tab { padding: 10px 20px; background: #fff; border: none; border-radius: 5px 5px 0 0; cursor: pointer; font-size: 16px; }
+        .tab.active { background: #4CAF50; color: white; }
+        .tab:hover:not(.active) { background: #e0e0e0; }
+        
+        .panel { display: none; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .panel.active { display: block; }
+        
+        /* 宾客管理 */
+        .guest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-secondary { background: #2196F3; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn:hover { opacity: 0.9; }
+        
+        .guest-list { display: grid; gap: 10px; }
+        .guest-card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; position: relative; }
+        .guest-card .name { font-size: 18px; font-weight: bold; color: #333; }
+        .guest-card .tags { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .tag { padding: 3px 8px; border-radius: 12px; font-size: 12px; }
+        .tag-elder { background: #FFE0B2; color: #E65100; }
+        .tag-adult { background: #B3E5FC; color: #01579B; }
+        .tag-child { background: #F8BBD0; color: #C2185B; }
+        .tag-conflict { background: #FFCDD2; color: #C62828; }
+        .tag-assigned { background: #C8E6C9; color: #2E7D32; }
+        .tag-unassigned { background: #EEEEEE; color: #616161; }
+        
+        .guest-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .conflict-info { margin-top: 10px; padding: 10px; background: #FFF3E0; border-left: 4px solid #FF9800; border-radius: 4px; font-size: 13px; }
+        .conflict-info strong { color: #E65100; }
+        
+        /* 模态框 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: white; border-radius: 8px; padding: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal h2 { margin-bottom: 20px; color: #333; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .conflict-checkboxes { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto; padding: 10px; border: 1px solid #eee; border-radius: 4px; }
+        .conflict-checkbox { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        
+        /* 座位安排 */
+        .seating-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .seating-container { grid-template-columns: 1fr; } }
+        
+        .unassigned-area { background: #f9f9f9; border: 2px dashed #ccc; border-radius: 8px; padding: 15px; min-height: 400px; }
+        .unassigned-area h3 { margin-bottom: 15px; color: #666; }
+        
+        .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .table-card { background: #fff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 15px; min-height: 200px; transition: border-color 0.2s; }
+        .table-card.drag-over { border-color: #4CAF50; background: #E8F5E9; }
+        .table-card.conflict { border-color: #f44336; background: #FFEBEE; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .table-name { font-size: 18px; font-weight: bold; }
+        .table-type-tag { font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+        .table-type-elder { background: #FFE0B2; color: #E65100; }
+        .table-type-normal { background: #E3F2FD; color: #1565C0; }
+        .table-type-vip { background: #FFF3E0; color: #EF6C00; }
+        .table-capacity { font-size: 13px; color: #666; margin-top: 5px; }
+        
+        .table-guests { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 60px; }
+        .guest-chip { background: #e3f2fd; padding: 6px 12px; border-radius: 16px; font-size: 14px; cursor: grab; user-select: none; display: flex; align-items: center; gap: 6px; }
+        .guest-chip.dragging { opacity: 0.5; }
+        .guest-chip.conflict { background: #ffcdd2; border: 1px solid #f44336; }
+        .guest-chip.elder { background: #ffe0b2; }
+        .guest-chip.child { background: #f8bbd0; }
+        .guest-chip .remove-btn { cursor: pointer; color: #666; font-weight: bold; }
+        .guest-chip .remove-btn:hover { color: #f44336; }
+        
+        .table-actions { display: flex; gap: 8px; margin-top: 10px; }
+        
+        .conflict-alerts { margin-top: 20px; }
+        .conflict-alert { background: #FFEBEE; border-left: 4px solid #f44336; padding: 12px; margin-bottom: 10px; border-radius: 4px; }
+        .conflict-alert.warning { background: #FFF8E1; border-left-color: #FFC107; }
+        .conflict-alert.info { background: #E3F2FD; border-left-color: #2196F3; }
+        .conflict-alert strong { color: #C62828; }
+        
+        /* 历史记录 */
+        .history-list { display: grid; gap: 12px; }
+        .history-item { background: #fafafa; border-left: 4px solid #2196F3; padding: 15px; border-radius: 4px; }
+        .history-item.undo { border-left-color: #9E9E9E; }
+        .history-timestamp { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .history-action { font-weight: bold; color: #333; margin-bottom: 8px; }
+        .history-diff { background: #fff; padding: 10px; border-radius: 4px; font-size: 13px; font-family: monospace; }
+        .diff-before { color: #C62828; text-decoration: line-through; }
+        .diff-after { color: #2E7D32; }
+        .history-actions { margin-top: 10px; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        
+        /* 工具提示 */
+        .tooltip { position: relative; }
+        .tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; white-space: nowrap; z-index: 100; }
+        
+        /* 统计 */
+        .stats-bar { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-item { background: #f5f5f5; padding: 10px 20px; border-radius: 8px; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+        .stat-label { font-size: 12px; color: #666; }
+        
+        /* 提示信息 */
+        .toast { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 4px; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: #4CAF50; color: white; }
+        .toast.error { background: #f44336; color: white; }
+        .toast.warning { background: #ff9800; color: white; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* 演示说明 */
+        .demo-guide { background: #E3F2FD; border-left: 4px solid #2196F3; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .demo-guide h3 { color: #1565C0; margin-bottom: 10px; }
+        .demo-guide ol { margin-left: 20px; line-height: 1.8; }
+        .demo-guide li { margin-bottom: 5px; }
+        
+        .error-guide { background: #FFEBEE; border-left: 4px solid #f44336; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .error-guide h3 { color: #C62828; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>💒 婚礼座次关系冲突器</h1>
+        
+        <div class="demo-guide">
+            <h3>🚀 最短演示路径（30秒体验核心功能）</h3>
+            <ol>
+                <li><strong>宾客管理</strong> → 点击"新增宾客"，添加张三（长辈）、李四（成人）、王五（儿童）、赵六（成人）</li>
+                <li>编辑李四，在"冲突关系"中勾选张三（模拟矛盾关系）</li>
+                <li><strong>座位安排</strong> → 点击"新增桌位"，添加桌1（普通桌，6人）、桌2（长辈桌，4人）</li>
+                <li>拖拽"张三"到桌2（长辈桌），拖拽"李四"到桌1，观察无冲突</li>
+                <li>再拖拽"张三"到桌1，观察<strong>红色冲突提示</strong>（矛盾关系检测）</li>
+                <li>查看<strong>历史记录</strong>，看到所有操作记录</li>
+            </ol>
+        </div>
+        
+        <div class="error-guide">
+            <h3>⚠️ 异常触发路径（体验错误处理）</h3>
+            <ol>
+                <li>在<strong>宾客管理</strong>中点击"新增宾客"，直接点"保存"（不填姓名）→ 看到必填验证</li>
+                <li>或者：在<strong>座位安排</strong>中，先添加一个2人桌，然后拖3个人进去 → 看到<strong>容量超限警告</strong></li>
+                <li>或者：编辑一个宾客，将其冲突关系设为自己 → 看到<strong>自我冲突错误</strong></li>
+            </ol>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('guests')">👥 宾客管理</button>
+            <button class="tab" onclick="switchTab('seating')">🪑 座位安排</button>
+            <button class="tab" onclick="switchTab('history')">📜 历史记录</button>
+        </div>
+        
+        <!-- 宾客管理面板 -->
+        <div id="guests-panel" class="panel active">
+            <div class="guest-header">
+                <div class="filters">
+                    <input type="text" id="search-input" placeholder="搜索宾客姓名..." oninput="renderGuests()">
+                    <select id="type-filter" onchange="renderGuests()">
+                        <option value="">全部类型</option>
+                        <option value="elder">长辈</option>
+                        <option value="adult">成人</option>
+                        <option value="child">儿童</option>
+                    </select>
+                    <select id="status-filter" onchange="renderGuests()">
+                        <option value="">全部状态</option>
+                        <option value="assigned">已分配</option>
+                        <option value="unassigned">未分配</option>
+                    </select>
+                    <select id="conflict-filter" onchange="renderGuests()">
+                        <option value="">全部关系</option>
+                        <option value="has-conflict">有冲突关系</option>
+                        <option value="no-conflict">无冲突</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="exportData()">📤 导出数据</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">📥 导入数据</button>
+                    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+                    <button class="btn btn-primary" onclick="openGuestModal()">➕ 新增宾客</button>
+                </div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-guests">0</div>
+                    <div class="stat-label">总宾客</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="assigned-guests">0</div>
+                    <div class="stat-label">已分配</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="conflict-pairs">0</div>
+                    <div class="stat-label">冲突对</div>
+                </div>
+            </div>
+            
+            <div id="guest-list" class="guest-list"></div>
+        </div>
+        
+        <!-- 座位安排面板 -->
+        <div id="seating-panel" class="panel">
+            <div class="guest-header">
+                <h3>座位安排</h3>
+                <button class="btn btn-primary" onclick="openTableModal()">➕ 新增桌位</button>
+            </div>
+            
+            <div class="conflict-alerts" id="conflict-alerts"></div>
+            
+            <div class="seating-container">
+                <div class="unassigned-area">
+                    <h3>📦 未分配宾客（拖拽到桌位）</h3>
+                    <div id="unassigned-guests" class="table-guests"></div>
+                </div>
+                
+                <div>
+                    <h3>🍽️ 桌位列表</h3>
+                    <div id="tables-container" class="tables-grid"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 历史记录面板 -->
+        <div id="history-panel" class="panel">
+            <div class="guest-header">
+                <h3>操作历史</h3>
+                <button class="btn btn-danger" onclick="clearHistory()">🗑️ 清空历史</button>
+            </div>
+            <div id="history-list" class="history-list"></div>
+        </div>
+    </div>
+    
+    <!-- 宾客编辑模态框 -->
+    <div id="guest-modal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="guest-modal-title">新增宾客</h2>
+            <form onsubmit="saveGuest(event)">
+                <input type="hidden" id="guest-id">
+                <div class="form-group">
+                    <label>姓名 *</label>
+                    <input type="text" id="guest-name" required placeholder="请输入姓名">
+                </div>
+                <div class="form-group">
+                    <label>类型 *</label>
+                    <select id="guest-type" required>
+                        <option value="adult">成人</option>
+                        <option value="elder">长辈</option>
+                        <option value="child">儿童</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="guest-notes" placeholder="特殊需求、饮食禁忌等"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>冲突关系（与这些人不能同桌）</label>
+                    <div id="conflict-checkboxes" class="conflict-checkboxes"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeGuestModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 桌位编辑模态框 -->
+    <div id="table-modal" class="modal-overlay">
+        <div class="modal">
+            <h2 id="table-modal-title">新增桌位</h2>
+            <form onsubmit="saveTable(event)">
+                <input type="hidden" id="table-id">
+                <div class="form-group">
+                    <label>桌号 *</label>
+                    <input type="text" id="table-name" required placeholder="如：桌1、主桌">
+                </div>
+                <div class="form-group">
+                    <label>座位数 *</label>
+                    <input type="number" id="table-capacity" required min="1" max="20" value="8">
+                </div>
+                <div class="form-group">
+                    <label>桌位类型</label>
+                    <select id="table-type">
+                        <option value="normal">普通桌</option>
+                        <option value="elder">长辈桌</option>
+                        <option value="vip">VIP桌</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="table-notes" placeholder="靠近舞台、靠近通道等"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeTableModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 数据模型
+        let data = {
+            guests: [],
+            tables: [],
+            history: []
+        };
+        
+        // 生成唯一ID
+        const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+        
+        // 初始化
+        function init() {
+            loadFromStorage();
+            renderAll();
+        }
+        
+        // 本地存储
+        function saveToStorage() {
+            localStorage.setItem('wedding-seating', JSON.stringify(data));
+        }
+        
+        function loadFromStorage() {
+            const saved = localStorage.getItem('wedding-seating');
+            if (saved) {
+                try {
+                    data = JSON.parse(saved);
+                } catch (e) {
+                    console.error('数据解析失败', e);
+                }
+            }
+        }
+        
+        // 历史记录
+        function recordHistory(action, description, before, after) {
+            const record = {
+                id: generateId(),
+                timestamp: Date.now(),
+                action,
+                description,
+                before: JSON.parse(JSON.stringify(before)),
+                after: JSON.parse(JSON.stringify(after))
+            };
+            data.history.unshift(record);
+            if (data.history.length > 100) data.history.pop();
+            saveToStorage();
+            renderHistory();
+        }
+        
+        // Tab 切换
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-panel`).classList.add('active');
+            
+            if (tabName === 'seating') {
+                renderSeating();
+            } else if (tabName === 'guests') {
+                renderGuests();
+            } else if (tabName === 'history') {
+                renderHistory();
+            }
+        }
+        
+        // 渲染所有
+        function renderAll() {
+            renderGuests();
+            renderSeating();
+            renderHistory();
+        }
+        
+        // === 宾客管理 ===
+        
+        function renderGuests() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const conflictFilter = document.getElementById('conflict-filter').value;
+            
+            let guests = [...data.guests];
+            
+            if (search) {
+                guests = guests.filter(g => g.name.toLowerCase().includes(search));
+            }
+            if (typeFilter) {
+                guests = guests.filter(g => g.type === typeFilter);
+            }
+            if (statusFilter) {
+                guests = guests.filter(g => {
+                    const assigned = data.tables.some(t => t.guests.includes(g.id));
+                    return statusFilter === 'assigned' ? assigned : !assigned;
+                });
+            }
+            if (conflictFilter) {
+                guests = guests.filter(g => {
+                    const hasConflict = g.conflicts && g.conflicts.length > 0;
+                    return conflictFilter === 'has-conflict' ? hasConflict : !hasConflict;
+                });
+            }
+            
+            const container = document.getElementById('guest-list');
+            
+            if (guests.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无宾客，点击"新增宾客"开始添加</div>';
+            } else {
+                container.innerHTML = guests.map(g => {
+                    const assignedTable = data.tables.find(t => t.guests.includes(g.id));
+                    const typeLabel = { elder: '长辈', adult: '成人', child: '儿童' }[g.type];
+                    const typeTag = `tag-${g.type}`;
+                    const hasConflicts = g.conflicts && g.conflicts.length > 0;
+                    const conflictNames = hasConflicts 
+                        ? g.conflicts.map(cid => data.guests.find(g2 => g2.id === cid)?.name || '已删除').join('、')
+                        : '';
+                    
+                    return `
+                        <div class="guest-card" id="guest-card-${g.id}">
+                            <div class="name">${escapeHtml(g.name)}</div>
+                            <div class="tags">
+                                <span class="tag ${typeTag}">${typeLabel}</span>
+                                ${hasConflicts ? `<span class="tag tag-conflict">⚠️ ${g.conflicts.length}个冲突</span>` : ''}
+                                ${assignedTable 
+                                    ? `<span class="tag tag-assigned">📍 ${escapeHtml(assignedTable.name)}</span>`
+                                    : `<span class="tag tag-unassigned">未分配</span>`}
+                            </div>
+                            ${g.notes ? `<div style="margin-top:8px;font-size:13px;color:#666;">📝 ${escapeHtml(g.notes)}</div>` : ''}
+                            ${hasConflicts ? `<div class="conflict-info"><strong>🚫 避免同桌：</strong>${escapeHtml(conflictNames)}</div>` : ''}
+                            <div class="guest-actions">
+                                <button class="btn btn-secondary" onclick="editGuest('${g.id}')">✏️ 编辑</button>
+                                ${assignedTable ? `<button class="btn btn-warning" onclick="unassignGuest('${g.id}')">📤 移出座位</button>` : ''}
+                                <button class="btn btn-danger" onclick="deleteGuest('${g.id}')">🗑️ 删除</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            document.getElementById('total-guests').textContent = data.guests.length;
+            const assignedCount = data.tables.reduce((sum, t) => sum + t.guests.length, 0);
+            document.getElementById('assigned-guests').textContent = assignedCount;
+            
+            let conflictPairs = 0;
+            data.guests.forEach(g => {
+                if (g.conflicts) {
+                    g.conflicts.forEach(cid => {
+                        if (g.id < cid) conflictPairs++;
+                    });
+                }
+            });
+            document.getElementById('conflict-pairs').textContent = conflictPairs;
+        }
+        
+        function openGuestModal(guestId = null) {
+            const modal = document.getElementById('guest-modal');
+            const title = document.getElementById('guest-modal-title');
+            
+            if (guestId) {
+                const guest = data.guests.find(g => g.id === guestId);
+                if (!guest) return;
+                
+                title.textContent = '编辑宾客';
+                document.getElementById('guest-id').value = guest.id;
+                document.getElementById('guest-name').value = guest.name;
+                document.getElementById('guest-type').value = guest.type;
+                document.getElementById('guest-notes').value = guest.notes || '';
+            } else {
+                title.textContent = '新增宾客';
+                document.getElementById('guest-id').value = '';
+                document.getElementById('guest-name').value = '';
+                document.getElementById('guest-type').value = 'adult';
+                document.getElementById('guest-notes').value = '';
+            }
+            
+            renderConflictCheckboxes(guestId);
+            modal.classList.add('active');
+        }
+        
+        function renderConflictCheckboxes(currentGuestId) {
+            const container = document.getElementById('conflict-checkboxes');
+            const currentGuest = currentGuestId ? data.guests.find(g => g.id === currentGuestId) : null;
+            const currentConflicts = currentGuest?.conflicts || [];
+            
+            const otherGuests = data.guests.filter(g => g.id !== currentGuestId);
+            
+            if (otherGuests.length === 0) {
+                container.innerHTML = '<div style="color:#999;font-size:13px;">暂无其他宾客可添加冲突关系</div>';
+                return;
+            }
+            
+            container.innerHTML = otherGuests.map(g => {
+                const checked = currentConflicts.includes(g.id) ? 'checked' : '';
+                return `
+                    <label class="conflict-checkbox">
+                        <input type="checkbox" name="conflict" value="${g.id}" ${checked}>
+                        ${escapeHtml(g.name)}
+                    </label>
+                `;
+            }).join('');
+        }
+        
+        function saveGuest(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('guest-id').value;
+            const name = document.getElementById('guest-name').value.trim();
+            const type = document.getElementById('guest-type').value;
+            const notes = document.getElementById('guest-notes').value.trim();
+            
+            const conflictCheckboxes = document.querySelectorAll('input[name="conflict"]:checked');
+            const conflicts = Array.from(conflictCheckboxes).map(cb => cb.value);
+            
+            if (!name) {
+                showToast('请输入姓名', 'error');
+                return;
+            }
+            
+            if (conflicts.includes(id)) {
+                showToast('不能与自己设置冲突关系！', 'error');
+                return;
+            }
+            
+            const before = id ? data.guests.find(g => g.id === id) : null;
+            let action, description;
+            
+            if (id) {
+                const index = data.guests.findIndex(g => g.id === id);
+                const updated = { ...data.guests[index], name, type, notes, conflicts };
+                data.guests[index] = updated;
+                action = 'update_guest';
+                description = `编辑宾客：${name}`;
+                
+                conflicts.forEach(cid => {
+                    const otherGuest = data.guests.find(g => g.id === cid);
+                    if (otherGuest) {
+                        if (!otherGuest.conflicts) otherGuest.conflicts = [];
+                        if (!otherGuest.conflicts.includes(id)) {
+                            otherGuest.conflicts.push(id);
+                        }
+                    }
+                });
+                
+                data.guests.forEach(g => {
+                    if (g.id !== id && g.conflicts) {
+                        if (!conflicts.includes(g.id) && g.conflicts.includes(id)) {
+                            g.conflicts = g.conflicts.filter(cid => cid !== id);
+                        }
+                    }
+                });
+            } else {
+                const newGuest = {
+                    id: generateId(),
+                    name,
+                    type,
+                    notes,
+                    conflicts
+                };
+                data.guests.push(newGuest);
+                action = 'create_guest';
+                description = `新增宾客：${name}`;
+                
+                conflicts.forEach(cid => {
+                    const otherGuest = data.guests.find(g => g.id === cid);
+                    if (otherGuest) {
+                        if (!otherGuest.conflicts) otherGuest.conflicts = [];
+                        if (!otherGuest.conflicts.includes(newGuest.id)) {
+                            otherGuest.conflicts.push(newGuest.id);
+                        }
+                    }
+                });
+            }
+            
+            recordHistory(action, description, before, { name, type, notes, conflicts });
+            closeGuestModal();
+            renderAll();
+            showToast(id ? '宾客已更新' : '宾客已添加', 'success');
+        }
+        
+        function closeGuestModal() {
+            document.getElementById('guest-modal').classList.remove('active');
+        }
+        
+        function editGuest(id) {
+            openGuestModal(id);
+        }
+        
+        function deleteGuest(id) {
+            const guest = data.guests.find(g => g.id === id);
+            if (!guest) return;
+            
+            if (!confirm(`确定要删除宾客"${guest.name}"吗？`)) return;
+            
+            const before = { ...guest };
+            data.guests = data.guests.filter(g => g.id !== id);
+            
+            data.guests.forEach(g => {
+                if (g.conflicts) {
+                    g.conflicts = g.conflicts.filter(cid => cid !== id);
+                }
+            });
+            
+            data.tables.forEach(t => {
+                t.guests = t.guests.filter(gid => gid !== id);
+            });
+            
+            recordHistory('delete_guest', `删除宾客：${guest.name}`, before, null);
+            renderAll();
+            showToast('宾客已删除', 'success');
+        }
+        
+        // === 桌位管理 ===
+        
+        function openTableModal(tableId = null) {
+            const modal = document.getElementById('table-modal');
+            const title = document.getElementById('table-modal-title');
+            
+            if (tableId) {
+                const table = data.tables.find(t => t.id === tableId);
+                if (!table) return;
+                
+                title.textContent = '编辑桌位';
+                document.getElementById('table-id').value = table.id;
+                document.getElementById('table-name').value = table.name;
+                document.getElementById('table-capacity').value = table.capacity;
+                document.getElementById('table-type').value = table.type;
+                document.getElementById('table-notes').value = table.notes || '';
+            } else {
+                title.textContent = '新增桌位';
+                document.getElementById('table-id').value = '';
+                document.getElementById('table-name').value = '';
+                document.getElementById('table-capacity').value = 8;
+                document.getElementById('table-type').value = 'normal';
+                document.getElementById('table-notes').value = '';
+            }
+            
+            modal.classList.add('active');
+        }
+        
+        function saveTable(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('table-id').value;
+            const name = document.getElementById('table-name').value.trim();
+            const capacity = parseInt(document.getElementById('table-capacity').value);
+            const type = document.getElementById('table-type').value;
+            const notes = document.getElementById('table-notes').value.trim();
+            
+            if (!name) {
+                showToast('请输入桌号', 'error');
+                return;
+            }
+            
+            if (capacity < 1 || capacity > 20) {
+                showToast('座位数必须在1-20之间', 'error');
+                return;
+            }
+            
+            const before = id ? data.tables.find(t => t.id === id) : null;
+            let action, description;
+            
+            if (id) {
+                const index = data.tables.findIndex(t => t.id === id);
+                data.tables[index] = { ...data.tables[index], name, capacity, type, notes };
+                action = 'update_table';
+                description = `编辑桌位：${name}`;
+            } else {
+                data.tables.push({
+                    id: generateId(),
+                    name,
+                    capacity,
+                    type,
+                    notes,
+                    guests: []
+                });
+                action = 'create_table';
+                description = `新增桌位：${name}`;
+            }
+            
+            recordHistory(action, description, before, { name, capacity, type, notes });
+            closeTableModal();
+            renderAll();
+            showToast(id ? '桌位已更新' : '桌位已添加', 'success');
+        }
+        
+        function closeTableModal() {
+            document.getElementById('table-modal').classList.remove('active');
+        }
+        
+        function deleteTable(id) {
+            const table = data.tables.find(t => t.id === id);
+            if (!table) return;
+            
+            if (!confirm(`确定要删除桌位"${table.name}"吗？该桌的${table.guests.length}位宾客将变为未分配状态。`)) return;
+            
+            const before = { ...table };
+            data.tables = data.tables.filter(t => t.id !== id);
+            
+            recordHistory('delete_table', `删除桌位：${table.name}`, before, null);
+            renderAll();
+            showToast('桌位已删除', 'success');
+        }
+        
+        // === 座位安排与拖拽 ===
+        
+        function renderSeating() {
+            const assignedGuestIds = new Set();
+            data.tables.forEach(t => t.guests.forEach(gid => assignedGuestIds.add(gid)));
+            
+            const unassignedGuests = data.guests.filter(g => !assignedGuestIds.has(g.id));
+            
+            const unassignedContainer = document.getElementById('unassigned-guests');
+            unassignedContainer.innerHTML = unassignedGuests.length === 0
+                ? '<div style="color:#999;padding:20px;">所有宾客已分配</div>'
+                : unassignedGuests.map(g => renderGuestChip(g)).join('');
+            
+            const tablesContainer = document.getElementById('tables-container');
+            tablesContainer.innerHTML = data.tables.length === 0
+                ? '<div style="color:#999;padding:40px;text-align:center;grid-column:1/-1;">暂无桌位，点击"新增桌位"开始</div>'
+                : data.tables.map(t => renderTableCard(t)).join('');
+            
+            checkConflicts();
+            setupDragAndDrop();
+        }
+        
+        function renderTableCard(table) {
+            const typeLabel = { normal: '普通桌', elder: '长辈桌', vip: 'VIP桌' }[table.type];
+            const typeTagClass = `table-type-${table.type}`;
+            const guests = table.guests.map(gid => data.guests.find(g => g.id === gid)).filter(Boolean);
+            
+            const hasConflict = checkTableConflict(table);
+            const isOverCapacity = guests.length > table.capacity;
+            const conflictClass = (hasConflict || isOverCapacity) ? 'conflict' : '';
+            
+            return `
+                <div class="table-card ${conflictClass}" 
+                     data-table-id="${table.id}"
+                     ondragover="handleDragOver(event)"
+                     ondrop="handleDrop(event, '${table.id}')"
+                     ondragleave="handleDragLeave(event)">
+                    <div class="table-header">
+                        <div class="table-name">${escapeHtml(table.name)}</div>
+                        <span class="table-type-tag ${typeTagClass}">${typeLabel}</span>
+                    </div>
+                    <div class="table-capacity">👥 ${guests.length}/${table.capacity} 人</div>
+                    ${table.notes ? `<div style="font-size:12px;color:#666;margin-top:5px;">📝 ${escapeHtml(table.notes)}</div>` : ''}
+                    <div class="table-guests" data-table-id="${table.id}">
+                        ${guests.map(g => renderGuestChip(g, table)).join('')}
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary" onclick="openTableModal('${table.id}')">✏️</button>
+                        <button class="btn btn-danger" onclick="deleteTable('${table.id}')">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderGuestChip(guest, table = null) {
+            const typeClass = guest.type === 'elder' ? 'elder' : guest.type === 'child' ? 'child' : '';
+            const hasConflict = table ? checkGuestConflict(guest.id, table) : false;
+            const conflictClass = hasConflict ? 'conflict' : '';
+            
+            return `
+                <div class="guest-chip ${typeClass} ${conflictClass}" 
+                     draggable="true"
+                     data-guest-id="${guest.id}"
+                     ondragstart="handleDragStart(event)"
+                     ondragend="handleDragEnd(event)"
+                     title="${hasConflict ? '⚠️ 存在冲突关系' : ''}">
+                    <span>${escapeHtml(guest.name)}</span>
+                    ${table ? `<span class="remove-btn" onclick="unassignGuest('${guest.id}')">×</span>` : ''}
+                </div>
+            `;
+        }
+        
+        function checkTableConflict(table) {
+            for (let i = 0; i < table.guests.length; i++) {
+                for (let j = i + 1; j < table.guests.length; j++) {
+                    const g1 = data.guests.find(g => g.id === table.guests[i]);
+                    const g2 = data.guests.find(g => g.id === table.guests[j]);
+                    if (g1?.conflicts?.includes(g2?.id)) return true;
+                }
+            }
+            return false;
+        }
+        
+        function checkGuestConflict(guestId, table) {
+            const guest = data.guests.find(g => g.id === guestId);
+            if (!guest?.conflicts) return false;
+            return table.guests.some(gid => guest.conflicts.includes(gid));
+        }
+        
+        function checkConflicts() {
+            const alerts = [];
+            
+            data.tables.forEach(table => {
+                const guests = table.guests.map(gid => data.guests.find(g => g.id === gid)).filter(Boolean);
+                
+                for (let i = 0; i < guests.length; i++) {
+                    for (let j = i + 1; j < guests.length; j++) {
+                        if (guests[i]?.conflicts?.includes(guests[j]?.id)) {
+                            alerts.push({
+                                type: 'error',
+                                message: `🚫 <strong>冲突警告：</strong>${escapeHtml(guests[i].name)} 和 ${escapeHtml(guests[j].name)} 是冲突关系，但被安排在同一桌（${escapeHtml(table.name)}）！`
+                            });
+                        }
+                    }
+                }
+                
+                if (guests.length > table.capacity) {
+                    alerts.push({
+                        type: 'warning',
+                        message: `⚠️ <strong>容量超限：</strong>${escapeHtml(table.name)} 仅有 ${table.capacity} 个座位，但安排了 ${guests.length} 人！`
+                    });
+                }
+                
+                if (table.type === 'elder') {
+                    const nonElders = guests.filter(g => g.type !== 'elder' && g.type !== 'child');
+                    if (nonElders.length > 0) {
+                        alerts.push({
+                            type: 'info',
+                            message: `ℹ️ <strong>建议：</strong>${escapeHtml(table.name)} 是长辈桌，但安排了非长辈/儿童：${nonElders.map(g => escapeHtml(g.name)).join('、')}`
+                        });
+                    }
+                }
+            });
+            
+            const assignedGuestIds = new Set();
+            data.tables.forEach(t => t.guests.forEach(gid => assignedGuestIds.add(gid)));
+            const unassignedElders = data.guests.filter(g => g.type === 'elder' && !assignedGuestIds.has(g.id));
+            if (unassignedElders.length > 0) {
+                alerts.push({
+                    type: 'info',
+                    message: `ℹ️ <strong>提示：</strong>还有 ${unassignedElders.length} 位长辈未安排座位：${unassignedElders.map(g => escapeHtml(g.name)).join('、')}`
+                });
+            }
+            
+            const container = document.getElementById('conflict-alerts');
+            container.innerHTML = alerts.length === 0
+                ? '<div style="padding:15px;background:#E8F5E9;border-radius:4px;color:#2E7D32;">✅ 暂无冲突，座次安排良好！</div>'
+                : alerts.map(a => `<div class="conflict-alert ${a.type}">${a.message}</div>`).join('');
+        }
+        
+        // 拖拽功能
+        let draggedGuestId = null;
+        
+        function handleDragStart(e) {
+            draggedGuestId = e.target.getAttribute('data-guest-id');
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+        
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+        
+        function handleDrop(e, tableId) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (!draggedGuestId) return;
+            
+            const guest = data.guests.find(g => g.id === draggedGuestId);
+            const targetTable = data.tables.find(t => t.id === tableId);
+            
+            if (!guest || !targetTable) return;
+            
+            const sourceTable = data.tables.find(t => t.guests.includes(draggedGuestId));
+            const beforeSource = sourceTable ? [...sourceTable.guests] : null;
+            const beforeTarget = [...targetTable.guests];
+            
+            const willHaveConflict = guest.conflicts?.some(cid => targetTable.guests.includes(cid));
+            
+            if (sourceTable) {
+                sourceTable.guests = sourceTable.guests.filter(gid => gid !== draggedGuestId);
+            }
+            targetTable.guests.push(draggedGuestId);
+            
+            let description;
+            if (sourceTable) {
+                description = `移动 ${guest.name}：${sourceTable.name} → ${targetTable.name}`;
+            } else {
+                description = `分配 ${guest.name} 到 ${targetTable.name}`;
+            }
+            
+            recordHistory('assign_seat', description, 
+                { source: sourceTable?.name || '未分配', sourceGuests: beforeSource, targetGuests: beforeTarget },
+                { source: sourceTable?.name || null, target: targetTable.name, targetGuests: [...targetTable.guests] }
+            );
+            
+            renderAll();
+            
+            if (willHaveConflict) {
+                showToast(`⚠️ 警告：${guest.name} 与该桌其他宾客有冲突关系！`, 'warning');
+            } else {
+                showToast(`${guest.name} 已分配到 ${targetTable.name}`, 'success');
+            }
+        }
+        
+        function setupDragAndDrop() {
+        }
+        
+        function unassignGuest(guestId) {
+            const guest = data.guests.find(g => g.id === guestId);
+            const table = data.tables.find(t => t.guests.includes(guestId));
+            
+            if (!guest || !table) return;
+            
+            const before = [...table.guests];
+            table.guests = table.guests.filter(gid => gid !== guestId);
+            
+            recordHistory('unassign_seat', `移出 ${guest.name} 从 ${table.name}`,
+                { table: table.name, guests: before },
+                { table: table.name, guests: [...table.guests] }
+            );
+            
+            renderAll();
+            showToast(`${guest.name} 已从 ${table.name} 移出`, 'success');
+        }
+        
+        // === 历史记录 ===
+        
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            
+            if (data.history.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无操作记录</div>';
+                return;
+            }
+            
+            container.innerHTML = data.history.slice(0, 50).map(record => {
+                const time = new Date(record.timestamp).toLocaleString('zh-CN');
+                const actionLabel = {
+                    create_guest: '➕ 新增宾客',
+                    update_guest: '✏️ 编辑宾客',
+                    delete_guest: '🗑️ 删除宾客',
+                    create_table: '➕ 新增桌位',
+                    update_table: '✏️ 编辑桌位',
+                    delete_table: '🗑️ 删除桌位',
+                    assign_seat: '🪑 分配座位',
+                    unassign_seat: '📤 移出座位'
+                }[record.action] || record.action;
+                
+                const diffHtml = renderDiff(record);
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-timestamp">🕐 ${time}</div>
+                        <div class="history-action">${actionLabel} - ${escapeHtml(record.description)}</div>
+                        <div class="history-diff">${diffHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderDiff(record) {
+            const { before, after } = record;
+            
+            if (!before && !after) return '无数据变化';
+            
+            if (!before) {
+                return `<span class="diff-after">→ ${formatObject(after)}</span>`;
+            }
+            
+            if (!after) {
+                return `<span class="diff-before">← ${formatObject(before)}</span>`;
+            }
+            
+            const beforeStr = formatObject(before);
+            const afterStr = formatObject(after);
+            
+            if (beforeStr === afterStr) {
+                return beforeStr;
+            }
+            
+            return `
+                <div><span class="diff-before">变更前：${beforeStr}</span></div>
+                <div><span class="diff-after">变更后：${afterStr}</span></div>
+            `;
+        }
+        
+        function formatObject(obj) {
+            if (!obj) return '无';
+            if (typeof obj === 'string') return escapeHtml(obj);
+            
+            const parts = [];
+            if (obj.name) parts.push(`姓名:${obj.name}`);
+            if (obj.type) parts.push(`类型:${{elder:'长辈',adult:'成人',child:'儿童',normal:'普通桌',elder:'长辈桌',vip:'VIP桌'}[obj.type] || obj.type}`);
+            if (obj.capacity) parts.push(`容量:${obj.capacity}`);
+            if (obj.source) parts.push(`来源:${obj.source || '未分配'}`);
+            if (obj.target) parts.push(`目标:${obj.target}`);
+            if (obj.table) parts.push(`桌位:${obj.table}`);
+            if (obj.guests && obj.guests.length > 0) {
+                const names = obj.guests.map(gid => data.guests.find(g => g.id === gid)?.name || gid);
+                parts.push(`宾客:[${names.join(', ')}]`);
+            }
+            if (obj.conflicts && obj.conflicts.length > 0) {
+                const names = obj.conflicts.map(gid => data.guests.find(g => g.id === gid)?.name || gid);
+                parts.push(`冲突:[${names.join(', ')}]`);
+            }
+            if (obj.notes) parts.push(`备注:${obj.notes}`);
+            
+            return parts.length > 0 ? parts.join(' | ') : JSON.stringify(obj);
+        }
+        
+        function clearHistory() {
+            if (!confirm('确定要清空所有历史记录吗？此操作不可恢复。')) return;
+            data.history = [];
+            saveToStorage();
+            renderHistory();
+            showToast('历史记录已清空', 'success');
+        }
+        
+        // === 导入导出 ===
+        
+        function exportData() {
+            const exportObj = {
+                guests: data.guests,
+                tables: data.tables,
+                exportedAt: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `婚礼座次_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            recordHistory('export_data', '导出数据', null, { count: data.guests.length + '位宾客, ' + data.tables.length + '个桌位' });
+            showToast('数据已导出', 'success');
+        }
+        
+        function importData(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    if (!imported.guests || !imported.tables) {
+                        throw new Error('无效的数据格式');
+                    }
+                    
+                    const beforeGuests = [...data.guests];
+                    const beforeTables = [...data.tables];
+                    
+                    data.guests = imported.guests;
+                    data.tables = imported.tables;
+                    
+                    recordHistory('import_data', `导入数据（${imported.guests.length}位宾客，${imported.tables.length}个桌位）`,
+                        { guests: beforeGuests, tables: beforeTables },
+                        { guests: data.guests, tables: data.tables }
+                    );
+                    
+                    saveToStorage();
+                    renderAll();
+                    showToast(`成功导入 ${imported.guests.length} 位宾客和 ${imported.tables.length} 个桌位`, 'success');
+                } catch (err) {
+                    showToast('导入失败：' + err.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            fileInput.value = '';
+        }
+        
+        // === 工具函数 ===
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        document.getElementById('guest-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeGuestModal();
+        });
+        
+        document.getElementById('table-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeTableModal();
+        });
+        
+        init();
+    </script>
+</body>
+</html>
