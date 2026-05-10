@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindOptionsOrder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AuditLog, AuditAction, AuditEntityType } from './audit-log.entity';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -54,7 +54,7 @@ export class AuditService {
     const skip = (page - 1) * limit;
     const [logs, total] = await this.auditLogRepository.findAndCount({
       where: { groupId },
-      order: { createdAt: 'DESC' as FindOptionsOrder<AuditLog> },
+      order: { createdAt: 'DESC' as const },
       skip,
       take: limit,
     });
@@ -78,7 +78,7 @@ export class AuditService {
     const skip = (page - 1) * limit;
     const [logs, total] = await this.auditLogRepository.findAndCount({
       where: { billId },
-      order: { createdAt: 'DESC' as FindOptionsOrder<AuditLog> },
+      order: { createdAt: 'DESC' as const },
       skip,
       take: limit,
     });
@@ -102,7 +102,7 @@ export class AuditService {
     const skip = (page - 1) * limit;
     const [logs, total] = await this.auditLogRepository.findAndCount({
       where: { userId },
-      order: { createdAt: 'DESC' as FindOptionsOrder<AuditLog> },
+      order: { createdAt: 'DESC' as const },
       skip,
       take: limit,
     });

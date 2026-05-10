@@ -19,6 +19,9 @@ export class BillShare extends BaseEntity {
   @Column({ type: 'timestamptz', nullable: true })
   settledAt: Date;
 
+  @Column({ type: 'uuid' })
+  billId: string;
+
   @ManyToOne(() => Bill, (bill) => bill.shares)
   bill: Bill;
 }

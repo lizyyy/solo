@@ -74,7 +74,7 @@ export class ReportsService {
       },
     });
 
-    return buffer as Buffer;
+    return buffer as unknown as Buffer;
   }
 
   private buildSummarySheet(

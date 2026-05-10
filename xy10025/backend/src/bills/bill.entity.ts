@@ -31,7 +31,7 @@ export class Bill extends BaseEntity {
   @Column({ type: 'uuid' })
   groupId: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, unique: true })
   requestId: string;
 
   @Column({
