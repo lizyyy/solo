@@ -66,7 +66,7 @@ func main() {
 		logger.Fatal("Failed to start mock service", zap.Error(err))
 	}
 
-	server := api.NewServer(cfg)
+	server := api.NewServer(cfg, mockService)
 	if err := server.Start(); err != nil {
 		logger.Fatal("Failed to start API server", zap.Error(err))
 	}

@@ -22,29 +22,29 @@ import (
 )
 
 type Server struct {
-	db               *gorm.DB
-	cfg              *config.Config
-	router           *chi.Mux
-	mockService      *services.MockService
-	trafficService   *services.TrafficService
-	mqService        *services.MessageQueueService
-	reportService    *services.ReportService
+	db                 *gorm.DB
+	cfg                *config.Config
+	router             *chi.Mux
+	mockService        *services.MockService
+	trafficService     *services.TrafficService
+	mqService          *services.MessageQueueService
+	reportService      *services.ReportService
 	consistencyService *services.ConsistencyService
-	traceService     *tracing.TraceService
-	server           *http.Server
+	traceService       *tracing.TraceService
+	server             *http.Server
 }
 
-func NewServer(cfg *config.Config) *Server {
+func NewServer(cfg *config.Config, mockService *services.MockService) *Server {
 	s := &Server{
-		db:             database.GetDB(),
-		cfg:            cfg,
-		router:         chi.NewRouter(),
-		mockService:    services.NewMockService(cfg.Mock),
-		trafficService: services.NewTrafficService(),
-		mqService:      services.NewMessageQueueService(),
-		reportService:  services.NewReportService(),
+		db:                 database.GetDB(),
+		cfg:                cfg,
+		router:             chi.NewRouter(),
+		mockService:        mockService,
+		trafficService:     services.NewTrafficService(),
+		mqService:          services.NewMessageQueueService(),
+		reportService:      services.NewReportService(),
 		consistencyService: services.NewConsistencyService(),
-		traceService:   tracing.NewTraceService(),
+		traceService:       tracing.NewTraceService(),
 	}
 
 	s.setupMiddleware()
@@ -207,10 +207,10 @@ func (s *Server) listAPIs(w http.ResponseWriter, r *http.Request) {
 	s.db.Preload("MockResponses").Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&apis)
 
 	writeJSON(w, http.StatusOK, map[string]interface{}{
-		"data":       apis,
-		"total":      total,
-		"page":       page,
-		"page_size":  pageSize,
+		"data":      apis,
+		"total":     total,
+		"page":      page,
+		"page_size": pageSize,
 	})
 }
 
