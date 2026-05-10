@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>港口拖车排队仿真器</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>港口拖车排队仿真器</h1>
+            <p class="subtitle">闸口调度策略预演与队列管理系统</p>
+        </header>
+
+        <div class="main-content">
+            <div class="control-panel">
+                <div class="control-section">
+                    <h2>仿真控制</h2>
+                    <div class="control-buttons">
+                        <button id="playBtn" class="btn btn-primary">播放</button>
+                        <button id="pauseBtn" class="btn btn-secondary">暂停</button>
+                        <button id="resetBtn" class="btn btn-danger">重置</button>
+                        <button id="exportBtn" class="btn btn-success">导出结果</button>
+                    </div>
+                    <div class="speed-control">
+                        <label>仿真速度：</label>
+                        <input type="range" id="speedSlider" min="1" max="10" value="1">
+                        <span id="speedValue">1x</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>车辆生成配置</h2>
+                    <div class="config-group">
+                        <label>高峰时段（06:00-18:00）到达率：</label>
+                        <input type="number" id="peakArrivalRate" value="30" min="1" max="100">
+                        <span class="unit">辆/分钟</span>
+                    </div>
+                    <div class="config-group">
+                        <label>平峰时段（其他时间）到达率：</label>
+                        <input type="number" id="offPeakArrivalRate" value="10" min="1" max="100">
+                        <span class="unit">辆/分钟</span>
+                    </div>
+                    <div class="config-group">
+                        <label>最大队列容量：</label>
+                        <input type="number" id="maxQueueSize" value="100" min="10" max="500">
+                        <span class="unit">辆</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>闸口策略配置</h2>
+                    <div class="strategy-group">
+                        <label>高峰策略：</label>
+                        <select id="peakStrategy">
+                            <option value="fixed">固定闸口数</option>
+                            <option value="elastic">弹性调度</option>
+                        </select>
+                    </div>
+                    <div class="config-group" id="peakGatesGroup">
+                        <label>高峰闸口数量：</label>
+                        <input type="number" id="peakGates" value="5" min="1" max="20">
+                        <span class="unit">个</span>
+                    </div>
+                    <div class="strategy-group">
+                        <label>平峰策略：</label>
+                        <select id="offPeakStrategy">
+                            <option value="fixed">固定闸口数</option>
+                            <option value="elastic">弹性调度</option>
+                        </select>
+                    </div>
+                    <div class="config-group" id="offPeakGatesGroup">
+                        <label>平峰闸口数量：</label>
+                        <input type="number" id="offPeakGates" value="2" min="1" max="20">
+                        <span class="unit">个</span>
+                    </div>
+                    <div class="config-group">
+                        <label>平均处理时间：</label>
+                        <input type="number" id="processingTime" value="3" min="1" max="30">
+                        <span class="unit">分钟/辆</span>
+                    </div>
+                </div>
+
+                <div class="control-section">
+                    <h2>加载测试数据</h2>
+                    <select id="testDataSet">
+                        <option value="normal">正常场景</option>
+                        <option value="overflow">队列溢出场景</option>
+                        <option value="strategy_change">策略调整场景</option>
+                    </select>
+                    <button id="loadTestBtn" class="btn btn-primary">加载数据</button>
+                </div>
+            </div>
+
+            <div class="simulation-area">
+                <div class="status-bar">
+                    <div class="status-item">
+                        <span class="status-label">当前时间：</span>
+                        <span id="currentTime" class="status-value">00:00:00</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">仿真状态：</span>
+                        <span id="simulationStatus" class="status-value status-stopped">已停止</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">已处理车辆：</span>
+                        <span id="processedCount" class="status-value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">排队车辆：</span>
+                        <span id="queueCount" class="status-value">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">溢出车辆：</span>
+                        <span id="overflowCount" class="status-value status-danger">0</span>
+                    </div>
+                </div>
+
+                <div class="visualization">
+                    <div class="queue-visualization">
+                        <h3>闸口队列状态</h3>
+                        <div class="queue-container">
+                            <div class="queue-area" id="queueArea">
+                                <p class="empty-hint">队列为空</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gates-visualization">
+                        <h3>闸口处理状态</h3>
+                        <div class="gates-container" id="gatesContainer">
+                            <p class="empty-hint">未配置闸口</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-panel">
+                    <h3>仿真结果与分析</h3>
+                    <div id="resultsOutput" class="results-output">
+                        <p>点击播放按钮开始仿真...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="business-summary">
+            <h3>业务分析报告</h3>
+            <div id="businessSummary" class="summary-content">
+                <p>等待仿真完成以生成业务分析报告...</p>
+            </div>
+        </div>
+
+        <div class="acceptance-criteria">
+            <h3>验收标准说明</h3>
+            <div class="criteria-list">
+                <div class="criteria-item">
+                    <h4>通过标准</h4>
+                    <ul>
+                        <li>车辆按配置速率生成，无丢失</li>
+                        <li>队列在容量范围内，无溢出或溢出在预期内</li>
+                        <li>策略切换与原始数据一致</li>
+                        <li>平均等待时间在可接受范围内</li>
+                    </ul>
+                </div>
+                <div class="criteria-item">
+                    <h4>需人工处理</h4>
+                    <ul>
+                        <li>队列溢出超过阈值</li>
+                        <li>车辆丢失率过高</li>
+                        <li>平均等待时间过长</li>
+                        <li>闸口利用率不均衡</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/vehicle.js"></script>
+    <script src="js/queue.js"></script>
+    <script src="js/gate.js"></script>
+    <script src="js/strategies.js"></script>
+    <script src="js/simulation.js"></script>
+    <script src="js/testData.js"></script>
+    <script src="js/exporter.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
