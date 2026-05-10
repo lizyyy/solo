@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场馆押金退还服务</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #1a365d; margin-bottom: 20px; text-align: center; }
+        .nav { background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .nav button { padding: 10px 20px; border: 2px solid #3182ce; background: white; color: #3182ce; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+        .nav button:hover, .nav button.active { background: #3182ce; color: white; }
+        .content { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section { display: none; }
+        .section.active { display: block; }
+        .section h2 { color: #2d3748; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #4a5568; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49,130,206,0.1); }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #3182ce; color: white; }
+        .btn-primary:hover { background: #2b6cb0; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-warning { background: #dd6b20; color: white; }
+        .btn-warning:hover { background: #c05621; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-danger:hover { background: #c53030; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; font-weight: 600; color: #2d3748; }
+        tr:hover { background: #f7fafc; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-PENDING { background: #fef3c7; color: #92400e; }
+        .status-IN_USE { background: #dbeafe; color: #1e40af; }
+        .status-CHECKING { background: #e0e7ff; color: #3730a3; }
+        .status-FEE_CALCULATED { background: #fce7f3; color: #9d174d; }
+        .status-REFUND_PENDING { background: #fed7aa; color: #9a3412; }
+        .status-REFUND_PROCESSING { background: #cffafe; color: #0e7490; }
+        .status-COMPLETED { background: #d1fae5; color: #065f46; }
+        .status-CANCELLED { background: #fecaca; color: #991b1b; }
+        .status-SUCCESS { background: #d1fae5; color: #065f46; }
+        .status-FAILED { background: #fecaca; color: #991b1b; }
+        .status-MANUAL_REVIEW { background: #fef3c7; color: #92400e; }
+        .card { background: #f7fafc; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #3182ce; }
+        .card h3 { margin-bottom: 10px; color: #2d3748; }
+        .card p { margin: 5px 0; color: #4a5568; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .detail-panel { background: #f7fafc; padding: 20px; border-radius: 6px; margin-top: 15px; max-height: 600px; overflow-y: auto; }
+        .detail-panel h3 { margin-bottom: 10px; color: #2d3748; }
+        .detail-item { margin: 8px 0; padding: 8px; background: white; border-radius: 4px; }
+        .detail-item label { font-weight: 500; color: #4a5568; }
+        .detail-item span { margin-left: 10px; }
+        .loading { text-align: center; padding: 20px; color: #4a5568; }
+        .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fecaca; color: #991b1b; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+        .guide { background: #ebf8ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3182ce; }
+        .guide h3 { color: #2c5282; margin-bottom: 10px; }
+        .guide ol { margin-left: 20px; color: #2d3748; }
+        .guide ol li { margin: 8px 0; }
+        .guide .next-step { font-weight: 600; color: #2c5282; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; }
+        .tab { padding: 10px 15px; cursor: pointer; border-bottom: 2px solid transparent; color: #4a5568; }
+        .tab.active { border-bottom-color: #3182ce; color: #3182ce; font-weight: 500; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .inline-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+        .inline-form .form-group { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏟️ 场馆押金退还服务</h1>
+        
+        <div class="nav">
+            <button onclick="showSection('dashboard')" class="active">📊 仪表盘</button>
+            <button onclick="showSection('orders')">📋 订单管理</button>
+            <button onclick="showSection('checking')">🔍 验收流程</button>
+            <button onclick="showSection('fees')">💰 费用计算</button>
+            <button onclick="showSection('refunds')">💸 退款处理</button>
+            <button onclick="showSection('reports')">📈 财务报表</button>
+            <button onclick="showSection('guide')">📖 操作指南</button>
+        </div>
+
+        <div class="content">
+            <!-- 仪表盘 -->
+            <div id="section-dashboard" class="section active">
+                <h2>仪表盘</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>待处理退款</h3>
+                        <p id="pending-refund-count">加载中...</p>
+                        <p style="color: #718096; font-size: 12px;">需要立即处理</p>
+                    </div>
+                    <div class="card">
+                        <h3>验收中的订单</h3>
+                        <p id="checking-order-count">加载中...</p>
+                        <p style="color: #718096; font-size: 12px;">正在进行验收</p>
+                    </div>
+                    <div class="card">
+                        <h3>今日押金收入</h3>
+                        <p id="today-deposits">加载中...</p>
+                        <p style="color: #718096; font-size: 12px;">今日新增订单押金</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="refreshDashboard()">🔄 刷新数据</button>
+            </div>
+
+            <!-- 订单管理 -->
+            <div id="section-orders" class="section">
+                <h2>订单管理</h2>
+                
+                <div class="guide">
+                    <h3>📖 快速开始</h3>
+                    <ol>
+                        <li>创建新订单时，请确保填写所有必填字段</li>
+                        <li>订单创建后状态为 <span class="next-step">PENDING（待确认）</span></li>
+                        <li>客户入场后点击 <span class="next-step">「开始使用」</span> 进入使用中</li>
+                        <li>使用结束后点击 <span class="next-step">「开始验收」</span> 进入验收流程</li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <h3>创建新订单</h3>
+                    <form id="create-order-form" class="grid">
+                        <div class="form-group">
+                            <label>场馆ID *</label>
+                            <input type="text" name="venue_id" required value="VENUE001">
+                        </div>
+                        <div class="form-group">
+                            <label>场馆名称 *</label>
+                            <input type="text" name="venue_name" required value="网球馆A">
+                        </div>
+                        <div class="form-group">
+                            <label>客户姓名 *</label>
+                            <input type="text" name="customer_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>联系电话</label>
+                            <input type="tel" name="customer_phone">
+                        </div>
+                        <div class="form-group">
+                            <label>押金金额 *</label>
+                            <input type="number" name="deposit_amount" step="0.01" required value="500">
+                        </div>
+                        <div class="form-group">
+                            <label>开始时间 *</label>
+                            <input type="datetime-local" name="rental_start_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label>结束时间 *</label>
+                            <input type="datetime-local" name="rental_end_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <input type="text" name="remark">
+                        </div>
+                    </form>
+                    <button class="btn btn-primary" onclick="createOrder()">➕ 创建订单</button>
+                </div>
+
+                <h3>订单列表</h3>
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>状态筛选</label>
+                        <select id="order-status-filter" onchange="loadOrders()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>客户姓名</label>
+                        <input type="text" id="order-customer-filter" placeholder="搜索客户">
+                    </div>
+                    <button class="btn btn-primary" onclick="loadOrders()">🔍 搜索</button>
+                </div>
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>场馆</th>
+                            <th>客户</th>
+                            <th>押金</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- 验收流程 -->
+            <div id="section-checking" class="section">
+                <h2>验收流程</h2>
+                
+                <div class="guide">
+                    <h3>📖 验收步骤</h3>
+                    <ol>
+                        <li>选择验收中的订单</li>
+                        <li>添加验收项目，填写实际数量和损坏情况</li>
+                        <li>对于损坏的项目，系统会 <span class="next-step">自动计算</span> 损坏扣费</li>
+                        <li>录入水电表读数，系统自动计算水电费</li>
+                        <li>确认所有项目后进入 <span class="next-step">费用计算</span></li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <h3>选择订单</h3>
+                    <div class="form-group">
+                        <label>订单ID</label>
+                        <input type="text" id="checking-order-id" placeholder="输入订单ID">
+                        <button class="btn btn-primary btn-sm" onclick="loadOrderForChecking()">加载订单</button>
+                    </div>
+                </div>
+
+                <div id="checking-detail" style="display: none;">
+                    <div class="tabs">
+                        <div class="tab active" onclick="showTab('checklist')">验收清单</div>
+                        <div class="tab" onclick="showTab('damage')">损坏扣费</div>
+                        <div class="tab" onclick="showTab('utility')">水电记录</div>
+                    </div>
+
+                    <!-- 验收清单 -->
+                    <div id="tab-checklist" class="tab-content active">
+                        <div class="card">
+                            <h3>添加验收项目</h3>
+                            <form id="checklist-form" class="grid">
+                                <input type="hidden" id="checklist-order-id">
+                                <div class="form-group">
+                                    <label>项目名称 *</label>
+                                    <input type="text" name="item_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>类别</label>
+                                    <input type="text" name="item_category" placeholder="如：设备、家具">
+                                </div>
+                                <div class="form-group">
+                                    <label>预期数量 *</label>
+                                    <input type="number" name="expected_quantity" required value="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>实际数量</label>
+                                    <input type="number" name="actual_quantity">
+                                </div>
+                                <div class="form-group">
+                                    <label>是否损坏</label>
+                                    <select name="is_damaged">
+                                        <option value="false">否</option>
+                                        <option value="true">是</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>损坏程度</label>
+                                    <select name="damage_degree">
+                                        <option value="">请选择</option>
+                                        <option value="NONE">无损坏</option>
+                                        <option value="MINOR">轻微</option>
+                                        <option value="MODERATE">中等</option>
+                                        <option value="SEVERE">严重</option>
+                                        <option value="TOTAL_LOSS">全损</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>单价</label>
+                                    <input type="number" name="unit_price" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label>备注</label>
+                                    <input type="text" name="remark">
+                                </div>
+                            </form>
+                            <button class="btn btn-primary" onclick="addChecklistItem()">➕ 添加项目</button>
+                        </div>
+                        <h3>验收清单</h3>
+                        <table id="checklist-table">
+                            <thead>
+                                <tr>
+                                    <th>项目</th>
+                                    <th>预期/实际</th>
+                                    <th>是否损坏</th>
+                                    <th>损坏程度</th>
+                                    <th>单价</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 损坏扣费 -->
+                    <div id="tab-damage" class="tab-content">
+                        <button class="btn btn-success" onclick="autoGenerateDamageCharges()">⚡ 自动生成损坏扣费</button>
+                        <h3>损坏扣费记录</h3>
+                        <table id="damage-table">
+                            <thead>
+                                <tr>
+                                    <th>项目</th>
+                                    <th>损坏程度</th>
+                                    <th>扣费金额</th>
+                                    <th>原因</th>
+                                    <th>人工调整</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 水电记录 -->
+                    <div id="tab-utility" class="tab-content">
+                        <div class="card">
+                            <h3>添加水电记录</h3>
+                            <form id="utility-form" class="grid">
+                                <input type="hidden" id="utility-order-id">
+                                <div class="form-group">
+                                    <label>类型 *</label>
+                                    <select name="utility_type" required>
+                                        <option value="WATER">水费</option>
+                                        <option value="ELECTRICITY">电费</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>初始读数 *</label>
+                                    <input type="number" name="initial_reading" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>最终读数</label>
+                                    <input type="number" name="final_reading" step="0.01">
+                                </div>
+                                <div class="form-group">
+                                    <label>单价 *</label>
+                                    <input type="number" name="unit_price" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>备注</label>
+                                    <input type="text" name="remark">
+                                </div>
+                            </form>
+                            <button class="btn btn-primary" onclick="addUtilityRecord()">➕ 添加记录</button>
+                        </div>
+                        <h3>水电记录</h3>
+                        <table id="utility-table">
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>初始读数</th>
+                                    <th>最终读数</th>
+                                    <th>使用量</th>
+                                    <th>单价</th>
+                                    <th>费用</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 费用计算 -->
+            <div id="section-fees" class="section">
+                <h2>费用计算</h2>
+                
+                <div class="guide">
+                    <h3>📖 费用计算步骤</h3>
+                    <ol>
+                        <li>确保验收清单和水电记录已完整</li>
+                        <li>系统会自动汇总 <span class="next-step">损坏扣费</span> 和 <span class="next-step">水电费用</span></li>
+                        <li>如需要，可进行 <span class="next-step">人工调整</span> 并填写调整原因</li>
+                        <li>确认费用后加入 <span class="next-step">退款队列</span></li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <div class="form-group">
+                        <label>订单ID</label>
+                        <input type="text" id="fee-order-id" placeholder="输入订单ID">
+                        <button class="btn btn-primary btn-sm" onclick="loadFeeSummary()">加载费用</button>
+                    </div>
+                </div>
+
+                <div id="fee-detail" style="display: none;">
+                    <button class="btn btn-success" onclick="calculateFees()">🧮 计算费用</button>
+                    <button class="btn btn-warning" onclick="addToRefundQueue()">📦 加入退款队列</button>
+                    
+                    <div id="fee-summary" class="detail-panel"></div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <h3>人工调整退款金额</h3>
+                        <div class="inline-form">
+                            <div class="form-group">
+                                <label>新退款金额</label>
+                                <input type="number" id="adjust-refund-amount" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label>调整原因 *</label>
+                                <input type="text" id="adjust-reason" placeholder="必须填写调整原因">
+                            </div>
+                            <button class="btn btn-warning" onclick="adjustRefundAmount()">✏️ 调整</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 退款处理 -->
+            <div id="section-refunds" class="section">
+                <h2>退款处理</h2>
+                
+                <div class="guide">
+                    <h3>📖 退款处理步骤</h3>
+                    <ol>
+                        <li>查看待处理的退款队列</li>
+                        <li>点击 <span class="next-step">「处理退款」</span> 执行退款操作</li>
+                        <li>如退款失败，可点击 <span class="next-step">「重试」</span>（最多3次）</li>
+                        <li>超过重试次数的订单需 <span class="next-step">人工确认</span> 处理</li>
+                    </ol>
+                </div>
+
+                <div class="inline-form">
+                    <div class="form-group">
+                        <label>状态筛选</label>
+                        <select id="refund-status-filter" onchange="loadRefundQueue()">
+                            <option value="">全部</option>
+                            <option value="PENDING">待处理</option>
+                            <option value="FAILED">失败</option>
+                            <option value="MANUAL_REVIEW">需人工审核</option>
+                            <option value="SUCCESS">成功</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="loadRefundQueue()">🔄 刷新</button>
+                </div>
+
+                <h3>退款队列</h3>
+                <table id="refund-table">
+                    <thead>
+                        <tr>
+                            <th>订单ID</th>
+                            <th>退款金额</th>
+                            <th>退款方式</th>
+                            <th>状态</th>
+                            <th>重试次数</th>
+                            <th>最后错误</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <!-- 财务报表 -->
+            <div id="section-reports" class="section">
+                <h2>财务报表</h2>
+                
+                <div class="guide">
+                    <h3>📖 报表说明</h3>
+                    <ol>
+                        <li>日报表包含当日所有 <span class="next-step">押金收入</span>、<span class="next-step">损坏扣费</span>、<span class="next-step">水电费用</span>、<span class="next-step">退款记录</span></li>
+                        <li>每笔扣费和退款都可 <span class="next-step">追溯到原始订单</span></li>
+                        <li>导出的 CSV 文件包含所有明细，便于财务复核</li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <div class="form-group">
+                        <label>选择日期</label>
+                        <input type="date" id="report-date">
+                        <button class="btn btn-primary btn-sm" onclick="generateDailyReport()">📊 生成日报表</button>
+                        <button class="btn btn-success btn-sm" onclick="exportDailyReport()">📥 导出CSV</button>
+                    </div>
+                </div>
+
+                <div id="report-detail"></div>
+
+                <div class="card" style="margin-top: 20px;">
+                    <h3>订单导出</h3>
+                    <div class="inline-form">
+                        <div class="form-group">
+                            <label>订单ID</label>
+                            <input type="text" id="export-order-id" placeholder="输入订单ID">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="loadOrderExport()">📋 查看数据</button>
+                        <button class="btn btn-success btn-sm" onclick="exportOrder()">📥 导出CSV</button>
+                    </div>
+                </div>
+                <div id="order-export-detail"></div>
+            </div>
+
+            <!-- 操作指南 -->
+            <div id="section-guide" class="section">
+                <h2>操作指南</h2>
+                
+                <div class="card">
+                    <h3>🏗️ 完整业务流程</h3>
+                    <ol>
+                        <li><strong>创建订单</strong> - 填写客户信息和押金金额</li>
+                        <li><strong>开始使用</strong> - 客户入场后更新订单状态</li>
+                        <li><strong>开始验收</strong> - 租借结束，进入验收流程</li>
+                        <li><strong>验收清单</strong> - 检查设备数量和损坏情况</li>
+                        <li><strong>损坏扣费</strong> - 根据损坏程度自动计算扣费</li>
+                        <li><strong>水电记录</strong> - 录入水电表读数，自动计算费用</li>
+                        <li><strong>费用计算</strong> - 汇总所有费用，计算应退押金</li>
+                        <li><strong>加入退款队列</strong> - 确认退款金额和方式</li>
+                        <li><strong>处理退款</strong> - 执行退款操作</li>
+                        <li><strong>订单完成</strong> - 退款成功，订单关闭</li>
+                    </ol>
+                </div>
+
+                <div class="card">
+                    <h3>❓ 常见问题排查</h3>
+                    <div class="detail-panel">
+                        <div class="detail-item">
+                            <label>Q: 发现扣费错误怎么办？</label><br>
+                            <span>A: 可以在「费用计算」页面进行人工调整，并填写调整原因。所有调整都会被记录。</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Q: 退款失败如何处理？</label><br>
+                            <span>A: 系统会自动重试最多3次。超过次数后，订单状态变为「需人工审核」，需要手动确认处理。</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Q: 如何查询历史操作？</label><br>
+                            <span>A: 每个订单详情都包含完整的操作日志，可在订单详情页面查看。</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Q: 多个订单共享水电如何分摊？</label><br>
+                            <span>A: 创建水电记录后，使用「分摊」功能按比例分摊到各订单。</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Q: 如何防止重复操作？</label><br>
+                            <span>A: 关键操作支持幂等性控制，使用 X-Idempotency-Key 头可防止重复请求。</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 状态流转图</h3>
+                    <div class="detail-panel">
+                        <pre style="background: white; padding: 15px; border-radius: 6px; font-size: 12px;">
+PENDING (待确认)
+    ↓
+IN_USE (使用中)
+    ↓
+CHECKING (验收中) ←────────┐
+    ↓                      │
+FEE_CALCULATED (费用已计算) │
+    ↓                      │
+REFUND_PENDING (待退款) ───┘
+    ↓
+REFUND_PROCESSING (退款中)
+    ↓
+COMPLETED (已完成)
+                        </pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>💡 下一步操作提示</h3>
+                    <ul>
+                        <li>如果订单在 <strong>PENDING</strong>：点击「开始使用」进入使用中</li>
+                        <li>如果订单在 <strong>IN_USE</strong>：使用结束后点击「开始验收」</li>
+                        <li>如果订单在 <strong>CHECKING</strong>：完成验收清单和水电记录</li>
+                        <li>如果订单在 <strong>FEE_CALCULATED</strong>：确认费用后加入退款队列</li>
+                        <li>如果订单在 <strong>REFUND_PENDING</strong>：在退款页面处理退款</li>
+                        <li>如果订单在 <strong>COMPLETED</strong>：订单已完成，可查看历史记录</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🔧 API 接口</h3>
+                    <div class="detail-panel">
+                        <h4>订单管理</h4>
+                        <ul>
+                            <li><code>POST /api/orders</code> - 创建订单</li>
+                            <li><code>GET /api/orders</code> - 查询订单列表</li>
+                            <li><code>GET /api/orders/:id</code> - 查询订单详情</li>
+                            <li><code>POST /api/orders/:id/start-using</code> - 开始使用</li>
+                            <li><code>POST /api/orders/:id/start-checking</code> - 开始验收</li>
+                        </ul>
+                        <h4>验收清单</h4>
+                        <ul>
+                            <li><code>POST /api/checklists</code> - 添加验收项目</li>
+                            <li><code>GET /api/checklists/order/:orderId</code> - 查询订单验收清单</li>
+                        </ul>
+                        <h4>损坏扣费</h4>
+                        <ul>
+                            <li><code>POST /api/damage/auto-generate/:orderId</code> - 自动生成损坏扣费</li>
+                            <li><code>POST /api/damage/:id/adjust</code> - 人工调整扣费</li>
+                        </ul>
+                        <h4>费用计算</h4>
+                        <ul>
+                            <li><code>POST /api/fees/calculate/:orderId</code> - 计算费用</li>
+                            <li><code>POST /api/fees/order/:orderId/adjust-refund</code> - 调整退款金额</li>
+                        </ul>
+                        <h4>退款处理</h4>
+                        <ul>
+                            <li><code>POST /api/refunds/enqueue/:orderId</code> - 加入退款队列</li>
+                            <li><code>POST /api/refunds/process/:id</code> - 处理退款</li>
+                            <li><code>POST /api/refunds/manual-process/:id</code> - 人工确认退款</li>
+                        </ul>
+                        <h4>报表导出</h4>
+                        <ul>
+                            <li><code>GET /api/reports/daily/:date/export</code> - 导出日报表</li>
+                            <li><code>GET /api/reports/order/:orderId/export</code> - 导出订单明细</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

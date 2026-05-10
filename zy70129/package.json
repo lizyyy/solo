@@ -1,0 +1,21 @@
+{
+  "name": "venue-deposit-refund-service",
+  "version": "1.0.0",
+  "description": "场馆押金退还服务 - 处理设备损坏、水电费和押金扣款的验收与退款流程",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node test/run-tests.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^11.5.0",
+    "uuid": "^11.0.0",
+    "date-fns": "^3.6.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
