@@ -165,6 +165,14 @@ func (s *MessageQueueService) StartSimulation(ctx context.Context, simID uint) e
 	return nil
 }
 
+type simulationStats struct {
+	consumedCount  int64
+	failedCount    int64
+	duplicateCount int64
+	expectedTotal  int64
+	processedAll   chan struct{}
+}
+
 func (s *MessageQueueService) runSimulation(ctx context.Context, sim *models.MessageQueueSimulation) {
 	logger.Info("Starting message queue simulation",
 		zap.Uint("sim_id", sim.ID),
@@ -177,38 +185,24 @@ func (s *MessageQueueService) runSimulation(ctx context.Context, sim *models.Mes
 
 	s.CreateTopic(sim.Topic)
 
-	var consumedCount, failedCount, duplicateCount int64
-	var wg sync.WaitGroup
+	var stats simulationStats
+	stats.processedAll = make(chan struct{}, 1)
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	s.Subscribe(sim.Topic, sim.ConsumerGroup, func(msg *Message) error {
-		if sim.DelayMs > 0 {
-			time.Sleep(time.Duration(sim.DelayMs) * time.Millisecond)
-		}
-
-		if r.Float64() < sim.ErrorRate {
-			atomic.AddInt64(&failedCount, 1)
-			return fmt.Errorf("simulated error processing message")
-		}
-
-		if msg.IsDuplicate {
-			atomic.AddInt64(&duplicateCount, 1)
-		}
-		atomic.AddInt64(&consumedCount, 1)
-		return nil
-	})
+	var publishWg sync.WaitGroup
+	var duplicateEstimate int64
 
 	for i := 0; i < sim.TotalMessages; i++ {
 		select {
 		case <-ctx.Done():
-			goto finish
+			goto waitForConsumers
 		default:
 		}
 
-		wg.Add(1)
+		publishWg.Add(1)
 		go func(idx int) {
-			defer wg.Done()
+			defer publishWg.Done()
 
 			msgContent := make(map[string]interface{})
 			for k, v := range sim.MessageContent {
@@ -218,19 +212,167 @@ func (s *MessageQueueService) runSimulation(ctx context.Context, sim *models.Mes
 			msgContent["sent_at"] = time.Now().Format(time.RFC3339)
 
 			s.Publish(sim.Topic, msgContent)
+			atomic.AddInt64(&stats.expectedTotal, 1)
 
 			if sim.DuplicateRate > 0 && r.Float64() < sim.DuplicateRate {
 				time.Sleep(time.Duration(sim.DelayMs/2) * time.Millisecond)
 				s.PublishDuplicate(sim.Topic, msgContent)
+				atomic.AddInt64(&stats.expectedTotal, 1)
+				atomic.AddInt64(&duplicateEstimate, 1)
 				logger.Debug("Duplicate message sent", zap.Int("message_index", idx))
 			}
 		}(i)
 	}
 
-	wg.Wait()
+	publishWg.Wait()
+	logger.Info("All messages published",
+		zap.Int64("expected_total", stats.expectedTotal),
+		zap.Int64("estimated_duplicates", duplicateEstimate),
+	)
+
+waitForConsumers:
+	consumerKey := fmt.Sprintf("%s:%s", sim.Topic, sim.ConsumerGroup)
+	if _, exists := s.consumers.Load(consumerKey); !exists {
+		s.startSimulationConsumer(sim, &stats)
+	}
+
+	waitTimeout := time.After(5 * time.Minute)
+	checkInterval := time.NewTicker(100 * time.Millisecond)
+	defer checkInterval.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			logger.Info("Simulation cancelled", zap.Uint("sim_id", sim.ID))
+			goto finish
+		case <-waitTimeout:
+			logger.Warn("Simulation timed out waiting for consumers",
+				zap.Uint("sim_id", sim.ID),
+				zap.Int64("consumed", atomic.LoadInt64(&stats.consumedCount)),
+				zap.Int64("expected", stats.expectedTotal),
+			)
+			goto finish
+		case <-checkInterval.C:
+			consumed := atomic.LoadInt64(&stats.consumedCount)
+			failed := atomic.LoadInt64(&stats.failedCount)
+			totalProcessed := consumed + failed
+
+			topicEmpty := s.isTopicEmpty(sim.Topic)
+
+			if totalProcessed >= stats.expectedTotal && topicEmpty {
+				logger.Info("All messages consumed",
+					zap.Int64("consumed", consumed),
+					zap.Int64("failed", failed),
+					zap.Int64("expected", stats.expectedTotal),
+				)
+				goto finish
+			}
+		}
+	}
 
 finish:
-	s.finishSimulation(sim, consumedCount, failedCount, duplicateCount)
+	s.finishSimulation(
+		sim,
+		atomic.LoadInt64(&stats.consumedCount),
+		atomic.LoadInt64(&stats.failedCount),
+		atomic.LoadInt64(&stats.duplicateCount),
+	)
+}
+
+func (s *MessageQueueService) startSimulationConsumer(sim *models.MessageQueueSimulation, stats *simulationStats) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	consumerKey := fmt.Sprintf("%s:%s", sim.Topic, sim.ConsumerGroup)
+
+	handler := func(msg *Message) error {
+		if sim.DelayMs > 0 {
+			time.Sleep(time.Duration(sim.DelayMs) * time.Millisecond)
+		}
+
+		if r.Float64() < sim.ErrorRate {
+			atomic.AddInt64(&stats.failedCount, 1)
+			return fmt.Errorf("simulated error processing message")
+		}
+
+		if msg.IsDuplicate {
+			atomic.AddInt64(&stats.duplicateCount, 1)
+		}
+		atomic.AddInt64(&stats.consumedCount, 1)
+		return nil
+	}
+
+	s.consumers.Store(consumerKey, handler)
+	logger.Info("Simulation consumer started",
+		zap.String("topic", sim.Topic),
+		zap.String("consumer_group", sim.ConsumerGroup),
+	)
+
+	go s.simulationConsumerLoop(sim.Topic, consumerKey, stats)
+}
+
+func (s *MessageQueueService) simulationConsumerLoop(topic, consumerKey string, stats *simulationStats) {
+	for {
+		messages, exists := s.topics.Load(topic)
+		if !exists {
+			time.Sleep(50 * time.Millisecond)
+			continue
+		}
+
+		msgMap := messages.(*sync.Map)
+		hasMessages := false
+
+		msgMap.Range(func(key, value interface{}) bool {
+			msg := value.(*Message)
+			if msg.Attempts > 0 {
+				return true
+			}
+			hasMessages = true
+
+			if handler, ok := s.consumers.Load(consumerKey); ok {
+				handlerFn := handler.(func(*Message) error)
+				msg.Attempts++
+				err := handlerFn(msg)
+
+				if err != nil {
+					logger.Debug("Message handling failed",
+						zap.String("msg_id", msg.ID),
+						zap.Int("attempts", msg.Attempts),
+					)
+				} else {
+					msgMap.Delete(key)
+					logger.Debug("Message consumed", zap.String("msg_id", msg.ID))
+				}
+			}
+
+			return true
+		})
+
+		if !hasMessages {
+			time.Sleep(50 * time.Millisecond)
+		} else {
+			time.Sleep(10 * time.Millisecond)
+		}
+	}
+}
+
+func (s *MessageQueueService) isTopicEmpty(topic string) bool {
+	messages, exists := s.topics.Load(topic)
+	if !exists {
+		return true
+	}
+
+	msgMap := messages.(*sync.Map)
+	hasUnprocessed := false
+
+	msgMap.Range(func(key, value interface{}) bool {
+		msg := value.(*Message)
+		if msg.Attempts == 0 {
+			hasUnprocessed = true
+			return false
+		}
+		return true
+	})
+
+	return !hasUnprocessed
 }
 
 func (s *MessageQueueService) finishSimulation(
