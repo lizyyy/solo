@@ -1,0 +1,148 @@
+{
+  "cards": {
+    "C001": {
+      "owner": "张三",
+      "remaining_washes": 9,
+      "balance": 150
+    },
+    "C002": {
+      "owner": "李四",
+      "remaining_washes": 0,
+      "balance": 500
+    },
+    "C003": {
+      "owner": "王五",
+      "remaining_washes": 2,
+      "balance": 20
+    },
+    "C004": {
+      "owner": "赵六",
+      "remaining_washes": 0,
+      "balance": 0
+    }
+  },
+  "queue": [
+    {
+      "id": "V20260510211727526359",
+      "plate": "京A00001",
+      "service_type": "普通洗车",
+      "card_id": null,
+      "wax": false,
+      "interior": false,
+      "add_ons_paid": true,
+      "status": "已完成",
+      "called": true,
+      "call_count": 1,
+      "station": "1",
+      "queue_number": 1,
+      "enqueue_time": "2026-05-10T21:17:27.526651",
+      "complete_time": "2026-05-10T21:17:31.148051",
+      "amount_charged": 30,
+      "washes_deducted": 0,
+      "exception": null
+    },
+    {
+      "id": "V20260510211727959839",
+      "plate": "京A00002",
+      "service_type": "会员扣次",
+      "card_id": "C001",
+      "wax": true,
+      "interior": false,
+      "add_ons_paid": true,
+      "status": "已完成",
+      "called": true,
+      "call_count": 1,
+      "station": "2",
+      "queue_number": 2,
+      "enqueue_time": "2026-05-10T21:17:27.959883",
+      "complete_time": "2026-05-10T21:17:31.537744",
+      "amount_charged": 50,
+      "washes_deducted": 1,
+      "exception": null,
+      "add_ons_charged": 50
+    },
+    {
+      "id": "V20260510211729136673",
+      "plate": "京A00003",
+      "service_type": "普通洗车",
+      "card_id": null,
+      "wax": false,
+      "interior": true,
+      "add_ons_paid": true,
+      "status": "已完成",
+      "called": true,
+      "call_count": 1,
+      "station": "1",
+      "queue_number": 3,
+      "enqueue_time": "2026-05-10T21:17:29.136724",
+      "complete_time": "2026-05-10T21:17:32.485812",
+      "amount_charged": 110,
+      "washes_deducted": 0,
+      "exception": null,
+      "add_ons_charged": 80
+    }
+  ],
+  "stations": {
+    "1": null,
+    "2": null,
+    "3": null
+  },
+  "transactions": [
+    {
+      "id": "20260510211730219578",
+      "time": "2026-05-10T21:17:30.219627",
+      "date": "2026-05-10",
+      "type": "扣次",
+      "amount": 0,
+      "plate": "京A00002",
+      "details": "卡号 C001 扣次1次"
+    },
+    {
+      "id": "20260510211731147998",
+      "time": "2026-05-10T21:17:31.148039",
+      "date": "2026-05-10",
+      "type": "收入",
+      "amount": 30,
+      "plate": "京A00001",
+      "details": "普通洗车费"
+    },
+    {
+      "id": "20260510211731537691",
+      "time": "2026-05-10T21:17:31.537732",
+      "date": "2026-05-10",
+      "type": "消费",
+      "amount": 50,
+      "plate": "京A00002",
+      "details": "加项费用: 打蜡=True, 内饰=False"
+    },
+    {
+      "id": "20260510211732485750",
+      "time": "2026-05-10T21:17:32.485783",
+      "date": "2026-05-10",
+      "type": "收入",
+      "amount": 30,
+      "plate": "京A00003",
+      "details": "普通洗车费"
+    },
+    {
+      "id": "20260510211732485800",
+      "time": "2026-05-10T21:17:32.485805",
+      "date": "2026-05-10",
+      "type": "收入",
+      "amount": 80,
+      "plate": "京A00003",
+      "details": "加项费用: 打蜡=False, 内饰=True"
+    }
+  ],
+  "no_shows": [],
+  "call_ids": [
+    "V20260510211727959839",
+    "V20260510211727526359",
+    "V20260510211729136673"
+  ],
+  "complete_ids": [
+    "V20260510211727959839",
+    "V20260510211727526359",
+    "V20260510211729136673"
+  ]
+}
