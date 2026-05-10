@@ -17,17 +17,17 @@ import (
 )
 
 type Message struct {
-	ID       string
-	Topic    string
-	Content  map[string]interface{}
-	Attempts int
+	ID          string
+	Topic       string
+	Content     map[string]interface{}
+	Attempts    int
 	IsDuplicate bool
 }
 
 type MessageQueueService struct {
-	db             *gorm.DB
-	topics         sync.Map
-	consumers      sync.Map
+	db                 *gorm.DB
+	topics             sync.Map
+	consumers          sync.Map
 	runningSimulations sync.Map
 }
 
@@ -44,21 +44,36 @@ func (s *MessageQueueService) CreateTopic(topic string) {
 }
 
 func (s *MessageQueueService) Publish(topic string, content map[string]interface{}) string {
+	return s.publishWithFlag(topic, content, false)
+}
+
+func (s *MessageQueueService) PublishDuplicate(topic string, content map[string]interface{}) string {
+	return s.publishWithFlag(topic, content, true)
+}
+
+func (s *MessageQueueService) publishWithFlag(topic string, content map[string]interface{}, isDuplicate bool) string {
 	s.CreateTopic(topic)
 	msgID := fmt.Sprintf("msg-%d", time.Now().UnixNano())
 
 	msg := &Message{
-		ID:       msgID,
-		Topic:    topic,
-		Content:  content,
-		Attempts: 0,
-		IsDuplicate: false,
+		ID:          msgID,
+		Topic:       topic,
+		Content:     content,
+		Attempts:    0,
+		IsDuplicate: isDuplicate,
 	}
 
 	messages, _ := s.topics.Load(topic)
 	messages.(*sync.Map).Store(msgID, msg)
 
-	logger.Debug("Message published", zap.String("topic", topic), zap.String("msg_id", msgID))
+	if isDuplicate {
+		logger.Debug("Duplicate message published",
+			zap.String("topic", topic),
+			zap.String("msg_id", msgID),
+		)
+	} else {
+		logger.Debug("Message published", zap.String("topic", topic), zap.String("msg_id", msgID))
+	}
 	return msgID
 }
 
@@ -114,8 +129,13 @@ func (s *MessageQueueService) consumerLoop(topic, consumerGroup string, handler 
 	}
 }
 
+type MQSimulationContext struct {
+	simID      uint
+	cancelFunc context.CancelFunc
+}
+
 func (s *MessageQueueService) StartSimulation(ctx context.Context, simID uint) error {
-	ctx, span := tracing.Start(ctx, "mq.start_simulation")
+	_, span := tracing.Start(ctx, "mq.start_simulation")
 	defer span.End()
 
 	var sim models.MessageQueueSimulation
@@ -134,7 +154,14 @@ func (s *MessageQueueService) StartSimulation(ctx context.Context, simID uint) e
 	tracing.AddAttribute(span, "total_messages", sim.TotalMessages)
 	tracing.AddAttribute(span, "duplicate_rate", sim.DuplicateRate)
 
-	go s.runSimulation(ctx, &sim)
+	simContext, cancel := context.WithCancel(context.Background())
+	simCtx := &MQSimulationContext{
+		simID:      simID,
+		cancelFunc: cancel,
+	}
+	s.runningSimulations.Store(simID, simCtx)
+
+	go s.runSimulation(simContext, &sim)
 	return nil
 }
 
@@ -153,13 +180,14 @@ func (s *MessageQueueService) runSimulation(ctx context.Context, sim *models.Mes
 	var consumedCount, failedCount, duplicateCount int64
 	var wg sync.WaitGroup
 
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	s.Subscribe(sim.Topic, sim.ConsumerGroup, func(msg *Message) error {
 		if sim.DelayMs > 0 {
 			time.Sleep(time.Duration(sim.DelayMs) * time.Millisecond)
 		}
 
-		rand.New(rand.NewSource(time.Now().UnixNano()))
-		if rand.Float64() < sim.ErrorRate {
+		if r.Float64() < sim.ErrorRate {
 			atomic.AddInt64(&failedCount, 1)
 			return fmt.Errorf("simulated error processing message")
 		}
@@ -191,9 +219,9 @@ func (s *MessageQueueService) runSimulation(ctx context.Context, sim *models.Mes
 
 			s.Publish(sim.Topic, msgContent)
 
-			if sim.DuplicateRate > 0 && rand.Float64() < sim.DuplicateRate {
+			if sim.DuplicateRate > 0 && r.Float64() < sim.DuplicateRate {
 				time.Sleep(time.Duration(sim.DelayMs/2) * time.Millisecond)
-				s.Publish(sim.Topic, msgContent)
+				s.PublishDuplicate(sim.Topic, msgContent)
 				logger.Debug("Duplicate message sent", zap.Int("message_index", idx))
 			}
 		}(i)
@@ -232,8 +260,9 @@ func (s *MessageQueueService) StopSimulation(ctx context.Context, simID uint) er
 		return fmt.Errorf("simulation not running")
 	}
 
-	if cancel, ok := simCtxVal.(context.CancelFunc); ok {
-		cancel()
+	if simCtx, ok := simCtxVal.(*MQSimulationContext); ok {
+		simCtx.cancelFunc()
+		s.runningSimulations.Delete(simID)
 	}
 
 	var sim models.MessageQueueSimulation

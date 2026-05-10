@@ -40,17 +40,17 @@ func NewTrafficService() *TrafficService {
 }
 
 type TrafficTestContext struct {
-	testID      uint
-	cancelFunc  context.CancelFunc
-	totalReq    int64
-	successCount int64
-	failureCount int64
+	testID        uint
+	cancelFunc    context.CancelFunc
+	totalReq      int64
+	successCount  int64
+	failureCount  int64
 	responseTimes []int64
-	mu          sync.Mutex
+	mu            sync.Mutex
 }
 
 func (s *TrafficService) StartTest(ctx context.Context, testID uint) error {
-	ctx, span := tracing.Start(ctx, "traffic.start_test")
+	_, span := tracing.Start(ctx, "traffic.start_test")
 	defer span.End()
 
 	var test models.TrafficTest
@@ -72,11 +72,15 @@ func (s *TrafficService) StartTest(ctx context.Context, testID uint) error {
 	testCtx := &TrafficTestContext{
 		testID: testID,
 	}
-	ctxWithTimeout, cancel := context.WithTimeout(ctx, time.Duration(test.DurationSeconds)*time.Second)
+
+	testContext, cancel := context.WithTimeout(
+		context.Background(),
+		time.Duration(test.DurationSeconds)*time.Second,
+	)
 	testCtx.cancelFunc = cancel
 	s.running.Store(testID, testCtx)
 
-	go s.runTrafficTest(ctxWithTimeout, testCtx, &test)
+	go s.runTrafficTest(testContext, testCtx, &test)
 
 	return nil
 }
@@ -217,17 +221,17 @@ func (s *TrafficService) makeRequest(
 
 	result := &models.TrafficTestResult{
 		TrafficTestID:  test.ID,
-		RequestNumber: requestNum,
-		StatusCode:   statusCode,
+		RequestNumber:  requestNum,
+		StatusCode:     statusCode,
 		ResponseTimeMs: responseTimeMs,
-		IsSuccess:  isSuccess,
-		ErrorMessage: errorMsg,
-		RequestURL: test.TargetURL,
-		RequestBody: test.RequestBody,
-		ResponseBody: respBodyMap,
-		TraceID:    span.SpanContext().TraceID().String(),
-		Timestamp:  time.Now(),
-		RetryAttempt: retryAttempt,
+		IsSuccess:      isSuccess,
+		ErrorMessage:   errorMsg,
+		RequestURL:     test.TargetURL,
+		RequestBody:    test.RequestBody,
+		ResponseBody:   respBodyMap,
+		TraceID:        span.SpanContext().TraceID().String(),
+		Timestamp:      time.Now(),
+		RetryAttempt:   retryAttempt,
 	}
 
 	s.db.Create(result)
