@@ -1,0 +1,25 @@
+{
+  "name": "artifact-promotion-gate-service",
+  "version": "1.0.0",
+  "description": "制品仓库晋级门禁服务 - 用于管控构建产物从测试仓到生产仓的晋级流程",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "init-db": "node src/scripts/init-db.js",
+    "demo": "node src/scripts/demo-flow.js",
+    "test": "node --test src/tests/"
+  },
+  "keywords": [
+    "artifact",
+    "promotion",
+    "devops",
+    "security"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
