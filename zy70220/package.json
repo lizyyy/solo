@@ -1,0 +1,17 @@
+{
+  "name": "island-homestay-water-api",
+  "version": "1.0.0",
+  "description": "海岛民宿淡水配额管理 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "node demos/demo-path.js",
+    "demo-error": "node demos/error-path.js",
+    "test": "node tests/run-all.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1"
+  }
+}
