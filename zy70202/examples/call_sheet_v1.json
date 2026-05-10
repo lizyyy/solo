@@ -1,0 +1,85 @@
+{
+  "shoot_date": "2024-01-15",
+  "notes": "第一天拍摄 - 室内戏",
+  "scenes": [
+    {
+      "number": "1-1",
+      "location": "A栋公寓 - 客厅",
+      "description": "男主回家发现异常",
+      "call_time": "08:00",
+      "wrap_time": "12:00",
+      "actors": ["张三", "李四"],
+      "vehicles": ["VAN-001"]
+    },
+    {
+      "number": "1-2",
+      "location": "A栋公寓 - 卧室",
+      "description": "男主回忆场景",
+      "call_time": "13:00",
+      "wrap_time": "17:00",
+      "actors": ["张三", "王五"],
+      "vehicles": ["CAR-001"]
+    },
+    {
+      "number": "2-1",
+      "location": "街道外景",
+      "description": "追逐戏",
+      "call_time": "18:00",
+      "wrap_time": "22:00",
+      "actors": ["张三", "李四"],
+      "vehicles": ["VAN-001", "MOTOR-001"]
+    }
+  ],
+  "actors": [
+    {
+      "name": "张三",
+      "role": "男主角",
+      "call_time": "07:00",
+      "wrap_time": "22:30",
+      "scenes": ["1-1", "1-2", "2-1"],
+      "notes": "需要提前化妆"
+    },
+    {
+      "name": "李四",
+      "role": "女主角",
+      "call_time": "07:30",
+      "wrap_time": "22:30",
+      "scenes": ["1-1", "2-1"],
+      "notes": ""
+    },
+    {
+      "name": "王五",
+      "role": "男配角",
+      "call_time": "12:30",
+      "wrap_time": "17:30",
+      "scenes": ["1-2"],
+      "notes": ""
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "VAN-001",
+      "type": "厢式货车",
+      "driver": "赵师傅",
+      "usage": "道具运输",
+      "start_time": "06:00",
+      "end_time": "23:00"
+    },
+    {
+      "id": "CAR-001",
+      "type": "轿车",
+      "driver": "钱师傅",
+      "usage": "演员接送",
+      "start_time": "07:00",
+      "end_time": "18:00"
+    },
+    {
+      "id": "MOTOR-001",
+      "type": "摩托车",
+      "driver": "特技车手",
+      "usage": "追逐戏道具",
+      "start_time": "17:00",
+      "end_time": "22:30"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "shoot_date": "2024-01-16",
+  "notes": "包含脏数据的测试文件",
+  "scenes": [
+    {
+      "number": "1-1",
+      "location": "办公室",
+      "description": "开场戏",
+      "call_time": "08:00",
+      "wrap_time": "12:00",
+      "actors": ["演员A", "演员B"],
+      "vehicles": ["CAR-001"]
+    },
+    {
+      "number": "1-1",
+      "location": "会议室",
+      "description": "重复场景号",
+      "call_time": "invalid_time",
+      "wrap_time": "17:00",
+      "actors": ["演员A"],
+      "vehicles": ["NONEXISTENT"]
+    },
+    {
+      "number": "",
+      "location": "",
+      "description": "缺少必填字段",
+      "call_time": "10:00",
+      "wrap_time": "11:00",
+      "actors": [],
+      "vehicles": []
+    }
+  ],
+  "actors": [
+    {
+      "name": "",
+      "role": "缺少姓名",
+      "call_time": "07:00",
+      "wrap_time": "18:00",
+      "scenes": ["NONEXISTENT_SCENE"]
+    },
+    {
+      "name": "演员A",
+      "role": "主角",
+      "call_time": "07:00",
+      "wrap_time": "22:30",
+      "scenes": ["1-1"]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "",
+      "type": "",
+      "driver": "张师傅",
+      "usage": "接送"
+    },
+    {
+      "id": "CAR-001",
+      "type": "商务车",
+      "driver": "李师傅",
+      "usage": "道具",
+      "start_time": "06:00",
+      "end_time": "23:00"
+    }
+  ]
+}
