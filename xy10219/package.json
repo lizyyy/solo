@@ -1,0 +1,15 @@
+{
+  "name": "elevator-maintenance-api",
+  "version": "1.0.0",
+  "description": "电梯维保零件换件 API - 故障单、备件批次与维保人员签收记录闭环管理",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "moment": "^2.29.4"
+  }
+}
