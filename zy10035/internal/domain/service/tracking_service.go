@@ -140,6 +140,21 @@ func (s *TrackingService) CreateTracking(ctx context.Context, req *CreateTrackin
 }
 
 func (s *TrackingService) UpdateStatus(ctx context.Context, trackingID string, newStatus model.MessageStatus, errMsg string, stack string) (*model.MessageTracking, error) {
+	tracking, err := s.updateStatusInternal(ctx, trackingID, newStatus, errMsg, stack)
+	if err != nil {
+		return nil, err
+	}
+
+	if newStatus == model.MessageStatusDeadLetter {
+		if _, err := s.createDeadLetterRecord(ctx, tracking, errMsg, stack); err != nil {
+			logger.Warn("Failed to create dead letter record for tracking_id=%s: %v", trackingID, err)
+		}
+	}
+
+	return tracking, nil
+}
+
+func (s *TrackingService) updateStatusInternal(ctx context.Context, trackingID string, newStatus model.MessageStatus, errMsg string, stack string) (*model.MessageTracking, error) {
 	lockKey := fmt.Sprintf("tracking_status:%s", trackingID)
 	if err := s.locker.Lock(ctx, lockKey, 30*time.Second); err != nil {
 		return nil, errors.ErrConcurrentOperation("update status")
@@ -210,6 +225,41 @@ func (s *TrackingService) UpdateStatus(ctx context.Context, trackingID string, n
 
 	logger.Info("Updated tracking status, tracking_id=%s, from=%s, to=%s", trackingID, oldStatus, newStatus)
 	return &tracking, nil
+}
+
+func (s *TrackingService) createDeadLetterRecord(ctx context.Context, tracking *model.MessageTracking, errMsg string, stack string) (*model.DeadLetterMessage, error) {
+	var existing model.DeadLetterMessage
+	if err := s.db.GetDB().Where("tracking_id = ?", tracking.TrackingID).First(&existing).Error; err == nil {
+		return &existing, nil
+	}
+
+	now := time.Now()
+	deadLetter := &model.DeadLetterMessage{
+		TrackingID:      tracking.TrackingID,
+		MessageID:       tracking.MessageID,
+		Topic:           tracking.Topic,
+		Tag:             tracking.Tag,
+		Keys:            tracking.Keys,
+		ConsumerGroup:   tracking.ConsumerGroup,
+		Body:            tracking.Body,
+		Properties:      tracking.Properties,
+		ErrorMessage:    errMsg,
+		ErrorStack:      stack,
+		TotalRetryCount: tracking.RetryCount,
+		ReplayCount:     0,
+		MaxReplayCount:  5,
+		OriginTopic:     tracking.Topic,
+		OriginMessageID: tracking.MessageID,
+		ReplayStatus:    model.MessageStatusDeadLetter,
+		DeadLetterAt:    &now,
+	}
+
+	if err := s.db.GetDB().WithContext(ctx).Create(deadLetter).Error; err != nil {
+		return nil, errors.ErrDatabaseOperationFailed("create deadletter", err)
+	}
+
+	logger.Info("Message moved to dead letter, tracking_id=%s, message_id=%s", tracking.TrackingID, tracking.MessageID)
+	return deadLetter, nil
 }
 
 func (s *TrackingService) GetByTrackingID(ctx context.Context, trackingID string) (*model.MessageTracking, error) {
@@ -285,57 +335,17 @@ func (s *TrackingService) ListByStatus(ctx context.Context, status model.Message
 }
 
 func (s *TrackingService) MarkAsDeadLetter(ctx context.Context, trackingID string, errMsg string, stack string) (*model.DeadLetterMessage, error) {
-	tracking, err := s.UpdateStatus(ctx, trackingID, model.MessageStatusDeadLetter, errMsg, stack)
+	_, err := s.UpdateStatus(ctx, trackingID, model.MessageStatusDeadLetter, errMsg, stack)
 	if err != nil {
 		return nil, err
 	}
 
-	lockKey := fmt.Sprintf("deadletter_create:%s", trackingID)
-	success, err := s.locker.TryLock(ctx, lockKey, 30*time.Second)
-	if err != nil {
-		return nil, errors.ErrConcurrentOperation("create deadletter")
-	}
-	if !success {
-		var existing model.DeadLetterMessage
-		if err := s.db.GetDB().Where("tracking_id = ?", trackingID).First(&existing).Error; err == nil {
-			return &existing, nil
-		}
-		return nil, errors.ErrConcurrentOperation("create deadletter")
-	}
-	defer s.locker.Unlock(ctx, lockKey)
-
-	var existing model.DeadLetterMessage
-	if err := s.db.GetDB().Where("tracking_id = ?", trackingID).First(&existing).Error; err == nil {
-		return &existing, nil
+	var deadLetter model.DeadLetterMessage
+	if err := s.db.GetDB().WithContext(ctx).Where("tracking_id = ?", trackingID).First(&deadLetter).Error; err != nil {
+		return nil, errors.ErrDeadLetterNotFound(trackingID)
 	}
 
-	now := time.Now()
-	deadLetter := &model.DeadLetterMessage{
-		TrackingID:      tracking.TrackingID,
-		MessageID:       tracking.MessageID,
-		Topic:           tracking.Topic,
-		Tag:             tracking.Tag,
-		Keys:            tracking.Keys,
-		ConsumerGroup:   tracking.ConsumerGroup,
-		Body:            tracking.Body,
-		Properties:      tracking.Properties,
-		ErrorMessage:    errMsg,
-		ErrorStack:      stack,
-		TotalRetryCount: tracking.RetryCount,
-		ReplayCount:     0,
-		MaxReplayCount:  5,
-		OriginTopic:     tracking.Topic,
-		OriginMessageID: tracking.MessageID,
-		ReplayStatus:    model.MessageStatusDeadLetter,
-		DeadLetterAt:    &now,
-	}
-
-	if err := s.db.GetDB().WithContext(ctx).Create(deadLetter).Error; err != nil {
-		return nil, errors.ErrDatabaseOperationFailed("create deadletter", err)
-	}
-
-	logger.Info("Message moved to dead letter, tracking_id=%s, message_id=%s", trackingID, tracking.MessageID)
-	return deadLetter, nil
+	return &deadLetter, nil
 }
 
 func (s *TrackingService) GetDeadLetter(ctx context.Context, id int64) (*model.DeadLetterMessage, error) {
