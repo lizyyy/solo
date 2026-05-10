@@ -52,7 +52,7 @@
         
         .container {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 350px 1fr;
             min-height: calc(100vh - 73px);
         }
         
@@ -60,6 +60,7 @@
             background-color: #1e293b;
             border-right: 1px solid #334155;
             padding: 1.5rem;
+            overflow-y: auto;
         }
         
         .sidebar h2 {
@@ -70,7 +71,11 @@
             letter-spacing: 0.05em;
         }
         
-        .chaos-btn {
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
             width: 100%;
             padding: 0.75rem 1rem;
             margin-bottom: 0.5rem;
@@ -84,14 +89,63 @@
             font-size: 0.9rem;
         }
         
-        .chaos-btn:hover {
+        .btn:hover {
             background-color: #475569;
             border-color: #60a5fa;
         }
         
-        .chaos-btn.active {
-            background-color: #1e40af;
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             border-color: #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #ef4444;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            border-color: #f59e0b;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.5rem;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #60a5fa;
         }
         
         .main-content {
@@ -118,65 +172,34 @@
             border: 1px solid #334155;
         }
         
-        .form-group {
-            margin-bottom: 1rem;
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #94a3b8;
-            font-size: 0.875rem;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: #0f172a;
+        .metric-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
             border: 1px solid #334155;
-            border-radius: 0.5rem;
-            color: #e2e8f0;
-            font-size: 1rem;
         }
         
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #60a5fa;
+        .metric-card .label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
         }
         
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
+        .metric-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #60a5fa;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
+        .metric-card.warning .value { color: #f59e0b; }
+        .metric-card.danger .value { color: #ef4444; }
         
         .timeline {
             position: relative;
@@ -238,88 +261,16 @@
             padding: 0.5rem;
             border-radius: 0.25rem;
             word-break: break-all;
-        }
-        
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .metric-card {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            border: 1px solid #334155;
-        }
-        
-        .metric-card .label {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
-        }
-        
-        .metric-card .value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #60a5fa;
-        }
-        
-        .metric-card.warning .value { color: #f59e0b; }
-        .metric-card.danger .value { color: #ef4444; }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                border-right: none;
-                border-bottom: 1px solid #334155;
-            }
-        }
-        
-        .log-panel {
-            max-height: 400px;
+            max-height: 200px;
             overflow-y: auto;
-            background-color: #0f172a;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-family: monospace;
-            font-size: 0.85rem;
         }
-        
-        .log-entry {
-            padding: 0.25rem 0;
-            border-bottom: 1px solid #1e293b;
-        }
-        
-        .log-entry .timestamp {
-            color: #64748b;
-            margin-right: 0.5rem;
-        }
-        
-        .log-entry .level-success { color: #10b981; }
-        .log-entry .level-error { color: #ef4444; }
-        .log-entry .level-warning { color: #f59e0b; }
-        .log-entry .level-info { color: #60a5fa; }
         
         .tabs {
             display: flex;
             gap: 0.5rem;
             margin-bottom: 1rem;
             border-bottom: 1px solid #334155;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -349,6 +300,116 @@
         .tab-content.active {
             display: block;
         }
+        
+        .log-panel {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        
+        .log-entry {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .log-entry .timestamp {
+            color: #64748b;
+            margin-right: 0.5rem;
+        }
+        
+        .log-entry .level-success { color: #10b981; }
+        .log-entry .level-error { color: #ef4444; }
+        .log-entry .level-warning { color: #f59e0b; }
+        .log-entry .level-info { color: #60a5fa; }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .three-column {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .two-column, .three-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #334155;
+                max-height: 50vh;
+            }
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #78350f;
+            border: 1px solid #f59e0b;
+            color: #fcd34d;
+        }
+        
+        .alert-danger {
+            background-color: #7f1d1d;
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+        
+        .alert-success {
+            background-color: #064e3b;
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+        }
+        
+        .snapshot-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: #0f172a;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid #334155;
+        }
+        
+        .snapshot-item .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .snapshot-item button {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .inline-btn {
+            width: auto;
+            padding: 0.5rem 1rem;
+            margin: 0;
+        }
+        
+        .inline-btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
     </style>
 </head>
 <body>
@@ -362,41 +423,160 @@
     
     <div class="container">
         <div class="sidebar">
-            <h2>混沌实验</h2>
-            <button class="chaos-btn" onclick="injectChaos('connection_pool')">
-                🔌 连接池耗尽
-            </button>
-            <button class="chaos-btn" onclick="injectChaos('message_backlog')">
-                📨 消息积压
-            </button>
-            <button class="chaos-btn" onclick="injectChaos('goroutine_leak')">
-                🧵 Goroutine泄漏
-            </button>
-            <button class="chaos-btn" onclick="injectChaos('db_lock_wait')">
-                🔒 数据库锁等待
-            </button>
-            <button class="chaos-btn" onclick="injectChaos('cache_dirty_data')">
-                💾 缓存脏数据
-            </button>
-            <button class="chaos-btn" onclick="injectChaos('config_drift')">
-                ⚙️ 配置漂移
-            </button>
+            <div class="sidebar-section">
+                <h2>📦 订单故障模拟</h2>
+                
+                <div class="alert alert-warning">
+                    <strong>核心场景：</strong>库存扣减后订单失败
+                </div>
+                
+                <button class="btn btn-success" onclick="createOrderNormal()">
+                    ✅ 正常订单流程
+                </button>
+                
+                <button class="btn btn-danger" onclick="createOrderWithFailure('after_reserve')">
+                    💥 库存扣减后失败
+                </button>
+                
+                <button class="btn btn-warning" onclick="createOrderWithFailure('order_creation')">
+                    📝 订单创建时失败
+                </button>
+                
+                <button class="btn btn-danger" onclick="createOrderWithFailure('payment')">
+                    💳 支付时失败
+                </button>
+                
+                <button class="btn btn-danger" onclick="createOrderWithFailure('after_payment')">
+                    ⚠️ 支付成功后失败
+                </button>
+            </div>
             
-            <h2 style="margin-top: 2rem;">业务操作</h2>
-            <button class="chaos-btn" onclick="createOrder(1, 1, 1)">
-                📦 创建正常订单
-            </button>
-            <button class="chaos-btn" onclick="createOrder(1, 1, 200)">
-                ❌ 库存不足 (模拟失败)
-            </button>
+            <div class="sidebar-section">
+                <h2>🔄 补偿故障模拟</h2>
+                
+                <div class="alert alert-danger">
+                    <strong>补偿失败场景：</strong>补偿逻辑重试出错
+                </div>
+                
+                <button class="btn btn-danger" onclick="createOrderWithCompensationFailure('refund_payment')">
+                    💰 退款步骤失败
+                </button>
+                
+                <button class="btn btn-danger" onclick="createOrderWithCompensationFailure('release_inventory')">
+                    📦 释放库存失败
+                </button>
+                
+                <button class="btn btn-danger" onclick="createOrderWithCompensationFailure('cancel_order')">
+                    ❌ 取消订单失败
+                </button>
+                
+                <button class="btn btn-warning" onclick="createOrderWithCompensationFailure('intermittent')">
+                    🔁 间歇性失败 (前3次)
+                </button>
+            </div>
             
-            <h2 style="margin-top: 2rem;">系统操作</h2>
-            <button class="chaos-btn" onclick="stopAllChaos()">
-                🛑 停止所有实验
-            </button>
-            <button class="chaos-btn" onclick="refreshEvents()">
-                🔄 刷新事件
-            </button>
+            <div class="sidebar-section">
+                <h2>🌪️ 混沌实验</h2>
+                
+                <button class="btn btn-danger" onclick="injectChaos('connection_pool')">
+                    🔌 连接池耗尽
+                </button>
+                
+                <button class="btn btn-danger" onclick="injectChaos('message_backlog')">
+                    📨 消息积压
+                </button>
+                
+                <button class="btn btn-danger" onclick="injectChaos('goroutine_leak')">
+                    🧵 Goroutine泄漏
+                </button>
+                
+                <button class="btn btn-danger" onclick="injectChaos('db_lock_wait')">
+                    🔒 数据库锁等待
+                </button>
+                
+                <button class="btn btn-danger" onclick="injectChaos('cache_dirty_data')">
+                    💾 缓存脏数据
+                </button>
+                
+                <button class="btn btn-danger" onclick="injectChaos('config_drift')">
+                    ⚙️ 配置漂移
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h2>📸 系统快照</h2>
+                
+                <button class="btn btn-primary" onclick="createSnapshot()">
+                    📷 创建快照
+                </button>
+                
+                <button class="btn" onclick="loadSnapshots()">
+                    📋 查看快照列表
+                </button>
+                
+                <div id="snapshotList"></div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h2>🛠️ 系统操作</h2>
+                
+                <button class="btn btn-success" onclick="resetAllChaos()">
+                    🔄 重置所有混沌
+                </button>
+                
+                <button class="btn" onclick="refreshEvents()">
+                    🔄 刷新事件
+                </button>
+                
+                <button class="btn" onclick="getSystemStatus()">
+                    📊 查看系统状态
+                </button>
+            </div>
+            
+            <div class="sidebar-section">
+                <h2>⚙️ 高级配置</h2>
+                
+                <div class="form-group">
+                    <label>故障注入点</label>
+                    <select id="failurePointSelect">
+                        <option value="none">无 (正常流程)</option>
+                        <option value="after_reserve">库存扣减后</option>
+                        <option value="order_creation">订单创建时</option>
+                        <option value="payment">支付时</option>
+                        <option value="after_payment">支付成功后</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>补偿故障模式</label>
+                    <select id="compensationFailureSelect">
+                        <option value="none">无 (补偿成功)</option>
+                        <option value="refund_payment">退款失败</option>
+                        <option value="release_inventory">释放库存失败</option>
+                        <option value="cancel_order">取消订单失败</option>
+                        <option value="intermittent">间歇性失败</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>用户ID</label>
+                    <input type="number" id="userId" value="1" />
+                </div>
+                
+                <div class="form-group">
+                    <label>商品ID</label>
+                    <input type="number" id="productId" value="1" />
+                </div>
+                
+                <div class="form-group">
+                    <label>数量</label>
+                    <input type="number" id="quantity" value="1" />
+                </div>
+                
+                <button class="btn btn-primary" onclick="createOrderAdvanced()">
+                    🚀 创建订单 (高级)
+                </button>
+            </div>
         </div>
         
         <div class="main-content">
@@ -418,6 +598,14 @@
                         <div class="label">活跃场景</div>
                         <div class="value" id="metric-scenarios">0</div>
                     </div>
+                    <div class="metric-card">
+                        <div class="label">库存可用</div>
+                        <div class="value" id="metric-inventory">-</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">库存锁定</div>
+                        <div class="value" id="metric-inventory-reserved">-</div>
+                    </div>
                 </div>
             </div>
             
@@ -427,6 +615,7 @@
                         <button class="tab active" onclick="switchTab('timeline')">事件时间线</button>
                         <button class="tab" onclick="switchTab('trace')">链路追踪</button>
                         <button class="tab" onclick="switchTab('replay')">状态回放</button>
+                        <button class="tab" onclick="switchTab('inventory')">库存状态</button>
                         <button class="tab" onclick="switchTab('logs')">实时日志</button>
                     </div>
                     
@@ -451,12 +640,27 @@
                     
                     <div id="tab-replay" class="tab-content">
                         <div class="section-title">状态回放</div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>回放功能说明：</strong>
+                            <br>1. 事件回放：将指定 Trace ID 的所有事件重新生成（带 replay 前缀）
+                            <br>2. 快照恢复：将系统状态恢复到快照创建时的状态（库存、订单、支付）
+                        </div>
+                        
                         <div class="form-group">
-                            <label>输入 Trace ID 进行回放</label>
+                            <label>Trace ID 事件回放</label>
                             <input type="text" id="replayTraceId" placeholder="输入要回放的 Trace ID" />
                         </div>
-                        <button class="btn btn-success" onclick="replayTrace()">开始回放</button>
+                        <button class="btn btn-success" onclick="replayTrace()">开始事件回放</button>
                         <div id="replayResult" style="margin-top: 1.5rem;"></div>
+                    </div>
+                    
+                    <div id="tab-inventory" class="tab-content">
+                        <div class="section-title">库存状态监控</div>
+                        <div id="inventoryStatus">
+                            <p style="color: #94a3b8;">点击刷新查看库存状态</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="refreshInventory()" style="margin-top: 1rem;">刷新库存</button>
                     </div>
                     
                     <div id="tab-logs" class="tab-content">
@@ -496,15 +700,17 @@
                     </div>
                     <div class="form-group">
                         <label>自定义参数 (JSON)</label>
-                        <input type="text" id="chaosParams" placeholder='{"leak_count": 100}' />
+                        <textarea id="chaosParams" rows="3" placeholder='{"leak_count": 100}'></textarea>
                     </div>
-                    <button class="btn btn-primary" onclick="injectChaosCustom()">开始实验</button>
-                    <button class="btn btn-danger" onclick="stopChaos()" style="margin-left: 0.5rem;">停止实验</button>
+                    <div class="inline-btn-group">
+                        <button class="btn btn-primary" onclick="injectChaosCustom()">开始实验</button>
+                        <button class="btn btn-danger" onclick="stopChaos()">停止实验</button>
+                    </div>
                 </div>
                 
                 <div class="card">
                     <div class="section-title">系统状态</div>
-                    <pre id="systemStatus" style="font-family: monospace; font-size: 0.85rem; color: #60a5fa; background: #0f172a; padding: 1rem; border-radius: 0.5rem;">
+                    <pre id="systemStatus" style="font-family: monospace; font-size: 0.85rem; color: #60a5fa; background: #0f172a; padding: 1rem; border-radius: 0.5rem; max-height: 400px; overflow-y: auto;">
 点击刷新查看状态
                     </pre>
                     <button class="btn btn-primary" onclick="getSystemStatus()" style="margin-top: 1rem;">刷新状态</button>
@@ -532,26 +738,86 @@
             }
         }
         
-        async function createOrder(userId, productId, quantity) {
+        function addLog(level, message) {
+            const panel = document.getElementById('logPanel');
+            const timestamp = new Date().toLocaleTimeString('zh-CN');
+            const levelClass = `level-${level}`;
+            const levelText = {
+                'info': 'INFO',
+                'success': 'SUCCESS',
+                'warning': 'WARNING',
+                'error': 'ERROR'
+            }[level] || 'INFO';
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="timestamp">[${timestamp}]</span>
+                <span class="${levelClass}">[${levelText}]</span>
+                <span>${message}</span>
+            `;
+            
+            panel.appendChild(entry);
+            panel.scrollTop = panel.scrollHeight;
+        }
+        
+        async function createOrderNormal() {
+            return createOrderWithParams(1, 1, 1, 'none', 'none');
+        }
+        
+        async function createOrderWithFailure(failurePoint) {
+            return createOrderWithParams(1, 1, 1, failurePoint, 'none');
+        }
+        
+        async function createOrderWithCompensationFailure(compensationMode) {
+            return createOrderWithParams(1, 1, 1, 'after_reserve', compensationMode);
+        }
+        
+        async function createOrderAdvanced() {
+            const userId = parseInt(document.getElementById('userId').value);
+            const productId = parseInt(document.getElementById('productId').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const failurePoint = document.getElementById('failurePointSelect').value;
+            const compensationFailure = document.getElementById('compensationFailureSelect').value;
+            
+            return createOrderWithParams(userId, productId, quantity, failurePoint, compensationFailure);
+        }
+        
+        async function createOrderWithParams(userId, productId, quantity, failurePoint, compensationFailure) {
+            addLog('info', `创建订单 - 故障点: ${failurePoint}, 补偿故障: ${compensationFailure}`);
+            
             const result = await apiCall('/orders', {
                 method: 'POST',
-                body: JSON.stringify({ user_id: userId, product_id: productId, quantity })
+                body: JSON.stringify({ 
+                    user_id: userId, 
+                    product_id: productId, 
+                    quantity: quantity,
+                    failure_point: failurePoint,
+                    compensation_failure: compensationFailure
+                })
             });
-            addLog('info', `创建订单: ${JSON.stringify(result)}`);
+            
+            addLog(result.error ? 'error' : 'success', `订单结果: ${JSON.stringify(result)}`);
+            
             if (result.trace_id) {
                 addLog('info', `Trace ID: ${result.trace_id}`);
+                document.getElementById('traceIdInput').value = result.trace_id;
             }
+            
             refreshEvents();
+            refreshInventory();
             return result;
         }
         
         async function injectChaos(type) {
-            document.getElementById('chaosType').value = type;
+            addLog('warning', `注入混沌实验: ${type}`);
+            
             const result = await apiCall('/chaos/inject', {
                 method: 'POST',
                 body: JSON.stringify({ type, duration: '30s' })
             });
-            addLog('warning', `注入混沌实验: ${type}`);
+            
+            addLog('info', `混沌实验结果: ${JSON.stringify(result)}`);
             refreshEvents();
             getSystemStatus();
             return result;
@@ -571,11 +837,14 @@
                 return;
             }
             
+            addLog('warning', `注入混沌实验: ${type}, 时长: ${duration}`);
+            
             const result = await apiCall('/chaos/inject', {
                 method: 'POST',
                 body: JSON.stringify({ type, duration, params })
             });
-            addLog('warning', `注入混沌实验: ${type}, 时长: ${duration}`);
+            
+            addLog('info', `混沌实验结果: ${JSON.stringify(result)}`);
             refreshEvents();
             getSystemStatus();
             return result;
@@ -583,23 +852,29 @@
         
         async function stopChaos() {
             const type = document.getElementById('chaosType').value;
+            addLog('warning', `停止混沌实验: ${type}`);
+            
             const result = await apiCall(`/chaos/stop/${type}`, {
                 method: 'POST'
             });
-            addLog('success', `停止混沌实验: ${type}`);
+            
+            addLog('success', `停止结果: ${JSON.stringify(result)}`);
             refreshEvents();
             getSystemStatus();
             return result;
         }
         
-        async function stopAllChaos() {
-            const types = ['connection_pool', 'message_backlog', 'goroutine_leak', 'db_lock_wait', 'cache_dirty_data', 'config_drift'];
-            for (const type of types) {
-                await apiCall(`/chaos/stop/${type}`, { method: 'POST' });
-            }
-            addLog('success', '已停止所有混沌实验');
+        async function resetAllChaos() {
+            addLog('warning', '重置所有混沌实验...');
+            
+            const result = await apiCall('/chaos/reset', {
+                method: 'POST'
+            });
+            
+            addLog('success', `重置结果: ${JSON.stringify(result)}`);
             refreshEvents();
             getSystemStatus();
+            return result;
         }
         
         async function refreshEvents() {
@@ -610,26 +885,33 @@
             }
         }
         
+        async function refreshInventory() {
+            const result = await apiCall('/inventory');
+            if (result.inventories) {
+                renderInventoryStatus(result);
+            }
+        }
+        
         async function getSystemStatus() {
             const result = await apiCall('/chaos/status');
             document.getElementById('systemStatus').textContent = JSON.stringify(result, null, 2);
             
-            if (result.goroutine_leak) {
-                const gCount = result.goroutine_leak.total_goroutines || 0;
-                document.getElementById('metric-goroutines').textContent = gCount;
+            if (result.runtime_goroutines) {
+                document.getElementById('metric-goroutines').textContent = result.runtime_goroutines;
                 const card = document.getElementById('metric-goroutine-card');
-                card.className = gCount > 100 ? 'metric-card danger' : 'metric-card';
+                card.className = result.runtime_goroutines > 100 ? 'metric-card danger' : 'metric-card';
             }
             
             if (result.connection_pool) {
-                const conn = result.connection_pool;
+                const cp = result.connection_pool;
                 document.getElementById('metric-connections').textContent = 
-                    `${conn.current_connections || 0}/${conn.max_connections || 10}`;
+                    `${cp.current || 0}/${cp.max_connections || 10}`;
             }
             
-            if (result.active_scenarios) {
-                const count = Object.keys(result.active_scenarios).length;
-                document.getElementById('metric-scenarios').textContent = count;
+            if (result.chaos_state) {
+                const cs = result.chaos_state;
+                const activeCount = Object.values(cs).filter(v => v === true).length;
+                document.getElementById('metric-scenarios').textContent = activeCount;
             }
         }
         
@@ -639,6 +921,8 @@
                 addLog('error', '请输入 Trace ID');
                 return;
             }
+            
+            addLog('info', `查询链路: ${traceId}`);
             
             const result = await apiCall(`/events/${traceId}`);
             const container = document.getElementById('traceResult');
@@ -655,6 +939,7 @@
                 addLog('success', `查询到 ${result.events.length} 个事件`);
             } else {
                 container.innerHTML = '<p style="color: #94a3b8;">未找到该 Trace ID 的事件</p>';
+                addLog('warning', '未找到该 Trace ID 的事件');
             }
         }
         
@@ -664,6 +949,8 @@
                 addLog('error', '请输入 Trace ID');
                 return;
             }
+            
+            addLog('info', `开始事件回放: ${traceId}`);
             
             const result = await apiCall(`/events/${traceId}/replay`, {
                 method: 'POST'
@@ -675,8 +962,75 @@ ${JSON.stringify(result, null, 2)}
                 </pre>
             `;
             
-            addLog('info', `开始回放: ${traceId}`);
+            addLog('success', `事件回放完成: ${JSON.stringify(result)}`);
             setTimeout(refreshEvents, 1000);
+        }
+        
+        async function createSnapshot() {
+            const desc = prompt('请输入快照描述:', '手动快照');
+            if (desc === null) return;
+            
+            addLog('info', '创建系统快照...');
+            
+            const result = await apiCall('/snapshots', {
+                method: 'POST',
+                body: JSON.stringify({ description: desc })
+            });
+            
+            addLog('success', `快照创建完成: ${JSON.stringify(result)}`);
+            loadSnapshots();
+            return result;
+        }
+        
+        async function loadSnapshots() {
+            const result = await apiCall('/snapshots');
+            const container = document.getElementById('snapshotList');
+            
+            if (result.snapshots && result.snapshots.length > 0) {
+                container.innerHTML = result.snapshots.map(snap => `
+                    <div class="snapshot-item">
+                        <div>
+                            <div style="font-weight: 600;">${new Date(snap.timestamp).toLocaleString('zh-CN')}</div>
+                            <div style="font-size: 0.8rem; color: #94a3b8;">${snap.description}</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">
+                                库存: ${snap.inventory_count} | 订单: ${snap.orders_count}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-success inline-btn" onclick="restoreSnapshot('${snap.id}')">恢复</button>
+                            <button class="btn btn-danger inline-btn" onclick="deleteSnapshot('${snap.id}')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p style="color: #94a3b8; font-size: 0.85rem;">暂无快照</p>';
+            }
+        }
+        
+        async function restoreSnapshot(snapshotId) {
+            if (!confirm('确定要恢复到此快照吗？当前状态将被覆盖。')) return;
+            
+            addLog('warning', `恢复快照: ${snapshotId}`);
+            
+            const result = await apiCall(`/snapshots/${snapshotId}/restore`, {
+                method: 'POST'
+            });
+            
+            addLog('success', `快照恢复完成: ${JSON.stringify(result)}`);
+            refreshEvents();
+            refreshInventory();
+            loadSnapshots();
+        }
+        
+        async function deleteSnapshot(snapshotId) {
+            if (!confirm('确定要删除此快照吗？')) return;
+            
+            const result = await apiCall(`/snapshots/${snapshotId}`, {
+                method: 'DELETE'
+            });
+            
+            addLog('info', `快照已删除: ${JSON.stringify(result)}`);
+            loadSnapshots();
         }
         
         function renderTimeline(events) {
@@ -717,6 +1071,7 @@ ${JSON.stringify(result, null, 2)}
                         <span>服务: ${event.service}</span> | 
                         <span>时间: ${time}</span>
                         ${event.duration ? `| 耗时: ${event.duration}` : ''}
+                        ${event.trace_id ? `| Trace: ${event.trace_id.substring(0, 8)}...` : ''}
                     </div>
                     ${event.error ? `<div style="color: #ef4444; margin: 0.5rem 0;">错误: ${event.error}</div>` : ''}
                     <div class="payload">
@@ -724,6 +1079,42 @@ ${JSON.stringify(result, null, 2)}
                     </div>
                 </div>
             `;
+        }
+        
+        function renderInventoryStatus(result) {
+            const container = document.getElementById('inventoryStatus');
+            
+            if (result.inventories && result.inventories.length > 0) {
+                let available = 0;
+                let reserved = 0;
+                
+                const html = result.inventories.map(inv => {
+                    available = inv.available_qty;
+                    reserved = inv.reserved_qty;
+                    return `
+                        <div class="card" style="margin-bottom: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 600;">商品 #${inv.product_id}</div>
+                                    <div style="font-size: 0.85rem; color: #94a3b8;">
+                                        可用: <span style="color: #10b981;">${inv.available_qty}</span> | 
+                                        锁定: <span style="color: #f59e0b;">${inv.reserved_qty}</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 0.75rem; color: #64748b;">版本: ${inv.version}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = html;
+                document.getElementById('metric-inventory').textContent = available;
+                document.getElementById('metric-inventory-reserved').textContent = reserved;
+            } else {
+                container.innerHTML = '<p style="color: #94a3b8;">暂无库存数据</p>';
+            }
         }
         
         function getTypeColor(type) {
@@ -746,6 +1137,8 @@ ${JSON.stringify(result, null, 2)}
                 'db_lock_wait': '#f59e0b',
                 'cache_dirty': '#ef4444',
                 'config_drift': '#f59e0b',
+                'snapshot_created': '#60a5fa',
+                'snapshot_restored': '#10b981',
             };
             return colors[type] || '#60a5fa';
         }
@@ -754,35 +1147,16 @@ ${JSON.stringify(result, null, 2)}
             document.getElementById('metric-events').textContent = events.length;
         }
         
-        function addLog(level, message) {
-            const panel = document.getElementById('logPanel');
-            const timestamp = new Date().toLocaleTimeString('zh-CN');
-            const levelClass = `level-${level}`;
-            const levelText = {
-                'info': 'INFO',
-                'success': 'SUCCESS',
-                'warning': 'WARNING',
-                'error': 'ERROR'
-            }[level] || 'INFO';
-            
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `
-                <span class="timestamp">[${timestamp}]</span>
-                <span class="${levelClass}">[${levelText}]</span>
-                <span>${message}</span>
-            `;
-            
-            panel.appendChild(entry);
-            panel.scrollTop = panel.scrollHeight;
-        }
-        
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
             event.target.classList.add('active');
             document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            if (tabName === 'inventory') {
+                refreshInventory();
+            }
         }
         
         function connectSSE() {
@@ -811,7 +1185,9 @@ ${JSON.stringify(result, null, 2)}
         
         document.addEventListener('DOMContentLoaded', function() {
             refreshEvents();
+            refreshInventory();
             getSystemStatus();
+            loadSnapshots();
             connectSSE();
             
             setInterval(refreshEvents, 5000);
