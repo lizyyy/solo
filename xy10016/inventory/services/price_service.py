@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 from sqlalchemy.orm import Session
@@ -22,10 +23,11 @@ class PriceService:
 
     def generate_change_no(self) -> str:
         now = datetime.now()
+        unique_suffix = uuid.uuid4().hex[:4].upper()
         count = self.db.query(PriceChange).filter(
             PriceChange.created_at >= now.replace(hour=0, minute=0, second=0)
         ).count() + 1
-        return f'PC{now.strftime("%Y%m%d")}{count:04d}'
+        return f'PC{now.strftime("%Y%m%d%H%M%S")}{count:03d}{unique_suffix}'
 
     def create_price_change(
         self,

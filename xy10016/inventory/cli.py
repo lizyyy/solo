@@ -522,13 +522,13 @@ def export_stores(output, format):
         click.echo(f'门店数据已导出到: {path}')
 
 
-@cli.group()
-def import_():
+@cli.group(name='import')
+def import_group():
     """数据导入"""
     pass
 
 
-@import_.command('products')
+@import_group.command('products')
 @click.argument('file')
 @click.option('--overwrite', is_flag=True, help='覆盖已有数据')
 @click.option('--user', default='system', help='操作人')
@@ -546,7 +546,7 @@ def import_products(file, overwrite, user):
                 click.echo(f'  {err}')
 
 
-@import_.command('stores')
+@import_group.command('stores')
 @click.argument('file')
 @click.option('--overwrite', is_flag=True, help='覆盖已有数据')
 @click.option('--user', default='system', help='操作人')
@@ -564,7 +564,7 @@ def import_stores(file, overwrite, user):
                 click.echo(f'  {err}')
 
 
-@import_.command('inventory-adjust')
+@import_group.command('inventory-adjust')
 @click.argument('file')
 @click.option('--reason', default='批量导入调整', help='调整原因')
 @click.option('--user', default='system', help='操作人')

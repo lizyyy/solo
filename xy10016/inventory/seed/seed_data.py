@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from inventory.models import (
     User, Role, RolePermission, user_role,
-    Store, Product, Inventory,
+    Store, Product, Inventory, InventoryHistory,
     Transfer, TransferItem, PriceChange
 )
 from inventory.services.inventory_service import InventoryService

@@ -10,18 +10,18 @@ from inventory.models import Base
 from inventory.seed.seed_data import seed_all
 
 
-TEST_DB_PATH = tempfile.mktemp(suffix='.db')
-
-
 @pytest.fixture
 def engine():
-    engine = create_engine(f'sqlite:///{TEST_DB_PATH}', echo=False, future=True)
+    db_path = tempfile.mktemp(suffix='.db')
+    engine = create_engine(f'sqlite:///{db_path}', echo=False, future=True)
     Base.metadata.create_all(engine)
-    yield engine
-    Base.metadata.drop_all(engine)
-    engine.dispose()
-    if os.path.exists(TEST_DB_PATH):
-        os.unlink(TEST_DB_PATH)
+    try:
+        yield engine
+    finally:
+        Base.metadata.drop_all(engine)
+        engine.dispose()
+        if os.path.exists(db_path):
+            os.unlink(db_path)
 
 
 @pytest.fixture
