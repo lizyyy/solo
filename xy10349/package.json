@@ -1,0 +1,11 @@
+{
+  "name": "roll-call-platform",
+  "version": "1.0.0",
+  "description": "研学活动安全点名台",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["roll-call", "school-trip", "attendance"]
+}
