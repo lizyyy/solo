@@ -1,0 +1,19 @@
+{
+  "name": "pet-grooming-system",
+  "version": "1.0.0",
+  "description": "宠物美容预约耗材管理系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["pet", "grooming", "appointment"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  }
+}

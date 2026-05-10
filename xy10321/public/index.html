@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宠物美容预约耗材台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 24px; font-weight: 600; }
+    .nav { background: white; padding: 0 24px; border-bottom: 1px solid #e8e8e8; display: flex; }
+    .nav-item { padding: 14px 20px; cursor: pointer; border-bottom: 3px solid transparent; color: #666; font-weight: 500; transition: all 0.3s; }
+    .nav-item:hover { color: #667eea; }
+    .nav-item.active { color: #667eea; border-bottom-color: #667eea; }
+    .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+    .content { display: none; }
+    .content.active { display: block; }
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #333; display: flex; justify-content: space-between; align-items: center; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a6fd6; }
+    .btn-success { background: #52c41a; color: white; }
+    .btn-success:hover { background: #49a715; }
+    .btn-danger { background: #ff4d4f; color: white; }
+    .btn-danger:hover { background: #e64547; }
+    .btn-warning { background: #faad14; color: white; }
+    .btn-warning:hover { background: #e09c12; }
+    .btn-default { background: #f0f0f0; color: #333; }
+    .btn-default:hover { background: #e0e0e0; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-pending { background: #fff7e6; color: #faad14; border: 1px solid #ffe58f; }
+    .badge-confirmed { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .badge-rejected { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+    .badge-closed { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    .table th { background: #fafafa; font-weight: 600; color: #666; }
+    .table tr:hover { background: #fafafa; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #333; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #667eea; }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .calendar-header { text-align: center; padding: 8px; font-weight: 600; color: #666; }
+    .calendar-day { background: #fafafa; border-radius: 6px; padding: 8px; min-height: 100px; cursor: pointer; transition: all 0.3s; border: 1px solid #f0f0f0; }
+    .calendar-day:hover { background: #f0f5ff; border-color: #667eea; }
+    .calendar-day.today { background: #e6f7ff; border-color: #1890ff; }
+    .calendar-day.selected { background: #f0f5ff; border-color: #667eea; }
+    .calendar-day-number { font-weight: 600; color: #333; margin-bottom: 8px; }
+    .calendar-appointment { background: #667eea; color: white; padding: 4px 6px; border-radius: 4px; font-size: 11px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .calendar-appointment.pending { background: #faad14; }
+    .calendar-appointment.rejected { background: #ff4d4f; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .stat-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .stat-value { font-size: 32px; font-weight: 700; color: #667eea; }
+    .stat-label { font-size: 14px; color: #666; margin-top: 8px; }
+    .warning-card { border-left: 4px solid #faad14; }
+    .danger-card { border-left: 4px solid #ff4d4f; }
+    .success-card { border-left: 4px solid #52c41a; }
+    .tabs { display: flex; border-bottom: 1px solid #f0f0f0; margin-bottom: 20px; }
+    .tab { padding: 12px 24px; cursor: pointer; color: #666; border-bottom: 2px solid transparent; transition: all 0.3s; }
+    .tab:hover { color: #667eea; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; }
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-item { display: flex; align-items: center; gap: 8px; }
+    .tag { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+    .tag-warning { background: #fff7e6; color: #d48806; }
+    .tag-danger { background: #fff1f0; color: #cf1322; }
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; }
+    .alert-warning { background: #fffbe6; border: 1px solid #ffe58f; color: #d48806; }
+    .alert-danger { background: #fff2f0; border: 1px solid #ffccc7; color: #cf1322; }
+    .alert-success { background: #f6ffed; border: 1px solid #b7eb8f; color: #389e0d; }
+    .history-item { padding: 12px; border-left: 2px solid #e8e8e8; margin-bottom: 8px; background: #fafafa; border-radius: 0 6px 6px 0; }
+    .history-timestamp { font-size: 12px; color: #999; margin-bottom: 4px; }
+    .history-content { color: #333; }
+    .empty { text-align: center; padding: 40px; color: #999; }
+    .flex { display: flex; }
+    .flex-between { justify-content: space-between; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-4 { gap: 16px; }
+    .mb-4 { margin-bottom: 16px; }
+    .mt-4 { margin-top: 16px; }
+    .p-4 { padding: 16px; }
+    .bg-light { background: #fafafa; }
+    .rounded { border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🐾 宠物美容预约耗材台</h1>
+    <div style="font-size: 14px;">
+      <span id="currentDate"></span>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item active" data-tab="calendar">📅 日历视图</div>
+    <div class="nav-item" data-tab="appointments">📋 预约管理</div>
+    <div class="nav-item" data-tab="pets">🐶 宠物档案</div>
+    <div class="nav-item" data-tab="supplies">📦 耗材管理</div>
+    <div class="nav-item" data-tab="addons">➕ 加项审核</div>
+    <div class="nav-item" data-tab="report">📊 日结统计</div>
+  </div>
+
+  <div class="container">
+    <div id="calendar" class="content active">
+      <div class="card">
+        <div class="card-title">
+          <div class="flex items-center gap-4">
+            <button class="btn btn-default" onclick="changeMonth(-1)">◀</button>
+            <span id="calendarTitle" style="font-size: 18px;"></span>
+            <button class="btn btn-default" onclick="changeMonth(1)">▶</button>
+            <button class="btn btn-primary" onclick="goToToday()">今天</button>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-primary" onclick="openNewAppointmentModal()">+ 新建预约</button>
+          </div>
+        </div>
+        <div class="calendar" id="calendarGrid"></div>
+      </div>
+    </div>
+
+    <div id="appointments" class="content">
+      <div class="card">
+        <div class="card-title">
+          <span>预约列表</span>
+          <button class="btn btn-primary" onclick="openNewAppointmentModal()">+ 新建预约</button>
+        </div>
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label class="form-label" style="margin: 0;">日期：</label>
+            <input type="date" id="filterDate" class="form-input" style="width: 150px;" onchange="loadAppointments()">
+          </div>
+          <div class="filter-item">
+            <label class="form-label" style="margin: 0;">状态：</label>
+            <select id="filterStatus" class="form-select" style="width: 120px;" onchange="loadAppointments()">
+              <option value="">全部</option>
+              <option value="pending">待处理</option>
+              <option value="confirmed">已确认</option>
+              <option value="rejected">已驳回</option>
+              <option value="closed">已关闭</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label class="form-label" style="margin: 0;">美容师：</label>
+            <select id="filterBeautician" class="form-select" style="width: 120px;" onchange="loadAppointments()">
+              <option value="">全部</option>
+            </select>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>预约号</th>
+              <th>宠物</th>
+              <th>服务项目</th>
+              <th>美容师</th>
+              <th>日期时间</th>
+              <th>价格</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="appointmentsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="pets" class="content">
+      <div class="card">
+        <div class="card-title">
+          <span>宠物档案</span>
+          <button class="btn btn-primary" onclick="openNewPetModal()">+ 新建档案</button>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>宠物名</th>
+              <th>主人</th>
+              <th>联系电话</th>
+              <th>类型</th>
+              <th>品种</th>
+              <th>年龄</th>
+              <th>体重</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="petsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="supplies" class="content">
+      <div class="card">
+        <div class="card-title">
+          <span>耗材库存</span>
+        </div>
+        <div id="supplyWarnings"></div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>耗材名称</th>
+              <th>单位</th>
+              <th>当前库存</th>
+              <th>最低库存</th>
+              <th>单价</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody id="suppliesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="addons" class="content">
+      <div class="card">
+        <div class="card-title">
+          <span>加项审核</span>
+        </div>
+        <div id="pendingAddOns"></div>
+      </div>
+    </div>
+
+    <div id="report" class="content">
+      <div class="card">
+        <div class="card-title">
+          <div class="flex items-center gap-4">
+            <span>日结统计</span>
+            <input type="date" id="reportDate" class="form-input" style="width: 150px;" onchange="loadDailyReport()">
+          </div>
+          <button class="btn btn-primary" onclick="exportDailyReport()">📥 导出日结</button>
+        </div>
+        
+        <div class="grid grid-3 mb-4">
+          <div class="stat-card">
+            <div class="stat-value">¥<span id="statRevenue">0</span></div>
+            <div class="stat-label">项目收入</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">¥<span id="statCost">0</span></div>
+            <div class="stat-label">耗材消耗</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">¥<span id="statNetIncome">0</span></div>
+            <div class="stat-label">净收入</div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="stat-card success-card">
+            <div class="stat-value"><span id="statClosed">0</span></div>
+            <div class="stat-label">已完成预约</div>
+          </div>
+          <div class="stat-card warning-card">
+            <div class="stat-value"><span id="statPending">0</span></div>
+            <div class="stat-label">待处理异常</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">已完成预约明细</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>预约号</th>
+              <th>宠物</th>
+              <th>服务项目</th>
+              <th>加项</th>
+              <th>金额</th>
+            </tr>
+          </thead>
+          <tbody id="reportAppointments"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">耗材消耗明细</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>耗材名称</th>
+              <th>消耗数量</th>
+              <th>单位</th>
+              <th>成本</th>
+            </tr>
+          </thead>
+          <tbody id="reportSupplies"></tbody>
+        </table>
+      </div>
+
+      <div class="card warning-card">
+        <div class="card-title">待处理异常</div>
+        <div id="reportExceptions"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="appointmentModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="appointmentModalTitle">新建预约</h3>
+        <button class="modal-close" onclick="closeModal('appointmentModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="alert" id="appointmentAlert" style="display: none;"></div>
+        
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">选择宠物</label>
+            <select id="appointmentPet" class="form-select" onchange="updatePrice()">
+              <option value="">请选择宠物</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">选择美容师</label>
+            <select id="appointmentBeautician" class="form-select" onchange="checkBeauticianAvailability()">
+              <option value="">请选择美容师</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">服务项目</label>
+            <select id="appointmentService" class="form-select" onchange="updatePrice()">
+              <option value="">请选择服务</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">日期</label>
+            <input type="date" id="appointmentDate" class="form-input" onchange="checkBeauticianAvailability()">
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">开始时间</label>
+            <input type="time" id="appointmentStartTime" class="form-input" onchange="updateEndTime(); checkBeauticianAvailability()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">结束时间</label>
+            <input type="time" id="appointmentEndTime" class="form-input" readonly>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">预计价格</label>
+          <div style="font-size: 24px; font-weight: 700; color: #667eea;">¥<span id="estimatedPrice">0</span></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea id="appointmentNotes" class="form-textarea"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('appointmentModal')">取消</button>
+        <button class="btn btn-primary" onclick="saveAppointment()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appointmentDetailModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>预约详情</h3>
+        <button class="modal-close" onclick="closeModal('appointmentDetailModal')">×</button>
+      </div>
+      <div class="modal-body" id="appointmentDetailContent"></div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('appointmentDetailModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="petModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="petModalTitle">新建宠物档案</h3>
+        <button class="modal-close" onclick="closeModal('petModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">宠物名称</label>
+            <input type="text" id="petName" class="form-input" placeholder="请输入宠物名称">
+          </div>
+          <div class="form-group">
+            <label class="form-label">宠物类型</label>
+            <select id="petType" class="form-select">
+              <option value="">请选择类型</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">主人姓名</label>
+            <input type="text" id="ownerName" class="form-input" placeholder="请输入主人姓名">
+          </div>
+          <div class="form-group">
+            <label class="form-label">联系电话</label>
+            <input type="text" id="ownerPhone" class="form-input" placeholder="请输入联系电话">
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">品种</label>
+            <input type="text" id="petBreed" class="form-input" placeholder="请输入品种">
+          </div>
+          <div class="form-group">
+            <label class="form-label">年龄</label>
+            <input type="number" id="petAge" class="form-input" placeholder="请输入年龄">
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label class="form-label">性别</label>
+            <select id="petGender" class="form-select">
+              <option value="公">公</option>
+              <option value="母">母</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">体重(kg)</label>
+            <input type="number" id="petWeight" class="form-input" step="0.1" placeholder="请输入体重">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea id="petNotes" class="form-textarea" placeholder="特殊说明、过敏史等"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('petModal')">取消</button>
+        <button class="btn btn-primary" onclick="savePet()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="addonModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>申请加项</h3>
+        <button class="modal-close" onclick="closeModal('addonModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">选择加项</label>
+          <select id="addonSelect" class="form-select" onchange="updateAddonPreview()">
+            <option value="">请选择加项</option>
+          </select>
+        </div>
+        <div id="addonPreview" class="bg-light p-4 rounded mb-4">
+          <div id="addonPreviewContent">请选择加项查看详情</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">申请理由</label>
+          <textarea id="addonReason" class="form-textarea" placeholder="请说明加项原因"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('addonModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitAddOnRequest()">提交申请</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="supplyModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>记录耗材用量</h3>
+        <button class="modal-close" onclick="closeModal('supplyModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="supplyForm"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('supplyModal')">取消</button>
+        <button class="btn btn-primary" onclick="submitSupplyUsage()">确认消耗</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
