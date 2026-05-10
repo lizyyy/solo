@@ -1,0 +1,17 @@
+{
+  "name": "体检中心报告补打台-backend",
+  "version": "1.0.0",
+  "description": "体检中心报告补打管理系统后端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "moment": "^2.30.1",
+    "sql.js": "^1.14.1",
+    "uuid": "^9.0.1"
+  }
+}
