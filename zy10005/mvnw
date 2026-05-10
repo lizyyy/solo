@@ -1,0 +1,22 @@
+#!/bin/sh
+# Maven Wrapper script
+# Attempts to download and use Maven 3.9.6
+
+set -e
+
+MAVEN_VERSION="3.9.6"
+MAVEN_HOME="$HOME/.m2/wrapper/dists/apache-maven-$MAVEN_VERSION"
+MAVEN_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.tar.gz"
+
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "Downloading Maven $MAVEN_VERSION..."
+    mkdir -p "$HOME/.m2/wrapper/dists"
+    curl -sL "$MAVEN_URL" -o "/tmp/apache-maven-$MAVEN_VERSION.tar.gz"
+    tar -xzf "/tmp/apache-maven-$MAVEN_VERSION.tar.gz" -C "$HOME/.m2/wrapper/dists"
+    rm -f "/tmp/apache-maven-$MAVEN_VERSION.tar.gz"
+fi
+
+export M2_HOME="$MAVEN_HOME/apache-maven-$MAVEN_VERSION"
+export PATH="$M2_HOME/bin:$PATH"
+
+exec mvn "$@"

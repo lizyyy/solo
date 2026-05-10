@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -96,16 +97,35 @@ public class ReleaseController {
     }
     
     @PostMapping("/{releaseId}/replay/{logId}")
-    public ResponseEntity<Release> replayOperation(@PathVariable String releaseId,
-                                                    @PathVariable Long logId,
-                                                    @RequestParam(required = false, defaultValue = "api") String operator) {
+    public ResponseEntity<ErrorReplayService.ReplayResult> replayOperation(@PathVariable String releaseId,
+                                                                            @PathVariable Long logId,
+                                                                            @RequestParam(required = false, defaultValue = "api") String operator) {
         return ResponseEntity.ok(replayService.replayOperation(releaseId, logId, operator));
     }
     
     @PostMapping("/{releaseId}/replay/all")
-    public ResponseEntity<List<Release>> replayAllOperations(@PathVariable String releaseId,
-                                                             @RequestParam(required = false, defaultValue = "api") String operator) {
+    public ResponseEntity<List<ErrorReplayService.ReplayResult>> replayAllOperations(@PathVariable String releaseId,
+                                                                                     @RequestParam(required = false, defaultValue = "api") String operator) {
         return ResponseEntity.ok(replayService.replayAllFailedOperations(releaseId, operator));
+    }
+    
+    @PostMapping("/{releaseId}/replay/checkpoint")
+    public ResponseEntity<ErrorReplayService.ReplayResult> restoreToCheckpoint(@PathVariable String releaseId,
+                                                                               @RequestParam(required = false, defaultValue = "api") String operator) {
+        return ResponseEntity.ok(replayService.restoreToCheckpoint(releaseId, operator));
+    }
+    
+    @GetMapping("/{releaseId}/replay/analysis")
+    public ResponseEntity<ErrorReplayService.ReplayAnalysis> getReplayAnalysis(@PathVariable String releaseId) {
+        return ResponseEntity.ok(replayService.analyzeForReplay(releaseId));
+    }
+    
+    @GetMapping("/{releaseId}/replay/report")
+    public ResponseEntity<String> getReplayReport(@PathVariable String releaseId) {
+        String report = replayService.generateReplayReport(releaseId);
+        return ResponseEntity.ok()
+                .header("Content-Type", "text/markdown; charset=utf-8")
+                .body(report);
     }
     
     @PostMapping("/{releaseId}/recover")
