@@ -160,10 +160,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getDevices, createDevice, updateDevice, deleteDevice } from '@/api/devices'
+import { getDevices, createDevice, updateDevice, deleteDevice as apiDeleteDevice } from '@/api/devices'
 import { borrowDevice as apiBorrowDevice } from '@/api/borrows'
 
 const router = useRouter()
@@ -357,7 +357,7 @@ async function deleteDevice(row) {
       type: 'warning'
     })
 
-    await deleteDevice(row.id)
+    await apiDeleteDevice(row.id)
     ElMessage.success('设备删除成功')
     loadDevices()
   } catch (error) {
@@ -398,8 +398,6 @@ async function confirmBorrow() {
 function viewDeviceHistory(row) {
   router.push(`/events/device/${row.id}`)
 }
-
-import { computed } from 'vue'
 
 onMounted(() => {
   loadDevices()

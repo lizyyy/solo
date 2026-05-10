@@ -41,7 +41,7 @@ func main() {
 	borrowRepo := repository.NewBorrowRepository(db)
 	auditRepo := repository.NewAuditRepository(db)
 	
-	userService := service.NewUserService(userRepo, eventStore, redisClient)
+	userService := service.NewUserService(userRepo, eventStore, redisClient, cfg.JWT.Secret)
 	deviceService := service.NewDeviceService(deviceRepo, eventStore, redisClient)
 	borrowService := service.NewBorrowService(borrowRepo, deviceRepo, eventStore, redisClient)
 	auditService := service.NewAuditService(auditRepo, eventStore)

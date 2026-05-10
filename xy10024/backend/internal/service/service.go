@@ -26,12 +26,12 @@ type UserService struct {
 	jwtSecret  string
 }
 
-func NewUserService(userRepo *repository.UserRepository, es *eventstore.EventStore, redis *redis.Client) *UserService {
+func NewUserService(userRepo *repository.UserRepository, es *eventstore.EventStore, redis *redis.Client, jwtSecret string) *UserService {
 	return &UserService{
 		userRepo:   userRepo,
 		eventStore: es,
 		redis:      redis,
-		jwtSecret:  "your-secret-key-change-in-production",
+		jwtSecret:  jwtSecret,
 	}
 }
 

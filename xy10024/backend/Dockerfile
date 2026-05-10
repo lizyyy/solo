@@ -4,8 +4,8 @@ WORKDIR /app
 
 RUN apk add --no-cache git gcc musl-dev
 
-COPY go.mod go.sum ./
-RUN go mod download
+COPY go.mod go.sum* ./
+RUN go mod tidy
 
 COPY . .
 
