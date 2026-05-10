@@ -1,0 +1,4 @@
+﻿tx_id,member_id,date,start_time,type,amount,balance_before,balance_after,requires_review,review_reason,notes,ref_id
+TX_faf59f81,M_13cd07b4,2026-05-11,09:00,checkin,-10.0,8.0,-2.0,True,余额不足，强制核销（需人工审核）,老板特批，先练后补,
+TX_cdb842ea,M_13cd07b4,2026-05-01,10:00,manual_entry,-1.0,-2.0,-3.0,True,余额不足，强制核销（需人工审核）,前台忘记录入,BK_A101
+TX_0bf076c9,M_13cd07b4,2026-05-20,15:00,penalty,-1.0,-3.0,-4.0,True,取消扣课时导致余额不足,预约未到,
