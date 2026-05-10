@@ -51,6 +51,28 @@ create_dirs() {
     mkdir -p "$LIB_DIR" "$CLASSES_DIR" "$TEST_CLASSES_DIR" 2>/dev/null || true
 }
 
+# 检查是否有编译后的类文件
+has_compiled_classes() {
+    # 检查 classes 目录是否存在且有 .class 文件
+    if [ ! -d "$CLASSES_DIR" ]; then
+        return 1
+    fi
+    
+    # 检查是否有 .class 文件
+    local class_count=$(find "$CLASSES_DIR" -name "*.class" 2>/dev/null | wc -l)
+    if [ "$class_count" -eq 0 ]; then
+        return 1
+    fi
+    
+    # 检查主类是否存在
+    local main_class_file="$CLASSES_DIR/com/example/config/ConfigHotUpdateApplication.class"
+    if [ ! -f "$main_class_file" ]; then
+        return 1
+    fi
+    
+    return 0
+}
+
 # Spring Boot 核心依赖 - 手动下载的 JAR
 download_dependency() {
     local url="$1"
@@ -226,7 +248,7 @@ build() {
 start() {
     check_java
     
-    if [ ! -d "$CLASSES_DIR" ]; then
+    if ! has_compiled_classes; then
         warn "未找到编译后的类文件，先执行构建..."
         build
     fi
@@ -246,7 +268,7 @@ run_tests() {
     check_java
     check_javac
     
-    if [ ! -d "$CLASSES_DIR" ]; then
+    if ! has_compiled_classes; then
         warn "未找到编译后的类文件，先执行构建..."
         build
     fi
