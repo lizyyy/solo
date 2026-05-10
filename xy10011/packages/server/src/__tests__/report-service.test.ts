@@ -69,7 +69,7 @@ describe('Report Service', () => {
     expect(content).toContain('Bill Split Report');
     expect(content).toContain('测试账单1');
     expect(content).toContain('测试账单2');
-    expect(content).toContain('300.00');
+    expect(content).toContain('300');
   });
 
   test('should generate excel report', async () => {

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Bill, Participant, User, Group } from '../types';
-import { getDatabase, executeTransaction } from '../database';
+import { Bill, Participant } from '../types';
+import { getDatabase } from '../database';
 import { eventStore, VersionConflictError } from '../event-store';
 import { conflictService } from './conflict-service';
 
@@ -11,34 +11,31 @@ class BillService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Bill> {
-    return executeTransaction(async () => {
-      const now = Date.now();
-      const bill: Bill = {
-        ...billData,
-        id: uuidv4(),
-        createdAt: now,
-        updatedAt: now,
-        version: 1,
-        deleted: false,
-      };
+    const now = Date.now();
+    const bill: Bill = {
+      ...billData,
+      id: uuidv4(),
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      deleted: false,
+    };
 
-      this.validateBillAmounts(bill);
+    this.validateBillAmounts(bill);
 
-      await eventStore.appendEvent(
-        bill.id,
-        'bill',
-        'BILL_CREATED',
-        { bill },
-        userId,
-        clientId,
-        0,
-        metadata
-      );
+    await eventStore.appendEvent(
+      bill.id,
+      'bill',
+      'BILL_CREATED',
+      { bill },
+      userId,
+      clientId,
+      0,
+      metadata
+    );
 
-      this.persistBill(bill);
-
-      return bill;
-    });
+    this.persistBill(bill);
+    return bill;
   }
 
   async updateBill(
@@ -49,67 +46,64 @@ class BillService {
     expectedVersion: number,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Bill> {
-    return executeTransaction(async () => {
-      const existingBill = this.getBillById(billId);
-      if (!existingBill) {
-        throw new Error(`Bill ${billId} not found`);
-      }
+    const existingBill = this.getBillById(billId);
+    if (!existingBill) {
+      throw new Error(`Bill ${billId} not found`);
+    }
 
-      const events = eventStore.getEventsByAggregate(billId);
-      const currentVersion = events.length > 0 
-        ? events[events.length - 1].newVersion 
-        : 0;
+    const events = eventStore.getEventsByAggregate(billId);
+    const currentVersion = events.length > 0 
+      ? events[events.length - 1].newVersion 
+      : 0;
 
-      if (currentVersion !== expectedVersion) {
-        const incomingEvent = {
-          id: uuidv4(),
-          eventType: 'BILL_UPDATED' as const,
-          aggregateId: billId,
-          aggregateType: 'bill' as const,
-          payload: updates,
-          previousVersion: expectedVersion,
-          newVersion: expectedVersion + 1,
-          userId,
-          timestamp: Date.now(),
-          clientId,
-          sequence: events.length + 1,
-        };
-
-        const conflicts = await conflictService.detectAllConflicts(billId, incomingEvent, events);
-        
-        if (conflicts.length > 0) {
-          throw new VersionConflictError(
-            billId,
-            expectedVersion,
-            currentVersion
-          );
-        }
-      }
-
-      const updatedBill: Bill = {
-        ...existingBill,
-        ...updates,
-        updatedAt: Date.now(),
-        version: currentVersion + 1,
+    if (currentVersion !== expectedVersion) {
+      const incomingEvent = {
+        id: uuidv4(),
+        eventType: 'BILL_UPDATED' as const,
+        aggregateId: billId,
+        aggregateType: 'bill' as const,
+        payload: updates,
+        previousVersion: expectedVersion,
+        newVersion: expectedVersion + 1,
+        userId,
+        timestamp: Date.now(),
+        clientId,
+        sequence: events.length + 1,
       };
 
-      this.validateBillAmounts(updatedBill);
+      const conflicts = await conflictService.detectAllConflicts(billId, incomingEvent, events);
+      
+      if (conflicts.length > 0) {
+        throw new VersionConflictError(
+          billId,
+          expectedVersion,
+          currentVersion
+        );
+      }
+    }
 
-      await eventStore.appendEvent(
-        billId,
-        'bill',
-        'BILL_UPDATED',
-        { updates },
-        userId,
-        clientId,
-        expectedVersion,
-        metadata
-      );
+    const updatedBill: Bill = {
+      ...existingBill,
+      ...updates,
+      updatedAt: Date.now(),
+      version: currentVersion + 1,
+    };
 
-      this.updatePersistedBill(updatedBill);
+    this.validateBillAmounts(updatedBill);
 
-      return updatedBill;
-    });
+    await eventStore.appendEvent(
+      billId,
+      'bill',
+      'BILL_UPDATED',
+      { updates },
+      userId,
+      clientId,
+      expectedVersion,
+      metadata
+    );
+
+    this.updatePersistedBill(updatedBill);
+    return updatedBill;
   }
 
   async deleteBill(
@@ -119,37 +113,35 @@ class BillService {
     expectedVersion: number,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<void> {
-    return executeTransaction(async () => {
-      const existingBill = this.getBillById(billId);
-      if (!existingBill) {
-        throw new Error(`Bill ${billId} not found`);
-      }
+    const existingBill = this.getBillById(billId);
+    if (!existingBill) {
+      throw new Error(`Bill ${billId} not found`);
+    }
 
-      const events = eventStore.getEventsByAggregate(billId);
-      const currentVersion = events.length > 0 
-        ? events[events.length - 1].newVersion 
-        : 0;
+    const events = eventStore.getEventsByAggregate(billId);
+    const currentVersion = events.length > 0 
+      ? events[events.length - 1].newVersion 
+      : 0;
 
-      if (currentVersion !== expectedVersion) {
-        throw new VersionConflictError(billId, expectedVersion, currentVersion);
-      }
+    if (currentVersion !== expectedVersion) {
+      throw new VersionConflictError(billId, expectedVersion, currentVersion);
+    }
 
-      await eventStore.appendEvent(
-        billId,
-        'bill',
-        'BILL_DELETED',
-        { deletedAt: Date.now() },
-        userId,
-        clientId,
-        expectedVersion,
-        metadata
-      );
+    await eventStore.appendEvent(
+      billId,
+      'bill',
+      'BILL_DELETED',
+      { deletedAt: Date.now() },
+      userId,
+      clientId,
+      expectedVersion,
+      metadata
+    );
 
-      const db = getDatabase();
-      db.prepare(`
-        UPDATE bills SET deleted = 1, updated_at = ? WHERE id = ?
-      `).run(Date.now(), billId);
-    });
+    const db = getDatabase();
+    db.prepare(`
+      UPDATE bills SET deleted = 1, updated_at = ? WHERE id = ?
+    `).run(Date.now(), billId);
   }
 
   getBillById(billId: string): Bill | null {

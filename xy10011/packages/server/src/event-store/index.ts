@@ -20,7 +20,7 @@ class EventStore {
       
       const currentVersion = this.getCurrentVersion(aggregateId);
       
-      if (currentVersion !== expectedVersion && expectedVersion > 0) {
+      if (currentVersion !== expectedVersion) {
         throw new VersionConflictError(
           aggregateId,
           expectedVersion,

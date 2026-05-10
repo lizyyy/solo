@@ -1,28 +1,30 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-import fs from 'fs';
-
-const DB_PATH = process.env.DB_PATH || path.join(process.cwd(), 'data', 'bills.db');
-
-let db: Database.Database;
-
-export function initDatabase(): Database.Database {
-  const dir = path.dirname(DB_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-
-  db = new Database(DB_PATH);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
-  db.pragma('synchronous = FULL');
-
-  initSchema();
-  return db;
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.initDatabase = initDatabase;
+exports.getDatabase = getDatabase;
+exports.executeTransaction = executeTransaction;
+const better_sqlite3_1 = __importDefault(require("better-sqlite3"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const DB_PATH = process.env.DB_PATH || path_1.default.join(process.cwd(), 'data', 'bills.db');
+let db;
+function initDatabase() {
+    const dir = path_1.default.dirname(DB_PATH);
+    if (!fs_1.default.existsSync(dir)) {
+        fs_1.default.mkdirSync(dir, { recursive: true });
+    }
+    db = new better_sqlite3_1.default(DB_PATH);
+    db.pragma('journal_mode = WAL');
+    db.pragma('foreign_keys = ON');
+    db.pragma('synchronous = FULL');
+    initSchema();
+    return db;
 }
-
-function initSchema(): void {
-  db.exec(`
+function initSchema() {
+    db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -111,35 +113,32 @@ function initSchema(): void {
 
     CREATE INDEX IF NOT EXISTS idx_cache_ttl ON cache(ttl) WHERE ttl IS NOT NULL;
   `);
-
-  const syncRow = db.prepare('SELECT * FROM sync_state WHERE id = ?').get('main');
-  if (!syncRow) {
-    db.prepare(`
+    const syncRow = db.prepare('SELECT * FROM sync_state WHERE id = ?').get('main');
+    if (!syncRow) {
+        db.prepare(`
       INSERT INTO sync_state (last_synced_at, pending_events, sync_status, server_version, local_version)
       VALUES (?, ?, ?, ?, ?)
     `).run(Date.now(), '[]', 'idle', 0, 0);
-  }
-}
-
-export function getDatabase(): Database.Database {
-  if (!db) {
-    return initDatabase();
-  }
-  return db;
-}
-
-export function executeTransaction<T>(fn: () => Promise<T> | T): Promise<T> {
-  return (async () => {
-    const db = getDatabase();
-    db.prepare('BEGIN TRANSACTION').run();
-    
-    try {
-      const result = await fn();
-      db.prepare('COMMIT TRANSACTION').run();
-      return result;
-    } catch (error) {
-      db.prepare('ROLLBACK TRANSACTION').run();
-      throw error;
     }
-  })();
+}
+function getDatabase() {
+    if (!db) {
+        return initDatabase();
+    }
+    return db;
+}
+function executeTransaction(fn) {
+    return (async () => {
+        const db = getDatabase();
+        db.prepare('BEGIN TRANSACTION').run();
+        try {
+            const result = await fn();
+            db.prepare('COMMIT TRANSACTION').run();
+            return result;
+        }
+        catch (error) {
+            db.prepare('ROLLBACK TRANSACTION').run();
+            throw error;
+        }
+    })();
 }

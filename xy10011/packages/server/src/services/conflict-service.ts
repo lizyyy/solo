@@ -202,11 +202,15 @@ class ConflictService {
     state: Record<string, unknown>
   ): Record<string, unknown> {
     if (event.eventType === 'BILL_CREATED' || event.eventType === 'GROUP_CREATED' || event.eventType === 'USER_CREATED') {
-      return { ...event.payload } as Record<string, unknown>;
+      const payload = event.payload as any;
+      const entity = payload.bill || payload.group || payload.user || payload;
+      return { ...entity } as Record<string, unknown>;
     }
 
     if (event.eventType === 'BILL_UPDATED' || event.eventType === 'GROUP_UPDATED' || event.eventType === 'USER_UPDATED') {
-      return { ...state, ...event.payload } as Record<string, unknown>;
+      const payload = event.payload as any;
+      const updates = payload.updates || payload;
+      return { ...state, ...updates } as Record<string, unknown>;
     }
 
     if (event.eventType === 'BILL_DELETED' || event.eventType === 'GROUP_DELETED') {

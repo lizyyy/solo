@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { Bill, Group, Participant } from '../types';
+import { Bill, Participant } from '../types';
 
 interface Props {
   bill: Bill | null;
-  group: Group;
   userId: string;
   onSave: (data: any) => void;
   onCancel: () => void;
 }
 
-export function BillForm({ bill, group, userId, onSave, onCancel }: Props) {
+export function BillForm({ bill, userId, onSave, onCancel }: Props) {
   const [title, setTitle] = useState(bill?.title || '');
   const [description, setDescription] = useState(bill?.description || '');
   const [amount, setAmount] = useState(bill?.amount || 0);

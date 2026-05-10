@@ -302,7 +302,6 @@ export default function App() {
           {showBillForm && (
             <BillForm
               bill={editingBill}
-              group={selectedGroup!}
               userId={USER_ID}
               onSave={handleSaveBill}
               onCancel={() => { setShowBillForm(false); setEditingBill(null); }}

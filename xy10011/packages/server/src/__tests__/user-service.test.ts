@@ -92,7 +92,7 @@ describe('User Service', () => {
       userId,
       { name: '更新后的名称' },
       testClientId,
-      0
+      1
     );
 
     expect(updatedUser.name).toBe('更新后的名称');

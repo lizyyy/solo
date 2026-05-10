@@ -7,10 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "install": "npm run install:all",
-    "install:all": "npm install && npm run install:server && npm run install:client",
-    "install:server": "cd packages/server && npm install",
-    "install:client": "cd packages/client && npm install",
+    "setup": "npm install && npm run setup:server && npm run setup:client",
+    "setup:server": "cd packages/server && npm install",
+    "setup:client": "cd packages/client && npm install",
     "dev": "npm run dev:server & npm run dev:client",
     "dev:server": "cd packages/server && npm run dev",
     "dev:client": "cd packages/client && npm run dev",

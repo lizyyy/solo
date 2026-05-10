@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../types';
-import { getDatabase, executeTransaction } from '../database';
+import { getDatabase } from '../database';
 import { eventStore } from '../event-store';
 
 class UserService {
@@ -10,35 +10,33 @@ class UserService {
     clientId?: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<User> {
-    return executeTransaction(async () => {
-      const existingUser = this.getUserById(userId);
-      if (existingUser) {
-        return existingUser;
-      }
+    const existingUser = this.getUserById(userId);
+    if (existingUser) {
+      return existingUser;
+    }
 
-      const now = Date.now();
-      const user: User = {
-        id: userId,
-        name: options?.name || `用户${userId.slice(-6)}`,
-        avatar: options?.avatar,
-        createdAt: now,
-        updatedAt: now,
-      };
+    const now = Date.now();
+    const user: User = {
+      id: userId,
+      name: options?.name || `用户${userId.slice(-6)}`,
+      avatar: options?.avatar,
+      createdAt: now,
+      updatedAt: now,
+    };
 
-      await eventStore.appendEvent(
-        userId,
-        'user',
-        'USER_CREATED',
-        { user },
-        userId,
-        clientId || 'system',
-        0,
-        metadata
-      );
+    await eventStore.appendEvent(
+      userId,
+      'user',
+      'USER_CREATED',
+      { user },
+      userId,
+      clientId || 'system',
+      0,
+      metadata
+    );
 
-      this.persistUser(user);
-      return user;
-    });
+    this.persistUser(user);
+    return user;
   }
 
   async createUser(
@@ -46,29 +44,27 @@ class UserService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<User> {
-    return executeTransaction(async () => {
-      const now = Date.now();
-      const user: User = {
-        ...userData,
-        id: userData.id || uuidv4(),
-        createdAt: now,
-        updatedAt: now,
-      };
+    const now = Date.now();
+    const user: User = {
+      ...userData,
+      id: userData.id || uuidv4(),
+      createdAt: now,
+      updatedAt: now,
+    };
 
-      await eventStore.appendEvent(
-        user.id,
-        'user',
-        'USER_CREATED',
-        { user },
-        user.id,
-        clientId,
-        0,
-        metadata
-      );
+    await eventStore.appendEvent(
+      user.id,
+      'user',
+      'USER_CREATED',
+      { user },
+      user.id,
+      clientId,
+      0,
+      metadata
+    );
 
-      this.persistUser(user);
-      return user;
-    });
+    this.persistUser(user);
+    return user;
   }
 
   async updateUser(
@@ -78,32 +74,30 @@ class UserService {
     expectedVersion: number,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<User> {
-    return executeTransaction(async () => {
-      const existingUser = this.getUserById(userId);
-      if (!existingUser) {
-        throw new Error(`User ${userId} not found`);
-      }
+    const existingUser = this.getUserById(userId);
+    if (!existingUser) {
+      throw new Error(`User ${userId} not found`);
+    }
 
-      const updatedUser: User = {
-        ...existingUser,
-        ...updates,
-        updatedAt: Date.now(),
-      };
+    const updatedUser: User = {
+      ...existingUser,
+      ...updates,
+      updatedAt: Date.now(),
+    };
 
-      await eventStore.appendEvent(
-        userId,
-        'user',
-        'USER_UPDATED',
-        { updates },
-        userId,
-        clientId,
-        expectedVersion,
-        metadata
-      );
+    await eventStore.appendEvent(
+      userId,
+      'user',
+      'USER_UPDATED',
+      { updates },
+      userId,
+      clientId,
+      expectedVersion,
+      metadata
+    );
 
-      this.updatePersistedUser(updatedUser);
-      return updatedUser;
-    });
+    this.updatePersistedUser(updatedUser);
+    return updatedUser;
   }
 
   getUserById(userId: string): User | null {

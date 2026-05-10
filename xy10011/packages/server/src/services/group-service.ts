@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Group, User } from '../types';
-import { getDatabase, executeTransaction } from '../database';
+import { Group } from '../types';
+import { getDatabase } from '../database';
 import { eventStore } from '../event-store';
 
 class GroupService {
@@ -10,31 +10,28 @@ class GroupService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Group> {
-    return executeTransaction(async () => {
-      const now = Date.now();
-      const group: Group = {
-        ...groupData,
-        id: uuidv4(),
-        createdAt: now,
-        updatedAt: now,
-        version: 1,
-      };
+    const now = Date.now();
+    const group: Group = {
+      ...groupData,
+      id: uuidv4(),
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+    };
 
-      await eventStore.appendEvent(
-        group.id,
-        'group',
-        'GROUP_CREATED',
-        { group },
-        userId,
-        clientId,
-        0,
-        metadata
-      );
+    await eventStore.appendEvent(
+      group.id,
+      'group',
+      'GROUP_CREATED',
+      { group },
+      userId,
+      clientId,
+      0,
+      metadata
+    );
 
-      this.persistGroup(group);
-
-      return group;
-    });
+    this.persistGroup(group);
+    return group;
   }
 
   async updateGroup(
@@ -45,34 +42,31 @@ class GroupService {
     expectedVersion: number,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Group> {
-    return executeTransaction(async () => {
-      const existingGroup = this.getGroupById(groupId);
-      if (!existingGroup) {
-        throw new Error(`Group ${groupId} not found`);
-      }
+    const existingGroup = this.getGroupById(groupId);
+    if (!existingGroup) {
+      throw new Error(`Group ${groupId} not found`);
+    }
 
-      const updatedGroup: Group = {
-        ...existingGroup,
-        ...updates,
-        updatedAt: Date.now(),
-        version: expectedVersion + 1,
-      };
+    const updatedGroup: Group = {
+      ...existingGroup,
+      ...updates,
+      updatedAt: Date.now(),
+      version: expectedVersion + 1,
+    };
 
-      await eventStore.appendEvent(
-        groupId,
-        'group',
-        'GROUP_UPDATED',
-        { updates },
-        userId,
-        clientId,
-        expectedVersion,
-        metadata
-      );
+    await eventStore.appendEvent(
+      groupId,
+      'group',
+      'GROUP_UPDATED',
+      { updates },
+      userId,
+      clientId,
+      expectedVersion,
+      metadata
+    );
 
-      this.updatePersistedGroup(updatedGroup);
-
-      return updatedGroup;
-    });
+    this.updatePersistedGroup(updatedGroup);
+    return updatedGroup;
   }
 
   getGroupById(groupId: string): Group | null {
