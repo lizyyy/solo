@@ -1,0 +1,155 @@
+{
+  "materials": [
+    {
+      "id": "1",
+      "lotNumber": "IMPL-2024-001",
+      "name": "诺贝尔Active植体",
+      "type": "植体",
+      "manufacturer": "Nobel Biocare",
+      "expiryDate": "2027-05-09",
+      "quantity": 50,
+      "minStock": 10,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "2",
+      "lotNumber": "IMPL-2023-199",
+      "name": "Straumann植体",
+      "type": "植体",
+      "manufacturer": "Straumann",
+      "expiryDate": "2026-04-09",
+      "quantity": 5,
+      "minStock": 10,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "3",
+      "lotNumber": "ABUT-2024-015",
+      "name": "钛合金基台",
+      "type": "基台",
+      "manufacturer": "Dentsply Sirona",
+      "expiryDate": "2027-05-09",
+      "quantity": 30,
+      "minStock": 15,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "4",
+      "lotNumber": "BONE-2024-008",
+      "name": "Bio-Oss骨粉",
+      "type": "骨粉",
+      "manufacturer": "Geistlich",
+      "expiryDate": "2027-05-09",
+      "quantity": 8,
+      "minStock": 10,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "patients": [
+    {
+      "id": "1",
+      "patientId": "P001",
+      "name": "张三",
+      "phone": "13800138001",
+      "gender": "男",
+      "age": 45,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "2",
+      "patientId": "P002",
+      "name": "李四",
+      "phone": "13800138002",
+      "gender": "女",
+      "age": 52,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "3",
+      "patientId": "P003",
+      "name": "王五",
+      "phone": "13800138003",
+      "gender": "男",
+      "age": 38,
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "1",
+      "doctorId": "D001",
+      "name": "王医生",
+      "department": "口腔种植科",
+      "phone": "13900139001",
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "2",
+      "doctorId": "D002",
+      "name": "李医生",
+      "department": "口腔种植科",
+      "phone": "13900139002",
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "1",
+      "appointmentNo": "APT001",
+      "patientId": "P001",
+      "patientName": "张三",
+      "doctorId": "D001",
+      "doctorName": "王医生",
+      "appointmentDate": "2026-05-10",
+      "description": "下颌种植手术",
+      "status": "已完成",
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "2",
+      "appointmentNo": "APT002",
+      "patientId": "P002",
+      "patientName": "李四",
+      "doctorId": "D002",
+      "doctorName": "李医生",
+      "appointmentDate": "2026-05-10",
+      "description": "上颌种植+骨增量",
+      "status": "待手术",
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "surgeries": [
+    {
+      "id": "1",
+      "surgeryNo": "OP001",
+      "appointmentId": "1",
+      "appointmentNo": "APT001",
+      "patientId": "P001",
+      "patientName": "张三",
+      "doctorId": "D001",
+      "doctorName": "王医生",
+      "surgeryDate": "2026-05-10",
+      "status": "已完成",
+      "createdAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "materialUsage": [
+    {
+      "id": "1",
+      "surgeryId": "1",
+      "lotNumber": "IMPL-2024-001",
+      "materialName": "诺贝尔Active植体",
+      "quantity": 2,
+      "usedAt": "2026-05-10T11:42:26.554Z"
+    },
+    {
+      "id": "2",
+      "surgeryId": "1",
+      "lotNumber": "ABUT-2024-015",
+      "materialName": "钛合金基台",
+      "quantity": 2,
+      "usedAt": "2026-05-10T11:42:26.554Z"
+    }
+  ],
+  "recalledLots": []
+}
