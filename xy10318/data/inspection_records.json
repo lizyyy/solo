@@ -1,0 +1,235 @@
+{
+  "351234567890001": {
+    "phone_info": {
+      "imei": "351234567890001",
+      "model": "iPhone 15 Pro Max",
+      "storage": "256GB",
+      "color": "钛金属原色",
+      "purchase_date": "2023-10-15",
+      "warranty_status": "in_warranty"
+    },
+    "inspection": {
+      "screen_condition": "perfect",
+      "frame_condition": "perfect",
+      "camera_condition": "perfect",
+      "battery_health": 98,
+      "repair_history": "none",
+      "repair_proof": false,
+      "functional_issues": [],
+      "notes": "客户自用，保护很好，原装贴膜未拆，发票齐全"
+    },
+    "base_price": 8500,
+    "total_deduction_percent": 0.0,
+    "total_deduction_amount": 0.0,
+    "final_price": 8500.0,
+    "quality_level": "A+",
+    "level_description": "准新成色 - 几乎全新，无明显划痕磕碰",
+    "deductions": [
+      {
+        "category": "屏幕",
+        "item": "perfect",
+        "description": "屏幕完好，无划痕无碎裂",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      },
+      {
+        "category": "边框",
+        "item": "perfect",
+        "description": "边框后盖完好",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      },
+      {
+        "category": "摄像头",
+        "item": "perfect",
+        "description": "摄像头功能完好",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      },
+      {
+        "category": "电池健康",
+        "item": "98%",
+        "description": "电池健康95%-100%，无扣减",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      },
+      {
+        "category": "维修记录",
+        "item": "none",
+        "description": "无维修记录，官方保修内/过保",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      }
+    ],
+    "anomalies": [],
+    "needs_manual_review": false,
+    "is_manual_adjusted": false,
+    "manual_adjustment": 0.0,
+    "status": "confirmed",
+    "confirmed_at": "2026-05-10T19:02:46.912032",
+    "created_at": "2026-05-10T19:02:46.912008"
+  },
+  "351234567890002": {
+    "phone_info": {
+      "imei": "351234567890002",
+      "model": "iPhone 14 Pro",
+      "storage": "128GB",
+      "color": "深空黑",
+      "purchase_date": "2022-11-20",
+      "warranty_status": "out_of_warranty"
+    },
+    "inspection": {
+      "screen_condition": "cracked",
+      "frame_condition": "major_dent",
+      "camera_condition": "lens_scratch",
+      "battery_health": 72,
+      "repair_history": "screen_replacement",
+      "repair_proof": true,
+      "functional_issues": [
+        "face_id_broken"
+      ],
+      "notes": "屏幕碎裂，右上角明显磕碰，曾更换过屏幕（有维修记录），面容ID损坏"
+    },
+    "base_price": 5200,
+    "total_deduction_percent": 1.1,
+    "total_deduction_amount": 5720.0,
+    "final_price": 0,
+    "quality_level": "D",
+    "level_description": "故障机 - 功能异常或有严重外观损伤",
+    "deductions": [
+      {
+        "category": "屏幕",
+        "item": "cracked",
+        "description": "屏幕碎裂或漏液",
+        "deduction_percent": 0.4,
+        "deduction_amount": 2080.0
+      },
+      {
+        "category": "边框",
+        "item": "major_dent",
+        "description": "明显磕碰或变形",
+        "deduction_percent": 0.15,
+        "deduction_amount": 780.0
+      },
+      {
+        "category": "摄像头",
+        "item": "lens_scratch",
+        "description": "镜头轻微划痕，不影响成像",
+        "deduction_percent": 0.1,
+        "deduction_amount": 520.0
+      },
+      {
+        "category": "电池健康",
+        "item": "72%",
+        "description": "电池健康60%-74%，扣减10%",
+        "deduction_percent": 0.1,
+        "deduction_amount": 520.0
+      },
+      {
+        "category": "维修记录",
+        "item": "screen_replacement",
+        "description": "更换过屏幕（非官方维修扣减翻倍）",
+        "deduction_percent": 0.15,
+        "deduction_amount": 780.0
+      },
+      {
+        "category": "功能异常",
+        "item": "face_id_broken",
+        "description": "面容/指纹识别损坏",
+        "deduction_percent": 0.2,
+        "deduction_amount": 1040.0
+      }
+    ],
+    "anomalies": [],
+    "needs_manual_review": true,
+    "is_manual_adjusted": false,
+    "manual_adjustment": 0.0,
+    "status": "draft",
+    "confirmed_at": null,
+    "created_at": "2026-05-10T19:02:22.898633"
+  },
+  "351234567890003": {
+    "phone_info": {
+      "imei": "351234567890003",
+      "model": "华为 Mate 60 Pro",
+      "storage": "512GB",
+      "color": "雅丹黑",
+      "purchase_date": "2023-10-01",
+      "warranty_status": "in_warranty"
+    },
+    "inspection": {
+      "screen_condition": "minor_scratch",
+      "frame_condition": "minor_dent",
+      "camera_condition": "perfect",
+      "battery_health": 115,
+      "repair_history": "battery_replacement",
+      "repair_proof": false,
+      "functional_issues": [
+        "water_damage",
+        "speaker_broken"
+      ],
+      "notes": "电池健康值显示异常（115%），客户说换过电池但无凭证，扬声器有杂音"
+    },
+    "base_price": 5800,
+    "total_deduction_percent": 0.655,
+    "total_deduction_amount": 3799.0,
+    "final_price": 2001.0,
+    "quality_level": "D",
+    "level_description": "故障机 - 功能异常或有严重外观损伤",
+    "deductions": [
+      {
+        "category": "屏幕",
+        "item": "minor_scratch",
+        "description": "轻微划痕（3mm以内，不影响显示）",
+        "deduction_percent": 0.05,
+        "deduction_amount": 290.0
+      },
+      {
+        "category": "边框",
+        "item": "minor_dent",
+        "description": "轻微磕碰或划痕",
+        "deduction_percent": 0.05,
+        "deduction_amount": 290.0
+      },
+      {
+        "category": "摄像头",
+        "item": "perfect",
+        "description": "摄像头功能完好",
+        "deduction_percent": 0,
+        "deduction_amount": 0
+      },
+      {
+        "category": "维修记录",
+        "item": "battery_replacement",
+        "description": "仅更换电池（官方维修，有记录）",
+        "deduction_percent": 0.07500000000000001,
+        "deduction_amount": 435.0
+      },
+      {
+        "category": "功能异常",
+        "item": "water_damage",
+        "description": "进水（严重扣减）",
+        "deduction_percent": 0.4,
+        "deduction_amount": 2320.0
+      },
+      {
+        "category": "功能异常",
+        "item": "speaker_broken",
+        "description": "扬声器/听筒损坏",
+        "deduction_percent": 0.08,
+        "deduction_amount": 464.0
+      }
+    ],
+    "anomalies": [
+      "电池健康值异常：115%（正常范围0-100%）",
+      "维修记录 'battery_replacement' 缺少维修凭证",
+      "功能项矛盾：进水标识触发，建议人工复核"
+    ],
+    "needs_manual_review": true,
+    "is_manual_adjusted": false,
+    "manual_adjustment": 0.0,
+    "status": "draft",
+    "confirmed_at": null,
+    "created_at": "2026-05-10T19:02:32.452112"
+  }
+}

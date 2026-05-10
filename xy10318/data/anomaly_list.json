@@ -1,0 +1,30 @@
+[
+  {
+    "imei": "351234567890002",
+    "model": "iPhone 14 Pro",
+    "quality_level": "D",
+    "base_price": 5200,
+    "final_price": 0,
+    "anomalies": [],
+    "needs_manual_review": true,
+    "status": "pending_review",
+    "created_at": "2026-05-10T19:02:22.899684",
+    "review_notes": ""
+  },
+  {
+    "imei": "351234567890003",
+    "model": "华为 Mate 60 Pro",
+    "quality_level": "D",
+    "base_price": 5800,
+    "final_price": 2001.0,
+    "anomalies": [
+      "电池健康值异常：115%（正常范围0-100%）",
+      "维修记录 'battery_replacement' 缺少维修凭证",
+      "功能项矛盾：进水标识触发，建议人工复核"
+    ],
+    "needs_manual_review": true,
+    "status": "pending_review",
+    "created_at": "2026-05-10T19:02:32.454212",
+    "review_notes": ""
+  }
+]

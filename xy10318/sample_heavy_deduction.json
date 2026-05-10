@@ -1,0 +1,20 @@
+{
+  "phone_info": {
+    "imei": "351234567890002",
+    "model": "iPhone 14 Pro",
+    "storage": "128GB",
+    "color": "深空黑",
+    "purchase_date": "2022-11-20",
+    "warranty_status": "out_of_warranty"
+  },
+  "inspection": {
+    "screen_condition": "cracked",
+    "frame_condition": "major_dent",
+    "camera_condition": "lens_scratch",
+    "battery_health": 72,
+    "repair_history": "screen_replacement",
+    "repair_proof": true,
+    "functional_issues": ["face_id_broken"],
+    "notes": "屏幕碎裂，右上角明显磕碰，曾更换过屏幕（有维修记录），面容ID损坏"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "phone_info": {
+    "imei": "351234567890003",
+    "model": "华为 Mate 60 Pro",
+    "storage": "512GB",
+    "color": "雅丹黑",
+    "purchase_date": "2023-10-01",
+    "warranty_status": "in_warranty"
+  },
+  "inspection": {
+    "screen_condition": "minor_scratch",
+    "frame_condition": "minor_dent",
+    "camera_condition": "perfect",
+    "battery_health": 115,
+    "repair_history": "battery_replacement",
+    "repair_proof": false,
+    "functional_issues": ["water_damage", "speaker_broken"],
+    "notes": "电池健康值显示异常（115%），客户说换过电池但无凭证，扬声器有杂音"
+  }
+}
