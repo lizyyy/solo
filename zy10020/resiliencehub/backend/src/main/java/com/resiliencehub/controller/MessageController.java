@@ -203,6 +203,7 @@ public class MessageController {
         response.put("successCount", successCount.get());
         response.put("failCount", failCount.get());
         response.put("duplicateSentCount", duplicateSentCount.get());
+        response.put("duplicateCount", duplicateSentCount.get());
         response.put("sampleMessageIds", messageIds.subList(0, Math.min(20, messageIds.size())));
         
         return Result.success(response);
@@ -224,8 +225,8 @@ public class MessageController {
         int actualMessageCount = totalMessages / concurrentProducers * concurrentProducers;
         
         String[] preGeneratedIds = new String[actualMessageCount];
+        boolean[] isDuplicateFlags = new boolean[actualMessageCount];
         List<String> uniqueIds = new ArrayList<>();
-        Set<String> idSet = new HashSet<>();
         int duplicatePlanned = 0;
         
         Random random = new Random();
@@ -233,12 +234,13 @@ public class MessageController {
             if (Math.random() < duplicateProbability && !uniqueIds.isEmpty()) {
                 int randomIndex = random.nextInt(uniqueIds.size());
                 preGeneratedIds[i] = uniqueIds.get(randomIndex);
+                isDuplicateFlags[i] = true;
                 duplicatePlanned++;
             } else {
                 String newId = "concurrent-" + baseId + "-" + i;
                 preGeneratedIds[i] = newId;
                 uniqueIds.add(newId);
-                idSet.add(newId);
+                isDuplicateFlags[i] = false;
             }
         }
         
@@ -273,7 +275,7 @@ public class MessageController {
                     for (int i = startIdx; i < endIdx; i++) {
                         try {
                             String messageId = preGeneratedIds[i];
-                            boolean isDuplicate = !idSet.contains(messageId);
+                            boolean isDuplicate = isDuplicateFlags[i];
                             
                             if (isDuplicate) {
                                 actualDuplicateSent.incrementAndGet();
@@ -321,7 +323,9 @@ public class MessageController {
         long duration = System.currentTimeMillis() - startTime;
         
         response.put("sentCount", sentCount.get());
+        response.put("successCount", sentCount.get());
         response.put("actualDuplicateSent", actualDuplicateSent.get());
+        response.put("duplicateCount", actualDuplicateSent.get());
         response.put("failCount", failCount.get());
         response.put("durationMs", duration);
         response.put("messagesPerSecond", duration > 0 ? (double) sentCount.get() / (duration / 1000.0) : 0);

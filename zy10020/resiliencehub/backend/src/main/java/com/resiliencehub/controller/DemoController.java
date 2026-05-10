@@ -291,12 +291,17 @@ public class DemoController {
         
         String limitKey = "peak-simulation:" + UUID.randomUUID().toString().substring(0, 8);
         
+        int actualConcurrentUsers = Math.min(concurrentUsers, totalRequests);
+        int requestsPerUser = totalRequests / actualConcurrentUsers;
+        int actualTotalRequests = requestsPerUser * actualConcurrentUsers;
+        
         Map<String, Object> result = new HashMap<>();
-        result.put("totalRequests", totalRequests);
-        result.put("concurrentUsers", concurrentUsers);
+        result.put("totalRequests", actualTotalRequests);
+        result.put("requestsPerUser", requestsPerUser);
+        result.put("concurrentUsers", actualConcurrentUsers);
         result.put("qpsLimit", qpsLimit);
         result.put("traceId", TraceContext.getTraceId());
-        result.put("executionType", "concurrent-peak");
+        result.put("executionType", "concurrent-peak-users");
         
         AtomicInteger success = new AtomicInteger(0);
         AtomicInteger rateLimited = new AtomicInteger(0);
@@ -305,11 +310,11 @@ public class DemoController {
         List<Long> latencyTimes = new ArrayList<>();
         
         CountDownLatch startLatch = new CountDownLatch(1);
-        CountDownLatch doneLatch = new CountDownLatch(totalRequests);
+        CountDownLatch doneLatch = new CountDownLatch(actualConcurrentUsers);
         
         long startTime = System.currentTimeMillis();
         
-        IntStream.range(0, totalRequests).forEach(i -> {
+        IntStream.range(0, actualConcurrentUsers).forEach(userIdx -> {
             simulationExecutor.submit(() -> {
                 int currentActive = activeThreads.incrementAndGet();
                 maxActiveThreads.updateAndGet(cur -> Math.max(cur, currentActive));
@@ -317,23 +322,26 @@ public class DemoController {
                 try {
                     startLatch.await();
                     
-                    long reqStart = System.currentTimeMillis();
-                    boolean allowed = rateLimitService.tryAcquireSlidingWindow(limitKey, qpsLimit, 1);
-                    
-                    if (allowed) {
-                        try {
-                            Thread.sleep(5 + (long)(Math.random() * 5));
-                            success.incrementAndGet();
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
+                    for (int reqIdx = 0; reqIdx < requestsPerUser; reqIdx++) {
+                        long reqStart = System.currentTimeMillis();
+                        boolean allowed = rateLimitService.tryAcquireSlidingWindow(limitKey, qpsLimit, 1);
+                        
+                        if (allowed) {
+                            try {
+                                Thread.sleep(5 + (long)(Math.random() * 5));
+                                success.incrementAndGet();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                break;
+                            }
+                        } else {
+                            rateLimited.incrementAndGet();
                         }
-                    } else {
-                        rateLimited.incrementAndGet();
-                    }
-                    
-                    long latency = System.currentTimeMillis() - reqStart;
-                    synchronized(latencyTimes) {
-                        latencyTimes.add(latency);
+                        
+                        long latency = System.currentTimeMillis() - reqStart;
+                        synchronized(latencyTimes) {
+                            latencyTimes.add(latency);
+                        }
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -358,7 +366,7 @@ public class DemoController {
         result.put("successCount", success.get());
         result.put("rateLimitedCount", rateLimited.get());
         result.put("durationMs", duration);
-        result.put("actualQps", duration > 0 ? (double) totalRequests / (duration / 1000.0) : 0);
+        result.put("actualQps", duration > 0 ? (double) actualTotalRequests / (duration / 1000.0) : 0);
         result.put("maxActiveThreads", maxActiveThreads.get());
         
         if (!latencyTimes.isEmpty()) {
