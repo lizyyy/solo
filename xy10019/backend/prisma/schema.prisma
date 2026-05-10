@@ -97,10 +97,10 @@ model Store {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  users           User[]
-  inventories     Inventory[]
-  transferOrders  TransferOrder[]
-  destinationOrders TransferOrder[]
+  users               User[]
+  inventories         Inventory[]
+  sourceTransferOrders  TransferOrder[] @relation("SourceStore")
+  targetTransferOrders  TransferOrder[] @relation("TargetStore")
 
   @@map("stores")
   @@index([code])

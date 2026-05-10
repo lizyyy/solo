@@ -2,17 +2,18 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { ExportService } from './export.service';
 import { ExportController } from './export.controller';
 import { AuthModule } from '../auth/auth.module';
-import { QueueService } from '../../infrastructure/queue/queue.service';
+import { QueueModule } from '../../infrastructure/queue/queue.module';
+import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, QueueModule, AuditModule],
   controllers: [ExportController],
   providers: [ExportService],
   exports: [ExportService],
 })
 export class ExportModule implements OnModuleInit {
   constructor(
-    private queueService: QueueService,
+    private queueService: any,
     private exportService: ExportService,
   ) {}
 

@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException, BadRequestException, ConflictExc
 import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { DistributedLockService } from '../../infrastructure/redis/distributed-lock.service';
 import { IdempotentService } from '../../infrastructure/redis/idempotent.service';
+import { CacheService } from '../../infrastructure/redis/cache.service';
 import { AuditService } from '../audit/audit.service';
 import {
   Inventory,
@@ -55,6 +56,7 @@ export class InventoryService {
     private prismaService: PrismaService,
     private lockService: DistributedLockService,
     private idempotentService: IdempotentService,
+    private cacheService: CacheService,
     private auditService: AuditService,
   ) {}
 
@@ -101,67 +103,95 @@ export class InventoryService {
     limit: number = 50,
     offset: number = 0,
   ): Promise<{ inventories: (Inventory & { product: any; store: any })[]; total: number }> {
-    const where: any = {};
+    const cacheKey = this.cacheService.generateKey(
+      'inventory:list',
+      filters.storeId,
+      filters.productId,
+      filters.keyword,
+      filters.lowStock,
+      limit,
+      offset,
+    );
 
-    if (filters.storeId) {
-      where.storeId = filters.storeId;
-    }
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const where: any = {};
 
-    if (filters.productId) {
-      where.productId = filters.productId;
-    }
+        if (filters.storeId) {
+          where.storeId = filters.storeId;
+        }
 
-    if (filters.lowStock) {
-      where.availableQty = { lte: 10 };
-    }
+        if (filters.productId) {
+          where.productId = filters.productId;
+        }
 
-    if (filters.keyword) {
-      where.OR = [
-        {
-          product: {
-            OR: [
-              { sku: { contains: filters.keyword } },
-              { name: { contains: filters.keyword } },
-              { barcode: { contains: filters.keyword } },
-            ],
-          },
-        },
-        {
-          store: {
-            OR: [
-              { code: { contains: filters.keyword } },
-              { name: { contains: filters.keyword } },
-            ],
-          },
-        },
-      ];
-    }
+        if (filters.lowStock) {
+          where.availableQty = { lte: 10 };
+        }
 
-    const [inventories, total] = await Promise.all([
-      this.prismaService.inventory.findMany({
-        where,
-        include: {
-          product: true,
-          store: true,
-        },
-        orderBy: { lastUpdated: 'desc' },
-        skip: offset,
-        take: limit,
-      }),
-      this.prismaService.inventory.count({ where }),
-    ]);
+        if (filters.keyword) {
+          where.OR = [
+            {
+              product: {
+                OR: [
+                  { sku: { contains: filters.keyword } },
+                  { name: { contains: filters.keyword } },
+                  { barcode: { contains: filters.keyword } },
+                ],
+              },
+            },
+            {
+              store: {
+                OR: [
+                  { code: { contains: filters.keyword } },
+                  { name: { contains: filters.keyword } },
+                ],
+              },
+            },
+          ];
+        }
 
-    return { inventories, total };
+        const [inventories, total] = await Promise.all([
+          this.prismaService.inventory.findMany({
+            where,
+            include: {
+              product: true,
+              store: true,
+            },
+            orderBy: { lastUpdated: 'desc' },
+            skip: offset,
+            take: limit,
+          }),
+          this.prismaService.inventory.count({ where }),
+        ]);
+
+        return { inventories, total };
+      },
+      { ttl: CACHE_TTL },
+    );
   }
 
   async findByStoreAndProduct(
     storeId: string,
     productId: string,
   ): Promise<(Inventory & { product: any; store: any }) | null> {
-    return this.prismaService.inventory.findUnique({
-      where: { storeId_productId: { storeId, productId } },
-      include: { product: true, store: true },
-    });
+    const cacheKey = this.cacheService.generateKey(
+      'inventory',
+      storeId,
+      productId,
+    );
+
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        return this.prismaService.inventory.findUnique({
+          where: { storeId_productId: { storeId, productId } },
+          include: { product: true, store: true },
+        });
+      },
+      { ttl: CACHE_TTL },
+    );
   }
 
   async adjust(
@@ -287,6 +317,7 @@ export class InventoryService {
       );
 
       await this.idempotentService.complete(idempotentKey, result);
+      await this.invalidateInventoryCache(data.storeId, data.productId);
       return result;
     } catch (error) {
       await this.idempotentService.fail(idempotentKey, error.message);
@@ -418,6 +449,9 @@ export class InventoryService {
       });
 
       await this.idempotentService.complete(idempotentKey, result);
+      for (const op of operations) {
+        await this.invalidateInventoryCache(op.storeId, op.productId);
+      }
       return result;
     } catch (error) {
       await this.idempotentService.fail(idempotentKey, error.message);
@@ -537,6 +571,7 @@ export class InventoryService {
       });
 
       await this.idempotentService.complete(idempotentKey, result);
+      await this.invalidateInventoryCache(data.storeId, data.productId);
       return result;
     } catch (error) {
       await this.idempotentService.fail(idempotentKey, error.message);
@@ -600,7 +635,7 @@ export class InventoryService {
 
     const transferLockKey = `transfer:${data.sourceStoreId}:${data.targetStoreId}`;
 
-    return this.lockService.executeWithLock(
+    const result = await this.lockService.executeWithLock(
       transferLockKey,
       async () => {
         return this.prismaService.$transaction(async (prisma) => {
@@ -718,6 +753,12 @@ export class InventoryService {
       },
       { ttl: 60000, retryCount: 3 },
     );
+
+    for (const item of data.items) {
+      await this.invalidateInventoryCache(data.sourceStoreId, item.productId);
+    }
+
+    return result;
   }
 
   async completeTransfer(
@@ -741,7 +782,7 @@ export class InventoryService {
 
     const transferLockKey = `transfer:complete:${transferOrderId}`;
 
-    return this.lockService.executeWithLock(
+    const result = await this.lockService.executeWithLock(
       transferLockKey,
       async () => {
         return this.prismaService.$transaction(async (prisma) => {
@@ -884,6 +925,13 @@ export class InventoryService {
       },
       { ttl: 60000, retryCount: 3 },
     );
+
+    for (const item of transfer.items) {
+      await this.invalidateInventoryCache(transfer.sourceStoreId, item.productId);
+      await this.invalidateInventoryCache(transfer.targetStoreId, item.productId);
+    }
+
+    return result;
   }
 
   async cancelTransfer(
@@ -905,7 +953,7 @@ export class InventoryService {
       throw new BadRequestException(`调拨单当前状态为 ${transfer.status}，无法取消`);
     }
 
-    return this.prismaService.$transaction(async (prisma) => {
+    const result = await this.prismaService.$transaction(async (prisma) => {
       for (const item of transfer.items) {
         await prisma.inventory.update({
           where: {
@@ -949,6 +997,12 @@ export class InventoryService {
 
       return cancelledOrder;
     });
+
+    for (const item of transfer.items) {
+      await this.invalidateInventoryCache(transfer.sourceStoreId, item.productId);
+    }
+
+    return result;
   }
 
   async getTransferOrders(
@@ -1009,39 +1063,56 @@ export class InventoryService {
   }
 
   async getStatistics(storeId?: string): Promise<any> {
-    const where: any = {};
-    if (storeId) {
-      where.storeId = storeId;
-    }
-
-    const [totalProducts, totalQuantity, lowStockCount, totalValue] = await Promise.all([
-      this.prismaService.inventory.count({ where }),
-      this.prismaService.inventory.aggregate({
-        _sum: { quantity: true },
-        where,
-      }),
-      this.prismaService.inventory.count({
-        where: {
-          ...where,
-          availableQty: { lte: 10 },
-        },
-      }),
-      this.prismaService.inventory.findMany({
-        where,
-        select: { quantity: true, price: true },
-      }),
-    ]);
-
-    const totalInventoryValue = totalValue.reduce((sum, item) => {
-      return sum + item.quantity * Number(item.price);
-    }, 0);
-
-    return {
-      totalProducts,
-      totalQuantity: totalQuantity._sum.quantity || 0,
-      lowStockCount,
-      totalInventoryValue,
+    const cacheKey = this.cacheService.generateKey(
+      'inventory:stats',
       storeId,
-    };
+    );
+
+    return this.cacheService.getOrSet(
+      cacheKey,
+      async () => {
+        const where: any = {};
+        if (storeId) {
+          where.storeId = storeId;
+        }
+
+        const [totalProducts, totalQuantity, lowStockCount, totalValue] = await Promise.all([
+          this.prismaService.inventory.count({ where }),
+          this.prismaService.inventory.aggregate({
+            _sum: { quantity: true },
+            where,
+          }),
+          this.prismaService.inventory.count({
+            where: {
+              ...where,
+              availableQty: { lte: 10 },
+            },
+          }),
+          this.prismaService.inventory.findMany({
+            where,
+            select: { quantity: true, price: true },
+          }),
+        ]);
+
+        const totalInventoryValue = totalValue.reduce((sum, item) => {
+          return sum + item.quantity * Number(item.price);
+        }, 0);
+
+        return {
+          totalProducts,
+          totalQuantity: totalQuantity._sum.quantity || 0,
+          lowStockCount,
+          totalInventoryValue,
+          storeId,
+        };
+      },
+      { ttl: CACHE_TTL },
+    );
+  }
+
+  private async invalidateInventoryCache(storeId?: string, productId?: string): Promise<void> {
+    await this.cacheService.invalidateInventory(storeId, productId);
+    await this.cacheService.invalidateStatistics(storeId);
+    this.logger.log(`缓存已失效: storeId=${storeId}, productId=${productId}`);
   }
 }

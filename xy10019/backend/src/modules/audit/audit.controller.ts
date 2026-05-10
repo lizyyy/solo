@@ -1,13 +1,27 @@
-import { Controller, Get, Query, Param, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Query, Param, HttpCode, HttpStatus, Post, Body, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { AuditService } from './audit.service';
-import { AuditOperation, AuditEntity } from '@prisma/client';
+import { RollbackService } from './rollback.service';
+import { AuditOperation, AuditEntity, UserRole } from '@prisma/client';
 import { success } from '../../common/types/api-response.type';
+import { AuthGuard } from '../auth/auth.guard';
+import { CurrentUser, RequestId } from '../../common/decorators/user.decorator';
+import { SetMetadata } from '@nestjs/common';
+
+const ROLES_KEY = 'roles';
+const Roles = (...roles: UserRole[]) => SetMetadata(ROLES_KEY, roles);
+
+interface RollbackRequest {
+  auditLogId: string;
+}
 
 @ApiTags('审计日志')
 @Controller('audit')
 export class AuditController {
-  constructor(private readonly auditService: AuditService) {}
+  constructor(
+    private readonly auditService: AuditService,
+    private readonly rollbackService: RollbackService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '查询审计日志' })
@@ -147,6 +161,36 @@ export class AuditController {
       entityId,
       new Date(startDate),
       new Date(endDate),
+    );
+    return success(result);
+  }
+
+  @Get('can-rollback/:auditLogId')
+  @ApiOperation({ summary: '检查操作是否可以回滚' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async canRollback(@Param('auditLogId') auditLogId: string) {
+    const result = await this.rollbackService.canRollback(auditLogId);
+    return success(result);
+  }
+
+  @Post('rollback')
+  @ApiOperation({ summary: '回滚指定的操作' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @HttpCode(HttpStatus.OK)
+  async rollbackOperation(
+    @Body() request: RollbackRequest,
+    @CurrentUser() user: any,
+    @RequestId() requestId: string,
+  ) {
+    const result = await this.rollbackService.rollbackOperation(
+      request.auditLogId,
+      user.id,
+      user.name,
+      requestId,
     );
     return success(result);
   }
