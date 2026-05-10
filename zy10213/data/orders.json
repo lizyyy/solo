@@ -1,0 +1,38 @@
+[
+  {
+    "id": "608475e3f705",
+    "order_no": "P20260511001",
+    "elevator_id": "670076f7b7ce",
+    "technician_id": "b56e7762866c",
+    "type": "periodic",
+    "planned_date": "2026-05-11",
+    "due_date": "2026-05-16",
+    "status": "completed",
+    "fault_description": "",
+    "completed_date": "2026-05-11",
+    "proof_url": "https://example.com/photo123",
+    "proof_notes": "已检查导轨润滑，一切正常",
+    "created_at": "2026-05-11",
+    "assigned_at": "2026-05-11",
+    "notes": "",
+    "import_hash": ""
+  },
+  {
+    "id": "b78dff928f50",
+    "order_no": "F20260511001",
+    "elevator_id": "670076f7b7ce",
+    "technician_id": "1d4edd498c9e",
+    "type": "fault",
+    "planned_date": "2026-05-11",
+    "due_date": "2026-05-13",
+    "status": "completed",
+    "fault_description": "电梯异响",
+    "completed_date": "2026-05-11",
+    "proof_url": "https://example.com/photo456",
+    "proof_notes": "调整门机参数，异响消除",
+    "created_at": "2026-05-11",
+    "assigned_at": "2026-05-11",
+    "notes": "",
+    "import_hash": "eaa14f43e343d87a"
+  }
+]
