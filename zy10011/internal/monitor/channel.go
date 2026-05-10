@@ -1,16 +1,17 @@
 package monitor
 
 import (
+	"sync"
 	"time"
 
 	"github.com/deadlock-detector/internal/model"
 )
 
 type monitoredChannel struct {
-	id     string
-	inner  chan interface{}
-	info   *model.ChannelInfo
-	closed bool
+	id        string
+	inner     chan interface{}
+	info      *model.ChannelInfo
+	closeOnce sync.Once
 }
 
 func newMonitoredChannel(name string, capacity int, chType model.ChannelType) *monitoredChannel {
@@ -65,12 +66,14 @@ func (c *monitoredChannel) Recv() (interface{}, bool) {
 }
 
 func (c *monitoredChannel) Close() {
-	if c.closed {
-		return
-	}
-	close(c.inner)
-	c.closed = true
-	c.info.Close()
+	c.closeOnce.Do(func() {
+		defer func() {
+			if r := recover(); r != nil {
+			}
+		}()
+		close(c.inner)
+		c.info.Close()
+	})
 }
 
 func generateChannelID() string {

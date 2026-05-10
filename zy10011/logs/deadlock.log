@@ -1,0 +1,537 @@
+[2026-05-10T20:56:29+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T20:56:30+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510205630","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T20:56:30+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T20:56:30+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T20:56:30+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T20:56:30+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T20:56:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T20:56:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205630","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T20:56:31+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510205630"}
+[2026-05-10T20:56:32+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T20:56:32+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T20:56:32+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T20:56:32+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T20:56:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205632","event_type":"start","goroutine_id":"0b28-𔰈-\u0002","total_events":7}
+[2026-05-10T20:56:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205632","event_type":"start","goroutine_id":"ddc6-𒄐-\u0001","total_events":8}
+[2026-05-10T20:56:35+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510205632","event_type":"send_success","goroutine_id":"ddc6-𒄐-\u0001","total_events":9}
+[2026-05-10T20:56:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:42+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:43+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:44+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:45+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:46+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:46+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:46+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:47+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:47+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:47+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:48+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:48+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:48+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:49+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:49+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:49+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:50+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:50+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:50+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:51+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:51+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:51+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:52+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:52+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:52+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:53+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:53+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:53+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:54+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:54+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:54+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:55+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:55+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:55+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:56+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:56+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:56+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:57+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:57+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:57+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:58+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:58+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:58+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:56:59+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:56:59+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:56:59+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:00+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:00+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:00+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:01+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:01+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:01+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:02+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:02+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:02+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:03+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:03+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:03+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:04+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:04+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:04+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:05+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:05+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:05+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:06+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:06+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:06+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:07+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:07+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:07+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:08+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:08+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:08+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:09+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:09+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:09+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:10+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:10+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:10+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:11+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:11+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:11+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:12+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:12+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:12+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:13+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:13+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:13+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:14+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:14+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:14+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:15+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:15+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:15+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:16+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:16+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:16+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:17+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:17+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:17+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:18+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:18+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:18+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:19+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:19+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:19+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:20+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:20+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:20+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:21+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:21+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:21+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:22+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:22+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:22+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:23+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:23+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:23+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:24+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:24+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:24+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:25+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:25+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:25+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:26+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:26+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:26+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:27+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:27+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:27+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:28+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:28+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:28+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:29+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:29+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:29+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:30+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:30+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:30+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:31+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:31+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:31+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:32+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:32+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:32+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:33+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:33+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:33+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:34+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:34+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:34+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:35+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:35+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:35+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:36+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:36+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:36+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:37+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:38+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:39+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:40+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:41+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:42+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:43+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:44+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:45+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:46+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:46+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:46+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:47+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:47+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:47+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:48+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:48+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:48+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:49+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:49+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:49+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:50+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:50+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:50+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:51+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:51+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:51+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:52+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:52+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:52+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:53+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:53+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:53+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:54+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:54+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:54+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:55+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:55+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:55+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:56+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:56+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:56+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:57+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:57+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:57+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:58+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:58+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:58+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:57:59+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:57:59+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:57:59+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:00+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:00+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:00+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:01+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:01+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:01+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:02+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:02+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:02+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:03+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:03+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:03+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:04+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:04+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:04+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:05+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:05+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:05+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:06+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:06+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:06+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:07+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:07+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:07+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:08+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:08+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:08+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:09+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:09+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:09+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:10+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:10+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:10+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:11+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:11+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:11+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:12+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:12+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:12+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:13+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:13+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:13+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:14+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:14+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:14+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:15+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:15+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:15+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:16+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:16+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:16+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:17+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:17+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:17+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:18+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:18+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:18+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:19+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:19+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:19+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:20+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:20+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:20+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:21+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:21+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:21+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:22+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:22+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:22+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:23+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:23+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:23+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:24+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:24+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:24+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:25+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:25+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:25+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:26+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:26+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:26+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:27+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:27+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:27+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:28+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:28+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:28+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:29+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:29+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:29+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:30+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:30+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:30+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:31+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:31+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:31+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:32+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:32+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:32+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:33+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:33+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:33+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:34+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:34+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:34+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:35+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:35+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:35+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:36+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:36+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:36+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:37+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:37+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:38+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:38+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:39+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:39+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:40+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:40+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:41+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:41+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:42+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:42+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:43+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:43+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:44+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:44+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"ddc6-𒄐-\u0001","goroutine_name":"deadlock-goroutine-A","last_heartbeat":"2026-05-10 20:56:32.344225 +0800 CST m=+2.406578918","state":"running"}
+[2026-05-10T20:58:45+08:00] [warn] [monitor] 检测到可能僵死的 goroutine {"goroutine_id":"0b28-𔰈-\u0002","goroutine_name":"deadlock-goroutine-B","last_heartbeat":"2026-05-10 20:56:32.344222 +0800 CST m=+2.406575626","state":"running"}
+[2026-05-10T20:58:45+08:00] [warn] [monitor] channel 长时间无操作 {"capacity":0,"channel_id":"ch-20260510205632","channel_name":"deadlock-ch2","length":0}
+[2026-05-10T20:58:46+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:00:03+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:00:04+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510210004","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:00:04+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210004","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:00:04+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210004"}
+[2026-05-10T21:00:05+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210005","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:00:05+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210005","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:00:05+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"79e6-𐇐-\u0001","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:00:05+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"181a-𔁐-\u0002","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:00:05+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210005","event_type":"start","goroutine_id":"181a-𔁐-\u0002","total_events":7}
+[2026-05-10T21:00:05+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210005","event_type":"start","goroutine_id":"79e6-𐇐-\u0001","total_events":8}
+[2026-05-10T21:00:07+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210005","event_type":"blocked","goroutine_id":"79e6-𐇐-\u0001","total_events":9}
+[2026-05-10T21:00:07+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210005","event_type":"blocked","goroutine_id":"181a-𔁐-\u0002","total_events":10}
+[2026-05-10T21:00:07+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"6364-𗻐-\u0003","detected_at":"2026-05-10 21:00:07.993201 +0800 CST m=+4.406945543","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:00:07+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:00:08+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"6364-𗻐-\u0003","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:00:08+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"79e6-𐇐-\u0001","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210005"]}
+[2026-05-10T21:00:08+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"181a-𔁐-\u0002","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210005"]}
+[2026-05-10T21:00:08+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"6364-𗻐-\u0003"}
+[2026-05-10T21:00:08+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"6364-𗻐-\u0003","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:00:08+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"6364-𗻐-\u0003","duration":"501.238291ms","resolution_type":"timeout_release"}
+[2026-05-10T21:00:08+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:00:08+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"181a-𔁐-\u0002"}
+[2026-05-10T21:00:08+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"79e6-𐇐-\u0001"}
+[2026-05-10T21:00:08+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210005"}
+[2026-05-10T21:00:10+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510210010","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:00:10+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:00:10+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210010","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:00:10+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210010"}
+[2026-05-10T21:00:11+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510210011","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:00:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:00:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:00:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:00:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:00:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:00:11+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210011"}
+[2026-05-10T21:00:11+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:03:18+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:03:18+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510210318","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:03:18+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:03:18+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:03:19+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:03:19+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:03:19+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:03:19+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210318","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:03:19+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210318"}
+[2026-05-10T21:03:20+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210320","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:03:20+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210320","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:03:20+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"0c36-21000-1","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:03:20+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"4a1a-32000-2","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:03:20+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210320","event_type":"start","goroutine_id":"4a1a-32000-2","total_events":7}
+[2026-05-10T21:03:20+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210320","event_type":"start","goroutine_id":"0c36-21000-1","total_events":8}
+[2026-05-10T21:03:22+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210320","event_type":"blocked","goroutine_id":"0c36-21000-1","total_events":9}
+[2026-05-10T21:03:22+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210320","event_type":"blocked","goroutine_id":"4a1a-32000-2","total_events":10}
+[2026-05-10T21:03:22+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"55dc-96000-3","detected_at":"2026-05-10 21:03:22.626599 +0800 CST m=+4.407662126","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:03:22+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:03:23+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"55dc-96000-3","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:03:23+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"0c36-21000-1","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210320"]}
+[2026-05-10T21:03:23+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"4a1a-32000-2","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210320"]}
+[2026-05-10T21:03:23+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"55dc-96000-3"}
+[2026-05-10T21:03:23+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"55dc-96000-3","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:03:23+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"55dc-96000-3","duration":"501.354959ms","resolution_type":"timeout_release"}
+[2026-05-10T21:03:23+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:03:23+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"4a1a-32000-2"}
+[2026-05-10T21:03:23+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"0c36-21000-1"}
+[2026-05-10T21:03:23+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210320"}
+[2026-05-10T21:03:25+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510210325","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:03:25+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:03:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210325","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:03:25+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210325"}
+[2026-05-10T21:03:26+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510210326","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:03:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:03:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:03:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:03:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:03:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:03:26+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210326"}
+[2026-05-10T21:03:26+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:05:51+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:05:51+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510210551","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:05:51+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:05:51+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:05:52+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:05:52+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:05:52+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:05:52+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210551","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:05:52+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210551"}
+[2026-05-10T21:05:53+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210553","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:05:53+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510210553","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:05:53+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"8e3d-30000-1","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:05:53+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"3c5f-52000-2","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:05:53+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210553","event_type":"start","goroutine_id":"3c5f-52000-2","total_events":7}
+[2026-05-10T21:05:53+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210553","event_type":"start","goroutine_id":"8e3d-30000-1","total_events":8}
+[2026-05-10T21:05:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210553","event_type":"blocked","goroutine_id":"8e3d-30000-1","total_events":9}
+[2026-05-10T21:05:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210553","event_type":"blocked","goroutine_id":"3c5f-52000-2","total_events":10}
+[2026-05-10T21:05:55+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"0de2-56000-3","detected_at":"2026-05-10 21:05:55.892959 +0800 CST m=+4.406537918","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:05:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:05:56+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"0de2-56000-3","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:05:56+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"8e3d-30000-1","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210553"]}
+[2026-05-10T21:05:56+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"3c5f-52000-2","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510210553"]}
+[2026-05-10T21:05:56+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"0de2-56000-3"}
+[2026-05-10T21:05:56+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"0de2-56000-3","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:05:56+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"0de2-56000-3","duration":"500.762708ms","resolution_type":"timeout_release"}
+[2026-05-10T21:05:56+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:05:56+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"3c5f-52000-2"}
+[2026-05-10T21:05:56+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"8e3d-30000-1"}
+[2026-05-10T21:05:56+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210553"}
+[2026-05-10T21:05:58+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510210558","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:05:58+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:05:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510210558","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:05:58+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210558"}
+[2026-05-10T21:05:59+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510210559","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:05:59+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210559"}
+[2026-05-10T21:05:59+08:00] [info] [monitor] 监控系统停止

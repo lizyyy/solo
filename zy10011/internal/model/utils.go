@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"sync/atomic"
 	"time"
 )
@@ -21,7 +22,7 @@ func generateID() string {
 }
 
 func formatID(timestamp int64, counter int64, random string) string {
-	return random[:4] + "-" + string(rune(timestamp%100000)) + "-" + string(rune(counter))
+	return fmt.Sprintf("%s-%d-%d", random[:4], timestamp%100000, counter)
 }
 
 func (c *ChannelInfo) IsBlocked() bool {
