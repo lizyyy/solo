@@ -1,0 +1,29 @@
+{
+  "name": "fresh-label-reprint-api",
+  "version": "1.0.0",
+  "description": "生鲜称重标签重打 API - 可运行原型",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "demo": "node scripts/demo.js",
+    "test": "node scripts/test.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "fresh",
+    "weighing",
+    "label",
+    "reprint",
+    "API"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "sqlite3": "^6.0.1",
+    "uuid": "^14.0.0"
+  }
+}
