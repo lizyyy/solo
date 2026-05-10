@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -175,9 +176,11 @@ public class DemoController {
         
         Map<String, Object> result = new HashMap<>();
         result.put("totalRequests", requests);
-        result.put("maxConcurrency", concurrency);
+        result.put("targetConcurrency", concurrency);
         result.put("traceId", TraceContext.getTraceId());
-        result.put("executionType", "concurrent");
+        result.put("executionType", "semaphore-controlled-concurrent");
+        
+        Semaphore semaphore = new Semaphore(concurrency);
         
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
@@ -187,60 +190,62 @@ public class DemoController {
         List<Map<String, Object>> requestDetails = new ArrayList<>();
         
         String limitKey = "high-concurrency-demo:" + UUID.randomUUID().toString().substring(0, 8);
-        CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch doneLatch = new CountDownLatch(requests);
         
         long startTime = System.currentTimeMillis();
         
         IntStream.range(0, requests).forEach(i -> {
             simulationExecutor.submit(() -> {
-                int currentConcurrent = actualConcurrentCount.incrementAndGet();
-                maxObservedConcurrent.updateAndGet(current -> Math.max(current, currentConcurrent));
-                
                 try {
-                    startLatch.await();
+                    semaphore.acquire();
                     
-                    long requestStart = System.currentTimeMillis();
-                    Map<String, Object> detail = new HashMap<>();
-                    detail.put("requestIndex", i);
-                    detail.put("startTime", requestStart);
-                    detail.put("thread", Thread.currentThread().getName());
+                    int currentConcurrent = actualConcurrentCount.incrementAndGet();
+                    maxObservedConcurrent.updateAndGet(current -> Math.max(current, currentConcurrent));
                     
-                    boolean allowed = rateLimitService.tryAcquireTokenBucket(
-                        limitKey, 
-                        concurrency, 
-                        1);
-                    
-                    if (allowed) {
-                        try {
-                            Thread.sleep(10 + (long)(Math.random() * 10));
-                            successCount.incrementAndGet();
-                            detail.put("status", "SUCCESS");
-                        } catch (InterruptedException e) {
-                            failCount.incrementAndGet();
-                            detail.put("status", "FAILED");
-                            Thread.currentThread().interrupt();
+                    try {
+                        long requestStart = System.currentTimeMillis();
+                        Map<String, Object> detail = new HashMap<>();
+                        detail.put("requestIndex", i);
+                        detail.put("startTime", requestStart);
+                        detail.put("thread", Thread.currentThread().getName());
+                        detail.put("acquiredPermit", true);
+                        
+                        boolean allowed = rateLimitService.tryAcquireTokenBucket(
+                            limitKey, 
+                            concurrency * 2, 
+                            1);
+                        
+                        if (allowed) {
+                            try {
+                                Thread.sleep(10 + (long)(Math.random() * 10));
+                                successCount.incrementAndGet();
+                                detail.put("status", "SUCCESS");
+                            } catch (InterruptedException e) {
+                                failCount.incrementAndGet();
+                                detail.put("status", "FAILED");
+                                Thread.currentThread().interrupt();
+                            }
+                        } else {
+                            rateLimitedCount.incrementAndGet();
+                            detail.put("status", "RATE_LIMITED");
                         }
-                    } else {
-                        rateLimitedCount.incrementAndGet();
-                        detail.put("status", "RATE_LIMITED");
-                    }
-                    
-                    detail.put("durationMs", System.currentTimeMillis() - requestStart);
-                    synchronized(requestDetails) {
-                        requestDetails.add(detail);
+                        
+                        detail.put("durationMs", System.currentTimeMillis() - requestStart);
+                        synchronized(requestDetails) {
+                            requestDetails.add(detail);
+                        }
+                    } finally {
+                        actualConcurrentCount.decrementAndGet();
+                        semaphore.release();
                     }
                 } catch (InterruptedException e) {
                     failCount.incrementAndGet();
                     Thread.currentThread().interrupt();
                 } finally {
-                    actualConcurrentCount.decrementAndGet();
                     doneLatch.countDown();
                 }
             });
         });
-        
-        startLatch.countDown();
         
         try {
             doneLatch.await();
@@ -257,6 +262,8 @@ public class DemoController {
         result.put("maxObservedConcurrent", maxObservedConcurrent.get());
         result.put("durationMs", duration);
         result.put("actualQps", requests > 0 ? (double) requests / (duration / 1000.0) : 0);
+        result.put("semaphoreAvailable", semaphore.availablePermits());
+        result.put("controlMethod", "Semaphore");
         
         int showDetails = Math.min(requests, 20);
         List<Map<String, Object>> sampleDetails = requestDetails.stream()
@@ -292,16 +299,16 @@ public class DemoController {
         String limitKey = "peak-simulation:" + UUID.randomUUID().toString().substring(0, 8);
         
         int actualConcurrentUsers = Math.min(concurrentUsers, totalRequests);
-        int requestsPerUser = totalRequests / actualConcurrentUsers;
-        int actualTotalRequests = requestsPerUser * actualConcurrentUsers;
         
         Map<String, Object> result = new HashMap<>();
-        result.put("totalRequests", actualTotalRequests);
-        result.put("requestsPerUser", requestsPerUser);
-        result.put("concurrentUsers", actualConcurrentUsers);
+        result.put("totalRequests", totalRequests);
+        result.put("targetConcurrentUsers", actualConcurrentUsers);
         result.put("qpsLimit", qpsLimit);
         result.put("traceId", TraceContext.getTraceId());
-        result.put("executionType", "concurrent-peak-users");
+        result.put("executionType", "semaphore-controlled-peak");
+        result.put("controlMethod", "Semaphore");
+        
+        Semaphore semaphore = new Semaphore(actualConcurrentUsers);
         
         AtomicInteger success = new AtomicInteger(0);
         AtomicInteger rateLimited = new AtomicInteger(0);
@@ -309,20 +316,19 @@ public class DemoController {
         AtomicInteger maxActiveThreads = new AtomicInteger(0);
         List<Long> latencyTimes = new ArrayList<>();
         
-        CountDownLatch startLatch = new CountDownLatch(1);
-        CountDownLatch doneLatch = new CountDownLatch(actualConcurrentUsers);
+        CountDownLatch doneLatch = new CountDownLatch(totalRequests);
         
         long startTime = System.currentTimeMillis();
         
-        IntStream.range(0, actualConcurrentUsers).forEach(userIdx -> {
+        IntStream.range(0, totalRequests).forEach(i -> {
             simulationExecutor.submit(() -> {
-                int currentActive = activeThreads.incrementAndGet();
-                maxActiveThreads.updateAndGet(cur -> Math.max(cur, currentActive));
-                
                 try {
-                    startLatch.await();
+                    semaphore.acquire();
                     
-                    for (int reqIdx = 0; reqIdx < requestsPerUser; reqIdx++) {
+                    int currentActive = activeThreads.incrementAndGet();
+                    maxActiveThreads.updateAndGet(cur -> Math.max(cur, currentActive));
+                    
+                    try {
                         long reqStart = System.currentTimeMillis();
                         boolean allowed = rateLimitService.tryAcquireSlidingWindow(limitKey, qpsLimit, 1);
                         
@@ -332,7 +338,6 @@ public class DemoController {
                                 success.incrementAndGet();
                             } catch (InterruptedException e) {
                                 Thread.currentThread().interrupt();
-                                break;
                             }
                         } else {
                             rateLimited.incrementAndGet();
@@ -342,17 +347,17 @@ public class DemoController {
                         synchronized(latencyTimes) {
                             latencyTimes.add(latency);
                         }
+                    } finally {
+                        activeThreads.decrementAndGet();
+                        semaphore.release();
                     }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } finally {
-                    activeThreads.decrementAndGet();
                     doneLatch.countDown();
                 }
             });
         });
-        
-        startLatch.countDown();
         
         try {
             doneLatch.await();
@@ -366,8 +371,9 @@ public class DemoController {
         result.put("successCount", success.get());
         result.put("rateLimitedCount", rateLimited.get());
         result.put("durationMs", duration);
-        result.put("actualQps", duration > 0 ? (double) actualTotalRequests / (duration / 1000.0) : 0);
+        result.put("actualQps", duration > 0 ? (double) totalRequests / (duration / 1000.0) : 0);
         result.put("maxActiveThreads", maxActiveThreads.get());
+        result.put("semaphoreAvailable", semaphore.availablePermits());
         
         if (!latencyTimes.isEmpty()) {
             latencyTimes.sort(Long::compare);

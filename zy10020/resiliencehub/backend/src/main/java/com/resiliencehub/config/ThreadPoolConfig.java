@@ -14,11 +14,12 @@ public class ThreadPoolConfig {
     @Bean("simulationExecutor")
     public ThreadPoolTaskExecutor simulationExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(20);
-        executor.setMaxPoolSize(200);
-        executor.setQueueCapacity(5000);
-        executor.setKeepAliveSeconds(60);
+        executor.setCorePoolSize(100);
+        executor.setMaxPoolSize(500);
+        executor.setQueueCapacity(1000);
+        executor.setKeepAliveSeconds(120);
         executor.setThreadNamePrefix("simulation-");
+        executor.setAllowCoreThreadTimeOut(true);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
@@ -29,11 +30,12 @@ public class ThreadPoolConfig {
     @Bean("messageExecutor")
     public ThreadPoolTaskExecutor messageExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(100);
-        executor.setQueueCapacity(1000);
-        executor.setKeepAliveSeconds(60);
+        executor.setCorePoolSize(50);
+        executor.setMaxPoolSize(200);
+        executor.setQueueCapacity(500);
+        executor.setKeepAliveSeconds(120);
         executor.setThreadNamePrefix("message-");
+        executor.setAllowCoreThreadTimeOut(true);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
