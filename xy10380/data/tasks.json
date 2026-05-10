@@ -1,0 +1,44 @@
+{
+  "tasks": [
+    {
+      "task_id": "T001",
+      "task_name": "用户管理模块开发",
+      "max_hours": 80,
+      "assignee": "张三",
+      "status": "completed",
+      "description": "实现用户注册、登录、权限管理功能"
+    },
+    {
+      "task_id": "T002",
+      "task_name": "订单管理接口开发",
+      "max_hours": 60,
+      "assignee": "李四",
+      "status": "completed",
+      "description": "实现订单创建、查询、取消接口"
+    },
+    {
+      "task_id": "T003",
+      "task_name": "数据报表功能",
+      "max_hours": 100,
+      "assignee": "王五",
+      "status": "in_progress",
+      "description": "实现销售数据统计报表"
+    },
+    {
+      "task_id": "T004",
+      "task_name": "系统配置模块",
+      "max_hours": 40,
+      "assignee": "赵六",
+      "status": "completed",
+      "description": "实现系统参数配置功能"
+    },
+    {
+      "task_id": "T005",
+      "task_name": "日志审计功能",
+      "max_hours": 50,
+      "assignee": "张三",
+      "status": "completed",
+      "description": "实现操作日志记录和查询"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "feedbacks": [
+    {
+      "feedback_id": "F001",
+      "task_id": "T001",
+      "status": "passed",
+      "comment": "功能完整，代码质量良好，符合验收标准",
+      "reviewer": "张经理",
+      "review_date": "2025-05-03",
+      "deduction_hours": 0
+    },
+    {
+      "feedback_id": "F002",
+      "task_id": "T002",
+      "status": "passed_with_deduction",
+      "comment": "接口文档不完整，扣减5工时",
+      "reviewer": "李经理",
+      "review_date": "2025-05-04",
+      "deduction_hours": 5
+    },
+    {
+      "feedback_id": "F003",
+      "task_id": "T003",
+      "status": "pending",
+      "comment": "验收中",
+      "reviewer": "王经理",
+      "review_date": "2025-05-05",
+      "deduction_hours": 0
+    },
+    {
+      "feedback_id": "F004",
+      "task_id": "T004",
+      "status": "passed",
+      "comment": "功能完整，符合验收标准",
+      "reviewer": "赵经理",
+      "review_date": "2025-05-05",
+      "deduction_hours": 0
+    },
+    {
+      "feedback_id": "F005",
+      "task_id": "T005",
+      "status": "failed",
+      "comment": "存在严重性能问题，验收未通过",
+      "reviewer": "张经理",
+      "review_date": "2025-05-07",
+      "deduction_hours": 45
+    }
+  ]
+}

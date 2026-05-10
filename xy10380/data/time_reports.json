@@ -1,0 +1,52 @@
+{
+  "reports": [
+    {
+      "report_id": "R001",
+      "task_id": "T001",
+      "hours": 75,
+      "developer": "张三",
+      "submit_date": "2025-05-01",
+      "description": "完成用户管理模块开发"
+    },
+    {
+      "report_id": "R002",
+      "task_id": "T002",
+      "hours": 65,
+      "developer": "李四",
+      "submit_date": "2025-05-02",
+      "description": "完成订单管理接口开发"
+    },
+    {
+      "report_id": "R003",
+      "task_id": "T003",
+      "hours": 90,
+      "developer": "王五",
+      "submit_date": "2025-05-03",
+      "description": "完成数据报表功能开发"
+    },
+    {
+      "report_id": "R004",
+      "task_id": "T004",
+      "hours": 38,
+      "developer": "赵六",
+      "submit_date": "2025-05-04",
+      "description": "完成系统配置模块开发"
+    },
+    {
+      "report_id": "R005",
+      "task_id": "T004",
+      "hours": 38,
+      "developer": "赵六",
+      "submit_date": "2025-05-05",
+      "description": "重复申报系统配置模块"
+    },
+    {
+      "report_id": "R006",
+      "task_id": "T005",
+      "hours": 45,
+      "developer": "张三",
+      "submit_date": "2025-05-06",
+      "description": "完成日志审计功能开发"
+    }
+  ]
+}
