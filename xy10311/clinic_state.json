@@ -1,0 +1,388 @@
+{
+  "date": "2026-05-10",
+  "queue_counter": 8,
+  "used_check_in_records": [
+    "110101199001010004_07:55",
+    "110101199001010009_09:45",
+    "110101199001010006_08:50",
+    "110101199001010001_09:20",
+    "110101199001010001_07:50",
+    "110101199001010005_09:00",
+    "110101199001010007_08:05",
+    "110101199001010008_09:00",
+    "110101199001010003_08:20"
+  ],
+  "doctors": {
+    "D001": {
+      "id": "D001",
+      "name": "张医生",
+      "department": "内科",
+      "available": true
+    },
+    "D002": {
+      "id": "D002",
+      "name": "李医生",
+      "department": "内科",
+      "available": true
+    },
+    "D003": {
+      "id": "D003",
+      "name": "王医生",
+      "department": "外科",
+      "available": true
+    },
+    "D004": {
+      "id": "D004",
+      "name": "赵医生",
+      "department": "外科",
+      "available": false
+    },
+    "D005": {
+      "id": "D005",
+      "name": "刘医生",
+      "department": "儿科",
+      "available": true
+    }
+  },
+  "appointments": {
+    "A001": {
+      "id": "A001",
+      "patient_name": "张三",
+      "patient_id": "110101199001010001",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "08:00",
+      "status": "爽约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "重复身份证",
+          "message": "身份证号重复，已存在预约: A010",
+          "raw_input": {
+            "patient_id": "110101199001010001",
+            "appointment_id": "A001",
+            "check_in_time": "07:50"
+          }
+        }
+      ]
+    },
+    "A002": {
+      "id": "A002",
+      "patient_name": "李四",
+      "patient_id": "110101199001010002",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "08:15",
+      "status": "爽约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": []
+    },
+    "A003": {
+      "id": "A003",
+      "patient_name": "王五",
+      "patient_id": "110101199001010003",
+      "doctor_id": "D002",
+      "department": "内科",
+      "appointment_time": "08:30",
+      "status": "已叫号",
+      "check_in_time": "08:20",
+      "call_time": "18:34:10",
+      "queue_number": 1,
+      "anomalies": []
+    },
+    "A004": {
+      "id": "A004",
+      "patient_name": "赵六",
+      "patient_id": "110101199001010004",
+      "doctor_id": "D003",
+      "department": "外科",
+      "appointment_time": "08:00",
+      "status": "已签到",
+      "check_in_time": "07:55",
+      "call_time": null,
+      "queue_number": 2,
+      "anomalies": []
+    },
+    "A005": {
+      "id": "A005",
+      "patient_name": "钱七",
+      "patient_id": "110101199001010005",
+      "doctor_id": "D003",
+      "department": "外科",
+      "appointment_time": "08:30",
+      "status": "爽约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "迟到",
+          "message": "迟到超过15分钟（预约时间: 08:30, 签到时间: 09:00）",
+          "raw_input": {
+            "patient_id": "110101199001010005",
+            "appointment_id": "A005",
+            "check_in_time": "09:00"
+          }
+        }
+      ]
+    },
+    "A006": {
+      "id": "A006",
+      "patient_name": "孙八",
+      "patient_id": "110101199001010006",
+      "doctor_id": "D004",
+      "department": "外科",
+      "appointment_time": "09:00",
+      "status": "已取消",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "医生停诊",
+          "message": "医生 赵医生 已停诊",
+          "raw_input": {
+            "patient_id": "110101199001010006",
+            "appointment_id": "A006",
+            "check_in_time": "08:50"
+          }
+        }
+      ]
+    },
+    "A007": {
+      "id": "A007",
+      "patient_name": "周九",
+      "patient_id": "110101199001010007",
+      "doctor_id": "D005",
+      "department": "儿科",
+      "appointment_time": "08:00",
+      "status": "已签到",
+      "check_in_time": "08:05",
+      "call_time": null,
+      "queue_number": 3,
+      "anomalies": []
+    },
+    "A008": {
+      "id": "A008",
+      "patient_name": "吴十",
+      "patient_id": "110101199001010008",
+      "doctor_id": "D005",
+      "department": "儿科",
+      "appointment_time": "08:30",
+      "status": "爽约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "迟到",
+          "message": "迟到超过15分钟（预约时间: 08:30, 签到时间: 09:00）",
+          "raw_input": {
+            "patient_id": "110101199001010008",
+            "appointment_id": "A008",
+            "check_in_time": "09:00"
+          }
+        }
+      ]
+    },
+    "A009": {
+      "id": "A009",
+      "patient_name": "郑十一",
+      "patient_id": "110101199001010009",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "09:00",
+      "status": "爽约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "迟到",
+          "message": "迟到超过15分钟（预约时间: 09:00, 签到时间: 09:45）",
+          "raw_input": {
+            "patient_id": "110101199001010009",
+            "appointment_id": "A009",
+            "check_in_time": "09:45"
+          }
+        }
+      ]
+    },
+    "A010": {
+      "id": "A010",
+      "patient_name": "王十二",
+      "patient_id": "110101199001010001",
+      "doctor_id": "D002",
+      "department": "内科",
+      "appointment_time": "09:30",
+      "status": "已预约",
+      "check_in_time": null,
+      "call_time": null,
+      "queue_number": null,
+      "anomalies": [
+        {
+          "success": false,
+          "anomaly_type": "重复身份证",
+          "message": "身份证号重复，已存在预约: A001",
+          "raw_input": {
+            "patient_id": "110101199001010001",
+            "appointment_id": "A010",
+            "check_in_time": "09:20"
+          }
+        }
+      ]
+    },
+    "WL_W001": {
+      "id": "WL_W001",
+      "patient_name": "候一",
+      "patient_id": "110101199001010011",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "08:00",
+      "status": "已签到",
+      "check_in_time": "18:33:57",
+      "call_time": null,
+      "queue_number": 4,
+      "anomalies": []
+    },
+    "WL_W002": {
+      "id": "WL_W002",
+      "patient_name": "候二",
+      "patient_id": "110101199001010012",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "08:15",
+      "status": "已签到",
+      "check_in_time": "18:33:57",
+      "call_time": null,
+      "queue_number": 5,
+      "anomalies": []
+    },
+    "WL_W003": {
+      "id": "WL_W003",
+      "patient_name": "候三",
+      "patient_id": "110101199001010013",
+      "doctor_id": "D003",
+      "department": "外科",
+      "appointment_time": "08:30",
+      "status": "已签到",
+      "check_in_time": "18:33:57",
+      "call_time": null,
+      "queue_number": 6,
+      "anomalies": []
+    },
+    "WL_W004": {
+      "id": "WL_W004",
+      "patient_name": "候四",
+      "patient_id": "110101199001010014",
+      "doctor_id": "D005",
+      "department": "儿科",
+      "appointment_time": "08:30",
+      "status": "已签到",
+      "check_in_time": "18:33:57",
+      "call_time": null,
+      "queue_number": 7,
+      "anomalies": []
+    },
+    "WL_W005": {
+      "id": "WL_W005",
+      "patient_name": "候五",
+      "patient_id": "110101199001010015",
+      "doctor_id": "D001",
+      "department": "内科",
+      "appointment_time": "09:00",
+      "status": "已签到",
+      "check_in_time": "18:33:57",
+      "call_time": null,
+      "queue_number": 8,
+      "anomalies": []
+    }
+  },
+  "waitlist": {
+    "W001": {
+      "id": "W001",
+      "patient_name": "候一",
+      "patient_id": "110101199001010011",
+      "department": "内科",
+      "register_time": "07:30:00",
+      "preferred_doctor_id": "D001",
+      "status": "已补位",
+      "promoted_appointment_id": "A001",
+      "promotion_reason": "补位爽约/取消号源（原预约: A001）",
+      "promotion_time": "18:33:57",
+      "anomalies": []
+    },
+    "W002": {
+      "id": "W002",
+      "patient_name": "候二",
+      "patient_id": "110101199001010012",
+      "department": "内科",
+      "register_time": "07:45:00",
+      "preferred_doctor_id": "D002",
+      "status": "已补位",
+      "promoted_appointment_id": "A002",
+      "promotion_reason": "补位爽约/取消号源（原预约: A002）",
+      "promotion_time": "18:33:57",
+      "anomalies": []
+    },
+    "W003": {
+      "id": "W003",
+      "patient_name": "候三",
+      "patient_id": "110101199001010013",
+      "department": "外科",
+      "register_time": "08:00:00",
+      "preferred_doctor_id": "D003",
+      "status": "已补位",
+      "promoted_appointment_id": "A005",
+      "promotion_reason": "补位爽约/取消号源（原预约: A005）",
+      "promotion_time": "18:33:57",
+      "anomalies": []
+    },
+    "W004": {
+      "id": "W004",
+      "patient_name": "候四",
+      "patient_id": "110101199001010014",
+      "department": "儿科",
+      "register_time": "08:15:00",
+      "preferred_doctor_id": "D005",
+      "status": "已补位",
+      "promoted_appointment_id": "A008",
+      "promotion_reason": "补位爽约/取消号源（原预约: A008）",
+      "promotion_time": "18:33:57",
+      "anomalies": []
+    },
+    "W005": {
+      "id": "W005",
+      "patient_name": "候五",
+      "patient_id": "110101199001010015",
+      "department": "内科",
+      "register_time": "08:30:00",
+      "preferred_doctor_id": "",
+      "status": "已补位",
+      "promoted_appointment_id": "A009",
+      "promotion_reason": "补位爽约/取消号源（原预约: A009）",
+      "promotion_time": "18:33:57",
+      "anomalies": []
+    }
+  },
+  "call_logs": [
+    {
+      "id": "CALL_1",
+      "appointment_id": "A003",
+      "patient_name": "王五",
+      "department": "内科",
+      "doctor_id": "D002",
+      "call_time": "18:34:10",
+      "queue_number": 1
+    }
+  ]
+}
