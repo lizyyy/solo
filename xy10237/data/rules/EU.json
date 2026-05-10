@@ -1,0 +1,23 @@
+{
+  "countryCode": "EU",
+  "countryName": "欧盟",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "EORI号",
+      "description": "欧盟境内贸易商需提供EORI号",
+      "mandatory": true
+    },
+    {
+      "name": "CE认证",
+      "description": "电气、机械等产品需提供CE认证",
+      "mandatory": false
+    }
+  ],
+  "valueThreshold": 22,
+  "notes": "欧盟对低于22欧元的样品免征增值税和关税"
+}

@@ -1,0 +1,18 @@
+{
+  "countryCode": "AU",
+  "countryName": "澳大利亚",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "检疫声明",
+      "description": "动植物产品需提供检疫声明",
+      "mandatory": false
+    }
+  ],
+  "valueThreshold": 1000,
+  "notes": "澳大利亚对低于1000澳元的样品简化通关"
+}

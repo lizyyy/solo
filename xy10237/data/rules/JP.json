@@ -1,0 +1,18 @@
+{
+  "countryCode": "JP",
+  "countryName": "日本",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "输入许可",
+      "description": "特定商品需要日本厚生劳动省许可",
+      "mandatory": false
+    }
+  ],
+  "valueThreshold": 10000,
+  "notes": "日本海关对低于10000日元的样品简化通关"
+}

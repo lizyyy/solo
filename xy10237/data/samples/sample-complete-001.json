@@ -1,0 +1,42 @@
+{
+  "id": "sample-complete-001",
+  "name": "完整样品-电子产品",
+  "type": "electronic",
+  "description": "蓝牙耳机样品，用于客户测试",
+  "originCountry": "CN",
+  "destinationCountry": "US",
+  "value": 150,
+  "currency": "USD",
+  "quantity": 2,
+  "materials": [
+    {
+      "id": "143b1cc7-d0db-49c2-888d-b27139b2af0f",
+      "type": "invoice",
+      "name": "商业发票_电子产品.pdf",
+      "filePath": "docs/invoice_electronic.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true,
+      "notes": "包含完整的HS编码、价值、原产地信息"
+    },
+    {
+      "id": "d9a5302c-9745-48cf-adea-2d5a277fcb9c",
+      "type": "composition",
+      "name": "成分说明_电子产品.pdf",
+      "filePath": "docs/composition_electronic.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true,
+      "notes": "详细列出了塑料、电子元件等成分"
+    },
+    {
+      "id": "63ef7f71-6e53-429a-b10f-155def86236a",
+      "type": "declaration",
+      "name": "用途声明_电子产品.pdf",
+      "filePath": "docs/declaration_electronic.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true,
+      "notes": "明确标注为样品，无商业价值"
+    }
+  ],
+  "createdAt": "2026-05-10T09:27:39.833Z",
+  "updatedAt": "2026-05-10T09:27:39.833Z"
+}

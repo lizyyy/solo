@@ -1,0 +1,18 @@
+{
+  "countryCode": "CN",
+  "countryName": "中国",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "海关编码",
+      "description": "准确的HS编码",
+      "mandatory": true
+    }
+  ],
+  "valueThreshold": 50,
+  "notes": "中国海关对低于50元人民币的样品免征关税"
+}

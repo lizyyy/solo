@@ -1,0 +1,23 @@
+{
+  "countryCode": "US",
+  "countryName": "美国",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "商业发票",
+      "description": "需包含详细的货物描述、价值、原产地信息",
+      "mandatory": true
+    },
+    {
+      "name": "海关发票编号",
+      "description": "对于价值超过2500美元的货物需要提供",
+      "mandatory": false
+    }
+  ],
+  "valueThreshold": 2500,
+  "notes": "美国海关对样品价值超过800美元的货物征收关税，样品声明需注明\"无商业价值\""
+}

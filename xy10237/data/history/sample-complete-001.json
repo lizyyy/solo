@@ -1,0 +1,57 @@
+{
+  "sampleId": "sample-complete-001",
+  "results": [
+    {
+      "id": "e4c946c5-1df2-49c1-8480-a849adb5038f",
+      "sampleId": "sample-complete-001",
+      "sampleName": "完整样品-电子产品",
+      "destinationCountry": "US",
+      "status": "manual_review",
+      "checkItems": [
+        {
+          "name": "国家规则验证",
+          "passed": true,
+          "message": "已加载 美国 (US) 的清关规则",
+          "details": "美国海关对样品价值超过800美元的货物征收关税，样品声明需注明\"无商业价值\""
+        },
+        {
+          "name": "商业发票检查",
+          "passed": true,
+          "message": "商业发票已提供且有效",
+          "details": "包含完整的HS编码、价值、原产地信息"
+        },
+        {
+          "name": "成分说明检查",
+          "passed": true,
+          "message": "成分说明已提供且有效",
+          "details": "详细列出了塑料、电子元件等成分"
+        },
+        {
+          "name": "用途声明检查",
+          "passed": true,
+          "message": "用途声明已提供且有效",
+          "details": "明确标注为样品，无商业价值"
+        },
+        {
+          "name": "价值阈值检查",
+          "passed": true,
+          "message": "样品价值(150 USD)在阈值(2500)范围内",
+          "details": "符合简化清关条件"
+        },
+        {
+          "name": "附加要求: 商业发票",
+          "passed": false,
+          "message": "需确认是否提供商业发票",
+          "details": "需包含详细的货物描述、价值、原产地信息"
+        }
+      ],
+      "errors": [],
+      "warnings": [
+        "需确认是否提供 商业发票: 需包含详细的货物描述、价值、原产地信息"
+      ],
+      "missingMaterials": [],
+      "checkedAt": "2026-05-10T09:27:49.280Z",
+      "runNumber": 1
+    }
+  ]
+}

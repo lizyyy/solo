@@ -1,0 +1,40 @@
+{
+  "id": "sample-invalid-003",
+  "name": "无效材料样品-化工品",
+  "type": "chemical",
+  "description": "化妆品原料样品",
+  "originCountry": "CN",
+  "destinationCountry": "JP",
+  "value": 5000,
+  "currency": "JPY",
+  "quantity": 1,
+  "materials": [
+    {
+      "id": "0b2c7d0b-a78c-411a-8c5d-846a6c3d0444",
+      "type": "invoice",
+      "name": "商业发票_化工品.pdf",
+      "filePath": "docs/invoice_chemical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true
+    },
+    {
+      "id": "57788624-9a13-4b33-af14-5568980e4653",
+      "type": "composition",
+      "name": "成分说明_化工品.pdf",
+      "filePath": "docs/composition_chemical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": false,
+      "notes": "成分说明中缺少详细的化学物质信息"
+    },
+    {
+      "id": "46d9214f-5aa3-486f-8027-e3364de841fa",
+      "type": "declaration",
+      "name": "用途声明_化工品.pdf",
+      "filePath": "docs/declaration_chemical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true
+    }
+  ],
+  "createdAt": "2026-05-10T09:27:39.833Z",
+  "updatedAt": "2026-05-10T09:27:39.833Z"
+}

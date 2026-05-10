@@ -1,0 +1,39 @@
+{
+  "id": "sample-highvalue-004",
+  "name": "高价值样品-医疗用品",
+  "type": "medical",
+  "description": "医疗诊断设备样品",
+  "originCountry": "CN",
+  "destinationCountry": "US",
+  "value": 3500,
+  "currency": "USD",
+  "quantity": 1,
+  "materials": [
+    {
+      "id": "04f67b77-1a01-46d4-8bac-fe0e75546944",
+      "type": "invoice",
+      "name": "商业发票_医疗.pdf",
+      "filePath": "docs/invoice_medical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true
+    },
+    {
+      "id": "982c582f-743d-4c58-ab44-4471fe208dcc",
+      "type": "composition",
+      "name": "成分说明_医疗.pdf",
+      "filePath": "docs/composition_medical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true
+    },
+    {
+      "id": "001af53e-ccac-4fcd-95ac-832ea7c84ea9",
+      "type": "declaration",
+      "name": "用途声明_医疗.pdf",
+      "filePath": "docs/declaration_medical.pdf",
+      "uploadedAt": "2026-05-10T09:27:39.834Z",
+      "valid": true
+    }
+  ],
+  "createdAt": "2026-05-10T09:27:39.833Z",
+  "updatedAt": "2026-05-10T09:27:39.833Z"
+}

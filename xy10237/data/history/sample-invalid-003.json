@@ -1,0 +1,57 @@
+{
+  "sampleId": "sample-invalid-003",
+  "results": [
+    {
+      "id": "e16085ca-3986-4cb5-9278-062b5936ade8",
+      "sampleId": "sample-invalid-003",
+      "sampleName": "无效材料样品-化工品",
+      "destinationCountry": "JP",
+      "status": "failed",
+      "checkItems": [
+        {
+          "name": "国家规则验证",
+          "passed": true,
+          "message": "已加载 日本 (JP) 的清关规则",
+          "details": "日本海关对低于10000日元的样品简化通关"
+        },
+        {
+          "name": "商业发票检查",
+          "passed": true,
+          "message": "商业发票已提供且有效"
+        },
+        {
+          "name": "成分说明检查",
+          "passed": false,
+          "message": "缺少必要的成分说明",
+          "details": "目的国 日本 要求必须提供成分说明"
+        },
+        {
+          "name": "用途声明检查",
+          "passed": true,
+          "message": "用途声明已提供且有效"
+        },
+        {
+          "name": "成分说明有效性",
+          "passed": false,
+          "message": "成分说明无效",
+          "details": "成分说明中缺少详细的化学物质信息"
+        },
+        {
+          "name": "价值阈值检查",
+          "passed": true,
+          "message": "样品价值(5000 JPY)在阈值(10000)范围内",
+          "details": "符合简化清关条件"
+        }
+      ],
+      "errors": [
+        "缺少必要材料: 成分说明"
+      ],
+      "warnings": [],
+      "missingMaterials": [
+        "composition"
+      ],
+      "checkedAt": "2026-05-10T09:28:00.636Z",
+      "runNumber": 1
+    }
+  ]
+}

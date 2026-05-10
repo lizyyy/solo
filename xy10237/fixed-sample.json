@@ -1,0 +1,40 @@
+{
+  "id": "sample-missing-002",
+  "name": "缺失材料样品-纺织品",
+  "type": "textile",
+  "description": "服装面料样品（已补充材料）",
+  "originCountry": "CN",
+  "destinationCountry": "EU",
+  "value": 20,
+  "currency": "EUR",
+  "quantity": 5,
+  "materials": [
+    {
+      "id": "mat-invoice-001",
+      "type": "invoice",
+      "name": "商业发票_纺织品.pdf",
+      "filePath": "docs/invoice_textile.pdf",
+      "uploadedAt": "2026-05-10T09:00:00.000Z",
+      "valid": true,
+      "notes": "商业发票已提供"
+    },
+    {
+      "id": "mat-composition-001",
+      "type": "composition",
+      "name": "成分说明_纺织品.pdf",
+      "filePath": "docs/composition_textile.pdf",
+      "uploadedAt": "2026-05-10T09:30:00.000Z",
+      "valid": true,
+      "notes": "详细列出了棉、聚酯纤维等成分比例"
+    },
+    {
+      "id": "mat-declaration-001",
+      "type": "declaration",
+      "name": "用途声明_纺织品.pdf",
+      "filePath": "docs/declaration_textile.pdf",
+      "uploadedAt": "2026-05-10T09:30:00.000Z",
+      "valid": true,
+      "notes": "明确标注为样品，仅供客户检验品质，无商业价值"
+    }
+  ]
+}

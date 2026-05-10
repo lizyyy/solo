@@ -1,0 +1,18 @@
+{
+  "countryCode": "UK",
+  "countryName": "英国",
+  "requiredMaterials": [
+    "invoice",
+    "composition",
+    "declaration"
+  ],
+  "additionalRequirements": [
+    {
+      "name": "EORI号（英国）",
+      "description": "英国独立的EORI号",
+      "mandatory": true
+    }
+  ],
+  "valueThreshold": 135,
+  "notes": "英国脱欧后实施独立的海关规则"
+}

@@ -1,0 +1,210 @@
+{
+  "sample": {
+    "id": "sample-missing-002",
+    "name": "缺失材料样品-纺织品",
+    "type": "textile",
+    "description": "服装面料样品（已补充材料）",
+    "originCountry": "CN",
+    "destinationCountry": "EU",
+    "value": 20,
+    "currency": "EUR",
+    "quantity": 5,
+    "materials": [
+      {
+        "id": "mat-invoice-001",
+        "type": "invoice",
+        "name": "商业发票_纺织品.pdf",
+        "filePath": "docs/invoice_textile.pdf",
+        "uploadedAt": "2026-05-10T09:00:00.000Z",
+        "valid": true,
+        "notes": "商业发票已提供"
+      },
+      {
+        "id": "mat-composition-001",
+        "type": "composition",
+        "name": "成分说明_纺织品.pdf",
+        "filePath": "docs/composition_textile.pdf",
+        "uploadedAt": "2026-05-10T09:30:00.000Z",
+        "valid": true,
+        "notes": "详细列出了棉、聚酯纤维等成分比例"
+      },
+      {
+        "id": "mat-declaration-001",
+        "type": "declaration",
+        "name": "用途声明_纺织品.pdf",
+        "filePath": "docs/declaration_textile.pdf",
+        "uploadedAt": "2026-05-10T09:30:00.000Z",
+        "valid": true,
+        "notes": "明确标注为样品，仅供客户检验品质，无商业价值"
+      }
+    ],
+    "createdAt": "2026-05-10T09:28:15.129Z",
+    "updatedAt": "2026-05-10T09:28:15.129Z"
+  },
+  "latestResult": {
+    "id": "58a9f290-243f-46ec-84ca-aade42c85e34",
+    "sampleId": "sample-missing-002",
+    "sampleName": "缺失材料样品-纺织品",
+    "destinationCountry": "EU",
+    "status": "manual_review",
+    "checkItems": [
+      {
+        "name": "国家规则验证",
+        "passed": true,
+        "message": "已加载 欧盟 (EU) 的清关规则",
+        "details": "欧盟对低于22欧元的样品免征增值税和关税"
+      },
+      {
+        "name": "商业发票检查",
+        "passed": true,
+        "message": "商业发票已提供且有效",
+        "details": "商业发票已提供"
+      },
+      {
+        "name": "成分说明检查",
+        "passed": true,
+        "message": "成分说明已提供且有效",
+        "details": "详细列出了棉、聚酯纤维等成分比例"
+      },
+      {
+        "name": "用途声明检查",
+        "passed": true,
+        "message": "用途声明已提供且有效",
+        "details": "明确标注为样品，仅供客户检验品质，无商业价值"
+      },
+      {
+        "name": "价值阈值检查",
+        "passed": true,
+        "message": "样品价值(20 EUR)在阈值(22)范围内",
+        "details": "符合简化清关条件"
+      },
+      {
+        "name": "附加要求: EORI号",
+        "passed": false,
+        "message": "需确认是否提供EORI号",
+        "details": "欧盟境内贸易商需提供EORI号"
+      }
+    ],
+    "errors": [],
+    "warnings": [
+      "需确认是否提供 EORI号: 欧盟境内贸易商需提供EORI号"
+    ],
+    "missingMaterials": [],
+    "checkedAt": "2026-05-10T09:28:20.388Z",
+    "runNumber": 2
+  },
+  "allHistory": [
+    {
+      "id": "b0cf363a-ea4c-4204-830a-795d4613fdb5",
+      "sampleId": "sample-missing-002",
+      "sampleName": "缺失材料样品-纺织品",
+      "destinationCountry": "EU",
+      "status": "failed",
+      "checkItems": [
+        {
+          "name": "国家规则验证",
+          "passed": true,
+          "message": "已加载 欧盟 (EU) 的清关规则",
+          "details": "欧盟对低于22欧元的样品免征增值税和关税"
+        },
+        {
+          "name": "商业发票检查",
+          "passed": true,
+          "message": "商业发票已提供且有效",
+          "details": "商业发票已提供"
+        },
+        {
+          "name": "成分说明检查",
+          "passed": false,
+          "message": "缺少必要的成分说明",
+          "details": "目的国 欧盟 要求必须提供成分说明"
+        },
+        {
+          "name": "用途声明检查",
+          "passed": false,
+          "message": "缺少必要的用途声明",
+          "details": "目的国 欧盟 要求必须提供用途声明"
+        },
+        {
+          "name": "价值阈值检查",
+          "passed": false,
+          "message": "样品价值(80 EUR)超过阈值(22)",
+          "details": "超过阈值的样品可能需要额外的报关文件和缴纳关税"
+        },
+        {
+          "name": "附加要求: EORI号",
+          "passed": false,
+          "message": "需确认是否提供EORI号",
+          "details": "欧盟境内贸易商需提供EORI号"
+        }
+      ],
+      "errors": [
+        "缺少必要材料: 成分说明",
+        "缺少必要材料: 用途声明"
+      ],
+      "warnings": [
+        "样品价值超过 欧盟 免税阈值，可能需要额外清关文件",
+        "需确认是否提供 EORI号: 欧盟境内贸易商需提供EORI号"
+      ],
+      "missingMaterials": [
+        "composition",
+        "declaration"
+      ],
+      "checkedAt": "2026-05-10T09:27:54.677Z",
+      "runNumber": 1
+    },
+    {
+      "id": "58a9f290-243f-46ec-84ca-aade42c85e34",
+      "sampleId": "sample-missing-002",
+      "sampleName": "缺失材料样品-纺织品",
+      "destinationCountry": "EU",
+      "status": "manual_review",
+      "checkItems": [
+        {
+          "name": "国家规则验证",
+          "passed": true,
+          "message": "已加载 欧盟 (EU) 的清关规则",
+          "details": "欧盟对低于22欧元的样品免征增值税和关税"
+        },
+        {
+          "name": "商业发票检查",
+          "passed": true,
+          "message": "商业发票已提供且有效",
+          "details": "商业发票已提供"
+        },
+        {
+          "name": "成分说明检查",
+          "passed": true,
+          "message": "成分说明已提供且有效",
+          "details": "详细列出了棉、聚酯纤维等成分比例"
+        },
+        {
+          "name": "用途声明检查",
+          "passed": true,
+          "message": "用途声明已提供且有效",
+          "details": "明确标注为样品，仅供客户检验品质，无商业价值"
+        },
+        {
+          "name": "价值阈值检查",
+          "passed": true,
+          "message": "样品价值(20 EUR)在阈值(22)范围内",
+          "details": "符合简化清关条件"
+        },
+        {
+          "name": "附加要求: EORI号",
+          "passed": false,
+          "message": "需确认是否提供EORI号",
+          "details": "欧盟境内贸易商需提供EORI号"
+        }
+      ],
+      "errors": [],
+      "warnings": [
+        "需确认是否提供 EORI号: 欧盟境内贸易商需提供EORI号"
+      ],
+      "missingMaterials": [],
+      "checkedAt": "2026-05-10T09:28:20.388Z",
+      "runNumber": 2
+    }
+  ],
+  "exportTime": "2026-05-10T09:28:35.341Z"
+}
