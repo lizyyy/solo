@@ -1,0 +1,376 @@
+{
+  "20260510AE3BF2": {
+    "batch_id": "20260510AE3BF2",
+    "created_at": "2026-05-10 18:34:24",
+    "status": "已确认",
+    "total_records": 9,
+    "valid_records": 9,
+    "invalid_records": 0,
+    "duplicate_records": 0,
+    "unreviewed_records": 1,
+    "total_baskets": 115,
+    "total_gross_weight": 2372.1,
+    "total_bad_weight": 73.0,
+    "total_net_weight": 2299.1000000000004,
+    "gross_amount": 5747.75,
+    "total_deductions": 182.5,
+    "total_advance": 350.0,
+    "net_amount": 5215.25,
+    "team_settlements": [
+      {
+        "team_id": "T001",
+        "team_name": "苹果一班",
+        "total_baskets": 62,
+        "total_gross_weight": 1261.0,
+        "total_bad_weight": 39.8,
+        "total_net_weight": 1221.2,
+        "gross_amount": 3053.0,
+        "total_deductions": 99.5,
+        "total_advance": 100.0,
+        "net_amount": 2853.5,
+        "workers": [
+          {
+            "worker_id": "W001",
+            "worker_name": "张小明",
+            "total_baskets": 26,
+            "total_gross_weight": 520.5,
+            "total_bad_weight": 15.0,
+            "total_net_weight": 505.5,
+            "gross_amount": 1263.75,
+            "total_deductions": 37.5,
+            "advance_payment": 0.0,
+            "net_amount": 1226.25,
+            "deductions": [
+              {
+                "record_id": "668aa20a113a8d4b8a6c220413c7d4ed",
+                "worker_id": "W001",
+                "worker_name": "张小明",
+                "category": "坏果扣重",
+                "description": "2026-05-08 坏果扣重 8.2kg",
+                "amount": 20.5,
+                "before_value": 0.0,
+                "after_value": 232.3
+              },
+              {
+                "record_id": "9547b328d2d919660d11b7e175c8dad6",
+                "worker_id": "W001",
+                "worker_name": "张小明",
+                "category": "坏果扣重",
+                "description": "2026-05-09 坏果扣重 6.8kg",
+                "amount": 17.0,
+                "before_value": 240.5,
+                "after_value": 505.5
+              }
+            ]
+          },
+          {
+            "worker_id": "W002",
+            "worker_name": "李大花",
+            "total_baskets": 21,
+            "total_gross_weight": 430.5,
+            "total_bad_weight": 12.8,
+            "total_net_weight": 417.7,
+            "gross_amount": 1044.25,
+            "total_deductions": 32.0,
+            "advance_payment": 100.0,
+            "net_amount": 912.25,
+            "deductions": [
+              {
+                "record_id": "e7a88956d6313d10363195d128fed3d7",
+                "worker_id": "W002",
+                "worker_name": "李大花",
+                "category": "坏果扣重",
+                "description": "2026-05-08 坏果扣重 5.5kg",
+                "amount": 13.75,
+                "before_value": 0.0,
+                "after_value": 199.5
+              },
+              {
+                "record_id": "e7a88956d6313d10363195d128fed3d7",
+                "worker_id": "W002",
+                "worker_name": "李大花",
+                "category": "预支工资",
+                "description": "2026-05-08 预支工资",
+                "amount": 100.0,
+                "before_value": 498.75,
+                "after_value": 398.75
+              },
+              {
+                "record_id": "0ec65e37376a54dbb51decb5f2be6405",
+                "worker_id": "W002",
+                "worker_name": "李大花",
+                "category": "坏果扣重",
+                "description": "2026-05-09 坏果扣重 7.3kg",
+                "amount": 18.25,
+                "before_value": 205.0,
+                "after_value": 417.7
+              }
+            ]
+          },
+          {
+            "worker_id": "W003",
+            "worker_name": "王二壮",
+            "total_baskets": 15,
+            "total_gross_weight": 310.0,
+            "total_bad_weight": 12.0,
+            "total_net_weight": 298.0,
+            "gross_amount": 745.0,
+            "total_deductions": 30.0,
+            "advance_payment": 0.0,
+            "net_amount": 715.0,
+            "deductions": [
+              {
+                "record_id": "f40e59d59b029a5562eae08f2ead4cbe",
+                "worker_id": "W003",
+                "worker_name": "王二壮",
+                "category": "坏果扣重",
+                "description": "2026-05-08 坏果扣重 12.0kg",
+                "amount": 30.0,
+                "before_value": 0.0,
+                "after_value": 298.0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "team_id": "T002",
+        "team_name": "苹果二班",
+        "total_baskets": 53,
+        "total_gross_weight": 1111.1,
+        "total_bad_weight": 33.2,
+        "total_net_weight": 1077.9,
+        "gross_amount": 2694.75,
+        "total_deductions": 83.0,
+        "total_advance": 250.0,
+        "net_amount": 2361.75,
+        "workers": [
+          {
+            "worker_id": "W004",
+            "worker_name": "赵四姐",
+            "total_baskets": 15,
+            "total_gross_weight": 310.3,
+            "total_bad_weight": 7.6,
+            "total_net_weight": 302.70000000000005,
+            "gross_amount": 756.75,
+            "total_deductions": 19.0,
+            "advance_payment": 250.0,
+            "net_amount": 487.75,
+            "deductions": [
+              {
+                "record_id": "634b8a8db18038079e7530ec84d3f286",
+                "worker_id": "W004",
+                "worker_name": "赵四姐",
+                "category": "坏果扣重",
+                "description": "2026-05-08 坏果扣重 3.1kg",
+                "amount": 7.75,
+                "before_value": 0.0,
+                "after_value": 162.20000000000002
+              },
+              {
+                "record_id": "634b8a8db18038079e7530ec84d3f286",
+                "worker_id": "W004",
+                "worker_name": "赵四姐",
+                "category": "预支工资",
+                "description": "2026-05-08 预支工资",
+                "amount": 50.0,
+                "before_value": 405.5,
+                "after_value": 355.5
+              },
+              {
+                "record_id": "15055dbe4a0763e3830865a0cbc76db0",
+                "worker_id": "W004",
+                "worker_name": "赵四姐",
+                "category": "坏果扣重",
+                "description": "2026-05-09 坏果扣重 4.5kg",
+                "amount": 11.25,
+                "before_value": 165.3,
+                "after_value": 302.70000000000005
+              },
+              {
+                "record_id": "15055dbe4a0763e3830865a0cbc76db0",
+                "worker_id": "W004",
+                "worker_name": "赵四姐",
+                "category": "预支工资",
+                "description": "2026-05-09 预支工资",
+                "amount": 200.0,
+                "before_value": 756.75,
+                "after_value": 506.75
+              }
+            ]
+          },
+          {
+            "worker_id": "W005",
+            "worker_name": "孙五强",
+            "total_baskets": 38,
+            "total_gross_weight": 800.8,
+            "total_bad_weight": 25.6,
+            "total_net_weight": 775.2,
+            "gross_amount": 1938.0,
+            "total_deductions": 64.0,
+            "advance_payment": 0.0,
+            "net_amount": 1874.0,
+            "deductions": [
+              {
+                "record_id": "0fe3069f2ae32b4630b8dab432841bdd",
+                "worker_id": "W005",
+                "worker_name": "孙五强",
+                "category": "坏果扣重",
+                "description": "2026-05-08 坏果扣重 15.6kg",
+                "amount": 39.0,
+                "before_value": 0.0,
+                "after_value": 405.2
+              },
+              {
+                "record_id": "40b3029333d3857829c5bd7270bd4ce4",
+                "worker_id": "W005",
+                "worker_name": "孙五强",
+                "category": "坏果扣重",
+                "description": "2026-05-09 坏果扣重 10.0kg",
+                "amount": 25.0,
+                "before_value": 420.8,
+                "after_value": 775.2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "deductions": [
+      {
+        "record_id": "668aa20a113a8d4b8a6c220413c7d4ed",
+        "worker_id": "W001",
+        "worker_name": "张小明",
+        "category": "坏果扣重",
+        "description": "2026-05-08 坏果扣重 8.2kg",
+        "amount": 20.5,
+        "before_value": 0.0,
+        "after_value": 232.3
+      },
+      {
+        "record_id": "e7a88956d6313d10363195d128fed3d7",
+        "worker_id": "W002",
+        "worker_name": "李大花",
+        "category": "坏果扣重",
+        "description": "2026-05-08 坏果扣重 5.5kg",
+        "amount": 13.75,
+        "before_value": 0.0,
+        "after_value": 199.5
+      },
+      {
+        "record_id": "e7a88956d6313d10363195d128fed3d7",
+        "worker_id": "W002",
+        "worker_name": "李大花",
+        "category": "预支工资",
+        "description": "2026-05-08 预支工资",
+        "amount": 100.0,
+        "before_value": 498.75,
+        "after_value": 398.75
+      },
+      {
+        "record_id": "f40e59d59b029a5562eae08f2ead4cbe",
+        "worker_id": "W003",
+        "worker_name": "王二壮",
+        "category": "坏果扣重",
+        "description": "2026-05-08 坏果扣重 12.0kg",
+        "amount": 30.0,
+        "before_value": 0.0,
+        "after_value": 298.0
+      },
+      {
+        "record_id": "634b8a8db18038079e7530ec84d3f286",
+        "worker_id": "W004",
+        "worker_name": "赵四姐",
+        "category": "坏果扣重",
+        "description": "2026-05-08 坏果扣重 3.1kg",
+        "amount": 7.75,
+        "before_value": 0.0,
+        "after_value": 162.20000000000002
+      },
+      {
+        "record_id": "634b8a8db18038079e7530ec84d3f286",
+        "worker_id": "W004",
+        "worker_name": "赵四姐",
+        "category": "预支工资",
+        "description": "2026-05-08 预支工资",
+        "amount": 50.0,
+        "before_value": 405.5,
+        "after_value": 355.5
+      },
+      {
+        "record_id": "0fe3069f2ae32b4630b8dab432841bdd",
+        "worker_id": "W005",
+        "worker_name": "孙五强",
+        "category": "坏果扣重",
+        "description": "2026-05-08 坏果扣重 15.6kg",
+        "amount": 39.0,
+        "before_value": 0.0,
+        "after_value": 405.2
+      },
+      {
+        "record_id": "9547b328d2d919660d11b7e175c8dad6",
+        "worker_id": "W001",
+        "worker_name": "张小明",
+        "category": "坏果扣重",
+        "description": "2026-05-09 坏果扣重 6.8kg",
+        "amount": 17.0,
+        "before_value": 240.5,
+        "after_value": 505.5
+      },
+      {
+        "record_id": "0ec65e37376a54dbb51decb5f2be6405",
+        "worker_id": "W002",
+        "worker_name": "李大花",
+        "category": "坏果扣重",
+        "description": "2026-05-09 坏果扣重 7.3kg",
+        "amount": 18.25,
+        "before_value": 205.0,
+        "after_value": 417.7
+      },
+      {
+        "record_id": "15055dbe4a0763e3830865a0cbc76db0",
+        "worker_id": "W004",
+        "worker_name": "赵四姐",
+        "category": "坏果扣重",
+        "description": "2026-05-09 坏果扣重 4.5kg",
+        "amount": 11.25,
+        "before_value": 165.3,
+        "after_value": 302.70000000000005
+      },
+      {
+        "record_id": "15055dbe4a0763e3830865a0cbc76db0",
+        "worker_id": "W004",
+        "worker_name": "赵四姐",
+        "category": "预支工资",
+        "description": "2026-05-09 预支工资",
+        "amount": 200.0,
+        "before_value": 756.75,
+        "after_value": 506.75
+      },
+      {
+        "record_id": "40b3029333d3857829c5bd7270bd4ce4",
+        "worker_id": "W005",
+        "worker_name": "孙五强",
+        "category": "坏果扣重",
+        "description": "2026-05-09 坏果扣重 10.0kg",
+        "amount": 25.0,
+        "before_value": 420.8,
+        "after_value": 775.2
+      }
+    ],
+    "warnings": [
+      "记录 9a524302(钱六妹) 未经过班组长复核，已跳过"
+    ],
+    "settled_records": [
+      "668aa20a113a8d4b8a6c220413c7d4ed",
+      "e7a88956d6313d10363195d128fed3d7",
+      "f40e59d59b029a5562eae08f2ead4cbe",
+      "634b8a8db18038079e7530ec84d3f286",
+      "0fe3069f2ae32b4630b8dab432841bdd",
+      "9547b328d2d919660d11b7e175c8dad6",
+      "0ec65e37376a54dbb51decb5f2be6405",
+      "15055dbe4a0763e3830865a0cbc76db0",
+      "40b3029333d3857829c5bd7270bd4ce4"
+    ]
+  }
+}
