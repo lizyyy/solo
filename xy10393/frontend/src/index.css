@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .status-registered { color: #6b7280; }
+  .status-equipment_passed { color: #10b981; }
+  .status-equipment_failed { color: #ef4444; }
+  .status-in_progress { color: #3b82f6; }
+  .status-dropped_out { color: #f59e0b; }
+  .status-finished { color: #8b5cf6; }
+  
+  .bg-status-registered { background-color: #f3f4f6; }
+  .bg-status-equipment_passed { background-color: #d1fae5; }
+  .bg-status-equipment_failed { background-color: #fee2e2; }
+  .bg-status-in_progress { background-color: #dbeafe; }
+  .bg-status-dropped_out { background-color: #fef3c7; }
+  .bg-status-finished { background-color: #ede9fe; }
+}
