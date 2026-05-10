@@ -1,0 +1,16 @@
+{
+  "name": "file-virus-scan-callback-service",
+  "version": "1.0.0",
+  "description": "文件病毒扫描回调服务 - 处理文件上传后的异步病毒扫描回调、业务状态管理和审计追踪",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/e2e-test.js",
+    "init-db": "node src/database/init.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
+  }
+}
