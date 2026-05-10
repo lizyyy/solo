@@ -35,18 +35,14 @@ func NewAPIHandler(
 func (h *APIHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/health", h.HealthCheck)
 
-	mux.HandleFunc("/api/trackings", h.ListTrackings)
-	mux.HandleFunc("/api/trackings/", h.GetTracking)
-	mux.HandleFunc("/api/trackings/message/", h.GetTrackingByMessageID)
-	mux.HandleFunc("/api/trackings/", h.UpdateTrackingStatus)
+	mux.HandleFunc("/api/trackings", h.handleTrackings)
+	mux.HandleFunc("/api/trackings/", h.handleTrackingsByID)
 
 	mux.HandleFunc("/api/dead-letters", h.ListDeadLetters)
 	mux.HandleFunc("/api/dead-letters/", h.GetDeadLetter)
 
-	mux.HandleFunc("/api/replays", h.CreateReplay)
-	mux.HandleFunc("/api/replays/", h.GetReplay)
-	mux.HandleFunc("/api/replays/cancel/", h.CancelReplay)
-	mux.HandleFunc("/api/replays/list", h.ListReplays)
+	mux.HandleFunc("/api/replays", h.handleReplays)
+	mux.HandleFunc("/api/replays/", h.handleReplaysByID)
 
 	mux.HandleFunc("/api/reports/tracking/", h.GenerateTrackingReport)
 	mux.HandleFunc("/api/reports/replay/", h.GenerateReplayReport)
@@ -55,6 +51,66 @@ func (h *APIHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/statistics", h.GetStatistics)
 
 	logger.Info("API routes registered")
+}
+
+func (h *APIHandler) handleTrackings(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		h.CreateTracking(w, r)
+	case http.MethodGet:
+		h.ListTrackings(w, r)
+	default:
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+	}
+}
+
+func (h *APIHandler) handleTrackingsByID(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/api/trackings/")
+
+	if strings.HasPrefix(path, "message/") {
+		h.GetTrackingByMessageID(w, r)
+		return
+	}
+
+	parts := strings.Split(path, "/")
+	if len(parts) >= 2 && parts[1] == "status" {
+		h.UpdateTrackingStatus(w, r)
+		return
+	}
+
+	if r.Method == http.MethodGet {
+		h.GetTracking(w, r)
+		return
+	}
+
+	writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+}
+
+func (h *APIHandler) handleReplays(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		h.CreateReplay(w, r)
+	case http.MethodGet:
+		h.ListReplays(w, r)
+	default:
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+	}
+}
+
+func (h *APIHandler) handleReplaysByID(w http.ResponseWriter, r *http.Request) {
+	path := strings.TrimPrefix(r.URL.Path, "/api/replays/")
+
+	if strings.HasPrefix(path, "cancel/") {
+		h.CancelReplay(w, r)
+		return
+	}
+
+	if r.Method == http.MethodGet {
+		h.GetReplay(w, r)
+		return
+	}
+
+	writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 }
 
 type Response struct {
@@ -91,6 +147,60 @@ func (h *APIHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 			"timestamp": time.Now().Unix(),
 			"status":    "healthy",
 		},
+	})
+}
+
+type CreateTrackingAPIRequest struct {
+	MessageID     string            `json:"message_id"`
+	Topic         string            `json:"topic"`
+	Tag           string            `json:"tag"`
+	Keys          string            `json:"keys"`
+	ProducerGroup string            `json:"producer_group"`
+	ConsumerGroup string            `json:"consumer_group"`
+	Body          string            `json:"body"`
+	Properties    map[string]string `json:"properties,omitempty"`
+}
+
+func (h *APIHandler) CreateTracking(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	var req CreateTrackingAPIRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	if req.MessageID == "" {
+		writeError(w, http.StatusBadRequest, "message_id is required")
+		return
+	}
+	if req.Topic == "" {
+		writeError(w, http.StatusBadRequest, "topic is required")
+		return
+	}
+
+	tracking, err := h.trackingSvc.CreateTracking(r.Context(), &service.CreateTrackingRequest{
+		MessageID:     req.MessageID,
+		Topic:         req.Topic,
+		Tag:           req.Tag,
+		Keys:          req.Keys,
+		ProducerGroup: req.ProducerGroup,
+		ConsumerGroup: req.ConsumerGroup,
+		Body:          req.Body,
+		Properties:    req.Properties,
+	})
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, Response{
+		Code:    http.StatusCreated,
+		Message: "success",
+		Data:    tracking,
 	})
 }
 

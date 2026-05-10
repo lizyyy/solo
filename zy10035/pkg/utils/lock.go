@@ -76,3 +76,21 @@ func (l *LocalLocker) Unlock(ctx context.Context, key string) error {
 	delete(l.entries, key)
 	return nil
 }
+
+type NoopLocker struct{}
+
+func NewNoopLocker() *NoopLocker {
+	return &NoopLocker{}
+}
+
+func (n *NoopLocker) TryLock(ctx context.Context, key string, ttl time.Duration) (bool, error) {
+	return true, nil
+}
+
+func (n *NoopLocker) Unlock(ctx context.Context, key string) error {
+	return nil
+}
+
+func (n *NoopLocker) Lock(ctx context.Context, key string, ttl time.Duration) error {
+	return nil
+}

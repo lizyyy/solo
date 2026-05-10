@@ -19,21 +19,27 @@ import (
 )
 
 type TrackingService struct {
-	db           database.DB
-	cacheMgr     *cache.CacheManager
-	locker       *cache.RedisLocker
-	cfg          *config.TrackingConfig
-	mqProducer   messagequeue.RocketMQProducer
-	mu           sync.RWMutex
+	db         database.DB
+	cacheMgr   *cache.CacheManager
+	locker     utils.DistributedLocker
+	cfg        *config.TrackingConfig
+	mqProducer messagequeue.RocketMQProducer
+	mu         sync.RWMutex
 }
 
 func NewTrackingService(
 	db database.DB,
 	cacheMgr *cache.CacheManager,
-	locker *cache.RedisLocker,
+	locker utils.DistributedLocker,
 	cfg *config.TrackingConfig,
 	producer messagequeue.RocketMQProducer,
 ) *TrackingService {
+	if locker == nil {
+		locker = &utils.NoopLocker{}
+	}
+	if cacheMgr == nil {
+		cacheMgr = cache.NewCacheManager(nil, nil)
+	}
 	return &TrackingService{
 		db:         db,
 		cacheMgr:   cacheMgr,
@@ -89,20 +95,20 @@ func (s *TrackingService) CreateTracking(ctx context.Context, req *CreateTrackin
 	}
 
 	tracking := &model.MessageTracking{
-		TrackingID:      trackingID,
-		MessageID:       req.MessageID,
-		Topic:           req.Topic,
-		Tag:             req.Tag,
-		Keys:            req.Keys,
-		ProducerGroup:   req.ProducerGroup,
-		ConsumerGroup:   req.ConsumerGroup,
-		Status:          model.MessageStatusProduced,
-		PreviousStatus:  "",
-		RetryCount:      0,
-		MaxRetryCount:   s.cfg.MaxRetryTimes,
-		Body:            req.Body,
-		Properties:      propertiesJSON,
-		ProducedAt:      &now,
+		TrackingID:     trackingID,
+		MessageID:      req.MessageID,
+		Topic:          req.Topic,
+		Tag:            req.Tag,
+		Keys:           req.Keys,
+		ProducerGroup:  req.ProducerGroup,
+		ConsumerGroup:  req.ConsumerGroup,
+		Status:         model.MessageStatusProduced,
+		PreviousStatus: "",
+		RetryCount:     0,
+		MaxRetryCount:  s.cfg.MaxRetryTimes,
+		Body:           req.Body,
+		Properties:     propertiesJSON,
+		ProducedAt:     &now,
 	}
 
 	if err := s.db.GetDB().WithContext(ctx).Create(tracking).Error; err != nil {
@@ -256,7 +262,7 @@ func (s *TrackingService) ListByStatus(ctx context.Context, status model.Message
 	var trackings []*model.MessageTracking
 
 	query := s.db.GetDB().WithContext(ctx).Model(&model.MessageTracking{}).Where("status = ?", status)
-	
+
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, errors.ErrDatabaseOperationFailed("count trackings", err)
 	}

@@ -20,13 +20,14 @@ import (
 	"mq-deadletter-review/internal/interfaces/api"
 	"mq-deadletter-review/internal/interfaces/reporter"
 	"mq-deadletter-review/pkg/logger"
+	"mq-deadletter-review/pkg/utils"
 )
 
 type App struct {
 	cfg      *config.Config
 	db       *gorm.DB
 	redis    *cache.RedisClient
-	locker   *cache.RedisLocker
+	locker   utils.DistributedLocker
 	cacheMgr *cache.CacheManager
 	mqClient *messagequeue.RocketMQClient
 }
@@ -72,6 +73,7 @@ func (a *App) initDatabase() error {
 func (a *App) initCache() {
 	logger.Info("Initializing in-memory cache...")
 	a.cacheMgr = cache.NewCacheManager(nil, nil)
+	a.locker = utils.NewLocalLocker()
 	logger.Info("Cache initialized (in-memory mode)")
 }
 

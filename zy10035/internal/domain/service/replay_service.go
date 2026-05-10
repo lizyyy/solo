@@ -19,24 +19,30 @@ import (
 )
 
 type ReplayService struct {
-	db           database.DB
-	cacheMgr     *cache.CacheManager
-	locker       *cache.RedisLocker
-	trackingSvc  *TrackingService
-	mqProducer   messagequeue.RocketMQProducer
-	cfg          *config.ReplayConfig
-	mu           sync.RWMutex
+	db            database.DB
+	cacheMgr      *cache.CacheManager
+	locker        utils.DistributedLocker
+	trackingSvc   *TrackingService
+	mqProducer    messagequeue.RocketMQProducer
+	cfg           *config.ReplayConfig
+	mu            sync.RWMutex
 	activeReplays map[string]bool
 }
 
 func NewReplayService(
 	db database.DB,
 	cacheMgr *cache.CacheManager,
-	locker *cache.RedisLocker,
+	locker utils.DistributedLocker,
 	trackingSvc *TrackingService,
 	producer messagequeue.RocketMQProducer,
 	cfg *config.ReplayConfig,
 ) *ReplayService {
+	if locker == nil {
+		locker = &utils.NoopLocker{}
+	}
+	if cacheMgr == nil {
+		cacheMgr = cache.NewCacheManager(nil, nil)
+	}
 	return &ReplayService{
 		db:            db,
 		cacheMgr:      cacheMgr,
@@ -63,15 +69,15 @@ type ReplayMessagesRequest struct {
 }
 
 type ReplayResult struct {
-	RequestID    string                 `json:"request_id"`
-	TotalCount   int                    `json:"total_count"`
-	SuccessCount int                    `json:"success_count"`
-	FailedCount  int                    `json:"failed_count"`
-	Status       string                 `json:"status"`
-	Results      []*ReplayItemResult    `json:"results,omitempty"`
-	StartTime    *time.Time             `json:"start_time"`
-	EndTime      *time.Time             `json:"end_time"`
-	Duration     int64                  `json:"duration_ms"`
+	RequestID    string              `json:"request_id"`
+	TotalCount   int                 `json:"total_count"`
+	SuccessCount int                 `json:"success_count"`
+	FailedCount  int                 `json:"failed_count"`
+	Status       string              `json:"status"`
+	Results      []*ReplayItemResult `json:"results,omitempty"`
+	StartTime    *time.Time          `json:"start_time"`
+	EndTime      *time.Time          `json:"end_time"`
+	Duration     int64               `json:"duration_ms"`
 }
 
 type ReplayItemResult struct {
@@ -261,10 +267,10 @@ func (s *ReplayService) executeReplay(
 	s.db.GetDB().Model(&model.ReplayRequest{}).
 		Where("request_id = ?", requestID).
 		Updates(map[string]interface{}{
-			"status":         finalStatus,
-			"success_count":  success,
-			"failed_count":   failed,
-			"end_time":       &endTime,
+			"status":        finalStatus,
+			"success_count": success,
+			"failed_count":  failed,
+			"end_time":      &endTime,
 		})
 
 	logger.Info("Replay completed, request_id=%s, total=%d, success=%d, failed=%d, duration=%dms",
@@ -333,9 +339,9 @@ func (s *ReplayService) replaySingleMessage(
 
 	now := time.Now()
 	updates := map[string]interface{}{
-		"replay_count":     dl.ReplayCount + 1,
-		"replay_status":    model.MessageStatusReplayed,
-		"last_replay_at":   &now,
+		"replay_count":      dl.ReplayCount + 1,
+		"replay_status":     model.MessageStatusReplayed,
+		"last_replay_at":    &now,
 		"origin_message_id": dl.MessageID,
 	}
 	s.db.GetDB().Model(&model.DeadLetterMessage{}).Where("id = ?", dl.ID).Updates(updates)
@@ -461,7 +467,7 @@ func (s *ReplayService) CancelReplay(ctx context.Context, requestID string) erro
 	result := s.db.GetDB().Model(&model.ReplayRequest{}).
 		Where("request_id = ? AND status = ?", requestID, "RUNNING").
 		Updates(map[string]interface{}{
-			"status": "CANCELLED",
+			"status":   "CANCELLED",
 			"end_time": time.Now(),
 		})
 
