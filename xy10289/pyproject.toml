@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "roast-review"
+version = "0.1.0"
+description = "咖啡豆烘焙曲线复盘 CLI - 比较多次烘焙曲线、一爆时间和杯测分数"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0",
+    "pandas>=2.0",
+    "matplotlib>=3.0",
+    "rich>=13.0",
+    "pydantic>=2.0",
+    "python-dateutil>=2.0",
+]
+
+[project.scripts]
+roast = "roast_review.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

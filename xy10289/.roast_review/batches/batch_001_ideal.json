@@ -1,0 +1,158 @@
+{
+  "batch_id": "batch_001_ideal",
+  "coffee_name": "埃塞俄比亚 耶加雪菲 水洗",
+  "origin": "Ethiopia, Yirgacheffe",
+  "process_method": "水洗",
+  "green_weight_g": 300.0,
+  "roasted_weight_g": 255.0,
+  "roast_date": "2026-05-01T10:00:00",
+  "curve_points": [
+    {
+      "time_seconds": 0.0,
+      "bean_temp": 25.0,
+      "exhaust_temp": 25.0
+    },
+    {
+      "time_seconds": 30.0,
+      "bean_temp": 85.0,
+      "exhaust_temp": 100.0
+    },
+    {
+      "time_seconds": 60.0,
+      "bean_temp": 110.0,
+      "exhaust_temp": 130.0
+    },
+    {
+      "time_seconds": 90.0,
+      "bean_temp": 130.0,
+      "exhaust_temp": 145.0
+    },
+    {
+      "time_seconds": 120.0,
+      "bean_temp": 145.0,
+      "exhaust_temp": 155.0
+    },
+    {
+      "time_seconds": 150.0,
+      "bean_temp": 155.0,
+      "exhaust_temp": 165.0
+    },
+    {
+      "time_seconds": 180.0,
+      "bean_temp": 165.0,
+      "exhaust_temp": 175.0
+    },
+    {
+      "time_seconds": 210.0,
+      "bean_temp": 172.0,
+      "exhaust_temp": 182.0
+    },
+    {
+      "time_seconds": 240.0,
+      "bean_temp": 178.0,
+      "exhaust_temp": 188.0
+    },
+    {
+      "time_seconds": 270.0,
+      "bean_temp": 183.0,
+      "exhaust_temp": 192.0
+    },
+    {
+      "time_seconds": 300.0,
+      "bean_temp": 187.0,
+      "exhaust_temp": 196.0
+    },
+    {
+      "time_seconds": 330.0,
+      "bean_temp": 190.0,
+      "exhaust_temp": 198.0
+    },
+    {
+      "time_seconds": 360.0,
+      "bean_temp": 192.0,
+      "exhaust_temp": 200.0
+    },
+    {
+      "time_seconds": 390.0,
+      "bean_temp": 194.0,
+      "exhaust_temp": 202.0
+    },
+    {
+      "time_seconds": 420.0,
+      "bean_temp": 195.0,
+      "exhaust_temp": 203.0
+    },
+    {
+      "time_seconds": 450.0,
+      "bean_temp": 196.0,
+      "exhaust_temp": 204.0
+    },
+    {
+      "time_seconds": 480.0,
+      "bean_temp": 196.5,
+      "exhaust_temp": 204.0
+    },
+    {
+      "time_seconds": 510.0,
+      "bean_temp": 197.0,
+      "exhaust_temp": 205.0
+    },
+    {
+      "time_seconds": 540.0,
+      "bean_temp": 198.0,
+      "exhaust_temp": 206.0
+    },
+    {
+      "time_seconds": 570.0,
+      "bean_temp": 201.0,
+      "exhaust_temp": 209.0
+    },
+    {
+      "time_seconds": 600.0,
+      "bean_temp": 205.0,
+      "exhaust_temp": 212.0
+    },
+    {
+      "time_seconds": 630.0,
+      "bean_temp": 208.0,
+      "exhaust_temp": 215.0
+    },
+    {
+      "time_seconds": 660.0,
+      "bean_temp": 210.0,
+      "exhaust_temp": 217.0
+    },
+    {
+      "time_seconds": 690.0,
+      "bean_temp": 212.0,
+      "exhaust_temp": 219.0
+    },
+    {
+      "time_seconds": 720.0,
+      "bean_temp": 214.0,
+      "exhaust_temp": 221.0
+    }
+  ],
+  "first_crack": {
+    "start_time_seconds": 540.0,
+    "start_temp": 198.0,
+    "end_time_seconds": 590.0,
+    "end_temp": 205.0,
+    "intensity": "medium",
+    "crack_type": "normal",
+    "notes": "一爆声音清脆，持续约50秒"
+  },
+  "cup_score": {
+    "aroma": 9.0,
+    "flavor": 9.2,
+    "aftertaste": 8.8,
+    "acidity": 8.5,
+    "body": 8.3,
+    "balance": 9.0,
+    "uniformity": 9.5,
+    "overall": 9.0,
+    "defects": 0.0
+  },
+  "roast_notes": "理想烘焙曲线，柠檬花香，茶感",
+  "metadata": {}
+}

@@ -1,0 +1,49 @@
+{
+  "batch_id": "batch_002_early_fc",
+  "coffee_name": "埃塞俄比亚 耶加雪菲 水洗",
+  "origin": "Ethiopia, Yirgacheffe",
+  "process_method": "水洗",
+  "green_weight_g": 300,
+  "roasted_weight_g": 250,
+  "roast_date": "2026-05-02T10:00:00",
+  "first_crack": {
+    "start_time_seconds": 360,
+    "start_temp": 192,
+    "intensity": "high",
+    "crack_type": "early",
+    "notes": "一爆发生过早，火力过大"
+  },
+  "cup_score": {
+    "aroma": 7.5,
+    "flavor": 7.0,
+    "aftertaste": 6.8,
+    "acidity": 8.0,
+    "body": 7.2,
+    "balance": 6.5,
+    "uniformity": 7.0,
+    "overall": 6.8,
+    "defects": 2.0
+  },
+  "roast_notes": "一爆过早，酸质刺激，平衡感差",
+  "curve_points": [
+    {"time_seconds": 0, "bean_temp": 25, "exhaust_temp": 25},
+    {"time_seconds": 30, "bean_temp": 100, "exhaust_temp": 120},
+    {"time_seconds": 60, "bean_temp": 135, "exhaust_temp": 150},
+    {"time_seconds": 90, "bean_temp": 155, "exhaust_temp": 170},
+    {"time_seconds": 120, "bean_temp": 170, "exhaust_temp": 185},
+    {"time_seconds": 150, "bean_temp": 178, "exhaust_temp": 190},
+    {"time_seconds": 180, "bean_temp": 183, "exhaust_temp": 195},
+    {"time_seconds": 210, "bean_temp": 186, "exhaust_temp": 197},
+    {"time_seconds": 240, "bean_temp": 188, "exhaust_temp": 198},
+    {"time_seconds": 270, "bean_temp": 189, "exhaust_temp": 199},
+    {"time_seconds": 300, "bean_temp": 190, "exhaust_temp": 199},
+    {"time_seconds": 330, "bean_temp": 191, "exhaust_temp": 200},
+    {"time_seconds": 360, "bean_temp": 192, "exhaust_temp": 201},
+    {"time_seconds": 390, "bean_temp": 198, "exhaust_temp": 205},
+    {"time_seconds": 420, "bean_temp": 205, "exhaust_temp": 210},
+    {"time_seconds": 450, "bean_temp": 210, "exhaust_temp": 215},
+    {"time_seconds": 480, "bean_temp": 212, "exhaust_temp": 218},
+    {"time_seconds": 510, "bean_temp": 213, "exhaust_temp": 219},
+    {"time_seconds": 540, "bean_temp": 214, "exhaust_temp": 220}
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "batch_id": "batch_003_late_fc",
+  "coffee_name": "埃塞俄比亚 耶加雪菲 水洗",
+  "origin": "Ethiopia, Yirgacheffe",
+  "process_method": "水洗",
+  "green_weight_g": 300.0,
+  "roasted_weight_g": 248.0,
+  "roast_date": "2026-05-03T10:00:00",
+  "curve_points": [
+    {
+      "time_seconds": 0.0,
+      "bean_temp": 25.0,
+      "exhaust_temp": 25.0
+    },
+    {
+      "time_seconds": 60.0,
+      "bean_temp": 70.0,
+      "exhaust_temp": 85.0
+    },
+    {
+      "time_seconds": 120.0,
+      "bean_temp": 95.0,
+      "exhaust_temp": 110.0
+    },
+    {
+      "time_seconds": 180.0,
+      "bean_temp": 115.0,
+      "exhaust_temp": 130.0
+    },
+    {
+      "time_seconds": 240.0,
+      "bean_temp": 132.0,
+      "exhaust_temp": 145.0
+    },
+    {
+      "time_seconds": 300.0,
+      "bean_temp": 145.0,
+      "exhaust_temp": 155.0
+    },
+    {
+      "time_seconds": 360.0,
+      "bean_temp": 155.0,
+      "exhaust_temp": 165.0
+    },
+    {
+      "time_seconds": 420.0,
+      "bean_temp": 163.0,
+      "exhaust_temp": 172.0
+    },
+    {
+      "time_seconds": 480.0,
+      "bean_temp": 170.0,
+      "exhaust_temp": 178.0
+    },
+    {
+      "time_seconds": 540.0,
+      "bean_temp": 175.0,
+      "exhaust_temp": 183.0
+    },
+    {
+      "time_seconds": 600.0,
+      "bean_temp": 179.0,
+      "exhaust_temp": 187.0
+    },
+    {
+      "time_seconds": 660.0,
+      "bean_temp": 183.0,
+      "exhaust_temp": 190.0
+    },
+    {
+      "time_seconds": 720.0,
+      "bean_temp": 187.0,
+      "exhaust_temp": 194.0
+    },
+    {
+      "time_seconds": 780.0,
+      "bean_temp": 202.0,
+      "exhaust_temp": 205.0
+    },
+    {
+      "time_seconds": 840.0,
+      "bean_temp": 210.0,
+      "exhaust_temp": 212.0
+    },
+    {
+      "time_seconds": 900.0,
+      "bean_temp": 215.0,
+      "exhaust_temp": 217.0
+    },
+    {
+      "time_seconds": 960.0,
+      "bean_temp": 218.0,
+      "exhaust_temp": 220.0
+    }
+  ],
+  "first_crack": {
+    "start_time_seconds": 780.0,
+    "start_temp": 202.0,
+    "end_time_seconds": null,
+    "end_temp": null,
+    "intensity": "low",
+    "crack_type": "late",
+    "notes": "一爆发生过晚，火力不足"
+  },
+  "cup_score": {
+    "aroma": 7.0,
+    "flavor": 7.2,
+    "aftertaste": 7.5,
+    "acidity": 6.5,
+    "body": 7.8,
+    "balance": 6.8,
+    "uniformity": 7.2,
+    "overall": 7.0,
+    "defects": 1.0
+  },
+  "roast_notes": "一爆过晚，醇厚但酸质弱，沉闷",
+  "metadata": {}
+}

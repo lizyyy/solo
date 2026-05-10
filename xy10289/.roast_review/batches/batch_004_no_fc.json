@@ -1,0 +1,150 @@
+{
+  "batch_id": "batch_004_no_fc",
+  "coffee_name": "哥伦比亚 苏普雷莫 水洗",
+  "origin": "Colombia",
+  "process_method": "水洗",
+  "green_weight_g": 300.0,
+  "roasted_weight_g": 245.0,
+  "roast_date": "2026-05-04T10:00:00",
+  "curve_points": [
+    {
+      "time_seconds": 0.0,
+      "bean_temp": 25.0,
+      "exhaust_temp": 25.0
+    },
+    {
+      "time_seconds": 30.0,
+      "bean_temp": 75.0,
+      "exhaust_temp": 90.0
+    },
+    {
+      "time_seconds": 60.0,
+      "bean_temp": 105.0,
+      "exhaust_temp": 125.0
+    },
+    {
+      "time_seconds": 90.0,
+      "bean_temp": 125.0,
+      "exhaust_temp": 140.0
+    },
+    {
+      "time_seconds": 120.0,
+      "bean_temp": 140.0,
+      "exhaust_temp": 152.0
+    },
+    {
+      "time_seconds": 150.0,
+      "bean_temp": 152.0,
+      "exhaust_temp": 163.0
+    },
+    {
+      "time_seconds": 180.0,
+      "bean_temp": 162.0,
+      "exhaust_temp": 172.0
+    },
+    {
+      "time_seconds": 210.0,
+      "bean_temp": 170.0,
+      "exhaust_temp": 178.0
+    },
+    {
+      "time_seconds": 240.0,
+      "bean_temp": 175.0,
+      "exhaust_temp": 183.0
+    },
+    {
+      "time_seconds": 270.0,
+      "bean_temp": 180.0,
+      "exhaust_temp": 188.0
+    },
+    {
+      "time_seconds": 300.0,
+      "bean_temp": 183.0,
+      "exhaust_temp": 190.0
+    },
+    {
+      "time_seconds": 330.0,
+      "bean_temp": 186.0,
+      "exhaust_temp": 193.0
+    },
+    {
+      "time_seconds": 360.0,
+      "bean_temp": 188.0,
+      "exhaust_temp": 195.0
+    },
+    {
+      "time_seconds": 390.0,
+      "bean_temp": 189.0,
+      "exhaust_temp": 196.0
+    },
+    {
+      "time_seconds": 420.0,
+      "bean_temp": 190.0,
+      "exhaust_temp": 197.0
+    },
+    {
+      "time_seconds": 450.0,
+      "bean_temp": 191.0,
+      "exhaust_temp": 198.0
+    },
+    {
+      "time_seconds": 480.0,
+      "bean_temp": 192.0,
+      "exhaust_temp": 199.0
+    },
+    {
+      "time_seconds": 510.0,
+      "bean_temp": 193.0,
+      "exhaust_temp": 200.0
+    },
+    {
+      "time_seconds": 540.0,
+      "bean_temp": 194.0,
+      "exhaust_temp": 201.0
+    },
+    {
+      "time_seconds": 570.0,
+      "bean_temp": 195.0,
+      "exhaust_temp": 202.0
+    },
+    {
+      "time_seconds": 600.0,
+      "bean_temp": 197.0,
+      "exhaust_temp": 204.0
+    },
+    {
+      "time_seconds": 630.0,
+      "bean_temp": 200.0,
+      "exhaust_temp": 207.0
+    },
+    {
+      "time_seconds": 660.0,
+      "bean_temp": 203.0,
+      "exhaust_temp": 210.0
+    },
+    {
+      "time_seconds": 690.0,
+      "bean_temp": 206.0,
+      "exhaust_temp": 213.0
+    },
+    {
+      "time_seconds": 720.0,
+      "bean_temp": 208.0,
+      "exhaust_temp": 215.0
+    }
+  ],
+  "first_crack": {
+    "start_time_seconds": 330.0,
+    "start_temp": 186.0,
+    "end_time_seconds": null,
+    "end_temp": null,
+    "intensity": "medium",
+    "crack_type": "early",
+    "notes": "自动检测，置信度: 58.0%"
+  },
+  "cup_score": null,
+  "roast_notes": "数据不完整，没有记录一爆",
+  "metadata": {
+    "batch_id": "batch_004_no_fc"
+  }
+}
