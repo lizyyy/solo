@@ -1,0 +1,32 @@
+[
+  {
+    "id": "SHP-20260414-0001",
+    "shipmentNo": "YS-2026-001",
+    "contractId": "CTR-20260410-0001",
+    "exhibitId": "EXH-20260401-0002",
+    "logisticsCompany": "专业艺术品物流公司",
+    "departureDate": "2026-04-14",
+    "expectedArrivalDate": "2026-04-16",
+    "actualArrivalDate": "2026-04-15",
+    "status": "delivered",
+    "handler": "王五",
+    "remark": "运输顺利，无异常",
+    "createTime": "2026-04-14T08:00:00Z",
+    "updateTime": "2026-04-15T18:00:00Z"
+  },
+  {
+    "id": "SHP-20260504-0001",
+    "shipmentNo": "YS-2026-002",
+    "contractId": "CTR-20260410-0002",
+    "exhibitId": "EXH-20260401-0004",
+    "logisticsCompany": "专业艺术品物流公司",
+    "departureDate": "2026-05-04",
+    "expectedArrivalDate": "2026-05-06",
+    "actualArrivalDate": null,
+    "status": "in_transit",
+    "handler": "赵六",
+    "remark": "恒温恒湿运输中",
+    "createTime": "2026-05-04T08:00:00Z",
+    "updateTime": "2026-05-04T08:00:00Z"
+  }
+]

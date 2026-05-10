@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博物馆临展借展保险台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🏛️ 博物馆临展借展保险台</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="initDemoData()">初始化示例数据</button>
+                <button class="btn btn-success" onclick="exportData('all')">导出全部数据</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="exhibits">📦 展品档案</button>
+        <button class="tab-btn" data-tab="contracts">📋 借展合同</button>
+        <button class="tab-btn" data-tab="insurances">🛡️ 保险登记</button>
+        <button class="tab-btn" data-tab="shipments">🚚 运输批次</button>
+        <button class="tab-btn" data-tab="checkpoints">✅ 状态点交</button>
+        <button class="tab-btn" data-tab="anomalies">⚠️ 异常测试</button>
+    </nav>
+
+    <main>
+        <section id="exhibits" class="tab-content active">
+            <div class="section-header">
+                <h2>展品档案管理</h2>
+                <button class="btn btn-primary" onclick="openExhibitModal()">➕ 新增展品</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>展品编号</th>
+                            <th>名称</th>
+                            <th>类别</th>
+                            <th>年代</th>
+                            <th>存放地</th>
+                            <th>估价(元)</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exhibitsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="contracts" class="tab-content">
+            <div class="section-header">
+                <h2>借展合同管理</h2>
+                <button class="btn btn-primary" onclick="openContractModal()">➕ 新增合同</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>合同编号</th>
+                            <th>展品</th>
+                            <th>借入方</th>
+                            <th>借出方</th>
+                            <th>期限</th>
+                            <th>保险金额(元)</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="insurances" class="tab-content">
+            <div class="section-header">
+                <h2>保险登记管理</h2>
+                <button class="btn btn-primary" onclick="openInsuranceModal()">➕ 新增保险</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>保单号</th>
+                            <th>合同编号</th>
+                            <th>保险公司</th>
+                            <th>保险期限</th>
+                            <th>金额(元)</th>
+                            <th>保费(元)</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="insurancesTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="shipments" class="tab-content">
+            <div class="section-header">
+                <h2>运输批次管理</h2>
+                <button class="btn btn-primary" onclick="openShipmentModal()">➕ 新增运输</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>运输批次号</th>
+                            <th>合同编号</th>
+                            <th>展品</th>
+                            <th>物流公司</th>
+                            <th>出发日期</th>
+                            <th>预计到达</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shipmentsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="checkpoints" class="tab-content">
+            <div class="section-header">
+                <h2>状态点交管理</h2>
+                <div class="header-actions-inline">
+                    <select id="filterShipment" onchange="filterCheckpoints()">
+                        <option value="">全部运输批次</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="openCheckpointModal()">➕ 新增点交</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>点交编号</th>
+                            <th>运输批次</th>
+                            <th>点交类型</th>
+                            <th>点交名称</th>
+                            <th>操作人</th>
+                            <th>时间</th>
+                            <th>状况</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checkpointsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="anomalies" class="tab-content">
+            <div class="section-header">
+                <h2>异常测试</h2>
+            </div>
+            <div class="anomaly-container">
+                <div class="anomaly-card">
+                    <h3>🔄 重复数据测试</h3>
+                    <p>测试添加相同编号的数据，验证系统是否会检测重复</p>
+                    <button class="btn btn-warning" onclick="testDuplicate()">运行测试</button>
+                    <div id="duplicateResult" class="test-result"></div>
+                </div>
+                <div class="anomaly-card">
+                    <h3>❌ 缺失字段测试</h3>
+                    <p>测试添加缺少必填字段的数据，验证校验逻辑</p>
+                    <button class="btn btn-danger" onclick="testMissingFields()">运行测试</button>
+                    <div id="missingResult" class="test-result"></div>
+                </div>
+                <div class="anomaly-card">
+                    <h3>✏️ 人工改错测试</h3>
+                    <p>测试保险金额与合同不一致的情况</p>
+                    <button class="btn btn-info" onclick="testMismatch()">运行测试</button>
+                    <div id="mismatchResult" class="test-result"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">标题</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

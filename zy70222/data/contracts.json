@@ -1,0 +1,34 @@
+[
+  {
+    "id": "CTR-20260410-0001",
+    "contractNo": "HT-2026-001",
+    "exhibitId": "EXH-20260401-0002",
+    "borrowerInstitution": "南京博物院",
+    "lenderInstitution": "河南博物院",
+    "startDate": "2026-04-15",
+    "endDate": "2026-06-30",
+    "status": "active",
+    "responsiblePerson": "张三",
+    "phone": "13800138001",
+    "insuranceAmount": 8000000,
+    "terms": "按合同条款执行，运输过程需专业物流公司",
+    "createTime": "2026-04-10T10:00:00Z",
+    "updateTime": "2026-04-10T10:00:00Z"
+  },
+  {
+    "id": "CTR-20260410-0002",
+    "contractNo": "HT-2026-002",
+    "exhibitId": "EXH-20260401-0004",
+    "borrowerInstitution": "国家博物馆",
+    "lenderInstitution": "敦煌研究院",
+    "startDate": "2026-05-01",
+    "endDate": "2026-07-15",
+    "status": "active",
+    "responsiblePerson": "李四",
+    "phone": "13800138002",
+    "insuranceAmount": 15000000,
+    "terms": "需全程恒温恒湿运输，专业押运",
+    "createTime": "2026-04-10T11:00:00Z",
+    "updateTime": "2026-04-10T11:00:00Z"
+  }
+]

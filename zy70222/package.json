@@ -1,0 +1,17 @@
+{
+  "name": "museum-borrow-insurance-system",
+  "version": "1.0.0",
+  "description": "博物馆临展借展保险台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

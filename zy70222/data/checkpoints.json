@@ -1,0 +1,87 @@
+[
+  {
+    "id": "CKP-20260414-0001",
+    "shipmentId": "SHP-20260414-0001",
+    "checkpointNo": "DJ-2026-001-A",
+    "checkpointType": "departure",
+    "checkpointName": "河南博物院出库点交",
+    "operator": "出库员A",
+    "timestamp": "2026-04-14T09:00:00Z",
+    "description": "展品出库，包装完好",
+    "condition": "good",
+    "photos": [
+      "photo1.jpg"
+    ],
+    "signature": "出库员A",
+    "status": "confirmed",
+    "createTime": "2026-04-14T09:00:00Z"
+  },
+  {
+    "id": "CKP-20260415-0001",
+    "shipmentId": "SHP-20260414-0001",
+    "checkpointNo": "DJ-2026-001-B",
+    "checkpointType": "transit",
+    "checkpointName": "郑州中转点交",
+    "operator": "中转员B",
+    "timestamp": "2026-04-15T12:00:00Z",
+    "description": "包装完好，温度湿度正常",
+    "condition": "good",
+    "photos": [
+      "photo2.jpg"
+    ],
+    "signature": "中转员B",
+    "status": "confirmed",
+    "createTime": "2026-04-15T12:00:00Z"
+  },
+  {
+    "id": "CKP-20260415-0002",
+    "shipmentId": "SHP-20260414-0001",
+    "checkpointNo": "DJ-2026-001-C",
+    "checkpointType": "arrival",
+    "checkpointName": "南京博物院入库点交",
+    "operator": "入库员C",
+    "timestamp": "2026-04-15T18:00:00Z",
+    "description": "展品完好，顺利入库",
+    "condition": "good",
+    "photos": [
+      "photo3.jpg"
+    ],
+    "signature": "入库员C",
+    "status": "confirmed",
+    "createTime": "2026-04-15T18:00:00Z"
+  },
+  {
+    "id": "CKP-20260504-0001",
+    "shipmentId": "SHP-20260504-0001",
+    "checkpointNo": "DJ-2026-002-A",
+    "checkpointType": "departure",
+    "checkpointName": "敦煌研究院出库点交",
+    "operator": "出库员D",
+    "timestamp": "2026-05-04T10:00:00Z",
+    "description": "恒温包装完成，出库",
+    "condition": "good",
+    "photos": [
+      "photo4.jpg"
+    ],
+    "signature": "出库员D",
+    "status": "confirmed",
+    "createTime": "2026-05-04T10:00:00Z"
+  },
+  {
+    "id": "CKP-20260504-0002",
+    "shipmentId": "SHP-20260504-0001",
+    "checkpointNo": "DJ-2026-002-B",
+    "checkpointType": "transit",
+    "checkpointName": "兰州中转点交",
+    "operator": "中转员E",
+    "timestamp": "2026-05-05T08:00:00Z",
+    "description": "恒温设备运行正常，待继续运输",
+    "condition": "good",
+    "photos": [
+      "photo5.jpg"
+    ],
+    "signature": "中转员E",
+    "status": "pending",
+    "createTime": "2026-05-05T08:00:00Z"
+  }
+]
