@@ -1,9 +1,18 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { EventType, Event } from '@live-push/shared';
 
-export interface EventDocument extends Document, Omit<Event, 'id'> {}
+export interface EventDocument {
+  _id: string;
+  type: string;
+  aggregateId: string;
+  data: unknown;
+  version: number;
+  timestamp: Date;
+  traceId: string;
+  metadata?: unknown;
+}
 
-const EventSchema = new Schema<EventDocument>(
+const EventSchema = new Schema(
   {
     _id: { type: String, required: true },
     type: {
@@ -20,11 +29,12 @@ const EventSchema = new Schema<EventDocument>(
   {
     timestamps: { createdAt: 'timestamp', updatedAt: false },
     toJSON: {
-      transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
+      transform: (_doc, ret) => {
+        const result = ret as any;
+        result.id = result._id;
+        delete result._id;
+        delete result.__v;
+        return result;
       },
     },
   }

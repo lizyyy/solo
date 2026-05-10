@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs';
-import puppeteer from 'puppeteer';
 import { 
   ReportData, 
   MessageType, 
@@ -18,6 +17,19 @@ interface ReportOptions {
   startDate: Date;
   endDate: Date;
   formats: Array<'excel' | 'markdown' | 'pdf'>;
+}
+
+let puppeteerModule: any = null;
+
+async function loadPuppeteer(): Promise<any> {
+  if (puppeteerModule === null) {
+    try {
+      puppeteerModule = await import('puppeteer');
+    } catch {
+      puppeteerModule = undefined;
+    }
+  }
+  return puppeteerModule;
 }
 
 class ReportService {
@@ -96,7 +108,7 @@ class ReportService {
       column.width = column.header && column.header.length > 20 ? 30 : 20;
     });
 
-    const buffer = await workbook.xlsx.writeBuffer() as Buffer;
+    const buffer = (await workbook.xlsx.writeBuffer()) as unknown as Buffer;
     
     logger.info('Excel report exported', { roomId: report.roomId });
     
@@ -160,6 +172,11 @@ class ReportService {
   }
 
   async exportToPdf(report: ReportData): Promise<Buffer> {
+    const puppeteer = await loadPuppeteer();
+    if (!puppeteer) {
+      throw new Error('PDF export requires puppeteer. Install with: npm install puppeteer');
+    }
+
     const markdown = await this.exportToMarkdown(report);
     const html = this.markdownToHtml(markdown);
 

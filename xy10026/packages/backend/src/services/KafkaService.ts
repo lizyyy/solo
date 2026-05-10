@@ -58,7 +58,6 @@ class KafkaService {
       sessionTimeout: 30000,
       rebalanceTimeout: 60000,
       heartbeatInterval: 3000,
-      maxPollInterval: 300000,
     });
 
     await this.consumer.connect();

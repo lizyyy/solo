@@ -208,7 +208,7 @@ class MessageService {
       return cached;
     }
 
-    const query: Record<string, unknown> = { roomId };
+    const query: any = { roomId };
 
     if (status) {
       query['status'] = status;
@@ -219,7 +219,7 @@ class MessageService {
     }
 
     if (startTime || endTime) {
-      query['createdAt'] = {} as Record<string, unknown>;
+      query['createdAt'] = {};
       if (startTime) query['createdAt'].$gte = startTime;
       if (endTime) query['createdAt'].$lte = endTime;
     }

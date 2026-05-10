@@ -193,7 +193,7 @@ const MessageList: React.FC = () => {
       title: '操作',
       key: 'actions',
       width: 240,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: any, record: LiveMessage) => (
         <Space size="small">
           <Button

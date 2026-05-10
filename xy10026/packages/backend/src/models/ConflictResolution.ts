@@ -1,9 +1,19 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { ConflictResolution } from '@live-push/shared';
 
-export interface ConflictResolutionDocument extends Document, Omit<ConflictResolution, 'id'> {}
+export interface ConflictResolutionDocument {
+  _id: string;
+  messageId: string;
+  baseVersion: number;
+  currentVersion: number;
+  proposedVersion: number;
+  resolved: boolean;
+  winner: string;
+  mergedData?: unknown;
+  resolvedAt: Date;
+}
 
-const ConflictResolutionSchema = new Schema<ConflictResolutionDocument>(
+const ConflictResolutionSchema = new Schema(
   {
     _id: { type: String, required: true },
     messageId: { type: String, required: true, index: true },
@@ -21,11 +31,12 @@ const ConflictResolutionSchema = new Schema<ConflictResolutionDocument>(
   {
     timestamps: { createdAt: 'resolvedAt', updatedAt: false },
     toJSON: {
-      transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
+      transform: (_doc, ret) => {
+        const result = ret as any;
+        result.id = result._id;
+        delete result._id;
+        delete result.__v;
+        return result;
       },
     },
   }

@@ -21,11 +21,11 @@ class AppLogger {
       format: combine(
         errors({ stack: true }),
         timestamp({ format: 'ISO8601' }),
-        printf(({ level, message, timestamp, stack, ...meta }) => {
-          const logEntry = {
+        printf(({ level, message, timestamp: ts, stack, ...meta }) => {
+          const logEntry: Record<string, unknown> = {
             level,
             message,
-            timestamp,
+            timestamp: ts,
             ...this.context,
             ...meta,
           };

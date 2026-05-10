@@ -79,6 +79,7 @@ export interface Event {
 }
 
 export interface ConflictResolution {
+  id: string;
   messageId: string;
   baseVersion: number;
   currentVersion: number;

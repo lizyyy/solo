@@ -1,9 +1,22 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { OperationType, Operation } from '@live-push/shared';
 
-export interface OperationDocument extends Document, Omit<Operation, 'id'> {}
+export interface OperationDocument {
+  _id: string;
+  messageId: string;
+  type: string;
+  operatorId: string;
+  operatorName: string;
+  beforeState?: unknown;
+  afterState?: unknown;
+  reason?: string;
+  timestamp: Date;
+  traceId: string;
+  ip?: string;
+  userAgent?: string;
+}
 
-const OperationSchema = new Schema<OperationDocument>(
+const OperationSchema = new Schema(
   {
     _id: { type: String, required: true },
     messageId: { type: String, required: true, index: true },
@@ -24,11 +37,12 @@ const OperationSchema = new Schema<OperationDocument>(
   {
     timestamps: { createdAt: 'timestamp', updatedAt: false },
     toJSON: {
-      transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
+      transform: (_doc, ret) => {
+        const result = ret as any;
+        result.id = result._id;
+        delete result._id;
+        delete result.__v;
+        return result;
       },
     },
   }

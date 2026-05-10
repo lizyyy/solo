@@ -1,5 +1,5 @@
 import EventModel, { EventDocument } from '../models/Event';
-import { Event, EventType, LiveMessage, Operation } from '@live-push/shared';
+import { Event, EventType, LiveMessage, Operation, MessageStatus } from '@live-push/shared';
 import { generateId } from '@live-push/shared';
 import logger from '../utils/logger';
 import cacheService from './CacheService';
@@ -10,7 +10,7 @@ class EventStoreService {
   async createEvent(
     type: EventType,
     aggregateId: string,
-    data: Partial<LiveMessage> | Operation,
+    data: Partial<LiveMessage> | Operation | any,
     traceId: string,
     metadata?: Record<string, unknown>
   ): Promise<Event> {
@@ -53,7 +53,7 @@ class EventStoreService {
   }
 
   async getNextVersion(aggregateId: string): Promise<number> {
-    const latestEvent = await EventModel.findOne({ aggregateId })
+    const latestEvent = await EventModel.findOne({ aggregateId } as any)
       .sort({ version: -1 })
       .limit(1);
 
@@ -72,14 +72,14 @@ class EventStoreService {
       return cached;
     }
 
-    const query: Record<string, unknown> = { aggregateId };
+    const query: any = { aggregateId };
 
     if (fromVersion !== undefined) {
-      query['version'] = { ...(query['version'] as object), $gte: fromVersion };
+      query['version'] = { ...(query['version'] || {}), $gte: fromVersion };
     }
 
     if (toVersion !== undefined) {
-      query['version'] = { ...(query['version'] as object), $lte: toVersion };
+      query['version'] = { ...(query['version'] || {}), $lte: toVersion };
     }
 
     const eventDocs = await EventModel.find(query).sort({ version: 1, timestamp: 1 });
@@ -92,7 +92,7 @@ class EventStoreService {
   }
 
   async getEventsByTraceId(traceId: string): Promise<Event[]> {
-    const eventDocs = await EventModel.find({ traceId }).sort({ timestamp: 1 });
+    const eventDocs = await EventModel.find({ traceId } as any).sort({ timestamp: 1 });
     return eventDocs.map((doc) => this.toEvent(doc));
   }
 
@@ -102,10 +102,10 @@ class EventStoreService {
     endTime?: Date,
     limit: number = 100
   ): Promise<Event[]> {
-    const query: Record<string, unknown> = { type };
+    const query: any = { type };
 
     if (startTime || endTime) {
-      query['timestamp'] = {} as Record<string, unknown>;
+      query['timestamp'] = {};
       if (startTime) query['timestamp'].$gte = startTime;
       if (endTime) query['timestamp'].$lte = endTime;
     }
@@ -148,7 +148,7 @@ class EventStoreService {
         return { ...state, ...eventData, version: event.version };
       
       case EventType.MESSAGE_DELETED:
-        return { ...state, status: 'deleted' as unknown };
+        return { ...state, status: MessageStatus.FAILED };
       
       case EventType.MESSAGE_PUSHED:
         return { ...state, ...eventData };
@@ -165,7 +165,7 @@ class EventStoreService {
   }
 
   async getAggregateVersion(aggregateId: string): Promise<number> {
-    const latestEvent = await EventModel.findOne({ aggregateId })
+    const latestEvent = await EventModel.findOne({ aggregateId } as any)
       .sort({ version: -1 })
       .limit(1);
 

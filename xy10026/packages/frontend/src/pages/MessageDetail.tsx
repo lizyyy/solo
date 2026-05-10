@@ -10,7 +10,7 @@ import {
   Modal,
   Form,
   Input,
-  message,
+  message as antdMessage,
   Divider,
 } from 'antd';
 import {
@@ -65,35 +65,35 @@ const MessageDetail: React.FC = () => {
   const updateMutation = useMutation({
     mutationFn: (params: any) => messageApi.update(messageId!, params),
     onSuccess: () => {
-      message.success('更新成功');
+      antdMessage.success('更新成功');
       setEditModalVisible(false);
       queryClient.invalidateQueries({ queryKey: ['message', messageId] });
     },
     onError: (error: any) => {
-      message.error(`更新失败: ${error.message}`);
+      antdMessage.error(`更新失败: ${error.message}`);
     },
   });
 
   const retryMutation = useMutation({
     mutationFn: (params: any) => messageApi.retry(messageId!, params),
     onSuccess: () => {
-      message.success('重试成功');
+      antdMessage.success('重试成功');
       queryClient.invalidateQueries({ queryKey: ['message', messageId] });
     },
     onError: (error: any) => {
-      message.error(`重试失败: ${error.message}`);
+      antdMessage.error(`重试失败: ${error.message}`);
     },
   });
 
   const rollbackMutation = useMutation({
     mutationFn: (params: any) => messageApi.rollback(messageId!, params),
     onSuccess: () => {
-      message.success('回滚成功');
+      antdMessage.success('回滚成功');
       setRollbackModalVisible(false);
       queryClient.invalidateQueries({ queryKey: ['message', messageId] });
     },
     onError: (error: any) => {
-      message.error(`回滚失败: ${error.message}`);
+      antdMessage.error(`回滚失败: ${error.message}`);
     },
   });
 

@@ -13,6 +13,7 @@ import {
   Typography,
   message,
   Collapse,
+  Divider,
 } from 'antd';
 import { SearchOutlined, BugOutlined, CheckCircleOutlined, WarningOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';

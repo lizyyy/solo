@@ -1,9 +1,25 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { MessageType, MessageStatus, LiveMessage } from '@live-push/shared';
 
-export interface LiveMessageDocument extends Document, Omit<LiveMessage, 'id'> {}
+export interface LiveMessageDocument {
+  _id: string;
+  roomId: string;
+  type: string;
+  content: string;
+  senderId: string;
+  senderName: string;
+  metadata?: unknown;
+  sequence: number;
+  status: string;
+  retryCount: number;
+  maxRetries: number;
+  createdAt: Date;
+  updatedAt: Date;
+  deliveredAt?: Date;
+  version: number;
+}
 
-const LiveMessageSchema = new Schema<LiveMessageDocument>(
+const LiveMessageSchema = new Schema(
   {
     _id: { type: String, required: true },
     roomId: { type: String, required: true, index: true },
@@ -31,11 +47,12 @@ const LiveMessageSchema = new Schema<LiveMessageDocument>(
   {
     timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
     toJSON: {
-      transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
+      transform: (_doc, ret) => {
+        const result = ret as any;
+        result.id = result._id;
+        delete result._id;
+        delete result.__v;
+        return result;
       },
     },
   }

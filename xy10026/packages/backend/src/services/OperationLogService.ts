@@ -64,7 +64,7 @@ class OperationLogService {
     messageId: string,
     limit: number = 100
   ): Promise<Operation[]> {
-    const operationDocs = await OperationModel.find({ messageId })
+    const operationDocs = await OperationModel.find({ messageId } as any)
       .sort({ timestamp: -1 })
       .limit(limit);
 
@@ -72,7 +72,7 @@ class OperationLogService {
   }
 
   async getOperationsByTraceId(traceId: string): Promise<Operation[]> {
-    const operationDocs = await OperationModel.find({ traceId }).sort({ timestamp: 1 });
+    const operationDocs = await OperationModel.find({ traceId } as any).sort({ timestamp: 1 });
     return operationDocs.map((doc) => this.toOperation(doc));
   }
 
@@ -82,10 +82,10 @@ class OperationLogService {
     endTime?: Date,
     limit: number = 100
   ): Promise<Operation[]> {
-    const query: Record<string, unknown> = { operatorId };
+    const query: any = { operatorId };
 
     if (startTime || endTime) {
-      query['timestamp'] = {} as Record<string, unknown>;
+      query['timestamp'] = {};
       if (startTime) query['timestamp'].$gte = startTime;
       if (endTime) query['timestamp'].$lte = endTime;
     }
@@ -103,10 +103,10 @@ class OperationLogService {
     endTime?: Date,
     limit: number = 100
   ): Promise<Operation[]> {
-    const query: Record<string, unknown> = { type };
+    const query: any = { type };
 
     if (startTime || endTime) {
-      query['timestamp'] = {} as Record<string, unknown>;
+      query['timestamp'] = {};
       if (startTime) query['timestamp'].$gte = startTime;
       if (endTime) query['timestamp'].$lte = endTime;
     }
@@ -124,7 +124,7 @@ class OperationLogService {
     types?: OperationType[],
     limit: number = 1000
   ): Promise<Operation[]> {
-    const query: Record<string, unknown> = {
+    const query: any = {
       timestamp: {
         $gte: startTime,
         $lte: endTime,

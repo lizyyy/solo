@@ -1,7 +1,7 @@
 import eventStoreService from './EventStoreService';
 import operationLogService from './OperationLogService';
 import messageService from './MessageService';
-import { Event, Operation, EventType, OperationType, LiveMessage } from '@live-push/shared';
+import { Event, Operation, EventType, OperationType, LiveMessage, MessageStatus } from '@live-push/shared';
 import logger from '../utils/logger';
 
 interface ReplayOptions {
@@ -330,7 +330,7 @@ class ReplayService {
       case EventType.MESSAGE_UPDATED:
         return { ...state, ...data };
       case EventType.MESSAGE_DELETED:
-        return { ...state, status: 'deleted' as unknown };
+        return { ...state, status: MessageStatus.FAILED };
       case EventType.MESSAGE_PUSHED:
         return { ...state, ...data };
       case EventType.MESSAGE_FAILED:

@@ -1,4 +1,3 @@
-import Redlock from 'redlock';
 import redisClient from '../utils/redis';
 import config from '../config';
 import logger from '../utils/logger';
@@ -11,24 +10,7 @@ interface Lock {
 }
 
 class DistributedLockService {
-  private redlock: Redlock | null = null;
   private readonly LOCK_PREFIX = 'lock:';
-
-  private getRedlock(): Redlock {
-    if (!this.redlock) {
-      const redis = redisClient.getClient();
-      this.redlock = new Redlock(
-        [redis],
-        {
-          driftFactor: 0.01,
-          retryCount: 10,
-          retryDelay: 200,
-          retryJitter: 200,
-        }
-      );
-    }
-    return this.redlock;
-  }
 
   private getLockKey(key: string): string {
     return `${this.LOCK_PREFIX}${key}`;
@@ -59,20 +41,6 @@ class DistributedLockService {
 
     logger.warn('Lock acquisition timeout', { key: lockKey, attempts, timeout });
     return null;
-  }
-
-  async acquireWithRedlock(options: DistributedLockOptions): Promise<Redlock.Lock | null> {
-    const redlock = this.getRedlock();
-    const lockKey = this.getLockKey(options.key);
-
-    try {
-      const lock = await redlock.acquire([lockKey], options.ttl);
-      logger.debug('Redlock acquired', { key: lockKey });
-      return lock;
-    } catch (error) {
-      logger.warn('Redlock acquisition failed', error as Error, { key: lockKey });
-      return null;
-    }
   }
 
   async release(lock: Lock): Promise<boolean> {
