@@ -1,0 +1,2453 @@
+{
+  "id": "d7d75e08-dcaa-40ee-9662-b42b46a7a4c1",
+  "timestamp": 1778428969102,
+  "logEntries": [
+    {
+      "id": "ae8f00d0-bd96-4f8e-b110-ed6365b651cc",
+      "timestamp": 1778428823213,
+      "operationId": "dcb5884e-3663-4974-8859-6f1becac2f0d",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "COMMIT",
+      "startTime": 1778428823213,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870142,
+      "duration": 46929
+    },
+    {
+      "id": "ae8f00d0-bd96-4f8e-b110-ed6365b651cc",
+      "timestamp": 1778428823213,
+      "operationId": "dcb5884e-3663-4974-8859-6f1becac2f0d",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "COMMIT",
+      "startTime": 1778428823213,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870142,
+      "duration": 46929
+    },
+    {
+      "id": "8f62fe12-d831-48e0-a4ac-39af71c02f25",
+      "timestamp": 1778428823214,
+      "operationId": "13c8da6b-128f-4b92-8bf1-273bce46da00",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "READ",
+      "sql": "SELECT balance, version FROM accounts WHERE account_id = ?",
+      "params": [
+        "ACC_001"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "8f62fe12-d831-48e0-a4ac-39af71c02f25",
+      "timestamp": 1778428823214,
+      "operationId": "13c8da6b-128f-4b92-8bf1-273bce46da00",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "READ",
+      "sql": "SELECT balance, version FROM accounts WHERE account_id = ?",
+      "params": [
+        "ACC_001"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "c7ed0fdd-c04d-4fec-a837-2741688c3c47",
+      "timestamp": 1778428823214,
+      "operationId": "e3603534-8d6a-49a1-ac93-b0a69339a642",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance - ?, version = version + 1 WHERE account_id = ? AND version = ?",
+      "params": [
+        109,
+        "ACC_001",
+        0
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "c7ed0fdd-c04d-4fec-a837-2741688c3c47",
+      "timestamp": 1778428823214,
+      "operationId": "e3603534-8d6a-49a1-ac93-b0a69339a642",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance - ?, version = version + 1 WHERE account_id = ? AND version = ?",
+      "params": [
+        109,
+        "ACC_001",
+        0
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "948ae6bc-c955-476f-bd4f-3cd24d35fc35",
+      "timestamp": 1778428823214,
+      "operationId": "da939a83-6593-41f0-a40e-3da4bcf4fb5c",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        109,
+        "ACC_002"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "948ae6bc-c955-476f-bd4f-3cd24d35fc35",
+      "timestamp": 1778428823214,
+      "operationId": "da939a83-6593-41f0-a40e-3da4bcf4fb5c",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        109,
+        "ACC_002"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "1f9eb6cb-d89a-4b9f-9b04-741f0a5c3fae",
+      "timestamp": 1778428823214,
+      "operationId": "02ee975d-4848-4709-a1ae-d91198761da6",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO transfer_logs (transfer_id, from_account, to_account, amount, status) VALUES (?, ?, ?, ?, ?)",
+      "params": [
+        "TX_80437b21",
+        "ACC_001",
+        "ACC_002",
+        109,
+        "SUCCESS"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "1f9eb6cb-d89a-4b9f-9b04-741f0a5c3fae",
+      "timestamp": 1778428823214,
+      "operationId": "02ee975d-4848-4709-a1ae-d91198761da6",
+      "transactionId": "4db48b4f-f9e5-4e8f-8127-21933131983c",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO transfer_logs (transfer_id, from_account, to_account, amount, status) VALUES (?, ?, ?, ?, ?)",
+      "params": [
+        "TX_80437b21",
+        "ACC_001",
+        "ACC_002",
+        109,
+        "SUCCESS"
+      ],
+      "startTime": 1778428823214,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428823214,
+      "duration": 0
+    },
+    {
+      "id": "86f8b06c-f457-4481-a8d7-2071f1a7bd42",
+      "timestamp": 1778428823214,
+      "operationId": "c7ef0642-4a2e-456d-8e8f-e45402c3116e",
+      "transactionId": "5f7f0fad-05cd-4cd4-a392-9e0cea29c2bd",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428823214,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428828410,
+      "duration": 5196,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 1)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "86f8b06c-f457-4481-a8d7-2071f1a7bd42",
+      "timestamp": 1778428823214,
+      "operationId": "c7ef0642-4a2e-456d-8e8f-e45402c3116e",
+      "transactionId": "5f7f0fad-05cd-4cd4-a392-9e0cea29c2bd",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428823214,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428828410,
+      "duration": 5196,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 1)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "ace1bd4c-fa6b-47b8-86ca-c767f9b361ba",
+      "timestamp": 1778428828416,
+      "operationId": "e8a4aae0-19c3-4100-9925-9fd86e30bc16",
+      "transactionId": "02d95c4e-4dcd-4617-8610-0c16108fe946",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428828416,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428833611,
+      "duration": 5195,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 2)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "ace1bd4c-fa6b-47b8-86ca-c767f9b361ba",
+      "timestamp": 1778428828416,
+      "operationId": "e8a4aae0-19c3-4100-9925-9fd86e30bc16",
+      "transactionId": "02d95c4e-4dcd-4617-8610-0c16108fe946",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428828416,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428833611,
+      "duration": 5195,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 2)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "b9038eaa-fac1-4e87-bc4d-4fcc328c7a97",
+      "timestamp": 1778428833613,
+      "operationId": "529a62d5-3bf8-43e9-935f-e9b2a7e650c8",
+      "transactionId": "03856d1e-ee0a-4a05-9ef2-94e756c88d48",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428833613,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428838833,
+      "duration": 5220,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 3)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "b9038eaa-fac1-4e87-bc4d-4fcc328c7a97",
+      "timestamp": 1778428833613,
+      "operationId": "529a62d5-3bf8-43e9-935f-e9b2a7e650c8",
+      "transactionId": "03856d1e-ee0a-4a05-9ef2-94e756c88d48",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428833613,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428838833,
+      "duration": 5220,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 3)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "f8f4db75-a03f-44fb-b1ff-288060125f14",
+      "timestamp": 1778428838834,
+      "operationId": "3a05f805-b807-4da0-915b-b89678374ebd",
+      "transactionId": "d0066b6b-3c64-4748-8d92-a706db270e61",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428838834,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428844069,
+      "duration": 5235,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 4)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "f8f4db75-a03f-44fb-b1ff-288060125f14",
+      "timestamp": 1778428838834,
+      "operationId": "3a05f805-b807-4da0-915b-b89678374ebd",
+      "transactionId": "d0066b6b-3c64-4748-8d92-a706db270e61",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428838834,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428844069,
+      "duration": 5235,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 4)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "1968049d-1c2c-4590-9f2b-a830e203329d",
+      "timestamp": 1778428844069,
+      "operationId": "a0b7bca3-a9ea-4f69-b57d-a49b31cc388a",
+      "transactionId": "8e995084-36a9-4e5c-8e65-e5c776c43793",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428844069,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428849280,
+      "duration": 5211,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 5)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "1968049d-1c2c-4590-9f2b-a830e203329d",
+      "timestamp": 1778428844069,
+      "operationId": "a0b7bca3-a9ea-4f69-b57d-a49b31cc388a",
+      "transactionId": "8e995084-36a9-4e5c-8e65-e5c776c43793",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428844069,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428849280,
+      "duration": 5211,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 5)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "464278f5-f912-4978-872c-a7e96c4e39d9",
+      "timestamp": 1778428849281,
+      "operationId": "9da44741-3582-41f1-98a0-d9bbe8cf29e2",
+      "transactionId": "e07e7ce6-2aaf-417b-9189-da24acec1d02",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428849281,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428854489,
+      "duration": 5208,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 6)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "464278f5-f912-4978-872c-a7e96c4e39d9",
+      "timestamp": 1778428849281,
+      "operationId": "9da44741-3582-41f1-98a0-d9bbe8cf29e2",
+      "transactionId": "e07e7ce6-2aaf-417b-9189-da24acec1d02",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428849281,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428854489,
+      "duration": 5208,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 6)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "e1fc0312-52b9-4648-8bbb-b17aa23b967f",
+      "timestamp": 1778428854489,
+      "operationId": "cfbc59ea-3c0e-4de1-9f16-39d8742b3b92",
+      "transactionId": "69339bb9-94ff-422e-aba2-41888653d4fb",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428854489,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428859717,
+      "duration": 5228,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 7)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "e1fc0312-52b9-4648-8bbb-b17aa23b967f",
+      "timestamp": 1778428854489,
+      "operationId": "cfbc59ea-3c0e-4de1-9f16-39d8742b3b92",
+      "transactionId": "69339bb9-94ff-422e-aba2-41888653d4fb",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428854489,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428859717,
+      "duration": 5228,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 7)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "68c9e1e0-56c2-4572-8231-3828a590cb9d",
+      "timestamp": 1778428859717,
+      "operationId": "f9324516-fc21-4eec-91ab-960a8a119dea",
+      "transactionId": "46420100-727d-4181-b31a-cbfd34cf7399",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428859717,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428864919,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 8)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "68c9e1e0-56c2-4572-8231-3828a590cb9d",
+      "timestamp": 1778428859717,
+      "operationId": "f9324516-fc21-4eec-91ab-960a8a119dea",
+      "transactionId": "46420100-727d-4181-b31a-cbfd34cf7399",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428859717,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428864919,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 8)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "2a45cf35-2cc4-44f0-87ea-59ce1a1de0b6",
+      "timestamp": 1778428864921,
+      "operationId": "b90ffdb4-ad81-421e-bb31-aa771d0f0767",
+      "transactionId": "aad63d0b-d8a4-4c3d-b800-49046263d487",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428864921,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870139,
+      "duration": 5218,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 9)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "2a45cf35-2cc4-44f0-87ea-59ce1a1de0b6",
+      "timestamp": 1778428864921,
+      "operationId": "b90ffdb4-ad81-421e-bb31-aa771d0f0767",
+      "transactionId": "aad63d0b-d8a4-4c3d-b800-49046263d487",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428864921,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870139,
+      "duration": 5218,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 9)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "ca29de14-afc2-4035-848a-35f1b3440ae3",
+      "timestamp": 1778428870143,
+      "operationId": "89b22c16-ae0e-4469-b71f-8cde65e31043",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "COMMIT",
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875350,
+      "duration": 5207
+    },
+    {
+      "id": "fe081e2b-1706-46a4-aaf4-666b476064f8",
+      "timestamp": 1778428870143,
+      "operationId": "5cd44415-53e4-444f-92b7-e74756db1cf9",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "READ",
+      "sql": "SELECT balance, version FROM accounts WHERE account_id = ?",
+      "params": [
+        "ACC_002"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "fe081e2b-1706-46a4-aaf4-666b476064f8",
+      "timestamp": 1778428870143,
+      "operationId": "5cd44415-53e4-444f-92b7-e74756db1cf9",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "READ",
+      "sql": "SELECT balance, version FROM accounts WHERE account_id = ?",
+      "params": [
+        "ACC_002"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "882751f5-2030-4eae-8126-2f73ea0655e6",
+      "timestamp": 1778428870143,
+      "operationId": "11e63a8e-05aa-47fb-be80-d3f3e0c25080",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance - ?, version = version + 1 WHERE account_id = ? AND version = ?",
+      "params": [
+        205,
+        "ACC_002",
+        1
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "882751f5-2030-4eae-8126-2f73ea0655e6",
+      "timestamp": 1778428870143,
+      "operationId": "11e63a8e-05aa-47fb-be80-d3f3e0c25080",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance - ?, version = version + 1 WHERE account_id = ? AND version = ?",
+      "params": [
+        205,
+        "ACC_002",
+        1
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "048aa5a8-723a-4565-ac47-0558e0d88d02",
+      "timestamp": 1778428870143,
+      "operationId": "0163d905-92f2-4de3-af86-9054ecd6698f",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        205,
+        "ACC_003"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "048aa5a8-723a-4565-ac47-0558e0d88d02",
+      "timestamp": 1778428870143,
+      "operationId": "0163d905-92f2-4de3-af86-9054ecd6698f",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE accounts SET balance = balance + ?, version = version + 1 WHERE account_id = ?",
+      "params": [
+        205,
+        "ACC_003"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "8fda8dc5-7a3a-4773-8e4c-9a86ed8b4c53",
+      "timestamp": 1778428870143,
+      "operationId": "3cd9e7ef-c180-48af-a462-be85da080874",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO transfer_logs (transfer_id, from_account, to_account, amount, status) VALUES (?, ?, ?, ?, ?)",
+      "params": [
+        "TX_08fb9532",
+        "ACC_002",
+        "ACC_003",
+        205,
+        "SUCCESS"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "8fda8dc5-7a3a-4773-8e4c-9a86ed8b4c53",
+      "timestamp": 1778428870143,
+      "operationId": "3cd9e7ef-c180-48af-a462-be85da080874",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO transfer_logs (transfer_id, from_account, to_account, amount, status) VALUES (?, ?, ?, ?, ?)",
+      "params": [
+        "TX_08fb9532",
+        "ACC_002",
+        "ACC_003",
+        205,
+        "SUCCESS"
+      ],
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "EXCLUSIVE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428870143,
+      "duration": 0
+    },
+    {
+      "id": "165a8849-81b6-402f-9634-d8d9ce087ccb",
+      "timestamp": 1778428870143,
+      "operationId": "64a3d4dc-f1a4-432d-9e82-add96b27852e",
+      "transactionId": "08056f4e-3821-4078-8283-e5e00fbdd46f",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428870143,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875346,
+      "duration": 5203,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 11)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "165a8849-81b6-402f-9634-d8d9ce087ccb",
+      "timestamp": 1778428870143,
+      "operationId": "64a3d4dc-f1a4-432d-9e82-add96b27852e",
+      "transactionId": "08056f4e-3821-4078-8283-e5e00fbdd46f",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428870143,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875346,
+      "duration": 5203,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:99:11\n    at async Promise.all (index 11)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:133:19)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "ca29de14-afc2-4035-848a-35f1b3440ae3",
+      "timestamp": 1778428870143,
+      "operationId": "89b22c16-ae0e-4469-b71f-8cde65e31043",
+      "transactionId": "83b47c46-f3ce-45e9-91cb-492940c05399",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "COMMIT",
+      "startTime": 1778428870143,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875350,
+      "duration": 5207
+    },
+    {
+      "id": "18fcfa54-6101-4627-8c82-758daf46fd53",
+      "timestamp": 1778428875351,
+      "operationId": "579df8a2-2e90-4c51-8369-91c3d6cffd72",
+      "transactionId": null,
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "\n    CREATE TABLE IF NOT EXISTS hot_updates (\n      id INTEGER PRIMARY KEY AUTOINCREMENT,\n      key TEXT UNIQUE NOT NULL,\n      value INTEGER DEFAULT 0,\n      version INTEGER DEFAULT 0\n    )\n  ",
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875351,
+      "duration": 0
+    },
+    {
+      "id": "18fcfa54-6101-4627-8c82-758daf46fd53",
+      "timestamp": 1778428875351,
+      "operationId": "579df8a2-2e90-4c51-8369-91c3d6cffd72",
+      "transactionId": null,
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "\n    CREATE TABLE IF NOT EXISTS hot_updates (\n      id INTEGER PRIMARY KEY AUTOINCREMENT,\n      key TEXT UNIQUE NOT NULL,\n      value INTEGER DEFAULT 0,\n      version INTEGER DEFAULT 0\n    )\n  ",
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875351,
+      "duration": 0
+    },
+    {
+      "id": "4b817d12-6257-4b08-bbfd-016f9a88659a",
+      "timestamp": 1778428875351,
+      "operationId": "efe512fe-2bfd-4ad6-b3ed-d60cb28c8194",
+      "transactionId": null,
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO hot_updates (key, value) VALUES (?, ?)",
+      "params": [
+        "counter",
+        0
+      ],
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875351,
+      "duration": 0
+    },
+    {
+      "id": "4b817d12-6257-4b08-bbfd-016f9a88659a",
+      "timestamp": 1778428875351,
+      "operationId": "efe512fe-2bfd-4ad6-b3ed-d60cb28c8194",
+      "transactionId": null,
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "INSERT INTO hot_updates (key, value) VALUES (?, ?)",
+      "params": [
+        "counter",
+        0
+      ],
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875351,
+      "duration": 0
+    },
+    {
+      "id": "55f6da39-aa90-4965-b593-458c5c75b011",
+      "timestamp": 1778428875351,
+      "operationId": "2e00ca9c-fbbb-4f83-9f44-2a8f1731e68c",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "COMMIT",
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 46825
+    },
+    {
+      "id": "55f6da39-aa90-4965-b593-458c5c75b011",
+      "timestamp": 1778428875351,
+      "operationId": "2e00ca9c-fbbb-4f83-9f44-2a8f1731e68c",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "COMMIT",
+      "startTime": 1778428875351,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 46825
+    },
+    {
+      "id": "333d4957-3379-4f5c-aaca-ce88c7e05a1b",
+      "timestamp": 1778428875352,
+      "operationId": "f46be039-99d6-4330-95c7-3447eb2f4696",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "READ",
+      "sql": "SELECT value, version FROM hot_updates WHERE key = ?",
+      "params": [
+        "counter"
+      ],
+      "startTime": 1778428875352,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875352,
+      "duration": 0
+    },
+    {
+      "id": "333d4957-3379-4f5c-aaca-ce88c7e05a1b",
+      "timestamp": 1778428875352,
+      "operationId": "f46be039-99d6-4330-95c7-3447eb2f4696",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "READ",
+      "sql": "SELECT value, version FROM hot_updates WHERE key = ?",
+      "params": [
+        "counter"
+      ],
+      "startTime": 1778428875352,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875352,
+      "duration": 0
+    },
+    {
+      "id": "6766ae2a-f779-4cda-8f81-718ce7cbcc35",
+      "timestamp": 1778428875352,
+      "operationId": "82b0322e-c1a8-4247-9b9d-48c56e5439e1",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE hot_updates SET value = value + 1, version = version + 1 WHERE key = ? AND version = ?",
+      "params": [
+        "counter",
+        0
+      ],
+      "startTime": 1778428875352,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875352,
+      "duration": 0
+    },
+    {
+      "id": "6766ae2a-f779-4cda-8f81-718ce7cbcc35",
+      "timestamp": 1778428875352,
+      "operationId": "82b0322e-c1a8-4247-9b9d-48c56e5439e1",
+      "transactionId": "0872d08c-502e-4efe-a76a-aa7c32bc10ba",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "WRITE",
+      "sql": "UPDATE hot_updates SET value = value + 1, version = version + 1 WHERE key = ? AND version = ?",
+      "params": [
+        "counter",
+        0
+      ],
+      "startTime": 1778428875352,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428875352,
+      "duration": 0
+    },
+    {
+      "id": "06368059-fb6c-424f-bbe2-b3e8fc23ea7f",
+      "timestamp": 1778428875352,
+      "operationId": "7c11bd41-e809-4ae8-bc6e-b5a97fef3965",
+      "transactionId": "270c3886-1be8-49a3-a1c1-4d57f43a7ef2",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428875352,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428880568,
+      "duration": 5216,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 1)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "06368059-fb6c-424f-bbe2-b3e8fc23ea7f",
+      "timestamp": 1778428875352,
+      "operationId": "7c11bd41-e809-4ae8-bc6e-b5a97fef3965",
+      "transactionId": "270c3886-1be8-49a3-a1c1-4d57f43a7ef2",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428875352,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428880568,
+      "duration": 5216,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 1)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "3521cd42-42af-40de-9a4a-cb26ed943c86",
+      "timestamp": 1778428880569,
+      "operationId": "309257bf-6f4f-4027-91c2-0e7af8569618",
+      "transactionId": "81ff3489-dc6c-49a4-ab67-09439907067f",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428880569,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428885766,
+      "duration": 5197,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 2)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "3521cd42-42af-40de-9a4a-cb26ed943c86",
+      "timestamp": 1778428880569,
+      "operationId": "309257bf-6f4f-4027-91c2-0e7af8569618",
+      "transactionId": "81ff3489-dc6c-49a4-ab67-09439907067f",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428880569,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428885766,
+      "duration": 5197,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 2)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "89eff62f-b161-4403-9402-ee76b06eb011",
+      "timestamp": 1778428885766,
+      "operationId": "0fb61d6a-0b49-4d1f-bf2c-a4cbc01bacd3",
+      "transactionId": "ae067e21-ac67-4694-b3f0-af0a6cd82e77",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428885766,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428890964,
+      "duration": 5198,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 3)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "89eff62f-b161-4403-9402-ee76b06eb011",
+      "timestamp": 1778428885766,
+      "operationId": "0fb61d6a-0b49-4d1f-bf2c-a4cbc01bacd3",
+      "transactionId": "ae067e21-ac67-4694-b3f0-af0a6cd82e77",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428885766,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428890964,
+      "duration": 5198,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 3)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "48e28348-86c1-4d27-aaef-9ad63ad8e3f6",
+      "timestamp": 1778428890965,
+      "operationId": "2c8e7287-b742-43c8-8d91-93f3f29fe7fd",
+      "transactionId": "342929a2-71b0-44fa-b166-6baf7098d245",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428890965,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428896169,
+      "duration": 5204,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 4)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "48e28348-86c1-4d27-aaef-9ad63ad8e3f6",
+      "timestamp": 1778428890965,
+      "operationId": "2c8e7287-b742-43c8-8d91-93f3f29fe7fd",
+      "transactionId": "342929a2-71b0-44fa-b166-6baf7098d245",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428890965,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428896169,
+      "duration": 5204,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 4)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "0d916a7a-f003-4a29-b48a-38419d577c86",
+      "timestamp": 1778428896169,
+      "operationId": "902daf9d-b27c-4f17-9bb2-9a81f0d54d91",
+      "transactionId": "0c809015-1fc1-4b99-92e3-1ce23b289636",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428896169,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428901364,
+      "duration": 5195,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 5)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "0d916a7a-f003-4a29-b48a-38419d577c86",
+      "timestamp": 1778428896169,
+      "operationId": "902daf9d-b27c-4f17-9bb2-9a81f0d54d91",
+      "transactionId": "0c809015-1fc1-4b99-92e3-1ce23b289636",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428896169,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428901364,
+      "duration": 5195,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 5)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "3372bf55-012f-47ab-88c4-d3f88394dc5a",
+      "timestamp": 1778428901365,
+      "operationId": "e5b71cdb-8e00-4dbb-a355-436f192b27e0",
+      "transactionId": "21e069f3-5f5f-4345-ba3b-55c1518423df",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428901365,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428906567,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 6)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "3372bf55-012f-47ab-88c4-d3f88394dc5a",
+      "timestamp": 1778428901365,
+      "operationId": "e5b71cdb-8e00-4dbb-a355-436f192b27e0",
+      "transactionId": "21e069f3-5f5f-4345-ba3b-55c1518423df",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428901365,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428906567,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 6)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "272a83f6-c1c3-4d1e-8d1f-2a81d0fe48d8",
+      "timestamp": 1778428906567,
+      "operationId": "55cbed3a-7b92-436b-b032-4ebd068f8569",
+      "transactionId": "6c72dafc-7a6f-453a-91ee-b023a493669a",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428906567,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428911765,
+      "duration": 5198,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 7)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "272a83f6-c1c3-4d1e-8d1f-2a81d0fe48d8",
+      "timestamp": 1778428906567,
+      "operationId": "55cbed3a-7b92-436b-b032-4ebd068f8569",
+      "transactionId": "6c72dafc-7a6f-453a-91ee-b023a493669a",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428906567,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428911765,
+      "duration": 5198,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 7)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "070bc397-0323-42bc-9488-1082d9d167af",
+      "timestamp": 1778428911767,
+      "operationId": "5dcacebb-10b9-4092-a4dc-ff191b95a021",
+      "transactionId": "28193323-573f-4a79-9786-5081e39c28bb",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428911767,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428916969,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 8)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "070bc397-0323-42bc-9488-1082d9d167af",
+      "timestamp": 1778428911767,
+      "operationId": "5dcacebb-10b9-4092-a4dc-ff191b95a021",
+      "transactionId": "28193323-573f-4a79-9786-5081e39c28bb",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428911767,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428916969,
+      "duration": 5202,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 8)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "060d5f8f-b595-41c7-991f-aed1c6b29d17",
+      "timestamp": 1778428916970,
+      "operationId": "b9847b50-a68c-4ec1-87e7-5b301cd8c196",
+      "transactionId": "88f342b2-18a6-40fb-b377-6b1d6a31279a",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428916970,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922175,
+      "duration": 5205,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 9)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "060d5f8f-b595-41c7-991f-aed1c6b29d17",
+      "timestamp": 1778428916970,
+      "operationId": "b9847b50-a68c-4ec1-87e7-5b301cd8c196",
+      "transactionId": "88f342b2-18a6-40fb-b377-6b1d6a31279a",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428916970,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922175,
+      "duration": 5205,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 9)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "04f7ee2c-1c28-4a27-8c26-23dacb0c0a80",
+      "timestamp": 1778428922176,
+      "operationId": "c99ee87e-6082-46bf-8330-63d850c94afc",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "COMMIT",
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428969102,
+      "duration": 46926
+    },
+    {
+      "id": "6045e090-e519-4811-8f03-e04cdc83805b",
+      "timestamp": 1778428922176,
+      "operationId": "9f141a02-53d3-47f8-808e-e4af93fe0892",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "READ",
+      "sql": "SELECT value, version FROM hot_updates WHERE key = ?",
+      "params": [
+        "counter"
+      ],
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 0
+    },
+    {
+      "id": "6045e090-e519-4811-8f03-e04cdc83805b",
+      "timestamp": 1778428922176,
+      "operationId": "9f141a02-53d3-47f8-808e-e4af93fe0892",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "READ",
+      "sql": "SELECT value, version FROM hot_updates WHERE key = ?",
+      "params": [
+        "counter"
+      ],
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "RESERVED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 0
+    },
+    {
+      "id": "236908a1-6121-4dc3-934b-d8320382b0e8",
+      "timestamp": 1778428922176,
+      "operationId": "ea0e3c83-eec5-4ff7-94a2-5fec93885cfe",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE hot_updates SET value = value + 1, version = version + 1 WHERE key = ? AND version = ?",
+      "params": [
+        "counter",
+        1
+      ],
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 0
+    },
+    {
+      "id": "236908a1-6121-4dc3-934b-d8320382b0e8",
+      "timestamp": 1778428922176,
+      "operationId": "ea0e3c83-eec5-4ff7-94a2-5fec93885cfe",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "WRITE",
+      "sql": "UPDATE hot_updates SET value = value + 1, version = version + 1 WHERE key = ? AND version = ?",
+      "params": [
+        "counter",
+        1
+      ],
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "SHARED",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428922176,
+      "duration": 0
+    },
+    {
+      "id": "e361bc9b-c10c-4a63-a3b0-365628089a35",
+      "timestamp": 1778428922176,
+      "operationId": "1e4ea95c-5573-4690-9d1c-057a8c5ffda5",
+      "transactionId": "ece2a6c6-caa9-4214-af3d-e5b0ee39fbb8",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428922176,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428927393,
+      "duration": 5217,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 11)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "e361bc9b-c10c-4a63-a3b0-365628089a35",
+      "timestamp": 1778428922176,
+      "operationId": "1e4ea95c-5573-4690-9d1c-057a8c5ffda5",
+      "transactionId": "ece2a6c6-caa9-4214-af3d-e5b0ee39fbb8",
+      "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428922176,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "50be7fe1-aa57-44ba-a7fc-b7e0456a55c8",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428927393,
+      "duration": 5217,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 11)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "04f7ee2c-1c28-4a27-8c26-23dacb0c0a80",
+      "timestamp": 1778428922176,
+      "operationId": "c99ee87e-6082-46bf-8330-63d850c94afc",
+      "transactionId": "10b781c6-036b-4c9f-9945-bc9eaec55c23",
+      "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+      "operationType": "COMMIT",
+      "startTime": 1778428922176,
+      "status": "SUCCESS",
+      "lockState": {
+        "connectionId": "8c4d0fef-0952-418b-b85d-b08c4532f5c2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428969102,
+      "duration": 46926
+    },
+    {
+      "id": "0570d46b-b814-46b0-b70e-58e553fbf274",
+      "timestamp": 1778428927397,
+      "operationId": "e29c87ee-52a2-4059-a803-7cfb0287459b",
+      "transactionId": "516bf3ec-b5d4-4e15-9d2e-ad95c0b3bdd6",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428927397,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428932598,
+      "duration": 5201,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 12)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "0570d46b-b814-46b0-b70e-58e553fbf274",
+      "timestamp": 1778428927397,
+      "operationId": "e29c87ee-52a2-4059-a803-7cfb0287459b",
+      "transactionId": "516bf3ec-b5d4-4e15-9d2e-ad95c0b3bdd6",
+      "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428927397,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7ea937f9-a900-4208-8470-b309205b96fd",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428932598,
+      "duration": 5201,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 12)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "e4fa90bd-1723-44be-b6c5-c2383e234b00",
+      "timestamp": 1778428932599,
+      "operationId": "51dc70f2-74a2-4de8-8e33-3257f8ccace1",
+      "transactionId": "26399d37-a149-4d82-a727-b6d201fb2a5a",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428932599,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428937814,
+      "duration": 5215,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 13)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "e4fa90bd-1723-44be-b6c5-c2383e234b00",
+      "timestamp": 1778428932599,
+      "operationId": "51dc70f2-74a2-4de8-8e33-3257f8ccace1",
+      "transactionId": "26399d37-a149-4d82-a727-b6d201fb2a5a",
+      "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428932599,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "7dbcb8ec-bc2c-418b-8470-247c912e6172",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428937814,
+      "duration": 5215,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 13)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "b3668830-cef2-4468-99e1-fd1ce8b725aa",
+      "timestamp": 1778428937822,
+      "operationId": "9995a5da-318f-4308-8d9e-ccf687286306",
+      "transactionId": "f6f394b6-b6d7-412e-8df5-722fa88889af",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428937822,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428943042,
+      "duration": 5220,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 14)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "b3668830-cef2-4468-99e1-fd1ce8b725aa",
+      "timestamp": 1778428937822,
+      "operationId": "9995a5da-318f-4308-8d9e-ccf687286306",
+      "transactionId": "f6f394b6-b6d7-412e-8df5-722fa88889af",
+      "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428937822,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "157e48f9-0f8f-46f3-936d-247d94bf5db3",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428943042,
+      "duration": 5220,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 14)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "65fd44dd-c773-45c7-817e-f38ea7e8c473",
+      "timestamp": 1778428943042,
+      "operationId": "f661a943-ab2e-43da-8895-957cf1ddfd72",
+      "transactionId": "4e6d9f7c-40a7-433a-8e53-abef63667e14",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428943042,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428948239,
+      "duration": 5197,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 15)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "65fd44dd-c773-45c7-817e-f38ea7e8c473",
+      "timestamp": 1778428943042,
+      "operationId": "f661a943-ab2e-43da-8895-957cf1ddfd72",
+      "transactionId": "4e6d9f7c-40a7-433a-8e53-abef63667e14",
+      "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428943042,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "3cf06802-609d-47d6-9e1d-e5d8eec85642",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428948239,
+      "duration": 5197,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 15)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "470fcb7a-ad9e-4cb3-8c93-16edb24691f0",
+      "timestamp": 1778428948240,
+      "operationId": "bfd256a9-6ffa-4a4e-aac0-d0417ca34e14",
+      "transactionId": "60c0ce82-077d-4137-885c-893588814aaa",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428948240,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428953453,
+      "duration": 5213,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 16)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "470fcb7a-ad9e-4cb3-8c93-16edb24691f0",
+      "timestamp": 1778428948240,
+      "operationId": "bfd256a9-6ffa-4a4e-aac0-d0417ca34e14",
+      "transactionId": "60c0ce82-077d-4137-885c-893588814aaa",
+      "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428948240,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "c8b9d118-df7a-41dd-b2e7-50f013ba99f6",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428953453,
+      "duration": 5213,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 16)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "49ed7338-9293-43e7-8f42-a2b7ce2f7211",
+      "timestamp": 1778428953453,
+      "operationId": "9b84a91e-399a-41e2-98af-df2ecfa5af49",
+      "transactionId": "0e620317-e45c-499a-9d86-17dec1f59c38",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428953453,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428958681,
+      "duration": 5228,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 17)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "49ed7338-9293-43e7-8f42-a2b7ce2f7211",
+      "timestamp": 1778428953453,
+      "operationId": "9b84a91e-399a-41e2-98af-df2ecfa5af49",
+      "transactionId": "0e620317-e45c-499a-9d86-17dec1f59c38",
+      "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428953453,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "d704c6ef-7d58-41cd-be24-78a5d68eae24",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428958681,
+      "duration": 5228,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 17)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "067d8112-be28-40ce-83d5-15b8144ba374",
+      "timestamp": 1778428958682,
+      "operationId": "4c10c889-94ed-48c1-b075-bb512578cd23",
+      "transactionId": "d65e7934-ed60-41d7-b9b4-9b0d300a00e2",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428958682,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428963895,
+      "duration": 5213,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 18)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "067d8112-be28-40ce-83d5-15b8144ba374",
+      "timestamp": 1778428958682,
+      "operationId": "4c10c889-94ed-48c1-b075-bb512578cd23",
+      "transactionId": "d65e7934-ed60-41d7-b9b4-9b0d300a00e2",
+      "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428958682,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "b0da0b1a-9dcd-4206-bba7-e01d818459d2",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428963895,
+      "duration": 5213,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 18)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "0d0765cf-1db6-40b3-9647-f535b67d768e",
+      "timestamp": 1778428963895,
+      "operationId": "7aa04fe7-7a6a-4e4c-8ac5-8143f553bd70",
+      "transactionId": "b7162aee-0d72-4f77-98ab-818c9b6d743f",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428963895,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428969101,
+      "duration": 5206,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 19)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    },
+    {
+      "id": "0d0765cf-1db6-40b3-9647-f535b67d768e",
+      "timestamp": 1778428963895,
+      "operationId": "7aa04fe7-7a6a-4e4c-8ac5-8143f553bd70",
+      "transactionId": "b7162aee-0d72-4f77-98ab-818c9b6d743f",
+      "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+      "operationType": "ROLLBACK",
+      "startTime": 1778428963895,
+      "status": "FAILED",
+      "lockState": {
+        "connectionId": "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d",
+        "lockType": "NONE",
+        "walFileSize": 0,
+        "checkpointProgress": 1,
+        "pendingWrites": 0,
+        "activeReaders": 0
+      },
+      "retryCount": 0,
+      "endTime": 1778428969101,
+      "duration": 5206,
+      "error": {
+        "message": "database is locked",
+        "code": "SQLITE_BUSY",
+        "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 19)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+        "isLockError": true
+      }
+    }
+  ],
+  "databaseState": {
+    "dbPath": "/Users/lzy/pro/solo/workspaces/zy10016/replay-data/replay.db",
+    "journalMode": "WAL",
+    "autoCommit": true,
+    "walCheckpoint": {
+      "busy": 0,
+      "log": 0,
+      "checkpointed": 0
+    },
+    "pageSize": 0,
+    "pageCount": 0,
+    "freelistCount": 0
+  },
+  "systemInfo": {
+    "nodeVersion": "v22.22.0",
+    "platform": "darwin",
+    "pid": 11028,
+    "uptime": 146.716476875,
+    "memory": {
+      "rss": 256475136,
+      "heapTotal": 129204224,
+      "heapUsed": 122462592,
+      "external": 7771541,
+      "arrayBuffers": 4872287
+    }
+  },
+  "errorContext": {
+    "error": {
+      "message": "database is locked",
+      "code": "SQLITE_BUSY",
+      "stack": "SqliteError: database is locked\n    at Database.exec (/Users/lzy/pro/solo/workspaces/zy10016/node_modules/better-sqlite3/lib/methods/wrappers.js:9:14)\n    at DatabaseConnection.beginTransaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseConnection.ts:86:13)\n    at DatabaseService.transaction (/Users/lzy/pro/solo/workspaces/zy10016/src/core/DatabaseService.ts:225:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async /Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:196:13\n    at async Promise.all (index 19)\n    at async createConcurrentLockConflictScenario (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:217:5)\n    at async main (/Users/lzy/pro/solo/workspaces/zy10016/scripts/replay-error.ts:330:47)",
+      "isLockError": true
+    },
+    "operationIndex": 89,
+    "affectedConnections": [
+      "44d79097-0f91-4b6f-bdf1-48c4e09fcb9d"
+    ],
+    "timestamp": 1778428963895
+  }
+}

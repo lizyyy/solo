@@ -42,12 +42,14 @@ export interface ReplayConfig {
   timingAccuracy: 'EXACT' | 'APPROXIMATE' | 'IGNORE';
   maxParallelOperations: number;
   replayLogger: Logger;
+  regenerateUniqueValues?: boolean;
 }
 
 export class ErrorReplayer {
   private readonly records: Map<string, ReplayRecord> = new Map();
   private readonly originalDbPath: string;
   private readonly config: Partial<ReplayConfig>;
+  private readonly uniqueValueMap = new Map<string, string>();
 
   constructor(originalDbPath: string, config?: Partial<ReplayConfig>) {
     this.originalDbPath = originalDbPath;
@@ -93,6 +95,8 @@ export class ErrorReplayer {
     if (!record) {
       throw new Error(`Replay record not found: ${recordId}`);
     }
+
+    this.uniqueValueMap.clear();
 
     const effectiveConfig = { ...this.config, ...config };
     const logger = config?.replayLogger || service.getLogger();
@@ -154,7 +158,7 @@ export class ErrorReplayer {
       const opStartTime = Date.now();
 
       try {
-        await this.executeOperation(service, op);
+        await this.executeOperation(service, op, config.regenerateUniqueValues || false);
         result.operationsExecuted++;
         result.timingMetrics.push({
           index: i,
@@ -214,7 +218,7 @@ export class ErrorReplayer {
 
     while (index < operations.length) {
       const batch = operations.slice(index, index + maxParallel);
-      const promises = batch.map((op, i) => this.executeOperationWithResult(service, op, index + i));
+      const promises = batch.map((op, i) => this.executeOperationWithResult(service, op, index + i, config.regenerateUniqueValues || false));
 
       const results = await Promise.allSettled(promises);
 
@@ -277,7 +281,7 @@ export class ErrorReplayer {
         const opStartTime = Date.now();
 
         try {
-          await this.executeOperation(service, op);
+          await this.executeOperation(service, op, config.regenerateUniqueValues || false);
           result.operationsExecuted++;
           result.timingMetrics.push({
             index: executionIndex,
@@ -307,37 +311,87 @@ export class ErrorReplayer {
     await executeTimeline();
   }
 
+  private regenerateUniqueValue(originalValue: string, prefix: string): string {
+    if (this.uniqueValueMap.has(originalValue)) {
+      return this.uniqueValueMap.get(originalValue)!;
+    }
+
+    const newValue = `${prefix}_${uuidv4().slice(0, 8)}`;
+    this.uniqueValueMap.set(originalValue, newValue);
+    return newValue;
+  }
+
+  private transformParamsForReplay(params: unknown[] | undefined): unknown[] | undefined {
+    if (!params) return params;
+
+    return params.map((param) => {
+      if (typeof param !== 'string') return param;
+
+      if (param.startsWith('TX_')) {
+        return this.regenerateUniqueValue(param, 'TX_R');
+      }
+
+      return param;
+    });
+  }
+
+  private transformSqlForReplay(sql: string): string {
+    let transformed = sql;
+
+    const txPattern = /TX_[a-z0-9_-]{4,32}/gi;
+    transformed = transformed.replace(txPattern, (match) => {
+      return this.regenerateUniqueValue(match, 'TX_R');
+    });
+
+    return transformed;
+  }
+
   private async executeOperation(
     service: DatabaseService,
-    op: ReplayOperation
+    op: ReplayOperation,
+    regenerateUniqueValues: boolean = false
   ): Promise<void> {
+    let sql = op.sql;
+    let params = op.params;
+
+    if (regenerateUniqueValues) {
+      sql = this.transformSqlForReplay(sql);
+      params = this.transformParamsForReplay(params);
+    }
+
     if (op.type === 'WRITE' || op.type === 'BEGIN_TRANSACTION') {
-      await service.run(op.sql, op.params);
+      await service.run(sql, params);
     } else if (op.type === 'READ') {
-      await service.all(op.sql, op.params);
+      await service.all(sql, params);
     }
   }
 
   private async executeOperationWithResult(
     service: DatabaseService,
     op: ReplayOperation,
-    index: number
+    index: number,
+    regenerateUniqueValues: boolean = false
   ): Promise<{ index: number; success: boolean }> {
-    await this.executeOperation(service, op);
+    await this.executeOperation(service, op, regenerateUniqueValues);
     return { index, success: true };
   }
 
   private extractWriteOperations(logEntries: LogEntry[]): ReplayOperation[] {
     const operations: ReplayOperation[] = [];
+    const seenOperations = new Set<string>();
 
     for (const entry of logEntries) {
       if (entry.sql && entry.status !== 'PENDING') {
-        operations.push({
-          type: entry.operationType,
-          sql: entry.sql,
-          params: entry.params,
-          timestamp: entry.timestamp,
-        });
+        const key = `${entry.id}-${entry.sql}-${JSON.stringify(entry.params)}`;
+        if (!seenOperations.has(key)) {
+          seenOperations.add(key);
+          operations.push({
+            type: entry.operationType,
+            sql: entry.sql,
+            params: entry.params,
+            timestamp: entry.timestamp,
+          });
+        }
       }
     }
 
