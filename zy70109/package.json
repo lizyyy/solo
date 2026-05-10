@@ -1,0 +1,15 @@
+{
+  "name": "land-transfer-contract-api",
+  "version": "1.0.0",
+  "description": "土地流转合同履约 API 服务端原型",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^11.0.2"
+  }
+}
