@@ -1,0 +1,92 @@
+{
+  "log_id": "LOG20260510191154",
+  "shift_start": "2026-05-10T08:00:00",
+  "shift_end": "2026-05-10T20:00:00",
+  "operator_on_duty": "张保安",
+  "total_entries": 4,
+  "total_exits": 4,
+  "blocked_entries": 0,
+  "violations": 1,
+  "events": [
+    {
+      "event_id": "EVT20260510100000000",
+      "event_type": "entry",
+      "plate_number": "京A12345",
+      "event_time": "2026-05-10T10:00:00",
+      "gate_name": "南门",
+      "operator": "张保安",
+      "result": "allowed",
+      "remark": "入场检查通过"
+    },
+    {
+      "event_id": "EVT20260510110000000",
+      "event_type": "entry",
+      "plate_number": "京B00001",
+      "event_time": "2026-05-10T11:00:00",
+      "gate_name": "南门",
+      "operator": "李保安",
+      "result": "allowed",
+      "remark": "入场检查通过"
+    },
+    {
+      "event_id": "EVT20260510150000000",
+      "event_type": "exit",
+      "plate_number": "京A12345",
+      "event_time": "2026-05-10T15:00:00",
+      "gate_name": "南门",
+      "operator": "张保安",
+      "result": "allowed",
+      "remark": "离场检查通过"
+    },
+    {
+      "event_id": "EVT20260510160000000",
+      "event_type": "exit",
+      "plate_number": "京B67890",
+      "event_time": "2026-05-10T16:00:00",
+      "gate_name": "南门",
+      "operator": "李保安",
+      "result": "blocked",
+      "remark": "出场异常：该车辆不在园区内（未入场或已出场）"
+    },
+    {
+      "event_id": "EVT20260510143000000",
+      "event_type": "entry",
+      "plate_number": "京C11111",
+      "event_time": "2026-05-10T14:30:00",
+      "gate_name": "南门",
+      "operator": "王保安",
+      "result": "allowed",
+      "remark": "入场检查通过"
+    },
+    {
+      "event_id": "EVT20260510173000000",
+      "event_type": "exit",
+      "plate_number": "京C11111",
+      "event_time": "2026-05-10T17:30:00",
+      "gate_name": "南门",
+      "operator": "王保安",
+      "result": "allowed",
+      "remark": "超时离场：超时 1.5 小时"
+    },
+    {
+      "event_id": "EVT20260510093000000",
+      "event_type": "entry",
+      "plate_number": "京D22222",
+      "event_time": "2026-05-10T09:30:00",
+      "gate_name": "南门",
+      "operator": "赵保安",
+      "result": "allowed",
+      "remark": "入场检查通过"
+    },
+    {
+      "event_id": "EVT20260510113000000",
+      "event_type": "exit",
+      "plate_number": "京D22222",
+      "event_time": "2026-05-10T11:30:00",
+      "gate_name": "南门",
+      "operator": "赵保安",
+      "result": "allowed",
+      "remark": "离场检查通过"
+    }
+  ]
+}

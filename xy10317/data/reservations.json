@@ -1,0 +1,82 @@
+{
+  "RES20260510190659JHKP": {
+    "reservation_id": "RES20260510190659JHKP",
+    "visitor": {
+      "visitor_name": "张三",
+      "visitor_id": "110101199001011234",
+      "visitor_phone": "13800138001",
+      "visitor_company": "科技有限公司"
+    },
+    "vehicle": {
+      "plate_number": "京A12345",
+      "vehicle_type": "小型车",
+      "color": ""
+    },
+    "intended_arrival_time": "2026-05-10T09:00:00",
+    "intended_departure_time": "2026-05-10T18:00:00",
+    "access_area": "全园区",
+    "approved": true,
+    "status": "active",
+    "created_at": "2026-05-10T19:06:59.179982"
+  },
+  "RES20260510190659IANP": {
+    "reservation_id": "RES20260510190659IANP",
+    "visitor": {
+      "visitor_name": "李四",
+      "visitor_id": "110101199002022345",
+      "visitor_phone": "13800138002",
+      "visitor_company": "贸易有限公司"
+    },
+    "vehicle": {
+      "plate_number": "京B00001",
+      "vehicle_type": "小型车",
+      "color": ""
+    },
+    "intended_arrival_time": "2026-05-10T10:00:00",
+    "intended_departure_time": "2026-05-10T17:00:00",
+    "access_area": "A栋",
+    "approved": true,
+    "status": "active",
+    "created_at": "2026-05-10T19:06:59.184105"
+  },
+  "RES20260510190659D6TA": {
+    "reservation_id": "RES20260510190659D6TA",
+    "visitor": {
+      "visitor_name": "王五",
+      "visitor_id": "110101199003033456",
+      "visitor_phone": "13800138003",
+      "visitor_company": "咨询有限公司"
+    },
+    "vehicle": {
+      "plate_number": "京C11111",
+      "vehicle_type": "小型车",
+      "color": ""
+    },
+    "intended_arrival_time": "2026-05-10T14:00:00",
+    "intended_departure_time": "2026-05-10T16:00:00",
+    "access_area": "全园区",
+    "approved": true,
+    "status": "active",
+    "created_at": "2026-05-10T19:06:59.189503"
+  },
+  "RES20260510190659273G": {
+    "reservation_id": "RES20260510190659273G",
+    "visitor": {
+      "visitor_name": "赵六",
+      "visitor_id": "110101199004044567",
+      "visitor_phone": "13800138004",
+      "visitor_company": "网络科技公司"
+    },
+    "vehicle": {
+      "plate_number": "京D22222",
+      "vehicle_type": "小型车",
+      "color": ""
+    },
+    "intended_arrival_time": "2026-05-10T09:00:00",
+    "intended_departure_time": "2026-05-10T12:00:00",
+    "access_area": "全园区",
+    "approved": true,
+    "status": "active",
+    "created_at": "2026-05-10T19:06:59.209016"
+  }
+}
