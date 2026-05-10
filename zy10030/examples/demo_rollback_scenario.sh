@@ -75,6 +75,27 @@ for i in 1 2 3 4 5; do
 done
 echo ""
 
+echo "[Step 5.5] Simulating duplicate message consumption to test idempotency..."
+DUPLICATE_RESPONSE=$(curl -s -X POST "$BASE_URL/duplicate-consumption/simulate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event_type": "order_created",
+    "service_name": "order-service",
+    "release_id": 1,
+    "version": "v2.0.0",
+    "count": 3,
+    "payload": {"order_id": 12345, "amount": 99.99}
+  }')
+MESSAGE_ID=$(echo "$DUPLICATE_RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['data']['message_id'])")
+DUPLICATE_COUNT=$(echo "$DUPLICATE_RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['data']['count'])")
+echo "✓ Simulated $DUPLICATE_COUNT duplicate consumptions, Message ID: $MESSAGE_ID"
+echo ""
+
+echo "[Step 5.6] Viewing dedup records..."
+DEDUP_RECORDS=$(curl -s "$BASE_URL/dedup-records?message_id=$MESSAGE_ID")
+echo "$DEDUP_RECORDS" | python3 -m json.tool
+echo ""
+
 echo "[Step 6] Triggering rollback due to detected issues..."
 ROLLBACK_RESPONSE=$(curl -s -X POST "$BASE_URL/releases/$RELEASE_ID/rollback" \
   -H "Content-Type: application/json" \

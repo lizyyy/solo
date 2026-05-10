@@ -30,6 +30,7 @@ type FaultInjectionService struct {
 	enabled          bool
 	configs          map[int64]*model.FaultInjectionConfig
 	activeFaults     map[string]*ActiveFault
+	concurrencyState map[string]*ConcurrencyState
 	mu               sync.RWMutex
 	maxConcurrent    int
 	queueSize        int
@@ -41,21 +42,28 @@ type FaultInjectionService struct {
 	backoffStrategy  string
 }
 
-type ActiveFault struct {
-	ID         int64
-	Name       string
-	FaultType  FaultType
-	Target     string
-	Enabled    bool
-	Config     map[string]interface{}
-	Probability float64
-	ExpiresAt  time.Time
-	CreatedAt  time.Time
+type ConcurrencyState struct {
+	mu            sync.Mutex
+	semaphore     chan struct{}
+	queue         chan struct{}
+	maxConcurrent int
 }
 
-func NewFaultInjectionService(enabled bool, maxConcurrent, queueSize int, minTimeout, maxTimeout string, 
+type ActiveFault struct {
+	ID          int64
+	Name        string
+	FaultType   FaultType
+	Target      string
+	Enabled     bool
+	Config      map[string]interface{}
+	Probability float64
+	ExpiresAt   time.Time
+	CreatedAt   time.Time
+}
+
+func NewFaultInjectionService(enabled bool, maxConcurrent, queueSize int, minTimeout, maxTimeout string,
 	timeoutProb, networkFailProb float64, networkRetry int, backoffStrategy string) *FaultInjectionService {
-	
+
 	minTD, _ := time.ParseDuration(minTimeout)
 	maxTD, _ := time.ParseDuration(maxTimeout)
 	if minTD <= 0 {
@@ -66,28 +74,29 @@ func NewFaultInjectionService(enabled bool, maxConcurrent, queueSize int, minTim
 	}
 
 	return &FaultInjectionService{
-		enabled:         enabled,
-		configs:         make(map[int64]*model.FaultInjectionConfig),
-		activeFaults:    make(map[string]*ActiveFault),
-		maxConcurrent:   maxConcurrent,
-		queueSize:       queueSize,
-		minTimeout:      minTD,
-		maxTimeout:      maxTD,
-		timeoutProb:     timeoutProb,
-		networkFailProb: networkFailProb,
-		networkRetry:    networkRetry,
-		backoffStrategy: backoffStrategy,
+		enabled:          enabled,
+		configs:          make(map[int64]*model.FaultInjectionConfig),
+		activeFaults:     make(map[string]*ActiveFault),
+		concurrencyState: make(map[string]*ConcurrencyState),
+		maxConcurrent:    maxConcurrent,
+		queueSize:        queueSize,
+		minTimeout:       minTD,
+		maxTimeout:       maxTD,
+		timeoutProb:      timeoutProb,
+		networkFailProb:  networkFailProb,
+		networkRetry:     networkRetry,
+		backoffStrategy:  backoffStrategy,
 	}
 }
 
-func (s *FaultInjectionService) CreateFaultConfig(ctx context.Context, name, faultType, targetService string, 
+func (s *FaultInjectionService) CreateFaultConfig(ctx context.Context, name, faultType, targetService string,
 	enabled bool, config map[string]interface{}, probability float64, durationSeconds int, createdBy string) (*model.FaultInjectionConfig, error) {
-	
+
 	ctx, span := tracer.StartSpan(ctx, "fault_injection.CreateFaultConfig")
 	defer span.End()
 
 	configJSON, _ := json.Marshal(config)
-	
+
 	now := time.Now()
 	cfg := &model.FaultInjectionConfig{
 		Name:            name,
@@ -164,9 +173,9 @@ func (s *FaultInjectionService) activateFault(cfg *model.FaultInjectionConfig) {
 	var configMap map[string]interface{}
 	json.Unmarshal(cfg.Config, &configMap)
 
-	expiresAt := time.Now()
+	var expiresAt time.Time
 	if cfg.DurationSeconds > 0 {
-		expiresAt = expiresAt.Add(time.Duration(cfg.DurationSeconds) * time.Second)
+		expiresAt = time.Now().Add(time.Duration(cfg.DurationSeconds) * time.Second)
 	}
 
 	active := &ActiveFault{
@@ -213,10 +222,10 @@ func (s *FaultInjectionService) GetActiveFault(targetService string) *ActiveFaul
 
 	now := time.Now()
 	for _, fault := range s.activeFaults {
-		if (fault.Target == targetService || fault.Target == "*") && 
-		   fault.Enabled && 
-		   (fault.ExpiresAt.IsZero() || fault.ExpiresAt.After(now)) {
-			
+		if (fault.Target == targetService || fault.Target == "*") &&
+			fault.Enabled &&
+			(fault.ExpiresAt.IsZero() || fault.ExpiresAt.After(now)) {
+
 			if rand.Float64() < fault.Probability {
 				return fault
 			}
@@ -262,7 +271,7 @@ func (s *FaultInjectionService) InjectFault(ctx context.Context, targetService s
 
 func (s *FaultInjectionService) injectTimeout(ctx context.Context, fault *ActiveFault, handler func() error) error {
 	timeout := s.minTimeout + time.Duration(rand.Int63n(int64(s.maxTimeout-s.minTimeout)))
-	
+
 	if customMin, ok := fault.Config["min_timeout"].(string); ok {
 		if customMinTD, err := time.ParseDuration(customMin); err == nil {
 			timeout = customMinTD
@@ -294,19 +303,19 @@ func (s *FaultInjectionService) injectTimeout(ctx context.Context, fault *Active
 
 func (s *FaultInjectionService) injectNetworkError(ctx context.Context, fault *ActiveFault, handler func() error) error {
 	logger.Info("Injecting network error fault with retry")
-	
+
 	backoff := 100 * time.Millisecond
 	for attempt := 0; attempt <= s.networkRetry; attempt++ {
 		if attempt > 0 {
 			logger.WithField("attempt", attempt).Info("Retrying after network error")
-			
+
 			switch s.backoffStrategy {
 			case "exponential":
 				backoff *= 2
 			case "linear":
 				backoff += 100 * time.Millisecond
 			}
-			
+
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
@@ -340,8 +349,35 @@ func (s *FaultInjectionService) injectSlowDBQuery(ctx context.Context, fault *Ac
 
 	logger.WithField("delay", delay).Info("Injecting slow DB query fault")
 	time.Sleep(delay)
-	
+
 	return handler()
+}
+
+func (s *FaultInjectionService) getConcurrencyState(targetService string, maxConcurrent, queueSize int) *ConcurrencyState {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	key := targetService
+	state, exists := s.concurrencyState[key]
+	if exists {
+		if state.maxConcurrent != maxConcurrent {
+			state = &ConcurrencyState{
+				semaphore:     make(chan struct{}, maxConcurrent),
+				queue:         make(chan struct{}, queueSize),
+				maxConcurrent: maxConcurrent,
+			}
+			s.concurrencyState[key] = state
+		}
+	} else {
+		state = &ConcurrencyState{
+			semaphore:     make(chan struct{}, maxConcurrent),
+			queue:         make(chan struct{}, queueSize),
+			maxConcurrent: maxConcurrent,
+		}
+		s.concurrencyState[key] = state
+	}
+
+	return state
 }
 
 func (s *FaultInjectionService) injectHighConcurrency(ctx context.Context, fault *ActiveFault, handler func() error) error {
@@ -351,16 +387,15 @@ func (s *FaultInjectionService) injectHighConcurrency(ctx context.Context, fault
 	}
 
 	logger.WithField("max_concurrent", maxConcurrent).Info("Injecting high concurrency fault")
-	
-	sem := make(chan struct{}, maxConcurrent)
-	queue := make(chan struct{}, s.queueSize)
-	
+
+	state := s.getConcurrencyState(fault.Target, maxConcurrent, s.queueSize)
+
 	select {
-	case queue <- struct{}{}:
-		defer func() { <-queue }()
+	case state.queue <- struct{}{}:
+		defer func() { <-state.queue }()
 		select {
-		case sem <- struct{}{}:
-			defer func() { <-sem }()
+		case state.semaphore <- struct{}{}:
+			defer func() { <-state.semaphore }()
 			return handler()
 		case <-ctx.Done():
 			return fmt.Errorf("concurrency limit reached, request queued and timed out")
@@ -406,10 +441,10 @@ func (s *FaultInjectionService) GetFaultConfigByID(ctx context.Context, id int64
 
 func (s *FaultInjectionService) SimulateRequest(targetService string) (int, error) {
 	ctx := context.Background()
-	
+
 	var statusCode int
 	var err error
-	
+
 	err = s.InjectFault(ctx, targetService, func() error {
 		statusCode = http.StatusOK
 		return nil
@@ -432,4 +467,3 @@ func (s *FaultInjectionService) SimulateRequest(targetService string) (int, erro
 
 	return statusCode, err
 }
-

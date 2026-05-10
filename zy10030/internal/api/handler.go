@@ -2,23 +2,26 @@ package api
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
+	"grayscale-simulator/internal/model"
 	"grayscale-simulator/internal/service"
 	"grayscale-simulator/pkg/logger"
 )
 
 type Handler struct {
-	grayReleaseService   *service.GrayReleaseService
-	rollbackEngine       *service.RollbackEngine
+	grayReleaseService    *service.GrayReleaseService
+	rollbackEngine        *service.RollbackEngine
 	faultInjectionService *service.FaultInjectionService
-	messageConsumer      *service.MessageConsumerService
-	traceService         *service.TraceService
-	reportService        *service.ReportService
+	messageConsumer       *service.MessageConsumerService
+	traceService          *service.TraceService
+	reportService         *service.ReportService
 }
 
 func NewHandler(
@@ -30,12 +33,12 @@ func NewHandler(
 	report *service.ReportService,
 ) *Handler {
 	return &Handler{
-		grayReleaseService:   grayRelease,
-		rollbackEngine:       rollback,
+		grayReleaseService:    grayRelease,
+		rollbackEngine:        rollback,
 		faultInjectionService: faultInjection,
-		messageConsumer:      consumer,
-		traceService:         trace,
-		reportService:        report,
+		messageConsumer:       consumer,
+		traceService:          trace,
+		reportService:         report,
 	}
 }
 
@@ -527,3 +530,51 @@ func (h *Handler) GetDedupRecords(c *gin.Context) {
 	respondSuccess(c, records)
 }
 
+func (h *Handler) SimulateDuplicateConsumption(c *gin.Context) {
+	ctx := context.Background()
+
+	var req struct {
+		EventType   string                 `json:"event_type" binding:"required"`
+		ServiceName string                 `json:"service_name"`
+		ReleaseID   int64                  `json:"release_id"`
+		Version     string                 `json:"version"`
+		InstanceID  string                 `json:"instance_id"`
+		Payload     map[string]interface{} `json:"payload"`
+		Count       int                    `json:"count"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respondError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if req.Count < 2 {
+		req.Count = 2
+	}
+
+	event := &model.GrayEvent{
+		EventType:   req.EventType,
+		ServiceName: req.ServiceName,
+		ReleaseID:   req.ReleaseID,
+		Version:     req.Version,
+		InstanceID:  req.InstanceID,
+		Timestamp:   time.Now(),
+	}
+
+	if req.Payload != nil {
+		payloadBytes, _ := json.Marshal(req.Payload)
+		event.Payload = payloadBytes
+	}
+
+	if err := h.messageConsumer.SimulateDuplicateConsumption(ctx, event, req.Count); err != nil {
+		respondError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondSuccess(c, map[string]interface{}{
+		"status":     "simulated",
+		"event_type": req.EventType,
+		"count":      req.Count,
+		"message_id": fmt.Sprintf("%s-%d-%s", req.EventType, req.ReleaseID, event.Timestamp.Format(time.RFC3339Nano)),
+	})
+}

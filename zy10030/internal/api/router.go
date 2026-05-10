@@ -45,6 +45,8 @@ func SetupRouter(handler *Handler) *gin.Engine {
 		faults.GET("/simulate", handler.SimulateFaultRequest)
 	}
 
+	api.POST("/duplicate-consumption/simulate", handler.SimulateDuplicateConsumption)
+
 	traces := api.Group("/traces")
 	{
 		traces.GET("", handler.SearchTraces)
@@ -100,4 +102,3 @@ func requestIDMiddleware() gin.HandlerFunc {
 func generateRequestID() string {
 	return "req-" + time.Now().Format("20060102150405")
 }
-
