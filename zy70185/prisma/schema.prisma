@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum BudgetVersionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  LOCKED
+  REJECTED
+  ROLLBACK_REQUESTED
+  ROLLBACK_APPROVED
+  ROLLBACK_REJECTED
+}
+
+enum DepartmentSubmissionStatus {
+  PENDING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  RESUBMITTED
+  LOCKED
+}
+
+enum LockWindowStatus {
+  OPEN
+  CLOSED
+  LOCKED
+}
+
+enum ApprovalAction {
+  SUBMIT
+  REVIEW
+  APPROVE
+  REJECT
+  LOCK
+  ROLLBACK_REQUEST
+  ROLLBACK_APPROVE
+  ROLLBACK_REJECT
+}
+
+enum Role {
+  ADMIN
+  FINANCE
+  DEPARTMENT_HEAD
+  VIEWER
+}
+
+model Department {
+  id          String                 @id @default(uuid())
+  name        String                 @unique
+  code        String                 @unique
+  description String?
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  submissions DepartmentSubmission[]
+  users       User[]
+}
+
+model User {
+  id           String                 @id @default(uuid())
+  username     String                 @unique
+  email        String                 @unique
+  name         String
+  role         Role
+  departmentId String?
+  department   Department?              @relation(fields: [departmentId], references: [id])
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  submissions  DepartmentSubmission[]
+  approvals    ApprovalRecord[]
+}
+
+model BudgetVersion {
+  id               String                 @id @default(uuid())
+  year               Int
+  quarter            Int
+  version            Int
+  status             BudgetVersionStatus  @default(DRAFT)
+  description        String?
+  isLocked           Boolean              @default(false)
+  lockedAt           DateTime?
+  lockedBy           String?
+  previousVersionId  String?
+  previousVersion    BudgetVersion?       @relation("BudgetVersionHistory", fields: [previousVersionId], references: [id])
+  nextVersions       BudgetVersion[]    @relation("BudgetVersionHistory")
+  submissions        DepartmentSubmission[]
+  lockWindows        LockWindow[]
+  reports            ForecastReport[]
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  @@unique([year, quarter, version])
+}
+
+model DepartmentSubmission {
+  id               String                       @id @default(uuid())
+  budgetVersionId String
+  budgetVersion    BudgetVersion            @relation(fields: [budgetVersionId], references: [id])
+  departmentId    String
+  department       Department               @relation(fields: [departmentId], references: [id])
+  version          Int
+  status           DepartmentSubmissionStatus @default(PENDING)
+  submittedBy      String?
+  submittedAt      DateTime?
+  reviewedBy       String?
+  reviewedAt     DateTime?
+  approvedBy       String?
+  approvedAt       DateTime?
+  lockedAt         DateTime?
+  data             Json?
+  differenceNotes  DifferenceNote[]
+  approvalRecords  ApprovalRecord[]
+  reports         ForecastReport[]
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@unique([budgetVersionId, departmentId, version])
+}
+
+model LockWindow {
+  id               String             @id @default(uuid())
+  budgetVersionId String
+  budgetVersion    BudgetVersion    @relation(fields: [budgetVersionId], references: [id])
+  name             String
+  description      String?
+  status           LockWindowStatus @default(OPEN)
+  startDate        DateTime
+  endDate          DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model ApprovalRecord {
+  id                   String             @id @default(uuid())
+  submissionId       String
+  submission          DepartmentSubmission @relation(fields: [submissionId], references: [id])
+  action               ApprovalAction
+  actorId            String
+  actor              User               @relation(fields: [actorId], references: [id])
+  comment            String?
+  createdAt          DateTime           @default(now())
+}
+
+model DifferenceNote {
+  id                   String             @id @default(uuid())
+  submissionId       String
+  submission          DepartmentSubmission @relation(fields: [submissionId], references: [id])
+  category             String
+  description          String
+  amount              Decimal
+  previousValue       Decimal?
+  currentValue         Decimal?
+  createdBy            String
+  createdAt          DateTime           @default(now())
+}
+
+model ForecastReport {
+  id                   String             @id @default(uuid())
+  name             String
+  description      String?
+  budgetVersionId String
+  budgetVersion    BudgetVersion    @relation(fields: [budgetVersionId], references: [id])
+  submissionId       String?
+  submission          DepartmentSubmission? @relation(fields: [submissionId], references: [id])
+  type                 String
+  data             Json
+  generatedBy          String
+  affectsFinalResult Boolean              @default(true)
+  createdAt          DateTime           @default(now())
+}
