@@ -3,12 +3,11 @@ import { apiService } from '../services/api';
 import { SystemState } from '../types';
 
 interface PlaybackControlProps {
-  onPlaybackState: (state: SystemState | null) => void;
+  onPlaybackState?: (state: SystemState | null) => void;
   onPlaybackModeChange: (isPlayback: boolean) => void;
 }
 
 export const PlaybackControl: React.FC<PlaybackControlProps> = ({
-  onPlaybackState,
   onPlaybackModeChange,
 }) => {
   const [isPlaybackMode, setIsPlaybackMode] = useState(false);
@@ -70,8 +69,6 @@ export const PlaybackControl: React.FC<PlaybackControlProps> = ({
       onPlaybackModeChange(true);
       if (response.current_idx !== undefined) {
         setCurrentIndex(response.current_idx);
-        const snapshot = await apiService.getSnapshotByIndex(response.current_idx);
-        onPlaybackState(snapshot);
       }
       if (response.total_idx !== undefined) {
         setTotalSnapshots(response.total_idx);
@@ -88,7 +85,6 @@ export const PlaybackControl: React.FC<PlaybackControlProps> = ({
       setIsPlaybackMode(false);
       setCurrentIndex(0);
       onPlaybackModeChange(false);
-      onPlaybackState(null);
     } catch (e) {
       console.error('Failed to stop playback:', e);
     }
@@ -97,11 +93,8 @@ export const PlaybackControl: React.FC<PlaybackControlProps> = ({
   const handleJump = async (index: number) => {
     try {
       const response = await apiService.playbackControl('step', index);
-      setCurrentIndex(index);
       if (response.current_idx !== undefined) {
         setCurrentIndex(response.current_idx);
-        const snapshot = await apiService.getSnapshotByIndex(response.current_idx);
-        onPlaybackState(snapshot);
       }
     } catch (e) {
       console.error('Failed to jump to snapshot:', e);

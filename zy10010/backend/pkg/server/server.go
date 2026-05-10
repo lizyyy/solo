@@ -354,7 +354,7 @@ func (s *Server) startPlayback() {
 
 func (s *Server) broadcastSnapshot(snapshot types.SystemState) {
 	message := map[string]interface{}{
-		"type":  "state",
+		"type":  "playback_state",
 		"state": snapshot,
 	}
 

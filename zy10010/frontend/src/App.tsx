@@ -1,16 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWebSocket } from './hooks/useWebSocket';
 import { MetricsPanel } from './components/MetricsPanel';
 import { EventTimeline } from './components/EventTimeline';
 import { ScenarioControl } from './components/ScenarioControl';
 import { SystemDetails } from './components/SystemDetails';
 import { PlaybackControl } from './components/PlaybackControl';
-import { SystemState } from './types';
 
 function App() {
-  const { events, currentState, isConnected, clearEvents } = useWebSocket();
-  const [playbackState, setPlaybackState] = useState<SystemState | null>(null);
+  const { events, currentState, playbackState, isConnected, clearEvents, clearPlaybackState } = useWebSocket();
   const [isPlaybackMode, setIsPlaybackMode] = useState(false);
+
+  useEffect(() => {
+    if (playbackState && !isPlaybackMode) {
+      setIsPlaybackMode(true);
+    }
+  }, [playbackState, isPlaybackMode]);
+
+  const handlePlaybackModeChange = (isPlayback: boolean) => {
+    setIsPlaybackMode(isPlayback);
+    if (!isPlayback) {
+      clearPlaybackState();
+    }
+  };
 
   const displayState = isPlaybackMode ? playbackState : currentState;
 
@@ -43,8 +54,8 @@ function App() {
           <div className="col-span-3 space-y-6">
             <ScenarioControl onReset={clearEvents} />
             <PlaybackControl
-              onPlaybackState={setPlaybackState}
-              onPlaybackModeChange={setIsPlaybackMode}
+              onPlaybackState={() => {}}
+              onPlaybackModeChange={handlePlaybackModeChange}
             />
           </div>
 

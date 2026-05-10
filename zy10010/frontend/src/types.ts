@@ -86,7 +86,7 @@ export interface SystemState {
 }
 
 export interface WSMessage {
-  type: 'event' | 'state';
+  type: 'event' | 'state' | 'playback_state';
   event?: Event;
   state?: SystemState;
 }

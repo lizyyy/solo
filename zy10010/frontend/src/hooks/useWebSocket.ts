@@ -4,6 +4,7 @@ import { Event, SystemState, WSMessage } from '../types';
 export function useWebSocket() {
   const [events, setEvents] = useState<Event[]>([]);
   const [currentState, setCurrentState] = useState<SystemState | null>(null);
+  const [playbackState, setPlaybackState] = useState<SystemState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectTimerRef = useRef<number | null>(null);
@@ -34,6 +35,8 @@ export function useWebSocket() {
             });
           } else if (data.type === 'state' && data.state) {
             setCurrentState(data.state);
+          } else if (data.type === 'playback_state' && data.state) {
+            setPlaybackState(data.state);
           }
         } catch (e) {
           console.error('Failed to parse WebSocket message:', e);
@@ -72,5 +75,9 @@ export function useWebSocket() {
     setEvents([]);
   }, []);
 
-  return { events, currentState, isConnected, clearEvents };
+  const clearPlaybackState = useCallback(() => {
+    setPlaybackState(null);
+  }, []);
+
+  return { events, currentState, playbackState, isConnected, clearEvents, clearPlaybackState };
 }
