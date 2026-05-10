@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>木材烘干窑曲线校准台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h1>木材烘干窑曲线校准台</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="createBatchBtn">新建校准批次</button>
+                <button class="btn btn-secondary" id="importBatchBtn">导入曲线</button>
+                <button class="btn btn-info" id="showDocBtn">使用说明</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        <section class="stats-bar" id="statsBar">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">总批次</div>
+            </div>
+            <div class="stat-card stat-success">
+                <div class="stat-value" id="statPassed">0</div>
+                <div class="stat-label">正常通过</div>
+            </div>
+            <div class="stat-card stat-warning">
+                <div class="stat-value" id="statReview">0</div>
+                <div class="stat-label">需人工处理</div>
+            </div>
+            <div class="stat-card stat-danger">
+                <div class="stat-value" id="statFailed">0</div>
+                <div class="stat-label">校准失败</div>
+            </div>
+            <div class="stat-card stat-info">
+                <div class="stat-value" id="statPending">0</div>
+                <div class="stat-label">待处理</div>
+            </div>
+        </section>
+
+        <section class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>批次状态：</label>
+                    <select id="filterStatus">
+                        <option value="">全部状态</option>
+                        <option value="PENDING">待校准</option>
+                        <option value="CURVE_VERIFICATION">曲线验证中</option>
+                        <option value="MODEL_VERIFICATION">模型验证中</option>
+                        <option value="BATCH_COMPARISON">批次对比中</option>
+                        <option value="PASSED">正常通过</option>
+                        <option value="NEEDS_REVIEW">需人工处理</option>
+                        <option value="FAILED">校准失败</option>
+                        <option value="RE_CALIBRATION">重新校准</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>木材种类：</label>
+                    <select id="filterWoodType">
+                        <option value="">全部种类</option>
+                        <option value="pine">松木</option>
+                        <option value="oak">橡木</option>
+                        <option value="maple">枫木</option>
+                        <option value="birch">桦木</option>
+                        <option value="cedar">杉木</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>关键词搜索：</label>
+                    <input type="text" id="searchInput" placeholder="输入批次号或备注...">
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-secondary" id="resetFilterBtn">重置筛选</button>
+                    <button class="btn btn-primary" id="exportBtn">导出数据</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="list-section">
+            <table class="data-table" id="batchTable">
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>木材种类</th>
+                        <th>初始含水率(%)</th>
+                        <th>目标含水率(%)</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <th>验证结果</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="batchTableBody">
+                </tbody>
+            </table>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <p>暂无校准批次数据</p>
+                <button class="btn btn-primary" id="emptyCreateBtn">新建第一个批次</button>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="createModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新建校准批次</h2>
+                <button class="close-btn" id="closeCreateModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createBatchForm">
+                    <div class="form-group">
+                        <label for="batchNo">批次号 <span class="required">*</span></label>
+                        <input type="text" id="batchNo" name="batchNo" required placeholder="如：BATCH-2024-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="woodType">木材种类 <span class="required">*</span></label>
+                        <select id="woodType" name="woodType" required>
+                            <option value="pine">松木</option>
+                            <option value="oak">橡木</option>
+                            <option value="maple">枫木</option>
+                            <option value="birch">桦木</option>
+                            <option value="cedar">杉木</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="initialMC">初始含水率(%) <span class="required">*</span></label>
+                            <input type="number" id="initialMC" name="initialMC" step="0.1" min="0" max="100" required placeholder="如：55.0">
+                        </div>
+                        <div class="form-group">
+                            <label for="targetMC">目标含水率(%) <span class="required">*</span></label>
+                            <input type="number" id="targetMC" name="targetMC" step="0.1" min="0" max="100" required placeholder="如：12.0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="woodThickness">木材厚度(mm) <span class="required">*</span></label>
+                            <input type="number" id="woodThickness" name="woodThickness" step="1" min="1" required placeholder="如：50">
+                        </div>
+                        <div class="form-group">
+                            <label for="batchSize">批次数量(m³) <span class="required">*</span></label>
+                            <input type="number" id="batchSize" name="batchSize" step="0.1" min="0" required placeholder="如：25.5">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="remarks">备注</label>
+                        <textarea id="remarks" name="remarks" rows="3" placeholder="备注信息..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelCreateBtn">取消</button>
+                <button class="btn btn-primary" id="confirmCreateBtn">创建并进入校准</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-large" id="importModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导入烘干曲线</h2>
+                <button class="close-btn" id="closeImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-section">
+                    <h3>1. 选择要导入的批次</h3>
+                    <select id="importBatchSelect">
+                        <option value="">-- 请选择批次 --</option>
+                    </select>
+                </div>
+                <div class="import-section">
+                    <h3>2. 粘贴曲线数据（CSV格式）</h3>
+                    <p class="help-text">格式：时间(小时),温度(℃),相对湿度(%),目标含水率(%)</p>
+                    <textarea id="curveDataInput" rows="10" placeholder="示例：
+0,20,60,55.0
+2,35,75,53.5
+4,45,78,51.8
+6,50,80,49.5
+8,55,75,46.0
+10,58,70,42.0
+12,60,65,38.0
+14,62,60,34.0
+16,64,55,30.0
+18,65,50,26.0
+20,65,45,22.0
+22,65,40,18.0
+24,65,35,14.0
+26,60,30,12.0"></textarea>
+                </div>
+                <div class="import-section">
+                    <h3>3. 粘贴实测数据（CSV格式，可选）</h3>
+                    <p class="help-text">格式：时间(小时),实测温度(℃),实测湿度(%),实测含水率(%)</p>
+                    <textarea id="actualDataInput" rows="8" placeholder="示例：
+0,19.5,61.2,54.8
+2,34.8,74.5,53.2
+4,44.5,77.8,51.5
+6,49.8,79.5,49.2
+8,54.5,74.8,45.8
+10,57.8,69.5,41.8
+12,59.8,64.8,37.8
+14,61.8,59.5,33.8
+16,63.8,54.8,29.8
+18,64.8,49.8,25.8
+20,64.8,44.8,21.8
+22,64.8,39.8,17.8
+24,64.8,34.8,13.8
+26,59.8,29.8,11.8"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelImportBtn">取消</button>
+                <button class="btn btn-primary" id="confirmImportBtn">导入并验证</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-large" id="detailModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>批次详情</h2>
+                <button class="close-btn" id="closeDetailModal">&times;</button>
+            </div>
+            <div class="modal-body" id="detailBody">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeDetailBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-large" id="calibrationModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>校准工作台</h2>
+                <button class="close-btn" id="closeCalibrationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="calibration-header" id="calibrationHeader">
+                </div>
+                <div class="calibration-stepper">
+                    <div class="step" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">曲线导入验证</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">含水率模型验证</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">批次对比校准</div>
+                    </div>
+                </div>
+                <div class="calibration-content" id="calibrationContent">
+                </div>
+            </div>
+            <div class="modal-footer" id="calibrationFooter">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal modal-large" id="docModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>使用说明 & 验收标准</h2>
+                <button class="close-btn" id="closeDocModal">&times;</button>
+            </div>
+            <div class="modal-body doc-content">
+                <h3>一、系统概述</h3>
+                <p>木材烘干窑曲线校准台用于验证烘干曲线导入是否生效、含水率模型是否可靠、批次对比是否与原始数据对得上，帮助在出窑前发现并修正问题，避免木材开裂。</p>
+
+                <h3>二、校准流程</h3>
+                <ol>
+                    <li><strong>曲线导入验证</strong>：验证导入的温湿度曲线格式是否正确，数据是否完整</li>
+                    <li><strong>含水率模型验证</strong>：验证模型估算的含水率与实测值的偏差</li>
+                    <li><strong>批次对比校准</strong>：对比目标曲线与实测数据，生成校准建议</li>
+                </ol>
+
+                <h3>三、验收标准 - 正常通过</h3>
+                <div class="criteria-box passed">
+                    <h4>判定输出："正常通过"</h4>
+                    <p>满足以下所有条件：</p>
+                    <ul>
+                        <li>曲线格式验证：数据点数 ≥ 10，时间间隔一致，温湿度在合理范围</li>
+                        <li>含水率模型：平均偏差 ≤ 1.5%，最大偏差 ≤ 3.0%，相关系数 ≥ 0.95</li>
+                        <li>批次对比：温度偏差均值 ≤ ±2℃，湿度偏差均值 ≤ ±3%RH</li>
+                        <li>无关键警告信息</li>
+                    </ul>
+                    <p class="action">→ 系统自动标记为通过，无需人工处理</p>
+                </div>
+
+                <h3>四、验收标准 - 需人工处理</h3>
+                <div class="criteria-box review">
+                    <h4>判定输出："需人工处理"</h4>
+                    <p>满足以下任一条件：</p>
+                    <ul>
+                        <li>含水率模型：1.5% < 平均偏差 ≤ 3.0%，或3.0% < 最大偏差 ≤ 5.0%</li>
+                        <li>批次对比：2℃ < 温度偏差均值 ≤ 4℃，或3% < 湿度偏差均值 ≤ 6%</li>
+                        <li>存在中等警告信息（如部分时段偏差较大）</li>
+                        <li>数据存在异常但不影响整体趋势</li>
+                    </ul>
+                    <p class="action">→ 需人工复核偏差点，可选择"修正后重跑"或"标记通过"</p>
+                </div>
+
+                <h3>五、验收标准 - 校准失败</h3>
+                <div class="criteria-box failed">
+                    <h4>判定输出："校准失败"</h4>
+                    <p>满足以下任一条件：</p>
+                    <ul>
+                        <li>曲线格式错误：数据点数 < 5，或时间间隔不一致超过20%</li>
+                        <li>含水率模型：平均偏差 > 3.0%，或最大偏差 > 5.0%，或相关系数 < 0.80</li>
+                        <li>批次对比：温度偏差均值 > 4℃，或湿度偏差均值 > 6%</li>
+                        <li>关键数据缺失或严重异常</li>
+                    </ul>
+                    <p class="action">→ 需检查数据质量，修正问题后点击"重新校准"</p>
+                </div>
+
+                <h3>六、修正后重跑</h3>
+                <p>当状态为"需人工处理"或"校准失败"时，可以：</p>
+                <ul>
+                    <li>修改曲线数据（调整温度/湿度参数）</li>
+                    <li>补充实测数据</li>
+                    <li>调整验证阈值（如需）</li>
+                    <li>点击"重新校准"重新执行验证流程</li>
+                </ul>
+
+                <h3>七、数据持久化</h3>
+                <p>所有数据存储在浏览器本地存储（LocalStorage）中，刷新页面后数据不会丢失。可以通过"导出数据"功能备份数据。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeDocBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="validation.js"></script>
+    <script src="ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
