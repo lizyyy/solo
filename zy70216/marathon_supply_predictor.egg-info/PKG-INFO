@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: marathon-supply-predictor
+Version: 1.0.0
+Summary: 马拉松补给消耗预测器
+Author: Marathon Supply Team
+Requires-Python: >=3.8
+Requires-Dist: python-dateutil>=2.8.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

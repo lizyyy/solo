@@ -1,0 +1,189 @@
+{
+  "event_id": "SH_MARATHON_2026_SMOOTH",
+  "name": "2026上海国际马拉松（顺利样例）",
+  "event_date": "2026-11-15",
+  "total_distance_km": 42.195,
+  "total_estimated_runners": 2000,
+  "weather": {
+    "temperature": 18.0,
+    "humidity": 50.0,
+    "wind_speed": 6.0,
+    "weather_type": "cloudy",
+    "precipitation_probability": 5.0
+  },
+  "supply_items": [
+    {
+      "name": "矿泉水",
+      "supply_type": "water",
+      "base_consumption_rate": 0.8,
+      "unit": "瓶"
+    },
+    {
+      "name": "运动饮料",
+      "supply_type": "sports_drink",
+      "base_consumption_rate": 0.5,
+      "unit": "瓶"
+    },
+    {
+      "name": "能量胶",
+      "supply_type": "energy_gel",
+      "base_consumption_rate": 0.6,
+      "unit": "个"
+    },
+    {
+      "name": "香蕉",
+      "supply_type": "food",
+      "base_consumption_rate": 0.3,
+      "unit": "根"
+    }
+  ],
+  "segments": [
+    {
+      "segment_id": "seg_0_10",
+      "name": "起点-10公里",
+      "start_km": 0.0,
+      "end_km": 10.0,
+      "estimated_runners": 2000,
+      "difficulty_level": "easy",
+      "elevation_profile": "flat"
+    },
+    {
+      "segment_id": "seg_10_20",
+      "name": "10公里-20公里",
+      "start_km": 10.0,
+      "end_km": 20.0,
+      "estimated_runners": 1900,
+      "difficulty_level": "easy",
+      "elevation_profile": "flat"
+    },
+    {
+      "segment_id": "seg_20_30",
+      "name": "20公里-30公里",
+      "start_km": 20.0,
+      "end_km": 30.0,
+      "estimated_runners": 1700,
+      "difficulty_level": "medium",
+      "elevation_profile": "slight_hill"
+    },
+    {
+      "segment_id": "seg_30_40",
+      "name": "30公里-40公里",
+      "start_km": 30.0,
+      "end_km": 40.0,
+      "estimated_runners": 1500,
+      "difficulty_level": "medium",
+      "elevation_profile": "rolling"
+    },
+    {
+      "segment_id": "seg_40_42",
+      "name": "40公里-终点",
+      "start_km": 40.0,
+      "end_km": 42.195,
+      "estimated_runners": 1300,
+      "difficulty_level": "medium",
+      "elevation_profile": "flat"
+    }
+  ],
+  "stations": [
+    {
+      "station_id": "st_05",
+      "name": "5公里补给站",
+      "distance_km": 5.0,
+      "segment_id": "seg_0_10",
+      "position": "起点后",
+      "prepared_supplies": {
+        "water": 2000,
+        "sports_drink": 1000
+      }
+    },
+    {
+      "station_id": "st_10",
+      "name": "10公里补给站",
+      "distance_km": 10.0,
+      "segment_id": "seg_0_10",
+      "position": "分段起点",
+      "prepared_supplies": {
+        "water": 2500,
+        "sports_drink": 1200,
+        "energy_gel": 800
+      }
+    },
+    {
+      "station_id": "st_15",
+      "name": "15公里补给站",
+      "distance_km": 15.0,
+      "segment_id": "seg_10_20",
+      "position": "分段中点",
+      "prepared_supplies": {
+        "water": 2500,
+        "sports_drink": 1200,
+        "energy_gel": 1000
+      }
+    },
+    {
+      "station_id": "st_20",
+      "name": "20公里补给站",
+      "distance_km": 20.0,
+      "segment_id": "seg_10_20",
+      "position": "分段终点",
+      "prepared_supplies": {
+        "water": 2800,
+        "sports_drink": 1400,
+        "energy_gel": 1200,
+        "food": 1000
+      }
+    },
+    {
+      "station_id": "st_25",
+      "name": "25公里补给站",
+      "distance_km": 25.0,
+      "segment_id": "seg_20_30",
+      "position": "分段中点",
+      "prepared_supplies": {
+        "water": 2800,
+        "sports_drink": 1400,
+        "energy_gel": 1500,
+        "food": 900
+      }
+    },
+    {
+      "station_id": "st_30",
+      "name": "30公里补给站",
+      "distance_km": 30.0,
+      "segment_id": "seg_20_30",
+      "position": "分段终点",
+      "prepared_supplies": {
+        "water": 3200,
+        "sports_drink": 1600,
+        "energy_gel": 1800,
+        "food": 1000
+      }
+    },
+    {
+      "station_id": "st_35",
+      "name": "35公里补给站",
+      "distance_km": 35.0,
+      "segment_id": "seg_30_40",
+      "position": "分段中点",
+      "prepared_supplies": {
+        "water": 3000,
+        "sports_drink": 1500,
+        "energy_gel": 1800,
+        "food": 900
+      }
+    },
+    {
+      "station_id": "st_40",
+      "name": "40公里补给站",
+      "distance_km": 40.0,
+      "segment_id": "seg_30_40",
+      "position": "分段终点",
+      "prepared_supplies": {
+        "water": 2800,
+        "sports_drink": 1400,
+        "energy_gel": 1700,
+        "food": 800
+      }
+    }
+  ]
+}

@@ -1,0 +1,522 @@
+{
+  "event_info": {
+    "event_id": "SH_MARATHON_2026_HIGHRISK",
+    "name": "2026上海国际马拉松（高风险拦截样例）",
+    "event_date": "2026-11-15",
+    "total_distance_km": 42.195,
+    "total_estimated_runners": 2500,
+    "segments": [
+      {
+        "segment_id": "seg_0_10",
+        "name": "起点-10公里",
+        "start_km": 0.0,
+        "end_km": 10.0,
+        "estimated_runners": 2500,
+        "difficulty_level": "easy",
+        "elevation_profile": "flat"
+      },
+      {
+        "segment_id": "seg_10_20",
+        "name": "10公里-20公里",
+        "start_km": 10.0,
+        "end_km": 20.0,
+        "estimated_runners": 2200,
+        "difficulty_level": "easy",
+        "elevation_profile": "flat"
+      },
+      {
+        "segment_id": "seg_20_30",
+        "name": "20公里-30公里",
+        "start_km": 20.0,
+        "end_km": 30.0,
+        "estimated_runners": 1800,
+        "difficulty_level": "medium",
+        "elevation_profile": "slight_hill"
+      },
+      {
+        "segment_id": "seg_30_40",
+        "name": "30公里-40公里",
+        "start_km": 30.0,
+        "end_km": 40.0,
+        "estimated_runners": 1500,
+        "difficulty_level": "hard",
+        "elevation_profile": "rolling"
+      },
+      {
+        "segment_id": "seg_40_42",
+        "name": "40公里-终点",
+        "start_km": 40.0,
+        "end_km": 42.195,
+        "estimated_runners": 1200,
+        "difficulty_level": "hard",
+        "elevation_profile": "flat"
+      }
+    ],
+    "stations": [
+      {
+        "station_id": "st_05",
+        "name": "5公里补给站",
+        "distance_km": 5.0,
+        "segment_id": "seg_0_10",
+        "position": "起点后",
+        "prepared_supplies": {
+          "water": 800,
+          "sports_drink": 400
+        }
+      },
+      {
+        "station_id": "st_10",
+        "name": "10公里补给站",
+        "distance_km": 10.0,
+        "segment_id": "seg_0_10",
+        "position": "分段起点",
+        "prepared_supplies": {
+          "water": 1000,
+          "sports_drink": 500,
+          "energy_gel": 300
+        }
+      },
+      {
+        "station_id": "st_15",
+        "name": "15公里补给站",
+        "distance_km": 15.0,
+        "segment_id": "seg_10_20",
+        "position": "分段中点",
+        "prepared_supplies": {
+          "water": 900,
+          "sports_drink": 500,
+          "energy_gel": 400
+        }
+      },
+      {
+        "station_id": "st_20",
+        "name": "20公里补给站",
+        "distance_km": 20.0,
+        "segment_id": "seg_10_20",
+        "position": "分段终点",
+        "prepared_supplies": {
+          "water": 1000,
+          "sports_drink": 500,
+          "energy_gel": 400,
+          "food": 300
+        }
+      },
+      {
+        "station_id": "st_25",
+        "name": "25公里补给站",
+        "distance_km": 25.0,
+        "segment_id": "seg_20_30",
+        "position": "分段中点",
+        "prepared_supplies": {
+          "water": 900,
+          "sports_drink": 450,
+          "energy_gel": 500,
+          "food": 300
+        }
+      },
+      {
+        "station_id": "st_30",
+        "name": "30公里补给站",
+        "distance_km": 30.0,
+        "segment_id": "seg_20_30",
+        "position": "分段终点",
+        "prepared_supplies": {
+          "water": 1200,
+          "sports_drink": 600,
+          "energy_gel": 600,
+          "food": 400
+        }
+      },
+      {
+        "station_id": "st_35",
+        "name": "35公里补给站",
+        "distance_km": 35.0,
+        "segment_id": "seg_30_40",
+        "position": "分段中点",
+        "prepared_supplies": {
+          "water": 1000,
+          "sports_drink": 550,
+          "energy_gel": 550,
+          "food": 350
+        }
+      },
+      {
+        "station_id": "st_40",
+        "name": "40公里补给站",
+        "distance_km": 40.0,
+        "segment_id": "seg_30_40",
+        "position": "分段终点",
+        "prepared_supplies": {
+          "water": 900,
+          "sports_drink": 500,
+          "energy_gel": 500,
+          "food": 300
+        }
+      }
+    ],
+    "weather": {
+      "temperature": 33.0,
+      "humidity": 88.0,
+      "wind_speed": 5.0,
+      "weather_type": "hot_sunny",
+      "precipitation_probability": 10.0
+    },
+    "supply_items": [
+      {
+        "name": "矿泉水",
+        "supply_type": "water",
+        "base_consumption_rate": 0.8,
+        "unit": "瓶"
+      },
+      {
+        "name": "运动饮料",
+        "supply_type": "sports_drink",
+        "base_consumption_rate": 0.5,
+        "unit": "瓶"
+      },
+      {
+        "name": "能量胶",
+        "supply_type": "energy_gel",
+        "base_consumption_rate": 0.6,
+        "unit": "个"
+      },
+      {
+        "name": "香蕉",
+        "supply_type": "food",
+        "base_consumption_rate": 0.3,
+        "unit": "根"
+      }
+    ]
+  },
+  "predictions": [
+    {
+      "station_id": "st_05",
+      "station_name": "5公里补给站",
+      "segment_id": "seg_0_10",
+      "runners_in_segment": 2500,
+      "distance_km": 5.0,
+      "predicted_consumption": {
+        "water": 2776.03,
+        "sports_drink": 1454.89
+      },
+      "prepared_supplies": {
+        "water": 800,
+        "sports_drink": 400
+      },
+      "gap": {
+        "water": -1976.03,
+        "sports_drink": -1054.89
+      },
+      "gap_percentage": {
+        "water": -71.18,
+        "sports_drink": -72.51
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 2776.0瓶, 现有备量: 800瓶, 缺口: 1976.0瓶",
+        "运动饮料 备量不足! 预测消耗: 1454.9瓶, 现有备量: 400瓶, 缺口: 1054.9瓶"
+      ]
+    },
+    {
+      "station_id": "st_10",
+      "station_name": "10公里补给站",
+      "segment_id": "seg_0_10",
+      "runners_in_segment": 2500,
+      "distance_km": 10.0,
+      "predicted_consumption": {
+        "water": 4164.05,
+        "sports_drink": 2327.82,
+        "energy_gel": 1496.45
+      },
+      "prepared_supplies": {
+        "water": 1000,
+        "sports_drink": 500,
+        "energy_gel": 300
+      },
+      "gap": {
+        "water": -3164.05,
+        "sports_drink": -1827.82,
+        "energy_gel": -1196.45
+      },
+      "gap_percentage": {
+        "water": -75.98,
+        "sports_drink": -78.52,
+        "energy_gel": -79.95
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 4164.1瓶, 现有备量: 1000瓶, 缺口: 3164.1瓶",
+        "运动饮料 备量不足! 预测消耗: 2327.8瓶, 现有备量: 500瓶, 缺口: 1827.8瓶",
+        "能量胶 备量不足! 预测消耗: 1496.5个, 现有备量: 300个, 缺口: 1196.5个"
+      ]
+    },
+    {
+      "station_id": "st_15",
+      "station_name": "15公里补给站",
+      "segment_id": "seg_10_20",
+      "runners_in_segment": 2200,
+      "distance_km": 15.0,
+      "predicted_consumption": {
+        "water": 3664.36,
+        "sports_drink": 2048.48,
+        "energy_gel": 2107.01
+      },
+      "prepared_supplies": {
+        "water": 900,
+        "sports_drink": 500,
+        "energy_gel": 400
+      },
+      "gap": {
+        "water": -2764.36,
+        "sports_drink": -1548.48,
+        "energy_gel": -1707.01
+      },
+      "gap_percentage": {
+        "water": -75.44,
+        "sports_drink": -75.59,
+        "energy_gel": -81.02
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 3664.4瓶, 现有备量: 900瓶, 缺口: 2764.4瓶",
+        "运动饮料 备量不足! 预测消耗: 2048.5瓶, 现有备量: 500瓶, 缺口: 1548.5瓶",
+        "能量胶 备量不足! 预测消耗: 2107.0个, 现有备量: 400个, 缺口: 1707.0个"
+      ]
+    },
+    {
+      "station_id": "st_20",
+      "station_name": "20公里补给站",
+      "segment_id": "seg_10_20",
+      "runners_in_segment": 2200,
+      "distance_km": 20.0,
+      "predicted_consumption": {
+        "water": 4478.66,
+        "sports_drink": 2816.66,
+        "energy_gel": 2107.01,
+        "food": 832.75
+      },
+      "prepared_supplies": {
+        "water": 1000,
+        "sports_drink": 500,
+        "energy_gel": 400,
+        "food": 300
+      },
+      "gap": {
+        "water": -3478.66,
+        "sports_drink": -2316.66,
+        "energy_gel": -1707.01,
+        "food": -532.75
+      },
+      "gap_percentage": {
+        "water": -77.67,
+        "sports_drink": -82.25,
+        "energy_gel": -81.02,
+        "food": -63.97
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true,
+        "food": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 4478.7瓶, 现有备量: 1000瓶, 缺口: 3478.7瓶",
+        "运动饮料 备量不足! 预测消耗: 2816.7瓶, 现有备量: 500瓶, 缺口: 2316.7瓶",
+        "能量胶 备量不足! 预测消耗: 2107.0个, 现有备量: 400个, 缺口: 1707.0个",
+        "香蕉 备量不足! 预测消耗: 832.8根, 现有备量: 300根, 缺口: 532.8根"
+      ]
+    },
+    {
+      "station_id": "st_25",
+      "station_name": "25公里补给站",
+      "segment_id": "seg_20_30",
+      "runners_in_segment": 1800,
+      "distance_km": 25.0,
+      "predicted_consumption": {
+        "water": 4311.01,
+        "sports_drink": 2711.22,
+        "energy_gel": 3042.2,
+        "food": 801.58
+      },
+      "prepared_supplies": {
+        "water": 900,
+        "sports_drink": 450,
+        "energy_gel": 500,
+        "food": 300
+      },
+      "gap": {
+        "water": -3411.01,
+        "sports_drink": -2261.22,
+        "energy_gel": -2542.2,
+        "food": -501.58
+      },
+      "gap_percentage": {
+        "water": -79.12,
+        "sports_drink": -83.4,
+        "energy_gel": -83.56,
+        "food": -62.57
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true,
+        "food": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 4311.0瓶, 现有备量: 900瓶, 缺口: 3411.0瓶",
+        "运动饮料 备量不足! 预测消耗: 2711.2瓶, 现有备量: 450瓶, 缺口: 2261.2瓶",
+        "能量胶 备量不足! 预测消耗: 3042.2个, 现有备量: 500个, 缺口: 2542.2个",
+        "香蕉 备量不足! 预测消耗: 801.6根, 现有备量: 300根, 缺口: 501.6根"
+      ]
+    },
+    {
+      "station_id": "st_30",
+      "station_name": "30公里补给站",
+      "segment_id": "seg_20_30",
+      "runners_in_segment": 1800,
+      "distance_km": 30.0,
+      "predicted_consumption": {
+        "water": 5094.84,
+        "sports_drink": 3204.17,
+        "energy_gel": 3042.2,
+        "food": 1145.11
+      },
+      "prepared_supplies": {
+        "water": 1200,
+        "sports_drink": 600,
+        "energy_gel": 600,
+        "food": 400
+      },
+      "gap": {
+        "water": -3894.84,
+        "sports_drink": -2604.17,
+        "energy_gel": -2442.2,
+        "food": -745.11
+      },
+      "gap_percentage": {
+        "water": -76.45,
+        "sports_drink": -81.27,
+        "energy_gel": -80.28,
+        "food": -65.07
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true,
+        "food": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 5094.8瓶, 现有备量: 1200瓶, 缺口: 3894.8瓶",
+        "运动饮料 备量不足! 预测消耗: 3204.2瓶, 现有备量: 600瓶, 缺口: 2604.2瓶",
+        "能量胶 备量不足! 预测消耗: 3042.2个, 现有备量: 600个, 缺口: 2442.2个",
+        "香蕉 备量不足! 预测消耗: 1145.1根, 现有备量: 400根, 缺口: 745.1根"
+      ]
+    },
+    {
+      "station_id": "st_35",
+      "station_name": "35公里补给站",
+      "segment_id": "seg_30_40",
+      "runners_in_segment": 1500,
+      "distance_km": 35.0,
+      "predicted_consumption": {
+        "water": 6123.6,
+        "sports_drink": 3337.68,
+        "energy_gel": 3961.2,
+        "food": 1192.83
+      },
+      "prepared_supplies": {
+        "water": 1000,
+        "sports_drink": 550,
+        "energy_gel": 550,
+        "food": 350
+      },
+      "gap": {
+        "water": -5123.6,
+        "sports_drink": -2787.68,
+        "energy_gel": -3411.2,
+        "food": -842.83
+      },
+      "gap_percentage": {
+        "water": -83.67,
+        "sports_drink": -83.52,
+        "energy_gel": -86.12,
+        "food": -70.66
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true,
+        "food": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 6123.6瓶, 现有备量: 1000瓶, 缺口: 5123.6瓶",
+        "运动饮料 备量不足! 预测消耗: 3337.7瓶, 现有备量: 550瓶, 缺口: 2787.7瓶",
+        "能量胶 备量不足! 预测消耗: 3961.2个, 现有备量: 550个, 缺口: 3411.2个",
+        "香蕉 备量不足! 预测消耗: 1192.8根, 现有备量: 350根, 缺口: 842.8根"
+      ]
+    },
+    {
+      "station_id": "st_40",
+      "station_name": "40公里补给站",
+      "segment_id": "seg_30_40",
+      "runners_in_segment": 1500,
+      "distance_km": 40.0,
+      "predicted_consumption": {
+        "water": 6123.6,
+        "sports_drink": 3337.68,
+        "energy_gel": 3961.2,
+        "food": 1192.83
+      },
+      "prepared_supplies": {
+        "water": 900,
+        "sports_drink": 500,
+        "energy_gel": 500,
+        "food": 300
+      },
+      "gap": {
+        "water": -5223.6,
+        "sports_drink": -2837.68,
+        "energy_gel": -3461.2,
+        "food": -892.83
+      },
+      "gap_percentage": {
+        "water": -85.3,
+        "sports_drink": -85.02,
+        "energy_gel": -87.38,
+        "food": -74.85
+      },
+      "shortage_risk": {
+        "water": true,
+        "sports_drink": true,
+        "energy_gel": true,
+        "food": true
+      },
+      "status": "warning",
+      "warnings": [
+        "矿泉水 备量不足! 预测消耗: 6123.6瓶, 现有备量: 900瓶, 缺口: 5223.6瓶",
+        "运动饮料 备量不足! 预测消耗: 3337.7瓶, 现有备量: 500瓶, 缺口: 2837.7瓶",
+        "能量胶 备量不足! 预测消耗: 3961.2个, 现有备量: 500个, 缺口: 3461.2个",
+        "香蕉 备量不足! 预测消耗: 1192.8根, 现有备量: 300根, 缺口: 892.8根"
+      ]
+    }
+  ],
+  "generated_at": "2026-05-10T21:56:46.613250"
+}
