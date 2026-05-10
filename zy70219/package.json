@@ -1,0 +1,23 @@
+{
+  "name": "shared-kitchen-scheduler",
+  "version": "1.0.0",
+  "description": "共享厨房档期审批台",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm start",
+    "install:all": "npm install && cd frontend && npm install",
+    "init:db": "node backend/scripts/init-db.js",
+    "seed": "node backend/scripts/seed-data.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  }
+}
