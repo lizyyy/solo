@@ -5,6 +5,7 @@ import billsRouter from './routes/bills';
 import groupsRouter from './routes/groups';
 import reportsRouter from './routes/reports';
 import eventsRouter from './routes/events';
+import usersRouter from './routes/users';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
@@ -27,6 +28,7 @@ async function main() {
     next();
   });
 
+  app.use('/api/users', usersRouter);
   app.use('/api/bills', billsRouter);
   app.use('/api/groups', groupsRouter);
   app.use('/api/reports', reportsRouter);
@@ -52,6 +54,10 @@ async function main() {
     console.log(`Bill Split System server running on port ${PORT}`);
     console.log(`API endpoints:
   - GET  /api/health
+  - POST /api/users/get-or-create
+  - GET  /api/users
+  - GET  /api/users/:id
+  - PUT  /api/users/:id
   - POST /api/bills
   - PUT  /api/bills/:id
   - GET  /api/bills/group/:groupId

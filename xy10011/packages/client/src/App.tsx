@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Group, Bill, Event, Conflict, BalanceResult } from './types';
+import { Group, Bill, Event, Conflict, BalanceResult, User } from './types';
 import { api, USER_ID } from './api/client';
 import { GroupList } from './components/GroupList';
 import { BillList } from './components/BillList';
@@ -10,6 +10,7 @@ import { ReportExport } from './components/ReportExport';
 import './App.css';
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [bills, setBills] = useState<Bill[]>([]);
@@ -19,16 +20,34 @@ export default function App() {
   const [showBillForm, setShowBillForm] = useState(false);
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [activeTab, setActiveTab] = useState<'bills' | 'audit' | 'conflicts' | 'reports'>('bills');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadGroups();
-    loadConflicts();
+    initializeApp();
   }, []);
 
+  async function initializeApp() {
+    try {
+      setInitializing(true);
+      const currentUser = await api.users.getOrCreate(USER_ID, {
+        name: `用户${USER_ID.slice(-6)}`,
+      });
+      setUser(currentUser);
+      
+      await loadGroups();
+      await loadConflicts();
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setInitializing(false);
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    if (selectedGroup) {
+    if (selectedGroup && user) {
       loadGroupData(selectedGroup.id);
     }
   }, [selectedGroup]);
@@ -48,6 +67,8 @@ export default function App() {
         });
         setGroups([newGroup]);
         setSelectedGroup(newGroup);
+      } else if (!selectedGroup) {
+        setSelectedGroup(data[0]);
       }
     } catch (err) {
       setError((err as Error).message);
@@ -156,18 +177,28 @@ export default function App() {
       <header className="header">
         <h1>账单分摊系统</h1>
         <div className="user-info">
-          <span>用户ID: {USER_ID}</span>
+          <span>{user?.name || '用户'}</span>
+          {user && (
+            <span className="user-id">ID: {user.id.slice(-6)}</span>
+          )}
         </div>
       </header>
 
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={() => setError(null)}>×</button>
+      {initializing ? (
+        <div className="initializing">
+          <div className="spinner"></div>
+          <p>初始化中...</p>
         </div>
-      )}
+      ) : (
+        <>
+          {error && (
+            <div className="error-message">
+              {error}
+              <button onClick={() => setError(null)}>×</button>
+            </div>
+          )}
 
-      <div className="main-content">
+          <div className="main-content">
         <aside className="sidebar">
           <GroupList
             groups={groups}
@@ -268,14 +299,16 @@ export default function App() {
         </main>
       </div>
 
-      {showBillForm && (
-        <BillForm
-          bill={editingBill}
-          group={selectedGroup!}
-          userId={USER_ID}
-          onSave={handleSaveBill}
-          onCancel={() => { setShowBillForm(false); setEditingBill(null); }}
-        />
+          {showBillForm && (
+            <BillForm
+              bill={editingBill}
+              group={selectedGroup!}
+              userId={USER_ID}
+              onSave={handleSaveBill}
+              onCancel={() => { setShowBillForm(false); setEditingBill(null); }}
+            />
+          )}
+        </>
       )}
     </div>
   );

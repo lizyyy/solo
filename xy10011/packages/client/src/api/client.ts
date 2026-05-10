@@ -1,11 +1,15 @@
-import { Bill, Group, Event, Conflict, SyncState, BalanceResult, ReportOptions } from '../types';
+import { Bill, Group, Event, Conflict, SyncState, BalanceResult, ReportOptions, User } from '../types';
 
 const API_BASE = '/api';
 const CLIENT_ID = localStorage.getItem('clientId') || `client-${Date.now()}`;
-const USER_ID = localStorage.getItem('userId') || `user-${Date.now()}`;
+let USER_ID = localStorage.getItem('userId') || '';
+
+if (!USER_ID) {
+  USER_ID = `user-${Date.now()}`;
+  localStorage.setItem('userId', USER_ID);
+}
 
 localStorage.setItem('clientId', CLIENT_ID);
-localStorage.setItem('userId', USER_ID);
 
 console.log('Client ID:', CLIENT_ID);
 console.log('User ID:', USER_ID);
@@ -42,6 +46,21 @@ async function request<T>(
 }
 
 export const api = {
+  users: {
+    getOrCreate: (userId: string, options?: { name?: string; avatar?: string }) =>
+      request<User>('/users/get-or-create', {
+        method: 'POST',
+        body: JSON.stringify(options || {}),
+        headers: { 'X-User-Id': userId },
+      }),
+
+    getById: (userId: string) =>
+      request<User>(`/users/${userId}`),
+
+    getAll: () =>
+      request<User[]>('/users'),
+  },
+
   bills: {
     create: (bill: Omit<Bill, 'id' | 'createdAt' | 'updatedAt' | 'version' | 'deleted'>) =>
       request<Bill>('/bills', {

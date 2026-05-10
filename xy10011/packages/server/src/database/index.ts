@@ -39,8 +39,7 @@ function initSchema(): void {
       created_by TEXT NOT NULL,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL,
-      version INTEGER NOT NULL DEFAULT 1,
-      FOREIGN KEY (created_by) REFERENCES users(id)
+      version INTEGER NOT NULL DEFAULT 1
     );
 
     CREATE TABLE IF NOT EXISTS bills (
@@ -56,9 +55,7 @@ function initSchema(): void {
       version INTEGER NOT NULL DEFAULT 1,
       participants TEXT NOT NULL,
       tags TEXT,
-      deleted INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY (group_id) REFERENCES groups_table(id),
-      FOREIGN KEY (created_by) REFERENCES users(id)
+      deleted INTEGER NOT NULL DEFAULT 0
     );
 
     CREATE TABLE IF NOT EXISTS events (
