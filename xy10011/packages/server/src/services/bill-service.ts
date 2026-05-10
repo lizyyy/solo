@@ -11,6 +11,13 @@ class BillService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Bill> {
+    if (metadata?.correlationId) {
+      const existingBill = this.findBillByCorrelationId(metadata.correlationId);
+      if (existingBill) {
+        return existingBill;
+      }
+    }
+
     const now = Date.now();
     const bill: Bill = {
       ...billData,
@@ -38,6 +45,21 @@ class BillService {
     return bill;
   }
 
+  private findBillByCorrelationId(correlationId: string): Bill | null {
+    const db = getDatabase();
+    const row = db.prepare(`
+      SELECT events.aggregate_id as bill_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'BILL_CREATED'
+    `).get(correlationId) as { bill_id: string } | undefined;
+
+    if (row?.bill_id) {
+      return this.getBillById(row.bill_id);
+    }
+    return null;
+  }
+
   async updateBill(
     billId: string,
     updates: Partial<Bill>,
@@ -46,6 +68,14 @@ class BillService {
     expectedVersion: number,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Bill> {
+    if (metadata?.correlationId) {
+      const existingUpdate = this.findUpdateByCorrelationId(metadata.correlationId);
+      if (existingUpdate) {
+        const bill = this.getBillById(billId);
+        if (bill) return bill;
+      }
+    }
+
     const existingBill = this.getBillById(billId);
     if (!existingBill) {
       throw new Error(`Bill ${billId} not found`);
@@ -106,6 +136,21 @@ class BillService {
     return updatedBill;
   }
 
+  private findUpdateByCorrelationId(correlationId: string): { billId: string } | null {
+    const db = getDatabase();
+    const row = db.prepare(`
+      SELECT aggregate_id as bill_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'BILL_UPDATED'
+    `).get(correlationId) as { bill_id: string } | undefined;
+
+    if (row?.bill_id) {
+      return { billId: row.bill_id };
+    }
+    return null;
+  }
+
   async deleteBill(
     billId: string,
     userId: string,
@@ -116,6 +161,10 @@ class BillService {
     const existingBill = this.getBillById(billId);
     if (!existingBill) {
       throw new Error(`Bill ${billId} not found`);
+    }
+
+    if (existingBill.deleted) {
+      return;
     }
 
     const events = eventStore.getEventsByAggregate(billId);

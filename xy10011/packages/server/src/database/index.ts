@@ -78,6 +78,7 @@ function initSchema(): void {
     CREATE INDEX IF NOT EXISTS idx_events_aggregate ON events(aggregate_id, sequence);
     CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
     CREATE INDEX IF NOT EXISTS idx_events_user ON events(user_id);
+    CREATE INDEX IF NOT EXISTS idx_events_correlation ON events(correlation_id);
 
     CREATE TABLE IF NOT EXISTS conflicts (
       id TEXT PRIMARY KEY,

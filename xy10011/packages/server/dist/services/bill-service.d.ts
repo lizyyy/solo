@@ -5,11 +5,13 @@ declare class BillService {
         userAgent?: string;
         correlationId?: string;
     }): Promise<Bill>;
+    private findBillByCorrelationId;
     updateBill(billId: string, updates: Partial<Bill>, userId: string, clientId: string, expectedVersion: number, metadata?: {
         ipAddress?: string;
         userAgent?: string;
         correlationId?: string;
     }): Promise<Bill>;
+    private findUpdateByCorrelationId;
     deleteBill(billId: string, userId: string, clientId: string, expectedVersion: number, metadata?: {
         ipAddress?: string;
         userAgent?: string;

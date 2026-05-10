@@ -15,6 +15,7 @@ declare class UserService {
         userAgent?: string;
         correlationId?: string;
     }): Promise<User>;
+    private findUserByCorrelationId;
     updateUser(userId: string, updates: Partial<User>, clientId: string, expectedVersion: number, metadata?: {
         ipAddress?: string;
         userAgent?: string;

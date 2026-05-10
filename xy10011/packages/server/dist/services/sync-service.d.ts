@@ -10,6 +10,7 @@ declare class SyncService {
         }>;
         newServerVersion: number;
     }>;
+    private appendSystemEvent;
     private applyRemoteEvent;
     private getEventsSinceVersion;
     private getLatestVersion;

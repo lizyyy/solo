@@ -6,6 +6,12 @@ const database_1 = require("../database");
 const event_store_1 = require("../event-store");
 class GroupService {
     async createGroup(groupData, userId, clientId, metadata) {
+        if (metadata?.correlationId) {
+            const existingGroup = this.findGroupByCorrelationId(metadata.correlationId);
+            if (existingGroup) {
+                return existingGroup;
+            }
+        }
         const now = Date.now();
         const group = {
             ...groupData,
@@ -17,6 +23,19 @@ class GroupService {
         await event_store_1.eventStore.appendEvent(group.id, 'group', 'GROUP_CREATED', { group }, userId, clientId, 0, metadata);
         this.persistGroup(group);
         return group;
+    }
+    findGroupByCorrelationId(correlationId) {
+        const db = (0, database_1.getDatabase)();
+        const row = db.prepare(`
+      SELECT aggregate_id as group_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'GROUP_CREATED'
+    `).get(correlationId);
+        if (row?.group_id) {
+            return this.getGroupById(row.group_id);
+        }
+        return null;
     }
     async updateGroup(groupId, updates, userId, clientId, expectedVersion, metadata) {
         const existingGroup = this.getGroupById(groupId);

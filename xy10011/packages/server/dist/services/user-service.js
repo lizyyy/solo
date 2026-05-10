@@ -23,6 +23,12 @@ class UserService {
         return user;
     }
     async createUser(userData, clientId, metadata) {
+        if (metadata?.correlationId) {
+            const existingUser = this.findUserByCorrelationId(metadata.correlationId);
+            if (existingUser) {
+                return existingUser;
+            }
+        }
         const now = Date.now();
         const user = {
             ...userData,
@@ -33,6 +39,19 @@ class UserService {
         await event_store_1.eventStore.appendEvent(user.id, 'user', 'USER_CREATED', { user }, user.id, clientId, 0, metadata);
         this.persistUser(user);
         return user;
+    }
+    findUserByCorrelationId(correlationId) {
+        const db = (0, database_1.getDatabase)();
+        const row = db.prepare(`
+      SELECT aggregate_id as user_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'USER_CREATED'
+    `).get(correlationId);
+        if (row?.user_id) {
+            return this.getUserById(row.user_id);
+        }
+        return null;
     }
     async updateUser(userId, updates, clientId, expectedVersion, metadata) {
         const existingUser = this.getUserById(userId);

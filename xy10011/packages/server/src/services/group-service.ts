@@ -10,6 +10,13 @@ class GroupService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<Group> {
+    if (metadata?.correlationId) {
+      const existingGroup = this.findGroupByCorrelationId(metadata.correlationId);
+      if (existingGroup) {
+        return existingGroup;
+      }
+    }
+
     const now = Date.now();
     const group: Group = {
       ...groupData,
@@ -32,6 +39,21 @@ class GroupService {
 
     this.persistGroup(group);
     return group;
+  }
+
+  private findGroupByCorrelationId(correlationId: string): Group | null {
+    const db = getDatabase();
+    const row = db.prepare(`
+      SELECT aggregate_id as group_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'GROUP_CREATED'
+    `).get(correlationId) as { group_id: string } | undefined;
+
+    if (row?.group_id) {
+      return this.getGroupById(row.group_id);
+    }
+    return null;
   }
 
   async updateGroup(

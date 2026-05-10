@@ -44,6 +44,13 @@ class UserService {
     clientId: string,
     metadata?: { ipAddress?: string; userAgent?: string; correlationId?: string }
   ): Promise<User> {
+    if (metadata?.correlationId) {
+      const existingUser = this.findUserByCorrelationId(metadata.correlationId);
+      if (existingUser) {
+        return existingUser;
+      }
+    }
+
     const now = Date.now();
     const user: User = {
       ...userData,
@@ -65,6 +72,21 @@ class UserService {
 
     this.persistUser(user);
     return user;
+  }
+
+  private findUserByCorrelationId(correlationId: string): User | null {
+    const db = getDatabase();
+    const row = db.prepare(`
+      SELECT aggregate_id as user_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'USER_CREATED'
+    `).get(correlationId) as { user_id: string } | undefined;
+
+    if (row?.user_id) {
+      return this.getUserById(row.user_id);
+    }
+    return null;
   }
 
   async updateUser(

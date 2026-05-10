@@ -7,6 +7,12 @@ const event_store_1 = require("../event-store");
 const conflict_service_1 = require("./conflict-service");
 class BillService {
     async createBill(billData, userId, clientId, metadata) {
+        if (metadata?.correlationId) {
+            const existingBill = this.findBillByCorrelationId(metadata.correlationId);
+            if (existingBill) {
+                return existingBill;
+            }
+        }
         const now = Date.now();
         const bill = {
             ...billData,
@@ -21,7 +27,28 @@ class BillService {
         this.persistBill(bill);
         return bill;
     }
+    findBillByCorrelationId(correlationId) {
+        const db = (0, database_1.getDatabase)();
+        const row = db.prepare(`
+      SELECT events.aggregate_id as bill_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'BILL_CREATED'
+    `).get(correlationId);
+        if (row?.bill_id) {
+            return this.getBillById(row.bill_id);
+        }
+        return null;
+    }
     async updateBill(billId, updates, userId, clientId, expectedVersion, metadata) {
+        if (metadata?.correlationId) {
+            const existingUpdate = this.findUpdateByCorrelationId(metadata.correlationId);
+            if (existingUpdate) {
+                const bill = this.getBillById(billId);
+                if (bill)
+                    return bill;
+            }
+        }
         const existingBill = this.getBillById(billId);
         if (!existingBill) {
             throw new Error(`Bill ${billId} not found`);
@@ -60,10 +87,26 @@ class BillService {
         this.updatePersistedBill(updatedBill);
         return updatedBill;
     }
+    findUpdateByCorrelationId(correlationId) {
+        const db = (0, database_1.getDatabase)();
+        const row = db.prepare(`
+      SELECT aggregate_id as bill_id
+      FROM events 
+      WHERE correlation_id = ? 
+        AND event_type = 'BILL_UPDATED'
+    `).get(correlationId);
+        if (row?.bill_id) {
+            return { billId: row.bill_id };
+        }
+        return null;
+    }
     async deleteBill(billId, userId, clientId, expectedVersion, metadata) {
         const existingBill = this.getBillById(billId);
         if (!existingBill) {
             throw new Error(`Bill ${billId} not found`);
+        }
+        if (existingBill.deleted) {
+            return;
         }
         const events = event_store_1.eventStore.getEventsByAggregate(billId);
         const currentVersion = events.length > 0

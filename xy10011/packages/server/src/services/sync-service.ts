@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Event, SyncState } from '../types';
-import { getDatabase, executeTransaction } from '../database';
+import { getDatabase } from '../database';
 import { eventStore } from '../event-store';
 import { cacheService } from './cache-service';
 
@@ -24,78 +24,67 @@ class SyncService {
     this.syncLock.set(clientId, true);
 
     try {
-      return await executeTransaction(async () => {
-        await eventStore.appendEvent(
-          'sync-' + clientId,
-          'system',
-          'SYNC_STARTED',
-          { clientId, localEventsCount: localEvents.length },
-          'system',
-          clientId,
-          0
-        );
-
-        const state = this.getSyncState();
-        let conflicts: Array<{ localEvent: Event; serverEvent: Event }> = [];
-        let eventsToApply: Event[] = [];
-
-        for (const localEvent of localEvents) {
-          const existingEvents = eventStore.getEventsByAggregate(localEvent.aggregateId);
-          const serverVersion = existingEvents.length > 0 
-            ? existingEvents[existingEvents.length - 1].newVersion 
-            : 0;
-
-          if (localEvent.previousVersion !== serverVersion && serverVersion > 0) {
-            const latestServerEvent = existingEvents[existingEvents.length - 1];
-            conflicts.push({ localEvent, serverEvent: latestServerEvent });
-          } else {
-            await this.applyRemoteEvent(localEvent);
-          }
-        }
-
-        const allServerEvents = await this.getEventsSinceVersion(lastKnownServerVersion);
-        eventsToApply = allServerEvents.filter(
-          e => !localEvents.some(le => le.id === e.id)
-        );
-
-        this.updateSyncState({
-          ...state,
-          lastSyncedAt: Date.now(),
-          serverVersion: this.getLatestVersion(),
-          localVersion: this.getLatestVersion(),
-          syncStatus: 'idle',
-          pendingEvents: [],
-        });
-
-        await eventStore.appendEvent(
-          'sync-' + clientId,
-          'system',
-          'SYNC_COMPLETED',
-          { clientId, appliedCount: eventsToApply.length, conflictCount: conflicts.length },
-          'system',
-          clientId,
-          0
-        );
-
-        await cacheService.invalidatePattern('bills');
-        await cacheService.invalidatePattern('groups');
-
-        return {
-          success: conflicts.length === 0,
-          eventsToApply,
-          conflicts,
-          newServerVersion: this.getLatestVersion(),
-        };
-      });
-    } catch (error) {
-      await eventStore.appendEvent(
+      this.appendSystemEvent(
         'sync-' + clientId,
-        'system',
+        'SYNC_STARTED',
+        { clientId, localEventsCount: localEvents.length },
+        clientId
+      );
+
+      const state = this.getSyncState();
+      let conflicts: Array<{ localEvent: Event; serverEvent: Event }> = [];
+      let eventsToApply: Event[] = [];
+
+      for (const localEvent of localEvents) {
+        const existingEvents = eventStore.getEventsByAggregate(localEvent.aggregateId);
+        const serverVersion = existingEvents.length > 0 
+          ? existingEvents[existingEvents.length - 1].newVersion 
+          : 0;
+
+        if (localEvent.previousVersion !== serverVersion && serverVersion > 0) {
+          const latestServerEvent = existingEvents[existingEvents.length - 1];
+          conflicts.push({ localEvent, serverEvent: latestServerEvent });
+        } else {
+          this.applyRemoteEvent(localEvent);
+        }
+      }
+
+      const allServerEvents = this.getEventsSinceVersion(lastKnownServerVersion);
+      eventsToApply = allServerEvents.filter(
+        e => !localEvents.some(le => le.id === e.id)
+      );
+
+      this.updateSyncState({
+        ...state,
+        lastSyncedAt: Date.now(),
+        serverVersion: this.getLatestVersion(),
+        localVersion: this.getLatestVersion(),
+        syncStatus: 'idle',
+        pendingEvents: [],
+      });
+
+      this.appendSystemEvent(
+        'sync-' + clientId,
+        'SYNC_COMPLETED',
+        { clientId, appliedCount: eventsToApply.length, conflictCount: conflicts.length },
+        clientId
+      );
+
+      cacheService.invalidatePattern('bills');
+      cacheService.invalidatePattern('groups');
+
+      return {
+        success: conflicts.length === 0,
+        eventsToApply,
+        conflicts,
+        newServerVersion: this.getLatestVersion(),
+      };
+    } catch (error) {
+      this.appendSystemEvent(
+        'sync-' + clientId,
         'SYNC_FAILED',
         { clientId, error: (error as Error).message },
-        'system',
-        clientId,
-        0
+        clientId
       );
 
       throw error;
@@ -104,7 +93,58 @@ class SyncService {
     }
   }
 
-  private async applyRemoteEvent(event: Event): Promise<void> {
+  private appendSystemEvent(
+    aggregateId: string,
+    eventType: 'SYNC_STARTED' | 'SYNC_COMPLETED' | 'SYNC_FAILED' | 'CACHE_INVALIDATED' | 'TRANSACTION_ROLLBACK',
+    payload: Record<string, unknown>,
+    clientId: string
+  ): void {
+    const db = getDatabase();
+    const existingEvents = eventStore.getEventsByAggregate(aggregateId);
+    const currentVersion = existingEvents.length > 0 
+      ? existingEvents[existingEvents.length - 1].newVersion 
+      : 0;
+    const sequence = existingEvents.length + 1;
+    
+    const event: Event = {
+      id: uuidv4(),
+      eventType,
+      aggregateId,
+      aggregateType: 'system',
+      payload,
+      previousVersion: currentVersion,
+      newVersion: currentVersion + 1,
+      userId: 'system',
+      timestamp: Date.now(),
+      clientId,
+      sequence,
+    };
+
+    db.prepare(`
+      INSERT INTO events (
+        id, event_type, aggregate_id, aggregate_type, payload,
+        previous_version, new_version, user_id, timestamp,
+        client_id, ip_address, user_agent, correlation_id, sequence
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      event.id,
+      event.eventType,
+      event.aggregateId,
+      event.aggregateType,
+      JSON.stringify(event.payload),
+      event.previousVersion,
+      event.newVersion,
+      event.userId,
+      event.timestamp,
+      event.clientId,
+      null,
+      null,
+      null,
+      event.sequence
+    );
+  }
+
+  private applyRemoteEvent(event: Event): void {
     const db = getDatabase();
     
     const existing = db.prepare('SELECT id FROM events WHERE id = ?').get(event.id);
@@ -134,7 +174,7 @@ class SyncService {
     );
   }
 
-  private async getEventsSinceVersion(version: number): Promise<Event[]> {
+  private getEventsSinceVersion(version: number): Event[] {
     const db = getDatabase();
     const rows = db.prepare(`
       SELECT * FROM events 
@@ -191,21 +231,38 @@ class SyncService {
 
   private updateSyncState(state: SyncState): void {
     const db = getDatabase();
-    db.prepare(`
-      UPDATE sync_state SET
-        last_synced_at = ?,
-        pending_events = ?,
-        sync_status = ?,
-        server_version = ?,
-        local_version = ?
-      WHERE id = 'main'
-    `).run(
-      state.lastSyncedAt,
-      JSON.stringify(state.pendingEvents),
-      state.syncStatus,
-      state.serverVersion,
-      state.localVersion
-    );
+    const existing = db.prepare('SELECT id FROM sync_state WHERE id = ?').get('main');
+    
+    if (existing) {
+      db.prepare(`
+        UPDATE sync_state SET
+          last_synced_at = ?,
+          pending_events = ?,
+          sync_status = ?,
+          server_version = ?,
+          local_version = ?
+        WHERE id = 'main'
+      `).run(
+        state.lastSyncedAt,
+        JSON.stringify(state.pendingEvents),
+        state.syncStatus,
+        state.serverVersion,
+        state.localVersion
+      );
+    } else {
+      db.prepare(`
+        INSERT INTO sync_state (
+          id, last_synced_at, pending_events, sync_status, server_version, local_version
+        ) VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        'main',
+        state.lastSyncedAt,
+        JSON.stringify(state.pendingEvents),
+        state.syncStatus,
+        state.serverVersion,
+        state.localVersion
+      );
+    }
   }
 
   async queueForSync(event: Event): Promise<void> {
@@ -218,14 +275,16 @@ class SyncService {
     try {
       const events = eventStore.replayEvents(aggregateId, targetVersion);
       
-      await eventStore.appendEvent(
+      const currentEvents = eventStore.getEventsByAggregate(aggregateId);
+      const currentVersion = currentEvents.length > 0 
+        ? currentEvents[currentEvents.length - 1].newVersion 
+        : 0;
+
+      this.appendSystemEvent(
         aggregateId,
-        'system',
         'CACHE_INVALIDATED',
         { aggregateId, targetVersion },
-        'system',
-        'replay',
-        0
+        'replay'
       );
 
       const db = getDatabase();
@@ -261,17 +320,14 @@ class SyncService {
         }
       }
 
-      await cacheService.invalidate(aggregateId);
+      cacheService.invalidate(aggregateId);
       return true;
     } catch (error) {
-      await eventStore.appendEvent(
+      this.appendSystemEvent(
         aggregateId,
-        'system',
         'TRANSACTION_ROLLBACK',
         { aggregateId, targetVersion, error: (error as Error).message },
-        'system',
-        'replay',
-        0
+        'replay'
       );
       throw error;
     }

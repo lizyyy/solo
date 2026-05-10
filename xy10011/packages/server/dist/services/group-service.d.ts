@@ -5,6 +5,7 @@ declare class GroupService {
         userAgent?: string;
         correlationId?: string;
     }): Promise<Group>;
+    private findGroupByCorrelationId;
     updateGroup(groupId: string, updates: Partial<Group>, userId: string, clientId: string, expectedVersion: number, metadata?: {
         ipAddress?: string;
         userAgent?: string;
