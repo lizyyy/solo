@@ -32,6 +32,10 @@ func NewEventStore(db *gorm.DB, redisClient *redis.Client) *EventStore {
 	}
 }
 
+func (es *EventStore) GetDB() *gorm.DB {
+	return es.db
+}
+
 func RegisterHandler(eventType string, handler EventHandler) {
 	handlers[eventType] = append(handlers[eventType], handler)
 }
@@ -40,38 +44,47 @@ func (es *EventStore) AppendEvent(ctx context.Context, event *models.Event) erro
 	es.mu.Lock()
 	defer es.mu.Unlock()
 
-	return es.db.Transaction(func(tx *gorm.DB) error {
-		var maxVersion int
-		err := tx.Model(&models.Event{}).
-			Where("aggregate_type = ? AND aggregate_id = ?", event.AggregateType, event.AggregateID).
-			Select("COALESCE(MAX(event_version), 0)").
-			Scan(&maxVersion).Error
-		if err != nil {
-			return err
-		}
+	return es.appendEventWithTx(ctx, es.db, event)
+}
 
-		event.EventVersion = maxVersion + 1
+func (es *EventStore) AppendEventWithTx(ctx context.Context, tx *gorm.DB, event *models.Event) error {
+	es.mu.Lock()
+	defer es.mu.Unlock()
 
-		if err := tx.Create(event).Error; err != nil {
-			return fmt.Errorf("failed to create event: %w", err)
-		}
+	return es.appendEventWithTx(ctx, tx, event)
+}
 
-		if err := es.updateSnapshot(tx, event); err != nil {
-			return err
-		}
+func (es *EventStore) appendEventWithTx(ctx context.Context, tx *gorm.DB, event *models.Event) error {
+	var maxVersion int
+	err := tx.Model(&models.Event{}).
+		Where("aggregate_type = ? AND aggregate_id = ?", event.AggregateType, event.AggregateID).
+		Select("COALESCE(MAX(event_version), 0)").
+		Scan(&maxVersion).Error
+	if err != nil {
+		return err
+	}
 
-		if eventHandlers, ok := handlers[event.EventType]; ok {
-			for _, handler := range eventHandlers {
-				if err := handler(event); err != nil {
-					return fmt.Errorf("handler failed for event %s: %w", event.EventType, err)
-				}
+	event.EventVersion = maxVersion + 1
+
+	if err := tx.Create(event).Error; err != nil {
+		return fmt.Errorf("failed to create event: %w", err)
+	}
+
+	if err := es.updateSnapshot(tx, event); err != nil {
+		return err
+	}
+
+	if eventHandlers, ok := handlers[event.EventType]; ok {
+		for _, handler := range eventHandlers {
+			if err := handler(event); err != nil {
+				return fmt.Errorf("handler failed for event %s: %w", event.EventType, err)
 			}
 		}
+	}
 
-		es.invalidateCache(event.AggregateType, event.AggregateID)
+	es.invalidateCache(event.AggregateType, event.AggregateID)
 
-		return nil
-	})
+	return nil
 }
 
 func (es *EventStore) GetEvents(ctx context.Context, aggregateType string, aggregateID uuid.UUID, fromVersion int) ([]models.Event, error) {

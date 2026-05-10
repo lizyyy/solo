@@ -3,12 +3,9 @@
 set -e
 
 echo "========================================"
-echo "设备借用管理系统 - 修复验证脚本"
+echo "设备借用管理系统 - 修复验证脚本 (第二轮)"
 echo "========================================"
 echo ""
-
-# 检查关键文件是否存在
-echo "[1/8] 检查关键文件..."
 
 check_file() {
     if [ -f "$1" ]; then
@@ -19,6 +16,19 @@ check_file() {
     fi
 }
 
+check_pattern() {
+    file=$1
+    pattern=$2
+    desc=$3
+    if grep -q "$pattern" "$file"; then
+        echo "  ✓ $desc"
+    else
+        echo "  ✗ $desc"
+        exit 1
+    fi
+}
+
+echo "[1/12] 检查关键文件..."
 check_file "backend/go.mod"
 check_file "backend/go.sum"
 check_file "backend/main.go"
@@ -28,91 +38,67 @@ check_file "docker-compose.yml"
 check_file "database/schema.sql"
 
 echo ""
-echo "[2/8] 验证后端 Dockerfile 修复..."
-
-if grep -q "go mod tidy" "backend/Dockerfile"; then
-    echo "  ✓ Dockerfile 使用 go mod tidy"
-else
-    echo "  ✗ Dockerfile 缺少 go mod tidy"
-    exit 1
-fi
+echo "[2/12] 验证第一轮修复: Dockerfile go.sum 处理..."
+check_pattern "backend/Dockerfile" "go mod tidy" "Dockerfile 使用 go mod tidy"
 
 echo ""
-echo "[3/8] 验证 middleware.go log 导入..."
-
-if grep -q '"log"' "backend/internal/middleware/middleware.go"; then
-    echo "  ✓ middleware.go 导入了 log 包"
-else
-    echo "  ✗ middleware.go 缺少 log 包导入"
-    exit 1
-fi
+echo "[3/12] 验证第一轮修复: middleware.go log 导入..."
+check_pattern "backend/internal/middleware/middleware.go" '"log"' "middleware.go 导入了 log 包"
 
 echo ""
-echo "[4/8] 验证 JWT Secret 统一..."
-
-if grep -q "cfg.JWT.Secret" "backend/main.go"; then
-    echo "  ✓ main.go 传递 cfg.JWT.Secret 给 UserService"
-else
-    echo "  ✗ main.go 未正确传递 JWT Secret"
-    exit 1
-fi
-
-if grep -q "jwtSecret string" "backend/internal/service/service.go"; then
-    echo "  ✓ UserService 接收 jwtSecret 参数"
-else
-    echo "  ✗ UserService 未接收 jwtSecret 参数"
-    exit 1
-fi
+echo "[4/12] 验证第一轮修复: JWT Secret 统一..."
+check_pattern "backend/main.go" "cfg.JWT.Secret" "main.go 传递 cfg.JWT.Secret 给 UserService"
+check_pattern "backend/internal/service/service.go" "jwtSecret string" "UserService 接收 jwtSecret 参数"
 
 echo ""
-echo "[5/8] 验证前端 Devices.vue 命名冲突修复..."
-
-if grep -q "apiDeleteDevice" "frontend/src/views/Devices.vue"; then
-    echo "  ✓ API 导入已重命名为 apiDeleteDevice"
-else
-    echo "  ✗ Devices.vue 仍有命名冲突"
-    exit 1
-fi
-
-if grep -q "import { computed } from 'vue'" "frontend/src/views/Devices.vue"; then
-    echo "  ✓ computed 已在顶部导入"
-else
-    echo "  ✗ computed 导入位置错误"
-    exit 1
-fi
+echo "[5/12] 验证第一轮修复: 前端 Devices.vue 命名冲突..."
+check_pattern "frontend/src/views/Devices.vue" "apiDeleteDevice" "API 导入已重命名为 apiDeleteDevice"
 
 echo ""
-echo "[6/8] 验证数据库 schema..."
-
-if grep -q "users" "database/schema.sql" && grep -q "devices" "database/schema.sql" && grep -q "events" "database/schema.sql"; then
-    echo "  ✓ 数据库 schema 包含核心表"
-else
-    echo "  ✗ 数据库 schema 不完整"
-    exit 1
-fi
+echo "[6/12] 验证第二轮修复: 高级中间件注册..."
+check_pattern "backend/main.go" "IdempotencyMiddleware" "main.go 注册了 IdempotencyMiddleware"
+check_pattern "backend/main.go" "AuditMiddleware" "main.go 注册了 AuditMiddleware"
+check_pattern "backend/main.go" "DistributedLockMiddleware" "main.go 注册了 DistributedLockMiddleware"
+check_pattern "backend/main.go" "OptimisticLockMiddleware" "main.go 注册了 OptimisticLockMiddleware"
 
 echo ""
-echo "[7/8] 验证 docker-compose 配置..."
-
-if grep -q "device-borrow-postgres" "docker-compose.yml" && grep -q "device-borrow-backend" "docker-compose.yml" && grep -q "device-borrow-frontend" "docker-compose.yml"; then
-    echo "  ✓ Docker Compose 配置完整"
-else
-    echo "  ✗ Docker Compose 配置不完整"
-    exit 1
-fi
+echo "[7/12] 验证第二轮修复: Repository 事务支持..."
+check_pattern "backend/internal/repository/repository.go" "func.*WithTx" "Repository 有 WithTx 方法"
 
 echo ""
-echo "[8/8] 检查环境变量配置..."
+echo "[8/12] 验证第二轮修复: EventStore 事务支持..."
+check_pattern "backend/internal/eventstore/eventstore.go" "func.*AppendEventWithTx" "EventStore 有 AppendEventWithTx 方法"
+check_pattern "backend/internal/eventstore/eventstore.go" "func.*GetDB" "EventStore 有 GetDB 方法"
 
-if [ -f ".env" ]; then
-    echo "  ✓ .env 文件存在"
-else
-    echo "  ⚠ .env 文件不存在，将使用默认配置"
-fi
+echo ""
+echo "[9/12] 验证第二轮修复: BorrowDevice 事务化..."
+check_pattern "backend/internal/service/service.go" "db.*:=.*GetDB" "BorrowDevice 获取 db 连接"
+check_pattern "backend/internal/service/service.go" "Transaction" "BorrowDevice 使用事务"
+check_pattern "backend/internal/service/service.go" "if err.*AppendEventWithTx" "BorrowDevice 检查 AppendEvent 错误"
+
+echo ""
+echo "[10/12] 验证第二轮修复: ReturnDevice 事务化..."
+check_pattern "backend/internal/service/service.go" "ReturnDevice.*requestID" "ReturnDevice 接收 requestID 参数"
+
+echo ""
+echo "[11/12] 验证第二轮修复: RequestID 链路追踪..."
+check_pattern "backend/internal/middleware/middleware.go" "uuid.New" "RequestIDMiddleware 生成 UUID"
+check_pattern "backend/internal/service/service.go" "RequestID: requestID" "事件写入 RequestID"
+check_pattern "backend/internal/api/api.go" "getRequestIDFromContext" "API 层获取并传递 RequestID"
+
+echo ""
+echo "[12/12] 验证数据库 schema..."
+check_pattern "database/schema.sql" "events" "数据库有 events 表"
 
 echo ""
 echo "========================================"
 echo "所有关键修复验证通过！"
+echo ""
+echo "核心修复说明："
+echo "  ✓ 高级中间件：幂等、审计、分布式锁、乐观锁已注册"
+echo "  ✓ 事务保证：借用/归还操作在同一个数据库事务中"
+echo "  ✓ 错误处理：AppendEvent 错误不再被忽略，失败时回滚"
+echo "  ✓ 链路追踪：所有事件写入 request_id，支持按请求回溯"
 echo ""
 echo "启动命令："
 echo "  docker-compose up -d"

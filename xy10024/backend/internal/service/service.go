@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -420,7 +421,11 @@ func NewBorrowService(borrowRepo *repository.BorrowRepository, deviceRepo *repos
 	}
 }
 
-func (s *BorrowService) BorrowDevice(deviceID, borrowerID uuid.UUID, purpose string, expectedReturnDate *time.Time, createdBy uuid.UUID) (*models.BorrowRecord, error) {
+type BorrowContext struct {
+	RequestID *uuid.UUID
+}
+
+func (s *BorrowService) BorrowDevice(deviceID, borrowerID uuid.UUID, purpose string, expectedReturnDate *time.Time, createdBy uuid.UUID, requestID *uuid.UUID) (*models.BorrowRecord, error) {
 	ctx := context.Background()
 
 	lockKey := fmt.Sprintf("lock:borrow:%s", deviceID.String())
@@ -432,71 +437,91 @@ func (s *BorrowService) BorrowDevice(deviceID, borrowerID uuid.UUID, purpose str
 		defer s.redis.Del(ctx, lockKey)
 	}
 
-	device, err := s.deviceRepo.FindByID(deviceID)
+	db := s.eventStore.GetDB()
+	var record *models.BorrowRecord
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		borrowRepo := s.borrowRepo.WithTx(tx)
+		deviceRepo := s.deviceRepo.WithTx(tx)
+
+		device, err := deviceRepo.FindByID(deviceID)
+		if err != nil {
+			return errors.New("device not found")
+		}
+
+		if device.Status != "available" {
+			return errors.New("device is not available for borrowing")
+		}
+
+		record = &models.BorrowRecord{
+			DeviceID:           deviceID,
+			BorrowerID:         borrowerID,
+			Purpose:            purpose,
+			ExpectedReturnDate: expectedReturnDate,
+			Status:             "borrowed",
+			CreatedBy:          &createdBy,
+		}
+
+		if err := borrowRepo.Create(record); err != nil {
+			return err
+		}
+
+		device.Status = "borrowed"
+		device.LastEventID = &record.ID
+		if err := deviceRepo.Update(device); err != nil {
+			return err
+		}
+
+		deviceEvent := &models.Event{
+			AggregateType: "device",
+			AggregateID:   deviceID,
+			EventType:     "device.borrowed",
+			Payload: map[string]interface{}{
+				"record_id":            record.ID.String(),
+				"borrower_id":          borrowerID.String(),
+				"purpose":              purpose,
+				"expected_return_date": expectedReturnDate,
+				"old_status":           "available",
+				"new_status":           "borrowed",
+			},
+			Metadata: map[string]interface{}{
+				"timestamp": time.Now().Unix(),
+				"action_by": createdBy.String(),
+			},
+			CreatedBy: &createdBy,
+			RequestID: requestID,
+		}
+		if err := s.eventStore.AppendEventWithTx(ctx, tx, deviceEvent); err != nil {
+			return fmt.Errorf("failed to append device event: %w", err)
+		}
+
+		borrowEvent := &models.Event{
+			AggregateType: "borrow",
+			AggregateID:   record.ID,
+			EventType:     "borrow.created",
+			Payload: map[string]interface{}{
+				"device_id":            deviceID.String(),
+				"borrower_id":          borrowerID.String(),
+				"purpose":              purpose,
+				"expected_return_date": expectedReturnDate,
+				"status":               "borrowed",
+			},
+			Metadata: map[string]interface{}{
+				"timestamp": time.Now().Unix(),
+			},
+			CreatedBy: &createdBy,
+			RequestID: requestID,
+		}
+		if err := s.eventStore.AppendEventWithTx(ctx, tx, borrowEvent); err != nil {
+			return fmt.Errorf("failed to append borrow event: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, errors.New("device not found")
-	}
-
-	if device.Status != "available" {
-		return nil, errors.New("device is not available for borrowing")
-	}
-
-	record := &models.BorrowRecord{
-		DeviceID:           deviceID,
-		BorrowerID:         borrowerID,
-		Purpose:            purpose,
-		ExpectedReturnDate: expectedReturnDate,
-		Status:             "borrowed",
-		CreatedBy:          &createdBy,
-	}
-
-	if err := s.borrowRepo.Create(record); err != nil {
 		return nil, err
 	}
-
-	device.Status = "borrowed"
-	device.LastEventID = &record.ID
-	if err := s.deviceRepo.Update(device); err != nil {
-		return nil, err
-	}
-
-	event := &models.Event{
-		AggregateType: "device",
-		AggregateID:   deviceID,
-		EventType:     "device.borrowed",
-		Payload: map[string]interface{}{
-			"record_id":            record.ID.String(),
-			"borrower_id":          borrowerID.String(),
-			"purpose":              purpose,
-			"expected_return_date": expectedReturnDate,
-			"old_status":           "available",
-			"new_status":           "borrowed",
-		},
-		Metadata: map[string]interface{}{
-			"timestamp": time.Now().Unix(),
-			"action_by": createdBy.String(),
-		},
-		CreatedBy: &createdBy,
-	}
-	s.eventStore.AppendEvent(ctx, event)
-
-	borrowEvent := &models.Event{
-		AggregateType: "borrow",
-		AggregateID:   record.ID,
-		EventType:     "borrow.created",
-		Payload: map[string]interface{}{
-			"device_id":            deviceID.String(),
-			"borrower_id":          borrowerID.String(),
-			"purpose":              purpose,
-			"expected_return_date": expectedReturnDate,
-			"status":               "borrowed",
-		},
-		Metadata: map[string]interface{}{
-			"timestamp": time.Now().Unix(),
-		},
-		CreatedBy: &createdBy,
-	}
-	s.eventStore.AppendEvent(ctx, borrowEvent)
 
 	if s.redis != nil {
 		cacheKey := fmt.Sprintf("cache:device:%s", deviceID.String())
@@ -506,73 +531,94 @@ func (s *BorrowService) BorrowDevice(deviceID, borrowerID uuid.UUID, purpose str
 	return record, nil
 }
 
-func (s *BorrowService) ReturnDevice(recordID uuid.UUID, notes string, returnedBy uuid.UUID) (*models.BorrowRecord, error) {
+func (s *BorrowService) ReturnDevice(recordID uuid.UUID, notes string, returnedBy uuid.UUID, requestID *uuid.UUID) (*models.BorrowRecord, error) {
 	ctx := context.Background()
 
-	record, err := s.borrowRepo.FindByID(recordID)
+	db := s.eventStore.GetDB()
+	var record *models.BorrowRecord
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		borrowRepo := s.borrowRepo.WithTx(tx)
+		deviceRepo := s.deviceRepo.WithTx(tx)
+
+		var err error
+		record, err = borrowRepo.FindByID(recordID)
+		if err != nil {
+			return errors.New("borrow record not found")
+		}
+
+		if record.Status != "borrowed" {
+			return errors.New("this device is already returned")
+		}
+
+		device, err := deviceRepo.FindByID(record.DeviceID)
+		if err != nil {
+			return errors.New("device not found")
+		}
+
+		now := time.Now()
+		record.ActualReturnDate = &now
+		record.Status = "returned"
+		record.Notes = notes
+
+		if err := borrowRepo.Update(record); err != nil {
+			return err
+		}
+
+		device.Status = "available"
+		device.LastEventID = &record.ID
+		if err := deviceRepo.Update(device); err != nil {
+			return err
+		}
+
+		deviceEvent := &models.Event{
+			AggregateType: "device",
+			AggregateID:   record.DeviceID,
+			EventType:     "device.returned",
+			Payload: map[string]interface{}{
+				"record_id":          record.ID.String(),
+				"actual_return_date": now,
+				"notes":              notes,
+				"old_status":         "borrowed",
+				"new_status":         "available",
+			},
+			Metadata: map[string]interface{}{
+				"timestamp": time.Now().Unix(),
+				"action_by": returnedBy.String(),
+			},
+			CreatedBy: &returnedBy,
+			RequestID: requestID,
+		}
+		if err := s.eventStore.AppendEventWithTx(ctx, tx, deviceEvent); err != nil {
+			return fmt.Errorf("failed to append device event: %w", err)
+		}
+
+		borrowEvent := &models.Event{
+			AggregateType: "borrow",
+			AggregateID:   record.ID,
+			EventType:     "borrow.completed",
+			Payload: map[string]interface{}{
+				"actual_return_date": now,
+				"notes":              notes,
+				"old_status":         "borrowed",
+				"new_status":         "returned",
+			},
+			Metadata: map[string]interface{}{
+				"timestamp": time.Now().Unix(),
+			},
+			CreatedBy: &returnedBy,
+			RequestID: requestID,
+		}
+		if err := s.eventStore.AppendEventWithTx(ctx, tx, borrowEvent); err != nil {
+			return fmt.Errorf("failed to append borrow event: %w", err)
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		return nil, errors.New("borrow record not found")
-	}
-
-	if record.Status != "borrowed" {
-		return nil, errors.New("this device is already returned")
-	}
-
-	device, err := s.deviceRepo.FindByID(record.DeviceID)
-	if err != nil {
-		return nil, errors.New("device not found")
-	}
-
-	now := time.Now()
-	record.ActualReturnDate = &now
-	record.Status = "returned"
-	record.Notes = notes
-
-	if err := s.borrowRepo.Update(record); err != nil {
 		return nil, err
 	}
-
-	device.Status = "available"
-	device.LastEventID = &record.ID
-	if err := s.deviceRepo.Update(device); err != nil {
-		return nil, err
-	}
-
-	event := &models.Event{
-		AggregateType: "device",
-		AggregateID:   record.DeviceID,
-		EventType:     "device.returned",
-		Payload: map[string]interface{}{
-			"record_id":          record.ID.String(),
-			"actual_return_date": now,
-			"notes":              notes,
-			"old_status":         "borrowed",
-			"new_status":         "available",
-		},
-		Metadata: map[string]interface{}{
-			"timestamp": time.Now().Unix(),
-			"action_by": returnedBy.String(),
-		},
-		CreatedBy: &returnedBy,
-	}
-	s.eventStore.AppendEvent(ctx, event)
-
-	borrowEvent := &models.Event{
-		AggregateType: "borrow",
-		AggregateID:   record.ID,
-		EventType:     "borrow.completed",
-		Payload: map[string]interface{}{
-			"actual_return_date": now,
-			"notes":              notes,
-			"old_status":         "borrowed",
-			"new_status":         "returned",
-		},
-		Metadata: map[string]interface{}{
-			"timestamp": time.Now().Unix(),
-		},
-		CreatedBy: &returnedBy,
-	}
-	s.eventStore.AppendEvent(ctx, borrowEvent)
 
 	if s.redis != nil {
 		cacheKey := fmt.Sprintf("cache:device:%s", record.DeviceID.String())

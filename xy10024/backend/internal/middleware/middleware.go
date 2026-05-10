@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -27,7 +28,7 @@ func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := c.GetHeader("X-Request-ID")
 		if requestID == "" {
-			requestID = generateRequestID()
+			requestID = uuid.New().String()
 		}
 		c.Set("request_id", requestID)
 		c.Writer.Header().Set("X-Request-ID", requestID)
@@ -70,8 +71,4 @@ func RecoveryMiddleware() gin.HandlerFunc {
 		}()
 		c.Next()
 	}
-}
-
-func generateRequestID() string {
-	return time.Now().Format("20060102150405.000000000")
 }

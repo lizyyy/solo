@@ -423,12 +423,15 @@ func (api *API) BorrowDevice(c *gin.Context) {
 	userID := c.GetString("user_id")
 	borrowerID, _ := uuid.Parse(userID)
 
+	requestID := getRequestIDFromContext(c)
+
 	record, err := api.borrowService.BorrowDevice(
 		deviceID,
 		borrowerID,
 		req.Purpose,
 		req.ExpectedReturnDate,
 		borrowerID,
+		requestID,
 	)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -458,7 +461,9 @@ func (api *API) ReturnDevice(c *gin.Context) {
 	userID := c.GetString("user_id")
 	returnedBy, _ := uuid.Parse(userID)
 
-	record, err := api.borrowService.ReturnDevice(recordID, req.Notes, returnedBy)
+	requestID := getRequestIDFromContext(c)
+
+	record, err := api.borrowService.ReturnDevice(recordID, req.Notes, returnedBy, requestID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -674,3 +679,15 @@ func validateToken(tokenString, secret string) (map[string]interface{}, error) {
 }
 
 var _ = json.Marshal
+
+func getRequestIDFromContext(c *gin.Context) *uuid.UUID {
+	requestIDStr := c.GetString("request_id")
+	if requestIDStr == "" {
+		return nil
+	}
+	requestID, err := uuid.Parse(requestIDStr)
+	if err != nil {
+		return nil
+	}
+	return &requestID
+}

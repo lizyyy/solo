@@ -15,6 +15,10 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
+func (r *UserRepository) WithTx(tx *gorm.DB) *UserRepository {
+	return &UserRepository{db: tx}
+}
+
 func (r *UserRepository) Create(user *models.User) error {
 	return r.db.Create(user).Error
 }
@@ -63,6 +67,10 @@ type DeviceRepository struct {
 
 func NewDeviceRepository(db *gorm.DB) *DeviceRepository {
 	return &DeviceRepository{db: db}
+}
+
+func (r *DeviceRepository) WithTx(tx *gorm.DB) *DeviceRepository {
+	return &DeviceRepository{db: tx}
 }
 
 func (r *DeviceRepository) Create(device *models.Device) error {
@@ -128,6 +136,10 @@ type BorrowRepository struct {
 
 func NewBorrowRepository(db *gorm.DB) *BorrowRepository {
 	return &BorrowRepository{db: db}
+}
+
+func (r *BorrowRepository) WithTx(tx *gorm.DB) *BorrowRepository {
+	return &BorrowRepository{db: tx}
 }
 
 func (r *BorrowRepository) Create(record *models.BorrowRecord) error {

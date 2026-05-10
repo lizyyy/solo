@@ -52,6 +52,10 @@ func main() {
 	router.Use(middleware.RequestIDMiddleware())
 	router.Use(middleware.LoggerMiddleware())
 	router.Use(middleware.RecoveryMiddleware())
+	router.Use(middleware.IdempotencyMiddleware(db, redisClient))
+	router.Use(middleware.DistributedLockMiddleware(redisClient))
+	router.Use(middleware.OptimisticLockMiddleware())
+	router.Use(middleware.AuditMiddleware(db, redisClient))
 	
 	api.RegisterRoutes(router, userService, deviceService, borrowService, auditService, exportService, cfg)
 	
