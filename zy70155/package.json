@@ -1,0 +1,15 @@
+{
+  "name": "idempotent-key-service",
+  "version": "1.0.0",
+  "description": "幂等键生命周期服务API系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test-cases.js",
+    "load-test": "node load-test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
