@@ -1,0 +1,561 @@
+{
+  "quotes": [
+    {
+      "supplier_name": "晨光",
+      "quote_id": "1796b3b38e57",
+      "quote_date": null,
+      "items": [
+        {
+          "sku": "PEN-001",
+          "name": "晨光中性笔 0.5mm",
+          "quantity": 50.0,
+          "unit": "支",
+          "unit_price": 1.8,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "PEN-001",
+            "商品名称": "晨光中性笔 0.5mm",
+            "数量": "50",
+            "单位": "支",
+            "单价(元)": "1.80",
+            "税率": "13%",
+            "小计(元)": "90.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "PAPER-001",
+          "name": "A4打印纸 70g",
+          "quantity": 10.0,
+          "unit": "包",
+          "unit_price": 25.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "PAPER-001",
+            "商品名称": "A4打印纸 70g",
+            "数量": "10",
+            "单位": "包",
+            "单价(元)": "25.00",
+            "税率": "13%",
+            "小计(元)": "250.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "CLIP-001",
+          "name": "回形针 100只装",
+          "quantity": 20.0,
+          "unit": "盒",
+          "unit_price": 2.5,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "CLIP-001",
+            "商品名称": "回形针 100只装",
+            "数量": "20",
+            "单位": "盒",
+            "单价(元)": "2.50",
+            "税率": "13%",
+            "小计(元)": "50.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "TAPE-001",
+          "name": "透明胶带 50m",
+          "quantity": 15.0,
+          "unit": "卷",
+          "unit_price": 3.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "TAPE-001",
+            "商品名称": "透明胶带 50m",
+            "数量": "15",
+            "单位": "卷",
+            "单价(元)": "3.00",
+            "税率": "13%",
+            "小计(元)": "45.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "FOLDER-001",
+          "name": "文件夹 A4",
+          "quantity": 30.0,
+          "unit": "个",
+          "unit_price": 4.5,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "FOLDER-001",
+            "商品名称": "文件夹 A4",
+            "数量": "30",
+            "单位": "个",
+            "单价(元)": "4.50",
+            "税率": "13%",
+            "小计(元)": "135.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "STAPLER-001",
+          "name": "订书器 标准型",
+          "quantity": 5.0,
+          "unit": "个",
+          "unit_price": 15.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "STAPLER-001",
+            "商品名称": "订书器 标准型",
+            "数量": "5",
+            "单位": "个",
+            "单价(元)": "15.00",
+            "税率": "13%",
+            "小计(元)": "75.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "PEN-002",
+          "name": "晨光荧光笔 黄色",
+          "quantity": 20.0,
+          "unit": "支",
+          "unit_price": 0.0,
+          "tax_rate": 13.0,
+          "is_gift": true,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "PEN-002",
+            "商品名称": "晨光荧光笔 黄色",
+            "数量": "20",
+            "单位": "支",
+            "单价(元)": "0",
+            "税率": "13%",
+            "小计(元)": "0.00",
+            "备注": "赠品"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "GIFT-001",
+          "name": "精美便签本",
+          "quantity": 2.0,
+          "unit": "本",
+          "unit_price": 0.0,
+          "tax_rate": 13.0,
+          "is_gift": true,
+          "is_package_item": false,
+          "original_line": {
+            "SKU": "GIFT-001",
+            "商品名称": "精美便签本",
+            "数量": "2",
+            "单位": "本",
+            "单价(元)": "0",
+            "税率": "13%",
+            "小计(元)": "0.00",
+            "备注": "免费赠送"
+          },
+          "warnings": []
+        }
+      ],
+      "packages": [],
+      "shipping_fee": 0.0,
+      "shipping_tax_rate": 9.0,
+      "corrections": [],
+      "file_hash": "1796b3b38e574f43a01447fbe497977d"
+    },
+    {
+      "supplier_name": "得力",
+      "quote_id": "ccb12086c7bd",
+      "quote_date": null,
+      "items": [
+        {
+          "sku": "PEN-001",
+          "name": "得力中性笔 0.5mm",
+          "quantity": 50.0,
+          "unit": "支",
+          "unit_price": 1.65,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "PEN-001",
+            "品名": "得力中性笔 0.5mm",
+            "采购量": "50",
+            "单位": "支",
+            "单价": "1.65",
+            "增值税率": "13%",
+            "金额": "82.50",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "PAPER-001",
+          "name": "A4打印纸 70g",
+          "quantity": 1.0,
+          "unit": "箱",
+          "unit_price": 240.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "PAPER-001",
+            "品名": "A4打印纸 70g",
+            "采购量": "1",
+            "单位": "箱",
+            "单价": "240.00",
+            "增值税率": "13%",
+            "金额": "240.00",
+            "备注": "1箱=10包"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "CLIP-001",
+          "name": "回形针 100只装",
+          "quantity": 20.0,
+          "unit": "盒",
+          "unit_price": 2.8,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "CLIP-001",
+            "品名": "回形针 100只装",
+            "采购量": "20",
+            "单位": "盒",
+            "单价": "2.80",
+            "增值税率": "13%",
+            "金额": "56.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "TAPE-001",
+          "name": "透明胶带 50m",
+          "quantity": 15.0,
+          "unit": "卷",
+          "unit_price": 2.9,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "TAPE-001",
+            "品名": "透明胶带 50m",
+            "采购量": "15",
+            "单位": "卷",
+            "单价": "2.90",
+            "增值税率": "13%",
+            "金额": "43.50",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "FOLDER-001",
+          "name": "文件夹 A4",
+          "quantity": 30.0,
+          "unit": "个",
+          "unit_price": 4.8,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "FOLDER-001",
+            "品名": "文件夹 A4",
+            "采购量": "30",
+            "单位": "个",
+            "单价": "4.80",
+            "增值税率": "13%",
+            "金额": "144.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "STAPLER-001",
+          "name": "订书器 标准型",
+          "quantity": 5.0,
+          "unit": "个",
+          "unit_price": 14.5,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "STAPLER-001",
+            "品名": "订书器 标准型",
+            "采购量": "5",
+            "单位": "个",
+            "单价": "14.50",
+            "增值税率": "13%",
+            "金额": "72.50",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "HIGHLIGHT-001",
+          "name": "荧光笔 黄色",
+          "quantity": 20.0,
+          "unit": "支",
+          "unit_price": 2.2,
+          "tax_rate": null,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "HIGHLIGHT-001",
+            "品名": "荧光笔 黄色",
+            "采购量": "20",
+            "单位": "支",
+            "单价": "2.20",
+            "增值税率": "nan",
+            "金额": "44.00",
+            "备注": "税率未提供"
+          },
+          "warnings": [
+            "缺税率"
+          ]
+        },
+        {
+          "sku": "CUTTER-001",
+          "name": "美工刀 大号",
+          "quantity": 10.0,
+          "unit": "把",
+          "unit_price": 8.5,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "货号": "CUTTER-001",
+            "品名": "美工刀 大号",
+            "采购量": "10",
+            "单位": "把",
+            "单价": "8.50",
+            "增值税率": "13%",
+            "金额": "85.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        }
+      ],
+      "packages": [],
+      "shipping_fee": 15.0,
+      "shipping_tax_rate": 9.0,
+      "corrections": [
+        {
+          "timestamp": "2026-05-10T18:24:39.799958",
+          "field": "shipping_fee",
+          "old_value": "15",
+          "new_value": "0",
+          "reason": "供应商确认实际包邮"
+        }
+      ],
+      "file_hash": "ccb12086c7bd2f66bbcf5a435eb90c1c"
+    },
+    {
+      "supplier_name": "齐心",
+      "quote_id": "b94a4b70463d",
+      "quote_date": null,
+      "items": [
+        {
+          "sku": "PEN-001",
+          "name": "齐心中性笔 0.5mm",
+          "quantity": 50.0,
+          "unit": "支",
+          "unit_price": 1.7,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "PEN-001",
+            "商品名称": "齐心中性笔 0.5mm",
+            "数量": "50",
+            "计量单位": "支",
+            "价格": "1.70",
+            "税率": "13%",
+            "价税合计": "85.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "PAPER-001",
+          "name": "A4打印纸 70g",
+          "quantity": 5.0,
+          "unit": "包",
+          "unit_price": 24.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "PAPER-001",
+            "商品名称": "A4打印纸 70g",
+            "数量": "5",
+            "计量单位": "包",
+            "价格": "24.00",
+            "税率": "13%",
+            "价税合计": "120.00",
+            "备注": "买5送5"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "CLIP-001",
+          "name": "回形针 100只装",
+          "quantity": 20.0,
+          "unit": "盒",
+          "unit_price": 2.6,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "CLIP-001",
+            "商品名称": "回形针 100只装",
+            "数量": "20",
+            "计量单位": "盒",
+            "价格": "2.60",
+            "税率": "13%",
+            "价税合计": "52.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "TAPE-001",
+          "name": "透明胶带 50m",
+          "quantity": 15.0,
+          "unit": "卷",
+          "unit_price": 3.2,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "TAPE-001",
+            "商品名称": "透明胶带 50m",
+            "数量": "15",
+            "计量单位": "卷",
+            "价格": "3.20",
+            "税率": "13%",
+            "价税合计": "48.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "FOLDER-001",
+          "name": "文件夹 A4",
+          "quantity": 30.0,
+          "unit": "个",
+          "unit_price": 4.2,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "FOLDER-001",
+            "商品名称": "文件夹 A4",
+            "数量": "30",
+            "计量单位": "个",
+            "价格": "4.20",
+            "税率": "13%",
+            "价税合计": "126.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "STAPLER-001",
+          "name": "订书器 标准型",
+          "quantity": 5.0,
+          "unit": "个",
+          "unit_price": 16.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "STAPLER-001",
+            "商品名称": "订书器 标准型",
+            "数量": "5",
+            "计量单位": "个",
+            "价格": "16.00",
+            "税率": "13%",
+            "价税合计": "80.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        },
+        {
+          "sku": "PEN-002",
+          "name": "荧光笔 黄色",
+          "quantity": 20.0,
+          "unit": "支",
+          "unit_price": 2.0,
+          "tax_rate": 13.0,
+          "is_gift": false,
+          "is_package_item": false,
+          "original_line": {
+            "sku": "PEN-002",
+            "商品名称": "荧光笔 黄色",
+            "数量": "20",
+            "计量单位": "支",
+            "价格": "2.00",
+            "税率": "13%",
+            "价税合计": "40.00",
+            "备注": "nan"
+          },
+          "warnings": []
+        }
+      ],
+      "packages": [
+        {
+          "sku": "BUNDLE-001",
+          "name": "办公基础套装",
+          "quantity": 1.0,
+          "unit": "套",
+          "package_price": 299.0,
+          "items": [],
+          "tax_rate": 13.0,
+          "original_line": {
+            "sku": "BUNDLE-001",
+            "商品名称": "办公基础套装",
+            "数量": "1",
+            "计量单位": "套",
+            "价格": "299.00",
+            "税率": "13%",
+            "价税合计": "299.00",
+            "备注": "套餐包:中性笔10支+文件夹5个+订书器1个"
+          },
+          "warnings": [
+            "套餐包内容未知"
+          ]
+        }
+      ],
+      "shipping_fee": 8.0,
+      "shipping_tax_rate": 9.0,
+      "corrections": [],
+      "file_hash": "b94a4b70463d1503032981d9d1ea0dc6"
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-05-10T18:22:50.985440",
+    "updated_at": "2026-05-10T18:24:39.800188",
+    "version": "1.0"
+  }
+}
