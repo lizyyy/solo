@@ -1,0 +1,43 @@
+{
+  "name": "livestock-vaccination-service",
+  "version": "1.0.0",
+  "description": "养殖疫苗接种批次服务",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "typeorm": "typeorm-ts-node-commonjs"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.3.17",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/uuid": "^9.0.2",
+    "@types/jest": "^29.5.4",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1",
+    "@types/better-sqlite3": "^7.6.4"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": ["**/tests/**/*.test.ts"],
+    "collectCoverageFrom": ["src/**/*.ts"],
+    "coveragePathIgnorePatterns": ["/node_modules/", "/tests/"],
+    "transform": {
+      "^.+\\.tsx?$": ["ts-jest", { "tsconfig": "tsconfig.json", "isolatedModules": true }]
+    },
+    "moduleFileExtensions": ["ts", "js", "json"]
+  }
+}
