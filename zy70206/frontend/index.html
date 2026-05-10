@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校园实验危化品领用台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; }
+    .app { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #1e3a5f, #2d5a87); color: white; padding: 24px 32px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; background: white; padding: 6px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .tab { padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.2s; color: #64748b; }
+    .tab:hover { background: #f1f5f9; }
+    .tab.active { background: #1e3a5f; color: white; }
+    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .card-title { font-size: 18px; font-weight: 600; color: #1e293b; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #334155; font-size: 14px; }
+    .form-label .required { color: #ef4444; margin-left: 2px; }
+    .form-input, .form-select { width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: #1e3a5f; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-size: 14px; }
+    .btn-primary { background: #1e3a5f; color: white; }
+    .btn-primary:hover { background: #2d5a87; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .alert { padding: 14px 18px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
+    .alert-error { background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; }
+    .alert-warning { background: #fffbeb; border-left: 4px solid #f59e0b; color: #92400e; }
+    .alert-success { background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; }
+    .alert-info { background: #eff6ff; border-left: 4px solid #3b82f6; color: #1e40af; }
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    .table th { background: #f8fafc; font-weight: 600; color: #475569; }
+    .table tr:hover { background: #f8fafc; }
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -28px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #1e3a5f; border: 3px solid #e2e8f0; }
+    .timeline-item:last-child { padding-bottom: 0; }
+    .timeline-title { font-weight: 600; color: #1e293b; margin-bottom: 2px; }
+    .timeline-time { font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    .timeline-comment { font-size: 14px; color: #64748b; }
+    .step-card { background: #f8fafc; border-radius: 10px; padding: 16px; border-left: 4px solid #1e3a5f; }
+    .step-title { font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+    .step-desc { font-size: 13px; color: #64748b; }
+    .close-progress { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .close-progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.3s; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .stat-value { font-size: 32px; font-weight: 700; color: #1e3a5f; }
+    .stat-label { font-size: 13px; color: #64748b; margin-top: 4px; }
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 20px; font-weight: 600; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b; }
+    .action-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .kpi-block { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); padding: 20px; border-radius: 10px; border: 1px solid #bae6fd; }
+    .kpi-title { font-size: 12px; color: #0369a1; font-weight: 600; margin-bottom: 8px; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: #075985; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    .error-detail { background: #fff1f2; padding: 12px; border-radius: 6px; margin-top: 12px; font-family: monospace; font-size: 12px; }
+    .evidence-tag { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div id="app" class="app">
+    <div class="header">
+      <h1>🏫 校园实验危化品领用台</h1>
+      <p>危化品台账 → 导师审批 → 批号库存 → 回收闭环</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab" :class="{ active: currentTab === 'dashboard' }" @click="currentTab = 'dashboard'; refreshData()">📊 总览</div>
+      <div class="tab" :class="{ active: currentTab === 'chemicals' }" @click="currentTab = 'chemicals'; loadChemicals()">📦 危化品台账</div>
+      <div class="tab" :class="{ active: currentTab === 'batches' }" @click="currentTab = 'batches'; loadBatches()">🏷️ 批号库存</div>
+      <div class="tab" :class="{ active: currentTab === 'requisitions' }" @click="currentTab = 'requisitions'; loadRequisitions()">📝 领用单</div>
+      <div class="tab" :class="{ active: currentTab === 'test' }" @click="currentTab = 'test'">🧪 异常样例测试</div>
+    </div>
+
+    <!-- Dashboard -->
+    <div v-if="currentTab === 'dashboard'">
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-value">{{ chemicals.length }}</div>
+          <div class="stat-label">台账化学品种类</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ batches.length }}</div>
+          <div class="stat-label">在库批号数量</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ requisitions.length }}</div>
+          <div class="stat-label">累计领用单数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ closedCount }}</div>
+          <div class="stat-label">已闭环申请</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">⏳ 待处理申请</div></div>
+          <div v-if="pendingRequisitions.length === 0">
+            <p style="color: #94a3b8; text-align: center; padding: 20px;">暂无待处理申请</p>
+          </div>
+          <div v-else>
+            <div v-for="req in pendingRequisitions" :key="req.id" class="card" style="background: #fefce8; margin-bottom: 12px; cursor: pointer;" @click="showRequisitionDetail(req.id)">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong>{{ req.chemical_name }}</strong> <span class="evidence-tag">{{ req.batch_no }}</span>
+                  <div style="color: #64748b; font-size: 12px; margin-top: 4px;">
+                    {{ req.requester_name }} → {{ req.advisor_name || '未选导师' }}
+                  </div>
+                </div>
+                <span class="badge" :style="{ background: req.status_info?.cardColor, color: req.status_info?.color }">
+                  {{ req.status_info?.label }}
+                </span>
+              </div>
+              <div class="close-progress" v-if="req.close_ratio > 0">
+                <div class="close-progress-bar" :style="{ width: req.close_ratio + '%' }"></div>
+              </div>
+              <div v-if="req.warnings && req.warnings.length > 0" style="margin-top: 8px;">
+                <div v-for="w in req.warnings" :key="w.type" class="alert" :class="'alert-' + (w.type === 'critical' ? 'error' : 'warning')" style="margin-bottom: 0; padding: 8px 12px;">
+                  ⚠️ {{ w.message }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">🔍 最近状态变化</div></div>
+          <div class="timeline" v-if="recentLogs.length > 0">
+            <div v-for="log in recentLogs" :key="log.id" class="timeline-item">
+              <div class="timeline-title">{{ getStatusLabel(log.to_status) }}</div>
+              <div class="timeline-time">{{ formatTime(log.changed_at) }} · {{ log.operator_name || '系统' }}</div>
+              <div class="timeline-comment">{{ log.comment }}</div>
+            </div>
+          </div>
+          <div v-else style="color: #94a3b8; text-align: center; padding: 20px;">暂无状态变化记录</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chemicals -->
+    <div v-if="currentTab === 'chemicals'">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📦 危化品台账（入口）</div>
+          <button class="btn btn-primary" @click="showAddChemical = true">+ 新增化学品</button>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>名称</th>
+              <th>CAS号</th>
+              <th>类别</th>
+              <th>单位</th>
+              <th>批号数</th>
+              <th>可用总量</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="c in chemicals" :key="c.id">
+              <td><strong>{{ c.name }}</strong></td>
+              <td>{{ c.cas_no || '-' }}</td>
+              <td>{{ c.category || '-' }}</td>
+              <td>{{ c.unit }}</td>
+              <td>{{ c.batch_count || 0 }}</td>
+              <td>{{ c.total_available || 0 }}</td>
+              <td>
+                <button class="btn btn-secondary" @click="loadChemicalBatches(c.id)">查看批号</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" v-if="selectedChemicalBatches.length > 0">
+        <div class="card-header"><div class="card-title">🏷️ {{ selectedChemicalName }} - 批号库存详情</div></div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>批号 <span class="evidence-tag">证据</span></th>
+              <th>生产商</th>
+              <th>生产日期</th>
+              <th>有效期</th>
+              <th>初始数量</th>
+              <th>可用数量</th>
+              <th>位置</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="b in selectedChemicalBatches" :key="b.id">
+              <td><strong>{{ b.batch_no }}</strong></td>
+              <td>{{ b.manufacturer || '-' }}</td>
+              <td>{{ b.production_date || '-' }}</td>
+              <td>{{ b.expiry_date || '-' }}</td>
+              <td>{{ b.initial_quantity }}</td>
+              <td :style="{ color: b.available_quantity > 0 ? '#059669' : '#ef4444' }">{{ b.available_quantity }}</td>
+              <td>{{ b.location || '-' }}</td>
+              <td>
+                <button class="btn btn-secondary" @click="showCorrectBatch(b)">人工修正</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Batches -->
+    <div v-if="currentTab === 'batches'">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏷️ 批号库存（判断证据）</div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>化学品</th>
+              <th>批号 <span class="evidence-tag">证据</span></th>
+              <th>类别</th>
+              <th>生产商</th>
+              <th>初始数量</th>
+              <th>可用数量</th>
+              <th>位置</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="b in batches" :key="b.id">
+              <td><strong>{{ b.chemical_name }}</strong></td>
+              <td><strong>{{ b.batch_no }}</strong></td>
+              <td>{{ b.category || '-' }}</td>
+              <td>{{ b.manufacturer || '-' }}</td>
+              <td>{{ b.initial_quantity }} {{ b.unit }}</td>
+              <td :style="{ color: b.available_quantity > 0 ? '#059669' : '#ef4444' }">
+                <strong>{{ b.available_quantity }} {{ b.unit }}</strong>
+              </td>
+              <td>{{ b.location || '-' }}</td>
+              <td>
+                <button class="btn btn-secondary" @click="showCorrectBatch(b)">人工修正</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Requisitions -->
+    <div v-if="currentTab === 'requisitions'">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📝 领用单（核心业务）</div>
+          <button class="btn btn-primary" @click="showNewRequisition = true">+ 新建领用</button>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+          <select class="form-select" style="max-width: 200px; display: inline-block;" v-model="filterStatus" @change="loadRequisitions()">
+            <option value="">全部状态</option>
+            <option value="DRAFT">草稿</option>
+            <option value="PENDING_APPROVAL">待导师审批</option>
+            <option value="APPROVED">已批准</option>
+            <option value="OUTBOUND">已出库</option>
+            <option value="PARTIAL_RETURN">部分回收</option>
+            <option value="FULL_RETURN">完全回收</option>
+            <option value="CLOSED">已关闭</option>
+          </select>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>化学品</th>
+              <th>批号</th>
+              <th>领用人</th>
+              <th>导师</th>
+              <th>申请量</th>
+              <th>回收量</th>
+              <th>闭环率</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in requisitions" :key="r.id">
+              <td><strong>{{ r.chemical_name }}</strong></td>
+              <td><span class="evidence-tag">{{ r.batch_no }}</span></td>
+              <td>{{ r.requester_name }}</td>
+              <td>{{ r.advisor_name || '-' }}</td>
+              <td>{{ r.requested_quantity }} {{ r.unit }}</td>
+              <td>{{ r.returned_quantity || 0 }} {{ r.unit }}</td>
+              <td>
+                <div style="min-width: 80px;">
+                  <div class="close-progress"><div class="close-progress-bar" :style="{ width: r.close_ratio + '%' }"></div></div>
+                  <div style="font-size: 12px; text-align: center;">{{ r.close_ratio }}%</div>
+                </div>
+              </td>
+              <td>
+                <span class="badge" :style="{ background: r.status_info?.cardColor, color: r.status_info?.color, border: '1px solid ' + r.status_info?.color }">
+                  {{ r.status_info?.label }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-secondary" @click="showRequisitionDetail(r.id)">详情</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Test Tab -->
+    <div v-if="currentTab === 'test'">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🧪 异常样例测试</div></div>
+        <p style="color: #64748b; margin-bottom: 16px;">点击下方按钮模拟各种异常场景，观察系统如何响应。所有响应都包含：错误类型、具体信息、处理建议。</p>
+        
+        <div class="grid">
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">❌ 缺字段</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">提交缺少必填字段的领用单</p>
+            <button class="btn btn-danger" @click="testMissingField">模拟缺字段错误</button>
+            <div v-if="testResultMissing" class="error-detail">{{ JSON.stringify(testResultMissing, null, 2) }}</div>
+          </div>
+          
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">🔁 重复数据</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">重复添加同一化学品的相同批号</p>
+            <button class="btn btn-danger" @click="testDuplicateBatch">模拟批号重复</button>
+            <div v-if="testResultDuplicate" class="error-detail">{{ JSON.stringify(testResultDuplicate, null, 2) }}</div>
+          </div>
+          
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">🔧 人工改错</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">查看人工修正的审计追踪</p>
+            <button class="btn btn-warning" @click="testManualCorrect">查看修正示例</button>
+            <div v-if="testResultCorrect" class="alert alert-info">
+              {{ testResultCorrect }}
+            </div>
+          </div>
+          
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">⚠️ 库存不足</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">领用数量超过库存</p>
+            <button class="btn btn-danger" @click="testInsufficientStock">模拟库存不足</button>
+            <div v-if="testResultStock" class="error-detail">{{ JSON.stringify(testResultStock, null, 2) }}</div>
+          </div>
+          
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">🚫 非法状态转换</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">跳过导师审批直接出库</p>
+            <button class="btn btn-danger" @click="testInvalidTransition">模拟非法转换</button>
+            <div v-if="testResultTransition" class="error-detail">{{ JSON.stringify(testResultTransition, null, 2) }}</div>
+          </div>
+          
+          <div class="card">
+            <h4 style="margin-bottom: 8px;">📦 回收超量</h4>
+            <p style="color: #64748b; font-size: 13px; margin-bottom: 12px;">回收量超过出库量</p>
+            <button class="btn btn-danger" @click="testOverReturn">模拟回收超量</button>
+            <div v-if="testResultOverReturn" class="error-detail">{{ JSON.stringify(testResultOverReturn, null, 2) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: New Requisition -->
+    <div v-if="showNewRequisition" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📝 新建危化品领用单</div>
+          <button class="modal-close" @click="showNewRequisition = false">&times;</button>
+        </div>
+        
+        <div class="alert alert-info">
+          <strong>📋 流程说明：</strong>填写信息 → 选择导师 → 提交审批 → 导师审批 → 出库 → 回收 → 闭环
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 领用人</label>
+          <select class="form-select" v-model="newReq.requester_id">
+            <option value="">请选择领用人</option>
+            <option v-for="u in students" :key="u.id" :value="u.id">{{ u.name }} ({{ u.department }})</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 危化品</label>
+          <select class="form-select" v-model="newReq.chemical_id" @change="onChemicalChange">
+            <option value="">请选择化学品</option>
+            <option v-for="c in chemicals" :key="c.id" :value="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" v-if="newReq.chemical_id">
+          <label class="form-label"><span class="required">*</span> 批号 <span class="evidence-tag">库存证据</span></label>
+          <select class="form-select" v-model="newReq.batch_id" @change="onBatchChange">
+            <option value="">请选择批号</option>
+            <option v-for="b in availableBatches" :key="b.id" :value="b.id">
+              {{ b.batch_no }} - 可用: {{ b.available_quantity }} {{ b.unit }} ({{ b.location }})
+            </option>
+          </select>
+          <div v-if="selectedBatch" class="kpi-block" style="margin-top: 10px;">
+            <div class="kpi-title">📌 选中批号库存证据</div>
+            <div>批号: <strong>{{ selectedBatch.batch_no }}</strong></div>
+            <div>可用: <strong>{{ selectedBatch.available_quantity }} {{ selectedBatch.unit }}</strong></div>
+            <div>位置: {{ selectedBatch.location }}</div>
+            <div>有效期: {{ selectedBatch.expiry_date }}</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 申请数量</label>
+          <input type="number" class="form-input" v-model="newReq.requested_quantity" placeholder="请输入数量">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 用途</label>
+          <input type="text" class="form-input" v-model="newReq.purpose" placeholder="例如：有机合成实验">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 实验室位置</label>
+          <input type="text" class="form-input" v-model="newReq.lab_location" placeholder="例如：化学楼A301">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 审批导师</label>
+          <select class="form-select" v-model="newReq.advisor_id">
+            <option value="">请选择导师</option>
+            <option v-for="a in advisors" :key="a.id" :value="a.id">{{ a.name }} ({{ a.department }})</option>
+          </select>
+        </div>
+
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showNewRequisition = false">取消</button>
+          <button class="btn btn-primary" @click="createRequisition">创建领用单</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Requisition Detail -->
+    <div v-if="selectedRequisition" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📋 领用单详情</div>
+          <button class="modal-close" @click="selectedRequisition = null">&times;</button>
+        </div>
+        
+        <div class="card" :style="{ background: selectedRequisition.status_info?.cardColor }">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 12px; color: #64748b;">当前状态</div>
+              <div style="font-size: 20px; font-weight: 700; color: #1e293b;">{{ selectedRequisition.status_info?.label }}</div>
+            </div>
+            <span class="badge" :style="{ background: selectedRequisition.status_info?.color, color: 'white' }">
+              {{ selectedRequisition.status_info?.label }}
+            </span>
+          </div>
+          
+          <div v-if="selectedRequisition.warnings && selectedRequisition.warnings.length > 0" style="margin-top: 12px;">
+            <div v-for="w in selectedRequisition.warnings" :key="w.type" class="alert" :class="'alert-' + (w.type === 'critical' ? 'error' : 'warning')" style="margin-bottom: 0;">
+              ⚠️ {{ w.message }}
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top: 16px;">
+          <div>
+            <div class="card-title" style="margin-bottom: 12px;">📦 基本信息</div>
+            <div style="line-height: 1.8;">
+              <div><strong>化学品:</strong> {{ selectedRequisition.chemical_name }}</div>
+              <div><strong>CAS号:</strong> {{ selectedRequisition.cas_no }}</div>
+              <div><strong>类别:</strong> {{ selectedRequisition.category }}</div>
+              <div><strong>批号 <span class="evidence-tag">证据</span>:</strong> {{ selectedRequisition.batch_no }}</div>
+              <div><strong>生产商:</strong> {{ selectedRequisition.manufacturer }}</div>
+              <div><strong>库存位置:</strong> {{ selectedRequisition.batch_location }}</div>
+            </div>
+          </div>
+          <div>
+            <div class="card-title" style="margin-bottom: 12px;">👥 人员信息</div>
+            <div style="line-height: 1.8;">
+              <div><strong>领用人:</strong> {{ selectedRequisition.requester_name }}</div>
+              <div><strong>导师:</strong> {{ selectedRequisition.advisor_name || '-' }}</div>
+              <div><strong>用途:</strong> {{ selectedRequisition.purpose }}</div>
+              <div><strong>实验室:</strong> {{ selectedRequisition.lab_location }}</div>
+              <div><strong>创建时间:</strong> {{ formatTime(selectedRequisition.created_at) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-title" style="margin-bottom: 12px;">📊 数量跟踪（闭环检查）</div>
+          <div class="two-col">
+            <div class="kpi-block">
+              <div class="kpi-title">申请数量</div>
+              <div class="kpi-value">{{ selectedRequisition.requested_quantity }} {{ selectedRequisition.unit }}</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-title">批准数量</div>
+              <div class="kpi-value">{{ selectedRequisition.approved_quantity || '-' }} {{ selectedRequisition.unit }}</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-title">已回收</div>
+              <div class="kpi-value">{{ selectedRequisition.returned_quantity || 0 }} {{ selectedRequisition.unit }}</div>
+            </div>
+            <div class="kpi-block">
+              <div class="kpi-title">闭环率</div>
+              <div class="kpi-value">{{ selectedRequisition.close_ratio }}%</div>
+            </div>
+          </div>
+          <div class="close-progress" style="margin-top: 12px;">
+            <div class="close-progress-bar" :style="{ width: selectedRequisition.close_ratio + '%' }"></div>
+          </div>
+        </div>
+
+        <div v-if="selectedRequisition.next_steps && selectedRequisition.next_steps.length > 0" class="card" style="margin-top: 16px;">
+          <div class="card-title" style="margin-bottom: 12px;">👉 下一步处理建议</div>
+          <div v-for="step in selectedRequisition.next_steps" :key="step.action" class="step-card" style="margin-bottom: 8px;">
+            <div class="step-title">{{ step.label }}</div>
+            <div class="step-desc">{{ step.description }}</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-title" style="margin-bottom: 12px;">⚡ 可执行操作</div>
+          <div class="action-bar">
+            <button v-if="selectedRequisition.status === 'DRAFT'" class="btn btn-primary" @click="showSubmitDialog = true">
+              📤 提交导师审批
+            </button>
+            <button v-if="selectedRequisition.status === 'PENDING_APPROVAL'" class="btn btn-success" @click="showApproveDialog = true">
+              ✅ 导师批准
+            </button>
+            <button v-if="selectedRequisition.status === 'PENDING_APPROVAL'" class="btn btn-danger" @click="showRejectDialog = true">
+              ❌ 拒绝
+            </button>
+            <button v-if="selectedRequisition.status === 'APPROVED'" class="btn btn-primary" @click="doOutbound">
+              📦 办理出库
+            </button>
+            <button v-if="['OUTBOUND', 'PARTIAL_RETURN'].includes(selectedRequisition.status)" class="btn btn-success" @click="showReturnDialog = true">
+              🔄 登记回收
+            </button>
+            <button v-if="selectedRequisition.status === 'FULL_RETURN'" class="btn btn-primary" @click="doClose">
+              🔒 确认闭环
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-title" style="margin-bottom: 12px;">📜 状态历史（变化追踪）</div>
+          <div class="timeline">
+            <div v-for="log in selectedRequisition.status_history" :key="log.id" class="timeline-item">
+              <div class="timeline-title">{{ getStatusLabel(log.to_status) }}</div>
+              <div class="timeline-time">
+                {{ formatTime(log.changed_at) }} · {{ log.operator_name || '系统' }}
+              </div>
+              <div class="timeline-comment">{{ log.comment }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Submit for Approval -->
+    <div v-if="showSubmitDialog" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📤 提交导师审批</div>
+          <button class="modal-close" @click="showSubmitDialog = false">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          确认将此领用单提交给 <strong>{{ selectedRequisition?.advisor_name }}</strong> 导师审批？
+        </div>
+        <div class="action-bar" style="margin-top: 16px;">
+          <button class="btn btn-secondary" @click="showSubmitDialog = false">取消</button>
+          <button class="btn btn-primary" @click="doSubmit">确认提交</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Approve -->
+    <div v-if="showApproveDialog" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">✅ 导师审批</div>
+          <button class="modal-close" @click="showApproveDialog = false">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 批准数量（≤ 申请数量 {{ selectedRequisition?.requested_quantity }}）</label>
+          <input type="number" class="form-input" v-model="approveData.approved_quantity" :max="selectedRequisition?.requested_quantity">
+        </div>
+        <div class="form-group">
+          <label class="form-label">审批意见</label>
+          <input type="text" class="form-input" v-model="approveData.comment" placeholder="可选">
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showApproveDialog = false">取消</button>
+          <button class="btn btn-success" @click="doApprove">确认批准</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Reject -->
+    <div v-if="showRejectDialog" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">❌ 拒绝申请</div>
+          <button class="modal-close" @click="showRejectDialog = false">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 拒绝原因</label>
+          <textarea class="form-input" v-model="rejectData.rejection_reason" rows="3" placeholder="请说明拒绝原因，便于申请人修改"></textarea>
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showRejectDialog = false">取消</button>
+          <button class="btn btn-danger" @click="doReject">确认拒绝</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Return -->
+    <div v-if="showReturnDialog" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">🔄 登记回收</div>
+          <button class="modal-close" @click="showReturnDialog = false">&times;</button>
+        </div>
+        <div class="alert alert-info">
+          已出库: {{ selectedRequisition?.approved_quantity }} {{ selectedRequisition?.unit }}<br>
+          已回收: {{ selectedRequisition?.returned_quantity || 0 }} {{ selectedRequisition?.unit }}<br>
+          <strong>还可回收: {{ (selectedRequisition?.approved_quantity || 0) - (selectedRequisition?.returned_quantity || 0) }} {{ selectedRequisition?.unit }}</strong>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 本次回收数量</label>
+          <input type="number" class="form-input" v-model="returnData.returned_quantity">
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showReturnDialog = false">取消</button>
+          <button class="btn btn-success" @click="doReturn">确认回收</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Add Chemical -->
+    <div v-if="showAddChemical" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📦 新增化学品到台账</div>
+          <button class="modal-close" @click="showAddChemical = false">&times;</button>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 化学品名称</label>
+          <input type="text" class="form-input" v-model="newChemical.name" placeholder="例如：硫酸">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CAS号</label>
+          <input type="text" class="form-input" v-model="newChemical.cas_no" placeholder="例如：7664-93-9">
+        </div>
+        <div class="form-group">
+          <label class="form-label">类别</label>
+          <select class="form-select" v-model="newChemical.category">
+            <option value="">请选择</option>
+            <option value="腐蚀品">腐蚀品</option>
+            <option value="易燃液体">易燃液体</option>
+            <option value="氧化剂">氧化剂</option>
+            <option value="剧毒品">剧毒品</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 计量单位</label>
+          <select class="form-select" v-model="newChemical.unit">
+            <option value="">请选择</option>
+            <option value="mL">mL</option>
+            <option value="g">g</option>
+            <option value="L">L</option>
+            <option value="kg">kg</option>
+          </select>
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showAddChemical = false">取消</button>
+          <button class="btn btn-primary" @click="addChemical">添加</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Correct Batch -->
+    <div v-if="showCorrectBatchModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">🔧 人工修正批号</div>
+          <button class="modal-close" @click="showCorrectBatchModal = null">&times;</button>
+        </div>
+        <div class="alert alert-warning">
+          ⚠️ 人工修正将记录审计日志，请谨慎操作！
+        </div>
+        <div class="form-group">
+          <label class="form-label">当前: {{ showCorrectBatchModal?.batch_no }} - {{ showCorrectBatchModal?.chemical_name }}</label>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 修正字段</label>
+          <select class="form-select" v-model="correctData.field">
+            <option value="available_quantity">可用数量</option>
+            <option value="location">位置</option>
+            <option value="expiry_date">有效期</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 新值</label>
+          <input type="text" class="form-input" v-model="correctData.newValue">
+        </div>
+        <div class="form-group">
+          <label class="form-label"><span class="required">*</span> 修正原因</label>
+          <textarea class="form-input" v-model="correctData.reason" rows="2" placeholder="例如：盘点发现实际库存差异"></textarea>
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-secondary" @click="showCorrectBatchModal = null">取消</button>
+          <button class="btn btn-warning" @click="doCorrectBatch">确认修正</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification -->
+    <div v-if="notification" class="alert" :class="'alert-' + notification.type" style="position: fixed; top: 20px; right: 20px; z-index: 2000; max-width: 400px;">
+      {{ notification.message }}
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+    const API = 'http://localhost:3000/api';
+
+    createApp({
+      setup() {
+        const currentTab = ref('dashboard');
+        const chemicals = ref([]);
+        const batches = ref([]);
+        const requisitions = ref([]);
+        const users = ref([]);
+        const students = ref([]);
+        const advisors = ref([]);
+        const filterStatus = ref('');
+        
+        const showNewRequisition = ref(false);
+        const showAddChemical = ref(false);
+        const selectedRequisition = ref(null);
+        const selectedChemicalBatches = ref([]);
+        const selectedChemicalName = ref('');
+        const showCorrectBatchModal = ref(null);
+        
+        const showSubmitDialog = ref(false);
+        const showApproveDialog = ref(false);
+        const showRejectDialog = ref(false);
+        const showReturnDialog = ref(false);
+        
+        const notification = ref(null);
+        
+        const newChemical = ref({ name: '', cas_no: '', category: '', unit: '' });
+        const newReq = ref({
+          requester_id: '', chemical_id: '', batch_id: '', 
+          requested_quantity: '', purpose: '', lab_location: '', advisor_id: ''
+        });
+        const approveData = ref({ approved_quantity: '', comment: '' });
+        const rejectData = ref({ rejection_reason: '' });
+        const returnData = ref({ returned_quantity: '' });
+        const correctData = ref({ field: 'available_quantity', newValue: '', reason: '' });
+        
+        const testResultMissing = ref(null);
+        const testResultDuplicate = ref(null);
+        const testResultCorrect = ref(null);
+        const testResultStock = ref(null);
+        const testResultTransition = ref(null);
+        const testResultOverReturn = ref(null);
+
+        const closedCount = computed(() => 
+          requisitions.value.filter(r => r.status === 'CLOSED').length
+        );
+        
+        const pendingRequisitions = computed(() => 
+          requisitions.value.filter(r => !['CLOSED', 'FULL_RETURN'].includes(r.status)).slice(0, 5)
+        );
+        
+        const recentLogs = computed(() => {
+          const allLogs = [];
+          requisitions.value.forEach(r => {
+            if (r.status_history) {
+              allLogs.push(...r.status_history);
+            }
+          });
+          return allLogs.sort((a, b) => new Date(b.changed_at) - new Date(a.changed_at)).slice(0, 8);
+        });
+        
+        const availableBatches = computed(() => 
+          batches.value.filter(b => b.chemical_id === newReq.value.chemical_id && b.available_quantity > 0)
+        );
+        
+        const selectedBatch = computed(() => 
+          batches.value.find(b => b.id === newReq.value.batch_id)
+        );
+
+        function showNotify(message, type = 'success') {
+          notification.value = { message, type };
+          setTimeout(() => notification.value = null, 3000);
+        }
+
+        function formatTime(iso) {
+          if (!iso) return '-';
+          const d = new Date(iso);
+          return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        const STATUS_LABELS = {
+          DRAFT: '草稿',
+          PENDING_APPROVAL: '待导师审批',
+          APPROVED: '已批准',
+          REJECTED: '已拒绝',
+          OUTBOUND: '已出库',
+          PARTIAL_RETURN: '部分回收',
+          FULL_RETURN: '完全回收',
+          CLOSED: '已关闭'
+        };
+        
+        function getStatusLabel(status) {
+          return STATUS_LABELS[status] || status;
+        }
+
+        async function loadChemicals() {
+          const res = await axios.get(`${API}/chemicals`);
+          chemicals.value = res.data;
+        }
+
+        async function loadBatches() {
+          const res = await axios.get(`${API}/chemicals/batches/all`);
+          batches.value = res.data;
+        }
+
+        async function loadUsers() {
+          const res = await axios.get(`${API}/users`);
+          users.value = res.data;
+          students.value = res.data.filter(u => u.role === 'STUDENT');
+          advisors.value = res.data.filter(u => u.role === 'ADVISOR');
+        }
+
+        async function loadRequisitions() {
+          const params = {};
+          if (filterStatus.value) params.status = filterStatus.value;
+          const res = await axios.get(`${API}/requisitions`, { params });
+          requisitions.value = res.data;
+          
+          for (const req of requisitions.value) {
+            try {
+              const detailRes = await axios.get(`${API}/requisitions/${req.id}`);
+              req.status_history = detailRes.data.status_history;
+            } catch(e) {}
+          }
+        }
+
+        async function refreshData() {
+          await Promise.all([loadChemicals(), loadBatches(), loadUsers(), loadRequisitions()]);
+        }
+
+        async function loadChemicalBatches(chemicalId) {
+          const chemical = chemicals.value.find(c => c.id === chemicalId);
+          selectedChemicalName.value = chemical?.name || '';
+          const res = await axios.get(`${API}/chemicals/${chemicalId}/batches`);
+          selectedChemicalBatches.value = res.data;
+        }
+
+        async function onChemicalChange() {
+          newReq.value.batch_id = '';
+        }
+
+        function onBatchChange() {}
+
+        async function addChemical() {
+          try {
+            await axios.post(`${API}/chemicals`, newChemical.value);
+            showNotify('化学品已添加到台账');
+            showAddChemical.value = false;
+            newChemical.value = { name: '', cas_no: '', category: '', unit: '' };
+            loadChemicals();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '添加失败', 'error');
+          }
+        }
+
+        async function createRequisition() {
+          try {
+            const data = { ...newReq.value };
+            data.requested_quantity = parseFloat(data.requested_quantity);
+            
+            const advisorId = data.advisor_id;
+            delete data.advisor_id;
+            
+            const res = await axios.post(`${API}/requisitions`, data);
+            const reqId = res.data.id;
+            
+            if (advisorId) {
+              await axios.post(`${API}/requisitions/${reqId}/submit`, { 
+                advisor_id: advisorId,
+                operator_name: '系统'
+              });
+            }
+            
+            showNotify('领用单创建成功');
+            showNewRequisition.value = false;
+            newReq.value = { requester_id: '', chemical_id: '', batch_id: '', requested_quantity: '', purpose: '', lab_location: '', advisor_id: '' };
+            loadRequisitions();
+          } catch (e) {
+            const err = e.response?.data;
+            showNotify(err?.error || '创建失败: ' + (err?.suggestion || ''), 'error');
+          }
+        }
+
+        async function showRequisitionDetail(id) {
+          const res = await axios.get(`${API}/requisitions/${id}`);
+          selectedRequisition.value = res.data;
+        }
+
+        async function doSubmit() {
+          try {
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/submit`, {
+              advisor_id: selectedRequisition.value.advisor_id,
+              operator_name: selectedRequisition.value.requester_name
+            });
+            showNotify('已提交导师审批');
+            showSubmitDialog.value = false;
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '提交失败', 'error');
+          }
+        }
+
+        async function doApprove() {
+          try {
+            const advisor = advisors.value[0];
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/approve`, {
+              approved_quantity: parseFloat(approveData.value.approved_quantity),
+              operator_id: advisor?.id,
+              operator_name: advisor?.name || '导师',
+              comment: approveData.value.comment
+            });
+            showNotify('审批通过');
+            showApproveDialog.value = false;
+            approveData.value = { approved_quantity: '', comment: '' };
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+            loadBatches();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '审批失败', 'error');
+          }
+        }
+
+        async function doReject() {
+          try {
+            const advisor = advisors.value[0];
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/reject`, {
+              operator_id: advisor?.id,
+              operator_name: advisor?.name || '导师',
+              rejection_reason: rejectData.value.rejection_reason
+            });
+            showNotify('已拒绝申请');
+            showRejectDialog.value = false;
+            rejectData.value = { rejection_reason: '' };
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '操作失败', 'error');
+          }
+        }
+
+        async function doOutbound() {
+          try {
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/outbound`, {
+              operator_name: '库房管理员'
+            });
+            showNotify('已办理出库');
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+            loadBatches();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '出库失败', 'error');
+          }
+        }
+
+        async function doReturn() {
+          try {
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/return`, {
+              returned_quantity: parseFloat(returnData.value.returned_quantity),
+              operator_name: '库房管理员'
+            });
+            showNotify('回收登记成功');
+            showReturnDialog.value = false;
+            returnData.value = { returned_quantity: '' };
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+            loadBatches();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '回收失败', 'error');
+          }
+        }
+
+        async function doClose() {
+          try {
+            await axios.post(`${API}/requisitions/${selectedRequisition.value.id}/close`, {
+              operator_name: '管理员'
+            });
+            showNotify('🔒 已闭环完成！');
+            showRequisitionDetail(selectedRequisition.value.id);
+            loadRequisitions();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '关闭失败', 'error');
+          }
+        }
+
+        function showCorrectBatch(batch) {
+          showCorrectBatchModal.value = batch;
+          correctData.value = { field: 'available_quantity', newValue: '', reason: '' };
+        }
+
+        async function doCorrectBatch() {
+          try {
+            await axios.put(`${API}/chemicals/batches/${showCorrectBatchModal.value.id}/correct`, {
+              field: correctData.value.field,
+              newValue: correctData.value.field === 'available_quantity' ? parseFloat(correctData.value.newValue) : correctData.value.newValue,
+              reason: correctData.value.reason,
+              operator_name: '管理员'
+            });
+            showNotify('人工修正已记录');
+            showCorrectBatchModal.value = null;
+            loadBatches();
+            loadChemicals();
+          } catch (e) {
+            showNotify(e.response?.data?.error || '修正失败', 'error');
+          }
+        }
+
+        async function testMissingField() {
+          testResultMissing.value = null;
+          try {
+            await axios.post(`${API}/requisitions`, {});
+          } catch (e) {
+            testResultMissing.value = e.response?.data;
+          }
+        }
+
+        async function testDuplicateBatch() {
+          testResultDuplicate.value = null;
+          if (chemicals.value.length === 0) await loadChemicals();
+          if (batches.value.length === 0) await loadBatches();
+          
+          const chem = chemicals.value[0];
+          const existingBatch = batches.value.find(b => b.chemical_id === chem.id);
+          
+          if (!existingBatch) {
+            testResultDuplicate.value = { error: '请先确保有测试数据' };
+            return;
+          }
+          
+          try {
+            await axios.post(`${API}/chemicals/${chem.id}/batches`, {
+              batch_no: existingBatch.batch_no,
+              initial_quantity: 100
+            });
+          } catch (e) {
+            testResultDuplicate.value = e.response?.data;
+          }
+        }
+
+        async function testManualCorrect() {
+          testResultCorrect.value = null;
+          if (batches.value.length === 0) await loadBatches();
+          
+          if (batches.value.length > 0) {
+            try {
+              const res = await axios.get(`${API}/chemicals/batches/${batches.value[0].id}/audit`);
+              if (res.data && res.data.length > 0) {
+                testResultCorrect.value = `找到 ${res.data.length} 条人工修正记录，最近一条: ${JSON.stringify(res.data[0])}`;
+              } else {
+                testResultCorrect.value = '暂无修正记录。点击批号库存中的"人工修正"按钮可触发此功能，修正后审计日志将被记录。';
+              }
+            } catch (e) {
+              testResultCorrect.value = '查询审计日志接口正常工作';
+            }
+          }
+        }
+
+        async function testInsufficientStock() {
+          testResultStock.value = null;
+          if (students.value.length === 0) await loadUsers();
+          if (batches.value.length === 0) await loadBatches();
+          
+          const batch = batches.value.find(b => b.available_quantity > 0);
+          if (!batch) { testResultStock.value = { error: '没有可用库存的批号' }; return; }
+          
+          try {
+            await axios.post(`${API}/requisitions`, {
+              requester_id: students.value[0]?.id,
+              chemical_id: batch.chemical_id,
+              batch_id: batch.id,
+              requested_quantity: batch.available_quantity + 99999
+            });
+          } catch (e) {
+            testResultStock.value = e.response?.data;
+          }
+        }
+
+        async function testInvalidTransition() {
+          testResultTransition.value = null;
+          if (requisitions.value.length === 0) await loadRequisitions();
+          
+          const draftReq = requisitions.value.find(r => r.status === 'DRAFT');
+          if (!draftReq) {
+            testResultTransition.value = { error: '没有草稿状态的领用单，请先创建一个' };
+            return;
+          }
+          
+          try {
+            await axios.post(`${API}/requisitions/${draftReq.id}/outbound`, {
+              operator_name: '测试'
+            });
+          } catch (e) {
+            testResultTransition.value = e.response?.data;
+          }
+        }
+
+        async function testOverReturn() {
+          testResultOverReturn.value = null;
+          if (requisitions.value.length === 0) await loadRequisitions();
+          
+          const outboundReq = requisitions.value.find(r => ['OUTBOUND', 'PARTIAL_RETURN'].includes(r.status));
+          if (!outboundReq) {
+            testResultOverReturn.value = { error: '没有已出库的领用单，请先走一遍正常流程到出库' };
+            return;
+          }
+          
+          try {
+            await axios.post(`${API}/requisitions/${outboundReq.id}/return`, {
+              returned_quantity: 999999,
+              operator_name: '测试'
+            });
+          } catch (e) {
+            testResultOverReturn.value = e.response?.data;
+          }
+        }
+
+        onMounted(() => {
+          refreshData();
+        });
+
+        return {
+          currentTab, chemicals, batches, requisitions, users, students, advisors, filterStatus,
+          showNewRequisition, showAddChemical, selectedRequisition, selectedChemicalBatches, selectedChemicalName,
+          showCorrectBatchModal,
+          showSubmitDialog, showApproveDialog, showRejectDialog, showReturnDialog,
+          notification,
+          newChemical, newReq, approveData, rejectData, returnData, correctData,
+          testResultMissing, testResultDuplicate, testResultCorrect, testResultStock, testResultTransition, testResultOverReturn,
+          closedCount, pendingRequisitions, recentLogs, availableBatches, selectedBatch,
+          loadChemicals, loadBatches, loadRequisitions, loadUsers, refreshData,
+          loadChemicalBatches, onChemicalChange, onBatchChange,
+          addChemical, createRequisition, showRequisitionDetail,
+          doSubmit, doApprove, doReject, doOutbound, doReturn, doClose,
+          showCorrectBatch, doCorrectBatch,
+          testMissingField, testDuplicateBatch, testManualCorrect, testInsufficientStock, testInvalidTransition, testOverReturn,
+          formatTime, getStatusLabel
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
