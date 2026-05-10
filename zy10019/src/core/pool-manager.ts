@@ -12,6 +12,8 @@ import {
 } from '../types';
 import { validatePoolConfig } from '../config';
 import { PoolConnection, ConnectionClient, MockConnectionClient } from './connection';
+import { PostgresClient, MySQLClient } from './db-clients';
+import { DatabaseType } from '../types';
 import { MetricsCollector } from '../utils/metrics';
 import { PoolLogger } from '../utils/logger';
 import { 
@@ -94,7 +96,8 @@ export class PoolManager {
   }
 
   private async createConnection(): Promise<PoolConnection> {
-    const client = new MockConnectionClient(this.config.connection);
+    const dbType = this.config.connection.type || 'mock';
+    const client = this.createClient(dbType);
     const conn = new PoolConnection(client);
     
     try {
@@ -105,12 +108,42 @@ export class PoolManager {
       const info = conn.getInfo();
       this.emitter.emit('connection:created', info);
       
-      this.logger.debug('Connection created', { connectionId: conn.id });
+      this.logger.debug('Connection created', { 
+        connectionId: conn.id,
+        dbType 
+      });
       return conn;
     } catch (error) {
       this.metrics.incrementError();
       this.logger.error('Failed to create connection', error as Error);
       throw error;
+    }
+  }
+
+  private createClient(dbType: DatabaseType): ConnectionClient {
+    switch (dbType) {
+      case 'postgresql':
+        return new PostgresClient(this.config.connection);
+      case 'mysql':
+        return new MySQLClient(this.config.connection);
+      case 'mock':
+      default:
+        return new MockConnectionClient(this.config.connection);
+    }
+  }
+
+  private async shutdownDatabasePools(): Promise<void> {
+    const dbType = this.config.connection.type || 'mock';
+    try {
+      if (dbType === 'postgresql') {
+        await PostgresClient.shutdownPool();
+      } else if (dbType === 'mysql') {
+        await MySQLClient.shutdownPool();
+      }
+    } catch (error) {
+      this.logger.warn('Error shutting down database pools', {
+        error: (error as Error).message
+      });
     }
   }
 
@@ -576,6 +609,7 @@ export class PoolManager {
 
   async close(): Promise<void> {
     await this.drain();
+    await this.shutdownDatabasePools();
   }
 
   on(event: keyof PoolEventMap, listener: (...args: any[]) => void): void {

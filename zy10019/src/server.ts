@@ -1,11 +1,15 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import compression from 'compression';
 import helmet from 'helmet';
 import { PoolService, PoolServiceConfig, PoolServiceOptions } from './core/pool-service';
-import { createEnvConfig } from './config';
+import { createEnvConfig, createPoolConfigFromEnv } from './config';
 import { logger } from './utils/logger';
 
 const envConfig = createEnvConfig();
+const poolConfig = createPoolConfigFromEnv();
 
 const app = express();
 app.use(helmet());
@@ -13,25 +17,8 @@ app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 
 const defaultPoolConfig: PoolServiceConfig = {
-  pool: {
-    name: 'default-pool',
-    connection: {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      database: process.env.DB_NAME || 'test',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || 'password'
-    },
-    min: parseInt(process.env.POOL_MIN || '2', 10),
-    max: parseInt(process.env.POOL_MAX || '10', 10),
-    acquireTimeout: parseInt(process.env.POOL_ACQUIRE_TIMEOUT || '30000', 10),
-    idleTimeout: parseInt(process.env.POOL_IDLE_TIMEOUT || '60000', 10),
-    reapInterval: parseInt(process.env.POOL_REAP_INTERVAL || '30000', 10),
-    testOnBorrow: process.env.POOL_TEST_ON_BORROW !== 'false',
-    testOnReturn: process.env.POOL_TEST_ON_RETURN === 'true',
-    testWhileIdle: process.env.POOL_TEST_WHILE_IDLE !== 'false'
-  },
-  cacheStrategy: 'read-through',
+  pool: poolConfig,
+  cacheStrategy: (process.env.CACHE_STRATEGY as 'read-through' | 'write-through' | 'write-behind' | 'cache-aside') || 'read-through',
   replay: {
     maxRecords: parseInt(process.env.REPLAY_MAX_RECORDS || '10000', 10),
     retentionPeriod: parseInt(process.env.REPLAY_RETENTION || '86400000', 10),

@@ -1,4 +1,4 @@
-import { PoolConfig, RetryConfig, CircuitBreakerConfig, ReplayConfig } from '../types';
+import { PoolConfig, RetryConfig, CircuitBreakerConfig, ReplayConfig, DatabaseType } from '../types';
 
 export const DEFAULT_POOL_CONFIG: Partial<PoolConfig> = {
   min: 2,
@@ -93,6 +93,44 @@ export const validatePoolConfig = (config: PoolConfig): string[] => {
   
   return errors;
 };
+
+function parseDatabaseType(type: string | undefined): DatabaseType {
+  if (!type) return 'mock';
+  const lowerType = type.toLowerCase();
+  if (lowerType === 'postgresql' || lowerType === 'postgres' || lowerType === 'pg') {
+    return 'postgresql';
+  }
+  if (lowerType === 'mysql') {
+    return 'mysql';
+  }
+  return 'mock';
+}
+
+export function createPoolConfigFromEnv(): PoolConfig {
+  const dbType = parseDatabaseType(process.env.DB_TYPE);
+  
+  return {
+    name: process.env.POOL_NAME || 'default-pool',
+    connection: {
+      type: dbType,
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || (dbType === 'postgresql' ? '5432' : '3306'), 10),
+      database: process.env.DB_NAME || 'test',
+      user: process.env.DB_USER || 'test',
+      password: process.env.DB_PASSWORD || 'test',
+      options: {}
+    },
+    min: parseInt(process.env.POOL_MIN || '2', 10),
+    max: parseInt(process.env.POOL_MAX || '10', 10),
+    acquireTimeout: parseInt(process.env.POOL_ACQUIRE_TIMEOUT || '30000', 10),
+    idleTimeout: parseInt(process.env.POOL_IDLE_TIMEOUT || '60000', 10),
+    reapInterval: parseInt(process.env.POOL_REAP_INTERVAL || '30000', 10),
+    validationQuery: process.env.DB_VALIDATION_QUERY || 'SELECT 1',
+    testOnBorrow: process.env.POOL_TEST_ON_BORROW !== 'false',
+    testOnReturn: process.env.POOL_TEST_ON_RETURN === 'true',
+    testWhileIdle: process.env.POOL_TEST_WHILE_IDLE !== 'false'
+  };
+}
 
 export function createEnvConfig(): { port: number; host: string; logLevel: string } {
   return {

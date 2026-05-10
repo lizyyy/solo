@@ -25,7 +25,10 @@ export enum CircuitBreakerState {
   HALF_OPEN = 'half_open'
 }
 
+export type DatabaseType = 'postgresql' | 'mysql' | 'mock';
+
 export interface ConnectionConfig {
+  type?: DatabaseType;
   host: string;
   port: number;
   database: string;
