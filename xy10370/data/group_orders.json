@@ -1,0 +1,26 @@
+[
+  {
+    "order_id": "G001",
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I001",
+    "quantity": 10.0,
+    "status": "cancelled"
+  },
+  {
+    "order_id": "G002",
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I002",
+    "quantity": 5.0,
+    "status": "confirmed"
+  },
+  {
+    "order_id": "G003",
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I003",
+    "quantity": 8.0,
+    "status": "cancelled"
+  }
+]

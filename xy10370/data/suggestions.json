@@ -1,0 +1,122 @@
+[
+  {
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I001",
+    "base_estimate": 37.54615384615385,
+    "weather_adjustment": -5.631923076923078,
+    "activity_adjustment": 9.386538461538462,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 39.89278846153846,
+    "adjusted_quantity": null,
+    "adjustment_reason": "雨天(14.0°C)：堂食减少15%; 促销活动：销量增加25%"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I002",
+    "base_estimate": 25.51923076923077,
+    "weather_adjustment": -3.827884615384616,
+    "activity_adjustment": 6.3798076923076925,
+    "group_order_quantity": 5.0,
+    "suggested_quantity": 32.11418269230769,
+    "adjusted_quantity": null,
+    "adjustment_reason": "雨天(14.0°C)：堂食减少15%; 促销活动：销量增加25%; 团餐订单：+5.0kg"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I003",
+    "base_estimate": 20.415384615384614,
+    "weather_adjustment": -3.0623076923076926,
+    "activity_adjustment": 5.1038461538461535,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 21.691346153846155,
+    "adjusted_quantity": null,
+    "adjustment_reason": "雨天(14.0°C)：堂食减少15%; 促销活动：销量增加25%"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I004",
+    "base_estimate": 35.72692307692308,
+    "weather_adjustment": -5.3590384615384625,
+    "activity_adjustment": 8.93173076923077,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 37.95985576923077,
+    "adjusted_quantity": null,
+    "adjustment_reason": "雨天(14.0°C)：堂食减少15%; 促销活动：销量增加25%"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S001",
+    "ingredient_id": "I005",
+    "base_estimate": 45.934615384615384,
+    "weather_adjustment": -6.890192307692309,
+    "activity_adjustment": 11.483653846153846,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 48.80552884615384,
+    "adjusted_quantity": null,
+    "adjustment_reason": "雨天(14.0°C)：堂食减少15%; 促销活动：销量增加25%"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S002",
+    "ingredient_id": "I001",
+    "base_estimate": 18.373846153846156,
+    "weather_adjustment": 0.0,
+    "activity_adjustment": 0.0,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 18.373846153846156,
+    "adjusted_quantity": null,
+    "adjustment_reason": "晴天(20.0°C)：无天气影响; 无活动"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S002",
+    "ingredient_id": "I002",
+    "base_estimate": 15.311538461538463,
+    "weather_adjustment": 0.0,
+    "activity_adjustment": 0.0,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 15.311538461538463,
+    "adjusted_quantity": null,
+    "adjustment_reason": "晴天(20.0°C)：无天气影响; 无活动"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S002",
+    "ingredient_id": "I003",
+    "base_estimate": 12.249230769230767,
+    "weather_adjustment": 0.0,
+    "activity_adjustment": 0.0,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 12.249230769230767,
+    "adjusted_quantity": null,
+    "adjustment_reason": "晴天(20.0°C)：无天气影响; 无活动"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S002",
+    "ingredient_id": "I004",
+    "base_estimate": 20.415384615384614,
+    "weather_adjustment": 0.0,
+    "activity_adjustment": 0.0,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 20.415384615384614,
+    "adjusted_quantity": null,
+    "adjustment_reason": "晴天(20.0°C)：无天气影响; 无活动"
+  },
+  {
+    "date": "2026-05-12",
+    "store_id": "S002",
+    "ingredient_id": "I005",
+    "base_estimate": 28.581538461538464,
+    "weather_adjustment": 0.0,
+    "activity_adjustment": 0.0,
+    "group_order_quantity": 0.0,
+    "suggested_quantity": 28.581538461538464,
+    "adjusted_quantity": null,
+    "adjustment_reason": "晴天(20.0°C)：无天气影响; 无活动"
+  }
+]
