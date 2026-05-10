@@ -19,10 +19,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @RestController
 @RequestMapping("/api/v1/demo")
@@ -31,12 +32,12 @@ public class DemoController {
     private final RateLimitService rateLimitService;
     private final CircuitBreakerService circuitBreakerService;
     private final FaultInjector faultInjector;
-    private final ExecutorService simulationExecutor;
+    private final ThreadPoolTaskExecutor simulationExecutor;
     
     public DemoController(RateLimitService rateLimitService,
                          CircuitBreakerService circuitBreakerService,
                          FaultInjector faultInjector,
-                         @Qualifier("simulationExecutor") ExecutorService simulationExecutor) {
+                         @Qualifier("simulationExecutor") ThreadPoolTaskExecutor simulationExecutor) {
         this.rateLimitService = rateLimitService;
         this.circuitBreakerService = circuitBreakerService;
         this.faultInjector = faultInjector;

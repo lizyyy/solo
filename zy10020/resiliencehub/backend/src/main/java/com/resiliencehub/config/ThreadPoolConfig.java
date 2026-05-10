@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
@@ -13,7 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ThreadPoolConfig {
     
     @Bean("simulationExecutor")
-    public Executor simulationExecutor() {
+    public ThreadPoolTaskExecutor simulationExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(20);
         executor.setMaxPoolSize(200);
@@ -28,7 +27,7 @@ public class ThreadPoolConfig {
     }
     
     @Bean("messageExecutor")
-    public Executor messageExecutor() {
+    public ThreadPoolTaskExecutor messageExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(10);
         executor.setMaxPoolSize(100);

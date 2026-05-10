@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @RestController
 @RequestMapping("/api/v1/message")
@@ -22,12 +24,12 @@ public class MessageController {
     private final RabbitTemplate rabbitTemplate;
     private final MessageService messageService;
     private final DemoMessageListener messageListener;
-    private final ExecutorService messageExecutor;
+    private final ThreadPoolTaskExecutor messageExecutor;
     
     public MessageController(RabbitTemplate rabbitTemplate,
                              MessageService messageService,
                              DemoMessageListener messageListener,
-                             @Qualifier("messageExecutor") ExecutorService messageExecutor) {
+                             @Qualifier("messageExecutor") ThreadPoolTaskExecutor messageExecutor) {
         this.rabbitTemplate = rabbitTemplate;
         this.messageService = messageService;
         this.messageListener = messageListener;
@@ -118,12 +120,31 @@ public class MessageController {
         String routingKey = "demo".equalsIgnoreCase(queueType) ? 
             RabbitMQConfig.DEMO_ROUTING_KEY : RabbitMQConfig.ORDER_ROUTING_KEY;
         
-        List<String> messageIds = new ArrayList<>();
         String baseId = UUID.randomUUID().toString().substring(0, 8);
+        
+        String[] preGeneratedIds = new String[count];
+        int uniqueCount = 0;
+        for (int i = 0; i < count; i++) {
+            if (simulateDuplicates && i > 0 && i % 3 == 0) {
+                preGeneratedIds[i] = preGeneratedIds[i - 1];
+            } else {
+                preGeneratedIds[i] = "batch-" + baseId + "-" + i;
+                uniqueCount++;
+            }
+        }
+        
+        List<String> messageIds = new ArrayList<>();
+        for (String id : preGeneratedIds) {
+            if (!messageIds.contains(id)) {
+                messageIds.add(id);
+            }
+        }
         
         Map<String, Object> response = new HashMap<>();
         response.put("queueType", queueType);
         response.put("totalMessages", count);
+        response.put("uniqueMessages", uniqueCount);
+        response.put("duplicateMessages", count - uniqueCount);
         response.put("simulateDuplicates", simulateDuplicates);
         response.put("simulateFailure", simulateFailure);
         response.put("traceId", TraceContext.getTraceId());
@@ -131,23 +152,22 @@ public class MessageController {
         CountDownLatch doneLatch = new CountDownLatch(count);
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
+        AtomicInteger duplicateSentCount = new AtomicInteger(0);
         
         IntStream.range(0, count).forEach(i -> {
             messageExecutor.submit(() -> {
                 try {
-                    String messageId;
+                    String messageId = preGeneratedIds[i];
                     
                     if (simulateDuplicates && i > 0 && i % 3 == 0) {
-                        messageId = messageIds.get(i - 1);
-                    } else {
-                        messageId = "batch-" + baseId + "-" + i;
-                        messageIds.add(messageId);
+                        duplicateSentCount.incrementAndGet();
                     }
                     
                     Map<String, Object> payload = new HashMap<>();
                     payload.put("message", "Batch message " + i);
                     payload.put("batchId", baseId);
                     payload.put("index", i);
+                    payload.put("isDuplicate", simulateDuplicates && i > 0 && i % 3 == 0);
                     payload.put("timestamp", LocalDateTime.now().toString());
                     
                     if (simulateFailure && i > 0 && i % 5 == 0) {
@@ -182,7 +202,8 @@ public class MessageController {
         
         response.put("successCount", successCount.get());
         response.put("failCount", failCount.get());
-        response.put("messageIds", messageIds.subList(0, Math.min(20, messageIds.size())));
+        response.put("duplicateSentCount", duplicateSentCount.get());
+        response.put("sampleMessageIds", messageIds.subList(0, Math.min(20, messageIds.size())));
         
         return Result.success(response);
     }
@@ -199,16 +220,41 @@ public class MessageController {
         String routingKey = "demo".equalsIgnoreCase(queueType) ? 
             RabbitMQConfig.DEMO_ROUTING_KEY : RabbitMQConfig.ORDER_ROUTING_KEY;
         
+        String baseId = UUID.randomUUID().toString().substring(0, 8);
+        int actualMessageCount = totalMessages / concurrentProducers * concurrentProducers;
+        
+        String[] preGeneratedIds = new String[actualMessageCount];
+        List<String> uniqueIds = new ArrayList<>();
+        Set<String> idSet = new HashSet<>();
+        int duplicatePlanned = 0;
+        
+        Random random = new Random();
+        for (int i = 0; i < actualMessageCount; i++) {
+            if (Math.random() < duplicateProbability && !uniqueIds.isEmpty()) {
+                int randomIndex = random.nextInt(uniqueIds.size());
+                preGeneratedIds[i] = uniqueIds.get(randomIndex);
+                duplicatePlanned++;
+            } else {
+                String newId = "concurrent-" + baseId + "-" + i;
+                preGeneratedIds[i] = newId;
+                uniqueIds.add(newId);
+                idSet.add(newId);
+            }
+        }
+        
         Map<String, Object> response = new HashMap<>();
         response.put("queueType", queueType);
-        response.put("totalMessages", totalMessages);
+        response.put("totalMessages", actualMessageCount);
         response.put("concurrentProducers", concurrentProducers);
         response.put("duplicateProbability", duplicateProbability);
+        response.put("uniqueMessages", uniqueIds.size());
+        response.put("duplicatePlanned", duplicatePlanned);
         response.put("traceId", TraceContext.getTraceId());
         
-        List<String> allMessageIds = new ArrayList<>();
+        int messagesPerProducer = actualMessageCount / concurrentProducers;
+        
         AtomicInteger sentCount = new AtomicInteger(0);
-        AtomicInteger duplicateCount = new AtomicInteger(0);
+        AtomicInteger actualDuplicateSent = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
         
         CountDownLatch startLatch = new CountDownLatch(1);
@@ -218,28 +264,25 @@ public class MessageController {
         
         IntStream.range(0, concurrentProducers).forEach(producerIdx -> {
             messageExecutor.submit(() -> {
-                int messagesPerProducer = totalMessages / concurrentProducers;
-                
                 try {
                     startLatch.await();
                     
-                    for (int i = 0; i < messagesPerProducer; i++) {
-                        String messageId;
-                        boolean isDuplicate = !allMessageIds.isEmpty() && 
-                                             Math.random() < duplicateProbability;
-                        
-                        if (isDuplicate && !allMessageIds.isEmpty()) {
-                            messageId = allMessageIds.get((int)(Math.random() * allMessageIds.size()));
-                            duplicateCount.incrementAndGet();
-                        } else {
-                            messageId = "concurrent-" + producerIdx + "-" + i + "-" + System.currentTimeMillis();
-                            allMessageIds.add(messageId);
-                        }
-                        
+                    int startIdx = producerIdx * messagesPerProducer;
+                    int endIdx = startIdx + messagesPerProducer;
+                    
+                    for (int i = startIdx; i < endIdx; i++) {
                         try {
+                            String messageId = preGeneratedIds[i];
+                            boolean isDuplicate = !idSet.contains(messageId);
+                            
+                            if (isDuplicate) {
+                                actualDuplicateSent.incrementAndGet();
+                            }
+                            
                             Map<String, Object> payload = new HashMap<>();
                             payload.put("producerId", producerIdx);
-                            payload.put("messageIndex", i);
+                            payload.put("messageIndex", i - startIdx);
+                            payload.put("globalIndex", i);
                             payload.put("isDuplicate", isDuplicate);
                             payload.put("timestamp", LocalDateTime.now().toString());
                             
@@ -278,10 +321,11 @@ public class MessageController {
         long duration = System.currentTimeMillis() - startTime;
         
         response.put("sentCount", sentCount.get());
-        response.put("duplicateCount", duplicateCount.get());
+        response.put("actualDuplicateSent", actualDuplicateSent.get());
         response.put("failCount", failCount.get());
         response.put("durationMs", duration);
         response.put("messagesPerSecond", duration > 0 ? (double) sentCount.get() / (duration / 1000.0) : 0);
+        response.put("sampleMessageIds", uniqueIds.subList(0, Math.min(20, uniqueIds.size())));
         
         return Result.success(response);
     }

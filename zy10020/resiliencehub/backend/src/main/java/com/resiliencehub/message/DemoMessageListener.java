@@ -3,17 +3,20 @@ package com.resiliencehub.message;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
@@ -23,43 +26,50 @@ public class DemoMessageListener {
     
     private final MessageService messageService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final Jackson2JsonMessageConverter messageConverter;
     
     private final Map<String, MessageStatistics> stats = new ConcurrentHashMap<>();
     
     @Autowired
     public DemoMessageListener(MessageService messageService, 
-                               RedisTemplate<String, Object> redisTemplate) {
+                               RedisTemplate<String, Object> redisTemplate,
+                               Jackson2JsonMessageConverter messageConverter) {
         this.messageService = messageService;
         this.redisTemplate = redisTemplate;
+        this.messageConverter = messageConverter;
         this.stats.put("demo", new MessageStatistics());
         this.stats.put("order", new MessageStatistics());
     }
     
     @RabbitListener(queues = "resiliencehub.demo.queue")
-    public void onDemoMessage(@Payload Object payload,
-                               Channel channel,
-                               @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag,
-                               @Header(value = "amqp_receivedMessageId", required = false) String messageId,
-                               @Header(value = "retry-count", defaultValue = "0") Integer retryCount) {
-        processMessage("demo", "resiliencehub.demo.queue", payload, channel, deliveryTag, messageId, retryCount);
+    public void onDemoMessage(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
+        processMessage("demo", "resiliencehub.demo.queue", message, channel, deliveryTag);
     }
     
     @RabbitListener(queues = "resiliencehub.order.queue")
-    public void onOrderMessage(@Payload Object payload,
-                                Channel channel,
-                                @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag,
-                                @Header(value = "amqp_receivedMessageId", required = false) String messageId,
-                                @Header(value = "retry-count", defaultValue = "0") Integer retryCount) {
-        processMessage("order", "resiliencehub.order.queue", payload, channel, deliveryTag, messageId, retryCount);
+    public void onOrderMessage(Message message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
+        processMessage("order", "resiliencehub.order.queue", message, channel, deliveryTag);
     }
     
-    private void processMessage(String type, String queueName, Object payload,
-                                 Channel channel, long deliveryTag,
-                                 String messageId, Integer retryCount) {
+    private void processMessage(String type, String queueName, Message message, Channel channel, long deliveryTag) {
         MessageStatistics stat = stats.get(type);
         stat.totalReceived.incrementAndGet();
         
-        String effectiveMessageId = messageId != null ? messageId : "msg-" + System.currentTimeMillis();
+        MessageProperties props = message.getMessageProperties();
+        String messageId = props.getMessageId();
+        Object retryCountObj = props.getHeader("retry-count");
+        int retryCount = retryCountObj != null ? 
+            Integer.parseInt(retryCountObj.toString()) : 0;
+        
+        String effectiveMessageId = messageId != null && !messageId.isEmpty() ? 
+            messageId : "msg-" + System.currentTimeMillis() + "-" + UUID();
+        
+        Object payload = null;
+        try {
+            payload = messageConverter.fromMessage(message);
+        } catch (Exception e) {
+            payload = new String(message.getBody());
+        }
         
         log.info("[{}] Processing message: messageId={}, retryCount={}, payload={}", 
                  type, effectiveMessageId, retryCount, payload);
@@ -71,7 +81,10 @@ public class DemoMessageListener {
                 applyMessageFaults(faultConfig, effectiveMessageId, retryCount, stat);
             }
             
-            if (messageService.isDuplicateMessage(effectiveMessageId)) {
+            String dedupKey = "message:dedup:" + effectiveMessageId;
+            Boolean isDuplicate = redisTemplate.opsForValue().setIfAbsent(dedupKey, System.currentTimeMillis(), 24, TimeUnit.HOURS);
+            
+            if (Boolean.FALSE.equals(isDuplicate)) {
                 stat.duplicateMessages.incrementAndGet();
                 log.warn("[{}] Duplicate message detected: {}", type, effectiveMessageId);
                 channel.basicAck(deliveryTag, false);
@@ -134,6 +147,10 @@ public class DemoMessageListener {
         }
     }
     
+    private String UUID() {
+        return java.util.UUID.randomUUID().toString().substring(0, 8);
+    }
+    
     private void applyMessageFaults(MessageService.MessageFaultConfig config, 
                                      String messageId, 
                                      int retryCount,
@@ -144,14 +161,14 @@ public class DemoMessageListener {
             Integer.parseInt(existingCount.toString()) : retryCount;
         
         if (config.isForceFail()) {
-            redisTemplate.opsForValue().set(retryKey, currentRetryCount + 1, 1, java.util.concurrent.TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(retryKey, currentRetryCount + 1, 1, TimeUnit.HOURS);
             throw new MessageService.MessageException("Forced message failure");
         }
         
         if (config.getRetryProbability() > 0) {
             if (currentRetryCount < config.getMaxRetryCount() && 
                 Math.random() < config.getRetryProbability()) {
-                redisTemplate.opsForValue().set(retryKey, currentRetryCount + 1, 1, java.util.concurrent.TimeUnit.HOURS);
+                redisTemplate.opsForValue().set(retryKey, currentRetryCount + 1, 1, TimeUnit.HOURS);
                 throw new MessageService.MessageRetryException("Simulating message retry, attempt: " + (currentRetryCount + 1));
             }
         }
