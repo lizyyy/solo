@@ -1,0 +1,41 @@
+[
+  {
+    "ac_id": "AC001",
+    "ac_name": "主机房A-1号",
+    "alarm_time": "2026-05-11 08:30",
+    "alarm_code": "E001",
+    "alarm_message": "滤网清洁提醒",
+    "status": "已处理",
+    "handled_by": "王五",
+    "handled_time": "2026-05-11 08:45",
+    "resolution": "已清洁滤网",
+    "created_at": "2026-05-11T02:21:11.605564",
+    "updated_at": "2026-05-11T02:21:11.605567"
+  },
+  {
+    "ac_id": "AC001",
+    "ac_name": "主机房A-1号",
+    "alarm_time": "2026-05-14 10:00",
+    "alarm_code": "E002",
+    "alarm_message": "高压保护",
+    "status": "未处理",
+    "handled_by": "",
+    "handled_time": "",
+    "resolution": "",
+    "created_at": "2026-05-11T02:21:11.620054",
+    "updated_at": "2026-05-11T02:21:11.620058"
+  },
+  {
+    "ac_id": "AC002",
+    "ac_name": "机房B-1号",
+    "alarm_time": "2026-05-14 11:30",
+    "alarm_code": "E003",
+    "alarm_message": "传感器故障",
+    "status": "处理中",
+    "handled_by": "王五",
+    "handled_time": "",
+    "resolution": "",
+    "created_at": "2026-05-11T02:21:11.620266",
+    "updated_at": "2026-05-11T02:21:11.620268"
+  }
+]

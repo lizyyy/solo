@@ -1,0 +1,110 @@
+{
+  "date": "2026-05-13",
+  "generated_at": "2026-05-11 02:21:11",
+  "status": "异常(高危)",
+  "summary": {
+    "inspections_count": 1,
+    "ups_count": 2,
+    "alarms_count": 0,
+    "unhandled_alarms_count": 0,
+    "risks_by_level": {
+      "high": 1,
+      "medium": 1,
+      "low": 1
+    },
+    "review_status": "未完成",
+    "reviewer": "无"
+  },
+  "details": {
+    "inspections": [
+      {
+        "time": "2026-05-13 09:00",
+        "room": "主机房A",
+        "inspector": "张三",
+        "temp": "25.0℃",
+        "humidity": "50.0%"
+      }
+    ],
+    "ups": [
+      {
+        "time": "2026-05-13 09:00",
+        "name": "UPS-主电源",
+        "battery": "43.5V",
+        "load": "85.0%",
+        "status": "告警"
+      },
+      {
+        "time": "2026-05-13 09:00",
+        "name": "UPS-备份",
+        "battery": "48.0V",
+        "load": "78.0%",
+        "status": "正常"
+      }
+    ],
+    "alarms": []
+  },
+  "risks": {
+    "high": [
+      {
+        "risk_id": "RISK-329EDA59",
+        "code": "U001",
+        "type": "UPS_BATTERY_LOW",
+        "level": "高危",
+        "source": "UPS:UPS-主电源",
+        "message": "电池电压43.5V低于阈值45.0V",
+        "suggestion": "UPS电池存在故障风险，请立即检查电池状态，必要时更换电池",
+        "status": "待处理",
+        "reviewed": false
+      }
+    ],
+    "medium": [
+      {
+        "risk_id": "RISK-C100B48D",
+        "code": "U002",
+        "type": "UPS_LOAD_HIGH",
+        "level": "中危",
+        "source": "UPS:UPS-主电源",
+        "message": "负载85.0%超过阈值80.0%",
+        "suggestion": "UPS负载超过80%，请评估是否需要增加UPS容量或减少负载",
+        "status": "待处理",
+        "reviewed": false
+      }
+    ],
+    "low": [
+      {
+        "risk_id": "RISK-228B242E",
+        "code": "R001",
+        "type": "MISSING_REVIEW",
+        "level": "低危",
+        "source": "系统",
+        "message": "日期2026-05-13的巡检数据已录入，但尚未完成人工复核",
+        "suggestion": "当日巡检数据尚未完成人工复核，请值班主管完成复核流程",
+        "status": "待处理",
+        "reviewed": false
+      }
+    ]
+  },
+  "suggestions": [
+    {
+      "priority": "紧急",
+      "action": "立即处理高危风险",
+      "items": [
+        "UPS电池存在故障风险，请立即检查电池状态，必要时更换电池"
+      ]
+    },
+    {
+      "priority": "高",
+      "action": "计划处理中危风险",
+      "items": [
+        "UPS负载超过80%，请评估是否需要增加UPS容量或减少负载"
+      ]
+    },
+    {
+      "priority": "一般",
+      "action": "关注并跟进",
+      "items": [
+        "当日巡检数据尚未完成人工复核，请值班主管完成复核流程"
+      ]
+    }
+  ]
+}
