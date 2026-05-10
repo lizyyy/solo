@@ -27,7 +27,7 @@ error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # 检查 Java
 check_java() {
-    if ! command -v java >/dev/null 2>&1; then
+    if command -v java >/dev/null 2>&1; then
         local version=$(java -version 2>&1 | head -1 | awk -F'"' '{print $2}')
         info "Java 版本: $version"
         return 0
@@ -40,7 +40,7 @@ check_java() {
 # 检查 javac
 check_javac() {
     if ! command -v javac >/dev/null 2>&1; then
-        error "未找到 javac (JDK 需要，而不是 JRE"
+        error "未找到 javac (JDK 需要，而不是 JRE)"
         error "请安装 JDK 8+，而不是只安装了 JRE"
         exit 1
     fi

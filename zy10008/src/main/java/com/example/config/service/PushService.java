@@ -173,15 +173,18 @@ public class PushService {
                 pushMessage.put("version", config.getVersion());
                 pushMessage.put("timestamp", System.currentTimeMillis());
 
+                ackFuture = ackManager.createAckWaiter(releaseId, instanceId, pushTimeoutSeconds * 1000L);
+                log.debug("创建ACK等待器: releaseId={}, instanceId={}, timeout={}s", releaseId, instanceId, pushTimeoutSeconds);
+
                 long startTime = System.currentTimeMillis();
                 boolean sendSuccess = webSocketService.pushToClient(instanceId, pushMessage);
 
                 if (!sendSuccess) {
+                    ackManager.cancelWaiter(releaseId, instanceId);
                     throw new RuntimeException("WebSocket发送失败，客户端可能已断开连接");
                 }
 
-                ackFuture = ackManager.createAckWaiter(releaseId, instanceId, pushTimeoutSeconds * 1000L);
-                log.debug("等待ACK: releaseId={}, instanceId={}, timeout={}s", releaseId, instanceId, pushTimeoutSeconds);
+                log.debug("等待ACK: releaseId={}, instanceId={}", releaseId, instanceId);
 
                 AckManager.AckResult ackResult = ackFuture.waitForAck();
                 long latency = System.currentTimeMillis() - startTime;
@@ -302,18 +305,24 @@ public class PushService {
 
         long successCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.SUCCESS);
         long failedCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.FAILED);
-        long pendingCount = allStatuses.size() - successCount - failedCount;
+        long timeoutCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.TIMEOUT);
+        long sendingCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.SENDING);
+        long pendingCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.PENDING);
+        long skippedCount = pushStatusRepository.countByReleaseIdAndStatus(releaseId, PushStatus.SKIPPED);
 
-        log.info("检查发布状态: releaseId={}, total={}, success={}, failed={}, pending={}",
-                releaseId, allStatuses.size(), successCount, failedCount, pendingCount);
+        long inProgressCount = pendingCount + sendingCount;
+        long totalFailedCount = failedCount + timeoutCount;
 
-        if (pendingCount > 0) {
+        log.info("检查发布状态: releaseId={}, total={}, success={}, failed={}, timeout={}, pending={}, sending={}, skipped={}",
+                releaseId, allStatuses.size(), successCount, failedCount, timeoutCount, pendingCount, sendingCount, skippedCount);
+
+        if (inProgressCount > 0) {
             configService.updateReleaseStatus(releaseId, ReleaseStatus.PUBLISHING);
-        } else if (failedCount == 0) {
+        } else if (totalFailedCount == 0 && skippedCount == 0) {
             configService.updateReleaseStatus(releaseId, ReleaseStatus.SUCCESS);
         } else if (successCount == 0) {
             configService.updateReleaseStatusWithFailure(releaseId, ReleaseStatus.FAILED,
-                    "全部客户端推送失败: " + failedCount + "/" + allStatuses.size());
+                    "全部客户端推送失败: " + totalFailedCount + "/" + allStatuses.size());
         } else {
             configService.updateReleaseStatus(releaseId, ReleaseStatus.PARTIAL_SUCCESS);
         }
