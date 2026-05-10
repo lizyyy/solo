@@ -153,22 +153,43 @@ func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID str
 		return false, err
 	}
 
-	seen := make(map[string]bool)
+	seenCallbackTxn := make(map[string]bool)
 	var validCallbacks []models.PaymentCallback
-	var duplicateIDs []string
+	var duplicateCallbackIDs []string
+	var duplicateTxnIDs []string
 
 	for _, cb := range callbacks {
-		if !seen[cb.TransactionID] {
-			seen[cb.TransactionID] = true
+		if !seenCallbackTxn[cb.TransactionID] {
+			seenCallbackTxn[cb.TransactionID] = true
 			validCallbacks = append(validCallbacks, cb)
 		} else {
-			duplicateIDs = append(duplicateIDs, cb.ID)
+			duplicateCallbackIDs = append(duplicateCallbackIDs, cb.ID)
+			duplicateTxnIDs = append(duplicateTxnIDs, cb.TransactionID)
 		}
 	}
 
-	removedCount := len(duplicateIDs)
-	if removedCount == 0 {
+	removedCallbackCount := len(duplicateCallbackIDs)
+	if removedCallbackCount == 0 {
 		return false, nil
+	}
+
+	var fundFlows []models.FundFlow
+	if err := rs.db.Where("order_id = ? AND flow_type = ?", orderID, models.FundFlowTypePayment).
+		Order("created_at ASC").Find(&fundFlows).Error; err != nil {
+		return false, err
+	}
+
+	seenFundTxn := make(map[string]bool)
+	var duplicateFundFlowIDs []string
+	var refundAmount float64
+
+	for _, ff := range fundFlows {
+		if !seenFundTxn[ff.TransactionID] {
+			seenFundTxn[ff.TransactionID] = true
+		} else {
+			duplicateFundFlowIDs = append(duplicateFundFlowIDs, ff.ID)
+			refundAmount += ff.Amount
+		}
 	}
 
 	tx := rs.db.Begin()
@@ -176,9 +197,28 @@ func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID str
 		return false, tx.Error
 	}
 
-	if err := tx.Where("id IN ?", duplicateIDs).Delete(&models.PaymentCallback{}).Error; err != nil {
-		tx.Rollback()
-		return false, err
+	if len(duplicateCallbackIDs) > 0 {
+		if err := tx.Where("id IN ?", duplicateCallbackIDs).Delete(&models.PaymentCallback{}).Error; err != nil {
+			tx.Rollback()
+			return false, err
+		}
+	}
+
+	if len(duplicateFundFlowIDs) > 0 {
+		if err := tx.Where("id IN ?", duplicateFundFlowIDs).Delete(&models.FundFlow{}).Error; err != nil {
+			tx.Rollback()
+			return false, err
+		}
+
+		rs.bus.Publish(eventbus.EventTypeRecoveryAction, orderID, "fund_flow",
+			map[string]interface{}{
+				"action":             "remove_duplicate_flows",
+				"removed_flow_count": len(duplicateFundFlowIDs),
+				"refund_amount":      refundAmount,
+				"removed_flow_ids":   duplicateFundFlowIDs,
+			},
+			nil,
+			"recovery-service")
 	}
 
 	if err := tx.Model(&models.Order{}).Where("id = ?", orderID).
@@ -197,8 +237,10 @@ func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID str
 
 	rs.bus.Publish(eventbus.EventTypeRecoveryAction, orderID, "order",
 		map[string]interface{}{
-			"duplicates_removed": removedCount,
-			"removed_ids":        duplicateIDs,
+			"duplicates_removed":      removedCallbackCount,
+			"removed_callback_ids":    duplicateCallbackIDs,
+			"duplicate_flows_removed": len(duplicateFundFlowIDs),
+			"total_refund_amount":     refundAmount,
 		},
 		nil,
 		"recovery-service")
