@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工地塔吊吊装审批台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-draft { background: #e3f2fd; color: #1976d2; }
+        .status-pending_review { background: #fff3e0; color: #f57c00; }
+        .status-pending_safety_review { background: #fce4ec; color: #c2185b; }
+        .status-approved { background: #e8f5e9; color: #388e3c; }
+        .status-rejected { background: #ffebee; color: #d32f2f; }
+        
+        .risk-high { border-left: 4px solid #f44336; }
+        .risk-low { border-left: 4px solid #4caf50; }
+        
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s; }
+        
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e0e0e0; }
+        .timeline-item { position: relative; margin-bottom: 20px; }
+        .timeline-dot { position: absolute; left: -30px; top: 4px; width: 18px; height: 18px; border-radius: 50%; background: #2196f3; border: 3px solid #fff; box-shadow: 0 0 0 2px #2196f3; }
+        
+        .validation-result { padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .validation-success { background: #e8f5e9; color: #2e7d32; }
+        .validation-error { background: #ffebee; color: #c62828; }
+        .validation-warning { background: #fff8e1; color: #f57f17; }
+        
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+        .step-indicator::before { content: ''; position: absolute; top: 20px; left: 10%; right: 10%; height: 2px; background: #e0e0e0; }
+        .step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .step-circle { width: 42px; height: 42px; border-radius: 50%; background: #e0e0e0; color: #9e9e9e; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+        .step.active .step-circle { background: #2196f3; color: white; }
+        .step.completed .step-circle { background: #4caf50; color: white; }
+        .step-label { font-size: 12px; color: #757575; }
+        .step.active .step-label { color: #2196f3; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">🏗️ 工地塔吊吊装审批台</span>
+            <div class="navbar-nav">
+                <button class="btn btn-light me-2" onclick="showList()">📋 计划列表</button>
+                <button class="btn btn-light me-2" onclick="showCreate()">➕ 新建计划</button>
+                <button class="btn btn-light me-2" onclick="showValidator()">⚖️ 重量半径校验</button>
+                <button class="btn btn-light" onclick="exportDaily()">📤 导出日报</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" id="app"></div>
+
+    <div class="modal fade" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailTitle">吊装计划详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API = '/api';
+        let currentPlans = [];
+
+        const STATUS_LABELS = {
+            draft: '草稿',
+            pending_review: '待审批',
+            pending_safety_review: '待安全员复核',
+            approved: '已通过',
+            rejected: '已驳回'
+        };
+
+        async function fetchJSON(url, options = {}) {
+            const res = await fetch(url, options);
+            return res.json();
+        }
+
+        function showList() {
+            loadPlanList();
+        }
+
+        async function loadPlanList() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="搜索任务名称/计划编号/物料" onkeyup="filterPlans(this.value)">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" onchange="filterByStatus(this.value)">
+                            <option value="">全部状态</option>
+                            <option value="draft">草稿</option>
+                            <option value="pending_review">待审批</option>
+                            <option value="pending_safety_review">待安全员复核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已驳回</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" onchange="filterByRisk(this.value)">
+                            <option value="">全部风险</option>
+                            <option value="low">低风险</option>
+                            <option value="high">高风险</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="planList" class="row g-3"></div>
+            `;
+            
+            currentPlans = await fetchJSON(`${API}/plans`);
+            renderPlans(currentPlans);
+        }
+
+        function renderPlans(plans) {
+            const container = document.getElementById('planList');
+            if (plans.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center py-5 text-muted">暂无吊装计划</div>';
+                return;
+            }
+            
+            container.innerHTML = plans.map(plan => `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-hover cursor-pointer ${plan.risk_level === 'high' ? 'risk-high' : 'risk-low'}" onclick="viewDetail(${plan.id})">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1 text-primary">${plan.plan_no}</h6>
+                                    <h5 class="mb-2">${plan.task_name}</h5>
+                                </div>
+                                <span class="status-badge status-${plan.status}">${STATUS_LABELS[plan.status]}</span>
+                            </div>
+                            <div class="text-muted small mb-3">
+                                <div>📦 物料: ${plan.material_name} (${plan.material_weight}吨)</div>
+                                <div>📍 半径: ${plan.operation_radius}米 | 塔吊: ${plan.crane_type}</div>
+                                <div>🕐 时段: ${formatDateTime(plan.start_time)} - ${formatTime(plan.end_time)}</div>
+                                <div>🌬️ 风速: ${plan.wind_speed}m/s | 👷 指挥: ${plan.commander}</div>
+                            </div>
+                            ${plan.risk_level === 'high' ? '<div class="text-danger small"><strong>⚠️ 高风险，需安全员复核</strong></div>' : ''}
+                            ${plan.status === 'rejected' && plan.rejection_reason ? 
+                                `<div class="text-danger small mt-2">❌ 驳回原因: ${plan.rejection_reason}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPlans(keyword) {
+            const filtered = currentPlans.filter(p => 
+                p.task_name.includes(keyword) || 
+                p.plan_no.includes(keyword) || 
+                p.material_name.includes(keyword)
+            );
+            renderPlans(filtered);
+        }
+
+        async function filterByStatus(status) {
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            currentPlans = await fetchJSON(`${API}/plans?${params}`);
+            renderPlans(currentPlans);
+        }
+
+        async function filterByRisk(risk) {
+            const params = new URLSearchParams();
+            if (risk) params.append('risk_level', risk);
+            currentPlans = await fetchJSON(`${API}/plans?${params}`);
+            renderPlans(currentPlans);
+        }
+
+        function formatDateTime(dt) {
+            if (!dt) return '-';
+            return dt.replace('T', ' ').substring(0, 16);
+        }
+
+        function formatTime(dt) {
+            if (!dt) return '-';
+            return dt.split('T')[1]?.substring(0, 5) || '-';
+        }
+
+        async function viewDetail(id) {
+            const data = await fetchJSON(`${API}/plans/${id}`);
+            showDetailModal(data);
+        }
+
+        function showDetailModal({ plan, logs }) {
+            document.getElementById('detailTitle').textContent = `${plan.plan_no} - ${plan.task_name}`;
+            
+            let actionButtons = '';
+            if (plan.status === 'draft') {
+                actionButtons = `
+                    <button class="btn btn-warning me-2" onclick="editPlan(${plan.id})">✏️ 编辑</button>
+                    <button class="btn btn-primary" onclick="submitPlan(${plan.id})">📤 提交审批</button>
+                `;
+            } else if (['pending_review', 'pending_safety_review'].includes(plan.status)) {
+                actionButtons = `
+                    <button class="btn btn-success me-2" onclick="approvePlan(${plan.id})">✅ 审批通过</button>
+                    <button class="btn btn-danger" onclick="rejectPlan(${plan.id})">❌ 驳回</button>
+                `;
+            } else if (plan.status === 'rejected') {
+                actionButtons = `
+                    <button class="btn btn-warning" onclick="returnToDraft(${plan.id})">↩️ 撤回修改</button>
+                `;
+            }
+            
+            document.getElementById('detailContent').innerHTML = `
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">基本信息</h6>
+                        <table class="table table-sm">
+                            <tr><th>计划编号</th><td>${plan.plan_no}</td></tr>
+                            <tr><th>任务名称</th><td>${plan.task_name}</td></tr>
+                            <tr><th>物料名称</th><td>${plan.material_name}</td></tr>
+                            <tr><th>物料重量</th><td>${plan.material_weight} 吨</td></tr>
+                            <tr><th>作业半径</th><td>${plan.operation_radius} 米</td></tr>
+                            <tr><th>塔吊型号</th><td>${plan.crane_type}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">作业条件</h6>
+                        <table class="table table-sm">
+                            <tr><th>开始时间</th><td>${formatDateTime(plan.start_time)}</td></tr>
+                            <tr><th>结束时间</th><td>${formatDateTime(plan.end_time)}</td></tr>
+                            <tr><th>风速</th><td>${plan.wind_speed} m/s ${plan.wind_speed > 12 ? '<span class="text-danger">⚠️超限</span>' : ''}</td></tr>
+                            <tr><th>指挥人员</th><td>${plan.commander} ${plan.commander_qualified ? '<span class="text-success">✅有资质</span>' : '<span class="text-danger">❌无资质</span>'}</td></tr>
+                            <tr><th>当前状态</th><td><span class="status-badge status-${plan.status}">${STATUS_LABELS[plan.status]}</span></td></tr>
+                            <tr><th>风险等级</th><td>${plan.risk_level === 'high' ? '<span class="text-danger">🔴 高风险</span>' : '<span class="text-success">🟢 低风险</span>'}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                ${actionButtons ? `<div class="mb-4">${actionButtons}</div>` : ''}
+                
+                <h6 class="text-muted mb-3">📜 审批历史记录</h6>
+                ${logs.length === 0 ? '<p class="text-muted">暂无审批记录</p>' : `
+                    <div class="timeline">
+                        ${logs.map(log => `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="bg-light p-3 rounded">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>${log.action}</strong>
+                                        <small class="text-muted">${formatDateTime(log.created_at)}</small>
+                                    </div>
+                                    <div class="small text-muted">
+                                        操作人: ${log.operator}
+                                        ${log.before_status ? ` | ${STATUS_LABELS[log.before_status]} → ${STATUS_LABELS[log.after_status]}` : ''}
+                                    </div>
+                                    ${log.comment ? `<div class="mt-2">${log.comment}</div>` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            `;
+            
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+
+        async function showCreate() {
+            const commanders = await fetchJSON(`${API}/commanders`);
+            const craneSpecs = await fetchJSON(`${API}/crane-specs`);
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h4 class="mb-0">➕ 新建吊装计划</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="step-indicator mb-4">
+                                    <div class="step active" id="step1">
+                                        <div class="step-circle">1</div>
+                                        <div class="step-label">填写计划</div>
+                                    </div>
+                                    <div class="step" id="step2">
+                                        <div class="step-circle">2</div>
+                                        <div class="step-label">重量半径校验</div>
+                                    </div>
+                                    <div class="step" id="step3">
+                                        <div class="step-circle">3</div>
+                                        <div class="step-label">提交审批</div>
+                                    </div>
+                                </div>
+                                
+                                <form id="planForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">任务名称 *</label>
+                                            <input type="text" class="form-control" name="task_name" required placeholder="如：3号楼标准层钢筋吊装">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">物料名称 *</label>
+                                            <input type="text" class="form-control" name="material_name" required placeholder="如：HRB400钢筋">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">物料重量 (吨) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="material_weight" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">作业半径 (米) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="operation_radius" required>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">塔吊型号 *</label>
+                                            <select class="form-select" name="crane_type" required>
+                                                ${Object.keys(craneSpecs).map(type => `<option value="${type}">${type}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">开始时间 *</label>
+                                            <input type="datetime-local" class="form-control" name="start_time" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">结束时间 *</label>
+                                            <input type="datetime-local" class="form-control" name="end_time" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">现场风速 (m/s) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="wind_speed" required>
+                                            <small class="text-muted">安全限值: ≤12m/s</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">指挥人员 *</label>
+                                            <select class="form-select" name="commander" required>
+                                                ${commanders.map(c => `<option value="${c.name}">${c.name} ${c.qualified ? '✅' : '❌无资质'}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="validationSection" class="d-none"></div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary" onclick="showList()">← 返回列表</button>
+                                        <div>
+                                            <button type="button" id="btnValidate" class="btn btn-info me-2" onclick="runValidation()">⚖️ 先校验重量半径</button>
+                                            <button type="button" id="btnCreate" class="btn btn-primary" onclick="createPlan()">📝 创建计划</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function runValidation() {
+            const form = document.getElementById('planForm');
+            const formData = new FormData(form);
+            const weight = parseFloat(formData.get('material_weight'));
+            const radius = parseFloat(formData.get('operation_radius'));
+            const crane_type = formData.get('crane_type');
+            
+            if (!weight || !radius) {
+                alert('请先填写物料重量和作业半径');
+                return;
+            }
+            
+            const result = await fetchJSON(`${API}/validate/weight-radius`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ weight, radius, crane_type })
+            });
+            
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            
+            const section = document.getElementById('validationSection');
+            section.classList.remove('d-none');
+            
+            if (result.valid) {
+                section.innerHTML = `
+                    <div class="validation-result validation-success">
+                        <strong>✅ 重量半径校验通过</strong><br>
+                        ${crane_type}在${radius}米半径下最大可吊${result.maxAllowedWeight.toFixed(1)}吨，申请${weight}吨，符合要求。
+                    </div>
+                `;
+            } else {
+                section.innerHTML = `
+                    <div class="validation-result validation-error">
+                        <strong>❌ 重量半径校验失败</strong><br>
+                        ${result.reason}
+                    </div>
+                `;
+            }
+        }
+
+        async function createPlan() {
+            const form = document.getElementById('planForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const plan = {
+                task_name: formData.get('task_name'),
+                material_name: formData.get('material_name'),
+                material_weight: parseFloat(formData.get('material_weight')),
+                operation_radius: parseFloat(formData.get('operation_radius')),
+                crane_type: formData.get('crane_type'),
+                start_time: formData.get('start_time'),
+                end_time: formData.get('end_time'),
+                wind_speed: parseFloat(formData.get('wind_speed')),
+                commander: formData.get('commander')
+            };
+            
+            const result = await fetchJSON(`${API}/validate/plan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(plan)
+            });
+            
+            let validationHtml = '';
+            if (result.issues.length > 0) {
+                validationHtml += `<div class="validation-result validation-error"><strong>❌ 必须驳回的问题：</strong><ul class="mb-0">${result.issues.map(i => `<li>${i}</li>`).join('')}</ul></div>`;
+            }
+            if (result.warnings.length > 0) {
+                validationHtml += `<div class="validation-result validation-warning"><strong>⚠️ 需安全员复核：</strong><ul class="mb-0">${result.warnings.map(w => `<li>${w}</li>`).join('')}</ul></div>`;
+            }
+            if (result.issues.length === 0 && result.warnings.length === 0) {
+                validationHtml += `<div class="validation-result validation-success"><strong>✅ 计划校验通过，可提交审批</strong></div>`;
+            }
+            
+            document.getElementById('validationSection').classList.remove('d-none');
+            document.getElementById('validationSection').innerHTML = validationHtml;
+            
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step2').classList.add('completed');
+            document.getElementById('step3').classList.add('active');
+            
+            const created = await fetchJSON(`${API}/plans`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(plan)
+            });
+            
+            const btnCreate = document.getElementById('btnCreate');
+            btnCreate.textContent = '📤 提交审批';
+            btnCreate.onclick = () => submitPlan(created.id);
+            btnCreate.className = 'btn btn-success';
+        }
+
+        async function submitPlan(id) {
+            const result = await fetchJSON(`${API}/plans/${id}/submit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '申请人' })
+            });
+            
+            if (!result.success) {
+                alert(`提交失败：${result.message}\n\n${result.issues?.join('\n')}`);
+                return;
+            }
+            
+            alert(result.message);
+            bootstrap.Modal.getInstance(document.getElementById('detailModal'))?.hide();
+            showList();
+        }
+
+        async function approvePlan(id) {
+            const comment = prompt('请输入审批意见（可选）：');
+            const result = await fetchJSON(`${API}/plans/${id}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '审批人', comment })
+            });
+            
+            if (result.success) {
+                alert('审批通过');
+                bootstrap.Modal.getInstance(document.getElementById('detailModal'))?.hide();
+                showList();
+            }
+        }
+
+        async function rejectPlan(id) {
+            const reason = prompt('请输入驳回原因：');
+            if (!reason) return;
+            
+            const result = await fetchJSON(`${API}/plans/${id}/reject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '审批人', reason })
+            });
+            
+            if (result.success) {
+                alert('已驳回');
+                bootstrap.Modal.getInstance(document.getElementById('detailModal'))?.hide();
+                showList();
+            }
+        }
+
+        async function returnToDraft(id) {
+            const result = await fetchJSON(`${API}/plans/${id}/return_to_draft`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ operator: '申请人' })
+            });
+            
+            if (result.success) {
+                alert(result.message);
+                bootstrap.Modal.getInstance(document.getElementById('detailModal'))?.hide();
+                showList();
+            }
+        }
+
+        async function editPlan(id) {
+            const data = await fetchJSON(`${API}/plans/${id}`);
+            const plan = data.plan;
+            const commanders = await fetchJSON(`${API}/commanders`);
+            const craneSpecs = await fetchJSON(`${API}/crane-specs`);
+            
+            bootstrap.Modal.getInstance(document.getElementById('detailModal'))?.hide();
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h4 class="mb-0">✏️ 编辑吊装计划 - ${plan.plan_no}</h4>
+                            </div>
+                            <div class="card-body">
+                                <form id="editForm">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">任务名称 *</label>
+                                            <input type="text" class="form-control" name="task_name" required value="${plan.task_name}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">物料名称 *</label>
+                                            <input type="text" class="form-control" name="material_name" required value="${plan.material_name}">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">物料重量 (吨) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="material_weight" required value="${plan.material_weight}">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">作业半径 (米) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="operation_radius" required value="${plan.operation_radius}">
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">塔吊型号 *</label>
+                                            <select class="form-select" name="crane_type" required>
+                                                ${Object.keys(craneSpecs).map(type => `<option value="${type}" ${type === plan.crane_type ? 'selected' : ''}>${type}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">开始时间 *</label>
+                                            <input type="datetime-local" class="form-control" name="start_time" required value="${plan.start_time?.substring(0, 16) || ''}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">结束时间 *</label>
+                                            <input type="datetime-local" class="form-control" name="end_time" required value="${plan.end_time?.substring(0, 16) || ''}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">现场风速 (m/s) *</label>
+                                            <input type="number" step="0.1" class="form-control" name="wind_speed" required value="${plan.wind_speed}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">指挥人员 *</label>
+                                            <select class="form-select" name="commander" required>
+                                                ${commanders.map(c => `<option value="${c.name}" ${c.name === plan.commander ? 'selected' : ''}>${c.name} ${c.qualified ? '✅' : '❌'}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary" onclick="showList()">← 返回列表</button>
+                                        <button type="button" class="btn btn-primary" onclick="updatePlan(${plan.id})">💾 保存修改</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function updatePlan(id) {
+            const form = document.getElementById('editForm');
+            const formData = new FormData(form);
+            
+            const plan = {
+                task_name: formData.get('task_name'),
+                material_name: formData.get('material_name'),
+                material_weight: parseFloat(formData.get('material_weight')),
+                operation_radius: parseFloat(formData.get('operation_radius')),
+                crane_type: formData.get('crane_type'),
+                start_time: formData.get('start_time'),
+                end_time: formData.get('end_time'),
+                wind_speed: parseFloat(formData.get('wind_speed')),
+                commander: formData.get('commander')
+            };
+            
+            await fetchJSON(`${API}/plans/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(plan)
+            });
+            
+            alert('保存成功');
+            showList();
+        }
+
+        async function showValidator() {
+            const craneSpecs = await fetchJSON(`${API}/crane-specs`);
+            
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h4 class="mb-0">⚖️ 重量半径校验工具</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-4">
+                                    根据塔吊型号和作业半径，校验物料重量是否在安全范围内。
+                                    塔吊随着作业半径增大，起重能力会相应降低。
+                                </p>
+                                
+                                <form id="validatorForm">
+                                    <div class="mb-3">
+                                        <label class="form-label">塔吊型号</label>
+                                        <select class="form-select" name="crane_type" id="craneTypeSelect">
+                                            ${Object.keys(craneSpecs).map(type => `<option value="${type}">${type} (最大${craneSpecs[type].maxWeight}吨/最大${craneSpecs[type].maxRadius}米)</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="craneInfo" class="mb-3 p-3 bg-light rounded">
+                                        <h6>性能参数</h6>
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr><th>半径(米)</th>${Object.values(craneSpecs)[0].radiusWeightTable ? Object.keys(Object.values(craneSpecs)[0].radiusWeightTable).map(r => `<th>${r}</th>`).join('') : ''}</tr>
+                                            </thead>
+                                            <tbody id="radiusWeightBody"></tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">物料重量 (吨)</label>
+                                            <input type="number" step="0.1" class="form-control" name="weight" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">作业半径 (米)</label>
+                                            <input type="number" step="0.1" class="form-control" name="radius" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-primary btn-lg" onclick="doValidate()">🔍 开始校验</button>
+                                    </div>
+                                    
+                                    <div id="validateResult" class="mt-4"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            updateCraneInfo();
+            document.getElementById('craneTypeSelect').onchange = updateCraneInfo;
+        }
+
+        async function updateCraneInfo() {
+            const craneSpecs = await fetchJSON(`${API}/crane-specs`);
+            const type = document.getElementById('craneTypeSelect').value;
+            const specs = craneSpecs[type];
+            
+            const radii = Object.keys(specs.radiusWeightTable).sort((a, b) => a - b);
+            document.getElementById('radiusWeightBody').innerHTML = `
+                <tr><th>最大重量(吨)</th>${radii.map(r => `<td>${specs.radiusWeightTable[r]}</td>`).join('')}</tr>
+            `;
+        }
+
+        async function doValidate() {
+            const form = document.getElementById('validatorForm');
+            const formData = new FormData(form);
+            
+            const result = await fetchJSON(`${API}/validate/weight-radius`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    weight: parseFloat(formData.get('weight')),
+                    radius: parseFloat(formData.get('radius')),
+                    crane_type: formData.get('crane_type')
+                })
+            });
+            
+            const container = document.getElementById('validateResult');
+            if (result.valid) {
+                container.innerHTML = `
+                    <div class="validation-result validation-success">
+                        <h6>✅ 校验通过</h6>
+                        <p class="mb-0">
+                            ${formData.get('crane_type')}在${formData.get('radius')}米半径下最大可吊<strong>${result.maxAllowedWeight.toFixed(1)}吨</strong>，
+                            申请<strong>${formData.get('weight')}吨</strong>，符合安全要求。
+                        </p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="validation-result validation-error">
+                        <h6>❌ 校验失败</h6>
+                        <p class="mb-0">${result.reason}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function exportDaily() {
+            const date = prompt('请输入导出日期（YYYY-MM-DD），留空则导出今天：', new Date().toISOString().slice(0, 10));
+            if (date === null) return;
+            
+            const data = await fetchJSON(`${API}/export/daily${date ? '?date=' + date : ''}`);
+            
+            let csv = '日期,计划编号,任务名称,物料,重量(吨),半径(米),塔吊型号,时段,风速(m/s),指挥人员,状态,风险等级,风险问题\n';
+            
+            data.records.forEach(p => {
+                const risks = [...(p.validation_issues || []), ...(p.validation_warnings || [])].join('; ');
+                csv += [
+                    data.date,
+                    p.plan_no,
+                    p.task_name,
+                    p.material_name,
+                    p.material_weight,
+                    p.operation_radius,
+                    p.crane_type,
+                    `${formatTime(p.start_time)}-${formatTime(p.end_time)}`,
+                    p.wind_speed,
+                    p.commander,
+                    STATUS_LABELS[p.status],
+                    p.risk_level === 'high' ? '高' : '低',
+                    risks
+                ].map(v => `"${v}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `吊装风险日报_${data.date}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert(`日报已导出！\n总计: ${data.total_count}条\n高风险: ${data.high_risk_count}条\n已通过: ${data.approved_count}条\n待审批: ${data.pending_count}条\n已驳回: ${data.rejected_count}条`);
+        }
+
+        showList();
+    </script>
+</body>
+</html>
