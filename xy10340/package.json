@@ -1,0 +1,25 @@
+{
+  "name": "auto-service-verification-cli",
+  "version": "1.0.0",
+  "description": "汽修保养套餐核销 CLI 工具",
+  "main": "index.js",
+  "bin": {
+    "auto-service": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "cli",
+    "auto-service",
+    "verification"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0",
+    "uuid": "^9.0.0"
+  }
+}

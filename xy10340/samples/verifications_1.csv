@@ -1,0 +1,5 @@
+id,vehicleIdentifier,shopId,date,action,packageRightId,materials,oilLiters,newPackageRightId
+VER001,京A12345,SH001,2024-05-01,verify,RIGHT001,"[{""name"":""全合成机油"",""quantity"":4,""unit"":""L""},{""name"":""机油滤清器"",""quantity"":1,""unit"":""个""}]",4,
+VER002,京B67890,SH001,2024-05-02,verify,RIGHT002,"[{""name"":""半合成机油"",""quantity"":5,""unit"":""L""},{""name"":""机油滤清器"",""quantity"":1,""unit"":""个""}]",5,
+VER003,沪C98765,SH003,2024-05-03,verify,RIGHT003,"[{""name"":""全合成机油"",""quantity"":4,""unit"":""L""},{""name"":""机油滤清器"",""quantity"":1,""unit"":""个""},{""name"":""空气滤清器"",""quantity"":1,""unit"":""个""}]",4,
+VER004,粤A24680,SH004,2024-05-04,verify,RIGHT004,"[{""name"":""全合成高端机油"",""quantity"":6,""unit"":""L""}]",6,

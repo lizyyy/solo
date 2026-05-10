@@ -1,0 +1,497 @@
+{
+  "vehicles": [
+    {
+      "id": "46dbe16b-1e11-489e-ab6c-e5a63265dc74",
+      "vin": "LSVNB4183JN123456",
+      "plateNumber": "京A12345",
+      "ownerName": "张三",
+      "ownerPhone": "13800138001",
+      "plateHistory": [
+        "京A12345"
+      ]
+    },
+    {
+      "id": "327407be-7a87-44c2-96b4-ccfdad066fd6",
+      "vin": "WVWZZZ32ZEW456789",
+      "plateNumber": "京B67890",
+      "ownerName": "李四",
+      "ownerPhone": "13800138002",
+      "plateHistory": [
+        "京B67890"
+      ]
+    },
+    {
+      "id": "c3226e71-9efe-439e-b5d1-4583f12784f1",
+      "vin": "LGBF2CE01HY012345",
+      "plateNumber": "沪C98765",
+      "ownerName": "王五",
+      "ownerPhone": "13800138003",
+      "plateHistory": [
+        "沪C98765"
+      ]
+    },
+    {
+      "id": "b99e3ccd-7543-49a5-83f3-c5eb9c8af24c",
+      "vin": "LBVVZ1105BM012345",
+      "plateNumber": "粤A24680",
+      "ownerName": "赵六",
+      "ownerPhone": "13800138004",
+      "plateHistory": [
+        "粤A24680"
+      ]
+    },
+    {
+      "id": "7bf8f7d4-ce82-4eb2-b42a-900d12a9b074",
+      "vin": "LFV3A23C0D0123456",
+      "plateNumber": "川A13579",
+      "ownerName": "孙七",
+      "ownerPhone": "13800138005",
+      "plateHistory": [
+        "川A13579"
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "id": "PKG001",
+      "name": "基础保养套餐A",
+      "packageType": "小保养",
+      "totalServices": 3,
+      "services": [
+        "换机油",
+        "换机滤"
+      ],
+      "materials": [
+        {
+          "name": "全合成机油",
+          "type": "oil",
+          "quantity": 4,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ]
+    },
+    {
+      "id": "PKG002",
+      "name": "基础保养套餐B",
+      "packageType": "小保养",
+      "totalServices": 5,
+      "services": [
+        "换机油",
+        "换机滤"
+      ],
+      "materials": [
+        {
+          "name": "半合成机油",
+          "type": "oil",
+          "quantity": 5,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ]
+    },
+    {
+      "id": "PKG003",
+      "name": "大保养套餐",
+      "packageType": "大保养",
+      "totalServices": 2,
+      "services": [
+        "换机油",
+        "换机滤",
+        "换空滤",
+        "换燃油滤",
+        "火花塞"
+      ],
+      "materials": [
+        {
+          "name": "全合成机油",
+          "type": "oil",
+          "quantity": 4,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "空气滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "燃油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "火花塞",
+          "type": "ignition",
+          "quantity": 4,
+          "unit": "支"
+        }
+      ]
+    },
+    {
+      "id": "PKG004",
+      "name": "豪华保养套餐",
+      "packageType": "豪华保养",
+      "totalServices": 3,
+      "services": [
+        "换机油",
+        "三滤",
+        "刹车油",
+        "火花塞"
+      ],
+      "materials": [
+        {
+          "name": "全合成高端机油",
+          "type": "oil",
+          "quantity": 6,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "空气滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "空调滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "刹车油",
+          "type": "fluid",
+          "quantity": 2,
+          "unit": "L"
+        },
+        {
+          "name": "火花塞",
+          "type": "ignition",
+          "quantity": 6,
+          "unit": "支"
+        }
+      ]
+    },
+    {
+      "id": "PKG005",
+      "name": "经济保养套餐",
+      "packageType": "经济保养",
+      "totalServices": 4,
+      "services": [
+        "换机油",
+        "机滤"
+      ],
+      "materials": [
+        {
+          "name": "矿物质机油",
+          "type": "oil",
+          "quantity": 3,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "type": "filter",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ]
+    }
+  ],
+  "packageRights": [
+    {
+      "id": "RIGHT001",
+      "vehicleId": "46dbe16b-1e11-489e-ab6c-e5a63265dc74",
+      "packageId": "PKG001",
+      "purchaseDate": "2024-01-15",
+      "totalServices": 3,
+      "remainingServices": 2,
+      "materials": [],
+      "purchasePrice": 1500,
+      "isRefunded": false,
+      "refundDate": null
+    },
+    {
+      "id": "RIGHT002",
+      "vehicleId": "327407be-7a87-44c2-96b4-ccfdad066fd6",
+      "packageId": "PKG002",
+      "purchaseDate": "2024-02-20",
+      "totalServices": 5,
+      "remainingServices": 3,
+      "materials": [],
+      "purchasePrice": 2000,
+      "isRefunded": false,
+      "refundDate": null
+    },
+    {
+      "id": "RIGHT003",
+      "vehicleId": "c3226e71-9efe-439e-b5d1-4583f12784f1",
+      "packageId": "PKG003",
+      "purchaseDate": "2024-03-10",
+      "totalServices": 2,
+      "remainingServices": 0,
+      "materials": [],
+      "purchasePrice": 3000,
+      "isRefunded": false,
+      "refundDate": null
+    },
+    {
+      "id": "RIGHT004",
+      "vehicleId": "b99e3ccd-7543-49a5-83f3-c5eb9c8af24c",
+      "packageId": "PKG004",
+      "purchaseDate": "2024-01-25",
+      "totalServices": 3,
+      "remainingServices": 2,
+      "materials": [],
+      "purchasePrice": 4500,
+      "isRefunded": true,
+      "refundDate": "2024-05-13"
+    },
+    {
+      "id": "RIGHT005",
+      "vehicleId": "7bf8f7d4-ce82-4eb2-b42a-900d12a9b074",
+      "packageId": "PKG005",
+      "purchaseDate": "2024-04-05",
+      "totalServices": 4,
+      "remainingServices": 4,
+      "materials": [],
+      "purchasePrice": 1200,
+      "isRefunded": true,
+      "refundDate": "2024-05-14"
+    },
+    {
+      "id": "RIGHT006",
+      "vehicleId": "7bf8f7d4-ce82-4eb2-b42a-900d12a9b074",
+      "packageId": "PKG001",
+      "purchaseDate": "2024-04-05",
+      "totalServices": 3,
+      "remainingServices": 3,
+      "materials": [],
+      "purchasePrice": 1500,
+      "isRefunded": false,
+      "refundDate": null
+    }
+  ],
+  "verificationRecords": [
+    {
+      "id": "VER001",
+      "packageRightId": "RIGHT001",
+      "shopId": "SH001",
+      "date": "2024-05-01",
+      "materials": [
+        {
+          "name": "全合成机油",
+          "quantity": 4,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_1.csv",
+      "action": "核销",
+      "finalResult": "核销成功: 基础保养套餐A (剩余2/3次)"
+    },
+    {
+      "id": "VER002",
+      "packageRightId": "RIGHT002",
+      "shopId": "SH001",
+      "date": "2024-05-02",
+      "materials": [
+        {
+          "name": "半合成机油",
+          "quantity": 5,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_1.csv",
+      "action": "核销",
+      "finalResult": "核销成功: 基础保养套餐B (剩余4/5次)"
+    },
+    {
+      "id": "VER003",
+      "packageRightId": "RIGHT003",
+      "shopId": "SH003",
+      "date": "2024-05-03",
+      "materials": [
+        {
+          "name": "全合成机油",
+          "quantity": 4,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "quantity": 1,
+          "unit": "个"
+        },
+        {
+          "name": "空气滤清器",
+          "quantity": 1,
+          "unit": "个"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_1.csv",
+      "action": "核销",
+      "finalResult": "核销成功: 大保养套餐 (剩余1/2次)"
+    },
+    {
+      "id": "VER004",
+      "packageRightId": "RIGHT004",
+      "shopId": "SH004",
+      "date": "2024-05-04",
+      "materials": [
+        {
+          "name": "全合成高端机油",
+          "quantity": 6,
+          "unit": "L"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_1.csv",
+      "action": "核销",
+      "finalResult": "核销成功: 豪华保养套餐 (剩余2/3次)"
+    },
+    {
+      "id": "VER005",
+      "packageRightId": "RIGHT001",
+      "shopId": "SH002",
+      "date": "2024-05-10",
+      "materials": [
+        {
+          "name": "全合成机油",
+          "quantity": 4,
+          "unit": "L"
+        }
+      ],
+      "status": "cancelled",
+      "sourceFile": "verifications_2_special.csv",
+      "action": "撤销",
+      "finalResult": "撤销成功: 恢复权益 1 → 2 次 (原因: 客户退单)"
+    },
+    {
+      "id": "VER006",
+      "packageRightId": "RIGHT002",
+      "shopId": "SH001",
+      "date": "2024-05-11",
+      "materials": [
+        {
+          "name": "半合成机油",
+          "quantity": 5,
+          "unit": "L"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_2_special.csv",
+      "action": "核销",
+      "finalResult": "机油升数不匹配(套餐5L/实际4L); 核销成功: 基础保养套餐B (剩余3/5次)"
+    },
+    {
+      "id": "VER007",
+      "packageRightId": "RIGHT003",
+      "shopId": "SH003",
+      "date": "2024-05-12",
+      "materials": [
+        {
+          "name": "全合成机油",
+          "quantity": 5,
+          "unit": "L"
+        },
+        {
+          "name": "机油滤清器",
+          "quantity": 2,
+          "unit": "个"
+        }
+      ],
+      "status": "verified",
+      "sourceFile": "verifications_2_special.csv",
+      "action": "核销",
+      "finalResult": "机油升数不匹配(套餐4L/实际5L); 材料超额(全合成机油超1, 机油滤清器超1); 核销成功: 大保养套餐 (剩余0/2次)"
+    },
+    {
+      "id": "VER008",
+      "packageRightId": "RIGHT004",
+      "shopId": "SH004",
+      "date": "2024-05-13",
+      "materials": [],
+      "status": "refunded",
+      "sourceFile": "verifications_2_special.csv",
+      "action": "退款",
+      "finalResult": "退款成功: 豪华保养套餐"
+    },
+    {
+      "id": "VER009",
+      "packageRightId": "RIGHT005",
+      "shopId": "SH005",
+      "date": "2024-05-14",
+      "materials": [],
+      "status": "exchanged",
+      "sourceFile": "verifications_2_special.csv",
+      "action": "换购",
+      "finalResult": "换购成功: 经济保养套餐 → 基础保养套餐A"
+    }
+  ],
+  "shops": [
+    {
+      "id": "SH001",
+      "name": "北京朝阳店",
+      "address": "北京市朝阳区建国路88号",
+      "phone": "010-88888801"
+    },
+    {
+      "id": "SH002",
+      "name": "北京海淀店",
+      "address": "北京市海淀区中关村大街1号",
+      "phone": "010-88888802"
+    },
+    {
+      "id": "SH003",
+      "name": "上海浦东店",
+      "address": "上海市浦东新区世纪大道100号",
+      "phone": "021-88888803"
+    },
+    {
+      "id": "SH004",
+      "name": "广州天河店",
+      "address": "广州市天河区体育西路191号",
+      "phone": "020-88888804"
+    },
+    {
+      "id": "SH005",
+      "name": "成都武侯店",
+      "address": "成都市武侯区天府大道北段1700号",
+      "phone": "028-88888805"
+    }
+  ]
+}
