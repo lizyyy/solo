@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>母婴店奶粉批号召回台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="header-content">
+                <h1>🍼 母婴店奶粉批号召回台</h1>
+                <div class="user-info">
+                    <span id="dashboard-summary">加载中...</span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">仪表盘</span>
+                </li>
+                <li class="nav-item" data-page="recalls">
+                    <span class="nav-icon">🚨</span>
+                    <span class="nav-text">召回管理</span>
+                </li>
+                <li class="nav-item" data-page="members">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">会员管理</span>
+                </li>
+                <li class="nav-item" data-page="inventory">
+                    <span class="nav-icon">📦</span>
+                    <span class="nav-text">库存管理</span>
+                </li>
+                <li class="nav-item" data-page="sales">
+                    <span class="nav-icon">🛒</span>
+                    <span class="nav-text">销售记录</span>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <div id="page-dashboard" class="page active">
+                <div class="page-header">
+                    <h2>仪表盘</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-members">0</div>
+                            <div class="stat-label">会员总数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-inventory">0</div>
+                            <div class="stat-label">库存批次</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-sales">0</div>
+                            <div class="stat-label">销售记录</div>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">🚨</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-active-recalls">0</div>
+                            <div class="stat-label">进行中召回</div>
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">🔒</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="stat-locked">0</div>
+                            <div class="stat-label">锁定库存</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>最新召回</h3>
+                    <div id="latest-recalls-list" class="card-list"></div>
+                </div>
+            </div>
+
+            <div id="page-recalls" class="page">
+                <div class="page-header">
+                    <h2>召回管理</h2>
+                    <button class="btn btn-primary" id="btn-create-recall">+ 新建召回</button>
+                </div>
+                
+                <div id="recalls-list" class="card-list"></div>
+            </div>
+
+            <div id="page-recall-detail" class="page">
+                <div class="page-header">
+                    <button class="btn btn-secondary" id="btn-back-recalls">← 返回列表</button>
+                    <h2 id="detail-recall-title">召回详情</h2>
+                    <button class="btn btn-secondary" id="btn-export-report">📥 导出报告</button>
+                </div>
+
+                <div class="recall-summary" id="recall-summary-card"></div>
+
+                <div class="progress-section">
+                    <h3>通知进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="notify-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span id="notify-info">已通知 0 / 0</span>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="mini-stat">
+                        <span class="mini-num" id="stat-pending">0</span>
+                        <span class="mini-label">待处理</span>
+                    </div>
+                    <div class="mini-stat success">
+                        <span class="mini-num" id="stat-returned">0</span>
+                        <span class="mini-label">已退货</span>
+                    </div>
+                    <div class="mini-stat info">
+                        <span class="mini-num" id="stat-exchanged">0</span>
+                        <span class="mini-label">已换货</span>
+                    </div>
+                    <div class="mini-stat warning">
+                        <span class="mini-num" id="stat-unreachable">0</span>
+                        <span class="mini-label">无法联系</span>
+                    </div>
+                    <div class="mini-stat danger">
+                        <span class="mini-num" id="stat-exceptions">0</span>
+                        <span class="mini-label">异常</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>受影响会员列表</h3>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>会员</th>
+                                    <th>电话</th>
+                                    <th>产品</th>
+                                    <th>数量</th>
+                                    <th>购买日期</th>
+                                    <th>通知状态</th>
+                                    <th>处理状态</th>
+                                    <th>异常</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="affected-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-members" class="page">
+                <div class="page-header">
+                    <h2>会员管理</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>会员号</th>
+                                <th>姓名</th>
+                                <th>电话</th>
+                                <th>地址</th>
+                                <th>注册时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-inventory" class="page">
+                <div class="page-header">
+                    <h2>库存管理</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>批号</th>
+                                <th>产品名称</th>
+                                <th>品牌</th>
+                                <th>规格</th>
+                                <th>数量</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-sales" class="page">
+                <div class="page-header">
+                    <h2>销售记录</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>销售单号</th>
+                                <th>会员</th>
+                                <th>批号</th>
+                                <th>产品</th>
+                                <th>数量</th>
+                                <th>销售日期</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal" id="create-recall-modal">
+            <div class="modal-header">
+                <h3>新建召回</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>召回批号 <span class="required">*</span></label>
+                    <input type="text" id="input-batch-no" placeholder="请输入要召回的产品批号">
+                    <small class="hint">系统会自动找到该批号的所有销售记录</small>
+                </div>
+                <div class="form-group">
+                    <label>召回原因</label>
+                    <textarea id="input-reason" rows="3" placeholder="请输入召回原因（可选）"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-recall">取消</button>
+                <button class="btn btn-primary" id="btn-confirm-recall">确认创建</button>
+            </div>
+        </div>
+
+        <div class="modal" id="handle-modal">
+            <div class="modal-header">
+                <h3>处理召回</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="member-info" id="handle-member-info"></div>
+                <div class="form-group">
+                    <label>处理方式 <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-item">
+                            <input type="radio" name="handle_type" value="return" checked>
+                            <span>退货 - 会员退回问题产品，办理退款</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="handle_type" value="exchange">
+                            <span>换货 - 会员退回问题产品，更换安全批次</span>
+                        </label>
+                        <label class="radio-item">
+                            <input type="radio" name="handle_type" value="unreachable">
+                            <span>无法联系 - 多次尝试无法联系到会员</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>操作人</label>
+                    <input type="text" id="input-operator" placeholder="请输入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="input-remark" rows="2" placeholder="补充说明（可选）"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-handle">取消</button>
+                <button class="btn btn-primary" id="btn-confirm-handle">确认处理</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
