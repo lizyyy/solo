@@ -1,0 +1,19 @@
+[
+  {
+    "harvester_id": "H003",
+    "model": "克拉斯 LEXION 760",
+    "driver_name": "王师傅",
+    "efficiency_ha_per_day": 18.0,
+    "maintenance_windows": [
+      {
+        "start_date": "2024-06-20",
+        "end_date": "2024-06-21",
+        "reason": "机油更换"
+      }
+    ],
+    "rest_rule": {
+      "max_daily_hours": 8.0,
+      "rest_between_trips_minutes": 30
+    }
+  }
+]

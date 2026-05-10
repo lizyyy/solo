@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: farm_scheduler
+Version: 0.1.0
+Summary: 农机跨村调度 CLI 工具
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

@@ -1,0 +1,246 @@
+[
+  {
+    "timestamp": "2026-05-10T16:38:18.219541",
+    "entity_type": "plot",
+    "entity_id": "P001",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "plot_id": "P001",
+      "village": "东风村",
+      "area": 8.5,
+      "crop_type": "小麦",
+      "ripening_start": "2024-06-10",
+      "ripening_end": "2024-06-20",
+      "priority": 2
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:18.221596",
+    "entity_type": "plot",
+    "entity_id": "P002",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "plot_id": "P002",
+      "village": "红星村",
+      "area": 12.3,
+      "crop_type": "小麦",
+      "ripening_start": "2024-06-12",
+      "ripening_end": "2024-06-22",
+      "priority": 1
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:18.222704",
+    "entity_type": "plot",
+    "entity_id": "P003",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "plot_id": "P003",
+      "village": "新华村",
+      "area": 6.7,
+      "crop_type": "油菜",
+      "ripening_start": "2024-05-25",
+      "ripening_end": "2024-06-05",
+      "priority": 3
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:18.225140",
+    "entity_type": "harvester",
+    "entity_id": "H001",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "harvester_id": "H001",
+      "model": "约翰迪尔 S790",
+      "driver_name": "张师傅",
+      "efficiency_ha_per_day": 15.0,
+      "maintenance_windows": [
+        {
+          "start_date": "2024-06-14",
+          "end_date": "2024-06-15",
+          "reason": "季度保养"
+        }
+      ],
+      "rest_rule": {
+        "max_daily_hours": 8.0,
+        "rest_between_trips_minutes": 30
+      }
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:18.234608",
+    "entity_type": "harvester",
+    "entity_id": "H002",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "harvester_id": "H002",
+      "model": "久保田 PRO988",
+      "driver_name": "李师傅",
+      "efficiency_ha_per_day": 8.0,
+      "maintenance_windows": [
+        {
+          "start_date": "2024-06-18",
+          "end_date": "2024-06-18",
+          "reason": "零部件更换"
+        }
+      ],
+      "rest_rule": {
+        "max_daily_hours": 8.0,
+        "rest_between_trips_minutes": 30
+      }
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:18.235764",
+    "entity_type": "schedule",
+    "entity_id": "S001",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "schedule_id": "S001",
+      "plot_id": "P001",
+      "harvester_id": "H001",
+      "scheduled_date": "2024-06-12",
+      "start_time": "08:00:00",
+      "end_time": "12:30:00",
+      "status": "pending"
+    },
+    "source": "sample_init"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:45.019331",
+    "entity_type": "plot",
+    "entity_id": "P004",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "plot_id": "P004",
+      "village": "红旗村",
+      "area": 15.2,
+      "crop_type": "小麦",
+      "ripening_start": "2024-06-15",
+      "ripening_end": "2024-06-25",
+      "priority": 2
+    },
+    "source": "import:sample_plots.json"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:45.033682",
+    "entity_type": "plot",
+    "entity_id": "P005",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "plot_id": "P005",
+      "village": "和平村",
+      "area": 9.8,
+      "crop_type": "大麦",
+      "ripening_start": "2024-06-08",
+      "ripening_end": "2024-06-18",
+      "priority": 1
+    },
+    "source": "import:sample_plots.json"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:50.615659",
+    "entity_type": "harvester",
+    "entity_id": "H003",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "harvester_id": "H003",
+      "model": "克拉斯 LEXION 760",
+      "driver_name": "王师傅",
+      "efficiency_ha_per_day": 18.0,
+      "maintenance_windows": [
+        {
+          "start_date": "2024-06-20",
+          "end_date": "2024-06-21",
+          "reason": "机油更换"
+        }
+      ],
+      "rest_rule": {
+        "max_daily_hours": 8.0,
+        "rest_between_trips_minutes": 30
+      }
+    },
+    "source": "import:sample_harvesters.json"
+  },
+  {
+    "timestamp": "2026-05-10T16:38:57.474092",
+    "entity_type": "schedule",
+    "entity_id": "S002",
+    "action": "create",
+    "old_value": null,
+    "new_value": {
+      "schedule_id": "S002",
+      "plot_id": "P002",
+      "harvester_id": "H002",
+      "scheduled_date": "2024-06-13",
+      "start_time": "08:00:00",
+      "end_time": "12:00:00",
+      "status": "pending"
+    },
+    "source": "cli_add"
+  },
+  {
+    "timestamp": "2026-05-10T16:43:29.703223",
+    "entity_type": "schedule",
+    "entity_id": "S001",
+    "action": "update",
+    "old_value": {
+      "schedule_id": "S001",
+      "plot_id": "P001",
+      "harvester_id": "H001",
+      "scheduled_date": "2024-06-12",
+      "start_time": "08:00:00",
+      "end_time": "12:30:00",
+      "status": "pending"
+    },
+    "new_value": {
+      "schedule_id": "S001",
+      "plot_id": "P001",
+      "harvester_id": "H001",
+      "scheduled_date": "2024-06-12",
+      "start_time": "08:00:00",
+      "end_time": "12:30:00",
+      "status": "completed"
+    },
+    "source": "cli_update"
+  },
+  {
+    "timestamp": "2026-05-10T16:43:31.506064",
+    "entity_type": "schedule",
+    "entity_id": "S002",
+    "action": "update",
+    "old_value": {
+      "schedule_id": "S002",
+      "plot_id": "P002",
+      "harvester_id": "H002",
+      "scheduled_date": "2024-06-13",
+      "start_time": "08:00:00",
+      "end_time": "12:00:00",
+      "status": "pending"
+    },
+    "new_value": {
+      "schedule_id": "S002",
+      "plot_id": "P002",
+      "harvester_id": "H002",
+      "scheduled_date": "2024-06-13",
+      "start_time": "08:00:00",
+      "end_time": "12:00:00",
+      "status": "cancelled"
+    },
+    "source": "cli_cancel"
+  }
+]

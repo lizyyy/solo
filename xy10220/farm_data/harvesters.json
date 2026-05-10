@@ -1,0 +1,53 @@
+[
+  {
+    "harvester_id": "H001",
+    "model": "约翰迪尔 S790",
+    "driver_name": "张师傅",
+    "efficiency_ha_per_day": 15.0,
+    "maintenance_windows": [
+      {
+        "start_date": "2024-06-14",
+        "end_date": "2024-06-15",
+        "reason": "季度保养"
+      }
+    ],
+    "rest_rule": {
+      "max_daily_hours": 8.0,
+      "rest_between_trips_minutes": 30
+    }
+  },
+  {
+    "harvester_id": "H002",
+    "model": "久保田 PRO988",
+    "driver_name": "李师傅",
+    "efficiency_ha_per_day": 8.0,
+    "maintenance_windows": [
+      {
+        "start_date": "2024-06-18",
+        "end_date": "2024-06-18",
+        "reason": "零部件更换"
+      }
+    ],
+    "rest_rule": {
+      "max_daily_hours": 8.0,
+      "rest_between_trips_minutes": 30
+    }
+  },
+  {
+    "harvester_id": "H003",
+    "model": "克拉斯 LEXION 760",
+    "driver_name": "王师傅",
+    "efficiency_ha_per_day": 18.0,
+    "maintenance_windows": [
+      {
+        "start_date": "2024-06-20",
+        "end_date": "2024-06-21",
+        "reason": "机油更换"
+      }
+    ],
+    "rest_rule": {
+      "max_daily_hours": 8.0,
+      "rest_between_trips_minutes": 30
+    }
+  }
+]

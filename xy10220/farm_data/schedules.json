@@ -1,0 +1,20 @@
+[
+  {
+    "schedule_id": "S001",
+    "plot_id": "P001",
+    "harvester_id": "H001",
+    "scheduled_date": "2024-06-12",
+    "start_time": "08:00:00",
+    "end_time": "12:30:00",
+    "status": "completed"
+  },
+  {
+    "schedule_id": "S002",
+    "plot_id": "P002",
+    "harvester_id": "H002",
+    "scheduled_date": "2024-06-13",
+    "start_time": "08:00:00",
+    "end_time": "12:00:00",
+    "status": "cancelled"
+  }
+]
