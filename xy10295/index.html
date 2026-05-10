@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物美容毛结收费计算器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>宠物美容毛结收费计算器</h1>
+            <div class="header-actions">
+                <button id="new-pet-btn" class="btn btn-primary">添加宠物</button>
+                <button id="export-btn" class="btn btn-secondary">导出记录</button>
+                <button id="clear-all-btn" class="btn btn-danger">清空全部</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <div class="workspace-section">
+                <div class="section-header">
+                    <h2>当前工作区</h2>
+                    <span id="workspace-status" class="status-badge">空</span>
+                </div>
+                <div id="pet-list" class="pet-list">
+                    <div class="empty-state">
+                        <p>暂无宠物记录，点击"添加宠物"开始</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pet-editor hidden" id="pet-editor">
+                <div class="editor-header">
+                    <h3 id="editor-title">添加宠物</h3>
+                    <button id="close-editor-btn" class="btn-close">&times;</button>
+                </div>
+
+                <div class="editor-body">
+                    <div class="form-section">
+                        <h4>基本信息</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="pet-name">宠物名称 <span class="required">*</span></label>
+                                <input type="text" id="pet-name" placeholder="例如：小白">
+                                <div class="error-message hidden" id="pet-name-error"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="pet-type">宠物体型 <span class="required">*</span></label>
+                                <select id="pet-type">
+                                    <option value="">请选择体型</option>
+                                    <option value="small">小型犬 (5kg以下)</option>
+                                    <option value="medium">中型犬 (5-15kg)</option>
+                                    <option value="large">大型犬 (15kg以上)</option>
+                                    <option value="cat">猫咪</option>
+                                </select>
+                                <div class="error-message hidden" id="pet-type-error"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>服务项目</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>基础美容服务</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="service-bath" value="bath">
+                                        <span>洗澡护理</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="service-cut" value="cut">
+                                        <span>美容修剪</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="service-nail" value="nail">
+                                        <span>指甲修剪</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="service-ear" value="ear">
+                                        <span>耳道清洁</span>
+                                    </label>
+                                </div>
+                                <div class="error-message hidden" id="services-error"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>毛结情况</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="mat-level">毛结等级 <span class="required">*</span></label>
+                                <select id="mat-level">
+                                    <option value="">请选择毛结等级</option>
+                                    <option value="none">无</option>
+                                    <option value="light">轻度 (局部轻微打结)</option>
+                                    <option value="medium">中度 (多处打结)</option>
+                                    <option value="heavy">重度 (大面积打结)</option>
+                                </select>
+                                <div class="error-message hidden" id="mat-level-error"></div>
+                            </div>
+
+                            <div class="form-group" id="mat-details-group">
+                                <label for="mat-details">毛结详情</label>
+                                <textarea id="mat-details" rows="2" placeholder="描述毛结部位和严重程度..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>附加服务</h4>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>可选附加服务</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="addon-deep-clean" value="deep-clean">
+                                        <span>深层清洁</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="addon-conditioner" value="conditioner">
+                                        <span>护毛素护理</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="addon-teeth" value="teeth">
+                                        <span>牙齿清洁</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" id="addon-flea" value="flea">
+                                        <span>除蚤处理</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="special-requests">特殊要求</label>
+                                <textarea id="special-requests" rows="2" placeholder="其他特殊要求..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calculation-preview" id="calculation-preview">
+                        <h4>费用预览</h4>
+                        <div class="preview-content">
+                            <div class="preview-row">
+                                <span>基础服务费：</span>
+                                <span id="preview-base">¥0.00</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>毛结处理费：</span>
+                                <span id="preview-mat">¥0.00</span>
+                            </div>
+                            <div class="preview-row">
+                                <span>附加服务费：</span>
+                                <span id="preview-addon">¥0.00</span>
+                            </div>
+                            <div class="preview-row total">
+                                <span>总计：</span>
+                                <span id="preview-total">¥0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="save-pet-btn" class="btn btn-primary">保存</button>
+                        <button id="cancel-editor-btn" class="btn btn-secondary">取消</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="statistics-section">
+                <div class="section-header">
+                    <h2>今日统计</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-count">0</div>
+                        <div class="stat-label">宠物数量</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total">¥0.00</div>
+                        <div class="stat-label">总金额</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-mat-heavy">0</div>
+                        <div class="stat-label">重度毛结</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-addon-count">0</div>
+                        <div class="stat-label">附加服务</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
