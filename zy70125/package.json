@@ -1,0 +1,24 @@
+{
+  "name": "theater-equipment-tour",
+  "version": "1.0.0",
+  "description": "剧场设备巡演调拨服务",
+  "main": "dist/index.js",
+  "bin": {
+    "tour": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/uuid": "^9.0.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3"
+  }
+}

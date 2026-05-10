@@ -1,0 +1,155 @@
+{
+  "equipmentCases": [
+    {
+      "id": "33a3c939-7c0b-4811-ae95-cdc24d186a85",
+      "caseNumber": "LIGHT-001",
+      "name": "灯光系统箱",
+      "items": [
+        {
+          "id": "989f04db-95ec-4106-a129-f3057464d985",
+          "name": "MA2灯光控制台",
+          "quantity": 1,
+          "unitValue": 150000,
+          "condition": "fair"
+        },
+        {
+          "id": "70ee7a83-d8f3-4640-ab4e-11d25e94322f",
+          "name": "DMX信号线",
+          "quantity": 15,
+          "unitValue": 200,
+          "condition": "good"
+        }
+      ],
+      "currentCityId": "84c5a894-9b1d-44f1-a0be-b6ab3522bfa2",
+      "status": "in_stock",
+      "totalValue": 154000,
+      "createdAt": "2026-05-10T01:21:04.821Z",
+      "updatedAt": "2026-05-10T01:21:16.743Z"
+    },
+    {
+      "id": "48bf03c4-00a1-48fa-9069-3c34d3e3b334",
+      "caseNumber": "AUDIO-001",
+      "name": "音响系统箱",
+      "items": [
+        {
+          "id": "1889545d-ad99-4088-8244-e42fef1c49a5",
+          "name": "DiGiCo数字调音台",
+          "quantity": 1,
+          "unitValue": 300000,
+          "condition": "good"
+        },
+        {
+          "id": "3da62d51-954c-448a-9adc-274753c8bce8",
+          "name": "XLR音频线",
+          "quantity": 30,
+          "unitValue": 150,
+          "condition": "good"
+        }
+      ],
+      "currentCityId": "e51ae347-785c-42c9-8e3c-7e3cd693bc8e",
+      "status": "in_stock",
+      "totalValue": 304500,
+      "createdAt": "2026-05-10T01:21:04.884Z",
+      "updatedAt": "2026-05-10T01:21:04.884Z"
+    }
+  ],
+  "cities": [
+    {
+      "id": "e51ae347-785c-42c9-8e3c-7e3cd693bc8e",
+      "name": "北京",
+      "code": "BJ",
+      "isActive": true
+    },
+    {
+      "id": "fd8b9841-c6d1-4f35-8fd7-8e996d053125",
+      "name": "上海",
+      "code": "SH",
+      "isActive": true
+    },
+    {
+      "id": "84c5a894-9b1d-44f1-a0be-b6ab3522bfa2",
+      "name": "广州",
+      "code": "GZ",
+      "isActive": true
+    }
+  ],
+  "tourManifests": [],
+  "borrowRecords": [
+    {
+      "id": "3e39df2a-4369-4b34-b4cf-7a05ee512b86",
+      "caseId": "33a3c939-7c0b-4811-ae95-cdc24d186a85",
+      "fromCityId": "e51ae347-785c-42c9-8e3c-7e3cd693bc8e",
+      "toCityId": "fd8b9841-c6d1-4f35-8fd7-8e996d053125",
+      "borrowedBy": "李技术",
+      "itemsAtBorrow": [
+        {
+          "id": "16259a40-ab5d-4170-838a-328057f9d9f0",
+          "name": "MA2灯光控制台",
+          "quantity": 1,
+          "unitValue": 150000,
+          "condition": "good"
+        },
+        {
+          "id": "fb615671-f827-4691-866d-c94ccf60a27d",
+          "name": "DMX信号线",
+          "quantity": 20,
+          "unitValue": 200,
+          "condition": "good"
+        }
+      ],
+      "status": "completed",
+      "createdAt": "2026-05-10T01:21:09.750Z",
+      "updatedAt": "2026-05-10T01:21:16.743Z",
+      "actualReturnTime": "2026-05-10T01:21:16.743Z",
+      "itemsAtReturn": [
+        {
+          "id": "989f04db-95ec-4106-a129-f3057464d985",
+          "name": "MA2灯光控制台",
+          "quantity": 1,
+          "unitValue": 150000,
+          "condition": "fair"
+        },
+        {
+          "id": "70ee7a83-d8f3-4640-ab4e-11d25e94322f",
+          "name": "DMX信号线",
+          "quantity": 15,
+          "unitValue": 200,
+          "condition": "good"
+        }
+      ]
+    }
+  ],
+  "damageRecords": [
+    {
+      "id": "16f74876-9cc7-494d-822e-498d7c88f57b",
+      "caseId": "33a3c939-7c0b-4811-ae95-cdc24d186a85",
+      "itemId": "70ee7a83-d8f3-4640-ab4e-11d25e94322f",
+      "cityId": "84c5a894-9b1d-44f1-a0be-b6ab3522bfa2",
+      "reportedBy": "张经理",
+      "severity": "medium",
+      "description": "DMX信号线丢失5根，灯光控制台外壳有划痕",
+      "damageTime": "2026-05-10T01:21:29.760Z",
+      "estimatedCost": 1000,
+      "isResolved": false,
+      "createdAt": "2026-05-10T01:21:29.760Z"
+    }
+  ],
+  "repairRecords": [],
+  "compensationActions": [
+    {
+      "id": "462bd66b-a8b4-46d8-a724-32db35aea70e",
+      "relatedRecordId": "16f74876-9cc7-494d-822e-498d7c88f57b",
+      "relatedRecordType": "damage",
+      "actionType": "review_responsibility",
+      "description": "审查设备箱「LIGHT-001」损坏责任，严重程度：中等",
+      "parameters": {
+        "damageId": "16f74876-9cc7-494d-822e-498d7c88f57b"
+      },
+      "attemptCount": 0,
+      "maxAttempts": 5,
+      "status": "pending",
+      "createdAt": "2026-05-10T01:21:29.761Z",
+      "updatedAt": "2026-05-10T01:21:29.761Z"
+    }
+  ]
+}
