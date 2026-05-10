@@ -1,0 +1,45 @@
+[
+  {
+    "id": "BAD-001",
+    "name": "川味王火锅店",
+    "location": "成都市锦江区春熙路1号",
+    "manager": "陈老板",
+    "phone": "13900139001",
+    "baseCycleDays": 90,
+    "openedDate": "2023-06-10",
+    "kitchenType": "火锅",
+    "cookStations": 12
+  },
+  {
+    "id": "BAD-002",
+    "name": "老张烧烤店",
+    "location": "武汉市洪山区光谷街2号",
+    "manager": "张师傅",
+    "phone": "13900139002",
+    "baseCycleDays": 90,
+    "openedDate": "2024-02-20",
+    "kitchenType": "烧烤",
+    "cookStations": 8
+  },
+  {
+    "id": "BAD-003",
+    "name": "星星快餐店",
+    "location": "广州市天河区天河路3号",
+    "manager": "李先生",
+    "phone": "13900139003",
+    "baseCycleDays": 90,
+    "kitchenType": "快餐",
+    "cookStations": 5
+  },
+  {
+    "id": "BAD-004",
+    "name": "江南酒家",
+    "location": "杭州市西湖区西湖路4号",
+    "manager": "王女士",
+    "phone": "13900139004",
+    "baseCycleDays": 90,
+    "openedDate": "2023-11-15",
+    "kitchenType": "浙菜",
+    "cookStations": 6
+  }
+]

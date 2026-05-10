@@ -1,0 +1,342 @@
+[
+  {
+    "timestamp": "2026-08-01T00:00:00.000Z",
+    "totalStores": 4,
+    "schedules": [
+      {
+        "storeId": "BAD-001",
+        "storeName": "川味王火锅店",
+        "lastCleanDate": "2026-06-01",
+        "nextCleanDate": "2026-06-28",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "extreme",
+          "intensityMultiplier": 0.5,
+          "intensityAdjustedCycle": 45,
+          "inspectionAdjustedCycle": 27,
+          "finalCycleDays": 27,
+          "notes": [
+            "消防检查不合格，清洗周期缩短40%"
+          ]
+        },
+        "daysSinceLast": 61,
+        "daysRemaining": -34,
+        "isOverdue": true,
+        "isWarning": false,
+        "hasNeverCleaned": false
+      },
+      {
+        "storeId": "BAD-002",
+        "storeName": "老张烧烤店",
+        "lastCleanDate": "2026-05-15",
+        "nextCleanDate": "2026-07-17",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "high",
+          "intensityMultiplier": 0.7,
+          "intensityAdjustedCycle": 63,
+          "inspectionAdjustedCycle": 63,
+          "finalCycleDays": 63,
+          "notes": []
+        },
+        "daysSinceLast": 78,
+        "daysRemaining": -15,
+        "isOverdue": true,
+        "isWarning": false,
+        "hasNeverCleaned": false
+      },
+      {
+        "storeId": "BAD-003",
+        "storeName": "星星快餐店",
+        "lastCleanDate": "无记录",
+        "nextCleanDate": "2026-10-30",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "medium",
+          "intensityMultiplier": 1,
+          "intensityAdjustedCycle": 90,
+          "inspectionAdjustedCycle": 90,
+          "finalCycleDays": 90,
+          "notes": []
+        },
+        "daysSinceLast": 0,
+        "daysRemaining": 90,
+        "isOverdue": false,
+        "isWarning": false,
+        "hasNeverCleaned": true
+      },
+      {
+        "storeId": "BAD-004",
+        "storeName": "江南酒家",
+        "lastCleanDate": "2026-05-20",
+        "nextCleanDate": "2026-07-31",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "medium",
+          "intensityMultiplier": 1,
+          "intensityAdjustedCycle": 90,
+          "inspectionAdjustedCycle": 72,
+          "finalCycleDays": 72,
+          "notes": [
+            "消防检查条件通过，清洗周期缩短20%"
+          ]
+        },
+        "daysSinceLast": 73,
+        "daysRemaining": -1,
+        "isOverdue": true,
+        "isWarning": false,
+        "hasNeverCleaned": false
+      }
+    ],
+    "anomalies": [
+      {
+        "storeId": "BAD-001",
+        "storeName": "川味王火锅店",
+        "location": "成都市锦江区春熙路1号",
+        "manager": "陈老板",
+        "phone": "13900139001",
+        "nextCleanDate": "2026-06-28",
+        "anomalies": [
+          {
+            "type": "CLEANING_OVERDUE",
+            "severity": "critical",
+            "message": "清洗逾期 34 天",
+            "details": {
+              "lastCleanDate": "2026-06-01",
+              "scheduledNextDate": "2026-06-28",
+              "cycleInfo": {
+                "baseCycle": 90,
+                "intensityLevel": "extreme",
+                "intensityMultiplier": 0.5,
+                "intensityAdjustedCycle": 45,
+                "inspectionAdjustedCycle": 27,
+                "finalCycleDays": 27,
+                "notes": [
+                  "消防检查不合格，清洗周期缩短40%"
+                ]
+              }
+            }
+          },
+          {
+            "type": "INSPECTION_OVERDUE",
+            "severity": "critical",
+            "message": "消防检查逾期 61 天",
+            "details": {
+              "nextRequiredDate": "2026-06-01T00:00:00.000Z"
+            }
+          },
+          {
+            "type": "INSPECTION_FAILED",
+            "severity": "critical",
+            "message": "最近消防检查不合格（2026-03-01），需立即整改并缩短清洗周期",
+            "details": {
+              "inspectionDate": "2026-03-01",
+              "inspector": "消防支队-周警官",
+              "notes": "油烟管道积碳严重，存在火灾隐患，要求立即整改，3个月内复检"
+            }
+          }
+        ]
+      },
+      {
+        "storeId": "BAD-002",
+        "storeName": "老张烧烤店",
+        "location": "武汉市洪山区光谷街2号",
+        "manager": "张师傅",
+        "phone": "13900139002",
+        "nextCleanDate": "2026-07-17",
+        "anomalies": [
+          {
+            "type": "CLEANING_OVERDUE",
+            "severity": "critical",
+            "message": "清洗逾期 15 天",
+            "details": {
+              "lastCleanDate": "2026-05-15",
+              "scheduledNextDate": "2026-07-17",
+              "cycleInfo": {
+                "baseCycle": 90,
+                "intensityLevel": "high",
+                "intensityMultiplier": 0.7,
+                "intensityAdjustedCycle": 63,
+                "inspectionAdjustedCycle": 63,
+                "finalCycleDays": 63,
+                "notes": []
+              }
+            }
+          }
+        ]
+      },
+      {
+        "storeId": "BAD-003",
+        "storeName": "星星快餐店",
+        "location": "广州市天河区天河路3号",
+        "manager": "李先生",
+        "phone": "13900139003",
+        "nextCleanDate": "2026-10-30",
+        "anomalies": [
+          {
+            "type": "NO_CLEANING_HISTORY",
+            "severity": "warning",
+            "message": "无清洗历史记录，请确认开业日期",
+            "details": {}
+          }
+        ]
+      },
+      {
+        "storeId": "BAD-004",
+        "storeName": "江南酒家",
+        "location": "杭州市西湖区西湖路4号",
+        "manager": "王女士",
+        "phone": "13900139004",
+        "nextCleanDate": "2026-07-31",
+        "anomalies": [
+          {
+            "type": "CLEANING_OVERDUE",
+            "severity": "critical",
+            "message": "清洗逾期 1 天",
+            "details": {
+              "lastCleanDate": "2026-05-20",
+              "scheduledNextDate": "2026-07-31",
+              "cycleInfo": {
+                "baseCycle": 90,
+                "intensityLevel": "medium",
+                "intensityMultiplier": 1,
+                "intensityAdjustedCycle": 90,
+                "inspectionAdjustedCycle": 72,
+                "finalCycleDays": 72,
+                "notes": [
+                  "消防检查条件通过，清洗周期缩短20%"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "overdue": 3,
+      "warning": 0,
+      "normal": 1,
+      "inspectionOverdue": 1
+    }
+  },
+  {
+    "timestamp": "2026-05-10T00:00:00.000Z",
+    "totalStores": 3,
+    "schedules": [
+      {
+        "storeId": "STORE-001",
+        "storeName": "味道川菜馆",
+        "lastCleanDate": "2026-03-01",
+        "nextCleanDate": "2026-05-03",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "high",
+          "intensityMultiplier": 0.7,
+          "intensityAdjustedCycle": 63,
+          "inspectionAdjustedCycle": 63,
+          "finalCycleDays": 63,
+          "notes": []
+        },
+        "daysSinceLast": 70,
+        "daysRemaining": -7,
+        "isOverdue": true,
+        "isWarning": false,
+        "hasNeverCleaned": false
+      },
+      {
+        "storeId": "STORE-002",
+        "storeName": "粤式茶餐厅",
+        "lastCleanDate": "2026-02-15",
+        "nextCleanDate": "2026-05-16",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "medium",
+          "intensityMultiplier": 1,
+          "intensityAdjustedCycle": 90,
+          "inspectionAdjustedCycle": 90,
+          "finalCycleDays": 90,
+          "notes": []
+        },
+        "daysSinceLast": 84,
+        "daysRemaining": 6,
+        "isOverdue": false,
+        "isWarning": true,
+        "hasNeverCleaned": false
+      },
+      {
+        "storeId": "STORE-003",
+        "storeName": "日料寿司店",
+        "lastCleanDate": "2026-04-10",
+        "nextCleanDate": "2026-08-05",
+        "cycleInfo": {
+          "baseCycle": 90,
+          "intensityLevel": "low",
+          "intensityMultiplier": 1.3,
+          "intensityAdjustedCycle": 117,
+          "inspectionAdjustedCycle": 117,
+          "finalCycleDays": 117,
+          "notes": []
+        },
+        "daysSinceLast": 30,
+        "daysRemaining": 87,
+        "isOverdue": false,
+        "isWarning": false,
+        "hasNeverCleaned": false
+      }
+    ],
+    "anomalies": [
+      {
+        "storeId": "STORE-001",
+        "storeName": "味道川菜馆",
+        "location": "北京市朝阳区建国路88号",
+        "manager": "张经理",
+        "phone": "13800138001",
+        "nextCleanDate": "2026-05-03",
+        "anomalies": [
+          {
+            "type": "CLEANING_OVERDUE",
+            "severity": "critical",
+            "message": "清洗逾期 7 天",
+            "details": {
+              "lastCleanDate": "2026-03-01",
+              "scheduledNextDate": "2026-05-03",
+              "cycleInfo": {
+                "baseCycle": 90,
+                "intensityLevel": "high",
+                "intensityMultiplier": 0.7,
+                "intensityAdjustedCycle": 63,
+                "inspectionAdjustedCycle": 63,
+                "finalCycleDays": 63,
+                "notes": []
+              }
+            }
+          }
+        ]
+      },
+      {
+        "storeId": "STORE-002",
+        "storeName": "粤式茶餐厅",
+        "location": "上海市静安区南京西路128号",
+        "manager": "李经理",
+        "phone": "13800138002",
+        "nextCleanDate": "2026-05-16",
+        "anomalies": [
+          {
+            "type": "CLEANING_WARNING",
+            "severity": "warning",
+            "message": "即将到达清洗期限，剩余 6 天",
+            "details": {
+              "nextCleanDate": "2026-05-16"
+            }
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "overdue": 1,
+      "warning": 1,
+      "normal": 1,
+      "inspectionOverdue": 0
+    }
+  }
+]

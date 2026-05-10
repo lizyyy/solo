@@ -1,0 +1,34 @@
+[
+  {
+    "id": "BI-BAD-001",
+    "storeId": "BAD-001",
+    "effectiveDate": "2026-01-01",
+    "level": "extreme",
+    "notes": "火锅店，全天营业，油烟非常大",
+    "multiplier": 0.5
+  },
+  {
+    "id": "BI-BAD-002",
+    "storeId": "BAD-002",
+    "effectiveDate": "2026-01-01",
+    "level": "high",
+    "notes": "烧烤店，主要晚市，油烟较大",
+    "multiplier": 0.7
+  },
+  {
+    "id": "BI-BAD-003",
+    "storeId": "BAD-003",
+    "effectiveDate": "2026-01-01",
+    "level": "medium",
+    "notes": "快餐店，早中晚三餐",
+    "multiplier": 1
+  },
+  {
+    "id": "BI-BAD-004",
+    "storeId": "BAD-004",
+    "effectiveDate": "2026-01-01",
+    "level": "medium",
+    "notes": "浙菜餐厅，较为清淡",
+    "multiplier": 1
+  }
+]

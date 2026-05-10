@@ -1,0 +1,35 @@
+[
+  {
+    "id": "STORE-001",
+    "name": "味道川菜馆",
+    "location": "北京市朝阳区建国路88号",
+    "manager": "张经理",
+    "phone": "13800138001",
+    "baseCycleDays": 90,
+    "openedDate": "2024-01-15",
+    "kitchenType": "川菜",
+    "cookStations": 6
+  },
+  {
+    "id": "STORE-002",
+    "name": "粤式茶餐厅",
+    "location": "上海市静安区南京西路128号",
+    "manager": "李经理",
+    "phone": "13800138002",
+    "baseCycleDays": 90,
+    "openedDate": "2024-03-20",
+    "kitchenType": "粤菜",
+    "cookStations": 4
+  },
+  {
+    "id": "STORE-003",
+    "name": "日料寿司店",
+    "location": "深圳市南山区科技园路1号",
+    "manager": "王经理",
+    "phone": "13800138003",
+    "baseCycleDays": 90,
+    "openedDate": "2024-02-10",
+    "kitchenType": "日料",
+    "cookStations": 3
+  }
+]

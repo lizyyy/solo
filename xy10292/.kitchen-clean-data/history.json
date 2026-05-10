@@ -1,0 +1,695 @@
+[
+  {
+    "id": "HIST-1778394978007-40qjf0",
+    "timestamp": "2026-05-10T06:36:18.007Z",
+    "operation": "DELETE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-003",
+    "before": {
+      "id": "FIRE-003",
+      "storeId": "STORE-003",
+      "inspectionDate": "2026-03-05",
+      "result": "pass",
+      "inspector": "消防支队-李警官",
+      "notes": "各项指标合格"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978007-zcaj4p",
+    "timestamp": "2026-05-10T06:36:18.007Z",
+    "operation": "DELETE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-002",
+    "before": {
+      "id": "FIRE-002",
+      "storeId": "STORE-002",
+      "inspectionDate": "2026-01-20",
+      "result": "pass",
+      "inspector": "消防支队-王警官",
+      "notes": "各项指标合格"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978007-nhqzd6",
+    "timestamp": "2026-05-10T06:36:18.007Z",
+    "operation": "DELETE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-001",
+    "before": {
+      "id": "FIRE-001",
+      "storeId": "STORE-001",
+      "inspectionDate": "2026-02-15",
+      "result": "pass",
+      "inspector": "消防支队-刘警官",
+      "notes": "各项指标合格"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978007-pu1kd7",
+    "timestamp": "2026-05-10T06:36:18.007Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-BAD-003",
+    "before": null,
+    "after": {
+      "id": "FIRE-BAD-003",
+      "storeId": "BAD-004",
+      "inspectionDate": "2026-02-20",
+      "result": "conditional",
+      "inspector": "消防支队-郑警官",
+      "notes": "油烟管道部分区域积碳较多，需加强清洗频率，6个月内复检"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978006-m1xi7f",
+    "timestamp": "2026-05-10T06:36:18.006Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-BAD-002",
+    "before": null,
+    "after": {
+      "id": "FIRE-BAD-002",
+      "storeId": "BAD-002",
+      "inspectionDate": "2026-02-15",
+      "result": "pass",
+      "inspector": "消防支队-吴警官",
+      "notes": "各项指标合格"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978006-be55kw",
+    "timestamp": "2026-05-10T06:36:18.006Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-BAD-001",
+    "before": null,
+    "after": {
+      "id": "FIRE-BAD-001",
+      "storeId": "BAD-001",
+      "inspectionDate": "2026-03-01",
+      "result": "fail",
+      "inspector": "消防支队-周警官",
+      "notes": "油烟管道积碳严重，存在火灾隐患，要求立即整改，3个月内复检"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978006-pveg6b",
+    "timestamp": "2026-05-10T06:36:18.006Z",
+    "operation": "DELETE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-003",
+    "before": {
+      "id": "BI-003",
+      "storeId": "STORE-003",
+      "effectiveDate": "2026-01-01",
+      "level": "low",
+      "notes": "日料油烟较少",
+      "multiplier": 1.3
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978006-pnnlky",
+    "timestamp": "2026-05-10T06:36:18.006Z",
+    "operation": "DELETE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-002",
+    "before": {
+      "id": "BI-002",
+      "storeId": "STORE-002",
+      "effectiveDate": "2026-01-01",
+      "level": "medium",
+      "notes": "粤菜较为清淡",
+      "multiplier": 1
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978006-le5gix",
+    "timestamp": "2026-05-10T06:36:18.006Z",
+    "operation": "DELETE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-001",
+    "before": {
+      "id": "BI-001",
+      "storeId": "STORE-001",
+      "effectiveDate": "2026-01-01",
+      "level": "high",
+      "notes": "川菜油烟大，营业强度高",
+      "multiplier": 0.7
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978005-2r59f1",
+    "timestamp": "2026-05-10T06:36:18.005Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-BAD-004",
+    "before": null,
+    "after": {
+      "id": "BI-BAD-004",
+      "storeId": "BAD-004",
+      "effectiveDate": "2026-01-01",
+      "level": "medium",
+      "notes": "浙菜餐厅，较为清淡",
+      "multiplier": 1
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978005-c4okan",
+    "timestamp": "2026-05-10T06:36:18.005Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-BAD-003",
+    "before": null,
+    "after": {
+      "id": "BI-BAD-003",
+      "storeId": "BAD-003",
+      "effectiveDate": "2026-01-01",
+      "level": "medium",
+      "notes": "快餐店，早中晚三餐",
+      "multiplier": 1
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978005-730md0",
+    "timestamp": "2026-05-10T06:36:18.005Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-BAD-002",
+    "before": null,
+    "after": {
+      "id": "BI-BAD-002",
+      "storeId": "BAD-002",
+      "effectiveDate": "2026-01-01",
+      "level": "high",
+      "notes": "烧烤店，主要晚市，油烟较大",
+      "multiplier": 0.7
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978005-j803jd",
+    "timestamp": "2026-05-10T06:36:18.005Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-BAD-001",
+    "before": null,
+    "after": {
+      "id": "BI-BAD-001",
+      "storeId": "BAD-001",
+      "effectiveDate": "2026-01-01",
+      "level": "extreme",
+      "notes": "火锅店，全天营业，油烟非常大",
+      "multiplier": 0.5
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978002-9frdag",
+    "timestamp": "2026-05-10T06:36:18.002Z",
+    "operation": "DELETE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-003",
+    "before": {
+      "id": "CLN-2026-003",
+      "storeId": "STORE-003",
+      "cleanDate": "2026-04-10",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "王师傅",
+      "cost": 1000,
+      "notes": "日料油烟少，维护良好"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978002-uy29c3",
+    "timestamp": "2026-05-10T06:36:18.002Z",
+    "operation": "DELETE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-002",
+    "before": {
+      "id": "CLN-2026-002",
+      "storeId": "STORE-002",
+      "cleanDate": "2026-02-15",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "张师傅",
+      "cost": 1200,
+      "notes": "油污较轻，清理顺利"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978002-ut4l9q",
+    "timestamp": "2026-05-10T06:36:18.002Z",
+    "operation": "DELETE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-001",
+    "before": {
+      "id": "CLN-2026-001",
+      "storeId": "STORE-001",
+      "cleanDate": "2026-03-01",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "刘师傅",
+      "cost": 1500,
+      "notes": "管道油污较厚，已彻底清理"
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978002-e1fu2a",
+    "timestamp": "2026-05-10T06:36:18.002Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-BAD-003",
+    "before": null,
+    "after": {
+      "id": "CLN-BAD-003",
+      "storeId": "BAD-004",
+      "cleanDate": "2026-05-20",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "孙师傅",
+      "cost": 1600,
+      "notes": "江南酒家维护一般"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978001-lvlhvk",
+    "timestamp": "2026-05-10T06:36:18.001Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-BAD-002",
+    "before": null,
+    "after": {
+      "id": "CLN-BAD-002",
+      "storeId": "BAD-002",
+      "cleanDate": "2026-05-15",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "钱师傅",
+      "cost": 2000,
+      "notes": "烧烤店油烟管道积碳严重"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978001-rqlpsr",
+    "timestamp": "2026-05-10T06:36:18.001Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-BAD-001",
+    "before": null,
+    "after": {
+      "id": "CLN-BAD-001",
+      "storeId": "BAD-001",
+      "cleanDate": "2026-06-01",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "赵师傅",
+      "cost": 2500,
+      "notes": "火锅店油污非常严重"
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978001-93ylki",
+    "timestamp": "2026-05-10T06:36:18.001Z",
+    "operation": "DELETE",
+    "entityType": "STORE",
+    "entityId": "STORE-003",
+    "before": {
+      "id": "STORE-003",
+      "name": "日料寿司店",
+      "location": "深圳市南山区科技园路1号",
+      "manager": "王经理",
+      "phone": "13800138003",
+      "baseCycleDays": 90,
+      "openedDate": "2024-02-10",
+      "kitchenType": "日料",
+      "cookStations": 3
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978001-31i15h",
+    "timestamp": "2026-05-10T06:36:18.001Z",
+    "operation": "DELETE",
+    "entityType": "STORE",
+    "entityId": "STORE-002",
+    "before": {
+      "id": "STORE-002",
+      "name": "粤式茶餐厅",
+      "location": "上海市静安区南京西路128号",
+      "manager": "李经理",
+      "phone": "13800138002",
+      "baseCycleDays": 90,
+      "openedDate": "2024-03-20",
+      "kitchenType": "粤菜",
+      "cookStations": 4
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978000-panmjb",
+    "timestamp": "2026-05-10T06:36:18.000Z",
+    "operation": "DELETE",
+    "entityType": "STORE",
+    "entityId": "STORE-001",
+    "before": {
+      "id": "STORE-001",
+      "name": "味道川菜馆",
+      "location": "北京市朝阳区建国路88号",
+      "manager": "张经理",
+      "phone": "13800138001",
+      "baseCycleDays": 90,
+      "openedDate": "2024-01-15",
+      "kitchenType": "川菜",
+      "cookStations": 6
+    },
+    "after": null,
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978000-tqlva2",
+    "timestamp": "2026-05-10T06:36:18.000Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "BAD-004",
+    "before": null,
+    "after": {
+      "id": "BAD-004",
+      "name": "江南酒家",
+      "location": "杭州市西湖区西湖路4号",
+      "manager": "王女士",
+      "phone": "13900139004",
+      "baseCycleDays": 90,
+      "openedDate": "2023-11-15",
+      "kitchenType": "浙菜",
+      "cookStations": 6
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394978000-efwgxm",
+    "timestamp": "2026-05-10T06:36:18.000Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "BAD-003",
+    "before": null,
+    "after": {
+      "id": "BAD-003",
+      "name": "星星快餐店",
+      "location": "广州市天河区天河路3号",
+      "manager": "李先生",
+      "phone": "13900139003",
+      "baseCycleDays": 90,
+      "kitchenType": "快餐",
+      "cookStations": 5
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394977999-0gnm78",
+    "timestamp": "2026-05-10T06:36:17.999Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "BAD-002",
+    "before": null,
+    "after": {
+      "id": "BAD-002",
+      "name": "老张烧烤店",
+      "location": "武汉市洪山区光谷街2号",
+      "manager": "张师傅",
+      "phone": "13900139002",
+      "baseCycleDays": 90,
+      "openedDate": "2024-02-20",
+      "kitchenType": "烧烤",
+      "cookStations": 8
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394977996-i7fral",
+    "timestamp": "2026-05-10T06:36:17.996Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "BAD-001",
+    "before": null,
+    "after": {
+      "id": "BAD-001",
+      "name": "川味王火锅店",
+      "location": "成都市锦江区春熙路1号",
+      "manager": "陈老板",
+      "phone": "13900139001",
+      "baseCycleDays": 90,
+      "openedDate": "2023-06-10",
+      "kitchenType": "火锅",
+      "cookStations": 12
+    },
+    "operator": "demo-anomaly"
+  },
+  {
+    "id": "HIST-1778394961353-hqzwg7",
+    "timestamp": "2026-05-10T06:36:01.353Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-003",
+    "before": null,
+    "after": {
+      "id": "FIRE-003",
+      "storeId": "STORE-003",
+      "inspectionDate": "2026-03-05",
+      "result": "pass",
+      "inspector": "消防支队-李警官",
+      "notes": "各项指标合格"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961353-s7i4p3",
+    "timestamp": "2026-05-10T06:36:01.353Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-002",
+    "before": null,
+    "after": {
+      "id": "FIRE-002",
+      "storeId": "STORE-002",
+      "inspectionDate": "2026-01-20",
+      "result": "pass",
+      "inspector": "消防支队-王警官",
+      "notes": "各项指标合格"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961353-q8e6cd",
+    "timestamp": "2026-05-10T06:36:01.353Z",
+    "operation": "CREATE",
+    "entityType": "FIRE_INSPECTION",
+    "entityId": "FIRE-001",
+    "before": null,
+    "after": {
+      "id": "FIRE-001",
+      "storeId": "STORE-001",
+      "inspectionDate": "2026-02-15",
+      "result": "pass",
+      "inspector": "消防支队-刘警官",
+      "notes": "各项指标合格"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961352-z7ub9j",
+    "timestamp": "2026-05-10T06:36:01.352Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-003",
+    "before": null,
+    "after": {
+      "id": "BI-003",
+      "storeId": "STORE-003",
+      "effectiveDate": "2026-01-01",
+      "level": "low",
+      "notes": "日料油烟较少",
+      "multiplier": 1.3
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961352-8b3hc1",
+    "timestamp": "2026-05-10T06:36:01.352Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-002",
+    "before": null,
+    "after": {
+      "id": "BI-002",
+      "storeId": "STORE-002",
+      "effectiveDate": "2026-01-01",
+      "level": "medium",
+      "notes": "粤菜较为清淡",
+      "multiplier": 1
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961352-v9bl8n",
+    "timestamp": "2026-05-10T06:36:01.352Z",
+    "operation": "CREATE",
+    "entityType": "BUSINESS_INTENSITY",
+    "entityId": "BI-001",
+    "before": null,
+    "after": {
+      "id": "BI-001",
+      "storeId": "STORE-001",
+      "effectiveDate": "2026-01-01",
+      "level": "high",
+      "notes": "川菜油烟大，营业强度高",
+      "multiplier": 0.7
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961352-an2d1n",
+    "timestamp": "2026-05-10T06:36:01.352Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-003",
+    "before": null,
+    "after": {
+      "id": "CLN-2026-003",
+      "storeId": "STORE-003",
+      "cleanDate": "2026-04-10",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "王师傅",
+      "cost": 1000,
+      "notes": "日料油烟少，维护良好"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961351-7h12zs",
+    "timestamp": "2026-05-10T06:36:01.351Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-002",
+    "before": null,
+    "after": {
+      "id": "CLN-2026-002",
+      "storeId": "STORE-002",
+      "cleanDate": "2026-02-15",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "张师傅",
+      "cost": 1200,
+      "notes": "油污较轻，清理顺利"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961351-yfi7oj",
+    "timestamp": "2026-05-10T06:36:01.351Z",
+    "operation": "CREATE",
+    "entityType": "CLEANING_RECORD",
+    "entityId": "CLN-2026-001",
+    "before": null,
+    "after": {
+      "id": "CLN-2026-001",
+      "storeId": "STORE-001",
+      "cleanDate": "2026-03-01",
+      "status": "completed",
+      "company": "洁净达清洗服务",
+      "technician": "刘师傅",
+      "cost": 1500,
+      "notes": "管道油污较厚，已彻底清理"
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961351-gwd3dg",
+    "timestamp": "2026-05-10T06:36:01.351Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "STORE-003",
+    "before": null,
+    "after": {
+      "id": "STORE-003",
+      "name": "日料寿司店",
+      "location": "深圳市南山区科技园路1号",
+      "manager": "王经理",
+      "phone": "13800138003",
+      "baseCycleDays": 90,
+      "openedDate": "2024-02-10",
+      "kitchenType": "日料",
+      "cookStations": 3
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961351-r5pm4f",
+    "timestamp": "2026-05-10T06:36:01.351Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "STORE-002",
+    "before": null,
+    "after": {
+      "id": "STORE-002",
+      "name": "粤式茶餐厅",
+      "location": "上海市静安区南京西路128号",
+      "manager": "李经理",
+      "phone": "13800138002",
+      "baseCycleDays": 90,
+      "openedDate": "2024-03-20",
+      "kitchenType": "粤菜",
+      "cookStations": 4
+    },
+    "operator": "demo"
+  },
+  {
+    "id": "HIST-1778394961350-7r1c4g",
+    "timestamp": "2026-05-10T06:36:01.350Z",
+    "operation": "CREATE",
+    "entityType": "STORE",
+    "entityId": "STORE-001",
+    "before": null,
+    "after": {
+      "id": "STORE-001",
+      "name": "味道川菜馆",
+      "location": "北京市朝阳区建国路88号",
+      "manager": "张经理",
+      "phone": "13800138001",
+      "baseCycleDays": 90,
+      "openedDate": "2024-01-15",
+      "kitchenType": "川菜",
+      "cookStations": 6
+    },
+    "operator": "demo"
+  }
+]

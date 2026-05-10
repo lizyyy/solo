@@ -1,0 +1,26 @@
+[
+  {
+    "id": "FIRE-BAD-001",
+    "storeId": "BAD-001",
+    "inspectionDate": "2026-03-01",
+    "result": "fail",
+    "inspector": "消防支队-周警官",
+    "notes": "油烟管道积碳严重，存在火灾隐患，要求立即整改，3个月内复检"
+  },
+  {
+    "id": "FIRE-BAD-002",
+    "storeId": "BAD-002",
+    "inspectionDate": "2026-02-15",
+    "result": "pass",
+    "inspector": "消防支队-吴警官",
+    "notes": "各项指标合格"
+  },
+  {
+    "id": "FIRE-BAD-003",
+    "storeId": "BAD-004",
+    "inspectionDate": "2026-02-20",
+    "result": "conditional",
+    "inspector": "消防支队-郑警官",
+    "notes": "油烟管道部分区域积碳较多，需加强清洗频率，6个月内复检"
+  }
+]

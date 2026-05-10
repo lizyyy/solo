@@ -1,0 +1,19 @@
+{
+  "name": "kitchen-exhaust-cleaner",
+  "version": "1.0.0",
+  "description": "商用厨房油烟管道清洗排期管理工具",
+  "bin": {
+    "kitchen-clean": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "keywords": ["kitchen", "exhaust", "cleaning", "schedule"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "table": "^6.8.1"
+  }
+}
