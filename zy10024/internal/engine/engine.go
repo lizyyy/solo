@@ -272,10 +272,10 @@ func (e *Engine) GetSnapshots() []models.Snapshot {
 }
 
 type ReplayResult struct {
-	FromTime  time.Time
-	ToTime    time.Time
-	Events    []models.Event
-	Snapshots []models.Snapshot
+	FromTime  time.Time         `json:"from_time"`
+	ToTime    time.Time         `json:"to_time"`
+	Events    []models.Event    `json:"events"`
+	Snapshots []models.Snapshot `json:"snapshots"`
 }
 
 func (e *Engine) Replay(from time.Time, to time.Time) (*ReplayResult, error) {

@@ -122,7 +122,7 @@ func (t *Timeline) GetByLevel(level EventLevel) []Event {
 }
 
 type Snapshot struct {
-	Timestamp time.Time
-	State     SystemState
-	Events    []Event
+	Timestamp time.Time   `json:"timestamp"`
+	State     SystemState `json:"state"`
+	Events    []Event     `json:"events"`
 }
