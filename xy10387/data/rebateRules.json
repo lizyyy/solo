@@ -1,0 +1,38 @@
+[
+  {
+    "id": "RR001",
+    "activityId": "AC001",
+    "name": "中华香烟基础返利",
+    "minStock": 10,
+    "minDisplayPhotos": 3,
+    "rebateAmount": 500,
+    "description": "进货量≥10条，陈列照片≥3张，返利500元"
+  },
+  {
+    "id": "RR002",
+    "activityId": "AC001",
+    "name": "中华香烟进阶返利",
+    "minStock": 30,
+    "minDisplayPhotos": 5,
+    "rebateAmount": 1200,
+    "description": "进货量≥30条，陈列照片≥5张，返利1200元"
+  },
+  {
+    "id": "RR003",
+    "activityId": "AC002",
+    "name": "茅台白酒基础返利",
+    "minStock": 5,
+    "minDisplayPhotos": 3,
+    "rebateAmount": 800,
+    "description": "进货量≥5瓶，陈列照片≥3张，返利800元"
+  },
+  {
+    "id": "RR004",
+    "activityId": "AC002",
+    "name": "茅台白酒进阶返利",
+    "minStock": 15,
+    "minDisplayPhotos": 5,
+    "rebateAmount": 2000,
+    "description": "进货量≥15瓶，陈列照片≥5张，返利2000元"
+  }
+]

@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烟酒店陈列返利管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        header { background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(196, 30, 58, 0.3); }
+        header h1 { font-size: 28px; margin-bottom: 5px; }
+        header p { opacity: 0.9; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 12px 24px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .tab:hover { border-color: #c41e3a; color: #c41e3a; }
+        .tab.active { background: #c41e3a; color: white; border-color: #c41e3a; }
+        
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #333; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #c41e3a; box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1); }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; }
+        .btn-primary { background: #c41e3a; color: white; }
+        .btn-primary:hover { background: #a01830; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-info:hover { background: #138496; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        table th { background: #f8f9fa; font-weight: 600; color: #555; }
+        table tr:hover { background: #f5f5f5; }
+        
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+        
+        .status-approved { color: #28a745; font-weight: 600; }
+        .status-rejected { color: #dc3545; font-weight: 600; }
+        .status-pending { color: #ffc107; font-weight: 600; }
+        
+        .alert { padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .alert-success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .alert-danger { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .alert-warning { background: #fff3cd; border: 1px solid #ffeeba; color: #856404; }
+        .alert-info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        
+        .result-box { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-top: 15px; }
+        .result-amount { font-size: 32px; font-weight: 700; color: #c41e3a; }
+        .result-label { color: #666; margin-bottom: 5px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 10px; padding: 25px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { font-size: 18px; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        
+        .sample-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .sample-box h4 { margin-bottom: 10px; color: #856404; }
+        .sample-box p { color: #666; font-size: 13px; }
+        
+        .reason-detail { font-size: 13px; color: #666; margin-top: 5px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 10px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 28px; font-weight: 700; color: #c41e3a; margin-bottom: 5px; }
+        .stat-label { color: #666; font-size: 14px; }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .tabs { flex-wrap: wrap; }
+            table { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 烟酒店陈列返利管理系统</h1>
+            <p>门店陈列返利审核与结算管理平台</p>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('dashboard')">📊 工作台</div>
+            <div class="tab" onclick="switchTab('submit')">📝 提交陈列</div>
+            <div class="tab" onclick="switchTab('review')">✅ 审核管理</div>
+            <div class="tab" onclick="switchTab('stock')">📦 进货核对</div>
+            <div class="tab" onclick="switchTab('calculate')">💰 返利试算</div>
+            <div class="tab" onclick="switchTab('records')">📋 记录查询</div>
+            <div class="tab" onclick="switchTab('export')">📥 导出结算</div>
+            <div class="tab" onclick="switchTab('samples')">🎯 样例演示</div>
+        </div>
+        
+        <div id="dashboard" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">总申报数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-approved">0</div>
+                    <div class="stat-label">已通过</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending">0</div>
+                    <div class="stat-label">待审核</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total-rebate">¥0</div>
+                    <div class="stat-label">返利总额</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📌 最近操作指南</div>
+                <div style="line-height: 2; color: #555;">
+                    <p>👨‍💼 <strong>业务员：</strong>门店陈列拍照后，在「提交陈列」页上传照片申报</p>
+                    <p>👩‍💻 <strong>审核员：</strong>在「审核管理」页审核照片和核对进货量</p>
+                    <p>💼 <strong>财务：</strong>审核通过后，在「导出结算」页导出Excel给品牌方</p>
+                    <p>⚠️ <strong>遇到拦截？</strong>看红色提示原因，检查活动时间、进货量、照片数量</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="submit" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">📝 提交陈列记录</div>
+                <div class="alert alert-info">
+                    <strong>操作人：</strong>业务员或门店督导 &nbsp;&nbsp;
+                    <strong>时间：</strong>活动期内，陈列完成后3天内
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>选择门店 *</label>
+                        <select id="submit-store">
+                            <option value="">请选择门店</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>选择活动 *</label>
+                        <select id="submit-activity">
+                            <option value="">请选择活动</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>申报日期</label>
+                        <input type="date" id="submit-date">
+                    </div>
+                    <div class="form-group">
+                        <label>照片数量 *</label>
+                        <input type="number" id="submit-photos" min="0" placeholder="请输入上传的照片数量">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="submit-remarks" rows="2" placeholder="可选填写"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="submitDisplay()">🚀 提交申报</button>
+                    <button class="btn btn-info" onclick="previewEligibility()">🔍 先检查资格</button>
+                </div>
+                <div id="submit-result"></div>
+            </div>
+        </div>
+        
+        <div id="review" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">✅ 照片审核 & 进货核对</div>
+                <div class="alert alert-info">
+                    <strong>操作人：</strong>审核员 &nbsp;&nbsp;
+                    <strong>时间：</strong>收到申报后2个工作日内
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-secondary btn-sm" onclick="loadRecords('review')">🔄 刷新列表</button>
+                </div>
+                <table id="review-table">
+                    <thead>
+                        <tr>
+                            <th>门店</th>
+                            <th>品牌/活动</th>
+                            <th>照片数</th>
+                            <th>进货量</th>
+                            <th>照片审核</th>
+                            <th>整体审核</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="stock" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">📦 进货量管理</div>
+                <div class="alert alert-info">
+                    <strong>操作人：</strong>数据录入员 &nbsp;&nbsp;
+                    <strong>时间：</strong>门店进货后及时录入
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>门店 *</label>
+                        <select id="stock-store">
+                            <option value="">请选择门店</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>活动 *</label>
+                        <select id="stock-activity">
+                            <option value="">请选择活动</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>进货数量 *</label>
+                        <input type="number" id="stock-amount" min="1" placeholder="如：10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>进货日期</label>
+                    <input type="date" id="stock-date">
+                </div>
+                <button class="btn btn-primary" onclick="addStock()">➕ 添加进货记录</button>
+                <div id="stock-result"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📋 进货记录列表</div>
+                <table id="stock-table">
+                    <thead>
+                        <tr>
+                            <th>门店</th>
+                            <th>活动</th>
+                            <th>进货量</th>
+                            <th>进货日期</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="calculate" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">💰 返利试算</div>
+                <div class="alert alert-info">
+                    <strong>用途：</strong>提交前试算，了解能拿多少返利
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>选择活动 *</label>
+                        <select id="calc-activity">
+                            <option value="">请选择活动</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>照片数量 *</label>
+                        <input type="number" id="calc-photos" min="0" placeholder="如：5">
+                    </div>
+                    <div class="form-group">
+                        <label>进货量 *</label>
+                        <input type="number" id="calc-stock" min="0" placeholder="如：35">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="calculateRebate()">🧮 开始试算</button>
+                <div id="calc-result"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">📋 返利规则一览</div>
+                <table id="rules-table">
+                    <thead>
+                        <tr>
+                            <th>活动</th>
+                            <th>规则名称</th>
+                            <th>最低进货</th>
+                            <th>最低照片</th>
+                            <th>返利金额</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="records" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">📋 陈列记录查询</div>
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-secondary btn-sm" onclick="loadRecords('records')">🔄 刷新</button>
+                </div>
+                <table id="records-table">
+                    <thead>
+                        <tr>
+                            <th>门店</th>
+                            <th>品牌</th>
+                            <th>活动</th>
+                            <th>申报日期</th>
+                            <th>照片数</th>
+                            <th>进货量</th>
+                            <th>照片审核</th>
+                            <th>整体审核</th>
+                            <th>返利</th>
+                            <th>结算</th>
+                            <th>通过/不通过原因</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="export" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">📥 导出结算表</div>
+                <div class="alert alert-info">
+                    <strong>操作人：</strong>财务 &nbsp;&nbsp;
+                    <strong>用途：</strong>导出Excel给品牌方核对
+                </div>
+                <p style="margin-bottom: 15px; color: #666;">导出的表格包含：门店信息、活动信息、进货量、照片数、审核状态、返利金额、通过/不通过原因等，方便品牌方核对。</p>
+                <div style="margin-bottom: 15px;">
+                    <strong>导出前请确认：</strong>
+                    <ul style="margin-left: 20px; color: #666; line-height: 1.8;">
+                        <li>所有申报记录已完成审核</li>
+                        <li>照片审核已完成</li>
+                        <li>进货量数据已录入完整</li>
+                    </ul>
+                </div>
+                <button class="btn btn-success" onclick="exportSettlement()">📥 导出结算表（Excel）</button>
+                <div id="export-result"></div>
+            </div>
+        </div>
+        
+        <div id="samples" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">🎯 样例演示</div>
+                <div class="alert alert-info">
+                    <strong>说明：</strong>以下样例展示了系统的核心拦截规则，点击即可查看效果
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">✅ 样例1：正常返利</div>
+                <div class="sample-box">
+                    <h4>场景：旺旺烟酒超市申报中华香烟活动</h4>
+                    <p>门店：ST001 旺旺烟酒超市 | 进货量：35条 | 照片数：5张</p>
+                    <p><strong>预期结果：</strong>符合「中华香烟进阶返利」规则，返利1200元</p>
+                </div>
+                <button class="btn btn-success" onclick="testSample('normal')">🎬 运行样例</button>
+                <div id="sample-normal"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">❌ 样例2：照片缺失</div>
+                <div class="sample-box">
+                    <h4>场景：照片数量不足被拦截</h4>
+                    <p>门店：ST001 旺旺烟酒超市 | 进货量：35条（达标）| 照片数：1张（不足）</p>
+                    <p><strong>预期结果：</strong>被拦截，提示「照片数量不足」，要求至少3张</p>
+                </div>
+                <button class="btn btn-danger" onclick="testSample('no-photos')">🎬 运行样例</button>
+                <div id="sample-no-photos"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">❌ 样例3：进货不足</div>
+                <div class="sample-box">
+                    <h4>场景：进货量不足被拦截</h4>
+                    <p>门店：ST002 顺发烟酒商行 | 进货量：8条（不足）| 照片数：5张（达标）</p>
+                    <p><strong>预期结果：</strong>被拦截，提示「进货量不足」，要求至少10条</p>
+                </div>
+                <button class="btn btn-danger" onclick="testSample('insufficient-stock')">🎬 运行样例</button>
+                <div id="sample-insufficient-stock"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">❌ 样例4：重复申报</div>
+                <div class="sample-box">
+                    <h4>场景：同一门店同一活动重复申报</h4>
+                    <p>门店：ST001 旺旺烟酒超市 | 已申报过AC001活动 | 再次申报同一活动</p>
+                    <p><strong>预期结果：</strong>被拦截，提示「该门店已申报过此活动」</p>
+                </div>
+                <button class="btn btn-danger" onclick="testSample('duplicate')">🎬 运行样例</button>
+                <div id="sample-duplicate"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">操作</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('submit-date').value = today;
+            document.getElementById('stock-date').value = today;
+            
+            loadSelects();
+            loadRules();
+            loadDashboard();
+        });
+        
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            event.target.classList.add('active');
+            
+            if (tabId === 'review') loadRecords('review');
+            if (tabId === 'records') loadRecords('records');
+            if (tabId === 'stock') loadStocks();
+            if (tabId === 'dashboard') loadDashboard();
+            if (tabId === 'calculate') loadRules();
+        }
+        
+        async function loadSelects() {
+            try {
+                const [storesRes, activitiesRes] = await Promise.all([
+                    fetch(`${API_BASE}/stores`),
+                    fetch(`${API_BASE}/activities`)
+                ]);
+                
+                const stores = await storesRes.json();
+                const activities = await activitiesRes.json();
+                
+                const storeSelects = ['submit-store', 'stock-store'];
+                storeSelects.forEach(id => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = '<option value="">请选择门店</option>';
+                    stores.forEach(s => {
+                        select.innerHTML += `<option value="${s.id}">${s.id} - ${s.name}</option>`;
+                    });
+                });
+                
+                const activitySelects = ['submit-activity', 'stock-activity', 'calc-activity'];
+                activitySelects.forEach(id => {
+                    const select = document.getElementById(id);
+                    select.innerHTML = '<option value="">请选择活动</option>';
+                    activities.forEach(a => {
+                        select.innerHTML += `<option value="${a.id}">${a.id} - ${a.name} (${a.startDate}~${a.endDate})</option>`;
+                    });
+                });
+            } catch (e) {
+                console.error('加载下拉框失败', e);
+            }
+        }
+        
+        async function loadDashboard() {
+            try {
+                const records = await fetch(`${API_BASE}/display-records`).then(r => r.json());
+                
+                document.getElementById('stat-total').textContent = records.length;
+                document.getElementById('stat-approved').textContent = records.filter(r => r.reviewStatus === 'approved').length;
+                document.getElementById('stat-pending').textContent = records.filter(r => r.reviewStatus === 'pending').length;
+                
+                const totalRebate = records
+                    .filter(r => r.reviewStatus === 'approved')
+                    .reduce((sum, r) => sum + (r.rebateAmount || 0), 0);
+                document.getElementById('stat-total-rebate').textContent = `¥${totalRebate.toLocaleString()}`;
+            } catch (e) {
+                console.error('加载统计失败', e);
+            }
+        }
+        
+        async function submitDisplay() {
+            const storeId = document.getElementById('submit-store').value;
+            const activityId = document.getElementById('submit-activity').value;
+            const photoCount = parseInt(document.getElementById('submit-photos').value) || 0;
+            const submitDate = document.getElementById('submit-date').value;
+            
+            if (!storeId || !activityId) {
+                showResult('submit-result', '请选择门店和活动', 'danger');
+                return;
+            }
+            
+            if (photoCount <= 0) {
+                showResult('submit-result', '请输入照片数量', 'danger');
+                return;
+            }
+            
+            try {
+                const photos = Array(photoCount).fill(0).map((_, i) => `photo_${i + 1}.jpg`);
+                
+                const response = await fetch(`${API_BASE}/display-records`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ storeId, activityId, photos, submitDate })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showResult('submit-result', `✅ 提交成功！预计返利：¥${result.eligibility.rebateAmount}，原因：${result.eligibility.reason}`, 'success');
+                    loadDashboard();
+                } else {
+                    showResult('submit-result', `❌ 被拦截：${result.reason}`, 'danger');
+                }
+            } catch (e) {
+                showResult('submit-result', `❌ 提交失败：${e.message}`, 'danger');
+            }
+        }
+        
+        async function previewEligibility() {
+            const storeId = document.getElementById('submit-store').value;
+            const activityId = document.getElementById('submit-activity').value;
+            const photoCount = parseInt(document.getElementById('submit-photos').value) || 0;
+            const submitDate = document.getElementById('submit-date').value;
+            
+            if (!storeId || !activityId) {
+                showResult('submit-result', '请先选择门店和活动', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/check-eligibility`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ storeId, activityId, photoCount, submitDate })
+                });
+                
+                const result = await response.json();
+                
+                if (result.eligible) {
+                    showResult('submit-result', `✅ 资格检查通过！预计返利：¥${result.rebateAmount}，${result.reason}`, 'success');
+                } else {
+                    showResult('submit-result', `❌ 资格检查不通过：${result.reason}`, 'danger');
+                }
+            } catch (e) {
+                showResult('submit-result', `❌ 检查失败：${e.message}`, 'danger');
+            }
+        }
+        
+        async function loadRecords(type) {
+            try {
+                const records = await fetch(`${API_BASE}/display-records`).then(r => r.json());
+                const rules = await fetch(`${API_BASE}/rebate-rules`).then(r => r.json());
+                
+                if (type === 'review') {
+                    renderReviewTable(records, rules);
+                } else {
+                    renderRecordsTable(records, rules);
+                }
+            } catch (e) {
+                console.error('加载记录失败', e);
+            }
+        }
+        
+        function renderReviewTable(records, rules) {
+            const tbody = document.querySelector('#review-table tbody');
+            tbody.innerHTML = '';
+            
+            records.forEach(r => {
+                const activityRules = rules.filter(ru => ru.activityId === r.activityId);
+                const minStock = activityRules.length > 0 ? Math.min(...activityRules.map(ru => ru.minStock)) : 0;
+                const minPhotos = activityRules.length > 0 ? Math.min(...activityRules.map(ru => ru.minDisplayPhotos)) : 0;
+                
+                const stockMatch = r.stockAmount >= minStock;
+                const photosMatch = (r.photos || []).length >= minPhotos;
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.storeName}</td>
+                        <td>${r.brandName}<br><small>${r.activityName}</small></td>
+                        <td>
+                            ${(r.photos || []).length}/${minPhotos}
+                            ${photosMatch ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}
+                        </td>
+                        <td>
+                            ${r.stockAmount}/${minStock}
+                            ${stockMatch ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}
+                        </td>
+                        <td>${getPhotoStatusBadge(r.photoStatus)}</td>
+                        <td>${getReviewStatusBadge(r.reviewStatus)}</td>
+                        <td>
+                            ${r.isSettled ? '<span class="badge badge-secondary">已结算</span>' : `
+                                <button class="btn btn-success btn-sm" onclick="reviewPhoto('${r.id}', 'approved')">照片通过</button>
+                                <button class="btn btn-danger btn-sm" onclick="reviewPhoto('${r.id}', 'rejected')">照片不通过</button>
+                                <button class="btn btn-success btn-sm" onclick="reviewRecord('${r.id}', 'approved')">审核通过</button>
+                                <button class="btn btn-danger btn-sm" onclick="reviewRecord('${r.id}', 'rejected')">审核不通过</button>
+                                <button class="btn btn-info btn-sm" onclick="settleRecord('${r.id}')">结算</button>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function renderRecordsTable(records, rules) {
+            const tbody = document.querySelector('#records-table tbody');
+            tbody.innerHTML = '';
+            
+            records.forEach(r => {
+                const activityRules = rules.filter(ru => ru.activityId === r.activityId);
+                const minStock = activityRules.length > 0 ? Math.min(...activityRules.map(ru => ru.minStock)) : 0;
+                const minPhotos = activityRules.length > 0 ? Math.min(...activityRules.map(ru => ru.minDisplayPhotos)) : 0;
+                
+                let reason = '';
+                if (r.reviewStatus === 'approved') {
+                    reason = `✅ 通过：照片${r.photoStatus === 'approved' ? '合规' : '待确认'}，进货量${r.stockAmount >= minStock ? '达标' : '不足'}，照片数${(r.photos || []).length >= minPhotos ? '达标' : '不足'}`;
+                } else {
+                    if (r.photoStatus === 'rejected') reason = '❌ 不通过：照片审核不通过';
+                    else if (r.stockAmount < minStock) reason = `❌ 不通过：进货量不足（${r.stockAmount}/${minStock}）`;
+                    else if ((r.photos || []).length < minPhotos) reason = `❌ 不通过：照片数量不足（${(r.photos || []).length}/${minPhotos}）`;
+                    else reason = '⏳ 待审核';
+                }
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.storeName}</td>
+                        <td>${r.brandName}</td>
+                        <td>${r.activityName}</td>
+                        <td>${r.submitDate}</td>
+                        <td>${(r.photos || []).length}</td>
+                        <td>${r.stockAmount}</td>
+                        <td>${getPhotoStatusBadge(r.photoStatus)}</td>
+                        <td>${getReviewStatusBadge(r.reviewStatus)}</td>
+                        <td><strong style="color: #c41e3a;">¥${r.reviewStatus === 'approved' ? r.rebateAmount : 0}</strong></td>
+                        <td>${r.isSettled ? '<span class="badge badge-success">已结算</span>' : '<span class="badge badge-warning">未结算</span>'}</td>
+                        <td class="reason-detail">${reason}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function getPhotoStatusBadge(status) {
+            if (status === 'approved') return '<span class="badge badge-success">通过</span>';
+            if (status === 'rejected') return '<span class="badge badge-danger">不通过</span>';
+            return '<span class="badge badge-warning">待审核</span>';
+        }
+        
+        function getReviewStatusBadge(status) {
+            if (status === 'approved') return '<span class="badge badge-success">通过</span>';
+            if (status === 'rejected') return '<span class="badge badge-danger">不通过</span>';
+            return '<span class="badge badge-warning">待审核</span>';
+        }
+        
+        async function reviewPhoto(id, status) {
+            try {
+                const remarks = status === 'rejected' ? prompt('请输入不通过原因：') : '照片审核通过';
+                if (status === 'rejected' && !remarks) return;
+                
+                const response = await fetch(`${API_BASE}/display-records/${id}/review-photos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ photoStatus: status, remarks })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert(`照片审核${status === 'approved' ? '通过' : '不通过'}成功`);
+                    loadRecords('review');
+                } else {
+                    alert(`操作失败：${result.message}`);
+                }
+            } catch (e) {
+                alert(`操作失败：${e.message}`);
+            }
+        }
+        
+        async function reviewRecord(id, status) {
+            try {
+                const remarks = status === 'rejected' ? prompt('请输入不通过原因：') : '审核通过';
+                if (status === 'rejected' && !remarks) return;
+                
+                const response = await fetch(`${API_BASE}/display-records/${id}/review`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reviewStatus: status, remarks })
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert(`审核${status === 'approved' ? '通过' : '不通过'}成功`);
+                    loadRecords('review');
+                    loadDashboard();
+                } else {
+                    alert(`操作失败：${result.message}`);
+                }
+            } catch (e) {
+                alert(`操作失败：${e.message}`);
+            }
+        }
+        
+        async function settleRecord(id) {
+            if (!confirm('确认结算此记录？结算后无法修改。')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/display-records/${id}/settle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    alert('结算成功');
+                    loadRecords('review');
+                } else {
+                    alert(`结算失败：${result.message}`);
+                }
+            } catch (e) {
+                alert(`操作失败：${e.message}`);
+            }
+        }
+        
+        async function addStock() {
+            const storeId = document.getElementById('stock-store').value;
+            const activityId = document.getElementById('stock-activity').value;
+            const stockAmount = parseInt(document.getElementById('stock-amount').value);
+            const purchaseDate = document.getElementById('stock-date').value;
+            
+            if (!storeId || !activityId || !stockAmount) {
+                showResult('stock-result', '请填写完整信息', 'danger');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/stocks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ storeId, activityId, stockAmount, purchaseDate })
+                });
+                
+                const result = await response.json();
+                showResult('stock-result', `✅ 进货记录添加成功！`, 'success');
+                loadStocks();
+            } catch (e) {
+                showResult('stock-result', `❌ 添加失败：${e.message}`, 'danger');
+            }
+        }
+        
+        async function loadStocks() {
+            try {
+                const [stocks, stores, activities] = await Promise.all([
+                    fetch(`${API_BASE}/stocks`).then(r => r.json()),
+                    fetch(`${API_BASE}/stores`).then(r => r.json()),
+                    fetch(`${API_BASE}/activities`).then(r => r.json())
+                ]);
+                
+                const tbody = document.querySelector('#stock-table tbody');
+                tbody.innerHTML = '';
+                
+                stocks.forEach(s => {
+                    const store = stores.find(st => st.id === s.storeId);
+                    const activity = activities.find(a => a.id === s.activityId);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${store ? store.name : s.storeId}</td>
+                            <td>${activity ? activity.name : s.activityId}</td>
+                            <td>${s.stockAmount}</td>
+                            <td>${s.purchaseDate || '-'}</td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                console.error('加载进货记录失败', e);
+            }
+        }
+        
+        async function calculateRebate() {
+            const activityId = document.getElementById('calc-activity').value;
+            const photoCount = parseInt(document.getElementById('calc-photos').value) || 0;
+            const stockAmount = parseInt(document.getElementById('calc-stock').value) || 0;
+            
+            if (!activityId) {
+                showResult('calc-result', '请选择活动', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/calculate-rebate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ activityId, photoCount, stockAmount })
+                });
+                
+                const result = await response.json();
+                const resultDiv = document.getElementById('calc-result');
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="result-box">
+                            <div class="result-label">试算结果</div>
+                            <div class="result-amount">¥${result.amount.toLocaleString()}</div>
+                            <div style="margin-top: 10px; color: #28a745;">✅ ${result.message}</div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result-box">
+                            <div class="result-label">试算结果</div>
+                            <div class="result-amount" style="color: #6c757d;">¥0</div>
+                            <div style="margin-top: 10px; color: #dc3545;">❌ ${result.message}</div>
+                            <div style="margin-top: 10px; color: #666; font-size: 13px;">
+                                请检查：照片数量是否达标？进货量是否达标？
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                showResult('calc-result', `❌ 试算失败：${e.message}`, 'danger');
+            }
+        }
+        
+        async function loadRules() {
+            try {
+                const [rules, activities] = await Promise.all([
+                    fetch(`${API_BASE}/rebate-rules`).then(r => r.json()),
+                    fetch(`${API_BASE}/activities`).then(r => r.json())
+                ]);
+                
+                const tbody = document.querySelector('#rules-table tbody');
+                tbody.innerHTML = '';
+                
+                rules.forEach(r => {
+                    const activity = activities.find(a => a.id === r.activityId);
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${activity ? activity.name : r.activityId}</td>
+                            <td>${r.name}</td>
+                            <td>${r.minStock}</td>
+                            <td>${r.minDisplayPhotos}</td>
+                            <td><strong style="color: #c41e3a;">¥${r.rebateAmount}</strong></td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                console.error('加载规则失败', e);
+            }
+        }
+        
+        async function exportSettlement() {
+            try {
+                const response = await fetch(`${API_BASE}/export-settlement`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('export-result').innerHTML = `
+                        <div class="alert alert-success" style="margin-top: 15px;">
+                            ✅ 导出成功！<a href="${result.downloadUrl}" download style="color: #155724; text-decoration: underline;">点击下载 ${result.fileName}</a>
+                        </div>
+                    `;
+                } else {
+                    showResult('export-result', '导出失败', 'danger');
+                }
+            } catch (e) {
+                showResult('export-result', `❌ 导出失败：${e.message}`, 'danger');
+            }
+        }
+        
+        async function testSample(type) {
+            const resultDiv = document.getElementById(`sample-${type}`);
+            resultDiv.innerHTML = '<div class="alert alert-info">正在运行样例...</div>';
+            
+            try {
+                const sampleInfo = await fetch(`${API_BASE}/sample-data?type=${type}`).then(r => r.json());
+                
+                const response = await fetch(`${API_BASE}/check-eligibility`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        storeId: sampleInfo.storeId,
+                        activityId: sampleInfo.activityId,
+                        photoCount: sampleInfo.photoCount,
+                        stockAmount: sampleInfo.stockAmount
+                    })
+                });
+                
+                const result = await response.json();
+                
+                let html = `
+                    <div class="result-box" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 10px;">📋 样例参数</h4>
+                        <p>门店：${sampleInfo.storeId}</p>
+                        <p>活动：${sampleInfo.activityId}</p>
+                        <p>进货量：${sampleInfo.stockAmount}</p>
+                        <p>照片数：${sampleInfo.photoCount}</p>
+                        
+                        <h4 style="margin: 15px 0 10px;">🎯 执行结果</h4>
+                `;
+                
+                if (result.eligible) {
+                    html += `
+                        <div class="alert alert-success">
+                            ✅ 资格通过<br>
+                            预计返利：<strong>¥${result.rebateAmount}</strong><br>
+                            原因：${result.reason}
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="alert alert-danger">
+                            ❌ 被拦截<br>
+                            原因代码：<strong>${result.reasonCode}</strong><br>
+                            详细原因：${result.reason}
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <h4 style="margin: 15px 0 10px;">💡 拦截说明</h4>
+                `;
+                
+                if (type === 'normal') {
+                    html += `<div class="alert alert-info">此样例展示正常通过的情况。进货量和照片数都达标，系统自动匹配最高档返利规则。</div>`;
+                } else if (type === 'no-photos') {
+                    html += `<div class="alert alert-warning">被拦截原因：照片数量不足（${sampleInfo.photoCount}张 < 最低要求）<br><strong>处理：</strong>提醒门店补拍照片，达到最低要求后重新申报</div>`;
+                } else if (type === 'insufficient-stock') {
+                    html += `<div class="alert alert-warning">被拦截原因：进货量不足（${sampleInfo.stockAmount} < 最低要求）<br><strong>处理：</strong>检查进货记录是否完整，或联系门店确认实际进货量</div>`;
+                } else if (type === 'duplicate') {
+                    html += `<div class="alert alert-warning">被拦截原因：该门店已申报过此活动<br><strong>处理：</strong>在「记录查询」页查看已有申报记录，避免重复操作</div>`;
+                }
+                
+                html += '</div>';
+                resultDiv.innerHTML = html;
+                
+            } catch (e) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">样例运行失败：${e.message}</div>`;
+            }
+        }
+        
+        function showResult(divId, message, type) {
+            const div = document.getElementById(divId);
+            div.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+        
+        function openModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+        
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
