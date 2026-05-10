@@ -1,0 +1,174 @@
+[
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "waveKey": "A|SF",
+    "zone": "A",
+    "carrierId": "CAR_SF",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "status": "RELEASED",
+    "orderIds": [
+      "ORD_ORD-20260510-001",
+      "ORD_ORD-20260510-002",
+      "ORD_ORD-20260510-009"
+    ],
+    "allocations": [
+      {
+        "orderId": "ORD_ORD-20260510-001",
+        "orderNumber": "ORD-20260510-001",
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 2
+      },
+      {
+        "orderId": "ORD_ORD-20260510-001",
+        "orderNumber": "ORD-20260510-001",
+        "sku": "SKU-A002",
+        "locationCode": "A-01-02",
+        "qty": 1
+      },
+      {
+        "orderId": "ORD_ORD-20260510-002",
+        "orderNumber": "ORD-20260510-002",
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 3
+      },
+      {
+        "orderId": "ORD_ORD-20260510-002",
+        "orderNumber": "ORD-20260510-002",
+        "sku": "SKU-D001",
+        "locationCode": "A-01-03",
+        "qty": 1
+      },
+      {
+        "orderId": "ORD_ORD-20260510-009",
+        "orderNumber": "ORD-20260510-009",
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 1
+      },
+      {
+        "orderId": "ORD_ORD-20260510-009",
+        "orderNumber": "ORD-20260510-009",
+        "sku": "SKU-B002",
+        "locationCode": "B-01-02",
+        "qty": 2
+      }
+    ],
+    "cutoffTime": "23:59",
+    "generatedAt": "2026-05-10T12:17:32.394Z",
+    "confirmedAt": "2026-05-10T12:17:46.693Z",
+    "releasedAt": "2026-05-10T12:18:23.417Z",
+    "isPreview": false,
+    "isConfirmed": false,
+    "isFailed": false,
+    "createdAt": "2026-05-10T12:17:32.394Z",
+    "updatedAt": "2026-05-10T12:18:23.417Z"
+  },
+  {
+    "waveId": "WAVE_B_JD_20260510_001",
+    "waveKey": "B|JD",
+    "zone": "B",
+    "carrierId": "CAR_JD",
+    "carrierCode": "JD",
+    "carrierName": "京东物流",
+    "status": "PREVIEW",
+    "orderIds": [
+      "ORD_ORD-20260510-003",
+      "ORD_ORD-20260510-004"
+    ],
+    "allocations": [
+      {
+        "orderId": "ORD_ORD-20260510-003",
+        "orderNumber": "ORD-20260510-003",
+        "sku": "SKU-B001",
+        "locationCode": "B-01-01",
+        "qty": 2
+      },
+      {
+        "orderId": "ORD_ORD-20260510-003",
+        "orderNumber": "ORD-20260510-003",
+        "sku": "SKU-B002",
+        "locationCode": "B-01-02",
+        "qty": 1
+      }
+    ],
+    "cutoffTime": "23:59",
+    "generatedAt": "2026-05-10T12:17:32.394Z",
+    "confirmedAt": null,
+    "releasedAt": null,
+    "isPreview": true,
+    "isConfirmed": false,
+    "isFailed": false,
+    "createdAt": "2026-05-10T12:17:32.394Z",
+    "updatedAt": "2026-05-10T12:17:32.394Z"
+  },
+  {
+    "waveId": "WAVE_C_YTO_20260510_001",
+    "waveKey": "C|YTO",
+    "zone": "C",
+    "carrierId": "CAR_YTO",
+    "carrierCode": "YTO",
+    "carrierName": "圆通速递",
+    "status": "PREVIEW",
+    "orderIds": [
+      "ORD_ORD-20260510-005"
+    ],
+    "allocations": [
+      {
+        "orderId": "ORD_ORD-20260510-005",
+        "orderNumber": "ORD-20260510-005",
+        "sku": "SKU-C001",
+        "locationCode": "C-01-01",
+        "qty": 5
+      },
+      {
+        "orderId": "ORD_ORD-20260510-005",
+        "orderNumber": "ORD-20260510-005",
+        "sku": "SKU-C002",
+        "locationCode": "C-01-02",
+        "qty": 10
+      }
+    ],
+    "cutoffTime": "23:59",
+    "generatedAt": "2026-05-10T12:17:32.394Z",
+    "confirmedAt": null,
+    "releasedAt": null,
+    "isPreview": true,
+    "isConfirmed": false,
+    "isFailed": false,
+    "createdAt": "2026-05-10T12:17:32.394Z",
+    "updatedAt": "2026-05-10T12:17:32.394Z"
+  },
+  {
+    "waveId": "WAVE_B_SF_20260510_001",
+    "waveKey": "B|SF",
+    "zone": "B",
+    "carrierId": "CAR_SF",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "status": "PREVIEW",
+    "orderIds": [
+      "ORD_ORD-20260510-007"
+    ],
+    "allocations": [
+      {
+        "orderId": "ORD_ORD-20260510-007",
+        "orderNumber": "ORD-20260510-007",
+        "sku": "SKU-C001",
+        "locationCode": "C-01-01",
+        "qty": 2
+      }
+    ],
+    "cutoffTime": "23:59",
+    "generatedAt": "2026-05-10T12:17:32.394Z",
+    "confirmedAt": null,
+    "releasedAt": null,
+    "isPreview": true,
+    "isConfirmed": false,
+    "isFailed": false,
+    "createdAt": "2026-05-10T12:17:32.394Z",
+    "updatedAt": "2026-05-10T12:17:32.394Z"
+  }
+]

@@ -1,0 +1,67 @@
+{
+  "waveId": "WAVE_A_SF_20260510_001",
+  "waveKey": "A|SF",
+  "zone": "A",
+  "carrierId": "CAR_SF",
+  "carrierCode": "SF",
+  "carrierName": "顺丰速运",
+  "status": "CONFIRMED",
+  "orderIds": [
+    "ORD_ORD-20260510-001",
+    "ORD_ORD-20260510-002",
+    "ORD_ORD-20260510-009"
+  ],
+  "allocations": [
+    {
+      "orderId": "ORD_ORD-20260510-001",
+      "orderNumber": "ORD-20260510-001",
+      "sku": "SKU-A001",
+      "locationCode": "A-01-01",
+      "qty": 2
+    },
+    {
+      "orderId": "ORD_ORD-20260510-001",
+      "orderNumber": "ORD-20260510-001",
+      "sku": "SKU-A002",
+      "locationCode": "A-01-02",
+      "qty": 1
+    },
+    {
+      "orderId": "ORD_ORD-20260510-002",
+      "orderNumber": "ORD-20260510-002",
+      "sku": "SKU-A001",
+      "locationCode": "A-01-01",
+      "qty": 3
+    },
+    {
+      "orderId": "ORD_ORD-20260510-002",
+      "orderNumber": "ORD-20260510-002",
+      "sku": "SKU-D001",
+      "locationCode": "A-01-03",
+      "qty": 1
+    },
+    {
+      "orderId": "ORD_ORD-20260510-009",
+      "orderNumber": "ORD-20260510-009",
+      "sku": "SKU-A001",
+      "locationCode": "A-01-01",
+      "qty": 1
+    },
+    {
+      "orderId": "ORD_ORD-20260510-009",
+      "orderNumber": "ORD-20260510-009",
+      "sku": "SKU-B002",
+      "locationCode": "B-01-02",
+      "qty": 2
+    }
+  ],
+  "cutoffTime": "23:59",
+  "generatedAt": "2026-05-10T12:17:32.394Z",
+  "confirmedAt": "2026-05-10T12:17:46.693Z",
+  "releasedAt": null,
+  "isPreview": false,
+  "isConfirmed": true,
+  "isFailed": false,
+  "createdAt": "2026-05-10T12:17:32.394Z",
+  "updatedAt": "2026-05-10T12:17:46.693Z"
+}

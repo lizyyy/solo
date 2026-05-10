@@ -1,0 +1,64 @@
+[
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "locationCode": "A-01-01",
+    "sku": "SKU-A001",
+    "totalQty": 6,
+    "orders": [
+      {
+        "orderId": "ORD_ORD-20260510-001",
+        "orderNumber": "ORD-20260510-001",
+        "qty": 2
+      },
+      {
+        "orderId": "ORD_ORD-20260510-002",
+        "orderNumber": "ORD-20260510-002",
+        "qty": 3
+      },
+      {
+        "orderId": "ORD_ORD-20260510-009",
+        "orderNumber": "ORD-20260510-009",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "locationCode": "A-01-02",
+    "sku": "SKU-A002",
+    "totalQty": 1,
+    "orders": [
+      {
+        "orderId": "ORD_ORD-20260510-001",
+        "orderNumber": "ORD-20260510-001",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "locationCode": "A-01-03",
+    "sku": "SKU-D001",
+    "totalQty": 1,
+    "orders": [
+      {
+        "orderId": "ORD_ORD-20260510-002",
+        "orderNumber": "ORD-20260510-002",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "locationCode": "B-01-02",
+    "sku": "SKU-B002",
+    "totalQty": 2,
+    "orders": [
+      {
+        "orderId": "ORD_ORD-20260510-009",
+        "orderNumber": "ORD-20260510-009",
+        "qty": 2
+      }
+    ]
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "orderId": "ORD_ORD-20260510-001",
+    "orderNumber": "ORD-20260510-001",
+    "carrierCode": "SF",
+    "customerName": "张三",
+    "shippingAddress": "北京市朝阳区",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 2
+      },
+      {
+        "sku": "SKU-A002",
+        "locationCode": "A-01-02",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "orderId": "ORD_ORD-20260510-002",
+    "orderNumber": "ORD-20260510-002",
+    "carrierCode": "SF",
+    "customerName": "李四",
+    "shippingAddress": "北京市海淀区",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 3
+      },
+      {
+        "sku": "SKU-D001",
+        "locationCode": "A-01-03",
+        "qty": 1
+      }
+    ]
+  },
+  {
+    "waveId": "WAVE_A_SF_20260510_001",
+    "orderId": "ORD_ORD-20260510-009",
+    "orderNumber": "ORD-20260510-009",
+    "carrierCode": "SF",
+    "customerName": "郑十一",
+    "shippingAddress": "成都市武侯区",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "locationCode": "A-01-01",
+        "qty": 1
+      },
+      {
+        "sku": "SKU-B002",
+        "locationCode": "B-01-02",
+        "qty": 2
+      }
+    ]
+  }
+]

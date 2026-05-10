@@ -1,0 +1,21 @@
+{
+  "name": "wave-picking-cli",
+  "version": "1.0.0",
+  "description": "仓库拣货波次合并 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "wave": "./bin/wave.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "start": "node bin/wave.js"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table": "^0.3.11"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

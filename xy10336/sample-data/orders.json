@@ -1,0 +1,125 @@
+[
+  {
+    "orderNumber": "ORD-20260510-001",
+    "status": "PENDING",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "customerName": "张三",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "北京市朝阳区",
+    "items": [
+      { "sku": "SKU-A001", "qty": 2, "unitPrice": 299 },
+      { "sku": "SKU-A002", "qty": 1, "unitPrice": 159 }
+    ],
+    "totalAmount": 757
+  },
+  {
+    "orderNumber": "ORD-20260510-002",
+    "status": "PENDING",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "customerName": "李四",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "北京市海淀区",
+    "items": [
+      { "sku": "SKU-A001", "qty": 3, "unitPrice": 299 },
+      { "sku": "SKU-D001", "qty": 1, "unitPrice": 599 }
+    ],
+    "totalAmount": 1496
+  },
+  {
+    "orderNumber": "ORD-20260510-003",
+    "status": "PENDING",
+    "carrierCode": "JD",
+    "carrierName": "京东物流",
+    "customerName": "王五",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "上海市浦东新区",
+    "items": [
+      { "sku": "SKU-B001", "qty": 2, "unitPrice": 89 },
+      { "sku": "SKU-B002", "qty": 1, "unitPrice": 199 }
+    ],
+    "totalAmount": 377
+  },
+  {
+    "orderNumber": "ORD-20260510-004",
+    "status": "PENDING",
+    "carrierCode": "JD",
+    "carrierName": "京东物流",
+    "customerName": "赵六",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "上海市静安区",
+    "items": [
+      { "sku": "SKU-B001", "qty": 3, "unitPrice": 89 }
+    ],
+    "totalAmount": 267
+  },
+  {
+    "orderNumber": "ORD-20260510-005",
+    "status": "PENDING",
+    "carrierCode": "YTO",
+    "carrierName": "圆通速递",
+    "customerName": "钱七",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "广州市天河区",
+    "items": [
+      { "sku": "SKU-C001", "qty": 5, "unitPrice": 128 },
+      { "sku": "SKU-C002", "qty": 10, "unitPrice": 45 }
+    ],
+    "totalAmount": 1090
+  },
+  {
+    "orderNumber": "ORD-20260510-006",
+    "status": "CANCELLED",
+    "carrierCode": "ZTO",
+    "carrierName": "中通快递",
+    "customerName": "孙八",
+    "orderDate": "2026-05-09",
+    "shippingAddress": "深圳市南山区",
+    "items": [
+      { "sku": "SKU-A001", "qty": 1, "unitPrice": 299 }
+    ],
+    "totalAmount": 299
+  },
+  {
+    "orderNumber": "ORD-20260510-007",
+    "status": "PENDING",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "customerName": "周九",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "杭州市西湖区",
+    "items": [
+      { "sku": "SKU-B001", "qty": 5, "unitPrice": 89 },
+      { "sku": "SKU-C001", "qty": 2, "unitPrice": 128 }
+    ],
+    "totalAmount": 701
+  },
+  {
+    "orderNumber": "ORD-20260510-008",
+    "status": "PENDING",
+    "carrierCode": "YTO",
+    "carrierName": "圆通速递",
+    "customerName": "吴十",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "南京市鼓楼区",
+    "items": [
+      { "sku": "SKU-INVALID", "qty": 2, "unitPrice": 100 }
+    ],
+    "totalAmount": 200
+  },
+  {
+    "orderNumber": "ORD-20260510-009",
+    "status": "PENDING",
+    "carrierCode": "SF",
+    "carrierName": "顺丰速运",
+    "customerName": "郑十一",
+    "orderDate": "2026-05-10",
+    "shippingAddress": "成都市武侯区",
+    "items": [
+      { "sku": "SKU-A001", "qty": 1, "unitPrice": 299 },
+      { "sku": "SKU-B002", "qty": 2, "unitPrice": 199 }
+    ],
+    "totalAmount": 697
+  }
+]
