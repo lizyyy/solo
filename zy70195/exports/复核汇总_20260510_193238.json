@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-05-10 19:32:38",
+  "qualifications": {
+    "total": 10,
+    "expired": 1,
+    "warning_30": 2,
+    "warning_90": 1,
+    "normal": 6
+  },
+  "freeze_logs": {
+    "total": 2,
+    "by_action": {
+      "freeze": 2
+    }
+  },
+  "orders": {
+    "total_orders": 7,
+    "total_amount": 158500,
+    "blocked_frozen_amount": 80000,
+    "by_status": {
+      "被拦截": 3,
+      "待处理": 1,
+      "已完成": 1,
+      "已通过": 1,
+      "已冻结": 1
+    }
+  },
+  "risks": {
+    "total": 1,
+    "active": 1,
+    "by_severity": {
+      "高": 1
+    }
+  },
+  "exceptions": {
+    "total": 8,
+    "pending": 8,
+    "by_type": {
+      "supplier_frozen": 1,
+      "risk_added": 1,
+      "order_blocked": 3,
+      "data_not_found": 1,
+      "business_event": 2
+    }
+  }
+}
