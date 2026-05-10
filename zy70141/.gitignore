@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+*.log
+coverage/
+.idea/
+.vscode/
+.DS_Store
+dist/
+*.pid
+*.seed
+*.pid.lock
