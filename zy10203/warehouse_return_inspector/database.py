@@ -239,6 +239,19 @@ class Database:
         )
         return cursor.fetchall()
 
+    def get_item_by_order_and_serial(self, order_no, serial_number):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT ri.*, ro.order_no
+            FROM return_items ri
+            JOIN return_orders ro ON ri.return_order_id = ro.id
+            WHERE ro.order_no = ? AND ri.serial_number = ?
+            """,
+            (order_no, serial_number),
+        )
+        return cursor.fetchone()
+
     def get_all_orders(self):
         cursor = self.conn.cursor()
         cursor.execute("SELECT * FROM return_orders ORDER BY return_date DESC")

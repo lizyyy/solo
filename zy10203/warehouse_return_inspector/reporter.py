@@ -5,17 +5,23 @@ from .database import Database
 
 class Reporter:
     def __init__(self, db_path=None):
+        self.db_path = db_path
         self.db = Database(db_path)
 
+    def close(self):
+        if self.db:
+            self.db.close()
+
     def generate_sorting_report(self, output_path=None):
-        orders = self.db.get_all_orders()
+        db = self.db
+        orders = db.get_all_orders()
         all_items = []
         for order in orders:
-            items = self.db.get_items_by_order(order["order_no"])
+            items = db.get_items_by_order(order["order_no"])
             all_items.extend(items)
 
-        unresolved_exceptions = self.db.get_unresolved_exceptions()
-        all_exceptions = self.db.get_all_exceptions()
+        unresolved_exceptions = db.get_unresolved_exceptions()
+        all_exceptions = db.get_all_exceptions()
 
         by_quality = {}
         by_location = {}
@@ -110,7 +116,7 @@ class Reporter:
             else:
                 f.write(f"发现 {len(duplicates)} 个序列号有重复记录:\n")
                 for sn, count in duplicates.items():
-                    items = self.db.get_item_by_serial(sn)
+                    items = db.get_item_by_serial(sn)
                     f.write(f"\n  SN: {sn} (共 {count} 条记录)\n")
                     for item in items:
                         f.write(
@@ -119,11 +125,11 @@ class Reporter:
                             f"导入批次: {item['import_batch_id'][:8]}...\n"
                         )
 
-        self.db.close()
         return output_path
 
     def generate_exception_list(self, output_path=None):
-        all_exceptions = self.db.get_all_exceptions()
+        db = self.db
+        all_exceptions = db.get_all_exceptions()
 
         if output_path is None:
             output_path = os.path.join(
@@ -152,28 +158,24 @@ class Reporter:
                         f.write(f"解决时间: {ex['resolved_at']}\n")
                         f.write(f"处理说明: {ex['resolution_note']}\n")
 
-        self.db.close()
         return output_path
 
     def list_orders(self):
-        orders = self.db.get_all_orders()
-        self.db.close()
-        return orders
+        return self.db.get_all_orders()
 
     def list_items(self, order_no=None):
+        db = self.db
         if order_no:
-            items = self.db.get_items_by_order(order_no)
+            return db.get_items_by_order(order_no)
         else:
             items = []
-            for order in self.db.get_all_orders():
-                items.extend(self.db.get_items_by_order(order["order_no"]))
-        self.db.close()
-        return items
+            for order in db.get_all_orders():
+                items.extend(db.get_items_by_order(order["order_no"]))
+            return items
 
     def list_exceptions(self, unresolved_only=False):
+        db = self.db
         if unresolved_only:
-            exceptions = self.db.get_unresolved_exceptions()
+            return db.get_unresolved_exceptions()
         else:
-            exceptions = self.db.get_all_exceptions()
-        self.db.close()
-        return exceptions
+            return db.get_all_exceptions()

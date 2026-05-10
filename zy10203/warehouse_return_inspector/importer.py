@@ -16,9 +16,11 @@ class DataImporter:
         self.validator = Validator(self.db)
 
     def generate_batch_id(self, file_path):
-        stat = os.stat(file_path)
-        file_info = f"{stat.st_size}-{stat.st_mtime}"
-        return hashlib.sha256(file_info.encode()).hexdigest()[:16]
+        hash_obj = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                hash_obj.update(chunk)
+        return hash_obj.hexdigest()[:16]
 
     def read_file(self, file_path):
         ext = os.path.splitext(file_path)[1].lower()
@@ -100,7 +102,9 @@ class DataImporter:
 
         total_records = len(df)
         success_records = 0
+        skipped_records = 0
         exceptions = []
+        current_batch_keys = set()
 
         for idx, row in df.iterrows():
             try:
@@ -123,6 +127,13 @@ class DataImporter:
                 if not return_date:
                     return_date = datetime.now().strftime("%Y-%m-%d")
 
+                record_key = (order_no, serial_number)
+
+                existing_item = self.db.get_item_by_order_and_serial(order_no, serial_number)
+                if existing_item:
+                    skipped_records += 1
+                    continue
+
                 order_id = self.db.add_return_order(order_no, customer_name, return_date)
 
                 item_id = self.db.add_return_item(
@@ -137,6 +148,22 @@ class DataImporter:
                     repair_responsibility,
                     batch_id,
                 )
+
+                if record_key in current_batch_keys:
+                    exceptions.append(
+                        {
+                            "row": idx + 2,
+                            "order_no": order_no,
+                            "exception_type": "序列号重复",
+                            "exception_detail": (
+                                f"该记录（订单 {order_no}，序列号 {serial_number}）"
+                                f"在当前导入文件中已出现过。"
+                                f"请检查是否是重复录入。"
+                            ),
+                        }
+                    )
+                else:
+                    current_batch_keys.add(record_key)
 
                 item_exceptions = self.validator.validate_item(
                     item_id,
@@ -175,7 +202,8 @@ class DataImporter:
             "batch_id": batch_id,
             "total_records": total_records,
             "success_records": success_records,
-            "failed_records": total_records - success_records,
+            "skipped_records": skipped_records,
+            "failed_records": total_records - success_records - skipped_records,
             "exceptions": exceptions,
         }
 

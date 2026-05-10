@@ -32,6 +32,13 @@ def import_command(file_path):
     click.echo(click.style(f"导入批次ID: {result['batch_id']}", fg="green"))
     click.echo(f"总记录数: {result['total_records']}")
     click.echo(f"成功导入: {result['success_records']}")
+    if result.get("skipped_records", 0) > 0:
+        click.echo(
+            click.style(
+                f"跳过重复: {result['skipped_records']} 条（已存在的订单+序列号组合不会重复导入）",
+                fg="cyan"
+            )
+        )
     if result["failed_records"] > 0:
         click.echo(
             click.style(f"导入失败: {result['failed_records']}", fg="red")
