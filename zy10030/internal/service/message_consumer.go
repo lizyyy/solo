@@ -19,14 +19,14 @@ import (
 )
 
 type MessageConsumerService struct {
-	enableIdempotency bool
-	dedupWindow       time.Duration
-	maxProcessingTime time.Duration
+	enableIdempotency  bool
+	dedupWindow        time.Duration
+	maxProcessingTime  time.Duration
 	enableManualCommit bool
-	handlers          map[string]MessageHandler
-	handlerMu         sync.RWMutex
-	running           bool
-	stopChan          chan struct{}
+	handlers           map[string]MessageHandler
+	handlerMu          sync.RWMutex
+	running            bool
+	stopChan           chan struct{}
 }
 
 type MessageHandler func(ctx context.Context, event *model.GrayEvent) error
@@ -34,7 +34,7 @@ type MessageHandler func(ctx context.Context, event *model.GrayEvent) error
 func NewMessageConsumerService(enableIdempotency bool, dedupWindowStr, maxProcessingTimeStr string, enableManualCommit bool) *MessageConsumerService {
 	dedupWindow, _ := time.ParseDuration(dedupWindowStr)
 	maxProcessingTime, _ := time.ParseDuration(maxProcessingTimeStr)
-	
+
 	if dedupWindow <= 0 {
 		dedupWindow = 5 * time.Minute
 	}
@@ -91,6 +91,12 @@ func (s *MessageConsumerService) consumeLoop(ctx context.Context) {
 			logger.Info("Message consumer stopped due to context cancellation")
 			return
 		default:
+			if !mq.IsConsumerReady() {
+				logger.Warn("Kafka consumer not ready, waiting...")
+				time.Sleep(2 * time.Second)
+				continue
+			}
+
 			event, err := mq.ConsumeEvent(ctx)
 			if err != nil {
 				if err == context.Canceled {
@@ -113,9 +119,9 @@ func (s *MessageConsumerService) processEvent(ctx context.Context, event *model.
 	defer span.End()
 
 	tracer.AddAttributesToSpan(span, map[string]interface{}{
-		"event_type":    event.EventType,
-		"service_name":  event.ServiceName,
-		"release_id":    event.ReleaseID,
+		"event_type":   event.EventType,
+		"service_name": event.ServiceName,
+		"release_id":   event.ReleaseID,
 	})
 
 	messageID := s.generateMessageID(event)
@@ -158,9 +164,9 @@ func (s *MessageConsumerService) processEvent(ctx context.Context, event *model.
 	}
 
 	logger.WithFields(map[string]interface{}{
-		"event_type":   event.EventType,
-		"message_id":   messageID,
-		"release_id":   event.ReleaseID,
+		"event_type": event.EventType,
+		"message_id": messageID,
+		"release_id": event.ReleaseID,
 	}).Info("Event processed successfully")
 
 	return nil
@@ -266,7 +272,7 @@ func (s *MessageConsumerService) SimulateDuplicateConsumption(ctx context.Contex
 
 	for i := 0; i < count; i++ {
 		logger.WithField("attempt", i+1).Info("Processing duplicate message")
-		
+
 		if err := s.processEvent(ctx, event); err != nil {
 			logger.WithField("attempt", i+1).Errorf("Processing failed: %v", err)
 			return err
@@ -305,7 +311,7 @@ func (s *MessageConsumerService) GetDedupRecords(ctx context.Context, messageID 
 
 func (s *MessageConsumerService) CleanupOldDedupRecords(ctx context.Context) error {
 	cutoff := time.Now().Add(-s.dedupWindow * 2)
-	
+
 	result, err := database.Exec(`
 		DELETE FROM message_dedup_records 
 		WHERE created_at < $1 AND status = 'processed'
@@ -317,7 +323,7 @@ func (s *MessageConsumerService) CleanupOldDedupRecords(ctx context.Context) err
 
 	rowsAffected, _ := result.RowsAffected()
 	logger.WithField("deleted_count", rowsAffected).Info("Cleaned up old dedup records")
-	
+
 	return nil
 }
 
@@ -325,4 +331,3 @@ func init() {
 	_ = kafka.Reader{}
 	_ = json.Marshal
 }
-

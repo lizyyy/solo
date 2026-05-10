@@ -64,9 +64,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_HOST: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_DBNAME: grayscale_simulator
       KAFKA_BROKERS: kafka:9092
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      TRACE_JAEGER_ENDPOINT: http://jaeger:14268/api/traces
     depends_on:
       postgres:
         condition: service_healthy

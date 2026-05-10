@@ -48,10 +48,14 @@ func main() {
 	if err := mq.InitProducer(&cfg.Kafka); err != nil {
 		logger.Warnf("Failed to init Kafka producer: %v", err)
 	}
+
+	if err := mq.InitConsumer(&cfg.Kafka); err != nil {
+		logger.Warnf("Failed to init Kafka consumer: %v", err)
+	}
 	defer mq.Close()
 
 	grayReleaseService := service.NewGrayReleaseService(cfg.GrayRelease.DefaultPercentage)
-	
+
 	rollbackEngine := service.NewRollbackEngine(
 		cfg.Rollback.MaxRetryTimes,
 		cfg.Rollback.RetryInterval,
@@ -71,7 +75,7 @@ func main() {
 	)
 
 	traceService := service.NewTraceService(cfg.Server.Name)
-	
+
 	reportService := service.NewReportService("./reports", traceService)
 
 	messageConsumer := service.NewMessageConsumerService(
@@ -130,4 +134,3 @@ func main() {
 
 	logger.Info("Server shutdown complete")
 }
-
