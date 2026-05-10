@@ -1,0 +1,47 @@
+[
+  {
+    "case": "重复收据",
+    "type": "payments",
+    "data": [
+      {
+        "farmer_id": "FARMER-001",
+        "payment_date": "2026-04-01",
+        "amount": 500.0,
+        "receipt_no": "RCPT-2026-001",
+        "payment_method": "现金",
+        "remark": "这是重复收据号，应该被拦截"
+      }
+    ]
+  },
+  {
+    "case": "超额退货",
+    "type": "returns",
+    "data": [
+      {
+        "farmer_id": "FARMER-002",
+        "sale_id": "SALE-003",
+        "return_date": "2026-04-01",
+        "product_name": "多菌灵",
+        "quantity": 10,
+        "unit_price": 30.0,
+        "amount": 300.0,
+        "reason": "退货数量超过原销售的10瓶",
+        "remark": "原销售只有10瓶，已经退了3瓶，再退10瓶会超过"
+      }
+    ]
+  },
+  {
+    "case": "无凭证抵扣",
+    "type": "deductions",
+    "data": [
+      {
+        "farmer_id": "FARMER-003",
+        "deduction_date": "2026-04-01",
+        "amount": 300.0,
+        "evidence": "",
+        "reason": "没有提供凭证号，应该被拦截",
+        "remark": "没有凭证号"
+      }
+    ]
+  }
+]

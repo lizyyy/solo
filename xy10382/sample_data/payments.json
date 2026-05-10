@@ -1,0 +1,29 @@
+[
+  {
+    "id": "PAY-001",
+    "farmer_id": "FARMER-001",
+    "payment_date": "2026-02-10",
+    "amount": 1600.0,
+    "receipt_no": "RCPT-2026-001",
+    "payment_method": "现金",
+    "remark": "全额还款"
+  },
+  {
+    "id": "PAY-002",
+    "farmer_id": "FARMER-002",
+    "payment_date": "2026-03-10",
+    "amount": 1500.0,
+    "receipt_no": "RCPT-2026-002",
+    "payment_method": "微信",
+    "remark": "第一批回款"
+  },
+  {
+    "id": "PAY-003",
+    "farmer_id": "FARMER-002",
+    "payment_date": "2026-03-25",
+    "amount": 1500.0,
+    "receipt_no": "RCPT-2026-003",
+    "payment_method": "支付宝",
+    "remark": "第二批回款"
+  }
+]
