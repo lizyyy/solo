@@ -1,0 +1,22 @@
+{
+  "order_id": "ORDER_001",
+  "customer_id": "CUST_001",
+  "customer_name": "张三",
+  "rental_start": "2026-05-01",
+  "rental_end": "2026-05-05",
+  "equipments": [
+    {
+      "equipment_id": "EQ_001",
+      "name": "佳能 EOS R5 相机",
+      "model": "EOS R5",
+      "serial_number": "CN12345"
+    },
+    {
+      "equipment_id": "EQ_002",
+      "name": "佳能 RF 24-70mm 镜头",
+      "model": "RF 24-70mm f/2.8L",
+      "serial_number": "LN12345"
+    }
+  ],
+  "rental_fee": 1200.0
+}

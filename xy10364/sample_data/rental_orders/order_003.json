@@ -1,0 +1,28 @@
+{
+  "order_id": "ORDER_003",
+  "customer_id": "CUST_003",
+  "customer_name": "王五",
+  "rental_start": "2026-05-05",
+  "rental_end": "2026-05-10",
+  "equipments": [
+    {
+      "equipment_id": "EQ_006",
+      "name": "尼康 Z7 II 相机",
+      "model": "Z7 II",
+      "serial_number": "NK001"
+    },
+    {
+      "equipment_id": "EQ_007",
+      "name": "智云 Weebill-S 稳定器",
+      "model": "Weebill-S",
+      "serial_number": "STA001"
+    },
+    {
+      "equipment_id": "EQ_008",
+      "name": "神牛 AD600 闪光灯",
+      "model": "AD600",
+      "serial_number": "FL001"
+    }
+  ],
+  "rental_fee": 1800.0
+}

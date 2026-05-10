@@ -1,0 +1,52 @@
+{
+  "claim_id": "911EFABA",
+  "order_id": "ORDER_001",
+  "customer_id": "CUST_001",
+  "customer_name": "张三",
+  "status": "confirmed",
+  "total_assessed_loss": 2000.0,
+  "total_repair_cost": 2000.0,
+  "total_deductible": 400.0,
+  "total_insurance_payout": 1600.0,
+  "total_customer_payable": 400.0,
+  "total_deposit_deducted": 400.0,
+  "total_deposit_remaining": 4600.0,
+  "original_deposit": 5000.0,
+  "items": [
+    {
+      "equipment_id": "EQ_002",
+      "equipment_name": "佳能 RF 24-70mm 镜头",
+      "damage_level": "moderate",
+      "damage_description": "镜头镜片边缘有轻微划痕，对焦马达有异响",
+      "assessed_loss": 1500.0,
+      "repair_cost": 1500.0,
+      "deductible_applied": 200.0,
+      "insurance_payout": 1300.0,
+      "customer_payable": 200.0,
+      "deposit_deducted": 200.0,
+      "remaining_deposit": 4800.0,
+      "is_insured": true,
+      "is_excluded": false,
+      "exclusion_reason": ""
+    },
+    {
+      "equipment_id": "EQ_001",
+      "equipment_name": "佳能 EOS R5 相机",
+      "damage_level": "minor",
+      "damage_description": "相机机身轻微划痕，LCD屏幕有一个小亮点",
+      "assessed_loss": 500.0,
+      "repair_cost": 500.0,
+      "deductible_applied": 200.0,
+      "insurance_payout": 300.0,
+      "customer_payable": 200.0,
+      "deposit_deducted": 200.0,
+      "remaining_deposit": 4600.0,
+      "is_insured": true,
+      "is_excluded": false,
+      "exclusion_reason": ""
+    }
+  ],
+  "anomalies": [],
+  "created_at": "2026-05-10T22:32:25.879928",
+  "confirmed_at": "2026-05-10T22:32:46.892820"
+}

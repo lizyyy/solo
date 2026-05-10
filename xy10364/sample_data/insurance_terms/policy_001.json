@@ -1,0 +1,10 @@
+{
+  "policy_id": "POLICY_001",
+  "name": "摄影器材综合保险",
+  "deductible_per_claim": 500.0,
+  "deductible_per_item": 200.0,
+  "max_coverage_per_item": 10000.0,
+  "max_coverage_per_claim": 50000.0,
+  "covered_equipment_types": ["相机", "镜头", "闪光灯", "三脚架", "稳定器", "无人机"],
+  "excluded_damage_types": ["故意损坏", "战争", "恐怖袭击", "核辐射"]
+}

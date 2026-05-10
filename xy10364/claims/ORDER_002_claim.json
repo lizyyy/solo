@@ -1,0 +1,75 @@
+{
+  "claim_id": "B12FE771",
+  "order_id": "ORDER_002",
+  "customer_id": "CUST_002",
+  "customer_name": "李四",
+  "status": "draft",
+  "total_assessed_loss": 17150.0,
+  "total_repair_cost": 17150.0,
+  "total_deductible": 400.0,
+  "total_insurance_payout": 16600.0,
+  "total_customer_payable": 550.0,
+  "total_deposit_deducted": 300.0,
+  "total_deposit_remaining": 0.0,
+  "original_deposit": 300.0,
+  "items": [
+    {
+      "equipment_id": "EQ_005",
+      "equipment_name": "GoPro Hero 10 运动相机",
+      "damage_level": "moderate",
+      "damage_description": "GoPro镜头轻微磨损",
+      "assessed_loss": 150.0,
+      "repair_cost": 150.0,
+      "deductible_applied": 0.0,
+      "insurance_payout": 0.0,
+      "customer_payable": 150.0,
+      "deposit_deducted": 150.0,
+      "remaining_deposit": 150.0,
+      "is_insured": true,
+      "is_excluded": true,
+      "exclusion_reason": "Deductible exceeds loss amount"
+    },
+    {
+      "equipment_id": "EQ_004",
+      "equipment_name": "DJI Mavic 3 无人机",
+      "damage_level": "total_loss",
+      "damage_description": "无人机摔落，机身断裂，云台损坏，电池漏液，无法修复",
+      "assessed_loss": 9000.0,
+      "repair_cost": 9000.0,
+      "deductible_applied": 200.0,
+      "insurance_payout": 8800.0,
+      "customer_payable": 200.0,
+      "deposit_deducted": 150.0,
+      "remaining_deposit": 0.0,
+      "is_insured": true,
+      "is_excluded": false,
+      "exclusion_reason": ""
+    },
+    {
+      "equipment_id": "EQ_003",
+      "equipment_name": "索尼 A7S III 相机",
+      "damage_level": "severe",
+      "damage_description": "相机机身变形，传感器受损，无法开机",
+      "assessed_loss": 8000.0,
+      "repair_cost": 8000.0,
+      "deductible_applied": 200.0,
+      "insurance_payout": 7800.0,
+      "customer_payable": 200.0,
+      "deposit_deducted": 0.0,
+      "remaining_deposit": 0.0,
+      "is_insured": true,
+      "is_excluded": false,
+      "exclusion_reason": ""
+    }
+  ],
+  "anomalies": [
+    {
+      "equipment_id": "EQ_005",
+      "equipment_name": "GoPro Hero 10 运动相机",
+      "type": "deductible_exceeds_loss",
+      "message": "Deductible (150.0) exceeds loss amount for GoPro Hero 10 运动相机"
+    }
+  ],
+  "created_at": "2026-05-10T22:32:35.065690",
+  "confirmed_at": null
+}
