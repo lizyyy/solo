@@ -1,0 +1,19 @@
+{
+  "name": "receivable-collection-service",
+  "version": "1.0.0",
+  "description": "应收账龄催收服务后端系统",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "node tests/run.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.10.3",
+    "express": "^4.19.2",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
