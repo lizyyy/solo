@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>连锁门店临期调拨台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>🏪 连锁门店临期调拨台</h1>
+            <div class="header-actions">
+                <span class="status-indicator" id="connectionStatus"></span>
+                <button class="btn btn-secondary" onclick="resetData()">🔄 重置数据</button>
+                <button class="btn btn-secondary" onclick="refreshData()">🔃 刷新</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="inventory">📦 库存总览</button>
+        <button class="tab-btn" data-tab="batches">🧾 批次管理</button>
+        <button class="tab-btn" data-tab="transfers">🚛 调拨管理</button>
+        <button class="tab-btn" data-tab="operations">📋 操作历史</button>
+        <button class="tab-btn" data-tab="report">📊 调拨报表</button>
+        <button class="tab-btn" data-tab="demo">🎮 演示样例</button>
+    </nav>
+
+    <main class="main-content">
+        <div id="toast" class="toast"></div>
+
+        <section id="inventory" class="tab-content active">
+            <div class="card">
+                <h2>📊 库存差异概览</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+            </div>
+            <div class="card">
+                <h3>🚨 临期预警商品</h3>
+                <div id="urgentInventory"></div>
+            </div>
+            <div class="card">
+                <h3>📦 各门店库存明细</h3>
+                <div class="table-container">
+                    <table class="data-table" id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>门店</th>
+                                <th>商品</th>
+                                <th>分类</th>
+                                <th>总库存</th>
+                                <th>临期数量</th>
+                                <th>状态</th>
+                                <th>批次详情</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="batches" class="tab-content">
+            <div class="card">
+                <h2>🧾 批次管理</h2>
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="showAddBatchModal()">➕ 新增批次</button>
+                    <button class="btn btn-secondary" onclick="showImportModal()">📥 批量导入</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="batchesTable">
+                        <thead>
+                            <tr>
+                                <th>批次号</th>
+                                <th>门店</th>
+                                <th>商品</th>
+                                <th>当前库存</th>
+                                <th>生产日期</th>
+                                <th>有效期</th>
+                                <th>进价</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="transfers" class="tab-content">
+            <div class="card">
+                <h2>🚛 调拨管理</h2>
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="showCreateTransferModal()">📝 发起调拨</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="transfersTable">
+                        <thead>
+                            <tr>
+                                <th>调拨单号</th>
+                                <th>调出门店</th>
+                                <th>调入门店</th>
+                                <th>商品数量</th>
+                                <th>状态</th>
+                                <th>发起人</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="operations" class="tab-content">
+            <div class="card">
+                <h2>📋 操作历史记录</h2>
+                <div class="table-container">
+                    <table class="data-table" id="operationsTable">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>操作类型</th>
+                                <th>描述</th>
+                                <th>详情</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="report" class="tab-content">
+            <div class="card">
+                <h2>📊 调拨统计报表</h2>
+                <div id="reportContent"></div>
+            </div>
+        </section>
+
+        <section id="demo" class="tab-content">
+            <div class="card">
+                <h2>🎮 演示样例</h2>
+                <div class="demo-section">
+                    <h3>✅ 正常样例</h3>
+                    <button class="btn btn-success" onclick="runNormalDemo1()">样例1: A店调拨临期饭团到B店</button>
+                    <button class="btn btn-success" onclick="runNormalDemo2()">样例2: A店折扣售卖临期牛奶</button>
+                    <button class="btn btn-success" onclick="runNormalDemo3()">样例3: 批量导入多个批次</button>
+                </div>
+                <div class="demo-section">
+                    <h3>❌ 会被拦截的脏数据</h3>
+                    <button class="btn btn-danger" onclick="runBadDemo1()">拦截1: 调拨已过期商品</button>
+                    <button class="btn btn-danger" onclick="runBadDemo2()">拦截2: 调拨库存不足</button>
+                    <button class="btn btn-danger" onclick="runBadDemo3()">拦截3: 同一批次重复调拨</button>
+                    <button class="btn btn-danger" onclick="runBadDemo4()">拦截4: 调入调出门店相同</button>
+                    <button class="btn btn-danger" onclick="runBadDemo5()">拦截5: 导入无效商品数据</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
