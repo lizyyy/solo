@@ -1,0 +1,17 @@
+{
+  "name": "rv-campground-pillar-sharing",
+  "version": "1.0.0",
+  "description": "房车营地水电桩分时费用分摊API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "test:rules": "node test/rule-validator.js",
+    "demo": "node test/demo-scenarios.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.0.0",
+    "uuid": "^9.0.1"
+  }
+}
