@@ -1,0 +1,16 @@
+{
+  "name": "stage-lighting-presets-api",
+  "version": "1.0.0",
+  "description": "舞台灯光预设回滚 API - 用于剧场彩排灯光预设版本管理、场景锁定和变更审批",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/run-tests.js",
+    "test-normal": "node tests/normal-flow.js",
+    "test-abnormal": "node tests/abnormal-cases.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
