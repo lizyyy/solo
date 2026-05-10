@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>职业考试报名材料管理台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                  color: white; padding: 24px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15); }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { margin-top: 8px; opacity: 0.9; font-size: 14px; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: white; padding: 8px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .tab { padding: 12px 24px; border-radius: 8px; cursor: pointer; transition: all 0.3s; 
+               font-weight: 500; color: #666; }
+        .tab:hover { background: #f0f2f5; }
+        .tab.active { background: #667eea; color: white; }
+
+        .panel { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: none; }
+        .panel.active { display: block; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #667eea; }
+        .stat-card h4 { font-size: 14px; color: #666; margin-bottom: 8px; }
+        .stat-card .number { font-size: 28px; font-weight: 700; color: #667eea; }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; 
+               font-weight: 500; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #6b7280; color: white; }
+        .btn-secondary:hover { background: #4b5563; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; font-size: 13px; }
+        tr:hover { background: #f9fafb; }
+
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-gray { background: #f3f4f6; color: #374151; }
+
+        .step-indicator { display: flex; align-items: center; gap: 8px; }
+        .step-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .step-dot.pending { background: #f59e0b; }
+        .step-dot.blocked { background: #ef4444; }
+        .step-dot.done { background: #10b981; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; 
+            border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                 background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+
+        .import-result { margin-top: 20px; padding: 16px; border-radius: 8px; display: none; }
+        .import-result.success { background: #d1fae5; color: #065f46; display: block; }
+        .import-result.partial { background: #fef3c7; color: #92400e; display: block; }
+        .import-result.failed { background: #fee2e2; color: #991b1b; display: block; }
+
+        .checklist { margin: 16px 0; }
+        .checklist-item { display: flex; align-items: center; padding: 12px; background: #f9fafb; margin-bottom: 8px; border-radius: 8px; }
+        .checklist-item .status-icon { width: 24px; height: 24px; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .checklist-item.passed .status-icon { color: #10b981; }
+        .checklist-item.failed .status-icon { color: #ef4444; }
+
+        .action-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .file-input { display: inline-block; padding: 10px 20px; background: #f3f4f6; border: 1px dashed #d1d5db; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+        .file-input:hover { background: #e5e7eb; border-color: #9ca3af; }
+
+        .detail-section { margin-bottom: 24px; }
+        .detail-section h4 { margin-bottom: 12px; color: #374151; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .detail-item { display: flex; }
+        .detail-label { color: #6b7280; width: 100px; font-size: 14px; }
+        .detail-value { color: #1f2937; font-weight: 500; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #9ca3af; }
+        .empty-state h4 { margin-bottom: 8px; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>职业考试报名材料管理台</h1>
+            <p>考生信息录入 · 资格校验 · 材料审核 · 缴费确认 · 导出核对</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="list">报名列表</div>
+            <div class="tab" data-tab="qualification">资格检查</div>
+            <div class="tab" data-tab="supplement">补交材料</div>
+            <div class="tab" data-tab="review">审核状态</div>
+            <div class="tab" data-tab="payment">缴费确认</div>
+            <div class="tab" data-tab="import">批量导入</div>
+            <div class="tab" data-tab="export">导出</div>
+        </div>
+
+        <!-- 报名列表 -->
+        <div class="panel active" id="panel-list">
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="openAddModal()">录入考生信息</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>身份证号</th>
+                        <th>考试类型</th>
+                        <th>学历</th>
+                        <th>工作年限</th>
+                        <th>照片</th>
+                        <th>缴费状态</th>
+                        <th>当前步骤</th>
+                        <th>审核状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="candidateTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 资格检查 -->
+        <div class="panel" id="panel-qualification">
+            <h3 style="margin-bottom: 16px;">资格检查</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">对考生进行学历和工作年限校验，不符合条件的无法通过审核</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>考试类型</th>
+                        <th>要求学历</th>
+                        <th>考生学历</th>
+                        <th>要求年限</th>
+                        <th>考生年限</th>
+                        <th>资格状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="qualificationTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 补交材料 -->
+        <div class="panel" id="panel-supplement">
+            <h3 style="margin-bottom: 16px;">补交材料</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">照片缺失的考生可以在此补交</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>考试类型</th>
+                        <th>照片状态</th>
+                        <th>当前步骤</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="supplementTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 审核状态 -->
+        <div class="panel" id="panel-review">
+            <h3 style="margin-bottom: 16px;">审核状态</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">对考生进行最终审核。注意：未满足所有条件的考生无法通过审核</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>待审核</h4>
+                    <div class="number" id="stat-pending">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>已通过</h4>
+                    <div class="number" id="stat-approved">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>不通过</h4>
+                    <div class="number" id="stat-rejected">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>资格失败</h4>
+                    <div class="number" id="stat-qual-failed">0</div>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>考试类型</th>
+                        <th>照片</th>
+                        <th>资格</th>
+                        <th>缴费</th>
+                        <th>当前状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="reviewTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 缴费确认 -->
+        <div class="panel" id="panel-payment">
+            <h3 style="margin-bottom: 16px;">缴费确认</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">确认考生缴费状态</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>考试类型</th>
+                        <th>缴费状态</th>
+                        <th>当前步骤</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 批量导入 -->
+        <div class="panel" id="panel-import">
+            <h3 style="margin-bottom: 16px;">批量导入</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">上传CSV文件批量录入考生信息。支持导入失败、部分成功、全部成功分开显示</p>
+            
+            <div class="form-group">
+                <label>CSV格式要求：</label>
+                <textarea rows="3" style="background: #f9fafb; font-family: monospace; font-size: 12px;" readonly>姓名,身份证号,电话,学历,工作年限,考试类型,照片,缴费状态
+张三,110101199001011234,13800138000,本科,5,一级建造师,是,已缴费
+李四,110101199202022345,13800138001,专科,3,注册会计师,否,未缴费</textarea>
+            </div>
+            
+            <div class="action-bar">
+                <label class="file-input">
+                    <input type="file" id="importFile" accept=".csv" style="display: none;" onchange="handleImport()">
+                    选择CSV文件
+                </label>
+            </div>
+            
+            <div class="import-result" id="importResult">
+                <h4 id="importResultTitle"></h4>
+                <p id="importResultSummary"></p>
+                <div id="importResultDetails"></div>
+            </div>
+        </div>
+
+        <!-- 导出 -->
+        <div class="panel" id="panel-export">
+            <h3 style="margin-bottom: 16px;">导出</h3>
+            <p style="margin-bottom: 16px; color: #6b7280;">导出所有考生信息，用于报名前最终核对</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>总考生数</h4>
+                    <div class="number" id="stat-total">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>缺少照片</h4>
+                    <div class="number" id="stat-photo">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>未缴费</h4>
+                    <div class="number" id="stat-unpaid">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>资格不通过</h4>
+                    <div class="number" id="stat-qual">0</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="exportCSV()">导出为CSV</button>
+            <p style="margin-top: 16px; color: #6b7280; font-size: 13px;">导出内容包含：姓名、身份证号、电话、考试类型、学历、工作年限、照片状态、缴费状态、当前步骤、审核状态、审核意见</p>
+        </div>
+    </div>
+
+    <!-- 添加考生模态框 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>录入考生信息</h3>
+                <button class="modal-close" onclick="closeModal('addModal')">&times;</button>
+            </div>
+            <form onsubmit="handleAddCandidate(event)">
+                <div class="detail-grid">
+                    <div class="form-group">
+                        <label>姓名</label>
+                        <input type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>身份证号</label>
+                        <input type="text" name="idCard" required>
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label>考试类型</label>
+                        <select name="examTypeId" id="examTypeSelect" required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>学历</label>
+                        <select name="education" required>
+                            <option value="高中">高中</option>
+                            <option value="中专">中专</option>
+                            <option value="专科">专科</option>
+                            <option value="本科" selected>本科</option>
+                            <option value="硕士">硕士</option>
+                            <option value="博士">博士</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>工作年限</label>
+                        <input type="number" name="workYears" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>照片上传</label>
+                        <select name="photoUploaded">
+                            <option value="true">已上传</option>
+                            <option value="false">未上传</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>缴费状态</label>
+                        <select name="paymentStatus">
+                            <option value="unpaid">未缴费</option>
+                            <option value="paid">已缴费</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>考生详情</h3>
+                <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- 审核模态框 -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>材料审核</h3>
+                <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
+            </div>
+            <div id="reviewContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let candidates = [];
+        let examTypes = [];
+
+        async function loadData() {
+            const [candidatesRes, examTypesRes, statsRes] = await Promise.all([
+                fetch('/api/candidates'),
+                fetch('/api/exam-types'),
+                fetch('/api/stats')
+            ]);
+            
+            candidates = await candidatesRes.json();
+            examTypes = await examTypesRes.json();
+            const stats = await statsRes.json();
+            
+            populateExamTypeSelect();
+            renderCandidateTable();
+            renderQualificationTable();
+            renderSupplementTable();
+            renderReviewTable();
+            renderPaymentTable();
+            renderStats(stats);
+        }
+
+        function populateExamTypeSelect() {
+            const select = document.getElementById('examTypeSelect');
+            select.innerHTML = examTypes.map(t => 
+                `<option value="${t.id}">${t.name}</option>`
+            ).join('');
+        }
+
+        function renderCandidateTable() {
+            const tbody = document.getElementById('candidateTableBody');
+            if (candidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h4>暂无考生数据</h4><p>请录入考生信息或导入CSV文件</p></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = candidates.map(c => `
+                <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.id_card}</td>
+                    <td>${c.exam_type_name}</td>
+                    <td>${c.education}</td>
+                    <td>${c.work_years}年</td>
+                    <td>${getPhotoBadge(c.photo_uploaded)}</td>
+                    <td>${getPaymentBadge(c.payment_status)}</td>
+                    <td>${getStepBadge(c.current_step)}</td>
+                    <td>${getStatusBadge(c.status)}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="viewCandidate('${c.id}')">详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderQualificationTable() {
+            const tbody = document.getElementById('qualificationTableBody');
+            const qualifying = candidates.filter(c => c.status !== 'approved');
+            
+            if (qualifying.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h4>无待检查考生</h4></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = qualifying.map(c => {
+                const examType = examTypes.find(t => t.id === c.exam_type_id);
+                const qualCheck = checkQualification(c.education, c.work_years, c.exam_type_id);
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.exam_type_name}</td>
+                        <td>${examType ? examType.min_education : '-'}</td>
+                        <td>${c.education}</td>
+                        <td>${examType ? examType.min_work_years : '-'}年</td>
+                        <td>${c.work_years}年</td>
+                        <td>${qualCheck.passed ? '<span class="badge badge-success">通过</span>' : '<span class="badge badge-danger">不通过</span>'}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="runQualificationCheck('${c.id}')">校验</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderSupplementTable() {
+            const tbody = document.getElementById('supplementTableBody');
+            const needPhoto = candidates.filter(c => !c.photo_uploaded && c.status !== 'approved');
+            
+            if (needPhoto.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h4>所有考生照片已齐全</h4></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = needPhoto.map(c => `
+                <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.exam_type_name}</td>
+                    <td><span class="badge badge-danger">缺失</span></td>
+                    <td>${getStepBadge(c.current_step)}</td>
+                    <td>
+                        <button class="btn btn-warning" style="padding: 6px 12px; font-size: 12px;" onclick="supplementPhoto('${c.id}')">补交</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderReviewTable() {
+            const tbody = document.getElementById('reviewTableBody');
+            
+            if (candidates.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><h4>无审核数据</h4></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = candidates.map(c => {
+                const checks = getEligibilityChecks(c);
+                return `
+                    <tr>
+                        <td><strong>${c.name}</strong></td>
+                        <td>${c.exam_type_name}</td>
+                        <td>${c.photo_uploaded ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}</td>
+                        <td>${checks.qualification.passed ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}</td>
+                        <td>${c.payment_status === 'paid' ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}</td>
+                        <td>${getStatusBadge(c.status)}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="openReviewModal('${c.id}')">审核</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPaymentTable() {
+            const tbody = document.getElementById('paymentTableBody');
+            const unpaid = candidates.filter(c => c.payment_status !== 'paid' && c.status !== 'approved');
+            
+            if (unpaid.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h4>所有考生已缴费</h4></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = unpaid.map(c => `
+                <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.exam_type_name}</td>
+                    <td>${getPaymentBadge(c.payment_status)}</td>
+                    <td>${getStepBadge(c.current_step)}</td>
+                    <td>
+                        <button class="btn btn-success" style="padding: 6px 12px; font-size: 12px;" onclick="confirmPayment('${c.id}')">确认缴费</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderStats(stats) {
+            const byStep = stats.byStep || {};
+            const byStatus = {};
+            candidates.forEach(c => {
+                byStatus[c.status] = (byStatus[c.status] || 0) + 1;
+            });
+
+            document.getElementById('stat-total').textContent = candidates.length;
+            document.getElementById('stat-pending').textContent = byStatus['pending'] || 0;
+            document.getElementById('stat-approved').textContent = byStatus['approved'] || 0;
+            document.getElementById('stat-rejected').textContent = byStatus['rejected'] || 0;
+            document.getElementById('stat-qual-failed').textContent = byStatus['qualification_failed'] || 0;
+            document.getElementById('stat-photo').textContent = byStep['photo_required'] || 0;
+            document.getElementById('stat-unpaid').textContent = byStep['payment_required'] || 0;
+            document.getElementById('stat-qual').textContent = byStep['qualification_failed'] || 0;
+        }
+
+        const educationOrder = ['高中', '中专', '专科', '本科', '硕士', '博士'];
+        
+        function getEducationLevel(education) {
+            const level = educationOrder.indexOf(education);
+            return level === -1 ? -1 : level;
+        }
+
+        function checkQualification(education, workYears, examTypeId) {
+            const examType = examTypes.find(t => t.id === examTypeId);
+            if (!examType) return { passed: false, error: '未知考试类型' };
+
+            const requiredLevel = getEducationLevel(examType.min_education);
+            const candidateLevel = getEducationLevel(education);
+            
+            const educationPassed = candidateLevel >= requiredLevel;
+            const yearsPassed = workYears >= examType.min_work_years;
+
+            if (!educationPassed && !yearsPassed) {
+                return { passed: false, error: '学历不符合要求且工作年限不足' };
+            }
+            if (!educationPassed) {
+                return { passed: false, error: `学历不符合要求（需要${examType.min_education}及以上）` };
+            }
+            if (!yearsPassed) {
+                return { passed: false, error: `工作年限不足（需要${examType.min_work_years}年及以上）` };
+            }
+
+            return { passed: true, error: null };
+        }
+
+        function getEligibilityChecks(candidate) {
+            const examType = examTypes.find(t => t.id === candidate.exam_type_id);
+            const qualCheck = checkQualification(candidate.education, candidate.work_years, candidate.exam_type_id);
+            
+            return {
+                photo: { passed: candidate.photo_uploaded === 1, label: '照片上传', required: '是', actual: candidate.photo_uploaded ? '是' : '否' },
+                qualification: { 
+                    passed: qualCheck.passed, 
+                    label: '资格条件', 
+                    error: qualCheck.error,
+                    details: examType ? `学历:${examType.min_education}+, 年限:${examType.min_work_years}年+` : '-'
+                },
+                payment: { passed: candidate.payment_status === 'paid', label: '报名费', required: '已缴费', actual: getPaymentText(candidate.payment_status) }
+            };
+        }
+
+        function getPhotoBadge(uploaded) {
+            return uploaded ? '<span class="badge badge-success">已上传</span>' : '<span class="badge badge-danger">缺失</span>';
+        }
+
+        function getPaymentBadge(status) {
+            const map = {
+                'unpaid': '<span class="badge badge-danger">未缴费</span>',
+                'paid': '<span class="badge badge-success">已缴费</span>',
+                'failed': '<span class="badge badge-danger">缴费失败</span>'
+            };
+            return map[status] || status;
+        }
+
+        function getPaymentText(status) {
+            const map = { 'unpaid': '未缴费', 'paid': '已缴费', 'failed': '缴费失败' };
+            return map[status] || status;
+        }
+
+        function getStepBadge(step) {
+            const map = {
+                'initial': '<span class="badge badge-gray">初始录入</span>',
+                'photo_required': '<span class="badge badge-warning">缺少照片</span>',
+                'qualification_failed': '<span class="badge badge-danger">资格不通过</span>',
+                'payment_required': '<span class="badge badge-warning">未缴费</span>',
+                'ready_for_review': '<span class="badge badge-info">待审核</span>',
+                'approved': '<span class="badge badge-success">审核通过</span>',
+                'rejected': '<span class="badge badge-danger">审核不通过</span>'
+            };
+            return map[step] || step;
+        }
+
+        function getStatusBadge(status) {
+            const map = {
+                'pending': '<span class="badge badge-info">待处理</span>',
+                'qualification_failed': '<span class="badge badge-danger">资格失败</span>',
+                'approved': '<span class="badge badge-success">通过</span>',
+                'rejected': '<span class="badge badge-danger">不通过</span>'
+            };
+            return map[status] || status;
+        }
+
+        async function handleAddCandidate(event) {
+            event.preventDefault();
+            const form = event.target;
+            const data = {
+                name: form.name.value,
+                idCard: form.idCard.value,
+                phone: form.phone.value,
+                education: form.education.value,
+                workYears: parseInt(form.workYears.value),
+                examTypeId: form.examTypeId.value,
+                photoUploaded: form.photoUploaded.value === 'true',
+                paymentStatus: form.paymentStatus.value
+            };
+
+            const res = await fetch('/api/candidates', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert('录入成功！当前步骤：' + (await res.json()).stepDescription);
+                closeModal('addModal');
+                loadData();
+            } else {
+                alert('录入失败：' + (await res.json()).error);
+            }
+        }
+
+        async function runQualificationCheck(id) {
+            const res = await fetch(`/api/candidates/${id}/qualification-check`, { method: 'POST' });
+            const result = await res.json();
+            
+            if (result.passed) {
+                alert('资格校验通过！已进入待审核状态');
+            } else {
+                alert('资格校验不通过：' + result.error);
+            }
+            loadData();
+        }
+
+        async function supplementPhoto(id) {
+            if (!confirm('确认已收到该考生的照片？')) return;
+            const res = await fetch(`/api/candidates/${id}/supplement-photo`, { method: 'POST' });
+            const result = await res.json();
+            alert(result.message + '\n当前步骤：' + result.stepDescription);
+            loadData();
+        }
+
+        async function confirmPayment(id) {
+            if (!confirm('确认该考生已缴费？')) return;
+            const res = await fetch(`/api/candidates/${id}/payment-confirm`, { method: 'POST' });
+            const result = await res.json();
+            alert(result.message + '\n当前步骤：' + result.stepDescription);
+            loadData();
+        }
+
+        async function viewCandidate(id) {
+            const res = await fetch(`/api/candidates/${id}`);
+            const candidate = await res.json();
+            const examType = examTypes.find(t => t.id === candidate.exam_type_id);
+            const checks = getEligibilityChecks(candidate);
+
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-section">
+                    <h4>基本信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">姓名</span><span class="detail-value">${candidate.name}</span></div>
+                        <div class="detail-item"><span class="detail-label">身份证号</span><span class="detail-value">${candidate.id_card}</span></div>
+                        <div class="detail-item"><span class="detail-label">电话</span><span class="detail-value">${candidate.phone || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">考试类型</span><span class="detail-value">${candidate.exam_type_name}</span></div>
+                        <div class="detail-item"><span class="detail-label">学历</span><span class="detail-value">${candidate.education}</span></div>
+                        <div class="detail-item"><span class="detail-label">工作年限</span><span class="detail-value">${candidate.work_years}年</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h4>资格条件</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">最低学历</span><span class="detail-value">${examType ? examType.min_education : '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">最低年限</span><span class="detail-value">${examType ? examType.min_work_years : '-'}年</span></div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h4>审核进度</h4>
+                    <div class="checklist">
+                        <div class="checklist-item ${checks.photo.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.photo.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>照片上传</strong>
+                                <span style="color: #6b7280; margin-left: 8px;">${checks.photo.actual}</span>
+                            </div>
+                        </div>
+                        <div class="checklist-item ${checks.qualification.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.qualification.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>资格条件</strong>
+                                <span style="color: #6b7280; margin-left: 8px;">${checks.qualification.details}</span>
+                                ${checks.qualification.error ? `<span style="color: #ef4444; margin-left: 8px;">(${checks.qualification.error})</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="checklist-item ${checks.payment.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.payment.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>报名费</strong>
+                                <span style="color: #6b7280; margin-left: 8px;">${checks.payment.actual}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h4>当前状态</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">当前步骤</span><span class="detail-value">${candidate.step_description}</span></div>
+                        <div class="detail-item"><span class="detail-label">审核状态</span><span class="detail-value">${candidate.status_text}</span></div>
+                        <div class="detail-item"><span class="detail-label">审核意见</span><span class="detail-value">${candidate.qualification_review_comment || '-'}</span></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        async function openReviewModal(id) {
+            const res = await fetch(`/api/candidates/${id}`);
+            const candidate = await res.json();
+            const checks = getEligibilityChecks(candidate);
+            const allPassed = checks.photo.passed && checks.qualification.passed && checks.payment.passed;
+
+            document.getElementById('reviewContent').innerHTML = `
+                <div class="detail-section">
+                    <h4>考生：${candidate.name} (${candidate.exam_type_name})</h4>
+                </div>
+                <div class="detail-section">
+                    <h4>审核条件检查</h4>
+                    <div class="checklist">
+                        <div class="checklist-item ${checks.photo.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.photo.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>照片上传</strong> - ${checks.photo.actual}
+                            </div>
+                        </div>
+                        <div class="checklist-item ${checks.qualification.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.qualification.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>资格条件</strong>
+                                ${checks.qualification.error ? ` - <span style="color: #ef4444;">${checks.qualification.error}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="checklist-item ${checks.payment.passed ? 'passed' : 'failed'}">
+                            <span class="status-icon">${checks.payment.passed ? '✓' : '✗'}</span>
+                            <div>
+                                <strong>报名费</strong> - ${checks.payment.actual}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h4>审核操作</h4>
+                    <div class="form-group">
+                        <label>审核意见</label>
+                        <textarea id="reviewComment" rows="3" placeholder="请输入审核意见（可选）"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-success" ${!allPassed ? 'disabled title="未满足所有条件，无法通过"' : ''} onclick="submitReview('${id}', 'approve')">通过审核</button>
+                        <button class="btn btn-danger" onclick="submitReview('${id}', 'reject')">不通过</button>
+                    </div>
+                    ${!allPassed ? '<p style="color: #ef4444; margin-top: 12px; font-size: 13px;">⚠ 未满足所有审核条件，无法通过审核</p>' : ''}
+                </div>
+            `;
+            document.getElementById('reviewModal').classList.add('active');
+        }
+
+        async function submitReview(id, decision) {
+            const comment = document.getElementById('reviewComment').value;
+            
+            const res = await fetch(`/api/candidates/${id}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ decision, comment })
+            });
+
+            const result = await res.json();
+            
+            if (!res.ok) {
+                alert('审核拦截：' + result.blockedReason);
+                return;
+            }
+
+            alert(result.message);
+            closeModal('reviewModal');
+            loadData();
+        }
+
+        function handleImport() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/api/import', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(result => {
+                    showImportResult(result);
+                    loadData();
+                })
+                .catch(err => alert('导入失败：' + err.message));
+        }
+
+        function showImportResult(result) {
+            const div = document.getElementById('importResult');
+            const title = document.getElementById('importResultTitle');
+            const summary = document.getElementById('importResultSummary');
+            const details = document.getElementById('importResultDetails');
+
+            div.className = 'import-result';
+            if (result.overallStatus === '全部成功') {
+                div.classList.add('success');
+                title.textContent = '✓ ' + result.overallStatus;
+            } else if (result.overallStatus === '部分成功') {
+                div.classList.add('partial');
+                title.textContent = '⚠ ' + result.overallStatus;
+            } else {
+                div.classList.add('failed');
+                title.textContent = '✗ ' + result.overallStatus;
+            }
+
+            summary.textContent = `共 ${result.total} 条，成功 ${result.success} 条，失败 ${result.failed} 条`;
+
+            let html = '';
+            if (result.successList && result.successList.length > 0) {
+                html += '<h5 style="margin-top: 12px;">成功录入：</h5><ul>';
+                result.successList.forEach(item => {
+                    html += `<li>${item.name} - 当前步骤：${item.stepDescription}</li>`;
+                });
+                html += '</ul>';
+            }
+            if (result.failedList && result.failedList.length > 0) {
+                html += '<h5 style="margin-top: 12px;">失败记录：</h5><ul>';
+                result.failedList.forEach(item => {
+                    html += `<li>第${item.row}行 - ${item.data['姓名'] || '未知'}: ${item.error}</li>`;
+                });
+                html += '</ul>';
+            }
+
+            details.innerHTML = html;
+        }
+
+        function exportCSV() {
+            window.location.href = '/api/export';
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        loadData();
+    </script>
+</body>
+</html>
