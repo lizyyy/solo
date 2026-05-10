@@ -1,0 +1,21 @@
+{
+  "name": "meal-settlement-api",
+  "version": "1.0.0",
+  "description": "团餐结算差异处理 API 工具链",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "cli": "node src/cli.js",
+    "init-db": "node src/scripts/init-db.js",
+    "seed": "node src/scripts/seed.js",
+    "task:settle": "node src/scripts/run-settlement-task.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "cors": "^2.8.5",
+    "date-fns": "^2.30.0",
+    "uuid": "^9.0.1"
+  }
+}
