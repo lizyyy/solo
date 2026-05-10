@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冷饮机投放点补冰预测器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); color: white; padding: 24px 32px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(30, 58, 95, 0.3); }
+        .header h1 { font-size: 28px; font-weight: 600; }
+        .header p { opacity: 0.9; margin-top: 8px; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; background: white; padding: 8px; border-radius: 10px; }
+        .tab { padding: 10px 20px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-size: 14px; font-weight: 500; color: #666; transition: all 0.2s; }
+        .tab:hover { background: #f0f2f5; }
+        .tab.active { background: #1e3a5f; color: white; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card h3 { margin-bottom: 16px; color: #1e3a5f; font-size: 18px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+        .stat-box.blue { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); }
+        .stat-box.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .stat-box.orange { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-value { font-size: 32px; font-weight: 700; }
+        .stat-label { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        
+        .upload-area { border: 2px dashed #ccc; border-radius: 10px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover, .upload-area.drag-over { border-color: #1e3a5f; background: #f8fafc; }
+        .upload-area input { display: none; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #1e3a5f; color: white; }
+        .btn-primary:hover { background: #2d5a87; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-success { background: #11998e; color: white; }
+        .btn-success:hover { background: #0f8577; }
+        .btn-danger { background: #f5576c; color: white; }
+        .btn-warning { background: #f093fb; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8fafc; font-weight: 600; color: #1e3a5f; }
+        tr:hover { background: #f8fafc; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-critical { background: #fee2e2; color: #dc2626; }
+        .badge-high { background: #ffedd5; color: #ea580c; }
+        .badge-medium { background: #fef3c7; color: #d97706; }
+        .badge-low { background: #d1fae5; color: #059669; }
+        .badge-pending { background: #e5e7eb; color: #4b5563; }
+        .badge-approved { background: #dbeafe; color: #2563eb; }
+        .badge-rejected { background: #fee2e2; color: #dc2626; }
+        
+        .reason-text { max-width: 300px; font-size: 12px; color: #666; line-height: 1.5; }
+        
+        .route-list { list-style: none; }
+        .route-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; }
+        .route-order { width: 32px; height: 32px; background: #1e3a5f; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; padding: 24px; max-width: 500px; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h4 { font-size: 18px; color: #1e3a5f; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 500; color: #333; }
+        .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        
+        .filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filters select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; }
+        
+        .summary-box { background: #f0f9ff; padding: 16px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #1e3a5f; }
+        .summary-box h4 { color: #1e3a5f; margin-bottom: 8px; }
+        .summary-box ul { padding-left: 20px; color: #444; font-size: 14px; }
+        .summary-box li { margin-bottom: 4px; }
+        
+        .loading { text-align: center; padding: 40px; color: #666; }
+        .empty { text-align: center; padding: 40px; color: #999; }
+        
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+        .alert-warning { background: #ffedd5; color: #c2410c; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #b91c1c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❄️ 冷饮机投放点补冰预测器</h1>
+            <p>户外活动冷饮机投放点高温时段缺冰预测与补给路线智能建议</p>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-box blue">
+                <div class="stat-value" id="statImports">0</div>
+                <div class="stat-label">数据导入批次</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statLocations">0</div>
+                <div class="stat-label">投放点数量</div>
+            </div>
+            <div class="stat-box green">
+                <div class="stat-value" id="statPredictions">0</div>
+                <div class="stat-label">预测记录</div>
+            </div>
+            <div class="stat-box orange">
+                <div class="stat-value" id="statPending">0</div>
+                <div class="stat-label">待复核</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="import">数据导入</button>
+            <button class="tab" data-tab="predictions">预测结果</button>
+            <button class="tab" data-tab="route">补给路线</button>
+            <button class="tab" data-tab="locations">投放点管理</button>
+        </div>
+        
+        <div id="tab-import" class="tab-content active">
+            <div class="card">
+                <h3>📥 导入销量数据</h3>
+                <div class="alert alert-info">
+                    支持 CSV / Excel 文件。文件哈希去重：同一文件多次上传不会重复导入。
+                </div>
+                <div class="upload-area" id="uploadArea">
+                    <p>点击选择或拖拽文件到此处</p>
+                    <p style="font-size:12px;color:#999;margin-top:8px;">支持 columns: date/location/sales/temperature/humidity/hour/event</p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx">
+                </div>
+                <div id="uploadResult" style="margin-top:16px;"></div>
+            </div>
+            
+            <div class="card">
+                <h3>📋 导入记录</h3>
+                <div class="table-wrapper">
+                    <table id="importsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>文件名</th>
+                                <th>行数</th>
+                                <th>已处理</th>
+                                <th>状态</th>
+                                <th>导入时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>🧪 使用样例数据</h3>
+                <p style="color:#666;margin-bottom:12px;">快速体验：加载内置样例数据（5个户外活动投放点，含高温时段销量与天气特征）</p>
+                <button class="btn btn-primary" id="loadSampleBtn">加载样例数据</button>
+            </div>
+        </div>
+        
+        <div id="tab-predictions" class="tab-content">
+            <div class="card">
+                <h3>🔮 缺冰预测结果</h3>
+                <div class="filters">
+                    <select id="filterImport">
+                        <option value="">全部批次</option>
+                    </select>
+                    <select id="filterPriority">
+                        <option value="">全部优先级</option>
+                        <option value="critical">紧急</option>
+                        <option value="high">高</option>
+                        <option value="medium">中</option>
+                        <option value="low">低</option>
+                    </select>
+                    <select id="filterReviewed">
+                        <option value="">全部状态</option>
+                        <option value="false">待复核</option>
+                        <option value="true">已复核</option>
+                    </select>
+                    <button class="btn btn-primary" id="refreshPredictions">刷新</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="predictionsTable">
+                        <thead>
+                            <tr>
+                                <th>投放点</th>
+                                <th>优先级</th>
+                                <th>紧急度</th>
+                                <th>建议补冰</th>
+                                <th>预计缺冰(h)</th>
+                                <th>预测原因</th>
+                                <th>复核状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📤 导出结果</h3>
+                <p style="color:#666;margin-bottom:12px;">导出为 Excel，包含所有预测详情与可解释原因。</p>
+                <div style="display:flex;gap:12px;align-items:center;">
+                    <select id="exportImportId" style="padding:8px;border:1px solid #ddd;border-radius:8px;">
+                        <option value="">选择导入批次</option>
+                    </select>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;">
+                        <input type="checkbox" id="exportReviewedOnly"> 仅已复核
+                    </label>
+                    <button class="btn btn-success" id="exportBtn">导出 Excel</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-route" class="tab-content">
+            <div class="card">
+                <h3>🗺️ 补给路线建议</h3>
+                <div style="margin-bottom:16px;display:flex;gap:12px;align-items:center;">
+                    <select id="routeImportId" style="padding:8px;border:1px solid #ddd;border-radius:8px;">
+                        <option value="">选择导入批次</option>
+                    </select>
+                    <button class="btn btn-primary" id="loadRouteBtn">生成路线</button>
+                </div>
+                <div id="routeSummary" class="summary-box" style="display:none;"></div>
+                <div id="routeContent"></div>
+            </div>
+        </div>
+        
+        <div id="tab-locations" class="tab-content">
+            <div class="card">
+                <h3>📍 投放点列表</h3>
+                <div class="table-wrapper">
+                    <table id="locationsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>区域</th>
+                                <th>冰槽容量</th>
+                                <th>是否户外</th>
+                                <th>优先级</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>人工复核</h4>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div id="reviewContent"></div>
+            <div class="form-group">
+                <label>复核状态</label>
+                <select id="reviewStatus">
+                    <option value="approved">通过</option>
+                    <option value="rejected">拒绝</option>
+                    <option value="adjusted">调整后通过</option>
+                    <option value="pending">待处理</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>复核备注</label>
+                <textarea id="reviewNote" placeholder="输入复核意见..."></textarea>
+            </div>
+            <div style="display:flex;gap:12px;justify-content:flex-end;">
+                <button class="btn" id="cancelReview">取消</button>
+                <button class="btn btn-primary" id="saveReview">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/app.js"></script>
+</body>
+</html>
