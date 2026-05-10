@@ -83,22 +83,24 @@ public class ErrorReplayService {
         Release restoredRelease = null;
         
         if (beforeStateRelease != null && !currentRelease.getStatus().equals(beforeStateRelease.getStatus())) {
-            log.warn("状态不一致！当前状态 {} 与日志记录的操作前状态 {} 不同", 
+            log.warn("状态不一致！当前状态 {} 与失败操作记录的操作前状态 {} 不同", 
                     currentRelease.getStatus(), beforeStateRelease.getStatus());
-            log.info("将先恢复到操作前状态，再重放操作");
+            log.info("将先恢复到失败操作前的精确状态，再重放操作");
             needsStateRestore = true;
             
-            if (currentRelease.getRollbackCheckpoint() != null) {
-                log.info("使用发布的检查点进行恢复");
-                Release checkpoint = releaseService.parseCheckpoint(currentRelease.getRollbackCheckpoint());
-                if (checkpoint != null) {
-                    restoredRelease = releaseService.restoreReleaseFromCheckpoint(releaseId, checkpoint);
-                    log.info("已恢复到检查点状态: {}", restoredRelease.getStatus());
+            log.info("优先使用失败日志记录的 beforeState 进行恢复（精确匹配失败操作前的状态）");
+            restoredRelease = releaseService.restoreReleaseFromCheckpoint(releaseId, beforeStateRelease);
+            log.info("已恢复到失败操作前状态: {}", restoredRelease.getStatus());
+            
+            if (restoredRelease == null || !restoredRelease.getStatus().equals(beforeStateRelease.getStatus())) {
+                log.warn("使用 beforeState 恢复失败，尝试使用检查点作为备选");
+                if (currentRelease.getRollbackCheckpoint() != null) {
+                    Release checkpoint = releaseService.parseCheckpoint(currentRelease.getRollbackCheckpoint());
+                    if (checkpoint != null) {
+                        restoredRelease = releaseService.restoreReleaseFromCheckpoint(releaseId, checkpoint);
+                        log.warn("已恢复到检查点状态（备选方案）: {}", restoredRelease.getStatus());
+                    }
                 }
-            } else {
-                log.info("使用日志中的 beforeState 进行恢复");
-                restoredRelease = releaseService.restoreReleaseFromCheckpoint(releaseId, beforeStateRelease);
-                log.info("已恢复到日志记录的状态: {}", restoredRelease.getStatus());
             }
         }
         
@@ -336,9 +338,10 @@ public class ErrorReplayService {
             if (!analysis.stateMatchesExpected) {
                 report.append("## ⚠️ 状态不一致警告\n\n");
                 report.append("当前状态与失败操作期望的操作前状态不一致！\n\n");
-                report.append("建议操作：\n");
-                report.append("1. 先调用 `POST /api/releases/{id}/replay/checkpoint` 恢复到检查点\n");
-                report.append("2. 然后再调用 `POST /api/releases/{id}/replay/{logId}` 重放操作\n");
+                report.append("**回放机制**：系统会自动优先使用失败日志记录的 `beforeState` 恢复到失败操作前的精确状态，然后再重放操作。\n\n");
+                report.append("如果需要手动控制，可以使用以下步骤：\n");
+                report.append("1. 调用 `POST /api/releases/{id}/replay/{logId}` - 系统自动处理状态恢复\n");
+                report.append("2. 或先调用 `POST /api/releases/{id}/replay/checkpoint` 恢复到检查点（备选方案）\n");
                 report.append("\n");
             }
         }

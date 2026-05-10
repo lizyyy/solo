@@ -60,23 +60,26 @@ public class ReleaseService {
     @CacheEvict(value = CACHE_NAME, allEntries = true)
     public Release createRelease(String serviceName, String currentVersion, 
                                   String targetVersion, int totalInstances, String metadata) {
+        String idempotentReleaseId = generateDeterministicId(
+            serviceName, currentVersion, targetVersion, totalInstances, metadata
+        );
+        
         Map<String, Object> requestContext = new HashMap<>();
         requestContext.put("serviceName", serviceName);
         requestContext.put("currentVersion", currentVersion);
         requestContext.put("targetVersion", targetVersion);
         requestContext.put("totalInstances", totalInstances);
         requestContext.put("metadata", metadata);
-        
-        String tempId = "create-" + UUID.randomUUID().toString();
+        requestContext.put("deterministicId", idempotentReleaseId);
         
         return idempotentService.executeIdempotent(
-            tempId,
+            idempotentReleaseId,
             OperationType.CREATE_RELEASE.name(),
             requestContext,
             () -> {
                 long startTime = System.currentTimeMillis();
                 Release release = Release.builder()
-                        .id(UUID.randomUUID().toString())
+                        .id(idempotentReleaseId)
                         .serviceName(serviceName)
                         .currentVersion(currentVersion)
                         .targetVersion(targetVersion)
@@ -163,7 +166,7 @@ public class ReleaseService {
         return idempotentService.executeIdempotent(
             releaseId,
             OperationType.ADVANCE_CANARY.name(),
-            Map.of("releaseId", releaseId, "timestamp", System.currentTimeMillis()),
+            Map.of("releaseId", releaseId),
             () -> {
                 return lockService.executeWithLock(
                     "release:" + releaseId,
@@ -288,7 +291,7 @@ public class ReleaseService {
         return idempotentService.executeIdempotent(
             releaseId,
             OperationType.EXECUTE_ROLLBACK.name(),
-            Map.of("releaseId", releaseId, "timestamp", System.currentTimeMillis()),
+            Map.of("releaseId", releaseId),
             () -> {
                 return lockService.executeWithLock(
                     "release:" + releaseId,
@@ -548,5 +551,36 @@ public class ReleaseService {
                 .failedAt(release.getFailedAt())
                 .version(release.getVersion())
                 .build();
+    }
+    
+    private String generateDeterministicId(String serviceName, String currentVersion,
+                                            String targetVersion, int totalInstances,
+                                            String metadata) {
+        try {
+            Map<String, Object> idSource = new HashMap<>();
+            idSource.put("serviceName", serviceName);
+            idSource.put("currentVersion", currentVersion);
+            idSource.put("targetVersion", targetVersion);
+            idSource.put("totalInstances", totalInstances);
+            idSource.put("metadata", metadata);
+            idSource.put("timestamp", LocalDateTime.now().toLocalDate().toString());
+            
+            String json = objectMapper.writeValueAsString(idSource);
+            
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            
+            return "rel-" + hexString.toString().substring(0, 32);
+        } catch (Exception e) {
+            log.warn("Failed to generate deterministic ID, falling back to UUID", e);
+            return "rel-" + UUID.randomUUID().toString();
+        }
     }
 }
