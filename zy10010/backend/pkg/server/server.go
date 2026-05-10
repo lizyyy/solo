@@ -24,6 +24,11 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
+type wsClient struct {
+	conn *websocket.Conn
+	send chan map[string]interface{}
+}
+
 type Server struct {
 	router            *gin.Engine
 	sm                *statemanager.StateManager
@@ -41,6 +46,9 @@ type Server struct {
 	playbackIdx    int
 	playbackSpeed  float64
 	playbackStopCh chan struct{}
+
+	clientsMu sync.Mutex
+	clients   map[*wsClient]bool
 }
 
 func NewServer() *Server {
@@ -60,6 +68,7 @@ func NewServer() *Server {
 		configScenario:    scenarios.NewConfigDriftScenario(sm, eb),
 		playbackSpeed:     1.0,
 		playbackStopCh:    make(chan struct{}),
+		clients:           make(map[*wsClient]bool),
 	}
 }
 
@@ -344,6 +353,37 @@ func (s *Server) startPlayback() {
 }
 
 func (s *Server) broadcastSnapshot(snapshot types.SystemState) {
+	message := map[string]interface{}{
+		"type":  "state",
+		"state": snapshot,
+	}
+
+	s.clientsMu.Lock()
+	defer s.clientsMu.Unlock()
+
+	for client := range s.clients {
+		select {
+		case client.send <- message:
+		default:
+			close(client.send)
+			delete(s.clients, client)
+		}
+	}
+}
+
+func (s *Server) addClient(client *wsClient) {
+	s.clientsMu.Lock()
+	defer s.clientsMu.Unlock()
+	s.clients[client] = true
+}
+
+func (s *Server) removeClient(client *wsClient) {
+	s.clientsMu.Lock()
+	defer s.clientsMu.Unlock()
+	if _, exists := s.clients[client]; exists {
+		close(client.send)
+		delete(s.clients, client)
+	}
 }
 
 func (s *Server) handleWebSocket(c *gin.Context) {
@@ -353,29 +393,50 @@ func (s *Server) handleWebSocket(c *gin.Context) {
 	}
 	defer conn.Close()
 
+	client := &wsClient{
+		conn: conn,
+		send: make(chan map[string]interface{}, 256),
+	}
+	s.addClient(client)
+	defer s.removeClient(client)
+
 	subID, eventCh := s.eb.Subscribe()
 	defer s.eb.Unsubscribe(subID)
 
 	snapshotTicker := time.NewTicker(1 * time.Second)
 	defer snapshotTicker.Stop()
 
+	go s.clientWritePump(client)
+
 	for {
 		select {
 		case event := <-eventCh:
-			if err := conn.WriteJSON(gin.H{
+			select {
+			case client.send <- map[string]interface{}{
 				"type":  "event",
 				"event": event,
-			}); err != nil {
+			}:
+			default:
 				return
 			}
 		case <-snapshotTicker.C:
 			state := s.sm.TakeSnapshot()
-			if err := conn.WriteJSON(gin.H{
+			select {
+			case client.send <- map[string]interface{}{
 				"type":  "state",
 				"state": state,
-			}); err != nil {
+			}:
+			default:
 				return
 			}
+		}
+	}
+}
+
+func (s *Server) clientWritePump(client *wsClient) {
+	for message := range client.send {
+		if err := client.conn.WriteJSON(message); err != nil {
+			return
 		}
 	}
 }

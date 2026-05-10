@@ -5,20 +5,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"system-chaos-visualizer/backend/pkg/eventbus"
 	"system-chaos-visualizer/backend/pkg/statemanager"
 	"system-chaos-visualizer/backend/pkg/types"
+
+	"github.com/google/uuid"
 )
 
 type ConnectionPoolScenario struct {
-	mu           sync.Mutex
-	sm           *statemanager.StateManager
-	eb           *eventbus.EventBus
-	maxPoolSize   int
-	connections  map[string]*simConnection
-	stopCh       chan struct{}
-	running      bool
+	mu          sync.Mutex
+	sm          *statemanager.StateManager
+	eb          *eventbus.EventBus
+	maxPoolSize int
+	connections map[string]*simConnection
+	stopCh      chan struct{}
+	running     bool
 }
 
 type simConnection struct {
@@ -49,16 +50,21 @@ func (s *ConnectionPoolScenario) Start(poolSize int, duration time.Duration) {
 	s.mu.Unlock()
 
 	go func() {
-		ticker := time.NewTicker(100 * time.Millisecond)
-		defer ticker.Stop()
+		activityTicker := time.NewTicker(100 * time.Millisecond)
+		defer activityTicker.Stop()
+
+		reconnectTicker := time.NewTicker(2 * time.Second)
+		defer reconnectTicker.Stop()
 
 		endTime := time.Now().Add(duration)
 		for time.Now().Before(endTime) {
 			select {
 			case <-s.stopCh:
 				return
-			case <-ticker.C:
+			case <-activityTicker.C:
 				s.simulateActivity()
+			case <-reconnectTicker.C:
+				s.simulateReconnect()
 			}
 		}
 	}()
@@ -89,8 +95,8 @@ func (s *ConnectionPoolScenario) simulateActivity() {
 				Source:   "connection_pool",
 				Message:  "Connection pool exhausted",
 				Data: map[string]interface{}{
-					"pool_size":     s.maxPoolSize,
-					"active_conns":  len(s.connections),
+					"pool_size":    s.maxPoolSize,
+					"active_conns": len(s.connections),
 				},
 			})
 		}
@@ -105,12 +111,62 @@ func (s *ConnectionPoolScenario) simulateActivity() {
 	})
 }
 
+func (s *ConnectionPoolScenario) simulateReconnect() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for id, conn := range s.connections {
+		if rand.Float64() < 0.5 {
+			connID := id
+			connection := conn
+			s.eb.Publish(types.Event{
+				Type:     types.EventTypeReconnectAttempt,
+				Severity: types.SeverityWarning,
+				Source:   "connection_pool",
+				Message:  "Attempting to reconnect",
+				Data: map[string]interface{}{
+					"connection_id": connID,
+				},
+			})
+
+			connection.LastUsed = time.Now()
+			s.sm.UpdateConnection(connID, types.ConnectionState{
+				Status:         "reconnecting",
+				ReconnectCount: connection.ReconnectCount,
+			})
+
+			go func(cid string) {
+				time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
+				s.mu.Lock()
+				defer s.mu.Unlock()
+				if c, exists := s.connections[cid]; exists {
+					c.LastUsed = time.Now()
+					s.sm.UpdateConnection(cid, types.ConnectionState{
+						Status:         "active",
+						LastActiveAt:   time.Now(),
+						ReconnectCount: c.ReconnectCount + 1,
+					})
+					s.eb.Publish(types.Event{
+						Type:     types.EventTypeReconnected,
+						Severity: types.SeverityInfo,
+						Source:   "connection_pool",
+						Message:  "Reconnected successfully",
+						Data: map[string]interface{}{
+							"connection_id": cid,
+						},
+					})
+				}
+			}(connID)
+		}
+	}
+}
+
 func (s *ConnectionPoolScenario) createConnection() {
 	id := uuid.New().String()
 	conn := &simConnection{
-		ID:         id,
-		Active:     true,
-		LastUsed:   time.Now(),
+		ID:           id,
+		Active:       true,
+		LastUsed:     time.Now(),
 		MessageCount: 0,
 	}
 	s.connections[id] = conn
@@ -136,53 +192,5 @@ func (s *ConnectionPoolScenario) releaseOldConnection() {
 	if oldestID != "" {
 		delete(s.connections, oldestID)
 		s.sm.RemoveConnection(oldestID)
-	}
-}
-
-func (s *ConnectionPoolScenario) SimulateReconnect() {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	for id, conn := range s.connections {
-		if rand.Float64() < 0.5 {
-			s.eb.Publish(types.Event{
-				Type:     types.EventTypeReconnectAttempt,
-				Severity: types.SeverityWarning,
-				Source:   "connection_pool",
-				Message:  "Attempting to reconnect",
-				Data: map[string]interface{}{
-					"connection_id": id,
-				},
-			})
-
-			conn.LastUsed = time.Now()
-			s.sm.UpdateConnection(id, types.ConnectionState{
-				Status:       "reconnecting",
-				ReconnectCount: conn.MessageCount,
-			})
-
-			go func(cid string) {
-				time.Sleep(time.Duration(rand.Intn(500)) * time.Millisecond)
-				s.mu.Lock()
-				defer s.mu.Unlock()
-				if c, exists := s.connections[cid]; exists {
-					c.LastUsed = time.Now()
-					s.sm.UpdateConnection(cid, types.ConnectionState{
-						Status:       "active",
-						LastActiveAt: time.Now(),
-						ReconnectCount: c.ReconnectCount + 1,
-					})
-					s.eb.Publish(types.Event{
-						Type:     types.EventTypeReconnected,
-						Severity: types.SeverityInfo,
-						Source:   "connection_pool",
-						Message:  "Reconnected successfully",
-						Data: map[string]interface{}{
-							"connection_id": cid,
-						},
-					})
-				}
-			}(id)
-		}
 	}
 }

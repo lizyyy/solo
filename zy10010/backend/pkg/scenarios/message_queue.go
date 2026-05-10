@@ -6,21 +6,22 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"system-chaos-visualizer/backend/pkg/eventbus"
 	"system-chaos-visualizer/backend/pkg/statemanager"
 	"system-chaos-visualizer/backend/pkg/types"
+
+	"github.com/google/uuid"
 )
 
 type MessageQueueScenario struct {
-	mu            sync.Mutex
-	sm            *statemanager.StateManager
-	eb            *eventbus.EventBus
-	messageQueue  chan types.MessageState
-	stopCh        chan struct{}
-	running       bool
-	lastSeq       int64
-	expectedSeq    int64
+	mu           sync.Mutex
+	sm           *statemanager.StateManager
+	eb           *eventbus.EventBus
+	messageQueue chan types.MessageState
+	stopCh       chan struct{}
+	running      bool
+	lastSeq      int64
+	expectedSeq  int64
 }
 
 func NewMessageQueueScenario(sm *statemanager.StateManager, eb *eventbus.EventBus) *MessageQueueScenario {
@@ -98,7 +99,7 @@ func (s *MessageQueueScenario) sendMessage(backlogSize int) {
 			Message:  "Message queue backlog",
 			Data: map[string]interface{}{
 				"queue_size": len(s.messageQueue),
-				"max_size": backlogSize,
+				"max_size":   backlogSize,
 			},
 		})
 	}
@@ -107,16 +108,18 @@ func (s *MessageQueueScenario) sendMessage(backlogSize int) {
 		m.MessageQueueSize = len(s.messageQueue)
 	})
 
+	s.lastSeq++
+	msg := types.MessageState{
+		ID:       uuid.New().String(),
+		Content:  fmt.Sprintf("Message %d", s.lastSeq),
+		Status:   "queued",
+		Sequence: s.lastSeq,
+		SentAt:   time.Now(),
+	}
+
 	if rand.Float64() < 0.3 {
 		delay := time.Duration(rand.Intn(200)) * time.Millisecond
 		time.Sleep(delay)
-	}
-
-	msg := types.MessageState{
-		ID:       uuid.New().String(),
-		Content:    fmt.Sprintf("Message %d", s.lastSeq+1),
-		Status:     "queued",
-		SentAt:     time.Now(),
 	}
 
 	select {
@@ -128,7 +131,7 @@ func (s *MessageQueueScenario) sendMessage(backlogSize int) {
 			Message:  "Message sent",
 			Data: map[string]interface{}{
 				"message_id": msg.ID,
-				"sequence": s.lastSeq + 1,
+				"sequence":   msg.Sequence,
 			},
 		})
 	default:
@@ -139,6 +142,7 @@ func (s *MessageQueueScenario) sendMessage(backlogSize int) {
 			Message:  "Message dropped due to queue full",
 			Data: map[string]interface{}{
 				"message_id": msg.ID,
+				"sequence":   msg.Sequence,
 			},
 		})
 	}
@@ -151,24 +155,24 @@ func (s *MessageQueueScenario) processMessage(msg types.MessageState) {
 	msg.ReceivedAt = time.Now()
 	msg.Status = "processed"
 
-	if rand.Float64() < 0.2 {
-		if msg.Sequence > s.expectedSeq+1 {
-			s.eb.Publish(types.Event{
-				Type:     types.EventTypeMessageOrderError,
-				Severity: types.SeverityWarning,
-				Source:   "message_queue",
-				Message:  "Message out of order",
-				Data: map[string]interface{}{
-					"message_id":   msg.ID,
-					"expected_seq":   s.expectedSeq + 1,
-					"actual_seq":   msg.Sequence,
-				},
-			})
-		}
+	if s.expectedSeq == 0 {
 		s.expectedSeq = msg.Sequence
-	} else {
-		s.expectedSeq = msg.Sequence
+	} else if msg.Sequence != s.expectedSeq+1 {
+		s.eb.Publish(types.Event{
+			Type:     types.EventTypeMessageOrderError,
+			Severity: types.SeverityWarning,
+			Source:   "message_queue",
+			Message:  "Message out of order",
+			Data: map[string]interface{}{
+				"message_id":   msg.ID,
+				"expected_seq": s.expectedSeq + 1,
+				"actual_seq":   msg.Sequence,
+			},
+		})
 	}
+	s.expectedSeq = msg.Sequence
+
+	msg.DelayMs = msg.ReceivedAt.Sub(msg.SentAt).Milliseconds()
 
 	s.eb.Publish(types.Event{
 		Type:     types.EventTypeMessageReceived,
@@ -177,6 +181,7 @@ func (s *MessageQueueScenario) processMessage(msg types.MessageState) {
 		Message:  "Message processed",
 		Data: map[string]interface{}{
 			"message_id": msg.ID,
+			"sequence":   msg.Sequence,
 			"delay_ms":   msg.DelayMs,
 		},
 	})
