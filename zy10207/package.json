@@ -1,0 +1,27 @@
+{
+  "name": "water-station-deposit-cli",
+  "version": "1.0.0",
+  "description": "水站桶装水押金对账 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "water-deposit": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "demo": "./demo/run-demo.sh"
+  },
+  "keywords": [
+    "water-station",
+    "deposit",
+    "reconciliation",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "yargs": "^17.7.2",
+    "chalk": "^4.1.2",
+    "papaparse": "^5.4.1",
+    "dayjs": "^1.11.10"
+  }
+}

@@ -1,0 +1,4 @@
+orderNo,customer,phone,bucketCount,depositPerBucket,totalDeposit,deliveryPerson,deliveryDate,notes
+D20260501001,张三,13800000001,2,40,80,王师傅,2026-05-05,重复记录
+D20260501111,,13800000011,3,40,120,王师傅,2026-05-11,客户名为空
+D20260501112,异常客户,13800000012,0,40,0,李师傅,2026-05-11,桶数为0
