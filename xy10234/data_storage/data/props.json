@@ -1,0 +1,98 @@
+{
+  "P001": {
+    "prop_id": "P001",
+    "name": "复古钢琴",
+    "category": "乐器",
+    "value": 50000.0,
+    "deposit_rate": 1.0,
+    "status": "borrowed",
+    "location": "A区-1号棚",
+    "description": "1960年生产的三角钢琴",
+    "created_at": "2026-05-10T17:16:00.914933",
+    "last_updated": "2026-05-10T17:16:17.990862"
+  },
+  "P002": {
+    "prop_id": "P002",
+    "name": "欧式沙发",
+    "category": "家具",
+    "value": 8000.0,
+    "deposit_rate": 1.0,
+    "status": "borrowed",
+    "location": "B区-仓库3",
+    "description": "三人座真皮沙发",
+    "created_at": "2026-05-10T17:16:00.915264",
+    "last_updated": "2026-05-10T17:16:17.991820"
+  },
+  "P003": {
+    "prop_id": "P003",
+    "name": "古代铠甲",
+    "category": "服装",
+    "value": 15000.0,
+    "deposit_rate": 1.5,
+    "status": "borrowed",
+    "location": "C区-服装库",
+    "description": "明代武士铠甲复刻",
+    "created_at": "2026-05-10T17:16:00.915475",
+    "last_updated": "2026-05-10T17:16:17.992565"
+  },
+  "P004": {
+    "prop_id": "P004",
+    "name": "古董座钟",
+    "category": "摆件",
+    "value": 25000.0,
+    "deposit_rate": 1.2,
+    "status": "available",
+    "location": "A区-贵重物品柜",
+    "description": "18世纪法国座钟",
+    "created_at": "2026-05-10T17:16:00.915660",
+    "last_updated": "2026-05-10T17:16:54.310826"
+  },
+  "P005": {
+    "prop_id": "P005",
+    "name": "摄影灯架",
+    "category": "设备",
+    "value": 2000.0,
+    "deposit_rate": 0.5,
+    "status": "available",
+    "location": "D区-设备间",
+    "description": "重型灯架5件套",
+    "created_at": "2026-05-10T17:16:00.915844",
+    "last_updated": "2026-05-10T17:17:04.999917"
+  },
+  "P006": {
+    "prop_id": "P006",
+    "name": "民国桌椅",
+    "category": "家具",
+    "value": 12000.0,
+    "deposit_rate": 1.0,
+    "status": "available",
+    "location": "B区-仓库2",
+    "description": "民国时期实木桌椅一套",
+    "created_at": "2026-05-10T17:16:00.916038",
+    "last_updated": "2026-05-10T17:16:00.916039"
+  },
+  "P007": {
+    "prop_id": "P007",
+    "name": "激光剑道具",
+    "category": "道具",
+    "value": 3500.0,
+    "deposit_rate": 1.0,
+    "status": "available",
+    "location": "E区-科幻区",
+    "description": "可发光激光剑模型",
+    "created_at": "2026-05-10T17:16:00.916238",
+    "last_updated": "2026-05-10T17:16:00.916239"
+  },
+  "P008": {
+    "prop_id": "P008",
+    "name": "中世纪剑",
+    "category": "武器",
+    "value": 8000.0,
+    "deposit_rate": 1.0,
+    "status": "available",
+    "location": "E区-武器库",
+    "description": "不开刃长剑",
+    "created_at": "2026-05-10T17:16:00.916494",
+    "last_updated": "2026-05-10T17:16:00.916495"
+  }
+}
