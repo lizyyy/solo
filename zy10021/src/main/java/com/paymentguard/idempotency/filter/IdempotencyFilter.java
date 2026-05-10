@@ -2,10 +2,10 @@ package com.paymentguard.idempotency.filter;
 
 import com.paymentguard.idempotency.service.IdempotencyService;
 import com.paymentguard.common.util.JsonUtil;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +43,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
             return;
         }
         
-        var record = idempotencyService.getRecord(idempotencyKey);
+        IdempotencyService.IdempotencyRecord record = idempotencyService.getRecord(idempotencyKey);
         if (record != null && "SUCCESS".equals(record.getStatus())) {
             log.info("Returning cached response for idempotency key: {}", idempotencyKey);
             writeCachedResponse(response, record.getResult());

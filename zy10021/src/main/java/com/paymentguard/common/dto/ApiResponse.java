@@ -29,6 +29,10 @@ public class ApiResponse<T> {
         return new ApiResponse<>(true, "操作成功", data, metadata);
     }
     
+    public static <T> ApiResponse<T> success(T data, String message, Map<String, Object> metadata) {
+        return new ApiResponse<>(true, message, data, metadata);
+    }
+    
     public static <T> ApiResponse<T> error(String message) {
         return new ApiResponse<>(false, message, null, null);
     }

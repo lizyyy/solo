@@ -60,25 +60,21 @@ public class ReportingController {
         String filename;
         MediaType mediaType;
         
-        switch (format.toLowerCase()) {
-            case "json" -> {
-                content = reportExporter.exportToJson(reportId);
-                filename = "report-" + reportId + ".json";
-                mediaType = MediaType.APPLICATION_JSON;
-            }
-            case "html" -> {
-                content = reportExporter.exportToHtml(reportId);
-                filename = "report-" + reportId + ".html";
-                mediaType = MediaType.TEXT_HTML;
-            }
-            case "markdown", "md" -> {
-                content = reportExporter.exportToMarkdown(reportId);
-                filename = "report-" + reportId + ".md";
-                mediaType = MediaType.parseMediaType("text/markdown");
-            }
-            default -> {
-                return ResponseEntity.badRequest().build();
-            }
+        String lowerFormat = format.toLowerCase();
+        if ("json".equals(lowerFormat)) {
+            content = reportExporter.exportToJson(reportId);
+            filename = "report-" + reportId + ".json";
+            mediaType = MediaType.APPLICATION_JSON;
+        } else if ("html".equals(lowerFormat)) {
+            content = reportExporter.exportToHtml(reportId);
+            filename = "report-" + reportId + ".html";
+            mediaType = MediaType.TEXT_HTML;
+        } else if ("markdown".equals(lowerFormat) || "md".equals(lowerFormat)) {
+            content = reportExporter.exportToMarkdown(reportId);
+            filename = "report-" + reportId + ".md";
+            mediaType = MediaType.parseMediaType("text/markdown");
+        } else {
+            return ResponseEntity.badRequest().build();
         }
         
         String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)

@@ -2,10 +2,11 @@ package com.paymentguard.payment.controller;
 
 import com.paymentguard.common.dto.ApiResponse;
 import com.paymentguard.common.dto.PaymentCallbackRequest;
+import com.paymentguard.common.enums.CallbackStatus;
 import com.paymentguard.payment.entity.CallbackRecord;
 import com.paymentguard.payment.entity.PaymentTransaction;
 import com.paymentguard.payment.service.PaymentCallbackService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

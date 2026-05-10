@@ -3,7 +3,7 @@ package com.paymentguard.simulator.controller;
 import com.paymentguard.common.dto.ApiResponse;
 import com.paymentguard.common.dto.ScenarioConfig;
 import com.paymentguard.simulator.scenario.ScenarioSimulator;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -4,7 +4,7 @@ import com.paymentguard.common.dto.ApiResponse;
 import com.paymentguard.common.dto.CreateOrderRequest;
 import com.paymentguard.order.entity.Order;
 import com.paymentguard.order.service.OrderService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -59,12 +59,24 @@ public class ScenarioSimulator {
         log.info("Starting scenario: type={}, executionId={}", config.getScenarioType(), executionId);
         
         switch (config.getScenarioType()) {
-            case HIGH_CONCURRENCY -> runHighConcurrencyScenario(execution);
-            case DUPLICATE_REQUEST -> runDuplicateRequestScenario(execution);
-            case SERVICE_TIMEOUT -> runServiceTimeoutScenario(execution);
-            case NETWORK_FAILURE -> runNetworkFailureScenario(execution);
-            case MESSAGE_REDELIVERY -> runMessageRedeliveryScenario(execution);
-            case MIXED -> runMixedScenario(execution);
+            case HIGH_CONCURRENCY:
+                runHighConcurrencyScenario(execution);
+                break;
+            case DUPLICATE_REQUEST:
+                runDuplicateRequestScenario(execution);
+                break;
+            case SERVICE_TIMEOUT:
+                runServiceTimeoutScenario(execution);
+                break;
+            case NETWORK_FAILURE:
+                runNetworkFailureScenario(execution);
+                break;
+            case MESSAGE_REDELIVERY:
+                runMessageRedeliveryScenario(execution);
+                break;
+            case MIXED:
+                runMixedScenario(execution);
+                break;
         }
         
         return execution;
@@ -277,7 +289,7 @@ public class ScenarioSimulator {
             PaymentCallbackRequest request = buildCallbackRequest(orderId, transactionId);
             
             long startTime = System.currentTimeMillis();
-            var record = callbackService.processCallback(request);
+            com.paymentguard.payment.entity.CallbackRecord record = callbackService.processCallback(request);
             long duration = System.currentTimeMillis() - startTime;
 
             ScenarioResult result = ScenarioResult.builder()

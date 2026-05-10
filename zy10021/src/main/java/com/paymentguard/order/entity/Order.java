@@ -2,7 +2,7 @@ package com.paymentguard.order.entity;
 
 import com.paymentguard.common.enums.OrderStatus;
 import com.paymentguard.common.util.IdGenerator;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;

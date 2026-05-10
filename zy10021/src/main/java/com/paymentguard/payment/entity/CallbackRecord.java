@@ -2,7 +2,7 @@ package com.paymentguard.payment.entity;
 
 import com.paymentguard.common.enums.CallbackStatus;
 import com.paymentguard.common.util.IdGenerator;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
