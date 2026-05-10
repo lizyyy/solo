@@ -3,6 +3,7 @@ package com.example.config.service;
 import com.example.config.domain.ClientPushStatus;
 import com.example.config.domain.ConfigEventLog;
 import com.example.config.domain.ConfigRelease;
+import com.example.config.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,11 @@ public class DebugService {
     public Map<String, Object> replayEvent(String traceId) {
         List<ConfigEventLog> events = eventLogService.getEventsByTraceId(traceId);
         if (events.isEmpty()) {
-            return Map.of(
-                    "traceId", traceId,
-                    "found", false,
-                    "message", "未找到相关事件"
-            );
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("traceId", traceId);
+            result.put("found", false);
+            result.put("message", "未找到相关事件");
+            return result;
         }
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -55,14 +56,14 @@ public class DebugService {
 
         Optional<ConfigRelease> release = findReleaseFromEvents(events);
         release.ifPresent(r -> {
-            result.put("release", Map.of(
-                    "releaseId", r.getReleaseId(),
-                    "namespace", r.getNamespace(),
-                    "configKey", r.getConfigKey(),
-                    "status", r.getStatus(),
-                    "fromVersion", r.getFromVersion(),
-                    "toVersion", r.getToVersion()
-            ));
+            Map<String, Object> releaseInfo = new LinkedHashMap<>();
+            releaseInfo.put("releaseId", r.getReleaseId());
+            releaseInfo.put("namespace", r.getNamespace());
+            releaseInfo.put("configKey", r.getConfigKey());
+            releaseInfo.put("status", r.getStatus());
+            releaseInfo.put("fromVersion", r.getFromVersion());
+            releaseInfo.put("toVersion", r.getToVersion());
+            result.put("release", releaseInfo);
 
             List<ClientPushStatus> pushStatuses = pushService.getPushStatusesByRelease(r.getReleaseId());
             List<Map<String, Object>> pushDetails = new ArrayList<>();
@@ -83,8 +84,11 @@ public class DebugService {
 
     public Map<String, Object> getReleaseTimeline(String releaseId) {
         Optional<ConfigRelease> releaseOpt = configService.getRelease(releaseId);
-        if (releaseOpt.isEmpty()) {
-            return Map.of("releaseId", releaseId, "found", false);
+        if (!releaseOpt.isPresent()) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("releaseId", releaseId);
+            result.put("found", false);
+            return result;
         }
 
         ConfigRelease release = releaseOpt.get();

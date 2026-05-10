@@ -2,19 +2,18 @@ package com.example.config.performance;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConfigLoadTester {
 
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .executor(Executors.newFixedThreadPool(100))
-            .build();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void main(String[] args) throws Exception {
@@ -54,40 +53,34 @@ public class ConfigLoadTester {
     }
 
     private static List<String> createTestConfigs(String baseUrl, int count) throws Exception {
-        List<String> keys = new ArrayList<>();
+        final List<String> keys = Collections.synchronizedList(new ArrayList<String>());
         ExecutorService executor = Executors.newFixedThreadPool(20);
-        CountDownLatch latch = new CountDownLatch(count);
-        AtomicInteger successCount = new AtomicInteger(0);
+        final CountDownLatch latch = new CountDownLatch(count);
+        final AtomicInteger successCount = new AtomicInteger(0);
 
         for (int i = 0; i < count; i++) {
-            int idx = i;
-            executor.submit(() -> {
-                try {
-                    String namespace = "stress-test";
-                    String key = "test.config." + idx;
-                    Map<String, Object> body = new HashMap<>();
-                    body.put("namespace", namespace);
-                    body.put("key", key);
-                    body.put("value", "initial-value-" + idx);
-                    body.put("description", "压测配置 " + idx);
-                    body.put("operator", "load-tester");
+            final int idx = i;
+            executor.submit(new Runnable() {
+                public void run() {
+                    try {
+                        String namespace = "stress-test";
+                        String key = "test.config." + idx;
+                        Map<String, Object> body = new HashMap<String, Object>();
+                        body.put("namespace", namespace);
+                        body.put("key", key);
+                        body.put("value", "initial-value-" + idx);
+                        body.put("description", "压测配置 " + idx);
+                        body.put("operator", "load-tester");
 
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create(baseUrl + "/api/config"))
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(OBJECT_MAPPER.writeValueAsString(body)))
-                            .build();
-
-                    HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-                    if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        synchronized (keys) {
+                        int statusCode = sendHttpRequest("POST", baseUrl + "/api/config", body);
+                        if (statusCode >= 200 && statusCode < 300) {
                             keys.add(namespace + ":" + key);
+                            successCount.incrementAndGet();
                         }
-                        successCount.incrementAndGet();
+                    } catch (Exception ignored) {
+                    } finally {
+                        latch.countDown();
                     }
-                } catch (Exception ignored) {
-                } finally {
-                    latch.countDown();
                 }
             });
         }
@@ -99,113 +92,147 @@ public class ConfigLoadTester {
 
     private static LoadTestResult runConcurrentReadTest(String baseUrl, List<String> configKeys,
                                                          int concurrentUsers, int iterations) throws Exception {
-        return runTest(concurrentUsers, iterations, (userIdx, iterIdx, random) -> {
-            String configKey = configKeys.get(random.nextInt(configKeys.size()));
-            String[] parts = configKey.split(":");
-            String namespace = parts[0];
-            String key = parts[1];
+        final List<String> safeKeys = new ArrayList<String>(configKeys);
+        return runTest(concurrentUsers, iterations, new RequestExecutor() {
+            public RequestResult execute(int userIdx, int iterIdx, Random random) throws Exception {
+                String configKey = safeKeys.get(random.nextInt(safeKeys.size()));
+                String[] parts = configKey.split(":");
+                String namespace = parts[0];
+                String key = parts[1];
 
-            long start = System.nanoTime();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "/api/config/" + namespace + "/" + key))
-                    .GET()
-                    .build();
+                long start = System.nanoTime();
+                int statusCode = sendHttpRequest("GET", baseUrl + "/api/config/" + namespace + "/" + key, null);
+                long end = System.nanoTime();
 
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            long end = System.nanoTime();
-
-            return new RequestResult(response.statusCode() >= 200, (end - start) / 1_000_000);
+                return new RequestResult(statusCode >= 200 && statusCode < 300, (end - start) / 1000000L);
+            }
         });
     }
 
     private static LoadTestResult runConcurrentWriteTest(String baseUrl, List<String> configKeys,
                                                           int concurrentUsers, int iterations) throws Exception {
-        AtomicInteger versionCounter = new AtomicInteger(0);
-        return runTest(concurrentUsers, iterations, (userIdx, iterIdx, random) -> {
-            String configKey = configKeys.get(random.nextInt(configKeys.size()));
-            String[] parts = configKey.split(":");
-            String namespace = parts[0];
-            String key = parts[1];
+        final List<String> safeKeys = new ArrayList<String>(configKeys);
+        final AtomicInteger versionCounter = new AtomicInteger(0);
+        return runTest(concurrentUsers, iterations, new RequestExecutor() {
+            public RequestResult execute(int userIdx, int iterIdx, Random random) throws Exception {
+                String configKey = safeKeys.get(random.nextInt(safeKeys.size()));
+                String[] parts = configKey.split(":");
+                String namespace = parts[0];
+                String key = parts[1];
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("value", "updated-value-" + versionCounter.incrementAndGet());
-            body.put("operator", "load-tester-user-" + userIdx);
+                Map<String, Object> body = new HashMap<String, Object>();
+                body.put("value", "updated-value-" + versionCounter.incrementAndGet());
+                body.put("operator", "load-tester-user-" + userIdx);
 
-            long start = System.nanoTime();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(baseUrl + "/api/config/" + namespace + "/" + key))
-                    .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.ofString(OBJECT_MAPPER.writeValueAsString(body)))
-                    .build();
+                long start = System.nanoTime();
+                int statusCode = sendHttpRequest("PUT", baseUrl + "/api/config/" + namespace + "/" + key, body);
+                long end = System.nanoTime();
 
-            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            long end = System.nanoTime();
-
-            return new RequestResult(response.statusCode() >= 200, (end - start) / 1_000_000);
+                return new RequestResult(statusCode >= 200 && statusCode < 300, (end - start) / 1000000L);
+            }
         });
     }
 
     private static LoadTestResult runMixedLoadTest(String baseUrl, List<String> configKeys,
                                                     int concurrentUsers, int iterations) throws Exception {
-        AtomicInteger versionCounter = new AtomicInteger(0);
-        return runTest(concurrentUsers, iterations, (userIdx, iterIdx, random) -> {
-            boolean isWrite = random.nextDouble() < 0.1;
-            String configKey = configKeys.get(random.nextInt(configKeys.size()));
-            String[] parts = configKey.split(":");
-            String namespace = parts[0];
-            String key = parts[1];
+        final List<String> safeKeys = new ArrayList<String>(configKeys);
+        final AtomicInteger versionCounter = new AtomicInteger(0);
+        return runTest(concurrentUsers, iterations, new RequestExecutor() {
+            public RequestResult execute(int userIdx, int iterIdx, Random random) throws Exception {
+                boolean isWrite = random.nextDouble() < 0.1;
+                String configKey = safeKeys.get(random.nextInt(safeKeys.size()));
+                String[] parts = configKey.split(":");
+                String namespace = parts[0];
+                String key = parts[1];
 
-            long start = System.nanoTime();
-            boolean success;
+                long start = System.nanoTime();
+                boolean success;
 
-            if (isWrite) {
-                Map<String, Object> body = new HashMap<>();
-                body.put("value", "mixed-value-" + versionCounter.incrementAndGet());
-                body.put("operator", "mixed-tester");
+                if (isWrite) {
+                    Map<String, Object> body = new HashMap<String, Object>();
+                    body.put("value", "mixed-value-" + versionCounter.incrementAndGet());
+                    body.put("operator", "mixed-tester");
 
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(baseUrl + "/api/config/" + namespace + "/" + key))
-                        .header("Content-Type", "application/json")
-                        .PUT(HttpRequest.BodyPublishers.ofString(OBJECT_MAPPER.writeValueAsString(body)))
-                        .build();
-                HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-                success = response.statusCode() >= 200;
-            } else {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(baseUrl + "/api/config/" + namespace + "/" + key))
-                        .GET()
-                        .build();
-                HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-                success = response.statusCode() >= 200;
+                    int statusCode = sendHttpRequest("PUT", baseUrl + "/api/config/" + namespace + "/" + key, body);
+                    success = statusCode >= 200 && statusCode < 300;
+                } else {
+                    int statusCode = sendHttpRequest("GET", baseUrl + "/api/config/" + namespace + "/" + key, null);
+                    success = statusCode >= 200 && statusCode < 300;
+                }
+
+                long end = System.nanoTime();
+                return new RequestResult(success, (end - start) / 1000000L);
             }
-
-            long end = System.nanoTime();
-            return new RequestResult(success, (end - start) / 1_000_000);
         });
+    }
+
+    private static int sendHttpRequest(String method, String urlString, Map<String, Object> body) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(method);
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(30000);
+
+        if (body != null) {
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+            String json = OBJECT_MAPPER.writeValueAsString(body);
+            OutputStream os = connection.getOutputStream();
+            os.write(json.getBytes(StandardCharsets.UTF_8));
+            os.flush();
+            os.close();
+        }
+
+        int statusCode = connection.getResponseCode();
+
+        BufferedReader reader = null;
+        try {
+            if (statusCode >= 200 && statusCode < 300) {
+                reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+            } else {
+                reader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8));
+            }
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (Exception e) {
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+            connection.disconnect();
+        }
+
+        return statusCode;
     }
 
     private static LoadTestResult runTest(int concurrentUsers, int iterations,
                                           RequestExecutor executor) throws Exception {
         ExecutorService threadPool = Executors.newFixedThreadPool(concurrentUsers);
-        List<Future<List<RequestResult>>> futures = new ArrayList<>();
+        List<Future<List<RequestResult>>> futures = new ArrayList<Future<List<RequestResult>>>();
 
         for (int i = 0; i < concurrentUsers; i++) {
-            int userIdx = i;
-            futures.add(threadPool.submit(() -> {
-                List<RequestResult> results = new ArrayList<>();
-                Random random = new Random(userIdx + System.currentTimeMillis());
-                for (int j = 0; j < iterations; j++) {
-                    try {
-                        results.add(executor.execute(userIdx, j, random));
-                    } catch (Exception e) {
-                        results.add(new RequestResult(false, 0));
+            final int userIdx = i;
+            final RequestExecutor exec = executor;
+            futures.add(threadPool.submit(new Callable<List<RequestResult>>() {
+                public List<RequestResult> call() {
+                    List<RequestResult> results = new ArrayList<RequestResult>();
+                    Random random = new Random(userIdx + System.currentTimeMillis());
+                    for (int j = 0; j < iterations; j++) {
+                        try {
+                            results.add(exec.execute(userIdx, j, random));
+                        } catch (Exception e) {
+                            results.add(new RequestResult(false, 0L));
+                        }
                     }
+                    return results;
                 }
-                return results;
             }));
         }
 
-        List<RequestResult> allResults = new ArrayList<>();
+        List<RequestResult> allResults = new ArrayList<RequestResult>();
         for (Future<List<RequestResult>> future : futures) {
             allResults.addAll(future.get());
         }
@@ -213,10 +240,13 @@ public class ConfigLoadTester {
         threadPool.shutdown();
 
         long totalRequests = allResults.size();
-        long successCount = allResults.stream().filter(r -> r.success).count();
+        long successCount = 0;
+        for (RequestResult r : allResults) {
+            if (r.success) successCount++;
+        }
         long failCount = totalRequests - successCount;
 
-        List<Long> latencies = new ArrayList<>();
+        List<Long> latencies = new ArrayList<Long>();
         for (RequestResult r : allResults) {
             if (r.success) latencies.add(r.latencyMs);
         }
@@ -225,7 +255,14 @@ public class ConfigLoadTester {
         long p50 = latencies.isEmpty() ? 0 : latencies.get((int) (latencies.size() * 0.5));
         long p95 = latencies.isEmpty() ? 0 : latencies.get((int) (latencies.size() * 0.95));
         long p99 = latencies.isEmpty() ? 0 : latencies.get((int) (latencies.size() * 0.99));
-        long avg = latencies.isEmpty() ? 0 : latencies.stream().mapToLong(Long::longValue).sum() / latencies.size();
+        long avg = 0;
+        if (!latencies.isEmpty()) {
+            long sum = 0;
+            for (Long l : latencies) {
+                sum += l;
+            }
+            avg = sum / latencies.size();
+        }
 
         return new LoadTestResult(totalRequests, successCount, failCount, avg, p50, p95, p99);
     }
@@ -242,7 +279,6 @@ public class ConfigLoadTester {
         System.out.println("  P99: " + result.p99Latency + "ms");
     }
 
-    @FunctionalInterface
     interface RequestExecutor {
         RequestResult execute(int userIdx, int iterIdx, Random random) throws Exception;
     }

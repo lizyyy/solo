@@ -4,6 +4,7 @@ import com.example.config.domain.ConfigEventLog;
 import com.example.config.domain.ConfigEventLog.EventLevel;
 import com.example.config.domain.ConfigEventLog.EventType;
 import com.example.config.repository.ConfigEventLogRepository;
+import com.example.config.util.CollectionUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -110,77 +111,77 @@ public class EventLogService {
         logEvent(EventType.CONFIG_UPDATE, EventLevel.INFO,
                 namespace + ":" + key, "ConfigItem",
                 "配置更新: " + namespace + "/" + key + " v" + fromVersion + " -> v" + toVersion,
-                Map.of("operator", operator, "fromVersion", fromVersion, "toVersion", toVersion), null);
+                CollectionUtils.mapOf("operator", operator, "fromVersion", fromVersion, "toVersion", toVersion), null);
     }
 
     public void logConfigPublish(String releaseId, String namespace, String key, String operator) {
         logEvent(EventType.CONFIG_PUBLISH, EventLevel.INFO,
                 releaseId, "ConfigRelease",
                 "配置发布开始: " + namespace + "/" + key,
-                Map.of("operator", operator, "namespace", namespace, "key", key), null);
+                CollectionUtils.mapOf("operator", operator, "namespace", namespace, "key", key), null);
     }
 
     public void logPushStart(String releaseId, String instanceId) {
         logEvent(EventType.PUSH_START, EventLevel.DEBUG,
                 releaseId + ":" + instanceId, "ClientPushStatus",
                 "开始推送配置到客户端: " + instanceId,
-                Map.of("releaseId", releaseId, "instanceId", instanceId), null);
+                CollectionUtils.mapOf("releaseId", releaseId, "instanceId", instanceId), null);
     }
 
     public void logPushSuccess(String releaseId, String instanceId, long latencyMs) {
         logEvent(EventType.PUSH_SUCCESS, EventLevel.INFO,
                 releaseId + ":" + instanceId, "ClientPushStatus",
                 "配置推送成功: " + instanceId + ", 耗时: " + latencyMs + "ms",
-                Map.of("releaseId", releaseId, "instanceId", instanceId, "latencyMs", latencyMs), null);
+                CollectionUtils.mapOf("releaseId", releaseId, "instanceId", instanceId, "latencyMs", latencyMs), null);
     }
 
     public void logPushFailed(String releaseId, String instanceId, String reason, Throwable t) {
         logEvent(EventType.PUSH_FAILED, EventLevel.ERROR,
                 releaseId + ":" + instanceId, "ClientPushStatus",
                 "配置推送失败: " + instanceId + " - " + reason,
-                Map.of("releaseId", releaseId, "instanceId", instanceId, "reason", reason), t);
+                CollectionUtils.mapOf("releaseId", releaseId, "instanceId", instanceId, "reason", reason), t);
     }
 
     public void logPushRetry(String releaseId, String instanceId, int retryCount) {
         logEvent(EventType.PUSH_RETRY, EventLevel.WARN,
                 releaseId + ":" + instanceId, "ClientPushStatus",
                 "配置推送重试: " + instanceId + ", 第" + retryCount + "次重试",
-                Map.of("releaseId", releaseId, "instanceId", instanceId, "retryCount", retryCount), null);
+                CollectionUtils.mapOf("releaseId", releaseId, "instanceId", instanceId, "retryCount", retryCount), null);
     }
 
     public void logClientConnect(String instanceId, String serviceName) {
         logEvent(EventType.CLIENT_CONNECT, EventLevel.INFO,
                 instanceId, "ClientRegistry",
                 "客户端连接: " + serviceName + "@" + instanceId,
-                Map.of("serviceName", serviceName), null);
+                CollectionUtils.mapOf("serviceName", serviceName), null);
     }
 
     public void logClientDisconnect(String instanceId, String reason) {
         logEvent(EventType.CLIENT_DISCONNECT, EventLevel.INFO,
                 instanceId, "ClientRegistry",
                 "客户端断开连接: " + instanceId + " - " + reason,
-                Map.of("reason", reason), null);
+                CollectionUtils.mapOf("reason", reason), null);
     }
 
     public void logCacheUpdate(String key, Long version) {
         logEvent(EventType.CACHE_UPDATE, EventLevel.DEBUG,
                 key, "Cache",
                 "缓存更新: " + key + " v" + version,
-                Map.of("key", key, "version", version), null);
+                CollectionUtils.mapOf("key", key, "version", version), null);
     }
 
     public void logCacheInvalidate(String key) {
         logEvent(EventType.CACHE_INVALIDATE, EventLevel.DEBUG,
                 key, "Cache",
                 "缓存失效: " + key,
-                Map.of("key", key), null);
+                CollectionUtils.mapOf("key", key), null);
     }
 
     public void logRollbackStart(String releaseId, String reason) {
         logEvent(EventType.ROLLBACK_START, EventLevel.WARN,
                 releaseId, "ConfigRelease",
                 "开始回滚发布: " + releaseId + " - " + reason,
-                Map.of("reason", reason), null);
+                CollectionUtils.mapOf("reason", reason), null);
     }
 
     public void logRollbackComplete(String releaseId) {

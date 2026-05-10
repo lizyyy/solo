@@ -1,0 +1,55 @@
+#!/bin/bash
+# Maven Wrapper - Smart Maven Bootstrapper
+# This script will:
+# 1. Use system mvn if available
+# 2. Try to download and use Maven Wrapper
+# 3. Fall back to providing clear error message
+
+set -e
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$SCRIPT_DIR"
+WRAPPER_JAR="$PROJECT_DIR/.mvn/wrapper/maven-wrapper.jar"
+WRAPPER_PROPS="$PROJECT_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+# Check for system Maven first
+if command -v mvn >/dev/null 2>&1; then
+    echo "Using system Maven: $(mvn -version | head -1)"
+    exec mvn "$@"
+fi
+
+# Check for Maven Wrapper JAR
+if [ -f "$WRAPPER_JAR" ]; then
+    echo "Using Maven Wrapper"
+    exec java -classpath "$WRAPPER_JAR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+fi
+
+# If we reach here, no Maven is available
+echo ""
+echo "=========================================="
+echo "  Maven Not Found"
+echo "=========================================="
+echo ""
+echo "Neither system Maven nor Maven Wrapper JAR was found."
+echo ""
+echo "Options:"
+echo ""
+echo "  1. Install Maven:"
+echo "     macOS:   brew install maven"
+echo "     Linux:   sudo apt-get install maven"
+echo "     Windows: choco install maven"
+echo ""
+echo "  2. Download Maven Wrapper JAR:"
+echo "     curl -o \"$WRAPPER_JAR\" \\"
+echo "       https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
+echo ""
+echo "  3. Use the provided run.sh script (no Maven required):"
+echo "     ./run.sh build    # Download dependencies and compile"
+echo "     ./run.sh start    # Start the application"
+echo "     ./run.sh test     # Run tests"
+echo ""
+echo "=========================================="
+echo ""
+
+exit 1

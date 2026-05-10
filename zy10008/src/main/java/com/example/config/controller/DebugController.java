@@ -4,6 +4,7 @@ import com.example.config.domain.ConfigEventLog;
 import com.example.config.service.DebugService;
 import com.example.config.service.EventLogService;
 import com.example.config.service.WebSocketService;
+import com.example.config.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +64,7 @@ public class DebugController {
 
     @GetMapping("/clients")
     public ResponseEntity<Map<String, Object>> getClientStatus() {
-        return ResponseEntity.ok(Map.of(
+        return ResponseEntity.ok(CollectionUtils.mapOf(
                 "connectedCount", webSocketService.getConnectedClientCount()
         ));
     }

@@ -3,6 +3,7 @@ package com.example.config;
 import com.example.config.domain.ConfigEventLog;
 import com.example.config.repository.ConfigEventLogRepository;
 import com.example.config.service.EventLogService;
+import com.example.config.util.CollectionUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,13 +38,15 @@ class EventLogServiceTest {
         String traceId = EventLogService.getCurrentTraceId();
         assertNotNull(traceId);
 
+        Map<String, Object> details = new java.util.HashMap<>();
+        details.put("key", "value");
         eventLogService.logEvent(
                 ConfigEventLog.EventType.CONFIG_CREATE,
                 ConfigEventLog.EventLevel.INFO,
                 "test-ns:test-key",
                 "ConfigItem",
                 "测试消息",
-                Map.of("key", "value"),
+                details,
                 null
         );
 

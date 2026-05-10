@@ -12,6 +12,9 @@
 
 ### 2. 可靠的推送机制
 - **WebSocket 长连接**：实时推送，低延迟
+- **真正的 ACK 确认机制**：发送后等待客户端 ACK，超时视为失败，确保推送真正生效
+- **ACK 超时处理**：30秒内未收到 ACK 标记为 TIMEOUT 状态
+- **ACK 去重与更新**：重复 ACK 不重复更新状态，支持状态回退更新
 - **并发推送**：线程池并发处理，支持大量客户端
 - **自动重试**：指数退避重试策略，最大 5 次
 - **推送状态追踪**：每个实例的推送状态独立追踪
@@ -216,7 +219,10 @@ ws://localhost:8080/ws/config
 }
 ```
 
-#### 客户端确认
+#### 客户端确认 (ACK 机制)
+
+服务器发送配置更新后，**必须**等待客户端的 ACK 确认。只有收到 ACK 才认为推送成功，30 秒内未收到 ACK 则标记为 TIMEOUT。
+
 ```json
 {
   "type": "ACK",
@@ -224,6 +230,17 @@ ws://localhost:8080/ws/config
   "status": "OK"
 }
 ```
+
+ACK 状态说明：
+- `OK`：配置更新成功应用
+- `ERROR`：配置更新失败（如解析错误）
+- `SKIP`：跳过（如版本号已更新）
+
+ACK 机制保障：
+1. **真正生效验证**：只有客户端返回 ACK，服务器才认为推送成功
+2. **超时检测**：30 秒内未收到 ACK，状态变为 TIMEOUT
+3. **自动重试**：TIMEOUT 状态会触发自动重试（最多 5 次）
+4. **完整追踪**：ACK 时间、重试次数、最终状态全部持久化记录
 
 ## 状态流转
 
@@ -279,26 +296,79 @@ config:
 ## 快速开始
 
 ### 前置条件
-- Java 8+
-- Maven 3.6+
-- Redis（可选，默认不启用缓存）
+- **Java 8+ (JDK)**（代码严格使用 Java 8 兼容 API，不依赖 Java 9/11+ 特性）
+- Maven 3.6+（可选，也可以使用项目提供的脚本）
+- Redis（可选，默认不启用缓存，使用本地 Caffeine 缓存）
 
-### 启动
+## 运行方式（三选一）
+
+### 方式 1：使用 run.sh 脚本（推荐，无需 Maven）
+项目提供了 `run.sh` 脚本，可以**完全不依赖 Maven** 来运行项目。
+
 ```bash
-mvn spring-boot:run
+# 查看帮助
+./run.sh help
+
+# 构建项目（自动下载依赖）
+./run.sh build
+
+# 启动应用
+./run.sh start
+
+# 一键完成：清理 -> 构建 -> 启动
+./run.sh all
+
+# 运行测试
+./run.sh test
+
+# 清理构建
+./run.sh clean
 ```
 
-服务启动后访问：
-- H2 控制台：http://localhost:8080/h2-console
-- 健康检查：http://localhost:8080/actuator/health
+### 方式 2：使用 Maven Wrapper (mvnw)
+如果系统没有安装 Maven，可以使用 `mvnw` 脚本：
 
-### 运行测试
 ```bash
+# 先下载 Maven Wrapper JAR（只需要执行一次）
+curl -o .mvn/wrapper/maven-wrapper.jar \
+  https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar
+
+# 然后使用 mvnw 代替 mvn
+./mvnw spring-boot:run
+./mvnw test
+./mvnw clean package -DskipTests
+```
+
+### 方式 3：使用系统 Maven
+如果系统已安装 Maven，可以直接使用：
+
+```bash
+# 编译并打包
+mvn clean package -DskipTests
+
+# 启动服务
+mvn spring-boot:run
+
+# 或使用打包后的 JAR 运行
+java -jar target/config-hot-update-0.0.1-SNAPSHOT.jar
+
+# 运行测试
 mvn test
 ```
 
+---
+
+服务启动后访问：
+- H2 控制台：http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:mem:configdb`
+  - Username: `sa`
+  - Password: （留空）
+- 健康检查：http://localhost:8080/actuator/health
+- 配置 API：http://localhost:8080/api/config
+
 ### 运行压测
 ```bash
+# 使用 Maven
 mvn exec:java -Dexec.mainClass="com.example.config.performance.ConfigLoadTester" \
   -Dexec.args="http://localhost:8080 100 50 10"
 ```

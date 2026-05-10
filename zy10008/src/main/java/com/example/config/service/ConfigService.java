@@ -4,6 +4,7 @@ import com.example.config.domain.ConfigItem;
 import com.example.config.domain.ConfigRelease;
 import com.example.config.repository.ConfigItemRepository;
 import com.example.config.repository.ConfigReleaseRepository;
+import com.example.config.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -144,7 +145,7 @@ public class ConfigService {
     public List<ConfigRelease> getPendingOrInProgressReleases() {
         LocalDateTime from = LocalDateTime.now().minusHours(24);
         return configReleaseRepository.findPendingOrInProgress(
-                List.of(ConfigRelease.ReleaseStatus.PENDING, ConfigRelease.ReleaseStatus.PUBLISHING),
+                CollectionUtils.listOf(ConfigRelease.ReleaseStatus.PENDING, ConfigRelease.ReleaseStatus.PUBLISHING),
                 from);
     }
 }

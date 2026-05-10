@@ -3,6 +3,7 @@ package com.example.config.service;
 import com.example.config.domain.ClientRegistry;
 import com.example.config.domain.ClientRegistry.ConnectionStatus;
 import com.example.config.repository.ClientRegistryRepository;
+import com.example.config.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class WebSocketService extends TextWebSocketHandler {
     private final ClientRegistryRepository clientRegistryRepository;
     private final EventLogService eventLogService;
     private final ObjectMapper objectMapper;
+    private final AckManager ackManager;
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, String> sessionToInstanceId = new ConcurrentHashMap<>();
@@ -103,7 +105,7 @@ public class WebSocketService extends TextWebSocketHandler {
         clientRegistryRepository.save(registry);
         eventLogService.logClientConnect(instanceId, serviceName);
 
-        sendResponse(session, "REGISTER_ACK", Map.of(
+        sendResponse(session, "REGISTER_ACK", CollectionUtils.mapOf(
                 "instanceId", instanceId,
                 "status", "OK"
         ));
@@ -122,7 +124,7 @@ public class WebSocketService extends TextWebSocketHandler {
             clientRegistryRepository.save(registry);
         });
 
-        sendResponse(session, "HEARTBEAT_ACK", Map.of("timestamp", System.currentTimeMillis()));
+        sendResponse(session, "HEARTBEAT_ACK", CollectionUtils.mapOf("timestamp", System.currentTimeMillis()));
     }
 
     private void handleSubscribe(WebSocketSession session, Map<String, Object> msg) {
@@ -150,11 +152,11 @@ public class WebSocketService extends TextWebSocketHandler {
                     com.example.config.domain.ConfigEventLog.EventLevel.INFO,
                     instanceId, "ClientRegistry",
                     "客户端订阅: " + namespace,
-                    Map.of("namespace", namespace), null
+                    CollectionUtils.mapOf("namespace", namespace), null
             );
         });
 
-        sendResponse(session, "SUBSCRIBE_ACK", Map.of("namespace", namespace, "status", "OK"));
+        sendResponse(session, "SUBSCRIBE_ACK", CollectionUtils.mapOf("namespace", namespace, "status", "OK"));
     }
 
     private void handleUnsubscribe(WebSocketSession session, Map<String, Object> msg) {
@@ -180,20 +182,24 @@ public class WebSocketService extends TextWebSocketHandler {
                     com.example.config.domain.ConfigEventLog.EventLevel.INFO,
                     instanceId, "ClientRegistry",
                     "客户端取消订阅: " + namespace,
-                    Map.of("namespace", namespace), null
+                    CollectionUtils.mapOf("namespace", namespace), null
             );
         });
 
-        sendResponse(session, "UNSUBSCRIBE_ACK", Map.of("namespace", namespace, "status", "OK"));
+        sendResponse(session, "UNSUBSCRIBE_ACK", CollectionUtils.mapOf("namespace", namespace, "status", "OK"));
     }
 
     private void handleAck(WebSocketSession session, Map<String, Object> msg) {
         String instanceId = sessionToInstanceId.get(session.getId());
         String releaseId = (String) msg.get("releaseId");
         String status = (String) msg.get("status");
+        String errorMessage = (String) msg.get("errorMessage");
 
-        if (releaseId != null) {
+        if (releaseId != null && instanceId != null) {
+            boolean success = "OK".equals(status);
             log.info("收到推送确认: instanceId={}, releaseId={}, status={}", instanceId, releaseId, status);
+
+            ackManager.notifyAck(releaseId, instanceId, success, errorMessage);
         }
     }
 

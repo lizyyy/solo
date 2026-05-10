@@ -4,6 +4,7 @@ import com.example.config.domain.*;
 import com.example.config.domain.ClientPushStatus.PushStatus;
 import com.example.config.domain.ConfigRelease.ReleaseStatus;
 import com.example.config.repository.ClientPushStatusRepository;
+import com.example.config.util.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ public class PushService {
     private final ClientPushStatusRepository pushStatusRepository;
     private final EventLogService eventLogService;
     private final StringRedisTemplate redisTemplate;
+    private final AckManager ackManager;
 
     @Value("${config.hot-update.push.timeout-seconds:30}")
     private int pushTimeoutSeconds;
@@ -114,22 +116,27 @@ public class PushService {
         String idempotentKey = IDEMPOTENT_KEY_PREFIX + releaseId + ":" + instanceId;
 
         if (idempotentEnabled) {
-            Boolean setIfAbsent = redisTemplate.opsForValue()
-                    .setIfAbsent(idempotentKey, "processing", idempotentTtlSeconds, TimeUnit.SECONDS);
-            if (Boolean.FALSE.equals(setIfAbsent)) {
-                log.info("跳过重复推送: releaseId={}, instanceId={}", releaseId, instanceId);
-                return;
+            try {
+                Boolean setIfAbsent = redisTemplate.opsForValue()
+                        .setIfAbsent(idempotentKey, "processing", idempotentTtlSeconds, TimeUnit.SECONDS);
+                if (Boolean.FALSE.equals(setIfAbsent)) {
+                    log.info("跳过重复推送: releaseId={}, instanceId={}", releaseId, instanceId);
+                    return;
+                }
+            } catch (Exception e) {
+                log.warn("Redis幂等检查失败，继续执行: {}", e.getMessage());
             }
         }
 
         int attempt = 0;
         while (attempt < maxRetryCount) {
             attempt++;
+            AckManager.AckFuture ackFuture = null;
 
             try {
                 Optional<ClientPushStatus> statusOpt = pushStatusRepository
                         .findByReleaseIdAndInstanceId(releaseId, instanceId);
-                if (statusOpt.isEmpty()) {
+                if (!statusOpt.isPresent()) {
                     log.error("推送状态不存在: releaseId={}, instanceId={}", releaseId, instanceId);
                     return;
                 }
@@ -151,7 +158,7 @@ public class PushService {
                         .orElseThrow(() -> new IllegalStateException("发布记录丢失: " + releaseId));
 
                 Optional<ConfigItem> configOpt = configService.getConfig(release.getNamespace(), release.getConfigKey());
-                if (configOpt.isEmpty()) {
+                if (!configOpt.isPresent()) {
                     throw new IllegalStateException("配置不存在: " + release.getNamespace() + "/" + release.getConfigKey());
                 }
 
@@ -167,41 +174,64 @@ public class PushService {
                 pushMessage.put("timestamp", System.currentTimeMillis());
 
                 long startTime = System.currentTimeMillis();
-                boolean success = webSocketService.pushToClient(instanceId, pushMessage);
+                boolean sendSuccess = webSocketService.pushToClient(instanceId, pushMessage);
+
+                if (!sendSuccess) {
+                    throw new RuntimeException("WebSocket发送失败，客户端可能已断开连接");
+                }
+
+                ackFuture = ackManager.createAckWaiter(releaseId, instanceId, pushTimeoutSeconds * 1000L);
+                log.debug("等待ACK: releaseId={}, instanceId={}, timeout={}s", releaseId, instanceId, pushTimeoutSeconds);
+
+                AckManager.AckResult ackResult = ackFuture.waitForAck();
                 long latency = System.currentTimeMillis() - startTime;
 
-                if (success) {
+                if (ackResult.isSuccess()) {
                     status.setStatus(PushStatus.SUCCESS);
                     status.setSucceededAt(LocalDateTime.now());
                     pushStatusRepository.save(status);
                     eventLogService.logPushSuccess(releaseId, instanceId, latency);
 
-                    if (idempotentEnabled) {
-                        redisTemplate.opsForValue().set(idempotentKey, "success", idempotentTtlSeconds, TimeUnit.SECONDS);
+                    try {
+                        if (idempotentEnabled) {
+                            redisTemplate.opsForValue().set(idempotentKey, "success", idempotentTtlSeconds, TimeUnit.SECONDS);
+                        }
+                    } catch (Exception e) {
+                        log.warn("更新Redis幂等键失败: {}", e.getMessage());
                     }
                     return;
+
+                } else if (ackResult.isTimeout()) {
+                    log.warn("等待ACK超时: releaseId={}, instanceId={}, 耗时={}ms", releaseId, instanceId, latency);
+                    throw new AckTimeoutException("等待ACK超时: " + latency + "ms", latency);
+
                 } else {
-                    throw new RuntimeException("WebSocket推送失败，客户端可能已断开连接");
+                    String errorMsg = ackResult.getMessage() != null ? ackResult.getMessage() : "客户端返回失败";
+                    log.warn("客户端ACK失败: releaseId={}, instanceId={}, error={}", releaseId, instanceId, errorMsg);
+                    throw new RuntimeException("客户端ACK失败: " + errorMsg);
                 }
 
             } catch (Exception e) {
                 log.error("推送失败: releaseId={}, instanceId={}, attempt={}, error={}",
                         releaseId, instanceId, attempt, e.getMessage());
 
+                boolean isTimeout = e instanceof AckTimeoutException;
+                String errorMsg = e.getMessage();
+
                 if (attempt >= maxRetryCount) {
                     ClientPushStatus status = pushStatusRepository
                             .findByReleaseIdAndInstanceId(releaseId, instanceId)
                             .orElse(new ClientPushStatus());
-                    status.setStatus(PushStatus.FAILED);
-                    status.setLastError(e.getMessage());
+                    status.setStatus(isTimeout ? PushStatus.TIMEOUT : PushStatus.FAILED);
+                    status.setLastError(errorMsg);
                     pushStatusRepository.save(status);
-                    eventLogService.logPushFailed(releaseId, instanceId, e.getMessage(), e);
+                    eventLogService.logPushFailed(releaseId, instanceId, errorMsg, e);
                 } else {
                     ClientPushStatus status = pushStatusRepository
                             .findByReleaseIdAndInstanceId(releaseId, instanceId)
                             .orElse(new ClientPushStatus());
-                    status.setStatus(PushStatus.FAILED);
-                    status.setLastError(e.getMessage());
+                    status.setStatus(isTimeout ? PushStatus.TIMEOUT : PushStatus.FAILED);
+                    status.setLastError(errorMsg);
                     status.setNextRetryAt(LocalDateTime.now().plusMillis(retryBackoffMs * attempt));
                     pushStatusRepository.save(status);
                     eventLogService.logPushRetry(releaseId, instanceId, attempt + 1);
@@ -210,10 +240,30 @@ public class PushService {
                         Thread.sleep(retryBackoffMs * attempt);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
+                        if (ackFuture != null) {
+                            ackFuture.cancel();
+                        }
                         return;
                     }
                 }
+            } finally {
+                if (ackFuture != null && !ackFuture.isCompleted()) {
+                    ackFuture.cancel();
+                }
             }
+        }
+    }
+
+    private static class AckTimeoutException extends RuntimeException {
+        private final long latencyMs;
+
+        public AckTimeoutException(String message, long latencyMs) {
+            super(message);
+            this.latencyMs = latencyMs;
+        }
+
+        public long getLatencyMs() {
+            return latencyMs;
         }
     }
 
@@ -222,7 +272,7 @@ public class PushService {
     public void retryFailedPushes() {
         LocalDateTime now = LocalDateTime.now();
         List<ClientPushStatus> retryable = pushStatusRepository.findRetryablePushStatuses(
-                List.of(PushStatus.FAILED, PushStatus.TIMEOUT),
+                CollectionUtils.listOf(PushStatus.FAILED, PushStatus.TIMEOUT),
                 now
         );
 
