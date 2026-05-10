@@ -41,4 +41,24 @@ export const apiService = {
     const response = await fetch('/api/snapshots');
     return response.json();
   },
+
+  getSnapshotByIndex: async (index: number) => {
+    const response = await fetch(`/api/snapshots/${index}`);
+    return response.json();
+  },
+
+  playbackControl: async (action: string, index?: number, speed?: number) => {
+    const body: Record<string, any> = { action };
+    if (index !== undefined) body.index = index;
+    if (speed !== undefined) body.speed = speed;
+    
+    const response = await fetch('/api/playback/control', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    return response.json();
+  },
 };

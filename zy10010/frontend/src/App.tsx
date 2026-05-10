@@ -1,12 +1,18 @@
-import React from 'react';
+import { useState } from 'react';
 import { useWebSocket } from './hooks/useWebSocket';
 import { MetricsPanel } from './components/MetricsPanel';
 import { EventTimeline } from './components/EventTimeline';
 import { ScenarioControl } from './components/ScenarioControl';
 import { SystemDetails } from './components/SystemDetails';
+import { PlaybackControl } from './components/PlaybackControl';
+import { SystemState } from './types';
 
 function App() {
   const { events, currentState, isConnected, clearEvents } = useWebSocket();
+  const [playbackState, setPlaybackState] = useState<SystemState | null>(null);
+  const [isPlaybackMode, setIsPlaybackMode] = useState(false);
+
+  const displayState = isPlaybackMode ? playbackState : currentState;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
@@ -23,22 +29,31 @@ function App() {
                 {isConnected ? '已连接' : '断开连接'}
               </span>
             </div>
+            {isPlaybackMode && (
+              <span className="px-3 py-1 bg-yellow-600 text-white text-sm rounded animate-pulse">
+                回放模式
+              </span>
+            )}
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3">
+          <div className="col-span-3 space-y-6">
             <ScenarioControl onReset={clearEvents} />
+            <PlaybackControl
+              onPlaybackState={setPlaybackState}
+              onPlaybackModeChange={setIsPlaybackMode}
+            />
           </div>
 
           <div className="col-span-9 space-y-6">
-            <MetricsPanel metrics={currentState?.metrics ?? null} />
+            <MetricsPanel metrics={displayState?.metrics ?? null} />
 
             <div className="grid grid-cols-2 gap-6">
               <div className="col-span-1">
-                <SystemDetails state={currentState} />
+                <SystemDetails state={displayState} />
               </div>
               <div className="col-span-1">
                 <EventTimeline events={events} />
@@ -49,7 +64,7 @@ function App() {
 
         <div className="mt-6 bg-gray-800 rounded-lg p-4">
           <h3 className="text-lg font-semibold mb-3 text-gray-300">功能说明</h3>
-          <div className="grid grid-cols-3 gap-4 text-sm text-gray-400">
+          <div className="grid grid-cols-4 gap-4 text-sm text-gray-400">
             <div>
               <h4 className="font-medium text-gray-300 mb-1">问题场景</h4>
               <ul className="list-disc list-inside space-y-1">
@@ -69,6 +84,16 @@ function App() {
                 <li>连接/消息/协程详情</li>
                 <li>错误严重级别过滤</li>
                 <li>自动滚动</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-300 mb-1">状态回放</h4>
+              <ul className="list-disc list-inside space-y-1">
+                <li>自动快照采集</li>
+                <li>播放/暂停控制</li>
+                <li>单步回放</li>
+                <li>时间轴跳转</li>
+                <li>播放速度调节</li>
               </ul>
             </div>
             <div>

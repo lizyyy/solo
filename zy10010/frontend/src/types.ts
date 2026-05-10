@@ -11,10 +11,10 @@ export interface Event {
 export interface ConnectionState {
   id: string;
   status: string;
-  createdAt: string;
-  lastActiveAt: string;
-  messageCount: number;
-  reconnectCount: number;
+  created_at: string;
+  last_active_at: string;
+  message_count: number;
+  reconnect_count: number;
 }
 
 export interface MessageState {
@@ -22,24 +22,24 @@ export interface MessageState {
   content: string;
   sequence: number;
   status: string;
-  sentAt: string;
-  receivedAt: string;
-  delayMs: number;
+  sent_at: string;
+  received_at: string;
+  delay_ms: number;
 }
 
 export interface GoroutineState {
   id: number;
   name: string;
-  createdAt: string;
+  created_at: string;
   status: string;
-  isLeaked: boolean;
-  expectedEnd?: string;
+  is_leaked: boolean;
+  expected_end?: string;
 }
 
 export interface DbLockState {
   resource: string;
-  holderId: string;
-  acquiredAt: string;
+  holder_id: string;
+  acquired_at: string;
   waiters: string[];
 }
 
@@ -47,8 +47,8 @@ export interface CacheState {
   key: string;
   value: any;
   version: number;
-  lastUpdated: string;
-  isDirty: boolean;
+  last_updated: string;
+  is_dirty: boolean;
   ttl: number;
 }
 
@@ -56,22 +56,22 @@ export interface ConfigState {
   key: string;
   value: any;
   source: string;
-  lastUpdated: string;
-  expectedValue?: any;
-  hasDrift: boolean;
+  last_updated: string;
+  expected_value?: any;
+  has_drift: boolean;
 }
 
 export interface SystemMetrics {
-  activeConnections: number;
-  connectionPoolSize: number;
-  connectionPoolUsage: number;
-  messageQueueSize: number;
-  messageProcessed: number;
-  activeGoroutines: number;
-  leakedGoroutines: number;
-  dbLockWaitTimeMs: number;
-  cacheHitRate: number;
-  configDriftCount: number;
+  active_connections: number;
+  connection_pool_size: number;
+  connection_pool_usage: number;
+  message_queue_size: number;
+  message_processed: number;
+  active_goroutines: number;
+  leaked_goroutines: number;
+  db_lock_wait_time_ms: number;
+  cache_hit_rate: number;
+  config_drift_count: number;
 }
 
 export interface SystemState {
@@ -79,7 +79,7 @@ export interface SystemState {
   connections: ConnectionState[];
   messages: MessageState[];
   goroutines: GoroutineState[];
-  dbLocks: DbLockState[];
+  db_locks: DbLockState[];
   cache: CacheState[];
   config: ConfigState[];
   metrics: SystemMetrics;
@@ -89,4 +89,11 @@ export interface WSMessage {
   type: 'event' | 'state';
   event?: Event;
   state?: SystemState;
+}
+
+export interface PlaybackControl {
+  is_playing: boolean;
+  speed: number;
+  current_idx: number;
+  total_idx: number;
 }

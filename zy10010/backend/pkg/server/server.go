@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +35,12 @@ type Server struct {
 	dbLockScenario    *scenarios.DbLockScenario
 	cacheScenario     *scenarios.CacheDirtyScenario
 	configScenario    *scenarios.ConfigDriftScenario
+
+	playbackMu     sync.Mutex
+	isPlaybackMode bool
+	playbackIdx    int
+	playbackSpeed  float64
+	playbackStopCh chan struct{}
 }
 
 func NewServer() *Server {
@@ -50,6 +58,8 @@ func NewServer() *Server {
 		dbLockScenario:    scenarios.NewDbLockScenario(sm, eb),
 		cacheScenario:     scenarios.NewCacheDirtyScenario(sm, eb),
 		configScenario:    scenarios.NewConfigDriftScenario(sm, eb),
+		playbackSpeed:     1.0,
+		playbackStopCh:    make(chan struct{}),
 	}
 }
 
@@ -62,17 +72,20 @@ func (s *Server) SetupRoutes() {
 		api.GET("/state", s.handleGetState)
 		api.GET("/events", s.handleGetEvents)
 		api.GET("/snapshots", s.handleGetSnapshots)
+		api.GET("/snapshots/:index", s.handleGetSnapshotByIndex)
+		api.POST("/playback/control", s.handlePlaybackControl)
 		api.POST("/scenario/:type", s.handleStartScenario)
 		api.POST("/recovery/:type", s.handleRecovery)
 		api.POST("/reset", s.handleReset)
 	}
 
-	s.router.Static("/", "./frontend/dist")
+	s.router.StaticFile("/", "./frontend/dist/index.html")
+	s.router.Static("/assets", "./frontend/dist/assets")
 }
 
 func (s *Server) handleHealth(c *gin.Context) {
 	c.JSON(200, gin.H{
-		"status": "ok",
+		"status":    "ok",
 		"timestamp": time.Now(),
 	})
 }
@@ -186,11 +199,151 @@ func (s *Server) handleRecovery(c *gin.Context) {
 }
 
 func (s *Server) handleReset(c *gin.Context) {
+	s.stopPlayback()
 	s.eb.Clear()
 	s.sm.Clear()
 	c.JSON(200, gin.H{
 		"status": "reset",
 	})
+}
+
+func (s *Server) handleGetSnapshotByIndex(c *gin.Context) {
+	indexStr := c.Param("index")
+	index, err := strconv.Atoi(indexStr)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid index"})
+		return
+	}
+
+	snapshots := s.sm.GetSnapshots()
+	if index < 0 || index >= len(snapshots) {
+		c.JSON(404, gin.H{"error": "snapshot not found"})
+		return
+	}
+
+	c.JSON(200, snapshots[index])
+}
+
+func (s *Server) handlePlaybackControl(c *gin.Context) {
+	var req struct {
+		Action string  `json:"action"`
+		Index  int     `json:"index"`
+		Speed  float64 `json:"speed"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	s.playbackMu.Lock()
+	defer s.playbackMu.Unlock()
+
+	snapshots := s.sm.GetSnapshots()
+	switch req.Action {
+	case "play":
+		if len(snapshots) == 0 {
+			c.JSON(400, gin.H{"error": "no snapshots available"})
+			return
+		}
+		s.stopPlayback()
+		s.isPlaybackMode = true
+		if req.Index >= 0 && req.Index < len(snapshots) {
+			s.playbackIdx = req.Index
+		}
+		if req.Speed > 0 {
+			s.playbackSpeed = req.Speed
+		}
+		s.startPlayback()
+		c.JSON(200, gin.H{
+			"status":      "playing",
+			"current_idx": s.playbackIdx,
+			"total_idx":   len(snapshots) - 1,
+			"speed":       s.playbackSpeed,
+		})
+
+	case "pause":
+		s.stopPlayback()
+		c.JSON(200, gin.H{
+			"status":      "paused",
+			"current_idx": s.playbackIdx,
+		})
+
+	case "step":
+		if len(snapshots) == 0 {
+			c.JSON(400, gin.H{"error": "no snapshots available"})
+			return
+		}
+		s.stopPlayback()
+		s.isPlaybackMode = true
+		if req.Index >= 0 && req.Index < len(snapshots) {
+			s.playbackIdx = req.Index
+		} else if s.playbackIdx < len(snapshots)-1 {
+			s.playbackIdx++
+		}
+		s.broadcastSnapshot(snapshots[s.playbackIdx])
+		c.JSON(200, gin.H{
+			"status":      "stepped",
+			"current_idx": s.playbackIdx,
+			"total_idx":   len(snapshots) - 1,
+		})
+
+	case "stop":
+		s.stopPlayback()
+		s.isPlaybackMode = false
+		c.JSON(200, gin.H{
+			"status": "stopped",
+		})
+
+	default:
+		c.JSON(400, gin.H{"error": "invalid action"})
+	}
+}
+
+func (s *Server) stopPlayback() {
+	if s.playbackStopCh != nil {
+		select {
+		case <-s.playbackStopCh:
+		default:
+			close(s.playbackStopCh)
+		}
+		s.playbackStopCh = make(chan struct{})
+	}
+}
+
+func (s *Server) startPlayback() {
+	go func() {
+		snapshots := s.sm.GetSnapshots()
+		if len(snapshots) == 0 {
+			return
+		}
+
+		ticker := time.NewTicker(time.Duration(1000.0/s.playbackSpeed) * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-s.playbackStopCh:
+				return
+			case <-ticker.C:
+				s.playbackMu.Lock()
+				snapshots = s.sm.GetSnapshots()
+				if s.playbackIdx >= len(snapshots) {
+					s.playbackMu.Unlock()
+					s.stopPlayback()
+					return
+				}
+				snapshot := snapshots[s.playbackIdx]
+				s.playbackIdx++
+				s.playbackMu.Unlock()
+
+				s.broadcastSnapshot(snapshot)
+			}
+		}
+	}()
+}
+
+func (s *Server) broadcastSnapshot(snapshot types.SystemState) {
 }
 
 func (s *Server) handleWebSocket(c *gin.Context) {
@@ -216,16 +369,7 @@ func (s *Server) handleWebSocket(c *gin.Context) {
 				return
 			}
 		case <-snapshotTicker.C:
-			state := types.SystemState{
-				Timestamp:   time.Now(),
-				Connections: s.sm.GetConnections(),
-				Messages:    s.sm.GetMessages(),
-				Goroutines:  s.sm.GetGoroutines(),
-				DbLocks:     s.sm.GetDbLocks(),
-				Cache:       s.sm.GetCache(),
-				Config:      s.sm.GetConfig(),
-				Metrics:     s.sm.GetMetrics(),
-			}
+			state := s.sm.TakeSnapshot()
 			if err := conn.WriteJSON(gin.H{
 				"type":  "state",
 				"state": state,

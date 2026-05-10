@@ -16,16 +16,16 @@ export const MetricsPanel: React.FC<MetricsPanelProps> = ({ metrics }) => {
   }
 
   const metricsData = [
-    { label: '活跃连接', value: metrics.activeConnections, color: 'text-blue-400' },
-    { label: '连接池大小', value: metrics.connectionPoolSize, color: 'text-blue-500' },
-    { label: '连接池使用率', value: `${metrics.connectionPoolUsage}%`, color: metrics.connectionPoolUsage > 80 ? 'text-red-400' : 'text-green-400' },
-    { label: '消息队列大小', value: metrics.messageQueueSize, color: metrics.messageQueueSize > 50 ? 'text-red-400' : 'text-yellow-400' },
-    { label: '消息处理数', value: metrics.messageProcessed, color: 'text-green-400' },
-    { label: '活跃 Goroutine', value: metrics.activeGoroutines, color: 'text-purple-400' },
-    { label: '泄漏 Goroutine', value: metrics.leakedGoroutines, color: metrics.leakedGoroutines > 0 ? 'text-red-400' : 'text-green-400' },
-    { label: 'DB 锁等待时间', value: `${metrics.dbLockWaitTimeMs}ms`, color: metrics.dbLockWaitTimeMs > 1000 ? 'text-red-400' : 'text-yellow-400' },
-    { label: '缓存命中率', value: `${metrics.cacheHitRate}%`, color: 'text-cyan-400' },
-    { label: '配置漂移数', value: metrics.configDriftCount, color: metrics.configDriftCount > 0 ? 'text-red-400' : 'text-green-400' },
+    { label: '活跃连接', value: metrics.active_connections, color: 'text-blue-400' },
+    { label: '连接池大小', value: metrics.connection_pool_size, color: 'text-blue-500' },
+    { label: '连接池使用率', value: `${metrics.connection_pool_usage}%`, color: metrics.connection_pool_usage > 80 ? 'text-red-400' : 'text-green-400' },
+    { label: '消息队列大小', value: metrics.message_queue_size, color: metrics.message_queue_size > 50 ? 'text-red-400' : 'text-yellow-400' },
+    { label: '消息处理数', value: metrics.message_processed, color: 'text-green-400' },
+    { label: '活跃 Goroutine', value: metrics.active_goroutines, color: 'text-purple-400' },
+    { label: '泄漏 Goroutine', value: metrics.leaked_goroutines, color: metrics.leaked_goroutines > 0 ? 'text-red-400' : 'text-green-400' },
+    { label: 'DB 锁等待时间', value: `${metrics.db_lock_wait_time_ms}ms`, color: metrics.db_lock_wait_time_ms > 1000 ? 'text-red-400' : 'text-yellow-400' },
+    { label: '缓存命中率', value: `${metrics.cache_hit_rate}%`, color: 'text-cyan-400' },
+    { label: '配置漂移数', value: metrics.config_drift_count, color: metrics.config_drift_count > 0 ? 'text-red-400' : 'text-green-400' },
   ];
 
   return (

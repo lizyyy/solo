@@ -20,12 +20,12 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
   }
 
   const tabs: { id: TabType; label: string; count: number }[] = [
-    { id: 'connections', label: '连接', count: state.connections.length },
-    { id: 'messages', label: '消息', count: state.messages.length },
-    { id: 'goroutines', label: 'Goroutine', count: state.goroutines.length },
-    { id: 'locks', label: '锁', count: state.dbLocks.length },
-    { id: 'cache', label: '缓存', count: state.cache.length },
-    { id: 'config', label: '配置', count: state.config.length },
+    { id: 'connections', label: '连接', count: state.connections?.length || 0 },
+    { id: 'messages', label: '消息', count: state.messages?.length || 0 },
+    { id: 'goroutines', label: 'Goroutine', count: state.goroutines?.length || 0 },
+    { id: 'locks', label: '锁', count: state.db_locks?.length || 0 },
+    { id: 'cache', label: '缓存', count: state.cache?.length || 0 },
+    { id: 'config', label: '配置', count: state.config?.length || 0 },
   ];
 
   const renderContent = () => {
@@ -33,7 +33,7 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'connections':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.connections.length === 0 ? (
+            {!state.connections || state.connections.length === 0 ? (
               <p className="text-gray-500">暂无连接</p>
             ) : (
               state.connections.map((conn) => (
@@ -57,7 +57,7 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
-                    消息: {conn.messageCount} | 重连: {conn.reconnectCount}
+                    消息: {conn.message_count} | 重连: {conn.reconnect_count}
                   </div>
                 </div>
               ))
@@ -68,7 +68,7 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'messages':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.messages.length === 0 ? (
+            {!state.messages || state.messages.length === 0 ? (
               <p className="text-gray-500">暂无消息</p>
             ) : (
               state.messages.slice(-20).map((msg) => (
@@ -88,7 +88,7 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
-                    {msg.content} | 延迟: {msg.delayMs}ms
+                    {msg.content} | 延迟: {msg.delay_ms}ms
                   </div>
                 </div>
               ))
@@ -99,13 +99,13 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'goroutines':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.goroutines.length === 0 ? (
+            {!state.goroutines || state.goroutines.length === 0 ? (
               <p className="text-gray-500">暂无活跃 goroutine</p>
             ) : (
               state.goroutines.map((g) => (
                 <div
                   key={g.id}
-                  className={`rounded p-3 border-l-4 ${g.isLeaked
+                  className={`rounded p-3 border-l-4 ${g.is_leaked
                       ? 'bg-red-900/30 border-red-500'
                       : 'bg-gray-700/50 border-cyan-500'
                     }`}
@@ -114,7 +114,7 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
                     <span className="font-mono text-sm text-cyan-400">
                       {g.name} #{g.id}
                     </span>
-                    {g.isLeaked && (
+                    {g.is_leaked && (
                       <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400">
                         泄漏
                       </span>
@@ -132,10 +132,10 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'locks':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.dbLocks.length === 0 ? (
+            {!state.db_locks || state.db_locks.length === 0 ? (
               <p className="text-gray-500">暂无数据库锁</p>
             ) : (
-              state.dbLocks.map((lock) => (
+              state.db_locks.map((lock) => (
                 <div
                   key={lock.resource}
                   className="bg-gray-700/50 rounded p-3 border-l-4 border-orange-500"
@@ -143,11 +143,11 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-orange-400">{lock.resource}</span>
                     <span className="text-xs text-gray-400">
-                      等待者: {lock.waiters.length}
+                      等待者: {lock.waiters?.length || 0}
                     </span>
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
-                    持有者: {lock.holderId}
+                    持有者: {lock.holder_id}
                   </div>
                 </div>
               ))
@@ -158,20 +158,20 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'cache':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.cache.length === 0 ? (
+            {!state.cache || state.cache.length === 0 ? (
               <p className="text-gray-500">暂无缓存数据</p>
             ) : (
               state.cache.map((cache) => (
                 <div
                   key={cache.key}
-                  className={`rounded p-3 border-l-4 ${cache.isDirty
+                  className={`rounded p-3 border-l-4 ${cache.is_dirty
                       ? 'bg-red-900/30 border-red-500'
                       : 'bg-gray-700/50 border-teal-500'
                     }`}
                 >
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-teal-400">{cache.key}</span>
-                    {cache.isDirty && (
+                    {cache.is_dirty && (
                       <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400">
                         脏数据
                       </span>
@@ -189,20 +189,20 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
       case 'config':
         return (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {state.config.length === 0 ? (
+            {!state.config || state.config.length === 0 ? (
               <p className="text-gray-500">暂无配置</p>
             ) : (
               state.config.map((cfg) => (
                 <div
                   key={cfg.key}
-                  className={`rounded p-3 border-l-4 ${cfg.hasDrift
+                  className={`rounded p-3 border-l-4 ${cfg.has_drift
                       ? 'bg-red-900/30 border-red-500'
                       : 'bg-gray-700/50 border-indigo-500'
                     }`}
                 >
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-indigo-400">{cfg.key}</span>
-                    {cfg.hasDrift && (
+                    {cfg.has_drift && (
                       <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400">
                         漂移
                       </span>
@@ -210,9 +210,9 @@ export const SystemDetails: React.FC<SystemDetailsProps> = ({ state }) => {
                   </div>
                   <div className="text-xs text-gray-400 mt-1">
                     当前值: {JSON.stringify(cfg.value)}
-                    {cfg.expectedValue !== undefined && (
+                    {cfg.expected_value !== undefined && (
                       <span className="text-red-400 ml-2">
-                        (预期: {JSON.stringify(cfg.expectedValue)})
+                        (预期: {JSON.stringify(cfg.expected_value)})
                       </span>
                     )}
                   </div>
