@@ -1,0 +1,34 @@
+[
+  {
+    "department_id": "DEPT-001",
+    "department_name": "普通内科",
+    "supply_id": "MAT-001",
+    "supply_name": "一次性注射器 10ml",
+    "monthly_limit": 100,
+    "used_amount": 0
+  },
+  {
+    "department_id": "DEPT-001",
+    "department_name": "普通内科",
+    "supply_id": "MAT-002",
+    "supply_name": "一次性手套 L号",
+    "monthly_limit": 500,
+    "used_amount": 450
+  },
+  {
+    "department_id": "DEPT-002",
+    "department_name": "急诊科",
+    "supply_id": "MAT-001",
+    "supply_name": "一次性注射器 10ml",
+    "monthly_limit": 200,
+    "used_amount": 0
+  },
+  {
+    "department_id": "DEPT-002",
+    "department_name": "急诊科",
+    "supply_id": "MAT-003",
+    "supply_name": "无菌纱布 5x5cm",
+    "monthly_limit": 1000,
+    "used_amount": 0
+  }
+]

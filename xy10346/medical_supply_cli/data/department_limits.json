@@ -1,0 +1,30 @@
+{
+  "DEPT-001": {
+    "MAT-001": {
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "monthly_limit": 100,
+      "used_amount": 50
+    },
+    "MAT-002": {
+      "supply_id": "MAT-002",
+      "supply_name": "一次性手套 L号",
+      "monthly_limit": 500,
+      "used_amount": 550
+    }
+  },
+  "DEPT-002": {
+    "MAT-001": {
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "monthly_limit": 200,
+      "used_amount": 0
+    },
+    "MAT-003": {
+      "supply_id": "MAT-003",
+      "supply_name": "无菌纱布 5x5cm",
+      "monthly_limit": 1000,
+      "used_amount": 100
+    }
+  }
+}

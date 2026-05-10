@@ -1,0 +1,78 @@
+[
+  {
+    "request_id": "REQ202605100001",
+    "department_id": "DEPT-001",
+    "department_name": "普通内科",
+    "supply_id": "MAT-001",
+    "supply_name": "一次性注射器 10ml",
+    "quantity": 50,
+    "unit": "支",
+    "status": "issued",
+    "created_at": "2026-05-10",
+    "approved_at": "2026-05-10",
+    "approved_by": "system",
+    "issued_at": "2026-05-10",
+    "issued_by": "admin",
+    "issued_batches": [
+      {
+        "batch_id": "BATCH-001",
+        "quantity_issued": 50,
+        "expiry_date": "2026-05-25"
+      }
+    ],
+    "approval_reasons": [],
+    "actual_issued": 50
+  },
+  {
+    "request_id": "REQ202605100002",
+    "department_id": "DEPT-001",
+    "department_name": "普通内科",
+    "supply_id": "MAT-002",
+    "supply_name": "一次性手套 L号",
+    "quantity": 100,
+    "unit": "双",
+    "status": "issued",
+    "created_at": "2026-05-10",
+    "approved_at": "2026-05-10",
+    "approved_by": "admin",
+    "issued_at": "2026-05-10",
+    "issued_by": "admin",
+    "issued_batches": [
+      {
+        "batch_id": "BATCH-004",
+        "quantity_issued": 100,
+        "expiry_date": "2026-08-08"
+      }
+    ],
+    "approval_reasons": [
+      "超限额: 限额500，已用450，申领100"
+    ],
+    "actual_issued": 100
+  },
+  {
+    "request_id": "REQ202605100003",
+    "department_id": "DEPT-002",
+    "department_name": "急诊科",
+    "supply_id": "MAT-003",
+    "supply_name": "无菌纱布 5x5cm",
+    "quantity": 100,
+    "unit": "包",
+    "status": "issued",
+    "created_at": "2026-05-10",
+    "approved_at": "2026-05-10",
+    "approved_by": "admin",
+    "issued_at": "2026-05-10",
+    "issued_by": "admin",
+    "issued_batches": [
+      {
+        "batch_id": "BATCH-005",
+        "quantity_issued": 100,
+        "expiry_date": "2027-05-10"
+      }
+    ],
+    "approval_reasons": [
+      "存在1条急诊借用未补单"
+    ],
+    "actual_issued": 100
+  }
+]

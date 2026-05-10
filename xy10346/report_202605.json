@@ -1,0 +1,215 @@
+{
+  "period": "2026年5月",
+  "issued_requests": [
+    {
+      "request_id": "REQ202605100001",
+      "department_id": "DEPT-001",
+      "department_name": "普通内科",
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "quantity": 50,
+      "unit": "支",
+      "status": "issued",
+      "created_at": "2026-05-10",
+      "approved_at": "2026-05-10",
+      "approved_by": "system",
+      "issued_at": "2026-05-10",
+      "issued_by": "admin",
+      "issued_batches": [
+        {
+          "batch_id": "BATCH-001",
+          "quantity_issued": 50,
+          "expiry_date": "2026-05-25"
+        }
+      ],
+      "approval_reasons": [],
+      "actual_issued": 50
+    },
+    {
+      "request_id": "REQ202605100002",
+      "department_id": "DEPT-001",
+      "department_name": "普通内科",
+      "supply_id": "MAT-002",
+      "supply_name": "一次性手套 L号",
+      "quantity": 100,
+      "unit": "双",
+      "status": "issued",
+      "created_at": "2026-05-10",
+      "approved_at": "2026-05-10",
+      "approved_by": "admin",
+      "issued_at": "2026-05-10",
+      "issued_by": "admin",
+      "issued_batches": [
+        {
+          "batch_id": "BATCH-004",
+          "quantity_issued": 100,
+          "expiry_date": "2026-08-08"
+        }
+      ],
+      "approval_reasons": [
+        "超限额: 限额500，已用450，申领100"
+      ],
+      "actual_issued": 100
+    },
+    {
+      "request_id": "REQ202605100003",
+      "department_id": "DEPT-002",
+      "department_name": "急诊科",
+      "supply_id": "MAT-003",
+      "supply_name": "无菌纱布 5x5cm",
+      "quantity": 100,
+      "unit": "包",
+      "status": "issued",
+      "created_at": "2026-05-10",
+      "approved_at": "2026-05-10",
+      "approved_by": "admin",
+      "issued_at": "2026-05-10",
+      "issued_by": "admin",
+      "issued_batches": [
+        {
+          "batch_id": "BATCH-005",
+          "quantity_issued": 100,
+          "expiry_date": "2027-05-10"
+        }
+      ],
+      "approval_reasons": [
+        "存在1条急诊借用未补单"
+      ],
+      "actual_issued": 100
+    }
+  ],
+  "department_summary": [
+    {
+      "department_id": "DEPT-001",
+      "department_name": "普通内科",
+      "supplies": [
+        {
+          "supply_id": "MAT-001",
+          "supply_name": "一次性注射器 10ml",
+          "quantity": 50,
+          "monthly_limit": 100,
+          "used_amount": 50
+        },
+        {
+          "supply_id": "MAT-002",
+          "supply_name": "一次性手套 L号",
+          "quantity": 100,
+          "monthly_limit": 500,
+          "used_amount": 550
+        }
+      ],
+      "total_issued": 150
+    },
+    {
+      "department_id": "DEPT-002",
+      "department_name": "急诊科",
+      "supplies": [
+        {
+          "supply_id": "MAT-003",
+          "supply_name": "无菌纱布 5x5cm",
+          "quantity": 100,
+          "monthly_limit": 1000,
+          "used_amount": 100
+        }
+      ],
+      "total_issued": 100
+    }
+  ],
+  "pending_emergency_borrows": [
+    {
+      "borrow_id": "EMG-001",
+      "department_id": "DEPT-002",
+      "department_name": "急诊科",
+      "supply_id": "MAT-003",
+      "supply_name": "无菌纱布 5x5cm",
+      "quantity": 50,
+      "unit": "包",
+      "borrow_date": "2026-05-07",
+      "expected_return_date": "2026-05-14",
+      "status": "borrowed",
+      "is_replenished": false
+    }
+  ],
+  "expiring_warnings": [
+    {
+      "batch_id": "BATCH-003",
+      "supply_id": "MAT-002",
+      "supply_name": "一次性手套 L号",
+      "quantity": 200,
+      "unit": "双",
+      "expiry_date": "2026-05-05",
+      "warning_level": "expired",
+      "days_left": -5
+    },
+    {
+      "batch_id": "BATCH-006",
+      "supply_id": "MAT-004",
+      "supply_name": "碘伏消毒液",
+      "quantity": 50,
+      "unit": "瓶",
+      "expiry_date": "2026-05-17",
+      "warning_level": "expiring_soon",
+      "days_left": 7
+    },
+    {
+      "batch_id": "BATCH-001",
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "quantity": 30,
+      "unit": "支",
+      "expiry_date": "2026-05-25",
+      "warning_level": "expiring_soon",
+      "days_left": 15
+    }
+  ],
+  "inventory_snapshot": [
+    {
+      "batch_id": "BATCH-001",
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "quantity": 30,
+      "unit": "支",
+      "expiry_date": "2026-05-25"
+    },
+    {
+      "batch_id": "BATCH-002",
+      "supply_id": "MAT-001",
+      "supply_name": "一次性注射器 10ml",
+      "quantity": 120,
+      "unit": "支",
+      "expiry_date": "2026-11-06"
+    },
+    {
+      "batch_id": "BATCH-003",
+      "supply_id": "MAT-002",
+      "supply_name": "一次性手套 L号",
+      "quantity": 200,
+      "unit": "双",
+      "expiry_date": "2026-05-05"
+    },
+    {
+      "batch_id": "BATCH-004",
+      "supply_id": "MAT-002",
+      "supply_name": "一次性手套 L号",
+      "quantity": 200,
+      "unit": "双",
+      "expiry_date": "2026-08-08"
+    },
+    {
+      "batch_id": "BATCH-005",
+      "supply_id": "MAT-003",
+      "supply_name": "无菌纱布 5x5cm",
+      "quantity": 400,
+      "unit": "包",
+      "expiry_date": "2027-05-10"
+    },
+    {
+      "batch_id": "BATCH-006",
+      "supply_id": "MAT-004",
+      "supply_name": "碘伏消毒液",
+      "quantity": 50,
+      "unit": "瓶",
+      "expiry_date": "2026-05-17"
+    }
+  ]
+}
