@@ -1,0 +1,4 @@
+﻿order_id,driver_id,origin_lat,origin_lng,dest_lat,dest_lng,planned_distance,expected_duration,pickup_time,delivery_time,status,assigned_vehicle,cargo_type
+ORD001,D001,31.2304,121.4737,31.2504,121.5037,4.5,1200,2024-05-15 14:30:00,2024-05-15 14:50:00,completed,沪A12345,生鲜
+ORD002,D002,31.2304,121.4737,31.2504,121.5037,4.5,1200,2024-05-15 14:00:00,2024-05-15 14:20:00,completed,沪B67890,普通
+ORD003,D001,31.2,121.4,31.22,121.42,3.0,900,2024-05-15 15:00:00,2024-05-15 15:15:00,completed,沪A12345,易碎品

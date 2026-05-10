@@ -1,0 +1,340 @@
+[
+  {
+    "change_id": "CHG_20260510212257497649",
+    "timestamp": "2026-05-10T21:22:57.497656",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD001",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD001",
+      "driver_id": "D001",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:30:00",
+      "delivery_time": "2024-05-15T14:50:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "生鲜"
+    },
+    "reason": "导入/更新订单: ORD001"
+  },
+  {
+    "change_id": "CHG_20260510212257498044",
+    "timestamp": "2026-05-10T21:22:57.498049",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD002",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD002",
+      "driver_id": "D002",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:00:00",
+      "delivery_time": "2024-05-15T14:20:00",
+      "status": "completed",
+      "assigned_vehicle": "沪B67890",
+      "cargo_type": "普通"
+    },
+    "reason": "导入/更新订单: ORD002"
+  },
+  {
+    "change_id": "CHG_20260510212257498299",
+    "timestamp": "2026-05-10T21:22:57.498303",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD003",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.0,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "reason": "导入/更新订单: ORD003"
+  },
+  {
+    "change_id": "CHG_20260510212257503525",
+    "timestamp": "2026-05-10T21:22:57.503537",
+    "action": "import",
+    "record_type": "trajectory",
+    "record_id": "normal_trajectory.csv",
+    "old_value": null,
+    "new_value": {
+      "count": 120
+    },
+    "reason": "导入轨迹文件: /Users/lzy/pro/solo/workspaces/zy70212/samples/normal_trajectory.csv"
+  },
+  {
+    "change_id": "CHG_20260510212257508257",
+    "timestamp": "2026-05-10T21:22:57.508262",
+    "action": "import",
+    "record_type": "trajectory",
+    "record_id": "anomaly_trajectory.csv",
+    "old_value": null,
+    "new_value": {
+      "count": 150
+    },
+    "reason": "导入轨迹文件: /Users/lzy/pro/solo/workspaces/zy70212/samples/anomaly_trajectory.csv"
+  },
+  {
+    "change_id": "CHG_20260510212315915939",
+    "timestamp": "2026-05-10T21:23:15.915944",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD001",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD001",
+      "driver_id": "D001",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:30:00",
+      "delivery_time": "2024-05-15T14:50:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "生鲜"
+    },
+    "reason": "导入/更新订单: ORD001"
+  },
+  {
+    "change_id": "CHG_20260510212315916434",
+    "timestamp": "2026-05-10T21:23:15.916438",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD002",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD002",
+      "driver_id": "D002",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:00:00",
+      "delivery_time": "2024-05-15T14:20:00",
+      "status": "completed",
+      "assigned_vehicle": "沪B67890",
+      "cargo_type": "普通"
+    },
+    "reason": "导入/更新订单: ORD002"
+  },
+  {
+    "change_id": "CHG_20260510212315916826",
+    "timestamp": "2026-05-10T21:23:15.916834",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD003",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.0,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "reason": "导入/更新订单: ORD003"
+  },
+  {
+    "change_id": "CHG_20260510212315920968",
+    "timestamp": "2026-05-10T21:23:15.920973",
+    "action": "import",
+    "record_type": "trajectory",
+    "record_id": "normal_trajectory.csv",
+    "old_value": null,
+    "new_value": {
+      "count": 120
+    },
+    "reason": "导入轨迹文件: /Users/lzy/pro/solo/workspaces/zy70212/samples/normal_trajectory.csv"
+  },
+  {
+    "change_id": "CHG_20260510212315925338",
+    "timestamp": "2026-05-10T21:23:15.925342",
+    "action": "import",
+    "record_type": "trajectory",
+    "record_id": "anomaly_trajectory.csv",
+    "old_value": null,
+    "new_value": {
+      "count": 150
+    },
+    "reason": "导入轨迹文件: /Users/lzy/pro/solo/workspaces/zy70212/samples/anomaly_trajectory.csv"
+  },
+  {
+    "change_id": "CHG_20260510212317073335",
+    "timestamp": "2026-05-10T21:23:17.073345",
+    "action": "update",
+    "record_type": "order",
+    "record_id": "ORD003",
+    "old_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.0,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "new_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.5,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "reason": "客户补录：发现原始距离有误"
+  },
+  {
+    "change_id": "CHG_20260510212317073822",
+    "timestamp": "2026-05-10T21:23:17.073827",
+    "action": "delete",
+    "record_type": "order",
+    "record_id": "ORD003",
+    "old_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.5,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "new_value": null,
+    "reason": "订单取消，客户撤回"
+  },
+  {
+    "change_id": "CHG_20260510212326527093",
+    "timestamp": "2026-05-10T21:23:26.527096",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD001",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD001",
+      "driver_id": "D001",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:30:00",
+      "delivery_time": "2024-05-15T14:50:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "生鲜"
+    },
+    "reason": "导入/更新订单: ORD001"
+  },
+  {
+    "change_id": "CHG_20260510212326527748",
+    "timestamp": "2026-05-10T21:23:26.527751",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD002",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD002",
+      "driver_id": "D002",
+      "origin_lat": 31.2304,
+      "origin_lng": 121.4737,
+      "dest_lat": 31.2504,
+      "dest_lng": 121.5037,
+      "planned_distance": 4.5,
+      "expected_duration": 1200,
+      "pickup_time": "2024-05-15T14:00:00",
+      "delivery_time": "2024-05-15T14:20:00",
+      "status": "completed",
+      "assigned_vehicle": "沪B67890",
+      "cargo_type": "普通"
+    },
+    "reason": "导入/更新订单: ORD002"
+  },
+  {
+    "change_id": "CHG_20260510212326528817",
+    "timestamp": "2026-05-10T21:23:26.528826",
+    "action": "import",
+    "record_type": "order",
+    "record_id": "ORD003",
+    "old_value": null,
+    "new_value": {
+      "order_id": "ORD003",
+      "driver_id": "D001",
+      "origin_lat": 31.2,
+      "origin_lng": 121.4,
+      "dest_lat": 31.22,
+      "dest_lng": 121.42,
+      "planned_distance": 3.0,
+      "expected_duration": 900,
+      "pickup_time": "2024-05-15T15:00:00",
+      "delivery_time": "2024-05-15T15:15:00",
+      "status": "completed",
+      "assigned_vehicle": "沪A12345",
+      "cargo_type": "易碎品"
+    },
+    "reason": "导入/更新订单: ORD003"
+  },
+  {
+    "change_id": "CHG_20260510212326534099",
+    "timestamp": "2026-05-10T21:23:26.534104",
+    "action": "import",
+    "record_type": "trajectory",
+    "record_id": "anomaly_trajectory.csv",
+    "old_value": null,
+    "new_value": {
+      "count": 150
+    },
+    "reason": "导入轨迹文件: /Users/lzy/pro/solo/workspaces/zy70212/samples/anomaly_trajectory.csv"
+  }
+]

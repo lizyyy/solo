@@ -1,0 +1,54 @@
+{
+  "report_name": "anomaly_report",
+  "generated_at": "2026-05-10T21:23:26.875143",
+  "analysis_count": 1,
+  "summary_table": "data/reports/anomaly_report/summary.csv",
+  "history_table": "data/reports/anomaly_report/history.csv",
+  "charts": {
+    "ORD002": "data/reports/anomaly_report/ORD002_analysis.png"
+  },
+  "details": {
+    "ORD002": "data/reports/anomaly_report/ORD002_details.csv"
+  },
+  "calculation_rules": {
+    "detour_distance_threshold": 1.5,
+    "detour_time_ratio": 1.4,
+    "stationary_time_threshold": 300,
+    "match_time_window": 600
+  },
+  "analyses": [
+    {
+      "order_id": "ORD002",
+      "driver_id": "D002",
+      "actual_distance_meters": 8725.01,
+      "planned_distance_meters": 4500.0,
+      "distance_ratio": 1.939,
+      "actual_duration_seconds": 1270,
+      "expected_duration_seconds": 1200,
+      "time_ratio": 1.058,
+      "detour_distance_meters": 4225.01,
+      "detour_segments_count": 0,
+      "detour_segments": [],
+      "stationary_segments_count": 1,
+      "stationary_segments": [
+        {
+          "start_index": 59,
+          "end_index": 90,
+          "start_time": "2024-05-15T14:06:00",
+          "end_time": "2024-05-15T14:15:10",
+          "duration_seconds": 550,
+          "location": {
+            "latitude": 31.260009,
+            "longitude": 121.470015
+          },
+          "radius_meters": 50
+        }
+      ],
+      "overall_risk_score": 8.78,
+      "conclusions": [
+        "【距离异常】实际行驶8.73公里, 超出计划4.23公里, 超出比例93.9%",
+        "【停留异常】检测到1处长时间停留, 累计9.2分钟"
+      ]
+    }
+  ]
+}
