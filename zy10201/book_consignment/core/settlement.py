@@ -126,13 +126,14 @@ def validate_sales(start_date: Optional[str] = None, end_date: Optional[str] = N
         if dup_check:
             issues.append({
                 'type': 'duplicate_sale',
-                'severity': 'warning',
+                'severity': 'error',
                 'sale_id': sale['id'],
                 'book_title': sale['title'],
                 'book_isbn': sale['isbn'],
                 'sale_date': sale['sale_date'],
                 'price': final_price,
-                'message': f'同一本书({sale["title"]})在同一天({sale["sale_date"]})以相同价格({final_price})售出，疑似重复'
+                'duplicate_count': len(dup_check) + 1,
+                'message': f'同一本书({sale["title"]})在同一天({sale["sale_date"]})以相同价格({final_price})售出 {len(dup_check) + 1} 次，疑似重复录入'
             })
         
         disc_check = _check_discount_below_min(sale['book_id'], final_price)

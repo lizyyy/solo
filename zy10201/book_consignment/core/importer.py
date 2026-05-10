@@ -182,12 +182,21 @@ def import_books(file_path: str) -> Dict[str, Any]:
     }
 
 
+def _check_duplicate_sale_record(cursor, book_id: int, sale_date: str, final_price: float) -> bool:
+    cursor.execute('''
+        SELECT COUNT(*) as cnt FROM sales 
+        WHERE book_id = ? AND sale_date = ? AND ABS(final_sale_price - ?) < 0.01
+    ''', (book_id, sale_date, final_price))
+    return cursor.fetchone()['cnt'] > 0
+
+
 def import_sales(file_path: str) -> Dict[str, Any]:
     is_dup, msg = _check_duplicate_import(file_path, 'sales')
     if is_dup:
-        return {'success': False, 'message': msg, 'imported': 0, 'errors': []}
+        return {'success': False, 'message': msg, 'imported': 0, 'skipped': 0, 'errors': []}
     
     imported = 0
+    skipped = 0
     errors = []
     now = datetime.now().isoformat()
     file_name = file_path.split('/')[-1]
@@ -238,6 +247,11 @@ def import_sales(file_path: str) -> Dict[str, Any]:
                     errors.append(f"第{line_num}行: 找不到匹配的书籍 (标识: {book_identifier}, 书名: {title})")
                     continue
                 
+                if _check_duplicate_sale_record(cursor, book_id, sale_date, final_price):
+                    skipped += 1
+                    errors.append(f"第{line_num}行: 同一本书已在 {sale_date} 以 ¥{final_price} 售出，已跳过（疑似重复导入）")
+                    continue
+                
                 cursor.execute('''
                     INSERT INTO sales 
                     (book_id, sale_date, original_sale_price, discount, final_sale_price, 
@@ -250,10 +264,15 @@ def import_sales(file_path: str) -> Dict[str, Any]:
     
     _record_import(file_path, 'sales', imported)
     
+    message = f'导入 {imported} 条销售记录'
+    if skipped > 0:
+        message += f'，跳过 {skipped} 条疑似重复的记录'
+    
     return {
-        'success': len(errors) == 0,
-        'message': f'导入 {imported} 条销售记录' + (f'，有 {len(errors)} 条错误' if errors else ''),
+        'success': True,
+        'message': message,
         'imported': imported,
+        'skipped': skipped,
         'errors': errors
     }
 
