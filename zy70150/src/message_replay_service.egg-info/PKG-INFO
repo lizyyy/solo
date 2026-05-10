@@ -1,0 +1,32 @@
+Metadata-Version: 2.4
+Name: message-replay-service
+Version: 1.0.0
+Summary: 生产消息重放审批服务 - 安全、可控、可追溯的消息重放解决方案
+Author: Dev Team
+License: MIT
+Keywords: message,replay,idempotency,kafka,queue
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: tabulate>=0.9.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: colorama>=0.4.6
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: black>=23.0.0; extra == "dev"
+Requires-Dist: ruff>=0.1.0; extra == "dev"
+Requires-Dist: mypy>=1.0.0; extra == "dev"
