@@ -115,13 +115,6 @@ func (s *ReplayService) ReplayMessages(ctx context.Context, req *ReplayMessagesR
 
 	requestID := utils.GenerateRequestID()
 
-	lockKey := fmt.Sprintf("replay:%s", requestID)
-	success, err := s.locker.TryLock(ctx, lockKey, time.Duration(req.Timeout+30)*time.Second)
-	if err != nil || !success {
-		return nil, errors.ErrConcurrentOperation("replay messages")
-	}
-	defer s.locker.Unlock(ctx, lockKey)
-
 	now := time.Now()
 	replayRequest := &model.ReplayRequest{
 		RequestID:     requestID,
@@ -133,8 +126,10 @@ func (s *ReplayService) ReplayMessages(ctx context.Context, req *ReplayMessagesR
 		MaxBatchSize:  req.MaxBatchSize,
 		Concurrency:   req.Concurrency,
 		Timeout:       req.Timeout,
-		Status:        "RUNNING",
+		Status:        "PENDING",
 		TotalCount:    len(deadLetters),
+		SuccessCount:  0,
+		FailedCount:   0,
 		OperatorID:    req.OperatorID,
 		Reason:        req.Reason,
 		StartTime:     &now,
@@ -147,33 +142,42 @@ func (s *ReplayService) ReplayMessages(ctx context.Context, req *ReplayMessagesR
 	result := &ReplayResult{
 		RequestID:  requestID,
 		TotalCount: len(deadLetters),
-		Status:     "RUNNING",
+		Status:     "PENDING",
 		StartTime:  &now,
 	}
 
 	s.mu.Lock()
 	s.activeReplays[requestID] = true
 	s.mu.Unlock()
-	defer func() {
-		s.mu.Lock()
-		delete(s.activeReplays, requestID)
-		s.mu.Unlock()
-	}()
 
-	go s.executeReplay(ctx, requestID, deadLetters, req)
+	go s.executeReplay(requestID, deadLetters, req)
 
+	logger.Info("Replay request created, request_id=%s, total=%d, dry_run=%v", requestID, len(deadLetters), req.DryRun)
 	return result, nil
 }
 
 func (s *ReplayService) executeReplay(
-	ctx context.Context,
 	requestID string,
 	deadLetters []*model.DeadLetterMessage,
 	req *ReplayMessagesRequest,
 ) {
-	startTime := time.Now()
-	timeoutCtx, cancel := context.WithTimeout(ctx, time.Duration(req.Timeout)*time.Second)
+	defer func() {
+		s.mu.Lock()
+		delete(s.activeReplays, requestID)
+		s.mu.Unlock()
+		logger.Info("Replay finished, request_id=%s, removed from active replays", requestID)
+	}()
+
+	if err := s.db.GetDB().Model(&model.ReplayRequest{}).
+		Where("request_id = ?", requestID).
+		Update("status", "RUNNING").Error; err != nil {
+		logger.Warn("Failed to update replay status to RUNNING, request_id=%s: %v", requestID, err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(req.Timeout)*time.Second)
 	defer cancel()
+
+	startTime := time.Now()
 
 	var successCount int64
 	var failedCount int64
@@ -181,7 +185,6 @@ func (s *ReplayService) executeReplay(
 	semaphore := make(chan struct{}, req.Concurrency)
 	var wg sync.WaitGroup
 
-	results := make([]*ReplayItemResult, len(deadLetters))
 	resultChan := make(chan *ReplayItemResult, len(deadLetters))
 
 	for i, dl := range deadLetters {
@@ -206,8 +209,11 @@ func (s *ReplayService) executeReplay(
 				MessageID:    dl.MessageID,
 				Sequence:     index,
 				Status:       "PROCESSING",
+				StartTime:    &itemStart,
 			}
-			s.db.GetDB().Create(task)
+			if err := s.db.GetDB().Create(task).Error; err != nil {
+				logger.Warn("Failed to create replay task for dl=%d: %v", dl.ID, err)
+			}
 
 			if req.DryRun {
 				itemResult.Success = true
@@ -216,7 +222,7 @@ func (s *ReplayService) executeReplay(
 				task.ExecutionTime = itemResult.ExecutionTime
 				atomic.AddInt64(&successCount, 1)
 			} else {
-				err := s.replaySingleMessage(timeoutCtx, dl, req)
+				err := s.replaySingleMessage(ctx, dl, req)
 				if err != nil {
 					itemResult.Success = false
 					itemResult.ErrorMessage = err.Error()
@@ -233,9 +239,10 @@ func (s *ReplayService) executeReplay(
 			}
 
 			now := time.Now()
-			task.StartTime = &itemStart
 			task.EndTime = &now
-			s.db.GetDB().Save(task)
+			if err := s.db.GetDB().Save(task).Error; err != nil {
+				logger.Warn("Failed to update replay task for dl=%d: %v", dl.ID, err)
+			}
 
 			resultChan <- itemResult
 		}(i, dl)
@@ -244,8 +251,9 @@ func (s *ReplayService) executeReplay(
 	wg.Wait()
 	close(resultChan)
 
-	for itemResult := range results {
-		_ = itemResult
+	results := make([]*ReplayItemResult, 0, len(deadLetters))
+	for itemResult := range resultChan {
+		results = append(results, itemResult)
 	}
 
 	endTime := time.Now()
@@ -264,17 +272,19 @@ func (s *ReplayService) executeReplay(
 		finalStatus = "SUCCESS"
 	}
 
-	s.db.GetDB().Model(&model.ReplayRequest{}).
+	if err := s.db.GetDB().Model(&model.ReplayRequest{}).
 		Where("request_id = ?", requestID).
 		Updates(map[string]interface{}{
 			"status":        finalStatus,
 			"success_count": success,
 			"failed_count":  failed,
 			"end_time":      &endTime,
-		})
+		}).Error; err != nil {
+		logger.Warn("Failed to update replay request status, request_id=%s: %v", requestID, err)
+	}
 
-	logger.Info("Replay completed, request_id=%s, total=%d, success=%d, failed=%d, duration=%dms",
-		requestID, len(deadLetters), success, failed, duration)
+	logger.Info("Replay completed, request_id=%s, total=%d, success=%d, failed=%d, duration=%dms, status=%s",
+		requestID, len(deadLetters), success, failed, duration, finalStatus)
 }
 
 func (s *ReplayService) replaySingleMessage(
