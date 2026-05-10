@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ancient-books-page-checker"
+version = "0.1.0"
+description = "古籍数字化页码校对 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "rich>=12.0",
+    "tabulate>=0.8",
+]
+
+[project.scripts]
+abcheck = "ancient_books.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
