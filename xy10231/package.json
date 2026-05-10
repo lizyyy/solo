@@ -1,0 +1,21 @@
+{
+  "name": "metro-lost-found-matcher",
+  "version": "1.0.0",
+  "description": "地铁失物招领匹配器",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "start": "npm --workspace backend run start",
+    "install:all": "npm install && npm --workspace backend install && npm --workspace frontend install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
