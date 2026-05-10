@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: subtitle-qc
+Version: 0.1.0
+Summary: 课程视频字幕质检 CLI 工具
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: srt>=3.5
+Requires-Dist: webvtt-py>=0.4
+Requires-Dist: python-dotenv>=0.19
+Requires-Dist: pathvalidate>=2.5
+Requires-Dist: regex>=2021.10

@@ -1,0 +1,26 @@
+[project]
+name = "subtitle-qc"
+version = "0.1.0"
+description = "课程视频字幕质检 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "srt>=3.5",
+    "webvtt-py>=0.4",
+    "python-dotenv>=0.19",
+    "pathvalidate>=2.5",
+    "regex>=2021.10",
+]
+
+[project.scripts]
+subtitle-qc = "subtitle_qc.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["subtitle_qc*"]
+
+[tool.setuptools.package-data]
+subtitle_qc = ["data/*"]

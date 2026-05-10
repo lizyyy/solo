@@ -1,0 +1,34 @@
+{
+  "terms": [
+    {
+      "term": "python",
+      "canonical_form": "Python",
+      "synonyms": [],
+      "case_sensitive": true
+    },
+    {
+      "term": "人工智能",
+      "canonical_form": "人工智能",
+      "synonyms": ["AI", "ai"],
+      "case_sensitive": false
+    },
+    {
+      "term": "机器翻译",
+      "canonical_form": "机器翻译",
+      "synonyms": ["MT", "自动翻译"],
+      "case_sensitive": false
+    },
+    {
+      "term": "账号",
+      "canonical_form": "账号",
+      "synonyms": ["帐号"],
+      "case_sensitive": false
+    },
+    {
+      "term": "登录",
+      "canonical_form": "登录",
+      "synonyms": ["登陆"],
+      "case_sensitive": false
+    }
+  ]
+}
