@@ -1,0 +1,118 @@
+{
+  "report_generated_at": "2026-05-10 19:06:24",
+  "last_scan": "2026-05-10 19:06:07",
+  "total_articles": 5,
+  "total_risks": 8,
+  "risks_by_severity": {
+    "high": 4,
+    "medium": 4,
+    "low": 0
+  },
+  "risks": [
+    {
+      "risk_id": "68069c000f71aec6",
+      "article_path": "05_already_confirmed_expired.md",
+      "article_title": "老版本API使用指南",
+      "type": "expired_policy",
+      "description": "政策已过期，生效日期为 2023-06-01",
+      "suggested_owner": "赵六",
+      "severity": "high",
+      "ref_count": 0,
+      "status": "re-expired",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:06:07",
+      "confirmed_at": "2026-05-10 19:06:00"
+    },
+    {
+      "risk_id": "2f4be3f352f6b420",
+      "article_path": "05_already_confirmed_expired.md",
+      "article_title": "老版本API使用指南",
+      "type": "high_ref_not_revised",
+      "description": "被高频引用（5次）但未标记修订",
+      "suggested_owner": "赵六",
+      "severity": "medium",
+      "ref_count": 5,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "400ed15d5ef5d9a0",
+      "article_path": "02_expired_price_article.md",
+      "article_title": "VIP会员服务条款",
+      "type": "expired_policy",
+      "description": "政策已过期，生效日期为 2024-01-01",
+      "suggested_owner": "李四",
+      "severity": "high",
+      "ref_count": 0,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "848226d1c439f770",
+      "article_path": "04_high_reference_article.md",
+      "article_title": "新用户快速入门指南",
+      "type": "expired_policy",
+      "description": "政策已过期，生效日期为 2026-03-01",
+      "suggested_owner": "王五",
+      "severity": "high",
+      "ref_count": 0,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "fa0cac43d42a1774",
+      "article_path": "04_high_reference_article.md",
+      "article_title": "新用户快速入门指南",
+      "type": "high_ref_not_revised",
+      "description": "被高频引用（10次）但未标记修订",
+      "suggested_owner": "王五",
+      "severity": "medium",
+      "ref_count": 10,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "f8fc004bbc335578",
+      "article_path": "03_missing_owner_article.md",
+      "article_title": "退款政策说明",
+      "type": "expired_policy",
+      "description": "政策已过期，生效日期为 2025-06-15",
+      "suggested_owner": "未知负责人",
+      "severity": "high",
+      "ref_count": 0,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "90a693d26a2c1605",
+      "article_path": "03_missing_owner_article.md",
+      "article_title": "退款政策说明",
+      "type": "missing_owner",
+      "description": "缺少负责人信息",
+      "suggested_owner": "知识库管理员",
+      "severity": "medium",
+      "ref_count": 0,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    },
+    {
+      "risk_id": "ff7044d30cfd77c8",
+      "article_path": "03_missing_owner_article.md",
+      "article_title": "退款政策说明",
+      "type": "high_ref_not_revised",
+      "description": "被高频引用（5次）但未标记修订",
+      "suggested_owner": "未知负责人",
+      "severity": "medium",
+      "ref_count": 5,
+      "status": "pending",
+      "created_at": "2026-05-10 19:05:39",
+      "updated_at": "2026-05-10 19:05:39"
+    }
+  ]
+}
