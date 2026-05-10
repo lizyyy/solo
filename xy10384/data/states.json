@@ -1,0 +1,42 @@
+{
+  "TEST001": [
+    {
+      "tracking_number": "TEST001",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:58",
+      "state": {
+        "tracking_number": "TEST001",
+        "pickup_code": "888888",
+        "recipient_name": "测试用户",
+        "phone": "13900139001",
+        "check_in_time": "2026-05-11 02:06:58",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020658928"
+    },
+    {
+      "tracking_number": "TEST001",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:59",
+      "state": {
+        "tracking_number": "TEST001",
+        "pickup_code": "888888",
+        "recipient_name": "测试用户",
+        "phone": "13900139001",
+        "check_in_time": "2026-05-11 02:06:58",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:59",
+        "picked_by": "顾客",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020659980"
+    }
+  ]
+}

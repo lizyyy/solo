@@ -1,0 +1,28 @@
+{
+  "20260511020658928": {
+    "event_id": "20260511020658928",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:58",
+    "tracking_number": "TEST001",
+    "details": {
+      "pickup_code": "888888",
+      "recipient_name": "测试用户",
+      "phone": "13900139001"
+    },
+    "operator": "测试站长",
+    "note": null
+  },
+  "20260511020659980": {
+    "event_id": "20260511020659980",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:59",
+    "tracking_number": "TEST001",
+    "details": {
+      "pickup_code": "888888",
+      "picked_by": "顾客",
+      "previous_status": "in_store"
+    },
+    "operator": "测试站长",
+    "note": null
+  }
+}

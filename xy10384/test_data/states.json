@@ -1,0 +1,493 @@
+{
+  "SF1001": [
+    {
+      "tracking_number": "SF1001",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "SF1001",
+        "pickup_code": "123456",
+        "recipient_name": "张三",
+        "phone": "13800138001",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648157"
+    },
+    {
+      "tracking_number": "SF1001",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "SF1001",
+        "pickup_code": "123456",
+        "recipient_name": "张三",
+        "phone": "13800138001",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "张三本人",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648158"
+    }
+  ],
+  "YT2002": [
+    {
+      "tracking_number": "YT2002",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YT2002",
+        "pickup_code": "234567",
+        "recipient_name": "李四",
+        "phone": "13800138002",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648159"
+    },
+    {
+      "tracking_number": "YT2002",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YT2002",
+        "pickup_code": "234567",
+        "recipient_name": "李四",
+        "phone": "13800138002",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "王五",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648160"
+    },
+    {
+      "tracking_number": "YT2002",
+      "version": 3,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YT2002",
+        "pickup_code": "234567",
+        "recipient_name": "李四",
+        "phone": "13800138002",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "mis_picked",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "王五",
+        "mis_pick_info": {
+          "reported_by": "李四",
+          "mis_picked_by": "王五",
+          "description": "包裹显示已取件，但本人未收到，监控显示被他人错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648161"
+    },
+    {
+      "tracking_number": "YT2002",
+      "version": 4,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YT2002",
+        "pickup_code": "234567",
+        "recipient_name": "李四",
+        "phone": "13800138002",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "recovered",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "王五",
+        "mis_pick_info": {
+          "reported_by": "李四",
+          "mis_picked_by": "王五",
+          "description": "包裹显示已取件，但本人未收到，监控显示被他人错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": {
+          "recovered": true,
+          "recovered_by": "王五",
+          "recovery_method": "电话联系",
+          "description": "王五发现拿错后主动送回",
+          "update_time": "2026-05-11 02:06:48"
+        },
+        "compensation_info": null
+      },
+      "event_id": "20260511020648162"
+    }
+  ],
+  "ZT3003": [
+    {
+      "tracking_number": "ZT3003",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "ZT3003",
+        "pickup_code": "345678",
+        "recipient_name": "赵六",
+        "phone": "13800138003",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648168"
+    },
+    {
+      "tracking_number": "ZT3003",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "ZT3003",
+        "pickup_code": "345678",
+        "recipient_name": "赵六",
+        "phone": "13800138003",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "未知人员",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648173"
+    },
+    {
+      "tracking_number": "ZT3003",
+      "version": 3,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "ZT3003",
+        "pickup_code": "345678",
+        "recipient_name": "赵六",
+        "phone": "13800138003",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "mis_picked",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "未知人员",
+        "mis_pick_info": {
+          "reported_by": "赵六",
+          "mis_picked_by": null,
+          "description": "包裹被冒领，监控无法识别取件人",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648176"
+    },
+    {
+      "tracking_number": "ZT3003",
+      "version": 4,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "ZT3003",
+        "pickup_code": "345678",
+        "recipient_name": "赵六",
+        "phone": "13800138003",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "lost",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "未知人员",
+        "mis_pick_info": {
+          "reported_by": "赵六",
+          "mis_picked_by": null,
+          "description": "包裹被冒领，监控无法识别取件人",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": {
+          "recovered": false,
+          "recovered_by": null,
+          "recovery_method": null,
+          "description": "多方查找无果，确认丢失",
+          "update_time": "2026-05-11 02:06:48"
+        },
+        "compensation_info": null
+      },
+      "event_id": "20260511020648177"
+    },
+    {
+      "tracking_number": "ZT3003",
+      "version": 5,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "ZT3003",
+        "pickup_code": "345678",
+        "recipient_name": "赵六",
+        "phone": "13800138003",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "compensated",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "未知人员",
+        "mis_pick_info": {
+          "reported_by": "赵六",
+          "mis_picked_by": null,
+          "description": "包裹被冒领，监控无法识别取件人",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": {
+          "recovered": false,
+          "recovered_by": null,
+          "recovery_method": null,
+          "description": "多方查找无果，确认丢失",
+          "update_time": "2026-05-11 02:06:48"
+        },
+        "compensation_info": {
+          "amount": 75.0,
+          "compensated_to": "赵六",
+          "payment_method": "微信转账",
+          "compensation_time": "2026-05-11 02:06:48"
+        }
+      },
+      "event_id": "20260511020648185"
+    }
+  ],
+  "JD4004": [
+    {
+      "tracking_number": "JD4004",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "JD4004",
+        "pickup_code": "456789",
+        "recipient_name": "钱七",
+        "phone": "13800138004",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648189"
+    },
+    {
+      "tracking_number": "JD4004",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "JD4004",
+        "pickup_code": "456789",
+        "recipient_name": "钱七",
+        "phone": "13800138004",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648191"
+    }
+  ],
+  "EMS5005": [
+    {
+      "tracking_number": "EMS5005",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "EMS5005",
+        "pickup_code": "567890",
+        "recipient_name": "孙八",
+        "phone": "13800138005",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648201"
+    },
+    {
+      "tracking_number": "EMS5005",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "EMS5005",
+        "pickup_code": "567890",
+        "recipient_name": "孙八",
+        "phone": "13800138005",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648205"
+    },
+    {
+      "tracking_number": "EMS5005",
+      "version": 3,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "EMS5005",
+        "pickup_code": "567890",
+        "recipient_name": "孙八",
+        "phone": "13800138005",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "mis_picked",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": {
+          "reported_by": "孙八",
+          "mis_picked_by": null,
+          "description": "包裹错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648208"
+    },
+    {
+      "tracking_number": "EMS5005",
+      "version": 4,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "EMS5005",
+        "pickup_code": "567890",
+        "recipient_name": "孙八",
+        "phone": "13800138005",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "lost",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": {
+          "reported_by": "孙八",
+          "mis_picked_by": null,
+          "description": "包裹错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": {
+          "recovered": false,
+          "recovered_by": null,
+          "recovery_method": null,
+          "description": null,
+          "update_time": "2026-05-11 02:06:48"
+        },
+        "compensation_info": null
+      },
+      "event_id": "20260511020648212"
+    }
+  ],
+  "YUN6006": [
+    {
+      "tracking_number": "YUN6006",
+      "version": 1,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YUN6006",
+        "pickup_code": "678901",
+        "recipient_name": "周九",
+        "phone": "13800138006",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "in_store",
+        "pickup_time": null,
+        "picked_by": null,
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648220"
+    },
+    {
+      "tracking_number": "YUN6006",
+      "version": 2,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YUN6006",
+        "pickup_code": "678901",
+        "recipient_name": "周九",
+        "phone": "13800138006",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "picked_up",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": null,
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648227"
+    },
+    {
+      "tracking_number": "YUN6006",
+      "version": 3,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YUN6006",
+        "pickup_code": "678901",
+        "recipient_name": "周九",
+        "phone": "13800138006",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "mis_picked",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": {
+          "reported_by": "周九",
+          "mis_picked_by": null,
+          "description": "错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": null,
+        "compensation_info": null
+      },
+      "event_id": "20260511020648234"
+    },
+    {
+      "tracking_number": "YUN6006",
+      "version": 4,
+      "timestamp": "2026-05-11 02:06:48",
+      "state": {
+        "tracking_number": "YUN6006",
+        "pickup_code": "678901",
+        "recipient_name": "周九",
+        "phone": "13800138006",
+        "check_in_time": "2026-05-11 02:06:48",
+        "status": "recovered",
+        "pickup_time": "2026-05-11 02:06:48",
+        "picked_by": "顾客",
+        "mis_pick_info": {
+          "reported_by": "周九",
+          "mis_picked_by": null,
+          "description": "错拿",
+          "register_time": "2026-05-11 02:06:48"
+        },
+        "recovery_info": {
+          "recovered": true,
+          "recovered_by": null,
+          "recovery_method": null,
+          "description": null,
+          "update_time": "2026-05-11 02:06:48"
+        },
+        "compensation_info": null
+      },
+      "event_id": "20260511020648244"
+    }
+  ]
+}

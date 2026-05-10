@@ -1,0 +1,292 @@
+{
+  "20260511020648157": {
+    "event_id": "20260511020648157",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "SF1001",
+    "details": {
+      "pickup_code": "123456",
+      "recipient_name": "张三",
+      "phone": "13800138001"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648158": {
+    "event_id": "20260511020648158",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "SF1001",
+    "details": {
+      "pickup_code": "123456",
+      "picked_by": "张三本人",
+      "previous_status": "in_store"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648159": {
+    "event_id": "20260511020648159",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YT2002",
+    "details": {
+      "pickup_code": "234567",
+      "recipient_name": "李四",
+      "phone": "13800138002"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648160": {
+    "event_id": "20260511020648160",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YT2002",
+    "details": {
+      "pickup_code": "234567",
+      "picked_by": "王五",
+      "previous_status": "in_store"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648161": {
+    "event_id": "20260511020648161",
+    "event_type": "mis_pick_register",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YT2002",
+    "details": {
+      "reported_by": "李四",
+      "mis_picked_by": "王五",
+      "description": "包裹显示已取件，但本人未收到，监控显示被他人错拿",
+      "previous_status": "picked_up"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648162": {
+    "event_id": "20260511020648162",
+    "event_type": "recovery_update",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YT2002",
+    "details": {
+      "recovered": true,
+      "recovered_by": "王五",
+      "recovery_method": "电话联系",
+      "description": "王五发现拿错后主动送回",
+      "previous_status": "mis_picked",
+      "new_status": "recovered"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648168": {
+    "event_id": "20260511020648168",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "ZT3003",
+    "details": {
+      "pickup_code": "345678",
+      "recipient_name": "赵六",
+      "phone": "13800138003"
+    },
+    "operator": "站点小张",
+    "note": null
+  },
+  "20260511020648173": {
+    "event_id": "20260511020648173",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "ZT3003",
+    "details": {
+      "pickup_code": "345678",
+      "picked_by": "未知人员",
+      "previous_status": "in_store"
+    },
+    "operator": "站点小张",
+    "note": null
+  },
+  "20260511020648176": {
+    "event_id": "20260511020648176",
+    "event_type": "mis_pick_register",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "ZT3003",
+    "details": {
+      "reported_by": "赵六",
+      "mis_picked_by": null,
+      "description": "包裹被冒领，监控无法识别取件人",
+      "previous_status": "picked_up"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648177": {
+    "event_id": "20260511020648177",
+    "event_type": "recovery_update",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "ZT3003",
+    "details": {
+      "recovered": false,
+      "recovered_by": null,
+      "recovery_method": null,
+      "description": "多方查找无果，确认丢失",
+      "previous_status": "mis_picked",
+      "new_status": "lost"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648185": {
+    "event_id": "20260511020648185",
+    "event_type": "compensation",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "ZT3003",
+    "details": {
+      "amount": 75.0,
+      "compensated_to": "赵六",
+      "payment_method": "微信转账",
+      "previous_status": "lost"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648189": {
+    "event_id": "20260511020648189",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "JD4004",
+    "details": {
+      "pickup_code": "456789",
+      "recipient_name": "钱七",
+      "phone": "13800138004"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648191": {
+    "event_id": "20260511020648191",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "JD4004",
+    "details": {
+      "pickup_code": "456789",
+      "picked_by": "顾客",
+      "previous_status": "in_store"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648201": {
+    "event_id": "20260511020648201",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "EMS5005",
+    "details": {
+      "pickup_code": "567890",
+      "recipient_name": "孙八",
+      "phone": "13800138005"
+    },
+    "operator": "站点小张",
+    "note": null
+  },
+  "20260511020648205": {
+    "event_id": "20260511020648205",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "EMS5005",
+    "details": {
+      "pickup_code": "567890",
+      "picked_by": "顾客",
+      "previous_status": "in_store"
+    },
+    "operator": "站点小张",
+    "note": null
+  },
+  "20260511020648208": {
+    "event_id": "20260511020648208",
+    "event_type": "mis_pick_register",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "EMS5005",
+    "details": {
+      "reported_by": "孙八",
+      "mis_picked_by": null,
+      "description": "包裹错拿",
+      "previous_status": "picked_up"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648212": {
+    "event_id": "20260511020648212",
+    "event_type": "recovery_update",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "EMS5005",
+    "details": {
+      "recovered": false,
+      "recovered_by": null,
+      "recovery_method": null,
+      "description": null,
+      "previous_status": "mis_picked",
+      "new_status": "lost"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648220": {
+    "event_id": "20260511020648220",
+    "event_type": "check_in",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YUN6006",
+    "details": {
+      "pickup_code": "678901",
+      "recipient_name": "周九",
+      "phone": "13800138006"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648227": {
+    "event_id": "20260511020648227",
+    "event_type": "pickup",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YUN6006",
+    "details": {
+      "pickup_code": "678901",
+      "picked_by": "顾客",
+      "previous_status": "in_store"
+    },
+    "operator": "站点小王",
+    "note": null
+  },
+  "20260511020648234": {
+    "event_id": "20260511020648234",
+    "event_type": "mis_pick_register",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YUN6006",
+    "details": {
+      "reported_by": "周九",
+      "mis_picked_by": null,
+      "description": "错拿",
+      "previous_status": "picked_up"
+    },
+    "operator": "站长小李",
+    "note": null
+  },
+  "20260511020648244": {
+    "event_id": "20260511020648244",
+    "event_type": "recovery_update",
+    "timestamp": "2026-05-11 02:06:48",
+    "tracking_number": "YUN6006",
+    "details": {
+      "recovered": true,
+      "recovered_by": null,
+      "recovery_method": null,
+      "description": null,
+      "previous_status": "mis_picked",
+      "new_status": "recovered"
+    },
+    "operator": "站长小李",
+    "note": null
+  }
+}
