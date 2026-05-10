@@ -1,0 +1,243 @@
+{
+  "完成用户登录模块开发": {
+    "id": "完成用户登录模块开发",
+    "description": "完成用户登录模块开发",
+    "assignee": "李四",
+    "due_date": "2024-01-15",
+    "project": "用户中心",
+    "status": "已完成",
+    "source_files": [
+      "meeting_2024_01_01.txt",
+      "meeting_2024_01_08.txt"
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-11T00:54:49.661679",
+        "source_file": "meeting_2024_01_08.txt",
+        "changes": [
+          "状态变化: 待开始 -> 已完成"
+        ],
+        "old_assignee": "李四",
+        "old_due_date": "2024-01-15",
+        "old_status": "待开始"
+      }
+    ],
+    "flags": [
+      "同一行动项多次变化"
+    ],
+    "created_at": "2026-05-11T00:54:49.660363",
+    "updated_at": "2026-05-11T00:54:49.661682"
+  },
+  "编写api文档": {
+    "id": "编写api文档",
+    "description": "编写API文档",
+    "assignee": "李四",
+    "due_date": "2024-01-20",
+    "project": "用户中心",
+    "status": "进行中",
+    "source_files": [
+      "meeting_2024_01_01.txt"
+    ],
+    "history": [],
+    "flags": [],
+    "created_at": "2026-05-11T00:54:49.661196",
+    "updated_at": "2026-05-11T00:54:49.661197"
+  },
+  "更新系统架构设计文档": {
+    "id": "更新系统架构设计文档",
+    "description": "更新系统架构设计文档",
+    "assignee": null,
+    "due_date": "2024-01-18",
+    "project": "系统架构",
+    "status": "待开始",
+    "source_files": [
+      "meeting_2024_01_01.txt"
+    ],
+    "history": [],
+    "flags": [
+      "负责人缺失"
+    ],
+    "created_at": "2026-05-11T00:54:49.661221",
+    "updated_at": "2026-05-11T00:54:49.661222"
+  },
+  "完成性能测试报告": {
+    "id": "完成性能测试报告",
+    "description": "完成性能测试报告",
+    "assignee": "王五",
+    "due_date": "2024-01-25",
+    "project": "性能优化",
+    "status": "延期",
+    "source_files": [
+      "meeting_2024_01_01.txt"
+    ],
+    "history": [],
+    "flags": [],
+    "created_at": "2026-05-11T00:54:49.661241",
+    "updated_at": "2026-05-11T00:54:49.661241"
+  },
+  "优化数据库查询性能": {
+    "id": "优化数据库查询性能",
+    "description": "优化数据库查询性能",
+    "assignee": "王五",
+    "due_date": "2024-01-30",
+    "project": "性能优化",
+    "status": "进行中",
+    "source_files": [
+      "meeting_2024_01_01.txt",
+      "meeting_2024_01_08.txt",
+      "meeting_2024_01_15.txt"
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-11T00:54:49.661666",
+        "source_file": "meeting_2024_01_08.txt",
+        "changes": [
+          "截止日期变化: 2024-01-22 -> 2024-01-25",
+          "状态变化: 待开始 -> 进行中"
+        ],
+        "old_assignee": "李四",
+        "old_due_date": "2024-01-22",
+        "old_status": "待开始"
+      },
+      {
+        "timestamp": "2026-05-11T00:54:49.662199",
+        "source_file": "meeting_2024_01_15.txt",
+        "changes": [
+          "负责人变化: 李四 -> 王五",
+          "截止日期变化: 2024-01-25 -> 2024-01-30"
+        ],
+        "old_assignee": "李四",
+        "old_due_date": "2024-01-25",
+        "old_status": "进行中"
+      }
+    ],
+    "flags": [
+      "同一行动项多次变化"
+    ],
+    "created_at": "2026-05-11T00:54:49.661263",
+    "updated_at": "2026-05-11T00:54:49.662201"
+  },
+  "准备产品演示": {
+    "id": "准备产品演示",
+    "description": "准备产品演示",
+    "assignee": "赵六",
+    "due_date": "2024-01-10",
+    "project": "产品发布",
+    "status": "已完成",
+    "source_files": [
+      "meeting_2024_01_01.txt",
+      "meeting_2024_01_15.txt"
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-11T00:54:49.662177",
+        "source_file": "meeting_2024_01_15.txt",
+        "changes": [
+          "状态变化: 进行中 -> 已完成"
+        ],
+        "old_assignee": "赵六",
+        "old_due_date": "2024-01-10",
+        "old_status": "进行中"
+      }
+    ],
+    "flags": [
+      "同一行动项多次变化"
+    ],
+    "created_at": "2026-05-11T00:54:49.661284",
+    "updated_at": "2026-05-11T00:54:49.662180"
+  },
+  "完成前端页面开发": {
+    "id": "完成前端页面开发",
+    "description": "完成前端页面开发",
+    "assignee": "赵六",
+    "due_date": "本月底",
+    "project": "用户界面",
+    "status": "进行中",
+    "source_files": [
+      "meeting_2024_01_08.txt"
+    ],
+    "history": [],
+    "flags": [
+      "截止日期模糊"
+    ],
+    "created_at": "2026-05-11T00:54:49.661704",
+    "updated_at": "2026-05-11T00:54:49.661704"
+  },
+  "修复登录模块bug": {
+    "id": "修复登录模块bug",
+    "description": "修复登录模块Bug",
+    "assignee": "王五",
+    "due_date": "2024-01-12",
+    "project": "用户中心",
+    "status": "已完成",
+    "source_files": [
+      "meeting_2024_01_08.txt",
+      "meeting_2024_01_15.txt"
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-11T00:54:49.662188",
+        "source_file": "meeting_2024_01_15.txt",
+        "changes": [
+          "状态变化: 待开始 -> 已完成"
+        ],
+        "old_assignee": "王五",
+        "old_due_date": "2024-01-12",
+        "old_status": "待开始"
+      }
+    ],
+    "flags": [
+      "同一行动项多次变化"
+    ],
+    "created_at": "2026-05-11T00:54:49.661729",
+    "updated_at": "2026-05-11T00:54:49.662190"
+  },
+  "准备季度报告": {
+    "id": "准备季度报告",
+    "description": "准备季度报告",
+    "assignee": "张三",
+    "due_date": "2024-01-30",
+    "project": "管理报告",
+    "status": "待开始",
+    "source_files": [
+      "meeting_2024_01_08.txt"
+    ],
+    "history": [],
+    "flags": [],
+    "created_at": "2026-05-11T00:54:49.661755",
+    "updated_at": "2026-05-11T00:54:49.661755"
+  },
+  "完成安全审计报告": {
+    "id": "完成安全审计报告",
+    "description": "完成安全审计报告",
+    "assignee": null,
+    "due_date": "待定",
+    "project": "安全审计",
+    "status": "待开始",
+    "source_files": [
+      "meeting_2024_01_15.txt"
+    ],
+    "history": [],
+    "flags": [
+      "负责人缺失",
+      "截止日期模糊"
+    ],
+    "created_at": "2026-05-11T00:54:49.662298",
+    "updated_at": "2026-05-11T00:54:49.662300"
+  },
+  "准备用户培训材料": {
+    "id": "准备用户培训材料",
+    "description": "准备用户培训材料",
+    "assignee": "赵六",
+    "due_date": "2024-02-05",
+    "project": "用户培训",
+    "status": "待开始",
+    "source_files": [
+      "meeting_2024_01_15.txt"
+    ],
+    "history": [],
+    "flags": [],
+    "created_at": "2026-05-11T00:54:49.662380",
+    "updated_at": "2026-05-11T00:54:49.662381"
+  }
+}
