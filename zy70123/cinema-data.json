@@ -1,0 +1,239 @@
+{
+  "halls": [
+    {
+      "id": "b95a64d7-e494-459d-bd19-d2af72f756d8",
+      "name": "影厅1",
+      "capacity": 100,
+      "createdAt": 1778374735954,
+      "updatedAt": 1778374735954
+    },
+    {
+      "id": "4c1ff328-4396-4b78-b16a-8685bf7891c5",
+      "name": "影厅2",
+      "capacity": 100,
+      "createdAt": 1778374735960,
+      "updatedAt": 1778374735960
+    },
+    {
+      "id": "cf605e3d-6952-4148-9075-f1d967d57b00",
+      "name": "影厅3",
+      "capacity": 100,
+      "createdAt": 1778374735967,
+      "updatedAt": 1778374735967
+    },
+    {
+      "id": "ed921cad-b0f8-401b-bc80-64dd55c0228c",
+      "name": "影厅4",
+      "capacity": 100,
+      "createdAt": 1778374735968,
+      "updatedAt": 1778374735968
+    },
+    {
+      "id": "304d5571-a7df-4042-87bf-587b4a43fa6a",
+      "name": "影厅5",
+      "capacity": 100,
+      "createdAt": 1778374735970,
+      "updatedAt": 1778374735970
+    },
+    {
+      "id": "738da119-4631-41ac-9988-4aef7785c295",
+      "name": "影厅6",
+      "capacity": 100,
+      "createdAt": 1778374735972,
+      "updatedAt": 1778374735972
+    },
+    {
+      "id": "8a396434-d7d2-4c79-8271-1c3776c04793",
+      "name": "影厅7",
+      "capacity": 100,
+      "createdAt": 1778374735974,
+      "updatedAt": 1778374735974
+    },
+    {
+      "id": "bd6fda2e-0b68-43d8-961f-62256a3775fb",
+      "name": "影厅8",
+      "capacity": 100,
+      "createdAt": 1778374735978,
+      "updatedAt": 1778374735978
+    },
+    {
+      "id": "c6bae8e8-c0b0-467a-a530-ca8a594b84bd",
+      "name": "影厅9",
+      "capacity": 100,
+      "createdAt": 1778374735979,
+      "updatedAt": 1778374735979
+    },
+    {
+      "id": "9c552e59-7abc-4c58-97b5-804fc753a1e0",
+      "name": "影厅10",
+      "capacity": 100,
+      "createdAt": 1778374735980,
+      "updatedAt": 1778374735980
+    }
+  ],
+  "movies": [
+    {
+      "id": "a235582d-95ed-4c10-8c32-b1c8d8bcad84",
+      "name": "电影A",
+      "duration": 120,
+      "createdAt": 1778374735954,
+      "updatedAt": 1778374735954
+    },
+    {
+      "id": "43ca8d54-0845-4fc6-a2a9-1d733cb6c0b4",
+      "name": "电影B",
+      "duration": 120,
+      "createdAt": 1778374735960,
+      "updatedAt": 1778374735960
+    },
+    {
+      "id": "ba533323-e7af-4182-bacb-045f7abb1fc9",
+      "name": "电影C",
+      "duration": 120,
+      "createdAt": 1778374735968,
+      "updatedAt": 1778374735968
+    },
+    {
+      "id": "ab2bea1e-d89d-432b-bab6-6c9df7ba21da",
+      "name": "电影D",
+      "duration": 120,
+      "createdAt": 1778374735968,
+      "updatedAt": 1778374735968
+    },
+    {
+      "id": "35d20b35-4491-464e-9e00-3c3fb03be8ff",
+      "name": "电影E",
+      "duration": 120,
+      "createdAt": 1778374735971,
+      "updatedAt": 1778374735971
+    },
+    {
+      "id": "f4558d01-0c28-4b07-b999-39809c3f9346",
+      "name": "电影F",
+      "duration": 120,
+      "createdAt": 1778374735972,
+      "updatedAt": 1778374735972
+    },
+    {
+      "id": "1835ed3d-4555-4823-88c4-ae49310144ae",
+      "name": "电影G",
+      "duration": 120,
+      "createdAt": 1778374735977,
+      "updatedAt": 1778374735977
+    },
+    {
+      "id": "42ca80e6-b9e6-4cb5-9d06-67dc52c2564f",
+      "name": "电影H",
+      "duration": 120,
+      "createdAt": 1778374735979,
+      "updatedAt": 1778374735979
+    },
+    {
+      "id": "54fbef16-7abf-4df5-adbc-ad3629238470",
+      "name": "电影I",
+      "duration": 120,
+      "createdAt": 1778374735979,
+      "updatedAt": 1778374735979
+    },
+    {
+      "id": "691cf332-81db-489d-92c8-7174b315d76a",
+      "name": "电影J",
+      "duration": 120,
+      "createdAt": 1778374735980,
+      "updatedAt": 1778374735980
+    }
+  ],
+  "keys": [
+    {
+      "id": "ad0d2ca9-034d-47cd-89c2-7f6b848d9e8d",
+      "movieId": "a235582d-95ed-4c10-8c32-b1c8d8bcad84",
+      "startAt": 1778288335954,
+      "endAt": 1778979535954,
+      "createdAt": 1778374735954,
+      "updatedAt": 1778374735954
+    },
+    {
+      "id": "2fe1875a-a502-46e8-904f-2176f5b491a8",
+      "movieId": "43ca8d54-0845-4fc6-a2a9-1d733cb6c0b4",
+      "startAt": 1778288335960,
+      "endAt": 1778979535960,
+      "createdAt": 1778374735960,
+      "updatedAt": 1778374735960
+    },
+    {
+      "id": "0bc1d2a8-1cb1-444f-a5e6-f180efc4420a",
+      "movieId": "ba533323-e7af-4182-bacb-045f7abb1fc9",
+      "startAt": 1777165135968,
+      "endAt": 1777769935968,
+      "createdAt": 1778374735968,
+      "updatedAt": 1778374735968
+    },
+    {
+      "id": "c052199b-61b7-497f-9042-4886d3c8f247",
+      "movieId": "ab2bea1e-d89d-432b-bab6-6c9df7ba21da",
+      "startAt": 1778288335968,
+      "endAt": 1778979535968,
+      "createdAt": 1778374735968,
+      "updatedAt": 1778374735968
+    },
+    {
+      "id": "e0502c97-194b-4ad5-8867-d582406ef2ef",
+      "movieId": "35d20b35-4491-464e-9e00-3c3fb03be8ff",
+      "startAt": 1778288335971,
+      "endAt": 1778979535971,
+      "createdAt": 1778374735971,
+      "updatedAt": 1778374735971
+    },
+    {
+      "id": "13ecaec7-bb5f-49b4-843d-c4d0476d0940",
+      "movieId": "f4558d01-0c28-4b07-b999-39809c3f9346",
+      "startAt": 1778288335972,
+      "endAt": 1778979535972,
+      "createdAt": 1778374735972,
+      "updatedAt": 1778374735972
+    },
+    {
+      "id": "0a3b5f48-b030-4f78-82d0-4ed539a8e881",
+      "movieId": "1835ed3d-4555-4823-88c4-ae49310144ae",
+      "startAt": 1778288335977,
+      "endAt": 1778979535977,
+      "createdAt": 1778374735977,
+      "updatedAt": 1778374735977
+    },
+    {
+      "id": "cfee2983-496c-47c0-9307-bfe2063b9559",
+      "movieId": "54fbef16-7abf-4df5-adbc-ad3629238470",
+      "startAt": 1778288335979,
+      "endAt": 1778979535979,
+      "createdAt": 1778374735979,
+      "updatedAt": 1778374735979
+    },
+    {
+      "id": "767fd189-2811-4bf6-9e9e-dc63367d27f3",
+      "movieId": "691cf332-81db-489d-92c8-7174b315d76a",
+      "startAt": 1778288335980,
+      "endAt": 1778979535980,
+      "createdAt": 1778374735980,
+      "updatedAt": 1778374735980
+    }
+  ],
+  "cleaningRules": [
+    {
+      "id": "972b3dd3-83bb-49e1-b56d-772f169b77d9",
+      "hallId": "ed921cad-b0f8-401b-bc80-64dd55c0228c",
+      "duration": 20,
+      "createdAt": 1778374735969,
+      "updatedAt": 1778374735969
+    },
+    {
+      "id": "3fbb6838-4089-4772-ae98-1140ea7b14fb",
+      "hallId": "c6bae8e8-c0b0-467a-a530-ca8a594b84bd",
+      "duration": 20,
+      "createdAt": 1778374735979,
+      "updatedAt": 1778374735979
+    }
+  ],
+  "schedules": [],
+  "conflicts": [],
+  "compensationTasks": []
+}
