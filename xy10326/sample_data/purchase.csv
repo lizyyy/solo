@@ -1,0 +1,5 @@
+po_number,part_number,ordered_quantity,received_quantity,order_date,expected_delivery,actual_delivery,status,supplier,price
+PO-2025-001,SENSOR-001,20,0,2025-04-01,2025-04-15,,in_transit,传感器供应商A,150.00
+PO-2025-002,BELT-001,30,28,2025-03-25,2025-04-05,2025-04-08,received,皮带供应商B,25.00
+PO-2025-003,SENSOR-002,15,0,2025-04-05,2025-04-20,,in_transit,传感器供应商A,200.00
+PO-2025-004,VALVE-002,10,0,2025-04-06,2025-04-25,,in_transit,阀门供应商C,300.00

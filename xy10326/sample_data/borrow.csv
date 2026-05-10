@@ -1,0 +1,4 @@
+borrow_number,part_number,borrowed_quantity,returned_quantity,borrow_date,expected_return,actual_return,from_location,to_location,status,borrower,remarks
+BR-2025-001,VALVE-001,3,0,2025-04-01,2025-04-08,,A仓库,B仓库,borrowed,张三,应急借调
+BR-2025-002,FILTER-001,5,5,2025-03-20,2025-03-30,2025-03-28,A仓库,C仓库,returned,李四,检修借调
+BR-2025-003,SENSOR-001,2,0,2025-03-25,2025-04-01,,A仓库,D仓库,borrowed,王五,备用借调
