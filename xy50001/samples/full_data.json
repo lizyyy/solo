@@ -1,0 +1,29 @@
+{
+  "students": [
+    {"name": "张三", "student_id": "2023001", "class_name": "初一(1)班", "gender": "男", "phone": "13800138001", "parent_phone": "13900139001"},
+    {"name": "李四", "student_id": "2023002", "class_name": "初一(1)班", "gender": "女", "phone": "13800138002", "parent_phone": "13900139002"},
+    {"name": "王五", "student_id": "2023003", "class_name": "初一(1)班", "gender": "男", "phone": "13800138003", "parent_phone": "13900139003"},
+    {"name": "赵六", "student_id": "2023004", "class_name": "初一(1)班", "gender": "女", "phone": "13800138004", "parent_phone": "13900139004"},
+    {"name": "陈七", "student_id": "2023005", "class_name": "初一(2)班", "gender": "男", "phone": "13800138005", "parent_phone": "13900139005"},
+    {"name": "刘八", "student_id": "2023006", "class_name": "初一(2)班", "gender": "女", "phone": "13800138006", "parent_phone": "13900139006"},
+    {"name": "周九", "student_id": "2023007", "class_name": "初一(2)班", "gender": "男", "phone": "13800138007", "parent_phone": "13900139007"},
+    {"name": "吴十", "student_id": "2023008", "class_name": "初一(2)班", "gender": "女", "phone": "13800138008", "parent_phone": "13900139008"},
+    {"name": "郑十一", "student_id": "2023009", "class_name": "初一(3)班", "gender": "男", "phone": "13800138009", "parent_phone": "13900139009"},
+    {"name": "孙十二", "student_id": "2023010", "class_name": "初一(3)班", "gender": "女", "phone": "13800138010", "parent_phone": "13900139010"},
+    {"name": "钱十三", "student_id": "2023011", "class_name": "初一(3)班", "gender": "男", "phone": "13800138011", "parent_phone": "13900139011"},
+    {"name": "冯十四", "student_id": "2023012", "class_name": "初二(1)班", "gender": "女", "phone": "13800138012", "parent_phone": "13900139012"}
+  ],
+  "teachers": [
+    {"name": "王老师", "phone": "13700137001", "role": "年级组长"},
+    {"name": "李老师", "phone": "13700137002", "role": "班主任"},
+    {"name": "张老师", "phone": "13700137003", "role": "班主任"}
+  ],
+  "vehicles": [
+    {"plate_number": "粤A12345", "capacity": 45, "driver_name": "陈师傅", "driver_phone": "13600136001"},
+    {"plate_number": "粤A67890", "capacity": 45, "driver_name": "刘师傅", "driver_phone": "13600136002"}
+  ],
+  "activities": [
+    {"name": "2024年春季春游 - 白云山", "type": "春游", "date": "2024-04-15", "meeting_point": "学校正门"},
+    {"name": "2024年秋季秋游 - 大夫山", "type": "秋游", "date": "2024-10-20", "meeting_point": "学校东门"}
+  ]
+}
