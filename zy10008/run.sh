@@ -105,6 +105,8 @@ download_dependencies() {
     local slf4j_version="1.7.36"
     local logback_version="1.2.12"
     local lombok_version="1.18.30"
+    local caffeine_version="3.1.8"
+    local lettuce_version="6.1.10.RELEASE"
     
     # 核心依赖列表
     local deps=(
@@ -114,6 +116,7 @@ download_dependencies() {
         "org/springframework/boot/spring-boot-starter/$spring_boot_version/spring-boot-starter-$spring_boot_version.jar"
         "org/springframework/boot/spring-boot-starter-web/$spring_boot_version/spring-boot-starter-web-$spring_boot_version.jar"
         "org/springframework/boot/spring-boot-starter-data-jpa/$spring_boot_version/spring-boot-starter-data-jpa-$spring_boot_version.jar"
+        "org/springframework/boot/spring-boot-starter-data-redis/$spring_boot_version/spring-boot-starter-data-redis-$spring_boot_version.jar"
         "org/springframework/boot/spring-boot-starter-actuator/$spring_boot_version/spring-boot-starter-actuator-$spring_boot_version.jar"
         
         # Spring Framework
@@ -127,9 +130,10 @@ download_dependencies() {
         "org/springframework/spring-websocket/$spring_version/spring-websocket-$spring_version.jar"
         "org/springframework/spring-messaging/$spring_version/spring-messaging-$spring_version.jar"
         
-        # Spring Data JPA
+        # Spring Data
         "org/springframework/data/spring-data-jpa/$spring_data_version/spring-data-jpa-$spring_data_version.jar"
         "org/springframework/data/spring-data-commons/$spring_data_version/spring-data-commons-$spring_data_version.jar"
+        "org/springframework/data/spring-data-redis/$spring_data_version/spring-data-redis-$spring_data_version.jar"
         
         # Hibernate
         "org/hibernate/hibernate-core/5.6.15.Final/hibernate-core-5.6.15.Final.jar"
@@ -149,6 +153,12 @@ download_dependencies() {
         
         # Lombok
         "org/projectlombok/lombok/$lombok_version/lombok-$lombok_version.jar"
+        
+        # Caffeine (本地缓存)
+        "com/github/ben-manes/caffeine/caffeine/$caffeine_version/caffeine-$caffeine_version.jar"
+        
+        # Redis
+        "io/lettuce/lettuce-core/$lettuce_version/lettuce-core-$lettuce_version.jar"
         
         # Jakarta
         "jakarta/persistence/jakarta.persistence-api/2.2.3/jakarta.persistence-api-2.2.3.jar"
