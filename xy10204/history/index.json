@@ -1,0 +1,22 @@
+{
+  "versions": [
+    {
+      "version_id": "20260510_153400",
+      "data_type": "water_level",
+      "action": "initial_upload",
+      "timestamp": "2026-05-10 15:34:00",
+      "file_path": "./history/water_level_20260510_153400.csv",
+      "record_count": 48,
+      "comment": "初始上传数据"
+    },
+    {
+      "version_id": "20260510_153406",
+      "data_type": "water_level",
+      "action": "correction",
+      "timestamp": "2026-05-10 15:34:06",
+      "file_path": "./history/water_level_20260510_153406.csv",
+      "record_count": 48,
+      "comment": "修正后的水位数据"
+    }
+  ]
+}
