@@ -1,0 +1,13 @@
+{
+  "backup_dir": "./backups",
+  "daily_keep": 7,
+  "weekly_keep": 4,
+  "monthly_keep": 12,
+  "retention_days": 90,
+  "date_pattern": "(\\d{4})[._-]?(\\d{2})[._-]?(\\d{2})",
+  "exceptions": [
+    "important_full_backup_2024-01-01.tar.gz",
+    "critical_restore_point_2024-06-15.zip"
+  ],
+  "confirmations_file": ".backup_confirmations.json"
+}
