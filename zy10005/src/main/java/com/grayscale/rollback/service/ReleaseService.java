@@ -163,10 +163,23 @@ public class ReleaseService {
     @Transactional
     @CacheEvict(value = CACHE_NAME, key = "#releaseId")
     public Release advanceCanary(String releaseId) {
+        Optional<Release> currentReleaseOpt = releaseRepository.findById(releaseId);
+        if (currentReleaseOpt.isEmpty()) {
+            throw new IllegalArgumentException("Release not found: " + releaseId);
+        }
+        ReleaseStatus fromStatus = currentReleaseOpt.get().getStatus();
+        
+        Map<String, Object> requestContext = new HashMap<>();
+        requestContext.put("releaseId", releaseId);
+        requestContext.put("fromStatus", fromStatus.name());
+        requestContext.put("operation", "advanceCanary");
+        
+        String idempotentKey = releaseId + ":advance:" + fromStatus.name();
+        
         return idempotentService.executeIdempotent(
-            releaseId,
+            idempotentKey,
             OperationType.ADVANCE_CANARY.name(),
-            Map.of("releaseId", releaseId),
+            requestContext,
             () -> {
                 return lockService.executeWithLock(
                     "release:" + releaseId,
@@ -183,6 +196,14 @@ public class ReleaseService {
                         
                         try {
                             ReleaseStatus currentStatus = release.getStatus();
+                            
+                            if (currentStatus != fromStatus) {
+                                log.warn("Release status changed between check and lock acquisition: expected={}, actual={}", 
+                                        fromStatus, currentStatus);
+                                throw new IllegalStateException(
+                                    "Release status changed from " + fromStatus + " to " + currentStatus);
+                            }
+                            
                             ReleaseEvent event = getNextEvent(currentStatus);
                             
                             if (event == null) {
@@ -208,7 +229,8 @@ public class ReleaseService {
                             
                             logService.logSuccess(savedRelease.getId(), OperationType.ADVANCE_CANARY,
                                     beforeRelease, savedRelease, OPERATOR,
-                                    String.format("Advanced to %s with %d instances", nextStatus, targetInstances),
+                                    String.format("Advanced from %s to %s with %d instances", 
+                                            fromStatus, nextStatus, targetInstances),
                                     System.currentTimeMillis() - startTime);
                             
                             return savedRelease;
