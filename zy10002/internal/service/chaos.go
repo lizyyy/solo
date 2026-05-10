@@ -83,7 +83,6 @@ func (ce *ChaosEngine) GetMetrics() map[string]float64 {
 		result[k] = v
 	}
 
-	var totalGoroutines int64
 	runtime.Stack(make([]byte, 0), false)
 	result["active_goroutines"] = float64(runtime.NumGoroutine())
 	result["active_leaks"] = float64(atomic.LoadInt64(&ce.activeLeaks))

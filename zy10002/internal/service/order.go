@@ -172,7 +172,7 @@ func (s *OrderService) ProcessPaymentCallback(ctx context.Context, req PaymentCa
 		return fmt.Errorf("order not found: %w", err)
 	}
 
-	existing, err := s.db.Where("transaction_id = ?", req.TransactionID).First(&models.PaymentCallback{}).Error
+	err = s.db.Where("transaction_id = ?", req.TransactionID).First(&models.PaymentCallback{}).Error
 	isDuplicate := err == nil
 
 	callback := &models.PaymentCallback{

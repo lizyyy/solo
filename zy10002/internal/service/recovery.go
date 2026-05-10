@@ -149,23 +149,24 @@ func (rs *RecoveryService) RevertToSnapshot(ctx context.Context, entityType, ent
 
 func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID string) (bool, error) {
 	var callbacks []models.PaymentCallback
-	if err := rs.db.Where("order_id = ?", orderID).Find(&callbacks).Error; err != nil {
+	if err := rs.db.Where("order_id = ?", orderID).Order("created_at ASC").Find(&callbacks).Error; err != nil {
 		return false, err
 	}
 
 	seen := make(map[string]bool)
 	var validCallbacks []models.PaymentCallback
-	removedCount := 0
+	var duplicateIDs []string
 
 	for _, cb := range callbacks {
 		if !seen[cb.TransactionID] {
 			seen[cb.TransactionID] = true
 			validCallbacks = append(validCallbacks, cb)
 		} else {
-			removedCount++
+			duplicateIDs = append(duplicateIDs, cb.ID)
 		}
 	}
 
+	removedCount := len(duplicateIDs)
 	if removedCount == 0 {
 		return false, nil
 	}
@@ -175,14 +176,9 @@ func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID str
 		return false, tx.Error
 	}
 
-	for _, cb := range callbacks {
-		if seen[cb.TransactionID] {
-			continue
-		}
-		if err := tx.Delete(&cb).Error; err != nil {
-			tx.Rollback()
-			return false, err
-		}
+	if err := tx.Where("id IN ?", duplicateIDs).Delete(&models.PaymentCallback{}).Error; err != nil {
+		tx.Rollback()
+		return false, err
 	}
 
 	if err := tx.Model(&models.Order{}).Where("id = ?", orderID).
@@ -200,7 +196,10 @@ func (rs *RecoveryService) FixDuplicateCallback(ctx context.Context, orderID str
 	}
 
 	rs.bus.Publish(eventbus.EventTypeRecoveryAction, orderID, "order",
-		map[string]interface{}{"duplicates_removed": removedCount},
+		map[string]interface{}{
+			"duplicates_removed": removedCount,
+			"removed_ids":        duplicateIDs,
+		},
 		nil,
 		"recovery-service")
 
