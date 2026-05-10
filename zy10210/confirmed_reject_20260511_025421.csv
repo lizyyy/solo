@@ -1,0 +1,6 @@
+﻿request_id,order_id,customer_name,customer_phone,session_id,total_amount,refund_amount,final_amount,gift_sku,gift_quantity,reason
+REQ001,ORD001,张三,,,,,,,0,存在多条冲突规则，需要人工确认
+REQ002,ORD002,李四,,,,,,,0,未找到匹配的赠品规则
+REQ003,ORD003,王五,,,,,,,0,未找到匹配的赠品规则
+REQ005,ORD005,钱七,,,,,,,0,存在多条冲突规则，需要人工确认
+REQ006,ORD006,孙八,,,,,,,0,未找到匹配的赠品规则
