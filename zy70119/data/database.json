@@ -1,0 +1,235 @@
+{
+  "channels": [
+    {
+      "id": "ch-001",
+      "name": "美团",
+      "code": "meituan",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "ch-002",
+      "name": "饿了么",
+      "code": "eleme",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "ch-003",
+      "name": "抖音",
+      "code": "douyin",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "ch-004",
+      "name": "微信小程序",
+      "code": "wechat",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    }
+  ],
+  "stores": [
+    {
+      "id": "st-001",
+      "name": "朝阳门店",
+      "code": "store-beijing-chao",
+      "address": "北京市朝阳区建国路88号",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "st-002",
+      "name": "海淀店",
+      "code": "store-beijing-hai",
+      "address": "北京市海淀区中关村大街1号",
+      "isActive": true,
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    }
+  ],
+  "menuItems": [
+    {
+      "id": "item-001",
+      "name": "香辣鸡腿堡",
+      "code": "burger-spicy",
+      "category": "汉堡",
+      "price": 28,
+      "description": "新鲜鸡腿肉配特制辣酱",
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "item-002",
+      "name": "原味薯条",
+      "code": "fries-original",
+      "category": "小食",
+      "price": 12,
+      "description": "比利时进口土豆现炸",
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "item-003",
+      "name": "冰爽可乐",
+      "code": "cola-ice",
+      "category": "饮料",
+      "price": 8,
+      "description": "冰爽可口可乐中杯",
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    },
+    {
+      "id": "item-004",
+      "name": "奥尔良烤翅",
+      "code": "wings-orleans",
+      "category": "小食",
+      "price": 18,
+      "description": "新奥尔良风味烤翅2对",
+      "createdAt": "2026-05-10T00:57:17.062Z"
+    }
+  ],
+  "menuVersions": [
+    {
+      "id": "mv-moz2cump-2qea3y",
+      "version": "V2026.05-开业版",
+      "description": "开业促销套餐",
+      "itemIds": [
+        "item-001",
+        "item-002",
+        "item-003"
+      ],
+      "createdBy": "运营经理",
+      "createdAt": "2026-05-10T00:57:41.137Z",
+      "isActive": true
+    }
+  ],
+  "inventories": [
+    {
+      "id": "inv-moz2d0xs-31re4u",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "quantity": 5,
+      "minThreshold": 10,
+      "updatedAt": "2026-05-10T00:58:06.730Z",
+      "updatedBy": "POS系统"
+    }
+  ],
+  "channelStatuses": [
+    {
+      "id": "cs-moz2d7fe-pqco7n",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-001",
+      "status": "OFFLINE",
+      "lastChangeReason": "OUT_OF_STOCK",
+      "lastChangeSource": "AUTO",
+      "changedBy": "系统-库存监控",
+      "changedAt": "2026-05-10T00:58:06.730Z"
+    },
+    {
+      "id": "cs-moz2dedn-ydo9co",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-002",
+      "status": "OFFLINE",
+      "lastChangeReason": "OUT_OF_STOCK",
+      "lastChangeSource": "AUTO",
+      "changedBy": "系统-库存监控",
+      "changedAt": "2026-05-10T00:58:06.731Z"
+    },
+    {
+      "id": "cs-moz2dedn-06wfm9",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-003",
+      "status": "OFFLINE",
+      "lastChangeReason": "OUT_OF_STOCK",
+      "lastChangeSource": "AUTO",
+      "changedBy": "系统-库存监控",
+      "changedAt": "2026-05-10T00:58:06.731Z"
+    },
+    {
+      "id": "cs-moz2dedn-xtetev",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-004",
+      "status": "OFFLINE",
+      "lastChangeReason": "OUT_OF_STOCK",
+      "lastChangeSource": "AUTO",
+      "changedBy": "系统-库存监控",
+      "changedAt": "2026-05-10T00:58:06.731Z"
+    }
+  ],
+  "statusHistory": [
+    {
+      "id": "hist-moz2d7ff-idmijj",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-001",
+      "previousStatus": null,
+      "newStatus": "ONLINE",
+      "reason": null,
+      "source": "MANUAL",
+      "operator": "运营专员",
+      "remark": "开业活动上架",
+      "timestamp": "2026-05-10T00:57:57.723Z",
+      "relatedTaskId": null
+    },
+    {
+      "id": "hist-moz2dedm-hlrl1u",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-001",
+      "previousStatus": "ONLINE",
+      "newStatus": "OFFLINE",
+      "reason": "OUT_OF_STOCK",
+      "source": "AUTO",
+      "operator": "系统-库存监控",
+      "remark": "库存由100降至5，低于阈值10",
+      "timestamp": "2026-05-10T00:58:06.730Z",
+      "relatedTaskId": null
+    },
+    {
+      "id": "hist-moz2dedn-d33hs5",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-002",
+      "previousStatus": null,
+      "newStatus": "OFFLINE",
+      "reason": "OUT_OF_STOCK",
+      "source": "AUTO",
+      "operator": "系统-库存监控",
+      "remark": "库存由100降至5，低于阈值10",
+      "timestamp": "2026-05-10T00:58:06.731Z",
+      "relatedTaskId": null
+    },
+    {
+      "id": "hist-moz2dedn-i0wfhl",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-003",
+      "previousStatus": null,
+      "newStatus": "OFFLINE",
+      "reason": "OUT_OF_STOCK",
+      "source": "AUTO",
+      "operator": "系统-库存监控",
+      "remark": "库存由100降至5，低于阈值10",
+      "timestamp": "2026-05-10T00:58:06.731Z",
+      "relatedTaskId": null
+    },
+    {
+      "id": "hist-moz2dedn-mh9d3s",
+      "storeId": "st-001",
+      "itemId": "item-001",
+      "channelId": "ch-004",
+      "previousStatus": null,
+      "newStatus": "OFFLINE",
+      "reason": "OUT_OF_STOCK",
+      "source": "AUTO",
+      "operator": "系统-库存监控",
+      "remark": "库存由100降至5，低于阈值10",
+      "timestamp": "2026-05-10T00:58:06.731Z",
+      "relatedTaskId": null
+    }
+  ],
+  "recoveryTasks": [],
+  "reconciliationJobs": [],
+  "auditLogs": []
+}
