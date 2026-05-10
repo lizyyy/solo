@@ -324,6 +324,13 @@ func scenarioCacheConsistency(ctx context.Context, m *monitor.Monitor, replayMgr
 func generateReport(l *logger.Manager, d *detector.Detector, r *replay.Manager) {
 	fmt.Println("\n=== 生成系统报告 ===")
 
+	replayFilename := fmt.Sprintf("replay-%s.json", time.Now().Format("20060102-150405"))
+	if err := r.SaveReplay(replayFilename); err != nil {
+		log.Printf("保存回放文件失败: %v", err)
+	} else {
+		fmt.Printf("回放文件已保存: replays/%s\n", replayFilename)
+	}
+
 	report := &model.Report{
 		GeneratedAt: time.Now(),
 		SystemInfo: model.SystemInfo{

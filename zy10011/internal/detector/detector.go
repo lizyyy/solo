@@ -9,20 +9,20 @@ import (
 )
 
 type Detector struct {
-	mu              sync.RWMutex
-	logger          *logger.Manager
-	deadlocks       []*model.DeadlockInfo
-	lastDeadlock    *model.DeadlockInfo
-	hasPotential    bool
-	checkInterval   time.Duration
+	mu               sync.RWMutex
+	logger           *logger.Manager
+	deadlocks        []*model.DeadlockInfo
+	lastDeadlock     *model.DeadlockInfo
+	hasPotential     bool
+	checkInterval    time.Duration
 	timeoutThreshold time.Duration
 }
 
 func NewDetector(logMgr *logger.Manager) *Detector {
 	return &Detector{
-		logger:          logMgr,
-		deadlocks:       make([]*model.DeadlockInfo, 0),
-		checkInterval:   5 * time.Second,
+		logger:           logMgr,
+		deadlocks:        make([]*model.DeadlockInfo, 0),
+		checkInterval:    5 * time.Second,
 		timeoutThreshold: 10 * time.Second,
 	}
 }
@@ -32,11 +32,34 @@ func (d *Detector) RecordPotentialDeadlock(goroutines []*model.GoroutineInfo, re
 	defer d.mu.Unlock()
 
 	channels := make([]*model.ChannelInfo, 0)
+	channelIDs := make(map[string]bool)
+
 	for _, g := range goroutines {
-		if g.CurrentOp != nil {
-			channels = append(channels, &model.ChannelInfo{
-				ID: g.CurrentOp.ChannelID,
-			})
+		if g.CurrentOp != nil && g.CurrentOp.ChannelID != "" {
+			if !channelIDs[g.CurrentOp.ChannelID] {
+				channelIDs[g.CurrentOp.ChannelID] = true
+				channels = append(channels, &model.ChannelInfo{
+					ID: g.CurrentOp.ChannelID,
+				})
+			}
+		}
+
+		for _, chID := range g.WaitChannels {
+			if chID != "" && !channelIDs[chID] {
+				channelIDs[chID] = true
+				channels = append(channels, &model.ChannelInfo{
+					ID: chID,
+				})
+			}
+		}
+
+		for _, chID := range g.HoldChannels {
+			if chID != "" && !channelIDs[chID] {
+				channelIDs[chID] = true
+				channels = append(channels, &model.ChannelInfo{
+					ID: chID,
+				})
+			}
 		}
 	}
 
@@ -46,10 +69,10 @@ func (d *Detector) RecordPotentialDeadlock(goroutines []*model.GoroutineInfo, re
 	d.hasPotential = true
 
 	d.logger.Error("detector", "检测到潜在死锁", map[string]interface{}{
-		"deadlock_id":   deadlock.ID,
+		"deadlock_id":     deadlock.ID,
 		"goroutine_count": len(goroutines),
-		"reason":        reason,
-		"detected_at":   deadlock.DetectedAt.String(),
+		"reason":          reason,
+		"detected_at":     deadlock.DetectedAt.String(),
 	})
 }
 
@@ -78,9 +101,9 @@ func (d *Detector) ResolveDeadlock(deadlockID string, resolutionType string) {
 			dl.MarkResolved(resolutionType)
 			d.hasPotential = false
 			d.logger.Info("detector", "死锁已解决", map[string]interface{}{
-				"deadlock_id":      deadlockID,
-				"resolution_type":  resolutionType,
-				"duration":         dl.Duration().String(),
+				"deadlock_id":     deadlockID,
+				"resolution_type": resolutionType,
+				"duration":        dl.Duration().String(),
 			})
 			break
 		}

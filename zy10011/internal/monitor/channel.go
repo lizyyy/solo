@@ -1,11 +1,15 @@
 package monitor
 
 import (
+	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/deadlock-detector/internal/model"
 )
+
+var channelCounter int64
 
 type monitoredChannel struct {
 	id        string
@@ -77,5 +81,5 @@ func (c *monitoredChannel) Close() {
 }
 
 func generateChannelID() string {
-	return "ch-" + time.Now().Format("20060102150405")
+	return fmt.Sprintf("ch-%s-%d", time.Now().Format("20060102150405"), atomic.AddInt64(&channelCounter, 1))
 }

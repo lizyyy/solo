@@ -1,0 +1,215 @@
+[
+  {
+    "Timestamp": "2026-05-10T21:35:55.028332+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "producer",
+    "Data": {
+      "msg": "msg-0"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:55.028411+08:00",
+    "Type": "recv",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "consumer",
+    "Data": {
+      "msg": "msg-0"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:55.329478+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "producer",
+    "Data": {
+      "msg": "msg-1"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:55.329572+08:00",
+    "Type": "recv",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "consumer",
+    "Data": {
+      "msg": "msg-1"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:55.629824+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "producer",
+    "Data": {
+      "msg": "msg-2"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:55.629894+08:00",
+    "Type": "recv",
+    "ChannelID": "ch-20260510213555",
+    "GoroutineID": "consumer",
+    "Data": {
+      "msg": "msg-2"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:56.931769+08:00",
+    "Type": "start",
+    "ChannelID": "ch-20260510213556",
+    "GoroutineID": "3e32-40000-2",
+    "Data": null
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:56.931786+08:00",
+    "Type": "start",
+    "ChannelID": "ch-20260510213556",
+    "GoroutineID": "c1b6-35000-1",
+    "Data": null
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:58.93396+08:00",
+    "Type": "blocked",
+    "ChannelID": "ch-20260510213556",
+    "GoroutineID": "c1b6-35000-1",
+    "Data": {
+      "wait_for": "ch1"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:58.934063+08:00",
+    "Type": "blocked",
+    "ChannelID": "ch-20260510213556",
+    "GoroutineID": "3e32-40000-2",
+    "Data": {
+      "wait_for": "ch2"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:58.934984+08:00",
+    "Type": "deadlock_recorded",
+    "ChannelID": "",
+    "GoroutineID": "",
+    "Data": {
+      "blocked_goroutines": 2,
+      "reason": "multiple goroutines blocked"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:35:59.438824+08:00",
+    "Type": "deadlock_resolved",
+    "ChannelID": "",
+    "GoroutineID": "",
+    "Data": {
+      "deadlock_id": "0986-53000-3",
+      "resolution": "timeout_release"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.445503+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "producer",
+    "Data": {
+      "attempt": 1,
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.44552+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "producer",
+    "Data": {
+      "attempt": 2,
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.445528+08:00",
+    "Type": "send",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "producer",
+    "Data": {
+      "attempt": 3,
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.445543+08:00",
+    "Type": "idempotent_process",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "processor",
+    "Data": {
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.545904+08:00",
+    "Type": "idempotent_skip",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "processor",
+    "Data": {
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:01.545918+08:00",
+    "Type": "idempotent_skip",
+    "ChannelID": "ch-20260510213601",
+    "GoroutineID": "processor",
+    "Data": {
+      "msg_id": "msg-001"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:02.546209+08:00",
+    "Type": "cache_update",
+    "ChannelID": "",
+    "GoroutineID": "cache",
+    "Data": {
+      "key": "key-1",
+      "value": "value-4"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:02.546239+08:00",
+    "Type": "cache_update",
+    "ChannelID": "",
+    "GoroutineID": "cache",
+    "Data": {
+      "key": "key-1",
+      "value": "value-1"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:02.546264+08:00",
+    "Type": "cache_update",
+    "ChannelID": "",
+    "GoroutineID": "cache",
+    "Data": {
+      "key": "key-0",
+      "value": "value-0"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:02.546277+08:00",
+    "Type": "cache_update",
+    "ChannelID": "",
+    "GoroutineID": "cache",
+    "Data": {
+      "key": "key-2",
+      "value": "value-2"
+    }
+  },
+  {
+    "Timestamp": "2026-05-10T21:36:02.54629+08:00",
+    "Type": "cache_update",
+    "ChannelID": "",
+    "GoroutineID": "cache",
+    "Data": {
+      "key": "key-0",
+      "value": "value-3"
+    }
+  }
+]

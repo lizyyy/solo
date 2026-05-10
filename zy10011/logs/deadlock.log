@@ -535,3 +535,146 @@
 [2026-05-10T21:05:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
 [2026-05-10T21:05:59+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510210559"}
 [2026-05-10T21:05:59+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:35:54+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:35:55+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510213555","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:35:55+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213555","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:35:55+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213555"}
+[2026-05-10T21:35:56+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213556","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:35:56+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213556","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:35:56+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"c1b6-35000-1","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:35:56+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"3e32-40000-2","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:35:56+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213556","event_type":"start","goroutine_id":"3e32-40000-2","total_events":7}
+[2026-05-10T21:35:56+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213556","event_type":"start","goroutine_id":"c1b6-35000-1","total_events":8}
+[2026-05-10T21:35:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213556","event_type":"blocked","goroutine_id":"c1b6-35000-1","total_events":9}
+[2026-05-10T21:35:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213556","event_type":"blocked","goroutine_id":"3e32-40000-2","total_events":10}
+[2026-05-10T21:35:58+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"0986-53000-3","detected_at":"2026-05-10 21:35:58.934958 +0800 CST m=+4.408701709","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:35:58+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:35:59+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"0986-53000-3","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:35:59+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"c1b6-35000-1","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213556"]}
+[2026-05-10T21:35:59+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"3e32-40000-2","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213556"]}
+[2026-05-10T21:35:59+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"0986-53000-3"}
+[2026-05-10T21:35:59+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"0986-53000-3","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:35:59+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"0986-53000-3","duration":"503.853584ms","resolution_type":"timeout_release"}
+[2026-05-10T21:35:59+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:35:59+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"3e32-40000-2"}
+[2026-05-10T21:35:59+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"c1b6-35000-1"}
+[2026-05-10T21:35:59+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213556"}
+[2026-05-10T21:36:01+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510213601","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:36:01+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:36:01+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213601","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:36:01+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213601"}
+[2026-05-10T21:36:02+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510213602","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:36:02+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:36:02+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:36:02+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:36:02+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:36:02+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:36:02+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213602"}
+[2026-05-10T21:36:02+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:36:02+08:00] [info] [replay] 回放数据已保存 {"event_count":23,"file_path":"replays/replay-20260510-213602.json"}
+[2026-05-10T21:37:24+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:37:24+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510213724-1","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:37:24+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:37:24+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:37:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:37:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:37:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:37:25+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213724-1","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:37:25+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213724-1"}
+[2026-05-10T21:37:26+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213726-2","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:37:26+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213726-3","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:37:26+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"4d95-87000-1","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:37:26+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"6b2d-6000-2","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:37:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213726-3","event_type":"start","goroutine_id":"6b2d-6000-2","total_events":7}
+[2026-05-10T21:37:26+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213726-2","event_type":"start","goroutine_id":"4d95-87000-1","total_events":8}
+[2026-05-10T21:37:28+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213726-3","event_type":"blocked","goroutine_id":"6b2d-6000-2","total_events":9}
+[2026-05-10T21:37:28+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213726-2","event_type":"blocked","goroutine_id":"4d95-87000-1","total_events":10}
+[2026-05-10T21:37:28+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"7319-47000-3","detected_at":"2026-05-10 21:37:28.65315 +0800 CST m=+4.407667959","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:37:28+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:37:29+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"7319-47000-3","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:37:29+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"4d95-87000-1","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213726-2"]}
+[2026-05-10T21:37:29+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"6b2d-6000-2","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213726-3"]}
+[2026-05-10T21:37:29+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"7319-47000-3"}
+[2026-05-10T21:37:29+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"7319-47000-3","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:37:29+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"7319-47000-3","duration":"501.277125ms","resolution_type":"timeout_release"}
+[2026-05-10T21:37:29+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:37:29+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"6b2d-6000-2"}
+[2026-05-10T21:37:29+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"4d95-87000-1"}
+[2026-05-10T21:37:29+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213726-3"}
+[2026-05-10T21:37:29+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213726-2"}
+[2026-05-10T21:37:31+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510213731-4","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:37:31+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:37:31+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213731-4","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:37:31+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213731-4"}
+[2026-05-10T21:37:32+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510213732-5","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:37:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:37:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:37:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:37:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:37:32+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:37:32+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213732-5"}
+[2026-05-10T21:37:32+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:37:32+08:00] [info] [replay] 回放数据已保存 {"event_count":23,"file_path":"replays/replay-20260510-213732.json"}
+[2026-05-10T21:38:07+08:00] [info] [monitor] 监控系统启动
+[2026-05-10T21:38:07+08:00] [info] [monitor] 注册 channel {"capacity":5,"channel_id":"ch-20260510213807-1","channel_name":"normal-prod-cons","type":"bidirectional"}
+[2026-05-10T21:38:07+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"send","goroutine_id":"producer","total_events":1}
+[2026-05-10T21:38:07+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"recv","goroutine_id":"consumer","total_events":2}
+[2026-05-10T21:38:08+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"send","goroutine_id":"producer","total_events":3}
+[2026-05-10T21:38:08+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"recv","goroutine_id":"consumer","total_events":4}
+[2026-05-10T21:38:08+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"send","goroutine_id":"producer","total_events":5}
+[2026-05-10T21:38:08+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213807-1","event_type":"recv","goroutine_id":"consumer","total_events":6}
+[2026-05-10T21:38:08+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213807-1"}
+[2026-05-10T21:38:09+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213809-2","channel_name":"deadlock-ch1","type":"bidirectional"}
+[2026-05-10T21:38:09+08:00] [info] [monitor] 注册 channel {"capacity":0,"channel_id":"ch-20260510213809-3","channel_name":"deadlock-ch2","type":"bidirectional"}
+[2026-05-10T21:38:09+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"a99f-92000-1","goroutine_name":"deadlock-goroutine-A","role":"producer"}
+[2026-05-10T21:38:09+08:00] [info] [monitor] 注册 goroutine {"goroutine_id":"7724-9000-2","goroutine_name":"deadlock-goroutine-B","role":"consumer"}
+[2026-05-10T21:38:09+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213809-3","event_type":"start","goroutine_id":"7724-9000-2","total_events":7}
+[2026-05-10T21:38:09+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213809-2","event_type":"start","goroutine_id":"a99f-92000-1","total_events":8}
+[2026-05-10T21:38:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213809-3","event_type":"blocked","goroutine_id":"7724-9000-2","total_events":9}
+[2026-05-10T21:38:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213809-2","event_type":"blocked","goroutine_id":"a99f-92000-1","total_events":10}
+[2026-05-10T21:38:11+08:00] [error] [detector] 检测到潜在死锁 {"deadlock_id":"2d5e-31000-3","detected_at":"2026-05-10 21:38:11.831434 +0800 CST m=+4.408697251","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:38:11+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_recorded","goroutine_id":"","total_events":11}
+[2026-05-10T21:38:12+08:00] [error] [recovery] 开始处理死锁 {"deadlock_id":"2d5e-31000-3","goroutine_count":2,"reason":"Goroutine A 等待 ch1，Goroutine B 等待 ch2，形成潜在死锁"}
+[2026-05-10T21:38:12+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"a99f-92000-1","goroutine_name":"deadlock-goroutine-A","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213809-2"]}
+[2026-05-10T21:38:12+08:00] [warn] [recovery] 阻塞 goroutine 信息 {"goroutine_id":"7724-9000-2","goroutine_name":"deadlock-goroutine-B","hold_channels":[],"state":"blocked","wait_channels":["ch-20260510213809-3"]}
+[2026-05-10T21:38:12+08:00] [warn] [recovery] 使用强制终止策略 {"deadlock_id":"2d5e-31000-3"}
+[2026-05-10T21:38:12+08:00] [info] [recovery] 死锁处理完成 {"deadlock_id":"2d5e-31000-3","recovery_count":1,"strategy_used":"force_termination"}
+[2026-05-10T21:38:12+08:00] [info] [detector] 死锁已解决 {"deadlock_id":"2d5e-31000-3","duration":"501.311375ms","resolution_type":"timeout_release"}
+[2026-05-10T21:38:12+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"deadlock_resolved","goroutine_id":"","total_events":12}
+[2026-05-10T21:38:12+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"7724-9000-2"}
+[2026-05-10T21:38:12+08:00] [info] [monitor] 注销 goroutine {"goroutine_id":"a99f-92000-1"}
+[2026-05-10T21:38:12+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213809-3"}
+[2026-05-10T21:38:12+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213809-2"}
+[2026-05-10T21:38:14+08:00] [info] [monitor] 注册 channel {"capacity":3,"channel_id":"ch-20260510213814-4","channel_name":"idempotent-ch","type":"bidirectional"}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"send","goroutine_id":"producer","total_events":13}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"send","goroutine_id":"producer","total_events":14}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"send","goroutine_id":"producer","total_events":15}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"idempotent_process","goroutine_id":"processor","total_events":16}
+[2026-05-10T21:38:14+08:00] [debug] [recovery] 消息标记为已处理 {"message_id":"msg-001"}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"idempotent_skip","goroutine_id":"processor","total_events":17}
+[2026-05-10T21:38:14+08:00] [debug] [replay] 记录回放事件 {"channel_id":"ch-20260510213814-4","event_type":"idempotent_skip","goroutine_id":"processor","total_events":18}
+[2026-05-10T21:38:14+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213814-4"}
+[2026-05-10T21:38:15+08:00] [info] [monitor] 注册 channel {"capacity":10,"channel_id":"ch-20260510213815-5","channel_name":"cache-ch","type":"bidirectional"}
+[2026-05-10T21:38:15+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":19}
+[2026-05-10T21:38:15+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":20}
+[2026-05-10T21:38:15+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":21}
+[2026-05-10T21:38:15+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":22}
+[2026-05-10T21:38:15+08:00] [debug] [replay] 记录回放事件 {"channel_id":"","event_type":"cache_update","goroutine_id":"cache","total_events":23}
+[2026-05-10T21:38:15+08:00] [info] [monitor] 注销 channel {"channel_id":"ch-20260510213815-5"}
+[2026-05-10T21:38:15+08:00] [info] [monitor] 监控系统停止
+[2026-05-10T21:38:15+08:00] [info] [replay] 回放数据已保存 {"event_count":23,"file_path":"replays/replay-20260510-213815.json"}
