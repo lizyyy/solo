@@ -140,14 +140,14 @@ class TransferService:
 
         try:
             for item in transfer.items:
-                success = self.inventory_service.reserve_quantity(
-                    transfer.from_store_id,
-                    item.product_id,
-                    item.requested_quantity,
-                    shipped_by
+                inventory = self.inventory_service.get_or_create_inventory(
+                    transfer.from_store_id, item.product_id, shipped_by
                 )
-                if not success:
-                    raise ValueError(f"Failed to reserve quantity for product {item.product_id}")
+                if inventory.available_quantity < item.requested_quantity:
+                    raise ValueError(
+                        f"Insufficient available quantity for product {item.product_id}: "
+                        f"available={inventory.available_quantity}, requested={item.requested_quantity}"
+                    )
 
                 self.db.flush()
 

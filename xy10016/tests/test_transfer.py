@@ -99,6 +99,11 @@ class TestTransferService:
         )
         seeded_db.flush()
 
+        inv_initial = inv_service.get_or_create_inventory(store.id, test_product.id)
+        assert inv_initial.quantity == 100
+        assert inv_initial.available_quantity == 100
+        assert inv_initial.reserved_quantity == 0
+
         transfer = service.create_transfer(
             from_store_code='ST001',
             to_store_code='ST002',
@@ -114,6 +119,8 @@ class TestTransferService:
         from_store = shipped.from_store
         inv = inv_service.get_or_create_inventory(from_store.id, test_product.id)
         assert inv.quantity == 95
+        assert inv.available_quantity == 95
+        assert inv.reserved_quantity == 0
 
     def test_receive_transfer(self, seeded_db):
         service = TransferService(seeded_db)
@@ -135,7 +142,10 @@ class TestTransferService:
         )
 
         to_store = seeded_db.query(Store).filter(Store.code == 'ST002').first()
-        initial_to_qty = inv_service.get_or_create_inventory(to_store.id, test_product.id).quantity
+        inv_to_initial = inv_service.get_or_create_inventory(to_store.id, test_product.id)
+        initial_to_qty = inv_to_initial.quantity
+        initial_to_available = inv_to_initial.available_quantity
+        initial_to_reserved = inv_to_initial.reserved_quantity
 
         transfer = service.create_transfer(
             from_store_code='ST001',
@@ -150,8 +160,15 @@ class TestTransferService:
 
         assert received.status == TRANSFER_STATUS_COMPLETED
 
-        inv = inv_service.get_or_create_inventory(to_store.id, test_product.id)
-        assert inv.quantity == initial_to_qty + 5
+        inv_from = inv_service.get_or_create_inventory(from_store.id, test_product.id)
+        assert inv_from.quantity == 95
+        assert inv_from.available_quantity == 95
+        assert inv_from.reserved_quantity == 0
+
+        inv_to = inv_service.get_or_create_inventory(to_store.id, test_product.id)
+        assert inv_to.quantity == initial_to_qty + 5
+        assert inv_to.available_quantity == initial_to_available + 5
+        assert inv_to.reserved_quantity == initial_to_reserved
 
     def test_cancel_transfer(self, seeded_db):
         service = TransferService(seeded_db)
