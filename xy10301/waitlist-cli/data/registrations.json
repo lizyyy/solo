@@ -1,0 +1,111 @@
+[
+  {
+    "id": "R001",
+    "course_id": "C001",
+    "name": "张三",
+    "phone": "13800000001",
+    "member_level": "钻石会员",
+    "registration_time": "2026-05-08T09:00:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R002",
+    "course_id": "C001",
+    "name": "李四",
+    "phone": "13800000002",
+    "member_level": "金卡会员",
+    "registration_time": "2026-05-08T09:05:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R003",
+    "course_id": "C001",
+    "name": "王五",
+    "phone": "13800000003",
+    "member_level": "银卡会员",
+    "registration_time": "2026-05-08T09:10:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R004",
+    "course_id": "C001",
+    "name": "赵六",
+    "phone": "13800000004",
+    "member_level": "钻石会员",
+    "registration_time": "2026-05-08T09:15:00",
+    "status": "候补"
+  },
+  {
+    "id": "R005",
+    "course_id": "C001",
+    "name": "钱七",
+    "phone": "13800000005",
+    "member_level": "普通会员",
+    "registration_time": "2026-05-08T09:20:00",
+    "status": "候补"
+  },
+  {
+    "id": "R006",
+    "course_id": "C001",
+    "name": "孙八",
+    "phone": "13800000004",
+    "member_level": "金卡会员",
+    "registration_time": "2026-05-08T09:25:00",
+    "status": "候补"
+  },
+  {
+    "id": "R007",
+    "course_id": "C002",
+    "name": "周九",
+    "phone": "13800000007",
+    "member_level": "钻石会员",
+    "registration_time": "2026-05-08T10:00:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R008",
+    "course_id": "C002",
+    "name": "吴十",
+    "phone": "13800000008",
+    "member_level": "银卡会员",
+    "registration_time": "2026-05-08T10:05:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R009",
+    "course_id": "C002",
+    "name": "郑十一",
+    "phone": "13800000009",
+    "member_level": "普通会员",
+    "registration_time": "2026-05-08T10:10:00",
+    "status": "已通知待确认",
+    "is_notified": true
+  },
+  {
+    "id": "R010",
+    "course_id": "C003",
+    "name": "王小明",
+    "phone": "13800000010",
+    "member_level": "金卡会员",
+    "registration_time": "2026-05-08T11:00:00",
+    "status": "已确认"
+  },
+  {
+    "id": "R011",
+    "course_id": "C003",
+    "name": "李小华",
+    "phone": "13800000011",
+    "member_level": "钻石会员",
+    "registration_time": "2026-05-08T11:05:00",
+    "status": "候补"
+  },
+  {
+    "id": "R012",
+    "course_id": "C003",
+    "name": "张小强",
+    "phone": "13800000012",
+    "member_level": "普通会员",
+    "registration_time": "2026-05-08T11:10:00",
+    "status": "候补"
+  }
+]
