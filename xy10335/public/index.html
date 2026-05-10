@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>养老助餐配送签收台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding-top: 20px; }
+        .nav-tabs { margin-bottom: 20px; }
+        .status-badge { font-size: 0.9em; padding: 4px 8px; }
+        .card { margin-bottom: 20px; }
+        .order-card { cursor: pointer; transition: all 0.2s; }
+        .order-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .modal-lg { max-width: 900px; }
+        .timeline { border-left: 2px solid #e9ecef; padding-left: 20px; }
+        .timeline-item { margin-bottom: 15px; position: relative; }
+        .timeline-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: #0d6efd; }
+        .table-responsive { overflow-x: auto; }
+        .stat-card { text-align: center; padding: 20px; }
+        .stat-number { font-size: 2rem; font-weight: bold; }
+        .stat-label { color: #6c757d; }
+        .route-column { border-left: 3px solid #0d6efd; padding-left: 15px; margin-bottom: 20px; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .alert-warning { background-color: #fff3cd; border-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="toast-container" id="toastContainer"></div>
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 mb-2">养老助餐配送签收台</h1>
+                <p class="text-muted">管理老人档案、套餐配送、路线分配及订单签收</p>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="mainTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dashboard">首页看板</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#routes">路线看板</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#exceptions">异常列表</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#orders">订单管理</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#elders">老人档案</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#history">操作历史</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#export">导出日报</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="dashboard">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <label class="form-label">选择日期：</label>
+                        <input type="date" id="dashboardDate" class="form-control w-auto d-inline-block">
+                        <button class="btn btn-primary ms-2" onclick="loadDashboard()">查询</button>
+                        <button class="btn btn-success ms-2" onclick="createSampleData()">生成样例数据</button>
+                        <button class="btn btn-outline-secondary ms-2" onclick="loadAllData()">刷新全部数据</button>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <div class="card stat-card bg-primary text-white">
+                            <div class="stat-number" id="statTotal">0</div>
+                            <div class="stat-label text-white-50">总订单数</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <div class="card stat-card bg-success text-white">
+                            <div class="stat-number" id="statSigned">0</div>
+                            <div class="stat-label text-white-50">已签收</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <div class="card stat-card bg-info text-white">
+                            <div class="stat-number" id="statPending">0</div>
+                            <div class="stat-label text-white-50">待配送</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <div class="card stat-card bg-warning text-dark">
+                            <div class="stat-number" id="statException">0</div>
+                            <div class="stat-label">异常</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-2">
+                        <div class="card stat-card bg-danger text-white">
+                            <div class="stat-number" id="statRefunded">0</div>
+                            <div class="stat-label text-white-50">已退款</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>今日订单概览</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="dashboardOrdersTable">
+                                        <thead>
+                                            <tr>
+                                                <th>订单ID</th>
+                                                <th>老人姓名</th>
+                                                <th>套餐</th>
+                                                <th>路线</th>
+                                                <th>状态</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="routes">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <label class="form-label">选择日期：</label>
+                        <input type="date" id="routesDate" class="form-control w-auto d-inline-block">
+                        <button class="btn btn-primary ms-2" onclick="loadRoutes()">查询</button>
+                    </div>
+                </div>
+                
+                <div id="routesContainer" class="row"></div>
+            </div>
+
+            <div class="tab-pane fade" id="exceptions">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <label class="form-label">选择日期：</label>
+                        <input type="date" id="exceptionsDate" class="form-control w-auto d-inline-block">
+                        <button class="btn btn-primary ms-2" onclick="loadExceptions()">查询</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>异常订单列表</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="exceptionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>订单ID</th>
+                                        <th>老人姓名</th>
+                                        <th>联系电话</th>
+                                        <th>套餐</th>
+                                        <th>异常原因</th>
+                                        <th>后续动作</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="orders">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrderModal">
+                            + 新建订单
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <label class="form-label">日期筛选：</label>
+                        <input type="date" id="ordersDate" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">状态筛选：</label>
+                        <select id="ordersStatus" class="form-select">
+                            <option value="">全部状态</option>
+                            <option value="pending">待分配</option>
+                            <option value="assigned">已分配</option>
+                            <option value="signed">已签收</option>
+                            <option value="exception">异常</option>
+                            <option value="refunded">已退款</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">路线筛选：</label>
+                        <select id="ordersRoute" class="form-select">
+                            <option value="">全部路线</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button class="btn btn-primary w-100" onclick="loadOrders()">查询</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>订单列表</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="ordersTable">
+                                <thead>
+                                    <tr>
+                                        <th>订单ID</th>
+                                        <th>老人姓名</th>
+                                        <th>套餐</th>
+                                        <th>订单日期</th>
+                                        <th>路线</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="elders">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>老人档案列表</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="eldersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>姓名</th>
+                                        <th>性别</th>
+                                        <th>年龄</th>
+                                        <th>电话</th>
+                                        <th>社区</th>
+                                        <th>地址</th>
+                                        <th>禁忌食材</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="history">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>操作历史记录</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="historyTable">
+                                <thead>
+                                    <tr>
+                                        <th>操作时间</th>
+                                        <th>订单ID</th>
+                                        <th>老人姓名</th>
+                                        <th>操作类型</th>
+                                        <th>操作详情</th>
+                                        <th>操作人</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="export">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>导出日报</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted">导出的日报包含：</p>
+                                <ul>
+                                    <li>配送数量统计（总订单、已签收、待配送、异常、退款）</li>
+                                    <li>异常原因统计</li>
+                                    <li>后续动作统计</li>
+                                    <li>所有订单明细</li>
+                                </ul>
+                                <div class="mb-3">
+                                    <label class="form-label">选择日期：</label>
+                                    <input type="date" id="exportDate" class="form-control w-auto">
+                                </div>
+                                <button class="btn btn-success" onclick="exportDailyReport()">
+                                    导出Excel日报
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createOrderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新建订单</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">老人</label>
+                        <select id="newOrderElder" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">套餐</label>
+                        <select id="newOrderPackage" class="form-select"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">订单日期</label>
+                        <input type="date" id="newOrderDate" class="form-control">
+                    </div>
+                    <div id="conflictWarning" class="alert alert-warning d-none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="createOrderBtn" onclick="submitOrder()">
+                        创建订单
+                    </button>
+                    <button type="button" class="btn btn-danger d-none" id="forceCreateBtn" onclick="forceCreateOrder()">
+                        强制创建
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="orderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">订单详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="orderDetailBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="elderDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">老人详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="elderDetailBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
