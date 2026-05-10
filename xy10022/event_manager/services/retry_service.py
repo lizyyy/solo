@@ -11,7 +11,17 @@ from ..exceptions import EventManagerException
 class RetryService:
     def __init__(self, db: Session, current_user: User = None):
         self.db = db
-        self.current_user = current_user
+        self.current_user = self._merge_user(db, current_user)
+    
+    def _merge_user(self, db: Session, user: User = None) -> User:
+        if user is None:
+            return None
+        try:
+            return db.merge(user)
+        except Exception:
+            if hasattr(user, 'id') and user.id:
+                return db.query(User).filter(User.id == user.id).first()
+            return None
 
     def record_failure(self, operation_type: str, error_message: str, resource_type: str = None, resource_id: int = None, input_data: dict = None):
         failed_op = FailedOperation(
