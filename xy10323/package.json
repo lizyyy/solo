@@ -1,0 +1,28 @@
+{
+  "name": "property-deposit-refund",
+  "version": "1.0.0",
+  "description": "小区装修押金退还管理系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon server/index.js",
+    "client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "install-deps": "npm install && npm install --prefix client"
+  },
+  "keywords": ["property", "deposit", "refund", "management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "cors": "^2.8.5",
+    "xlsx": "^0.18.5",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.2"
+  }
+}
