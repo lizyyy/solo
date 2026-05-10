@@ -8,16 +8,16 @@ def _round_currency(value: float) -> float:
     return round(value, 2)
 
 
-def _check_duplicate_sales(book_id: int, sale_date: str, final_price: float, exclude_id: Optional[int] = None) -> List[Dict]:
+def _check_duplicate_sales(book_id: int, exclude_id: Optional[int] = None) -> List[Dict]:
     with get_connection() as conn:
         cursor = conn.cursor()
         query = '''
             SELECT s.*, b.title, b.isbn
             FROM sales s
             JOIN books b ON s.book_id = b.id
-            WHERE s.book_id = ? AND s.sale_date = ? AND ABS(s.final_sale_price - ?) < 0.01
+            WHERE s.book_id = ?
         '''
-        params = [book_id, sale_date, final_price]
+        params = [book_id]
         
         if exclude_id:
             query += ' AND s.id != ?'
@@ -120,10 +120,9 @@ def validate_sales(start_date: Optional[str] = None, end_date: Optional[str] = N
         final_price = sale['final_sale_price']
         total_amount += final_price
         
-        dup_check = _check_duplicate_sales(
-            sale['book_id'], sale['sale_date'], final_price, sale['id']
-        )
+        dup_check = _check_duplicate_sales(sale['book_id'], sale['id'])
         if dup_check:
+            first_other = dup_check[0]
             issues.append({
                 'type': 'duplicate_sale',
                 'severity': 'error',
@@ -132,8 +131,10 @@ def validate_sales(start_date: Optional[str] = None, end_date: Optional[str] = N
                 'book_isbn': sale['isbn'],
                 'sale_date': sale['sale_date'],
                 'price': final_price,
+                'other_sale_date': first_other['sale_date'],
+                'other_price': first_other['final_sale_price'],
                 'duplicate_count': len(dup_check) + 1,
-                'message': f'同一本书({sale["title"]})在同一天({sale["sale_date"]})以相同价格({final_price})售出 {len(dup_check) + 1} 次，疑似重复录入'
+                'message': f'同一本书({sale["title"]})被多次售出！本次: {sale["sale_date"]} ¥{final_price}, 另一条: {first_other["sale_date"]} ¥{first_other["final_sale_price"]}'
             })
         
         disc_check = _check_discount_below_min(sale['book_id'], final_price)
