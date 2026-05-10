@@ -1,5 +1,4 @@
 import click
-import json
 from typing import Optional
 
 from ..database import init_db, get_db
@@ -8,18 +7,14 @@ from ..models import UserRole, EventStatus, RegistrationStatus
 from ..exceptions import EventManagerException
 from ..utils import parse_datetime, format_datetime
 
+from .utils import Context, pass_context, print_table, print_json
+
 from .user_cli import user_cli
 from .event_cli import event_cli
 from .registration_cli import reg_cli
 from .batch_cli import batch_cli
 from .export_cli import export_cli
 from .log_cli import log_cli
-
-class Context:
-    def __init__(self):
-        self.current_user = None
-
-pass_context = click.make_pass_decorator(Context, ensure=True)
 
 @click.group()
 @click.option('--username', '-u', help='用户名')
@@ -73,25 +68,4 @@ def seed(ctx: Context):
             click.secho(f'填充失败: {e}', fg='red', err=True)
             raise click.Abort()
 
-def print_table(headers, rows):
-    if not rows:
-        click.echo('没有数据')
-        return
-    
-    widths = [len(h) for h in headers]
-    for row in rows:
-        for i, cell in enumerate(row):
-            widths[i] = max(widths[i], len(str(cell) if cell is not None else ''))
-    
-    header_line = '  '.join(f'{h:<{w}}' for h, w in zip(headers, widths))
-    click.echo(header_line)
-    click.echo('-' * len(header_line))
-    
-    for row in rows:
-        line = '  '.join(f'{str(c) if c is not None else "":<{w}}' for c, w in zip(row, widths))
-        click.echo(line)
-
-def print_json(data):
-    click.echo(json.dumps(data, ensure_ascii=False, indent=2, default=str))
-
-__all__ = ['cli', 'print_table', 'print_json', 'pass_context', 'Context']
+__all__ = ['cli']

@@ -5,7 +5,7 @@ from ..models import EventStatus
 from ..exceptions import EventManagerException
 from ..utils import parse_datetime, format_datetime
 
-from .cli import print_table, print_json, pass_context, Context
+from .utils import print_table, print_json, pass_context, Context
 
 @click.group()
 def event_cli():

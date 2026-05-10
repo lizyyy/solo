@@ -5,7 +5,7 @@ from ..models import RegistrationStatus
 from ..exceptions import EventManagerException
 from ..utils import format_datetime
 
-from .cli import print_table, print_json, pass_context, Context
+from .utils import print_table, print_json, pass_context, Context
 
 @click.group()
 def reg_cli():

@@ -4,7 +4,7 @@ from ..database import get_db
 from ..models import LogLevel, FailedOperation
 from ..utils import format_datetime
 
-from .cli import print_table, pass_context, Context
+from .utils import print_table, pass_context, Context
 
 @click.group()
 def log_cli():

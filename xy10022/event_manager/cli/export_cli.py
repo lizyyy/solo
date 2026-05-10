@@ -5,7 +5,7 @@ from ..models import RegistrationStatus, EventStatus
 from ..exceptions import EventManagerException
 from ..utils import format_datetime
 
-from .cli import print_table, pass_context, Context
+from .utils import print_table, pass_context, Context
 
 @click.group()
 def export_cli():
