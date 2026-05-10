@@ -534,7 +534,7 @@ def main():
   theater-cli rooms list
   theater-cli import bookings.json
   theater-cli check
-  theater-cli fix reschedule b001 --new-start "2026-05-12 14:00" --new-end "2026-05-12 18:00" --reason "导演调整"
+  theater-cli fix --booking-id b001 reschedule --new-start "2026-05-12 14:00" --new-end "2026-05-12 18:00" --reason "导演调整"
   theater-cli confirm b001
   theater-cli report conflicts
   theater-cli report available --room-id r001

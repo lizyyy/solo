@@ -8,7 +8,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from theater_conflict_cli.data_store import add_item, save_data
 
-print("初始化基础数据...")
+print("初始化基础数据（重置所有数据）...")
+
+save_data("bookings", [])
+print("✓ 已清空预约数据")
+
+save_data("reschedule_history", [])
+print("✓ 已清空改期历史")
+
+save_data("key_records", [])
+print("✓ 已清空钥匙记录")
 
 save_data("rooms", [
     {"id": "r001", "name": "一号排练厅", "capacity": 50, "features": ["舞台", "音响系统"]},
