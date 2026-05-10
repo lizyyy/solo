@@ -1,0 +1,23 @@
+{
+  "name": "fishing-boat-declaration-api",
+  "version": "1.0.0",
+  "description": "渔船出港申报 API 后台接口",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node tests/test-main.js"
+  },
+  "keywords": [
+    "fishing-boat",
+    "declaration",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.0.0",
+    "uuid": "^9.0.1"
+  }
+}
