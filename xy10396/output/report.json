@@ -1,0 +1,259 @@
+{
+  "reportId": "REPORT-MP051OOG",
+  "generatedAt": "2026-05-10T19:00:45.232Z",
+  "summary": {
+    "totalOrders": 5,
+    "abnormalOrders": 4,
+    "normalOrders": 1,
+    "totalCompensation": 720,
+    "abnormalityBreakdown": {
+      "missing_parts": 1,
+      "elevator_conflict": 2,
+      "reschedule_conflict": 2,
+      "damage": 2,
+      "installation_issue": 2,
+      "late_delivery": 0,
+      "duplicate_compensation": 0
+    },
+    "partyResponsibility": {
+      "customer": 0,
+      "supplier": 1,
+      "delivery_team": 3,
+      "installation_team": 5,
+      "manufacturer": 0,
+      "company": 0
+    }
+  },
+  "abnormalities": [
+    {
+      "orderId": "ORD-001",
+      "type": "reschedule_conflict",
+      "severity": "high",
+      "description": "订单已改期至2024-01-15，但仍在原日期(2024-01-15)进行了安装/派送",
+      "responsibleParty": "installation_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-002",
+      "type": "elevator_conflict",
+      "severity": "high",
+      "description": "订单包含大件家具，电梯尺寸(1.8m x 1.4m x 2.2m)无法容纳",
+      "responsibleParty": "delivery_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-002",
+      "type": "missing_parts",
+      "severity": "high",
+      "description": "存在缺件未补齐：安装螺丝包，当前状态：shipped",
+      "responsibleParty": "supplier",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-002",
+      "type": "installation_issue",
+      "severity": "medium",
+      "description": "安装存在问题：布艺沙发: 缺少安装螺丝",
+      "responsibleParty": "installation_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-003",
+      "type": "elevator_conflict",
+      "severity": "high",
+      "description": "订单包含大件家具，目标楼层(12楼)无电梯或仅能走楼梯，大件无法搬运",
+      "responsibleParty": "delivery_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-003",
+      "type": "reschedule_conflict",
+      "severity": "high",
+      "description": "订单已改期至2024-01-24，但仍在原日期(2024-01-17)进行了安装/派送",
+      "responsibleParty": "installation_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-003",
+      "type": "damage",
+      "severity": "medium",
+      "description": "存在损坏记录待处理：电梯无法搬运大件，需要吊装，补偿客户延误损失费",
+      "responsibleParty": "delivery_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-003",
+      "type": "installation_issue",
+      "severity": "medium",
+      "description": "安装存在问题：大型衣柜: 大件无法进入电梯, 无楼梯搬运条件",
+      "responsibleParty": "installation_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    },
+    {
+      "orderId": "ORD-004",
+      "type": "damage",
+      "severity": "medium",
+      "description": "存在损坏记录待处理：玻璃茶几桌面有轻微划痕，安装时造成",
+      "responsibleParty": "installation_team",
+      "status": "open",
+      "createdAt": "2026-05-10T19:00:45.232Z"
+    }
+  ],
+  "orders": [
+    {
+      "orderId": "ORD-001",
+      "customerName": "张先生",
+      "address": "北京市朝阳区幸福路123号",
+      "scheduledDate": "2024-01-15",
+      "floor": 5,
+      "items": [
+        {
+          "itemId": "ITEM-001",
+          "name": "实木餐桌",
+          "dimensions": {
+            "length": 1.6,
+            "width": 0.9,
+            "height": 0.75
+          },
+          "quantity": 1,
+          "price": 3500
+        },
+        {
+          "itemId": "ITEM-002",
+          "name": "餐椅",
+          "dimensions": {
+            "length": 0.45,
+            "width": 0.45,
+            "height": 0.9
+          },
+          "quantity": 4,
+          "price": 600
+        }
+      ],
+      "status": "completed",
+      "createdAt": "2024-01-10T09:00:00Z"
+    },
+    {
+      "orderId": "ORD-002",
+      "customerName": "李女士",
+      "address": "上海市浦东新区张江路456号",
+      "scheduledDate": "2024-01-16",
+      "floor": 8,
+      "items": [
+        {
+          "itemId": "ITEM-003",
+          "name": "布艺沙发",
+          "dimensions": {
+            "length": 2.2,
+            "width": 1,
+            "height": 0.9
+          },
+          "quantity": 1,
+          "price": 5800
+        }
+      ],
+      "status": "partially_delivered",
+      "createdAt": "2024-01-11T10:30:00Z"
+    },
+    {
+      "orderId": "ORD-003",
+      "customerName": "王先生",
+      "address": "广州市天河区体育西路789号",
+      "scheduledDate": "2024-01-17",
+      "floor": 12,
+      "items": [
+        {
+          "itemId": "ITEM-004",
+          "name": "大型衣柜",
+          "dimensions": {
+            "length": 2.4,
+            "width": 0.6,
+            "height": 2.2
+          },
+          "quantity": 1,
+          "price": 8500
+        }
+      ],
+      "status": "rescheduled",
+      "createdAt": "2024-01-12T14:20:00Z"
+    },
+    {
+      "orderId": "ORD-004",
+      "customerName": "赵女士",
+      "address": "深圳市南山区科技园路321号",
+      "scheduledDate": "2024-01-18",
+      "floor": 3,
+      "items": [
+        {
+          "itemId": "ITEM-005",
+          "name": "玻璃茶几",
+          "dimensions": {
+            "length": 1.2,
+            "width": 0.6,
+            "height": 0.45
+          },
+          "quantity": 1,
+          "price": 2200
+        }
+      ],
+      "status": "delivered",
+      "createdAt": "2024-01-13T16:45:00Z"
+    },
+    {
+      "orderId": "ORD-005",
+      "customerName": "陈先生",
+      "address": "北京市海淀区中关村大街654号",
+      "scheduledDate": "2024-01-19",
+      "floor": 2,
+      "items": [
+        {
+          "itemId": "ITEM-006",
+          "name": "电视柜",
+          "dimensions": {
+            "length": 1.8,
+            "width": 0.45,
+            "height": 0.5
+          },
+          "quantity": 1,
+          "price": 1800
+        }
+      ],
+      "status": "completed",
+      "createdAt": "2024-01-14T08:15:00Z"
+    }
+  ],
+  "compensations": [
+    {
+      "compensationId": "COMP-DEMO-001",
+      "orderId": "ORD-004",
+      "itemId": "ITEM-005",
+      "damageType": "installation_damage",
+      "damageSeverity": "minor",
+      "compensationAmount": 220,
+      "responsibleParty": "installation_team",
+      "description": "玻璃茶几桌面有轻微划痕，安装时造成",
+      "reportedDate": "2024-01-18",
+      "status": "approved"
+    },
+    {
+      "compensationId": "COMP-DEMO-002",
+      "orderId": "ORD-003",
+      "itemId": "ITEM-004",
+      "damageType": "delivery_damage",
+      "damageSeverity": "moderate",
+      "compensationAmount": 500,
+      "responsibleParty": "delivery_team",
+      "description": "电梯无法搬运大件，需要吊装，补偿客户延误损失费",
+      "reportedDate": "2024-01-17",
+      "status": "pending"
+    }
+  ]
+}

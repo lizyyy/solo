@@ -1,0 +1,61 @@
+[
+  {
+    "orderId": "ORD-001",
+    "itemId": "ITEM-001",
+    "installedDate": "2024-01-15",
+    "installerId": "INST-001",
+    "issues": [],
+    "isCompleted": true,
+    "notes": "安装顺利，客户满意"
+  },
+  {
+    "orderId": "ORD-001",
+    "itemId": "ITEM-002",
+    "installedDate": "2024-01-15",
+    "installerId": "INST-001",
+    "issues": [],
+    "isCompleted": true,
+    "notes": "四把餐椅已全部安装完成"
+  },
+  {
+    "orderId": "ORD-002",
+    "itemId": "ITEM-003",
+    "installedDate": "2024-01-16",
+    "installerId": "INST-002",
+    "issues": [
+      "缺少安装螺丝"
+    ],
+    "isCompleted": false,
+    "notes": "螺丝数量不足，已登记缺件"
+  },
+  {
+    "orderId": "ORD-003",
+    "itemId": "ITEM-004",
+    "installedDate": "2024-01-17",
+    "installerId": "INST-003",
+    "issues": [
+      "大件无法进入电梯",
+      "无楼梯搬运条件"
+    ],
+    "isCompleted": false,
+    "notes": "12楼无电梯，大件衣柜无法搬运"
+  },
+  {
+    "orderId": "ORD-004",
+    "itemId": "ITEM-005",
+    "installedDate": "2024-01-18",
+    "installerId": "INST-004",
+    "issues": [],
+    "isCompleted": true,
+    "notes": "安装完成，但发现桌面有轻微划痕"
+  },
+  {
+    "orderId": "ORD-005",
+    "itemId": "ITEM-006",
+    "installedDate": "2024-01-19",
+    "installerId": "INST-005",
+    "issues": [],
+    "isCompleted": true,
+    "notes": "2楼楼梯搬运，安装顺利完成"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "compensationId": "COMP-DEMO-001",
+    "orderId": "ORD-004",
+    "itemId": "ITEM-005",
+    "damageType": "installation_damage",
+    "damageSeverity": "minor",
+    "compensationAmount": 220,
+    "responsibleParty": "installation_team",
+    "description": "玻璃茶几桌面有轻微划痕，安装时造成",
+    "reportedDate": "2024-01-18",
+    "status": "approved"
+  },
+  {
+    "compensationId": "COMP-DEMO-002",
+    "orderId": "ORD-003",
+    "itemId": "ITEM-004",
+    "damageType": "delivery_damage",
+    "damageSeverity": "moderate",
+    "compensationAmount": 500,
+    "responsibleParty": "delivery_team",
+    "description": "电梯无法搬运大件，需要吊装，补偿客户延误损失费",
+    "reportedDate": "2024-01-17",
+    "status": "pending"
+  },
+  {
+    "compensationId": "COMP-MP053DDS-SGAI2I",
+    "orderId": "ORD-005",
+    "itemId": "ITEM-006",
+    "damageType": "installation_damage",
+    "damageSeverity": "moderate",
+    "compensationAmount": 540,
+    "responsibleParty": "installation_team",
+    "description": "测试中等程度安装损坏赔付计算",
+    "reportedDate": "2026-05-10",
+    "status": "pending"
+  }
+]

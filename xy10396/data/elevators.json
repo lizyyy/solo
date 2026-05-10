@@ -1,0 +1,50 @@
+[
+  {
+    "orderId": "ORD-001",
+    "floor": 5,
+    "hasElevator": true,
+    "elevatorSize": {
+      "length": 2,
+      "width": 1.5,
+      "height": 2.2
+    },
+    "maxWeight": 800,
+    "stairAccessOnly": false
+  },
+  {
+    "orderId": "ORD-002",
+    "floor": 8,
+    "hasElevator": true,
+    "elevatorSize": {
+      "length": 1.8,
+      "width": 1.4,
+      "height": 2.2
+    },
+    "maxWeight": 1000,
+    "stairAccessOnly": false
+  },
+  {
+    "orderId": "ORD-003",
+    "floor": 12,
+    "hasElevator": false,
+    "stairAccessOnly": true
+  },
+  {
+    "orderId": "ORD-004",
+    "floor": 3,
+    "hasElevator": true,
+    "elevatorSize": {
+      "length": 1.6,
+      "width": 1.2,
+      "height": 2
+    },
+    "maxWeight": 600,
+    "stairAccessOnly": false
+  },
+  {
+    "orderId": "ORD-005",
+    "floor": 2,
+    "hasElevator": false,
+    "stairAccessOnly": true
+  }
+]
