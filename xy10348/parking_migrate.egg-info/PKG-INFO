@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: parking-migrate
+Version: 0.1.0
+Summary: 停车月卡续费迁移CLI工具
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=13.0.0

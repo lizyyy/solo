@@ -1,0 +1,16 @@
+[project]
+name = "parking-migrate"
+version = "0.1.0"
+description = "停车月卡续费迁移CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+parking-migrate = "parking_migrate.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["parking_migrate*"]
