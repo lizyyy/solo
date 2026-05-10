@@ -1,0 +1,38 @@
+[
+  {
+    "recovery_id": "R001",
+    "shipment_id": "S001",
+    "quantity_recovered": 8,
+    "recovery_date": "2024-12-15",
+    "lost_quantity": 0,
+    "notes": "活动结束，剩余样品全部回收",
+    "created_at": "2026-05-11T02:19:16.405660"
+  },
+  {
+    "recovery_id": "R002",
+    "shipment_id": "S002",
+    "quantity_recovered": 5,
+    "recovery_date": "2024-12-20",
+    "lost_quantity": 3,
+    "notes": "部分丢失，已登记",
+    "created_at": "2026-05-11T02:19:16.408160"
+  },
+  {
+    "recovery_id": "R003",
+    "shipment_id": "S004",
+    "quantity_recovered": 0,
+    "recovery_date": "2025-01-05",
+    "lost_quantity": 5,
+    "notes": "全部试香使用完毕，无剩余回收",
+    "created_at": "2026-05-11T02:19:16.410144"
+  },
+  {
+    "recovery_id": "R004",
+    "shipment_id": "S006",
+    "quantity_recovered": 3,
+    "recovery_date": "2025-01-20",
+    "lost_quantity": 2,
+    "notes": "部分完成，待赔付",
+    "created_at": "2026-05-11T02:19:16.425284"
+  }
+]

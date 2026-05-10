@@ -1,0 +1,71 @@
+{
+  "total_batches": 4,
+  "total_shipments": 6,
+  "shipments_in_transit": 1,
+  "shipments_with_feedback": 1,
+  "shipments_recovered": 1,
+  "shipments_lost": 3,
+  "shipments_compensated": 1,
+  "anomalies": [
+    {
+      "shipment_id": "S002",
+      "batch_id": "B001",
+      "fragrance": "东方玫瑰",
+      "store": "北京三里屯店",
+      "anomalies": [
+        "样品丢失未赔付"
+      ],
+      "status": "丢失未赔付"
+    },
+    {
+      "shipment_id": "S006",
+      "batch_id": "B004",
+      "fragrance": "甜美花果",
+      "store": "广州天河城店",
+      "anomalies": [
+        "反馈缺失",
+        "样品丢失未赔付"
+      ],
+      "status": "丢失未赔付"
+    }
+  ],
+  "fragrance_ratings": [
+    {
+      "fragrance": "木质檀香",
+      "avg_rating": 5.0,
+      "feedback_count": 1
+    },
+    {
+      "fragrance": "东方玫瑰",
+      "avg_rating": 4.5,
+      "feedback_count": 2
+    },
+    {
+      "fragrance": "清新柑橘",
+      "avg_rating": 2.0,
+      "feedback_count": 1
+    }
+  ],
+  "outstanding_samples": [
+    {
+      "shipment_id": "S003",
+      "batch_id": "B002",
+      "fragrance": "清新柑橘",
+      "store": "深圳万象城店",
+      "quantity": 15,
+      "shipment_date": "2024-12-20",
+      "status": "在途",
+      "responsible_person": null
+    },
+    {
+      "shipment_id": "S005",
+      "batch_id": "B003",
+      "fragrance": "木质檀香",
+      "store": "成都IFS店",
+      "quantity": 10,
+      "shipment_date": "2025-01-05",
+      "status": "已反馈",
+      "responsible_person": "刘店长"
+    }
+  ]
+}

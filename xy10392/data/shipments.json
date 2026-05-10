@@ -1,0 +1,62 @@
+[
+  {
+    "shipment_id": "S001",
+    "batch_id": "B001",
+    "store_name": "上海恒隆广场店",
+    "quantity": 20,
+    "shipment_date": "2024-12-05",
+    "responsible_person": "李经理",
+    "notes": "首批试香，重点推荐",
+    "created_at": "2026-05-11T02:19:16.169044"
+  },
+  {
+    "shipment_id": "S002",
+    "batch_id": "B001",
+    "store_name": "北京三里屯店",
+    "quantity": 30,
+    "shipment_date": "2024-12-06",
+    "responsible_person": "王店长",
+    "notes": "周末活动用",
+    "created_at": "2026-05-11T02:19:16.169537"
+  },
+  {
+    "shipment_id": "S003",
+    "batch_id": "B002",
+    "store_name": "深圳万象城店",
+    "quantity": 15,
+    "shipment_date": "2024-12-20",
+    "responsible_person": null,
+    "notes": "负责人临时空缺",
+    "created_at": "2026-05-11T02:19:16.302845"
+  },
+  {
+    "shipment_id": "S004",
+    "batch_id": "B002",
+    "store_name": "杭州湖滨银泰店",
+    "quantity": 20,
+    "shipment_date": "2024-12-21",
+    "responsible_person": "张主管",
+    "notes": "圣诞活动",
+    "created_at": "2026-05-11T02:19:16.309413"
+  },
+  {
+    "shipment_id": "S005",
+    "batch_id": "B003",
+    "store_name": "成都IFS店",
+    "quantity": 10,
+    "shipment_date": "2025-01-05",
+    "responsible_person": "刘店长",
+    "notes": "新品试香",
+    "created_at": "2026-05-11T02:19:16.313431"
+  },
+  {
+    "shipment_id": "S006",
+    "batch_id": "B004",
+    "store_name": "广州天河城店",
+    "quantity": 10,
+    "shipment_date": "2025-01-15",
+    "responsible_person": "陈经理",
+    "notes": "测试批次发样",
+    "created_at": "2026-05-11T02:19:16.320256"
+  }
+]
