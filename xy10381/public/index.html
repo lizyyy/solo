@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区共享冰箱捐赠台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a202c; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #2d5a27 0%, #4a7c3d 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    header p { opacity: 0.9; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { padding: 12px 24px; border: none; border-radius: 8px; background: white; cursor: pointer; font-size: 15px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
+    .tab-btn:hover { background: #e8f5e9; }
+    .tab-btn.active { background: #2d5a27; color: white; }
+    .panel { display: none; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .panel.active { display: block; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: #f8fafc; border-radius: 10px; padding: 20px; border-left: 4px solid #4a7c3d; }
+    .card h3 { font-size: 14px; color: #64748b; margin-bottom: 8px; }
+    .card .value { font-size: 32px; font-weight: bold; color: #1a202c; }
+    .card.warning { border-left-color: #f59e0b; }
+    .card.danger { border-left-color: #ef4444; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f8fafc; font-weight: 600; font-size: 13px; color: #64748b; text-transform: uppercase; }
+    tr:hover { background: #f8fafc; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge.available { background: #d1fae5; color: #065f46; }
+    .badge.near_expiry { background: #fef3c7; color: #92400e; }
+    .badge.expired { background: #fee2e2; color: #991b1b; }
+    .badge.offline { background: #e2e8f0; color: #475569; }
+    form { max-width: 600px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; font-size: 14px; }
+    input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: border-color 0.2s; }
+    input:focus, select:focus { outline: none; border-color: #4a7c3d; }
+    .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #2d5a27; color: white; }
+    .btn-primary:hover { background: #204a1b; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 1000; animation: slideIn 0.3s ease; }
+    .toast.success { background: #10b981; }
+    .toast.error { background: #ef4444; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .alert-box { background: #fef3c7; border: 1px solid #fbbf24; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .alert-box h4 { color: #92400e; margin-bottom: 8px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .details { background: #f8fafc; border-radius: 6px; padding: 12px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+    .operator-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 12px 16px; background: white; border-radius: 8px; }
+    .operator-input { display: flex; gap: 8px; align-items: center; }
+    .operator-input input { width: 150px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🧊 社区共享冰箱捐赠台</h1>
+      <p>管理食品捐赠、居民领取与过期处理，让爱心有迹可循</p>
+    </header>
+
+    <div class="operator-bar">
+      <span>📋 数据导出与复盘支持</span>
+      <div class="operator-input">
+        <label for="operator">当前操作人:</label>
+        <input type="text" id="operator" value="志愿者小明" placeholder="输入您的姓名">
+        <button class="btn btn-primary btn-sm" onclick="exportData()">📥 导出数据</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="dashboard">📊 总览</button>
+      <button class="tab-btn" data-tab="foods">🥬 食品列表</button>
+      <button class="tab-btn" data-tab="add">➕ 上架捐赠</button>
+      <button class="tab-btn" data-tab="pickup">🎁 领取登记</button>
+      <button class="tab-btn" data-tab="alerts">⚠️ 过期提醒</button>
+      <button class="tab-btn" data-tab="history">📜 处理历史</button>
+      <button class="tab-btn" data-tab="stats">📈 公益统计</button>
+    </div>
+
+    <div id="dashboard" class="panel active">
+      <h2 style="margin-bottom: 16px;">冰箱状态总览</h2>
+      <div id="stats-cards" class="grid"></div>
+      <div style="margin-top: 24px;">
+        <h3 style="margin-bottom: 12px;">📋 今日可领食品</h3>
+        <div id="today-available"></div>
+      </div>
+    </div>
+
+    <div id="foods" class="panel">
+      <h2 style="margin-bottom: 16px;">冰箱内食品</h2>
+      <div id="food-table"></div>
+    </div>
+
+    <div id="add" class="panel">
+      <h2 style="margin-bottom: 16px;">食品上架（捐赠登记）</h2>
+      
+      <div style="background: #e8f5e9; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <h4 style="color: #1b5e20;">✅ 规则说明</h4>
+        <p style="margin-top: 8px; font-size: 14px; color: #2e7d32;">
+          • 过期食品会被自动拦截，无法上架<br>
+          • 同一批次号不可重复使用<br>
+          • 临期食品（保质期≤3天）会在提醒区高亮显示
+        </p>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div>
+          <h3 style="margin-bottom: 12px;">1. 新增捐赠人</h3>
+          <form id="donor-form">
+            <div class="form-group">
+              <label>姓名/机构名 *</label>
+              <input type="text" id="donor-name" required>
+            </div>
+            <div class="form-group">
+              <label>联系电话</label>
+              <input type="tel" id="donor-phone">
+            </div>
+            <div class="form-group">
+              <label>类型</label>
+              <select id="donor-type">
+                <option value="个人">个人</option>
+                <option value="商家">商家</option>
+                <option value="社区">社区</option>
+                <option value="企业">企业</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">添加捐赠人</button>
+          </form>
+        </div>
+        
+        <div>
+          <h3 style="margin-bottom: 12px;">2. 登记食品</h3>
+          <form id="food-form">
+            <div class="form-group">
+              <label>批次号 * (唯一标识)</label>
+              <input type="text" id="food-batch" placeholder="如：DON-20240115-001" required>
+            </div>
+            <div class="form-group">
+              <label>食品名称 *</label>
+              <input type="text" id="food-name" required>
+            </div>
+            <div class="two-col">
+              <div class="form-group">
+                <label>品类</label>
+                <select id="food-category"></select>
+              </div>
+              <div class="form-group">
+                <label>捐赠人 *</label>
+                <select id="food-donor" required></select>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="form-group">
+                <label>数量 *</label>
+                <input type="number" id="food-quantity" min="1" required>
+              </div>
+              <div class="form-group">
+                <label>单位</label>
+                <input type="text" id="food-unit" value="份">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>保质期截止日期 *</label>
+              <input type="date" id="food-expiry" required>
+            </div>
+            <button type="submit" class="btn btn-primary">审核上架</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="pickup" class="panel">
+      <h2 style="margin-bottom: 16px;">居民领取登记</h2>
+      
+      <div style="background: #fff3e0; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <h4 style="color: #e65100;">⚠️ 领取限制</h4>
+        <p style="margin-top: 8px; font-size: 14px; color: #ef6c00;">
+          • 同一批次食品，每人每天最多领取2份<br>
+          • 已过期/已下架食品无法领取<br>
+          • 领取后库存自动扣减
+        </p>
+      </div>
+      
+      <form id="pickup-form" style="max-width: 500px;">
+        <div class="form-group">
+          <label>选择食品 *</label>
+          <select id="pickup-food" required>
+            <option value="">-- 请选择可领食品 --</option>
+          </select>
+        </div>
+        <div class="two-col">
+          <div class="form-group">
+            <label>领取人姓名 *</label>
+            <input type="text" id="pickup-name" required>
+          </div>
+          <div class="form-group">
+            <label>联系电话</label>
+            <input type="tel" id="pickup-phone">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>领取数量 *</label>
+          <input type="number" id="pickup-quantity" min="1" max="2" value="1" required>
+        </div>
+        <button type="submit" class="btn btn-primary">确认领取</button>
+      </form>
+    </div>
+
+    <div id="alerts" class="panel">
+      <h2 style="margin-bottom: 16px;">过期提醒 & 报损处理</h2>
+      <div id="alerts-list"></div>
+    </div>
+
+    <div id="history" class="panel">
+      <h2 style="margin-bottom: 16px;">处理历史日志（可追溯）</h2>
+      <p style="margin-bottom: 16px; color: #64748b;">每条记录包含：操作时间、操作类型、处理人、来源渠道、详细信息</p>
+      <div id="history-table"></div>
+    </div>
+
+    <div id="stats" class="panel">
+      <h2 style="margin-bottom: 16px;">公益统计</h2>
+      <div id="stats-detail"></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api';
+    const OPERATOR_KEY = 'fridge_operator';
+    
+    function getOperator() {
+      return localStorage.getItem(OPERATOR_KEY) || '志愿者';
+    }
+    
+    function setOperator(name) {
+      localStorage.setItem(OPERATOR_KEY, name);
+    }
+    
+    async function apiCall(url, options = {}) {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Operator': encodeURIComponent(getOperator()),
+        ...options.headers
+      };
+      const res = await fetch(url, { ...options, headers });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: '请求失败' }));
+        throw new Error(err.error || '请求失败');
+      }
+      return res.json();
+    }
+    
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleString('zh-CN', { hour12: false });
+    }
+    
+    function formatDateShort(dateStr) {
+      if (!dateStr) return '-';
+      return dateStr.split('T')[0];
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+      
+      if (tabName === 'dashboard') loadDashboard();
+      if (tabName === 'foods') loadFoods();
+      if (tabName === 'add') loadAddForm();
+      if (tabName === 'pickup') loadPickupForm();
+      if (tabName === 'alerts') loadAlerts();
+      if (tabName === 'history') loadHistory();
+      if (tabName === 'stats') loadStatsDetail();
+    }
+    
+    async function loadDashboard() {
+      const stats = await apiCall(API + '/stats');
+      const s = stats.summary;
+      const cards = document.getElementById('stats-cards');
+      cards.innerHTML = `
+        <div class="card">
+          <h3>📦 食品总数</h3>
+          <div class="value">${s.totalFoods}</div>
+        </div>
+        <div class="card">
+          <h3>✅ 可领取</h3>
+          <div class="value">${s.availableFoods}</div>
+        </div>
+        <div class="card">
+          <h3>💝 捐赠人</h3>
+          <div class="value">${s.totalDonors}</div>
+        </div>
+        <div class="card">
+          <h3>🎁 累计领取</h3>
+          <div class="value">${s.totalPickups} 份</div>
+        </div>
+        <div class="card warning">
+          <h3>⚠️ 临期（3天内）</h3>
+          <div class="value">${s.nearExpiryCount}</div>
+        </div>
+        <div class="card danger">
+          <h3>❌ 已过期</h3>
+          <div class="value">${s.expiredCount}</div>
+        </div>
+        <div class="card">
+          <h3>🗑️ 报损</h3>
+          <div class="value">${s.totalDamaged} 份</div>
+        </div>
+      `;
+      
+      const foods = await apiCall(API + '/foods');
+      const available = foods.filter(f => f.effective_status === 'available' && f.stock > 0);
+      const todayDiv = document.getElementById('today-available');
+      
+      if (available.length === 0) {
+        todayDiv.innerHTML = '<p style="color: #64748b;">暂无可用食品</p>';
+        return;
+      }
+      
+      todayDiv.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>批次</th>
+              <th>名称</th>
+              <th>品类</th>
+              <th>捐赠人</th>
+              <th>库存</th>
+              <th>保质期</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${available.map(f => `
+              <tr>
+                <td><code>${f.batch_no}</code></td>
+                <td>${f.name}</td>
+                <td>${f.category_name || '-'}</td>
+                <td>${f.donor_name || '-'}</td>
+                <td>${f.stock} ${f.unit}</td>
+                <td>${formatDateShort(f.expiry_date)}</td>
+                <td><span class="badge ${f.effective_status}">${getStatusText(f.effective_status)}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function getStatusText(status) {
+      const map = {
+        available: '可领取',
+        near_expiry: '临期',
+        expired: '过期',
+        offline: '已下架',
+        pending: '待审核'
+      };
+      return map[status] || status;
+    }
+    
+    async function loadFoods() {
+      const foods = await apiCall(API + '/foods');
+      const div = document.getElementById('food-table');
+      
+      if (foods.length === 0) {
+        div.innerHTML = '<p style="color: #64748b;">暂无食品记录</p>';
+        return;
+      }
+      
+      div.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>批次</th>
+              <th>名称</th>
+              <th>品类</th>
+              <th>捐赠人</th>
+              <th>总量</th>
+              <th>库存</th>
+              <th>保质期</th>
+              <th>状态</th>
+              <th>上架时间</th>
+              <th>审核人</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${foods.map(f => `
+              <tr>
+                <td><code>${f.batch_no}</code></td>
+                <td>${f.name}</td>
+                <td>${f.category_name || '-'}</td>
+                <td>${f.donor_name || '-'}</td>
+                <td>${f.quantity} ${f.unit}</td>
+                <td>${f.stock} ${f.unit}</td>
+                <td>${formatDateShort(f.expiry_date)}</td>
+                <td><span class="badge ${f.effective_status}">${getStatusText(f.effective_status)}</span></td>
+                <td>${formatDate(f.created_at)}</td>
+                <td>${f.approved_by || '-'}</td>
+                <td>
+                  ${f.status !== 'offline' ? `
+                    <button class="btn btn-secondary btn-sm" onclick="offlineFood(${f.id})">下架</button>
+                    <button class="btn btn-danger btn-sm" onclick="damageFood(${f.id}, ${f.stock})">报损</button>
+                  ` : '<span style="color: #94a3b8;">已处理</span>'}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    async function offlineFood(id) {
+      const reason = prompt('下架原因：');
+      if (reason === null) return;
+      try {
+        await apiCall(`${API}/foods/${id}/offline`, {
+          method: 'POST',
+          body: JSON.stringify({ reason })
+        });
+        showToast('已下架');
+        loadFoods();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+    
+    async function damageFood(id, maxQty) {
+      const qty = prompt(`报损数量 (1-${maxQty}):`);
+      if (!qty) return;
+      const reason = prompt('报损原因：');
+      if (reason === null) return;
+      
+      try {
+        await apiCall(`${API}/foods/${id}/damage`, {
+          method: 'POST',
+          body: JSON.stringify({ quantity: parseInt(qty), reason })
+        });
+        showToast('报损完成');
+        loadFoods();
+      } catch (e) {
+        showToast(e.message, 'error');
+      }
+    }
+    
+    async function loadAddForm() {
+      const [categories, donors] = await Promise.all([
+        apiCall(API + '/categories'),
+        apiCall(API + '/donors')
+      ]);
+      
+      document.getElementById('food-category').innerHTML = categories.map(
+        c => `<option value="${c.id}">${c.name} (${c.unit})</option>`
+      ).join('');
+      
+      document.getElementById('food-donor').innerHTML = donors.map(
+        d => `<option value="${d.id}">${d.name} ${d.type ? `(${d.type})` : ''}</option>`
+      ).join('') || '<option value="">请先添加捐赠人</option>';
+    }
+    
+    async function loadPickupForm() {
+      const foods = await apiCall(API + '/foods');
+      const available = foods.filter(f => 
+        f.effective_status === 'available' && f.stock > 0
+      );
+      
+      document.getElementById('pickup-food').innerHTML = `
+        <option value="">-- 请选择可领食品 --</option>
+        ${available.map(f => `
+          <option value="${f.id}">
+            ${f.name} (批次: ${f.batch_no}, 库存: ${f.stock}${f.unit}, 保质期: ${formatDateShort(f.expiry_date)})
+          </option>
+        `).join('')}
+      `;
+    }
+    
+    async function loadAlerts() {
+      const alerts = await apiCall(API + '/alerts');
+      const div = document.getElementById('alerts-list');
+      
+      if (alerts.length === 0) {
+        div.innerHTML = '<p style="color: #64748b;">👍 暂无需要关注的食品</p>';
+        return;
+      }
+      
+      div.innerHTML = alerts.map(f => {
+        const isExpired = f.days_left < 0;
+        const cardClass = isExpired ? 'card danger' : 'card warning';
+        const daysText = isExpired ? `已过期 ${Math.abs(f.days_left)} 天` : `剩余 ${f.days_left} 天`;
+        
+        return `
+          <div class="${cardClass}" style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+              <div>
+                <h4 style="font-size: 18px; margin-bottom: 8px;">${f.name} <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 12px;">${f.batch_no}</code></h4>
+                <p>📦 库存: ${f.stock} ${f.unit}</p>
+                <p>💝 来自: ${f.donor_name || '-'}</p>
+                <p>📅 保质期: ${formatDateShort(f.expiry_date)} <strong style="color: ${isExpired ? '#dc2626' : '#d97706'};">(${daysText})</strong></p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="offlineFood(${f.id})">下架</button>
+                <button class="btn btn-danger btn-sm" onclick="damageFood(${f.id}, ${f.stock})">报损</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    async function loadHistory() {
+      const logs = await apiCall(API + '/logs');
+      const div = document.getElementById('history-table');
+      
+      if (logs.length === 0) {
+        div.innerHTML = '<p style="color: #64748b;">暂无历史记录</p>';
+        return;
+      }
+      
+      div.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>操作类型</th>
+              <th>操作对象</th>
+              <th>处理人</th>
+              <th>来源</th>
+              <th>详细信息</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logs.map(l => `
+              <tr>
+                <td>${formatDate(l.created_at)}</td>
+                <td><strong>${getActionText(l.action)}</strong></td>
+                <td>${l.target_type || '-'} #${l.target_id || '-'}</td>
+                <td>${l.operator}</td>
+                <td>${l.source}</td>
+                <td>
+                  <details>
+                    <summary>查看详情</summary>
+                    <div class="details">${JSON.stringify(l.details, null, 2)}</div>
+                  </details>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    function getActionText(action) {
+      const map = {
+        create: '创建',
+        add: '上架',
+        pickup: '领取',
+        offline: '下架',
+        damage: '报损',
+        reject: '拦截',
+        reject_pickup: '领取被拒'
+      };
+      return map[action] || action;
+    }
+    
+    async function loadStatsDetail() {
+      const stats = await apiCall(API + '/stats');
+      const div = document.getElementById('stats-detail');
+      
+      div.innerHTML = `
+        <div class="grid" style="margin-bottom: 24px;">
+          <div class="card">
+            <h3>💝 捐赠排行榜 (按数量)</h3>
+            <ul style="list-style: none; margin-top: 12px;">
+              ${stats.donorRanking.length ? stats.donorRanking.map((d, i) => `
+                <li style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                  ${i + 1}. <strong>${d.name}</strong> - ${d.total_quantity}份 (${d.food_count}批次)
+                </li>
+              `).join('') : '<li>暂无数据</li>'}
+            </ul>
+          </div>
+          <div class="card">
+            <h3>📦 品类分布</h3>
+            <ul style="list-style: none; margin-top: 12px;">
+              ${stats.categoryStats.map(c => `
+                <li style="padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                  ${c.name}: <strong>${c.food_count}</strong> 批次
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 20px; border-radius: 10px;">
+          <h3 style="margin-bottom: 12px;">📋 复盘数据</h3>
+          <p style="color: #64748b; margin-bottom: 12px;">
+            点击右上角"导出数据"可导出完整 JSON 数据，包含食品、领取记录、操作日志，供社区志愿者复盘使用。
+          </p>
+          <button class="btn btn-primary" onclick="exportData()">📥 导出完整数据</button>
+        </div>
+      `;
+    }
+    
+    async function exportData() {
+      const res = await fetch(API + '/export');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fridge-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('数据导出完成');
+    }
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+    
+    document.getElementById('operator').addEventListener('change', (e) => {
+      setOperator(e.target.value);
+    });
+    
+    document.getElementById('donor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await apiCall(API + '/donors', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('donor-name').value,
+            phone: document.getElementById('donor-phone').value,
+            type: document.getElementById('donor-type').value
+          })
+        });
+        showToast('捐赠人已添加');
+        document.getElementById('donor-form').reset();
+        loadAddForm();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+    
+    document.getElementById('food-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await apiCall(API + '/foods', {
+          method: 'POST',
+          body: JSON.stringify({
+            batch_no: document.getElementById('food-batch').value,
+            name: document.getElementById('food-name').value,
+            category_id: document.getElementById('food-category').value,
+            donor_id: document.getElementById('food-donor').value,
+            quantity: parseInt(document.getElementById('food-quantity').value),
+            unit: document.getElementById('food-unit').value,
+            expiry_date: document.getElementById('food-expiry').value
+          })
+        });
+        showToast('食品已上架');
+        document.getElementById('food-form').reset();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+    
+    document.getElementById('pickup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await apiCall(API + '/pickups', {
+          method: 'POST',
+          body: JSON.stringify({
+            food_id: document.getElementById('pickup-food').value,
+            resident_name: document.getElementById('pickup-name').value,
+            resident_phone: document.getElementById('pickup-phone').value,
+            quantity: parseInt(document.getElementById('pickup-quantity').value)
+          })
+        });
+        showToast('领取登记成功');
+        document.getElementById('pickup-form').reset();
+        loadPickupForm();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+    
+    document.getElementById('operator').value = getOperator();
+    loadDashboard();
+  </script>
+</body>
+</html>
