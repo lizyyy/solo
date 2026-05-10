@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Project {
+  id           String    @id @default(uuid())
+  name         String
+  code         String    @unique
+  description  String?
+  deadline     DateTime?
+  status       String    @default("active")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sections     Section[]
+  questions    Question[]
+  clarifications Clarification[]
+  addendums    Addendum[]
+  archives     ArchiveReport[]
+  auditLogs    AuditLog[]
+}
+
+model Section {
+  id           String    @id @default(uuid())
+  projectId    String
+  name         String
+  code         String
+  description  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  questions    Question[]
+  clarifications Clarification[]
+  addendums    Addendum[]
+  confirmations SupplierConfirmation[]
+
+  @@unique([projectId, code])
+}
+
+model Supplier {
+  id           String    @id @default(uuid())
+  name         String
+  code         String    @unique
+  contact      String?
+  email        String?
+  phone        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  questions    Question[]
+  confirmations SupplierConfirmation[]
+}
+
+model Question {
+  id           String    @id @default(uuid())
+  projectId    String
+  sectionId    String?
+  supplierId   String
+  title        String
+  content      String
+  status       String    @default("pending")
+  answer       String?
+  answeredAt   DateTime?
+  answeredBy   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  section      Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  supplier     Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  auditLogs    AuditLog[]
+  clarificationItems ClarificationItem[]
+}
+
+model Clarification {
+  id           String    @id @default(uuid())
+  projectId    String
+  sectionId    String?
+  version      Int
+  title        String
+  content      String
+  publishDate  DateTime?
+  status       String    @default("draft")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  publishedBy  String?
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  section      Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  items        ClarificationItem[]
+  auditLogs    AuditLog[]
+
+  @@unique([projectId, sectionId, version])
+}
+
+model ClarificationItem {
+  id             String        @id @default(uuid())
+  clarificationId String
+  questionId     String
+  answer         String
+  createdAt      DateTime      @default(now())
+  clarification  Clarification @relation(fields: [clarificationId], references: [id], onDelete: Cascade)
+  question       Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Addendum {
+  id           String    @id @default(uuid())
+  projectId    String
+  sectionId    String?
+  title        String
+  description  String?
+  fileName     String
+  filePath     String
+  fileSize     Int?
+  uploadedBy   String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  section      Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  confirmations SupplierConfirmation[]
+  auditLogs    AuditLog[]
+}
+
+model SupplierConfirmation {
+  id           String    @id @default(uuid())
+  supplierId   String
+  addendumId   String?
+  sectionId    String?
+  confirmed    Boolean   @default(false)
+  confirmedAt  DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  supplier     Supplier  @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  addendum     Addendum? @relation(fields: [addendumId], references: [id], onDelete: SetNull)
+  section      Section?  @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+}
+
+model ArchiveReport {
+  id           String    @id @default(uuid())
+  projectId    String
+  title        String
+  content      String
+  filePath     String?
+  generatedBy  String?
+  status       String    @default("generating")
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id           String    @id @default(uuid())
+  action       String
+  entityType   String
+  entityId     String
+  userId       String?
+  userName     String?
+  beforeState  String?
+  afterState   String?
+  remarks      String?
+  createdAt    DateTime  @default(now())
+  project      Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId    String?
+  question     Question? @relation(fields: [questionId], references: [id], onDelete: SetNull)
+  questionId   String?
+  clarification Clarification? @relation(fields: [clarificationId], references: [id], onDelete: SetNull)
+  clarificationId String?
+  addendum     Addendum? @relation(fields: [addendumId], references: [id], onDelete: SetNull)
+  addendumId   String?
+  archive      ArchiveReport? @relation(fields: [archiveId], references: [id], onDelete: SetNull)
+  archiveId    String?
+}
+
+model BackgroundJob {
+  id           String    @id @default(uuid())
+  type         String
+  status       String    @default("pending")
+  payload      String?
+  result       String?
+  errorMessage String?
+  retryCount   Int       @default(0)
+  maxRetries   Int       @default(3)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  failedAt     DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  logs         String?
+}
