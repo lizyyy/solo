@@ -1,0 +1,29 @@
+{
+  "key": "ASSET001_RULE002_CC002_2023-08_张三",
+  "result": {
+    "success": true,
+    "message": "折旧重算成功：版本号 ver_252c88cf，重算 6 个期间，总差异 -7600.02 元",
+    "data": {
+      "version_id": "ver_252c88cf",
+      "asset_code": "ASSET001",
+      "asset_name": "生产设备-数控机床",
+      "change_type": "both",
+      "effective_period": "2023-08",
+      "recalculated_periods": [
+        "2023-08",
+        "2023-09",
+        "2023-10",
+        "2023-11",
+        "2023-12",
+        "2024-01"
+      ],
+      "differences_count": 6,
+      "total_difference": "-7600.02",
+      "old_rule": "RULE001",
+      "new_rule": "RULE002",
+      "old_cost_center": "CC001",
+      "new_cost_center": "CC002"
+    }
+  },
+  "created_at": "2026-05-10 15:18:50"
+}

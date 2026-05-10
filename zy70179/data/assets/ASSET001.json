@@ -1,0 +1,172 @@
+{
+  "asset_code": "ASSET001",
+  "asset_name": "生产设备-数控机床",
+  "original_value": "120000.00",
+  "depreciation_rule_code": "RULE002",
+  "cost_center_code": "CC002",
+  "purchase_date": "2023-01-15 00:00:00",
+  "start_depreciation_month": "2023-02",
+  "accumulated_depreciation": "49400.04",
+  "net_value": "70599.96",
+  "status": "active",
+  "cost_center_history": [
+    {
+      "cost_center_code": "CC001",
+      "effective_from": "2023-02",
+      "effective_to": "2023-08",
+      "is_current": false
+    },
+    {
+      "cost_center_code": "CC002",
+      "effective_from": "2023-08",
+      "effective_to": null,
+      "is_current": true
+    }
+  ],
+  "depreciation_history": [
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-02",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "3166.67",
+      "net_value": "116833.33",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-03",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "6333.34",
+      "net_value": "113666.66",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-04",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "9500.01",
+      "net_value": "110499.99",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-05",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "12666.68",
+      "net_value": "107333.32",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-06",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "15833.35",
+      "net_value": "104166.65",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-07",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "19000.02",
+      "net_value": "100999.98",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-08",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "22166.69",
+      "net_value": "97833.31",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-09",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "25333.36",
+      "net_value": "94666.64",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-10",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "28500.03",
+      "net_value": "91499.97",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-11",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "31666.70",
+      "net_value": "88333.30",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2023-12",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "34833.37",
+      "net_value": "85166.63",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    },
+    {
+      "asset_code": "ASSET001",
+      "period": "2024-01",
+      "depreciation_amount": "3166.67",
+      "accumulated_depreciation": "38000.04",
+      "net_value": "81999.96",
+      "cost_center_code": "CC001",
+      "depreciation_rule_code": "RULE001",
+      "version_id": null,
+      "is_original": true,
+      "created_at": "2026-05-10 15:18:50"
+    }
+  ]
+}
