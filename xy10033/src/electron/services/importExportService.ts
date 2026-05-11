@@ -110,12 +110,16 @@ function parseImportRow(row: any[], headers: any[]): Omit<ReissueOrder, 'id' | '
     orderNo: getValue('订单号', false) || '',
     customerName: getValue('客户姓名', true)!,
     customerPhone: getValue('客户电话', true)!,
-    customerAddress: getValue('客户地址', false),
+    customerAddress: getValue('客户地址', false) || '',
     productName: getValue('产品名称', true)!,
-    productSku: getValue('产品SKU', false),
+    productSku: getValue('产品SKU', false) || '',
     quantity,
     reason: getValue('补发原因', true)!,
-    description: getValue('备注', false)
+    description: getValue('备注', false) || '',
+    assigneeId: null,
+    assigneeName: null,
+    trackingNo: null,
+    shippingCompany: null
   };
 }
 

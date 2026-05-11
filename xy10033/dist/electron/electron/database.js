@@ -1,34 +1,38 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-
-let db: Database.Database | null = null;
-
-export function getDatabase(): Database.Database {
-  if (!db) {
-    let dbPath: string;
-    if (process.env.NODE_ENV === 'test') {
-      dbPath = ':memory:';
-    } else {
-      try {
-        const { app } = require('electron');
-        dbPath = path.join(app.getPath('userData'), 'reissue.db');
-      } catch {
-        dbPath = path.join(process.cwd(), 'test.db');
-      }
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getDatabase = getDatabase;
+exports.closeDatabase = closeDatabase;
+const path_1 = __importDefault(require("path"));
+let db = null;
+function getDatabase() {
+    if (!db) {
+        let dbPath;
+        if (process.env.NODE_ENV === 'test') {
+            dbPath = ':memory:';
+        }
+        else {
+            try {
+                const { app } = require('electron');
+                dbPath = path_1.default.join(app.getPath('userData'), 'reissue.db');
+            }
+            catch {
+                dbPath = path_1.default.join(process.cwd(), 'test.db');
+            }
+        }
+        const BetterSqlite3 = require('better-sqlite3');
+        const newDb = BetterSqlite3(dbPath);
+        newDb.pragma('journal_mode = WAL');
+        newDb.pragma('foreign_keys = ON');
+        initializeDatabase(newDb);
+        db = newDb;
     }
-    
-    const BetterSqlite3 = require('better-sqlite3');
-    const newDb = BetterSqlite3(dbPath) as Database.Database;
-    newDb.pragma('journal_mode = WAL');
-    newDb.pragma('foreign_keys = ON');
-    initializeDatabase(newDb);
-    db = newDb;
-  }
-  return db!;
+    return db;
 }
-
-function initializeDatabase(db: Database.Database): void {
-  db.exec(`
+function initializeDatabase(db) {
+    db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
@@ -108,10 +112,9 @@ function initializeDatabase(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_logs_user ON audit_logs(user_id);
   `);
 }
-
-export function closeDatabase(): void {
-  if (db) {
-    db.close();
-    db = null;
-  }
+function closeDatabase() {
+    if (db) {
+        db.close();
+        db = null;
+    }
 }
