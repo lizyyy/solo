@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-05-12",
+  "generated_time": "00:29:40",
+  "summary": {
+    "total_employees": 3,
+    "expiring_soon": 1,
+    "expired": 0,
+    "restricted_positions": 0
+  },
+  "expiring_soon": [
+    {
+      "employee_id": "E003",
+      "employee_name": "John Smith",
+      "position": "外籍技术人员",
+      "certificate": "工作签证",
+      "expiry_date": "2026-05-20",
+      "days_left": 8
+    }
+  ],
+  "expired": [],
+  "restricted_positions": [],
+  "reminders": [
+    {
+      "id": "E003_工作签证_2026-05-20",
+      "employee_id": "E003",
+      "employee_name": "John Smith",
+      "position": "外籍技术人员",
+      "certificate_type": "工作签证",
+      "expiry_date": "2026-05-20",
+      "status": "即将到期",
+      "generated_at": "2026-05-12",
+      "generated_time": "00:29:36",
+      "notified_person": "王经理",
+      "notification_method": "邮件",
+      "confirmed": false
+    }
+  ]
+}

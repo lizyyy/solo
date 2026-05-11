@@ -1,0 +1,47 @@
+{
+  "cert_types": [
+    {"name": "健康证", "description": "食品行业从业必需"},
+    {"name": "叉车证", "description": "特种设备操作证"},
+    {"name": "工作签证", "description": "外籍员工工作许可"}
+  ],
+  "positions": [
+    {"name": "厨师", "required_certs": ["健康证"]},
+    {"name": "叉车司机", "required_certs": ["叉车证"]},
+    {"name": "外籍技术人员", "required_certs": ["工作签证"]}
+  ],
+  "employees": [
+    {
+      "id": "E001",
+      "name": "张三",
+      "position": "厨师",
+      "department": "厨房",
+      "contact": "13800138001",
+      "certificates": [
+        {"type": "健康证", "expiry_date": "2026-06-15"}
+      ]
+    },
+    {
+      "id": "E002",
+      "name": "李四",
+      "position": "叉车司机",
+      "department": "仓库",
+      "contact": "13800138002",
+      "certificates": [
+        {"type": "叉车证", "expiry_date": "2025-03-20"}
+      ]
+    },
+    {
+      "id": "E003",
+      "name": "John Smith",
+      "position": "外籍技术人员",
+      "department": "技术部",
+      "contact": "john@company.com",
+      "certificates": [
+        {"type": "工作签证", "expiry_date": "2026-05-20"}
+      ]
+    }
+  ],
+  "schedules": [
+    {"employee_id": "E002", "date": "2026-05-15", "shift": "早班"}
+  ]
+}
