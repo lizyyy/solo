@@ -1,0 +1,14 @@
+{
+  "name": "badge-print-cli",
+  "version": "1.0.0",
+  "description": "活动胸牌打印补打 CLI 工具",
+  "bin": {
+    "badge": "./src/index.js"
+  },
+  "scripts": {
+    "badge": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
