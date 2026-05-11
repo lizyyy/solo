@@ -1,0 +1,58 @@
+[
+  {
+    "patient_id": "P001",
+    "patient_name": "张三",
+    "doctor": "李医生",
+    "date": "2026-05-12",
+    "stage": "常规复诊",
+    "interval": 28,
+    "phone": "13800138001"
+  },
+  {
+    "patient_id": "P002",
+    "patient_name": "李四",
+    "doctor": "李医生",
+    "date": "2026-05-12",
+    "stage": "托槽粘接",
+    "interval": 14,
+    "phone": "13800138002"
+  },
+  {
+    "patient_id": "P003",
+    "patient_name": "王五",
+    "doctor": "王医生",
+    "date": "2026-05-12",
+    "stage": "保持器佩戴",
+    "interval": 42,
+    "phone": "13800138003"
+  },
+  {
+    "patient_id": "P004",
+    "patient_name": "赵六",
+    "doctor": "李医生",
+    "date": "2026-05-12",
+    "emergency": true,
+    "emergency_reason": "托槽脱落",
+    "stage": "紧急调整",
+    "interval": 28,
+    "phone": "13800138004"
+  },
+  {
+    "patient_id": "P005",
+    "patient_name": "钱七",
+    "doctor": "王医生",
+    "date": "2026-05-13",
+    "stage": "常规复诊",
+    "interval": 28,
+    "phone": "13800138005"
+  },
+  {
+    "patient_id": "P006",
+    "patient_name": "孙八",
+    "doctor": "李医生",
+    "date": "2026-05-13",
+    "stage": "方案确认",
+    "interval": 28,
+    "phone": "13800138006"
+  }
+]
