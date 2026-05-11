@@ -1,0 +1,219 @@
+{
+  "generated_at": "2026-05-11 18:03:09.892966",
+  "statistics": {
+    "total_queries": 13,
+    "unique_patterns": 11,
+    "parse_errors": 0,
+    "total_execution_time": 89.7,
+    "assigned_to_owners": 3,
+    "unassigned_patterns": 2,
+    "duplicates_detected": 2
+  },
+  "config_conflicts": [],
+  "unknown_tables": [
+    "orders",
+    "product_categories",
+    "products",
+    "users"
+  ],
+  "parse_errors": [],
+  "duplicate_notes": [
+    "重复查询: SQL摘要已存在于模式中，首次发生于 2026-05-11 09:15:30",
+    "重复查询: SQL摘要已存在于模式中，首次发生于 2026-05-11 09:15:30"
+  ],
+  "owner_reports": [
+    {
+      "owner": "张三",
+      "service": "订单服务",
+      "pattern_count": 4,
+      "total_queries": 6,
+      "total_execution_time": 30.8,
+      "avg_execution_time": 5.14,
+      "max_execution_time": 8.12,
+      "patterns": [
+        {
+          "tables": [
+            "orders"
+          ],
+          "database": "order_db",
+          "total_count": 3,
+          "total_execution_time": 15.360000000000001,
+          "avg_execution_time": 5.12,
+          "max_execution_time": 5.23,
+          "first_seen": "2026-05-11 09:15:30",
+          "last_seen": "2026-05-11 09:25:30",
+          "is_confirmed": true,
+          "sql_digest": "select * from orders where user_id = NUM and status = 'STRING' order by created_at desc limit NUM;"
+        },
+        {
+          "tables": [
+            "orders"
+          ],
+          "database": "order_db",
+          "total_count": 1,
+          "total_execution_time": 8.12,
+          "avg_execution_time": 8.12,
+          "max_execution_time": 8.12,
+          "first_seen": "2026-05-11 09:17:20",
+          "last_seen": "2026-05-11 09:17:20",
+          "is_confirmed": true,
+          "sql_digest": "select user_id, count(*) as order_count, sum(total_amount) as total from orders where created_at between 'STRING' and 'STRING' group by user_id having order_count > NUM;"
+        },
+        {
+          "tables": [
+            "order_items",
+            "orders"
+          ],
+          "database": "order_db",
+          "total_count": 1,
+          "total_execution_time": 3.87,
+          "avg_execution_time": 3.87,
+          "max_execution_time": 3.87,
+          "first_seen": "2026-05-11 09:16:45",
+          "last_seen": "2026-05-11 09:16:45",
+          "is_confirmed": true,
+          "sql_digest": "select o.*, oi.* from orders o join order_items oi on o.id = oi.order_id where o.created_at >= 'STRING' and o.created_at < 'STRING';"
+        },
+        {
+          "tables": [
+            "orders"
+          ],
+          "database": "order_db",
+          "total_count": 1,
+          "total_execution_time": 3.45,
+          "avg_execution_time": 3.45,
+          "max_execution_time": 3.45,
+          "first_seen": "2026-05-11 13:00:00",
+          "last_seen": "2026-05-11 13:00:00",
+          "is_confirmed": true,
+          "sql_digest": "select select * from orders where user_id = NUM;"
+        }
+      ]
+    },
+    {
+      "owner": "李四",
+      "service": "会员服务",
+      "pattern_count": 3,
+      "total_queries": 3,
+      "total_execution_time": 13.68,
+      "avg_execution_time": 4.56,
+      "max_execution_time": 6.78,
+      "patterns": [
+        {
+          "tables": [
+            "user_points"
+          ],
+          "database": "user_db",
+          "total_count": 1,
+          "total_execution_time": 6.78,
+          "avg_execution_time": 6.78,
+          "max_execution_time": 6.78,
+          "first_seen": "2026-05-11 10:08:33",
+          "last_seen": "2026-05-11 10:08:33",
+          "is_confirmed": false,
+          "sql_digest": "select user_id, sum(points) as total_points from user_points where created_at >= 'STRING' group by user_id order by total_points desc limit NUM;"
+        },
+        {
+          "tables": [
+            "user_profiles",
+            "users"
+          ],
+          "database": "user_db",
+          "total_count": 1,
+          "total_execution_time": 4.56,
+          "avg_execution_time": 4.56,
+          "max_execution_time": 4.56,
+          "first_seen": "2026-05-11 10:05:12",
+          "last_seen": "2026-05-11 10:05:12",
+          "is_confirmed": false,
+          "sql_digest": "select * from users u join user_profiles up on u.id = up.user_id where u.email like 'STRING' limit NUM;"
+        },
+        {
+          "tables": [
+            "user_addresses",
+            "users"
+          ],
+          "database": "user_db",
+          "total_count": 1,
+          "total_execution_time": 2.34,
+          "avg_execution_time": 2.34,
+          "max_execution_time": 2.34,
+          "first_seen": "2026-05-11 10:10:15",
+          "last_seen": "2026-05-11 10:10:15",
+          "is_confirmed": false,
+          "sql_digest": "select ua.* from user_addresses ua join users u on ua.user_id = u.id where u.status = 'STRING';"
+        }
+      ]
+    },
+    {
+      "owner": "王五",
+      "service": "报表服务",
+      "pattern_count": 2,
+      "total_queries": 2,
+      "total_execution_time": 22.32,
+      "avg_execution_time": 11.16,
+      "max_execution_time": 12.45,
+      "patterns": [
+        {
+          "tables": [
+            "daily_reports",
+            "monthly_stats"
+          ],
+          "database": "report_db",
+          "total_count": 1,
+          "total_execution_time": 12.45,
+          "avg_execution_time": 12.45,
+          "max_execution_time": 12.45,
+          "first_seen": "2026-05-11 11:00:00",
+          "last_seen": "2026-05-11 11:00:00",
+          "is_confirmed": false,
+          "sql_digest": "select dr.*, ms.* from daily_reports dr left join monthly_stats ms on dr.report_date = ms.report_date where dr.report_date between 'STRING' and 'STRING';"
+        },
+        {
+          "tables": [
+            "sales_aggregates"
+          ],
+          "database": "report_db",
+          "total_count": 1,
+          "total_execution_time": 9.87,
+          "avg_execution_time": 9.87,
+          "max_execution_time": 9.87,
+          "first_seen": "2026-05-11 11:15:25",
+          "last_seen": "2026-05-11 11:15:25",
+          "is_confirmed": false,
+          "sql_digest": "select product_id, sum(quantity) as qty, sum(amount) as amt from sales_aggregates where sale_date >= 'STRING' group by product_id with rollup;"
+        }
+      ]
+    }
+  ],
+  "unassigned_patterns": [
+    {
+      "tables": [
+        "product_categories",
+        "products"
+      ],
+      "database": "product_db",
+      "total_count": 1,
+      "total_execution_time": 7.23,
+      "avg_execution_time": 7.23,
+      "max_execution_time": 7.23,
+      "first_seen": "2026-05-11 12:00:00",
+      "last_seen": "2026-05-11 12:00:00",
+      "sql_digest": "select * from products p join product_categories pc on p.category_id = pc.id where p.price > NUM;"
+    },
+    {
+      "tables": [
+        "orders",
+        "users"
+      ],
+      "database": "order_db",
+      "total_count": 1,
+      "total_execution_time": 15.67,
+      "avg_execution_time": 15.67,
+      "max_execution_time": 15.67,
+      "first_seen": "2026-05-11 14:00:00",
+      "last_seen": "2026-05-11 14:00:00",
+      "sql_digest": "select o.*, u.email from orders o join user_db.users u on o.user_id = u.id where o.created_at >= 'STRING';"
+    }
+  ]
+}

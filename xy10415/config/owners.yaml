@@ -1,0 +1,28 @@
+owners:
+  - name: 张三
+    service: 订单服务
+    tables:
+      - orders
+      - order_items
+      - order_status
+    databases:
+      - order_db
+
+  - name: 李四
+    service: 会员服务
+    tables:
+      - users
+      - user_profiles
+      - user_points
+      - user_addresses
+    databases:
+      - user_db
+
+  - name: 王五
+    service: 报表服务
+    tables:
+      - daily_reports
+      - monthly_stats
+      - sales_aggregates
+    databases:
+      - report_db

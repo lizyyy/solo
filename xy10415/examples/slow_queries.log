@@ -1,0 +1,29 @@
+# 数据库慢查询日志样例
+# 格式: 时间 | 执行时间(秒) | 数据库 | SQL语句
+
+# 订单服务相关查询
+2026-05-11 09:15:30|5.23|order_db|SELECT * FROM orders WHERE user_id = 12345 AND status = 'paid' ORDER BY created_at DESC LIMIT 100;
+2026-05-11 09:16:45|3.87|order_db|SELECT o.*, oi.* FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE o.created_at >= '2026-05-01' AND o.created_at < '2026-05-11';
+2026-05-11 09:17:20|8.12|order_db|SELECT user_id, COUNT(*) as order_count, SUM(total_amount) as total FROM orders WHERE created_at BETWEEN '2026-04-01' AND '2026-05-01' GROUP BY user_id HAVING order_count > 10;
+
+# 会员服务相关查询
+2026-05-11 10:05:12|4.56|user_db|SELECT * FROM users u JOIN user_profiles up ON u.id = up.user_id WHERE u.email LIKE '%@example.com' LIMIT 1000;
+2026-05-11 10:08:33|6.78|user_db|SELECT user_id, SUM(points) as total_points FROM user_points WHERE created_at >= '2026-01-01' GROUP BY user_id ORDER BY total_points DESC LIMIT 100;
+2026-05-11 10:10:15|2.34|user_db|SELECT ua.* FROM user_addresses ua JOIN users u ON ua.user_id = u.id WHERE u.status = 'active';
+
+# 报表服务相关查询
+2026-05-11 11:00:00|12.45|report_db|SELECT dr.*, ms.* FROM daily_reports dr LEFT JOIN monthly_stats ms ON dr.report_date = ms.report_date WHERE dr.report_date BETWEEN '2026-01-01' AND '2026-05-10';
+2026-05-11 11:15:25|9.87|report_db|SELECT product_id, SUM(quantity) as qty, SUM(amount) as amt FROM sales_aggregates WHERE sale_date >= '2026-04-01' GROUP BY product_id WITH ROLLUP;
+
+# 重复查询 (同一模式多次出现)
+2026-05-11 09:20:00|4.98|order_db|SELECT * FROM orders WHERE user_id = 67890 AND status = 'paid' ORDER BY created_at DESC LIMIT 100;
+2026-05-11 09:25:30|5.15|order_db|SELECT * FROM orders WHERE user_id = 11111 AND status = 'paid' ORDER BY created_at DESC LIMIT 100;
+
+# 未知表 (未在配置中定义)
+2026-05-11 12:00:00|7.23|product_db|SELECT * FROM products p JOIN product_categories pc ON p.category_id = pc.id WHERE p.price > 1000;
+
+# 解析失败的 SQL (故意写坏的 SQL)
+2026-05-11 13:00:00|3.45|order_db|SELECT SELECT * FROM orders WHERE user_id = 99999;
+
+# 跨表查询 (可能涉及多个服务)
+2026-05-11 14:00:00|15.67|order_db|SELECT o.*, u.email FROM orders o JOIN user_db.users u ON o.user_id = u.id WHERE o.created_at >= '2026-05-01';
