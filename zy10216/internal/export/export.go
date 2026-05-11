@@ -239,3 +239,163 @@ func ensureDir(path string) error {
 	}
 	return nil
 }
+
+type ImportResult struct {
+	TotalRows     int
+	Imported      int
+	Skipped       int
+	Failed        int
+	SkippedIDs    []string
+	FailedDetails []string
+}
+
+func (e *Exporter) ImportRentalsFromCSV(csvPath string) (*[]models.Rental, *ImportResult, error) {
+	file, err := os.Open(csvPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("打开文件失败: %w", err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.TrimLeadingSpace = true
+
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, nil, fmt.Errorf("读取CSV失败: %w", err)
+	}
+
+	if len(records) < 2 {
+		return nil, nil, fmt.Errorf("CSV文件为空或只有表头")
+	}
+
+	result := &ImportResult{
+		TotalRows:     len(records) - 1,
+		Imported:      0,
+		Skipped:       0,
+		Failed:        0,
+		SkippedIDs:    []string{},
+		FailedDetails: []string{},
+	}
+
+	headerMap := make(map[string]int)
+	for i, h := range records[0] {
+		headerMap[strings.TrimSpace(h)] = i
+	}
+
+	rentals := []models.Rental{}
+
+	for rowIdx, row := range records[1:] {
+		if len(row) < 3 {
+			result.Failed++
+			result.FailedDetails = append(result.FailedDetails, fmt.Sprintf("第%d行: 列数不足", rowIdx+2))
+			continue
+		}
+
+		getCol := func(name string) string {
+			if idx, ok := headerMap[name]; ok && idx < len(row) {
+				return strings.TrimSpace(row[idx])
+			}
+			return ""
+		}
+
+		rentalID := getCol("订单ID")
+		equipmentID := getCol("器材ID")
+		equipmentName := getCol("器材名称")
+		renterID := getCol("租客ID")
+		renterName := getCol("租客姓名")
+		renterPhone := getCol("租客电话")
+		rentalStart := getCol("借出日期")
+		rentalEnd := getCol("计划归还")
+		actualReturn := getCol("实际归还")
+		depositPaidStr := getCol("押金")
+		dailyRateStr := getCol("日租金")
+		accessoriesOutStr := getCol("出库配件")
+		accessoriesBackStr := getCol("归还配件")
+		missingAccessoriesStr := getCol("缺失配件")
+		overdueDaysStr := getCol("逾期天数")
+		overdueFeeStr := getCol("逾期费用")
+		missingFeeStr := getCol("缺失扣款")
+		compensationAmountStr := getCol("赔付金额")
+		refundAmountStr := getCol("应退押金")
+		status := getCol("状态")
+
+		depositPaid, _ := strconv.ParseFloat(depositPaidStr, 64)
+		dailyRate, _ := strconv.ParseFloat(dailyRateStr, 64)
+		overdueDays, _ := strconv.Atoi(overdueDaysStr)
+		overdueFee, _ := strconv.ParseFloat(overdueFeeStr, 64)
+		missingFee, _ := strconv.ParseFloat(missingFeeStr, 64)
+		compensationAmount, _ := strconv.ParseFloat(compensationAmountStr, 64)
+		refundAmount, _ := strconv.ParseFloat(refundAmountStr, 64)
+
+		parseAccessories := func(s string) []string {
+			if s == "" {
+				return []string{}
+			}
+			parts := strings.Split(s, ";")
+			result := []string{}
+			for _, p := range parts {
+				p = strings.TrimSpace(p)
+				if p != "" {
+					result = append(result, p)
+				}
+			}
+			return result
+		}
+
+		if rentalID == "" {
+			result.Failed++
+			result.FailedDetails = append(result.FailedDetails, fmt.Sprintf("第%d行: 订单ID为空", rowIdx+2))
+			continue
+		}
+
+		if equipmentID == "" || equipmentName == "" {
+			result.Failed++
+			result.FailedDetails = append(result.FailedDetails, fmt.Sprintf("第%d行: 器材信息不完整", rowIdx+2))
+			continue
+		}
+
+		isReturned := strings.ToUpper(status) == "RETURNED" || strings.Contains(strings.ToUpper(status), "归还")
+		isCompensated := compensationAmount > 0
+
+		if actualReturn == "" && isReturned {
+			actualReturn = rentalEnd
+		}
+
+		rental := models.Rental{
+			ID:                 rentalID,
+			EquipmentID:        equipmentID,
+			EquipmentName:      equipmentName,
+			RenterID:           renterID,
+			RenterName:         renterName,
+			RenterPhone:        renterPhone,
+			RentalStart:        rentalStart,
+			RentalEnd:          rentalEnd,
+			ActualReturn:       actualReturn,
+			DepositPaid:        depositPaid,
+			DailyRate:          dailyRate,
+			AccessoriesOut:     parseAccessories(accessoriesOutStr),
+			OutChecklist:       []models.CheckItem{},
+			OutVerified:        true,
+			AccessoriesBack:    parseAccessories(accessoriesBackStr),
+			InChecklist:        []models.CheckItem{},
+			InVerified:         isReturned,
+			IsReturned:         isReturned,
+			IsCompensated:      isCompensated,
+			CompensationAmount: compensationAmount,
+			CompensationNote:   "",
+			OverdueDays:        overdueDays,
+			OverdueFee:         overdueFee,
+			MissingAccessories: parseAccessories(missingAccessoriesStr),
+			MissingFee:         missingFee,
+			RefundAmount:       refundAmount,
+			FinalBalance:       refundAmount,
+			Status:             status,
+			CreatedAt:          "",
+			UpdatedAt:          "",
+		}
+
+		rentals = append(rentals, rental)
+	}
+
+	return &rentals, result, nil
+}

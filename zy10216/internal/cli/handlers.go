@@ -13,8 +13,8 @@ import (
 )
 
 type CLI struct {
-	store   *store.Store
-	svc     *service.RentalService
+	store    *store.Store
+	svc      *service.RentalService
 	exporter *export.Exporter
 }
 
@@ -462,5 +462,82 @@ func (c *CLI) HandleExportDetail(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("✅ 已导出订单详情到: %s\n", output)
+	return nil
+}
+
+func (c *CLI) HandleImportRentals(cmd *cobra.Command, args []string) error {
+	input, _ := cmd.Flags().GetString("input")
+	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	yes, _ := cmd.Flags().GetBool("yes")
+
+	if input == "" {
+		return fmt.Errorf("请指定输入文件路径 (--input)")
+	}
+
+	importedRentals, parseResult, err := c.exporter.ImportRentalsFromCSV(input)
+	if err != nil {
+		return fmt.Errorf("解析CSV失败: %w", err)
+	}
+
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Printf("CSV解析结果:\n")
+	fmt.Printf("  总行数:   %d\n", parseResult.TotalRows)
+	fmt.Printf("  解析成功: %d\n", len(*importedRentals))
+	if parseResult.Failed > 0 {
+		fmt.Printf("  解析失败: %d\n", parseResult.Failed)
+		for _, d := range parseResult.FailedDetails {
+			fmt.Printf("    - %s\n", d)
+		}
+	}
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+	db, err := c.store.Load()
+	if err != nil {
+		return err
+	}
+
+	mergeResult := c.svc.MergeImportedRentals(db, importedRentals)
+
+	fmt.Println()
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+	fmt.Printf("导入规划:\n")
+	fmt.Printf("  待导入:   %d\n", mergeResult.TotalRows)
+	fmt.Printf("  新增:     %d\n", mergeResult.ImportedNew)
+	fmt.Printf("  跳过重复: %d\n", mergeResult.SkippedExisting)
+	if mergeResult.SkippedExisting > 0 {
+		fmt.Printf("  重复ID:   %v\n", mergeResult.SkippedIDs)
+	}
+	if mergeResult.Failed > 0 {
+		fmt.Printf("  失败:     %d\n", mergeResult.Failed)
+		for _, d := range mergeResult.FailedDetails {
+			fmt.Printf("    - %s\n", d)
+		}
+	}
+	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+	if dryRun {
+		fmt.Println("\n📋 [Dry Run] 仅预览，未执行实际导入")
+		return nil
+	}
+
+	if !yes {
+		confirmed := promptYesNo("确认执行导入?", false)
+		if !confirmed {
+			fmt.Println("❌ 操作已取消")
+			return nil
+		}
+	}
+
+	if err := c.store.Save(db); err != nil {
+		return fmt.Errorf("保存数据库失败: %w", err)
+	}
+
+	fmt.Printf("\n✅ 导入完成: 新增 %d 条, 跳过 %d 条重复\n",
+		mergeResult.ImportedNew, mergeResult.SkippedExisting)
+
+	if mergeResult.SkippedExisting > 0 {
+		fmt.Printf("⚠️  跳过的重复订单不会影响现有历史和报表\n")
+	}
+
 	return nil
 }

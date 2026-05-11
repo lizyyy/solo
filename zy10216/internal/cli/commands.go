@@ -29,6 +29,7 @@ func (c *CLI) NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(c.newCompensateCmd())
 	rootCmd.AddCommand(c.newListCmd())
 	rootCmd.AddCommand(c.newShowCmd())
+	rootCmd.AddCommand(c.newImportRentalsCmd())
 	rootCmd.AddCommand(c.newExportRentalsCmd())
 	rootCmd.AddCommand(c.newExportDisputesCmd())
 	rootCmd.AddCommand(c.newExportDisputeSummaryCmd())
@@ -203,10 +204,10 @@ func (c *CLI) newListCmd() *cobra.Command {
 
 func (c *CLI) newShowCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show",
-		Short: "查看订单详情",
+		Use:     "show",
+		Short:   "查看订单详情",
 		Example: `  lensrent show --id RN20260501120000001`,
-		RunE: c.HandleShowRental,
+		RunE:    c.HandleShowRental,
 	}
 
 	cmd.Flags().String("id", "", "订单ID (必填)")
@@ -267,5 +268,39 @@ func (c *CLI) newExportDetailCmd() *cobra.Command {
 	cmd.Flags().String("id", "", "订单ID (必填)")
 	cmd.Flags().String("output", "", "输出路径")
 	_ = cmd.MarkFlagRequired("id")
+	return cmd
+}
+
+func (c *CLI) newImportRentalsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import-rentals",
+		Short: "从CSV导入历史订单（自动去重）",
+		Long: `从CSV文件导入历史订单数据。
+
+⚠️  去重规则:
+  1. 订单ID相同 -> 跳过
+  2. 同一租客 + 同一器材 + 同一租期 -> 跳过
+  3. 导入缺失的器材和租客会自动创建
+
+CSV 格式（与 export-rentals 输出格式一致）:
+  订单ID,器材ID,器材名称,租客ID,租客姓名,租客电话,
+  借出日期,计划归还,实际归还,押金,日租金,
+  出库配件,归还配件,缺失配件,
+  逾期天数,逾期费用,缺失扣款,赔付金额,应退押金,状态
+
+示例:
+  # 预览导入结果（不保存）
+  lensrent import-rentals --input /path/to/history.csv --dry-run
+
+  # 实际导入
+  lensrent import-rentals --input /path/to/history.csv --yes`,
+		RunE: c.HandleImportRentals,
+	}
+
+	cmd.Flags().String("input", "", "输入CSV文件路径 (必填)")
+	cmd.Flags().Bool("dry-run", false, "仅预览，不实际保存")
+	cmd.Flags().Bool("yes", false, "跳过确认直接执行")
+
+	_ = cmd.MarkFlagRequired("input")
 	return cmd
 }

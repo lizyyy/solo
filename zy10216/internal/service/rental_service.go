@@ -191,6 +191,12 @@ func (s *RentalService) CreateRental(
 		return nil, overallResult, fmt.Errorf("器材档期冲突")
 	}
 
+	exactDupResult := ValidateExactDuplicate(db.Rentals, equipmentID, renterID, rentalStart, rentalEnd, "")
+	if !exactDupResult.IsValid {
+		overallResult.Conflicts = append(overallResult.Conflicts, exactDupResult.Conflicts...)
+		return nil, overallResult, fmt.Errorf("检测到重复订单")
+	}
+
 	var renter *models.Renter
 	for i := range db.Renters {
 		if db.Renters[i].ID == renterID {
@@ -228,24 +234,24 @@ func (s *RentalService) CreateRental(
 
 	now := time.Now().Format(time.RFC3339)
 	rental := models.Rental{
-		ID:               rentalID,
-		EquipmentID:      eq.ID,
-		EquipmentName:    eq.Name,
-		RenterID:         renter.ID,
-		RenterName:       renter.Name,
-		RenterPhone:      renter.Phone,
-		RentalStart:      rentalStart,
-		RentalEnd:        rentalEnd,
-		DepositPaid:      effectiveDeposit,
-		DailyRate:        effectiveRate,
-		AccessoriesOut:   accessoriesOut,
-		OutChecklist:     outChecklist,
-		OutVerified:      len(outChecklist) > 0,
-		IsReturned:       false,
-		IsCompensated:    false,
-		Status:           "OUT",
-		CreatedAt:        now,
-		UpdatedAt:        now,
+		ID:             rentalID,
+		EquipmentID:    eq.ID,
+		EquipmentName:  eq.Name,
+		RenterID:       renter.ID,
+		RenterName:     renter.Name,
+		RenterPhone:    renter.Phone,
+		RentalStart:    rentalStart,
+		RentalEnd:      rentalEnd,
+		DepositPaid:    effectiveDeposit,
+		DailyRate:      effectiveRate,
+		AccessoriesOut: accessoriesOut,
+		OutChecklist:   outChecklist,
+		OutVerified:    len(outChecklist) > 0,
+		IsReturned:     false,
+		IsCompensated:  false,
+		Status:         "OUT",
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 
 	db.Rentals = append(db.Rentals, rental)
@@ -413,5 +419,150 @@ func (s *RentalService) ListRentals(db *models.Database, status string) []models
 			result = append(result, r)
 		}
 	}
+	return result
+}
+
+type ImportMergeResult struct {
+	TotalRows       int
+	ImportedNew     int
+	SkippedExisting int
+	Failed          int
+	SkippedIDs      []string
+	FailedDetails   []string
+}
+
+func (s *RentalService) MergeImportedRentals(
+	db *models.Database,
+	importedRentals *[]models.Rental,
+) *ImportMergeResult {
+
+	result := &ImportMergeResult{
+		TotalRows:       len(*importedRentals),
+		ImportedNew:     0,
+		SkippedExisting: 0,
+		Failed:          0,
+		SkippedIDs:      []string{},
+		FailedDetails:   []string{},
+	}
+
+	for _, r := range *importedRentals {
+		if r.ID == "" {
+			result.Failed++
+			result.FailedDetails = append(result.FailedDetails, "订单ID为空")
+			continue
+		}
+
+		dupByID := false
+		for _, existing := range db.Rentals {
+			if existing.ID == r.ID {
+				dupByID = true
+				break
+			}
+		}
+		if dupByID {
+			result.SkippedExisting++
+			result.SkippedIDs = append(result.SkippedIDs, r.ID)
+			continue
+		}
+
+		dupByContent := false
+		for _, existing := range db.Rentals {
+			if existing.EquipmentID == r.EquipmentID &&
+				existing.RenterID == r.RenterID &&
+				existing.RentalStart == r.RentalStart &&
+				existing.RentalEnd == r.RentalEnd {
+				dupByContent = true
+				result.SkippedIDs = append(result.SkippedIDs, r.ID+"(内容重复)")
+				break
+			}
+		}
+		if dupByContent {
+			result.SkippedExisting++
+			continue
+		}
+
+		now := time.Now().Format(time.RFC3339)
+		if r.CreatedAt == "" {
+			r.CreatedAt = now
+		}
+		if r.UpdatedAt == "" {
+			r.UpdatedAt = now
+		}
+
+		foundEq := false
+		for i := range db.Equipments {
+			if db.Equipments[i].ID == r.EquipmentID {
+				foundEq = true
+				if r.IsReturned {
+					db.Equipments[i].IsAvailable = true
+				} else {
+					db.Equipments[i].IsAvailable = false
+				}
+				db.Equipments[i].UpdatedAt = now
+				break
+			}
+		}
+		if !foundEq {
+			newEq := models.Equipment{
+				ID:          r.EquipmentID,
+				Name:        r.EquipmentName,
+				Type:        "未知",
+				Deposit:     r.DepositPaid,
+				DailyRate:   r.DailyRate,
+				Accessories: []string{},
+				IsAvailable: r.IsReturned,
+				CreatedAt:   now,
+				UpdatedAt:   now,
+			}
+			db.Equipments = append(db.Equipments, newEq)
+		}
+
+		foundRenter := false
+		for i := range db.Renters {
+			if db.Renters[i].ID == r.RenterID {
+				foundRenter = true
+				break
+			}
+		}
+		if !foundRenter {
+			newRenter := models.Renter{
+				ID:        r.RenterID,
+				Name:      r.RenterName,
+				Phone:     r.RenterPhone,
+				Email:     "",
+				Notes:     "从CSV导入",
+				CreatedAt: now,
+			}
+			db.Renters = append(db.Renters, newRenter)
+		}
+
+		if r.IsCompensated && r.CompensationAmount > 0 {
+			hasDispute := false
+			for _, d := range db.Disputes {
+				if d.RentalID == r.ID {
+					hasDispute = true
+					break
+				}
+			}
+			if !hasDispute {
+				dispute := models.DisputeRecord{
+					ID:            GenerateID("DP"),
+					RentalID:      r.ID,
+					EquipmentName: r.EquipmentName,
+					RenterName:    r.RenterName,
+					IssueType:     "IMPORTED_COMPENSATION",
+					Description:   "从CSV导入的历史赔付记录",
+					Resolution:    fmt.Sprintf("赔付扣款 %.2f 元", r.CompensationAmount),
+					Amount:        r.CompensationAmount,
+					Timestamp:     now,
+				}
+				db.Disputes = append(db.Disputes, dispute)
+			}
+		}
+
+		db.Rentals = append(db.Rentals, r)
+		result.ImportedNew++
+	}
+
 	return result
 }

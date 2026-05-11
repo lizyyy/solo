@@ -11,6 +11,15 @@ equipments:
       is_available: true
       created_at: "2026-05-11T15:12:17+08:00"
       updated_at: "2026-05-11T15:12:42+08:00"
+    - id: EQ_TEST_CANON
+      name: 佳能 EOS R5
+      type: 未知
+      deposit: 12000
+      daily_rate: 500
+      accessories: []
+      is_available: true
+      created_at: "2026-05-11T18:09:30+08:00"
+      updated_at: "2026-05-11T18:09:30+08:00"
 renters:
     - id: RT20260511151228000
       name: 张三
@@ -18,6 +27,18 @@ renters:
       email: ""
       notes: ""
       created_at: "2026-05-11T15:12:28+08:00"
+    - id: RT_TEST_LISI
+      name: 李四
+      phone: "13900139000"
+      email: ""
+      notes: 从CSV导入
+      created_at: "2026-05-11T18:09:30+08:00"
+    - id: RT_TEST_WANGWU
+      name: 王五
+      phone: "13700137000"
+      email: ""
+      notes: 从CSV导入
+      created_at: "2026-05-11T18:09:30+08:00"
 rentals:
     - id: RN20260511151237000
       equipment_id: EQ20260511151217000
@@ -70,6 +91,61 @@ rentals:
       status: RETURNED
       created_at: "2026-05-11T15:12:37+08:00"
       updated_at: "2026-05-11T15:12:51+08:00"
+    - id: RN_TEST_001
+      equipment_id: EQ_TEST_CANON
+      equipment_name: 佳能 EOS R5
+      renter_id: RT_TEST_LISI
+      renter_name: 李四
+      renter_phone: "13900139000"
+      rental_start: "2026-04-01"
+      rental_end: "2026-04-03"
+      actual_return: "2026-04-03"
+      deposit_paid: 12000
+      daily_rate: 500
+      accessories_out:
+        - 镜头盖,电池
+      out_checklist: []
+      out_verified: true
+      accessories_back:
+        - 镜头盖,电池
+      in_verified: true
+      is_returned: true
+      is_compensated: false
+      refund_amount: 12000
+      final_balance: 12000
+      status: RETURNED
+      created_at: "2026-05-11T18:09:30+08:00"
+      updated_at: "2026-05-11T18:09:30+08:00"
+    - id: RN_TEST_002
+      equipment_id: EQ_TEST_CANON
+      equipment_name: 佳能 EOS R5
+      renter_id: RT_TEST_WANGWU
+      renter_name: 王五
+      renter_phone: "13700137000"
+      rental_start: "2026-04-10"
+      rental_end: "2026-04-12"
+      actual_return: "2026-04-13"
+      deposit_paid: 12000
+      daily_rate: 500
+      accessories_out:
+        - 镜头盖,电池,UV镜
+      out_checklist: []
+      out_verified: true
+      accessories_back:
+        - 镜头盖,电池
+      in_verified: true
+      is_returned: true
+      is_compensated: false
+      overdue_days: 1
+      overdue_fee: 750
+      missing_accessories:
+        - UV镜
+      missing_fee: 50
+      refund_amount: 11200
+      final_balance: 11200
+      status: RETURNED
+      created_at: "2026-05-11T18:09:30+08:00"
+      updated_at: "2026-05-11T18:09:30+08:00"
 disputes:
     - id: DP20260511151251000
       rental_id: RN20260511151237000
@@ -80,4 +156,4 @@ disputes:
       resolution: 赔付扣款 500.00 元
       amount: 500
       timestamp: "2026-05-11T15:12:51+08:00"
-last_modified: "2026-05-11T15:12:51+08:00"
+last_modified: "2026-05-11T18:09:30+08:00"

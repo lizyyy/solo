@@ -17,10 +17,10 @@ func (e *ValidationError) Error() string {
 }
 
 type ValidationResult struct {
-	Errors     []*ValidationError
-	Warnings   []*ValidationError
-	IsValid    bool
-	Conflicts  []string
+	Errors    []*ValidationError
+	Warnings  []*ValidationError
+	IsValid   bool
+	Conflicts []string
 }
 
 func NewValidationResult() *ValidationResult {
@@ -123,6 +123,27 @@ func ValidateEquipmentAvailability(rentals []models.Rental, eqID string, newRent
 
 		if !(endTime.Before(rStart) || startTime.After(rEnd)) {
 			result.AddConflict(fmt.Sprintf("器材ID %s 在 %s 至 %s 已被订单 %s 占用", eqID, r.RentalStart, r.RentalEnd, r.ID))
+			result.IsValid = false
+		}
+	}
+
+	return result
+}
+
+func ValidateExactDuplicate(rentals []models.Rental, eqID, renterID, start, end, newRentalID string) *ValidationResult {
+	result := NewValidationResult()
+
+	for _, r := range rentals {
+		if newRentalID != "" && r.ID == newRentalID {
+			continue
+		}
+
+		if r.EquipmentID == eqID &&
+			r.RenterID == renterID &&
+			r.RentalStart == start &&
+			r.RentalEnd == end {
+			result.AddConflict(fmt.Sprintf("检测到完全相同的历史订单: 租客 %s, 器材 %s, 租期 %s→%s 已存在于订单 %s",
+				renterID, eqID, start, end, r.ID))
 			result.IsValid = false
 		}
 	}
