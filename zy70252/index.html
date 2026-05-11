@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街舞赛事评分复核器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #1a1a2e; color: #eaeaea; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; }
+        .header h1 { font-size: 28px; font-weight: 700; color: white; }
+        .header p { color: rgba(255,255,255,0.8); margin-top: 8px; }
+        
+        .tab-nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 12px 24px; border: none; background: #2d2d44; color: #eaeaea; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .tab-btn:hover { background: #3d3d5c; }
+        .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .tab-btn.danger { background: #dc3545; }
+        .tab-btn.danger:hover { background: #c82333; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .card { background: #2d2d44; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; margin-bottom: 6px; font-weight: 500; color: #b0b0c0; }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 16px; border: 2px solid #3d3d5c; border-radius: 8px; background: #1a1a2e; color: #eaeaea; font-size: 14px; transition: border-color 0.3s; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #667eea; }
+        .form-textarea { min-height: 80px; resize: vertical; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #3d3d5c; color: #eaeaea; }
+        .btn-secondary:hover { background: #4d4d6c; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; transform: translateY(-2px); }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #3d3d5c; }
+        th { background: #3d3d5c; font-weight: 600; color: #b0b0c0; }
+        tr:hover { background: #3d3d5c30; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-primary { background: #667eea; color: white; }
+        .badge-success { background: #28a745; color: white; }
+        .badge-warning { background: #ffc107; color: #212529; }
+        .badge-danger { background: #dc3545; color: white; }
+        .badge-info { background: #17a2b8; color: white; }
+        
+        .alert { padding: 14px 20px; border-radius: 8px; margin-bottom: 16px; display: none; }
+        .alert.show { display: block; animation: slideIn 0.3s ease; }
+        .alert-success { background: #28a74520; border-left: 4px solid #28a745; color: #28a745; }
+        .alert-danger { background: #dc354520; border-left: 4px solid #dc3545; color: #dc3545; }
+        .alert-warning { background: #ffc10720; border-left: 4px solid #ffc107; color: #ffc107; }
+        .alert-info { background: #17a2b820; border-left: 4px solid #17a2b8; color: #17a2b8; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .score-input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .judge-score-card { flex: 1; min-width: 200px; background: #1a1a2e; padding: 16px; border-radius: 8px; border: 2px solid #3d3d5c; }
+        .judge-score-card.updated { border-color: #28a745; background: #28a74510; }
+        .judge-score-card.error { border-color: #dc3545; background: #dc354510; }
+        
+        .history-item { background: #1a1a2e; border-left: 4px solid #667eea; padding: 16px; margin-bottom: 12px; border-radius: 0 8px 8px 0; }
+        .history-item.withdraw { border-left-color: #ffc107; }
+        .history-item.modify { border-left-color: #17a2b8; }
+        .history-item.supplement { border-left-color: #28a745; }
+        .history-item.review { border-left-color: #dc3545; }
+        .history-item-title { font-weight: 600; margin-bottom: 8px; }
+        .history-item-time { font-size: 12px; color: #888; margin-bottom: 12px; }
+        .history-diff { background: #2d2d44; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; }
+        .diff-old { color: #dc3545; text-decoration: line-through; }
+        .diff-new { color: #28a745; }
+        
+        .rank-row { display: flex; align-items: center; gap: 16px; padding: 16px; background: #1a1a2e; border-radius: 8px; margin-bottom: 8px; }
+        .rank-number { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+        .rank-1 { background: gold; color: #212529; }
+        .rank-2 { background: #c0c0c0; color: #212529; }
+        .rank-3 { background: #cd7f32; color: #212529; }
+        .rank-other { background: #3d3d5c; color: #eaeaea; }
+        
+        .playoff-notice { background: #ffc10720; border: 2px solid #ffc107; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .playoff-notice h4 { color: #ffc107; margin-bottom: 8px; }
+        
+        .freeze-badge { background: #dc3545; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; display: inline-block; }
+        .frozen { opacity: 0.6; pointer-events: none; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-number { font-size: 32px; font-weight: 700; color: #667eea; }
+        .stat-label { color: #b0b0c0; font-size: 14px; margin-top: 4px; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: #2d2d44; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+        
+        .progress-container { margin-bottom: 8px; }
+        .progress-bar { width: 100%; height: 8px; background: #3d3d5c; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s; }
+        
+        .score-breakdown { display: flex; gap: 8px; flex-wrap: wrap; }
+        .mini-score { background: #3d3d5c; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        
+        .quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        
+        @media (max-width: 768px) {
+            .header h1 { font-size: 22px; }
+            .tab-btn { padding: 10px 16px; font-size: 13px; }
+            .card { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 街舞赛事评分复核器</h1>
+            <p>实时追踪评委打分、申诉复核、加赛规则与排名</p>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-number" id="statCompetitors">0</div>
+                <div class="stat-label">参赛选手</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statJudges">0</div>
+                <div class="stat-label">评委数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statWithdrawn">0</div>
+                <div class="stat-label">弃权人数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statReviews">0</div>
+                <div class="stat-label">待复核申诉</div>
+            </div>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="competitors">👤 选手档案</button>
+            <button class="tab-btn" data-tab="judges">⚖️ 评委打分</button>
+            <button class="tab-btn" data-tab="ranking">🏆 实时排名</button>
+            <button class="tab-btn" data-tab="review">📋 申诉复核</button>
+            <button class="tab-btn" data-tab="history">📜 操作历史</button>
+            <button class="tab-btn" id="btnFreezeRanking" data-tab="freeze">❄️ 冻结排名</button>
+        </div>
+        
+        <!-- 选手档案 Tab -->
+        <div class="tab-content active" id="tab-competitors">
+            <div class="card">
+                <div class="card-title">添加新选手</div>
+                <form id="competitorForm">
+                    <div class="form-group">
+                        <label class="form-label">选手编号 *</label>
+                        <input type="text" class="form-input" id="competitorId" placeholder="例如: 001, A-03" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">选手姓名/艺名 *</label>
+                        <input type="text" class="form-input" id="competitorName" placeholder="例如: B-Boy Storm" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">参赛项目</label>
+                        <select class="form-select" id="competitorCategory">
+                            <option value="breaking">Breaking (霹雳舞)</option>
+                            <option value="popping">Popping</option>
+                            <option value="locking">Locking</option>
+                            <option value="hiphop">Hip-Hop</option>
+                            <option value="allstyle">All Style</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" id="competitorNotes" placeholder="代表队、特殊说明等"></textarea>
+                    </div>
+                    <div class="btn-row">
+                        <button type="submit" class="btn btn-primary">➕ 添加选手</button>
+                        <button type="button" class="btn btn-secondary" id="btnQuickDemo">⚡ 快速演示：加载示例数据</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">选手列表</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>姓名</th>
+                                <th>项目</th>
+                                <th>状态</th>
+                                <th>平均分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="competitorTableBody">
+                            <tr><td colspan="6" style="text-align: center; color: #888; padding: 40px;">暂无选手，请先添加</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 评委打分 Tab -->
+        <div class="tab-content" id="tab-judges">
+            <div class="card">
+                <div class="card-title">评委配置</div>
+                <form id="judgeForm">
+                    <div class="form-group">
+                        <label class="form-label">评委姓名</label>
+                        <input type="text" class="form-input" id="judgeName" placeholder="例如: 评委老K" required>
+                    </div>
+                    <div class="btn-row">
+                        <button type="submit" class="btn btn-primary">➕ 添加评委</button>
+                        <button type="button" class="btn btn-secondary" id="btnAutoJudges">🤖 快速添加5位评委</button>
+                    </div>
+                </form>
+                <div id="judgesList" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">评委打分面板</div>
+                <div class="quick-actions">
+                    <label class="form-label" style="margin: auto 0;">选择选手：</label>
+                    <select class="form-select" id="scoreCompetitorSelect" style="width: auto; min-width: 200px;">
+                        <option value="">-- 请选择选手 --</option>
+                    </select>
+                </div>
+                
+                <div id="scorePanel" style="display: none;">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="scoreProgress" style="width: 0%;"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #888; margin-top: 4px;">
+                            打分进度: <span id="scoreProgressText">0/0</span>
+                        </div>
+                    </div>
+                    
+                    <div id="judgeScoreContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;"></div>
+                    
+                    <div class="btn-row" style="margin-top: 20px;">
+                        <button class="btn btn-primary" id="btnSubmitScores">✅ 提交所有打分</button>
+                        <button class="btn btn-success" id="btnAutoFillScores">🎲 自动填充分数</button>
+                        <button class="btn btn-warning" id="btnMarkWithdraw">🏃 标记弃权</button>
+                        <button class="btn btn-secondary" id="btnClearScores">🧹 清空当前</button>
+                    </div>
+                </div>
+                
+                <div id="noScorePanel" style="text-align: center; color: #888; padding: 40px;">
+                    请先添加评委和选手，然后选择选手进行打分
+                </div>
+            </div>
+        </div>
+        
+        <!-- 排名 Tab -->
+        <div class="tab-content" id="tab-ranking">
+            <div class="card">
+                <div class="card-title">加赛规则说明</div>
+                <div style="background: #1a1a2e; padding: 16px; border-radius: 8px;">
+                    <p><strong>当前规则：</strong></p>
+                    <ul style="margin-left: 20px; margin-top: 8px; color: #b0b0c0; line-height: 1.8;">
+                        <li>评委打分范围: 0-100分</li>
+                        <li>选手最终得分: 去掉一个最高分和一个最低分，取平均分（当评委数≥3时）</li>
+                        <li>同分处理: 平均分相同的选手触发<span class="badge badge-warning">加赛</span>标记</li>
+                        <li>弃权选手: 标记为<span class="badge badge-danger">弃权</span>，不参与排名</li>
+                        <li>排名冻结: 点击"冻结排名"后，排名不可再修改</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="playoffNotice" class="playoff-notice" style="display: none;">
+                <h4>⚠️ 加赛提醒</h4>
+                <p id="playoffMessage"></p>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    实时排名
+                    <span id="freezeStatus" class="badge badge-info" style="margin-left: 10px;">未冻结</span>
+                </div>
+                <div id="rankingList">
+                    <div style="text-align: center; color: #888; padding: 40px;">暂无排名数据</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 申诉复核 Tab -->
+        <div class="tab-content" id="tab-review">
+            <div class="card">
+                <div class="card-title">提交申诉</div>
+                <form id="reviewForm">
+                    <div class="form-group">
+                        <label class="form-label">申诉选手</label>
+                        <select class="form-select" id="reviewCompetitorSelect" required>
+                            <option value="">-- 请选择选手 --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">申诉类型</label>
+                        <select class="form-select" id="reviewType" required>
+                            <option value="score_question">分数异议</option>
+                            <option value="playoff">加赛资格</option>
+                            <option value="withdraw">弃权判定</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">申诉理由</label>
+                        <textarea class="form-textarea" id="reviewReason" placeholder="详细描述申诉内容..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">📝 提交申诉</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">申诉列表</div>
+                <div id="reviewList">
+                    <div style="text-align: center; color: #888; padding: 40px;">暂无申诉记录</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 操作历史 Tab -->
+        <div class="tab-content" id="tab-history">
+            <div class="card">
+                <div class="card-title">
+                    操作历史记录
+                    <div class="btn-row" style="display: inline-flex; margin-left: 16px;">
+                        <button class="btn btn-secondary" onclick="filterHistory('all')">全部</button>
+                        <button class="btn btn-secondary" onclick="filterHistory('modify')">修改</button>
+                        <button class="btn btn-secondary" onclick="filterHistory('withdraw')">弃权</button>
+                        <button class="btn btn-secondary" onclick="filterHistory('supplement')">补录</button>
+                        <button class="btn btn-secondary" onclick="filterHistory('review')">申诉</button>
+                        <button class="btn btn-danger" id="btnUndoLast">↩️ 撤回上一步</button>
+                    </div>
+                </div>
+                <div id="historyList">
+                    <div style="text-align: center; color: #888; padding: 40px;">暂无操作历史</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 确认对话框 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-title" id="confirmModalTitle">确认操作</div>
+            <p id="confirmModalMessage" style="margin-bottom: 24px;"></p>
+            <div class="btn-row">
+                <button class="btn btn-secondary" id="confirmModalCancel">取消</button>
+                <button class="btn btn-primary" id="confirmModalOk">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STATE = {
+            competitors: [],
+            judges: [],
+            scores: {},
+            reviews: [],
+            history: [],
+            frozen: false
+        };
+        
+        let currentHistoryFilter = 'all';
+        let pendingConfirm = null;
+        
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const id = 'alert_' + Date.now();
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} show`;
+            alert.id = id;
+            alert.innerHTML = message;
+            container.appendChild(alert);
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 4000);
+        }
+        
+        function showConfirm(title, message, onConfirm) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalMessage').textContent = message;
+            pendingConfirm = onConfirm;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        
+        function hideConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+            pendingConfirm = null;
+        }
+        
+        document.getElementById('confirmModalCancel').onclick = hideConfirm;
+        document.getElementById('confirmModalOk').onclick = () => {
+            if (pendingConfirm) pendingConfirm();
+            hideConfirm();
+        };
+        
+        function addHistory(type, action, detail, before = null, after = null) {
+            const historyItem = {
+                id: Date.now() + Math.random().toString(36).substr(2, 9),
+                type: type,
+                action: action,
+                detail: detail,
+                before: before,
+                after: after,
+                timestamp: new Date().toISOString()
+            };
+            STATE.history.unshift(historyItem);
+            renderHistory();
+            updateStats();
+        }
+        
+        function formatTime(isoString) {
+            const d = new Date(isoString);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        }
+        
+        function updateStats() {
+            document.getElementById('statCompetitors').textContent = STATE.competitors.length;
+            document.getElementById('statJudges').textContent = STATE.judges.length;
+            document.getElementById('statWithdrawn').textContent = STATE.competitors.filter(c => c.withdrawn).length;
+            document.getElementById('statReviews').textContent = STATE.reviews.filter(r => r.status === 'pending').length;
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            if (tabName === 'ranking') renderRanking();
+            if (tabName === 'competitors') renderCompetitorTable();
+            if (tabName === 'judges') { renderJudgesList(); updateScorePanel(); }
+            if (tabName === 'review') renderReviewList();
+            if (tabName === 'history') renderHistory();
+        }
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            if (!btn.id) {
+                btn.onclick = () => switchTab(btn.dataset.tab);
+            }
+        });
+        
+        document.getElementById('competitorForm').onsubmit = function(e) {
+            e.preventDefault();
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法添加新选手'); return; }
+            
+            const id = document.getElementById('competitorId').value.trim();
+            const name = document.getElementById('competitorName').value.trim();
+            const category = document.getElementById('competitorCategory').value;
+            const notes = document.getElementById('competitorNotes').value.trim();
+            
+            if (!id || !name) { showAlert('danger', '❌ 选手编号和姓名不能为空'); return; }
+            if (STATE.competitors.some(c => c.id === id)) { showAlert('danger', '❌ 选手编号已存在'); return; }
+            
+            const competitor = {
+                id: id,
+                name: name,
+                category: category,
+                notes: notes,
+                withdrawn: false,
+                createdAt: new Date().toISOString()
+            };
+            
+            STATE.competitors.push(competitor);
+            STATE.scores[id] = {};
+            
+            addHistory('supplement', `选手档案建立`, `${id} - ${name} (${category})`, null, competitor);
+            
+            this.reset();
+            renderCompetitorTable();
+            updateScoreSelects();
+            updateStats();
+            showAlert('success', `✅ 选手 ${name} 已成功添加`);
+        };
+        
+        document.getElementById('btnQuickDemo').onclick = function() {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法加载演示数据'); return; }
+            
+            const demoCompetitors = [
+                { id: '001', name: 'B-Boy Storm', category: 'breaking', notes: '北京代表队' },
+                { id: '002', name: 'B-Girl Flame', category: 'breaking', notes: '上海代表队' },
+                { id: '003', name: 'Poppin King', category: 'popping', notes: '广州代表队' },
+                { id: '004', name: 'Lock Master', category: 'locking', notes: '成都代表队' },
+                { id: '005', name: 'Hip-Hop Star', category: 'hiphop', notes: '武汉代表队' }
+            ];
+            
+            demoCompetitors.forEach(c => {
+                if (!STATE.competitors.some(existing => existing.id === c.id)) {
+                    const competitor = { ...c, withdrawn: false, createdAt: new Date().toISOString() };
+                    STATE.competitors.push(competitor);
+                    STATE.scores[c.id] = {};
+                }
+            });
+            
+            addHistory('supplement', `批量导入选手`, `导入 ${demoCompetitors.length} 位选手`, null, demoCompetitors);
+            
+            renderCompetitorTable();
+            updateScoreSelects();
+            updateStats();
+            showAlert('success', `✅ 已加载 ${demoCompetitors.length} 位示例选手，快去打分吧！`);
+        };
+        
+        function renderCompetitorTable() {
+            const tbody = document.getElementById('competitorTableBody');
+            if (STATE.competitors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #888; padding: 40px;">暂无选手，请先添加</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = STATE.competitors.map(c => {
+                const avgScore = calculateAverageScore(c.id);
+                const statusBadge = c.withdrawn 
+                    ? '<span class="badge badge-danger">弃权</span>' 
+                    : '<span class="badge badge-success">正常</span>';
+                
+                return `
+                    <tr>
+                        <td><strong>${c.id}</strong></td>
+                        <td>${c.name}</td>
+                        <td>${c.category}</td>
+                        <td>${statusBadge}</td>
+                        <td>${avgScore !== null ? avgScore.toFixed(1) : '-'}</td>
+                        <td class="btn-row">
+                            <button class="btn btn-secondary" onclick="editCompetitor('${c.id}')">编辑</button>
+                            ${!c.withdrawn 
+                                ? `<button class="btn btn-warning" onclick="markWithdrawn('${c.id}')">弃权</button>` 
+                                : `<button class="btn btn-success" onclick="markWithdrawn('${c.id}')">恢复</button>`
+                            }
+                            <button class="btn btn-danger" onclick="deleteCompetitor('${c.id}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function calculateAverageScore(competitorId) {
+            const scores = STATE.scores[competitorId];
+            if (!scores) return null;
+            const scoreValues = Object.values(scores).filter(s => typeof s === 'number');
+            if (scoreValues.length === 0) return null;
+            
+            if (scoreValues.length >= 3) {
+                const sorted = [...scoreValues].sort((a, b) => a - b);
+                const trimmed = sorted.slice(1, -1);
+                return trimmed.reduce((a, b) => a + b, 0) / trimmed.length;
+            }
+            return scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length;
+        }
+        
+        function editCompetitor(id) {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法修改'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === id);
+            if (!competitor) return;
+            
+            const newName = prompt('编辑选手姓名:', competitor.name);
+            if (newName === null) return;
+            if (!newName.trim()) { showAlert('danger', '❌ 姓名不能为空'); return; }
+            
+            const before = { ...competitor };
+            competitor.name = newName.trim();
+            
+            addHistory('modify', `选手信息修改`, `${id}`, before, { ...competitor });
+            
+            renderCompetitorTable();
+            updateScoreSelects();
+            showAlert('success', `✅ 选手 ${id} 信息已更新`);
+        }
+        
+        function markWithdrawn(id) {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法修改'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === id);
+            if (!competitor) return;
+            
+            const before = { ...competitor };
+            competitor.withdrawn = !competitor.withdrawn;
+            
+            const action = competitor.withdrawn ? '标记弃权' : '取消弃权';
+            addHistory('withdraw', `选手${action}`, `${id} - ${competitor.name}`, before, { ...competitor });
+            
+            renderCompetitorTable();
+            updateStats();
+            showAlert(competitor.withdrawn ? 'warning' : 'success', 
+                competitor.withdrawn ? `⚠️ 选手 ${competitor.name} 已标记为弃权` : `✅ 选手 ${competitor.name} 已恢复参赛`);
+        }
+        
+        function deleteCompetitor(id) {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法删除'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === id);
+            if (!competitor) return;
+            
+            showConfirm('确认删除', `确定要删除选手 ${id} - ${competitor.name} 吗？此操作可在历史记录中撤回。`, () => {
+                const index = STATE.competitors.findIndex(c => c.id === id);
+                if (index > -1) {
+                    const deleted = STATE.competitors.splice(index, 1)[0];
+                    addHistory('modify', `选手删除`, `${id} - ${competitor.name}`, deleted, null);
+                    
+                    renderCompetitorTable();
+                    updateScoreSelects();
+                    updateStats();
+                    showAlert('success', `✅ 选手 ${deleted.name} 已删除（可在历史记录中撤回）`);
+                }
+            });
+        }
+        
+        document.getElementById('judgeForm').onsubmit = function(e) {
+            e.preventDefault();
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法添加评委'); return; }
+            
+            const name = document.getElementById('judgeName').value.trim();
+            if (!name) { showAlert('danger', '❌ 评委姓名不能为空'); return; }
+            
+            const judge = {
+                id: 'J' + String(STATE.judges.length + 1).padStart(2, '0'),
+                name: name,
+                createdAt: new Date().toISOString()
+            };
+            
+            STATE.judges.push(judge);
+            addHistory('supplement', `评委添加`, `${judge.id} - ${name}`, null, judge);
+            
+            this.reset();
+            renderJudgesList();
+            updateScorePanel();
+            updateStats();
+            showAlert('success', `✅ 评委 ${name} 已添加`);
+        };
+        
+        document.getElementById('btnAutoJudges').onclick = function() {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法添加评委'); return; }
+            
+            const judgeNames = ['裁判老K', '裁判DJ', '裁判A-Flow', '裁判Ice', '裁判Queen'];
+            let added = 0;
+            
+            judgeNames.forEach((name, i) => {
+                if (!STATE.judges.some(j => j.name === name)) {
+                    const judge = {
+                        id: 'J' + String(STATE.judges.length + 1).padStart(2, '0'),
+                        name: name,
+                        createdAt: new Date().toISOString()
+                    };
+                    STATE.judges.push(judge);
+                    added++;
+                }
+            });
+            
+            if (added > 0) {
+                addHistory('supplement', `批量添加评委`, `添加 ${added} 位评委`, null, judgeNames);
+            }
+            
+            renderJudgesList();
+            updateScorePanel();
+            updateStats();
+            showAlert('success', `✅ 已添加 ${added} 位评委`);
+        };
+        
+        function renderJudgesList() {
+            const container = document.getElementById('judgesList');
+            if (STATE.judges.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = STATE.judges.map(j => `
+                <span class="badge badge-primary" style="padding: 8px 16px; font-size: 14px;">
+                    ${j.id} - ${j.name}
+                    <button onclick="removeJudge('${j.id}')" style="background: none; border: none; color: white; margin-left: 8px; cursor: pointer;" title="移除">×</button>
+                </span>
+            `).join('');
+        }
+        
+        function removeJudge(judgeId) {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法移除评委'); return; }
+            
+            const index = STATE.judges.findIndex(j => j.id === judgeId);
+            if (index > -1) {
+                const removed = STATE.judges.splice(index, 1)[0];
+                Object.values(STATE.scores).forEach(scores => {
+                    if (scores[judgeId]) delete scores[judgeId];
+                });
+                
+                addHistory('modify', `评委移除`, `${removed.id} - ${removed.name}`, removed, null);
+                
+                renderJudgesList();
+                updateScorePanel();
+                updateStats();
+                showAlert('warning', `⚠️ 评委 ${removed.name} 已移除，相关打分已清除`);
+            }
+        }
+        
+        function updateScoreSelects() {
+            const competitorSelect = document.getElementById('scoreCompetitorSelect');
+            const reviewSelect = document.getElementById('reviewCompetitorSelect');
+            
+            const options = STATE.competitors.map(c => `<option value="${c.id}">${c.id} - ${c.name}</option>`);
+            const defaultOption = '<option value="">-- 请选择选手 --</option>';
+            
+            competitorSelect.innerHTML = defaultOption + options;
+            reviewSelect.innerHTML = defaultOption + options;
+        }
+        
+        document.getElementById('scoreCompetitorSelect').onchange = function() {
+            updateScorePanel();
+        };
+        
+        function updateScorePanel() {
+            const panel = document.getElementById('scorePanel');
+            const noPanel = document.getElementById('noScorePanel');
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            
+            if (STATE.judges.length === 0 || STATE.competitors.length === 0 || !competitorId) {
+                panel.style.display = 'none';
+                noPanel.style.display = 'block';
+                return;
+            }
+            
+            const competitor = STATE.competitors.find(c => c.id === competitorId);
+            if (!competitor) return;
+            
+            panel.style.display = 'block';
+            noPanel.style.display = 'none';
+            
+            if (STATE.frozen) {
+                panel.classList.add('frozen');
+            } else {
+                panel.classList.remove('frozen');
+            }
+            
+            const container = document.getElementById('judgeScoreContainer');
+            if (!STATE.scores[competitorId]) STATE.scores[competitorId] = {};
+            
+            container.innerHTML = STATE.judges.map(j => {
+                const currentScore = STATE.scores[competitorId][j.id];
+                return `
+                    <div class="judge-score-card" id="score-card-${j.id}">
+                        <div style="font-weight: 600; margin-bottom: 8px;">${j.id} - ${j.name}</div>
+                        <input type="number" 
+                               class="form-input" 
+                               placeholder="0-100" 
+                               min="0" 
+                               max="100" 
+                               value="${currentScore !== undefined ? currentScore : ''}"
+                               data-judge="${j.id}"
+                               oninput="onScoreInput(this)"
+                               ${competitor.withdrawn ? 'disabled' : ''}>
+                        ${competitor.withdrawn ? '<div style="color: #dc3545; font-size: 12px; margin-top: 8px;">选手已弃权</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            updateScoreProgress();
+        }
+        
+        function onScoreInput(input) {
+            const card = input.closest('.judge-score-card');
+            const value = parseFloat(input.value);
+            
+            card.classList.remove('updated', 'error');
+            
+            if (input.value === '') {
+                return;
+            }
+            
+            if (isNaN(value) || value < 0 || value > 100) {
+                card.classList.add('error');
+                showAlert('danger', '❌ 分数必须在 0-100 之间');
+                return;
+            }
+            
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            const judgeId = input.dataset.judge;
+            const before = STATE.scores[competitorId][judgeId];
+            
+            STATE.scores[competitorId][judgeId] = value;
+            card.classList.add('updated');
+            
+            setTimeout(() => updateScoreProgress(), 100);
+        }
+        
+        function updateScoreProgress() {
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            if (!competitorId || !STATE.scores[competitorId]) return;
+            
+            const scored = Object.values(STATE.scores[competitorId]).filter(s => typeof s === 'number').length;
+            const total = STATE.judges.length;
+            const percent = total > 0 ? (scored / total) * 100 : 0;
+            
+            document.getElementById('scoreProgress').style.width = percent + '%';
+            document.getElementById('scoreProgressText').textContent = `${scored}/${total}`;
+        }
+        
+        document.getElementById('btnSubmitScores').onclick = function() {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法提交打分'); return; }
+            
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            if (!competitorId) { showAlert('danger', '❌ 请先选择选手'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === competitorId);
+            if (!competitor) return;
+            
+            if (competitor.withdrawn) { showAlert('danger', '❌ 该选手已弃权，无法提交打分'); return; }
+            
+            const scores = STATE.scores[competitorId];
+            const scoredCount = Object.values(scores).filter(s => typeof s === 'number').length;
+            
+            if (scoredCount !== STATE.judges.length) {
+                showAlert('warning', `⚠️ 还有 ${STATE.judges.length - scoredCount} 位评委未打分，确定提交？`);
+                return;
+            }
+            
+            addHistory('modify', `提交打分`, `${competitorId} - ${competitor.name}`, null, { ...scores });
+            
+            showAlert('success', `✅ ${competitor.name} 的 ${STATE.judges.length} 位评委打分已全部提交！`);
+            renderRanking();
+        };
+        
+        document.getElementById('btnAutoFillScores').onclick = function() {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结'); return; }
+            
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            if (!competitorId) { showAlert('danger', '❌ 请先选择选手'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === competitorId);
+            if (competitor && competitor.withdrawn) {
+                showAlert('danger', '❌ 选手已弃权');
+                return;
+            }
+            
+            const before = { ...STATE.scores[competitorId] };
+            
+            STATE.judges.forEach(j => {
+                STATE.scores[competitorId][j.id] = Math.floor(Math.random() * 40) + 60;
+            });
+            
+            addHistory('modify', `自动填充分数`, `${competitorId} - ${competitor?.name || competitorId}`, before, { ...STATE.scores[competitorId] });
+            
+            updateScorePanel();
+            showAlert('success', '🎲 已随机填充 60-100 分的分数（演示用）');
+        };
+        
+        document.getElementById('btnMarkWithdraw').onclick = function() {
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            if (!competitorId) { showAlert('danger', '❌ 请先选择选手'); return; }
+            markWithdrawn(competitorId);
+            updateScorePanel();
+        };
+        
+        document.getElementById('btnClearScores').onclick = function() {
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结'); return; }
+            
+            const competitorId = document.getElementById('scoreCompetitorSelect').value;
+            if (!competitorId) { showAlert('danger', '❌ 请先选择选手'); return; }
+            
+            showConfirm('确认清空', '确定要清空该选手的所有打分记录吗？', () => {
+                const before = { ...STATE.scores[competitorId] };
+                STATE.scores[competitorId] = {};
+                
+                const competitor = STATE.competitors.find(c => c.id === competitorId);
+                addHistory('modify', `清空分数`, `${competitorId} - ${competitor?.name || competitorId}`, before, {});
+                
+                updateScorePanel();
+                showAlert('warning', '⚠️ 打分已清空');
+            });
+        };
+        
+        function renderRanking() {
+            const container = document.getElementById('rankingList');
+            const freezeStatus = document.getElementById('freezeStatus');
+            
+            if (STATE.frozen) {
+                freezeStatus.className = 'badge badge-danger';
+                freezeStatus.textContent = '已冻结';
+            } else {
+                freezeStatus.className = 'badge badge-info';
+                freezeStatus.textContent = '未冻结';
+            }
+            
+            const validCompetitors = STATE.competitors.filter(c => !c.withdrawn && calculateAverageScore(c.id) !== null);
+            
+            if (validCompetitors.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">暂无排名数据（选手需有有效打分）</div>';
+                document.getElementById('playoffNotice').style.display = 'none';
+                return;
+            }
+            
+            const ranked = validCompetitors
+                .map(c => ({
+                    competitor: c,
+                    avg: calculateAverageScore(c.id),
+                    scores: STATE.scores[c.id] || {}
+                }))
+                .sort((a, b) => b.avg - a.avg);
+            
+            const scoreGroups = {};
+            ranked.forEach(item => {
+                const key = item.avg.toFixed(2);
+                if (!scoreGroups[key]) scoreGroups[key] = [];
+                scoreGroups[key].push(item);
+            });
+            
+            const playoffScores = Object.entries(scoreGroups)
+                .filter(([_, items]) => items.length > 1)
+                .map(([score, items]) => ({ score, items }));
+            
+            const playoffNotice = document.getElementById('playoffNotice');
+            if (playoffScores.length > 0) {
+                playoffNotice.style.display = 'block';
+                document.getElementById('playoffMessage').innerHTML = 
+                    playoffScores.map(({ score, items }) => 
+                        `分数 <strong>${score}</strong> 分有 <strong>${items.length}</strong> 人同分：${items.map(i => i.competitor.name).join('、')}`
+                    ).join('；');
+            } else {
+                playoffNotice.style.display = 'none';
+            }
+            
+            let currentRank = 1;
+            let lastAvg = null;
+            let sameRankCount = 0;
+            
+            container.innerHTML = ranked.map((item, index) => {
+                if (item.avg !== lastAvg) {
+                    currentRank = index + 1;
+                    sameRankCount = 1;
+                } else {
+                    sameRankCount++;
+                }
+                lastAvg = item.avg;
+                
+                const scoreBreakdown = Object.entries(item.scores)
+                    .filter(([_, v]) => typeof v === 'number')
+                    .map(([judge, score]) => `<span class="mini-score">${judge}: ${score}</span>`)
+                    .join('');
+                
+                const isPlayoff = playoffScores.some(p => p.score === item.avg.toFixed(2));
+                
+                return `
+                    <div class="rank-row">
+                        <div class="rank-number rank-${currentRank <= 3 ? currentRank : 'other'}">${currentRank}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 16px;">
+                                ${item.competitor.id} - ${item.competitor.name}
+                                ${isPlayoff ? '<span class="badge badge-warning" style="margin-left: 8px;">同分待加赛</span>' : ''}
+                            </div>
+                            <div style="color: #888; font-size: 13px; margin-top: 4px;">
+                                ${item.competitor.category}
+                            </div>
+                            <div class="score-breakdown" style="margin-top: 8px;">
+                                ${scoreBreakdown || '<span style="color: #888;">暂无打分详情</span>'}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 24px; font-weight: 700; color: #667eea;">${item.avg.toFixed(1)}</div>
+                            <div style="font-size: 12px; color: #888;">平均分</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        document.getElementById('btnFreezeRanking').onclick = function() {
+            if (STATE.frozen) {
+                showAlert('warning', '⚠️ 排名已处于冻结状态');
+                return;
+            }
+            
+            showConfirm('冻结排名', '确定要冻结当前排名吗？冻结后所有打分、选手信息、申诉状态都不可修改，此操作不可撤销！', () => {
+                STATE.frozen = true;
+                addHistory('modify', `排名冻结`, `所有排名、打分、申诉状态已锁定`, null, { frozenAt: new Date().toISOString() });
+                
+                showAlert('danger', '❄️ 排名已冻结！所有后续修改操作已被禁止。');
+                renderRanking();
+                renderCompetitorTable();
+                renderJudgesList();
+            });
+        };
+        
+        document.getElementById('reviewForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const competitorId = document.getElementById('reviewCompetitorSelect').value;
+            const type = document.getElementById('reviewType').value;
+            const reason = document.getElementById('reviewReason').value.trim();
+            
+            if (!competitorId) { showAlert('danger', '❌ 请选择申诉选手'); return; }
+            if (!reason) { showAlert('danger', '❌ 请填写申诉理由'); return; }
+            
+            if (STATE.frozen) { showAlert('danger', '❌ 排名已冻结，无法提交新申诉'); return; }
+            
+            const competitor = STATE.competitors.find(c => c.id === competitorId);
+            
+            const review = {
+                id: 'R' + String(STATE.reviews.length + 1).padStart(4, '0'),
+                competitorId: competitorId,
+                competitorName: competitor?.name || competitorId,
+                type: type,
+                reason: reason,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                reviewNote: null
+            };
+            
+            STATE.reviews.push(review);
+            addHistory('review', `申诉提交`, `${review.id}: ${competitorId} - ${type}`, null, review);
+            
+            this.reset();
+            document.getElementById('reviewCompetitorSelect').value = '';
+            renderReviewList();
+            updateStats();
+            showAlert('info', `📋 申诉 ${review.id} 已提交，待复核处理`);
+        };
+        
+        function renderReviewList() {
+            const container = document.getElementById('reviewList');
+            
+            if (STATE.reviews.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">暂无申诉记录</div>';
+                return;
+            }
+            
+            container.innerHTML = STATE.reviews.map(r => {
+                const statusBadge = r.status === 'pending' 
+                    ? '<span class="badge badge-warning">待复核</span>' 
+                    : r.status === 'approved'
+                        ? '<span class="badge badge-success">申诉通过</span>'
+                        : '<span class="badge badge-danger">申诉驳回</span>';
+                
+                const typeLabels = {
+                    score_question: '分数异议',
+                    playoff: '加赛资格',
+                    withdraw: '弃权判定',
+                    other: '其他'
+                };
+                
+                return `
+                    <div class="history-item review" style="margin-bottom: 16px;">
+                        <div class="history-item-title">
+                            ${r.id} - ${r.competitorName}
+                            <span style="margin-left: 8px;">${statusBadge}</span>
+                        </div>
+                        <div class="history-item-time">
+                            类型: ${typeLabels[r.type] || r.type} | ${formatTime(r.createdAt)}
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>申诉理由:</strong> ${r.reason}
+                        </div>
+                        ${r.reviewNote ? `<div style="background: #2d2d44; padding: 12px; border-radius: 6px; margin-bottom: 12px;"><strong>复核意见:</strong> ${r.reviewNote}</div>` : ''}
+                        ${r.status === 'pending' && !STATE.frozen ? `
+                            <div class="btn-row">
+                                <button class="btn btn-success" onclick="handleReview('${r.id}', 'approved')">✅ 通过</button>
+                                <button class="btn btn-danger" onclick="handleReview('${r.id}', 'rejected')">❌ 驳回</button>
+                                <button class="btn btn-secondary" onclick="askReviewNote('${r.id}', 'approved')">📝 通过（附意见）</button>
+                                <button class="btn btn-secondary" onclick="askReviewNote('${r.id}', 'rejected')">📝 驳回（附意见）</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function handleReview(reviewId, status, note = null) {
+            const review = STATE.reviews.find(r => r.id === reviewId);
+            if (!review) return;
+            
+            const before = { ...review };
+            review.status = status;
+            review.reviewNote = note;
+            review.reviewedAt = new Date().toISOString();
+            
+            addHistory('review', 
+                `申诉${status === 'approved' ? '通过' : '驳回'}`, 
+                `${reviewId} - ${review.competitorName}`,
+                before,
+                { ...review }
+            );
+            
+            renderReviewList();
+            updateStats();
+            showAlert(status === 'approved' ? 'success' : 'warning', 
+                status === 'approved' ? '✅ 申诉已通过' : '⚠️ 申诉已驳回');
+        }
+        
+        function askReviewNote(reviewId, status) {
+            const note = prompt('请输入复核意见:');
+            if (note !== null) {
+                handleReview(reviewId, status, note.trim());
+            }
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+            
+            let filtered = STATE.history;
+            if (currentHistoryFilter !== 'all') {
+                filtered = STATE.history.filter(h => h.type === currentHistoryFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #888; padding: 40px;">暂无操作历史</div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(h => {
+                let diffHtml = '';
+                if (h.before !== null || h.after !== null) {
+                    if (h.before && h.after) {
+                        diffHtml = `
+                            <div class="history-diff">
+                                <div><span style="color: #888;">变更前:</span> ${JSON.stringify(h.before, null, 2).substring(0, 200)}</div>
+                                <div style="margin-top: 8px;"><span style="color: #888;">变更后:</span> ${JSON.stringify(h.after, null, 2).substring(0, 200)}</div>
+                            </div>
+                        `;
+                    } else if (h.after) {
+                        diffHtml = `
+                            <div class="history-diff">
+                                <span class="diff-new">[新增]</span> ${JSON.stringify(h.after, null, 2).substring(0, 200)}
+                            </div>
+                        `;
+                    } else if (h.before) {
+                        diffHtml = `
+                            <div class="history-diff">
+                                <span class="diff-old">[删除]</span> ${JSON.stringify(h.before, null, 2).substring(0, 200)}
+                            </div>
+                        `;
+                    }
+                }
+                
+                const typeLabels = {
+                    modify: '🔄 修改',
+                    withdraw: '🏃 弃权',
+                    supplement: '➕ 补录/新增',
+                    review: '📋 申诉'
+                };
+                
+                return `
+                    <div class="history-item ${h.type}">
+                        <div class="history-item-title">
+                            ${typeLabels[h.type] || h.type} | ${h.action}
+                        </div>
+                        <div class="history-item-time">
+                            ${formatTime(h.timestamp)} | ID: ${h.id.substring(0, 12)}
+                        </div>
+                        <div style="margin-bottom: 12px; color: #b0b0c0;">
+                            ${h.detail}
+                        </div>
+                        ${diffHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function filterHistory(type) {
+            currentHistoryFilter = type;
+            renderHistory();
+        }
+        
+        document.getElementById('btnUndoLast').onclick = function() {
+            if (STATE.frozen) {
+                showAlert('danger', '❌ 排名已冻结，无法撤回');
+                return;
+            }
+            
+            if (STATE.history.length === 0) {
+                showAlert('warning', '⚠️ 没有可撤回的操作');
+                return;
+            }
+            
+            showConfirm('撤回操作', '确定要撤回上一步操作吗？撤回后历史记录仍然可见。', () => {
+                const lastAction = STATE.history[0];
+                
+                let undone = false;
+                
+                switch (lastAction.type) {
+                    case 'supplement':
+                        if (lastAction.action.includes('选手') && lastAction.after && lastAction.after.id) {
+                            const idx = STATE.competitors.findIndex(c => c.id === lastAction.after.id);
+                            if (idx > -1) {
+                                STATE.competitors.splice(idx, 1);
+                                delete STATE.scores[lastAction.after.id];
+                                undone = true;
+                            }
+                        } else if (lastAction.action.includes('评委') && lastAction.after && lastAction.after.id) {
+                            const idx = STATE.judges.findIndex(j => j.id === lastAction.after.id);
+                            if (idx > -1) {
+                                STATE.judges.splice(idx, 1);
+                                undone = true;
+                            }
+                        }
+                        break;
+                        
+                    case 'modify':
+                        if (lastAction.before !== null && lastAction.before.id) {
+                            const compIdx = STATE.competitors.findIndex(c => c.id === lastAction.before.id);
+                            if (compIdx > -1) {
+                                STATE.competitors[compIdx] = { ...lastAction.before };
+                                undone = true;
+                            }
+                            const judgeIdx = STATE.judges.findIndex(j => j.id === lastAction.before.id);
+                            if (judgeIdx > -1) {
+                                STATE.judges[judgeIdx] = { ...lastAction.before };
+                                undone = true;
+                            }
+                        } else if (lastAction.before === null && lastAction.after === null) {
+                            if (lastAction.detail.includes('分数')) {
+                                undone = true;
+                            }
+                        }
+                        break;
+                        
+                    case 'withdraw':
+                        if (lastAction.before && lastAction.before.id) {
+                            const idx = STATE.competitors.findIndex(c => c.id === lastAction.before.id);
+                            if (idx > -1) {
+                                STATE.competitors[idx] = { ...lastAction.before };
+                                undone = true;
+                            }
+                        }
+                        break;
+                }
+                
+                addHistory('modify', `撤回操作`, `撤回: ${lastAction.action}`, lastAction, null);
+                
+                if (undone) {
+                    renderCompetitorTable();
+                    renderJudgesList();
+                    updateScoreSelects();
+                    updateScorePanel();
+                    updateStats();
+                    showAlert('success', '↩️ 上一步操作已撤回');
+                } else {
+                    showAlert('warning', '⚠️ 记录已保存，但部分复杂操作无法自动撤销，请手动处理');
+                }
+            });
+        };
+        
+        updateStats();
+        renderCompetitorTable();
+        updateScoreSelects();
+    </script>
+</body>
+</html>
