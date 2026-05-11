@@ -1,0 +1,307 @@
+{
+  "routes": [
+    {
+      "id": 1,
+      "name": "1号线（早班）",
+      "description": "早晨接送学生上学",
+      "created_at": "2026-05-11T10:19:20.249Z"
+    },
+    {
+      "id": 2,
+      "name": "2号线（早班）",
+      "description": "早晨接送学生上学",
+      "created_at": "2026-05-11T10:19:20.260Z"
+    }
+  ],
+  "stations": [
+    {
+      "id": 1,
+      "name": "阳光小区北门",
+      "address": "阳光路1号"
+    },
+    {
+      "id": 2,
+      "name": "幸福家园",
+      "address": "幸福路2号"
+    },
+    {
+      "id": 3,
+      "name": "锦绣花园",
+      "address": "锦绣路3号"
+    },
+    {
+      "id": 4,
+      "name": "金色年华",
+      "address": "金色大道4号"
+    },
+    {
+      "id": 5,
+      "name": "临时站点A",
+      "address": "备用站点A地址"
+    },
+    {
+      "id": 6,
+      "name": "临时站点B",
+      "address": "备用站点B地址"
+    },
+    {
+      "id": 7,
+      "name": "阳光小区南门",
+      "address": "阳光路1号南门"
+    }
+  ],
+  "route_stations": [
+    {
+      "id": 1,
+      "route_id": 1,
+      "station_id": 1,
+      "station_order": 1,
+      "estimated_arrival_time": "07:00",
+      "estimated_duration": 5
+    },
+    {
+      "id": 2,
+      "route_id": 1,
+      "station_id": 2,
+      "station_order": 2,
+      "estimated_arrival_time": "07:10",
+      "estimated_duration": 5
+    },
+    {
+      "id": 3,
+      "route_id": 1,
+      "station_id": 3,
+      "station_order": 3,
+      "estimated_arrival_time": "07:20",
+      "estimated_duration": 5
+    },
+    {
+      "id": 4,
+      "route_id": 1,
+      "station_id": 4,
+      "station_order": 4,
+      "estimated_arrival_time": "07:30",
+      "estimated_duration": 5
+    },
+    {
+      "id": 5,
+      "route_id": 2,
+      "station_id": 5,
+      "station_order": 1,
+      "estimated_arrival_time": "07:05",
+      "estimated_duration": 5
+    },
+    {
+      "id": 6,
+      "route_id": 2,
+      "station_id": 6,
+      "station_order": 2,
+      "estimated_arrival_time": "07:15",
+      "estimated_duration": 5
+    },
+    {
+      "id": 7,
+      "route_id": 2,
+      "station_id": 7,
+      "station_order": 3,
+      "estimated_arrival_time": "07:25",
+      "estimated_duration": 5
+    }
+  ],
+  "students": [
+    {
+      "id": 1,
+      "name": "小明",
+      "student_no": "S001",
+      "route_id": 1,
+      "station_id": 1,
+      "parent_name": "小明爸爸",
+      "parent_phone": "13800138001",
+      "class": "一年级1班"
+    },
+    {
+      "id": 2,
+      "name": "小红",
+      "student_no": "S002",
+      "route_id": 1,
+      "station_id": 1,
+      "parent_name": "小红妈妈",
+      "parent_phone": "13800138002",
+      "class": "一年级2班"
+    },
+    {
+      "id": 3,
+      "name": "小华",
+      "student_no": "S003",
+      "route_id": 1,
+      "station_id": 2,
+      "parent_name": "小华爸爸",
+      "parent_phone": "13800138003",
+      "class": "二年级1班"
+    },
+    {
+      "id": 4,
+      "name": "小丽",
+      "student_no": "S004",
+      "route_id": 1,
+      "station_id": 3,
+      "parent_name": "小丽妈妈",
+      "parent_phone": "13800138004",
+      "class": "二年级2班"
+    },
+    {
+      "id": 5,
+      "name": "小强",
+      "student_no": "S005",
+      "route_id": 1,
+      "station_id": 4,
+      "parent_name": "小强爸爸",
+      "parent_phone": "13800138005",
+      "class": "三年级1班"
+    },
+    {
+      "id": 6,
+      "name": "小刚",
+      "student_no": "S006",
+      "route_id": 2,
+      "station_id": 5,
+      "parent_name": "小刚妈妈",
+      "parent_phone": "13800138006",
+      "class": "三年级2班"
+    },
+    {
+      "id": 7,
+      "name": "小芳",
+      "student_no": "S007",
+      "route_id": 2,
+      "station_id": 6,
+      "parent_name": "小芳爸爸",
+      "parent_phone": "13800138007",
+      "class": "四年级1班"
+    }
+  ],
+  "leaves": [
+    {
+      "id": 1,
+      "student_id": 2,
+      "leave_date": "2026-05-11",
+      "reason": "身体不适",
+      "status": "approved",
+      "created_at": "2026-05-11T10:19:20.261Z",
+      "created_by": "张调度"
+    }
+  ],
+  "reroutes": [
+    {
+      "id": 1,
+      "route_id": 1,
+      "original_route": "[{\"id\":1,\"station_id\":1,\"station_order\":1,\"estimated_arrival_time\":\"07:00\",\"estimated_duration\":5,\"name\":\"阳光小区北门\"},{\"id\":2,\"station_id\":2,\"station_order\":2,\"estimated_arrival_time\":\"07:10\",\"estimated_duration\":5,\"name\":\"幸福家园\"},{\"id\":3,\"station_id\":3,\"station_order\":3,\"estimated_arrival_time\":\"07:20\",\"estimated_duration\":5,\"name\":\"锦绣花园\"},{\"id\":4,\"station_id\":4,\"station_order\":4,\"estimated_arrival_time\":\"07:30\",\"estimated_duration\":5,\"name\":\"金色年华\"}]",
+      "new_route": "[{\"station_id\":1,\"station_order\":1,\"estimated_arrival_time\":\"07:05\",\"estimated_duration\":5},{\"station_id\":5,\"station_order\":2,\"estimated_arrival_time\":\"07:15\",\"estimated_duration\":5},{\"station_id\":4,\"station_order\":3,\"estimated_arrival_time\":\"07:35\",\"estimated_duration\":5}]",
+      "reason": "修路绕行：幸福家园站点绕行",
+      "status": "approved",
+      "created_at": "2026-05-11T10:19:20.261Z",
+      "created_by": "张调度",
+      "approved_at": "2026-05-11T10:19:20.261Z",
+      "approved_by": "张调度",
+      "scheduled_date": "2026-05-12"
+    },
+    {
+      "id": 2,
+      "route_id": 2,
+      "original_route": "[{\"id\":5,\"station_id\":5,\"station_order\":1,\"estimated_arrival_time\":\"07:05\",\"estimated_duration\":5,\"name\":\"临时站点A\"},{\"id\":6,\"station_id\":6,\"station_order\":2,\"estimated_arrival_time\":\"07:15\",\"estimated_duration\":5,\"name\":\"临时站点B\"},{\"id\":7,\"station_id\":7,\"station_order\":3,\"estimated_arrival_time\":\"07:25\",\"estimated_duration\":5,\"name\":\"阳光小区南门\"}]",
+      "new_route": "[{\"station_id\":5,\"station_order\":1,\"estimated_arrival_time\":\"07:00\",\"estimated_duration\":5}]",
+      "reason": "临时站点调整",
+      "status": "pending",
+      "created_at": "2026-05-11T10:19:20.262Z",
+      "created_by": "张调度",
+      "approved_at": null,
+      "approved_by": null,
+      "scheduled_date": "2026-05-12"
+    }
+  ],
+  "reroute_stations": [
+    {
+      "id": 1,
+      "reroute_id": 1,
+      "station_id": 1,
+      "station_order": 1,
+      "estimated_arrival_time": "07:05",
+      "action": null
+    },
+    {
+      "id": 2,
+      "reroute_id": 1,
+      "station_id": 5,
+      "station_order": 2,
+      "estimated_arrival_time": "07:15",
+      "action": null
+    },
+    {
+      "id": 3,
+      "reroute_id": 1,
+      "station_id": 4,
+      "station_order": 3,
+      "estimated_arrival_time": "07:35",
+      "action": null
+    }
+  ],
+  "driver_confirmations": [],
+  "notifications": [],
+  "ride_logs": [
+    {
+      "id": 1,
+      "route_id": 1,
+      "date": "2026-05-11",
+      "reroute_id": null,
+      "bus_status": "in_progress",
+      "departed_at": "2026-05-11T10:19:20.262Z",
+      "arrived_at": null
+    }
+  ],
+  "boardings": [
+    {
+      "id": 1,
+      "student_id": 1,
+      "route_id": 1,
+      "date": "2026-05-11",
+      "boarded_at": "2026-05-11T10:19:20.262Z",
+      "boarding_order": 1
+    },
+    {
+      "id": 2,
+      "student_id": 3,
+      "route_id": 1,
+      "date": "2026-05-11",
+      "boarded_at": "2026-05-11T10:19:20.262Z",
+      "boarding_order": 2
+    },
+    {
+      "id": 3,
+      "student_id": 4,
+      "route_id": 1,
+      "date": "2026-05-11",
+      "boarded_at": "2026-05-11T10:19:20.262Z",
+      "boarding_order": 3
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "dispatcher1",
+      "name": "张调度",
+      "role": "dispatcher"
+    },
+    {
+      "id": 2,
+      "username": "driver1",
+      "name": "李司机",
+      "role": "driver"
+    },
+    {
+      "id": 3,
+      "username": "driver2",
+      "name": "王司机",
+      "role": "driver"
+    }
+  ]
+}

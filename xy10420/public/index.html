@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>校车临时改线台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .header { background: #1890ff; color: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header .subtitle { opacity: 0.9; font-size: 14px; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: white; border: 1px solid #d9d9d9; border-radius: 4px; cursor: pointer; transition: all 0.3s; }
+    .tab:hover { border-color: #1890ff; }
+    .tab.active { background: #1890ff; color: white; border-color: #1890ff; }
+    
+    .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .card-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #262626; border-bottom: 2px solid #1890ff; padding-bottom: 10px; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    th { background: #fafafa; font-weight: 600; color: #262626; }
+    tr:hover { background: #fafafa; }
+    
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .btn-primary { background: #1890ff; color: white; }
+    .btn-primary:hover { background: #40a9ff; }
+    .btn-success { background: #52c41a; color: white; }
+    .btn-success:hover { background: #73d13d; }
+    .btn-warning { background: #faad14; color: white; }
+    .btn-warning:hover { background: #ffc53d; }
+    .btn-danger { background: #ff4d4f; color: white; }
+    .btn-danger:hover { background: #ff7875; }
+    .btn-default { background: #fff; color: #262626; border: 1px solid #d9d9d9; }
+    .btn-default:hover { border-color: #1890ff; color: #1890ff; }
+    
+    .badge { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .badge-success { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .badge-warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+    .badge-danger { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+    .badge-info { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .badge-pending { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .comparison-col { background: #fafafa; padding: 15px; border-radius: 8px; }
+    .comparison-col h4 { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #d9d9d9; }
+    
+    .station-item { display: flex; align-items: center; padding: 10px; margin-bottom: 5px; background: white; border-radius: 4px; border-left: 4px solid #1890ff; }
+    .station-item.removed { opacity: 0.5; border-left-color: #ff4d4f; }
+    .station-item.added { border-left-color: #52c41a; background: #f6ffed; }
+    .station-number { width: 28px; height: 28px; background: #1890ff; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 12px; }
+    .station-info { flex: 1; }
+    .station-name { font-weight: 600; }
+    .station-time { font-size: 12px; color: #8c8c8c; }
+    
+    .form-group { margin-bottom: 15px; }
+    .form-label { display: block; margin-bottom: 5px; font-weight: 500; }
+    .form-input { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+    .form-input:focus { outline: none; border-color: #1890ff; }
+    .form-select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 14px; }
+    
+    .stats-row { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat-card { background: white; padding: 20px; border-radius: 8px; flex: 1; min-width: 200px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .stat-value { font-size: 28px; font-weight: bold; color: #1890ff; }
+    .stat-label { color: #8c8c8c; margin-top: 5px; }
+    
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; border-radius: 8px; padding: 24px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+    .modal-title { font-size: 18px; font-weight: 600; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #8c8c8c; }
+    
+    .message { padding: 12px; border-radius: 4px; margin-bottom: 15px; }
+    .message-success { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .message-error { background: #fff2f0; color: #ff4d4f; border: 1px solid #ffccc7; }
+    
+    .route-selector { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .route-tag { padding: 8px 16px; background: white; border: 1px solid #d9d9d9; border-radius: 4px; cursor: pointer; }
+    .route-tag.active { background: #1890ff; color: white; border-color: #1890ff; }
+    
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #d9d9d9; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -26px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #1890ff; border: 2px solid #fff; box-shadow: 0 0 0 2px #1890ff; }
+    .timeline-item.removed::before { background: #ff4d4f; box-shadow: 0 0 0 2px #ff4d4f; }
+    .timeline-item.added::before { background: #52c41a; box-shadow: 0 0 0 2px #52c41a; }
+    .timeline-date { font-size: 12px; color: #8c8c8c; margin-top: 4px; }
+    
+    .student-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fafafa; border-radius: 4px; margin-bottom: 8px; }
+    
+    .hidden { display: none; }
+    
+    .checkbox-label { display: flex; align-items: center; gap: 8px; }
+    .checkbox-label input { width: 16px; height: 16px; }
+    
+    .flex { display: flex; gap: 10px; }
+    .flex-wrap { flex-wrap: wrap; }
+    .align-center { align-items: center; }
+    
+    .mb-10 { margin-bottom: 10px; }
+    .mb-20 { margin-bottom: 20px; }
+    .mt-10 { margin-top: 10px; }
+    .mt-20 { margin-top: 20px; }
+    
+    .text-small { font-size: 12px; }
+    .text-muted { color: #8c8c8c; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="container">
+      <div class="header">
+        <h1>🚍 校车临时改线台</h1>
+        <div class="subtitle">当前日期：{{ today }} | 当前用户：张调度</div>
+      </div>
+      
+      <div class="tabs">
+        <div class="tab" :class="{ active: activeTab === 'dashboard' }" @click="activeTab = 'dashboard'">📊 今日乘车报表</div>
+        <div class="tab" :class="{ active: activeTab === 'routes' }" @click="activeTab = 'routes'">🗺️ 线路管理</div>
+        <div class="tab" :class="{ active: activeTab === 'students' }" @click="activeTab = 'students'">👨‍🎓 学生名单</div>
+        <div class="tab" :class="{ active: activeTab === 'reroutes' }" @click="activeTab = 'reroutes'">🔄 临时改线</div>
+        <div class="tab" :class="{ active: activeTab === 'leaves' }" @click="activeTab = 'leaves'">📋 请假管理</div>
+        <div class="tab" :class="{ active: activeTab === 'notifications' }" @click="activeTab = 'notifications'">📢 通知记录</div>
+      </div>
+      
+      <div v-if="message" :class="['message', 'message-' + messageType]">
+        {{ message }}
+      </div>
+      
+      <!-- 今日乘车报表 -->
+      <div v-if="activeTab === 'dashboard'">
+        <div class="card">
+          <div class="card-title">📊 今日乘车总览</div>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-value">{{ dailyReport.total_routes || 0 }}</div>
+              <div class="stat-label">运行线路</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #52c41a">{{ totalBoarding }}</div>
+              <div class="stat-label">已上车学生</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #ff4d4f">{{ totalLeaves }}</div>
+              <div class="stat-label">请假学生</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color: #faad14">{{ pendingConfirmations }}</div>
+              <div class="stat-label">待司机确认</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">🚍 各线路状态</div>
+          <div v-for="route in dailyReport.report" :key="route.route_id" class="card" style="margin-bottom: 15px;">
+            <div class="flex align-center mb-10">
+              <h3 style="flex: 1;">{{ route.route_name }}</h3>
+              <span :class="['badge', getStatusBadge(route.bus_status)]">{{ getBusStatusText(route.bus_status) }}</span>
+            </div>
+            
+            <div class="grid">
+              <div>
+                <div class="text-muted text-small mb-10">基础信息</div>
+                <div class="student-card">
+                  <span>学生总数</span>
+                  <span style="font-weight: bold;">{{ route.total_students }} 人</span>
+                </div>
+                <div class="student-card">
+                  <span>已上车</span>
+                  <span style="font-weight: bold; color: #52c41a;">{{ route.boarding_count }} 人</span>
+                </div>
+                <div class="student-card">
+                  <span>请假</span>
+                  <span style="font-weight: bold; color: #ff4d4f;">{{ route.leave_count }} 人</span>
+                </div>
+              </div>
+              
+              <div>
+                <div class="text-muted text-small mb-10">改线与确认</div>
+                <div class="student-card">
+                  <span>今日改线</span>
+                  <span v-if="route.has_reroute" :class="['badge', 'badge-info']">有改线</span>
+                  <span v-else class="badge badge-success">正常线路</span>
+                </div>
+                <div class="student-card">
+                  <span>司机确认</span>
+                  <span v-if="route.driver_confirmed" :class="['badge', 'badge-success']">已确认</span>
+                  <span v-else :class="['badge', 'badge-warning']">未确认</span>
+                </div>
+                <div v-if="route.driver_confirmation" class="student-card">
+                  <span>确认人</span>
+                  <span>{{ route.driver_confirmation.driver_name }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap mt-20" style="gap: 10px;">
+              <button class="btn btn-default" @click="showRouteDetail(route.route_id)">📋 查看线路详情</button>
+              <button v-if="route.has_reroute" class="btn btn-info" @click="showRerouteCompare(route.reroute.id)">🔍 对比改线前后</button>
+              <button v-if="!route.driver_confirmed && route.bus_status === 'not_departed'" class="btn btn-warning" @click="openDriverConfirmModal(route)">📝 司机确认</button>
+              <button v-if="route.bus_status === 'not_departed'" class="btn btn-success" @click="departRoute(route.route_id)">🚌 发车</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">📢 待通知家长</div>
+          <table v-if="pendingNotifications.pending_parents && pendingNotifications.pending_parents.length > 0">
+            <thead>
+              <tr>
+                <th>学生</th>
+                <th>家长</th>
+                <th>电话</th>
+                <th>线路</th>
+                <th>原因</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in pendingNotifications.pending_parents" :key="item.student_id">
+                <td>{{ item.student_name }}</td>
+                <td>{{ item.parent_name }}</td>
+                <td>{{ item.parent_phone }}</td>
+                <td>{{ item.route_name }}</td>
+                <td>{{ item.reason }}</td>
+                <td><span class="badge badge-warning">待通知</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div v-else class="text-muted" style="text-align: center; padding: 20px;">暂无待通知家长</div>
+        </div>
+      </div>
+      
+      <!-- 线路管理 -->
+      <div v-if="activeTab === 'routes'">
+        <div class="card">
+          <div class="card-title">🗺️ 线路列表</div>
+          <div class="route-selector">
+            <div v-for="route in routes" :key="route.id" 
+                 :class="['route-tag', { active: selectedRouteId === route.id }]" 
+                 @click="selectRoute(route.id)">
+              {{ route.name }}
+            </div>
+          </div>
+          
+          <div v-if="selectedRoute">
+            <h3 style="margin: 20px 0 10px;">{{ selectedRoute.name }}</h3>
+            <p style="color: #8c8c8c; margin-bottom: 15px;">{{ selectedRoute.description }}</p>
+            
+            <div class="timeline">
+              <div v-for="station in selectedRoute.stations" :key="station.station_order" class="timeline-item">
+                <div class="station-name">{{ station.name }}</div>
+                <div class="text-small text-muted">{{ station.address }}</div>
+                <div class="timeline-date">预计到达：{{ station.calculated_arrival || station.estimated_arrival_time }}</div>
+              </div>
+            </div>
+            
+            <div class="mt-20">
+              <h4 style="margin-bottom: 10px;">👨‍🎓 该线路学生</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>班级</th>
+                    <th>上车站点</th>
+                    <th>家长</th>
+                    <th>电话</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="student in routeStudents" :key="student.id">
+                    <td>{{ student.student_no }}</td>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.class }}</td>
+                    <td>{{ student.station_name }}</td>
+                    <td>{{ student.parent_name }}</td>
+                    <td>{{ student.parent_phone }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 学生名单 -->
+      <div v-if="activeTab === 'students'">
+        <div class="card">
+          <div class="card-title">👨‍🎓 所有学生</div>
+          <div class="flex mb-10">
+            <select v-model="studentFilterRoute" class="form-select" style="width: 200px;">
+              <option value="">全部线路</option>
+              <option v-for="route in routes" :key="route.id" :value="route.id">{{ route.name }}</option>
+            </select>
+            <input type="text" v-model="studentSearch" class="form-input" style="width: 300px;" placeholder="搜索学生姓名/学号">
+            <button class="btn btn-primary" @click="openNewLeaveModal">📋 新增请假</button>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>学号</th>
+                <th>姓名</th>
+                <th>班级</th>
+                <th>线路</th>
+                <th>上车站点</th>
+                <th>家长</th>
+                <th>电话</th>
+                <th>今日状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="student in filteredStudents" :key="student.id">
+                <td>{{ student.student_no }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.class }}</td>
+                <td>{{ student.route_name }}</td>
+                <td>{{ student.station_name }}</td>
+                <td>{{ student.parent_name }}</td>
+                <td>{{ student.parent_phone }}</td>
+                <td>
+                  <span v-if="isStudentOnLeave(student.id)" class="badge badge-danger">请假</span>
+                  <span v-else-if="isStudentBoarded(student.id)" class="badge badge-success">已上车</span>
+                  <span v-else class="badge badge-info">待乘车</span>
+                </td>
+                <td>
+                  <button v-if="!isStudentOnLeave(student.id) && !isStudentBoarded(student.id)" class="btn btn-sm btn-success" @click="boardStudent(student)">✅ 标记上车</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- 临时改线 -->
+      <div v-if="activeTab === 'reroutes'">
+        <div class="card">
+          <div class="card-title flex align-center" style="display: flex; justify-content: space-between;">
+            <span>🔄 临时改线管理</span>
+            <button class="btn btn-primary" @click="openNewRerouteModal">➕ 新建改线</button>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>线路</th>
+                <th>改线原因</th>
+                <th>改线日期</th>
+                <th>状态</th>
+                <th>创建人</th>
+                <th>审批人</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="reroute in reroutes" :key="reroute.id">
+                <td>{{ getRouteName(reroute.route_id) }}</td>
+                <td>{{ reroute.reason }}</td>
+                <td>{{ reroute.scheduled_date }}</td>
+                <td>
+                  <span v-if="reroute.status === 'approved'" class="badge badge-success">已审批</span>
+                  <span v-else class="badge badge-pending">待审批</span>
+                </td>
+                <td>{{ reroute.created_by }}</td>
+                <td>{{ reroute.approved_by || '-' }}</td>
+                <td>{{ formatTime(reroute.created_at) }}</td>
+                <td>
+                  <button class="btn btn-sm btn-default" @click="showRerouteCompare(reroute.id)">🔍 对比</button>
+                  <button v-if="reroute.status === 'pending'" class="btn btn-sm btn-success" @click="approveReroute(reroute.id)">✅ 审批</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- 请假管理 -->
+      <div v-if="activeTab === 'leaves'">
+        <div class="card">
+          <div class="card-title flex align-center" style="display: flex; justify-content: space-between;">
+            <span>📋 请假记录</span>
+            <button class="btn btn-primary" @click="openNewLeaveModal">➕ 新增请假</button>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>学生</th>
+                <th>请假日期</th>
+                <th>请假原因</th>
+                <th>创建人</th>
+                <th>创建时间</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="leave in leaves" :key="leave.id">
+                <td>{{ getStudentName(leave.student_id) }}</td>
+                <td>{{ leave.leave_date }}</td>
+                <td>{{ leave.reason }}</td>
+                <td>{{ leave.created_by }}</td>
+                <td>{{ formatTime(leave.created_at) }}</td>
+                <td><span class="badge badge-success">已批准</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- 通知记录 -->
+      <div v-if="activeTab === 'notifications'">
+        <div class="card">
+          <div class="card-title">📢 通知记录</div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>类型</th>
+                <th>学生</th>
+                <th>线路</th>
+                <th>通知内容</th>
+                <th>发送时间</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="notification in notifications" :key="notification.id">
+                <td>
+                  <span v-if="notification.type === 'reroute'" class="badge badge-info">改线通知</span>
+                  <span v-else class="badge badge-warning">请假通知</span>
+                </td>
+                <td>{{ notification.student_name || '-' }}</td>
+                <td>{{ notification.route_name || '-' }}</td>
+                <td>{{ notification.message }}</td>
+                <td>{{ formatTime(notification.sent_at) }}</td>
+                <td><span class="badge badge-success">已发送</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 新建改线弹窗 -->
+    <div v-if="showNewRerouteModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">新建临时改线</h3>
+          <button class="modal-close" @click="showNewRerouteModal = false">&times;</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">选择线路</label>
+          <select v-model="newReroute.route_id" class="form-select" @change="onRouteChange">
+            <option value="">请选择线路</option>
+            <option v-for="route in routes" :key="route.id" :value="route.id">{{ route.name }}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">改线日期</label>
+          <input type="date" v-model="newReroute.scheduled_date" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">改线原因</label>
+          <input type="text" v-model="newReroute.reason" class="form-input" placeholder="例如：修路绕行、临时站点调整等">
+        </div>
+        
+        <div v-if="currentRouteDetail" class="form-group">
+          <label class="form-label">选择站点（按顺序勾选新的站点顺序）</label>
+          <div class="text-small text-muted mb-10">当前站点顺序：{{ currentRouteDetail.stations.map(s => s.name).join(' → ') }}</div>
+          
+          <div v-for="station in allStations" :key="station.id" class="checkbox-label mb-10">
+            <input type="checkbox" :value="station.id" v-model="newReroute.selectedStations">
+            <span>{{ station.name }} - {{ station.address }}</span>
+          </div>
+          
+          <div v-if="newReroute.selectedStations.length > 0" class="mt-10">
+            <div class="text-small text-muted mb-10">已选站点顺序（可拖拽调整）：</div>
+            <div v-for="(stationId, index) in newReroute.selectedStations" :key="stationId" class="student-card">
+              <span>{{ index + 1 }}. {{ getStationName(stationId) }}</span>
+              <button class="btn btn-sm btn-danger" @click="removeStationFromSelection(index)">移除</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex mt-20" style="gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-default" @click="showNewRerouteModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitNewReroute">提交改线</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 改线对比弹窗 -->
+    <div v-if="showCompareModal" class="modal">
+      <div class="modal-content" style="max-width: 1000px;">
+        <div class="modal-header">
+          <h3 class="modal-title">改线前后对比</h3>
+          <button class="modal-close" @click="showCompareModal = false">&times;</button>
+        </div>
+        
+        <div v-if="compareReroute">
+          <div class="mb-10">
+            <strong>改线原因：</strong>{{ compareReroute.reason }}
+          </div>
+          <div class="mb-10">
+            <strong>创建人：</strong>{{ compareReroute.created_by }} | 
+            <strong>审批人：</strong>{{ compareReroute.approved_by || '待审批' }} | 
+            <strong>改线日期：</strong>{{ compareReroute.scheduled_date }}
+          </div>
+          
+          <div class="comparison">
+            <div class="comparison-col">
+              <h4>📋 原线路</h4>
+              <div v-for="station in compareReroute.original_route" :key="station.station_id" class="station-item" :class="{ removed: !isInNewRoute(station.station_id, compareReroute.new_route) }">
+                <div class="station-number">{{ station.station_order }}</div>
+                <div class="station-info">
+                  <div class="station-name">{{ station.name }}</div>
+                  <div class="station-time">预计到达：{{ station.calculated_arrival || station.estimated_arrival_time }}</div>
+                </div>
+                <span v-if="!isInNewRoute(station.station_id, compareReroute.new_route)" class="badge badge-danger">移除</span>
+              </div>
+            </div>
+            
+            <div class="comparison-col">
+              <h4>🔄 新线路</h4>
+              <div v-for="(station, index) in compareReroute.new_route" :key="station.station_id || index" class="station-item" :class="{ added: !isInOriginalRoute(station.station_id, compareReroute.original_route) }">
+                <div class="station-number">{{ index + 1 }}</div>
+                <div class="station-info">
+                  <div class="station-name">{{ getStationName(station.station_id) }}</div>
+                  <div class="station-time">预计到达：{{ station.calculated_arrival || station.estimated_arrival_time }}</div>
+                </div>
+                <span v-if="!isInOriginalRoute(station.station_id, compareReroute.original_route)" class="badge badge-success">新增</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex mt-20" style="gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-default" @click="showCompareModal = false">关闭</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 新增请假弹窗 -->
+    <div v-if="showNewLeaveModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">新增请假</h3>
+          <button class="modal-close" @click="showNewLeaveModal = false">&times;</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">选择学生</label>
+          <select v-model="newLeave.student_id" class="form-select">
+            <option value="">请选择学生</option>
+            <option v-for="student in students" :key="student.id" :value="student.id">{{ student.name }} - {{ student.route_name }}</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">请假日期</label>
+          <input type="date" v-model="newLeave.leave_date" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">请假原因</label>
+          <input type="text" v-model="newLeave.reason" class="form-input" placeholder="例如：身体不适、家中有事等">
+        </div>
+        
+        <div class="flex mt-20" style="gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-default" @click="showNewLeaveModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitNewLeave">提交请假</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 司机确认弹窗 -->
+    <div v-if="showDriverConfirmModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">司机确认</h3>
+          <button class="modal-close" @click="showDriverConfirmModal = false">&times;</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">司机姓名</label>
+          <input type="text" v-model="driverConfirm.driver_name" class="form-input" placeholder="请输入司机姓名">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea v-model="driverConfirm.notes" class="form-input" rows="3" placeholder="可选备注信息"></textarea>
+        </div>
+        
+        <div class="flex mt-20" style="gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-default" @click="showDriverConfirmModal = false">取消</button>
+          <button class="btn btn-success" @click="submitDriverConfirm">确认</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 线路详情弹窗 -->
+    <div v-if="showRouteDetailModal" class="modal">
+      <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+          <h3 class="modal-title">线路详情</h3>
+          <button class="modal-close" @click="showRouteDetailModal = false">&times;</button>
+        </div>
+        
+        <div v-if="routeDetailData">
+          <h3>{{ routeDetailData.name }}</h3>
+          <p class="text-muted mb-20">{{ routeDetailData.description }}</p>
+          
+          <div class="comparison">
+            <div class="comparison-col">
+              <h4>🚌 站点顺序</h4>
+              <div v-for="station in routeDetailData.stations" :key="station.station_order" class="student-card">
+                <span>{{ station.station_order }}. {{ station.name }}</span>
+                <span class="text-muted">{{ station.calculated_arrival || station.estimated_arrival_time }}</span>
+              </div>
+            </div>
+            
+            <div class="comparison-col">
+              <h4>👨‍🎓 学生名单</h4>
+              <div v-for="student in routeDetailStudents" :key="student.id" class="student-card">
+                <div>
+                  <div style="font-weight: 600;">{{ student.name }}</div>
+                  <div class="text-small text-muted">{{ student.class }} | {{ student.station_name }}</div>
+                </div>
+                <span v-if="isStudentOnLeave(student.id)" class="badge badge-danger">请假</span>
+                <span v-else-if="isStudentBoarded(student.id)" class="badge badge-success">已上车</span>
+                <span v-else class="badge badge-info">待乘车</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex mt-20" style="gap: 10px; justify-content: flex-end;">
+          <button class="btn btn-default" @click="showRouteDetailModal = false">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+    
+    createApp({
+      setup() {
+        const today = new Date().toISOString().split('T')[0];
+        const activeTab = ref('dashboard');
+        const message = ref('');
+        const messageType = ref('success');
+        
+        const routes = ref([]);
+        const students = ref([]);
+        const stations = ref([]);
+        const reroutes = ref([]);
+        const leaves = ref([]);
+        const notifications = ref([]);
+        const dailyReport = ref({ report: [] });
+        const pendingNotifications = ref({ pending_parents: [] });
+        
+        const selectedRouteId = ref(null);
+        const selectedRoute = ref(null);
+        const routeStudents = ref([]);
+        
+        const studentFilterRoute = ref('');
+        const studentSearch = ref('');
+        
+        const showNewRerouteModal = ref(false);
+        const showCompareModal = ref(false);
+        const showNewLeaveModal = ref(false);
+        const showDriverConfirmModal = ref(false);
+        const showRouteDetailModal = ref(false);
+        
+        const newReroute = ref({
+          route_id: '',
+          scheduled_date: today,
+          reason: '',
+          selectedStations: []
+        });
+        const currentRouteDetail = ref(null);
+        
+        const newLeave = ref({
+          student_id: '',
+          leave_date: today,
+          reason: ''
+        });
+        
+        const driverConfirm = ref({
+          route_id: '',
+          driver_name: '',
+          notes: ''
+        });
+        
+        const compareReroute = ref(null);
+        const routeDetailData = ref(null);
+        const routeDetailStudents = ref([]);
+        
+        const apiBase = '/api';
+        
+        const totalBoarding = computed(() => {
+          return (dailyReport.value.report || []).reduce((sum, r) => sum + (r.boarding_count || 0), 0);
+        });
+        
+        const totalLeaves = computed(() => {
+          return (dailyReport.value.report || []).reduce((sum, r) => sum + (r.leave_count || 0), 0);
+        });
+        
+        const pendingConfirmations = computed(() => {
+          return (dailyReport.value.report || []).filter(r => !r.driver_confirmed && r.bus_status === 'not_departed').length;
+        });
+        
+        const allStations = computed(() => stations.value);
+        
+        const filteredStudents = computed(() => {
+          let result = students.value;
+          if (studentFilterRoute.value) {
+            result = result.filter(s => s.route_id === parseInt(studentFilterRoute.value));
+          }
+          if (studentSearch.value) {
+            const search = studentSearch.value.toLowerCase();
+            result = result.filter(s => 
+              s.name.toLowerCase().includes(search) || 
+              (s.student_no && s.student_no.toLowerCase().includes(search))
+            );
+          }
+          return result;
+        });
+        
+        function showMessage(msg, type = 'success') {
+          message.value = msg;
+          messageType.value = type;
+          setTimeout(() => message.value = '', 3000);
+        }
+        
+        async function fetchData() {
+          try {
+            const [rRes, sRes, stRes, rerRes, lRes, nRes, dRes, pRes] = await Promise.all([
+              fetch(`${apiBase}/routes`).then(r => r.json()),
+              fetch(`${apiBase}/students`).then(r => r.json()),
+              fetch(`${apiBase}/stations`).then(r => r.json()),
+              fetch(`${apiBase}/reroutes`).then(r => r.json()),
+              fetch(`${apiBase}/leaves?date=${today}`).then(r => r.json()),
+              fetch(`${apiBase}/notifications`).then(r => r.json()),
+              fetch(`${apiBase}/daily-report?date=${today}`).then(r => r.json()),
+              fetch(`${apiBase}/pending-notifications?date=${today}`).then(r => r.json())
+            ]);
+            
+            routes.value = rRes;
+            students.value = sRes;
+            stations.value = stRes;
+            reroutes.value = rerRes;
+            leaves.value = lRes;
+            notifications.value = nRes;
+            dailyReport.value = dRes;
+            pendingNotifications.value = pRes;
+            
+            if (rRes.length > 0 && !selectedRouteId.value) {
+              selectRoute(rRes[0].id);
+            }
+          } catch (e) {
+            console.error('加载数据失败', e);
+          }
+        }
+        
+        async function selectRoute(routeId) {
+          selectedRouteId.value = routeId;
+          try {
+            const route = await fetch(`${apiBase}/routes/${routeId}`).then(r => r.json());
+            selectedRoute.value = route;
+            
+            const studentsList = await fetch(`${apiBase}/students?route_id=${routeId}`).then(r => r.json());
+            routeStudents.value = studentsList;
+          } catch (e) {
+            console.error('加载线路详情失败', e);
+          }
+        }
+        
+        function openNewRerouteModal() {
+          newReroute.value = {
+            route_id: '',
+            scheduled_date: today,
+            reason: '',
+            selectedStations: []
+          };
+          currentRouteDetail.value = null;
+          showNewRerouteModal.value = true;
+        }
+        
+        async function onRouteChange() {
+          if (newReroute.value.route_id) {
+            try {
+              const route = await fetch(`${apiBase}/routes/${newReroute.value.route_id}`).then(r => r.json());
+              currentRouteDetail.value = route;
+              newReroute.value.selectedStations = route.stations.map(s => s.id);
+            } catch (e) {
+              console.error('加载线路失败', e);
+            }
+          }
+        }
+        
+        function removeStationFromSelection(index) {
+          newReroute.value.selectedStations.splice(index, 1);
+        }
+        
+        function getStationName(stationId) {
+          const station = stations.value.find(s => s.id === stationId);
+          return station ? station.name : '未知站点';
+        }
+        
+        function getRouteName(routeId) {
+          const route = routes.value.find(r => r.id === routeId);
+          return route ? route.name : '未知线路';
+        }
+        
+        function getStudentName(studentId) {
+          const student = students.value.find(s => s.id === studentId);
+          return student ? student.name : '未知学生';
+        }
+        
+        async function submitNewReroute() {
+          if (!newReroute.value.route_id || !newReroute.value.reason || newReroute.value.selectedStations.length === 0) {
+            showMessage('请填写完整的改线信息', 'error');
+            return;
+          }
+          
+          const newStations = newReroute.value.selectedStations.map((stationId, index) => ({
+            station_id: stationId,
+            station_order: index + 1,
+            estimated_duration: 5
+          }));
+          
+          try {
+            const res = await fetch(`${apiBase}/reroutes`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                route_id: newReroute.value.route_id,
+                reason: newReroute.value.reason,
+                scheduled_date: newReroute.value.scheduled_date,
+                new_stations: newStations,
+                created_by: '张调度'
+              })
+            });
+            
+            if (res.ok) {
+              showMessage('改线申请已提交');
+              showNewRerouteModal.value = false;
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '提交失败', 'error');
+            }
+          } catch (e) {
+            showMessage('提交失败', 'error');
+          }
+        }
+        
+        async function showRerouteCompare(rerouteId) {
+          try {
+            const reroute = await fetch(`${apiBase}/reroutes/${rerouteId}`).then(r => r.json());
+            compareReroute.value = reroute;
+            showCompareModal.value = true;
+          } catch (e) {
+            console.error('加载改线详情失败', e);
+          }
+        }
+        
+        function isInNewRoute(stationId, newRoute) {
+          return newRoute.some(s => s.station_id === stationId);
+        }
+        
+        function isInOriginalRoute(stationId, originalRoute) {
+          return originalRoute.some(s => s.id === stationId || s.station_id === stationId);
+        }
+        
+        function openNewLeaveModal() {
+          newLeave.value = {
+            student_id: '',
+            leave_date: today,
+            reason: ''
+          };
+          showNewLeaveModal.value = true;
+        }
+        
+        async function submitNewLeave() {
+          if (!newLeave.value.student_id || !newLeave.value.leave_date || !newLeave.value.reason) {
+            showMessage('请填写完整的请假信息', 'error');
+            return;
+          }
+          
+          try {
+            const res = await fetch(`${apiBase}/leaves`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                student_id: newLeave.value.student_id,
+                leave_date: newLeave.value.leave_date,
+                reason: newLeave.value.reason,
+                created_by: '张调度'
+              })
+            });
+            
+            if (res.ok) {
+              showMessage('请假已提交');
+              showNewLeaveModal.value = false;
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '提交失败', 'error');
+            }
+          } catch (e) {
+            showMessage('提交失败', 'error');
+          }
+        }
+        
+        function openDriverConfirmModal(route) {
+          driverConfirm.value = {
+            route_id: route.route_id,
+            driver_name: '',
+            notes: ''
+          };
+          showDriverConfirmModal.value = true;
+        }
+        
+        async function submitDriverConfirm() {
+          if (!driverConfirm.value.driver_name) {
+            showMessage('请输入司机姓名', 'error');
+            return;
+          }
+          
+          try {
+            const res = await fetch(`${apiBase}/driver/confirm`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                route_id: driverConfirm.value.route_id,
+                driver_name: driverConfirm.value.driver_name,
+                notes: driverConfirm.value.notes
+              })
+            });
+            
+            if (res.ok) {
+              showMessage('司机确认已提交');
+              showDriverConfirmModal.value = false;
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '提交失败', 'error');
+            }
+          } catch (e) {
+            showMessage('提交失败', 'error');
+          }
+        }
+        
+        async function showRouteDetail(routeId) {
+          try {
+            const route = await fetch(`${apiBase}/routes/${routeId}`).then(r => r.json());
+            routeDetailData.value = route;
+            const studentsList = await fetch(`${apiBase}/students?route_id=${routeId}`).then(r => r.json());
+            routeDetailStudents.value = studentsList;
+            showRouteDetailModal.value = true;
+          } catch (e) {
+            console.error('加载线路详情失败', e);
+          }
+        }
+        
+        async function approveReroute(rerouteId) {
+          try {
+            const res = await fetch(`${apiBase}/reroutes/${rerouteId}/approve`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ approved_by: '张调度' })
+            });
+            
+            if (res.ok) {
+              showMessage('审批通过');
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '审批失败', 'error');
+            }
+          } catch (e) {
+            showMessage('审批失败', 'error');
+          }
+        }
+        
+        async function departRoute(routeId) {
+          try {
+            const res = await fetch(`${apiBase}/ride/depart`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ route_id: routeId })
+            });
+            
+            if (res.ok) {
+              showMessage('发车成功');
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '发车失败', 'error');
+            }
+          } catch (e) {
+            showMessage('发车失败', 'error');
+          }
+        }
+        
+        async function boardStudent(student) {
+          try {
+            const res = await fetch(`${apiBase}/ride/boarding`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                student_id: student.id,
+                route_id: student.route_id
+              })
+            });
+            
+            if (res.ok) {
+              showMessage(`${student.name} 已上车`);
+              fetchData();
+            } else {
+              const data = await res.json();
+              showMessage(data.error || '操作失败', 'error');
+            }
+          } catch (e) {
+            showMessage('操作失败', 'error');
+          }
+        }
+        
+        function isStudentOnLeave(studentId) {
+          return leaves.value.some(l => l.student_id === studentId);
+        }
+        
+        function isStudentBoarded(studentId) {
+          for (const report of dailyReport.value.report) {
+            if (report.boardings && report.boardings.some(b => b.student_id === studentId)) {
+              return true;
+            }
+          }
+          return false;
+        }
+        
+        function formatTime(timeStr) {
+          if (!timeStr) return '-';
+          const date = new Date(timeStr);
+          return date.toLocaleString('zh-CN');
+        }
+        
+        function getBusStatusText(status) {
+          const map = {
+            'not_departed': '未发车',
+            'in_progress': '运行中',
+            'completed': '已完成'
+          };
+          return map[status] || status;
+        }
+        
+        function getStatusBadge(status) {
+          const map = {
+            'not_departed': 'badge-warning',
+            'in_progress': 'badge-info',
+            'completed': 'badge-success'
+          };
+          return map[status] || 'badge-info';
+        }
+        
+        onMounted(() => {
+          fetchData();
+        });
+        
+        return {
+          today,
+          activeTab,
+          message,
+          messageType,
+          routes,
+          students,
+          stations,
+          reroutes,
+          leaves,
+          notifications,
+          dailyReport,
+          pendingNotifications,
+          selectedRouteId,
+          selectedRoute,
+          routeStudents,
+          studentFilterRoute,
+          studentSearch,
+          showNewRerouteModal,
+          showCompareModal,
+          showNewLeaveModal,
+          showDriverConfirmModal,
+          showRouteDetailModal,
+          newReroute,
+          currentRouteDetail,
+          newLeave,
+          driverConfirm,
+          compareReroute,
+          routeDetailData,
+          routeDetailStudents,
+          allStations,
+          filteredStudents,
+          totalBoarding,
+          totalLeaves,
+          pendingConfirmations,
+          fetchData,
+          selectRoute,
+          openNewRerouteModal,
+          onRouteChange,
+          removeStationFromSelection,
+          getStationName,
+          getRouteName,
+          getStudentName,
+          submitNewReroute,
+          showRerouteCompare,
+          isInNewRoute,
+          isInOriginalRoute,
+          openNewLeaveModal,
+          submitNewLeave,
+          openDriverConfirmModal,
+          submitDriverConfirm,
+          showRouteDetail,
+          approveReroute,
+          departRoute,
+          boardStudent,
+          isStudentOnLeave,
+          isStudentBoarded,
+          formatTime,
+          getBusStatusText,
+          getStatusBadge
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
