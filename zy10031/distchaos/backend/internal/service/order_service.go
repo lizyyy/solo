@@ -264,6 +264,19 @@ func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, 
 		return errors.New("connection pool exhausted: no available connections")
 	}
 
+	if s.chaosState.IsMessageBacklogActive() {
+		s.recordChaosEvent(ctx, traceID, "message_backlog_injection", "消息队列积压，处理延迟增加")
+		time.Sleep(3 * time.Second)
+	}
+
+	if s.chaosState.IsCacheDirty() {
+		s.recordChaosEvent(ctx, traceID, "cache_dirty_injection", "缓存脏数据，库存/价格信息不一致")
+	}
+
+	if s.chaosState.IsConfigDrifted() {
+		s.recordChaosEvent(ctx, traceID, "config_drift_injection", "配置漂移，参数配置不一致")
+	}
+
 	if s.chaosState.IsDBLockWaiting() {
 		s.recordChaosEvent(ctx, traceID, "db_lock_injection", "数据库锁等待注入中")
 		time.Sleep(5 * time.Second)
@@ -378,10 +391,13 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		Status:        event.EventStatusPending,
 		Service:       "order-service",
 		Payload: map[string]interface{}{
-			"order_no": orderNo,
-			"amount":   order.Amount,
-			"step":     "create_order",
-			"phase":    "before_create",
+			"order_no":   orderNo,
+			"user_id":    order.UserID,
+			"product_id": order.ProductID,
+			"quantity":   order.Quantity,
+			"amount":     order.Amount,
+			"step":       "create_order",
+			"phase":      "before_create",
 		},
 	}
 	s.eventManager.Record(ctx, step2)
@@ -1006,16 +1022,108 @@ func (s *OrderService) ReplayEvents(ctx context.Context, traceID string) error {
 		Status:        event.EventStatusSuccess,
 		Service:       "replay-service",
 		Payload: map[string]interface{}{
-			"original_trace_id": traceID,
-			"total_replayed":    len(events),
+			"original_trace_id":  traceID,
+			"total_replayed":     len(events),
 			"replay_duration_ms": time.Since(replayStartTime).Milliseconds(),
-			"status":            "completed",
-			"message":           "事件回放完成，系统状态已按事件序列恢复",
+			"status":             "completed",
+			"message":            "事件回放完成，系统状态已按事件序列恢复",
 		},
 	}
 	s.eventManager.Record(ctx, completeEvt)
 
 	return nil
+}
+
+func getInt64FromPayload(payload map[string]interface{}, key string) (int64, bool) {
+	if payload == nil {
+		return 0, false
+	}
+
+	val, ok := payload[key]
+	if !ok || val == nil {
+		return 0, false
+	}
+
+	switch v := val.(type) {
+	case float64:
+		return int64(v), true
+	case int64:
+		return v, true
+	case int:
+		return int64(v), true
+	case uint:
+		return int64(v), true
+	case uint64:
+		return int64(v), true
+	default:
+		return 0, false
+	}
+}
+
+func getIntFromPayload(payload map[string]interface{}, key string) (int, bool) {
+	if payload == nil {
+		return 0, false
+	}
+
+	val, ok := payload[key]
+	if !ok || val == nil {
+		return 0, false
+	}
+
+	switch v := val.(type) {
+	case float64:
+		return int(v), true
+	case int64:
+		return int(v), true
+	case int:
+		return v, true
+	case uint:
+		return int(v), true
+	case uint64:
+		return int(v), true
+	default:
+		return 0, false
+	}
+}
+
+func getFloat64FromPayload(payload map[string]interface{}, key string) (float64, bool) {
+	if payload == nil {
+		return 0, false
+	}
+
+	val, ok := payload[key]
+	if !ok || val == nil {
+		return 0, false
+	}
+
+	switch v := val.(type) {
+	case float64:
+		return v, true
+	case int64:
+		return float64(v), true
+	case int:
+		return float64(v), true
+	default:
+		return 0, false
+	}
+}
+
+func getStringFromPayload(payload map[string]interface{}, key string) (string, bool) {
+	if payload == nil {
+		return "", false
+	}
+
+	val, ok := payload[key]
+	if !ok || val == nil {
+		return "", false
+	}
+
+	switch v := val.(type) {
+	case string:
+		return v, true
+	default:
+		return fmt.Sprintf("%v", v), true
+	}
 }
 
 func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, replayTraceID string) error {
@@ -1027,10 +1135,10 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 	switch evt.Type {
 	case event.EventTypeInventoryReserved:
 		if evt.Status == event.EventStatusSuccess && payload["status"] == "inventory_deducted" {
-			productID, _ := payload["product_id"].(float64)
-			quantity, _ := payload["quantity"].(float64)
-			if productID > 0 && quantity > 0 {
-				err := s.inventoryRepo.Reserve(ctx, int64(productID), int(quantity))
+			productID, ok1 := getInt64FromPayload(payload, "product_id")
+			quantity, ok2 := getIntFromPayload(payload, "quantity")
+			if ok1 && ok2 && productID > 0 && quantity > 0 {
+				err := s.inventoryRepo.Reserve(ctx, productID, quantity)
 				if err != nil {
 					return fmt.Errorf("replay reserve inventory failed: %w", err)
 				}
@@ -1044,10 +1152,10 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 
 	case event.EventTypeInventoryReleased:
 		if evt.Status == event.EventStatusSuccess {
-			productID, _ := payload["product_id"].(float64)
-			quantity, _ := payload["quantity"].(float64)
-			if productID > 0 && quantity > 0 {
-				err := s.inventoryRepo.Release(ctx, int64(productID), int(quantity))
+			productID, ok1 := getInt64FromPayload(payload, "product_id")
+			quantity, ok2 := getIntFromPayload(payload, "quantity")
+			if ok1 && ok2 && productID > 0 && quantity > 0 {
+				err := s.inventoryRepo.Release(ctx, productID, quantity)
 				if err != nil {
 					return fmt.Errorf("replay release inventory failed: %w", err)
 				}
@@ -1061,20 +1169,20 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 
 	case event.EventTypeOrderCreated:
 		if evt.Status == event.EventStatusSuccess {
-			orderNo, _ := payload["order_no"].(string)
-			userID, _ := payload["user_id"].(float64)
-			productID, _ := payload["product_id"].(float64)
-			quantity, _ := payload["quantity"].(float64)
-			amount, _ := payload["amount"].(float64)
+			orderNo, ok1 := getStringFromPayload(payload, "order_no")
+			userID, ok2 := getInt64FromPayload(payload, "user_id")
+			productID, ok3 := getInt64FromPayload(payload, "product_id")
+			quantity, ok4 := getIntFromPayload(payload, "quantity")
+			amount, ok5 := getFloat64FromPayload(payload, "amount")
 
-			if orderNo != "" {
+			if ok1 && orderNo != "" {
 				existing, _ := s.orderRepo.GetByOrderNo(ctx, orderNo)
 				if existing == nil {
 					order := &domain.Order{
 						OrderNo:   orderNo,
-						UserID:    int64(userID),
-						ProductID: int64(productID),
-						Quantity:  int(quantity),
+						UserID:    userID,
+						ProductID: productID,
+						Quantity:  quantity,
 						Amount:    amount,
 						Status:    domain.OrderStatusPending,
 					}
@@ -1083,9 +1191,17 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 						return fmt.Errorf("replay create order failed: %w", err)
 					}
 					s.recordReplayEvent(ctx, replayTraceID, "order_created_replayed", map[string]interface{}{
-						"order_no": orderNo,
-						"order_id": order.ID,
-						"action":   "replay_create_order",
+						"order_no":       orderNo,
+						"order_id":       order.ID,
+						"user_id":        order.UserID,
+						"product_id":     order.ProductID,
+						"quantity":       order.Quantity,
+						"amount":         order.Amount,
+						"has_user_id":    ok2,
+						"has_product_id": ok3,
+						"has_quantity":   ok4,
+						"has_amount":     ok5,
+						"action":         "replay_create_order",
 					})
 				}
 			}
@@ -1093,13 +1209,13 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 
 	case event.EventTypePaymentSucceeded:
 		if evt.Status == event.EventStatusSuccess {
-			orderID, _ := payload["order_id"].(float64)
-			amount, _ := payload["amount"].(float64)
-			if orderID > 0 {
-				existing, _ := s.paymentRepo.GetByOrderID(ctx, int64(orderID))
+			orderID, ok1 := getInt64FromPayload(payload, "order_id")
+			amount, ok2 := getFloat64FromPayload(payload, "amount")
+			if ok1 && orderID > 0 {
+				existing, _ := s.paymentRepo.GetByOrderID(ctx, orderID)
 				if existing == nil {
 					payment := &domain.Payment{
-						OrderID:       int64(orderID),
+						OrderID:       orderID,
 						Amount:        amount,
 						Status:        domain.PaymentStatusSuccess,
 						TransactionNo: "replay-" + uuid.New().String(),
@@ -1109,7 +1225,7 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 						return fmt.Errorf("replay payment failed: %w", err)
 					}
 
-					order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+					order, _ := s.orderRepo.GetByID(ctx, orderID)
 					if order != nil {
 						order.PaymentID = payment.ID
 						order.Status = domain.OrderStatusPaid
@@ -1119,6 +1235,8 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 					s.recordReplayEvent(ctx, replayTraceID, "payment_replayed", map[string]interface{}{
 						"order_id":   orderID,
 						"payment_id": payment.ID,
+						"amount":     amount,
+						"has_amount": ok2,
 						"action":     "replay_payment",
 					})
 				}
@@ -1127,19 +1245,21 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 
 	case event.EventTypeOrderFailed:
 		if evt.Status == event.EventStatusFailed {
-			orderID, _ := payload["order_id"].(float64)
-			if orderID > 0 {
-				order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+			orderID, ok := getInt64FromPayload(payload, "order_id")
+			if ok && orderID > 0 {
+				order, _ := s.orderRepo.GetByID(ctx, orderID)
 				if order != nil {
 					order.Status = domain.OrderStatusFailed
-					err, _ := payload["error"].(string)
-					if err == "" {
-						err = "replay_failed"
+					errMsg, hasErr := getStringFromPayload(payload, "error")
+					if hasErr && errMsg != "" {
+						order.LastError = errMsg
+					} else {
+						order.LastError = "replay_failed"
 					}
-					order.LastError = err
 					s.orderRepo.Update(ctx, order)
 					s.recordReplayEvent(ctx, replayTraceID, "order_failed_replayed", map[string]interface{}{
 						"order_id": orderID,
+						"error":    order.LastError,
 						"action":   "replay_failed_order",
 					})
 				}
@@ -1147,9 +1267,9 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 		}
 
 	case event.EventTypeCompensationStart:
-		orderID, _ := payload["order_id"].(float64)
-		if orderID > 0 {
-			order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+		orderID, ok := getInt64FromPayload(payload, "order_id")
+		if ok && orderID > 0 {
+			order, _ := s.orderRepo.GetByID(ctx, orderID)
 			if order != nil {
 				order.Status = domain.OrderStatusCompensating
 				s.orderRepo.Update(ctx, order)
@@ -1157,9 +1277,9 @@ func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, r
 		}
 
 	case event.EventTypeCompensationSuccess:
-		orderID, _ := payload["order_id"].(float64)
-		if orderID > 0 {
-			order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+		orderID, ok := getInt64FromPayload(payload, "order_id")
+		if ok && orderID > 0 {
+			order, _ := s.orderRepo.GetByID(ctx, orderID)
 			if order != nil {
 				order.Status = domain.OrderStatusCancelled
 				s.orderRepo.Update(ctx, order)
@@ -1215,7 +1335,7 @@ func (s *OrderService) GetFullStatus() map[string]interface{} {
 			"drifted_count":  len(s.chaosState.DriftedConfigs),
 		},
 		"message_backlog": map[string]interface{}{
-			"active":   s.chaosState.MessageBacklogActive,
+			"active":    s.chaosState.MessageBacklogActive,
 			"queue_len": len(s.chaosState.BacklogQueue),
 		},
 	}
