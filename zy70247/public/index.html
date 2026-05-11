@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中学实验器材预约台</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .header-actions {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header-actions button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #45a049;
+    }
+
+    .btn-secondary {
+      background: #2196F3;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #1976D2;
+    }
+
+    .btn-danger {
+      background: #f44336;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #d32f2f;
+    }
+
+    .btn-warning {
+      background: #ff9800;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #f57c00;
+    }
+
+    .stats-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      background: #f5f5f5;
+      border: none;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      background: white;
+      color: #4CAF50;
+      border-bottom: 3px solid #4CAF50;
+    }
+
+    .tab:hover:not(.active) {
+      background: #e0e0e0;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    th {
+      background: #4CAF50;
+      color: white;
+      font-weight: 500;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .badge-confirmed {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .badge-completed {
+      background: #cce5ff;
+      color: #004085;
+    }
+
+    .badge-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .badge-normal {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-consumable {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .action-btns button {
+      padding: 6px 12px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .form-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      border-radius: 4px;
+      color: white;
+      font-size: 14px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast-success {
+      background: #4CAF50;
+    }
+
+    .toast-error {
+      background: #f44336;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .deduction-list {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 4px;
+    }
+
+    .deduction-item {
+      padding: 5px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .deduction-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>中学实验器材预约台</h1>
+
+    <div class="header-actions">
+      <button class="btn-primary" onclick="loadSampleData()">加载示例数据</button>
+      <button class="btn-secondary" onclick="refreshAll()">刷新数据</button>
+      <button class="btn-warning" onclick="exportEquipment()">导出器材档案</button>
+      <button class="btn-warning" onclick="exportReservations()">导出预约记录</button>
+    </div>
+
+    <div class="stats-panel" id="statsPanel">
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('equipment')">器材档案</button>
+      <button class="tab" onclick="switchTab('reservations')">预约管理</button>
+    </div>
+
+    <div id="equipmentTab" class="tab-content active">
+      <div style="margin-bottom: 20px;">
+        <button class="btn-primary" onclick="openEquipmentModal()">新增器材</button>
+      </div>
+      <table id="equipmentTable">
+        <thead>
+          <tr>
+            <th>器材名称</th>
+            <th>学科</th>
+            <th>类型</th>
+            <th>易耗品</th>
+            <th>库存数量</th>
+            <th>单位</th>
+            <th>存放位置</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="reservationsTab" class="tab-content">
+      <div style="margin-bottom: 20px;">
+        <button class="btn-primary" onclick="openReservationModal()">新增预约</button>
+      </div>
+      <table id="reservationsTable">
+        <thead>
+          <tr>
+            <th>班级</th>
+            <th>器材</th>
+            <th>数量</th>
+            <th>预约日期</th>
+            <th>用途</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div id="equipmentModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="equipmentModalTitle">新增器材</h2>
+          <button class="close-btn" onclick="closeEquipmentModal()">&times;</button>
+        </div>
+        <form id="equipmentForm">
+          <input type="hidden" id="equipmentId">
+          <div class="form-group">
+            <label>器材名称</label>
+            <input type="text" id="equipmentName" required>
+          </div>
+          <div class="form-group">
+            <label>学科</label>
+            <select id="equipmentCategory" required>
+              <option value="物理">物理</option>
+              <option value="化学">化学</option>
+              <option value="生物">生物</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>类型</label>
+            <select id="equipmentType" required>
+              <option value="普通">普通</option>
+              <option value="危险">危险</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>是否易耗品</label>
+            <select id="equipmentIsConsumable" required>
+              <option value="false">否</option>
+              <option value="true">是</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>库存数量</label>
+            <input type="number" id="equipmentQuantity" min="0" required>
+          </div>
+          <div class="form-group">
+            <label>单位</label>
+            <input type="text" id="equipmentUnit" required>
+          </div>
+          <div class="form-group">
+            <label>存放位置</label>
+            <input type="text" id="equipmentLocation">
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea id="equipmentDescription"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeEquipmentModal()">取消</button>
+            <button type="submit" class="btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="reservationModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="reservationModalTitle">新增预约</h2>
+          <button class="close-btn" onclick="closeReservationModal()">&times;</button>
+        </div>
+        <form id="reservationForm">
+          <input type="hidden" id="reservationId">
+          <div class="form-group">
+            <label>班级</label>
+            <select id="reservationClass" required></select>
+          </div>
+          <div class="form-group">
+            <label>器材</label>
+            <select id="reservationEquipment" required></select>
+          </div>
+          <div class="form-group">
+            <label>数量</label>
+            <input type="number" id="reservationQuantity" min="1" required>
+          </div>
+          <div class="form-group">
+            <label>预约日期</label>
+            <input type="date" id="reservationDate" required>
+          </div>
+          <div class="form-group">
+            <label>用途</label>
+            <textarea id="reservationPurpose"></textarea>
+          </div>
+          <div class="alert alert-info" id="reservationInfo" style="display:none;"></div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeReservationModal()">取消</button>
+            <button type="submit" class="btn-primary">保存</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="approvalModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="approvalModalTitle">审批</h2>
+          <button class="close-btn" onclick="closeApprovalModal()">&times;</button>
+        </div>
+        <form id="approvalForm">
+          <input type="hidden" id="approvalReservationId">
+          <input type="hidden" id="approvalAction">
+          <div class="form-group">
+            <label>审批人</label>
+            <input type="text" id="approvalBy" required>
+          </div>
+          <div class="form-group">
+            <label>审批意见</label>
+            <textarea id="approvalComment"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeApprovalModal()">取消</button>
+            <button type="submit" class="btn-primary">确认</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let equipmentData = [];
+    let classData = [];
+    let reservationData = [];
+    let editingEquipmentId = null;
+    let editingReservationId = null;
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    async function fetchData(url, options = {}) {
+      try {
+        const response = await fetch(url, {
+          headers: { 'Content-Type': 'application/json' },
+          ...options
+        });
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+        return data;
+      } catch (error) {
+        showToast(error.message, 'error');
+        throw error;
+      }
+    }
+
+    async function loadStats() {
+      const stats = await fetchData('/api/stats');
+      const panel = document.getElementById('statsPanel');
+      panel.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">总预约数</div>
+          <div class="stat-value">${stats.reservations.total_reservations || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">待审批</div>
+          <div class="stat-value">${stats.reservations.pending_count || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已确认</div>
+          <div class="stat-value">${stats.reservations.confirmed_count || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已拒绝</div>
+          <div class="stat-value">${stats.reservations.rejected_count || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已完成</div>
+          <div class="stat-value">${stats.reservations.completed_count || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">危险器材</div>
+          <div class="stat-value">${stats.equipment.dangerous_count || 0}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">易耗品种类</div>
+          <div class="stat-value">${stats.equipment.consumable_count || 0}</div>
+        </div>
+      `;
+
+      if (stats.deductions && stats.deductions.length > 0) {
+        const deductionHtml = stats.deductions.map(d => `
+          <div class="stat-card">
+            <div class="stat-label">${d.name} 已扣减</div>
+            <div class="stat-value">${d.total_deducted}</div>
+          </div>
+        `).join('');
+        panel.innerHTML += deductionHtml;
+      }
+    }
+
+    async function loadEquipment() {
+      equipmentData = await fetchData('/api/equipment');
+      const tbody = document.querySelector('#equipmentTable tbody');
+      tbody.innerHTML = equipmentData.map(eq => `
+        <tr>
+          <td>${eq.name}</td>
+          <td>${eq.category}</td>
+          <td><span class="badge ${eq.type === '危险' ? 'badge-danger' : 'badge-normal'}">${eq.type}</span></td>
+          <td>${eq.is_consumable ? '<span class="badge badge-consumable">是</span>' : '否'}</td>
+          <td>${eq.quantity}</td>
+          <td>${eq.unit}</td>
+          <td>${eq.location || '-'}</td>
+          <td class="action-btns">
+            <button class="btn-secondary" onclick="editEquipment('${eq.id}')">修改</button>
+            <button class="btn-danger" onclick="deleteEquipment('${eq.id}')">删除</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadClasses() {
+      classData = await fetchData('/api/classes');
+    }
+
+    async function loadReservations() {
+      reservationData = await fetchData('/api/reservations');
+      const tbody = document.querySelector('#reservationsTable tbody');
+      tbody.innerHTML = reservationData.map(res => {
+        const statusBadge = {
+          '待审批': 'badge-pending',
+          '已确认': 'badge-confirmed',
+          '已拒绝': 'badge-rejected',
+          '已完成': 'badge-completed'
+        }[res.status] || 'badge-pending';
+
+        let actionBtns = '';
+        if (res.status === '待审批') {
+          actionBtns = `
+            <button class="btn-secondary" onclick="editReservation('${res.id}')">修改</button>
+            <button class="btn-primary" onclick="approveReservation('${res.id}')">确认</button>
+            <button class="btn-danger" onclick="rejectReservation('${res.id}')">拒绝</button>
+          `;
+        } else if (res.status === '已确认') {
+          actionBtns = `
+            <button class="btn-warning" onclick="completeReservation('${res.id}')">完成</button>
+          `;
+        }
+
+        return `
+        <tr>
+          <td>${res.class_name}</td>
+          <td>${res.equipment_name} <span class="badge ${res.type === '危险' ? 'badge-danger' : 'badge-normal'}">${res.type}</span>${res.is_consumable ? ' <span class="badge badge-consumable">易耗品</span>' : ''}</td>
+          <td>${res.quantity} ${res.unit}</td>
+          <td>${res.reservation_date}</td>
+          <td>${res.purpose || '-'}</td>
+          <td><span class="badge ${statusBadge}">${res.status}</span></td>
+          <td class="action-btns">${actionBtns}</td>
+        </tr>
+      `}).join('');
+    }
+
+    async function refreshAll() {
+      await Promise.all([
+        loadStats(),
+        loadEquipment(),
+        loadClasses(),
+        loadReservations()
+      ]);
+      showToast('数据已刷新');
+    }
+
+    async function loadSampleData() {
+      const result = await fetchData('/api/load-sample', { method: 'POST' });
+      await refreshAll();
+      showToast(result.message);
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      
+      if (tab === 'equipment') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('equipmentTab').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('reservationsTab').classList.add('active');
+      }
+    }
+
+    function openEquipmentModal() {
+      editingEquipmentId = null;
+      document.getElementById('equipmentModalTitle').textContent = '新增器材';
+      document.getElementById('equipmentForm').reset();
+      document.getElementById('equipmentModal').classList.add('show');
+    }
+
+    function closeEquipmentModal() {
+      document.getElementById('equipmentModal').classList.remove('show');
+      editingEquipmentId = null;
+    }
+
+    async function editEquipment(id) {
+      const eq = equipmentData.find(e => e.id === id);
+      if (!eq) return;
+
+      editingEquipmentId = id;
+      document.getElementById('equipmentModalTitle').textContent = '修改器材';
+      document.getElementById('equipmentId').value = eq.id;
+      document.getElementById('equipmentName').value = eq.name;
+      document.getElementById('equipmentCategory').value = eq.category;
+      document.getElementById('equipmentType').value = eq.type;
+      document.getElementById('equipmentIsConsumable').value = eq.is_consumable ? 'true' : 'false';
+      document.getElementById('equipmentQuantity').value = eq.quantity;
+      document.getElementById('equipmentUnit').value = eq.unit;
+      document.getElementById('equipmentLocation').value = eq.location || '';
+      document.getElementById('equipmentDescription').value = eq.description || '';
+      document.getElementById('equipmentModal').classList.add('show');
+    }
+
+    async function deleteEquipment(id) {
+      if (!confirm('确定要删除这个器材吗？')) return;
+      await fetchData(`/api/equipment/${id}`, { method: 'DELETE' });
+      await refreshAll();
+      showToast('器材已删除');
+    }
+
+    document.getElementById('equipmentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const equipment = {
+        name: document.getElementById('equipmentName').value,
+        category: document.getElementById('equipmentCategory').value,
+        type: document.getElementById('equipmentType').value,
+        is_consumable: document.getElementById('equipmentIsConsumable').value === 'true',
+        quantity: parseInt(document.getElementById('equipmentQuantity').value),
+        unit: document.getElementById('equipmentUnit').value,
+        location: document.getElementById('equipmentLocation').value,
+        description: document.getElementById('equipmentDescription').value
+      };
+
+      if (editingEquipmentId) {
+        await fetchData(`/api/equipment/${editingEquipmentId}`, {
+          method: 'PUT',
+          body: JSON.stringify(equipment)
+        });
+        showToast('器材已更新');
+      } else {
+        await fetchData('/api/equipment', {
+          method: 'POST',
+          body: JSON.stringify(equipment)
+        });
+        showToast('器材已新增');
+      }
+
+      closeEquipmentModal();
+      await refreshAll();
+    });
+
+    async function populateReservationModal() {
+      const classSelect = document.getElementById('reservationClass');
+      const eqSelect = document.getElementById('reservationEquipment');
+
+      classSelect.innerHTML = classData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      eqSelect.innerHTML = equipmentData.map(e => `<option value="${e.id}">${e.name} (${e.type}${e.is_consumable ? ', 易耗品' : ''})</option>`).join('');
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('reservationDate').value = today;
+
+      updateReservationInfo();
+    }
+
+    function updateReservationInfo() {
+      const eqId = document.getElementById('reservationEquipment').value;
+      const eq = equipmentData.find(e => e.id === eqId);
+      const infoDiv = document.getElementById('reservationInfo');
+      
+      if (eq) {
+        let info = `当前器材：${eq.name}，库存：${eq.quantity} ${eq.unit}`;
+        if (eq.type === '危险') {
+          info += ' | <strong>危险器材，需要审批</strong>';
+        } else {
+          info += ' | 普通器材，自动确认';
+        }
+        if (eq.is_consumable) {
+          info += ' | <strong>易耗品，确认后自动扣减库存</strong>';
+        }
+        infoDiv.innerHTML = info;
+        infoDiv.style.display = 'block';
+      } else {
+        infoDiv.style.display = 'none';
+      }
+    }
+
+    function openReservationModal() {
+      editingReservationId = null;
+      document.getElementById('reservationModalTitle').textContent = '新增预约';
+      document.getElementById('reservationForm').reset();
+      populateReservationModal();
+      document.getElementById('reservationModal').classList.add('show');
+    }
+
+    function closeReservationModal() {
+      document.getElementById('reservationModal').classList.remove('show');
+      editingReservationId = null;
+    }
+
+    async function editReservation(id) {
+      const res = reservationData.find(r => r.id === id);
+      if (!res) return;
+
+      editingReservationId = id;
+      document.getElementById('reservationModalTitle').textContent = '修改预约';
+      await populateReservationModal();
+
+      document.getElementById('reservationId').value = res.id;
+      document.getElementById('reservationClass').value = res.class_id;
+      document.getElementById('reservationEquipment').value = res.equipment_id;
+      document.getElementById('reservationQuantity').value = res.quantity;
+      document.getElementById('reservationDate').value = res.reservation_date;
+      document.getElementById('reservationPurpose').value = res.purpose || '';
+      updateReservationInfo();
+
+      document.getElementById('reservationModal').classList.add('show');
+    }
+
+    document.getElementById('reservationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const reservation = {
+        class_id: document.getElementById('reservationClass').value,
+        equipment_id: document.getElementById('reservationEquipment').value,
+        quantity: parseInt(document.getElementById('reservationQuantity').value),
+        reservation_date: document.getElementById('reservationDate').value,
+        purpose: document.getElementById('reservationPurpose').value
+      };
+
+      if (editingReservationId) {
+        await fetchData(`/api/reservations/${editingReservationId}`, {
+          method: 'PUT',
+          body: JSON.stringify(reservation)
+        });
+        showToast('预约已更新');
+      } else {
+        const result = await fetchData('/api/reservations', {
+          method: 'POST',
+          body: JSON.stringify(reservation)
+        });
+        if (result.status === '待审批') {
+          showToast('预约已提交，等待审批');
+        } else {
+          showToast('预约已确认');
+        }
+      }
+
+      closeReservationModal();
+      await refreshAll();
+    });
+
+    document.getElementById('reservationEquipment').addEventListener('change', updateReservationInfo);
+
+    function openApprovalModal(action, id) {
+      document.getElementById('approvalReservationId').value = id;
+      document.getElementById('approvalAction').value = action;
+      document.getElementById('approvalModalTitle').textContent = action === 'approve' ? '确认预约' : '拒绝预约';
+      document.getElementById('approvalForm').reset();
+      document.getElementById('approvalModal').classList.add('show');
+    }
+
+    function closeApprovalModal() {
+      document.getElementById('approvalModal').classList.remove('show');
+    }
+
+    function approveReservation(id) {
+      openApprovalModal('approve', id);
+    }
+
+    function rejectReservation(id) {
+      openApprovalModal('reject', id);
+    }
+
+    document.getElementById('approvalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('approvalReservationId').value;
+      const action = document.getElementById('approvalAction').value;
+      const data = {
+        approved_by: document.getElementById('approvalBy').value,
+        comment: document.getElementById('approvalComment').value
+      };
+
+      if (action === 'approve') {
+        await fetchData(`/api/reservations/${id}/approve`, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        showToast('预约已确认');
+      } else {
+        await fetchData(`/api/reservations/${id}/reject`, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        showToast('预约已拒绝');
+      }
+
+      closeApprovalModal();
+      await refreshAll();
+    });
+
+    async function completeReservation(id) {
+      if (!confirm('确定要标记为完成吗？')) return;
+      await fetchData(`/api/reservations/${id}/complete`, { method: 'POST' });
+      await refreshAll();
+      showToast('预约已完成');
+    }
+
+    function exportEquipment() {
+      window.location.href = '/api/export/equipment/excel';
+    }
+
+    function exportReservations() {
+      window.location.href = '/api/export/reservations/excel';
+    }
+
+    refreshAll();
+  </script>
+</body>
+</html>
