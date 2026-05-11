@@ -1,0 +1,35 @@
+[
+  {
+    "invoice_number": "INV20260505001",
+    "invoice_date": "2026-05-05",
+    "expense_type": "transportation",
+    "amount": 600,
+    "merchant": "中国高铁",
+    "description": "北京-西安 高铁"
+  },
+  {
+    "invoice_number": "INV20260505002",
+    "invoice_date": "2026-05-04",
+    "expense_type": "accommodation",
+    "amount": 800,
+    "merchant": "西安假日酒店",
+    "description": "住宿 5月4-7日",
+    "days": 4
+  },
+  {
+    "invoice_number": "INV20260506001",
+    "invoice_date": "2026-05-06",
+    "expense_type": "meal",
+    "amount": 85,
+    "merchant": "西安老孙家",
+    "description": "工作餐"
+  },
+  {
+    "invoice_number": "INV20260507001",
+    "invoice_date": "2026-05-07",
+    "expense_type": "transportation",
+    "amount": 580,
+    "merchant": "中国高铁",
+    "description": "西安-北京 高铁"
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "invoice_number": "INV20260520001",
+    "invoice_date": "2026-05-20",
+    "expense_type": "transportation",
+    "amount": 800,
+    "merchant": "中国高铁",
+    "description": "北京-杭州 高铁"
+  },
+  {
+    "invoice_number": "INV20260520002",
+    "invoice_date": "2026-05-20",
+    "expense_type": "accommodation",
+    "amount": 350,
+    "merchant": "杭州如家酒店",
+    "description": "住宿",
+    "days": 1
+  },
+  {
+    "invoice_number": "INV20260520003",
+    "invoice_date": "2026-05-20",
+    "expense_type": "meal",
+    "amount": 120,
+    "merchant": "杭州楼外楼",
+    "description": "午餐"
+  },
+  {
+    "invoice_number": "INV20260520004",
+    "invoice_date": "2026-05-20",
+    "expense_type": "meal",
+    "amount": 90,
+    "merchant": "杭州知味观",
+    "description": "晚餐"
+  },
+  {
+    "invoice_number": "INV20260521001",
+    "invoice_date": "2026-05-21",
+    "expense_type": "transportation",
+    "amount": 750,
+    "merchant": "中国高铁",
+    "description": "杭州-北京 高铁"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "rule_id": "R001",
+    "expense_type": "transportation",
+    "city_level": "tier1",
+    "max_amount": 3000,
+    "description": "一线城市交通费用上限3000元（机票/高铁）"
+  },
+  {
+    "rule_id": "R002",
+    "expense_type": "transportation",
+    "city_level": "tier2",
+    "max_amount": 2000,
+    "description": "二线城市交通费用上限2000元"
+  },
+  {
+    "rule_id": "R003",
+    "expense_type": "transportation",
+    "city_level": "tier3",
+    "max_amount": 1500,
+    "description": "三线城市交通费用上限1500元"
+  },
+  {
+    "rule_id": "R004",
+    "expense_type": "accommodation",
+    "city_level": "tier1",
+    "max_amount": 2000,
+    "max_daily_amount": 500,
+    "description": "一线城市住宿每日标准500元"
+  },
+  {
+    "rule_id": "R005",
+    "expense_type": "accommodation",
+    "city_level": "tier2",
+    "max_amount": 1200,
+    "max_daily_amount": 400,
+    "description": "二线城市住宿每日标准400元"
+  },
+  {
+    "rule_id": "R006",
+    "expense_type": "accommodation",
+    "city_level": "tier3",
+    "max_amount": 900,
+    "max_daily_amount": 300,
+    "description": "三线城市住宿每日标准300元"
+  },
+  {
+    "rule_id": "R007",
+    "expense_type": "meal",
+    "city_level": "default",
+    "max_amount": 500,
+    "max_daily_amount": 100,
+    "description": "餐补每日标准100元，仅允许每日一笔"
+  },
+  {
+    "rule_id": "R008",
+    "expense_type": "other",
+    "city_level": "default",
+    "max_amount": 500,
+    "description": "其他杂项费用上限500元"
+  }
+]

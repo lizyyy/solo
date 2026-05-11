@@ -1,0 +1,43 @@
+[
+  {
+    "invoice_number": "INV20260510001",
+    "invoice_date": "2026-05-10",
+    "expense_type": "transportation",
+    "amount": 1200,
+    "merchant": "中国国际航空",
+    "description": "北京-上海 机票"
+  },
+  {
+    "invoice_number": "INV20260510002",
+    "invoice_date": "2026-05-10",
+    "expense_type": "accommodation",
+    "amount": 1400,
+    "merchant": "上海希尔顿酒店",
+    "description": "住宿 5月10-12日",
+    "days": 3
+  },
+  {
+    "invoice_number": "INV20260511001",
+    "invoice_date": "2026-05-11",
+    "expense_type": "meal",
+    "amount": 80,
+    "merchant": "上海小南国",
+    "description": "客户午餐"
+  },
+  {
+    "invoice_number": "INV20260512001",
+    "invoice_date": "2026-05-12",
+    "expense_type": "transportation",
+    "amount": 1100,
+    "merchant": "东方航空",
+    "description": "上海-北京 机票"
+  },
+  {
+    "invoice_number": "INV20260511002",
+    "invoice_date": "2026-05-11",
+    "expense_type": "other",
+    "amount": 200,
+    "merchant": "滴滴出行",
+    "description": "市内打车费"
+  }
+]

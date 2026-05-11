@@ -1,0 +1,150 @@
+{
+  "itinerary": {
+    "employee_name": "李四",
+    "employee_id": "E002",
+    "department": "市场部",
+    "trip_purpose": "展会参会",
+    "start_date": "2026-05-15",
+    "end_date": "2026-05-17",
+    "departure_city": "北京",
+    "arrival_city": "深圳",
+    "approval_number": "AP20260515001"
+  },
+  "invoices": [
+    {
+      "invoice": {
+        "invoice_number": "INV20260515001",
+        "invoice_date": "2026-05-15",
+        "expense_type": "transportation",
+        "amount": "1500",
+        "merchant": "深圳航空",
+        "description": "北京-深圳 机票",
+        "days": 1
+      },
+      "status": "approved",
+      "final_amount": "1500",
+      "checks": [
+        {
+          "check_name": "票据日期检查",
+          "passed": true,
+          "message": "票据日期 2026-05-15 在行程范围内 (2026-05-15 - 2026-05-18)",
+          "details": null
+        },
+        {
+          "check_name": "重复发票检查",
+          "passed": true,
+          "message": "无重复发票",
+          "details": null
+        },
+        {
+          "check_name": "同一天餐补检查",
+          "passed": true,
+          "message": "无同一天重复餐补",
+          "details": null
+        },
+        {
+          "check_name": "金额标准检查",
+          "passed": true,
+          "message": "金额 1500 符合标准 (上限 1500)",
+          "details": "规则: 一线城市交通费用上限3000元（机票/高铁）"
+        }
+      ],
+      "manual_override": null,
+      "notes": null
+    },
+    {
+      "invoice": {
+        "invoice_number": "INV20260515002",
+        "invoice_date": "2026-05-15",
+        "expense_type": "accommodation",
+        "amount": "1800",
+        "merchant": "深圳万豪酒店",
+        "description": "住宿 5月15-17日",
+        "days": 3
+      },
+      "status": "manual_approved",
+      "final_amount": "1800",
+      "checks": [
+        {
+          "check_name": "票据日期检查",
+          "passed": true,
+          "message": "票据日期 2026-05-15 在行程范围内 (2026-05-15 - 2026-05-18)",
+          "details": null
+        },
+        {
+          "check_name": "重复发票检查",
+          "passed": true,
+          "message": "无重复发票",
+          "details": null
+        },
+        {
+          "check_name": "同一天餐补检查",
+          "passed": true,
+          "message": "无同一天重复餐补",
+          "details": null
+        },
+        {
+          "check_name": "金额标准检查",
+          "passed": false,
+          "message": "金额超标: 1800 > 1500",
+          "details": "规则: 一线城市住宿每日标准500元, 超标 300"
+        }
+      ],
+      "manual_override": {
+        "override_id": "OVR001",
+        "invoice_number": "INV20260515002",
+        "reason": "展会期间酒店紧俏，经部门经理王总特批，同意按实际金额报销住宿费用",
+        "approved_by": "财务经理 陈丽",
+        "approved_date": "2026-05-18T15:30:00",
+        "override_amount": "1800"
+      },
+      "notes": "人工审批: 展会期间酒店紧俏，经部门经理王总特批，同意按实际金额报销住宿费用"
+    },
+    {
+      "invoice": {
+        "invoice_number": "INV20260517001",
+        "invoice_date": "2026-05-17",
+        "expense_type": "transportation",
+        "amount": "1600",
+        "merchant": "中国国际航空",
+        "description": "深圳-北京 机票",
+        "days": 1
+      },
+      "status": "approved",
+      "final_amount": "1600",
+      "checks": [
+        {
+          "check_name": "票据日期检查",
+          "passed": true,
+          "message": "票据日期 2026-05-17 在行程范围内 (2026-05-15 - 2026-05-18)",
+          "details": null
+        },
+        {
+          "check_name": "重复发票检查",
+          "passed": true,
+          "message": "无重复发票",
+          "details": null
+        },
+        {
+          "check_name": "同一天餐补检查",
+          "passed": true,
+          "message": "无同一天重复餐补",
+          "details": null
+        },
+        {
+          "check_name": "金额标准检查",
+          "passed": true,
+          "message": "金额 1600 符合标准 (上限 1600)",
+          "details": "规则: 一线城市交通费用上限3000元（机票/高铁）"
+        }
+      ],
+      "manual_override": null,
+      "notes": null
+    }
+  ],
+  "total_requested_amount": "4900",
+  "total_approved_amount": "4900",
+  "total_rejected_amount": "0",
+  "generated_at": "2026-05-11T19:38:07.797116",
+  "summary": "员工: 李四 | 行程: 北京 -> 深圳 | 日期: 2026-05-15 至 2026-05-17 | 通过: 3 笔, 暂缓: 0 笔 | 申请金额: 4900, 核准金额: 4900"
+}

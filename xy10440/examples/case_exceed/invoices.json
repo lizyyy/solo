@@ -1,0 +1,27 @@
+[
+  {
+    "invoice_number": "INV20260515001",
+    "invoice_date": "2026-05-15",
+    "expense_type": "transportation",
+    "amount": 1500,
+    "merchant": "深圳航空",
+    "description": "北京-深圳 机票"
+  },
+  {
+    "invoice_number": "INV20260515002",
+    "invoice_date": "2026-05-15",
+    "expense_type": "accommodation",
+    "amount": 1800,
+    "merchant": "深圳万豪酒店",
+    "description": "住宿 5月15-17日",
+    "days": 3
+  },
+  {
+    "invoice_number": "INV20260517001",
+    "invoice_date": "2026-05-17",
+    "expense_type": "transportation",
+    "amount": 1600,
+    "merchant": "中国国际航空",
+    "description": "深圳-北京 机票"
+  }
+]
