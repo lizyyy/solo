@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物业装修押金验收台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 头部导航 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">🏠 物业装修押金验收台</h1>
+                <div class="header-actions">
+                    <button id="btn-export" class="btn btn-secondary">导出数据</button>
+                    <button id="btn-reset-demo" class="btn btn-danger">重置演示</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧导航 -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-tab="dashboard">📊 验收总览</button>
+                    <button class="nav-item" data-tab="registration">📝 装修报备</button>
+                    <button class="nav-item" data-tab="deposit">💰 押金管理</button>
+                    <button class="nav-item" data-tab="inspection">🔍 巡检整改</button>
+                    <button class="nav-item" data-tab="refund">✅ 押金退还</button>
+                    <button class="nav-item" data-tab="history">📜 历史记录</button>
+                </nav>
+                
+                <div class="demo-path">
+                    <h3>📋 演示路径</h3>
+                    <button id="btn-normal-demo" class="btn btn-primary btn-block">正常路径演示</button>
+                    <button id="btn-abnormal-demo" class="btn btn-warning btn-block">异常路径演示</button>
+                </div>
+            </aside>
+
+            <!-- 右侧内容 -->
+            <section class="content-area">
+                <!-- 验收总览 -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="page-header">
+                        <h2>验收总览</h2>
+                        <p class="page-subtitle">实时跟踪装修押金验收全流程</p>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-registration">0</div>
+                                <div class="stat-label">装修报备</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-deposit">0</div>
+                                <div class="stat-label">冻结押金</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔍</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-inspection">0</div>
+                                <div class="stat-label">巡检问题</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-refund">0</div>
+                                <div class="stat-label">已退还</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <div class="summary-header">
+                            <h3>📋 待办事项汇总</h3>
+                        </div>
+                        <div id="todo-list" class="todo-list">
+                            <div class="empty-state">暂无待办事项</div>
+                        </div>
+                    </div>
+
+                    <div class="workflow-section">
+                        <h3>🔄 验收流程</h3>
+                        <div class="workflow-diagram">
+                            <div class="workflow-step active">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">装修报备</div>
+                                    <div class="step-desc">业主提交装修申请</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">押金冻结</div>
+                                    <div class="step-desc">缴纳并冻结装修押金</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">巡检整改</div>
+                                    <div class="step-desc">巡查发现问题并整改</div>
+                                </div>
+                            </div>
+                            <div class="workflow-arrow">→</div>
+                            <div class="workflow-step">
+                                <div class="step-number">4</div>
+                                <div class="step-content">
+                                    <div class="step-title">押金退还</div>
+                                    <div class="step-desc">验收通过退还押金</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 装修报备 -->
+                <div id="registration" class="tab-content">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h2>装修报备</h2>
+                            <p class="page-subtitle">管理业主装修申请的报备、审核与跟踪</p>
+                        </div>
+                        <button id="btn-add-registration" class="btn btn-primary">+ 新增报备</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="registration-filter" class="form-control">
+                            <option value="all">全部状态</option>
+                            <option value="pending">待审核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已拒绝</option>
+                            <option value="modified">已修改</option>
+                        </select>
+                    </div>
+
+                    <div id="registration-list" class="card-list">
+                        <div class="empty-state">暂无装修报备记录</div>
+                    </div>
+                </div>
+
+                <!-- 押金管理 -->
+                <div id="deposit" class="tab-content">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h2>押金管理</h2>
+                            <p class="page-subtitle">管理装修押金的冻结、解冻与退还</p>
+                        </div>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-mini">
+                            <span class="stat-mini-label">冻结押金总额</span>
+                            <span class="stat-mini-value" id="stat-frozen-total">¥0</span>
+                        </div>
+                        <div class="stat-mini">
+                            <span class="stat-mini-label">已退还总额</span>
+                            <span class="stat-mini-value" id="stat-refunded-total">¥0</span>
+                        </div>
+                        <div class="stat-mini">
+                            <span class="stat-mini-label">待退还</span>
+                            <span class="stat-mini-value" id="stat-pending-refund">¥0</span>
+                        </div>
+                    </div>
+
+                    <div id="deposit-list" class="card-list">
+                        <div class="empty-state">暂无押金记录</div>
+                    </div>
+                </div>
+
+                <!-- 巡检整改 -->
+                <div id="inspection" class="tab-content">
+                    <div class="page-header">
+                        <div class="page-header-left">
+                            <h2>巡检整改</h2>
+                            <p class="page-subtitle">记录巡检问题、跟踪整改、验收复核</p>
+                        </div>
+                        <button id="btn-add-inspection" class="btn btn-primary">+ 新增巡检</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="inspection-filter" class="form-control">
+                            <option value="all">全部状态</option>
+                            <option value="open">待整改</option>
+                            <option value="in_progress">整改中</option>
+                            <option value="completed">已整改待验</option>
+                            <option value="closed">已关闭</option>
+                        </select>
+                    </div>
+
+                    <div id="inspection-list" class="card-list">
+                        <div class="empty-state">暂无巡检记录</div>
+                    </div>
+                </div>
+
+                <!-- 押金退还 -->
+                <div id="refund" class="tab-content">
+                    <div class="page-header">
+                        <h2>押金退还</h2>
+                        <p class="page-subtitle">核对报备、巡检、整改情况，审批押金退还</p>
+                    </div>
+
+                    <div class="refund-checklist">
+                        <h3>✅ 退还前核对清单</h3>
+                        <div id="checklist-content">
+                            <div class="empty-state">请选择一个报备记录进行核对</div>
+                        </div>
+                    </div>
+
+                    <div id="refund-list" class="card-list">
+                        <div class="empty-state">暂无可退还的押金</div>
+                    </div>
+                </div>
+
+                <!-- 历史记录 -->
+                <div id="history" class="tab-content">
+                    <div class="page-header">
+                        <h2>历史记录</h2>
+                        <p class="page-subtitle">追踪所有操作历史，查看变更前后对比</p>
+                    </div>
+
+                    <div class="filter-bar">
+                        <select id="history-type-filter" class="form-control">
+                            <option value="all">全部类型</option>
+                            <option value="registration">装修报备</option>
+                            <option value="deposit">押金管理</option>
+                            <option value="inspection">巡检整改</option>
+                            <option value="refund">押金退还</option>
+                        </select>
+                        <select id="history-action-filter" class="form-control">
+                            <option value="all">全部动作</option>
+                            <option value="create">新增</option>
+                            <option value="update">修改</option>
+                            <option value="approve">确认</option>
+                            <option value="reject">拒绝</option>
+                            <option value="withdraw">撤回</option>
+                        </select>
+                    </div>
+
+                    <div id="history-list" class="history-list">
+                        <div class="empty-state">暂无历史记录</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 模态框容器 -->
+        <div id="modal-container"></div>
+
+        <!-- Toast 提示 -->
+        <div id="toast-container"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
