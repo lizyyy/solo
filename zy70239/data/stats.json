@@ -1,0 +1,90 @@
+[
+  {
+    "total": 3,
+    "processed": 3,
+    "success": 3,
+    "failed": 0,
+    "risks": {
+      "CRITICAL": 1,
+      "HIGH": 1,
+      "MEDIUM": 1,
+      "LOW": 0
+    },
+    "categoryStats": {
+      "EXPLOSIVES": 1,
+      "FLAMMABLE_LIQUIDS": 1,
+      "TOXIC": 1
+    },
+    "batchId": "BATCH-2024-001",
+    "createdAt": "2026-05-11T12:56:20.759Z",
+    "updatedAt": "2026-05-11T12:56:43.165Z"
+  },
+  {
+    "total": 1,
+    "processed": 1,
+    "success": 0,
+    "failed": 1,
+    "risks": {
+      "CRITICAL": 0,
+      "HIGH": 1,
+      "MEDIUM": 0,
+      "LOW": 0
+    },
+    "categoryStats": {},
+    "batchId": "SCENARIO-MISSING-001",
+    "createdAt": "2026-05-11T12:56:59.481Z",
+    "updatedAt": "2026-05-11T12:56:59.481Z"
+  },
+  {
+    "total": 2,
+    "processed": 2,
+    "success": 2,
+    "failed": 0,
+    "risks": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 2
+    },
+    "categoryStats": {
+      "MISCELLANEOUS": 1
+    },
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "createdAt": "2026-05-11T12:57:09.929Z",
+    "updatedAt": "2026-05-11T12:57:09.929Z"
+  },
+  {
+    "total": 1,
+    "processed": 1,
+    "success": 0,
+    "failed": 1,
+    "risks": {
+      "CRITICAL": 0,
+      "HIGH": 1,
+      "MEDIUM": 0,
+      "LOW": 0
+    },
+    "categoryStats": {},
+    "batchId": "SCENARIO-ILLEGAL-001",
+    "createdAt": "2026-05-11T12:57:15.847Z",
+    "updatedAt": "2026-05-11T12:57:15.847Z"
+  },
+  {
+    "total": 1,
+    "processed": 1,
+    "success": 1,
+    "failed": 0,
+    "risks": {
+      "CRITICAL": 0,
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 1
+    },
+    "categoryStats": {
+      "FLAMMABLE_LIQUIDS": 1
+    },
+    "batchId": "SCENARIO-CORRECTION-001",
+    "createdAt": "2026-05-11T12:57:22.086Z",
+    "updatedAt": "2026-05-11T12:57:22.088Z"
+  }
+]

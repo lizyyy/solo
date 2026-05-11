@@ -1,0 +1,21 @@
+[
+  {
+    "batchId": "SCENARIO-CORRECTION-001",
+    "goodsId": "c855adc4-7698-4a20-96b4-f1429ad095ba",
+    "goodsNo": "COR-001",
+    "operator": "operator-001",
+    "originalData": {
+      "category": "MISCELLANEOUS",
+      "weight": 10000,
+      "operationType": "IMPORT"
+    },
+    "newData": {
+      "category": "FLAMMABLE_LIQUIDS",
+      "weight": 8000,
+      "reason": "发现类别申报错误，实际为易燃液体"
+    },
+    "reason": "发现类别申报错误，实际为易燃液体",
+    "id": "1b0dccff-b7ef-43c8-8bb6-7fb0aeedb19c",
+    "createdAt": "2026-05-11T12:57:22.088Z"
+  }
+]

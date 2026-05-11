@@ -1,0 +1,70 @@
+[
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsNo": "DG-001",
+    "category": "EXPLOSIVES",
+    "weight": 5000,
+    "operationType": "IMPORT",
+    "containerNo": "CONT-001",
+    "unCode": "UN0001",
+    "description": "测试爆炸品",
+    "id": "a1bbc349-bdcf-48bf-85ae-87977c3de78c",
+    "status": "assigned",
+    "createdAt": "2026-05-11T12:56:20.755Z",
+    "updatedAt": "2026-05-11T12:56:20.757Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsNo": "DG-002",
+    "category": "FLAMMABLE_LIQUIDS",
+    "weight": 15000,
+    "operationType": "IMPORT",
+    "containerNo": "CONT-002",
+    "unCode": "UN1203",
+    "description": "测试易燃液体",
+    "id": "07ebcce3-297e-461d-917d-1f61d78ccde6",
+    "status": "assignment_failed",
+    "createdAt": "2026-05-11T12:56:20.757Z",
+    "updatedAt": "2026-05-11T12:56:20.757Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsNo": "DG-003",
+    "category": "TOXIC",
+    "weight": 8000,
+    "operationType": "EXPORT",
+    "containerNo": "CONT-003",
+    "unCode": "UN2810",
+    "description": "测试毒性物质",
+    "id": "c7bbe01e-8b4c-4ad6-be1b-fd3dfb785035",
+    "status": "assigned",
+    "createdAt": "2026-05-11T12:56:20.758Z",
+    "updatedAt": "2026-05-11T12:56:20.758Z"
+  },
+  {
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "goodsNo": "DUP-001",
+    "category": "MISCELLANEOUS",
+    "weight": 5000,
+    "operationType": "IMPORT",
+    "containerNo": "CONT-DUP-001",
+    "unCode": "UN3082",
+    "id": "e51e96d8-900b-488b-94b1-eb1e0204d2d3",
+    "status": "assigned",
+    "createdAt": "2026-05-11T12:57:09.928Z",
+    "updatedAt": "2026-05-11T12:57:09.929Z"
+  },
+  {
+    "batchId": "SCENARIO-CORRECTION-001",
+    "goodsNo": "COR-001",
+    "category": "FLAMMABLE_LIQUIDS",
+    "weight": 8000,
+    "operationType": "IMPORT",
+    "containerNo": "CONT-COR-001",
+    "unCode": "UN3082",
+    "id": "c855adc4-7698-4a20-96b4-f1429ad095ba",
+    "status": "assigned",
+    "createdAt": "2026-05-11T12:57:22.085Z",
+    "updatedAt": "2026-05-11T12:57:22.088Z"
+  }
+]

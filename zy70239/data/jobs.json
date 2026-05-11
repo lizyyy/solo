@@ -1,0 +1,104 @@
+[
+  {
+    "batchId": "BATCH-2024-001",
+    "jobNo": "JOB-BATCH-2024-001-DG-001",
+    "goodsId": "a1bbc349-bdcf-48bf-85ae-87977c3de78c",
+    "goodsNo": "DG-001",
+    "category": "EXPLOSIVES",
+    "categoryName": "爆炸品",
+    "operationType": "IMPORT",
+    "zone": "ZONE_A",
+    "zoneName": "A区 - 爆炸品区",
+    "slot": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "priority": 1,
+    "status": "PENDING_UNLOAD",
+    "plannedTime": "2026-05-11T13:56:20.756Z",
+    "requiredEquipment": [
+      "防爆叉车",
+      "防爆搬运车"
+    ],
+    "id": "1625086a-63db-44d6-8308-8b27f6916a71",
+    "createdAt": "2026-05-11T12:56:20.756Z",
+    "updatedAt": "2026-05-11T12:56:20.756Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "jobNo": "JOB-BATCH-2024-001-DG-003",
+    "goodsId": "c7bbe01e-8b4c-4ad6-be1b-fd3dfb785035",
+    "goodsNo": "DG-003",
+    "category": "TOXIC",
+    "categoryName": "毒性物质",
+    "operationType": "EXPORT",
+    "zone": "ZONE_F",
+    "zoneName": "F区 - 毒性物质区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 100
+    },
+    "priority": 2,
+    "status": "PENDING_LOAD",
+    "plannedTime": "2026-05-11T14:56:20.758Z",
+    "requiredEquipment": [
+      "防毒面具",
+      "密封搬运箱"
+    ],
+    "id": "262deee3-ffd5-4836-8da9-3fc2a4510095",
+    "createdAt": "2026-05-11T12:56:20.758Z",
+    "updatedAt": "2026-05-11T12:56:20.758Z"
+  },
+  {
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "jobNo": "JOB-SCENARIO-DUPLICATE-001-DUP-001",
+    "goodsId": "e51e96d8-900b-488b-94b1-eb1e0204d2d3",
+    "goodsNo": "DUP-001",
+    "category": "MISCELLANEOUS",
+    "categoryName": "杂项危险物质",
+    "operationType": "IMPORT",
+    "zone": "ZONE_I",
+    "zoneName": "I区 - 杂项区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 200
+    },
+    "priority": 5,
+    "status": "PENDING_UNLOAD",
+    "plannedTime": "2026-05-12T12:57:09.928Z",
+    "requiredEquipment": [
+      "标准搬运设备"
+    ],
+    "id": "01a8e791-9176-42e3-8cfa-3d2ee6216e67",
+    "createdAt": "2026-05-11T12:57:09.929Z",
+    "updatedAt": "2026-05-11T12:57:09.929Z"
+  },
+  {
+    "batchId": "SCENARIO-CORRECTION-001",
+    "jobNo": "JOB-SCENARIO-CORRECTION-001-COR-001",
+    "goodsId": "c855adc4-7698-4a20-96b4-f1429ad095ba",
+    "goodsNo": "COR-001",
+    "category": "MISCELLANEOUS",
+    "categoryName": "杂项危险物质",
+    "operationType": "IMPORT",
+    "zone": "ZONE_I",
+    "zoneName": "I区 - 杂项区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 200
+    },
+    "priority": 5,
+    "status": "PENDING_UNLOAD",
+    "plannedTime": "2026-05-12T12:57:22.086Z",
+    "requiredEquipment": [
+      "标准搬运设备"
+    ],
+    "id": "7054d022-3584-46a1-a5b1-d3a41bdfee05",
+    "createdAt": "2026-05-11T12:57:22.086Z",
+    "updatedAt": "2026-05-11T12:57:22.086Z"
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsId": "a1bbc349-bdcf-48bf-85ae-87977c3de78c",
+    "goodsNo": "DG-001",
+    "category": "EXPLOSIVES",
+    "zone": "ZONE_A",
+    "zoneName": "A区 - 爆炸品区",
+    "slot": 1,
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "requiredDistance": 50,
+    "id": "5c93f250-33af-4f03-91dd-30b6ea1f1bfb",
+    "createdAt": "2026-05-11T12:56:20.756Z",
+    "updatedAt": "2026-05-11T12:56:20.756Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsId": "c7bbe01e-8b4c-4ad6-be1b-fd3dfb785035",
+    "goodsNo": "DG-003",
+    "category": "TOXIC",
+    "zone": "ZONE_F",
+    "zoneName": "F区 - 毒性物质区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 100
+    },
+    "requiredDistance": 35,
+    "id": "5731911c-1f83-4c56-aa46-9e07dd3e00e6",
+    "createdAt": "2026-05-11T12:56:20.758Z",
+    "updatedAt": "2026-05-11T12:56:20.758Z"
+  },
+  {
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "goodsId": "e51e96d8-900b-488b-94b1-eb1e0204d2d3",
+    "goodsNo": "DUP-001",
+    "category": "MISCELLANEOUS",
+    "zone": "ZONE_I",
+    "zoneName": "I区 - 杂项区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 200
+    },
+    "requiredDistance": 10,
+    "id": "fb7738bf-16a4-4d53-b628-37d2bd812ad9",
+    "createdAt": "2026-05-11T12:57:09.928Z",
+    "updatedAt": "2026-05-11T12:57:09.928Z"
+  },
+  {
+    "batchId": "SCENARIO-CORRECTION-001",
+    "goodsId": "c855adc4-7698-4a20-96b4-f1429ad095ba",
+    "goodsNo": "COR-001",
+    "category": "MISCELLANEOUS",
+    "zone": "ZONE_I",
+    "zoneName": "I区 - 杂项区",
+    "slot": 1,
+    "position": {
+      "x": 300,
+      "y": 200
+    },
+    "requiredDistance": 10,
+    "id": "a4261766-4f30-421a-916f-fafe7e75be9a",
+    "createdAt": "2026-05-11T12:57:22.086Z",
+    "updatedAt": "2026-05-11T12:57:22.086Z"
+  }
+]

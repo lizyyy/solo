@@ -1,0 +1,75 @@
+[
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsId": "a1bbc349-bdcf-48bf-85ae-87977c3de78c",
+    "goodsNo": "DG-001",
+    "valid": true,
+    "violations": [],
+    "warnings": [],
+    "riskLevel": "CRITICAL",
+    "zone": "ZONE_A",
+    "slot": 1,
+    "id": "e15c608d-62cb-4ce8-9e5c-49dc57782f41",
+    "createdAt": "2026-05-11T12:56:20.756Z",
+    "updatedAt": "2026-05-11T12:56:20.756Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsId": "07ebcce3-297e-461d-917d-1f61d78ccde6",
+    "goodsNo": "DG-002",
+    "valid": false,
+    "errors": [
+      {
+        "type": "ASSIGNMENT_FAILED",
+        "severity": "CRITICAL",
+        "message": "与 DG-001 (爆炸品) 属于不相容类别，距离不足"
+      }
+    ],
+    "riskLevel": "MEDIUM",
+    "id": "a7dedb2c-cd9e-47fd-adfa-2cc33e898695",
+    "createdAt": "2026-05-11T12:56:20.758Z",
+    "updatedAt": "2026-05-11T12:56:20.758Z"
+  },
+  {
+    "batchId": "BATCH-2024-001",
+    "goodsId": "c7bbe01e-8b4c-4ad6-be1b-fd3dfb785035",
+    "goodsNo": "DG-003",
+    "valid": true,
+    "violations": [],
+    "warnings": [],
+    "riskLevel": "HIGH",
+    "zone": "ZONE_F",
+    "slot": 1,
+    "id": "15f84b81-04b4-4b36-aba0-88d7969a057f",
+    "createdAt": "2026-05-11T12:56:20.758Z",
+    "updatedAt": "2026-05-11T12:56:20.758Z"
+  },
+  {
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "goodsId": "e51e96d8-900b-488b-94b1-eb1e0204d2d3",
+    "goodsNo": "DUP-001",
+    "valid": true,
+    "violations": [],
+    "warnings": [],
+    "riskLevel": "LOW",
+    "zone": "ZONE_I",
+    "slot": 1,
+    "id": "eefbf619-741e-418d-b045-50f17eca127b",
+    "createdAt": "2026-05-11T12:57:09.928Z",
+    "updatedAt": "2026-05-11T12:57:09.928Z"
+  },
+  {
+    "batchId": "SCENARIO-CORRECTION-001",
+    "goodsId": "c855adc4-7698-4a20-96b4-f1429ad095ba",
+    "goodsNo": "COR-001",
+    "valid": true,
+    "violations": [],
+    "warnings": [],
+    "riskLevel": "LOW",
+    "zone": "ZONE_I",
+    "slot": 1,
+    "id": "a08bb7f3-0bb4-40ab-9336-fed986133b3c",
+    "createdAt": "2026-05-11T12:57:22.086Z",
+    "updatedAt": "2026-05-11T12:57:22.086Z"
+  }
+]

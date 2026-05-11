@@ -1,0 +1,517 @@
+[
+  {
+    "id": "eca1b377-af0e-497c-8f63-4dff073aa2cd",
+    "batchId": "BATCH-2024-001",
+    "type": "ASSIGNMENT_REPORT",
+    "content": {
+      "batchId": "BATCH-2024-001",
+      "generatedAt": "2026-05-11T12:56:43.166Z",
+      "type": "ASSIGNMENT_REPORT",
+      "data": [
+        {
+          "goodsNo": "DG-001",
+          "category": "EXPLOSIVES",
+          "zone": "ZONE_A",
+          "zoneName": "A区 - 爆炸品区",
+          "slot": 1,
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "requiredDistance": 50
+        },
+        {
+          "goodsNo": "DG-003",
+          "category": "TOXIC",
+          "zone": "ZONE_F",
+          "zoneName": "F区 - 毒性物质区",
+          "slot": 1,
+          "position": {
+            "x": 300,
+            "y": 100
+          },
+          "requiredDistance": 35
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:56:20.759Z",
+    "updatedAt": "2026-05-11T12:56:43.167Z"
+  },
+  {
+    "id": "2901afa6-c9ef-4785-a015-bde0e75a56ed",
+    "batchId": "BATCH-2024-001",
+    "type": "VALIDATION_REPORT",
+    "content": {
+      "batchId": "BATCH-2024-001",
+      "generatedAt": "2026-05-11T12:56:43.167Z",
+      "type": "VALIDATION_REPORT",
+      "data": [
+        {
+          "goodsNo": "DG-001",
+          "valid": true,
+          "violations": [],
+          "warnings": [],
+          "riskLevel": "CRITICAL"
+        },
+        {
+          "goodsNo": "DG-002",
+          "valid": false,
+          "riskLevel": "MEDIUM"
+        },
+        {
+          "goodsNo": "DG-003",
+          "valid": true,
+          "violations": [],
+          "warnings": [],
+          "riskLevel": "HIGH"
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:56:20.759Z",
+    "updatedAt": "2026-05-11T12:56:43.167Z"
+  },
+  {
+    "id": "60df2cca-9242-4a3e-bc1f-d528c9d01312",
+    "batchId": "BATCH-2024-001",
+    "type": "JOB_PLAN",
+    "content": {
+      "batchId": "BATCH-2024-001",
+      "generatedAt": "2026-05-11T12:56:43.167Z",
+      "type": "JOB_PLAN",
+      "data": [
+        {
+          "jobNo": "JOB-BATCH-2024-001-DG-001",
+          "goodsNo": "DG-001",
+          "categoryName": "爆炸品",
+          "operationType": "IMPORT",
+          "zoneName": "A区 - 爆炸品区",
+          "slot": 1,
+          "priority": 1,
+          "status": "PENDING_UNLOAD",
+          "plannedTime": "2026-05-11T13:56:20.756Z",
+          "requiredEquipment": [
+            "防爆叉车",
+            "防爆搬运车"
+          ]
+        },
+        {
+          "jobNo": "JOB-BATCH-2024-001-DG-003",
+          "goodsNo": "DG-003",
+          "categoryName": "毒性物质",
+          "operationType": "EXPORT",
+          "zoneName": "F区 - 毒性物质区",
+          "slot": 1,
+          "priority": 2,
+          "status": "PENDING_LOAD",
+          "plannedTime": "2026-05-11T14:56:20.758Z",
+          "requiredEquipment": [
+            "防毒面具",
+            "密封搬运箱"
+          ]
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:56:20.759Z",
+    "updatedAt": "2026-05-11T12:56:43.167Z"
+  },
+  {
+    "id": "a232264d-d333-4b31-8704-481562b9dcbf",
+    "batchId": "BATCH-2024-001",
+    "type": "RISK_SUMMARY",
+    "content": {
+      "batchId": "BATCH-2024-001",
+      "generatedAt": "2026-05-11T12:56:43.169Z",
+      "type": "RISK_SUMMARY",
+      "data": {
+        "stats": {
+          "total": 3,
+          "processed": 3,
+          "success": 3,
+          "failed": 0,
+          "risks": {
+            "CRITICAL": 1,
+            "HIGH": 1,
+            "MEDIUM": 1,
+            "LOW": 0
+          },
+          "categoryStats": {
+            "EXPLOSIVES": 1,
+            "FLAMMABLE_LIQUIDS": 1,
+            "TOXIC": 1
+          },
+          "batchId": "BATCH-2024-001",
+          "createdAt": "2026-05-11T12:56:20.759Z",
+          "updatedAt": "2026-05-11T12:56:43.165Z"
+        },
+        "criticalItems": [
+          "DG-001"
+        ],
+        "highRiskItems": [
+          "DG-003"
+        ]
+      }
+    },
+    "createdAt": "2026-05-11T12:56:20.760Z",
+    "updatedAt": "2026-05-11T12:56:43.169Z"
+  },
+  {
+    "id": "94c500f5-3aa1-4a22-a319-5df88655bcc3",
+    "batchId": "SCENARIO-MISSING-001",
+    "type": "ASSIGNMENT_REPORT",
+    "content": {
+      "batchId": "SCENARIO-MISSING-001",
+      "generatedAt": "2026-05-11T12:56:59.482Z",
+      "type": "ASSIGNMENT_REPORT",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:56:59.482Z",
+    "updatedAt": "2026-05-11T12:56:59.482Z"
+  },
+  {
+    "id": "63e743b0-52e8-4d21-808a-c589a2629a66",
+    "batchId": "SCENARIO-MISSING-001",
+    "type": "VALIDATION_REPORT",
+    "content": {
+      "batchId": "SCENARIO-MISSING-001",
+      "generatedAt": "2026-05-11T12:56:59.483Z",
+      "type": "VALIDATION_REPORT",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:56:59.483Z",
+    "updatedAt": "2026-05-11T12:56:59.483Z"
+  },
+  {
+    "id": "a34e87eb-fb29-455a-b060-f8b060e492e9",
+    "batchId": "SCENARIO-MISSING-001",
+    "type": "JOB_PLAN",
+    "content": {
+      "batchId": "SCENARIO-MISSING-001",
+      "generatedAt": "2026-05-11T12:56:59.483Z",
+      "type": "JOB_PLAN",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:56:59.483Z",
+    "updatedAt": "2026-05-11T12:56:59.483Z"
+  },
+  {
+    "id": "87084f5a-b78e-4783-b2d4-c8aa1ae6942b",
+    "batchId": "SCENARIO-MISSING-001",
+    "type": "RISK_SUMMARY",
+    "content": {
+      "batchId": "SCENARIO-MISSING-001",
+      "generatedAt": "2026-05-11T12:56:59.483Z",
+      "type": "RISK_SUMMARY",
+      "data": {
+        "stats": {
+          "total": 1,
+          "processed": 1,
+          "success": 0,
+          "failed": 1,
+          "risks": {
+            "CRITICAL": 0,
+            "HIGH": 1,
+            "MEDIUM": 0,
+            "LOW": 0
+          },
+          "categoryStats": {},
+          "batchId": "SCENARIO-MISSING-001",
+          "createdAt": "2026-05-11T12:56:59.481Z",
+          "updatedAt": "2026-05-11T12:56:59.481Z"
+        },
+        "criticalItems": [],
+        "highRiskItems": []
+      }
+    },
+    "createdAt": "2026-05-11T12:56:59.484Z",
+    "updatedAt": "2026-05-11T12:56:59.484Z"
+  },
+  {
+    "id": "02d6ac57-9166-4133-9a63-8a3bdf811bba",
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "type": "ASSIGNMENT_REPORT",
+    "content": {
+      "batchId": "SCENARIO-DUPLICATE-001",
+      "generatedAt": "2026-05-11T12:57:09.930Z",
+      "type": "ASSIGNMENT_REPORT",
+      "data": [
+        {
+          "goodsNo": "DUP-001",
+          "category": "MISCELLANEOUS",
+          "zone": "ZONE_I",
+          "zoneName": "I区 - 杂项区",
+          "slot": 1,
+          "position": {
+            "x": 300,
+            "y": 200
+          },
+          "requiredDistance": 10
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:09.930Z",
+    "updatedAt": "2026-05-11T12:57:09.930Z"
+  },
+  {
+    "id": "a84cee73-032f-4f93-8a9a-ee4b40a94118",
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "type": "VALIDATION_REPORT",
+    "content": {
+      "batchId": "SCENARIO-DUPLICATE-001",
+      "generatedAt": "2026-05-11T12:57:09.930Z",
+      "type": "VALIDATION_REPORT",
+      "data": [
+        {
+          "goodsNo": "DUP-001",
+          "valid": true,
+          "violations": [],
+          "warnings": [],
+          "riskLevel": "LOW"
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:09.930Z",
+    "updatedAt": "2026-05-11T12:57:09.930Z"
+  },
+  {
+    "id": "591ea88c-e025-4e7f-b6f4-7575db5b6ee7",
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "type": "JOB_PLAN",
+    "content": {
+      "batchId": "SCENARIO-DUPLICATE-001",
+      "generatedAt": "2026-05-11T12:57:09.930Z",
+      "type": "JOB_PLAN",
+      "data": [
+        {
+          "jobNo": "JOB-SCENARIO-DUPLICATE-001-DUP-001",
+          "goodsNo": "DUP-001",
+          "categoryName": "杂项危险物质",
+          "operationType": "IMPORT",
+          "zoneName": "I区 - 杂项区",
+          "slot": 1,
+          "priority": 5,
+          "status": "PENDING_UNLOAD",
+          "plannedTime": "2026-05-12T12:57:09.928Z",
+          "requiredEquipment": [
+            "标准搬运设备"
+          ]
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:09.931Z",
+    "updatedAt": "2026-05-11T12:57:09.931Z"
+  },
+  {
+    "id": "da78bee6-3083-4133-8b59-785ecc10d967",
+    "batchId": "SCENARIO-DUPLICATE-001",
+    "type": "RISK_SUMMARY",
+    "content": {
+      "batchId": "SCENARIO-DUPLICATE-001",
+      "generatedAt": "2026-05-11T12:57:09.931Z",
+      "type": "RISK_SUMMARY",
+      "data": {
+        "stats": {
+          "total": 2,
+          "processed": 2,
+          "success": 2,
+          "failed": 0,
+          "risks": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 2
+          },
+          "categoryStats": {
+            "MISCELLANEOUS": 1
+          },
+          "batchId": "SCENARIO-DUPLICATE-001",
+          "createdAt": "2026-05-11T12:57:09.929Z",
+          "updatedAt": "2026-05-11T12:57:09.929Z"
+        },
+        "criticalItems": [],
+        "highRiskItems": []
+      }
+    },
+    "createdAt": "2026-05-11T12:57:09.931Z",
+    "updatedAt": "2026-05-11T12:57:09.931Z"
+  },
+  {
+    "id": "c9d17c4c-f846-45e8-8ce5-aa7db3b34772",
+    "batchId": "SCENARIO-ILLEGAL-001",
+    "type": "ASSIGNMENT_REPORT",
+    "content": {
+      "batchId": "SCENARIO-ILLEGAL-001",
+      "generatedAt": "2026-05-11T12:57:15.848Z",
+      "type": "ASSIGNMENT_REPORT",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:57:15.848Z",
+    "updatedAt": "2026-05-11T12:57:15.848Z"
+  },
+  {
+    "id": "5c3bb34a-c50a-4846-9d85-6aba51aa8aa3",
+    "batchId": "SCENARIO-ILLEGAL-001",
+    "type": "VALIDATION_REPORT",
+    "content": {
+      "batchId": "SCENARIO-ILLEGAL-001",
+      "generatedAt": "2026-05-11T12:57:15.849Z",
+      "type": "VALIDATION_REPORT",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:57:15.849Z",
+    "updatedAt": "2026-05-11T12:57:15.849Z"
+  },
+  {
+    "id": "31ab42dd-fb6f-4d38-aa5a-8164675e0b50",
+    "batchId": "SCENARIO-ILLEGAL-001",
+    "type": "JOB_PLAN",
+    "content": {
+      "batchId": "SCENARIO-ILLEGAL-001",
+      "generatedAt": "2026-05-11T12:57:15.849Z",
+      "type": "JOB_PLAN",
+      "data": []
+    },
+    "createdAt": "2026-05-11T12:57:15.849Z",
+    "updatedAt": "2026-05-11T12:57:15.849Z"
+  },
+  {
+    "id": "7732630b-183e-457d-ae84-0adae5e24262",
+    "batchId": "SCENARIO-ILLEGAL-001",
+    "type": "RISK_SUMMARY",
+    "content": {
+      "batchId": "SCENARIO-ILLEGAL-001",
+      "generatedAt": "2026-05-11T12:57:15.849Z",
+      "type": "RISK_SUMMARY",
+      "data": {
+        "stats": {
+          "total": 1,
+          "processed": 1,
+          "success": 0,
+          "failed": 1,
+          "risks": {
+            "CRITICAL": 0,
+            "HIGH": 1,
+            "MEDIUM": 0,
+            "LOW": 0
+          },
+          "categoryStats": {},
+          "batchId": "SCENARIO-ILLEGAL-001",
+          "createdAt": "2026-05-11T12:57:15.847Z",
+          "updatedAt": "2026-05-11T12:57:15.847Z"
+        },
+        "criticalItems": [],
+        "highRiskItems": []
+      }
+    },
+    "createdAt": "2026-05-11T12:57:15.849Z",
+    "updatedAt": "2026-05-11T12:57:15.849Z"
+  },
+  {
+    "id": "af7e6805-11f4-4b30-98c5-e81badf9948a",
+    "batchId": "SCENARIO-CORRECTION-001",
+    "type": "ASSIGNMENT_REPORT",
+    "content": {
+      "batchId": "SCENARIO-CORRECTION-001",
+      "generatedAt": "2026-05-11T12:57:22.089Z",
+      "type": "ASSIGNMENT_REPORT",
+      "data": [
+        {
+          "goodsNo": "COR-001",
+          "category": "MISCELLANEOUS",
+          "zone": "ZONE_I",
+          "zoneName": "I区 - 杂项区",
+          "slot": 1,
+          "position": {
+            "x": 300,
+            "y": 200
+          },
+          "requiredDistance": 10
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:22.087Z",
+    "updatedAt": "2026-05-11T12:57:22.089Z"
+  },
+  {
+    "id": "87d0555b-357f-416c-a560-0b7956ffd2ff",
+    "batchId": "SCENARIO-CORRECTION-001",
+    "type": "VALIDATION_REPORT",
+    "content": {
+      "batchId": "SCENARIO-CORRECTION-001",
+      "generatedAt": "2026-05-11T12:57:22.089Z",
+      "type": "VALIDATION_REPORT",
+      "data": [
+        {
+          "goodsNo": "COR-001",
+          "valid": true,
+          "violations": [],
+          "warnings": [],
+          "riskLevel": "LOW"
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:22.087Z",
+    "updatedAt": "2026-05-11T12:57:22.089Z"
+  },
+  {
+    "id": "2472597e-10bc-4d70-8856-fca9cb554c91",
+    "batchId": "SCENARIO-CORRECTION-001",
+    "type": "JOB_PLAN",
+    "content": {
+      "batchId": "SCENARIO-CORRECTION-001",
+      "generatedAt": "2026-05-11T12:57:22.089Z",
+      "type": "JOB_PLAN",
+      "data": [
+        {
+          "jobNo": "JOB-SCENARIO-CORRECTION-001-COR-001",
+          "goodsNo": "COR-001",
+          "categoryName": "杂项危险物质",
+          "operationType": "IMPORT",
+          "zoneName": "I区 - 杂项区",
+          "slot": 1,
+          "priority": 5,
+          "status": "PENDING_UNLOAD",
+          "plannedTime": "2026-05-12T12:57:22.086Z",
+          "requiredEquipment": [
+            "标准搬运设备"
+          ]
+        }
+      ]
+    },
+    "createdAt": "2026-05-11T12:57:22.087Z",
+    "updatedAt": "2026-05-11T12:57:22.090Z"
+  },
+  {
+    "id": "53c9c17a-377d-454e-b228-20b4579d3a6b",
+    "batchId": "SCENARIO-CORRECTION-001",
+    "type": "RISK_SUMMARY",
+    "content": {
+      "batchId": "SCENARIO-CORRECTION-001",
+      "generatedAt": "2026-05-11T12:57:22.090Z",
+      "type": "RISK_SUMMARY",
+      "data": {
+        "stats": {
+          "total": 1,
+          "processed": 1,
+          "success": 1,
+          "failed": 0,
+          "risks": {
+            "CRITICAL": 0,
+            "HIGH": 0,
+            "MEDIUM": 0,
+            "LOW": 1
+          },
+          "categoryStats": {
+            "FLAMMABLE_LIQUIDS": 1
+          },
+          "batchId": "SCENARIO-CORRECTION-001",
+          "createdAt": "2026-05-11T12:57:22.086Z",
+          "updatedAt": "2026-05-11T12:57:22.088Z"
+        },
+        "criticalItems": [],
+        "highRiskItems": []
+      }
+    },
+    "createdAt": "2026-05-11T12:57:22.087Z",
+    "updatedAt": "2026-05-11T12:57:22.090Z"
+  }
+]
