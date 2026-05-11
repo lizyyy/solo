@@ -1,0 +1,15 @@
+{
+  "name": "after-sales-parts-api",
+  "version": "1.0.0",
+  "description": "售后配件寄送API系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "node-cron": "^3.0.3"
+  }
+}
