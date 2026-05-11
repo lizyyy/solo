@@ -513,8 +513,8 @@ def report():
 
 
 @report.command('kitchen')
-@click.option('--date', default=None, help='用餐日期（YYYY-MM-DD），默认明天')
-def report_kitchen(date):
+@click.option('--date', 'meal_date', default=None, help='用餐日期（YYYY-MM-DD），默认明天')
+def report_kitchen(meal_date):
     """厨房备餐数汇总
     
     显示指定日期的备餐数量，按餐标分类统计。
@@ -522,13 +522,13 @@ def report_kitchen(date):
     """
     service = get_service()
     
-    if not date:
-        date = (date.today() + timedelta(days=1)).isoformat()
+    if not meal_date:
+        meal_date = (date.today() + timedelta(days=1)).isoformat()
     
-    summary = service.get_kitchen_prep_summary(date)
+    summary = service.get_kitchen_prep_summary(meal_date)
     
     click.echo("\n" + "=" * 60)
-    click.echo(f"=== 厨房备餐汇总 - {date} ===")
+    click.echo(f"=== 厨房备餐汇总 - {meal_date} ===")
     click.echo(click.style(f"总备餐数: {summary['total_count']} 份", fg='green', bold=True))
     click.echo(f"总餐费: {summary['total_price']} 元")
     click.echo(f"总补贴: {summary['total_subsidy']} 元")
@@ -560,21 +560,21 @@ def report_kitchen(date):
 
 
 @report.command('routes')
-@click.option('--date', default=None, help='用餐日期（YYYY-MM-DD），默认今天')
-def report_routes(date):
+@click.option('--date', 'meal_date', default=None, help='用餐日期（YYYY-MM-DD），默认今天')
+def report_routes(meal_date):
     """配送员路线汇总
     
     按配送路线分组显示订单，方便配送员按顺序送餐。
     """
     service = get_service()
     
-    if not date:
-        date = date.today().isoformat()
+    if not meal_date:
+        meal_date = date.today().isoformat()
     
-    routes = service.get_delivery_routes(date)
+    routes = service.get_delivery_routes(meal_date)
     
     click.echo("\n" + "=" * 60)
-    click.echo(f"=== 配送路线汇总 - {date} ===")
+    click.echo(f"=== 配送路线汇总 - {meal_date} ===")
     click.echo(f"路线数: {routes['total_routes']} 条")
     click.echo(f"总配送量: {routes['total_deliveries']} 份")
     
