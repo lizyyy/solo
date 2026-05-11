@@ -93,7 +93,7 @@ function recordFailedOperation(targetId, operationType, errorMessage) {
       INSERT INTO failed_operations (
         id, operation_type, target_id, error_message,
         retry_count, max_retries, last_attempt_at, created_at
-      ) VALUES (?, ?, ?, ?, 0, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, 1, ?, ?, ?)
     `).run(id, operationType, targetId, errorMessage, constants_1.MAX_RETRY_COUNT, now, now);
     }
 }

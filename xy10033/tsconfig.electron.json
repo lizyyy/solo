@@ -9,7 +9,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "sourceMap": false
   },
   "include": ["src/electron/**/*", "src/shared/**/*"]
 }
