@@ -1,0 +1,20 @@
+{
+  "name": "garment-borrow-cli",
+  "version": "1.0.0",
+  "description": "服装样衣借还管理CLI工具",
+  "main": "index.js",
+  "bin": {
+    "garment": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js"
+  },
+  "keywords": ["garment", "borrow", "inventory", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
