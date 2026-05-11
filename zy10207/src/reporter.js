@@ -136,12 +136,11 @@ function calculateWeeklyDepositChanges(weeksAgo = 0) {
   const returns = storage.getAllData(TYPES.RETURN).all;
   const refunds = storage.getAllData(TYPES.REFUND).all;
   
-  const targetWeekStart = dayjs().subtract(weeksAgo, 'week').startOf('week');
-  const targetWeekEnd = dayjs().subtract(weeksAgo, 'week').endOf('week');
+  const targetWeekStart = dayjs().subtract(weeksAgo, 'week').startOf('week').format('YYYY-MM-DD');
+  const targetWeekEnd = dayjs().subtract(weeksAgo, 'week').endOf('week').format('YYYY-MM-DD');
   
-  const inRange = (date) => {
-    const d = dayjs(date);
-    return d.isAfter(targetWeekStart) && d.isBefore(targetWeekEnd);
+  const inRange = (dateStr) => {
+    return dateStr >= targetWeekStart && dateStr <= targetWeekEnd;
   };
   
   const weeklyDeliveries = deliveries.filter(d => inRange(d.deliveryDate));
@@ -151,7 +150,7 @@ function calculateWeeklyDepositChanges(weeksAgo = 0) {
   const depositOut = weeklyRefunds.reduce((sum, r) => sum + r.refundAmount, 0);
   
   return {
-    period: `${targetWeekStart.format('YYYY-MM-DD')} ~ ${targetWeekEnd.format('YYYY-MM-DD')}`,
+    period: `${targetWeekStart} ~ ${targetWeekEnd}`,
     deliveryCount: weeklyDeliveries.length,
     refundCount: weeklyRefunds.length,
     depositIn,
