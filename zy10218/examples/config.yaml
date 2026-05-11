@@ -1,0 +1,42 @@
+# 冷链温控异常追溯 CLI 配置文件示例
+
+data_files:
+  # 温度数据文件
+  temperature: "examples/temperature.csv"
+  
+  # 车辆路线数据文件
+  routes: "examples/vehicle_route.csv"
+  
+  # 装卸节点数据文件
+  nodes: "examples/nodes.csv"
+  
+  # 签收时间数据文件
+  signoffs: "examples/signoff.csv"
+  
+  # 货品批次数据文件
+  batches: "examples/batches.csv"
+  
+  # 温控阈值规则数据文件
+  thresholds: "examples/thresholds.csv"
+
+# 分析设置
+analysis:
+  # 时间格式
+  time_format: "%Y-%m-%d %H:%M:%S"
+  
+  # 数据去重（重复数据导入时自动跳过）
+  deduplication: true
+  
+  # 时间漂移检测阈值（秒）
+  time_drift_threshold: 300
+  
+  # 温度数据间隔最大允许值（秒）
+  max_temperature_gap: 1800
+
+# 报告设置
+report:
+  # 输出目录
+  output_dir: "reports"
+  
+  # 默认格式（text 或 html）
+  default_format: "text"

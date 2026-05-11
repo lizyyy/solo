@@ -1,0 +1,4 @@
+rule_id,product_type,warning_min,warning_max,critical_min,critical_max,allowed_duration
+RULE001,疫苗,0,10,-2,15,15
+RULE002,血液制品,2,6,0,8,10
+RULE003,生物制剂,-20,-10,-30,-5,20
