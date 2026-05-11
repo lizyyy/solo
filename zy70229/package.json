@@ -1,0 +1,14 @@
+{
+  "name": "gift-inventory-lock-api",
+  "version": "1.0.0",
+  "description": "电商赠品库存锁定 API - 大促活动场景",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node tests/run-scenarios.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
