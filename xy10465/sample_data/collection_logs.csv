@@ -1,0 +1,6 @@
+log_id,invoice_no,contact_date,contact_method,contact_result,notes,promised_date,promised_amount
+LOG001,INV004,2026-02-10,phone,no_answer,电话未接,,
+LOG002,INV004,2026-02-15,phone,contacted,已联系负责人，等待回复,,
+LOG003,INV008,2026-02-20,email,contacted,已发送催款邮件,,
+LOG004,INV001,2026-03-10,phone,contacted,已联系，客户称资金周转困难,2026-04-15,85000
+LOG005,INV002,2026-04-20,visit,contacted,上门拜访，正在走审批流程,,
