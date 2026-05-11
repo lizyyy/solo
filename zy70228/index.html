@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物园温室参观限流器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>🌿 植物园温室参观限流器</h1>
+            <div class="header-stats">
+                <span id="current-time">--:--</span>
+                <span class="status-badge" id="system-status">就绪</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="control-panel">
+                <section class="panel-section">
+                    <h2>⚙️ 温室配置</h2>
+                    <div class="config-group">
+                        <label>总容量: <input type="number" id="total-capacity" value="200" min="50" max="1000"></label>
+                        <label>安全阈值: <input type="number" id="safety-threshold" value="80" min="50" max="100">%</label>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>👥 人流控制</h2>
+                    <div class="control-group">
+                        <button id="btn-normal-flow">正常流量</button>
+                        <button id="btn-high-flow">高峰流量</button>
+                        <button id="btn-stop-flow">暂停进入</button>
+                    </div>
+                    <div class="flow-display">
+                        <div>当前人数: <span id="current-count" class="count">0</span></div>
+                        <div>容量使用率: <span id="capacity-rate" class="rate">0%</span></div>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>🗺️ 讲解路线</h2>
+                    <div class="route-controls">
+                        <button class="route-btn active" data-route="A">路线A (经典)</button>
+                        <button class="route-btn" data-route="B">路线B (快捷)</button>
+                        <button class="route-btn" data-route="C">路线C (深度)</button>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>🎮 演示模式</h2>
+                    <div class="demo-controls">
+                        <button id="btn-demo-short">最短演示</button>
+                        <button id="btn-demo-exception">异常触发</button>
+                        <button id="btn-reset">重置系统</button>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2>📝 历史记录</h2>
+                    <div class="history-controls">
+                        <button id="btn-undo">↩️ 撤回</button>
+                        <button id="btn-add-record">➕ 补录</button>
+                        <button id="btn-edit-record">✏️ 修改</button>
+                    </div>
+                    <div id="history-list" class="history-list"></div>
+                </section>
+            </aside>
+
+            <section class="visualization-area">
+                <div class="alert-banner" id="alert-banner" style="display: none;"></div>
+                
+                <div class="greenhouse-view">
+                    <h3>温室区域实时状态</h3>
+                    <div id="greenhouse-map" class="greenhouse-map">
+                        <div class="greenhouse-grid">
+                            <div class="zone" data-zone="entrance">
+                                <div class="zone-label">入口大厅</div>
+                                <div class="zone-stats">
+                                    <span class="zone-count">0</span>/<span class="zone-capacity">50</span>
+                                </div>
+                                <div class="zone-heat"></div>
+                            </div>
+                            <div class="zone" data-zone="tropical">
+                                <div class="zone-label">热带植物区</div>
+                                <div class="zone-stats">
+                                    <span class="zone-count">0</span>/<span class="zone-capacity">80</span>
+                                </div>
+                                <div class="zone-heat"></div>
+                            </div>
+                            <div class="zone" data-zone="desert">
+                                <div class="zone-label">沙漠植物区</div>
+                                <div class="zone-stats">
+                                    <span class="zone-count">0</span>/<span class="zone-capacity">40</span>
+                                </div>
+                                <div class="zone-heat"></div>
+                            </div>
+                            <div class="zone" data-zone="orchid">
+                                <div class="zone-label">兰花展室</div>
+                                <div class="zone-stats">
+                                    <span class="zone-count">0</span>/<span class="zone-capacity">30</span>
+                                </div>
+                                <div class="zone-heat"></div>
+                            </div>
+                            <div class="zone" data-zone="exit">
+                                <div class="zone-label">出口商店</div>
+                                <div class="zone-stats">
+                                    <span class="zone-count">0</span>/<span class="zone-capacity">50</span>
+                                </div>
+                                <div class="zone-heat"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="heatmap-legend">
+                    <h4>容量热力图例</h4>
+                    <div class="legend-items">
+                        <div class="legend-item"><span class="legend-color low"></span>正常 (0-50%)</div>
+                        <div class="legend-item"><span class="legend-color medium"></span>警告 (51-80%)</div>
+                        <div class="legend-item"><span class="legend-color high"></span>危险 (81-100%)</div>
+                        <div class="legend-item"><span class="legend-color critical"></span>超容 (>100%)</div>
+                    </div>
+                </div>
+
+                <div class="route-visualization">
+                    <h3>当前讲解路线</h3>
+                    <div id="route-display" class="route-display">
+                        <div class="route-steps"></div>
+                    </div>
+                </div>
+
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-label">总容量</div>
+                        <div class="stat-value" id="stat-total">200</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">当前人数</div>
+                        <div class="stat-value" id="stat-current">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">拥堵风险</div>
+                        <div class="stat-value risk" id="stat-risk">低</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">推荐路线</div>
+                        <div class="stat-value" id="stat-route">A</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
