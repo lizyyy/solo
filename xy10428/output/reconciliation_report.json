@@ -1,0 +1,279 @@
+{
+  "summary": {
+    "total_amount": 3779.3500000000004,
+    "abnormal_amount": 3259.3500000000004,
+    "normal_amount": 520.0,
+    "total_records": 9,
+    "abnormal_records": 8,
+    "normal_records": 1,
+    "abnormal_rate": 88.89,
+    "abnormal_type_counts": {
+      "油耗超阈值": 8,
+      "重复流水": 1,
+      "非排班加油": 1,
+      "疑似私用": 1
+    },
+    "pending_review_count": 7,
+    "reconciled_at": "2026-05-11T18:39:06.071912"
+  },
+  "records": [
+    {
+      "fuel_record": {
+        "id": "F001",
+        "plate_number": "京A12345",
+        "fuel_time": "2026-04-15T08:30:00",
+        "fuel_amount": 343.2,
+        "fuel_liters": 44.0,
+        "unit_price": 7.8,
+        "station_name": "中石化机场站",
+        "card_number": "100123456789",
+        "odometer": 15320.0
+      },
+      "driver_name": "张三",
+      "schedule": {
+        "driver": "张三",
+        "shift_type": "早班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 300.0,
+      "calculated_fuel_consumption": 14.666666666666666,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F006",
+        "plate_number": "京A12345",
+        "fuel_time": "2026-04-15T08:30:00",
+        "fuel_amount": 343.2,
+        "fuel_liters": 44.0,
+        "unit_price": 7.8,
+        "station_name": "中石化机场站",
+        "card_number": "100123456789",
+        "odometer": 15320.0
+      },
+      "driver_name": "张三",
+      "schedule": {
+        "driver": "张三",
+        "shift_type": "早班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 300.0,
+      "calculated_fuel_consumption": 14.666666666666666,
+      "is_normal": false,
+      "abnormal_types": [
+        "重复流水",
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F005",
+        "plate_number": "京A12345",
+        "fuel_time": "2026-04-15T23:00:00",
+        "fuel_amount": 561.6,
+        "fuel_liters": 72.0,
+        "unit_price": 7.8,
+        "station_name": "中石化夜间接驳站",
+        "card_number": "100123456789",
+        "odometer": null
+      },
+      "driver_name": null,
+      "schedule": null,
+      "calculated_distance": 50.0,
+      "calculated_fuel_consumption": 144.0,
+      "is_normal": false,
+      "abnormal_types": [
+        "非排班加油",
+        "油耗超阈值",
+        "疑似私用"
+      ],
+      "review": {
+        "reviewer": "王主管",
+        "review_time": "2026-05-11T18:38:49.312475",
+        "status": "确认异常",
+        "conclusion": "非工作时间大额加油，确认为私用，需从司机工资扣除",
+        "remarks": "金额¥561.60"
+      }
+    },
+    {
+      "fuel_record": {
+        "id": "F009",
+        "plate_number": "京A12345",
+        "fuel_time": "2026-04-16T09:30:00",
+        "fuel_amount": 335.4,
+        "fuel_liters": 43.0,
+        "unit_price": 7.8,
+        "station_name": "中石化机场站",
+        "card_number": "100123456789",
+        "odometer": 15620.0
+      },
+      "driver_name": "张三",
+      "schedule": {
+        "driver": "张三",
+        "shift_type": "早班",
+        "shift_date": "2026-04-16"
+      },
+      "calculated_distance": 300.0,
+      "calculated_fuel_consumption": 14.333333333333334,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F002",
+        "plate_number": "京B67890",
+        "fuel_time": "2026-04-15T10:15:00",
+        "fuel_amount": 528.0,
+        "fuel_liters": 66.0,
+        "unit_price": 8.0,
+        "station_name": "中石油北京站",
+        "card_number": "100198765432",
+        "odometer": 23250.0
+      },
+      "driver_name": "李四",
+      "schedule": {
+        "driver": "李四",
+        "shift_type": "早班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 300.0,
+      "calculated_fuel_consumption": 22.0,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F008",
+        "plate_number": "京B67890",
+        "fuel_time": "2026-04-16T10:00:00",
+        "fuel_amount": 520.0,
+        "fuel_liters": 65.0,
+        "unit_price": 8.0,
+        "station_name": "中石油临时站",
+        "card_number": "100198765432",
+        "odometer": null
+      },
+      "driver_name": "李四",
+      "schedule": {
+        "driver": "李四",
+        "shift_type": "早班",
+        "shift_date": "2026-04-16"
+      },
+      "calculated_distance": null,
+      "calculated_fuel_consumption": null,
+      "is_normal": true,
+      "abnormal_types": [
+        "正常"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F003",
+        "plate_number": "京C11111",
+        "fuel_time": "2026-04-15T18:00:00",
+        "fuel_amount": 218.4,
+        "fuel_liters": 28.0,
+        "unit_price": 7.8,
+        "station_name": "中石化王府井站",
+        "card_number": "100111222333",
+        "odometer": 8980.0
+      },
+      "driver_name": "王五",
+      "schedule": {
+        "driver": "王五",
+        "shift_type": "中班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 200.0,
+      "calculated_fuel_consumption": 14.000000000000002,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F004",
+        "plate_number": "京D22222",
+        "fuel_time": "2026-04-16T02:30:00",
+        "fuel_amount": 305.55,
+        "fuel_liters": 37.5,
+        "unit_price": 8.15,
+        "station_name": "CNG国贸站",
+        "card_number": "100144455566",
+        "odometer": 5720.0
+      },
+      "driver_name": "赵六",
+      "schedule": {
+        "driver": "赵六",
+        "shift_type": "晚班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 250.0,
+      "calculated_fuel_consumption": 15.0,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    },
+    {
+      "fuel_record": {
+        "id": "F007",
+        "plate_number": "京E33333",
+        "fuel_time": "2026-04-15T09:00:00",
+        "fuel_amount": 624.0,
+        "fuel_liters": 78.0,
+        "unit_price": 8.0,
+        "station_name": "中石油郊区站",
+        "card_number": "100177788899",
+        "odometer": 31250.0
+      },
+      "driver_name": "钱七",
+      "schedule": {
+        "driver": "钱七",
+        "shift_type": "早班",
+        "shift_date": "2026-04-15"
+      },
+      "calculated_distance": 150.0,
+      "calculated_fuel_consumption": 52.0,
+      "is_normal": false,
+      "abnormal_types": [
+        "油耗超阈值"
+      ],
+      "review": null
+    }
+  ],
+  "pending_review_drivers": {
+    "张三": [
+      "F001",
+      "F006",
+      "F009"
+    ],
+    "李四": [
+      "F002"
+    ],
+    "王五": [
+      "F003"
+    ],
+    "赵六": [
+      "F004"
+    ],
+    "钱七": [
+      "F007"
+    ]
+  }
+}

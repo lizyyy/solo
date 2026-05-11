@@ -1,0 +1,20 @@
+[
+  {
+    "id": "aea76fb2-31ff-4949-aeea-bd64dc53a951",
+    "fuel_record_id": "F005",
+    "reviewer": "王主管",
+    "review_time": "2026-05-11T18:38:49.312475",
+    "status": "确认异常",
+    "conclusion": "非工作时间大额加油，确认为私用，需从司机工资扣除",
+    "remarks": "金额¥561.60"
+  },
+  {
+    "id": "da4c2e8f-1a3a-47c5-b188-764d34b3ae64",
+    "fuel_record_id": "F006",
+    "reviewer": "李主管",
+    "review_time": "2026-05-11T18:39:15.173090",
+    "status": "确认正常",
+    "conclusion": "系加油站系统重复打印单据，实际只发生一次加油",
+    "remarks": "与F001为同一笔交易"
+  }
+]
