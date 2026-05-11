@@ -73,6 +73,7 @@ module.exports = function(program) {
       let errorCount = 0;
       const errors = [];
       const newImportedKeys = [];
+      const batchSeenKeys = new Set();
 
       for (let i = 0; i < records.length; i++) {
         const rawRecord = records[i];
@@ -98,7 +99,13 @@ module.exports = function(program) {
         const uniqueKey = `${tempRecord.garmentInfo.styleNo}-${tempRecord.garmentInfo.size}-${tempRecord.garmentInfo.color}-${tempRecord.department}-${tempRecord.borrowDate}-${tempRecord.dueDate}`;
 
         if (!options.force && importedKeys.has(uniqueKey)) {
-          console.log(`⏭️  [行${lineNum}] 跳过: 记录已存在 (${uniqueKey})`);
+          console.log(`⏭️  [行${lineNum}] 跳过: 记录已从历史导入 (${uniqueKey})`);
+          skipCount++;
+          continue;
+        }
+
+        if (!options.force && batchSeenKeys.has(uniqueKey)) {
+          console.log(`⏭️  [行${lineNum}] 跳过: 本批次重复行 (${uniqueKey})`);
           skipCount++;
           continue;
         }
@@ -110,6 +117,8 @@ module.exports = function(program) {
           errorCount++;
           continue;
         }
+
+        batchSeenKeys.add(uniqueKey);
 
         try {
           let garment = dataStore.getGarmentByKey(

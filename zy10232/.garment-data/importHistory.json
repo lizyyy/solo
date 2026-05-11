@@ -1,22 +1,20 @@
 [
   {
-    "id": "IM_1778490273077_zyujj6c6t",
-    "batchId": "BATCH_1778490273077_54WK9K",
-    "fileName": "shooting-list.csv",
-    "fileHash": "5d62dcb9549cb9df4bcd63adb5ebe840",
+    "id": "IM_1778506011140_hbctn8aw6",
+    "batchId": "BATCH_1778506011140_1XN02S",
+    "fileName": "test-duplicates.csv",
+    "fileHash": "2ce026b9620629905431ea80149d27e3",
     "importType": "borrow",
-    "importDate": "2026-05-11T09:04:33.077Z",
-    "recordCount": 5,
-    "successCount": 5,
+    "importDate": "2026-05-11T13:26:51.140Z",
+    "recordCount": 6,
+    "successCount": 3,
     "errorCount": 0,
     "status": "completed",
     "errors": [],
     "importedKeys": [
-      "SS2024-001-M-黑色-拍摄部-2026-05-10-2026-05-12",
-      "SS2024-001-L-黑色-电商部-2026-05-11-2026-05-15",
-      "SS2024-002-S-白色-设计部-2026-05-08-2026-05-10",
-      "SS2024-002-M-白色-拍摄部-2026-05-09-2026-05-13",
-      "SS2024-003-M-蓝色-市场部-2026-05-05-2026-05-08"
+      "SS2024-TEST-001-M-黑色-拍摄部-2026-05-15-2026-05-20",
+      "SS2024-TEST-002-L-白色-电商部-2026-05-16-2026-05-22",
+      "SS2024-TEST-003-S-蓝色-设计部-2026-05-17-2026-05-25"
     ],
     "notes": ""
   }

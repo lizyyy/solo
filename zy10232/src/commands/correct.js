@@ -133,11 +133,22 @@ module.exports = function(program) {
 
       const confirmed = [];
       const skipped = [];
+      const invalid = [];
       const now = new Date().toISOString();
 
       for (const record of recordsToConfirm) {
         if (record.confirmedAt) {
-          skipped.push(record);
+          skipped.push({ record, reason: '已确认' });
+          continue;
+        }
+
+        if (record.returnStatus !== 'returned') {
+          invalid.push({ record, reason: `未归还 (状态: ${record.returnStatus})` });
+          continue;
+        }
+
+        if (record.inspectionStatus !== 'passed') {
+          invalid.push({ record, reason: `未通过验收 (状态: ${record.inspectionStatus})` });
           continue;
         }
 
@@ -146,15 +157,32 @@ module.exports = function(program) {
       }
 
       console.log(`\n✅ 最终确认完成`);
-      console.log('─'.repeat(50));
+      console.log('─'.repeat(60));
       console.log(`  成功确认: ${confirmed.length} 条`);
       console.log(`  已确认跳过: ${skipped.length} 条`);
+      console.log(`  不符合条件: ${invalid.length} 条`);
 
       if (confirmed.length > 0) {
-        console.log(`\n  已确认记录:`);
+        console.log(`\n  ✅ 已确认记录:`);
         confirmed.forEach(r => {
           console.log(`    • ${r.garmentInfo.styleNo}-${r.garmentInfo.size}-${r.garmentInfo.color} (${r.id})`);
         });
+      }
+
+      if (skipped.length > 0) {
+        console.log(`\n  ⏭️  已确认跳过 (已在历史中确认):`);
+        skipped.forEach(item => {
+          console.log(`    • ${item.record.garmentInfo.styleNo}-${item.record.garmentInfo.size}-${item.record.garmentInfo.color} (${item.record.id})`);
+        });
+      }
+
+      if (invalid.length > 0) {
+        console.log(`\n  ❌ 不符合确认条件 (需已归还+已验收):`);
+        invalid.forEach(item => {
+          const g = item.record.garmentInfo;
+          console.log(`    • ${g.styleNo}-${g.size}-${g.color} (${item.record.id}): ${item.reason}`);
+        });
+        console.log(`\n  💡 提示: 请先使用 garment return 完成归还，再用 garment inspect 完成验收`);
       }
     });
 
