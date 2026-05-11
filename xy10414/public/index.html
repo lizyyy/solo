@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>亲子活动签到补录台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">
+            <h2>🎈 亲子签到台</h2>
+        </div>
+        <ul class="menu">
+            <li class="active" data-page="dashboard">
+                <span>📊</span> 活动看板
+            </li>
+            <li data-page="families">
+                <span>👨‍👩‍👧</span> 家庭管理
+            </li>
+            <li data-page="points">
+                <span>⭐</span> 积分流水
+            </li>
+            <li data-page="makeup">
+                <span>📝</span> 补录审核
+            </li>
+            <li data-page="exceptions">
+                <span>⚠️</span> 异常列表
+            </li>
+            <li data-page="stats">
+                <span>📈</span> 参与统计
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <h1 id="page-title">活动看板</h1>
+            <div class="actions">
+                <button id="refresh-btn" class="btn btn-secondary">🔄 刷新</button>
+            </div>
+        </header>
+
+        <div id="content"></div>
+    </main>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">操作</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
