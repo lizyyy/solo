@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药店慢病处方续配台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>🏥 药店慢病处方续配台</h1>
+            <div class="role-switch">
+                <button id="clerkBtn" class="active">💊 店员窗口</button>
+                <button id="pharmacistBtn">⚕️ 药师审核</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="clerkView" class="view">
+            <div class="search-section">
+                <h2>🔍 患者处方查询</h2>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="输入患者姓名或身份证号搜索...">
+                    <button id="searchBtn">搜索</button>
+                </div>
+                <div id="patientList" class="patient-list"></div>
+            </div>
+
+            <div id="prescriptionSection" class="prescription-section" style="display: none;">
+                <h2>📋 处方信息</h2>
+                <div id="prescriptionList" class="prescription-list"></div>
+            </div>
+
+            <div id="validationSection" class="validation-section" style="display: none;">
+                <h2>✅ 续配验证</h2>
+                <div id="validationResult"></div>
+            </div>
+
+            <div class="inventory-section">
+                <h2>📦 药品库存管理</h2>
+                <button id="refreshStockBtn">刷新库存</button>
+                <div id="inventoryList" class="inventory-list"></div>
+            </div>
+        </div>
+
+        <div id="pharmacistView" class="view" style="display: none;">
+            <div class="pending-section">
+                <h2>⏳ 待审核续配申请</h2>
+                <div class="stats-bar">
+                    <span id="pendingCount">待审核: 0</span>
+                    <button id="refreshPendingBtn">刷新</button>
+                </div>
+                <div id="pendingList" class="pending-list"></div>
+            </div>
+
+            <div class="history-section">
+                <h2>📊 今日续配统计</h2>
+                <div class="date-picker">
+                    <input type="date" id="exportDate" value="">
+                    <button id="exportBtn">📥 导出今日清单</button>
+                </div>
+                <div id="todayStats" class="stats"></div>
+                <div id="todayList" class="today-list"></div>
+            </div>
+
+            <div class="rejection-section">
+                <h2>❌ 未通过原因</h2>
+                <div id="rejectionList" class="rejection-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button id="modalCancel">取消</button>
+                <button id="modalConfirm" class="primary">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" style="display: none;"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
