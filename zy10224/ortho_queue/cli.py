@@ -1,5 +1,5 @@
 import click
-from datetime import date, timedelta
+from datetime import date as date_class, timedelta
 from tabulate import tabulate
 from .database import get_session, init_db
 from .services import (
@@ -51,7 +51,7 @@ def reminder():
               help="输出格式")
 def today(date, format):
     """查看今日队列"""
-    target_date = date.date() if date else date.today()
+    target_date = date.date() if date else date_class.today()
     session = get_session()
     
     try:
@@ -312,7 +312,7 @@ def reminder_create(code, reminder_date, reminder_type):
               help="导出格式")
 def reminder_list(date, include_withdrawn, export):
     """查看提醒清单"""
-    target_date = date.date() if date else date.today()
+    target_date = date.date() if date else date_class.today()
     session = get_session()
     
     try:
