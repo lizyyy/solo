@@ -1,0 +1,66 @@
+{
+  "CAB001_2026-05-11T22:46:13.859728": {
+    "cabinet_id": "CAB001",
+    "report_time": "2026-05-11T22:46:13.859728",
+    "is_online": true,
+    "slot_status": {
+      "S01": "occupied",
+      "S02": "empty",
+      "S03": "empty"
+    },
+    "raw_data": {
+      "cabinet_id": "CAB001",
+      "report_time": "2026-05-11T22:46:13.859728",
+      "is_online": "true",
+      "slot_status": "S01:occupied;S02:empty;S03:empty"
+    }
+  },
+  "CAB002_2026-05-11T22:46:13.859728": {
+    "cabinet_id": "CAB002",
+    "report_time": "2026-05-11T22:46:13.859728",
+    "is_online": false,
+    "slot_status": {
+      "S01": "empty",
+      "S02": "empty",
+      "S03": "empty"
+    },
+    "raw_data": {
+      "cabinet_id": "CAB002",
+      "report_time": "2026-05-11T22:46:13.859728",
+      "is_online": "false",
+      "slot_status": "S01:empty;S02:empty;S03:empty"
+    }
+  },
+  "CAB003_2026-05-11T22:46:13.859728": {
+    "cabinet_id": "CAB003",
+    "report_time": "2026-05-11T22:46:13.859728",
+    "is_online": true,
+    "slot_status": {
+      "S01": "empty",
+      "S02": "empty",
+      "S03": "empty"
+    },
+    "raw_data": {
+      "cabinet_id": "CAB003",
+      "report_time": "2026-05-11T22:46:13.859728",
+      "is_online": "true",
+      "slot_status": "S01:empty;S02:empty;S03:empty"
+    }
+  },
+  "CAB004_2026-05-11T22:46:13.859728": {
+    "cabinet_id": "CAB004",
+    "report_time": "2026-05-11T22:46:13.859728",
+    "is_online": true,
+    "slot_status": {
+      "S01": "empty",
+      "S02": "occupied",
+      "S03": "empty"
+    },
+    "raw_data": {
+      "cabinet_id": "CAB004",
+      "report_time": "2026-05-11T22:46:13.859728",
+      "is_online": "true",
+      "slot_status": "S01:empty;S02:occupied;S03:empty"
+    }
+  }
+}

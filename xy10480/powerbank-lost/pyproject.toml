@@ -1,0 +1,16 @@
+[project]
+name = "powerbank-lost"
+version = "1.0.0"
+description = "共享充电宝丢失申诉处理 CLI"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "rich>=13.0",
+]
+
+[project.scripts]
+pb-lost = "powerbank_lost.cli:cli"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

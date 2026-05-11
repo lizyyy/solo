@@ -1,0 +1,53 @@
+{
+  "ORD001_2026-05-11T22:16:13.859728": {
+    "order_id": "ORD001",
+    "user_id": "USER001",
+    "device_id": "DEV001",
+    "cabinet_id": "CAB001",
+    "return_time": "2026-05-11T22:16:13.859728",
+    "slot_id": "S01",
+    "is_confirmed": false,
+    "raw_data": {
+      "order_id": "ORD001",
+      "user_id": "USER001",
+      "device_id": "DEV001",
+      "cabinet_id": "CAB001",
+      "return_time": "2026-05-11T22:16:13.859728",
+      "slot_id": "S01"
+    }
+  },
+  "ORD003_2026-05-11T21:16:13.859728": {
+    "order_id": "ORD003",
+    "user_id": "USER003",
+    "device_id": "DEV003",
+    "cabinet_id": "CAB002",
+    "return_time": "2026-05-11T21:16:13.859728",
+    "slot_id": "S03",
+    "is_confirmed": false,
+    "raw_data": {
+      "order_id": "ORD003",
+      "user_id": "USER003",
+      "device_id": "DEV003",
+      "cabinet_id": "CAB002",
+      "return_time": "2026-05-11T21:16:13.859728",
+      "slot_id": "S03"
+    }
+  },
+  "ORD004_2026-05-11T22:16:13.859728": {
+    "order_id": "ORD004",
+    "user_id": "USER006",
+    "device_id": "DEV004",
+    "cabinet_id": "CAB004",
+    "return_time": "2026-05-11T22:16:13.859728",
+    "slot_id": "S02",
+    "is_confirmed": false,
+    "raw_data": {
+      "order_id": "ORD004",
+      "user_id": "USER006",
+      "device_id": "DEV004",
+      "cabinet_id": "CAB004",
+      "return_time": "2026-05-11T22:16:13.859728",
+      "slot_id": "S02"
+    }
+  }
+}
