@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>门店排队叫号台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🏪 门店排队叫号台</h1>
+            <div class="current-time" id="currentTime"></div>
+        </header>
+
+        <div class="main-content">
+            <nav class="sidebar">
+                <div class="nav-item active" data-tab="dashboard">
+                    <span>📊</span> 总览
+                </div>
+                <div class="nav-item" data-tab="customer">
+                    <span>🎫</span> 顾客取号
+                </div>
+                <div class="nav-item" data-tab="staff">
+                    <span>🖥️</span> 窗口叫号
+                </div>
+                <div class="nav-item" data-tab="history">
+                    <span>📋</span> 历史记录
+                </div>
+            </nav>
+
+            <div class="content-area">
+                <div class="tab-content active" id="dashboard">
+                    <div class="dashboard-grid">
+                        <div class="stats-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="statWaiting">0</div>
+                                <div class="stat-label">等待中</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="statCompleted">0</div>
+                                <div class="stat-label">已完成</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="statMissed">0</div>
+                                <div class="stat-label">过号</div>
+                            </div>
+                        </div>
+                        <div class="stats-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="statAvgWait">0</div>
+                                <div class="stat-label">平均等待(秒)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">当前队列</div>
+                    <div class="queues-container" id="queuesContainer"></div>
+
+                    <div class="section-title">窗口状态</div>
+                    <div class="windows-container" id="windowsContainer"></div>
+
+                    <div class="section-title">过号列表</div>
+                    <div class="missed-container" id="missedContainer"></div>
+                </div>
+
+                <div class="tab-content" id="customer">
+                    <div class="form-container">
+                        <h2>取号登记</h2>
+                        <form id="takeNumberForm">
+                            <div class="form-group">
+                                <label>姓名</label>
+                                <input type="text" id="customerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>手机号</label>
+                                <input type="tel" id="customerPhone" required pattern="[0-9]{11}">
+                            </div>
+                            <div class="form-group">
+                                <label>业务类型</label>
+                                <select id="businessType" required>
+                                    <option value="">请选择</option>
+                                    <option value="card">办卡业务 (C)</option>
+                                    <option value="after_sale">售后服务 (A)</option>
+                                    <option value="consultation">咨询服务 (Z)</option>
+                                </select>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="isSenior">
+                                    60岁以上老人（优先办理）
+                                </label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="isReservation">
+                                    已预约客户（优先办理）
+                                </label>
+                            </div>
+                            <div class="form-group" id="reservationIdGroup" style="display: none;">
+                                <label>预约号</label>
+                                <input type="text" id="reservationId">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">立即取号</button>
+                        </form>
+                    </div>
+                    <div id="ticketResult"></div>
+                </div>
+
+                <div class="tab-content" id="staff">
+                    <div class="staff-section">
+                        <h3>窗口选择</h3>
+                        <div class="window-selector" id="staffWindowSelector"></div>
+                    </div>
+
+                    <div class="staff-section" id="staffActions" style="display: none;">
+                        <h3>当前号码</h3>
+                        <div class="current-number-display" id="staffCurrentNumber">
+                            <div class="no-number">暂无正在处理的号码</div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-success" id="btnCallNext">呼叫下一位</button>
+                            <button class="btn btn-warning" id="btnMarkMissed">标记过号</button>
+                            <button class="btn btn-primary" id="btnComplete">完成办理</button>
+                        </div>
+                    </div>
+
+                    <div class="staff-section">
+                        <h3>未完成号码（交接用）</h3>
+                        <div id="incompleteNumbers"></div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="history">
+                    <div class="history-actions">
+                        <button class="btn btn-primary" id="btnRefreshHistory">刷新历史</button>
+                        <a class="btn btn-success" href="/api/export/today" id="btnExport">导出今天记录</a>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="searchTicketId" placeholder="输入号码查询（如：C001）">
+                        <button class="btn btn-secondary" id="btnSearchTicket">查询</button>
+                    </div>
+                    <div id="ticketDetail" class="ticket-detail" style="display: none;"></div>
+                    <div class="history-table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>号码</th>
+                                    <th>姓名</th>
+                                    <th>业务类型</th>
+                                    <th>状态</th>
+                                    <th>取号时间</th>
+                                    <th>叫号时间</th>
+                                    <th>完成时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
