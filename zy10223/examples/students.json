@@ -1,0 +1,50 @@
+[
+  {
+    "id": "S001",
+    "name": "张三",
+    "group": "一组",
+    "emails": ["zhangsan@example.com", "zs_test@example.com"],
+    "aliases": ["小张", "zs"],
+    "notes": ""
+  },
+  {
+    "id": "S002",
+    "name": "李四",
+    "group": "一组",
+    "emails": ["lisi@example.com"],
+    "aliases": ["小李"],
+    "notes": ""
+  },
+  {
+    "id": "S003",
+    "name": "王五",
+    "group": "一组",
+    "emails": ["wangwu@example.com"],
+    "aliases": [],
+    "notes": ""
+  },
+  {
+    "id": "S004",
+    "name": "赵六",
+    "group": "二组",
+    "emails": ["zhaoliu@example.com"],
+    "aliases": ["小赵"],
+    "notes": ""
+  },
+  {
+    "id": "S005",
+    "name": "钱七",
+    "group": "二组",
+    "emails": ["qianqi@example.com", "qq_alt@example.com"],
+    "aliases": [],
+    "notes": "请假两周"
+  },
+  {
+    "id": "S006",
+    "name": "孙八",
+    "group": "二组",
+    "emails": ["sunba@example.com"],
+    "aliases": [],
+    "notes": ""
+  }
+]

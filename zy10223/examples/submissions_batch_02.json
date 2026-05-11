@@ -1,0 +1,42 @@
+[
+  {
+    "student_identifier": "zhangsan@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-05T10:00:00",
+    "score": 90.0,
+    "resubmit_reason": "根据反馈修改了环境配置",
+    "grader_notes": "重交后通过"
+  },
+  {
+    "student_identifier": "qianqi@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-11T09:00:00",
+    "score": 72.0,
+    "resubmit_reason": "请假回来补交",
+    "grader_notes": "迟交"
+  },
+  {
+    "student_identifier": "zhangsan@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-14T10:00:00",
+    "score": 78.0,
+    "resubmit_reason": "",
+    "grader_notes": "补打分"
+  },
+  {
+    "student_identifier": "lisi@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-16T08:00:00",
+    "score": 65.0,
+    "resubmit_reason": "周末赶工",
+    "grader_notes": "迟交"
+  },
+  {
+    "student_identifier": "qq_alt@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-15T23:55:00",
+    "score": 80.0,
+    "resubmit_reason": "",
+    "grader_notes": "卡点提交"
+  }
+]

@@ -1,0 +1,138 @@
+[
+  {
+    "student_identifier": "zhangsan@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-04T15:30:00",
+    "score": 85.0,
+    "resubmit_reason": "",
+    "grader_notes": "环境配置正确"
+  },
+  {
+    "student_identifier": "zs_test@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-04T15:30:00",
+    "score": null,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "小李",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-06T10:00:00",
+    "score": 75.0,
+    "resubmit_reason": "昨晚加班太晚",
+    "grader_notes": "迟交一天"
+  },
+  {
+    "student_identifier": "wangwu@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-05T22:00:00",
+    "score": 90.0,
+    "resubmit_reason": "",
+    "grader_notes": "完成得很好"
+  },
+  {
+    "student_identifier": "zhaoliu@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-04T20:00:00",
+    "score": 80.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "qianqi@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-03T18:00:00",
+    "score": 88.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "sunba@example.com",
+    "assignment_id": "round_01",
+    "submitted_at": "2026-05-05T23:30:00",
+    "score": 70.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "zhangsan@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-10T18:00:00",
+    "score": 82.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "lisi@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-10T23:50:00",
+    "score": 65.0,
+    "resubmit_reason": "",
+    "grader_notes": "刚刚赶完"
+  },
+  {
+    "student_identifier": "wangwu@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-09T14:00:00",
+    "score": 92.0,
+    "resubmit_reason": "",
+    "grader_notes": "提前完成"
+  },
+  {
+    "student_identifier": "zhaoliu@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-11T02:00:00",
+    "score": 78.0,
+    "resubmit_reason": "家里有事耽误了",
+    "grader_notes": "迟交"
+  },
+  {
+    "student_identifier": "qianqi@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-10T16:00:00",
+    "score": null,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "sunba@example.com",
+    "assignment_id": "round_02",
+    "submitted_at": "2026-05-10T20:00:00",
+    "score": 60.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "zhangsan@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-14T10:00:00",
+    "score": null,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "wangwu@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-13T20:00:00",
+    "score": 95.0,
+    "resubmit_reason": "",
+    "grader_notes": "优秀"
+  },
+  {
+    "student_identifier": "zhaoliu@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-15T23:00:00",
+    "score": 83.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  },
+  {
+    "student_identifier": "unknown@example.com",
+    "assignment_id": "round_03",
+    "submitted_at": "2026-05-14T15:00:00",
+    "score": 70.0,
+    "resubmit_reason": "",
+    "grader_notes": ""
+  }
+]
