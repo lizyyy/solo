@@ -1,0 +1,83 @@
+equipments:
+    - id: EQ20260511151217000
+      name: 索尼 FE 24-70mm F2.8 GM
+      type: 镜头
+      deposit: 5000
+      daily_rate: 200
+      accessories:
+        - 镜头盖
+        - 遮光罩
+        - UV镜
+      is_available: true
+      created_at: "2026-05-11T15:12:17+08:00"
+      updated_at: "2026-05-11T15:12:42+08:00"
+renters:
+    - id: RT20260511151228000
+      name: 张三
+      phone: "13800138000"
+      email: ""
+      notes: ""
+      created_at: "2026-05-11T15:12:28+08:00"
+rentals:
+    - id: RN20260511151237000
+      equipment_id: EQ20260511151217000
+      equipment_name: 索尼 FE 24-70mm F2.8 GM
+      renter_id: RT20260511151228000
+      renter_name: 张三
+      renter_phone: "13800138000"
+      rental_start: "2026-05-01"
+      rental_end: "2026-05-05"
+      actual_return: "2026-05-06"
+      deposit_paid: 5000
+      daily_rate: 200
+      accessories_out:
+        - 镜头盖
+        - 遮光罩
+        - UV镜
+      out_checklist:
+        - name: 外观完好
+          is_good: true
+          comment: ""
+        - name: 功能正常
+          is_good: true
+          comment: ""
+        - name: 配件齐全
+          is_good: true
+          comment: ""
+      out_verified: true
+      accessories_back:
+        - 镜头盖
+      in_checklist:
+        - name: 外观完好
+          is_good: true
+          comment: ""
+        - name: 功能正常
+          is_good: true
+          comment: ""
+      in_verified: true
+      is_returned: true
+      is_compensated: true
+      compensation_amount: 500
+      compensation_note: 镜头镀膜划伤需维修
+      overdue_days: 1
+      overdue_fee: 300
+      missing_accessories:
+        - 遮光罩
+        - UV镜
+      missing_fee: 100
+      refund_amount: 4100
+      final_balance: 4100
+      status: RETURNED
+      created_at: "2026-05-11T15:12:37+08:00"
+      updated_at: "2026-05-11T15:12:51+08:00"
+disputes:
+    - id: DP20260511151251000
+      rental_id: RN20260511151237000
+      equipment_name: 索尼 FE 24-70mm F2.8 GM
+      renter_name: 张三
+      issue_type: COMPENSATION
+      description: 镜头镀膜划伤需维修
+      resolution: 赔付扣款 500.00 元
+      amount: 500
+      timestamp: "2026-05-11T15:12:51+08:00"
+last_modified: "2026-05-11T15:12:51+08:00"
