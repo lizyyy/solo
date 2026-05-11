@@ -1,0 +1,430 @@
+[
+  {
+    "id": "veh-001",
+    "vin": "LFMAP22C3D0000001",
+    "plateNumber": "京A12345",
+    "brand": "丰田",
+    "model": "卡罗拉",
+    "year": 2018,
+    "mileage": 58000,
+    "purchasePrice": 65000,
+    "expectedSellingPrice": 85000,
+    "status": "in_preparation",
+    "preparationItems": [
+      {
+        "id": "99ddd2c7-580f-4095-8e1c-cf2609821636",
+        "type": "轮胎更换",
+        "description": "更换四条米其林轮胎",
+        "status": "completed",
+        "startDate": "2026-05-01",
+        "completedDate": "2026-05-02",
+        "assignedTo": "张师傅",
+        "notes": ""
+      },
+      {
+        "id": "d8194647-a768-457b-8b37-60abb6017e4e",
+        "type": "漆面修复",
+        "description": "左前门和左后门补漆",
+        "status": "completed",
+        "startDate": "2026-05-02",
+        "completedDate": "2026-05-04",
+        "assignedTo": "李师傅",
+        "notes": ""
+      },
+      {
+        "id": "bd34f790-b81a-4cd4-9f4a-179cceebe7bf",
+        "type": "常规保养",
+        "description": "更换机油、机滤、空滤",
+        "status": "completed",
+        "startDate": "2026-05-05",
+        "completedDate": "2026-05-05",
+        "assignedTo": "王师傅",
+        "notes": ""
+      }
+    ],
+    "costs": [
+      {
+        "id": "8cd08701-c52c-4ab5-8c48-b958f97ce144",
+        "vehicleId": "veh-001",
+        "category": "轮胎",
+        "description": "米其林 XM2+ 195/65R15 x4",
+        "partsCost": 2800,
+        "laborCost": 200,
+        "laborHours": 2,
+        "date": "2026-05-02",
+        "notes": ""
+      },
+      {
+        "id": "ea5b2fa0-4eec-4b0d-ac7f-25c783cb82a6",
+        "vehicleId": "veh-001",
+        "category": "漆面",
+        "description": "左前门+左后门钣金喷漆",
+        "partsCost": 800,
+        "laborCost": 1200,
+        "laborHours": 8,
+        "date": "2026-05-04",
+        "notes": ""
+      },
+      {
+        "id": "a6c6a776-ddb2-41c1-a2ec-1205be45a85b",
+        "vehicleId": "veh-001",
+        "category": "保养",
+        "description": "全合成机油+机滤+空滤",
+        "partsCost": 450,
+        "laborCost": 80,
+        "laborHours": 1,
+        "date": "2026-05-05",
+        "notes": ""
+      }
+    ],
+    "priceAdjustments": [],
+    "notes": "个人一手车，车况良好",
+    "createdAt": "2026-05-11T13:21:19.149Z"
+  },
+  {
+    "id": "veh-002",
+    "vin": "LSVAU4182C2000002",
+    "plateNumber": "京B67890",
+    "brand": "大众",
+    "model": "朗逸",
+    "year": 2017,
+    "mileage": 72000,
+    "purchasePrice": 52000,
+    "expectedSellingPrice": 68000,
+    "status": "for_sale",
+    "preparationItems": [
+      {
+        "id": "3bcfc4b6-f7e9-49f0-9eb8-ab87ea3aed1c",
+        "type": "轮胎更换",
+        "description": "更换四条轮胎",
+        "status": "completed",
+        "startDate": "2026-04-28",
+        "completedDate": "2026-04-29",
+        "assignedTo": "张师傅",
+        "notes": ""
+      },
+      {
+        "id": "55ae2a13-5db3-4ded-b13e-f25f8d179d43",
+        "type": "漆面修复",
+        "description": "全车抛光打蜡，前保险杠喷漆",
+        "status": "completed",
+        "startDate": "2026-04-29",
+        "completedDate": "2026-05-03",
+        "assignedTo": "李师傅",
+        "notes": ""
+      },
+      {
+        "id": "13004d42-a1b1-46ae-a3f7-4d66c8977e53",
+        "type": "常规保养",
+        "description": "大保养：更换正时皮带、变速箱油",
+        "status": "completed",
+        "startDate": "2026-05-01",
+        "completedDate": "2026-05-03",
+        "assignedTo": "王师傅",
+        "notes": ""
+      },
+      {
+        "id": "8a28ebb7-6412-4c66-9e76-4f982841abb5",
+        "type": "空调维修",
+        "description": "更换压缩机，清洗空调系统",
+        "status": "completed",
+        "startDate": "2026-05-03",
+        "completedDate": "2026-05-05",
+        "assignedTo": "赵师傅",
+        "notes": ""
+      }
+    ],
+    "costs": [
+      {
+        "id": "d7e450c8-6146-4154-891c-5221fc4acbbc",
+        "vehicleId": "veh-002",
+        "category": "轮胎",
+        "description": "固特异 205/55R16 x4",
+        "partsCost": 2400,
+        "laborCost": 200,
+        "laborHours": 2,
+        "date": "2026-04-29",
+        "notes": ""
+      },
+      {
+        "id": "b909bf68-26ee-487e-b985-eed0a77b3b32",
+        "vehicleId": "veh-002",
+        "category": "漆面",
+        "description": "全车抛光+前保险杠喷漆",
+        "partsCost": 1200,
+        "laborCost": 1800,
+        "laborHours": 12,
+        "date": "2026-05-03",
+        "notes": ""
+      },
+      {
+        "id": "16944a0a-6ce0-402a-83c0-8df9e5b809e0",
+        "vehicleId": "veh-002",
+        "category": "保养",
+        "description": "大保养：正时皮带+变速箱油+火花塞",
+        "partsCost": 3500,
+        "laborCost": 1200,
+        "laborHours": 6,
+        "date": "2026-05-03",
+        "notes": ""
+      },
+      {
+        "id": "be5c270f-48bb-48e1-a1e0-e6f2cebb9e16",
+        "vehicleId": "veh-002",
+        "category": "空调",
+        "description": "压缩机更换+空调清洗",
+        "partsCost": 2800,
+        "laborCost": 800,
+        "laborHours": 4,
+        "date": "2026-05-05",
+        "notes": ""
+      }
+    ],
+    "priceAdjustments": [
+      {
+        "id": "3c8321fc-4abb-49b5-93e9-0054b0032b43",
+        "vehicleId": "veh-002",
+        "oldPrice": 68000,
+        "newPrice": 65000,
+        "reason": "市场行情不好，需要降价促销",
+        "createdAt": "2026-05-11T13:21:54.605Z",
+        "createdBy": "test"
+      }
+    ],
+    "notes": "整备费用超预算，需要评估售价",
+    "createdAt": "2026-05-11T13:21:19.155Z"
+  },
+  {
+    "id": "veh-003",
+    "vin": "LGWEF4A50CF000003",
+    "plateNumber": "京C54321",
+    "brand": "哈弗",
+    "model": "H6",
+    "year": 2019,
+    "mileage": 45000,
+    "purchasePrice": 78000,
+    "expectedSellingPrice": 98000,
+    "status": "for_sale",
+    "preparationItems": [
+      {
+        "id": "14eaa2aa-d1b0-4a46-9c52-80707bcfda73",
+        "type": "轮胎更换",
+        "description": "更换四条轮胎",
+        "status": "completed",
+        "startDate": "2026-05-01",
+        "completedDate": "2026-05-02",
+        "assignedTo": "张师傅",
+        "notes": ""
+      },
+      {
+        "id": "f62e75d2-c2c5-4cbc-aac3-a3247ef93309",
+        "type": "轮胎更换",
+        "description": "后轮胎更换",
+        "status": "completed",
+        "startDate": "2026-05-03",
+        "completedDate": "2026-05-03",
+        "assignedTo": "张师傅",
+        "notes": ""
+      },
+      {
+        "id": "cd482bdd-e182-4d2a-a4f5-b78f0848fa7b",
+        "type": "漆面修复",
+        "description": "前后保险杠喷漆",
+        "status": "completed",
+        "startDate": "2026-05-02",
+        "completedDate": "2026-05-04",
+        "assignedTo": "李师傅",
+        "notes": ""
+      },
+      {
+        "id": "7c492e31-9e86-4860-aee8-b43cd174f5e8",
+        "type": "常规保养",
+        "description": "小保养",
+        "status": "completed",
+        "startDate": "2026-05-04",
+        "completedDate": "2026-05-04",
+        "assignedTo": "王师傅",
+        "notes": ""
+      }
+    ],
+    "costs": [
+      {
+        "id": "68b433f6-1388-4522-a007-d059aefcf5b3",
+        "vehicleId": "veh-003",
+        "category": "轮胎",
+        "description": "米其林 225/65R17 x4",
+        "partsCost": 3600,
+        "laborCost": 240,
+        "laborHours": 2,
+        "date": "2026-05-02",
+        "notes": ""
+      },
+      {
+        "id": "c771f5e9-cb1a-4d23-993f-ebbc48fda545",
+        "vehicleId": "veh-003",
+        "category": "轮胎",
+        "description": "后轮换胎重复记录",
+        "partsCost": 1800,
+        "laborCost": 120,
+        "laborHours": 1,
+        "date": "2026-05-03",
+        "notes": ""
+      },
+      {
+        "id": "94f828d9-3af4-446b-89c2-c5e61a18ec24",
+        "vehicleId": "veh-003",
+        "category": "漆面",
+        "description": "前后保险杠喷漆",
+        "partsCost": 1000,
+        "laborCost": 1400,
+        "laborHours": 8,
+        "date": "2026-05-04",
+        "notes": ""
+      },
+      {
+        "id": "6b4a721b-9ccc-40f6-a81b-730b61c86674",
+        "vehicleId": "veh-003",
+        "category": "保养",
+        "description": "小保养",
+        "partsCost": 500,
+        "laborCost": 100,
+        "laborHours": 1,
+        "date": "2026-05-04",
+        "notes": ""
+      }
+    ],
+    "priceAdjustments": [],
+    "notes": "有重复整备项目记录",
+    "createdAt": "2026-05-11T13:21:19.155Z"
+  },
+  {
+    "id": "veh-004",
+    "vin": "LGBP2AE04DY000004",
+    "plateNumber": "京D98765",
+    "brand": "日产",
+    "model": "轩逸",
+    "year": 2016,
+    "mileage": 89000,
+    "purchasePrice": 42000,
+    "expectedSellingPrice": 55000,
+    "status": "for_sale",
+    "preparationItems": [
+      {
+        "id": "cbaf9670-0fd8-44c1-a49b-9de8ebb80555",
+        "type": "轮胎更换",
+        "description": "更换两条前胎",
+        "status": "completed",
+        "startDate": "2026-05-02",
+        "completedDate": "2026-05-02",
+        "assignedTo": "张师傅",
+        "notes": ""
+      },
+      {
+        "id": "e91ee547-b44f-4244-ac7f-dc69c6fad5c3",
+        "type": "漆面修复",
+        "description": "左后翼子板钣金喷漆",
+        "status": "pending",
+        "startDate": "2026-05-03",
+        "assignedTo": "李师傅",
+        "notes": ""
+      },
+      {
+        "id": "90eb9f91-67bf-46ff-8e93-820941931c6e",
+        "type": "常规保养",
+        "description": "常规小保养",
+        "status": "completed",
+        "startDate": "2026-05-01",
+        "completedDate": "2026-05-01",
+        "assignedTo": "王师傅",
+        "notes": ""
+      }
+    ],
+    "costs": [
+      {
+        "id": "0ee1e058-010f-4104-a2fa-417682ac6c35",
+        "vehicleId": "veh-004",
+        "category": "轮胎",
+        "description": "前胎两条 195/60R16",
+        "partsCost": 1400,
+        "laborCost": 100,
+        "laborHours": 1,
+        "date": "2026-05-02",
+        "notes": ""
+      },
+      {
+        "id": "73b01d38-e713-480f-aa81-9f59d8b5c2ce",
+        "vehicleId": "veh-004",
+        "category": "漆面",
+        "description": "左后翼子板钣金喷漆",
+        "partsCost": 600,
+        "laborCost": 800,
+        "laborHours": 6,
+        "date": "2026-05-03",
+        "notes": ""
+      },
+      {
+        "id": "c1859239-4435-4f6b-b920-b858d225a212",
+        "vehicleId": "veh-004",
+        "category": "保养",
+        "description": "常规保养",
+        "partsCost": 380,
+        "laborCost": 80,
+        "laborHours": 1,
+        "date": "2026-05-01",
+        "notes": ""
+      }
+    ],
+    "priceAdjustments": [],
+    "notes": "整备未完成但标记为待售",
+    "createdAt": "2026-05-11T13:21:19.155Z"
+  },
+  {
+    "id": "veh-005",
+    "vin": "LVHFA1646C5000005",
+    "plateNumber": "京E13579",
+    "brand": "本田",
+    "model": "思域",
+    "year": 2020,
+    "mileage": 32000,
+    "purchasePrice": 105000,
+    "expectedSellingPrice": 135000,
+    "status": "in_preparation",
+    "preparationItems": [
+      {
+        "id": "638b032a-85d9-4265-a9a3-2e418fa0a256",
+        "type": "常规保养",
+        "description": "更换机油机滤",
+        "status": "completed",
+        "startDate": "2026-05-05",
+        "completedDate": "2026-05-05",
+        "assignedTo": "王师傅",
+        "notes": ""
+      },
+      {
+        "id": "a65b293d-146c-40a4-961b-c732cdcfd872",
+        "type": "漆面修复",
+        "description": "右侧两扇门抛光",
+        "status": "pending",
+        "startDate": "2026-05-06",
+        "assignedTo": "李师傅",
+        "notes": ""
+      }
+    ],
+    "costs": [
+      {
+        "id": "1dceb5b7-d61e-4a80-aae5-6fc9a2b41616",
+        "vehicleId": "veh-005",
+        "category": "保养",
+        "description": "全合成机油+机滤",
+        "partsCost": 550,
+        "laborCost": 100,
+        "laborHours": 1,
+        "date": "2026-05-05",
+        "notes": ""
+      }
+    ],
+    "priceAdjustments": [],
+    "notes": "车况极佳",
+    "createdAt": "2026-05-11T13:21:19.155Z"
+  }
+]
