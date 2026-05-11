@@ -1,0 +1,44 @@
+{
+  "events": [
+    {
+      "timestamp": "2026-05-11T15:28:02.122223",
+      "action": "import",
+      "details": {
+        "data_type": "orders",
+        "file": "sample_orders.csv",
+        "records": 7,
+        "batch_id": "20260511_orders"
+      }
+    },
+    {
+      "timestamp": "2026-05-11T15:28:06.140734",
+      "action": "import",
+      "details": {
+        "data_type": "products",
+        "file": "sample_products.csv",
+        "records": 4,
+        "batch_id": "20260511_products"
+      }
+    },
+    {
+      "timestamp": "2026-05-11T15:28:12.218624",
+      "action": "import",
+      "details": {
+        "data_type": "stockout",
+        "file": "sample_stockout.csv",
+        "records": 2,
+        "batch_id": "20260511_stockout"
+      }
+    },
+    {
+      "timestamp": "2026-05-11T15:28:37.686142",
+      "action": "confirm",
+      "details": {
+        "refunds": 3,
+        "replacements": 0,
+        "commissions": 6
+      }
+    }
+  ],
+  "last_confirmed": "2026-05-11T15:28:37.685894"
+}

@@ -1,0 +1,8 @@
+order_id,building,room,product_id,product_name,quantity,unit_price,total_amount,paid_amount,order_item_id
+ORD001,1栋,101,P001,草莓,3,25.0,75.0,75.0,ORD001_P001
+ORD001,1栋,101,P002,牛奶,2,15.0,30.0,30.0,ORD001_P002
+ORD002,1栋,202,P001,草莓,2,25.0,50.0,50.0,ORD002_P001
+ORD002,1栋,202,P003,鸡蛋,1,20.0,20.0,20.0,ORD002_P003
+ORD003,2栋,301,P001,草莓,1,25.0,25.0,25.0,ORD003_P001
+ORD003,2栋,301,P002,牛奶,1,15.0,15.0,15.0,ORD003_P002
+ORD004,2栋,402,P004,番茄,2,8.0,16.0,16.0,ORD004_P004
