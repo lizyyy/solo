@@ -75,7 +75,22 @@ class DataAccess {
         );
       }
       
-      logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      if (options.sort) {
+        const sortKeys = Object.keys(options.sort);
+        logs.sort((a, b) => {
+          for (const key of sortKeys) {
+            const order = options.sort[key];
+            const valA = a[key] instanceof Date ? a[key].getTime() : 
+                          typeof a[key] === 'string' && !isNaN(Date.parse(a[key])) ? new Date(a[key]).getTime() : a[key];
+            const valB = b[key] instanceof Date ? b[key].getTime() : 
+                          typeof b[key] === 'string' && !isNaN(Date.parse(b[key])) ? new Date(b[key]).getTime() : b[key];
+            
+            if (valA < valB) return -1 * order;
+            if (valA > valB) return 1 * order;
+          }
+          return 0;
+        });
+      }
       
       if (options.skip) {
         logs = logs.slice(options.skip);

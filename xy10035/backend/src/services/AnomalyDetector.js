@@ -30,7 +30,15 @@ class AnomalyDetector {
     const operationMap = new Map();
 
     logs.forEach(log => {
-      const key = `${log.operation}-${JSON.stringify(log.details?.requestBody || {})}`;
+      const hasRequestBody = log.details?.requestBody && 
+                           Object.keys(log.details.requestBody).length > 0;
+      
+      let key;
+      if (hasRequestBody) {
+        key = `${log.service}-${log.operation}-${JSON.stringify(log.details.requestBody)}`;
+      } else {
+        key = `${log.service}-${log.operation}-${log.message}-${log.userId || ''}`;
+      }
       
       if (operationMap.has(key)) {
         const previous = operationMap.get(key);
