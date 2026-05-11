@@ -358,6 +358,8 @@ const inventoryService = {
     const t = await db.sequelize.transaction();
     let lockFrom = null;
     let lockTo = null;
+    let fromInventory = null;
+    let toInventory = null;
 
     try {
       const requestCheck = await idempotencyService.isRequestProcessed(requestId);
@@ -377,7 +379,7 @@ const inventoryService = {
       await idempotencyService.registerRequest(requestId, 'TRANSFER', transferData, userId, t);
       await idempotencyService.markProcessing(requestId, t);
 
-      const fromInventory = await db.Inventory.findOne({
+      fromInventory = await db.Inventory.findOne({
         where: { storeId: fromStoreId, productId: productId },
         transaction: t
       });
@@ -390,7 +392,7 @@ const inventoryService = {
         throw new Error(`调出门店库存不足，当前库存: ${fromInventory.quantity}, 调拨数量: ${quantity}`);
       }
 
-      let toInventory = await db.Inventory.findOne({
+      toInventory = await db.Inventory.findOne({
         where: { storeId: toStoreId, productId: productId },
         transaction: t
       });
