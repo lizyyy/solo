@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自助打印店耗材补给系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .tab-content { margin-top: 20px; }
+    .low-level { color: #dc3545; font-weight: bold; }
+    .status-badge { font-size: 0.85em; }
+    .device-card { border-left: 4px solid #0d6efd; }
+    .device-card.fault { border-left-color: #dc3545; }
+    .device-card.warning { border-left-color: #ffc107; }
+    .anomaly-panel { background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .anomaly-panel h5 { color: #856404; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container">
+      <span class="navbar-brand mb-0 h1">🖨️ 自助打印店耗材补给系统</span>
+      <div class="d-flex gap-2">
+        <button class="btn btn-light" onclick="exportReport()">📊 导出Excel</button>
+        <button class="btn btn-warning" onclick="showAnomalyPanel()">⚠️ 异常测试</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="anomaly-panel" class="anomaly-panel d-none">
+      <h5>异常测试样例</h5>
+      <p class="small text-muted">点击下方按钮触发各类异常，验证系统容错能力</p>
+      <div class="row">
+        <div class="col-md-4">
+          <button class="btn btn-danger w-100" onclick="testDuplicate()">❌ 测试重复数据</button>
+          <small class="text-muted">创建已存在的门店名称</small>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-danger w-100" onclick="testMissingField()">❌ 测试缺字段</button>
+          <small class="text-muted">创建设备时不填设备编号</small>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-info w-100" onclick="testManualFix()">✏️ 人工改错演示</button>
+          <small class="text-muted">演示手工修复错误数据</small>
+        </div>
+      </div>
+      <hr>
+      <div id="anomaly-result" class="small"></div>
+    </div>
+
+    <ul class="nav nav-tabs" id="mainTabs">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#dashboard">总览</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#devices">设备</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#consumables">耗材</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#faults">故障</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#orders">补给单</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#stores">门店</a></li>
+    </ul>
+
+    <div class="tab-content" id="tabContent">
+      <div class="tab-pane fade show active" id="dashboard">
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 id="stat-stores" class="text-primary">0</h3>
+                <p class="text-muted mb-0">门店数</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 id="stat-devices" class="text-info">0</h3>
+                <p class="text-muted mb-0">设备数</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 id="stat-low" class="text-danger">0</h3>
+                <p class="text-muted mb-0">耗材预警</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 id="stat-pending" class="text-warning">0</h3>
+                <p class="text-muted mb-0">待处理故障</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>⚠️ 耗材预警</span>
+                <button class="btn btn-sm btn-primary" onclick="autoGenerateOrders()">一键生成补给单</button>
+              </div>
+              <div class="card-body">
+                <div id="low-consumables-list"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">🔧 待处理故障</div>
+              <div class="card-body">
+                <div id="pending-faults-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="devices">
+        <div class="card mb-3">
+          <div class="card-header d-flex justify-content-between">
+            <span>设备列表</span>
+            <button class="btn btn-primary btn-sm" onclick="showDeviceModal()">+ 新增设备</button>
+          </div>
+          <div class="card-body">
+            <div class="row" id="devices-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="consumables">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <span>耗材余量</span>
+            <button class="btn btn-primary btn-sm" onclick="showConsumableModal()">+ 新增耗材记录</button>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>门店</th><th>设备</th><th>类型</th><th>余量(%)</th><th>阈值</th><th>状态</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="consumables-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="faults">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <span>故障记录</span>
+            <button class="btn btn-primary btn-sm" onclick="showFaultModal()">+ 登记故障</button>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>门店</th><th>设备</th><th>故障类型</th><th>描述</th><th>状态</th><th>上报时间</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="faults-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="orders">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <span>补给单</span>
+            <button class="btn btn-primary btn-sm" onclick="showOrderModal()">+ 新建补给单</button>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>门店</th><th>设备</th><th>类型</th><th>物品</th><th>数量</th><th>状态</th><th>备注</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="stores">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between">
+            <span>门店管理</span>
+            <button class="btn btn-primary btn-sm" onclick="showStoreModal()">+ 新增门店</button>
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr><th>名称</th><th>地址</th><th>电话</th><th>操作</th></tr>
+              </thead>
+              <tbody id="stores-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Store Modal -->
+  <div class="modal" id="storeModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">门店</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="store-id">
+          <div class="mb-3"><label>门店名称 *</label><input class="form-control" id="store-name"></div>
+          <div class="mb-3"><label>地址 *</label><input class="form-control" id="store-address"></div>
+          <div class="mb-3"><label>电话</label><input class="form-control" id="store-phone"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button class="btn btn-primary" onclick="saveStore()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Modal -->
+  <div class="modal" id="deviceModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">设备</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="device-id">
+          <div class="mb-3"><label>所属门店 *</label><select class="form-select" id="device-store"></select></div>
+          <div class="mb-3"><label>设备编号 *</label><input class="form-control" id="device-code"></div>
+          <div class="mb-3"><label>型号</label><input class="form-control" id="device-model"></div>
+          <div class="mb-3"><label>位置</label><input class="form-control" id="device-location"></div>
+          <div class="mb-3"><label>状态</label>
+            <select class="form-select" id="device-status">
+              <option value="normal">正常</option>
+              <option value="fault">故障</option>
+              <option value="maintenance">维护中</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button class="btn btn-primary" onclick="saveDevice()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consumable Modal -->
+  <div class="modal" id="consumableModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">耗材记录</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="consumable-id">
+          <div class="mb-3"><label>设备 *</label><select class="form-select" id="consumable-device"></select></div>
+          <div class="mb-3"><label>耗材类型 *</label>
+            <select class="form-select" id="consumable-type">
+              <option>纸张</option>
+              <option>黑色墨粉</option>
+              <option>彩色墨粉</option>
+              <option>色带</option>
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3"><label>当前余量(%)</label><input type="number" class="form-control" id="consumable-level" value="100"></div>
+            <div class="col-md-6 mb-3"><label>预警阈值(%)</label><input type="number" class="form-control" id="consumable-threshold" value="10"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button class="btn btn-primary" onclick="saveConsumable()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fault Modal -->
+  <div class="modal" id="faultModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">故障登记</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="fault-id">
+          <div class="mb-3"><label>设备 *</label><select class="form-select" id="fault-device"></select></div>
+          <div class="mb-3"><label>故障类型 *</label>
+            <select class="form-select" id="fault-type">
+              <option>卡纸</option>
+              <option>打印不清晰</option>
+              <option>无法开机</option>
+              <option>网络断开</option>
+              <option>墨粉漏印</option>
+              <option>异响</option>
+              <option>其他</option>
+            </select>
+          </div>
+          <div class="mb-3"><label>描述</label><textarea class="form-control" id="fault-desc" rows="3"></textarea></div>
+          <div class="mb-3"><label>状态</label>
+            <select class="form-select" id="fault-status">
+              <option value="pending">待处理</option>
+              <option value="in_progress">处理中</option>
+              <option value="resolved">已解决</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button class="btn btn-primary" onclick="saveFault()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Modal -->
+  <div class="modal" id="orderModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">补给单</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+          <input type="hidden" id="order-id">
+          <div class="mb-3"><label>门店 *</label><select class="form-select" id="order-store"></select></div>
+          <div class="mb-3"><label>设备</label><select class="form-select" id="order-device"><option value="">-- 不指定设备 --</option></select></div>
+          <div class="mb-3"><label>类型 *</label>
+            <select class="form-select" id="order-type">
+              <option>耗材补给</option>
+              <option>设备维修</option>
+              <option>配件更换</option>
+            </select>
+          </div>
+          <div class="mb-3"><label>物品 *</label><input class="form-control" id="order-item" placeholder="如: A4纸, 黑色墨粉盒"></div>
+          <div class="row">
+            <div class="col-md-6 mb-3"><label>数量</label><input type="number" class="form-control" id="order-qty" value="1"></div>
+            <div class="col-md-6 mb-3"><label>状态</label>
+              <select class="form-select" id="order-status">
+                <option value="pending">待处理</option>
+                <option value="in_progress">进行中</option>
+                <option value="completed">已完成</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3"><label>备注</label><textarea class="form-control" id="order-notes" rows="2"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button class="btn btn-primary" onclick="saveOrder()">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

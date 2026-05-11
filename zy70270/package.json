@@ -1,0 +1,17 @@
+{
+  "name": "print-shop-supplier",
+  "version": "1.0.0",
+  "description": "自助打印店耗材补给系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "seed": "node server/seeds/seed.js",
+    "dev": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0"
+  }
+}
