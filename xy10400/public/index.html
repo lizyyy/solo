@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>换标退货批次追踪台</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>换标退货批次追踪台</h1>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="refreshData()">刷新</button>
+        <button class="btn btn-primary" onclick="exportCsv()">导出换标明细</button>
+        <button class="btn btn-danger" onclick="resetData()">重置数据</button>
+      </div>
+    </header>
+
+    <div class="stats-cards">
+      <div class="card pending">
+        <div class="card-title">待质检</div>
+        <div class="card-value" id="stat-pending">0</div>
+        <div class="card-subtitle">退货单</div>
+      </div>
+      <div class="card inspected">
+        <div class="card-title">质检通过</div>
+        <div class="card-value" id="stat-inspected">0</div>
+        <div class="card-subtitle">待换标</div>
+      </div>
+      <div class="card relabeled">
+        <div class="card-title">已换标</div>
+        <div class="card-value" id="stat-relabeled">0</div>
+        <div class="card-subtitle">已重新入库</div>
+      </div>
+      <div class="card rejected">
+        <div class="card-title">已报废</div>
+        <div class="card-value" id="stat-rejected">0</div>
+        <div class="card-subtitle">质检不合格</div>
+      </div>
+    </div>
+
+    <div class="inventory-summary">
+      <h3>库存差异汇总</h3>
+      <div class="summary-items">
+        <div class="summary-item">
+          <span class="label">总退货数量:</span>
+          <span class="value" id="summary-return">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">换标入库:</span>
+          <span class="value success" id="summary-relabel">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">报废数量:</span>
+          <span class="value danger" id="summary-scrap">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">换标率:</span>
+          <span class="value" id="summary-rate">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="form-panel">
+          <h2>录入退货单</h2>
+          <form id="returnForm">
+            <div class="form-group">
+              <label>退货箱号 *</label>
+              <input type="text" id="returnBoxId" required placeholder="如: BOX005">
+            </div>
+            <div class="form-group">
+              <label>原 SKU *</label>
+              <select id="originalSku" required>
+                <option value="">请选择或输入</option>
+                <option value="CLOTH-001">CLOTH-001 - 男式纯棉T恤</option>
+                <option value="CLOTH-002">CLOTH-002 - 女式碎花连衣裙</option>
+                <option value="APPLIANCE-001">APPLIANCE-001 - 智能电饭煲</option>
+                <option value="APPLIANCE-002">APPLIANCE-002 - 多功能榨汁机</option>
+              </select>
+              <input type="text" id="customSku" placeholder="或输入新SKU" style="margin-top: 8px; display: none;">
+            </div>
+            <div class="form-group">
+              <label>原批次 *</label>
+              <input type="text" id="originalBatch" required placeholder="如: BATCH-202605">
+            </div>
+            <div class="form-group">
+              <label>退货日期 *</label>
+              <input type="date" id="returnDate" required>
+            </div>
+            <div class="form-group">
+              <label>退货数量 *</label>
+              <input type="number" id="returnQty" required min="1" placeholder="如: 25">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">录入退货单</button>
+          </form>
+        </div>
+
+        <div class="timeline-panel">
+          <h2>批次时间线</h2>
+          <div id="timeline" class="timeline">
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="orders-panel">
+          <h2>退货单列表</h2>
+          <div class="filters">
+            <select id="statusFilter">
+              <option value="">全部状态</option>
+              <option value="pending">待质检</option>
+              <option value="inspected">质检通过</option>
+              <option value="relabeled">已换标</option>
+              <option value="rejected">已报废</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="搜索退货箱号/SKU">
+          </div>
+          <div id="ordersList" class="orders-list">
+          </div>
+        </div>
+
+        <div id="pendingAlert" class="alert" style="display: none;">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-content">
+            <div class="alert-title">待处理提醒</div>
+            <div class="alert-message" id="alertMessage">有退货单需要处理</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">质检处理</h3>
+        <button class="btn-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
