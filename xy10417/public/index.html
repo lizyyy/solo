@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>招聘面试爽约追踪台</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>📋 招聘面试爽约追踪台</h1>
+    <div class="header-actions">
+      <button onclick="showStatsModal()">📊 本周统计</button>
+      <button onclick="exportWeeklyReport()">📥 导出本周报告</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>📌 快速操作</h3>
+        <button class="sidebar-btn" onclick="showAddPositionModal()">➕ 新增岗位</button>
+        <button class="sidebar-btn" onclick="showAddCandidateModal()">👤 新增候选人</button>
+        <button class="sidebar-btn" onclick="showAddInterviewModal()">📅 安排面试</button>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>🔍 筛选条件</h3>
+        <div class="filter-group">
+          <label>岗位</label>
+          <select id="filterPosition" onchange="loadInterviews()">
+            <option value="">全部岗位</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>HR</label>
+          <select id="filterHR" onchange="loadInterviews()">
+            <option value="">全部HR</option>
+          </select>
+        </div>
+        <button class="sidebar-btn secondary" onclick="clearFilters()">🔄 重置筛选</button>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>⚠️ 高风险候选人</h3>
+        <div id="highRiskList" class="high-risk-list">
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('kanban')">📋 看板视图</button>
+        <button class="tab" onclick="switchTab('list')">📋 列表视图</button>
+      </div>
+
+      <div id="kanbanView" class="kanban-view">
+        <div class="kanban-column">
+          <h3>📅 待面试 <span class="count" id="scheduledCount">0</span></h3>
+          <div id="scheduledColumn" class="kanban-cards"></div>
+        </div>
+        <div class="kanban-column">
+          <h3>🔄 已改期 <span class="count" id="rescheduledCount">0</span></h3>
+          <div id="rescheduledColumn" class="kanban-cards"></div>
+        </div>
+        <div class="kanban-column">
+          <h3>✅ 已完成 <span class="count" id="completedCount">0</span></h3>
+          <div id="completedColumn" class="kanban-cards"></div>
+        </div>
+      </div>
+
+      <div id="listView" class="list-view hidden">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>候选人</th>
+              <th>岗位</th>
+              <th>HR</th>
+              <th>面试时间</th>
+              <th>状态</th>
+              <th>风险等级</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="interviewTableBody">
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div id="addPositionModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>新增岗位</h2>
+      <form id="positionForm" onsubmit="addPosition(event)">
+        <div class="form-group">
+          <label>岗位名称 *</label>
+          <input type="text" id="posName" required>
+        </div>
+        <div class="form-group">
+          <label>所属部门</label>
+          <input type="text" id="posDepartment">
+        </div>
+        <div class="form-group">
+          <label>负责HR *</label>
+          <input type="text" id="posHR" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="hideModal('addPositionModal')">取消</button>
+          <button type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addCandidateModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>新增候选人</h2>
+      <form id="candidateForm" onsubmit="addCandidate(event)">
+        <div class="form-group">
+          <label>姓名 *</label>
+          <input type="text" id="candName" required>
+        </div>
+        <div class="form-group">
+          <label>电话</label>
+          <input type="tel" id="candPhone">
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="candEmail">
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="hideModal('addCandidateModal')">取消</button>
+          <button type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addInterviewModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>安排面试</h2>
+      <form id="interviewForm" onsubmit="addInterview(event)">
+        <div class="form-group">
+          <label>岗位 *</label>
+          <select id="intPosition" required></select>
+        </div>
+        <div class="form-group">
+          <label>候选人 *</label>
+          <select id="intCandidate" required></select>
+        </div>
+        <div class="form-group">
+          <label>HR *</label>
+          <input type="text" id="intHR" required>
+        </div>
+        <div class="form-group">
+          <label>面试时间 *</label>
+          <input type="datetime-local" id="intTime" required>
+        </div>
+        <div class="form-group">
+          <label>备注</label>
+          <textarea id="intNotes" rows="3"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" onclick="hideModal('addInterviewModal')">取消</button>
+          <button type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal hidden">
+    <div class="modal-content large">
+      <h2>面试详情</h2>
+      <div id="detailContent"></div>
+      <div class="form-actions">
+        <button type="button" onclick="hideModal('detailModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="statsModal" class="modal hidden">
+    <div class="modal-content large">
+      <h2>📊 本周面试统计</h2>
+      <div id="statsContent"></div>
+      <div class="form-actions">
+        <button type="button" onclick="hideModal('statsModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
