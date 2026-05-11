@@ -1,0 +1,36 @@
+[
+  {
+    "booth_id": "b001",
+    "rate_type": "tiered",
+    "tier_config": [
+      { "threshold": 0, "rate": 0.1 },
+      { "threshold": 5000, "rate": 0.12 },
+      { "threshold": 10000, "rate": 0.15 }
+    ],
+    "effective_date": "2025-01-01"
+  },
+  {
+    "booth_id": "b002",
+    "rate_type": "flat",
+    "flat_rate": 0.12,
+    "effective_date": "2025-01-01"
+  },
+  {
+    "booth_id": "b003",
+    "rate_type": "flat",
+    "flat_rate": 0.1,
+    "effective_date": "2025-01-01"
+  },
+  {
+    "booth_id": "b004",
+    "rate_type": "flat",
+    "flat_rate": 0.08,
+    "effective_date": "2025-01-01"
+  },
+  {
+    "booth_id": "b005",
+    "rate_type": "flat",
+    "flat_rate": 0.08,
+    "effective_date": "2025-01-01"
+  }
+]
