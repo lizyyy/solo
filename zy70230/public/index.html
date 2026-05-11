@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区犬证年检台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; color: #1f2937; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    
+    .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 24px; border-radius: 16px; margin-bottom: 24px; }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); text-align: center; }
+    .stat-card .number { font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+    .stat-card .label { font-size: 13px; color: #6b7280; }
+    .stat-card.approved .number { color: #10b981; }
+    .stat-card.reviewing .number { color: #f59e0b; }
+    .stat-card.need-material .number { color: #ef4444; }
+    .stat-card.pending .number { color: #6b7280; }
+    .stat-card.warning .number { color: #f97316; }
+    
+    .main-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; }
+    
+    .queue-panel { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: fit-content; }
+    .panel-header { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; font-weight: 600; font-size: 16px; }
+    
+    .queue-list { max-height: 600px; overflow-y: auto; }
+    .queue-item { padding: 16px 20px; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.2s; }
+    .queue-item:hover { background: #f9fafb; }
+    .queue-item.active { background: #eff6ff; border-left: 4px solid #3b82f6; }
+    
+    .queue-item .dog-info { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .queue-item .avatar { width: 48px; height: 48px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; }
+    .queue-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .queue-item .dog-name { font-weight: 600; font-size: 15px; }
+    .queue-item .owner { font-size: 13px; color: #6b7280; }
+    
+    .queue-item .meta { display: flex; justify-content: space-between; align-items: center; }
+    .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-badge.submitted { background: #dbeafe; color: #1d4ed8; }
+    .status-badge.reviewing { background: #fef3c7; color: #92400e; }
+    .status-badge.need_material { background: #fee2e2; color: #991b1b; }
+    .status-badge.approved { background: #d1fae5; color: #065f46; }
+    .status-badge.rejected { background: #e5e7eb; color: #374151; }
+    
+    .blocker-count { background: #fef2f2; color: #dc2626; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+    .check-year { font-size: 12px; color: #9ca3af; }
+    
+    .detail-panel { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    
+    .empty-state { padding: 80px 20px; text-align: center; color: #9ca3af; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+    
+    .detail-content { padding: 24px; display: none; }
+    .detail-content.active { display: block; }
+    
+    .detail-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .detail-header .dog-card { display: flex; gap: 16px; }
+    .detail-header .dog-avatar { width: 80px; height: 80px; border-radius: 12px; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 32px; overflow: hidden; }
+    .detail-header .dog-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-header .dog-details h2 { font-size: 20px; margin-bottom: 4px; }
+    .detail-header .dog-details p { color: #6b7280; font-size: 14px; margin-bottom: 2px; }
+    
+    .action-buttons { display: flex; gap: 8px; }
+    .btn { padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    
+    .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section { margin-bottom: 24px; }
+    
+    .blockers-list { display: flex; flex-direction: column; gap: 12px; }
+    .blocker-card { background: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; border-radius: 8px; }
+    .blocker-card.warning { background: #fffbeb; border-left-color: #f59e0b; }
+    .blocker-card.info { background: #eff6ff; border-left-color: #3b82f6; }
+    .blocker-type { font-size: 12px; font-weight: 600; color: #991b1b; text-transform: uppercase; margin-bottom: 4px; }
+    .blocker-message { font-weight: 500; margin-bottom: 8px; }
+    .blocker-suggestion { font-size: 13px; color: #6b7280; background: white; padding: 8px 12px; border-radius: 6px; }
+    
+    .validation-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .validation-card { background: #f9fafb; padding: 16px; border-radius: 8px; }
+    .validation-title { font-size: 13px; color: #6b7280; margin-bottom: 8px; }
+    .validation-stats { display: flex; gap: 12px; margin-bottom: 8px; }
+    .validation-stat { font-size: 12px; }
+    .validation-stat .val { font-weight: 700; font-size: 18px; }
+    .validation-stat.green .val { color: #10b981; }
+    .validation-stat.red .val { color: #ef4444; }
+    .validation-stat.yellow .val { color: #f59e0b; }
+    
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .data-table th { background: #f9fafb; font-weight: 600; font-size: 13px; color: #374151; }
+    .data-table tr:hover { background: #f9fafb; }
+    
+    .tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .tag.valid { background: #d1fae5; color: #065f46; }
+    .tag.expired { background: #fee2e2; color: #991b1b; }
+    .tag.pending { background: #fef3c7; color: #92400e; }
+    .tag.resolved { background: #d1fae5; color: #065f46; }
+    
+    .history-list { display: flex; flex-direction: column; gap: 12px; }
+    .history-item { display: flex; gap: 12px; }
+    .history-timeline { width: 2px; background: #e5e7eb; position: relative; }
+    .history-timeline::before { content: ''; position: absolute; left: -4px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #3b82f6; }
+    .history-content { flex: 1; padding-bottom: 12px; }
+    .history-action { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+    .history-meta { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+    .history-remark { font-size: 13px; color: #374151; background: #f9fafb; padding: 8px 12px; border-radius: 6px; }
+    
+    .issue-badge { display: inline-block; background: #fef2f2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-left: 8px; }
+    
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; padding: 24px; border-radius: 12px; max-width: 500px; width: 100%; margin: 20px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h3 { font-size: 18px; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #374151; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-secondary:hover { background: #d1d5db; }
+    
+    .tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 24px; }
+    .tab { padding: 12px 20px; cursor: pointer; border-bottom: 2px solid transparent; font-weight: 500; color: #6b7280; transition: all 0.2s; }
+    .tab:hover { color: #374151; }
+    .tab.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .check-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .check-info-item { background: #f9fafb; padding: 16px; border-radius: 8px; }
+    .check-info-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+    .check-info-value { font-weight: 600; font-size: 15px; }
+    
+    .loading { text-align: center; padding: 40px; color: #6b7280; }
+    
+    .notification { position: fixed; top: 20px; right: 20px; padding: 16px 24px; border-radius: 8px; z-index: 2000; font-weight: 500; animation: slideIn 0.3s ease; }
+    .notification.success { background: #d1fae5; color: #065f46; }
+    .notification.error { background: #fee2e2; color: #991b1b; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🐕 社区犬证年检台</h1>
+      <p>核对疫苗、照片、住址和违规记录，助力犬证年检规范化管理</p>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card approved">
+        <div class="number" id="stat-approved">0</div>
+        <div class="label">已通过</div>
+      </div>
+      <div class="stat-card reviewing">
+        <div class="number" id="stat-reviewing">0</div>
+        <div class="label">审核中</div>
+      </div>
+      <div class="stat-card need-material">
+        <div class="number" id="stat-need-material">0</div>
+        <div class="label">需补材料</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="number" id="stat-submitted">0</div>
+        <div class="label">已提交</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="number" id="stat-violations">0</div>
+        <div class="label">待处理违规</div>
+      </div>
+    </div>
+    
+    <div class="main-grid">
+      <div class="queue-panel">
+        <div class="panel-header">📋 年检申请队列</div>
+        <div class="queue-list" id="queue-list">
+          <div class="loading">加载中...</div>
+        </div>
+      </div>
+      
+      <div class="detail-panel">
+        <div class="empty-state" id="empty-state">
+          <div class="icon">📋</div>
+          <h3>请选择一条年检申请</h3>
+          <p style="margin-top: 8px;">从左侧队列中点击选择需要处理的申请</p>
+        </div>
+        
+        <div class="detail-content" id="detail-content">
+          <div class="detail-header">
+            <div class="dog-card">
+              <div class="dog-avatar" id="dog-avatar">🐕</div>
+              <div class="dog-details">
+                <h2 id="dog-name">-</h2>
+                <p id="dog-breed">-</p>
+                <p id="dog-owner">-</p>
+                <p id="dog-address">-</p>
+              </div>
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-warning" onclick="openNeedMaterialModal()">需补材料</button>
+              <button class="btn btn-success" onclick="openApproveModal()">通过</button>
+              <button class="btn btn-danger" onclick="openRejectModal()">拒绝</button>
+            </div>
+          </div>
+          
+          <div class="check-info">
+            <div class="check-info-item">
+              <div class="check-info-label">年检年度</div>
+              <div class="check-info-value" id="check-year">-</div>
+            </div>
+            <div class="check-info-item">
+              <div class="check-info-label">申请日期</div>
+              <div class="check-info-value" id="apply-date">-</div>
+            </div>
+            <div class="check-info-item">
+              <div class="check-info-label">当前状态</div>
+              <div class="check-info-value"><span class="status-badge" id="current-status">-</span></div>
+            </div>
+          </div>
+          
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('blockers')">🔴 当前卡点</div>
+            <div class="tab" onclick="switchTab('validation')">📊 校验详情</div>
+            <div class="tab" onclick="switchTab('vaccines')">💉 疫苗记录</div>
+            <div class="tab" onclick="switchTab('violations')">⚠️ 违规记录</div>
+            <div class="tab" onclick="switchTab('history')">📜 历史变化</div>
+          </div>
+          
+          <div class="tab-content active" id="tab-blockers">
+            <div class="section">
+              <div class="section-title">🔴 当前卡点</div>
+              <div id="blockers-container">
+                <p style="color: #6b7280;">无当前卡点</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="tab-validation">
+            <div class="section">
+              <div class="section-title">📊 校验详情</div>
+              <div class="validation-grid">
+                <div class="validation-card">
+                  <div class="validation-title">💉 疫苗记录</div>
+                  <div class="validation-stats">
+                    <div class="validation-stat green">
+                      <div class="val" id="val-vaccine-valid">0</div>
+                      <div>有效</div>
+                    </div>
+                    <div class="validation-stat red">
+                      <div class="val" id="val-vaccine-expired">0</div>
+                      <div>过期</div>
+                    </div>
+                    <div class="validation-stat yellow">
+                      <div class="val" id="val-vaccine-pending">0</div>
+                      <div>待补</div>
+                    </div>
+                  </div>
+                  <div id="vaccine-issues"></div>
+                </div>
+                <div class="validation-card">
+                  <div class="validation-title">⚠️ 违规记录</div>
+                  <div class="validation-stats">
+                    <div class="validation-stat red">
+                      <div class="val" id="val-violation-pending">0</div>
+                      <div>待处理</div>
+                    </div>
+                    <div class="validation-stat green">
+                      <div class="val" id="val-violation-resolved">0</div>
+                      <div>已处理</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="validation-card">
+                  <div class="validation-title">📷 犬只照片</div>
+                  <div id="photo-status"></div>
+                </div>
+                <div class="validation-card">
+                  <div class="validation-title">🏠 住址信息</div>
+                  <div id="address-status"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="tab-vaccines">
+            <div class="section">
+              <div class="section-title">💉 疫苗记录</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>疫苗类型</th>
+                    <th>接种日期</th>
+                    <th>有效期至</th>
+                    <th>接种诊所</th>
+                    <th>证书编号</th>
+                    <th>状态</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody id="vaccines-table"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="tab-violations">
+            <div class="section">
+              <div class="section-title">⚠️ 违规记录</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>违规日期</th>
+                    <th>违规类型</th>
+                    <th>地点</th>
+                    <th>罚款金额</th>
+                    <th>状态</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody id="violations-table"></tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="tab-content" id="tab-history">
+            <div class="section">
+              <div class="section-title">📜 历史变化</div>
+              <div class="history-list" id="history-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="action-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">操作确认</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>操作人</label>
+        <input type="text" id="action-operator" value="张社工">
+      </div>
+      <div class="form-group">
+        <label>备注说明</label>
+        <textarea id="action-remark" placeholder="请输入操作备注..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn" id="modal-action-btn">确认</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_BASE = '';
+    let currentCheckId = null;
+    let currentDetail = null;
+    let pendingAction = null;
+    
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      return res.json();
+    }
+    
+    async function postJSON(url, data) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return res.json();
+    }
+    
+    function showNotification(message, type = 'success') {
+      const notif = document.createElement('div');
+      notif.className = `notification ${type}`;
+      notif.textContent = message;
+      document.body.appendChild(notif);
+      setTimeout(() => notif.remove(), 3000);
+    }
+    
+    async function loadStats() {
+      const stats = await fetchJSON(`${API_BASE}/api/dashboard/stats`);
+      document.getElementById('stat-approved').textContent = stats.byStatus.approved;
+      document.getElementById('stat-reviewing').textContent = stats.byStatus.reviewing;
+      document.getElementById('stat-need-material').textContent = stats.byStatus.need_material;
+      document.getElementById('stat-submitted').textContent = stats.byStatus.submitted;
+      document.getElementById('stat-violations').textContent = stats.pendingViolations;
+    }
+    
+    async function loadQueue() {
+      const queue = await fetchJSON(`${API_BASE}/api/dashboard/queue`);
+      const container = document.getElementById('queue-list');
+      
+      if (queue.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>暂无年检申请</p></div>';
+        return;
+      }
+      
+      container.innerHTML = queue.map(item => `
+        <div class="queue-item ${currentCheckId === item.checkId ? 'active' : ''}" 
+             onclick="selectCheck('${item.checkId}')">
+          <div class="dog-info">
+            <div class="avatar">🐕</div>
+            <div>
+              <div class="dog-name">${item.dogName} <span class="check-year">${item.checkYear}年度</span></div>
+              <div class="owner">主人：${item.ownerName}</div>
+            </div>
+          </div>
+          <div class="meta">
+            <span class="status-badge ${item.status}">${item.statusInfo.icon} ${item.statusInfo.text}</span>
+            ${item.blockerCount > 0 ? `<span class="blocker-count">${item.blockerCount} 卡点</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    async function selectCheck(checkId) {
+      currentCheckId = checkId;
+      await loadQueue();
+      
+      document.getElementById('empty-state').style.display = 'none';
+      document.getElementById('detail-content').classList.add('active');
+      
+      const detail = await fetchJSON(`${API_BASE}/api/checks/${checkId}/detail`);
+      currentDetail = detail;
+      
+      renderDetail(detail);
+    }
+    
+    function renderDetail(detail) {
+      const { check, dog, vaccines, violations, validation, statusInfo, currentBlockers, history } = detail;
+      
+      const avatarEl = document.getElementById('dog-avatar');
+      if (dog.photo) {
+        avatarEl.innerHTML = `<img src="${dog.photo}" alt="${dog.name}">`;
+      } else {
+        avatarEl.textContent = '🐕';
+      }
+      
+      document.getElementById('dog-name').textContent = `${dog.name} (${dog.licenseNumber})`;
+      document.getElementById('dog-breed').textContent = `${dog.breed} · ${dog.age}岁 · ${dog.gender}`;
+      document.getElementById('dog-owner').textContent = `主人：${dog.ownerName} · ${dog.ownerPhone}`;
+      document.getElementById('dog-address').textContent = `住址：${dog.address}`;
+      
+      document.getElementById('check-year').textContent = `${check.checkYear}年度`;
+      document.getElementById('apply-date').textContent = check.applyDate;
+      
+      const statusEl = document.getElementById('current-status');
+      statusEl.className = `status-badge ${check.status}`;
+      statusEl.textContent = `${statusInfo.icon} ${statusInfo.text}`;
+      
+      const blockersContainer = document.getElementById('blockers-container');
+      if (currentBlockers && currentBlockers.length > 0) {
+        blockersContainer.innerHTML = currentBlockers.map(blocker => {
+          let cardClass = 'blocker-card';
+          if (blocker.type === 'data_quality') cardClass += ' info';
+          else if (blocker.type === 'vaccine') cardClass += '';
+          return `
+            <div class="${cardClass}">
+              <div class="blocker-type">${getBlockerTypeLabel(blocker.type)}</div>
+              <div class="blocker-message">📌 ${blocker.message}</div>
+              <div class="blocker-suggestion">💡 ${blocker.suggestion}</div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        blockersContainer.innerHTML = '<p style="color: #10b981;">✅ 暂无卡点，所有校验项正常</p>';
+      }
+      
+      document.getElementById('val-vaccine-valid').textContent = validation.vaccines.valid;
+      document.getElementById('val-vaccine-expired').textContent = validation.vaccines.expired;
+      document.getElementById('val-vaccine-pending').textContent = validation.vaccines.pending;
+      document.getElementById('val-violation-pending').textContent = validation.violations.pending;
+      document.getElementById('val-violation-resolved').textContent = validation.violations.resolved;
+      
+      const issuesContainer = document.getElementById('vaccine-issues');
+      if (validation.vaccines.issues && validation.vaccines.issues.length > 0) {
+        issuesContainer.innerHTML = validation.vaccines.issues.map(issue => 
+          `<div class="issue-badge">⚠️ ${issue.message}</div>`
+        ).join('');
+      } else {
+        issuesContainer.innerHTML = '<span style="color: #10b981; font-size: 13px;">✅ 无异常</span>';
+      }
+      
+      document.getElementById('photo-status').innerHTML = validation.photo.hasPhoto 
+        ? '<span style="color: #10b981;">✅ 照片已上传</span>' 
+        : `<span style="color: #ef4444;">❌ ${validation.photo.issue}</span>`;
+      
+      document.getElementById('address-status').innerHTML = validation.address.hasAddress 
+        ? '<span style="color: #10b981;">✅ 住址已登记</span>' 
+        : `<span style="color: #ef4444;">❌ ${validation.address.issue}</span>`;
+      
+      const vaccinesTable = document.getElementById('vaccines-table');
+      vaccinesTable.innerHTML = vaccines.map(v => `
+        <tr>
+          <td><strong>${v.type}</strong></td>
+          <td>${v.vaccineDate || '<span style="color: #ef4444;">缺</span>'}</td>
+          <td>${v.validUntil || '<span style="color: #ef4444;">缺</span>'}</td>
+          <td>${v.clinic || '<span style="color: #ef4444;">缺</span>'}</td>
+          <td>${v.certificateNumber || '<span style="color: #ef4444;">缺</span>'}</td>
+          <td><span class="tag ${v.status}">${getVaccineStatusLabel(v.status)}</span></td>
+          <td>${v.note || '-'}</td>
+        </tr>
+      `).join('');
+      
+      const violationsTable = document.getElementById('violations-table');
+      if (violations.length === 0) {
+        violationsTable.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #9ca3af; padding: 24px;">无违规记录</td></tr>';
+      } else {
+        violationsTable.innerHTML = violations.map(v => `
+          <tr>
+            <td>${v.violationDate}</td>
+            <td><strong>${v.type}</strong></td>
+            <td>${v.location}</td>
+            <td>¥${v.fineAmount}</td>
+            <td><span class="tag ${v.status === 'resolved' ? 'resolved' : 'pending'}">${v.status === 'resolved' ? '已处理' : '待处理'}</span></td>
+            <td>${v.note || '-'}</td>
+          </tr>
+        `).join('');
+      }
+      
+      const historyList = document.getElementById('history-list');
+      const sortedHistory = [...history].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      historyList.innerHTML = sortedHistory.map(h => `
+        <div class="history-item">
+          <div class="history-timeline"></div>
+          <div class="history-content">
+            <div class="history-action">${h.action}</div>
+            <div class="history-meta">
+              ${formatTimestamp(h.timestamp)} · ${h.operator}
+              ${h.oldStatus && h.newStatus && h.oldStatus !== h.newStatus 
+                ? ` · ${getStatusBadge(h.oldStatus)} → ${getStatusBadge(h.newStatus)}` 
+                : ''}
+            </div>
+            ${h.remark ? `<div class="history-remark">${h.remark}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+    
+    function getBlockerTypeLabel(type) {
+      const labels = {
+        'vaccine': '疫苗问题',
+        'violation': '违规问题',
+        'photo': '照片问题',
+        'address': '住址问题',
+        'data_quality': '数据质量'
+      };
+      return labels[type] || type;
+    }
+    
+    function getVaccineStatusLabel(status) {
+      const labels = {
+        'valid': '有效',
+        'expired': '过期',
+        'pending': '待补'
+      };
+      return labels[status] || status;
+    }
+    
+    function getStatusBadge(status) {
+      const labels = {
+        'submitted': '已提交',
+        'reviewing': '审核中',
+        'need_material': '需补材料',
+        'approved': '已通过',
+        'rejected': '已拒绝'
+      };
+      return labels[status] || status;
+    }
+    
+    function formatTimestamp(ts) {
+      const date = new Date(ts);
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+    
+    function openActionModal(title, action, status, btnClass) {
+      if (!currentCheckId) {
+        showNotification('请先选择一条年检申请', 'error');
+        return;
+      }
+      pendingAction = { action, status };
+      document.getElementById('modal-title').textContent = title;
+      const actionBtn = document.getElementById('modal-action-btn');
+      actionBtn.className = `btn ${btnClass}`;
+      actionBtn.textContent = '确认';
+      actionBtn.onclick = executeAction;
+      document.getElementById('action-remark').value = '';
+      document.getElementById('action-modal').classList.add('active');
+    }
+    
+    function openNeedMaterialModal() {
+      openActionModal('标记为"需补材料"', '标记需补材料', 'need_material', 'btn-warning');
+    }
+    
+    function openApproveModal() {
+      openActionModal('确认通过年检', '通过年检', 'approved', 'btn-success');
+    }
+    
+    function openRejectModal() {
+      openActionModal('拒绝年检申请', '拒绝申请', 'rejected', 'btn-danger');
+    }
+    
+    function closeModal() {
+      document.getElementById('action-modal').classList.remove('active');
+      pendingAction = null;
+    }
+    
+    async function executeAction() {
+      if (!pendingAction) return;
+      
+      const operator = document.getElementById('action-operator').value;
+      const remark = document.getElementById('action-remark').value;
+      
+      try {
+        const result = await postJSON(`${API_BASE}/api/checks/${currentCheckId}/action`, {
+          action: pendingAction.action,
+          operator: operator,
+          remark: remark,
+          newStatus: pendingAction.status
+        });
+        
+        if (result.success) {
+          showNotification(result.message);
+          closeModal();
+          await loadStats();
+          await loadQueue();
+          await selectCheck(currentCheckId);
+        } else {
+          showNotification('操作失败', 'error');
+        }
+      } catch (e) {
+        showNotification('操作异常', 'error');
+        console.error(e);
+      }
+    }
+    
+    async function init() {
+      await loadStats();
+      await loadQueue();
+    }
+    
+    init();
+  </script>
+</body>
+</html>

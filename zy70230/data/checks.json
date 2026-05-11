@@ -1,0 +1,124 @@
+[
+  {
+    "id": "C001",
+    "dogId": "D001",
+    "checkYear": 2026,
+    "applyDate": "2026-04-28",
+    "status": "approved",
+    "checkResult": "通过",
+    "checker": "张社工",
+    "checkDate": "2026-04-30",
+    "history": [
+      {
+        "timestamp": "2026-04-28T10:00:00",
+        "operator": "张三",
+        "action": "提交年检申请",
+        "oldStatus": null,
+        "newStatus": "submitted",
+        "remark": "居民提交2026年度年检申请"
+      },
+      {
+        "timestamp": "2026-04-28T14:30:00",
+        "operator": "王社工",
+        "action": "初审",
+        "oldStatus": "submitted",
+        "newStatus": "reviewing",
+        "remark": "疫苗记录完整，照片清晰，住址未变更"
+      },
+      {
+        "timestamp": "2026-04-30T09:15:00",
+        "operator": "张社工",
+        "action": "终审通过",
+        "oldStatus": "reviewing",
+        "newStatus": "approved",
+        "remark": "所有校验项通过，年检完成"
+      }
+    ]
+  },
+  {
+    "id": "C002",
+    "dogId": "D002",
+    "checkYear": 2026,
+    "applyDate": "2026-05-02",
+    "status": "need_material",
+    "currentBlockers": [
+      {
+        "type": "vaccine",
+        "field": "六联疫苗",
+        "message": "缺少完整的六联疫苗记录，需要补充接种日期、有效期和证书编号",
+        "suggestion": "请联系宠物医院获取完整的疫苗证明，或扫描上传疫苗接种手册"
+      }
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-02T11:20:00",
+        "operator": "李四",
+        "action": "提交年检申请",
+        "oldStatus": null,
+        "newStatus": "submitted",
+        "remark": "居民提交2026年度年检申请"
+      },
+      {
+        "timestamp": "2026-05-02T16:45:00",
+        "operator": "李社工",
+        "action": "初审发现异常",
+        "oldStatus": "submitted",
+        "newStatus": "need_material",
+        "remark": "发现缺字段异常：六联疫苗记录不完整，缺少接种日期、有效期等关键字段"
+      }
+    ]
+  },
+  {
+    "id": "C003",
+    "dogId": "D003",
+    "checkYear": 2026,
+    "applyDate": "2026-05-05",
+    "status": "reviewing",
+    "currentBlockers": [
+      {
+        "type": "violation",
+        "field": "违规记录",
+        "message": "存在未处理的违规记录（编号：VIO20260415001），需先完成整改",
+        "suggestion": "请先到社区服务中心处理违规记录，缴纳罚款后再继续年检"
+      },
+      {
+        "type": "vaccine",
+        "field": "六联疫苗",
+        "message": "六联疫苗已过期（有效期至2025-05-09）",
+        "suggestion": "请尽快带犬只到指定宠物医院接种六联疫苗"
+      },
+      {
+        "type": "data_quality",
+        "field": "疫苗记录",
+        "message": "狂犬病疫苗存在重复记录",
+        "suggestion": "系统已自动选用最新有效记录，如存在疑问请联系工作人员核实"
+      }
+    ],
+    "history": [
+      {
+        "timestamp": "2026-05-05T09:00:00",
+        "operator": "王五",
+        "action": "提交年检申请",
+        "oldStatus": null,
+        "newStatus": "submitted",
+        "remark": "居民提交2026年度年检申请"
+      },
+      {
+        "timestamp": "2026-05-05T13:30:00",
+        "operator": "王社工",
+        "action": "初审发现多个问题",
+        "oldStatus": "submitted",
+        "newStatus": "reviewing",
+        "remark": "发现异常：1)狂犬病疫苗有重复记录(已自动处理) 2)六联疫苗已过期 3)存在未处理违规记录"
+      },
+      {
+        "timestamp": "2026-05-06T10:00:00",
+        "operator": "张社工",
+        "action": "人工修正重复数据",
+        "oldStatus": "reviewing",
+        "newStatus": "reviewing",
+        "remark": "人工改错：确认D003的狂犬病疫苗记录，V006为最新有效记录，V005标记为过期"
+      }
+    ]
+  }
+]

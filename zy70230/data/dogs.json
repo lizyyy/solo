@@ -1,0 +1,47 @@
+[
+  {
+    "id": "D001",
+    "name": "旺财",
+    "breed": "金毛寻回犬",
+    "age": 3,
+    "gender": "公",
+    "ownerName": "张三",
+    "ownerPhone": "13800138001",
+    "address": "阳光社区1号楼3单元501室",
+    "photo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=golden%20retriever%20dog%20portrait&image_size=square",
+    "licenseNumber": "京犬证2023-0001",
+    "lastCheckDate": "2025-05-01",
+    "status": "active",
+    "createdAt": "2023-03-15"
+  },
+  {
+    "id": "D002",
+    "name": "花花",
+    "breed": "泰迪",
+    "age": 2,
+    "gender": "母",
+    "ownerName": "李四",
+    "ownerPhone": "13800138002",
+    "address": "阳光社区2号楼1单元201室",
+    "photo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=poodle%20dog%20portrait&image_size=square",
+    "licenseNumber": "京犬证2023-0002",
+    "lastCheckDate": "2025-03-20",
+    "status": "active",
+    "createdAt": "2023-06-10"
+  },
+  {
+    "id": "D003",
+    "name": "小黑",
+    "breed": "拉布拉多",
+    "age": 5,
+    "gender": "公",
+    "ownerName": "王五",
+    "ownerPhone": "13800138003",
+    "address": "阳光社区3号楼2单元702室",
+    "photo": "https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=black%20labrador%20dog%20portrait&image_size=square",
+    "licenseNumber": "京犬证2023-0003",
+    "lastCheckDate": "2024-12-15",
+    "status": "active",
+    "createdAt": "2022-01-20"
+  }
+]

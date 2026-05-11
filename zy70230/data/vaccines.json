@@ -1,0 +1,81 @@
+[
+  {
+    "id": "V001",
+    "dogId": "D001",
+    "type": "狂犬病疫苗",
+    "vaccineDate": "2025-04-15",
+    "validUntil": "2026-04-14",
+    "clinic": "阳光宠物医院",
+    "doctorName": "王医生",
+    "certificateNumber": "YM20250415001",
+    "status": "valid"
+  },
+  {
+    "id": "V002",
+    "dogId": "D001",
+    "type": "六联疫苗",
+    "vaccineDate": "2025-04-15",
+    "validUntil": "2026-04-14",
+    "clinic": "阳光宠物医院",
+    "doctorName": "王医生",
+    "certificateNumber": "YM20250415002",
+    "status": "valid"
+  },
+  {
+    "id": "V003",
+    "dogId": "D002",
+    "type": "狂犬病疫苗",
+    "vaccineDate": "2024-08-20",
+    "validUntil": "2025-08-19",
+    "clinic": "爱心宠物医院",
+    "doctorName": "李医生",
+    "certificateNumber": "YM20240820001",
+    "status": "valid"
+  },
+  {
+    "id": "V004",
+    "dogId": "D002",
+    "type": "六联疫苗",
+    "vaccineDate": "",
+    "validUntil": "",
+    "clinic": "",
+    "doctorName": "李医生",
+    "certificateNumber": "",
+    "status": "pending",
+    "note": "缺字段异常: 疫苗记录缺少接种日期、有效期、诊所和证书编号"
+  },
+  {
+    "id": "V005",
+    "dogId": "D003",
+    "type": "狂犬病疫苗",
+    "vaccineDate": "2024-05-10",
+    "validUntil": "2025-05-09",
+    "clinic": "阳光宠物医院",
+    "doctorName": "张医生",
+    "certificateNumber": "YM20240510001",
+    "status": "expired"
+  },
+  {
+    "id": "V006",
+    "dogId": "D003",
+    "type": "狂犬病疫苗",
+    "vaccineDate": "2025-05-10",
+    "validUntil": "2026-05-09",
+    "clinic": "阳光宠物医院",
+    "doctorName": "张医生",
+    "certificateNumber": "YM20250510001",
+    "status": "valid",
+    "note": "重复数据异常: D003有多条狂犬病疫苗记录，本条为最新有效记录"
+  },
+  {
+    "id": "V007",
+    "dogId": "D003",
+    "type": "六联疫苗",
+    "vaccineDate": "2024-05-10",
+    "validUntil": "2025-05-09",
+    "clinic": "阳光宠物医院",
+    "doctorName": "张医生",
+    "certificateNumber": "YM20240510002",
+    "status": "expired"
+  }
+]

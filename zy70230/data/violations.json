@@ -1,0 +1,27 @@
+[
+  {
+    "id": "VIO20260415001",
+    "dogId": "D003",
+    "violationDate": "2026-04-15",
+    "type": "未牵绳",
+    "description": "在公共区域遛犬未使用牵引绳",
+    "location": "社区花园",
+    "officer": "李警官",
+    "fineAmount": 200,
+    "status": "pending",
+    "note": "未缴纳罚款，需居民整改"
+  },
+  {
+    "id": "VIO20250820001",
+    "dogId": "D002",
+    "violationDate": "2025-08-20",
+    "type": "超时未清理粪便",
+    "description": "在社区道路上未及时清理犬只粪便",
+    "location": "社区2号楼前",
+    "officer": "王警官",
+    "fineAmount": 100,
+    "status": "resolved",
+    "resolvedDate": "2025-08-22",
+    "note": "已缴纳罚款并完成整改"
+  }
+]
