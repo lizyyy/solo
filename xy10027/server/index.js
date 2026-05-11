@@ -8,6 +8,7 @@ const { RateLimiterRedis } = require('rate-limiter-flexible');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const db = require('./config/database');
 const { redis } = require('./config/redis');
@@ -26,6 +27,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestIdMiddleware);
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 const rateLimiter = new RateLimiterRedis({
   storeClient: redis,

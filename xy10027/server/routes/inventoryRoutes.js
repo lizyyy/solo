@@ -1,5 +1,6 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
+const db = require('../config/database');
 const InventoryService = require('../services/inventoryService');
 const AuditService = require('../services/auditService');
 const ReportService = require('../services/reportService');

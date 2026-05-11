@@ -1,12 +1,12 @@
 -- 测试数据初始化脚本
--- 密码: password123 (bcrypt哈希)
+-- 默认密码: password123
 
 -- 创建默认用户
 INSERT INTO users (id, username, password, email, full_name, role)
 VALUES (
     '00000000-0000-0000-0000-000000000001',
     'admin',
-    '$2a$10$EixZaY3s7vjRjMRC/.R6/.wG8x1Q5ZJz4YWK5jR5eK5eK5eK5eK5e',
+    '$2a$10$.V0xO6I8KqY2eO8i9q1XruGqWJ0BdM0KfQ3iW4vT3n2mK1lK0jL',
     'admin@example.com',
     '系统管理员',
     'admin'
@@ -16,7 +16,7 @@ INSERT INTO users (id, username, password, email, full_name, role)
 VALUES (
     '00000000-0000-0000-0000-000000000002',
     'user1',
-    '$2a$10$EixZaY3s7vjRjMRC/.R6/.wG8x1Q5ZJz4YWK5jR5eK5eK5eK5eK5e',
+    '$2a$10$.V0xO6I8KqY2eO8i9q1XruGqWJ0BdM0KfQ3iW4vT3n2mK1lK0jL',
     'user1@example.com',
     '盘点员张三',
     'user'
@@ -26,7 +26,7 @@ INSERT INTO users (id, username, password, email, full_name, role)
 VALUES (
     '00000000-0000-0000-0000-000000000003',
     'user2',
-    '$2a$10$EixZaY3s7vjRjMRC/.R6/.wG8x1Q5ZJz4YWK5jR5eK5eK5eK5eK5e',
+    '$2a$10$.V0xO6I8KqY2eO8i9q1XruGqWJ0BdM0KfQ3iW4vT3n2mK1lK0jL',
     'user2@example.com',
     '盘点员李四',
     'user'

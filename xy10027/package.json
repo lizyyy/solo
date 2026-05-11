@@ -6,8 +6,11 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
-    "test": "jest",
-    "lint": "eslint ."
+    "test": "jest --runInBand",
+    "lint": "eslint .",
+    "db:init": "node scripts/init-db.js",
+    "setup": "npm install && npm run db:init",
+    "install": "node scripts/install.js"
   },
   "dependencies": {
     "express": "^4.18.2",
