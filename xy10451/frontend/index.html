@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共享厨房排班台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1>🍳 共享厨房排班台</h1>
+            <div class="header-actions">
+                <button id="initSampleData" class="btn btn-primary">加载样例数据</button>
+                <button id="exportSchedule" class="btn btn-success">导出今日排班</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="kanban">📅 排班看板</button>
+            <button class="tab-btn" data-tab="reservations">📝 预约管理</button>
+            <button class="tab-btn" data-tab="merchants">👥 商户管理</button>
+            <button class="tab-btn" data-tab="resources">🔧 资源管理</button>
+            <button class="tab-btn" data-tab="faults">⚠️ 设备故障</button>
+            <button class="tab-btn" data-tab="overtime">⏰ 超时记录</button>
+            <button class="tab-btn" data-tab="fees">💰 费用汇总</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="kanban-tab" class="tab-content active">
+                <div class="kanban-header">
+                    <div class="date-selector">
+                        <label>选择日期：</label>
+                        <input type="date" id="kanbanDate">
+                        <button id="refreshKanban" class="btn btn-primary">刷新</button>
+                    </div>
+                </div>
+
+                <div class="alerts-panel" id="alertsPanel">
+                </div>
+
+                <div class="kanban-timeline" id="kanbanTimeline">
+                </div>
+
+                <div class="fees-panel" id="feesPanel">
+                </div>
+            </section>
+
+            <section id="reservations-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>预约管理</h2>
+                    <button id="addReservation" class="btn btn-primary">+ 新建预约</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>商户</th>
+                                <th>资源</th>
+                                <th>日期</th>
+                                <th>时间</th>
+                                <th>状态</th>
+                                <th>冲突</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="merchants-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>商户管理</h2>
+                    <button id="addMerchant" class="btn btn-primary">+ 新建商户</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>联系人</th>
+                                <th>电话</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="merchantsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="resources-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>资源管理</h2>
+                    <button id="addResource" class="btn btn-primary">+ 新建资源</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>类型</th>
+                                <th>位置</th>
+                                <th>描述</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resourcesTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="faults-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>设备故障</h2>
+                    <button id="addFault" class="btn btn-danger">+ 上报故障</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>资源</th>
+                                <th>故障时间</th>
+                                <th>类型</th>
+                                <th>描述</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faultsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="overtime-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>超时记录</h2>
+                    <button id="recordOvertime" class="btn btn-warning">+ 记录超时</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>预约ID</th>
+                                <th>实际结束</th>
+                                <th>超时(分钟)</th>
+                                <th>超时费</th>
+                                <th>影响下一个</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overtimeTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="fees-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>费用汇总</h2>
+                    <button id="addFee" class="btn btn-primary">+ 新建费用</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>商户</th>
+                                <th>日期</th>
+                                <th>预约费</th>
+                                <th>超时费</th>
+                                <th>总计</th>
+                                <th>备注</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feesTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content" id="modalContent">
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

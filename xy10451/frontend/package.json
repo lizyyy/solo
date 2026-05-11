@@ -1,0 +1,13 @@
+{
+  "name": "shared-kitchen-frontend",
+  "version": "1.0.0",
+  "description": "共享厨房排班台前端",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": ["shared-kitchen", "scheduling", "kanban"],
+  "author": "",
+  "license": "MIT"
+}
