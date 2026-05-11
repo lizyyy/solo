@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小区泳池开放值守管理系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏊 小区泳池开放值守管理系统</h1>
+            <div class="header-actions">
+                <button id="btn-import" class="btn btn-secondary">📥 导入数据</button>
+                <button id="btn-export" class="btn btn-secondary">📤 导出数据</button>
+                <button id="btn-clear" class="btn btn-danger">🗑️ 清空数据</button>
+                <button id="btn-help" class="btn btn-info">❓ 使用说明</button>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="calendar">📅 开放日历</button>
+            <button class="tab-btn" data-tab="scheduling">👥 救生员排班</button>
+            <button class="tab-btn" data-tab="disinfection">🧼 消毒记录</button>
+            <button class="tab-btn" data-tab="statistics">📊 统计分析</button>
+            <button class="tab-btn" data-tab="abnormal">⚠️ 异常处理</button>
+        </nav>
+
+        <main>
+            <!-- 开放日历 Tab -->
+            <section id="tab-calendar" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>开放日历</h2>
+                        <div class="card-actions">
+                            <button id="btn-create-day" class="btn btn-primary">➕ 新建开放日</button>
+                            <button id="btn-batch-create" class="btn btn-secondary">📅 批量创建</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>日期范围：</label>
+                            <input type="date" id="filter-date-from">
+                            <span>至</span>
+                            <input type="date" id="filter-date-to">
+                        </div>
+                        <div class="filter-group">
+                            <label>状态：</label>
+                            <select id="filter-status">
+                                <option value="">全部</option>
+                                <option value="planned">计划中</option>
+                                <option value="checking">核对中</option>
+                                <option value="open">已开放</option>
+                                <option value="closed">临时闭馆</option>
+                                <option value="completed">已结束</option>
+                            </select>
+                        </div>
+                        <button id="btn-filter" class="btn btn-primary">🔍 筛选</button>
+                        <button id="btn-reset-filter" class="btn btn-secondary">🔄 重置</button>
+                    </div>
+
+                    <div id="calendar-list" class="list-container">
+                        <!-- 日历列表将通过JS渲染 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 救生员排班 Tab -->
+            <section id="tab-scheduling" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>救生员排班</h2>
+                        <div class="card-actions">
+                            <button id="btn-create-lifeguard" class="btn btn-primary">➕ 添加救生员</button>
+                            <button id="btn-import-lifeguards" class="btn btn-secondary">📥 批量导入</button>
+                        </div>
+                    </div>
+
+                    <div class="two-column">
+                        <div class="column">
+                            <h3>救生员名单</h3>
+                            <div id="lifeguard-list" class="list-container">
+                                <!-- 救生员列表 -->
+                            </div>
+                        </div>
+                        <div class="column">
+                            <h3>排班安排</h3>
+                            <div class="scheduling-controls">
+                                <label>选择日期：</label>
+                                <input type="date" id="schedule-date">
+                                <button id="btn-load-schedule" class="btn btn-primary">📋 加载排班</button>
+                            </div>
+                            <div id="schedule-container" class="list-container">
+                                <!-- 排班详情 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 消毒记录 Tab -->
+            <section id="tab-disinfection" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>消毒记录</h2>
+                        <div class="card-actions">
+                            <button id="btn-create-disinfection" class="btn btn-primary">➕ 记录消毒</button>
+                        </div>
+                    </div>
+
+                    <div class="filters">
+                        <div class="filter-group">
+                            <label>日期：</label>
+                            <input type="date" id="filter-disinfection-date">
+                        </div>
+                        <button id="btn-filter-disinfection" class="btn btn-primary">🔍 筛选</button>
+                    </div>
+
+                    <div id="disinfection-list" class="list-container">
+                        <!-- 消毒记录列表 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 统计分析 Tab -->
+            <section id="tab-statistics" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>统计分析</h2>
+                    </div>
+
+                    <div class="stats-grid" id="stats-grid">
+                        <!-- 统计卡片 -->
+                    </div>
+
+                    <div class="two-column">
+                        <div class="column">
+                            <h3>月度开放情况</h3>
+                            <div id="monthly-stats" class="stats-container">
+                                <!-- 月度统计 -->
+                            </div>
+                        </div>
+                        <div class="column">
+                            <h3>异常统计</h3>
+                            <div id="abnormal-stats" class="stats-container">
+                                <!-- 异常统计 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 异常处理 Tab -->
+            <section id="tab-abnormal" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>异常处理</h2>
+                        <div class="card-actions">
+                            <button id="btn-generate-abnormal" class="btn btn-warning">⚠️ 生成测试异常数据</button>
+                            <button id="btn-check-abnormal" class="btn btn-primary">🔍 自动检测异常</button>
+                        </div>
+                    </div>
+
+                    <div class="abnormal-types">
+                        <button class="abnormal-btn active" data-type="duplicate">🔄 重复数据</button>
+                        <button class="abnormal-btn" data-type="missing">❌ 缺字段</button>
+                        <button class="abnormal-btn" data-type="manual">✏️ 人工改错</button>
+                    </div>
+
+                    <div id="abnormal-list" class="list-container">
+                        <!-- 异常列表 -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 模态框容器 -->
+    <div id="modal-container"></div>
+
+    <!-- 使用说明模态框 -->
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>📖 使用说明</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body" id="help-content">
+                <!-- 使用说明内容 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
