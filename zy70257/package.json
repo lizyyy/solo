@@ -1,0 +1,19 @@
+{
+  "name": "dental-denture-return-api",
+  "version": "1.0.0",
+  "description": "口腔技工义齿返修管理系统 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "init-db": "node scripts/init-db.js",
+    "test": "node scripts/test-main-flow.js",
+    "test-exception": "node scripts/test-exceptions.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.10"
+  }
+}

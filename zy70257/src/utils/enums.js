@@ -1,0 +1,128 @@
+const PRESCRIPTION_STATUS = {
+  PENDING: 'pending',
+  IN_PRODUCTION: 'in_production',
+  COMPLETED: 'completed',
+  RETURNED: 'returned',
+  REWORK_IN_PROGRESS: 'rework_in_progress',
+  DELIVERED: 'delivered'
+};
+
+const PRESCRIPTION_STATUS_LABELS = {
+  [PRESCRIPTION_STATUS.PENDING]: '待生产',
+  [PRESCRIPTION_STATUS.IN_PRODUCTION]: '生产中',
+  [PRESCRIPTION_STATUS.COMPLETED]: '已完成',
+  [PRESCRIPTION_STATUS.RETURNED]: '已退回',
+  [PRESCRIPTION_STATUS.REWORK_IN_PROGRESS]: '返工中',
+  [PRESCRIPTION_STATUS.DELIVERED]: '已交付'
+};
+
+const BATCH_STATUS = {
+  CREATED: 'created',
+  IN_PRODUCTION: 'in_production',
+  COMPLETED: 'completed',
+  RETURNED: 'returned',
+  REWORKING: 'reworking',
+  CLOSED: 'closed'
+};
+
+const BATCH_STATUS_LABELS = {
+  [BATCH_STATUS.CREATED]: '已创建',
+  [BATCH_STATUS.IN_PRODUCTION]: '生产中',
+  [BATCH_STATUS.COMPLETED]: '已完成',
+  [BATCH_STATUS.RETURNED]: '已退回',
+  [BATCH_STATUS.REWORKING]: '返工中',
+  [BATCH_STATUS.CLOSED]: '已结案'
+};
+
+const WORK_ORDER_STATUS = {
+  PENDING: 'pending',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed'
+};
+
+const WORK_ORDER_STATUS_LABELS = {
+  [WORK_ORDER_STATUS.PENDING]: '待开始',
+  [WORK_ORDER_STATUS.IN_PROGRESS]: '进行中',
+  [WORK_ORDER_STATUS.COMPLETED]: '已完成'
+};
+
+const RETURN_STATUS = {
+  SUBMITTED: 'submitted',
+  RESPONSIBILITY_ASSIGNED: 'responsibility_assigned',
+  REWORK_IN_PROGRESS: 'rework_in_progress',
+  RESOLVED: 'resolved',
+  CLOSED: 'closed'
+};
+
+const RETURN_STATUS_LABELS = {
+  [RETURN_STATUS.SUBMITTED]: '已提交',
+  [RETURN_STATUS.RESPONSIBILITY_ASSIGNED]: '已归因',
+  [RETURN_STATUS.REWORK_IN_PROGRESS]: '返工中',
+  [RETURN_STATUS.RESOLVED]: '已解决',
+  [RETURN_STATUS.CLOSED]: '已关闭'
+};
+
+const DEPARTMENTS = {
+  CLINIC: 'clinic',
+  DESIGN: 'design',
+  MOLDING: 'molding',
+  WAX: 'wax',
+  CASTING: 'casting',
+  PORCELAIN: 'porcelain',
+  POLISHING: 'polishing',
+  QC: 'qc',
+  DELIVERY: 'delivery'
+};
+
+const DEPARTMENT_LABELS = {
+  [DEPARTMENTS.CLINIC]: '门诊',
+  [DEPARTMENTS.DESIGN]: '设计部',
+  [DEPARTMENTS.MOLDING]: '取模部',
+  [DEPARTMENTS.WAX]: '蜡型部',
+  [DEPARTMENTS.CASTING]: '铸造部',
+  [DEPARTMENTS.PORCELAIN]: '上瓷部',
+  [DEPARTMENTS.POLISHING]: '抛光部',
+  [DEPARTMENTS.QC]: '质检部',
+  [DEPARTMENTS.DELIVERY]: '交付部'
+};
+
+const RETURN_REASONS = {
+  FIT_ISSUE: 'fit_issue',
+  COLOR_MISMATCH: 'color_mismatch',
+  SHAPE_INCORRECT: 'shape_incorrect',
+  DESIGN_ERROR: 'design_error',
+  MODEL_DISTORTION: 'model_distortion',
+  BREAKAGE: 'breakage',
+  PATIENT_DISCOMFORT: 'patient_discomfort',
+  MARGIN_FIT: 'margin_fit',
+  OCCLUSION_ISSUE: 'occlusion_issue',
+  MATERIAL_DEFECT: 'material_defect'
+};
+
+const RETURN_REASON_LABELS = {
+  [RETURN_REASONS.FIT_ISSUE]: '贴合问题',
+  [RETURN_REASONS.COLOR_MISMATCH]: '颜色偏差',
+  [RETURN_REASONS.SHAPE_INCORRECT]: '形态不对',
+  [RETURN_REASONS.DESIGN_ERROR]: '设计错误',
+  [RETURN_REASONS.MODEL_DISTORTION]: '模型变形',
+  [RETURN_REASONS.BREAKAGE]: '崩瓷/断裂',
+  [RETURN_REASONS.PATIENT_DISCOMFORT]: '患者不适',
+  [RETURN_REASONS.MARGIN_FIT]: '边缘密合度',
+  [RETURN_REASONS.OCCLUSION_ISSUE]: '咬合问题',
+  [RETURN_REASONS.MATERIAL_DEFECT]: '材料缺陷'
+};
+
+module.exports = {
+  PRESCRIPTION_STATUS,
+  PRESCRIPTION_STATUS_LABELS,
+  BATCH_STATUS,
+  BATCH_STATUS_LABELS,
+  WORK_ORDER_STATUS,
+  WORK_ORDER_STATUS_LABELS,
+  RETURN_STATUS,
+  RETURN_STATUS_LABELS,
+  DEPARTMENTS,
+  DEPARTMENT_LABELS,
+  RETURN_REASONS,
+  RETURN_REASON_LABELS
+};
