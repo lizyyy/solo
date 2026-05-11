@@ -1,0 +1,13 @@
+{
+  "name": "environment-lease-api",
+  "version": "1.0.0",
+  "description": "研发环境租期管理 API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
