@@ -652,56 +652,123 @@ def export(target, output):
         click.echo(tabulate(summary_df, headers='keys', tablefmt='simple', showindex=False))
     
     elif target == 'supplier':
-        supplier_orders = orders.copy()
-        if not products.empty and 'supplier' in products.columns:
-            supplier_orders = supplier_orders.merge(
-                products[['product_id', 'supplier']], on='product_id', how='left'
-            )
+        supplier_map = {}
+        if not products.empty and 'supplier' in products.columns and 'product_id' in products.columns:
+            for _, p in products.iterrows():
+                supplier_map[str(p['product_id'])] = p.get('supplier', '未知供应商')
         
-        summary = []
-        if not supplier_orders.empty:
-            if 'supplier' in supplier_orders.columns:
-                by_supplier = supplier_orders.groupby('supplier').agg({
-                    'quantity': 'sum',
-                    'total_amount': 'sum'
-                }).reset_index()
-                for _, row in by_supplier.iterrows():
-                    summary.append({
-                        '供应商': row['supplier'],
-                        '发货件数': int(row['quantity']),
-                        '发货金额': round(row['total_amount'], 2)
-                    })
-            else:
-                total_qty = supplier_orders['quantity'].sum()
-                total_amt = supplier_orders['total_amount'].sum()
-                summary.append({'供应商': '默认', '发货件数': int(total_qty), '发货金额': round(total_amt, 2)})
+        def get_supplier(pid):
+            return supplier_map.get(str(pid), '未知供应商')
         
-        refund_summary = []
+        order_by_product = {}
+        for _, item in orders.iterrows():
+            pid = str(item['product_id'])
+            qty = pd.to_numeric(item.get('quantity', 0), errors='coerce')
+            unit_price = pd.to_numeric(item.get('unit_price', 0), errors='coerce')
+            if pd.isna(qty) or qty <= 0:
+                continue
+            if pd.isna(unit_price) or unit_price <= 0:
+                total = pd.to_numeric(item.get('total_amount', 0), errors='coerce')
+                unit_price = total / qty if not pd.isna(total) and qty > 0 else 0
+            if pid not in order_by_product:
+                order_by_product[pid] = {'qty': 0, 'amount': 0}
+            order_by_product[pid]['qty'] += qty
+            order_by_product[pid]['amount'] += round(qty * unit_price, 2)
+        
+        refund_by_product = {}
+        refunds_with_supplier = []
         if not refunds.empty:
+            refunds = refunds.copy()
             refunds['refund_amount'] = pd.to_numeric(refunds['refund_amount'], errors='coerce')
             refunds['quantity'] = pd.to_numeric(refunds['quantity'], errors='coerce')
-            refund_summary.append({
-                '供应商': '全部',
-                '缺货退款件数': int(refunds['quantity'].sum()),
-                '退款金额': round(refunds['refund_amount'].sum(), 2)
-            })
+            
+            for _, r in refunds.iterrows():
+                pid = str(r['product_id'])
+                qty = r.get('quantity', 0)
+                amt = r.get('refund_amount', 0)
+                if pd.isna(qty):
+                    qty = 0
+                if pd.isna(amt):
+                    amt = 0
+                if pid not in refund_by_product:
+                    refund_by_product[pid] = {'qty': 0, 'amount': 0}
+                refund_by_product[pid]['qty'] += qty
+                refund_by_product[pid]['amount'] += round(float(amt), 2)
+                
+                refund_row = dict(r)
+                refund_row['供应商'] = get_supplier(pid)
+                refunds_with_supplier.append(refund_row)
+        
+        supplier_summary = {}
+        all_product_ids = set(list(order_by_product.keys()) + list(refund_by_product.keys()))
+        
+        for pid in all_product_ids:
+            supplier = get_supplier(pid)
+            if supplier not in supplier_summary:
+                supplier_summary[supplier] = {
+                    '供应商': supplier,
+                    '订单件数': 0,
+                    '订单金额': 0,
+                    '缺货退款件数': 0,
+                    '缺货退款金额': 0,
+                    '实际发货件数': 0,
+                    '实际发货金额': 0,
+                    '净结算金额': 0
+                }
+            
+            order = order_by_product.get(pid, {'qty': 0, 'amount': 0})
+            refund = refund_by_product.get(pid, {'qty': 0, 'amount': 0})
+            
+            supplier_summary[supplier]['订单件数'] += order['qty']
+            supplier_summary[supplier]['订单金额'] += order['amount']
+            supplier_summary[supplier]['缺货退款件数'] += refund['qty']
+            supplier_summary[supplier]['缺货退款金额'] += refund['amount']
+        
+        for s in supplier_summary.values():
+            s['实际发货件数'] = s['订单件数'] - s['缺货退款件数']
+            s['实际发货金额'] = round(s['订单金额'] - s['缺货退款金额'], 2)
+            s['净结算金额'] = s['实际发货金额']
+        
+        summary_list = list(supplier_summary.values())
+        summary_list.sort(key=lambda x: x['供应商'])
+        
+        total_row = {
+            '供应商': '合计',
+            '订单件数': sum(s['订单件数'] for s in summary_list),
+            '订单金额': round(sum(s['订单金额'] for s in summary_list), 2),
+            '缺货退款件数': sum(s['缺货退款件数'] for s in summary_list),
+            '缺货退款金额': round(sum(s['缺货退款金额'] for s in summary_list), 2),
+            '实际发货件数': sum(s['实际发货件数'] for s in summary_list),
+            '实际发货金额': round(sum(s['实际发货金额'] for s in summary_list), 2),
+            '净结算金额': round(sum(s['净结算金额'] for s in summary_list), 2)
+        }
+        summary_list.append(total_row)
+        
+        summary_df = pd.DataFrame(summary_list)
+        
+        refund_detail_df = pd.DataFrame(refunds_with_supplier)
+        if not refund_detail_df.empty:
+            cols = ['order_id', 'building', 'room', 'product_id', 'product_name', 
+                    '供应商', 'quantity', 'refund_amount', 'reason', 'processed_at']
+            existing_cols = [c for c in cols if c in refund_detail_df.columns]
+            refund_detail_df = refund_detail_df[existing_cols]
         
         if not output:
             output = f"供应商对账表_{datetime.now().strftime('%Y%m%d')}.csv"
+        
         with open(output, 'w', encoding='utf-8-sig') as f:
-            f.write("=== 供应商发货汇总 ===\n")
-        pd.DataFrame(summary).to_csv(output, mode='a', index=False, encoding='utf-8-sig')
+            f.write("=== 供应商对账汇总（按供应商分组）===\n")
+        summary_df.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
+        
         with open(output, 'a', encoding='utf-8-sig') as f:
-            f.write("\n=== 供应商缺货退款汇总 ===\n")
-        pd.DataFrame(refund_summary).to_csv(output, mode='a', index=False, encoding='utf-8-sig')
-        with open(output, 'a', encoding='utf-8-sig') as f:
-            f.write("\n=== 退款明细 ===\n")
-        if not refunds.empty:
-            refunds.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
+            f.write("\n=== 退款明细（含供应商）===\n")
+        if not refund_detail_df.empty:
+            refund_detail_df.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
         
         click.echo(f"✓ 供应商对账表已导出: {output}")
-        if summary:
-            click.echo(tabulate(pd.DataFrame(summary), headers='keys', tablefmt='simple', showindex=False))
+        display_cols = ['供应商', '订单件数', '订单金额', '缺货退款件数', 
+                        '缺货退款金额', '实际发货件数', '实际发货金额', '净结算金额']
+        click.echo(tabulate(summary_df[display_cols], headers='keys', tablefmt='simple', showindex=False))
     
     elif target == 'finance':
         paid_total = orders['paid_amount'].sum() if 'paid_amount' in orders.columns else 0
