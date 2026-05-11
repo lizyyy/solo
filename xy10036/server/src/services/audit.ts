@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../database'
-import type { AuditAction, EntityType, AuditLog } from '../../shared/types'
+import type { AuditAction, EntityType, AuditLog } from '../../../shared/types'
 
 export interface AuditLogParams {
   action: AuditAction

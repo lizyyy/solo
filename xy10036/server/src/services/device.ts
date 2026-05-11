@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../database'
 import { ConflictError, NotFoundError, ValidationError } from '../middleware/error'
-import type { Device, DeviceStatus, PaginatedResponse } from '../../shared/types'
+import type { Device, DeviceStatus, PaginatedResponse } from '../../../shared/types'
 import { createAuditLog } from './audit'
 
 interface DbDevice {

@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { getAuditLogs } from '../services/audit'
-import type { AuditAction, EntityType } from '../../shared/types'
+import type { AuditAction, EntityType } from '../../../shared/types'
 
 const router = Router()
 

@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express'
 import { borrowDevice, returnDevice, getBorrowRecords, getBorrowRecordById, getBorrowRecordsForReport } from '../services/borrow'
 import { getAuditLogs } from '../services/audit'
 import { cacheIdempotentResponse, getEndpointKey } from '../middleware/idempotency'
-import type { BorrowStatus, ReportFilters } from '../../shared/types'
+import type { BorrowStatus, ReportFilters } from '../../../shared/types'
 
 const router = Router()
 

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../database'
 import { ConflictError, NotFoundError, ValidationError, OptimisticLockError } from '../middleware/error'
-import type { BorrowRecord, BorrowStatus, Device, ReportFilters, PaginatedResponse } from '../../shared/types'
+import type { BorrowRecord, BorrowStatus, Device, ReportFilters, PaginatedResponse } from '../../../shared/types'
 import { createAuditLog } from './audit'
 
 interface DbDevice {

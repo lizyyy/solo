@@ -2,6 +2,15 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosR
 import { v4 as uuidv4 } from 'uuid'
 import type { ApiResponse } from '@shared/types'
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    _skipRetry?: boolean
+    _retryCountLimit?: number
+    _retryDelay?: number
+    _retryCount?: number
+  }
+}
+
 export interface RequestOptions {
   skipRetry?: boolean
   retryCount?: number
