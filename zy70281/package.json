@@ -1,0 +1,15 @@
+{
+  "name": "rural-express-settlement",
+  "version": "1.0.0",
+  "description": "乡村快递共配结算台",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "seed": "cd backend && npm run seed",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "cd backend && npm start",
+    "test:api": "node backend/test-api.mjs"
+  }
+}
