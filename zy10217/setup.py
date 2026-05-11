@@ -5,6 +5,7 @@ setup(
     version='1.0.0',
     description='农机合作社作业计费 CLI 系统',
     packages=find_packages(),
+    py_modules=['cli'],
     install_requires=[
         'click>=8.0.0',
         'sqlalchemy>=2.0.0',
