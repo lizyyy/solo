@@ -1,0 +1,132 @@
+{
+  "iceRinks": [
+    {
+      "id": "rink-1",
+      "name": "主冰场 1 号",
+      "status": "active"
+    },
+    {
+      "id": "rink-2",
+      "name": "主冰场 2 号",
+      "status": "active"
+    }
+  ],
+  "courses": [
+    {
+      "id": "course-1",
+      "rinkId": "rink-1",
+      "name": "花样滑冰训练班 A 组",
+      "startTime": "2026-05-12T09:00:00",
+      "endTime": "2026-05-12T10:30:00",
+      "priority": "normal"
+    },
+    {
+      "id": "course-2",
+      "rinkId": "rink-1",
+      "name": "速度滑冰训练",
+      "startTime": "2026-05-12T14:00:00",
+      "endTime": "2026-05-12T15:30:00",
+      "priority": "normal"
+    }
+  ],
+  "competitions": [
+    {
+      "id": "comp-1",
+      "rinkId": "rink-1",
+      "name": "市级花样滑冰锦标赛",
+      "startTime": "2026-05-12T19:00:00",
+      "endTime": "2026-05-12T22:00:00",
+      "priority": "high"
+    }
+  ],
+  "iceMaintenance": [
+    {
+      "id": "maintenance-1",
+      "rinkId": "rink-1",
+      "name": "例行制冰维护",
+      "startTime": "2026-05-12T04:00:00",
+      "endTime": "2026-05-12T07:00:00",
+      "type": "regular",
+      "recoveryHours": 2
+    }
+  ],
+  "resurfacingTasks": [
+    {
+      "id": "task-ba36cff6-42c4-4738-baf6-59d753df3d9f",
+      "rinkId": "rink-1",
+      "rinkName": "主冰场 1 号",
+      "startTime": "2026-05-12T07:45:00.000Z",
+      "endTime": "2026-05-12T08:00:00.000Z",
+      "recoveryEndTime": "2026-05-12T08:30:00.000Z",
+      "status": "revised",
+      "reason": "调整到速度滑冰课后磨冰",
+      "requestedBy": "张主管",
+      "createdAt": "2026-05-11T23:57:09.772Z",
+      "updatedAt": "2026-05-11T23:57:34.561Z",
+      "history": [
+        {
+          "action": "created",
+          "timestamp": "2026-05-11T23:57:09.772Z",
+          "note": "任务已创建，磨冰时长 15 分钟，恢复时长 30 分钟"
+        },
+        {
+          "action": "advanced",
+          "previousStatus": "pending",
+          "newStatus": "in_progress",
+          "timestamp": "2026-05-11T23:57:25.512Z"
+        },
+        {
+          "action": "revised",
+          "previousStatus": "in_progress",
+          "newStatus": "revised",
+          "changes": {
+            "startTime": {
+              "from": "2026-05-12T02:30:00.000Z",
+              "to": "2026-05-12T07:45:00.000Z"
+            },
+            "reason": "调整到速度滑冰课后磨冰"
+          },
+          "timestamp": "2026-05-11T23:57:34.561Z"
+        }
+      ]
+    },
+    {
+      "id": "task-597d32f5-fa2f-4b57-bba6-b99fa4da3521",
+      "rinkId": "rink-2",
+      "rinkName": "主冰场 2 号",
+      "startTime": "2026-05-12T08:00:00.000Z",
+      "endTime": "2026-05-12T08:15:00.000Z",
+      "recoveryEndTime": "2026-05-12T08:45:00.000Z",
+      "status": "cancelled",
+      "reason": "2号冰场日常维护",
+      "requestedBy": "陈场务",
+      "createdAt": "2026-05-11T23:57:27.790Z",
+      "updatedAt": "2026-05-11T23:57:36.322Z",
+      "history": [
+        {
+          "action": "created",
+          "timestamp": "2026-05-11T23:57:27.790Z",
+          "note": "任务已创建，磨冰时长 15 分钟，恢复时长 30 分钟"
+        },
+        {
+          "action": "cancelled",
+          "previousStatus": "pending",
+          "reason": "临时取消，改为明天",
+          "timestamp": "2026-05-11T23:57:36.322Z"
+        }
+      ],
+      "cancelledAt": "2026-05-11T23:57:36.322Z",
+      "cancellationReason": "临时取消，改为明天"
+    }
+  ],
+  "idempotencyKeys": {
+    "test-create-001": {
+      "taskId": "task-ba36cff6-42c4-4738-baf6-59d753df3d9f",
+      "timestamp": "2026-05-11T23:57:09.772Z"
+    },
+    "test-cancel": {
+      "taskId": "task-597d32f5-fa2f-4b57-bba6-b99fa4da3521",
+      "timestamp": "2026-05-11T23:57:27.790Z"
+    }
+  }
+}
