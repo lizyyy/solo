@@ -27,8 +27,15 @@ class Appointment:
     time_slot: str
     volume_cubic: float
     payment_status: str = 'unpaid'
+    amount_due: float = 0.0
+    amount_paid: float = 0.0
+    price_per_cubic: float = 0.0
     source: Optional[str] = None
     import_batch_id: Optional[str] = None
+    
+    @property
+    def amount_diff(self) -> float:
+        return self.amount_due - self.amount_paid
 
 @dataclass
 class Violation:

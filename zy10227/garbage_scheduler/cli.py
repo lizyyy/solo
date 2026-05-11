@@ -235,14 +235,16 @@ def resolve(anomaly_id, resolution):
 @click.option('--status', '-s', required=True,
               type=click.Choice(VALID_PAYMENT_STATUSES),
               help='缴费状态: paid/unpaid/partial')
-def update_payment(appointment_id, status):
-    """更新预约的缴费状态"""
+@click.option('--amount-paid', '-a', type=float,
+              help='已收金额（元）')
+def update_payment(appointment_id, status, amount_paid):
+    """更新预约的缴费状态和已收金额"""
     try:
-        if update_appointment_payment(appointment_id, status):
-            click.echo(click.style(
-                f"预约 {appointment_id} 缴费状态已更新为: {status}",
-                fg=PAYMENT_COLORS.get(status, 'white')
-            ))
+        if update_appointment_payment(appointment_id, status, amount_paid):
+            msg = f"预约 {appointment_id} 缴费状态已更新为: {status}"
+            if amount_paid is not None:
+                msg += f", 已收金额: {amount_paid}元"
+            click.echo(click.style(msg, fg=PAYMENT_COLORS.get(status, 'white')))
         else:
             click.echo(f"未找到预约 ID: {appointment_id}", err=True)
             sys.exit(1)
