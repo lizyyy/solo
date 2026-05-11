@@ -1,0 +1,26 @@
+{
+  "name": "price-tag-platform-backend",
+  "version": "1.0.0",
+  "description": "门店价签生效台 - 后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "init": "node src/scripts/init-db.js",
+    "seed": "node src/scripts/seed-data.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "sql.js": "^1.14.1",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
