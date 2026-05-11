@@ -1,0 +1,54 @@
+{
+  "auditId": "62af0738-7be6-468c-b41c-d88c0e633058",
+  "auditName": "测试盘点_20260512",
+  "generatedAt": "2026-05-11T16:41:51.458Z",
+  "summary": {
+    "totalItems": 11,
+    "matchedItems": 3,
+    "profitItems": 3,
+    "lossItems": 2,
+    "notCountedItems": 2,
+    "overCountedItems": 1,
+    "pendingApproval": 10,
+    "approved": 1,
+    "rejected": 0
+  },
+  "adjustments": {
+    "before": [
+      {
+        "sku": "SKU002",
+        "location": "A01",
+        "quantity": 50
+      }
+    ],
+    "after": [
+      {
+        "sku": "SKU002",
+        "location": "A01",
+        "quantity": 45
+      }
+    ]
+  },
+  "pendingApprovalItems": [],
+  "completedItems": [
+    {
+      "id": "19c7cce8-e9d6-4843-8c2d-0e9eb7cbaa54",
+      "auditId": "62af0738-7be6-468c-b41c-d88c0e633058",
+      "location": "A01",
+      "sku": "SKU002",
+      "bookQuantity": 50,
+      "actualQuantity": 45,
+      "differenceQuantity": -5,
+      "differenceType": "loss",
+      "owner": "张三",
+      "approvalStatus": "approved",
+      "createdAt": "2026-05-11T16:37:58.948Z",
+      "updatedAt": "2026-05-11T16:38:50.913Z",
+      "adjustmentQuantity": -5,
+      "reviewedBy": "张三",
+      "reviewedAt": "2026-05-11T16:38:19.660Z",
+      "approvedBy": "经理",
+      "approvedAt": "2026-05-11T16:38:50.911Z"
+    }
+  ]
+}
