@@ -47,5 +47,18 @@
     "rejection_reason": "已确认过赔付，不需要重复赔付",
     "rejected_by": "李店长",
     "rejected_at": "2026-05-11 15:29:18"
+  },
+  "P-20260511193228-a0d03f": {
+    "compensation_id": "P-20260511193228-a0d03f",
+    "complaint_id": "C-006",
+    "amount": 200.0,
+    "coupon_amount": 50.0,
+    "reason": "测试正常投诉的赔付",
+    "processed_by": "张店长",
+    "process_time": "2026-05-11 19:32:28",
+    "status": "confirmed",
+    "created_at": "2026-05-11 19:32:28",
+    "confirmed_by": "李店长",
+    "confirmed_at": "2026-05-11 19:32:36"
   }
 }

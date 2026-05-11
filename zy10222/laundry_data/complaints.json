@@ -63,5 +63,18 @@
     "created_at": "2026-05-11 15:28:10",
     "resolution_notes": "在衣物 G-001 争议中败诉，衣物已判给投诉 C-004。",
     "updated_at": "2026-05-11 15:28:34"
+  },
+  "C-006": {
+    "complaint_id": "C-006",
+    "receipt_id": "R-001",
+    "garment_id": "",
+    "customer_name": "张三",
+    "complaint_type": "洗坏",
+    "description": "我的白色衬衫领口有污渍",
+    "claim_time": "2026-05-11 19:00:00",
+    "status": "closed",
+    "created_at": "2026-05-11 19:31:53",
+    "resolution_notes": "已赔付 200.0 元，补偿券 50.0 元。",
+    "updated_at": "2026-05-11 19:32:36"
   }
 }

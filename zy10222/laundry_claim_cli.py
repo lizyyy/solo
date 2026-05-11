@@ -344,6 +344,17 @@ class LaundryClaimCLI:
         if complaint.get("status") == "rejected":
             return {"success": False, "message": f"投诉 {complaint_id} 已被拒绝，无法赔付"}
         
+        if complaint.get("status") == "closed":
+            existing_comps = [
+                cid for cid, c in self.compensations.items()
+                if c.get("complaint_id") == complaint_id
+            ]
+            if existing_comps:
+                return {
+                    "success": False, 
+                    "message": f"投诉 {complaint_id} 已关闭，已有赔付记录: {existing_comps}"
+                }
+        
         existing_pending = [
             cid for cid, c in self.compensations.items()
             if c.get("complaint_id") == complaint_id and c.get("status") == "pending"
@@ -352,6 +363,16 @@ class LaundryClaimCLI:
             return {
                 "success": False, 
                 "message": f"投诉 {complaint_id} 已有待处理的赔付: {existing_pending}"
+            }
+        
+        existing_confirmed = [
+            cid for cid, c in self.compensations.items()
+            if c.get("complaint_id") == complaint_id and c.get("status") == "confirmed"
+        ]
+        if existing_confirmed:
+            return {
+                "success": False, 
+                "message": f"投诉 {complaint_id} 已有已确认的赔付: {existing_confirmed}"
             }
         
         max_amount = self.rules.get("max_amount_per_garment", 500)
