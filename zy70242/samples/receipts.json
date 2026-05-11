@@ -1,0 +1,54 @@
+[
+  {
+    "receipt_id": "RCPT-2024001",
+    "batch_id": "BATCH-2024001",
+    "case_id": "(2024)京民初字第001号",
+    "receipt_date": "2024-01-16",
+    "receipt_person": "审判庭A",
+    "received_page_count": 30,
+    "missing_pages": "",
+    "extra_pages": "",
+    "status": "received",
+    "return_reason": "",
+    "return_notes": ""
+  },
+  {
+    "receipt_id": "RCPT-2024002",
+    "batch_id": "BATCH-2024002",
+    "case_id": "(2024)京民初字第001号",
+    "receipt_date": "2024-03-21",
+    "receipt_person": "档案室",
+    "received_page_count": 28,
+    "missing_pages": "10,27-28",
+    "extra_pages": "",
+    "status": "returned",
+    "return_reason": "missing_pages",
+    "return_notes": "发现缺页，退回审判庭补正"
+  },
+  {
+    "receipt_id": "RCPT-2024003",
+    "batch_id": "BATCH-2024003",
+    "case_id": "(2024)京民初字第002号",
+    "receipt_date": "2024-02-02",
+    "receipt_person": "审判庭B",
+    "received_page_count": 12,
+    "missing_pages": "",
+    "extra_pages": "",
+    "status": "received",
+    "return_reason": "",
+    "return_notes": ""
+  },
+  {
+    "receipt_id": "RCPT-2024004",
+    "batch_id": "BATCH-2024004",
+    "case_id": "(2024)京民初字第002号",
+    "receipt_date": "2024-04-11",
+    "receipt_person": "档案室",
+    "received_page_count": 12,
+    "missing_pages": "",
+    "extra_pages": "",
+    "status": "received",
+    "return_reason": "",
+    "return_notes": ""
+  }
+]

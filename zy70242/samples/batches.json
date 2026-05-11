@@ -1,0 +1,46 @@
+[
+  {
+    "batch_id": "BATCH-2024001",
+    "case_id": "(2024)京民初字第001号",
+    "from_stage": "filing",
+    "to_stage": "trial",
+    "total_pages": 30,
+    "dossier_count": 1,
+    "transfer_date": "2024-01-15",
+    "transfer_person": "张三",
+    "notes": "民事案件一审移送"
+  },
+  {
+    "batch_id": "BATCH-2024002",
+    "case_id": "(2024)京民初字第001号",
+    "from_stage": "trial",
+    "to_stage": "archive",
+    "total_pages": 30,
+    "dossier_count": 1,
+    "transfer_date": "2024-03-20",
+    "transfer_person": "李四",
+    "notes": "判决生效后归档"
+  },
+  {
+    "batch_id": "BATCH-2024003",
+    "case_id": "(2024)京民初字第002号",
+    "from_stage": "filing",
+    "to_stage": "trial",
+    "total_pages": 12,
+    "dossier_count": 1,
+    "transfer_date": "2024-02-01",
+    "transfer_person": "王五",
+    "notes": ""
+  },
+  {
+    "batch_id": "BATCH-2024004",
+    "case_id": "(2024)京民初字第002号",
+    "from_stage": "trial",
+    "to_stage": "archive",
+    "total_pages": 12,
+    "dossier_count": 1,
+    "transfer_date": "2024-04-10",
+    "transfer_person": "赵六",
+    "notes": ""
+  }
+]

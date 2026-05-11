@@ -1,0 +1,166 @@
+{
+  "results": [
+    {
+      "id": 4,
+      "batch_id": "BATCH-2024001",
+      "case_id": "(2024)京民初字第001号",
+      "check_time": "2026-05-11T21:29:55.507075",
+      "passed": true,
+      "issues": []
+    },
+    {
+      "id": 3,
+      "batch_id": "BATCH-2024003",
+      "case_id": "(2024)京民初字第002号",
+      "check_time": "2026-05-11T21:29:55.506692",
+      "passed": true,
+      "issues": []
+    },
+    {
+      "id": 2,
+      "batch_id": "BATCH-2024002",
+      "case_id": "(2024)京民初字第001号",
+      "check_time": "2026-05-11T21:29:55.506186",
+      "passed": false,
+      "issues": [
+        {
+          "type": "RECEIVED_PAGE_COUNT_MISMATCH",
+          "message": "实收页数与移交页数不一致",
+          "details": "移交页数=30, 实收页数=28, 差异=2页",
+          "severity": "error"
+        },
+        {
+          "type": "MISSING_PAGES",
+          "message": "存在缺页",
+          "details": "缺失页码: 10,27-28",
+          "severity": "error"
+        },
+        {
+          "type": "RETURN_MISSING_PAGES",
+          "message": "因缺页被退回",
+          "details": "缺失页码: 10,27-28",
+          "severity": "warning"
+        },
+        {
+          "type": "RETURNED",
+          "message": "卷宗已被退回",
+          "details": "退回原因: missing_pages",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "batch_id": "BATCH-2024004",
+      "case_id": "(2024)京民初字第002号",
+      "check_time": "2026-05-11T21:29:55.504716",
+      "passed": true,
+      "issues": []
+    }
+  ],
+  "problems": [],
+  "batches": [
+    {
+      "batch_id": "BATCH-2024004",
+      "case_id": "(2024)京民初字第002号",
+      "from_stage": "trial",
+      "to_stage": "archive",
+      "total_pages": 12,
+      "dossier_count": 1,
+      "transfer_date": "2024-04-10",
+      "transfer_person": "赵六",
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "batch_id": "BATCH-2024002",
+      "case_id": "(2024)京民初字第001号",
+      "from_stage": "trial",
+      "to_stage": "archive",
+      "total_pages": 30,
+      "dossier_count": 1,
+      "transfer_date": "2024-03-20",
+      "transfer_person": "李四",
+      "status": "pending",
+      "notes": "判决生效后归档"
+    },
+    {
+      "batch_id": "BATCH-2024003",
+      "case_id": "(2024)京民初字第002号",
+      "from_stage": "filing",
+      "to_stage": "trial",
+      "total_pages": 12,
+      "dossier_count": 1,
+      "transfer_date": "2024-02-01",
+      "transfer_person": "王五",
+      "status": "pending",
+      "notes": ""
+    },
+    {
+      "batch_id": "BATCH-2024001",
+      "case_id": "(2024)京民初字第001号",
+      "from_stage": "filing",
+      "to_stage": "trial",
+      "total_pages": 30,
+      "dossier_count": 1,
+      "transfer_date": "2024-01-15",
+      "transfer_person": "张三",
+      "status": "pending",
+      "notes": "民事案件一审移送"
+    }
+  ],
+  "receipts": [
+    {
+      "receipt_id": "RCPT-2024004",
+      "batch_id": "BATCH-2024004",
+      "case_id": "(2024)京民初字第002号",
+      "receipt_date": "2024-04-11",
+      "receipt_person": "档案室",
+      "received_page_count": 12,
+      "missing_pages": "",
+      "extra_pages": "",
+      "status": "received",
+      "return_reason": "",
+      "return_notes": ""
+    },
+    {
+      "receipt_id": "RCPT-2024002",
+      "batch_id": "BATCH-2024002",
+      "case_id": "(2024)京民初字第001号",
+      "receipt_date": "2024-03-21",
+      "receipt_person": "档案室",
+      "received_page_count": 28,
+      "missing_pages": "10,27-28",
+      "extra_pages": "",
+      "status": "returned",
+      "return_reason": "missing_pages",
+      "return_notes": "发现缺页，退回审判庭补正"
+    },
+    {
+      "receipt_id": "RCPT-2024003",
+      "batch_id": "BATCH-2024003",
+      "case_id": "(2024)京民初字第002号",
+      "receipt_date": "2024-02-02",
+      "receipt_person": "审判庭B",
+      "received_page_count": 12,
+      "missing_pages": "",
+      "extra_pages": "",
+      "status": "received",
+      "return_reason": "",
+      "return_notes": ""
+    },
+    {
+      "receipt_id": "RCPT-2024001",
+      "batch_id": "BATCH-2024001",
+      "case_id": "(2024)京民初字第001号",
+      "receipt_date": "2024-01-16",
+      "receipt_person": "审判庭A",
+      "received_page_count": 30,
+      "missing_pages": "",
+      "extra_pages": "",
+      "status": "received",
+      "return_reason": "",
+      "return_notes": ""
+    }
+  ]
+}
