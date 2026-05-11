@@ -1,0 +1,15 @@
+{
+  "name": "decoration-material-comparison-api",
+  "version": "1.0.0",
+  "description": "装修材料采购比价 API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "body-parser": "^1.20.2"
+  }
+}
