@@ -1,0 +1,24 @@
+{
+  "name": "supplier-arrival-discrepancy-api",
+  "version": "1.0.0",
+  "description": "供应商到货短溢 API - 支持采购单管理、到货登记、验收差异、让步接收、拒收退回和库存入账",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "node test/sample-flows.js"
+  },
+  "keywords": ["supplier", "arrival", "discrepancy", "api", "inventory"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sequelize": "^6.35.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
