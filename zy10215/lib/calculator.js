@@ -181,6 +181,7 @@ function calculateRequirements(recipes, orders, inventories, substitutes, losses
   const shortages = [];
   const substitutionDetails = [];
 
+  const deficitItems = [];
   Object.keys(ingredientRequirements).forEach(itemId => {
     const req = ingredientRequirements[itemId];
     const netRequired = Math.ceil(req.required * 1000) / 1000;
@@ -188,66 +189,121 @@ function calculateRequirements(recipes, orders, inventories, substitutes, losses
     if (req.available < netRequired) {
       const deficit = netRequired - req.available;
       const subList = getSubstitutes(substitutes, itemId);
-      let covered = false;
+      deficitItems.push({
+        itemId,
+        req,
+        netRequired,
+        deficit,
+        subList
+      });
+    }
+  });
 
-      for (const sub of subList) {
-        const subInv = getInventory(inventories, sub.substituteId);
-        if (!subInv) continue;
+  const substituteRemaining = {};
+  inventories.forEach(inv => {
+    substituteRemaining[inv.itemId] = inv.quantity;
+  });
 
-        const allergenCheck = validateAllergenForSubstitute(itemId, sub.substituteId, inventories);
-        if (!allergenCheck.valid) {
-          allergenWarnings.push({
-            originalId: itemId,
-            originalName: req.itemName,
-            substituteId: sub.substituteId,
-            substituteName: subInv.itemName,
-            reason: allergenCheck.reason,
-            originalAllergens: allergenCheck.originalAllergens,
-            substituteAllergens: allergenCheck.substituteAllergens
-          });
-        }
+  const allSubstituteOptions = [];
+  deficitItems.forEach(({ itemId, req, deficit, subList }) => {
+    subList.forEach(sub => {
+      const subInv = getInventory(inventories, sub.substituteId);
+      if (!subInv) return;
 
-        const conversionRatio = sub.conversionRatio || 1;
-        const subNeeded = deficit * conversionRatio;
-        const subAvailable = subInv.quantity;
-        const subDeficit = subNeeded - subAvailable;
-
-        req.substitutions.push({
+      const allergenCheck = validateAllergenForSubstitute(itemId, sub.substituteId, inventories);
+      if (!allergenCheck.valid) {
+        allergenWarnings.push({
+          originalId: itemId,
+          originalName: req.itemName,
           substituteId: sub.substituteId,
           substituteName: subInv.itemName,
-          conversionRatio,
-          priority: sub.priority || 1,
-          notes: sub.notes || '',
-          needed: Number(subNeeded.toFixed(3)),
-          available: subAvailable
-        });
-
-        if (subAvailable >= subNeeded) {
-          covered = true;
-          substitutionDetails.push({
-            originalId: itemId,
-            originalName: req.itemName,
-            substituteId: sub.substituteId,
-            substituteName: subInv.itemName,
-            originalDeficit: Number(deficit.toFixed(3)),
-            substituteUsed: Number(subNeeded.toFixed(3)),
-            conversionRatio
-          });
-          break;
-        }
-      }
-
-      if (!covered) {
-        shortages.push({
-          itemId,
-          itemName: req.itemName,
-          unit: req.unit,
-          required: Number(netRequired.toFixed(3)),
-          available: req.available,
-          deficit: Number(deficit.toFixed(3)),
-          deficitPercent: Number((deficit / netRequired * 100).toFixed(2))
+          reason: allergenCheck.reason,
+          originalAllergens: allergenCheck.originalAllergens,
+          substituteAllergens: allergenCheck.substituteAllergens
         });
       }
+
+      const conversionRatio = sub.conversionRatio || 1;
+      const subNeeded = deficit * conversionRatio;
+      
+      allSubstituteOptions.push({
+        originalItemId: itemId,
+        originalItemName: req.itemName,
+        originalDeficit: deficit,
+        substituteId: sub.substituteId,
+        substituteName: subInv.itemName,
+        conversionRatio,
+        subNeeded,
+        priority: sub.priority || 1,
+        notes: sub.notes || '',
+        req
+      });
+    });
+  });
+
+  allSubstituteOptions.sort((a, b) => {
+    if (a.priority !== b.priority) return a.priority - b.priority;
+    return a.subNeeded - b.subNeeded;
+  });
+
+  const originalCovered = {};
+  deficitItems.forEach(item => {
+    originalCovered[item.itemId] = false;
+  });
+
+  allSubstituteOptions.forEach(option => {
+    if (originalCovered[option.originalItemId]) return;
+    
+    const remaining = substituteRemaining[option.substituteId] || 0;
+    if (remaining >= option.subNeeded) {
+      substituteRemaining[option.substituteId] = remaining - option.subNeeded;
+      originalCovered[option.originalItemId] = true;
+      
+      option.req.substitutions.push({
+        substituteId: option.substituteId,
+        substituteName: option.substituteName,
+        conversionRatio: option.conversionRatio,
+        priority: option.priority,
+        notes: option.notes,
+        needed: Number(option.subNeeded.toFixed(3)),
+        available: remaining,
+        remainingAfterUse: Number((remaining - option.subNeeded).toFixed(3))
+      });
+      
+      substitutionDetails.push({
+        originalId: option.originalItemId,
+        originalName: option.originalItemName,
+        substituteId: option.substituteId,
+        substituteName: option.substituteName,
+        originalDeficit: Number(option.originalDeficit.toFixed(3)),
+        substituteUsed: Number(option.subNeeded.toFixed(3)),
+        conversionRatio: option.conversionRatio
+      });
+    } else {
+      option.req.substitutions.push({
+        substituteId: option.substituteId,
+        substituteName: option.substituteName,
+        conversionRatio: option.conversionRatio,
+        priority: option.priority,
+        notes: option.notes,
+        needed: Number(option.subNeeded.toFixed(3)),
+        available: remaining,
+        insufficient: true
+      });
+    }
+  });
+
+  deficitItems.forEach(({ itemId, req, netRequired, deficit }) => {
+    if (!originalCovered[itemId]) {
+      shortages.push({
+        itemId,
+        itemName: req.itemName,
+        unit: req.unit,
+        required: Number(netRequired.toFixed(3)),
+        available: req.available,
+        deficit: Number(deficit.toFixed(3)),
+        deficitPercent: Number((deficit / netRequired * 100).toFixed(2))
+      });
     }
   });
 
