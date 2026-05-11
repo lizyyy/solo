@@ -1011,32 +1011,170 @@ def load_sample_data(manager: CoffeeBatchManager):
         raise
 
 
+def print_green_beans(manager: CoffeeBatchManager):
+    conn = manager._get_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM green_beans ORDER BY arrival_date DESC')
+    beans = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    if not beans:
+        print("暂无生豆记录")
+        return
+
+    content = f"{'生豆ID':<18} {'产地':<18} {'品种':<12} {'重量(kg)':<10} {'到货日期':<12} {'供应商':<20}\n"
+    content += "-" * 95 + "\n"
+    for bean in beans:
+        content += (f"{bean['green_bean_id']:<18} {bean['origin']:<18} {bean['variety']:<12} "
+                   f"{bean['weight_kg']:<10.2f} {bean['arrival_date']:<12} {bean['supplier']:<20}\n")
+
+    print(format_report("生豆库存", content))
+
+
+def print_batches(manager: CoffeeBatchManager):
+    batches = manager.get_all_batches()
+    if not batches:
+        print("暂无烘焙批次")
+        return
+
+    content = f"{'批次ID':<18} {'产地':<18} {'品种':<10} {'烘焙日期':<12} {'投入(kg)':<10} {'产出(kg)':<10}\n"
+    content += "-" * 85 + "\n"
+    for batch in batches:
+        output = f"{batch['output_weight_kg']:.2f}" if batch['output_weight_kg'] else "未记录"
+        content += (f"{batch['batch_id']:<18} {batch['origin']:<18} {batch['variety']:<10} "
+                   f"{batch['roast_date']:<12} {batch['raw_input_kg']:<10.2f} {output:<10}\n")
+
+    print(format_report("烘焙批次列表", content))
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="咖啡豆烘焙杯测批次管理 CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+=== 日常使用流程 ===
+1. 生豆入库    -> add-green-bean
+2. 创建烘焙批次 -> add-batch
+3. 记录成品重量 -> record-output
+4. 完成杯测评分 -> add-cupping
+5. 客户预留发货 -> add-reservation
+
+=== 异常处理 ===
+- 取消预留     -> cancel-reservation
+- 撤销批次     -> revoke-batch
+
+=== 查看报告 ===
+- 生豆列表     -> list-green-beans
+- 批次列表     -> list-batches
+- 库存报告     -> inventory
+- 低分批次     -> low-score
+- 批次履历     -> history BATCH_ID
+- 预留记录     -> reservations
+- 完整报告     -> report
+
 示例:
-  # 加载示例数据
-  coffee_batch_cli.py sample
+  # 快速体验：加载示例数据
+  python3 coffee_batch_cli.py sample
 
-  # 查看库存报告
-  coffee_batch_cli.py inventory
+  # 生豆入库
+  python3 coffee_batch_cli.py add-green-bean \
+    --id GB_TEST_001 --origin "巴西 喜拉多" --variety "卡杜艾" \
+    --weight 60.0 --arrival "2024-03-01" --supplier "南美咖啡贸易"
 
-  # 查看低分批次
-  coffee_batch_cli.py low-score --threshold 7.5
+  # 创建烘焙批次
+  python3 coffee_batch_cli.py add-batch \
+    --id B20240301_BRA_01 --green-bean GB_TEST_001 \
+    --roast-date "2024-03-01" --raw-input 12.0 --duration 13.5 \
+    --profile "中烘焙，一爆发展45秒，208°C下豆"
 
-  # 查看批次履历
-  coffee_batch_cli.py history B20240215_ETH_01
+  # 记录成品重量
+  python3 coffee_batch_cli.py record-output \
+    --batch B20240301_BRA_01 --weight 10.2
 
-  # 查看所有预留
-  coffee_batch_cli.py reservations
+  # 完成杯测评分
+  python3 coffee_batch_cli.py add-cupping \
+    --batch B20240301_BRA_01 --date "2024-03-03" \
+    --aroma 8.0 --flavor 7.5 --acidity 7.5 --body 8.0 \
+    --balance 7.5 --sweetness 8.0 --cleanliness 7.5 \
+    --completed
+
+  # 创建客户预留
+  python3 coffee_batch_cli.py add-reservation \
+    --id RES_TEST_001 --batch B20240301_BRA_01 \
+    --customer-id CUST_001 --customer-name "测试咖啡馆" \
+    --weight 2.0 --date "2024-03-03"
+
+  # 取消预留
+  python3 coffee_batch_cli.py cancel-reservation --id RES_TEST_001
+
+  # 撤销批次（回滚所有预留）
+  python3 coffee_batch_cli.py revoke-batch \
+    --batch B20240301_BRA_01 --reason "烘焙失败，质量不合格"
         """
     )
 
     subparsers = parser.add_subparsers(dest='command', help='可用命令')
 
     sample_parser = subparsers.add_parser('sample', help='加载示例数据（3锅样例）')
+
+    gb_add = subparsers.add_parser('add-green-bean', help='录入生豆入库')
+    gb_add.add_argument('--id', required=True, help='生豆ID (如: GB_ETH_2024_001)')
+    gb_add.add_argument('--origin', required=True, help='产地 (如: 埃塞俄比亚 耶加雪菲)')
+    gb_add.add_argument('--variety', required=True, help='品种 (如: 原生种)')
+    gb_add.add_argument('--weight', type=float, required=True, help='重量(kg)')
+    gb_add.add_argument('--arrival', required=True, help='到货日期 (如: 2024-01-15)')
+    gb_add.add_argument('--supplier', required=True, help='供应商')
+    gb_add.add_argument('--notes', help='备注')
+
+    gb_list = subparsers.add_parser('list-green-beans', help='查看生豆列表')
+
+    batch_add = subparsers.add_parser('add-batch', help='创建烘焙批次')
+    batch_add.add_argument('--id', required=True, help='批次ID (如: B20240215_ETH_01)')
+    batch_add.add_argument('--green-bean', required=True, help='生豆ID')
+    batch_add.add_argument('--roast-date', required=True, help='烘焙日期')
+    batch_add.add_argument('--raw-input', type=float, required=True, help='投入生豆重量(kg)')
+    batch_add.add_argument('--duration', type=float, required=True, help='烘焙时长(分钟)')
+    batch_add.add_argument('--profile', required=True, help='烘焙曲线摘要')
+    batch_add.add_argument('--first-crack-temp', type=float, help='一爆温度(°C)')
+    batch_add.add_argument('--first-crack-time', type=float, help='一爆时间(分钟)')
+    batch_add.add_argument('--drop-temp', type=float, help='下豆温度(°C)')
+    batch_add.add_argument('--notes', help='备注')
+
+    batch_list = subparsers.add_parser('list-batches', help='查看烘焙批次列表')
+
+    output_rec = subparsers.add_parser('record-output', help='记录成品重量')
+    output_rec.add_argument('--batch', required=True, help='批次ID')
+    output_rec.add_argument('--weight', type=float, required=True, help='成品重量(kg)')
+
+    cupping_add = subparsers.add_parser('add-cupping', help='录入杯测评分')
+    cupping_add.add_argument('--batch', required=True, help='批次ID')
+    cupping_add.add_argument('--date', required=True, help='杯测日期')
+    cupping_add.add_argument('--aroma', type=float, required=True, help='香气评分 (0-10)')
+    cupping_add.add_argument('--flavor', type=float, required=True, help='风味评分 (0-10)')
+    cupping_add.add_argument('--acidity', type=float, required=True, help='酸度评分 (0-10)')
+    cupping_add.add_argument('--body', type=float, required=True, help='醇厚度评分 (0-10)')
+    cupping_add.add_argument('--balance', type=float, required=True, help='平衡感评分 (0-10)')
+    cupping_add.add_argument('--sweetness', type=float, required=True, help='甜度评分 (0-10)')
+    cupping_add.add_argument('--cleanliness', type=float, required=True, help='干净度评分 (0-10)')
+    cupping_add.add_argument('--overall', type=float, help='综合分 (默认自动计算平均值)')
+    cupping_add.add_argument('--completed', action='store_true', help='标记杯测完成')
+    cupping_add.add_argument('--notes', help='杯测备注')
+
+    res_add = subparsers.add_parser('add-reservation', help='创建客户预留')
+    res_add.add_argument('--id', required=True, help='预留ID (如: RES_001)')
+    res_add.add_argument('--batch', required=True, help='批次ID')
+    res_add.add_argument('--customer-id', required=True, help='客户ID')
+    res_add.add_argument('--customer-name', required=True, help='客户名称')
+    res_add.add_argument('--weight', type=float, required=True, help='预留重量(kg)')
+    res_add.add_argument('--date', required=True, help='预留日期')
+    res_add.add_argument('--notes', help='备注')
+
+    res_cancel = subparsers.add_parser('cancel-reservation', help='取消客户预留')
+    res_cancel.add_argument('--id', required=True, help='预留ID')
+
+    batch_revoke = subparsers.add_parser('revoke-batch', help='撤销批次（自动回滚所有预留）')
+    batch_revoke.add_argument('--batch', required=True, help='批次ID')
+    batch_revoke.add_argument('--reason', default="", help='撤销原因')
 
     inventory_parser = subparsers.add_parser('inventory', help='查看可售库存报告')
 
@@ -1055,45 +1193,152 @@ def main():
 
     manager = CoffeeBatchManager()
 
-    if args.command == 'sample':
-        load_sample_data(manager)
-        print("\n" + "=" * 60)
-        print("运行以下命令查看结果:")
-        print("  python coffee_batch_cli.py inventory    # 查看库存")
-        print("  python coffee_batch_cli.py low-score    # 查看低分批次")
-        print("  python coffee_batch_cli.py history B20240215_ETH_01  # 查看批次履历")
-        print("  python coffee_batch_cli.py report       # 完整报告")
-        print("=" * 60)
+    try:
+        if args.command == 'sample':
+            load_sample_data(manager)
+            print("\n" + "=" * 60)
+            print("运行以下命令查看结果:")
+            print("  python coffee_batch_cli.py inventory    # 查看库存")
+            print("  python coffee_batch_cli.py low-score    # 查看低分批次")
+            print("  python coffee_batch_cli.py history B20240215_ETH_01  # 查看批次履历")
+            print("  python coffee_batch_cli.py report       # 完整报告")
+            print("=" * 60)
 
-    elif args.command == 'inventory':
-        print_inventory_report(manager)
+        elif args.command == 'add-green-bean':
+            gb = GreenBean(
+                green_bean_id=args.id,
+                origin=args.origin,
+                variety=args.variety,
+                weight_kg=args.weight,
+                arrival_date=args.arrival,
+                supplier=args.supplier,
+                notes=args.notes
+            )
+            manager.add_green_bean(gb)
+            print(f"✓ 生豆入库成功: {args.id} ({args.origin} {args.variety})")
+            print(f"  重量: {args.weight}kg, 到货日期: {args.arrival}, 供应商: {args.supplier}")
 
-    elif args.command == 'low-score':
-        print_low_score_report(manager, args.threshold)
+        elif args.command == 'list-green-beans':
+            print_green_beans(manager)
 
-    elif args.command == 'history':
-        print_batch_history(manager, args.batch_id)
+        elif args.command == 'add-batch':
+            batch = RoastBatch(
+                batch_id=args.id,
+                green_bean_id=args.green_bean,
+                roast_date=args.roast_date,
+                profile_summary=args.profile,
+                raw_input_kg=args.raw_input,
+                roast_duration_min=args.duration,
+                first_crack_temp_c=args.first_crack_temp,
+                first_crack_min=args.first_crack_time,
+                drop_temp_c=args.drop_temp,
+                notes=args.notes
+            )
+            manager.add_roast_batch(batch)
+            print(f"✓ 烘焙批次创建成功: {args.id}")
+            print(f"  生豆: {args.green_bean}, 投入: {args.raw_input}kg, 时长: {args.duration}分钟")
+            print(f"  曲线: {args.profile}")
 
-    elif args.command == 'reservations':
-        reservations = manager.get_reservations(args.batch)
-        if not reservations:
-            print("暂无预留记录")
-        else:
-            content = f"{'预留ID':<12} {'批次ID':<18} {'客户':<15} {'重量':<8} {'状态':<10}\n"
-            content += "-" * 70 + "\n"
-            for r in reservations:
-                content += (f"{r['reservation_id']:<12} {r['batch_id']:<18} {r['customer_name']:<15} "
-                          f"{r['weight_kg']:<8.2f} {r['status']:<10}\n")
-            print(format_report("预留记录", content))
+        elif args.command == 'list-batches':
+            print_batches(manager)
 
-    elif args.command == 'report':
-        print_inventory_report(manager)
-        print()
-        print_low_score_report(manager)
-        print()
+        elif args.command == 'record-output':
+            result = manager.record_output_weight(args.batch, args.weight)
+            print(f"✓ 成品重量记录成功: {args.batch}")
+            print(f"  成品重量: {result}kg")
 
-    elif args.command is None:
-        parser.print_help()
+        elif args.command == 'add-cupping':
+            cupping = Cupping(
+                cupping_id=f"CUP_{args.batch}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                batch_id=args.batch,
+                cupping_date=args.date,
+                aroma=args.aroma,
+                flavor=args.flavor,
+                acidity=args.acidity,
+                body=args.body,
+                balance=args.balance,
+                sweetness=args.sweetness,
+                cleanliness=args.cleanliness,
+                overall=args.overall,
+                completed=args.completed,
+                notes=args.notes
+            )
+            manager.add_cupping(cupping)
+            status = "已完成" if args.completed else "未完成"
+            overall = args.overall if args.overall else (
+                args.aroma + args.flavor + args.acidity + args.body +
+                args.balance + args.sweetness + args.cleanliness
+            ) / 7.0
+            print(f"✓ 杯测记录成功: {args.batch}")
+            print(f"  状态: {status}, 综合分: {overall:.1f}")
+            if args.notes:
+                print(f"  备注: {args.notes}")
+
+        elif args.command == 'add-reservation':
+            res = Reservation(
+                reservation_id=args.id,
+                batch_id=args.batch,
+                customer_id=args.customer_id,
+                customer_name=args.customer_name,
+                weight_kg=args.weight,
+                reserved_date=args.date,
+                notes=args.notes
+            )
+            manager.add_reservation(res)
+            print(f"✓ 客户预留创建成功: {args.id}")
+            print(f"  客户: {args.customer_name} ({args.customer_id})")
+            print(f"  批次: {args.batch}, 预留重量: {args.weight}kg")
+
+        elif args.command == 'cancel-reservation':
+            manager.cancel_reservation(args.id)
+            print(f"✓ 预留已取消: {args.id}")
+            print(f"  库存已自动回滚")
+
+        elif args.command == 'revoke-batch':
+            manager.revoke_batch(args.batch, args.reason)
+            print(f"✓ 批次已撤销: {args.batch}")
+            if args.reason:
+                print(f"  原因: {args.reason}")
+            print(f"  所有活跃预留已自动取消并回滚库存")
+
+        elif args.command == 'inventory':
+            print_inventory_report(manager)
+
+        elif args.command == 'low-score':
+            print_low_score_report(manager, args.threshold)
+
+        elif args.command == 'history':
+            print_batch_history(manager, args.batch_id)
+
+        elif args.command == 'reservations':
+            reservations = manager.get_reservations(args.batch)
+            if not reservations:
+                print("暂无预留记录")
+            else:
+                content = f"{'预留ID':<12} {'批次ID':<18} {'客户':<15} {'重量':<8} {'状态':<10}\n"
+                content += "-" * 70 + "\n"
+                for r in reservations:
+                    content += (f"{r['reservation_id']:<12} {r['batch_id']:<18} {r['customer_name']:<15} "
+                              f"{r['weight_kg']:<8.2f} {r['status']:<10}\n")
+                print(format_report("预留记录", content))
+
+        elif args.command == 'report':
+            print_inventory_report(manager)
+            print()
+            print_low_score_report(manager)
+            print()
+
+        elif args.command is None:
+            parser.print_help()
+
+    except ValueError as e:
+        print(f"❌ 业务规则验证失败: {e}")
+        exit(1)
+    except Exception as e:
+        print(f"❌ 执行出错: {e}")
+        import traceback
+        traceback.print_exc()
+        exit(1)
 
 
 if __name__ == '__main__':
