@@ -1,0 +1,29 @@
+﻿记录ID,车辆ID,车牌号,司机,异常类型,严重程度,描述,证据,建议
+R0001,V001,沪A-12345,张师傅,重复数据,高,重复数据: 与记录 R0001 重复,"original_record_id=R0001; duplicate_keys={'vehicle_id': 'V001', 'date': datetime.date(2024, 1, 1), 'route_name': '北区绿化洒水'}",建议删除重复记录，保留最早的一条
+R0009,V001,沪A-12345,张师傅,重复数据,高,重复数据: 与记录 R0009 重复,"original_record_id=R0009; duplicate_keys={'vehicle_id': 'V001', 'date': datetime.date(2024, 1, 3), 'route_name': '东区垃圾清运路线'}",建议删除重复记录，保留最早的一条
+R0010,V002,沪A-23456,李师傅,重复数据,高,重复数据: 与记录 R0010 重复,"original_record_id=R0010; duplicate_keys={'vehicle_id': 'V002', 'date': datetime.date(2024, 1, 3), 'route_name': '北区绿化洒水'}",建议删除重复记录，保留最早的一条
+R0026,V002,沪A-23456,李师傅,重复数据,高,重复数据: 与记录 R0026 重复,"original_record_id=R0026; duplicate_keys={'vehicle_id': 'V002', 'date': datetime.date(2024, 1, 7), 'route_name': '东区垃圾清运路线'}",建议删除重复记录，保留最早的一条
+R0009,V001,沪A-12345,张师傅,缺失字段,严重,缺失关键字段: fuel_consumption,missing_field=fuel_consumption; is_critical=True,请补充缺失的字段: fuel_consumption
+R0009,V001,沪A-12345,张师傅,缺失字段,严重,缺失关键字段: route_mileage,missing_field=route_mileage; is_critical=True,请补充缺失的字段: route_mileage
+R0010,V002,沪A-23456,nan,缺失字段,中,缺失关键字段: load_weight,missing_field=load_weight; is_critical=False,请补充缺失的字段: load_weight
+R0010,V002,沪A-23456,nan,缺失字段,中,缺失关键字段: driver_name,missing_field=driver_name; is_critical=False,请补充缺失的字段: driver_name
+R0016,V004,沪A-45678,赵师傅,缺失字段,严重,缺失关键字段: route_mileage,missing_field=route_mileage; is_critical=True,请补充缺失的字段: route_mileage
+R0018,V002,沪A-23456,李师傅,缺失字段,中,缺失关键字段: idle_time,missing_field=idle_time; is_critical=False,请补充缺失的字段: idle_time
+R0020,V004,沪A-45678,赵师傅,缺失字段,严重,缺失关键字段: date,missing_field=date; is_critical=True,请补充缺失的字段: date
+R0022,nan,nan,李师傅,缺失字段,严重,缺失关键字段: vehicle_id,missing_field=vehicle_id; is_critical=True,请补充缺失的字段: vehicle_id
+R0022,nan,nan,李师傅,缺失字段,中,缺失关键字段: plate_number,missing_field=plate_number; is_critical=False,请补充缺失的字段: plate_number
+R0027,V003,沪A-34567,王师傅,缺失字段,中,缺失关键字段: load_weight,missing_field=load_weight; is_critical=False,请补充缺失的字段: load_weight
+R0022,V002,沪A-23456,李师傅,缺失字段,严重,缺失关键字段: fuel_consumption,missing_field=fuel_consumption; is_critical=True,请补充缺失的字段: fuel_consumption
+R0009,V001,沪A-12345,张师傅,缺失字段,严重,数值字段缺失或为空: fuel_consumption,missing_field=fuel_consumption; is_critical=True,请补充缺失的字段: fuel_consumption
+R0022,V002,沪A-23456,李师傅,缺失字段,严重,数值字段缺失或为空: fuel_consumption,missing_field=fuel_consumption; is_critical=True,请补充缺失的字段: fuel_consumption
+R0009,V001,沪A-12345,张师傅,缺失字段,严重,数值字段缺失或为空: route_mileage,missing_field=route_mileage; is_critical=True,请补充缺失的字段: route_mileage
+R0016,V004,沪A-45678,赵师傅,缺失字段,严重,数值字段缺失或为空: route_mileage,missing_field=route_mileage; is_critical=True,请补充缺失的字段: route_mileage
+R0010,V002,沪A-23456,nan,缺失字段,中,数值字段缺失或为空: load_weight,missing_field=load_weight; is_critical=False,请补充缺失的字段: load_weight
+R0027,V003,沪A-34567,王师傅,缺失字段,中,数值字段缺失或为空: load_weight,missing_field=load_weight; is_critical=False,请补充缺失的字段: load_weight
+R0018,V002,沪A-23456,李师傅,缺失字段,中,数值字段缺失或为空: idle_time,missing_field=idle_time; is_critical=False,请补充缺失的字段: idle_time
+R0009,V001,沪A-12345,张师傅,人工改错,高,检测到人工编辑记录: 怠速时间异常放大8倍,"notes=怠速时间异常放大8倍; original_values={'fuel_consumption': nan, 'route_mileage': nan, 'load_weight': 5132.49, 'idle_time': 412.8}; is_suspicious=True",请核实人工修改的原因和合理性，必要时联系数据录入人员确认
+R0010,V002,沪A-23456,nan,人工改错,高,检测到人工编辑记录: 油耗被错误清零,"notes=油耗被错误清零; original_values={'fuel_consumption': 0.0, 'route_mileage': 78.86, 'load_weight': nan, 'idle_time': 39.71}; is_suspicious=True",请核实人工修改的原因和合理性，必要时联系数据录入人员确认
+R0016,V004,沪A-45678,赵师傅,人工改错,高,检测到人工编辑记录: 油耗异常缩小5倍,"notes=油耗异常缩小5倍; original_values={'fuel_consumption': 10.7, 'route_mileage': nan, 'load_weight': 8701.03, 'idle_time': 29.36}; is_suspicious=True",请核实人工修改的原因和合理性，必要时联系数据录入人员确认
+R0018,V002,沪A-23456,李师傅,人工改错,高,检测到人工编辑记录: 载重异常放大3倍,"notes=载重异常放大3倍; original_values={'fuel_consumption': 42.13, 'route_mileage': 82.58, 'load_weight': 16808.82, 'idle_time': nan}; is_suspicious=True",请核实人工修改的原因和合理性，必要时联系数据录入人员确认
+R0027,V003,沪A-34567,王师傅,人工改错,高,检测到人工编辑记录: 里程异常缩小10倍,"notes=里程异常缩小10倍; original_values={'fuel_consumption': 36.04, 'route_mileage': 6.24, 'load_weight': nan, 'idle_time': 52.71}; is_suspicious=True",请核实人工修改的原因和合理性，必要时联系数据录入人员确认
+R0009,V001,沪A-12345,张师傅,油耗与怠速不匹配,高,怠速时间异常偏高: 412.8 分钟,field=idle_time; value=412.8; normal_range=0.0-240.0,请核实怠速时间数据是否正确，是否存在数据录入错误或设备故障
