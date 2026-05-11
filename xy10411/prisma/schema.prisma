@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Material {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  type          String
+  clipVersions  ClipVersion[]
+  channels      LicenseChannel[]
+  contracts     Contract[]
+  applications  Application[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  status        String         @default("active")
+}
+
+model ClipVersion {
+  id            String         @id @default(cuid())
+  materialId    String
+  version       String
+  fileName      String
+  duration      Int?
+  size          Int?
+  description   String?
+  material      Material       @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  applications  Application[]
+  createdAt     DateTime       @default(now())
+  @@unique([materialId, version])
+}
+
+model LicenseChannel {
+  id            String         @id @default(cuid())
+  materialId    String
+  channelName   String
+  description   String?
+  material      Material       @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  contracts     Contract[]
+  @@unique([materialId, channelName])
+}
+
+model Contract {
+  id               String           @id @default(cuid())
+  materialId       String
+  channelId        String
+  contractNumber   String
+  startDate        DateTime
+  endDate          DateTime
+  fileUrl          String?
+  notes            String?
+  material         Material         @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  channel          LicenseChannel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  createdAt        DateTime         @default(now())
+}
+
+model Application {
+  id              String             @id @default(cuid())
+  materialId      String
+  clipVersionId   String
+  channel         String
+  applicant       String
+  department      String
+  purpose         String
+  status          String
+  riskLevel       String
+  reasons         String?
+  createdAt       DateTime           @default(now())
+  material        Material           @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  clipVersion     ClipVersion        @relation(fields: [clipVersionId], references: [id], onDelete: Cascade)
+}
