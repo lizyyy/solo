@@ -1,0 +1,16 @@
+{
+  "name": "medical-beauty-treatment-api",
+  "version": "1.0.0",
+  "description": "医美疗程消耗 API - 用于管理疗程包购入、消耗、退款和流水追踪",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test:api": "bash scripts/test-demo.sh"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "moment": "^2.29.4"
+  }
+}
