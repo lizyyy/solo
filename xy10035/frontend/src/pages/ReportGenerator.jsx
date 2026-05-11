@@ -96,9 +96,9 @@ const ReportGenerator = () => {
   const handlePreview = async (values) => {
     const filters = {};
     
-    if (values.startTime && values.endTime) {
-      filters.startTime = values.startTime.toISOString();
-      filters.endTime = values.endTime.toISOString();
+    if (values.timeRange && values.timeRange.length === 2) {
+      filters.startTime = values.timeRange[0].toISOString();
+      filters.endTime = values.timeRange[1].toISOString();
     }
     if (values.level) filters.level = values.level;
     if (values.service) filters.service = values.service;
@@ -115,9 +115,9 @@ const ReportGenerator = () => {
     const values = form.getFieldsValue();
     const filters = {};
     
-    if (values.startTime && values.endTime) {
-      filters.startTime = values.startTime.toISOString();
-      filters.endTime = values.endTime.toISOString();
+    if (values.timeRange && values.timeRange.length === 2) {
+      filters.startTime = values.timeRange[0].toISOString();
+      filters.endTime = values.timeRange[1].toISOString();
     }
     if (values.level) filters.level = values.level;
     if (values.service) filters.service = values.service;

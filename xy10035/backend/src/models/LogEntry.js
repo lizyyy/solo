@@ -58,7 +58,7 @@ const logEntrySchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['START', 'PROCESSING', 'SUCCESS', 'FAILED', 'ROLLBACK', 'TIMEOUT'],
+    enum: ['START', 'PROCESSING', 'SUCCESS', 'FAILED', 'ROLLBACK', 'TIMEOUT', 'END'],
     default: 'PROCESSING'
   },
   duration: {
