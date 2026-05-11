@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机房变更窗口台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1f2937;
+    }
+    .app {
+      min-height: 100vh;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    .header p {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-top: 0.25rem;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    .filters {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .filter-group label {
+      font-size: 0.75rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .filter-group input,
+    .filter-group select {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      min-width: 160px;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #059669;
+    }
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+    .btn-warning:hover {
+      background: #d97706;
+    }
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+    .action-bar {
+      margin-left: auto;
+      display: flex;
+      gap: 0.75rem;
+    }
+    .change-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .change-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .change-card-header {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .change-card-header:hover {
+      background: #f9fafb;
+    }
+    .change-id {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 0.75rem;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+    }
+    .change-title {
+      flex: 1;
+      font-weight: 600;
+      color: #1f2937;
+      cursor: pointer;
+    }
+    .change-title:hover {
+      color: #3b82f6;
+    }
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .status-pending_approval {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-approved {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .status-in_progress {
+      background: #d1fae5;
+      color: #065f46;
+      animation: pulse 2s infinite;
+    }
+    .status-completed {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+    .status-rolled_back {
+      background: #fce7f3;
+      color: #9d174d;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .risk-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .risk-high {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .risk-medium {
+      background: #fffbeb;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+    .risk-low {
+      background: #f0fdf4;
+      color: #059669;
+      border: 1px solid #bbf7d0;
+    }
+    .change-card-body {
+      padding: 1rem 1.25rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .change-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .change-info-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    .change-info-value {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    .change-card-footer {
+      padding: 0.75rem 1.25rem;
+      background: #f9fafb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    .asset-tag {
+      display: inline-block;
+      background: #f3f4f6;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin: 0.125rem;
+      color: #4b5563;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-lg {
+      max-width: 1000px;
+    }
+    .modal-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #6b7280;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 1.5rem;
+    }
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #f3f4f6;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 0.25rem;
+    }
+    .form-group label .required {
+      color: #ef4444;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.625rem 0.875rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    .form-group .error {
+      color: #ef4444;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    .form-group .hint {
+      color: #6b7280;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .asset-checkboxes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+      padding: 0.75rem;
+      border-radius: 6px;
+    }
+    .asset-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .asset-checkbox:hover {
+      background: #f9fafb;
+    }
+    .asset-checkbox input {
+      width: auto;
+    }
+    .asset-checkbox-label {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    .asset-type-tag {
+      font-size: 0.625rem;
+      background: #e5e7eb;
+      padding: 0.125rem 0.375rem;
+      border-radius: 3px;
+      color: #6b7280;
+    }
+    .detail-section {
+      margin-bottom: 1.5rem;
+    }
+    .detail-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #f3f4f6;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .detail-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    .detail-value {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 0.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+    .timeline-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #3b82f6;
+      margin-top: 0.5rem;
+      flex-shrink: 0;
+    }
+    .timeline-dot-approve {
+      background: #10b981;
+    }
+    .timeline-dot-reject {
+      background: #ef4444;
+    }
+    .timeline-dot-start {
+      background: #3b82f6;
+    }
+    .timeline-dot-complete {
+      background: #6366f1;
+    }
+    .timeline-dot-rollback {
+      background: #f59e0b;
+    }
+    .timeline-content {
+      flex: 1;
+    }
+    .timeline-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    .timeline-meta {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.125rem;
+    }
+    .timeline-message {
+      font-size: 0.875rem;
+      color: #4b5563;
+      margin-top: 0.25rem;
+      background: #f9fafb;
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+    .rollback-record {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .rollback-record h4 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #92400e;
+      margin-bottom: 0.5rem;
+    }
+    .rollback-record p {
+      font-size: 0.875rem;
+      color: #78350f;
+    }
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+    .report-modal .stat-card {
+      padding: 0.75rem;
+    }
+    .report-modal .stat-number {
+      font-size: 1.25rem;
+    }
+    .report-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .report-table th,
+    .report-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .report-table th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+    .report-table tr:hover {
+      background: #f9fafb;
+    }
+    .alert {
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+    .alert-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .alert-warning {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    .alert-info {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #6b7280;
+    }
+    .empty-state p {
+      margin-top: 0.5rem;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="app">
+      <div class="header">
+        <h1>🏢 机房变更窗口台</h1>
+        <p>统一管理和规范机房变更操作，降低变更风险</p>
+      </div>
+      
+      <div class="container">
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.total }}</div>
+            <div class="stat-label">全部变更</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.pending_approval }}</div>
+            <div class="stat-label">待审批</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.approved }}</div>
+            <div class="stat-label">已审批</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.rejected }}</div>
+            <div class="stat-label">已拒绝</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.in_progress }}</div>
+            <div class="stat-label">执行中</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.completed }}</div>
+            <div class="stat-label">已完成</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ stats.rolled_back }}</div>
+            <div class="stat-label">已回退</div>
+          </div>
+        </div>
+        
+        <div class="filters">
+          <div class="filter-group">
+            <label>开始日期</label>
+            <input type="date" v-model="filters.startDate" @change="loadChanges">
+          </div>
+          <div class="filter-group">
+            <label>结束日期</label>
+            <input type="date" v-model="filters.endDate" @change="loadChanges">
+          </div>
+          <div class="filter-group">
+            <label>负责人</label>
+            <select v-model="filters.ownerId" @change="loadChanges">
+              <option value="">全部</option>
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.name }}
+              </option>
+            </select>
+          </div>
+          <div class="action-bar">
+            <button class="btn btn-secondary" @click="showReport = true">
+              📊 周报导出
+            </button>
+            <button class="btn btn-primary" @click="openCreateModal">
+              ➕ 新建变更
+            </button>
+          </div>
+        </div>
+        
+        <div class="change-list" v-if="changes.length > 0">
+          <div class="change-card" v-for="change in changes" :key="change.id">
+            <div class="change-card-header" @click="openDetail(change)">
+              <span class="change-id">{{ change.id }}</span>
+              <span class="change-title">{{ change.title }}</span>
+              <span class="risk-badge" :class="'risk-' + change.risk">
+                {{ change.riskDisplay }}
+              </span>
+              <span class="status-badge" :class="'status-' + change.status">
+                {{ change.statusDisplay }}
+              </span>
+            </div>
+            <div class="change-card-body">
+              <div class="change-info-item">
+                <span class="change-info-label">变更类型</span>
+                <span class="change-info-value">{{ change.typeDisplay }}</span>
+              </div>
+              <div class="change-info-item">
+                <span class="change-info-label">负责人</span>
+                <span class="change-info-value">{{ change.owner?.name }}</span>
+              </div>
+              <div class="change-info-item">
+                <span class="change-info-label">变更窗口</span>
+                <span class="change-info-value">
+                  {{ change.formattedWindowStart }} ~ {{ change.formattedWindowEnd }}
+                </span>
+              </div>
+              <div class="change-info-item">
+                <span class="change-info-label">涉及资产</span>
+                <div>
+                  <span v-for="asset in change.assets" :key="asset.id" class="asset-tag">
+                    {{ asset.name }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="change-card-footer">
+              <button class="btn btn-secondary btn-sm" @click="openDetail(change)">
+                详情
+              </button>
+              <button 
+                v-if="change.canEdit"
+                class="btn btn-secondary btn-sm" 
+                @click="openEditModal(change)"
+              >
+                编辑
+              </button>
+              <button 
+                v-if="change.canExecute"
+                class="btn btn-primary btn-sm" 
+                @click="startExecution(change)"
+              >
+                开始执行
+              </button>
+              <button 
+                v-if="change.status === 'pending_approval'"
+                class="btn btn-success btn-sm" 
+                @click="openApproveModal(change, 'approve')"
+              >
+                审批通过
+              </button>
+              <button 
+                v-if="change.status === 'pending_approval'"
+                class="btn btn-danger btn-sm" 
+                @click="openApproveModal(change, 'reject')"
+              >
+                审批拒绝
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="empty-state" v-else>
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">📭</div>
+          <h3>暂无变更记录</h3>
+          <p>点击"新建变更"开始创建第一个变更申请</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay" v-if="showCreate || showEdit" @click.self="closeFormModal">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <h2>{{ showEdit ? '编辑变更' : '新建变更' }}</h2>
+          <button class="modal-close" @click="closeFormModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="formError" class="alert alert-error">{{ formError }}</div>
+          
+          <div class="form-group">
+            <label>变更标题 <span class="required">*</span></label>
+            <input type="text" v-model="form.title" placeholder="请输入变更标题">
+          </div>
+          
+          <div class="form-group">
+            <label>变更描述 <span class="required">*</span></label>
+            <textarea v-model="form.description" placeholder="请详细描述变更内容"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>变更类型 <span class="required">*</span></label>
+              <select v-model="form.type">
+                <option value="">请选择</option>
+                <option value="network">网络变更</option>
+                <option value="database">数据库变更</option>
+                <option value="server">服务器变更</option>
+                <option value="security">安全变更</option>
+                <option value="other">其他变更</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>风险等级 <span class="required">*</span></label>
+              <select v-model="form.risk">
+                <option value="">请选择</option>
+                <option value="low">低风险</option>
+                <option value="medium">中风险</option>
+                <option value="high">高风险</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>负责人 <span class="required">*</span></label>
+              <select v-model="form.ownerId">
+                <option value="">请选择</option>
+                <option v-for="user in users" :key="user.id" :value="user.id">
+                  {{ user.name }}
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>开始时间 <span class="required">*</span></label>
+              <input type="datetime-local" v-model="form.windowStart">
+            </div>
+            <div class="form-group">
+              <label>结束时间 <span class="required">*</span></label>
+              <input type="datetime-local" v-model="form.windowEnd">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>涉及资产 <span class="required">*</span></label>
+            <div class="asset-checkboxes">
+              <label v-for="asset in assets" :key="asset.id" class="asset-checkbox">
+                <input type="checkbox" :value="asset.id" v-model="form.assetIds">
+                <span class="asset-checkbox-label">
+                  {{ asset.name }}
+                  <span class="asset-type-tag">{{ asset.location }}</span>
+                </span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>回退方案 <span class="required">*</span></label>
+            <textarea 
+              v-model="form.rollbackPlan" 
+              placeholder="请详细填写回退方案，至少20个字符"
+            ></textarea>
+            <div class="hint">回退方案是变更的重要保障，请详细描述每一步操作</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="closeFormModal">取消</button>
+          <button class="btn btn-primary" @click="submitForm" :disabled="submitting">
+            {{ submitting ? '提交中...' : '提交变更' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay" v-if="showDetail" @click.self="closeDetailModal">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <h2>
+            <span class="change-id">{{ currentChange.id }}</span>
+            {{ currentChange.title }}
+            <span class="status-badge" :class="'status-' + currentChange.status" style="margin-left: 0.5rem;">
+              {{ currentChange.statusDisplay }}
+            </span>
+          </h2>
+          <button class="modal-close" @click="closeDetailModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-section">
+            <h3>基本信息</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">变更类型</span>
+                <span class="detail-value">{{ currentChange.typeDisplay }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">风险等级</span>
+                <span class="detail-value">
+                  <span class="risk-badge" :class="'risk-' + currentChange.risk">
+                    {{ currentChange.riskDisplay }}
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">负责人</span>
+                <span class="detail-value">{{ currentChange.owner?.name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">创建时间</span>
+                <span class="detail-value">{{ currentChange.formattedCreatedAt }}</span>
+              </div>
+              <div class="detail-item" style="grid-column: span 2;">
+                <span class="detail-label">变更窗口</span>
+                <span class="detail-value">
+                  {{ currentChange.formattedWindowStart }} ~ {{ currentChange.formattedWindowEnd }}
+                </span>
+              </div>
+              <div class="detail-item" style="grid-column: span 2;">
+                <span class="detail-label">涉及资产</span>
+                <span class="detail-value">
+                  <span v-for="asset in currentChange.assets" :key="asset.id" class="asset-tag">
+                    {{ asset.name }} ({{ asset.location }})
+                  </span>
+                </span>
+              </div>
+              <div class="detail-item" style="grid-column: span 2;">
+                <span class="detail-label">变更描述</span>
+                <span class="detail-value" style="white-space: pre-wrap;">{{ currentChange.description }}</span>
+              </div>
+              <div class="detail-item" style="grid-column: span 2;">
+                <span class="detail-label">回退方案</span>
+                <span class="detail-value" style="white-space: pre-wrap; background: #fffbeb; padding: 0.5rem; border-radius: 4px;">
+                  {{ currentChange.rollbackPlan }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>审批历史</h3>
+            <div v-if="currentChange.approvals.length > 0" class="timeline">
+              <div class="timeline-item" v-for="ap in currentChange.approvals" :key="ap.id">
+                <div class="timeline-dot" :class="'timeline-dot-' + ap.action"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">{{ ap.actionDisplay }}</div>
+                  <div class="timeline-meta">{{ ap.user?.name }} · {{ ap.formattedTimestamp }}</div>
+                  <div v-if="ap.comment" class="timeline-message">{{ ap.comment }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-state" style="padding: 1rem;">
+              <p>暂无审批记录</p>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>执行日志</h3>
+            <div v-if="currentChange.executionLogs.length > 0" class="timeline">
+              <div class="timeline-item" v-for="log in currentChange.executionLogs" :key="log.id">
+                <div class="timeline-dot" :class="'timeline-dot-' + log.action"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">
+                    {{ {
+                      'start': '开始执行',
+                      'complete': '完成变更',
+                      'rollback': '执行回退',
+                      'configure': '配置变更',
+                      'verify': '验证操作'
+                    }[log.action] || log.action }}
+                  </div>
+                  <div class="timeline-meta">{{ log.user?.name }} · {{ log.formattedTimestamp }}</div>
+                  <div class="timeline-message">{{ log.message }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-state" style="padding: 1rem;">
+              <p>暂无执行记录</p>
+            </div>
+          </div>
+          
+          <div class="detail-section" v-if="currentChange.rollbackRecords.length > 0">
+            <h3>回退记录</h3>
+            <div class="rollback-record" v-for="rb in currentChange.rollbackRecords" :key="rb.id">
+              <h4>回退操作 - {{ rb.user?.name }} · {{ rb.formattedTimestamp }}</h4>
+              <p><strong>原因：</strong>{{ rb.reason }}</p>
+              <p><strong>总结：</strong>{{ rb.summary }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button 
+            v-if="currentChange.canEdit"
+            class="btn btn-secondary" 
+            @click="openEditModalFromDetail"
+          >
+            编辑
+          </button>
+          <button 
+            v-if="currentChange.status === 'pending_approval'"
+            class="btn btn-success" 
+            @click="openApproveModal(currentChange, 'approve')"
+          >
+            审批通过
+          </button>
+          <button 
+            v-if="currentChange.status === 'pending_approval'"
+            class="btn btn-danger" 
+            @click="openApproveModal(currentChange, 'reject')"
+          >
+            审批拒绝
+          </button>
+          <button 
+            v-if="currentChange.canExecute"
+            class="btn btn-primary" 
+            @click="startExecution(currentChange)"
+          >
+            开始执行
+          </button>
+          <button 
+            v-if="currentChange.status === 'in_progress'"
+            class="btn btn-success" 
+            @click="openCompleteModal"
+          >
+            完成变更
+          </button>
+          <button 
+            v-if="currentChange.status === 'in_progress'"
+            class="btn btn-warning" 
+            @click="openRollbackModal"
+          >
+            执行回退
+          </button>
+          <button class="btn btn-secondary" @click="closeDetailModal">关闭</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay" v-if="showApprove" @click.self="showApprove = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>{{ approveAction === 'approve' ? '审批通过' : '审批拒绝' }}</h2>
+          <button class="modal-close" @click="showApprove = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>审批意见</label>
+            <textarea v-model="approveComment" placeholder="请输入审批意见（可选）"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showApprove = false">取消</button>
+          <button 
+            :class="approveAction === 'approve' ? 'btn btn-success' : 'btn btn-danger'" 
+            @click="submitApproval"
+          >
+            确认{{ approveAction === 'approve' ? '通过' : '拒绝' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay" v-if="showComplete" @click.self="showComplete = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>完成变更</h2>
+          <button class="modal-close" @click="showComplete = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-info">
+            请确认变更已成功完成并填写总结
+          </div>
+          <div class="form-group">
+            <label>执行总结 <span class="required">*</span></label>
+            <textarea v-model="completeSummary" placeholder="请描述变更执行情况和验证结果"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showComplete = false">取消</button>
+          <button class="btn btn-success" @click="submitComplete" :disabled="!completeSummary">
+            确认完成
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay" v-if="showRollback" @click.self="showRollback = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>执行回退</h2>
+          <button class="modal-close" @click="showRollback = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="alert alert-warning">
+            ⚠️ 回退操作将标记变更为失败状态，请谨慎操作
+          </div>
+          <div class="form-group">
+            <label>回退原因 <span class="required">*</span></label>
+            <textarea v-model="rollbackReason" placeholder="请描述需要回退的原因"></textarea>
+          </div>
+          <div class="form-group">
+            <label>回退总结 <span class="required">*</span></label>
+            <textarea v-model="rollbackSummary" placeholder="请描述回退执行情况"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showRollback = false">取消</button>
+          <button 
+            class="btn btn-warning" 
+            @click="submitRollback" 
+            :disabled="!rollbackReason || !rollbackSummary"
+          >
+            确认回退
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-overlay report-modal" v-if="showReport" @click.self="showReport = false">
+      <div class="modal modal-lg">
+        <div class="modal-header">
+          <h2>📊 变更周报</h2>
+          <button class="modal-close" @click="showReport = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="filters" style="margin-bottom: 1rem;">
+            <div class="filter-group">
+              <label>开始日期</label>
+              <input type="date" v-model="reportFilter.startDate" @change="loadReport">
+            </div>
+            <div class="filter-group">
+              <label>结束日期</label>
+              <input type="date" v-model="reportFilter.endDate" @change="loadReport">
+            </div>
+            <button class="btn btn-primary" style="align-self: flex-end;" @click="exportReport">
+              📥 导出CSV
+            </button>
+          </div>
+          
+          <div v-if="report" class="detail-section">
+            <h3>统计概览</h3>
+            <div class="stats-bar" style="margin-bottom: 0.5rem;">
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.total }}</div>
+                <div class="stat-label">全部变更</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.pendingApproval }}</div>
+                <div class="stat-label">待审批</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.approved }}</div>
+                <div class="stat-label">已审批</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.inProgress }}</div>
+                <div class="stat-label">执行中</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.completed }}</div>
+                <div class="stat-label">已完成</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.rolledBack }}</div>
+                <div class="stat-label">已回退</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ report.stats.rejected }}</div>
+                <div class="stat-label">已拒绝</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section" v-if="report && report.changes.length > 0">
+            <h3>变更详情</h3>
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>变更编号</th>
+                  <th>标题</th>
+                  <th>类型</th>
+                  <th>负责人</th>
+                  <th>状态</th>
+                  <th>回退次数</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="c in report.changes" :key="c.id">
+                  <td>{{ c.id }}</td>
+                  <td>{{ c.title }}</td>
+                  <td>{{ c.typeDisplay }}</td>
+                  <td>{{ c.owner?.name }}</td>
+                  <td>
+                    <span class="status-badge" :class="'status-' + c.status">
+                      {{ c.statusDisplay }}
+                    </span>
+                  </td>
+                  <td>{{ c.rollbackCount }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div v-else class="empty-state" style="padding: 2rem;">
+            <p>该时间段内暂无变更记录</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showReport = false">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+    
+    createApp({
+      setup() {
+        const API_BASE = '/api';
+        
+        const users = ref([]);
+        const assets = ref([]);
+        const changes = ref([]);
+        const currentUser = ref({ id: 'u3', name: '王五', role: 'approver' });
+        
+        const showCreate = ref(false);
+        const showEdit = ref(false);
+        const showDetail = ref(false);
+        const showApprove = ref(false);
+        const showComplete = ref(false);
+        const showRollback = ref(false);
+        const showReport = ref(false);
+        
+        const currentChange = ref(null);
+        const editingChangeId = ref(null);
+        
+        const filters = reactive({
+          startDate: '',
+          endDate: '',
+          ownerId: ''
+        });
+        
+        const reportFilter = reactive({
+          startDate: '',
+          endDate: ''
+        });
+        
+        const report = ref(null);
+        
+        const form = reactive({
+          title: '',
+          description: '',
+          type: '',
+          risk: '',
+          ownerId: '',
+          windowStart: '',
+          windowEnd: '',
+          assetIds: [],
+          rollbackPlan: ''
+        });
+        
+        const formError = ref('');
+        const submitting = ref(false);
+        
+        const approveAction = ref('approve');
+        const approveComment = ref('');
+        
+        const completeSummary = ref('');
+        const rollbackReason = ref('');
+        const rollbackSummary = ref('');
+        
+        const stats = computed(() => {
+          const result = {
+            total: 0,
+            pending_approval: 0,
+            approved: 0,
+            rejected: 0,
+            in_progress: 0,
+            completed: 0,
+            rolled_back: 0
+          };
+          changes.value.forEach(c => {
+            result.total++;
+            if (result[c.status] !== undefined) {
+              result[c.status]++;
+            }
+          });
+          return result;
+        });
+        
+        async function loadUsers() {
+          const res = await fetch(`${API_BASE}/users`);
+          users.value = await res.json();
+        }
+        
+        async function loadAssets() {
+          const res = await fetch(`${API_BASE}/assets`);
+          assets.value = await res.json();
+        }
+        
+        async function loadChanges() {
+          const params = new URLSearchParams();
+          if (filters.startDate) params.append('startDate', filters.startDate);
+          if (filters.endDate) params.append('endDate', filters.endDate);
+          if (filters.ownerId) params.append('ownerId', filters.ownerId);
+          
+          const url = `${API_BASE}/changes${params.toString() ? '?' + params.toString() : ''}`;
+          const res = await fetch(url);
+          changes.value = await res.json();
+        }
+        
+        async function loadReport() {
+          const params = new URLSearchParams();
+          if (reportFilter.startDate) params.append('startDate', reportFilter.startDate);
+          if (reportFilter.endDate) params.append('endDate', reportFilter.endDate);
+          
+          const url = `${API_BASE}/reports/weekly${params.toString() ? '?' + params.toString() : ''}`;
+          const res = await fetch(url);
+          report.value = await res.json();
+        }
+        
+        function openCreateModal() {
+          resetForm();
+          showCreate.value = true;
+        }
+        
+        function openEditModal(change) {
+          editingChangeId.value = change.id;
+          form.title = change.title;
+          form.description = change.description;
+          form.type = change.type;
+          form.risk = change.risk;
+          form.ownerId = change.ownerId;
+          
+          const format = (d) => {
+            const date = new Date(d);
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+          };
+          form.windowStart = format(change.windowStart);
+          form.windowEnd = format(change.windowEnd);
+          form.assetIds = [...change.assetIds];
+          form.rollbackPlan = change.rollbackPlan;
+          
+          showEdit.value = true;
+        }
+        
+        function openEditModalFromDetail() {
+          showDetail.value = false;
+          openEditModal(currentChange.value);
+        }
+        
+        function resetForm() {
+          form.title = '';
+          form.description = '';
+          form.type = '';
+          form.risk = '';
+          form.ownerId = '';
+          form.windowStart = '';
+          form.windowEnd = '';
+          form.assetIds = [];
+          form.rollbackPlan = '';
+          formError.value = '';
+          submitting.value = false;
+          editingChangeId.value = null;
+        }
+        
+        function closeFormModal() {
+          showCreate.value = false;
+          showEdit.value = false;
+          resetForm();
+        }
+        
+        async function submitForm() {
+          submitting.value = true;
+          formError.value = '';
+          
+          try {
+            let res;
+            const data = { ...form };
+            
+            if (showEdit.value) {
+              res = await fetch(`${API_BASE}/changes/${editingChangeId.value}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              });
+            } else {
+              res = await fetch(`${API_BASE}/changes`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+              });
+            }
+            
+            const result = await res.json();
+            
+            if (!res.ok) {
+              formError.value = result.error || '提交失败';
+              return;
+            }
+            
+            closeFormModal();
+            loadChanges();
+          } catch (e) {
+            formError.value = '网络错误，请稍后重试';
+          } finally {
+            submitting.value = false;
+          }
+        }
+        
+        async function openDetail(change) {
+          const res = await fetch(`${API_BASE}/changes/${change.id}`);
+          currentChange.value = await res.json();
+          showDetail.value = true;
+        }
+        
+        function closeDetailModal() {
+          showDetail.value = false;
+          currentChange.value = null;
+        }
+        
+        function openApproveModal(change, action) {
+          if (showDetail.value) {
+            showDetail.value = false;
+          }
+          currentChange.value = change;
+          approveAction.value = action;
+          approveComment.value = '';
+          showApprove.value = true;
+        }
+        
+        async function submitApproval() {
+          const action = approveAction.value;
+          const res = await fetch(`${API_BASE}/changes/${currentChange.value.id}/${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser.value.id,
+              comment: approveComment.value
+            })
+          });
+          
+          showApprove.value = false;
+          approveComment.value = '';
+          
+          if (res.ok) {
+            loadChanges();
+          }
+        }
+        
+        async function startExecution(change) {
+          const res = await fetch(`${API_BASE}/changes/${change.id}/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser.value.id })
+          });
+          
+          if (res.ok) {
+            loadChanges();
+            if (showDetail.value) {
+              openDetail(change);
+            }
+          }
+        }
+        
+        function openCompleteModal() {
+          completeSummary.value = '';
+          showComplete.value = true;
+        }
+        
+        async function submitComplete() {
+          const res = await fetch(`${API_BASE}/changes/${currentChange.value.id}/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser.value.id,
+              summary: completeSummary.value
+            })
+          });
+          
+          showComplete.value = false;
+          
+          if (res.ok) {
+            loadChanges();
+            openDetail(currentChange.value);
+          }
+        }
+        
+        function openRollbackModal() {
+          rollbackReason.value = '';
+          rollbackSummary.value = '';
+          showRollback.value = true;
+        }
+        
+        async function submitRollback() {
+          const res = await fetch(`${API_BASE}/changes/${currentChange.value.id}/rollback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: currentUser.value.id,
+              reason: rollbackReason.value,
+              summary: rollbackSummary.value
+            })
+          });
+          
+          showRollback.value = false;
+          
+          if (res.ok) {
+            loadChanges();
+            openDetail(currentChange.value);
+          }
+        }
+        
+        function exportReport() {
+          if (!report.value) return;
+          
+          let csv = '变更编号,标题,类型,负责人,状态,回退次数\n';
+          report.value.changes.forEach(c => {
+            csv += `${c.id},"${c.title}",${c.typeDisplay},${c.owner?.name || ''},${c.statusDisplay},${c.rollbackCount}\n`;
+          });
+          
+          const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `变更周报_${report.value.startDate}_${report.value.endDate}.csv`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+        
+        watch(showReport, (val) => {
+          if (val) {
+            loadReport();
+          }
+        });
+        
+        onMounted(() => {
+          loadUsers();
+          loadAssets();
+          loadChanges();
+        });
+        
+        return {
+          users,
+          assets,
+          changes,
+          currentUser,
+          filters,
+          reportFilter,
+          report,
+          showCreate,
+          showEdit,
+          showDetail,
+          showApprove,
+          showComplete,
+          showRollback,
+          showReport,
+          currentChange,
+          form,
+          formError,
+          submitting,
+          approveAction,
+          approveComment,
+          completeSummary,
+          rollbackReason,
+          rollbackSummary,
+          stats,
+          openCreateModal,
+          openEditModal,
+          openEditModalFromDetail,
+          closeFormModal,
+          submitForm,
+          openDetail,
+          closeDetailModal,
+          openApproveModal,
+          submitApproval,
+          startExecution,
+          openCompleteModal,
+          submitComplete,
+          openRollbackModal,
+          submitRollback,
+          loadReport,
+          exportReport,
+          loadChanges
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
