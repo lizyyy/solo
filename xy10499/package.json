@@ -1,0 +1,15 @@
+{
+  "name": "snack-tasting-api",
+  "version": "1.0.0",
+  "description": "门店试吃转化 API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"No tests specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1"
+  }
+}
