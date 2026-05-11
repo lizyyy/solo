@@ -1,0 +1,9 @@
+coupon_id,old_user_id,name,value,value_type,status,issue_date,expire_date,used_date
+C001,U001,满100减20,20,fixed,active,2026-03-01,2026-06-30,
+C002,U001,9折券,0.1,discount,active,2026-03-15,2026-04-15,
+C003,U002,满200减50,50,fixed,active,2026-02-01,2026-05-31,
+C004,U002,新人券,10,fixed,expired,2025-12-01,2026-01-01,
+C005,U003,满50减10,10,fixed,active,2026-01-01,2026-03-31,
+C006,U004,无门槛50元,50,fixed,active,2026-04-01,2026-12-31,
+C007,U004,已使用券,30,fixed,used,2026-01-01,2026-06-30,2026-03-01
+C008,U005,生日礼券,20,fixed,active,2026-02-01,2026-03-01,

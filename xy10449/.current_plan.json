@@ -1,0 +1,103 @@
+{
+  "plan_id": "PL_20260511_0b62def3",
+  "created_at": "2026-05-11T20:31:26.405436",
+  "total_users": 6,
+  "validation_errors": [
+    "手机号 13800138002 被多个用户占用: ['U002', 'U005']",
+    "大额积分 2500 缺少流水记录，需要人工确认",
+    "手机号 13800138002 被多个用户占用: ['U002', 'U005']"
+  ],
+  "pending_items": [
+    {
+      "old_user_id": "U001",
+      "new_user_id": "NU1001",
+      "phone": "13800138001",
+      "points_to_migrate": 500,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [
+        "有 1 张优惠券已过期，将被跳过"
+      ],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362183",
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U003",
+      "new_user_id": "NU1003",
+      "phone": "13800138003",
+      "points_to_migrate": 800,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [
+        "有 1 张优惠券已过期，将被跳过"
+      ],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362189",
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U006",
+      "new_user_id": "NU1006",
+      "phone": null,
+      "points_to_migrate": 0,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362192",
+      "coupons_count": 0,
+      "points_records_count": 0
+    }
+  ],
+  "needs_review_items": [
+    {
+      "old_user_id": "U002",
+      "new_user_id": "NU1002",
+      "phone": "13800138002",
+      "points_to_migrate": 1200,
+      "status": "needs_review",
+      "error_reason": "手机号 13800138002 被多个用户占用: ['U002', 'U005']",
+      "warnings": [
+        "手机号 13800138002 被多个用户占用: ['U002', 'U005']"
+      ],
+      "retries": 0,
+      "migrated_at": null,
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U004",
+      "new_user_id": "NU1004",
+      "phone": "13800138004",
+      "points_to_migrate": 2500,
+      "status": "needs_review",
+      "error_reason": "大额积分 2500 缺少流水记录，需要人工确认",
+      "warnings": [
+        "积分余额 2500 但没有积分流水记录"
+      ],
+      "retries": 0,
+      "migrated_at": null,
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U005",
+      "new_user_id": "NU1005",
+      "phone": "13800138002",
+      "points_to_migrate": 300,
+      "status": "needs_review",
+      "error_reason": "手机号 13800138002 被多个用户占用: ['U002', 'U005']",
+      "warnings": [
+        "手机号 13800138002 被多个用户占用: ['U002', 'U005']",
+        "有 1 张优惠券已过期，将被跳过"
+      ],
+      "retries": 0,
+      "migrated_at": null,
+      "coupons_count": 0,
+      "points_records_count": 0
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "plan_id": "PL_20260511_0b62def3",
+  "executed_at": "2026-05-11T20:31:31.362126",
+  "is_simulation": false,
+  "total_items": 3,
+  "success_count": 3,
+  "failed_count": 0,
+  "skipped_count": 0,
+  "success_items": [
+    {
+      "old_user_id": "U001",
+      "new_user_id": "NU1001",
+      "phone": "13800138001",
+      "points_to_migrate": 500,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [
+        "有 1 张优惠券已过期，将被跳过"
+      ],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362183",
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U003",
+      "new_user_id": "NU1003",
+      "phone": "13800138003",
+      "points_to_migrate": 800,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [
+        "有 1 张优惠券已过期，将被跳过"
+      ],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362189",
+      "coupons_count": 0,
+      "points_records_count": 0
+    },
+    {
+      "old_user_id": "U006",
+      "new_user_id": "NU1006",
+      "phone": null,
+      "points_to_migrate": 0,
+      "status": "success",
+      "error_reason": null,
+      "warnings": [],
+      "retries": 0,
+      "migrated_at": "2026-05-11T20:31:31.362192",
+      "coupons_count": 0,
+      "points_records_count": 0
+    }
+  ],
+  "failed_items": [],
+  "skipped_items": []
+}
