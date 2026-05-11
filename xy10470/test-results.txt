@@ -1,0 +1,246 @@
+========= 采购合同履约 API 测试脚本 =========
+
+[场景 1] 设备采购 - 正常履约
+========================================
+1. 创建设备采购合同
+合同ID: 
+
+2. 获取条款ID
+条款ID: 
+
+3. 登记第一批交付 (5台)
+交付批次ID: 
+
+4. 验收通过第一批 (5台全部通过)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//inspections</pre>
+</body>
+</html>
+
+
+5. 登记第二批交付 (5台)
+交付批次ID: 
+
+6. 验收通过第二批 (5台全部通过)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//inspections</pre>
+</body>
+</html>
+
+
+7. 查询合同状态（验收完成，无待验收批次）
+Expecting value: line 1 column 1 (char 0)
+
+
+8. 触发验收款付款节点
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//payments</pre>
+</body>
+</html>
+
+
+9. 再次尝试触发同一付款节点（应该被拦截）
+测试付款节点重复触发拦截：
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//payments</pre>
+</body>
+</html>
+
+
+[场景 2] 耗材采购 - 部分驳回和扣款
+========================================
+1. 创建耗材采购合同
+合同ID: 
+
+2. 获取条款ID
+条款ID: 
+
+3. 登记交付 (1000箱)
+交付批次ID: 
+
+4. 部分驳回验收（950箱通过，50箱驳回，扣款5000元）
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//inspections</pre>
+</body>
+</html>
+
+
+5. 再次验收同一批次（应该被拦截，驳回批次重复计入）
+测试驳回批次重复计入拦截：
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//inspections</pre>
+</body>
+</html>
+
+
+6. 查询合同详情（查看完成率、扣款原因）
+合同完成率、应付金额、扣款原因：
+Expecting value: line 1 column 1 (char 0)
+
+
+7. 触发付款
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//payments</pre>
+</body>
+</html>
+
+
+[场景 3] 延期扣款和付款暂缓
+========================================
+1. 创建新合同测试延期扣款
+合同ID: 
+
+2. 获取条款ID
+条款ID: 
+
+3. 登记交付 (延期交付)
+交付批次ID: 
+
+4. 验收通过但因延期扣款
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//inspections</pre>
+</body>
+</html>
+
+
+5. 触发付款
+付款ID: 
+
+6. 暂缓付款（财务审批中）
+付款暂缓操作：
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//payments//suspend</pre>
+</body>
+</html>
+
+
+[场景 4] 超量交付拦截测试
+========================================
+1. 创建设备合同
+合同ID: 
+
+2. 获取条款ID
+条款ID: 
+
+3. 登记交付3台（正常）
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//deliveries</pre>
+</body>
+</html>
+
+
+4. 再登记交付3台（超过合同5台，应该被拦截）
+测试超量交付拦截：
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//deliveries</pre>
+</body>
+</html>
+
+
+[场景 5] 未验收付款拦截测试
+========================================
+1. 创建设备合同
+合同ID: 
+
+2. 获取条款ID
+条款ID: 
+
+3. 登记交付10个（不验收）
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//deliveries</pre>
+</body>
+</html>
+
+
+4. 尝试触发付款（存在待验收批次，应该被拦截）
+测试未验收付款拦截：
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/contracts//payments</pre>
+</body>
+</html>
+
+
+========= 合同列表查询 =========
+
+Expecting value: line 1 column 1 (char 0)
+
+
+========= 测试完成 =========

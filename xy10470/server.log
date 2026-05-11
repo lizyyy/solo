@@ -1,0 +1,11 @@
+采购合同履约 API 已启动: http://localhost:3000
+
+API 端点:
+POST /api/contracts              - 创建合同
+POST /api/contracts/:id/deliveries - 登记交付
+POST /api/contracts/:id/inspections - 验收
+POST /api/contracts/:id/payments - 触发付款
+POST /api/contracts/:id/payments/:pid/suspend - 暂缓付款
+GET  /api/contracts/:id          - 查询合同详情
+GET  /api/contracts              - 查询合同列表
+POST /api/contracts/:id/close    - 关闭合同
