@@ -1,0 +1,20 @@
+{
+  "name": "aquaculture-seed-transfer-api",
+  "version": "1.0.0",
+  "description": "水产苗种分池 API - 孵化池到育苗池的密度、水温、成活率联动计算系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node test/demo.js",
+    "seed": "node data/seed.js"
+  },
+  "keywords": ["aquaculture", "fish-farming", "seed-transfer", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0"
+  }
+}
