@@ -1,0 +1,20 @@
+{
+  "name": "hospital-pathology-shipping-api",
+  "version": "1.0.0",
+  "description": "医院病理标本外送 API - 条码、冷链和报告回传闭环管理",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["pathology", "specimen", "shipping", "api", "hospital"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.1"
+  }
+}
