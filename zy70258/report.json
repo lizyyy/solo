@@ -1,0 +1,790 @@
+{
+  "summary": {
+    "total_records": 20,
+    "processed_records": 20,
+    "skipped_records": 0,
+    "passed_records": 2,
+    "failed_records": 9,
+    "manual_check_needed": 9,
+    "issue_summary": {
+      "违反忌口规则": 16,
+      "数据缺失": 4,
+      "过敏源不匹配": 13,
+      "无有效替换餐": 10
+    }
+  },
+  "issues": [
+    {
+      "order_id": "O001",
+      "elderly_name": "张爷爷",
+      "dish_name": "红烧排骨",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['鸡蛋']. 老人过敏源: ['海鲜', '鸡蛋'], 菜品过敏源: ['鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O001",
+      "elderly_name": "张爷爷",
+      "dish_name": "红烧排骨",
+      "reason": "无有效替换餐",
+      "details": "替换菜品 红烧肉 仍有忌口问题: ['高盐']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O001",
+      "elderly_name": "张爷爷",
+      "dish_name": "红烧排骨",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['高盐']. 老人口味限制: ['高盐', '辛辣'], 菜品标签: ['高盐', '油腻']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O001",
+      "elderly_name": "张爷爷",
+      "dish_name": "红烧排骨",
+      "reason": "无有效替换餐",
+      "details": "替换规则中无与违规条件 ['高盐'] 匹配的规则",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O003",
+      "elderly_name": "王爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['牛奶']. 老人过敏源: ['牛奶'], 菜品过敏源: ['牛奶', '鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O003",
+      "elderly_name": "王爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "无有效替换餐",
+      "details": "替换菜品 紫薯粥 仍有忌口问题: ['甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O003",
+      "elderly_name": "王爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['甜食']. 老人口味限制: ['甜食'], 菜品标签: ['高蛋白', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O003",
+      "elderly_name": "王爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "无有效替换餐",
+      "details": "替换规则中无与违规条件 ['甜食'] 匹配的规则",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O004",
+      "elderly_name": "赵奶奶",
+      "dish_name": "馒头",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['面筋', '小麦']. 老人过敏源: ['面筋', '小麦'], 菜品过敏源: ['面筋', '小麦']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O004",
+      "elderly_name": "赵奶奶",
+      "dish_name": "麻婆豆腐",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['辛辣']. 老人口味限制: ['辛辣'], 菜品标签: ['辛辣', '家常']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['牛奶', '鸡蛋']. 老人过敏源: ['牛奶', '鸡蛋'], 菜品过敏源: ['牛奶', '鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "无有效替换餐",
+      "details": "替换菜品 紫薯粥 仍有忌口问题: ['甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['甜食']. 老人口味限制: ['油腻', '甜食'], 菜品标签: ['高蛋白', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "dish_name": "牛奶蒸蛋",
+      "reason": "无有效替换餐",
+      "details": "替换规则中无与违规条件 ['甜食'] 匹配的规则",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "dish_name": "红烧肉",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['油腻', '甜食']. 老人口味限制: ['油腻', '甜食'], 菜品标签: ['高盐', '油腻', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O006",
+      "elderly_name": "陈奶奶",
+      "dish_name": "海鲜粥",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['海鲜']. 老人过敏源: ['花生', '海鲜'], 菜品过敏源: ['海鲜']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O007",
+      "elderly_name": "周爷爷",
+      "dish_name": "麻婆豆腐",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['辛辣']. 老人口味限制: ['辛辣'], 菜品标签: ['辛辣', '家常']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "糖醋里脊",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['鸡蛋']. 老人过敏源: ['海鲜', '牛奶', '鸡蛋'], 菜品过敏源: ['鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "糖醋里脊",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['甜食']. 老人口味限制: ['高盐', '油腻', '甜食'], 菜品标签: ['高糖', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "红烧排骨",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['鸡蛋']. 老人过敏源: ['海鲜', '牛奶', '鸡蛋'], 菜品过敏源: ['鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "红烧排骨",
+      "reason": "无有效替换餐",
+      "details": "替换菜品 红烧肉 仍有忌口问题: ['高盐', '油腻', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "红烧排骨",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['高盐', '油腻']. 老人口味限制: ['高盐', '油腻', '甜食'], 菜品标签: ['高盐', '油腻']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "dish_name": "红烧排骨",
+      "reason": "无有效替换餐",
+      "details": "替换规则中无与违规条件 ['高盐', '油腻'] 匹配的规则",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O009",
+      "elderly_name": "郑爷爷",
+      "dish_name": "宫保鸡丁",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['花生']. 老人过敏源: ['花生'], 菜品过敏源: ['花生']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O009",
+      "elderly_name": "郑爷爷",
+      "dish_name": "宫保鸡丁",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['辛辣']. 老人口味限制: ['辛辣'], 菜品标签: ['辛辣', '家常']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O010",
+      "elderly_name": "孙奶奶",
+      "dish_name": "凉拌黄瓜",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['生冷']. 老人口味限制: ['油腻', '生冷'], 菜品标签: ['生冷', '清淡']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O012",
+      "elderly_name": "李奶奶",
+      "dish_name": "花生炖猪蹄",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['花生', '坚果']. 老人过敏源: ['花生', '坚果'], 菜品过敏源: ['花生', '坚果']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O012",
+      "elderly_name": "李奶奶",
+      "dish_name": "花生炖猪蹄",
+      "reason": "无有效替换餐",
+      "details": "替换菜品 红烧肉 仍有忌口问题: ['油腻']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O012",
+      "elderly_name": "李奶奶",
+      "dish_name": "花生炖猪蹄",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['油腻']. 老人口味限制: ['油腻', '生冷'], 菜品标签: ['油腻', '高蛋白']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O012",
+      "elderly_name": "李奶奶",
+      "dish_name": "花生炖猪蹄",
+      "reason": "无有效替换餐",
+      "details": "替换规则中无与违规条件 ['油腻'] 匹配的规则",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O013",
+      "elderly_name": "ID: E999",
+      "dish_name": "N/A",
+      "reason": "数据缺失",
+      "details": "未找到老人档案 ID: E999",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O014",
+      "elderly_name": "赵奶奶",
+      "dish_name": "馒头",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['面筋', '小麦']. 老人过敏源: ['面筋', '小麦'], 菜品过敏源: ['面筋', '小麦']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O014",
+      "elderly_name": "赵奶奶",
+      "dish_name": "水煮鱼",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['辛辣']. 老人口味限制: ['辛辣'], 菜品标签: ['油腻', '辛辣']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O015",
+      "elderly_name": "陈奶奶",
+      "dish_name": "凉拌海蜇",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['海鲜']. 老人过敏源: ['花生', '海鲜'], 菜品过敏源: ['海鲜']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O015",
+      "elderly_name": "陈奶奶",
+      "dish_name": "凉拌海蜇",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['生冷']. 老人口味限制: ['高盐', '生冷'], 菜品标签: ['海鲜', '生冷']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O015",
+      "elderly_name": "陈奶奶",
+      "dish_name": "凉拌黄瓜",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['生冷']. 老人口味限制: ['高盐', '生冷'], 菜品标签: ['生冷', '清淡']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O016",
+      "elderly_name": "吴奶奶",
+      "dish_name": "清蒸鲈鱼",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['海鲜']. 老人过敏源: ['海鲜', '牛奶', '鸡蛋'], 菜品过敏源: ['海鲜']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O016",
+      "elderly_name": "吴奶奶",
+      "dish_name": "糖醋里脊",
+      "reason": "过敏源不匹配",
+      "details": "检测到过敏源冲突: ['鸡蛋']. 老人过敏源: ['海鲜', '牛奶', '鸡蛋'], 菜品过敏源: ['鸡蛋']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O016",
+      "elderly_name": "吴奶奶",
+      "dish_name": "糖醋里脊",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['甜食']. 老人口味限制: ['高盐', '油腻', '甜食'], 菜品标签: ['高糖', '甜食']",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O017",
+      "elderly_name": "未知",
+      "dish_name": "N/A",
+      "reason": "数据缺失",
+      "details": "订单缺少老人ID",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O018",
+      "elderly_name": "刘爷爷",
+      "dish_name": "N/A",
+      "reason": "数据缺失",
+      "details": "订单缺少菜品列表",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O019",
+      "elderly_name": "张爷爷",
+      "dish_name": "ID: D999",
+      "reason": "数据缺失",
+      "details": "未找到菜品 ID: D999",
+      "source_file": null,
+      "source_line": null
+    },
+    {
+      "order_id": "O020",
+      "elderly_name": "周爷爷",
+      "dish_name": "水煮鱼",
+      "reason": "违反忌口规则",
+      "details": "违反忌口规则: ['辛辣']. 老人口味限制: ['辛辣'], 菜品标签: ['油腻', '辛辣']",
+      "source_file": null,
+      "source_line": null
+    }
+  ],
+  "substitutions": [
+    {
+      "order_id": "O004",
+      "elderly_name": "赵奶奶",
+      "original_dish": "馒头",
+      "substitute_dish": "米饭",
+      "rule_id": "S012"
+    },
+    {
+      "order_id": "O004",
+      "elderly_name": "赵奶奶",
+      "original_dish": "麻婆豆腐",
+      "substitute_dish": "炒青菜",
+      "rule_id": "S013"
+    },
+    {
+      "order_id": "O005",
+      "elderly_name": "刘爷爷",
+      "original_dish": "红烧肉",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S015"
+    },
+    {
+      "order_id": "O006",
+      "elderly_name": "陈奶奶",
+      "original_dish": "海鲜粥",
+      "substitute_dish": "紫薯粥",
+      "rule_id": "S002"
+    },
+    {
+      "order_id": "O007",
+      "elderly_name": "周爷爷",
+      "original_dish": "麻婆豆腐",
+      "substitute_dish": "炒青菜",
+      "rule_id": "S013"
+    },
+    {
+      "order_id": "O008",
+      "elderly_name": "吴奶奶",
+      "original_dish": "糖醋里脊",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S009"
+    },
+    {
+      "order_id": "O009",
+      "elderly_name": "郑爷爷",
+      "original_dish": "宫保鸡丁",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S011"
+    },
+    {
+      "order_id": "O010",
+      "elderly_name": "孙奶奶",
+      "original_dish": "凉拌黄瓜",
+      "substitute_dish": "炒青菜",
+      "rule_id": "S014"
+    },
+    {
+      "order_id": "O014",
+      "elderly_name": "赵奶奶",
+      "original_dish": "馒头",
+      "substitute_dish": "米饭",
+      "rule_id": "S012"
+    },
+    {
+      "order_id": "O014",
+      "elderly_name": "赵奶奶",
+      "original_dish": "水煮鱼",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S005"
+    },
+    {
+      "order_id": "O015",
+      "elderly_name": "陈奶奶",
+      "original_dish": "凉拌海蜇",
+      "substitute_dish": "炒青菜",
+      "rule_id": "S004"
+    },
+    {
+      "order_id": "O015",
+      "elderly_name": "陈奶奶",
+      "original_dish": "凉拌黄瓜",
+      "substitute_dish": "炒青菜",
+      "rule_id": "S014"
+    },
+    {
+      "order_id": "O016",
+      "elderly_name": "吴奶奶",
+      "original_dish": "清蒸鲈鱼",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S001"
+    },
+    {
+      "order_id": "O016",
+      "elderly_name": "吴奶奶",
+      "original_dish": "糖醋里脊",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S009"
+    },
+    {
+      "order_id": "O020",
+      "elderly_name": "周爷爷",
+      "original_dish": "水煮鱼",
+      "substitute_dish": "素炒山药",
+      "rule_id": "S005"
+    }
+  ],
+  "order_details": [
+    {
+      "order_id": "O001",
+      "elderly_id": "E001",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D001",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 4,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O002",
+      "elderly_id": "E002",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D002",
+        "D011",
+        "D018"
+      ],
+      "status": "PASS",
+      "issues_count": 0,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O003",
+      "elderly_id": "E003",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D005",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 4,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O004",
+      "elderly_id": "E004",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D010",
+        "D006",
+        "D011"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 2,
+      "substitutions_count": 2
+    },
+    {
+      "order_id": "O005",
+      "elderly_id": "E005",
+      "delivery_date": "2026-05-11",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D005",
+        "D008",
+        "D011"
+      ],
+      "status": "FAIL",
+      "issues_count": 5,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O006",
+      "elderly_id": "E006",
+      "delivery_date": "2026-05-11",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D009",
+        "D011",
+        "D012"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 1,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O007",
+      "elderly_id": "E007",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D006",
+        "D011",
+        "D012"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 1,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O008",
+      "elderly_id": "E008",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D013",
+        "D001",
+        "D011"
+      ],
+      "status": "FAIL",
+      "issues_count": 6,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O009",
+      "elderly_id": "E009",
+      "delivery_date": "2026-05-11",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D015",
+        "D011",
+        "D012"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 2,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O010",
+      "elderly_id": "E010",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D007",
+        "D010",
+        "D011"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 1,
+      "substitutions_count": 1
+    },
+    {
+      "order_id": "O011",
+      "elderly_id": "E001",
+      "delivery_date": "2026-05-12",
+      "meal_type": "早餐",
+      "dish_ids": [
+        "D017",
+        "D010",
+        "D018"
+      ],
+      "status": "PASS",
+      "issues_count": 0,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O012",
+      "elderly_id": "E002",
+      "delivery_date": "2026-05-12",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D004",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 4,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O013",
+      "elderly_id": "E999",
+      "delivery_date": "2026-05-12",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D001",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 1,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O014",
+      "elderly_id": "E004",
+      "delivery_date": "2026-05-12",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D010",
+        "D016",
+        "D011"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 2,
+      "substitutions_count": 2
+    },
+    {
+      "order_id": "O015",
+      "elderly_id": "E006",
+      "delivery_date": "2026-05-12",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D014",
+        "D007",
+        "D011"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 3,
+      "substitutions_count": 2
+    },
+    {
+      "order_id": "O016",
+      "elderly_id": "E008",
+      "delivery_date": "2026-05-12",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D002",
+        "D013",
+        "D011"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 3,
+      "substitutions_count": 2
+    },
+    {
+      "order_id": "O017",
+      "elderly_id": "",
+      "delivery_date": "2026-05-12",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D001",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 1,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O018",
+      "elderly_id": "E005",
+      "delivery_date": "2026-05-12",
+      "meal_type": "早餐",
+      "dish_ids": [],
+      "status": "FAIL",
+      "issues_count": 1,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O019",
+      "elderly_id": "E001",
+      "delivery_date": "2026-05-12",
+      "meal_type": "晚餐",
+      "dish_ids": [
+        "D999",
+        "D011",
+        "D012"
+      ],
+      "status": "FAIL",
+      "issues_count": 1,
+      "substitutions_count": 0
+    },
+    {
+      "order_id": "O020",
+      "elderly_id": "E007",
+      "delivery_date": "2026-05-12",
+      "meal_type": "午餐",
+      "dish_ids": [
+        "D016",
+        "D011",
+        "D012"
+      ],
+      "status": "NEED_MANUAL_CHECK",
+      "issues_count": 1,
+      "substitutions_count": 1
+    }
+  ]
+}

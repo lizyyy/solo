@@ -1,0 +1,87 @@
+{
+  "elderly_profiles": [
+    {
+      "id": "E001",
+      "name": "张爷爷",
+      "room_number": "A101",
+      "known_allergens": ["海鲜", "鸡蛋"],
+      "dietary_restrictions": ["辛辣", "高盐"],
+      "special_conditions": ["糖尿病"]
+    },
+    {
+      "id": "E002",
+      "name": "李奶奶",
+      "room_number": "A102",
+      "known_allergens": ["花生", "坚果"],
+      "dietary_restrictions": ["油腻", "生冷"],
+      "special_conditions": ["高血压"]
+    }
+  ],
+  "dishes": [
+    {
+      "id": "D001",
+      "name": "红烧排骨",
+      "category": "肉类",
+      "allergens": ["鸡蛋"],
+      "dietary_tags": ["油腻", "高盐"]
+    },
+    {
+      "id": "D002",
+      "name": "清蒸鲈鱼",
+      "category": "海鲜",
+      "allergens": ["海鲜"],
+      "dietary_tags": ["清淡", "高蛋白"]
+    },
+    {
+      "id": "D011",
+      "name": "米饭",
+      "category": "主食",
+      "allergens": [],
+      "dietary_tags": ["主食", "清淡"]
+    },
+    {
+      "id": "D012",
+      "name": "炒青菜",
+      "category": "素菜",
+      "allergens": [],
+      "dietary_tags": ["清淡", "低油"]
+    },
+    {
+      "id": "D020",
+      "name": "素炒山药",
+      "category": "素菜",
+      "allergens": [],
+      "dietary_tags": ["清淡", "家常"]
+    }
+  ],
+  "substitution_rules": [
+    {
+      "id": "S001",
+      "source_dish_id": "D002",
+      "substitute_dish_id": "D020",
+      "applicable_conditions": ["海鲜"]
+    },
+    {
+      "id": "S006",
+      "source_dish_id": "D001",
+      "substitute_dish_id": "D012",
+      "applicable_conditions": ["鸡蛋"]
+    }
+  ],
+  "meal_orders": [
+    {
+      "id": "O001",
+      "elderly_id": "E001",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": ["D001", "D011", "D012"]
+    },
+    {
+      "id": "O002",
+      "elderly_id": "E002",
+      "delivery_date": "2026-05-11",
+      "meal_type": "午餐",
+      "dish_ids": ["D002", "D011", "D020"]
+    }
+  ]
+}
