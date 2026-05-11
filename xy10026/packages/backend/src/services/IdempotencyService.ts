@@ -1,7 +1,7 @@
 import redisClient from '../utils/redis';
 import config from '../config';
 import logger from '../utils/logger';
-import { IdempotencyRecord } from '@live-push/shared';
+import { IdempotencyRecord, IdempotencyStatus } from '@live-push/shared';
 
 class IdempotencyService {
   private readonly IDEMPOTENCY_PREFIX = 'idempotency:';
@@ -19,7 +19,8 @@ class IdempotencyService {
     idempotencyKey: string,
     traceId: string,
     messageId: string,
-    response?: Record<string, unknown>
+    response?: Record<string, unknown>,
+    status: IdempotencyStatus = 'pending'
   ): Promise<IdempotencyRecord | null> {
     const redis = redisClient.getClient();
     const key = this.getKey(idempotencyKey);
@@ -28,6 +29,7 @@ class IdempotencyService {
       idempotencyKey,
       traceId,
       messageId,
+      status,
       createdAt: new Date(),
       expiresAt: new Date(Date.now() + this.defaultTtl * 1000),
       response,
@@ -37,7 +39,7 @@ class IdempotencyService {
     const result = await redis.set(key, serialized, 'EX', this.defaultTtl, 'NX');
 
     if (result === 'OK') {
-      logger.debug('Idempotency record created', { idempotencyKey, traceId, messageId });
+      logger.debug('Idempotency record created', { idempotencyKey, traceId, messageId, status });
       return null;
     }
 
@@ -47,7 +49,8 @@ class IdempotencyService {
       logger.info('Idempotency key collision detected', { 
         idempotencyKey, 
         existingTraceId: parsed.traceId,
-        newTraceId: traceId 
+        newTraceId: traceId,
+        status: parsed.status
       });
       return parsed;
     }
@@ -66,7 +69,11 @@ class IdempotencyService {
     return null;
   }
 
-  async setResponse(idempotencyKey: string, response: Record<string, unknown>): Promise<boolean> {
+  async setResponse(
+    idempotencyKey: string, 
+    response: Record<string, unknown>,
+    messageId?: string
+  ): Promise<boolean> {
     const redis = redisClient.getClient();
     const key = this.getKey(idempotencyKey);
 
@@ -77,15 +84,73 @@ class IdempotencyService {
 
     const record = JSON.parse(value) as IdempotencyRecord;
     record.response = response;
+    record.status = 'completed';
+    if (messageId) {
+      record.messageId = messageId;
+    }
 
     const ttl = await redis.ttl(key);
     if (ttl > 0) {
       await redis.setex(key, ttl, JSON.stringify(record));
-      logger.debug('Idempotency response stored', { idempotencyKey });
+      logger.debug('Idempotency response stored', { idempotencyKey, messageId: record.messageId });
       return true;
     }
 
     return false;
+  }
+
+  async setFailed(
+    idempotencyKey: string,
+    error: string,
+    messageId?: string
+  ): Promise<boolean> {
+    const redis = redisClient.getClient();
+    const key = this.getKey(idempotencyKey);
+
+    const value = await redis.get(key);
+    if (!value) {
+      return false;
+    }
+
+    const record = JSON.parse(value) as IdempotencyRecord;
+    record.status = 'failed';
+    record.error = error;
+    if (messageId) {
+      record.messageId = messageId;
+    }
+
+    const ttl = await redis.ttl(key);
+    if (ttl > 0) {
+      await redis.setex(key, ttl, JSON.stringify(record));
+      logger.debug('Idempotency marked as failed', { idempotencyKey, error });
+      return true;
+    }
+
+    return false;
+  }
+
+  async waitForCompletion(
+    idempotencyKey: string,
+    maxWaitMs: number = 10000,
+    pollIntervalMs: number = 500
+  ): Promise<IdempotencyRecord | null> {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < maxWaitMs) {
+      const record = await this.get(idempotencyKey);
+      
+      if (!record) {
+        return null;
+      }
+      
+      if (record.status !== 'pending') {
+        return record;
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+    }
+    
+    return this.get(idempotencyKey);
   }
 
   async invalidate(idempotencyKey: string): Promise<void> {

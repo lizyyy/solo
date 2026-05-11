@@ -65,14 +65,54 @@ class MessageService {
 
     if (idempotencyKey) {
       const existingRecord = await idempotencyService.checkAndSet(idempotencyKey, traceId, 'pending');
+      
       if (existingRecord) {
-        logger.info('Idempotency hit, returning existing message', { 
+        logger.info('Idempotency key exists, checking status', { 
           idempotencyKey,
+          status: existingRecord.status,
           existingMessageId: existingRecord.messageId 
         });
-        const existingMessage = await this.getMessageById(existingRecord.messageId);
-        if (existingMessage) {
-          return { message: existingMessage, isDuplicate: true };
+        
+        if (existingRecord.status === 'completed') {
+          const finalMessageId = existingRecord.messageId;
+          if (finalMessageId && finalMessageId !== 'pending') {
+            const existingMessage = await this.getMessageById(finalMessageId);
+            if (existingMessage) {
+              return { message: existingMessage, isDuplicate: true };
+            }
+          }
+        }
+        
+        if (existingRecord.status === 'pending') {
+          logger.info('Previous request still pending, waiting for completion', { idempotencyKey });
+          const completedRecord = await idempotencyService.waitForCompletion(idempotencyKey, 10000, 500);
+          
+          if (completedRecord && completedRecord.status === 'completed') {
+            const finalMessageId = completedRecord.messageId;
+            if (finalMessageId && finalMessageId !== 'pending') {
+              const existingMessage = await this.getMessageById(finalMessageId);
+              if (existingMessage) {
+                return { message: existingMessage, isDuplicate: true };
+              }
+            }
+          }
+          
+          if (completedRecord && completedRecord.status === 'failed') {
+            logger.warn('Previous request failed, allowing retry', { 
+              idempotencyKey, 
+              error: completedRecord.error 
+            });
+            await idempotencyService.invalidate(idempotencyKey);
+          }
+        }
+        
+        if (existingRecord.status === 'failed') {
+          logger.warn('Previous request failed, allowing retry', { 
+            idempotencyKey, 
+            error: existingRecord.error 
+          });
+          await idempotencyService.invalidate(idempotencyKey);
+          await idempotencyService.checkAndSet(idempotencyKey, traceId, 'pending');
         }
       }
     }
@@ -88,10 +128,12 @@ class MessageService {
       throw new Error('Failed to acquire lock for message creation');
     }
 
+    let message: LiveMessage | null = null;
+    
     try {
       const sequence = await sequenceService.getNextSequence(roomId);
 
-      const message: LiveMessage = {
+      message = {
         id: generateId(),
         roomId,
         type,
@@ -116,7 +158,11 @@ class MessageService {
       await messageDoc.save();
 
       if (idempotencyKey) {
-        await idempotencyService.setResponse(idempotencyKey, { messageId: message.id });
+        await idempotencyService.setResponse(
+          idempotencyKey, 
+          { messageId: message.id },
+          message.id
+        );
       }
 
       await eventStoreService.createEvent(
@@ -151,6 +197,20 @@ class MessageService {
 
       return { message, isDuplicate: false };
 
+    } catch (error) {
+      if (idempotencyKey && message) {
+        await idempotencyService.setFailed(
+          idempotencyKey,
+          error instanceof Error ? error.message : 'Unknown error',
+          message.id
+        );
+      } else if (idempotencyKey) {
+        await idempotencyService.setFailed(
+          idempotencyKey,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
+      }
+      throw error;
     } finally {
       await distributedLockService.release(lock);
     }

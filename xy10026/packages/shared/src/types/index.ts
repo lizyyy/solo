@@ -164,11 +164,15 @@ export interface DistributedLockOptions {
   retryDelay?: number;
 }
 
+export type IdempotencyStatus = 'pending' | 'completed' | 'failed';
+
 export interface IdempotencyRecord {
   idempotencyKey: string;
   traceId: string;
   messageId: string;
+  status: IdempotencyStatus;
   createdAt: Date;
   expiresAt: Date;
   response?: Record<string, unknown>;
+  error?: string;
 }
