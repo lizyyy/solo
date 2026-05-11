@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: maintenance-api
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/equipment_maintenance
+      - PORT=3000
+      - TZ=Asia/Shanghai
+    depends_on:
+      - mongodb
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:6.0
+    container_name: maintenance-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
