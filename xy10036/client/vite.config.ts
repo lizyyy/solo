@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig({
+  root: resolve(__dirname),
   plugins: [vue()],
   resolve: {
     alias: {
@@ -18,5 +19,9 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    outDir: resolve(__dirname, 'dist'),
+    emptyOutDir: true
   }
 })
