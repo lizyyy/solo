@@ -1,0 +1,15 @@
+{
+  "name": "cable-car-wind-api",
+  "version": "1.0.0",
+  "description": "景区索道风速停运API系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/demo.js",
+    "test-abnormal": "node test/abnormal.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}

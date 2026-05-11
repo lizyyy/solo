@@ -1,0 +1,181 @@
+{
+  "wind_speed_monitor": [
+    {
+      "id": 1,
+      "location": "main",
+      "wind_speed": 5,
+      "status": "NORMAL",
+      "threshold_warning": 15,
+      "threshold_stop": 25,
+      "recorded_at": "2026-05-11 15:04:33"
+    },
+    {
+      "id": 4,
+      "location": "main",
+      "wind_speed": 30,
+      "status": "STOPPED",
+      "threshold_warning": 15,
+      "threshold_stop": 25,
+      "recorded_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 12,
+      "location": "main",
+      "wind_speed": 35,
+      "status": "STOPPED",
+      "threshold_warning": 15,
+      "threshold_stop": 25,
+      "recorded_at": "2026-05-11 15:04:35"
+    }
+  ],
+  "cable_car_schedule": [
+    {
+      "id": "29690efc-af92-43c2-859b-0fa807ef166f",
+      "route": "测试线路",
+      "departure_time": "2026-05-13 10:00:00",
+      "arrival_time": "2026-05-13 10:15:00",
+      "capacity": 50,
+      "status": "CANCELLED",
+      "reason": "风速超标，索道停运",
+      "created_at": "2026-05-11 15:04:34",
+      "updated_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": "47f571d9-c1ae-4e70-bbf6-5cab16e44ff2",
+      "route": "测试线路2",
+      "departure_time": "2026-05-14 10:00:00",
+      "arrival_time": "2026-05-14 10:15:00",
+      "capacity": 50,
+      "status": "CANCELLED",
+      "reason": "风速超标，索道停运",
+      "created_at": "2026-05-11 15:04:35",
+      "updated_at": "2026-05-11 15:04:35"
+    }
+  ],
+  "ticket": [
+    {
+      "id": "9455e64a-a262-4103-ad6a-3071aef7539b",
+      "schedule_id": "29690efc-af92-43c2-859b-0fa807ef166f",
+      "passenger_name": "测试游客",
+      "passenger_phone": null,
+      "price": 100,
+      "status": "REFUNDED",
+      "refund_amount": 100,
+      "created_at": "2026-05-11 15:04:34",
+      "updated_at": "2026-05-11 15:04:35"
+    },
+    {
+      "id": "7db782c0-0ede-4f2e-aa23-14f517f90d68",
+      "schedule_id": "47f571d9-c1ae-4e70-bbf6-5cab16e44ff2",
+      "passenger_name": "测试游客2",
+      "passenger_phone": null,
+      "price": 80,
+      "status": "PURCHASED",
+      "refund_amount": 0,
+      "created_at": "2026-05-11 15:04:35",
+      "updated_at": "2026-05-11 15:04:35"
+    }
+  ],
+  "history_record": [
+    {
+      "id": 2,
+      "entity_type": "SCHEDULE",
+      "entity_id": "29690efc-af92-43c2-859b-0fa807ef166f",
+      "operation": "CREATE",
+      "before_value": null,
+      "after_value": "{\"id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"route\":\"测试线路\",\"departure_time\":\"2026-05-13 10:00:00\",\"arrival_time\":\"2026-05-13 10:15:00\",\"capacity\":50,\"status\":\"PLANNED\",\"reason\":null,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 3,
+      "entity_type": "TICKET",
+      "entity_id": "9455e64a-a262-4103-ad6a-3071aef7539b",
+      "operation": "CREATE",
+      "before_value": null,
+      "after_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"PURCHASED\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 5,
+      "entity_type": "WIND_SPEED",
+      "entity_id": "main",
+      "operation": "WIND_STATUS_CHANGE",
+      "before_value": "{\"status\":\"NORMAL\",\"wind_speed\":5}",
+      "after_value": "{\"status\":\"STOPPED\",\"wind_speed\":30}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 6,
+      "entity_type": "SCHEDULE",
+      "entity_id": "29690efc-af92-43c2-859b-0fa807ef166f",
+      "operation": "SCHEDULE_STATUS_CHANGE",
+      "before_value": "{\"id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"route\":\"测试线路\",\"departure_time\":\"2026-05-13 10:00:00\",\"arrival_time\":\"2026-05-13 10:15:00\",\"capacity\":50,\"status\":\"PLANNED\",\"reason\":null,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "after_value": "{\"id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"route\":\"测试线路\",\"departure_time\":\"2026-05-13 10:00:00\",\"arrival_time\":\"2026-05-13 10:15:00\",\"capacity\":50,\"status\":\"CANCELLED\",\"reason\":\"风速超标，索道停运\",\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 7,
+      "entity_type": "TICKET",
+      "entity_id": "9455e64a-a262-4103-ad6a-3071aef7539b",
+      "operation": "TICKET_STATUS_CHANGE",
+      "before_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"PURCHASED\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "after_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"LOCKED\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:34"
+    },
+    {
+      "id": 8,
+      "entity_type": "TICKET",
+      "entity_id": "9455e64a-a262-4103-ad6a-3071aef7539b",
+      "operation": "TICKET_STATUS_CHANGE",
+      "before_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"LOCKED\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:34\"}",
+      "after_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"REFUNDABLE\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:35"
+    },
+    {
+      "id": 9,
+      "entity_type": "TICKET",
+      "entity_id": "9455e64a-a262-4103-ad6a-3071aef7539b",
+      "operation": "TICKET_STATUS_CHANGE",
+      "before_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"REFUNDABLE\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "after_value": "{\"id\":\"9455e64a-a262-4103-ad6a-3071aef7539b\",\"schedule_id\":\"29690efc-af92-43c2-859b-0fa807ef166f\",\"passenger_name\":\"测试游客\",\"passenger_phone\":null,\"price\":100,\"status\":\"REFUNDED\",\"refund_amount\":100,\"created_at\":\"2026-05-11 15:04:34\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:35"
+    },
+    {
+      "id": 10,
+      "entity_type": "SCHEDULE",
+      "entity_id": "47f571d9-c1ae-4e70-bbf6-5cab16e44ff2",
+      "operation": "CREATE",
+      "before_value": null,
+      "after_value": "{\"id\":\"47f571d9-c1ae-4e70-bbf6-5cab16e44ff2\",\"route\":\"测试线路2\",\"departure_time\":\"2026-05-14 10:00:00\",\"arrival_time\":\"2026-05-14 10:15:00\",\"capacity\":50,\"status\":\"PLANNED\",\"reason\":null,\"created_at\":\"2026-05-11 15:04:35\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:35"
+    },
+    {
+      "id": 11,
+      "entity_type": "TICKET",
+      "entity_id": "7db782c0-0ede-4f2e-aa23-14f517f90d68",
+      "operation": "CREATE",
+      "before_value": null,
+      "after_value": "{\"id\":\"7db782c0-0ede-4f2e-aa23-14f517f90d68\",\"schedule_id\":\"47f571d9-c1ae-4e70-bbf6-5cab16e44ff2\",\"passenger_name\":\"测试游客2\",\"passenger_phone\":null,\"price\":80,\"status\":\"PURCHASED\",\"refund_amount\":0,\"created_at\":\"2026-05-11 15:04:35\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:35"
+    },
+    {
+      "id": 13,
+      "entity_type": "SCHEDULE",
+      "entity_id": "47f571d9-c1ae-4e70-bbf6-5cab16e44ff2",
+      "operation": "SCHEDULE_STATUS_CHANGE",
+      "before_value": "{\"id\":\"47f571d9-c1ae-4e70-bbf6-5cab16e44ff2\",\"route\":\"测试线路2\",\"departure_time\":\"2026-05-14 10:00:00\",\"arrival_time\":\"2026-05-14 10:15:00\",\"capacity\":50,\"status\":\"PLANNED\",\"reason\":null,\"created_at\":\"2026-05-11 15:04:35\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "after_value": "{\"id\":\"47f571d9-c1ae-4e70-bbf6-5cab16e44ff2\",\"route\":\"测试线路2\",\"departure_time\":\"2026-05-14 10:00:00\",\"arrival_time\":\"2026-05-14 10:15:00\",\"capacity\":50,\"status\":\"CANCELLED\",\"reason\":\"风速超标，索道停运\",\"created_at\":\"2026-05-11 15:04:35\",\"updated_at\":\"2026-05-11 15:04:35\"}",
+      "operator": "SYSTEM",
+      "created_at": "2026-05-11 15:04:35"
+    }
+  ]
+}
