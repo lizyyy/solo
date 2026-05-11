@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡门店豆仓轮换台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>咖啡门店豆仓轮换台</h1>
+            <div class="header-info">
+                <div class="store-info">
+                    <label>当前门店：</label>
+                    <select id="store-select">
+                        <option value="store1">门店A</option>
+                        <option value="store2">门店B</option>
+                        <option value="store3">门店C</option>
+                    </select>
+                </div>
+                <div class="actions">
+                    <button id="btn-load-samples" class="btn btn-primary">加载示例数据</button>
+                    <button id="btn-export" class="btn btn-secondary">导出数据</button>
+                    <button id="btn-export-logs" class="btn btn-secondary">导出日志</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- 左侧导航 -->
+            <nav class="sidebar">
+                <ul>
+                    <li data-tab="batches" class="active">豆仓批次</li>
+                    <li data-tab="openings">开封记录</li>
+                    <li data-tab="consumptions">消耗登记</li>
+                    <li data-tab="rotation">轮换建议</li>
+                    <li data-tab="problems">问题列表</li>
+                    <li data-tab="logs">操作日志</li>
+                    <li data-tab="rules">规则验证</li>
+                </ul>
+            </nav>
+
+            <!-- 主内容区 -->
+            <main class="content">
+                <!-- 豆仓批次 -->
+                <section id="tab-batches" class="tab-content active">
+                    <div class="section-header">
+                        <h2>豆仓批次管理</h2>
+                        <button id="btn-add-batch" class="btn btn-primary">新增批次</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="batches-table">
+                            <thead>
+                                <tr>
+                                    <th>批次编号</th>
+                                    <th>咖啡豆类型</th>
+                                    <th>烘焙日期</th>
+                                    <th>最佳赏味期至</th>
+                                    <th>数量(g)</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 开封记录 -->
+                <section id="tab-openings" class="tab-content">
+                    <div class="section-header">
+                        <h2>开封记录管理</h2>
+                        <button id="btn-add-opening" class="btn btn-primary">新增开封</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="openings-table">
+                            <thead>
+                                <tr>
+                                    <th>记录编号</th>
+                                    <th>批次编号</th>
+                                    <th>咖啡豆类型</th>
+                                    <th>开封日期</th>
+                                    <th>开封数量(g)</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 消耗登记 -->
+                <section id="tab-consumptions" class="tab-content">
+                    <div class="section-header">
+                        <h2>消耗登记</h2>
+                        <button id="btn-add-consumption" class="btn btn-primary">新增消耗</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="consumptions-table">
+                            <thead>
+                                <tr>
+                                    <th>记录编号</th>
+                                    <th>批次编号</th>
+                                    <th>咖啡豆类型</th>
+                                    <th>消耗日期</th>
+                                    <th>消耗数量(g)</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 轮换建议 -->
+                <section id="tab-rotation" class="tab-content">
+                    <div class="section-header">
+                        <h2>轮换建议</h2>
+                        <button id="btn-calculate-rotation" class="btn btn-primary">计算轮换</button>
+                    </div>
+                    <div id="rotation-results"></div>
+                </section>
+
+                <!-- 问题列表 -->
+                <section id="tab-problems" class="tab-content">
+                    <div class="section-header">
+                        <h2>问题列表</h2>
+                        <button id="btn-clear-problems" class="btn btn-danger">清空已解决</button>
+                    </div>
+                    <div class="table-container">
+                        <table id="problems-table">
+                            <thead>
+                                <tr>
+                                    <th>问题编号</th>
+                                    <th>问题类型</th>
+                                    <th>来源数据</th>
+                                    <th>问题描述</th>
+                                    <th>发生时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 操作日志 -->
+                <section id="tab-logs" class="tab-content">
+                    <div class="section-header">
+                        <h2>操作日志</h2>
+                        <div class="log-filters">
+                            <select id="log-type-filter">
+                                <option value="all">全部类型</option>
+                                <option value="success">成功</option>
+                                <option value="failed">失败</option>
+                            </select>
+                            <input type="text" id="log-search" placeholder="搜索输入/输出/失败原因...">
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table id="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>操作类型</th>
+                                    <th>状态</th>
+                                    <th>输入</th>
+                                    <th>输出</th>
+                                    <th>失败原因</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 规则验证 -->
+                <section id="tab-rules" class="tab-content">
+                    <div class="section-header">
+                        <h2>规则验证</h2>
+                        <p class="rules-intro">以下是系统的核心轮换规则，您可以通过测试用例验证规则是否生效：</p>
+                    </div>
+                    <div id="rules-container"></div>
+                    <div class="test-results">
+                        <h3>测试结果</h3>
+                        <button id="btn-run-tests" class="btn btn-primary">运行所有测试</button>
+                        <div id="test-results-container"></div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- 模态框容器 -->
+    <div id="modal-container"></div>
+
+    <script src="data.js"></script>
+    <script src="rules.js"></script>
+    <script src="logger.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
