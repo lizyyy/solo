@@ -54,7 +54,7 @@ const OrderListPage: React.FC<OrderListPageProps> = ({ currentUser, onViewDetail
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingOrder, setEditingOrder] = useState<ReissueOrder | null>(null);
   const [form] = Form.useForm();
-  const [users, setUsers] = useState<Array<Omit<User, 'password'>>([]);
+  const [users, setUsers] = useState<Array<Omit<User, 'password'>>>([]);
 
   const [filters, setFilters] = useState({
     status: undefined as ReissueStatus | undefined,
@@ -311,7 +311,7 @@ const OrderListPage: React.FC<OrderListPageProps> = ({ currentUser, onViewDetail
       title: '操作',
       key: 'actions',
       width: 200,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: any, record: ReissueOrder) => (
         <Space size="small">
           <Tooltip title="查看详情">
