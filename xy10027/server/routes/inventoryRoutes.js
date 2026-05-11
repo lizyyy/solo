@@ -252,6 +252,144 @@ router.get('/audit/:resourceType/:resourceId', async (req, res) => {
   }
 });
 
+router.get('/audit/user', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 100;
+    
+    const history = await AuditService.getUserHistory(req.userId, limit);
+    
+    res.status(200).json({
+      history,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error getting user history:', error);
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.get('/audit/replay/:logId', async (req, res) => {
+  try {
+    const { logId } = req.params;
+    
+    const operation = await AuditService.replayOperation(logId);
+    
+    res.status(200).json({
+      operation,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error replaying operation:', error);
+    res.status(404).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.get('/audit/time-range', async (req, res) => {
+  try {
+    const { startTime, endTime, resourceType } = req.query;
+    
+    if (!startTime || !endTime) {
+      return res.status(400).json({
+        error: 'startTime and endTime are required',
+        requestId: req.requestId
+      });
+    }
+    
+    const history = await AuditService.getTimeRangeHistory(
+      new Date(startTime),
+      new Date(endTime),
+      resourceType,
+      req.userId
+    );
+    
+    res.status(200).json({
+      history,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error getting time range history:', error);
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.get('/tasks/:taskId/status', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    
+    const status = await AsyncTaskService.getTaskStatus(taskId);
+    
+    res.status(200).json({
+      status,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error getting task status:', error);
+    res.status(404).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.post('/tasks/:taskId/rollback', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    
+    const result = await AsyncTaskService.rollbackOperation(taskId);
+    
+    await AuditService.logOperation(
+      req.userId,
+      'ROLLBACK',
+      'sync_queue',
+      taskId,
+      null,
+      result,
+      req.requestId,
+      req.clientId,
+      req.ip,
+      req.get('User-Agent'),
+      'success'
+    );
+    
+    res.status(200).json({
+      success: true,
+      result,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error rolling back task:', error);
+    
+    await AuditService.logOperation(
+      req.userId,
+      'ROLLBACK',
+      'sync_queue',
+      req.params.taskId,
+      null,
+      null,
+      req.requestId,
+      req.clientId,
+      req.ip,
+      req.get('User-Agent'),
+      'failed',
+      error.message
+    );
+    
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
 router.get('/report/:taskId', async (req, res) => {
   try {
     const { taskId } = req.params;

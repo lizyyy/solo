@@ -413,14 +413,16 @@ class InventoryService {
     
     for (const operation of operations) {
       try {
+        const operationRequestId = operation.request_id || operation.requestId;
+        
         const duplicateCheck = await ConcurrencyService.checkDuplicateRequest(
-          operation.request_id,
+          operationRequestId,
           userId
         );
         
         if (duplicateCheck.isDuplicate) {
           results.push({
-            operation_id: operation.request_id,
+            operation_id: operationRequestId,
             status: 'duplicate',
             data: duplicateCheck.data
           });
@@ -436,7 +438,7 @@ class InventoryService {
               operation.data.notes,
               userId,
               clientId,
-              operation.request_id,
+              operationRequestId,
               ipAddress,
               userAgent
             );
@@ -446,7 +448,7 @@ class InventoryService {
               operation.data.task_id,
               userId,
               clientId,
-              operation.request_id,
+              operationRequestId,
               ipAddress,
               userAgent
             );
@@ -456,18 +458,19 @@ class InventoryService {
         }
         
         await ConcurrencyService.cacheRequestResult(
-          operation.request_id,
+          operationRequestId,
           userId,
           result
         );
         
         results.push({
-          operation_id: operation.request_id,
+          operation_id: operationRequestId,
           status: 'success',
           data: result
         });
       } catch (error) {
-        logger.error(`Error syncing operation ${operation.request_id}:`, error);
+        const operationRequestId = operation.request_id || operation.requestId;
+        logger.error(`Error syncing operation ${operationRequestId}:`, error);
         
         await AsyncTaskService.enqueueTask(
           operation.type,
@@ -477,7 +480,7 @@ class InventoryService {
         );
         
         results.push({
-          operation_id: operation.request_id,
+          operation_id: operationRequestId,
           status: 'queued',
           error: error.message
         });
