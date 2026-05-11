@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>广告预算封顶台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">💰</span>
+        <h1>广告预算封顶台</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="demo-btn">加载演示数据</button>
+        <button class="btn btn-secondary" id="reset-btn">重置数据</button>
+      </div>
+    </header>
+
+    <nav class="side-nav">
+      <ul>
+        <li class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>预算看板</span>
+        </li>
+        <li class="nav-item" data-tab="activities">
+          <span class="nav-icon">📁</span>
+          <span>活动管理</span>
+        </li>
+        <li class="nav-item" data-tab="spends">
+          <span class="nav-icon">💸</span>
+          <span>消耗记录</span>
+        </li>
+        <li class="nav-item" data-tab="adjustments">
+          <span class="nav-icon">📝</span>
+          <span>调额审批</span>
+        </li>
+        <li class="nav-item" data-tab="refunds">
+          <span class="nav-icon">↩️</span>
+          <span>退款回写</span>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <section id="dashboard" class="tab-content active">
+        <div class="page-header">
+          <h2>预算看板</h2>
+          <button class="btn btn-primary" id="refresh-dashboard">🔄 刷新数据</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">总预算</div>
+            <div class="stat-value" id="stat-budget">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">已消耗</div>
+            <div class="stat-value" id="stat-spend">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">已退款</div>
+            <div class="stat-value refund" id="stat-refund">¥0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">剩余预算</div>
+            <div class="stat-value" id="stat-remaining">¥0</div>
+          </div>
+          <div class="stat-card full">
+            <div class="stat-label">预算使用率</div>
+            <div class="progress-bar">
+              <div class="progress" id="utilization-bar" style="width: 0%"></div>
+            </div>
+            <div class="stat-value small" id="stat-utilization">0%</div>
+          </div>
+        </div>
+
+        <div class="dashboard-sections">
+          <div class="section-card">
+            <div class="section-header">
+              <h3>🔴 风险活动</h3>
+              <span class="badge" id="risk-count">0</span>
+            </div>
+            <div class="risk-list" id="risk-list">
+              <div class="empty-state">暂无风险活动</div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div class="section-header">
+              <h3>📋 审批历史</h3>
+              <button class="btn btn-link" id="export-btn">导出对账</button>
+            </div>
+            <div class="history-list" id="history-list">
+              <div class="empty-state">暂无审批记录</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card" id="overspend-section" style="display: none;">
+          <div class="section-header">
+            <h3>⚠️ 超花活动追踪</h3>
+          </div>
+          <div id="overspend-list"></div>
+        </div>
+      </section>
+
+      <section id="activities" class="tab-content">
+        <div class="page-header">
+          <h2>活动管理</h2>
+          <button class="btn btn-primary" id="add-activity-btn">+ 新建活动</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>活动名称</th>
+                <th>渠道</th>
+                <th>日预算</th>
+                <th>总预算</th>
+                <th>已消耗</th>
+                <th>剩余</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="activities-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="spends" class="tab-content">
+        <div class="page-header">
+          <h2>消耗记录</h2>
+          <button class="btn btn-primary" id="import-spend-btn">+ 导入消耗</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>活动</th>
+                <th>渠道</th>
+                <th>日期</th>
+                <th>金额</th>
+                <th>来源</th>
+                <th>状态</th>
+                <th>导入时间</th>
+              </tr>
+            </thead>
+            <tbody id="spends-table"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="adjustments" class="tab-content">
+        <div class="page-header">
+          <h2>调额审批</h2>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-subtab="pending">待审批</button>
+          <button class="tab-btn" data-subtab="all">全部申请</button>
+        </div>
+
+        <div class="subtab-content active" id="pending-adjustments">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>活动</th>
+                  <th>调整类型</th>
+                  <th>当前金额</th>
+                  <th>申请金额</th>
+                  <th>原因</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="pending-adjustments-table"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="subtab-content" id="all-adjustments">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>活动</th>
+                  <th>调整类型</th>
+                  <th>当前金额</th>
+                  <th>申请金额</th>
+                  <th>原因</th>
+                  <th>状态</th>
+                  <th>时间</th>
+                </tr>
+              </thead>
+              <tbody id="all-adjustments-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="refunds" class="tab-content">
+        <div class="page-header">
+          <h2>退款回写</h2>
+          <button class="btn btn-primary" id="add-refund-btn">+ 新增退款</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>活动</th>
+                <th>渠道</th>
+                <th>退款金额</th>
+                <th>原因</th>
+                <th>状态</th>
+                <th>时间</th>
+              </tr>
+            </thead>
+            <tbody id="refunds-table"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">标题</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
