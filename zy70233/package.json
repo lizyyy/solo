@@ -1,0 +1,20 @@
+{
+  "name": "hotel-linen-sorting",
+  "version": "1.0.0",
+  "description": "酒店布草污渍分拣台 - 用于酒店洗衣房分拣布草污渍、破损和返洗批次",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "test": "node tests/test.js",
+    "seed": "node server/seed.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "json2csv": "^6.0.0-alpha.2",
+    "sql.js": "^1.10.3",
+    "xlsx": "^0.18.5"
+  }
+}

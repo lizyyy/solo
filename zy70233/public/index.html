@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>酒店布草污渍分拣台</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #1e3a5f 0%, #0d2137 100%);
+      color: white;
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+
+    .logo h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .logo p {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .nav-menu {
+      list-style: none;
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .nav-item.active {
+      background: rgba(255,255,255,0.15);
+      border-left-color: #4CAF50;
+    }
+
+    .nav-item .icon {
+      font-size: 18px;
+    }
+
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+      font-size: 24px;
+      color: #1e3a5f;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #2196F3;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1976D2;
+    }
+
+    .btn-success {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #45a049;
+    }
+
+    .btn-danger {
+      background: #F44336;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #d32f2f;
+    }
+
+    .btn-secondary {
+      background: #757575;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #616161;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .stat-card h3 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1e3a5f;
+    }
+
+    .stat-card .change {
+      font-size: 12px;
+      color: #4CAF50;
+      margin-top: 4px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #1e3a5f;
+      font-size: 13px;
+    }
+
+    tr:hover {
+      background: #f8f9fa;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-available { background: #E8F5E9; color: #2E7D32; }
+    .status-rewashing { background: #FFF3E0; color: #E65100; }
+    .status-damaged { background: #FFEBEE; color: #C62828; }
+    .status-scrapped { background: #F5F5F5; color: #616161; }
+    .status-in_progress { background: #E3F2FD; color: #1565C0; }
+    .status-completed { background: #E8F5E9; color: #2E7D32; }
+    .status-reported { background: #FFEBEE; color: #C62828; }
+    .status-repaired { background: #E8F5E9; color: #2E7D32; }
+    .status-pending { background: #FFF3E0; color: #E65100; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      color: #1e3a5f;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #2196F3;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-bar input,
+    .search-bar select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .detail-section {
+      margin-bottom: 20px;
+    }
+
+    .detail-section h4 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .detail-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+
+    .detail-item .label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .detail-item .value {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .tab.active {
+      color: #2196F3;
+      border-bottom-color: #2196F3;
+    }
+
+    .stain-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .alert-success {
+      background: #E8F5E9;
+      color: #2E7D32;
+      border: 1px solid #A5D6A7;
+    }
+
+    .alert-error {
+      background: #FFEBEE;
+      color: #C62828;
+      border: 1px solid #EF9A9A;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="app-container">
+      <div class="sidebar">
+        <div class="logo">
+          <h1>🏨 布草分拣台</h1>
+          <p>酒店洗衣房管理系统</p>
+        </div>
+        <ul class="nav-menu">
+          <li class="nav-item" :class="{active: currentPage === 'dashboard'}" @click="currentPage = 'dashboard'; loadDashboard()">
+            <span class="icon">📊</span> 数据概览
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'sorting'}" @click="currentPage = 'sorting'; loadSortingData()">
+            <span class="icon">🧺</span> 污渍分拣
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'linen'}" @click="currentPage = 'linen'; loadLinenItems()">
+            <span class="icon">📋</span> 布草档案
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'stains'}" @click="currentPage = 'stains'; loadStainLevels()">
+            <span class="icon">🎨</span> 污渍等级
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'rewash'}" @click="currentPage = 'rewash'; loadRewashBatches()">
+            <span class="icon">🔄</span> 返洗批次
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'damage'}" @click="currentPage = 'damage'; loadDamageRecords()">
+            <span class="icon">⚠️</span> 破损登记
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'history'}" @click="currentPage = 'history'; loadSortingHistory()">
+            <span class="icon">📜</span> 分拣历史
+          </li>
+          <li class="nav-item" :class="{active: currentPage === 'handover'}" @click="currentPage = 'handover'; loadHandoverReports()">
+            <span class="icon">📦</span> 交接报表
+          </li>
+        </ul>
+      </div>
+
+      <div class="main-content">
+        <div v-if="alert" :class="['alert', 'alert-' + alert.type]">
+          {{ alert.message }}
+        </div>
+
+        <div v-if="currentPage === 'dashboard'">
+          <div class="page-header">
+            <h2>📊 数据概览</h2>
+            <button class="btn btn-primary" @click="loadDashboard()">🔄 刷新</button>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>总布草数量</h3>
+              <div class="value">{{ stats.totalLinen }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>可用布草</h3>
+              <div class="value" style="color: #4CAF50">{{ stats.availableLinen }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>返洗中</h3>
+              <div class="value" style="color: #FF9800">{{ stats.rewashingLinen }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>破损布草</h3>
+              <div class="value" style="color: #F44336">{{ stats.damagedLinen }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>今日分拣</h3>
+              <div class="value">{{ stats.todaySortings }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>今日破损登记</h3>
+              <div class="value">{{ stats.todayDamages }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>进行中返洗批次</h3>
+              <div class="value" style="color: #2196F3">{{ stats.activeRewashBatches }}</div>
+            </div>
+            <div class="stat-card">
+              <h3>待处理交接</h3>
+              <div class="value" style="color: #9C27B0">{{ stats.pendingHandovers }}</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 16px; color: #1e3a5f;">破损类型分布</h3>
+            <div v-if="stats.damageTypes?.length" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <div v-for="dt in stats.damageTypes" :key="dt.type" class="status-badge" style="background: #E3F2FD; color: #1565C0;">
+                {{ getDamageTypeName(dt.type) }}: {{ dt.count }}
+              </div>
+            </div>
+            <div v-else style="color: #666;">暂无破损数据</div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 16px; color: #1e3a5f;">分拣结果分布</h3>
+            <div v-if="stats.sortingResults?.length" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <div v-for="sr in stats.sortingResults" :key="sr.result" class="status-badge" style="background: #E8F5E9; color: #2E7D32;">
+                {{ getSortingResultName(sr.result) }}: {{ sr.count }}
+              </div>
+            </div>
+            <div v-else style="color: #666;">暂无分拣数据</div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'sorting'">
+          <div class="page-header">
+            <h2>🧺 污渍分拣</h2>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 16px;">快速分拣</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>选择布草</label>
+                <select v-model="sortingForm.linen_item_id">
+                  <option value="">请选择布草</option>
+                  <option v-for="item in availableLinen" :key="item.id" :value="item.id">
+                    {{ item.code }} - {{ item.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>污渍等级</label>
+                <select v-model="sortingForm.stain_level_id">
+                  <option value="">无污渍</option>
+                  <option v-for="level in stainLevels" :key="level.id" :value="level.id">
+                    {{ level.level }} - {{ level.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>分拣结果</label>
+                <select v-model="sortingForm.sorting_result">
+                  <option value="normal">正常入库</option>
+                  <option value="rewash">需要返洗</option>
+                  <option value="damage">报破损</option>
+                </select>
+              </div>
+              <div class="form-group" v-if="sortingForm.sorting_result === 'rewash'">
+                <label>返洗批次</label>
+                <select v-model="sortingForm.rewash_batch_id">
+                  <option value="">请选择批次</option>
+                  <option v-for="batch in activeBatches" :key="batch.id" :value="batch.id">
+                    {{ batch.batch_code }} - {{ batch.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>备注</label>
+              <textarea v-model="sortingForm.notes" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label>分拣人</label>
+              <input v-model="sortingForm.sorted_by" placeholder="请输入分拣人姓名">
+            </div>
+            <button class="btn btn-primary" @click="submitSorting">✅ 提交分拣</button>
+          </div>
+
+          <div class="card">
+            <h3 style="margin-bottom: 16px;">最近分拣记录</h3>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>时间</th>
+                    <th>布草编码</th>
+                    <th>布草名称</th>
+                    <th>污渍等级</th>
+                    <th>分拣结果</th>
+                    <th>返洗批次</th>
+                    <th>分拣人</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="record in recentSorting" :key="record.id">
+                    <td>{{ record.created_at }}</td>
+                    <td>{{ record.linen_code }}</td>
+                    <td>{{ record.linen_name }}</td>
+                    <td>
+                      <span v-if="record.stain_level_color" class="stain-indicator" :style="{background: record.stain_level_color}"></span>
+                      {{ record.stain_level_name || '-' }}
+                    </td>
+                    <td>
+                      <span :class="['status-badge', record.sorting_result === 'normal' ? 'status-available' : (record.sorting_result === 'rewash' ? 'status-rewashing' : 'status-damaged')]">
+                        {{ getSortingResultName(record.sorting_result) }}
+                      </span>
+                    </td>
+                    <td>{{ record.rewash_batch_name || '-' }}</td>
+                    <td>{{ record.sorted_by || '-' }}</td>
+                  </tr>
+                  <tr v-if="!recentSorting.length">
+                    <td colspan="7" style="text-align: center; color: #666;">暂无分拣记录</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'linen'">
+          <div class="page-header">
+            <h2>📋 布草档案</h2>
+            <button class="btn btn-primary" @click="showLinenModal = true">➕ 新增布草</button>
+          </div>
+
+          <div class="search-bar">
+            <input v-model="linenSearch" placeholder="搜索编码或名称..." @input="loadLinenItems">
+            <select v-model="linenStatusFilter" @change="loadLinenItems">
+              <option value="">全部状态</option>
+              <option value="available">可用</option>
+              <option value="rewashing">返洗中</option>
+              <option value="damaged">破损</option>
+              <option value="scrapped">已报废</option>
+            </select>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>编码</th>
+                    <th>名称</th>
+                    <th>类型</th>
+                    <th>规格</th>
+                    <th>状态</th>
+                    <th>洗涤次数</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in linenItems" :key="item.id">
+                    <td>{{ item.code }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ getLinenTypeName(item.type) }}</td>
+                    <td>{{ item.specification || '-' }}</td>
+                    <td>
+                      <span :class="['status-badge', 'status-' + item.status]">
+                        {{ getStatusName(item.status) }}
+                      </span>
+                    </td>
+                    <td>{{ item.total_washes }}</td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn btn-secondary action-btn" @click="viewLinenDetail(item.id)">详情</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="!linenItems.length">
+                    <td colspan="7" style="text-align: center; color: #666;">暂无布草档案</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'stains'">
+          <div class="page-header">
+            <h2>🎨 污渍等级</h2>
+            <button class="btn btn-primary" @click="showStainModal = true">➕ 新增等级</button>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>等级</th>
+                    <th>名称</th>
+                    <th>描述</th>
+                    <th>标识色</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="level in stainLevels" :key="level.id">
+                    <td>{{ level.level }}</td>
+                    <td>{{ level.name }}</td>
+                    <td>{{ level.description || '-' }}</td>
+                    <td>
+                      <span class="stain-indicator" :style="{background: level.color}"></span>
+                      {{ level.color }}
+                    </td>
+                  </tr>
+                  <tr v-if="!stainLevels.length">
+                    <td colspan="4" style="text-align: center; color: #666;">暂无污渍等级</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'rewash'">
+          <div class="page-header">
+            <h2>🔄 返洗批次</h2>
+            <div>
+              <button class="btn btn-secondary" style="margin-right: 8px;" @click="exportRewashBatches">📥 导出</button>
+              <button class="btn btn-primary" @click="showRewashModal = true">➕ 新建批次</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>批次编码</th>
+                    <th>批次名称</th>
+                    <th>返洗原因</th>
+                    <th>布草数量</th>
+                    <th>状态</th>
+                    <th>创建人</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="batch in rewashBatches" :key="batch.id">
+                    <td>{{ batch.batch_code }}</td>
+                    <td>{{ batch.name }}</td>
+                    <td>{{ batch.reason || '-' }}</td>
+                    <td>{{ batch.items_count }}</td>
+                    <td>
+                      <span :class="['status-badge', 'status-' + batch.status]">
+                        {{ batch.status === 'in_progress' ? '进行中' : '已完成' }}
+                      </span>
+                    </td>
+                    <td>{{ batch.created_by || '-' }}</td>
+                    <td>{{ batch.created_at }}</td>
+                    <td>
+                      <div class="action-btns">
+                        <button class="btn btn-secondary action-btn" @click="viewRewashDetail(batch.id)">详情</button>
+                        <button v-if="batch.status === 'in_progress'" class="btn btn-success action-btn" @click="completeRewashBatch(batch.id)">完成</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="!rewashBatches.length">
+                    <td colspan="8" style="text-align: center; color: #666;">暂无返洗批次</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'damage'">
+          <div class="page-header">
+            <h2>⚠️ 破损登记</h2>
+            <div>
+              <button class="btn btn-secondary" style="margin-right: 8px;" @click="exportDamageRecords">📥 导出</button>
+              <button class="btn btn-primary" @click="showDamageModal = true">➕ 登记破损</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>登记时间</th>
+                    <th>布草编码</th>
+                    <th>布草名称</th>
+                    <th>破损类型</th>
+                    <th>严重程度</th>
+                    <th>状态</th>
+                    <th>登记人</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="record in damageRecords" :key="record.id">
+                    <td>{{ record.created_at }}</td>
+                    <td>{{ record.linen_code }}</td>
+                    <td>{{ record.linen_name }}</td>
+                    <td>{{ getDamageTypeName(record.damage_type) }}</td>
+                    <td>{{ getSeverityName(record.severity) }}</td>
+                    <td>
+                      <span :class="['status-badge', 'status-' + record.status]">
+                        {{ getDamageStatusName(record.status) }}
+                      </span>
+                    </td>
+                    <td>{{ record.reported_by || '-' }}</td>
+                    <td>
+                      <div class="action-btns" v-if="record.status === 'reported'">
+                        <button class="btn btn-success action-btn" @click="updateDamageStatus(record.id, 'repaired')">已修复</button>
+                        <button class="btn btn-danger action-btn" @click="updateDamageStatus(record.id, 'scrapped')">报废</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="!damageRecords.length">
+                    <td colspan="8" style="text-align: center; color: #666;">暂无破损记录</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'history'">
+          <div class="page-header">
+            <h2>📜 分拣历史</h2>
+            <button class="btn btn-secondary" @click="exportSortingHistory">📥 导出</button>
+          </div>
+
+          <div class="search-bar">
+            <input v-model="historySearch" placeholder="搜索布草编码..." @input="loadSortingHistory">
+            <input type="date" v-model="historyStartDate" @change="loadSortingHistory">
+            <input type="date" v-model="historyEndDate" @change="loadSortingHistory">
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>分拣时间</th>
+                    <th>布草编码</th>
+                    <th>布草名称</th>
+                    <th>污渍等级</th>
+                    <th>分拣结果</th>
+                    <th>返洗批次</th>
+                    <th>备注</th>
+                    <th>分拣人</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="record in sortingHistory" :key="record.id">
+                    <td>{{ record.created_at }}</td>
+                    <td>{{ record.linen_code }}</td>
+                    <td>{{ record.linen_name }}</td>
+                    <td>
+                      <span v-if="record.stain_level_color" class="stain-indicator" :style="{background: record.stain_level_color}"></span>
+                      {{ record.stain_level_name || '-' }}
+                    </td>
+                    <td>
+                      <span :class="['status-badge', record.sorting_result === 'normal' ? 'status-available' : (record.sorting_result === 'rewash' ? 'status-rewashing' : 'status-damaged')]">
+                        {{ getSortingResultName(record.sorting_result) }}
+                      </span>
+                    </td>
+                    <td>{{ record.rewash_batch_name || '-' }}</td>
+                    <td>{{ record.notes || '-' }}</td>
+                    <td>{{ record.sorted_by || '-' }}</td>
+                  </tr>
+                  <tr v-if="!sortingHistory.length">
+                    <td colspan="8" style="text-align: center; color: #666;">暂无分拣历史</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'handover'">
+          <div class="page-header">
+            <h2>📦 交接报表</h2>
+            <button class="btn btn-primary" @click="showHandoverModal = true">➕ 新建交接</button>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>报表编码</th>
+                    <th>批次类型</th>
+                    <th>交接类型</th>
+                    <th>数量</th>
+                    <th>状态</th>
+                    <th>交出人</th>
+                    <th>接收人</th>
+                    <th>交接时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="report in handoverReports" :key="report.id">
+                    <td>{{ report.report_code }}</td>
+                    <td>{{ getBatchTypeName(report.batch_type) }}</td>
+                    <td>{{ getHandoverTypeName(report.handover_type) }}</td>
+                    <td>{{ report.items_count }}</td>
+                    <td>
+                      <span :class="['status-badge', 'status-' + report.status]">
+                        {{ report.status === 'pending' ? '待确认' : '已完成' }}
+                      </span>
+                    </td>
+                    <td>{{ report.handed_by || '-' }}</td>
+                    <td>{{ report.received_by || '-' }}</td>
+                    <td>{{ report.handover_date || '-' }}</td>
+                    <td>
+                      <div class="action-btns">
+                        <button v-if="report.status === 'pending'" class="btn btn-success action-btn" @click="confirmHandover(report.id)">确认</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="!handoverReports.length">
+                    <td colspan="9" style="text-align: center; color: #666;">暂无交接报表</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showLinenModal" class="modal-overlay" @click.self="showLinenModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>新增布草档案</h3>
+          <button class="close-btn" @click="showLinenModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>布草编码 *</label>
+              <input v-model="linenForm.code" placeholder="如: LIN-2024-001">
+            </div>
+            <div class="form-group">
+              <label>布草名称 *</label>
+              <input v-model="linenForm.name" placeholder="如: 白色标准床单">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>类型 *</label>
+              <select v-model="linenForm.type">
+                <option value="">请选择</option>
+                <option value="sheet">床单</option>
+                <option value="pillowcase">枕套</option>
+                <option value="duvet_cover">被套</option>
+                <option value="towel">毛巾</option>
+                <option value="bathrobe">浴袍</option>
+                <option value="floor_mat">地巾</option>
+                <option value="face_towel">方巾</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>规格</label>
+              <input v-model="linenForm.specification" placeholder="如: 200*230cm 纯棉">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>初始质量</label>
+              <select v-model="linenForm.initial_quality">
+                <option value="good">良好</option>
+                <option value="fair">一般</option>
+                <option value="poor">较差</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>采购日期</label>
+              <input type="date" v-model="linenForm.purchase_date">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showLinenModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitLinen">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showStainModal" class="modal-overlay" @click.self="showStainModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>新增污渍等级</h3>
+          <button class="close-btn" @click="showStainModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>等级编号 *</label>
+              <input v-model="stainForm.level" placeholder="如: L1, L2, L3">
+            </div>
+            <div class="form-group">
+              <label>等级名称 *</label>
+              <input v-model="stainForm.name" placeholder="如: 轻微污渍">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>描述</label>
+            <textarea v-model="stainForm.description" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>标识颜色</label>
+            <input type="color" v-model="stainForm.color" style="height: 40px;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showStainModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitStain">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showRewashModal" class="modal-overlay" @click.self="showRewashModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>新建返洗批次</h3>
+          <button class="close-btn" @click="showRewashModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>批次编码 *</label>
+              <input v-model="rewashForm.batch_code" placeholder="如: RW-2024-001">
+            </div>
+            <div class="form-group">
+              <label>批次名称 *</label>
+              <input v-model="rewashForm.name" placeholder="如: 5月上旬污渍批次">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>返洗原因</label>
+            <textarea v-model="rewashForm.reason" rows="3" placeholder="说明返洗原因，如：餐饮油污污染、化妆品残留等"></textarea>
+          </div>
+          <div class="form-group">
+            <label>创建人</label>
+            <input v-model="rewashForm.created_by" placeholder="请输入创建人">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showRewashModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitRewash">创建批次</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showDamageModal" class="modal-overlay" @click.self="showDamageModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>登记破损</h3>
+          <button class="close-btn" @click="showDamageModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>选择布草 *</label>
+            <select v-model="damageForm.linen_item_id">
+              <option value="">请选择布草</option>
+              <option v-for="item in allLinen" :key="item.id" :value="item.id">
+                {{ item.code }} - {{ item.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>破损类型 *</label>
+              <select v-model="damageForm.damage_type">
+                <option value="">请选择</option>
+                <option value="tear">撕裂/破洞</option>
+                <option value="stain_persistent">顽固污渍</option>
+                <option value="fraying">磨损/起毛</option>
+                <option value="discoloration">褪色/变色</option>
+                <option value="shrinkage">缩水变形</option>
+                <option value="other">其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>严重程度 *</label>
+              <select v-model="damageForm.severity">
+                <option value="">请选择</option>
+                <option value="mild">轻微</option>
+                <option value="moderate">中等</option>
+                <option value="severe">严重</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>详细描述</label>
+            <textarea v-model="damageForm.description" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>登记人</label>
+            <input v-model="damageForm.reported_by" placeholder="请输入登记人">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showDamageModal = false">取消</button>
+          <button class="btn btn-danger" @click="submitDamage">登记破损</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showHandoverModal" class="modal-overlay" @click.self="showHandoverModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>新建交接报表</h3>
+          <button class="close-btn" @click="showHandoverModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>报表编码 *</label>
+              <input v-model="handoverForm.report_code" placeholder="如: HO-2024-001">
+            </div>
+            <div class="form-group">
+              <label>批次类型 *</label>
+              <select v-model="handoverForm.batch_type">
+                <option value="">请选择</option>
+                <option value="normal">正常批次</option>
+                <option value="rewash">返洗批次</option>
+                <option value="damage">破损批次</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>交接类型 *</label>
+              <select v-model="handoverForm.handover_type">
+                <option value="">请选择</option>
+                <option value="to_laundry">送洗</option>
+                <option value="from_laundry">收洗</option>
+                <option value="to_room">送房</option>
+                <option value="to_damage">报损</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>布草数量</label>
+              <input type="number" v-model="handoverForm.items_count" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>交出人</label>
+              <input v-model="handoverForm.handed_by">
+            </div>
+            <div class="form-group">
+              <label>接收人</label>
+              <input v-model="handoverForm.received_by">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea v-model="handoverForm.notes" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showHandoverModal = false">取消</button>
+          <button class="btn btn-primary" @click="submitHandover">创建</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showDetailModal" class="modal-overlay" @click.self="showDetailModal = false">
+      <div class="modal" style="max-width: 800px;">
+        <div class="modal-header">
+          <h3>{{ detailTitle }}</h3>
+          <button class="close-btn" @click="showDetailModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="detailType === 'linen'">
+            <div class="detail-section">
+              <h4>基本信息</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="label">布草编码</div>
+                  <div class="value">{{ detailData.code }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">布草名称</div>
+                  <div class="value">{{ detailData.name }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">类型</div>
+                  <div class="value">{{ getLinenTypeName(detailData.type) }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">规格</div>
+                  <div class="value">{{ detailData.specification || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">状态</div>
+                  <div class="value">
+                    <span :class="['status-badge', 'status-' + detailData.status]">
+                      {{ getStatusName(detailData.status) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">洗涤次数</div>
+                  <div class="value">{{ detailData.total_washes }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4>破损记录</h4>
+              <div v-if="detailData.damageRecords?.length" class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>时间</th>
+                      <th>类型</th>
+                      <th>程度</th>
+                      <th>描述</th>
+                      <th>状态</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="dr in detailData.damageRecords" :key="dr.id">
+                      <td>{{ dr.created_at }}</td>
+                      <td>{{ getDamageTypeName(dr.damage_type) }}</td>
+                      <td>{{ getSeverityName(dr.severity) }}</td>
+                      <td>{{ dr.description || '-' }}</td>
+                      <td>
+                        <span :class="['status-badge', 'status-' + dr.status]">
+                          {{ getDamageStatusName(dr.status) }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else style="color: #666; padding: 20px;">暂无破损记录</div>
+            </div>
+
+            <div class="detail-section">
+              <h4>分拣历史</h4>
+              <div v-if="detailData.sortingHistory?.length" class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>时间</th>
+                      <th>污渍等级</th>
+                      <th>结果</th>
+                      <th>返洗批次</th>
+                      <th>分拣人</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="sh in detailData.sortingHistory" :key="sh.id">
+                      <td>{{ sh.created_at }}</td>
+                      <td>
+                        <span v-if="sh.stain_level_color" class="stain-indicator" :style="{background: sh.stain_level_color}"></span>
+                        {{ sh.stain_level_name || '-' }}
+                      </td>
+                      <td>{{ getSortingResultName(sh.sorting_result) }}</td>
+                      <td>{{ sh.rewash_batch_name || '-' }}</td>
+                      <td>{{ sh.sorted_by || '-' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else style="color: #666; padding: 20px;">暂无分拣历史</div>
+            </div>
+          </div>
+
+          <div v-if="detailType === 'rewash'">
+            <div class="detail-section">
+              <h4>批次信息</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <div class="label">批次编码</div>
+                  <div class="value">{{ detailData.batch_code }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">批次名称</div>
+                  <div class="value">{{ detailData.name }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">状态</div>
+                  <div class="value">
+                    <span :class="['status-badge', 'status-' + detailData.status]">
+                      {{ detailData.status === 'in_progress' ? '进行中' : '已完成' }}
+                    </span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">创建人</div>
+                  <div class="value">{{ detailData.created_by || '-' }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">创建时间</div>
+                  <div class="value">{{ detailData.created_at }}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="label">完成时间</div>
+                  <div class="value">{{ detailData.completed_at || '-' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4>返洗原因</h4>
+              <p style="padding: 12px; background: #f8f9fa; border-radius: 6px;">{{ detailData.reason || '暂无说明' }}</p>
+            </div>
+
+            <div class="detail-section">
+              <h4>批次布草列表 ({{ detailData.items?.length || 0 }}件)</h4>
+              <div v-if="detailData.items?.length" class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>布草编码</th>
+                      <th>布草名称</th>
+                      <th>类型</th>
+                      <th>加入时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in detailData.items" :key="item.id">
+                      <td>{{ item.linen_code }}</td>
+                      <td>{{ item.linen_name }}</td>
+                      <td>{{ getLinenTypeName(item.linen_type) }}</td>
+                      <td>{{ item.created_at }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else style="color: #666; padding: 20px;">暂无布草加入此批次</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showDetailModal = false">关闭</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, reactive, onMounted, computed } = Vue;
+
+    const API_BASE = '/api';
+
+    createApp({
+      setup() {
+        const currentPage = ref('dashboard');
+        const alert = ref(null);
+
+        const stats = ref({});
+        const linenItems = ref([]);
+        const stainLevels = ref([]);
+        const rewashBatches = ref([]);
+        const damageRecords = ref([]);
+        const sortingHistory = ref([]);
+        const handoverReports = ref([]);
+        const recentSorting = ref([]);
+
+        const linenSearch = ref('');
+        const linenStatusFilter = ref('');
+        const historySearch = ref('');
+        const historyStartDate = ref('');
+        const historyEndDate = ref('');
+
+        const showLinenModal = ref(false);
+        const showStainModal = ref(false);
+        const showRewashModal = ref(false);
+        const showDamageModal = ref(false);
+        const showHandoverModal = ref(false);
+        const showDetailModal = ref(false);
+
+        const detailTitle = ref('');
+        const detailType = ref('');
+        const detailData = ref({});
+
+        const linenForm = reactive({
+          code: '',
+          name: '',
+          type: '',
+          specification: '',
+          initial_quality: 'good',
+          purchase_date: ''
+        });
+
+        const stainForm = reactive({
+          level: '',
+          name: '',
+          description: '',
+          color: '#2196F3'
+        });
+
+        const rewashForm = reactive({
+          batch_code: '',
+          name: '',
+          reason: '',
+          created_by: ''
+        });
+
+        const damageForm = reactive({
+          linen_item_id: '',
+          damage_type: '',
+          severity: '',
+          description: '',
+          reported_by: ''
+        });
+
+        const handoverForm = reactive({
+          report_code: '',
+          batch_type: '',
+          handover_type: '',
+          items_count: 0,
+          notes: '',
+          handed_by: '',
+          received_by: ''
+        });
+
+        const sortingForm = reactive({
+          linen_item_id: '',
+          stain_level_id: '',
+          rewash_batch_id: '',
+          sorting_result: 'normal',
+          notes: '',
+          sorted_by: ''
+        });
+
+        const availableLinen = computed(() => {
+          return linenItems.value.filter(item => item.status === 'available');
+        });
+
+        const allLinen = computed(() => linenItems.value);
+
+        const activeBatches = computed(() => {
+          return rewashBatches.value.filter(batch => batch.status === 'in_progress');
+        });
+
+        function showAlert(type, message) {
+          alert.value = { type, message };
+          setTimeout(() => { alert.value = null; }, 3000);
+        }
+
+        async function apiRequest(url, options = {}) {
+          try {
+            const response = await fetch(API_BASE + url, {
+              headers: { 'Content-Type': 'application/json' },
+              ...options
+            });
+            const data = await response.json();
+            return data;
+          } catch (error) {
+            console.error('API Error:', error);
+            return { success: false, error: error.message };
+          }
+        }
+
+        async function loadDashboard() {
+          const data = await apiRequest('/stats/dashboard');
+          if (data.success) {
+            stats.value = data.data;
+          }
+        }
+
+        async function loadLinenItems() {
+          let url = '/linen-items';
+          const params = [];
+          if (linenSearch.value) params.push('search=' + encodeURIComponent(linenSearch.value));
+          if (linenStatusFilter.value) params.push('status=' + linenStatusFilter.value);
+          if (params.length) url += '?' + params.join('&');
+          
+          const data = await apiRequest(url);
+          if (data.success) {
+            linenItems.value = data.data;
+          }
+        }
+
+        async function loadStainLevels() {
+          const data = await apiRequest('/stain-levels');
+          if (data.success) {
+            stainLevels.value = data.data;
+          }
+        }
+
+        async function loadRewashBatches() {
+          const data = await apiRequest('/rewash-batches');
+          if (data.success) {
+            rewashBatches.value = data.data;
+          }
+        }
+
+        async function loadDamageRecords() {
+          const data = await apiRequest('/damage-records');
+          if (data.success) {
+            damageRecords.value = data.data;
+          }
+        }
+
+        async function loadSortingHistory() {
+          let url = '/sorting-history';
+          const params = [];
+          if (historySearch.value) params.push('linen_item_id=' + historySearch.value);
+          if (historyStartDate.value) params.push('start_date=' + historyStartDate.value);
+          if (historyEndDate.value) params.push('end_date=' + historyEndDate.value);
+          if (params.length) url += '?' + params.join('&');
+          
+          const data = await apiRequest(url);
+          if (data.success) {
+            sortingHistory.value = data.data;
+            if (currentPage.value === 'sorting') {
+              recentSorting.value = data.data.slice(0, 10);
+            }
+          }
+        }
+
+        async function loadHandoverReports() {
+          const data = await apiRequest('/handover-reports');
+          if (data.success) {
+            handoverReports.value = data.data;
+          }
+        }
+
+        async function loadSortingData() {
+          await loadLinenItems();
+          await loadStainLevels();
+          await loadRewashBatches();
+          await loadSortingHistory();
+        }
+
+        async function submitLinen() {
+          if (!linenForm.code || !linenForm.name || !linenForm.type) {
+            showAlert('error', '请填写必填字段');
+            return;
+          }
+
+          const data = await apiRequest('/linen-items', {
+            method: 'POST',
+            body: JSON.stringify(linenForm)
+          });
+
+          if (data.success) {
+            showAlert('success', '布草档案创建成功');
+            showLinenModal.value = false;
+            Object.assign(linenForm, { code: '', name: '', type: '', specification: '', initial_quality: 'good', purchase_date: '' });
+            await loadLinenItems();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function submitStain() {
+          if (!stainForm.level || !stainForm.name) {
+            showAlert('error', '请填写必填字段');
+            return;
+          }
+
+          const data = await apiRequest('/stain-levels', {
+            method: 'POST',
+            body: JSON.stringify(stainForm)
+          });
+
+          if (data.success) {
+            showAlert('success', '污渍等级创建成功');
+            showStainModal.value = false;
+            Object.assign(stainForm, { level: '', name: '', description: '', color: '#2196F3' });
+            await loadStainLevels();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function submitRewash() {
+          if (!rewashForm.batch_code || !rewashForm.name) {
+            showAlert('error', '请填写必填字段');
+            return;
+          }
+
+          const data = await apiRequest('/rewash-batches', {
+            method: 'POST',
+            body: JSON.stringify(rewashForm)
+          });
+
+          if (data.success) {
+            showAlert('success', '返洗批次创建成功');
+            showRewashModal.value = false;
+            Object.assign(rewashForm, { batch_code: '', name: '', reason: '', created_by: '' });
+            await loadRewashBatches();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function submitDamage() {
+          if (!damageForm.linen_item_id || !damageForm.damage_type || !damageForm.severity) {
+            showAlert('error', '请填写必填字段');
+            return;
+          }
+
+          const data = await apiRequest('/damage-records', {
+            method: 'POST',
+            body: JSON.stringify(damageForm)
+          });
+
+          if (data.success) {
+            showAlert('success', '破损登记成功，布草状态已更新为破损');
+            showDamageModal.value = false;
+            Object.assign(damageForm, { linen_item_id: '', damage_type: '', severity: '', description: '', reported_by: '' });
+            await loadDamageRecords();
+            await loadLinenItems();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function submitHandover() {
+          if (!handoverForm.report_code || !handoverForm.batch_type || !handoverForm.handover_type) {
+            showAlert('error', '请填写必填字段');
+            return;
+          }
+
+          const data = await apiRequest('/handover-reports', {
+            method: 'POST',
+            body: JSON.stringify(handoverForm)
+          });
+
+          if (data.success) {
+            showAlert('success', '交接报表创建成功');
+            showHandoverModal.value = false;
+            Object.assign(handoverForm, { report_code: '', batch_type: '', handover_type: '', items_count: 0, notes: '', handed_by: '', received_by: '' });
+            await loadHandoverReports();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function submitSorting() {
+          if (!sortingForm.linen_item_id || !sortingForm.sorting_result) {
+            showAlert('error', '请选择布草和分拣结果');
+            return;
+          }
+
+          if (sortingForm.sorting_result === 'rewash' && !sortingForm.rewash_batch_id) {
+            showAlert('error', '请选择返洗批次');
+            return;
+          }
+
+          const payload = { ...sortingForm };
+          if (!payload.stain_level_id) payload.stain_level_id = null;
+          if (!payload.rewash_batch_id) payload.rewash_batch_id = null;
+
+          const data = await apiRequest('/sorting-history', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+
+          if (data.success) {
+            let msg = '分拣记录创建成功';
+            if (sortingForm.sorting_result === 'normal') msg += '，洗涤次数已增加';
+            if (sortingForm.sorting_result === 'rewash') msg += '，布草状态已更新为返洗中';
+            showAlert('success', msg);
+            Object.assign(sortingForm, { linen_item_id: '', stain_level_id: '', rewash_batch_id: '', sorting_result: 'normal', notes: '', sorted_by: '' });
+            await loadSortingHistory();
+            await loadLinenItems();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '创建失败');
+          }
+        }
+
+        async function viewLinenDetail(id) {
+          const data = await apiRequest('/linen-items/' + id);
+          if (data.success) {
+            detailTitle.value = '布草详情';
+            detailType.value = 'linen';
+            detailData.value = data.data;
+            showDetailModal.value = true;
+          }
+        }
+
+        async function viewRewashDetail(id) {
+          const data = await apiRequest('/rewash-batches/' + id);
+          if (data.success) {
+            detailTitle.value = '返洗批次详情';
+            detailType.value = 'rewash';
+            detailData.value = data.data;
+            showDetailModal.value = true;
+          }
+        }
+
+        async function completeRewashBatch(id) {
+          if (!confirm('确定要完成此返洗批次吗？批次中的所有布草状态将恢复为可用。')) return;
+          
+          const data = await apiRequest('/rewash-batches/' + id + '/complete', { method: 'PUT' });
+          if (data.success) {
+            showAlert('success', '返洗批次已完成，布草状态已更新');
+            await loadRewashBatches();
+            await loadLinenItems();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '操作失败');
+          }
+        }
+
+        async function updateDamageStatus(id, status) {
+          const msg = status === 'repaired' ? '确定标记为已修复吗？布草状态将恢复为可用。' : '确定报废此布草吗？此操作不可撤销。';
+          if (!confirm(msg)) return;
+          
+          const data = await apiRequest('/damage-records/' + id + '/status', {
+            method: 'PUT',
+            body: JSON.stringify({ status })
+          });
+          if (data.success) {
+            showAlert('success', status === 'repaired' ? '已修复，布草状态已恢复' : '已报废处理');
+            await loadDamageRecords();
+            await loadLinenItems();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '操作失败');
+          }
+        }
+
+        async function confirmHandover(id) {
+          const data = await apiRequest('/handover-reports/' + id + '/confirm', { method: 'PUT' });
+          if (data.success) {
+            showAlert('success', '交接已确认');
+            await loadHandoverReports();
+            await loadDashboard();
+          } else {
+            showAlert('error', data.error || '操作失败');
+          }
+        }
+
+        function exportSortingHistory() {
+          window.open(API_BASE + '/export/sorting-history', '_blank');
+        }
+
+        function exportDamageRecords() {
+          window.open(API_BASE + '/export/damage-records', '_blank');
+        }
+
+        function exportRewashBatches() {
+          window.open(API_BASE + '/export/rewash-batches', '_blank');
+        }
+
+        function getLinenTypeName(type) {
+          const map = {
+            sheet: '床单',
+            pillowcase: '枕套',
+            duvet_cover: '被套',
+            towel: '毛巾',
+            bathrobe: '浴袍',
+            floor_mat: '地巾',
+            face_towel: '方巾'
+          };
+          return map[type] || type;
+        }
+
+        function getStatusName(status) {
+          const map = {
+            available: '可用',
+            rewashing: '返洗中',
+            damaged: '破损',
+            scrapped: '已报废'
+          };
+          return map[status] || status;
+        }
+
+        function getDamageTypeName(type) {
+          const map = {
+            tear: '撕裂/破洞',
+            stain_persistent: '顽固污渍',
+            fraying: '磨损/起毛',
+            discoloration: '褪色/变色',
+            shrinkage: '缩水变形',
+            other: '其他'
+          };
+          return map[type] || type;
+        }
+
+        function getSeverityName(severity) {
+          const map = { mild: '轻微', moderate: '中等', severe: '严重' };
+          return map[severity] || severity;
+        }
+
+        function getDamageStatusName(status) {
+          const map = { reported: '待处理', repaired: '已修复', scrapped: '已报废' };
+          return map[status] || status;
+        }
+
+        function getSortingResultName(result) {
+          const map = { normal: '正常入库', rewash: '需要返洗', damage: '报破损' };
+          return map[result] || result;
+        }
+
+        function getBatchTypeName(type) {
+          const map = { normal: '正常批次', rewash: '返洗批次', damage: '破损批次' };
+          return map[type] || type;
+        }
+
+        function getHandoverTypeName(type) {
+          const map = { to_laundry: '送洗', from_laundry: '收洗', to_room: '送房', to_damage: '报损' };
+          return map[type] || type;
+        }
+
+        onMounted(async () => {
+          await loadDashboard();
+          await loadLinenItems();
+          await loadStainLevels();
+          await loadRewashBatches();
+        });
+
+        return {
+          currentPage,
+          alert,
+          stats,
+          linenItems,
+          stainLevels,
+          rewashBatches,
+          damageRecords,
+          sortingHistory,
+          handoverReports,
+          recentSorting,
+          linenSearch,
+          linenStatusFilter,
+          historySearch,
+          historyStartDate,
+          historyEndDate,
+          showLinenModal,
+          showStainModal,
+          showRewashModal,
+          showDamageModal,
+          showHandoverModal,
+          showDetailModal,
+          detailTitle,
+          detailType,
+          detailData,
+          linenForm,
+          stainForm,
+          rewashForm,
+          damageForm,
+          handoverForm,
+          sortingForm,
+          availableLinen,
+          allLinen,
+          activeBatches,
+          loadDashboard,
+          loadLinenItems,
+          loadStainLevels,
+          loadRewashBatches,
+          loadDamageRecords,
+          loadSortingHistory,
+          loadHandoverReports,
+          loadSortingData,
+          submitLinen,
+          submitStain,
+          submitRewash,
+          submitDamage,
+          submitHandover,
+          submitSorting,
+          viewLinenDetail,
+          viewRewashDetail,
+          completeRewashBatch,
+          updateDamageStatus,
+          confirmHandover,
+          exportSortingHistory,
+          exportDamageRecords,
+          exportRewashBatches,
+          getLinenTypeName,
+          getStatusName,
+          getDamageTypeName,
+          getSeverityName,
+          getDamageStatusName,
+          getSortingResultName,
+          getBatchTypeName,
+          getHandoverTypeName
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
