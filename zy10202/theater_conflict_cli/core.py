@@ -214,10 +214,10 @@ def check_duplicate_import(import_hash: str) -> bool:
 
 
 def has_key_record(booking_id: str) -> bool:
-    """检查预约是否有钥匙领取记录"""
+    """检查预约是否有未归还的钥匙领取记录"""
     records = load_data("key_records")
     for record in records:
-        if record.get("booking_id") == booking_id:
+        if record.get("booking_id") == booking_id and record.get("status") == "picked_up":
             return True
     return False
 
@@ -266,7 +266,23 @@ def confirm_booking(booking_id: str) -> Optional[Dict[str, Any]]:
 
 
 def pickup_key(booking_id: str, contact_id: str) -> Dict[str, Any]:
-    """领取钥匙"""
+    """领取钥匙（检查重复领取和存在性）"""
+    booking = get_by_id("bookings", booking_id)
+    if not booking:
+        raise ValueError(f"预约 {booking_id} 不存在")
+    
+    if booking.get("status") in ("cancelled", "deleted"):
+        raise ValueError(f"预约 {booking_id} 已取消或删除，无法领取钥匙")
+    
+    contact = get_by_id("contacts", contact_id)
+    if not contact:
+        raise ValueError(f"联系人 {contact_id} 不存在")
+    
+    records = load_data("key_records")
+    for record in records:
+        if record.get("booking_id") == booking_id and record.get("status") == "picked_up":
+            raise ValueError(f"预约 {booking_id} 的钥匙已被领取，请勿重复领取")
+    
     record = {
         "booking_id": booking_id,
         "contact_id": contact_id,
@@ -277,7 +293,14 @@ def pickup_key(booking_id: str, contact_id: str) -> Dict[str, Any]:
 
 
 def return_key(record_id: str) -> Optional[Dict[str, Any]]:
-    """归还钥匙"""
+    """归还钥匙（检查存在性和状态）"""
+    record = get_by_id("key_records", record_id)
+    if not record:
+        return None
+    
+    if record.get("status") == "returned":
+        raise ValueError(f"钥匙记录 {record_id} 已归还，请勿重复操作")
+    
     return update_item("key_records", record_id, {
         "return_time": format_time(datetime.now()),
         "status": "returned"

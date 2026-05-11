@@ -349,21 +349,29 @@ def cmd_key(args):
     """钥匙领取管理"""
     if args.action == "pickup":
         print_header("领取钥匙")
-        record = pickup_key(args.booking_id, args.contact_id)
-        print(f"钥匙已领取")
-        print(f"  记录ID: {record['id']}")
-        print(f"  预约ID: {record['booking_id']}")
-        print(f"  领取时间: {record['pickup_time']}")
+        try:
+            record = pickup_key(args.booking_id, args.contact_id)
+            print(f"钥匙已领取")
+            print(f"  记录ID: {record['id']}")
+            print(f"  预约ID: {record['booking_id']}")
+            print(f"  领取时间: {record['pickup_time']}")
+        except ValueError as e:
+            print(f"领取失败: {e}")
+            return 1
     
     elif args.action == "return":
         print_header("归还钥匙")
-        result = return_key(args.record_id)
-        if result:
-            print(f"钥匙已归还")
-            print(f"  记录ID: {result['id']}")
-            print(f"  归还时间: {result['return_time']}")
-        else:
-            print(f"钥匙记录 {args.record_id} 不存在")
+        try:
+            result = return_key(args.record_id)
+            if result:
+                print(f"钥匙已归还")
+                print(f"  记录ID: {result['id']}")
+                print(f"  归还时间: {result['return_time']}")
+            else:
+                print(f"钥匙记录 {args.record_id} 不存在")
+                return 1
+        except ValueError as e:
+            print(f"归还失败: {e}")
             return 1
     
     elif args.action == "list":
