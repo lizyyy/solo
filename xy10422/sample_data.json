@@ -1,0 +1,187 @@
+{
+  "S001": {
+    "id": "S001",
+    "patient_name": "张三",
+    "patient_id": "P001",
+    "test_item": "血常规",
+    "status": "已接收",
+    "is_supplement": false,
+    "collected_at": "2026-05-11T18:22:24.384860",
+    "collected_by": "张姐",
+    "transferred_at": "2026-05-11T18:22:24.416834",
+    "courier": "小李",
+    "received_at": "2026-05-11T18:22:24.428953",
+    "received_by": "老王",
+    "abnormal_type": null,
+    "abnormal_note": null,
+    "abnormal_at": null,
+    "history": [
+      {
+        "action": "采集确认",
+        "time": "2026-05-11T18:22:24.384860",
+        "operator": "张姐",
+        "note": "护士采集确认"
+      },
+      {
+        "action": "交接",
+        "time": "2026-05-11T18:22:24.416834",
+        "operator": "小李",
+        "note": "交接给运输员"
+      },
+      {
+        "action": "接收",
+        "time": "2026-05-11T18:22:24.428953",
+        "operator": "老王",
+        "note": "实验室接收"
+      }
+    ]
+  },
+  "S002": {
+    "id": "S002",
+    "patient_name": "李四",
+    "patient_id": "P002",
+    "test_item": "生化全项",
+    "status": "已接收",
+    "is_supplement": false,
+    "collected_at": "2026-05-11T18:22:24.401357",
+    "collected_by": "张姐",
+    "transferred_at": "2026-05-11T18:22:24.418045",
+    "courier": "小李",
+    "received_at": "2026-05-11T18:22:24.430141",
+    "received_by": "老王",
+    "abnormal_type": null,
+    "abnormal_note": null,
+    "abnormal_at": null,
+    "history": [
+      {
+        "action": "采集确认",
+        "time": "2026-05-11T18:22:24.401357",
+        "operator": "张姐",
+        "note": "护士采集确认"
+      },
+      {
+        "action": "交接",
+        "time": "2026-05-11T18:22:24.418045",
+        "operator": "小李",
+        "note": "交接给运输员"
+      },
+      {
+        "action": "接收",
+        "time": "2026-05-11T18:22:24.430141",
+        "operator": "老王",
+        "note": "实验室接收"
+      }
+    ]
+  },
+  "S003": {
+    "id": "S003",
+    "patient_name": "王五",
+    "patient_id": "P003",
+    "test_item": "肝功能",
+    "status": "异常",
+    "is_supplement": false,
+    "collected_at": "2026-05-11T15:22:24.441796",
+    "collected_by": "张姐",
+    "transferred_at": "2026-05-11T15:52:24.441818",
+    "courier": "小李",
+    "received_at": null,
+    "received_by": null,
+    "abnormal_type": "超时",
+    "abnormal_note": "接收时发现超时",
+    "abnormal_at": "2026-05-11T18:22:24.444121",
+    "history": [
+      {
+        "action": "采集确认",
+        "time": "2026-05-11T18:22:24.408257",
+        "operator": "张姐",
+        "note": "护士采集确认"
+      },
+      {
+        "action": "交接",
+        "time": "2026-05-11T18:22:24.418701",
+        "operator": "小李",
+        "note": "交接给运输员"
+      },
+      {
+        "action": "异常标记",
+        "time": "2026-05-11T18:22:24.444121",
+        "operator": "老王",
+        "note": "接收时发现超时（超过2小时）"
+      }
+    ]
+  },
+  "S004": {
+    "id": "S004",
+    "patient_name": "赵六",
+    "patient_id": "P004",
+    "test_item": "尿常规",
+    "status": "异常",
+    "is_supplement": false,
+    "collected_at": "2026-05-11T18:22:24.409869",
+    "collected_by": "张姐",
+    "transferred_at": null,
+    "courier": null,
+    "received_at": null,
+    "received_by": null,
+    "abnormal_type": "破损",
+    "abnormal_note": "接收时发现管体破损，样本溢出",
+    "abnormal_at": "2026-05-11T18:22:24.453711",
+    "history": [
+      {
+        "action": "采集确认",
+        "time": "2026-05-11T18:22:24.409869",
+        "operator": "张姐",
+        "note": "护士采集确认"
+      },
+      {
+        "action": "异常补录",
+        "time": "2026-05-11T18:22:24.453711",
+        "operator": "老王",
+        "note": "异常类型: 破损, 备注: 接收时发现管体破损，样本溢出"
+      }
+    ]
+  },
+  "S005": {
+    "id": "S005",
+    "patient_name": "钱七",
+    "patient_id": "P005",
+    "test_item": "血糖",
+    "status": "已导入",
+    "is_supplement": false,
+    "collected_at": null,
+    "collected_by": null,
+    "transferred_at": null,
+    "courier": null,
+    "received_at": null,
+    "received_by": null,
+    "abnormal_type": null,
+    "abnormal_note": null,
+    "abnormal_at": null,
+    "history": []
+  },
+  "S006": {
+    "id": "S006",
+    "patient_name": "孙八",
+    "patient_id": "P006",
+    "test_item": "肾功能",
+    "status": "异常",
+    "is_supplement": true,
+    "collected_at": null,
+    "collected_by": null,
+    "transferred_at": null,
+    "courier": null,
+    "received_at": null,
+    "received_by": null,
+    "abnormal_type": "待复核",
+    "abnormal_note": "监控发现漏采，患者已离开",
+    "abnormal_at": "2026-05-11T18:22:24.452689",
+    "history": [
+      {
+        "action": "异常补录",
+        "time": "2026-05-11T18:22:24.452689",
+        "operator": "护士长",
+        "note": "异常类型: 待复核, 备注: 监控发现漏采，患者已离开"
+      }
+    ]
+  }
+}
