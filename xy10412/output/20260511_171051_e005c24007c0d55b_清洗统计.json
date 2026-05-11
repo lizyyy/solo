@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-05-11T17:10:51.427640",
+  "input_hash": "e005c24007c0d55b",
+  "statistics": {
+    "total_customers": 10,
+    "valid_phones": 10,
+    "sendable_count": 5,
+    "filtered_count": 6,
+    "reasons": {
+      "DUPLICATE_CUSTOMER": 1,
+      "UNSUBSCRIBED": 2,
+      "BLACKLIST": 1,
+      "FREQUENCY_EXCEEDED": 1,
+      "PHONE_INVALID": 1
+    }
+  },
+  "parameters": {
+    "frequency_limit": 3,
+    "frequency_days": 7,
+    "deduplicate_by_customer": true
+  },
+  "files": {
+    "customer": "data/客户名单.csv",
+    "unsubscribe": "data/退订名单.csv",
+    "blacklist": "data/黑名单.csv",
+    "recent_send": "data/最近发送记录.csv",
+    "whitelist": "data/whitelist.json"
+  },
+  "whitelist_log": [
+    {
+      "timestamp": "2026-05-10T09:00:00",
+      "phone": "13800000005",
+      "operator": "市场部-李经理",
+      "reason": "重要VIP客户，手动解除退订限制"
+    }
+  ]
+}
