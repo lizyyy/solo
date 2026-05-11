@@ -220,8 +220,11 @@ class CSVImporter:
             "added": 0,
             "skipped": 0,
             "errors": [],
-            "conflicts": []
+            "conflicts": [],
+            "duplicates": []
         }
+        
+        seen_followups = set()
         
         with open(csv_path, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
@@ -233,6 +236,13 @@ class CSVImporter:
                 if not sampling_no or not appointment_date:
                     results["errors"].append(f"第{row_num}行: 缺少采样编号或复查日期")
                     continue
+                
+                dedup_key = (sampling_no, appointment_date)
+                if dedup_key in seen_followups:
+                    results["duplicates"].append(f"第{row_num}行: 采样号 {sampling_no} 同一天 {appointment_date} 在本文件中重复")
+                    results["skipped"] += 1
+                    continue
+                seen_followups.add(dedup_key)
                 
                 test_result = self.db.get_test_result(sampling_no)
                 
@@ -249,8 +259,8 @@ class CSVImporter:
                 if success:
                     results["added"] += 1
                 else:
-                    if "同一天" in msg:
-                        results["conflicts"].append(f"采样号 {sampling_no}: {msg}")
+                    if "同一天" in msg or "已存在" in msg:
+                        results["duplicates"].append(f"采样号 {sampling_no}: {msg}")
                         results["skipped"] += 1
                     else:
                         results["errors"].append(f"采样号 {sampling_no}: {msg}")

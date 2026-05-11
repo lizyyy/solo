@@ -295,12 +295,12 @@ class Database:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                SELECT * FROM followup_appointments 
-                WHERE sampling_no = ? AND appointment_date = ? AND status = 'pending'
+                SELECT id FROM followup_appointments 
+                WHERE sampling_no = ? AND appointment_date = ?
             ''', (sampling_no, appointment_date))
             existing = cursor.fetchone()
             if existing:
-                return False, f"同一天 {appointment_date} 已有待处理的复查预约"
+                return False, f"同一天 {appointment_date} 已有复查预约记录，跳过"
             cursor.execute('''
                 INSERT INTO followup_appointments 
                 (sampling_no, resident_id, test_result_id, appointment_date,
