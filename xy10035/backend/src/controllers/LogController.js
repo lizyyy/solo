@@ -1,7 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 const asyncHandler = require('express-async-handler');
-const LogEntry = require('../models/LogEntry');
-const TraceSession = require('../models/TraceSession');
+const DataAccess = require('../data/DataAccess');
 const AnomalyDetector = require('../services/AnomalyDetector');
 
 class LogController {
@@ -11,11 +10,11 @@ class LogController {
     const createdLogs = [];
     
     for (const log of logs) {
-      const logEntry = new LogEntry({
+      const logData = {
         traceId: log.traceId || uuidv4(),
         spanId: log.spanId || uuidv4(),
         parentSpanId: log.parentSpanId || null,
-        timestamp: log.timestamp || new Date(),
+        timestamp: log.timestamp ? new Date(log.timestamp) : new Date(),
         level: log.level || 'INFO',
         source: log.source,
         service: log.service,
@@ -28,11 +27,12 @@ class LogController {
         duration: log.duration || 0,
         tags: log.tags || [],
         anomalies: log.anomalies || []
-      });
+      };
       
-      createdLogs.push(await logEntry.save());
+      const savedLog = await DataAccess.saveLog(logData);
+      createdLogs.push(savedLog);
       
-      await this.updateOrCreateTraceSession(logEntry);
+      await this.updateOrCreateTraceSession(savedLog);
     }
     
     res.status(201).json({
@@ -45,10 +45,10 @@ class LogController {
   static async updateOrCreateTraceSession(logEntry) {
     const { traceId } = logEntry;
     
-    let session = await TraceSession.findOne({ traceId });
+    let session = await DataAccess.findSession({ traceId });
     
     if (!session) {
-      session = new TraceSession({
+      session = await DataAccess.saveSession({
         traceId,
         startTime: logEntry.timestamp,
         userId: logEntry.userId,
@@ -56,39 +56,45 @@ class LogController {
         status: 'RUNNING',
         totalSteps: 1,
         successSteps: logEntry.status === 'SUCCESS' ? 1 : 0,
-        failedSteps: logEntry.status === 'FAILED' ? 1 : 0
+        failedSteps: logEntry.status === 'FAILED' ? 1 : 0,
+        anomalies: []
       });
     } else {
-      session.totalSteps++;
-      
-      if (logEntry.status === 'SUCCESS') {
-        session.successSteps++;
-      } else if (logEntry.status === 'FAILED') {
-        session.failedSteps++;
-      }
-      
-      if (!session.services.includes(logEntry.service)) {
-        session.services.push(logEntry.service);
-      }
+      const updatedSession = {
+        traceId,
+        totalSteps: session.totalSteps + 1,
+        successSteps: session.successSteps + (logEntry.status === 'SUCCESS' ? 1 : 0),
+        failedSteps: session.failedSteps + (logEntry.status === 'FAILED' ? 1 : 0),
+        services: session.services.includes(logEntry.service) 
+          ? session.services 
+          : [...session.services, logEntry.service]
+      };
       
       if (logEntry.status === 'END' || logEntry.operation === 'SESSION_END') {
-        session.endTime = logEntry.timestamp;
+        updatedSession.endTime = logEntry.timestamp;
         
-        if (session.failedSteps > 0) {
-          session.status = 'FAILED';
-        } else if (session.successSteps > 0) {
-          session.status = 'COMPLETED';
+        if (updatedSession.failedSteps > 0) {
+          updatedSession.status = 'FAILED';
+        } else if (updatedSession.successSteps > 0) {
+          updatedSession.status = 'COMPLETED';
+        } else {
+          updatedSession.status = session.status;
         }
+      } else {
+        updatedSession.status = session.status;
       }
+      
+      session = await DataAccess.saveSession(updatedSession);
     }
-    
-    await session.save();
     
     const anomalies = await AnomalyDetector.detectAnomalies(traceId);
     if (anomalies.length > 0) {
-      session.anomalies = anomalies;
-      session.status = session.failedSteps > 0 ? 'FAILED' : 'PARTIAL';
-      await session.save();
+      const status = session.failedSteps > 0 ? 'FAILED' : 'PARTIAL';
+      session = await DataAccess.saveSession({
+        traceId,
+        anomalies,
+        status
+      });
       await AnomalyDetector.markAnomaliesInLogs(traceId, anomalies);
     }
     
@@ -142,11 +148,12 @@ class LogController {
     const skip = (page - 1) * limit;
     
     const [logs, total] = await Promise.all([
-      LogEntry.find(query)
-        .sort({ timestamp: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      LogEntry.countDocuments(query)
+      DataAccess.findLogs(query, {
+        sort: { timestamp: -1 },
+        skip,
+        limit: parseInt(limit)
+      }),
+      DataAccess.countLogs(query)
     ]);
 
     res.json({
@@ -164,7 +171,7 @@ class LogController {
   static getById = asyncHandler(async (req, res) => {
     const { id } = req.params;
     
-    const log = await LogEntry.findById(id);
+    const log = await DataAccess.findLogById(id);
     
     if (!log) {
       res.status(404);
@@ -180,57 +187,35 @@ class LogController {
   static getStatistics = asyncHandler(async (req, res) => {
     const { startTime, endTime, service } = req.query;
     
-    const match = {};
+    const query = {};
     
     if (startTime || endTime) {
-      match.timestamp = {};
-      if (startTime) match.timestamp.$gte = new Date(startTime);
-      if (endTime) match.timestamp.$lte = new Date(endTime);
+      query.timestamp = {};
+      if (startTime) query.timestamp.$gte = new Date(startTime);
+      if (endTime) query.timestamp.$lte = new Date(endTime);
     }
     
     if (service) {
-      match.service = service;
+      query.service = service;
     }
 
-    const [byLevel, byService, byStatus, total] = await Promise.all([
-      LogEntry.aggregate([
-        { $match: match },
-        { $group: { _id: '$level', count: { $sum: 1 } } }
-      ]),
-      LogEntry.aggregate([
-        { $match: match },
-        { $group: { _id: '$service', count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-        { $limit: 10 }
-      ]),
-      LogEntry.aggregate([
-        { $match: match },
-        { $group: { _id: '$status', count: { $sum: 1 } } }
-      ]),
-      LogEntry.countDocuments(match)
-    ]);
-
-    const recentErrors = await LogEntry.find({
-      ...match,
-      level: { $in: ['ERROR', 'FATAL'] }
-    })
-      .sort({ timestamp: -1 })
-      .limit(10);
+    const stats = await DataAccess.getLogStatistics(query);
+    const recentErrors = await DataAccess.getRecentErrors(query, 10);
 
     res.json({
       success: true,
       data: {
-        total,
-        byLevel: byLevel.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
-        byService,
-        byStatus: byStatus.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
+        total: stats.total,
+        byLevel: stats.byLevel.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
+        byService: stats.byService,
+        byStatus: stats.byStatus.reduce((acc, item) => ({ ...acc, [item._id]: item.count }), {}),
         recentErrors
       }
     });
   });
 
   static getServices = asyncHandler(async (req, res) => {
-    const services = await LogEntry.distinct('service');
+    const services = await DataAccess.getDistinctServices();
     
     res.json({
       success: true,
@@ -242,7 +227,7 @@ class LogController {
     const { days = 90 } = req.query;
     const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     
-    const result = await LogEntry.deleteMany({ timestamp: { $lt: cutoffDate } });
+    const result = await DataAccess.deleteOldLogs(cutoffDate);
     
     res.json({
       success: true,

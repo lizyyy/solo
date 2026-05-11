@@ -1,5 +1,4 @@
-const LogEntry = require('../models/LogEntry');
-const TraceSession = require('../models/TraceSession');
+const DataAccess = require('../data/DataAccess');
 
 const ANOMALY_TYPES = {
   DUPLICATE: 'DUPLICATE',
@@ -12,7 +11,7 @@ const ANOMALY_TYPES = {
 
 class AnomalyDetector {
   static async detectAnomalies(traceId) {
-    const logs = await LogEntry.find({ traceId }).sort({ timestamp: 1 });
+    const logs = await DataAccess.findLogs({ traceId }, { sort: { timestamp: 1 } });
     const anomalies = [];
 
     if (logs.length === 0) return anomalies;
@@ -31,11 +30,11 @@ class AnomalyDetector {
     const operationMap = new Map();
 
     logs.forEach(log => {
-      const key = `${log.operation}-${JSON.stringify(log.details.requestBody || {})}`;
+      const key = `${log.operation}-${JSON.stringify(log.details?.requestBody || {})}`;
       
       if (operationMap.has(key)) {
         const previous = operationMap.get(key);
-        const timeDiff = log.timestamp - previous.timestamp;
+        const timeDiff = new Date(log.timestamp) - new Date(previous.timestamp);
         
         if (timeDiff < 5000) {
           anomalies.push({
@@ -60,7 +59,7 @@ class AnomalyDetector {
     const resourceMap = new Map();
 
     logs.forEach(log => {
-      if (log.details.resourceId) {
+      if (log.details?.resourceId) {
         const resourceId = log.details.resourceId;
         
         if (!resourceMap.has(resourceId)) {
@@ -79,7 +78,7 @@ class AnomalyDetector {
         const current = writeOperations[i];
         const next = writeOperations[i + 1];
         
-        const timeDiff = next.timestamp - current.timestamp;
+        const timeDiff = new Date(next.timestamp) - new Date(current.timestamp);
         
         if (current.userId !== next.userId && timeDiff < 1000) {
           anomalies.push({
@@ -97,14 +96,14 @@ class AnomalyDetector {
 
   static detectAsyncOutOfOrder(logs) {
     const anomalies = [];
-    const asyncOperations = logs.filter(log => log.tags.includes('async'));
+    const asyncOperations = logs.filter(log => log.tags?.includes('async'));
 
     for (let i = 0; i < asyncOperations.length - 1; i++) {
       const current = asyncOperations[i];
       const next = asyncOperations[i + 1];
 
-      if (current.details.expectedOrder && 
-          next.details.expectedOrder &&
+      if (current.details?.expectedOrder && 
+          next.details?.expectedOrder &&
           current.details.expectedOrder > next.details.expectedOrder) {
         anomalies.push({
           type: ANOMALY_TYPES.ASYNC_OUT_OF_ORDER,
@@ -120,12 +119,12 @@ class AnomalyDetector {
 
   static detectCacheStaleIssues(logs) {
     const anomalies = [];
-    const cacheLogs = logs.filter(log => log.tags.includes('cache'));
+    const cacheLogs = logs.filter(log => log.tags?.includes('cache'));
 
     for (let i = 0; i < cacheLogs.length; i++) {
       const log = cacheLogs[i];
       
-      if (log.operation === 'CACHE_HIT' && log.details.staleTime) {
+      if (log.operation === 'CACHE_HIT' && log.details?.staleTime) {
         const staleTime = parseInt(log.details.staleTime);
         
         if (staleTime > 300000) {
@@ -138,17 +137,17 @@ class AnomalyDetector {
         }
       }
 
-      if (log.operation === 'DB_UPDATE' && log.details.shouldInvalidateCache) {
+      if (log.operation === 'DB_UPDATE' && log.details?.shouldInvalidateCache) {
         const nextCacheHit = cacheLogs.find(c => 
           c.operation === 'CACHE_HIT' && 
-          c.timestamp > log.timestamp &&
-          c.timestamp - log.timestamp < 60000
+          new Date(c.timestamp) > new Date(log.timestamp) &&
+          new Date(c.timestamp) - new Date(log.timestamp) < 60000
         );
         
-        if (nextCacheHit && nextCacheHit.details.cacheVersion !== log.details.newVersion) {
+        if (nextCacheHit && nextCacheHit.details?.cacheVersion !== log.details?.newVersion) {
           anomalies.push({
             type: ANOMALY_TYPES.CACHE_STALE,
-            description: `缓存未更新: 数据库版本 ${log.details.newVersion} 但缓存仍为 ${nextCacheHit.details.cacheVersion}`,
+            description: `缓存未更新: 数据库版本 ${log.details.newVersion} 但缓存仍为 ${nextCacheHit.details?.cacheVersion}`,
             timestamp: nextCacheHit.timestamp,
             affectedSteps: [log.spanId, nextCacheHit.spanId]
           });
@@ -186,7 +185,7 @@ class AnomalyDetector {
         .filter(a => a.affectedSteps.includes(spanId))
         .map(a => a.type);
 
-      await LogEntry.findOneAndUpdate(
+      await DataAccess.updateLog(
         { spanId },
         { $addToSet: { anomalies: { $each: logAnomalies } } }
       );

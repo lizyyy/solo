@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const LogReplayService = require('../services/LogReplayService');
-const TraceSession = require('../models/TraceSession');
+const DataAccess = require('../data/DataAccess');
 
 class ReplayController {
   static getTimeline = asyncHandler(async (req, res) => {
@@ -81,11 +81,12 @@ class ReplayController {
     const skip = (page - 1) * limit;
     
     const [traces, total] = await Promise.all([
-      TraceSession.find(query)
-        .sort({ startTime: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      TraceSession.countDocuments(query)
+      DataAccess.findSessions(query, {
+        sort: { startTime: -1 },
+        skip,
+        limit: parseInt(limit)
+      }),
+      DataAccess.countSessions(query)
     ]);
 
     res.json({
@@ -112,13 +113,13 @@ class ReplayController {
       status: timeline.session?.status,
       duration: timeline.timeline.duration,
       totalSteps: timeline.statistics.total,
-      errors: timeline.statistics.byLevel.ERROR + timeline.statistics.byLevel.FATAL,
-      warnings: timeline.statistics.byLevel.WARN,
+      errors: (timeline.statistics.byLevel.ERROR || 0) + (timeline.statistics.byLevel.FATAL || 0),
+      warnings: timeline.statistics.byLevel.WARN || 0,
       anomalies: timeline.statistics.anomalies.total,
       services: timeline.session?.services || [],
       anomalyTypes: Object.keys(timeline.statistics.anomalies.byType),
       successRate: timeline.statistics.total > 0 ? 
-        Math.round((timeline.statistics.byStatus.SUCCESS / timeline.statistics.total) * 100) : 0
+        Math.round(((timeline.statistics.byStatus.SUCCESS || 0) / timeline.statistics.total) * 100) : 0
     };
     
     res.json({

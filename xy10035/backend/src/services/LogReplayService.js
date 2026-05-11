@@ -1,10 +1,9 @@
-const LogEntry = require('../models/LogEntry');
-const TraceSession = require('../models/TraceSession');
+const DataAccess = require('../data/DataAccess');
 
 class LogReplayService {
   static async getReplayTimeline(traceId) {
-    const logs = await LogEntry.find({ traceId }).sort({ timestamp: 1 });
-    const session = await TraceSession.findOne({ traceId });
+    const logs = await DataAccess.findLogs({ traceId }, { sort: { timestamp: 1 } });
+    const session = await DataAccess.findSession({ traceId });
 
     if (logs.length === 0) {
       throw new Error('Trace not found');
@@ -45,7 +44,7 @@ class LogReplayService {
       flat: steps,
       tree: tree,
       duration: steps.length > 0 ? 
-        steps[steps.length - 1].timestamp - steps[0].timestamp : 0
+        new Date(steps[steps.length - 1].timestamp) - new Date(steps[0].timestamp) : 0
     };
   }
 
@@ -85,7 +84,8 @@ class LogReplayService {
         SUCCESS: 0,
         FAILED: 0,
         ROLLBACK: 0,
-        TIMEOUT: 0
+        TIMEOUT: 0,
+        END: 0
       },
       byService: {},
       anomalies: {
@@ -148,17 +148,17 @@ class LogReplayService {
   }
 
   static async searchInTrace(traceId, query) {
-    const logs = await LogEntry.find({
-      traceId,
-      $or: [
-        { message: { $regex: query, $options: 'i' } },
-        { operation: { $regex: query, $options: 'i' } },
-        { service: { $regex: query, $options: 'i' } }
-      ]
-    }).sort({ timestamp: 1 });
+    const allLogs = await DataAccess.findLogs({ traceId }, { sort: { timestamp: 1 } });
+    const regex = new RegExp(query, 'i');
+    
+    const logs = allLogs.filter(log => 
+      regex.test(log.message || '') || 
+      regex.test(log.operation || '') || 
+      regex.test(log.service || '')
+    );
 
     return logs.map((log, index) => ({
-      ...log.toObject(),
+      ...(log.toObject ? log.toObject() : log),
       matchIndex: index
     }));
   }

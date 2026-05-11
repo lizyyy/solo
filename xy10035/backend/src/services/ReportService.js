@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { Parser } = require('json2csv');
+const XLSX = require('xlsx');
 const PDFDocument = require('pdfkit');
-const LogEntry = require('../models/LogEntry');
-const AnalysisReport = require('../models/AnalysisReport');
+const { v4: uuidv4 } = require('uuid');
+const DataAccess = require('../data/DataAccess');
 const LogReplayService = require('./LogReplayService');
 
 class ReportService {
@@ -55,7 +55,7 @@ class ReportService {
       query.anomalies = { $in: filters.anomalies };
     }
 
-    return await LogEntry.find(query).sort({ timestamp: -1 }).limit(10000);
+    return await DataAccess.findLogs(query, { sort: { timestamp: -1 }, limit: 10000 });
   }
 
   static async analyzeLogs(logs) {
@@ -98,11 +98,12 @@ class ReportService {
 
       serviceCounts[log.service] = (serviceCounts[log.service] || 0) + 1;
 
-      if (!statistics.timeRange.start || log.timestamp < statistics.timeRange.start) {
-        statistics.timeRange.start = log.timestamp;
+      const logTime = new Date(log.timestamp);
+      if (!statistics.timeRange.start || logTime < statistics.timeRange.start) {
+        statistics.timeRange.start = logTime;
       }
-      if (!statistics.timeRange.end || log.timestamp > statistics.timeRange.end) {
-        statistics.timeRange.end = log.timestamp;
+      if (!statistics.timeRange.end || logTime > statistics.timeRange.end) {
+        statistics.timeRange.end = logTime;
       }
     });
 
@@ -141,11 +142,9 @@ class ReportService {
   }
 
   static async createReportRecord(filters, statistics, logs, createdBy) {
-    const { v4: uuidv4 } = require('uuid');
-    
     const topTraces = await this.getTopTraces(logs);
 
-    const report = await AnalysisReport.create({
+    const report = await DataAccess.saveReport({
       reportId: uuidv4(),
       title: `日志分析报告 - ${new Date().toISOString()}`,
       createdBy,
@@ -203,39 +202,47 @@ class ReportService {
   }
 
   static async exportToExcel(report, logs) {
-    const fields = [
-      'timestamp',
-      'traceId',
-      'spanId',
-      'level',
-      'service',
-      'operation',
-      'status',
-      'message',
-      'userId',
-      'duration',
-      'anomalies'
-    ];
-
     const logData = logs.map(log => ({
-      timestamp: log.timestamp.toISOString(),
-      traceId: log.traceId,
-      spanId: log.spanId,
-      level: log.level,
-      service: log.service,
-      operation: log.operation,
-      status: log.status,
-      message: log.message,
-      userId: log.userId || '',
-      duration: log.duration,
-      anomalies: (log.anomalies || []).join(', ')
+      '时间': new Date(log.timestamp).toISOString(),
+      '追踪ID': log.traceId,
+      'SpanID': log.spanId,
+      '级别': log.level,
+      '服务': log.service,
+      '操作': log.operation,
+      '状态': log.status,
+      '消息': log.message,
+      '用户ID': log.userId || '',
+      '耗时(ms)': log.duration,
+      '异常': (log.anomalies || []).join(', ')
     }));
 
-    const parser = new Parser({ fields });
-    const csv = parser.parse(logData);
+    const wb = XLSX.utils.book_new();
+    
+    const ws1 = XLSX.utils.json_to_sheet(logData);
+    XLSX.utils.book_append_sheet(wb, ws1, '日志详情');
 
-    const filePath = path.join(__dirname, '../../exports', `${report.reportId}.csv`);
-    fs.writeFileSync(filePath, csv);
+    const summaryData = [
+      { '指标': '总日志数', '数值': report.summary.totalLogs },
+      { '指标': '错误数', '数值': report.summary.errorCount },
+      { '指标': '警告数', '数值': report.summary.warningCount },
+      { '指标': '异常数', '数值': report.summary.anomalyCount },
+      { '指标': '时间范围开始', '数值': report.summary.timeRange.start?.toISOString() || 'N/A' },
+      { '指标': '时间范围结束', '数值': report.summary.timeRange.end?.toISOString() || 'N/A' }
+    ];
+    const ws2 = XLSX.utils.json_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(wb, ws2, '报告概览');
+
+    if (report.anomalies && report.anomalies.length > 0) {
+      const anomalyData = report.anomalies.map(a => ({
+        '异常类型': a.description,
+        '次数': a.count
+      }));
+      const ws3 = XLSX.utils.json_to_sheet(anomalyData);
+      XLSX.utils.book_append_sheet(wb, ws3, '异常分析');
+    }
+
+    const filePath = path.join(__dirname, '../../exports', `${report.reportId}.xlsx`);
+    XLSX.writeFile(wb, filePath);
 
     return {
       report,
@@ -348,13 +355,14 @@ class ReportService {
 
   static async listReports(createdBy, limit = 50) {
     const query = createdBy ? { createdBy } : {};
-    return await AnalysisReport.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit);
+    return await DataAccess.findReports(query, { 
+      sort: { createdAt: -1 },
+      limit 
+    });
   }
 
   static async getReport(reportId) {
-    return await AnalysisReport.findOne({ reportId });
+    return await DataAccess.findReportById(reportId);
   }
 }
 

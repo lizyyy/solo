@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 
-const connectDB = require('./config/database');
+const { connectDB } = require('./config/database');
 const logRoutes = require('./routes/logRoutes');
 const replayRoutes = require('./routes/replayRoutes');
 const reportRoutes = require('./routes/reportRoutes');
@@ -20,7 +20,9 @@ if (!fs.existsSync(exportsDir)) {
   fs.mkdirSync(exportsDir, { recursive: true });
 }
 
-connectDB();
+connectDB().then(() => {
+  console.log('数据库初始化完成');
+});
 
 app.get('/health', (req, res) => {
   res.json({ 

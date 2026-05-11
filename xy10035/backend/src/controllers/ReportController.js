@@ -28,13 +28,13 @@ class ReportController {
       const fileName = path.basename(result.filePath);
       
       const contentTypeMap = {
-        excel: 'text/csv',
+        excel: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         markdown: 'text/markdown',
         pdf: 'application/pdf'
       };
 
       const extensionMap = {
-        excel: 'csv',
+        excel: 'xlsx',
         markdown: 'md',
         pdf: 'pdf'
       };
@@ -85,8 +85,11 @@ class ReportController {
       throw new Error('Report not found');
     }
 
-    const LogEntry = require('../models/LogEntry');
-    const logs = await ReportService.queryLogs(report.filters);
+    const DataAccess = require('../data/DataAccess');
+    const logs = await DataAccess.findLogs(report.filters || {}, { 
+      sort: { timestamp: -1 },
+      limit: 10000
+    });
 
     let result;
     switch (format) {
@@ -108,13 +111,13 @@ class ReportController {
     }
 
     const contentTypeMap = {
-      excel: 'text/csv',
+      excel: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       markdown: 'text/markdown',
       pdf: 'application/pdf'
     };
 
     const extensionMap = {
-      excel: 'csv',
+      excel: 'xlsx',
       markdown: 'md',
       pdf: 'pdf'
     };
