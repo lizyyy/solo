@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-05-11 23:13:40",
+  "summary": {
+    "total_orders": 0,
+    "valid_orders": 0,
+    "total_invoice_groups": 5,
+    "total_issues": 0,
+    "unresolved_issues": 0,
+    "total_amount": 0.0,
+    "adjustment_count": 1
+  },
+  "invoice_groups": [
+    {
+      "group_id": "INV-GRP-0003",
+      "header_name": "上海贸易有限公司",
+      "header_type": "企业",
+      "tax_rate": 0.13,
+      "tax_rate_percent": "13.0%",
+      "order_ids": "ORD002,ORD007",
+      "order_count": 2,
+      "item_count": 0,
+      "total_amount": 0.0,
+      "tax_amount": 0.0,
+      "net_amount": 0.0,
+      "split_reason": "按税率 13.0% 分组；企业抬头单独开票",
+      "is_adjusted": false,
+      "adjustment_notes": ""
+    },
+    {
+      "group_id": "INV-GRP-0002",
+      "header_name": "北京科技有限公司",
+      "header_type": "企业",
+      "tax_rate": 0.09,
+      "tax_rate_percent": "9.0%",
+      "order_ids": "ORD001",
+      "order_count": 1,
+      "item_count": 0,
+      "total_amount": 0.0,
+      "tax_amount": 0.0,
+      "net_amount": 0.0,
+      "split_reason": "按税率 9.0% 分组；企业抬头单独开票；包含 1 笔退款订单，已冲抵退款金额",
+      "is_adjusted": false,
+      "adjustment_notes": ""
+    },
+    {
+      "group_id": "INV-GRP-0001",
+      "header_name": "北京科技有限公司",
+      "header_type": "企业",
+      "tax_rate": 0.13,
+      "tax_rate_percent": "13.0%",
+      "order_ids": "ORD001,ORD004",
+      "order_count": 2,
+      "item_count": 0,
+      "total_amount": 0.0,
+      "tax_amount": 0.0,
+      "net_amount": 0.0,
+      "split_reason": "按税率 13.0% 分组；企业抬头单独开票；包含 2 笔退款订单，已冲抵退款金额",
+      "is_adjusted": false,
+      "adjustment_notes": ""
+    },
+    {
+      "group_id": "INV-GRP-0004",
+      "header_name": "张三",
+      "header_type": "个人",
+      "tax_rate": 0.13,
+      "tax_rate_percent": "13.0%",
+      "order_ids": "ORD003",
+      "order_count": 1,
+      "item_count": 0,
+      "total_amount": 0.0,
+      "tax_amount": 0.0,
+      "net_amount": 0.0,
+      "split_reason": "按税率 13.0% 分组；个人抬头单独开票",
+      "is_adjusted": false,
+      "adjustment_notes": ""
+    },
+    {
+      "group_id": "INV-GRP-0001",
+      "header_name": "王五",
+      "header_type": "个人",
+      "tax_rate": 0.09,
+      "tax_rate_percent": "9.0%",
+      "order_ids": "ORD005",
+      "order_count": 1,
+      "item_count": 0,
+      "total_amount": 0.0,
+      "tax_amount": 0.0,
+      "net_amount": 0.0,
+      "split_reason": "人工合并 2 个分组: INV-GRP-0005, INV-GRP-0006",
+      "is_adjusted": true,
+      "adjustment_notes": "税率0%的商品是赠品，与9%商品合并开票"
+    }
+  ],
+  "issues": [],
+  "orders": [],
+  "refunds": [],
+  "adjustments": [
+    {
+      "adjustment_id": "3c89a8c6",
+      "timestamp": "2026-05-11 23:13:40",
+      "operator": "财务小王",
+      "action": "merge",
+      "reason": "王五要求将所有商品开在同一张发票上",
+      "notes": "税率0%的商品是赠品，与9%商品合并开票",
+      "original_group_count": 2,
+      "new_group_count": 1
+    }
+  ]
+}

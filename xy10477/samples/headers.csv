@@ -1,0 +1,6 @@
+header_id,name,type,tax_number,address,phone,bank_name,bank_account,email,is_valid
+H001,北京科技有限公司,企业,91110105MA00ABC123,北京市朝阳区xxx路xxx号,010-12345678,中国工商银行北京分行,6222020000000000001,finance@tech.com,true
+H002,上海贸易有限公司,企业,91310101MA00DEF456,上海市黄浦区yyy路yyy号,021-87654321,中国建设银行上海分行,6217000000000000002,finance@trade.com,true
+H003,张三,个人,,,,,,zhangsan@example.com,true
+H004,李四,个人,,,,,,lisi@example.com,true
+H005,无效测试公司,企业,,,,,,,false
