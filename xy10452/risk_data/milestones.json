@@ -1,0 +1,43 @@
+[
+  {
+    "id": "M001",
+    "title": "一期需求评审通过",
+    "planned_date": "2026-04-30",
+    "actual_date": "2026-04-29",
+    "status": "已完成",
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "dependent_tasks": []
+  },
+  {
+    "id": "M002",
+    "title": "核心功能开发完成",
+    "planned_date": "2026-05-20",
+    "actual_date": null,
+    "status": "进行中",
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "dependent_tasks": [
+      "T001",
+      "T002",
+      "T003",
+      "T004"
+    ]
+  },
+  {
+    "id": "M003",
+    "title": "用户验收测试",
+    "planned_date": "2026-05-01",
+    "actual_date": null,
+    "status": "未开始",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "dependent_tasks": [
+      "T007",
+      "T008"
+    ]
+  }
+]

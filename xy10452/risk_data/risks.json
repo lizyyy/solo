@@ -1,0 +1,238 @@
+[
+  {
+    "id": "R01001",
+    "risk_type": "缺陷堆积",
+    "level": "高",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "金融管理系统",
+    "title": "缺陷堆积: 2个待修复",
+    "description": "当前有 2 个未修复缺陷，其中 1 个为严重/致命级别。",
+    "evidence": [
+      {
+        "source_type": "defect",
+        "source_id": "D002",
+        "source_title": "报表数据计算不准确",
+        "details": {
+          "severity": "严重",
+          "status": "待修复",
+          "owner": "李四",
+          "related_task_id": "T002"
+        }
+      },
+      {
+        "source_type": "defect",
+        "source_id": "D003",
+        "source_title": "导出文件编码问题",
+        "details": {
+          "severity": "中",
+          "status": "待修复",
+          "owner": "赵六",
+          "related_task_id": "T004"
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:05:39.192324"
+  },
+  {
+    "id": "R01001",
+    "risk_type": "延期风险",
+    "level": "中",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "2个任务延期",
+    "description": "检测到 2 个任务存在延期风险，延期天数累计超过阈值。",
+    "evidence": [
+      {
+        "source_type": "task",
+        "source_id": "T006",
+        "source_title": "性能压测脚本",
+        "details": {
+          "status": "进行中",
+          "planned_end": "2026-05-08",
+          "today": "2026-05-11",
+          "delay_days": 3
+        }
+      },
+      {
+        "source_type": "task",
+        "source_id": "T007",
+        "source_title": "日志分析功能",
+        "details": {
+          "status": "未开始",
+          "planned_end": "2026-05-05",
+          "today": "2026-05-11",
+          "delay_days": 6
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:06:04.179934"
+  },
+  {
+    "id": "R01002",
+    "risk_type": "缺陷堆积",
+    "level": "高",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "缺陷堆积: 2个待修复",
+    "description": "当前有 2 个未修复缺陷，其中 2 个为严重/致命级别。",
+    "evidence": [
+      {
+        "source_type": "defect",
+        "source_id": "D005",
+        "source_title": "API接口超时频繁",
+        "details": {
+          "severity": "高",
+          "status": "待修复",
+          "owner": "李四",
+          "related_task_id": "T005"
+        }
+      },
+      {
+        "source_type": "defect",
+        "source_id": "D006",
+        "source_title": "备份恢复功能验证失败",
+        "details": {
+          "severity": "致命",
+          "status": "待修复",
+          "owner": "未分配",
+          "related_task_id": "T010"
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:06:04.179948"
+  },
+  {
+    "id": "R01003",
+    "risk_type": "里程碑偏差",
+    "level": "中",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "1个里程碑存在偏差风险",
+    "description": "有 1 个里程碑可能无法按时达成。",
+    "evidence": [
+      {
+        "source_type": "milestone",
+        "source_id": "M003",
+        "source_title": "用户验收测试",
+        "details": {
+          "status": "未开始",
+          "planned_date": "2026-05-01",
+          "incomplete_dependent_tasks": 1,
+          "total_dependent_tasks": 2,
+          "latest_task_end": "2026-05-05"
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:06:04.179963"
+  },
+  {
+    "id": "R01004",
+    "risk_type": "任务关闭缺陷未修复",
+    "level": "高",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "1个异常: 任务已关闭但缺陷未修复",
+    "description": "检测到 1 个异常：关联任务已完成/关闭，但缺陷仍未修复。",
+    "evidence": [
+      {
+        "source_type": "anomaly",
+        "source_id": "D006-T010",
+        "source_title": "缺陷:备份恢复功能验证失败 / 任务:备份恢复机制",
+        "details": {
+          "defect_status": "待修复",
+          "defect_severity": "致命",
+          "task_status": "已完成",
+          "task_id": "T010"
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:06:04.179968"
+  },
+  {
+    "id": "R01005",
+    "risk_type": "里程碑早于任务计划",
+    "level": "中",
+    "status": "已识别",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "1个里程碑日期异常",
+    "description": "有 1 个里程碑的计划日期早于其关联任务的计划结束日期。",
+    "evidence": [
+      {
+        "source_type": "anomaly",
+        "source_id": "M003-T007",
+        "source_title": "里程碑:用户验收测试 / 任务:日志分析功能",
+        "details": {
+          "milestone_planned": "2026-05-01",
+          "task_planned_end": "2026-05-05",
+          "task_id": "T007",
+          "issue": "里程碑日期早于关联任务计划结束日期"
+        }
+      },
+      {
+        "source_type": "anomaly",
+        "source_id": "M003-T008",
+        "source_title": "里程碑:用户验收测试 / 任务:安全审计模块",
+        "details": {
+          "milestone_planned": "2026-05-01",
+          "task_planned_end": "2026-05-02",
+          "task_id": "T008",
+          "issue": "里程碑日期早于关联任务计划结束日期"
+        }
+      }
+    ],
+    "owner": null,
+    "explanation": null,
+    "created_at": "2026-05-11T21:06:04.179974"
+  },
+  {
+    "id": "R01006",
+    "risk_type": "负责人缺失",
+    "level": "高",
+    "status": "已解释",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "title": "2项工作缺少负责人",
+    "description": "有 1 个任务和 1 个缺陷未分配负责人。",
+    "evidence": [
+      {
+        "source_type": "task",
+        "source_id": "T009",
+        "source_title": "用户认证模块",
+        "details": {
+          "status": "进行中",
+          "planned_end": "2026-05-10",
+          "issue": "缺少负责人"
+        }
+      },
+      {
+        "source_type": "defect",
+        "source_id": "D006",
+        "source_title": "备份恢复功能验证失败",
+        "details": {
+          "severity": "致命",
+          "status": "待修复",
+          "issue": "缺少负责人"
+        }
+      }
+    ],
+    "owner": "王五",
+    "explanation": "已与HR沟通，新员工下周入职，将临时指派王五处理",
+    "created_at": "2026-05-11T21:06:04.179979"
+  }
+]

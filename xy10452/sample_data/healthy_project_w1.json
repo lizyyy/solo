@@ -1,0 +1,89 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "用户登录模块开发",
+      "status": "已完成",
+      "owner": "张三",
+      "planned_start": "2026-05-01",
+      "planned_end": "2026-05-05",
+      "actual_start": "2026-05-01",
+      "actual_end": "2026-05-04",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "tags": ["前端", "认证"]
+    },
+    {
+      "id": "T002",
+      "title": "商品列表API开发",
+      "status": "已完成",
+      "owner": "李四",
+      "planned_start": "2026-05-02",
+      "planned_end": "2026-05-06",
+      "actual_start": "2026-05-02",
+      "actual_end": "2026-05-06",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "tags": ["后端", "API"]
+    },
+    {
+      "id": "T003",
+      "title": "数据库表结构设计",
+      "status": "进行中",
+      "owner": "王五",
+      "planned_start": "2026-05-06",
+      "planned_end": "2026-05-10",
+      "actual_start": "2026-05-06",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "tags": ["数据库", "设计"]
+    },
+    {
+      "id": "T004",
+      "title": "订单模块接口文档",
+      "status": "进行中",
+      "owner": "赵六",
+      "planned_start": "2026-05-08",
+      "planned_end": "2026-05-12",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "tags": ["文档", "设计"]
+    }
+  ],
+  "defects": [
+    {
+      "id": "D001",
+      "title": "登录页面样式在移动端显示异常",
+      "severity": "低",
+      "status": "已修复",
+      "owner": "张三",
+      "related_task_id": "T001",
+      "created_date": "2026-05-03",
+      "resolved_date": "2026-05-04",
+      "week_number": 1,
+      "project": "电商平台V2"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M001",
+      "title": "一期需求评审通过",
+      "planned_date": "2026-04-30",
+      "actual_date": "2026-04-29",
+      "status": "已完成",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "dependent_tasks": []
+    },
+    {
+      "id": "M002",
+      "title": "核心功能开发完成",
+      "planned_date": "2026-05-20",
+      "status": "进行中",
+      "week_number": 1,
+      "project": "电商平台V2",
+      "dependent_tasks": ["T001", "T002", "T003", "T004"]
+    }
+  ],
+  "blockers": []
+}

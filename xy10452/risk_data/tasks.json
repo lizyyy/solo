@@ -1,0 +1,172 @@
+[
+  {
+    "id": "T001",
+    "title": "用户登录模块开发",
+    "status": "已完成",
+    "owner": "张三",
+    "planned_start": "2026-05-01",
+    "planned_end": "2026-05-05",
+    "actual_start": "2026-05-01",
+    "actual_end": "2026-05-04",
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "tags": [
+      "前端",
+      "认证"
+    ]
+  },
+  {
+    "id": "T002",
+    "title": "商品列表API开发",
+    "status": "已完成",
+    "owner": "李四",
+    "planned_start": "2026-05-02",
+    "planned_end": "2026-05-06",
+    "actual_start": "2026-05-02",
+    "actual_end": "2026-05-06",
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "tags": [
+      "后端",
+      "API"
+    ]
+  },
+  {
+    "id": "T003",
+    "title": "数据库表结构设计",
+    "status": "进行中",
+    "owner": "王五",
+    "planned_start": "2026-05-06",
+    "planned_end": "2026-05-10",
+    "actual_start": "2026-05-06",
+    "actual_end": null,
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "tags": [
+      "数据库",
+      "设计"
+    ]
+  },
+  {
+    "id": "T004",
+    "title": "订单模块接口文档",
+    "status": "进行中",
+    "owner": "赵六",
+    "planned_start": "2026-05-08",
+    "planned_end": "2026-05-12",
+    "actual_start": null,
+    "actual_end": null,
+    "week_number": 1,
+    "project": "电商平台V2",
+    "description": "",
+    "tags": [
+      "文档",
+      "设计"
+    ]
+  },
+  {
+    "id": "T005",
+    "title": "日志系统优化",
+    "status": "已完成",
+    "owner": "张三",
+    "planned_start": "2026-05-04",
+    "planned_end": "2026-05-08",
+    "actual_start": "2026-05-04",
+    "actual_end": "2026-05-10",
+    "week_number": 1,
+    "project": "金融管理系统",
+    "description": "",
+    "tags": [
+      "日志",
+      "优化"
+    ]
+  },
+  {
+    "id": "T006",
+    "title": "性能压测脚本",
+    "status": "进行中",
+    "owner": "李四",
+    "planned_start": "2026-05-03",
+    "planned_end": "2026-05-08",
+    "actual_start": "2026-05-03",
+    "actual_end": null,
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "tags": [
+      "测试",
+      "性能"
+    ]
+  },
+  {
+    "id": "T007",
+    "title": "日志分析功能",
+    "status": "未开始",
+    "owner": "王五",
+    "planned_start": "2026-04-29",
+    "planned_end": "2026-05-05",
+    "actual_start": null,
+    "actual_end": null,
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "tags": [
+      "日志",
+      "分析"
+    ]
+  },
+  {
+    "id": "T008",
+    "title": "安全审计模块",
+    "status": "已关闭",
+    "owner": null,
+    "planned_start": "2026-04-25",
+    "planned_end": "2026-05-02",
+    "actual_start": null,
+    "actual_end": null,
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "tags": [
+      "安全",
+      "审计"
+    ]
+  },
+  {
+    "id": "T009",
+    "title": "用户认证模块",
+    "status": "进行中",
+    "owner": null,
+    "planned_start": "2026-05-01",
+    "planned_end": "2026-05-10",
+    "actual_start": null,
+    "actual_end": null,
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "tags": [
+      "安全",
+      "认证"
+    ]
+  },
+  {
+    "id": "T010",
+    "title": "备份恢复机制",
+    "status": "已完成",
+    "owner": "王五",
+    "planned_start": "2026-04-20",
+    "planned_end": "2026-04-28",
+    "actual_start": "2026-04-20",
+    "actual_end": "2026-04-28",
+    "week_number": 1,
+    "project": "AI决策系统",
+    "description": "",
+    "tags": [
+      "运维",
+      "备份"
+    ]
+  }
+]

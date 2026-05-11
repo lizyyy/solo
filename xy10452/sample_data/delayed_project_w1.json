@@ -1,0 +1,141 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "支付网关集成",
+      "status": "进行中",
+      "owner": "张三",
+      "planned_start": "2026-04-28",
+      "planned_end": "2026-05-05",
+      "actual_start": "2026-04-28",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "tags": ["支付", "集成"]
+    },
+    {
+      "id": "T002",
+      "title": "报表统计功能开发",
+      "status": "进行中",
+      "owner": "李四",
+      "planned_start": "2026-05-01",
+      "planned_end": "2026-05-06",
+      "actual_start": "2026-05-03",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "tags": ["报表", "后端"]
+    },
+    {
+      "id": "T003",
+      "title": "用户权限管理",
+      "status": "未开始",
+      "owner": "王五",
+      "planned_start": "2026-05-02",
+      "planned_end": "2026-05-08",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "tags": ["安全", "权限"]
+    },
+    {
+      "id": "T004",
+      "title": "数据导出功能",
+      "status": "进行中",
+      "owner": "赵六",
+      "planned_start": "2026-04-30",
+      "planned_end": "2026-05-04",
+      "actual_start": "2026-04-30",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "tags": ["导出", "后端"]
+    },
+    {
+      "id": "T005",
+      "title": "日志系统优化",
+      "status": "已完成",
+      "owner": "张三",
+      "planned_start": "2026-05-04",
+      "planned_end": "2026-05-08",
+      "actual_start": "2026-05-04",
+      "actual_end": "2026-05-10",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "tags": ["日志", "优化"]
+    }
+  ],
+  "defects": [
+    {
+      "id": "D001",
+      "title": "支付回调接口偶发500错误",
+      "severity": "高",
+      "status": "待修复",
+      "owner": "张三",
+      "related_task_id": "T001",
+      "created_date": "2026-05-03",
+      "week_number": 1,
+      "project": "金融管理系统"
+    },
+    {
+      "id": "D002",
+      "title": "报表数据计算不准确",
+      "severity": "严重",
+      "status": "待修复",
+      "owner": "李四",
+      "related_task_id": "T002",
+      "created_date": "2026-05-05",
+      "week_number": 1,
+      "project": "金融管理系统"
+    },
+    {
+      "id": "D003",
+      "title": "导出文件编码问题",
+      "severity": "中",
+      "status": "待修复",
+      "owner": "赵六",
+      "related_task_id": "T004",
+      "created_date": "2026-05-04",
+      "week_number": 1,
+      "project": "金融管理系统"
+    },
+    {
+      "id": "D004",
+      "title": "页面加载缓慢",
+      "severity": "低",
+      "status": "已修复",
+      "owner": "王五",
+      "created_date": "2026-05-02",
+      "resolved_date": "2026-05-03",
+      "week_number": 1,
+      "project": "金融管理系统"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M001",
+      "title": "支付功能上线",
+      "planned_date": "2026-05-06",
+      "status": "进行中",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "dependent_tasks": ["T001", "T005"]
+    },
+    {
+      "id": "M002",
+      "title": "核心功能测试完成",
+      "planned_date": "2026-05-15",
+      "status": "未开始",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "dependent_tasks": ["T002", "T003", "T004"]
+    }
+  ],
+  "blockers": [
+    {
+      "id": "B001",
+      "content": "第三方支付接口文档不完整，需要等待对方提供",
+      "owner": "张三",
+      "created_date": "2026-05-05",
+      "week_number": 1,
+      "project": "金融管理系统",
+      "related_task_id": "T001"
+    }
+  ]
+}

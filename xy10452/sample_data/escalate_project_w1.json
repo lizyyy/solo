@@ -1,0 +1,239 @@
+{
+  "tasks": [
+    {
+      "id": "T001",
+      "title": "核心算法重构",
+      "status": "进行中",
+      "owner": "张三",
+      "planned_start": "2026-04-20",
+      "planned_end": "2026-04-30",
+      "actual_start": "2026-04-20",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["算法", "核心"]
+    },
+    {
+      "id": "T002",
+      "title": "模型训练优化",
+      "status": "进行中",
+      "owner": "张三",
+      "planned_start": "2026-04-25",
+      "planned_end": "2026-05-05",
+      "actual_start": "2026-04-25",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["AI", "训练"]
+    },
+    {
+      "id": "T003",
+      "title": "数据清洗模块开发",
+      "status": "进行中",
+      "owner": "张三",
+      "planned_start": "2026-05-01",
+      "planned_end": "2026-05-08",
+      "actual_start": "2026-05-01",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["数据", "清洗"]
+    },
+    {
+      "id": "T004",
+      "title": "用户界面开发",
+      "status": "进行中",
+      "owner": "李四",
+      "planned_start": "2026-04-28",
+      "planned_end": "2026-05-06",
+      "actual_start": "2026-04-28",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["前端", "UI"]
+    },
+    {
+      "id": "T005",
+      "title": "API服务部署",
+      "status": "进行中",
+      "owner": "李四",
+      "planned_start": "2026-05-01",
+      "planned_end": "2026-05-07",
+      "actual_start": "2026-05-01",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["部署", "运维"]
+    },
+    {
+      "id": "T006",
+      "title": "性能压测脚本",
+      "status": "进行中",
+      "owner": "李四",
+      "planned_start": "2026-05-03",
+      "planned_end": "2026-05-08",
+      "actual_start": "2026-05-03",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["测试", "性能"]
+    },
+    {
+      "id": "T007",
+      "title": "日志分析功能",
+      "status": "未开始",
+      "owner": "王五",
+      "planned_start": "2026-04-29",
+      "planned_end": "2026-05-05",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["日志", "分析"]
+    },
+    {
+      "id": "T008",
+      "title": "安全审计模块",
+      "status": "已关闭",
+      "owner": null,
+      "planned_start": "2026-04-25",
+      "planned_end": "2026-05-02",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["安全", "审计"]
+    },
+    {
+      "id": "T009",
+      "title": "用户认证模块",
+      "status": "进行中",
+      "owner": null,
+      "planned_start": "2026-05-01",
+      "planned_end": "2026-05-10",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["安全", "认证"]
+    },
+    {
+      "id": "T010",
+      "title": "备份恢复机制",
+      "status": "已完成",
+      "owner": "王五",
+      "planned_start": "2026-04-20",
+      "planned_end": "2026-04-28",
+      "actual_start": "2026-04-20",
+      "actual_end": "2026-04-28",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "tags": ["运维", "备份"]
+    }
+  ],
+  "defects": [
+    {
+      "id": "D001",
+      "title": "算法结果与预期偏差超过5%",
+      "severity": "严重",
+      "status": "待修复",
+      "owner": "张三",
+      "related_task_id": "T001",
+      "created_date": "2026-05-02",
+      "week_number": 1,
+      "project": "AI决策系统"
+    },
+    {
+      "id": "D002",
+      "title": "训练过程内存溢出",
+      "severity": "严重",
+      "status": "待修复",
+      "owner": "张三",
+      "related_task_id": "T002",
+      "created_date": "2026-05-03",
+      "week_number": 1,
+      "project": "AI决策系统"
+    },
+    {
+      "id": "D003",
+      "title": "数据清洗丢失重要字段",
+      "severity": "高",
+      "status": "待修复",
+      "owner": "张三",
+      "related_task_id": "T003",
+      "created_date": "2026-05-04",
+      "week_number": 1,
+      "project": "AI决策系统"
+    },
+    {
+      "id": "D004",
+      "title": "UI响应式布局失效",
+      "severity": "中",
+      "status": "待修复",
+      "owner": "李四",
+      "related_task_id": "T004",
+      "created_date": "2026-05-03",
+      "week_number": 1,
+      "project": "AI决策系统"
+    },
+    {
+      "id": "D005",
+      "title": "API接口超时频繁",
+      "severity": "高",
+      "status": "待修复",
+      "owner": "李四",
+      "related_task_id": "T005",
+      "created_date": "2026-05-05",
+      "week_number": 1,
+      "project": "AI决策系统"
+    },
+    {
+      "id": "D006",
+      "title": "备份恢复功能验证失败",
+      "severity": "致命",
+      "status": "待修复",
+      "owner": null,
+      "related_task_id": "T010",
+      "created_date": "2026-05-05",
+      "week_number": 1,
+      "project": "AI决策系统"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M001",
+      "title": "算法验证通过",
+      "planned_date": "2026-05-03",
+      "status": "进行中",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "dependent_tasks": ["T001", "T002"]
+    },
+    {
+      "id": "M002",
+      "title": "一期功能上线",
+      "planned_date": "2026-05-05",
+      "status": "未开始",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "dependent_tasks": ["T001", "T002", "T003", "T004", "T005"]
+    },
+    {
+      "id": "M003",
+      "title": "用户验收测试",
+      "planned_date": "2026-05-01",
+      "status": "未开始",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "dependent_tasks": ["T007", "T008"]
+    }
+  ],
+  "blockers": [
+    {
+      "id": "B001",
+      "content": "训练数据缺失，需要从第三方获取，但沟通进度缓慢",
+      "owner": "张三",
+      "created_date": "2026-05-01",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "related_task_id": "T002"
+    },
+    {
+      "id": "B002",
+      "content": "服务器资源不足，无法进行大规模训练",
+      "owner": "张三",
+      "created_date": "2026-05-03",
+      "week_number": 1,
+      "project": "AI决策系统",
+      "related_task_id": "T002"
+    }
+  ]
+}
