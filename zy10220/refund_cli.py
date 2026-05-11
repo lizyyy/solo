@@ -296,171 +296,169 @@ def process_refunds_and_replacements():
     commission_rate = float(config.get('commission_rate', 0.1))
     commission_refunded = config.get('commission_refunded', True)
     
+    stockout_by_product = {}
     for _, stock_row in stockout.iterrows():
         product_id = str(stock_row['product_id'])
         stockout_qty = stock_row['stockout_qty']
-        
         if pd.isna(stockout_qty) or stockout_qty <= 0:
             continue
-        
-        order_items = orders[orders['product_id'] == product_id]
-        if order_items.empty:
+        stockout_by_product[product_id] = {
+            'remaining': stockout_qty,
+            'row': stock_row
+        }
+    
+    for _, item in orders.iterrows():
+        item_qty = item['quantity']
+        if pd.isna(item_qty) or item_qty <= 0:
             continue
         
-        remaining_stockout = stockout_qty
+        unit_price = item.get('unit_price', 0)
+        if pd.isna(unit_price) or unit_price <= 0:
+            unit_price = item['total_amount'] / item['quantity'] if item['quantity'] > 0 else 0
         
-        for _, order_row in order_items.iterrows():
-            if remaining_stockout <= 0:
-                break
+        product_id = str(item['product_id'])
+        
+        normal_qty = item_qty
+        affected_qty = 0
+        
+        if product_id in stockout_by_product:
+            stock_info = stockout_by_product[product_id]
+            remaining_stockout = stock_info['remaining']
             
-            order_qty = order_row['quantity']
-            if pd.isna(order_qty) or order_qty <= 0:
-                continue
-            
-            affected_qty = min(remaining_stockout, order_qty)
-            unit_price = order_row.get('unit_price', 0)
-            if pd.isna(unit_price):
-                unit_price = order_row['total_amount'] / order_row['quantity'] if order_row['quantity'] > 0 else 0
-            
-            refund_amount = round(affected_qty * unit_price, 2)
-            
-            has_replacement = (
-                'replacement_product_id' in stock_row and 
-                pd.notna(stock_row['replacement_product_id']) and 
-                str(stock_row['replacement_product_id']).strip()
-            )
-            replacement_approved = str(stock_row.get('replacement_approved', 'false')).lower() == 'true'
-            
-            reason = f"商品 {product_id} 缺货 {affected_qty} 件"
-            
-            if has_replacement and replacement_approved:
-                replacement_id = str(stock_row['replacement_product_id'])
-                replacement_name = str(stock_row.get('replacement_name', replacement_id))
+            if remaining_stockout > 0:
+                affected_qty = min(remaining_stockout, item_qty)
+                normal_qty = item_qty - affected_qty
+                stock_info['remaining'] = remaining_stockout - affected_qty
                 
-                replacements.append({
-                    'order_id': order_row['order_id'],
-                    'order_item_id': order_row['order_item_id'],
-                    'building': order_row['building'],
-                    'room': order_row['room'],
-                    'original_product_id': product_id,
-                    'original_name': order_row['product_name'],
-                    'replacement_product_id': replacement_id,
-                    'replacement_name': replacement_name,
-                    'quantity': affected_qty,
-                    'reason': reason,
-                    'processed_at': datetime.now().isoformat()
-                })
+                stock_row = stock_info['row']
+                refund_amount = round(affected_qty * unit_price, 2)
                 
-                reason += f" → 替换为 {replacement_name}"
+                has_replacement = (
+                    'replacement_product_id' in stock_row and 
+                    pd.notna(stock_row['replacement_product_id']) and 
+                    str(stock_row['replacement_product_id']).strip()
+                )
+                replacement_approved = str(stock_row.get('replacement_approved', 'false')).lower() == 'true'
                 
-                if commission_refunded or True:
-                    commission = round(refund_amount * commission_rate, 2)
-                    commissions.append({
-                        'order_id': order_row['order_id'],
-                        'order_item_id': order_row['order_item_id'],
-                        'product_id': product_id,
-                        'product_name': order_row['product_name'],
+                reason = f"商品 {product_id} 缺货 {affected_qty} 件"
+                
+                if has_replacement and replacement_approved:
+                    replacement_id = str(stock_row['replacement_product_id'])
+                    replacement_name = str(stock_row.get('replacement_name', replacement_id))
+                    
+                    replacements.append({
+                        'order_id': item['order_id'],
+                        'order_item_id': item['order_item_id'],
+                        'building': item['building'],
+                        'room': item['room'],
+                        'original_product_id': product_id,
+                        'original_name': item['product_name'],
+                        'replacement_product_id': replacement_id,
+                        'replacement_name': replacement_name,
                         'quantity': affected_qty,
-                        'amount': refund_amount,
-                        'commission_rate': commission_rate,
-                        'commission': commission,
-                        'source': 'replacement',
-                        'reason': f"替换商品佣金（{reason}）",
-                        'calculated_at': datetime.now().isoformat()
+                        'reason': reason,
+                        'processed_at': datetime.now().isoformat()
                     })
-            
-            elif has_replacement and not replacement_approved:
-                reason += "，客户拒绝替换，已退款"
-                refunds.append({
-                    'order_id': order_row['order_id'],
-                    'order_item_id': order_row['order_item_id'],
-                    'building': order_row['building'],
-                    'room': order_row['room'],
-                    'product_id': product_id,
-                    'product_name': order_row['product_name'],
-                    'quantity': affected_qty,
-                    'unit_price': unit_price,
-                    'refund_amount': refund_amount,
-                    'reason': reason,
-                    'processed_at': datetime.now().isoformat()
-                })
+                    
+                    reason += f" → 替换为 {replacement_name}"
+                    
+                    if commission_refunded:
+                        commission = round(refund_amount * commission_rate, 2)
+                        commissions.append({
+                            'order_id': item['order_id'],
+                            'order_item_id': item['order_item_id'],
+                            'product_id': product_id,
+                            'product_name': item['product_name'],
+                            'quantity': affected_qty,
+                            'amount': refund_amount,
+                            'commission_rate': commission_rate,
+                            'commission': commission,
+                            'source': 'replacement',
+                            'reason': f"替换商品佣金（{reason}）",
+                            'calculated_at': datetime.now().isoformat()
+                        })
                 
-                if commission_refunded:
-                    commission = round(refund_amount * commission_rate, 2)
-                    commissions.append({
-                        'order_id': order_row['order_id'],
-                        'order_item_id': order_row['order_item_id'],
+                elif has_replacement and not replacement_approved:
+                    reason += "，客户拒绝替换，已退款"
+                    refunds.append({
+                        'order_id': item['order_id'],
+                        'order_item_id': item['order_item_id'],
+                        'building': item['building'],
+                        'room': item['room'],
                         'product_id': product_id,
-                        'product_name': order_row['product_name'],
+                        'product_name': item['product_name'],
                         'quantity': affected_qty,
-                        'amount': refund_amount,
-                        'commission_rate': commission_rate,
-                        'commission': commission,
-                        'source': 'refund',
-                        'reason': f"退款仍计佣金（{reason}）",
-                        'calculated_at': datetime.now().isoformat()
+                        'unit_price': unit_price,
+                        'refund_amount': refund_amount,
+                        'reason': reason,
+                        'processed_at': datetime.now().isoformat()
                     })
-            
-            else:
-                reason += "，无替换商品，已退款"
-                refunds.append({
-                    'order_id': order_row['order_id'],
-                    'order_item_id': order_row['order_item_id'],
-                    'building': order_row['building'],
-                    'room': order_row['room'],
-                    'product_id': product_id,
-                    'product_name': order_row['product_name'],
-                    'quantity': affected_qty,
-                    'unit_price': unit_price,
-                    'refund_amount': refund_amount,
-                    'reason': reason,
-                    'processed_at': datetime.now().isoformat()
-                })
+                    
+                    if commission_refunded:
+                        commission = round(refund_amount * commission_rate, 2)
+                        commissions.append({
+                            'order_id': item['order_id'],
+                            'order_item_id': item['order_item_id'],
+                            'product_id': product_id,
+                            'product_name': item['product_name'],
+                            'quantity': affected_qty,
+                            'amount': refund_amount,
+                            'commission_rate': commission_rate,
+                            'commission': commission,
+                            'source': 'refund',
+                            'reason': f"退款仍计佣金（{reason}）",
+                            'calculated_at': datetime.now().isoformat()
+                        })
                 
-                if commission_refunded:
-                    commission = round(refund_amount * commission_rate, 2)
-                    commissions.append({
-                        'order_id': order_row['order_id'],
-                        'order_item_id': order_row['order_item_id'],
+                else:
+                    reason += "，无替换商品，已退款"
+                    refunds.append({
+                        'order_id': item['order_id'],
+                        'order_item_id': item['order_item_id'],
+                        'building': item['building'],
+                        'room': item['room'],
                         'product_id': product_id,
-                        'product_name': order_row['product_name'],
+                        'product_name': item['product_name'],
                         'quantity': affected_qty,
-                        'amount': refund_amount,
-                        'commission_rate': commission_rate,
-                        'commission': commission,
-                        'source': 'refund',
-                        'reason': f"退款仍计佣金（{reason}）",
-                        'calculated_at': datetime.now().isoformat()
+                        'unit_price': unit_price,
+                        'refund_amount': refund_amount,
+                        'reason': reason,
+                        'processed_at': datetime.now().isoformat()
                     })
-            
-            remaining_stockout -= affected_qty
-    
-    for _, order_row in orders.iterrows():
-        order_items = orders[orders['order_id'] == order_row['order_id']]
-        for _, item in order_items.iterrows():
-            in_stockout = len(stockout[stockout['product_id'] == item['product_id']]) > 0
-            if in_stockout:
-                continue
-            
-            item_qty = item['quantity']
-            if pd.isna(item_qty):
-                continue
-            item_amount = item_qty * item.get('unit_price', 0)
-            if item_amount <= 0:
-                item_amount = item.get('paid_amount', 0)
-            
-            commission = round(item_amount * commission_rate, 2)
+                    
+                    if commission_refunded:
+                        commission = round(refund_amount * commission_rate, 2)
+                        commissions.append({
+                            'order_id': item['order_id'],
+                            'order_item_id': item['order_item_id'],
+                            'product_id': product_id,
+                            'product_name': item['product_name'],
+                            'quantity': affected_qty,
+                            'amount': refund_amount,
+                            'commission_rate': commission_rate,
+                            'commission': commission,
+                            'source': 'refund',
+                            'reason': f"退款仍计佣金（{reason}）",
+                            'calculated_at': datetime.now().isoformat()
+                        })
+        
+        if normal_qty > 0:
+            normal_amount = round(normal_qty * unit_price, 2)
+            commission = round(normal_amount * commission_rate, 2)
+            reason = '正常销售佣金'
+            if affected_qty > 0:
+                reason = f"正常销售佣金（总订{item_qty}件，缺货{affected_qty}件，正常发货{normal_qty}件）"
             commissions.append({
                 'order_id': item['order_id'],
                 'order_item_id': item['order_item_id'],
-                'product_id': item['product_id'],
+                'product_id': product_id,
                 'product_name': item['product_name'],
-                'quantity': item_qty,
-                'amount': item_amount,
+                'quantity': normal_qty,
+                'amount': normal_amount,
                 'commission_rate': commission_rate,
                 'commission': commission,
                 'source': 'normal',
-                'reason': '正常销售佣金',
+                'reason': reason,
                 'calculated_at': datetime.now().isoformat()
             })
     

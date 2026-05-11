@@ -1,7 +1,7 @@
 {
   "events": [
     {
-      "timestamp": "2026-05-11T15:28:02.122223",
+      "timestamp": "2026-05-11T19:24:31.625311",
       "action": "import",
       "details": {
         "data_type": "orders",
@@ -11,7 +11,7 @@
       }
     },
     {
-      "timestamp": "2026-05-11T15:28:06.140734",
+      "timestamp": "2026-05-11T19:24:32.416612",
       "action": "import",
       "details": {
         "data_type": "products",
@@ -21,7 +21,7 @@
       }
     },
     {
-      "timestamp": "2026-05-11T15:28:12.218624",
+      "timestamp": "2026-05-11T19:24:33.231086",
       "action": "import",
       "details": {
         "data_type": "stockout",
@@ -31,14 +31,14 @@
       }
     },
     {
-      "timestamp": "2026-05-11T15:28:37.686142",
+      "timestamp": "2026-05-11T19:24:56.762950",
       "action": "confirm",
       "details": {
         "refunds": 3,
         "replacements": 0,
-        "commissions": 6
+        "commissions": 8
       }
     }
   ],
-  "last_confirmed": "2026-05-11T15:28:37.685894"
+  "last_confirmed": "2026-05-11T19:24:56.762717"
 }
