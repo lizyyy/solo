@@ -1,0 +1,48 @@
+{
+  "orders": [
+    {
+      "orderId": "ORD001",
+      "customerId": "CUST001",
+      "amount": 1000.00,
+      "createdAt": "2026-05-01T10:00:00Z"
+    },
+    {
+      "orderId": "ORD002",
+      "customerId": "CUST002",
+      "amount": 500.00,
+      "createdAt": "2026-05-02T14:30:00Z"
+    },
+    {
+      "orderId": "ORD003",
+      "customerId": "CUST003",
+      "amount": 2000.00,
+      "createdAt": "2026-05-03T09:15:00Z"
+    },
+    {
+      "orderId": "ORD004",
+      "customerId": "CUST004",
+      "amount": 800.00,
+      "createdAt": "2026-05-04T16:45:00Z"
+    }
+  ],
+  "agents": [
+    {
+      "agentId": "AGENT001",
+      "name": "张三",
+      "role": "agent"
+    },
+    {
+      "agentId": "AGENT002",
+      "name": "李四",
+      "role": "agent"
+    },
+    {
+      "agentId": "SUP001",
+      "name": "王主管",
+      "role": "supervisor"
+    }
+  ],
+  "complaints": [],
+  "compensations": [],
+  "idempotency": {}
+}
