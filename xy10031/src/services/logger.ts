@@ -1,5 +1,6 @@
 import { db } from './database'
-import { LogLevel } from '@prisma/client'
+
+export type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG'
 
 export interface LogData {
   userId: string

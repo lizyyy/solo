@@ -23,6 +23,7 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons'
 import { ipc } from '../ipc'
+import { authStore } from '../store/authStore'
 import type { SyncStatus, SyncStats } from '../../types'
 
 const { Text } = Typography
@@ -108,10 +109,16 @@ function SyncPage() {
   }
 
   const handleAddTestItem = async () => {
+    const currentUserId = authStore.currentUser?.id
+    if (!currentUserId) {
+      message.error('用户未登录')
+      return
+    }
+
     const result = await ipc.sync.addToQueue({
       type: 'TEST_' + Date.now(),
       payload: { type: 'test', data: { test: true, timestamp: Date.now() } },
-      userId: 'current',
+      userId: currentUserId,
       maxRetries: 3,
     })
     if (result.success) {

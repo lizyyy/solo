@@ -1,31 +1,26 @@
 import { db } from './database'
-import { TaskStatus } from '@prisma/client'
 import { logger } from './logger'
+import { syncService } from './sync'
+
+export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'PENDING_APPROVAL' | 'APPROVED' | 'REJECTED' | 'CANCELLED'
 
 const STATUS_TRANSITIONS: Record<TaskStatus, TaskStatus[]> = {
-  [TaskStatus.PENDING]: [TaskStatus.IN_PROGRESS, TaskStatus.CANCELLED],
-  [TaskStatus.IN_PROGRESS]: [
-    TaskStatus.PENDING_APPROVAL,
-    TaskStatus.CANCELLED,
-  ],
-  [TaskStatus.PENDING_APPROVAL]: [
-    TaskStatus.APPROVED,
-    TaskStatus.REJECTED,
-    TaskStatus.IN_PROGRESS,
-  ],
-  [TaskStatus.APPROVED]: [],
-  [TaskStatus.REJECTED]: [TaskStatus.IN_PROGRESS, TaskStatus.CANCELLED],
-  [TaskStatus.CANCELLED]: [],
+  PENDING: ['IN_PROGRESS', 'CANCELLED'],
+  IN_PROGRESS: ['PENDING_APPROVAL', 'CANCELLED'],
+  PENDING_APPROVAL: ['APPROVED', 'REJECTED', 'IN_PROGRESS'],
+  APPROVED: [],
+  REJECTED: ['IN_PROGRESS', 'CANCELLED'],
+  CANCELLED: [],
 }
 
 class TaskService {
-  canTransition(oldStatus: TaskStatus, newStatus: TaskStatus): boolean {
-    const allowed = STATUS_TRANSITIONS[oldStatus] || []
-    return allowed.includes(newStatus)
+  canTransition(oldStatus: string, newStatus: string): boolean {
+    const allowed = STATUS_TRANSITIONS[oldStatus as TaskStatus] || []
+    return allowed.includes(newStatus as TaskStatus)
   }
 
   async listTasks(params: {
-    status?: TaskStatus
+    status?: string
     assigneeId?: string
     keyword?: string
     skip?: number
@@ -92,7 +87,7 @@ class TaskService {
       data: {
         taskId: task.id,
         oldStatus: null,
-        newStatus: TaskStatus.PENDING,
+        newStatus: 'PENDING',
         remark: '任务创建',
         changedBy: userId,
       },
@@ -105,12 +100,27 @@ class TaskService {
       details: { taskId: task.id, name: params.name },
     })
 
+    await syncService.addToQueue({
+      type: 'TASK_CREATE',
+      payload: {
+        type: 'TASK_CREATE',
+        data: {
+          id: task.id,
+          name: params.name,
+          description: params.description,
+          assigneeId: params.assigneeId,
+        }
+      },
+      userId,
+      maxRetries: 5,
+    })
+
     return task
   }
 
   async updateTaskStatus(params: {
     taskId: string
-    newStatus: TaskStatus
+    newStatus: string
     remark?: string
     userId: string
   }) {
@@ -130,10 +140,10 @@ class TaskService {
 
     const updateData: any = { status: newStatus }
 
-    if (newStatus === TaskStatus.IN_PROGRESS && !task.startedAt) {
+    if (newStatus === 'IN_PROGRESS' && !task.startedAt) {
       updateData.startedAt = new Date()
     }
-    if (newStatus === TaskStatus.APPROVED && !task.completedAt) {
+    if (newStatus === 'APPROVED' && !task.completedAt) {
       updateData.completedAt = new Date()
     }
 
@@ -164,6 +174,23 @@ class TaskService {
       },
     })
 
+    await syncService.addToQueue({
+      type: 'TASK_STATUS_CHANGE',
+      payload: {
+        type: 'TASK_STATUS_CHANGE',
+        data: {
+          taskId,
+          fromStatus: task.status,
+          toStatus: newStatus,
+          remark,
+          startedAt: newStatus === 'IN_PROGRESS' ? new Date().toISOString() : null,
+          completedAt: newStatus === 'APPROVED' ? new Date().toISOString() : null,
+        }
+      },
+      userId,
+      maxRetries: 5,
+    })
+
     return updatedTask
   }
 
@@ -178,6 +205,19 @@ class TaskService {
       action: 'ASSIGN',
       module: 'TASK',
       details: { taskId, assigneeId },
+    })
+
+    await syncService.addToQueue({
+      type: 'TASK_ASSIGN',
+      payload: {
+        type: 'TASK_ASSIGN',
+        data: {
+          taskId,
+          assigneeId,
+        }
+      },
+      userId,
+      maxRetries: 5,
     })
 
     return task
@@ -230,6 +270,25 @@ class TaskService {
         expectedQty: params.expectedQty,
         actualQty: params.actualQty,
       },
+    })
+
+    await syncService.addToQueue({
+      type: 'INVENTORY_RECORD',
+      payload: {
+        type: 'INVENTORY_RECORD',
+        data: {
+          id: record.id,
+          taskId,
+          productId,
+          expectedQty: params.expectedQty,
+          actualQty: params.actualQty,
+          difference: params.actualQty - params.expectedQty,
+          remark: params.remark,
+          isUpdate: !!existing,
+        }
+      },
+      userId,
+      maxRetries: 5,
     })
 
     return record

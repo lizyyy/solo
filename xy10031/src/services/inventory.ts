@@ -1,5 +1,6 @@
 import { db } from './database'
 import { logger } from './logger'
+import { syncService } from './sync'
 
 class InventoryService {
   async listProducts(params: {
@@ -79,6 +80,26 @@ class InventoryService {
       details: { sku: params.sku, name: params.name },
     })
 
+    await syncService.addToQueue({
+      type: 'PRODUCT_CREATE',
+      payload: {
+        type: 'PRODUCT_CREATE',
+        data: {
+          id: product.id,
+          sku: params.sku,
+          name: params.name,
+          category: params.category,
+          unit: params.unit,
+          description: params.description,
+          quantity: params.quantity,
+          minQuantity: params.minQuantity,
+          location: params.location,
+        }
+      },
+      userId: params.userId,
+      maxRetries: 5,
+    })
+
     return product
   }
 
@@ -103,6 +124,19 @@ class InventoryService {
       action: 'UPDATE',
       module: 'PRODUCT',
       details: { productId: id, ...data },
+    })
+
+    await syncService.addToQueue({
+      type: 'PRODUCT_UPDATE',
+      payload: {
+        type: 'PRODUCT_UPDATE',
+        data: {
+          id,
+          ...data,
+        }
+      },
+      userId,
+      maxRetries: 5,
     })
 
     return product
@@ -155,6 +189,23 @@ class InventoryService {
         newQuantity: params.quantity,
         changeReason,
       },
+    })
+
+    await syncService.addToQueue({
+      type: 'INVENTORY_UPDATE',
+      payload: {
+        type: 'INVENTORY_UPDATE',
+        data: {
+          productId,
+          oldQuantity,
+          newQuantity: params.quantity,
+          changeReason,
+          location: params.location,
+          minQuantity: params.minQuantity,
+        }
+      },
+      userId,
+      maxRetries: 5,
     })
 
     return inventory

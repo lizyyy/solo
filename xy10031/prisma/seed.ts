@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, TaskStatus } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import * as crypto from 'crypto'
 
 const prisma = new PrismaClient()
@@ -17,7 +17,7 @@ async function main() {
       username: 'admin',
       password: hashPassword('admin123'),
       name: '系统管理员',
-      role: UserRole.ADMIN,
+      role: 'ADMIN',
     },
   })
 
@@ -28,7 +28,7 @@ async function main() {
       username: 'checker1',
       password: hashPassword('checker123'),
       name: '张三',
-      role: UserRole.CHECKER,
+      role: 'CHECKER',
     },
   })
 
@@ -39,7 +39,7 @@ async function main() {
       username: 'checker2',
       password: hashPassword('checker123'),
       name: '李四',
-      role: UserRole.CHECKER,
+      role: 'CHECKER',
     },
   })
 
@@ -86,7 +86,7 @@ async function main() {
     data: {
       name: '1月第一周盘点任务',
       description: '电子产品区周度盘点',
-      status: TaskStatus.IN_PROGRESS,
+      status: 'IN_PROGRESS',
       assigneeId: checker1.id,
       startedAt: new Date(),
     },
@@ -96,7 +96,7 @@ async function main() {
     data: {
       name: '办公设备月度盘点',
       description: '办公设备区月度全面盘点',
-      status: TaskStatus.PENDING,
+      status: 'PENDING',
       assigneeId: checker2.id,
     },
   })
@@ -105,7 +105,7 @@ async function main() {
     data: {
       name: '已完成盘点任务示例',
       description: '历史盘点任务',
-      status: TaskStatus.APPROVED,
+      status: 'APPROVED',
       assigneeId: checker1.id,
       startedAt: new Date(Date.now() - 86400000 * 7),
       completedAt: new Date(Date.now() - 86400000 * 5),
@@ -136,8 +136,8 @@ async function main() {
       await prisma.taskHistory.create({
         data: {
           taskId: task3.id,
-          oldStatus: TaskStatus.PENDING,
-          newStatus: TaskStatus.IN_PROGRESS,
+          oldStatus: 'PENDING',
+          newStatus: 'IN_PROGRESS',
           remark: '任务开始',
           changedBy: admin.id,
           changedAt: new Date(Date.now() - 86400000 * 6),
@@ -176,7 +176,6 @@ async function main() {
         level: 'INFO',
       },
     ],
-    skipDuplicates: true,
   })
 
   console.log('创建审计日志完成')

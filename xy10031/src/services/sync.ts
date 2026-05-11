@@ -1,6 +1,7 @@
 import { db } from './database'
-import { SyncStatus } from '@prisma/client'
 import { logger } from './logger'
+
+export type SyncStatus = 'PENDING' | 'SYNCING' | 'SUCCESS' | 'FAILED'
 
 interface SyncPayload {
   type: string
@@ -23,7 +24,7 @@ class SyncService {
       data: {
         type,
         payload: JSON.stringify(payload),
-        status: SyncStatus.PENDING,
+        status: 'PENDING',
         retryCount: 0,
         maxRetries,
         userId,
@@ -35,9 +36,9 @@ class SyncService {
     return db.syncQueue.findMany({
       where: {
         OR: [
-          { status: SyncStatus.PENDING },
+          { status: 'PENDING' },
           {
-            status: SyncStatus.FAILED,
+            status: 'FAILED',
             retryCount: { lt: db.syncQueue.fields.maxRetries },
           },
         ],
@@ -61,7 +62,7 @@ class SyncService {
     if (item.retryCount >= item.maxRetries) {
       await db.syncQueue.update({
         where: { id: itemId },
-        data: { status: SyncStatus.FAILED },
+        data: { status: 'FAILED' },
       })
       return false
     }
@@ -70,7 +71,7 @@ class SyncService {
       await db.syncQueue.update({
         where: { id: itemId },
         data: {
-          status: SyncStatus.SYNCING,
+          status: 'SYNCING',
           lastAttempt: new Date(),
         },
       })
@@ -82,7 +83,7 @@ class SyncService {
         await db.syncQueue.update({
           where: { id: itemId },
           data: {
-            status: SyncStatus.SUCCESS,
+            status: 'SUCCESS',
             lastError: null,
           },
         })
@@ -105,7 +106,7 @@ class SyncService {
       await db.syncQueue.update({
         where: { id: itemId },
         data: {
-          status: willRetry ? SyncStatus.PENDING : SyncStatus.FAILED,
+          status: willRetry ? 'PENDING' : 'FAILED',
           retryCount: newRetryCount,
           lastError: err.message,
         },
@@ -145,7 +146,7 @@ class SyncService {
   async retryFailedItems() {
     const failedItems = await db.syncQueue.findMany({
       where: {
-        status: SyncStatus.FAILED,
+        status: 'FAILED',
         retryCount: { lt: db.syncQueue.fields.maxRetries },
       },
     })
@@ -153,7 +154,7 @@ class SyncService {
     for (const item of failedItems) {
       await db.syncQueue.update({
         where: { id: item.id },
-        data: { status: SyncStatus.PENDING, lastError: null },
+        data: { status: 'PENDING', lastError: null },
       })
     }
 
@@ -164,7 +165,7 @@ class SyncService {
     return db.syncQueue.update({
       where: { id: itemId },
       data: {
-        status: SyncStatus.PENDING,
+        status: 'PENDING',
         retryCount: 0,
         lastError: null,
       },
@@ -173,17 +174,17 @@ class SyncService {
 
   async getStatistics() {
     const [pending, syncing, success, failed] = await Promise.all([
-      db.syncQueue.count({ where: { status: SyncStatus.PENDING } }),
-      db.syncQueue.count({ where: { status: SyncStatus.SYNCING } }),
-      db.syncQueue.count({ where: { status: SyncStatus.SUCCESS } }),
-      db.syncQueue.count({ where: { status: SyncStatus.FAILED } }),
+      db.syncQueue.count({ where: { status: 'PENDING' } }),
+      db.syncQueue.count({ where: { status: 'SYNCING' } }),
+      db.syncQueue.count({ where: { status: 'SUCCESS' } }),
+      db.syncQueue.count({ where: { status: 'FAILED' } }),
     ])
 
     return { pending, syncing, success, failed }
   }
 
   async listQueueItems(params: {
-    status?: SyncStatus
+    status?: string
     type?: string
     skip?: number
     take?: number

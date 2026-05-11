@@ -7,40 +7,12 @@ datasource db {
   url      = "file:./warehouse.db"
 }
 
-enum UserRole {
-  ADMIN
-  CHECKER
-}
-
-enum TaskStatus {
-  PENDING
-  IN_PROGRESS
-  PENDING_APPROVAL
-  APPROVED
-  REJECTED
-  CANCELLED
-}
-
-enum SyncStatus {
-  PENDING
-  SYNCING
-  SUCCESS
-  FAILED
-}
-
-enum LogLevel {
-  INFO
-  WARN
-  ERROR
-  DEBUG
-}
-
 model User {
   id        String   @id @default(uuid())
   username  String   @unique
   password  String
   name      String
-  role      UserRole @default(CHECKER)
+  role      String   @default("CHECKER")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -78,15 +50,15 @@ model Inventory {
 }
 
 model InventoryTask {
-  id          String     @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-  status      TaskStatus @default(PENDING)
+  status      String   @default("PENDING")
   assigneeId  String?
   startedAt   DateTime?
   completedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   assignee User?             @relation(fields: [assigneeId], references: [id])
   records  InventoryRecord[]
@@ -94,10 +66,10 @@ model InventoryTask {
 }
 
 model InventoryRecord {
-  id        String   @id @default(uuid())
-  taskId    String
-  productId String
-  userId    String
+  id          String   @id @default(uuid())
+  taskId      String
+  productId   String
+  userId      String
   expectedQty Int
   actualQty   Int
   difference  Int
@@ -110,17 +82,17 @@ model InventoryRecord {
 }
 
 model SyncQueue {
-  id          String     @id @default(uuid())
+  id          String   @id @default(uuid())
   type        String
   payload     String
-  status      SyncStatus @default(PENDING)
-  retryCount  Int        @default(0)
-  maxRetries  Int        @default(5)
+  status      String   @default("PENDING")
+  retryCount  Int      @default(0)
+  maxRetries  Int      @default(5)
   lastError   String?
   lastAttempt DateTime?
   userId      String
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -140,8 +112,8 @@ model InventoryHistory {
 model TaskHistory {
   id        String   @id @default(uuid())
   taskId    String
-  oldStatus TaskStatus?
-  newStatus TaskStatus
+  oldStatus String?
+  newStatus String
   remark    String?
   changedBy String
   changedAt DateTime @default(now())
@@ -155,7 +127,7 @@ model AuditLog {
   action    String
   module    String
   details   String
-  level     LogLevel @default(INFO)
+  level     String   @default("INFO")
   ipAddress String?
   createdAt DateTime @default(now())
 
