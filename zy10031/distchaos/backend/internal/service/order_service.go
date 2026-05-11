@@ -52,11 +52,13 @@ type ChaosState struct {
 	CacheOriginalData map[string]interface{}
 	CacheDirtyData    map[string]interface{}
 
-	OriginalConfigs  map[string]interface{}
-	DriftedConfigs   map[string]interface{}
+	OriginalConfigs map[string]interface{}
+	DriftedConfigs  map[string]interface{}
 
 	LeakedGoroutines   int32
 	StopGoroutineChans []chan struct{}
+
+	BacklogQueue chan interface{}
 }
 
 func NewChaosState() *ChaosState {
@@ -69,6 +71,7 @@ func NewChaosState() *ChaosState {
 		OriginalConfigs:     make(map[string]interface{}),
 		DriftedConfigs:      make(map[string]interface{}),
 		StopGoroutineChans:  make([]chan struct{}, 0),
+		BacklogQueue:        make(chan interface{}, 10000),
 	}
 }
 
@@ -102,6 +105,50 @@ func (c *ChaosState) IncrementCompensationFailCount() int {
 	defer c.Mu.Unlock()
 	c.CompensationFailCount++
 	return c.CompensationFailCount
+}
+
+func (c *ChaosState) IsConnectionPoolBroken() bool {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	return c.ConnectionPoolBroken
+}
+
+func (c *ChaosState) IsDBLockWaiting() bool {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	return c.DBLockWaiting
+}
+
+func (c *ChaosState) IsCacheDirty() bool {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	return c.CacheDirty
+}
+
+func (c *ChaosState) IsMessageBacklogActive() bool {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	return c.MessageBacklogActive
+}
+
+func (c *ChaosState) IsConfigDrifted() bool {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	return c.ConfigDrifted
+}
+
+func (c *ChaosState) GetDirtyCache(key string) (interface{}, bool) {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	val, ok := c.CacheDirtyData[key]
+	return val, ok
+}
+
+func (c *ChaosState) GetDriftedConfig(key string) (interface{}, bool) {
+	c.Mu.RLock()
+	defer c.Mu.RUnlock()
+	val, ok := c.DriftedConfigs[key]
+	return val, ok
 }
 
 type OrderService struct {
@@ -166,7 +213,7 @@ func (s *OrderService) GetChaosState() *ChaosState {
 
 type CreateOrderRequestExtended struct {
 	domain.CreateOrderRequest
-	FailurePoint        FailurePoint             `json:"failure_point"`
+	FailurePoint        FailurePoint            `json:"failure_point"`
 	CompensationFailure CompensationFailureMode `json:"compensation_failure"`
 }
 
@@ -211,9 +258,45 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *CreateOrderRequestE
 	}, nil
 }
 
+func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, phase string) error {
+	if s.chaosState.IsConnectionPoolBroken() {
+		s.recordChaosEvent(ctx, traceID, "connection_pool_injection", "连接池耗尽，无法获取数据库连接")
+		return errors.New("connection pool exhausted: no available connections")
+	}
+
+	if s.chaosState.IsDBLockWaiting() {
+		s.recordChaosEvent(ctx, traceID, "db_lock_injection", "数据库锁等待注入中")
+		time.Sleep(5 * time.Second)
+	}
+
+	return nil
+}
+
+func (s *OrderService) recordChaosEvent(ctx context.Context, traceID string, eventType string, description string) {
+	evt := event.Event{
+		ID:            uuid.New().String(),
+		TraceID:       traceID,
+		CorrelationID: traceID,
+		Type:          event.EventType(eventType),
+		Status:        event.EventStatusFailed,
+		Service:       "chaos-engine",
+		Payload: map[string]interface{}{
+			"phase":       eventType,
+			"description": description,
+			"impact":      "业务操作被混沌故障阻断",
+			"timestamp":   time.Now().Format(time.RFC3339),
+		},
+	}
+	s.eventManager.Record(ctx, evt)
+}
+
 func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.TransactionContext, req *domain.CreateOrderRequest) (*domain.Order, error) {
 	traceID := txCtx.TraceID
 	failurePoint := s.chaosState.GetOrderFailurePoint()
+
+	if err := s.checkChaosInjection(ctx, traceID, "before_reserve"); err != nil {
+		return nil, err
+	}
 
 	step1 := event.Event{
 		ID:            uuid.New().String(),
@@ -276,44 +359,6 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	}
 	s.eventManager.Record(ctx, inventoryReservedEvt)
 
-	if failurePoint == FailurePointAfterReserve {
-		failEvt := event.Event{
-			ID:            uuid.New().String(),
-			TraceID:       traceID,
-			CorrelationID: txCtx.CorrelationID,
-			PreviousID:    inventoryReservedEvt.ID,
-			Type:          event.EventTypeOrderFailed,
-			Status:        event.EventStatusFailed,
-			Service:       "chaos-engine",
-			Payload: map[string]interface{}{
-				"reason":      "simulated_failure_after_inventory_reserve",
-				"description": "库存已扣减，但订单流程在此时被人为中断",
-				"impact":      "库存已锁定，但订单未创建，需要补偿",
-				"inventory_state": map[string]interface{}{
-					"available": availableAfter,
-					"reserved":  reservedAfter,
-				},
-			},
-		}
-		s.eventManager.Record(ctx, failEvt)
-
-		fakeOrder := &domain.Order{
-			OrderNo:   fmt.Sprintf("ORD-%d", time.Now().UnixNano()),
-			UserID:    req.UserID,
-			ProductID: req.ProductID,
-			Quantity:  req.Quantity,
-			Amount:    float64(req.Quantity) * 100.0,
-			Status:    domain.OrderStatusFailed,
-			LastError: "simulated failure after inventory reserve",
-		}
-
-		s.triggerCompensation(ctx, txCtx, fakeOrder, "failure_after_inventory_reserve")
-
-		s.chaosState.SetOrderFailurePoint(FailurePointNone)
-
-		return nil, errors.New("simulated failure: inventory deducted but order creation aborted")
-	}
-
 	orderNo := fmt.Sprintf("ORD-%d", time.Now().UnixNano())
 	order := &domain.Order{
 		OrderNo:   orderNo,
@@ -341,6 +386,52 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	}
 	s.eventManager.Record(ctx, step2)
 
+	if err := s.checkChaosInjection(ctx, traceID, "before_order_creation"); err != nil {
+		order.Status = domain.OrderStatusFailed
+		order.LastError = "chaos_injection_failed_during_order_creation"
+		s.orderRepo.Create(ctx, order)
+		s.triggerCompensation(ctx, txCtx, order, "chaos_injection_failed")
+		return nil, err
+	}
+
+	if failurePoint == FailurePointAfterReserve {
+		if err := s.orderRepo.Create(ctx, order); err != nil {
+			s.inventoryRepo.Release(ctx, req.ProductID, req.Quantity)
+			return nil, fmt.Errorf("failed to create order: %w", err)
+		}
+
+		failEvt := event.Event{
+			ID:            uuid.New().String(),
+			TraceID:       traceID,
+			CorrelationID: txCtx.CorrelationID,
+			PreviousID:    inventoryReservedEvt.ID,
+			Type:          event.EventTypeOrderFailed,
+			Status:        event.EventStatusFailed,
+			Service:       "chaos-engine",
+			Payload: map[string]interface{}{
+				"reason":      "simulated_failure_after_inventory_reserve",
+				"description": "库存已扣减，订单已创建，但订单流程在此时被人为中断",
+				"impact":      "库存已锁定，订单已创建但标记失败，需要补偿",
+				"order_id":    order.ID,
+				"inventory_state": map[string]interface{}{
+					"available": availableAfter,
+					"reserved":  reservedAfter,
+				},
+			},
+		}
+		s.eventManager.Record(ctx, failEvt)
+
+		order.Status = domain.OrderStatusFailed
+		order.LastError = "simulated failure after inventory reserve"
+		s.orderRepo.Update(ctx, order)
+
+		s.triggerCompensation(ctx, txCtx, order, "failure_after_inventory_reserve")
+
+		s.chaosState.SetOrderFailurePoint(FailurePointNone)
+
+		return nil, errors.New("simulated failure: inventory deducted, order created but aborted")
+	}
+
 	if failurePoint == FailurePointOrderCreation {
 		step2.Status = event.EventStatusFailed
 		step2.Error = "simulated order creation failure"
@@ -348,6 +439,15 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		step2.Payload["phase"] = "failed"
 		step2.Payload["reason"] = "chaos_injection_order_creation"
 		s.eventManager.Record(ctx, step2)
+
+		if err := s.orderRepo.Create(ctx, order); err != nil {
+			s.inventoryRepo.Release(ctx, req.ProductID, req.Quantity)
+			return nil, fmt.Errorf("failed to create order: %w", err)
+		}
+
+		order.Status = domain.OrderStatusFailed
+		order.LastError = "simulated order creation failure"
+		s.orderRepo.Update(ctx, order)
 
 		s.triggerCompensation(ctx, txCtx, order, "simulated_order_creation_failure")
 		s.chaosState.SetOrderFailurePoint(FailurePointNone)
@@ -361,7 +461,7 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		step2.Duration = time.Since(txCtx.StartTime)
 		s.eventManager.Record(ctx, step2)
 
-		s.triggerCompensation(ctx, txCtx, order, "order_creation_failed")
+		s.inventoryRepo.Release(ctx, req.ProductID, req.Quantity)
 		return nil, fmt.Errorf("failed to create order: %w", err)
 	}
 
@@ -398,6 +498,14 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		},
 	}
 	s.eventManager.Record(ctx, step3)
+
+	if err := s.checkChaosInjection(ctx, traceID, "before_payment"); err != nil {
+		order.Status = domain.OrderStatusFailed
+		order.LastError = "chaos_injection_failed_during_payment"
+		s.orderRepo.Update(ctx, order)
+		s.triggerCompensation(ctx, txCtx, order, "chaos_injection_payment")
+		return nil, err
+	}
 
 	if failurePoint == FailurePointPayment {
 		step3.Status = event.EventStatusFailed
@@ -772,12 +880,42 @@ func (s *OrderService) executeCompensation(ctx context.Context, txCtx *domain.Tr
 }
 
 func (s *OrderService) compensatePayment(ctx context.Context, order *domain.Order) error {
+	if order.PaymentID == 0 {
+		evt := event.Event{
+			ID:            uuid.New().String(),
+			TraceID:       order.OrderNo,
+			CorrelationID: order.OrderNo,
+			Type:          "compensation_step_skipped",
+			Status:        event.EventStatusSuccess,
+			Service:       "compensation-service",
+			Payload: map[string]interface{}{
+				"step":        "refund_payment",
+				"reason":      "no_payment_record",
+				"description": "订单没有支付记录，跳过退款步骤",
+			},
+		}
+		s.eventManager.Record(ctx, evt)
+		return nil
+	}
+
 	payment, err := s.paymentRepo.GetByOrderID(ctx, order.ID)
 	if err != nil {
-		if order.PaymentID == 0 {
-			return nil
+		evt := event.Event{
+			ID:            uuid.New().String(),
+			TraceID:       order.OrderNo,
+			CorrelationID: order.OrderNo,
+			Type:          "compensation_step_skipped",
+			Status:        event.EventStatusSuccess,
+			Service:       "compensation-service",
+			Payload: map[string]interface{}{
+				"step":        "refund_payment",
+				"reason":      "payment_not_found",
+				"description": "支付记录不存在，跳过退款步骤",
+				"error":       err.Error(),
+			},
 		}
-		return fmt.Errorf("failed to get payment: %w", err)
+		s.eventManager.Record(ctx, evt)
+		return nil
 	}
 
 	if payment.Status == domain.PaymentStatusSuccess {
@@ -818,7 +956,13 @@ func (s *OrderService) ReplayEvents(ctx context.Context, traceID string) error {
 		return err
 	}
 
-	for _, evt := range events {
+	if len(events) == 0 {
+		return errors.New("no events found for replay")
+	}
+
+	replayStartTime := time.Now()
+
+	for i, evt := range events {
 		replayEvt := event.Event{
 			ID:            uuid.New().String(),
 			TraceID:       fmt.Sprintf("replay-%s", traceID),
@@ -833,23 +977,210 @@ func (s *OrderService) ReplayEvents(ctx context.Context, traceID string) error {
 				"original_payload":  evt.Payload,
 				"replay_mode":       true,
 				"replay_phase":      "replaying",
+				"replay_sequence":   i + 1,
+				"total_events":      len(events),
 			},
 		}
+		s.eventManager.Record(ctx, replayEvt)
 
-		if err := s.eventManager.Record(ctx, replayEvt); err != nil {
-			return err
+		if err := s.replaySingleEvent(ctx, evt, replayEvt.TraceID); err != nil {
+			replayEvt.Status = event.EventStatusFailed
+			replayEvt.Error = err.Error()
+			replayEvt.Payload["replay_phase"] = "failed"
+			s.eventManager.Record(ctx, replayEvt)
+			return fmt.Errorf("replay failed at event %d: %w", i+1, err)
 		}
-
-		time.Sleep(200 * time.Millisecond)
 
 		replayEvt.Status = event.EventStatusSuccess
 		replayEvt.Payload["replay_phase"] = "completed"
 		s.eventManager.Record(ctx, replayEvt)
 
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(300 * time.Millisecond)
+	}
+
+	completeEvt := event.Event{
+		ID:            uuid.New().String(),
+		TraceID:       fmt.Sprintf("replay-%s", traceID),
+		CorrelationID: events[0].CorrelationID,
+		Type:          "replay_complete",
+		Status:        event.EventStatusSuccess,
+		Service:       "replay-service",
+		Payload: map[string]interface{}{
+			"original_trace_id": traceID,
+			"total_replayed":    len(events),
+			"replay_duration_ms": time.Since(replayStartTime).Milliseconds(),
+			"status":            "completed",
+			"message":           "事件回放完成，系统状态已按事件序列恢复",
+		},
+	}
+	s.eventManager.Record(ctx, completeEvt)
+
+	return nil
+}
+
+func (s *OrderService) replaySingleEvent(ctx context.Context, evt event.Event, replayTraceID string) error {
+	payload := evt.Payload
+	if payload == nil {
+		return nil
+	}
+
+	switch evt.Type {
+	case event.EventTypeInventoryReserved:
+		if evt.Status == event.EventStatusSuccess && payload["status"] == "inventory_deducted" {
+			productID, _ := payload["product_id"].(float64)
+			quantity, _ := payload["quantity"].(float64)
+			if productID > 0 && quantity > 0 {
+				err := s.inventoryRepo.Reserve(ctx, int64(productID), int(quantity))
+				if err != nil {
+					return fmt.Errorf("replay reserve inventory failed: %w", err)
+				}
+				s.recordReplayEvent(ctx, replayTraceID, "inventory_reserved_replayed", map[string]interface{}{
+					"product_id": productID,
+					"quantity":   quantity,
+					"action":     "replay_reserve",
+				})
+			}
+		}
+
+	case event.EventTypeInventoryReleased:
+		if evt.Status == event.EventStatusSuccess {
+			productID, _ := payload["product_id"].(float64)
+			quantity, _ := payload["quantity"].(float64)
+			if productID > 0 && quantity > 0 {
+				err := s.inventoryRepo.Release(ctx, int64(productID), int(quantity))
+				if err != nil {
+					return fmt.Errorf("replay release inventory failed: %w", err)
+				}
+				s.recordReplayEvent(ctx, replayTraceID, "inventory_released_replayed", map[string]interface{}{
+					"product_id": productID,
+					"quantity":   quantity,
+					"action":     "replay_release",
+				})
+			}
+		}
+
+	case event.EventTypeOrderCreated:
+		if evt.Status == event.EventStatusSuccess {
+			orderNo, _ := payload["order_no"].(string)
+			userID, _ := payload["user_id"].(float64)
+			productID, _ := payload["product_id"].(float64)
+			quantity, _ := payload["quantity"].(float64)
+			amount, _ := payload["amount"].(float64)
+
+			if orderNo != "" {
+				existing, _ := s.orderRepo.GetByOrderNo(ctx, orderNo)
+				if existing == nil {
+					order := &domain.Order{
+						OrderNo:   orderNo,
+						UserID:    int64(userID),
+						ProductID: int64(productID),
+						Quantity:  int(quantity),
+						Amount:    amount,
+						Status:    domain.OrderStatusPending,
+					}
+					err := s.orderRepo.Create(ctx, order)
+					if err != nil {
+						return fmt.Errorf("replay create order failed: %w", err)
+					}
+					s.recordReplayEvent(ctx, replayTraceID, "order_created_replayed", map[string]interface{}{
+						"order_no": orderNo,
+						"order_id": order.ID,
+						"action":   "replay_create_order",
+					})
+				}
+			}
+		}
+
+	case event.EventTypePaymentSucceeded:
+		if evt.Status == event.EventStatusSuccess {
+			orderID, _ := payload["order_id"].(float64)
+			amount, _ := payload["amount"].(float64)
+			if orderID > 0 {
+				existing, _ := s.paymentRepo.GetByOrderID(ctx, int64(orderID))
+				if existing == nil {
+					payment := &domain.Payment{
+						OrderID:       int64(orderID),
+						Amount:        amount,
+						Status:        domain.PaymentStatusSuccess,
+						TransactionNo: "replay-" + uuid.New().String(),
+					}
+					err := s.paymentRepo.Create(ctx, payment)
+					if err != nil {
+						return fmt.Errorf("replay payment failed: %w", err)
+					}
+
+					order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+					if order != nil {
+						order.PaymentID = payment.ID
+						order.Status = domain.OrderStatusPaid
+						s.orderRepo.Update(ctx, order)
+					}
+
+					s.recordReplayEvent(ctx, replayTraceID, "payment_replayed", map[string]interface{}{
+						"order_id":   orderID,
+						"payment_id": payment.ID,
+						"action":     "replay_payment",
+					})
+				}
+			}
+		}
+
+	case event.EventTypeOrderFailed:
+		if evt.Status == event.EventStatusFailed {
+			orderID, _ := payload["order_id"].(float64)
+			if orderID > 0 {
+				order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+				if order != nil {
+					order.Status = domain.OrderStatusFailed
+					err, _ := payload["error"].(string)
+					if err == "" {
+						err = "replay_failed"
+					}
+					order.LastError = err
+					s.orderRepo.Update(ctx, order)
+					s.recordReplayEvent(ctx, replayTraceID, "order_failed_replayed", map[string]interface{}{
+						"order_id": orderID,
+						"action":   "replay_failed_order",
+					})
+				}
+			}
+		}
+
+	case event.EventTypeCompensationStart:
+		orderID, _ := payload["order_id"].(float64)
+		if orderID > 0 {
+			order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+			if order != nil {
+				order.Status = domain.OrderStatusCompensating
+				s.orderRepo.Update(ctx, order)
+			}
+		}
+
+	case event.EventTypeCompensationSuccess:
+		orderID, _ := payload["order_id"].(float64)
+		if orderID > 0 {
+			order, _ := s.orderRepo.GetByID(ctx, int64(orderID))
+			if order != nil {
+				order.Status = domain.OrderStatusCancelled
+				s.orderRepo.Update(ctx, order)
+			}
+		}
 	}
 
 	return nil
+}
+
+func (s *OrderService) recordReplayEvent(ctx context.Context, replayTraceID string, eventType string, data map[string]interface{}) {
+	evt := event.Event{
+		ID:            uuid.New().String(),
+		TraceID:       replayTraceID,
+		CorrelationID: replayTraceID,
+		Type:          event.EventType(eventType),
+		Status:        event.EventStatusSuccess,
+		Service:       "replay-service",
+		Payload:       data,
+	}
+	s.eventManager.Record(ctx, evt)
 }
 
 func (s *OrderService) GetFullStatus() map[string]interface{} {
@@ -884,7 +1215,8 @@ func (s *OrderService) GetFullStatus() map[string]interface{} {
 			"drifted_count":  len(s.chaosState.DriftedConfigs),
 		},
 		"message_backlog": map[string]interface{}{
-			"active": s.chaosState.MessageBacklogActive,
+			"active":   s.chaosState.MessageBacklogActive,
+			"queue_len": len(s.chaosState.BacklogQueue),
 		},
 	}
 }

@@ -16,7 +16,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"distchaos/internal/cache"
 	"distchaos/internal/chaos"
+	"distchaos/internal/config"
 	"distchaos/internal/domain"
 	"distchaos/internal/event"
 	"distchaos/internal/repository"
@@ -31,6 +33,8 @@ type App struct {
 	inventoryRepo *repository.MemoryInventoryRepo
 	orderRepo     *repository.MemoryOrderRepo
 	paymentRepo   *repository.MemoryPaymentRepo
+	cacheService  *cache.CacheService
+	configService *config.ConfigService
 
 	snapshots  map[string]*SystemSnapshot
 	snapshotMu sync.RWMutex
@@ -55,6 +59,11 @@ func main() {
 	paymentRepo := repository.NewMemoryPaymentRepo()
 	compensationRepo := repository.NewMemoryCompensationRepo()
 
+	cacheService := cache.NewCacheService(chaosState)
+	configService := config.NewConfigService(chaosState)
+
+	cacheService.SetProductCache(1, 100.0, 100)
+
 	orderService := service.NewOrderService(
 		baseInventoryRepo,
 		orderRepo,
@@ -72,6 +81,8 @@ func main() {
 		inventoryRepo: baseInventoryRepo,
 		orderRepo:     orderRepo,
 		paymentRepo:   paymentRepo,
+		cacheService:  cacheService,
+		configService: configService,
 		snapshots:     make(map[string]*SystemSnapshot),
 	}
 
@@ -109,6 +120,8 @@ func main() {
 	api.GET("/orders", app.listOrders)
 	api.GET("/status", app.getSystemStatus)
 	api.GET("/sse/events", app.sseEvents)
+	api.GET("/cache", app.getCacheStatus)
+	api.GET("/config", app.getConfigStatus)
 
 	log.Println("DistChaos server starting on :8080")
 	if err := r.Run(":8080"); err != nil {
@@ -786,6 +799,24 @@ func (a *App) getChaosStatus(c *gin.Context) {
 		"message_backlog_active": a.chaosMgr.MessageBacklogActive,
 	}
 	c.JSON(http.StatusOK, status)
+}
+
+func (a *App) getCacheStatus(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"is_dirty":        a.chaosMgr.CacheDirty,
+		"dirty_keys":      len(a.chaosMgr.CacheDirtyData),
+		"original_keys":   len(a.chaosMgr.CacheOriginalData),
+		"effective_cache": a.cacheService.GetAll(),
+	})
+}
+
+func (a *App) getConfigStatus(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"is_drifted":       a.chaosMgr.ConfigDrifted,
+		"drifted_keys":     len(a.chaosMgr.DriftedConfigs),
+		"original_keys":    len(a.chaosMgr.OriginalConfigs),
+		"effective_config": a.configService.GetAll(),
+	})
 }
 
 func (a *App) createSnapshot(c *gin.Context) {
