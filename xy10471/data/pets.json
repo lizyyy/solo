@@ -1,0 +1,31 @@
+[
+  {
+    "id": 1,
+    "name": "小橘",
+    "species": "猫",
+    "age": "3岁",
+    "owner_name": "张三",
+    "owner_phone": "13800138001",
+    "check_in": "2026-05-01 09:00:00",
+    "check_out": "2026-05-07 18:00:00",
+    "medical_conditions": null,
+    "notes": "正常健康猫咪，性格温顺",
+    "active": true,
+    "created_at": "2026-05-11 22:28:31"
+  },
+  {
+    "id": 2,
+    "name": "旺财",
+    "species": "狗",
+    "age": "5岁",
+    "owner_name": "李四",
+    "owner_phone": "13900139002",
+    "check_in": "2026-05-01 10:00:00",
+    "check_out": "2026-05-05 17:00:00",
+    "medical_conditions": "心脏病，需要每日服药",
+    "notes": "有心脏病史，需密切观察精神状态",
+    "active": false,
+    "created_at": "2026-05-11 22:28:31",
+    "actual_check_out": "2026-05-11 22:38:51"
+  }
+]

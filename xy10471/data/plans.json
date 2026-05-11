@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "pet_id": 1,
+    "type": "feeding",
+    "name": "幼猫猫粮",
+    "dosage": "50g",
+    "frequency": "每日2次（早晚各一次）",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-07",
+    "notes": "温水泡软后喂食",
+    "created_at": "2026-05-11 22:28:31"
+  },
+  {
+    "id": 2,
+    "pet_id": 2,
+    "type": "medication",
+    "name": "心脏病药物A",
+    "dosage": "1片",
+    "frequency": "每日1次",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-05",
+    "notes": "饭后服用",
+    "created_at": "2026-05-11 22:28:31"
+  },
+  {
+    "id": 3,
+    "pet_id": 2,
+    "type": "medication",
+    "name": "心脏病药物B",
+    "dosage": "半片",
+    "frequency": "每日2次",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-05",
+    "notes": "早晚各一次",
+    "created_at": "2026-05-11 22:28:31"
+  },
+  {
+    "id": 4,
+    "pet_id": 2,
+    "type": "feeding",
+    "name": "处方狗粮",
+    "dosage": "100g",
+    "frequency": "每日3次",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-05",
+    "notes": "少量多餐",
+    "created_at": "2026-05-11 22:28:31"
+  }
+]
