@@ -6,30 +6,31 @@
     "discount_policies.json": "ccdc1a5522f0af87cc164f005759b41f"
   },
   "processed_add_ons": [
-    "ADD009",
-    "ADD004",
-    "ADD002",
-    "ADD005",
-    "ADD008",
-    "ADD007",
     "ADD006",
+    "ADD009",
+    "ADD005",
     "ADD001",
-    "ADD003"
+    "ADD004",
+    "ADD008",
+    "ADD003",
+    "ADD007",
+    "ADD002"
   ],
   "processed_payments": [
-    "PAY009",
-    "PAY007",
-    "PAY003",
-    "PAY001",
-    "PAY008",
     "PAY005",
-    "PAY004",
+    "PAY001",
+    "PAY007",
+    "PAY002",
+    "PAY009_NEW1",
     "PAY006",
-    "PAY002"
+    "PAY008",
+    "PAY004",
+    "PAY009_NEW2",
+    "PAY003"
   ],
   "processed_refunds": [
-    "REF001",
-    "REF002"
+    "REF002",
+    "REF001"
   ],
   "group_checkups": [
     {
@@ -351,14 +352,25 @@
       "status": "completed"
     },
     {
-      "payment_id": "PAY009",
+      "payment_id": "PAY009_NEW1",
       "employee_id": "E008",
       "add_on_id": "ADD009",
       "item_code": "ITEM002",
-      "amount": 72.0,
-      "payment_method": "现金",
-      "operator": "收银员C",
+      "amount": 36.0,
+      "payment_method": "微信",
+      "operator": "收银员A",
       "timestamp": "2024-03-15 11:20:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY009_NEW2",
+      "employee_id": "E008",
+      "add_on_id": "ADD009",
+      "item_code": "ITEM002",
+      "amount": 36.0,
+      "payment_method": "现金",
+      "operator": "收银员B",
+      "timestamp": "2024-03-15 11:21:00",
       "status": "completed"
     }
   ],

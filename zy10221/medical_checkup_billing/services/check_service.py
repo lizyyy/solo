@@ -123,7 +123,11 @@ class BillingChecker:
                 issue_desc = "📋 待收费 - 已有加项记录但无收费流水"
             
             else:
-                if total_refund > 0:
+                if len(payments) > 1:
+                    status = "issue"
+                    issue_type = "DUPLICATE_PAYMENT"
+                    issue_desc = f"⚠️ 重复收费 - 同一加项有 {len(payments)} 笔收费记录（合计 ¥{total_paid:.2f}）"
+                elif total_refund > 0:
                     if abs(net_paid) < 0.01:
                         status = "normal"
                         issue_type = None
@@ -141,11 +145,6 @@ class BillingChecker:
                         status = "issue"
                         issue_type = "AMOUNT_MISMATCH"
                         issue_desc = f"⚠️ 金额不符 - 应收 {expected_amount:.2f} 元，实收 {total_paid:.2f} 元"
-                
-                if len(payments) > 1 and status != "normal":
-                    status = "issue"
-                    issue_type = "DUPLICATE_PAYMENT"
-                    issue_desc = f"⚠️ 重复收费 - 同一加项有 {len(payments)} 笔收费记录"
 
             result = CheckResult(
                 employee_id=employee.employee_id,
