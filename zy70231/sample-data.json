@@ -1,0 +1,240 @@
+{
+  "workZones": [
+    {
+      "id": "wz-001",
+      "name": "京广线郑州工区",
+      "responsiblePerson": "张工"
+    },
+    {
+      "id": "wz-002",
+      "name": "京广线许昌工区",
+      "responsiblePerson": "李工"
+    },
+    {
+      "id": "wz-003",
+      "name": "陇海线开封工区",
+      "responsiblePerson": "王工"
+    }
+  ],
+  "blockSections": [
+    {
+      "id": "bs-001",
+      "line": "京广线",
+      "startStation": "郑州",
+      "endStation": "新郑",
+      "direction": "up"
+    },
+    {
+      "id": "bs-002",
+      "line": "京广线",
+      "startStation": "郑州",
+      "endStation": "新郑",
+      "direction": "down"
+    },
+    {
+      "id": "bs-003",
+      "line": "京广线",
+      "startStation": "新郑",
+      "endStation": "许昌",
+      "direction": "up"
+    },
+    {
+      "id": "bs-004",
+      "line": "京广线",
+      "startStation": "新郑",
+      "endStation": "许昌",
+      "direction": "down"
+    },
+    {
+      "id": "bs-005",
+      "line": "陇海线",
+      "startStation": "开封",
+      "endStation": "商丘",
+      "direction": "up"
+    }
+  ],
+  "resources": [
+    {
+      "id": "res-p001",
+      "name": "线路工-甲组",
+      "type": "people",
+      "quantity": 8,
+      "workZoneId": "wz-001"
+    },
+    {
+      "id": "res-p002",
+      "name": "线路工-乙组",
+      "type": "people",
+      "quantity": 6,
+      "workZoneId": "wz-001"
+    },
+    {
+      "id": "res-p003",
+      "name": "电务作业组",
+      "type": "people",
+      "quantity": 4,
+      "workZoneId": "wz-002"
+    },
+    {
+      "id": "res-p004",
+      "name": "接触网作业组",
+      "type": "people",
+      "quantity": 5,
+      "workZoneId": "wz-003"
+    },
+    {
+      "id": "res-m001",
+      "name": "捣固车",
+      "type": "machine",
+      "quantity": 1,
+      "workZoneId": "wz-001"
+    },
+    {
+      "id": "res-m002",
+      "name": "钢轨打磨车",
+      "type": "machine",
+      "quantity": 1,
+      "workZoneId": "wz-002"
+    },
+    {
+      "id": "res-m003",
+      "name": "接触网作业车",
+      "type": "machine",
+      "quantity": 2,
+      "workZoneId": "wz-003"
+    },
+    {
+      "id": "res-mat001",
+      "name": "60kg/m钢轨",
+      "type": "material",
+      "quantity": 50,
+      "workZoneId": "wz-001"
+    },
+    {
+      "id": "res-mat002",
+      "name": "道岔配件",
+      "type": "material",
+      "quantity": 100,
+      "workZoneId": "wz-002"
+    }
+  ],
+  "maintenanceWindows": [
+    {
+      "id": "win-20260512-01",
+      "date": "2026-05-12",
+      "windowType": "night",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "blockSections": ["bs-001", "bs-002"],
+      "priority": 1
+    },
+    {
+      "id": "win-20260512-02",
+      "date": "2026-05-12",
+      "windowType": "day",
+      "time": {
+        "start": "10:00",
+        "end": "12:00"
+      },
+      "blockSections": ["bs-003", "bs-004"],
+      "priority": 2
+    },
+    {
+      "id": "win-20260513-01",
+      "date": "2026-05-13",
+      "windowType": "night",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "blockSections": ["bs-001", "bs-002", "bs-003", "bs-004"],
+      "priority": 1
+    },
+    {
+      "id": "win-20260513-02",
+      "date": "2026-05-13",
+      "windowType": "night",
+      "time": {
+        "start": "01:00",
+        "end": "05:00"
+      },
+      "blockSections": ["bs-005"],
+      "priority": 1
+    }
+  ],
+  "workTasks": [
+    {
+      "id": "task-001",
+      "workZoneId": "wz-001",
+      "title": "郑州-新郑上行线路捣固",
+      "description": "K600-K620公里线路捣固作业",
+      "requiredResources": [
+        { "resourceId": "res-p001", "quantity": 4 },
+        { "resourceId": "res-m001", "quantity": 1 }
+      ],
+      "requiredBlockSections": ["bs-001"],
+      "estimatedDuration": 120
+    },
+    {
+      "id": "task-002",
+      "workZoneId": "wz-001",
+      "title": "郑州-新郑下行线路检查",
+      "description": "K600-K620公里线路综合检查",
+      "requiredResources": [
+        { "resourceId": "res-p002", "quantity": 3 }
+      ],
+      "requiredBlockSections": ["bs-002"],
+      "estimatedDuration": 60
+    },
+    {
+      "id": "task-003",
+      "workZoneId": "wz-002",
+      "title": "新郑-许昌道岔检修",
+      "description": "新郑站3号道岔检修更换",
+      "requiredResources": [
+        { "resourceId": "res-p003", "quantity": 4 },
+        { "resourceId": "res-mat002", "quantity": 20 }
+      ],
+      "requiredBlockSections": ["bs-003", "bs-004"],
+      "estimatedDuration": 90
+    },
+    {
+      "id": "task-004",
+      "workZoneId": "wz-001",
+      "title": "钢轨打磨作业",
+      "description": "郑州-新郑区间钢轨打磨",
+      "requiredResources": [
+        { "resourceId": "res-p001", "quantity": 2 },
+        { "resourceId": "res-m002", "quantity": 1 }
+      ],
+      "requiredBlockSections": ["bs-001", "bs-002"],
+      "estimatedDuration": 180
+    },
+    {
+      "id": "task-005",
+      "workZoneId": "wz-003",
+      "title": "开封-商丘接触网检修",
+      "description": "K400-K450公里接触网设备检修",
+      "requiredResources": [
+        { "resourceId": "res-p004", "quantity": 5 },
+        { "resourceId": "res-m003", "quantity": 1 }
+      ],
+      "requiredBlockSections": ["bs-005"],
+      "estimatedDuration": 150
+    },
+    {
+      "id": "task-006",
+      "workZoneId": "wz-001",
+      "title": "线路应力放散",
+      "description": "郑州-新郑区间线路应力放散",
+      "requiredResources": [
+        { "resourceId": "res-p001", "quantity": 8 },
+        { "resourceId": "res-mat001", "quantity": 10 }
+      ],
+      "requiredBlockSections": ["bs-001"],
+      "estimatedDuration": 240
+    }
+  ]
+}

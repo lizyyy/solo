@@ -1,0 +1,30 @@
+{
+  "name": "railway-schedule-cli",
+  "version": "1.0.0",
+  "description": "铁路检修天窗排程 CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "rw-schedule": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": ["railway", "maintenance", "schedule", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "chalk": "^4.1.2",
+    "uuid": "^9.0.1",
+    "exceljs": "^4.4.0",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2"
+  }
+}

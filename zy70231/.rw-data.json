@@ -1,0 +1,553 @@
+{
+  "maintenanceWindows": {
+    "win-20260512-01": {
+      "id": "win-20260512-01",
+      "date": "2026-05-12",
+      "windowType": "night",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "blockSections": [
+        "bs-001",
+        "bs-002"
+      ],
+      "priority": 1
+    },
+    "win-20260512-02": {
+      "id": "win-20260512-02",
+      "date": "2026-05-12",
+      "windowType": "day",
+      "time": {
+        "start": "10:00",
+        "end": "12:00"
+      },
+      "blockSections": [
+        "bs-003",
+        "bs-004"
+      ],
+      "priority": 2
+    },
+    "win-20260513-01": {
+      "id": "win-20260513-01",
+      "date": "2026-05-13",
+      "windowType": "night",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "blockSections": [
+        "bs-001",
+        "bs-002",
+        "bs-003",
+        "bs-004"
+      ],
+      "priority": 1
+    },
+    "win-20260513-02": {
+      "id": "win-20260513-02",
+      "date": "2026-05-13",
+      "windowType": "night",
+      "time": {
+        "start": "01:00",
+        "end": "05:00"
+      },
+      "blockSections": [
+        "bs-005"
+      ],
+      "priority": 1
+    }
+  },
+  "workZones": {
+    "wz-001": {
+      "id": "wz-001",
+      "name": "京广线郑州工区",
+      "responsiblePerson": "张工"
+    },
+    "wz-002": {
+      "id": "wz-002",
+      "name": "京广线许昌工区",
+      "responsiblePerson": "李工"
+    },
+    "wz-003": {
+      "id": "wz-003",
+      "name": "陇海线开封工区",
+      "responsiblePerson": "王工"
+    }
+  },
+  "resources": {
+    "res-p001": {
+      "id": "res-p001",
+      "name": "线路工-甲组",
+      "type": "people",
+      "quantity": 8,
+      "workZoneId": "wz-001"
+    },
+    "res-p002": {
+      "id": "res-p002",
+      "name": "线路工-乙组",
+      "type": "people",
+      "quantity": 6,
+      "workZoneId": "wz-001"
+    },
+    "res-p003": {
+      "id": "res-p003",
+      "name": "电务作业组",
+      "type": "people",
+      "quantity": 4,
+      "workZoneId": "wz-002"
+    },
+    "res-p004": {
+      "id": "res-p004",
+      "name": "接触网作业组",
+      "type": "people",
+      "quantity": 5,
+      "workZoneId": "wz-003"
+    },
+    "res-m001": {
+      "id": "res-m001",
+      "name": "捣固车",
+      "type": "machine",
+      "quantity": 1,
+      "workZoneId": "wz-001"
+    },
+    "res-m002": {
+      "id": "res-m002",
+      "name": "钢轨打磨车",
+      "type": "machine",
+      "quantity": 1,
+      "workZoneId": "wz-002"
+    },
+    "res-m003": {
+      "id": "res-m003",
+      "name": "接触网作业车",
+      "type": "machine",
+      "quantity": 2,
+      "workZoneId": "wz-003"
+    },
+    "res-mat001": {
+      "id": "res-mat001",
+      "name": "60kg/m钢轨",
+      "type": "material",
+      "quantity": 50,
+      "workZoneId": "wz-001"
+    },
+    "res-mat002": {
+      "id": "res-mat002",
+      "name": "道岔配件",
+      "type": "material",
+      "quantity": 100,
+      "workZoneId": "wz-002"
+    }
+  },
+  "workTasks": {
+    "task-001": {
+      "id": "task-001",
+      "workZoneId": "wz-001",
+      "title": "郑州-新郑上行线路捣固",
+      "description": "K600-K620公里线路捣固作业",
+      "requiredResources": [
+        {
+          "resourceId": "res-p001",
+          "quantity": 4
+        },
+        {
+          "resourceId": "res-m001",
+          "quantity": 1
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-001"
+      ],
+      "estimatedDuration": 120
+    },
+    "task-002": {
+      "id": "task-002",
+      "workZoneId": "wz-001",
+      "title": "郑州-新郑下行线路检查",
+      "description": "K600-K620公里线路综合检查",
+      "requiredResources": [
+        {
+          "resourceId": "res-p002",
+          "quantity": 3
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-002"
+      ],
+      "estimatedDuration": 60
+    },
+    "task-003": {
+      "id": "task-003",
+      "workZoneId": "wz-002",
+      "title": "新郑-许昌道岔检修",
+      "description": "新郑站3号道岔检修更换",
+      "requiredResources": [
+        {
+          "resourceId": "res-p003",
+          "quantity": 4
+        },
+        {
+          "resourceId": "res-mat002",
+          "quantity": 20
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-003",
+        "bs-004"
+      ],
+      "estimatedDuration": 90
+    },
+    "task-004": {
+      "id": "task-004",
+      "workZoneId": "wz-001",
+      "title": "钢轨打磨作业",
+      "description": "郑州-新郑区间钢轨打磨",
+      "requiredResources": [
+        {
+          "resourceId": "res-p001",
+          "quantity": 2
+        },
+        {
+          "resourceId": "res-m002",
+          "quantity": 1
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-001",
+        "bs-002"
+      ],
+      "estimatedDuration": 180
+    },
+    "task-005": {
+      "id": "task-005",
+      "workZoneId": "wz-003",
+      "title": "开封-商丘接触网检修",
+      "description": "K400-K450公里接触网设备检修",
+      "requiredResources": [
+        {
+          "resourceId": "res-p004",
+          "quantity": 5
+        },
+        {
+          "resourceId": "res-m003",
+          "quantity": 1
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-005"
+      ],
+      "estimatedDuration": 150
+    },
+    "task-006": {
+      "id": "task-006",
+      "workZoneId": "wz-001",
+      "title": "线路应力放散",
+      "description": "郑州-新郑区间线路应力放散",
+      "requiredResources": [
+        {
+          "resourceId": "res-p001",
+          "quantity": 8
+        },
+        {
+          "resourceId": "res-mat001",
+          "quantity": 10
+        }
+      ],
+      "requiredBlockSections": [
+        "bs-001"
+      ],
+      "estimatedDuration": 240
+    }
+  },
+  "blockSections": {
+    "bs-001": {
+      "id": "bs-001",
+      "line": "京广线",
+      "startStation": "郑州",
+      "endStation": "新郑",
+      "direction": "up"
+    },
+    "bs-002": {
+      "id": "bs-002",
+      "line": "京广线",
+      "startStation": "郑州",
+      "endStation": "新郑",
+      "direction": "down"
+    },
+    "bs-003": {
+      "id": "bs-003",
+      "line": "京广线",
+      "startStation": "新郑",
+      "endStation": "许昌",
+      "direction": "up"
+    },
+    "bs-004": {
+      "id": "bs-004",
+      "line": "京广线",
+      "startStation": "新郑",
+      "endStation": "许昌",
+      "direction": "down"
+    },
+    "bs-005": {
+      "id": "bs-005",
+      "line": "陇海线",
+      "startStation": "开封",
+      "endStation": "商丘",
+      "direction": "up"
+    }
+  },
+  "scheduledTasks": {
+    "276c5180-d692-4b16-be03-06411834453d": {
+      "id": "276c5180-d692-4b16-be03-06411834453d",
+      "taskId": "task-001",
+      "windowId": "win-20260512-01",
+      "workZoneId": "wz-001",
+      "assignedTime": {
+        "start": "00:30",
+        "end": "02:30"
+      },
+      "assignedResources": [
+        {
+          "resourceId": "res-p001",
+          "quantity": 4
+        },
+        {
+          "resourceId": "res-m001",
+          "quantity": 1
+        }
+      ],
+      "assignedBlockSections": [
+        "bs-001"
+      ],
+      "status": "scheduled"
+    },
+    "8b8d3c70-df63-44ab-b496-c9e2f79b0af7": {
+      "id": "8b8d3c70-df63-44ab-b496-c9e2f79b0af7",
+      "taskId": "task-002",
+      "windowId": "win-20260512-01",
+      "workZoneId": "wz-001",
+      "assignedTime": {
+        "start": "02:30",
+        "end": "03:30"
+      },
+      "assignedResources": [
+        {
+          "resourceId": "res-p002",
+          "quantity": 3
+        }
+      ],
+      "assignedBlockSections": [
+        "bs-002"
+      ],
+      "status": "scheduled"
+    },
+    "afd504e3-f2d2-4c50-9a47-55741da06655": {
+      "id": "afd504e3-f2d2-4c50-9a47-55741da06655",
+      "taskId": "task-003",
+      "windowId": "win-20260512-02",
+      "workZoneId": "wz-002",
+      "assignedTime": {
+        "start": "10:00",
+        "end": "11:30"
+      },
+      "assignedResources": [
+        {
+          "resourceId": "res-p003",
+          "quantity": 4
+        },
+        {
+          "resourceId": "res-mat002",
+          "quantity": 20
+        }
+      ],
+      "assignedBlockSections": [
+        "bs-003",
+        "bs-004"
+      ],
+      "status": "scheduled"
+    },
+    "54c96c48-c366-422f-b137-b4d8e0a486ea": {
+      "id": "54c96c48-c366-422f-b137-b4d8e0a486ea",
+      "taskId": "task-006",
+      "windowId": "win-20260513-01",
+      "workZoneId": "wz-001",
+      "assignedTime": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "assignedResources": [
+        {
+          "resourceId": "res-p001",
+          "quantity": 8
+        },
+        {
+          "resourceId": "res-mat001",
+          "quantity": 10
+        }
+      ],
+      "assignedBlockSections": [
+        "bs-001"
+      ],
+      "status": "scheduled"
+    },
+    "3274e3d5-f3b8-4474-a46b-9e57e7de1aa3": {
+      "id": "3274e3d5-f3b8-4474-a46b-9e57e7de1aa3",
+      "taskId": "task-005",
+      "windowId": "win-20260513-02",
+      "workZoneId": "wz-003",
+      "assignedTime": {
+        "start": "01:00",
+        "end": "03:30"
+      },
+      "assignedResources": [
+        {
+          "resourceId": "res-p004",
+          "quantity": 5
+        },
+        {
+          "resourceId": "res-m003",
+          "quantity": 1
+        }
+      ],
+      "assignedBlockSections": [
+        "bs-005"
+      ],
+      "status": "scheduled"
+    }
+  },
+  "resourceOccupancies": {
+    "3a3a7a07-04ba-4499-8f24-63b19015ae50": {
+      "resourceId": "res-p001",
+      "windowId": "win-20260512-01",
+      "time": {
+        "start": "00:30",
+        "end": "02:30"
+      },
+      "assignedQuantity": 4,
+      "scheduledTaskId": "276c5180-d692-4b16-be03-06411834453d"
+    },
+    "997f4317-c7fe-4947-8442-33615fae696f": {
+      "resourceId": "res-m001",
+      "windowId": "win-20260512-01",
+      "time": {
+        "start": "00:30",
+        "end": "02:30"
+      },
+      "assignedQuantity": 1,
+      "scheduledTaskId": "276c5180-d692-4b16-be03-06411834453d"
+    },
+    "d635c9f8-c6f5-4672-b3e5-48da690e3eaa": {
+      "resourceId": "res-p002",
+      "windowId": "win-20260512-01",
+      "time": {
+        "start": "02:30",
+        "end": "03:30"
+      },
+      "assignedQuantity": 3,
+      "scheduledTaskId": "8b8d3c70-df63-44ab-b496-c9e2f79b0af7"
+    },
+    "a84d6dc1-dc9a-4f62-98e5-77c9f1fa921a": {
+      "resourceId": "res-p003",
+      "windowId": "win-20260512-02",
+      "time": {
+        "start": "10:00",
+        "end": "11:30"
+      },
+      "assignedQuantity": 4,
+      "scheduledTaskId": "afd504e3-f2d2-4c50-9a47-55741da06655"
+    },
+    "728563ed-fdae-4f42-94bd-0b4cef05afdd": {
+      "resourceId": "res-mat002",
+      "windowId": "win-20260512-02",
+      "time": {
+        "start": "10:00",
+        "end": "11:30"
+      },
+      "assignedQuantity": 20,
+      "scheduledTaskId": "afd504e3-f2d2-4c50-9a47-55741da06655"
+    },
+    "17a18ff9-4aa5-481f-9c5f-3a4c42f4bde8": {
+      "resourceId": "res-p001",
+      "windowId": "win-20260513-01",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "assignedQuantity": 8,
+      "scheduledTaskId": "54c96c48-c366-422f-b137-b4d8e0a486ea"
+    },
+    "11418e17-ffca-4dbc-834d-fdf2b59210bd": {
+      "resourceId": "res-mat001",
+      "windowId": "win-20260513-01",
+      "time": {
+        "start": "00:30",
+        "end": "04:30"
+      },
+      "assignedQuantity": 10,
+      "scheduledTaskId": "54c96c48-c366-422f-b137-b4d8e0a486ea"
+    },
+    "5feb6362-913b-4dd7-9d9a-2bef101c1684": {
+      "resourceId": "res-p004",
+      "windowId": "win-20260513-02",
+      "time": {
+        "start": "01:00",
+        "end": "03:30"
+      },
+      "assignedQuantity": 5,
+      "scheduledTaskId": "3274e3d5-f3b8-4474-a46b-9e57e7de1aa3"
+    },
+    "ed26546d-aad4-4546-a3db-b81e2e547503": {
+      "resourceId": "res-m003",
+      "windowId": "win-20260513-02",
+      "time": {
+        "start": "01:00",
+        "end": "03:30"
+      },
+      "assignedQuantity": 1,
+      "scheduledTaskId": "3274e3d5-f3b8-4474-a46b-9e57e7de1aa3"
+    }
+  },
+  "conflicts": [
+    {
+      "type": "resource",
+      "severity": "error",
+      "description": "任务需要资源 res-m002，但工区 wz-001 没有该资源",
+      "affectedTasks": [
+        "task-004"
+      ]
+    },
+    {
+      "type": "time",
+      "severity": "error",
+      "description": "任务 钢轨打磨作业 (task-004) 无法在任何可用天窗中安排",
+      "affectedTasks": [
+        "task-004"
+      ]
+    }
+  ],
+  "runStates": [
+    {
+      "runId": "2207f690-a236-4f2b-84b5-289359ef0667",
+      "timestamp": "2026-05-11T11:25:14.208Z",
+      "status": "completed",
+      "stats": {
+        "totalWindows": 4,
+        "totalTasks": 6,
+        "scheduledTasks": 5,
+        "conflicts": 2
+      }
+    },
+    {
+      "runId": "2c9bfadb-bfe3-4314-8094-285e5ff810c0",
+      "timestamp": "2026-05-11T11:25:50.691Z",
+      "status": "completed",
+      "stats": {
+        "totalWindows": 4,
+        "totalTasks": 6,
+        "scheduledTasks": 5,
+        "conflicts": 2
+      }
+    }
+  ]
+}
