@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>依赖许可证审计报告</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 1200px; margin: 0 auto; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .status { text-align: center; font-size: 1.2em; margin-bottom: 30px; }
+    .status-badge { display: inline-block; padding: 8px 24px; border-radius: 20px; font-weight: bold; color: white; }
+    .status-PASS { background: #28a745; }
+    .status-WARN { background: #ffc107; color: #333; }
+    .status-FAIL { background: #dc3545; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .summary-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; }
+    .summary-card .label { font-size: 0.9em; color: #666; }
+    .summary-card .value { font-size: 1.8em; font-weight: bold; }
+    .summary-card.allowed .value { color: #28a745; }
+    .summary-card.needs-confirmation .value { color: #ffc107; }
+    .summary-card.forbidden .value { color: #dc3545; }
+    .summary-card.unknown .value { color: #17a2b8; }
+    section { margin-bottom: 30px; }
+    h2 { border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+    th { background: #f8f9fa; font-weight: 600; }
+    tr:hover { background: #f5f5f5; }
+    .exception-tag { background: #17a2b8; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; }
+    .risk-low { color: #28a745; }
+    .risk-medium { color: #ffc107; }
+    .risk-high { color: #fd7e14; }
+    .risk-critical { color: #dc3545; }
+    .warnings { background: #fff3cd; padding: 20px; border-radius: 8px; }
+    .warnings ul { margin-left: 20px; }
+    .category.forbidden h2 { color: #dc3545; border-color: #dc3545; }
+    .category.needs-confirmation h2 { color: #ffc107; border-color: #ffc107; }
+    .category.unknown h2 { color: #17a2b8; border-color: #17a2b8; }
+    .category.allowed h2 { color: #28a745; border-color: #28a745; }
+    .count { font-size: 0.8em; font-weight: normal; color: #666; }
+    .meta { text-align: center; color: #666; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>依赖许可证审计报告</h1>
+  <div class="meta">
+    <p>扫描时间: 2026-05-11T10:07:05.504Z</p>
+    <p>扫描源: sample</p>
+  </div>
+  <div class="status">
+    <span class="status-badge status-WARN">WARN</span>
+  </div>
+  
+  <div class="summary">
+    <div class="summary-card">
+      <div class="label">总依赖数</div>
+      <div class="value">116</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">直接依赖</div>
+      <div class="value">10</div>
+    </div>
+    <div class="summary-card">
+      <div class="label">传递依赖</div>
+      <div class="value">109</div>
+    </div>
+    <div class="summary-card allowed">
+      <div class="label">✓ 允许</div>
+      <div class="value">110</div>
+    </div>
+    <div class="summary-card needs-confirmation">
+      <div class="label">⚠ 需确认</div>
+      <div class="value">3</div>
+    </div>
+    <div class="summary-card forbidden">
+      <div class="label">✗ 禁止</div>
+      <div class="value">0</div>
+    </div>
+    <div class="summary-card unknown">
+      <div class="label">? 未知</div>
+      <div class="value">5</div>
+    </div>
+  </div>
+  
+  
+        <section class="warnings">
+          <h2>⚠️ 警告</h2>
+          <ul>
+            <li>
+              <strong>whatwg-url</strong>: 版本 13.0.0, 5.0.0, 许可证 MIT, MIT
+            </li>
+          
+            <li>
+              <strong>tr46</strong>: 版本 4.1.1, 0.0.3, 许可证 MIT, MIT
+            </li>
+          </ul>
+        </section>
+      
+  
+          <section class="category needs-confirmation">
+            <h2>需审批确认许可证 <span class="count">(3)</span></h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>包名</th>
+                  <th>版本</th>
+                  <th>许可证</th>
+                  <th>风险</th>
+                  <th>类型</th>
+                  <th>父依赖</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td>agpl-library</td>
+            <td>2.1.0</td>
+            <td>AGPL-3.0</td>
+            <td><span class="risk-medium">medium</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>gpl-component</td>
+            <td>3.0.0</td>
+            <td>GPL-3.0</td>
+            <td><span class="risk-medium">medium</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>lgpl-utils</td>
+            <td>2.1.0</td>
+            <td>LGPL-2.1</td>
+            <td><span class="risk-medium">medium</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </section>
+        
+          <section class="category unknown">
+            <h2>未知许可证 <span class="count">(5)</span></h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>包名</th>
+                  <th>版本</th>
+                  <th>许可证</th>
+                  <th>风险</th>
+                  <th>类型</th>
+                  <th>父依赖</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td>sspl-package</td>
+            <td>1.0.0</td>
+            <td>SSPL-1.0</td>
+            <td><span class="risk-high">high</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>unknown-pkg</td>
+            <td>1.0.0</td>
+            <td>UNKNOWN</td>
+            <td><span class="risk-high">high</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>missing-license</td>
+            <td>2.0.0</td>
+            <td>UNKNOWN</td>
+            <td><span class="risk-high">high</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>custom-license</td>
+            <td>1.5.0</td>
+            <td>CUSTOM</td>
+            <td><span class="risk-high">high</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+          <tr>
+            <td>proprietary-pkg</td>
+            <td>3.0.0</td>
+            <td>Proprietary</td>
+            <td><span class="risk-high">high</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </section>
+        
+          <section class="category allowed">
+            <h2>允许许可证 <span class="count">(111)</span></h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>包名</th>
+                  <th>版本</th>
+                  <th>许可证</th>
+                  <th>风险</th>
+                  <th>类型</th>
+                  <th>父依赖</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+          <tr>
+            <td>express</td>
+            <td>4.18.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>lodash</td>
+            <td>4.17.21</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>axios</td>
+            <td>1.6.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>react</td>
+            <td>18.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>vue</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>mongodb</td>
+            <td>6.2.0</td>
+            <td>Apache-2.0</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>redis</td>
+            <td>4.6.10</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>moment</td>
+            <td>2.29.4</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>nodemailer</td>
+            <td>6.9.7</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>multer</td>
+            <td>1.4.5-lts.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>直接</td>
+            <td>-</td>
+          </tr>
+        
+          <tr>
+            <td>accepts</td>
+            <td>1.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>array-flatten</td>
+            <td>1.1.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>body-parser</td>
+            <td>1.20.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>content-disposition</td>
+            <td>0.5.4</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>content-type</td>
+            <td>1.0.5</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>cookie</td>
+            <td>0.5.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>cookie-signature</td>
+            <td>1.0.6</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>debug</td>
+            <td>2.6.9</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>depd</td>
+            <td>2.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>encodeurl</td>
+            <td>1.0.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>escape-html</td>
+            <td>1.0.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>etag</td>
+            <td>1.8.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>finalhandler</td>
+            <td>1.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>fresh</td>
+            <td>0.5.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>http-errors</td>
+            <td>2.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>merge-descriptors</td>
+            <td>1.0.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>methods</td>
+            <td>1.1.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>on-finished</td>
+            <td>2.4.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>parseurl</td>
+            <td>1.3.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>path-to-regexp</td>
+            <td>0.1.7</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>proxy-addr</td>
+            <td>2.0.7</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>qs</td>
+            <td>6.11.0</td>
+            <td>BSD-3-Clause</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>range-parser</td>
+            <td>1.2.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>safe-buffer</td>
+            <td>5.2.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>send</td>
+            <td>0.18.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>serve-static</td>
+            <td>1.15.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>setprototypeof</td>
+            <td>1.2.0</td>
+            <td>ISC</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>statuses</td>
+            <td>2.0.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>type-is</td>
+            <td>1.6.18</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>utils-merge</td>
+            <td>1.0.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>vary</td>
+            <td>1.1.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>express</td>
+          </tr>
+        
+          <tr>
+            <td>follow-redirects</td>
+            <td>1.15.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>axios</td>
+          </tr>
+        
+          <tr>
+            <td>form-data</td>
+            <td>4.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>axios</td>
+          </tr>
+        
+          <tr>
+            <td>proxy-from-env</td>
+            <td>1.1.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>axios</td>
+          </tr>
+        
+          <tr>
+            <td>loose-envify</td>
+            <td>1.4.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>react</td>
+          </tr>
+        
+          <tr>
+            <td>react-is</td>
+            <td>18.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>react</td>
+          </tr>
+        
+          <tr>
+            <td>@babel/runtime</td>
+            <td>7.23.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/shared</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/compiler-dom</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/runtime-dom</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/reactivity</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/runtime-core</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>@vue/compiler-core</td>
+            <td>3.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>vue</td>
+          </tr>
+        
+          <tr>
+            <td>bson</td>
+            <td>6.2.0</td>
+            <td>Apache-2.0</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mongodb</td>
+          </tr>
+        
+          <tr>
+            <td>mongodb-connection-string-url</td>
+            <td>3.0.0</td>
+            <td>Apache-2.0</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mongodb</td>
+          </tr>
+        
+          <tr>
+            <td>socks</td>
+            <td>2.7.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mongodb</td>
+          </tr>
+        
+          <tr>
+            <td>whatwg-url</td>
+            <td>13.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mongodb-connection-string-url</td>
+          </tr>
+        
+          <tr>
+            <td>tr46</td>
+            <td>4.1.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>whatwg-url</td>
+          </tr>
+        
+          <tr>
+            <td>punycode</td>
+            <td>2.3.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>tr46</td>
+          </tr>
+        
+          <tr>
+            <td>smart-buffer</td>
+            <td>4.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>socks</td>
+          </tr>
+        
+          <tr>
+            <td>ipaddr.js</td>
+            <td>2.1.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>proxy-addr</td>
+          </tr>
+        
+          <tr>
+            <td>ms</td>
+            <td>2.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>debug</td>
+          </tr>
+        
+          <tr>
+            <td>ee-first</td>
+            <td>1.1.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>on-finished</td>
+          </tr>
+        
+          <tr>
+            <td>destroy</td>
+            <td>1.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>on-finished</td>
+          </tr>
+        
+          <tr>
+            <td>unpipe</td>
+            <td>1.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>on-finished</td>
+          </tr>
+        
+          <tr>
+            <td>forwarded</td>
+            <td>0.2.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>proxy-addr</td>
+          </tr>
+        
+          <tr>
+            <td>mime</td>
+            <td>1.6.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>send</td>
+          </tr>
+        
+          <tr>
+            <td>mime-types</td>
+            <td>2.1.35</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>type-is</td>
+          </tr>
+        
+          <tr>
+            <td>mime-db</td>
+            <td>1.52.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mime-types</td>
+          </tr>
+        
+          <tr>
+            <td>negotiator</td>
+            <td>0.6.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>accepts</td>
+          </tr>
+        
+          <tr>
+            <td>inherits</td>
+            <td>2.0.4</td>
+            <td>ISC</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>setprototypeof</td>
+          </tr>
+        
+          <tr>
+            <td>asynckit</td>
+            <td>0.4.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>form-data</td>
+          </tr>
+        
+          <tr>
+            <td>combined-stream</td>
+            <td>1.0.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>form-data</td>
+          </tr>
+        
+          <tr>
+            <td>delayed-stream</td>
+            <td>1.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>combined-stream</td>
+          </tr>
+        
+          <tr>
+            <td>js-tokens</td>
+            <td>4.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>loose-envify</td>
+          </tr>
+        
+          <tr>
+            <td>regenerator-runtime</td>
+            <td>0.14.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@babel/runtime</td>
+          </tr>
+        
+          <tr>
+            <td>entities</td>
+            <td>4.5.0</td>
+            <td>BSD-2-Clause</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-dom</td>
+          </tr>
+        
+          <tr>
+            <td>estree-walker</td>
+            <td>2.0.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-core</td>
+          </tr>
+        
+          <tr>
+            <td>source-map-js</td>
+            <td>1.0.2</td>
+            <td>BSD-3-Clause</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-core</td>
+          </tr>
+        
+          <tr>
+            <td>iconv-lite</td>
+            <td>0.4.24</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>body-parser</td>
+          </tr>
+        
+          <tr>
+            <td>raw-body</td>
+            <td>2.5.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>body-parser</td>
+          </tr>
+        
+          <tr>
+            <td>bytes</td>
+            <td>3.1.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>raw-body</td>
+          </tr>
+        
+          <tr>
+            <td>safer-buffer</td>
+            <td>2.1.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>iconv-lite</td>
+          </tr>
+        
+          <tr>
+            <td>busboy</td>
+            <td>1.6.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>streamsearch</td>
+            <td>1.1.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>busboy</td>
+          </tr>
+        
+          <tr>
+            <td>append-field</td>
+            <td>1.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>buffer-from</td>
+            <td>1.1.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>concat-stream</td>
+            <td>1.6.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>mkdirp</td>
+            <td>0.5.6</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>object-assign</td>
+            <td>4.1.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>on-finished</td>
+            <td>2.4.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>type-is</td>
+            <td>1.6.18</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>xtend</td>
+            <td>4.0.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>multer</td>
+          </tr>
+        
+          <tr>
+            <td>minimist</td>
+            <td>1.2.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>mkdirp</td>
+          </tr>
+        
+          <tr>
+            <td>typedarray</td>
+            <td>0.0.6</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>concat-stream</td>
+          </tr>
+        
+          <tr>
+            <td>readable-stream</td>
+            <td>2.3.8</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>concat-stream</td>
+          </tr>
+        
+          <tr>
+            <td>core-util-is</td>
+            <td>1.0.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>readable-stream</td>
+          </tr>
+        
+          <tr>
+            <td>isarray</td>
+            <td>1.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>readable-stream</td>
+          </tr>
+        
+          <tr>
+            <td>process-nextick-args</td>
+            <td>2.0.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>readable-stream</td>
+          </tr>
+        
+          <tr>
+            <td>string_decoder</td>
+            <td>1.1.1</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>readable-stream</td>
+          </tr>
+        
+          <tr>
+            <td>util-deprecate</td>
+            <td>1.0.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>readable-stream</td>
+          </tr>
+        
+          <tr>
+            <td>nodemailer</td>
+            <td>6.9.7</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>nodemailer</td>
+          </tr>
+        
+          <tr>
+            <td>node-fetch</td>
+            <td>2.7.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>nodemailer</td>
+          </tr>
+        
+          <tr>
+            <td>whatwg-url</td>
+            <td>5.0.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>node-fetch</td>
+          </tr>
+        
+          <tr>
+            <td>tr46</td>
+            <td>0.0.3</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>whatwg-url@5.0.0</td>
+          </tr>
+        
+          <tr>
+            <td>webidl-conversions</td>
+            <td>3.0.1</td>
+            <td>BSD-2-Clause</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>whatwg-url@5.0.0</td>
+          </tr>
+        
+          <tr>
+            <td>acorn</td>
+            <td>8.11.2</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-core</td>
+          </tr>
+        
+          <tr>
+            <td>@babel/parser</td>
+            <td>7.23.0</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-core</td>
+          </tr>
+        
+          <tr>
+            <td>magic-string</td>
+            <td>0.30.5</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>@vue/compiler-core</td>
+          </tr>
+        
+          <tr>
+            <td>@jridgewell/sourcemap-codec</td>
+            <td>1.4.15</td>
+            <td>MIT</td>
+            <td><span class="risk-low">low</span></td>
+            <td>传递</td>
+            <td>magic-string</td>
+          </tr>
+        
+          <tr>
+            <td>license-checker-rseidelsohn</td>
+            <td>4.3.0 <span class="exception-tag">例外</span></td>
+            <td>SSPL</td>
+            <td><span class="risk-critical">critical</span></td>
+            <td>传递</td>
+            <td>sample</td>
+          </tr>
+        
+              </tbody>
+            </table>
+          </section>
+        
+</body>
+</html>

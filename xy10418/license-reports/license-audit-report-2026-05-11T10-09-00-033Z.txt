@@ -1,0 +1,808 @@
+================================================================================
+                       依赖许可证审计报告
+================================================================================
+
+扫描时间: 2026-05-11T10:07:05.504Z
+扫描源: sample
+审计状态: ⚠ WARN
+
+--------------------------------------------------------------------------------
+                                   摘要
+--------------------------------------------------------------------------------
+
+  总依赖数: 116
+  直接依赖: 10
+  传递依赖: 109
+
+  ✓ 允许: 110
+  ⚠ 需确认: 3
+  ✗ 禁止: 0
+  ? 未知: 5
+  例外审批: 1
+
+--------------------------------------------------------------------------------
+                                   警告
+--------------------------------------------------------------------------------
+
+  同名不同版本: whatwg-url
+    版本: 13.0.0, 5.0.0
+    许可证: MIT, MIT
+
+  同名不同版本: tr46
+    版本: 4.1.1, 0.0.3
+    许可证: MIT, MIT
+
+--------------------------------------------------------------------------------
+                                   问题
+--------------------------------------------------------------------------------
+
+  [未知] sspl-package@1.0.0
+    许可证: SSPL-1.0
+    原因: 未知许可证，需人工确认
+    类型: 传递依赖
+    父依赖: sample
+
+  [需确认] agpl-library@2.1.0
+    许可证: AGPL-3.0
+    原因: 许可证 AGPL-3.0 需要审批确认
+    类型: 传递依赖
+    父依赖: sample
+
+  [需确认] gpl-component@3.0.0
+    许可证: GPL-3.0
+    原因: 许可证 GPL-3.0 需要审批确认
+    类型: 传递依赖
+    父依赖: sample
+
+  [需确认] lgpl-utils@2.1.0
+    许可证: LGPL-2.1
+    原因: 许可证 LGPL-2.1 需要审批确认
+    类型: 传递依赖
+    父依赖: sample
+
+  [未知] unknown-pkg@1.0.0
+    许可证: UNKNOWN
+    原因: 无法识别的许可证
+    类型: 传递依赖
+    父依赖: sample
+
+  [未知] missing-license@2.0.0
+    许可证: UNKNOWN
+    原因: 无法识别的许可证
+    类型: 传递依赖
+    父依赖: sample
+
+  [未知] custom-license@1.5.0
+    许可证: CUSTOM
+    原因: 未知许可证，需人工确认
+    类型: 传递依赖
+    父依赖: sample
+
+  [未知] proprietary-pkg@3.0.0
+    许可证: Proprietary
+    原因: 未知许可证，需人工确认
+    类型: 传递依赖
+    父依赖: sample
+
+--------------------------------------------------------------------------------
+                               需审批确认许可证 (3)
+--------------------------------------------------------------------------------
+
+  [传递] agpl-library@2.1.0
+    许可证: AGPL-3.0
+    风险: medium
+    原因: 许可证 AGPL-3.0 需要审批确认
+    父依赖: sample
+
+  [传递] gpl-component@3.0.0
+    许可证: GPL-3.0
+    风险: medium
+    原因: 许可证 GPL-3.0 需要审批确认
+    父依赖: sample
+
+  [传递] lgpl-utils@2.1.0
+    许可证: LGPL-2.1
+    风险: medium
+    原因: 许可证 LGPL-2.1 需要审批确认
+    父依赖: sample
+
+--------------------------------------------------------------------------------
+                               未知许可证 (5)
+--------------------------------------------------------------------------------
+
+  [传递] sspl-package@1.0.0
+    许可证: SSPL-1.0
+    风险: high
+    原因: 未知许可证，需人工确认
+    父依赖: sample
+
+  [传递] unknown-pkg@1.0.0
+    许可证: UNKNOWN
+    风险: high
+    原因: 无法识别的许可证
+    父依赖: sample
+
+  [传递] missing-license@2.0.0
+    许可证: UNKNOWN
+    风险: high
+    原因: 无法识别的许可证
+    父依赖: sample
+
+  [传递] custom-license@1.5.0
+    许可证: CUSTOM
+    风险: high
+    原因: 未知许可证，需人工确认
+    父依赖: sample
+
+  [传递] proprietary-pkg@3.0.0
+    许可证: Proprietary
+    风险: high
+    原因: 未知许可证，需人工确认
+    父依赖: sample
+
+--------------------------------------------------------------------------------
+                               允许许可证 (111)
+--------------------------------------------------------------------------------
+
+  [直接] express@4.18.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] lodash@4.17.21
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] axios@1.6.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] react@18.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] vue@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] mongodb@6.2.0
+    许可证: Apache-2.0
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] redis@4.6.10
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] moment@2.29.4
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] nodemailer@6.9.7
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [直接] multer@1.4.5-lts.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+
+  [传递] accepts@1.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] array-flatten@1.1.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] body-parser@1.20.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] content-disposition@0.5.4
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] content-type@1.0.5
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] cookie@0.5.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] cookie-signature@1.0.6
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] debug@2.6.9
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] depd@2.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] encodeurl@1.0.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] escape-html@1.0.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] etag@1.8.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] finalhandler@1.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] fresh@0.5.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] http-errors@2.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] merge-descriptors@1.0.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] methods@1.1.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] on-finished@2.4.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] parseurl@1.3.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] path-to-regexp@0.1.7
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] proxy-addr@2.0.7
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] qs@6.11.0
+    许可证: BSD-3-Clause
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] range-parser@1.2.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] safe-buffer@5.2.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] send@0.18.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] serve-static@1.15.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] setprototypeof@1.2.0
+    许可证: ISC
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] statuses@2.0.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] type-is@1.6.18
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] utils-merge@1.0.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] vary@1.1.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: express
+
+  [传递] follow-redirects@1.15.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: axios
+
+  [传递] form-data@4.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: axios
+
+  [传递] proxy-from-env@1.1.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: axios
+
+  [传递] loose-envify@1.4.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: react
+
+  [传递] react-is@18.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: react
+
+  [传递] @babel/runtime@7.23.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/shared@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/compiler-dom@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/runtime-dom@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/reactivity@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/runtime-core@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] @vue/compiler-core@3.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: vue
+
+  [传递] bson@6.2.0
+    许可证: Apache-2.0
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mongodb
+
+  [传递] mongodb-connection-string-url@3.0.0
+    许可证: Apache-2.0
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mongodb
+
+  [传递] socks@2.7.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mongodb
+
+  [传递] whatwg-url@13.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mongodb-connection-string-url
+
+  [传递] tr46@4.1.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: whatwg-url
+
+  [传递] punycode@2.3.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: tr46
+
+  [传递] smart-buffer@4.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: socks
+
+  [传递] ipaddr.js@2.1.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: proxy-addr
+
+  [传递] ms@2.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: debug
+
+  [传递] ee-first@1.1.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: on-finished
+
+  [传递] destroy@1.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: on-finished
+
+  [传递] unpipe@1.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: on-finished
+
+  [传递] forwarded@0.2.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: proxy-addr
+
+  [传递] mime@1.6.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: send
+
+  [传递] mime-types@2.1.35
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: type-is
+
+  [传递] mime-db@1.52.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mime-types
+
+  [传递] negotiator@0.6.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: accepts
+
+  [传递] inherits@2.0.4
+    许可证: ISC
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: setprototypeof
+
+  [传递] asynckit@0.4.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: form-data
+
+  [传递] combined-stream@1.0.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: form-data
+
+  [传递] delayed-stream@1.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: combined-stream
+
+  [传递] js-tokens@4.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: loose-envify
+
+  [传递] regenerator-runtime@0.14.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @babel/runtime
+
+  [传递] entities@4.5.0
+    许可证: BSD-2-Clause
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-dom
+
+  [传递] estree-walker@2.0.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-core
+
+  [传递] source-map-js@1.0.2
+    许可证: BSD-3-Clause
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-core
+
+  [传递] iconv-lite@0.4.24
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: body-parser
+
+  [传递] raw-body@2.5.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: body-parser
+
+  [传递] bytes@3.1.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: raw-body
+
+  [传递] safer-buffer@2.1.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: iconv-lite
+
+  [传递] busboy@1.6.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] streamsearch@1.1.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: busboy
+
+  [传递] append-field@1.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] buffer-from@1.1.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] concat-stream@1.6.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] mkdirp@0.5.6
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] object-assign@4.1.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] on-finished@2.4.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] type-is@1.6.18
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] xtend@4.0.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: multer
+
+  [传递] minimist@1.2.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: mkdirp
+
+  [传递] typedarray@0.0.6
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: concat-stream
+
+  [传递] readable-stream@2.3.8
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: concat-stream
+
+  [传递] core-util-is@1.0.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: readable-stream
+
+  [传递] isarray@1.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: readable-stream
+
+  [传递] process-nextick-args@2.0.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: readable-stream
+
+  [传递] string_decoder@1.1.1
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: readable-stream
+
+  [传递] util-deprecate@1.0.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: readable-stream
+
+  [传递] nodemailer@6.9.7
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: nodemailer
+
+  [传递] node-fetch@2.7.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: nodemailer
+
+  [传递] whatwg-url@5.0.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: node-fetch
+
+  [传递] tr46@0.0.3
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: whatwg-url@5.0.0
+
+  [传递] webidl-conversions@3.0.1
+    许可证: BSD-2-Clause
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: whatwg-url@5.0.0
+
+  [传递] acorn@8.11.2
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-core
+
+  [传递] @babel/parser@7.23.0
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-core
+
+  [传递] magic-string@0.30.5
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: @vue/compiler-core
+
+  [传递] @jridgewell/sourcemap-codec@1.4.15
+    许可证: MIT
+    风险: low
+    原因: 许可证在允许列表中
+    父依赖: magic-string
+
+  [传递] license-checker-rseidelsohn@4.3.0 [例外审批]
+    许可证: SSPL
+    风险: critical
+    原因: 许可证 SSPL 在禁止列表中
+    父依赖: sample
+    审批人: 张经理
+    审批理由: 业务必需，已获得管理层批准
+    过期时间: 2026-12-31T23:59:59Z
+
+================================================================================
+                              报告结束
+================================================================================
