@@ -1,0 +1,491 @@
+{
+  "orders": [
+    {
+      "orderNo": "ORD-2024-0001",
+      "trackingNo": "SF1000001",
+      "amount": 199.99,
+      "shippedAt": "2024-01-10 10:00:00",
+      "status": "delivered",
+      "product": "iPhone 手机壳",
+      "customer": "张三"
+    },
+    {
+      "orderNo": "ORD-2024-0002",
+      "trackingNo": "SF1000002",
+      "amount": 299,
+      "shippedAt": "2024-01-11 09:30:00",
+      "status": "delivered",
+      "product": "蓝牙耳机",
+      "customer": "李四"
+    },
+    {
+      "orderNo": "ORD-2024-0003",
+      "trackingNo": "SF1000003",
+      "amount": 1599,
+      "shippedAt": "2024-01-12 14:20:00",
+      "status": "delivered",
+      "product": "智能手表",
+      "customer": "王五"
+    },
+    {
+      "orderNo": "ORD-2024-0004",
+      "trackingNo": "SF1000004",
+      "amount": 89.5,
+      "shippedAt": "2024-01-13 08:15:00",
+      "status": "delivered",
+      "product": "数据线",
+      "customer": "赵六"
+    },
+    {
+      "orderNo": "ORD-2024-0005",
+      "trackingNo": "SF1000005",
+      "amount": 1288,
+      "shippedAt": "2024-01-14 16:45:00",
+      "status": "delivered",
+      "product": "机械键盘",
+      "customer": "钱七"
+    },
+    {
+      "orderNo": "ORD-2024-0006",
+      "trackingNo": "SF1000006",
+      "amount": 500,
+      "shippedAt": "2024-01-15 11:00:00",
+      "status": "closed",
+      "product": "保温杯",
+      "customer": "孙八"
+    },
+    {
+      "orderNo": "ORD-2024-0007",
+      "trackingNo": "SF1000007",
+      "amount": 3200,
+      "shippedAt": "2024-01-16 13:30:00",
+      "status": "delivered",
+      "product": "平板电脑",
+      "customer": "周九"
+    },
+    {
+      "orderNo": "ORD-2024-0008",
+      "trackingNo": "SF1000008",
+      "amount": 150,
+      "shippedAt": "2024-01-17 09:00:00",
+      "status": "delivered",
+      "product": "鼠标",
+      "customer": "吴十"
+    },
+    {
+      "orderNo": "ORD-2024-0009",
+      "trackingNo": "SF1000009",
+      "amount": 888,
+      "shippedAt": "2024-01-18 15:20:00",
+      "status": "delivered",
+      "product": "显示器支架",
+      "customer": "郑十一"
+    },
+    {
+      "orderNo": "ORD-2024-0010",
+      "trackingNo": "SF1000010",
+      "amount": 200,
+      "shippedAt": "2024-01-19 10:30:00",
+      "status": "closed",
+      "product": "背包",
+      "customer": "王十二"
+    }
+  ],
+  "signRecords": [
+    {
+      "trackingNo": "SF1000001",
+      "signedAt": "2024-01-12 14:30:00",
+      "signedBy": "张三",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000001.jpg",
+      "batchId": "BATCH-20240112-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000002",
+      "signedAt": "2024-01-13 09:15:00",
+      "signedBy": "李四",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000002.jpg",
+      "batchId": "BATCH-20240113-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000003",
+      "signedAt": "2024-01-14 11:20:00",
+      "signedBy": "王五",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000003.jpg",
+      "batchId": "BATCH-20240114-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000004",
+      "signedAt": "2024-01-15 16:40:00",
+      "signedBy": "赵六",
+      "hasPhoto": false,
+      "batchId": "BATCH-20240115-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000007",
+      "signedAt": "2024-01-18 10:00:00",
+      "signedBy": "快递柜",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000007.jpg",
+      "batchId": "BATCH-20240118-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000009",
+      "signedAt": "2024-01-20 14:30:00",
+      "signedBy": "郑十一",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000009.jpg",
+      "batchId": "BATCH-20240120-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "",
+      "signedAt": "2024-01-16 09:00:00",
+      "signedBy": "未知",
+      "hasPhoto": false,
+      "batchId": "BATCH-20240116-A",
+      "status": "success"
+    },
+    {
+      "trackingNo": "SF1000009",
+      "signedAt": "2024-01-17 10:00:00",
+      "signedBy": "郑十一",
+      "hasPhoto": true,
+      "photoUrl": "https://example.com/photos/SF1000009-early.jpg",
+      "batchId": "BATCH-20240117-A",
+      "status": "success"
+    }
+  ],
+  "refuseRecords": [
+    {
+      "trackingNo": "SF1000007",
+      "refusedAt": "2024-01-17 15:30:00",
+      "reason": "商品损坏",
+      "operator": "快递员小张",
+      "batchId": "REFUSE-20240117-A"
+    },
+    {
+      "trackingNo": "SF1000008",
+      "refusedAt": "2024-01-19 11:00:00",
+      "reason": "客户不在家，改期派送",
+      "operator": "快递员小李",
+      "batchId": "REFUSE-20240119-A"
+    }
+  ],
+  "claimRecords": [
+    {
+      "claimId": "CLAIM-001",
+      "trackingNo": "SF1000005",
+      "amount": 500,
+      "appliedAt": "2024-01-16 10:00:00",
+      "approvedAt": "2024-01-17 09:30:00",
+      "status": "approved",
+      "reason": "商品丢失",
+      "batchId": "CLAIM-20240116-A"
+    },
+    {
+      "claimId": "CLAIM-002",
+      "trackingNo": "SF1000005",
+      "amount": 300,
+      "appliedAt": "2024-01-17 14:00:00",
+      "status": "pending",
+      "reason": "部分商品损坏",
+      "batchId": "CLAIM-20240117-A"
+    },
+    {
+      "claimId": "CLAIM-003",
+      "trackingNo": "SF1000001",
+      "amount": 200,
+      "appliedAt": "2024-01-14 11:00:00",
+      "approvedAt": "2024-01-15 10:00:00",
+      "status": "approved",
+      "reason": "小额赔付",
+      "batchId": "CLAIM-20240114-A"
+    },
+    {
+      "claimId": "",
+      "trackingNo": "SF1000002",
+      "amount": 150,
+      "appliedAt": "2024-01-15 14:00:00",
+      "status": "pending",
+      "reason": "测试赔付",
+      "batchId": "CLAIM-20240115-A"
+    }
+  ],
+  "abnormals": [
+    {
+      "id": "closed-SF1000005",
+      "type": "closed_without_sign",
+      "trackingNo": "SF1000005",
+      "orderNo": "ORD-2024-0005",
+      "description": "订单 ORD-2024-0005 已结案但未找到有效签收记录",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0005",
+          "trackingNo": "SF1000005",
+          "amount": 1288,
+          "shippedAt": "2024-01-14 16:45:00",
+          "status": "delivered",
+          "product": "机械键盘",
+          "customer": "钱七"
+        },
+        "signRecords": []
+      }
+    },
+    {
+      "id": "closed-SF1000006",
+      "type": "closed_without_sign",
+      "trackingNo": "SF1000006",
+      "orderNo": "ORD-2024-0006",
+      "description": "订单 ORD-2024-0006 已结案但未找到有效签收记录",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0006",
+          "trackingNo": "SF1000006",
+          "amount": 500,
+          "shippedAt": "2024-01-15 11:00:00",
+          "status": "closed",
+          "product": "保温杯",
+          "customer": "孙八"
+        },
+        "signRecords": []
+      }
+    },
+    {
+      "id": "closed-SF1000008",
+      "type": "closed_without_sign",
+      "trackingNo": "SF1000008",
+      "orderNo": "ORD-2024-0008",
+      "description": "订单 ORD-2024-0008 已结案但未找到有效签收记录",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0008",
+          "trackingNo": "SF1000008",
+          "amount": 150,
+          "shippedAt": "2024-01-17 09:00:00",
+          "status": "delivered",
+          "product": "鼠标",
+          "customer": "吴十"
+        },
+        "signRecords": []
+      }
+    },
+    {
+      "id": "closed-SF1000010",
+      "type": "closed_without_sign",
+      "trackingNo": "SF1000010",
+      "orderNo": "ORD-2024-0010",
+      "description": "订单 ORD-2024-0010 已结案但未找到有效签收记录",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0010",
+          "trackingNo": "SF1000010",
+          "amount": 200,
+          "shippedAt": "2024-01-19 10:30:00",
+          "status": "closed",
+          "product": "背包",
+          "customer": "王十二"
+        },
+        "signRecords": []
+      }
+    },
+    {
+      "id": "proof-SF1000004-2024-01-15 16:40:00",
+      "type": "sign_without_proof",
+      "trackingNo": "SF1000004",
+      "orderNo": "ORD-2024-0004",
+      "description": "运单 SF1000004 已签收但缺少签收照片凭证",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0004",
+          "trackingNo": "SF1000004",
+          "amount": 89.5,
+          "shippedAt": "2024-01-13 08:15:00",
+          "status": "delivered",
+          "product": "数据线",
+          "customer": "赵六"
+        },
+        "signRecords": [
+          {
+            "trackingNo": "SF1000004",
+            "signedAt": "2024-01-15 16:40:00",
+            "signedBy": "赵六",
+            "hasPhoto": false,
+            "batchId": "BATCH-20240115-A",
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "id": "proof--2024-01-16 09:00:00",
+      "type": "sign_without_proof",
+      "trackingNo": "",
+      "orderNo": "",
+      "description": "运单  已签收但缺少签收照片凭证",
+      "detectedAt": "2026-05-11T15:50:39.162Z",
+      "reviewed": false,
+      "matchedData": {
+        "signRecords": [
+          {
+            "trackingNo": "",
+            "signedAt": "2024-01-16 09:00:00",
+            "signedBy": "未知",
+            "hasPhoto": false,
+            "batchId": "BATCH-20240116-A",
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "id": "refuse-SF1000007-2024-01-17 15:30:00-2024-01-18 10:00:00",
+      "type": "delivered_after_refuse",
+      "trackingNo": "SF1000007",
+      "orderNo": "ORD-2024-0007",
+      "description": "运单 SF1000007 在拒收(2024-01-17 15:30:00)后又被签收(2024-01-18 10:00:00)",
+      "detectedAt": "2026-05-11T15:50:39.163Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0007",
+          "trackingNo": "SF1000007",
+          "amount": 3200,
+          "shippedAt": "2024-01-16 13:30:00",
+          "status": "delivered",
+          "product": "平板电脑",
+          "customer": "周九"
+        },
+        "refuseRecords": [
+          {
+            "trackingNo": "SF1000007",
+            "refusedAt": "2024-01-17 15:30:00",
+            "reason": "商品损坏",
+            "operator": "快递员小张",
+            "batchId": "REFUSE-20240117-A"
+          }
+        ],
+        "signRecords": [
+          {
+            "trackingNo": "SF1000007",
+            "signedAt": "2024-01-18 10:00:00",
+            "signedBy": "快递柜",
+            "hasPhoto": true,
+            "photoUrl": "https://example.com/photos/SF1000007.jpg",
+            "batchId": "BATCH-20240118-A",
+            "status": "success"
+          }
+        ]
+      }
+    },
+    {
+      "id": "duplicate-SF1000005",
+      "type": "duplicate_claim",
+      "trackingNo": "SF1000005",
+      "orderNo": "ORD-2024-0005",
+      "description": "运单 SF1000005 存在 2 条有效赔付申请",
+      "detectedAt": "2026-05-11T15:50:39.163Z",
+      "reviewed": false,
+      "matchedData": {
+        "order": {
+          "orderNo": "ORD-2024-0005",
+          "trackingNo": "SF1000005",
+          "amount": 1288,
+          "shippedAt": "2024-01-14 16:45:00",
+          "status": "delivered",
+          "product": "机械键盘",
+          "customer": "钱七"
+        },
+        "claimRecords": [
+          {
+            "claimId": "CLAIM-001",
+            "trackingNo": "SF1000005",
+            "amount": 500,
+            "appliedAt": "2024-01-16 10:00:00",
+            "approvedAt": "2024-01-17 09:30:00",
+            "status": "approved",
+            "reason": "商品丢失",
+            "batchId": "CLAIM-20240116-A"
+          },
+          {
+            "claimId": "CLAIM-002",
+            "trackingNo": "SF1000005",
+            "amount": 300,
+            "appliedAt": "2024-01-17 14:00:00",
+            "status": "pending",
+            "reason": "部分商品损坏",
+            "batchId": "CLAIM-20240117-A"
+          }
+        ]
+      }
+    }
+  ],
+  "issues": [
+    {
+      "id": "missing-签收记录-febc80fae42ef455",
+      "type": "missing_tracking_no",
+      "description": "签收记录 记录缺少运单号",
+      "source": "签收记录",
+      "detectedAt": "2026-05-11T15:50:39.163Z"
+    },
+    {
+      "id": "early-sign-SF1000009-2024-01-17 10:00:00",
+      "type": "sign_before_ship",
+      "trackingNo": "SF1000009",
+      "description": "运单 SF1000009 签收时间(2024-01-17 10:00:00)早于发货时间(2024-01-18 15:20:00)",
+      "source": "签收记录",
+      "detectedAt": "2026-05-11T15:50:39.163Z"
+    },
+    {
+      "id": "over-claim-CLAIM-003",
+      "type": "claim_exceeds_order",
+      "trackingNo": "SF1000001",
+      "description": "赔付金额(200)超过订单金额(199.99)，运单: SF1000001",
+      "source": "赔付记录",
+      "detectedAt": "2026-05-11T15:50:39.163Z"
+    },
+    {
+      "id": "missing-签收记录-5a41118b49451764",
+      "type": "missing_tracking_no",
+      "description": "签收记录 记录缺少运单号",
+      "source": "签收记录",
+      "detectedAt": "2026-05-11T15:50:44.150Z"
+    }
+  ],
+  "reviews": [
+    {
+      "abnormalId": "duplicate-SF1000005",
+      "trackingNo": "SF1000005",
+      "reviewer": "客服小王",
+      "note": "经核实，两笔赔付都是客户分别针对不同商品申请的，系统显示同一运单实际是分开发货的，建议联系快递核实真实情况。",
+      "reviewedAt": "2026-05-11T15:50:30.291Z"
+    }
+  ],
+  "processedBatches": [
+    "BATCH-20240112-A",
+    "BATCH-20240113-A",
+    "BATCH-20240114-A",
+    "BATCH-20240115-A",
+    "BATCH-20240118-A",
+    "BATCH-20240120-A",
+    "BATCH-20240116-A",
+    "BATCH-20240117-A"
+  ]
+}

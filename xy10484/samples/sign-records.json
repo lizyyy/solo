@@ -1,0 +1,72 @@
+[
+  {
+    "trackingNo": "SF1000001",
+    "signedAt": "2024-01-12 14:30:00",
+    "signedBy": "张三",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000001.jpg",
+    "batchId": "BATCH-20240112-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000002",
+    "signedAt": "2024-01-13 09:15:00",
+    "signedBy": "李四",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000002.jpg",
+    "batchId": "BATCH-20240113-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000003",
+    "signedAt": "2024-01-14 11:20:00",
+    "signedBy": "王五",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000003.jpg",
+    "batchId": "BATCH-20240114-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000004",
+    "signedAt": "2024-01-15 16:40:00",
+    "signedBy": "赵六",
+    "hasPhoto": false,
+    "batchId": "BATCH-20240115-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000007",
+    "signedAt": "2024-01-18 10:00:00",
+    "signedBy": "快递柜",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000007.jpg",
+    "batchId": "BATCH-20240118-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000009",
+    "signedAt": "2024-01-20 14:30:00",
+    "signedBy": "郑十一",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000009.jpg",
+    "batchId": "BATCH-20240120-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "",
+    "signedAt": "2024-01-16 09:00:00",
+    "signedBy": "未知",
+    "hasPhoto": false,
+    "batchId": "BATCH-20240116-A",
+    "status": "success"
+  },
+  {
+    "trackingNo": "SF1000009",
+    "signedAt": "2024-01-17 10:00:00",
+    "signedBy": "郑十一",
+    "hasPhoto": true,
+    "photoUrl": "https://example.com/photos/SF1000009-early.jpg",
+    "batchId": "BATCH-20240117-A",
+    "status": "success"
+  }
+]

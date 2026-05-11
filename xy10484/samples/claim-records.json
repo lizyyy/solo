@@ -1,0 +1,40 @@
+[
+  {
+    "claimId": "CLAIM-001",
+    "trackingNo": "SF1000005",
+    "amount": 500.00,
+    "appliedAt": "2024-01-16 10:00:00",
+    "approvedAt": "2024-01-17 09:30:00",
+    "status": "approved",
+    "reason": "商品丢失",
+    "batchId": "CLAIM-20240116-A"
+  },
+  {
+    "claimId": "CLAIM-002",
+    "trackingNo": "SF1000005",
+    "amount": 300.00,
+    "appliedAt": "2024-01-17 14:00:00",
+    "status": "pending",
+    "reason": "部分商品损坏",
+    "batchId": "CLAIM-20240117-A"
+  },
+  {
+    "claimId": "CLAIM-003",
+    "trackingNo": "SF1000001",
+    "amount": 200.00,
+    "appliedAt": "2024-01-14 11:00:00",
+    "approvedAt": "2024-01-15 10:00:00",
+    "status": "approved",
+    "reason": "小额赔付",
+    "batchId": "CLAIM-20240114-A"
+  },
+  {
+    "claimId": "",
+    "trackingNo": "SF1000002",
+    "amount": 150.00,
+    "appliedAt": "2024-01-15 14:00:00",
+    "status": "pending",
+    "reason": "测试赔付",
+    "batchId": "CLAIM-20240115-A"
+  }
+]
