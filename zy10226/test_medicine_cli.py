@@ -113,7 +113,7 @@ def test_all_scenarios():
         print(f"✗ 补货失败: {result['reason']}")
         failed += 1
     
-    print("\n【测试2.1】同批号重复入库（应创建新记录）")
+    print("\n【测试2.1】同批号同来源重复入库（应拒绝）")
     result = service.replenish(
         medicine_id=med_id,
         batch_no="20260101",
@@ -122,14 +122,11 @@ def test_all_scenarios():
         source="社区医院捐赠",
         volunteer="张志愿者"
     )
-    if result["success"] and result["duplicate_check"]["has_duplicate"]:
-        inv_id1b = result["inventory_item"]["id"]
-        print(f"✓ 同批号重复入库处理正确: 检测到重复但创建新记录")
-        print(f"  现有批次数量: {result['duplicate_check']['total_qty']}")
-        print(f"  新库存ID: {inv_id1b}")
+    if not result["success"] and "同批号同来源已存在" in result["reason"]:
+        print(f"✓ 同批号同来源被正确拒绝: {result['reason']}")
         passed += 1
     else:
-        print(f"✗ 同批号处理错误")
+        print(f"✗ 同批号同来源应该被拒绝")
         failed += 1
     
     print("\n【测试2.2】不同来源同批号（应创建新记录）")
@@ -149,17 +146,31 @@ def test_all_scenarios():
     print("\n【测试2.3】重复提交相同补货（去重）")
     result = service.replenish(
         medicine_id=med_id,
-        batch_no="20260101",
+        batch_no="20260102",
         expiry_date=expiry_normal,
-        quantity=5,
+        quantity=3,
         source="社区医院捐赠",
         volunteer="张志愿者"
     )
-    if not result["success"] and "重复操作" in result["reason"]:
-        print(f"✓ 去重有效: {result['reason']}")
+    if result["success"]:
+        print(f"✓ 新批号补货成功")
         passed += 1
+        result2 = service.replenish(
+            medicine_id=med_id,
+            batch_no="20260102",
+            expiry_date=expiry_normal,
+            quantity=3,
+            source="社区医院捐赠",
+            volunteer="张志愿者"
+        )
+        if not result2["success"] and "同批号同来源已存在" in result2["reason"]:
+            print(f"✓ 去重有效: {result2['reason']}")
+            passed += 1
+        else:
+            print(f"✗ 去重失败")
+            failed += 1
     else:
-        print(f"✗ 去重失败")
+        print(f"✗ 新批号补货失败: {result.get('reason', '未知')}")
         failed += 1
     
     print("\n" + "-" * 70)
@@ -363,10 +374,16 @@ def test_all_scenarios():
     print(f"\n【可用库存】共 {len(status['available_stock'])} 种药品")
     for mid, info in status["available_stock"].items():
         med = store.data["medicines"][mid]
-        print(f"  {med['name']}: 总库存 {info['total']} {med['unit']}")
-        for batch in info["batches"]:
-            expire_status = f"剩余{batch['days_to_expire']}天" if batch['days_to_expire'] >= 0 else f"已过期{-batch['days_to_expire']}天"
-            print(f"    - 批号{batch['batch_no']}: {batch['quantity']} {med['unit']} ({expire_status})")
+        print(f"  {med['name']}: 有效库存 {info['total']} {med['unit']}")
+        if info["batches"]:
+            print(f"    有效批次:")
+            for batch in info["batches"]:
+                expire_status = f"剩余{batch['days_to_expire']}天" if batch['days_to_expire'] >= 0 else f"已过期{-batch['days_to_expire']}天"
+                print(f"      - 批号{batch['batch_no']}: {batch['quantity']} {med['unit']} ({expire_status})")
+        if info.get("expired_batches"):
+            print(f"    已过期批次（不计入可用库存）:")
+            for batch in info["expired_batches"]:
+                print(f"      - 批号{batch['batch_no']}: {batch['quantity']} {med['unit']} (已过期{-batch['days_to_expire']}天)")
     
     print(f"\n【即将过期】共 {len(status['expiring_soon'])} 个批次")
     for item in status["expiring_soon"]:
@@ -374,14 +391,50 @@ def test_all_scenarios():
     
     print(f"\n【需要补货】共 {len(status['need_replenish'])} 种药品")
     for item in status["need_replenish"]:
-        print(f"  - {item['medicine_name']}: 当前{item['current_stock']} < 最低{item['min_stock']}, 缺口{item['deficit']}")
+        print(f"  - {item['medicine_name']}: 有效库存{item['current_stock']} < 最低{item['min_stock']}, 缺口{item['deficit']}")
     
-    print(f"\n【交接差异】共 {len(status['handover_diff'])} 个下架批次")
+    print(f"\n【交接差异】共 {len(status['handover_diff'])} 个批次（含历史下架记录）")
     for item in status["handover_diff"]:
-        replenish_status = "已补回" if item["replenish_after_offline"] else "未补回"
-        print(f"  - {item['medicine_name']}: 下架{item['offline_count']}次, {replenish_status}")
+        status_str = "下架中" if item["current_status"] == "offline" else "已补回(active)"
+        print(f"  - {item['medicine_name']}: 批号{item['batch_no']}, 下架{item['offline_count']}次, 当前状态:{status_str}")
     
-    passed += 1
+    print("\n【验证库存口径修复】")
+    chuangketie_info = status["available_stock"].get(med_id3, {})
+    if chuangketie_info.get("total") == 0:
+        print(f"✓ 已过期60天的创可贴不计入可用库存（有效库存={chuangketie_info.get('total')}）")
+        print(f"✓ 已过期批次单独列出: {len(chuangketie_info.get('expired_batches', []))} 个批次")
+        passed += 1
+    else:
+        print(f"✗ 库存口径错误: 过期创可贴不应计入可用库存，实际={chuangketie_info.get('total')}")
+        failed += 1
+    
+    print("\n【验证交接差异修复】")
+    if len(status["handover_diff"]) > 0:
+        print(f"✓ 交接差异包含历史下架记录: {len(status['handover_diff'])} 个批次")
+        has_replenished = any(item["current_status"] == "active" for item in status["handover_diff"])
+        if has_replenished:
+            print(f"✓ 包含已补回的批次（当前状态为 active）")
+            passed += 1
+        else:
+            print(f"✗ 未包含已补回的批次")
+            failed += 1
+    else:
+        print(f"✗ 交接差异应该包含历史下架记录")
+        failed += 1
+    
+    print("\n【验证补货缺口计算】")
+    need_replenish_names = [item["medicine_name"] for item in status["need_replenish"]]
+    if "创可贴" in need_replenish_names:
+        chuangketie_need = next(item for item in status["need_replenish"] if item["medicine_name"] == "创可贴")
+        if chuangketie_need["current_stock"] == 0 and chuangketie_need["deficit"] == 20:
+            print(f"✓ 创可贴补货缺口正确: 有效库存0，最低20，缺口20")
+            passed += 1
+        else:
+            print(f"✗ 创可贴补货缺口错误: 有效库存={chuangketie_need['current_stock']}, 缺口={chuangketie_need['deficit']}")
+            failed += 1
+    else:
+        print(f"✗ 创可贴应该在需要补货列表中")
+        failed += 1
     
     print("\n" + "-" * 70)
     print("【测试7】验证数据持久化")

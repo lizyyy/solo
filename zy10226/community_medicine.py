@@ -163,12 +163,18 @@ class MedicineService:
         if medicine_id not in self.store.data["medicines"]:
             return {"success": False, "reason": "药品不存在"}
 
+        check_result = self.validator.check_batch_duplicate(medicine_id, batch_no, source)
+        if check_result["has_duplicate"]:
+            return {
+                "success": False,
+                "reason": f"同批号同来源已存在，现有数量: {check_result['total_qty']}",
+                "duplicate_check": check_result
+            }
+
         signature = f"replenish_{medicine_id}_{batch_no}_{source}_{quantity}_{volunteer}"
         if self.validator.check_duplicate_operation("replenish", signature):
             return {"success": False, "reason": "重复操作：该批次已入库"}
 
-        check_result = self.validator.check_batch_duplicate(medicine_id, batch_no, source)
-        
         inventory_item = {
             "id": self.store._generate_id(),
             "medicine_id": medicine_id,
@@ -339,7 +345,7 @@ class MedicineService:
         medicines = self.store.data["medicines"]
         inventory = self.store.data["inventory"]
         
-        available_stock = defaultdict(lambda: {"total": 0, "batches": []})
+        available_stock = defaultdict(lambda: {"total": 0, "batches": [], "expired_batches": []})
         expiring_soon = []
         need_replenish = []
         handover_diff = []
@@ -356,25 +362,31 @@ class MedicineService:
             exp_date = datetime.strptime(item["expiry_date"], "%Y-%m-%d").date()
             days_to_expire = (exp_date - today).days
             
-            available_stock[item["medicine_id"]]["total"] += item["quantity"]
-            available_stock[item["medicine_id"]]["batches"].append({
+            is_expired = days_to_expire < 0
+            batch_info = {
                 "id": item["id"],
                 "batch_no": item["batch_no"],
                 "quantity": item["quantity"],
                 "expiry_date": item["expiry_date"],
                 "days_to_expire": days_to_expire,
                 "source": item["source"]
-            })
+            }
             
-            if 0 <= days_to_expire <= warning_days:
-                expiring_soon.append({
-                    "medicine_id": item["medicine_id"],
-                    "medicine_name": medicine_name,
-                    "batch_no": item["batch_no"],
-                    "expiry_date": item["expiry_date"],
-                    "days_to_expire": days_to_expire,
-                    "quantity": item["quantity"]
-                })
+            if is_expired:
+                available_stock[item["medicine_id"]]["expired_batches"].append(batch_info)
+            else:
+                available_stock[item["medicine_id"]]["total"] += item["quantity"]
+                available_stock[item["medicine_id"]]["batches"].append(batch_info)
+                
+                if days_to_expire <= warning_days:
+                    expiring_soon.append({
+                        "medicine_id": item["medicine_id"],
+                        "medicine_name": medicine_name,
+                        "batch_no": item["batch_no"],
+                        "expiry_date": item["expiry_date"],
+                        "days_to_expire": days_to_expire,
+                        "quantity": item["quantity"]
+                    })
         
         for med_id, info in available_stock.items():
             medicine = medicines.get(med_id, {})
@@ -389,8 +401,14 @@ class MedicineService:
                     "deficit": min_stock - total_qty
                 })
         
-        offline_items = [item for item in inventory if item["status"] == "offline"]
-        for item in offline_items:
+        inventory_ids_with_offline = set()
+        for rec in self.store.data["offline_records"]:
+            inventory_ids_with_offline.add(rec["inventory_id"])
+        
+        for inv_id in inventory_ids_with_offline:
+            item = next((i for i in inventory if i["id"] == inv_id), None)
+            if not item:
+                continue
             medicine = medicines.get(item["medicine_id"], {})
             offline_check = self.validator.check_offline_replenish(item)
             handover_diff.append({
@@ -399,6 +417,7 @@ class MedicineService:
                 "medicine_name": medicine.get("name", "未知"),
                 "batch_no": item["batch_no"],
                 "quantity": item["quantity"],
+                "current_status": item["status"],
                 "offline_count": offline_check["offline_count"],
                 "replenish_after_offline": offline_check["replenish_after_offline"]
             })
@@ -548,14 +567,19 @@ class CLIController:
         for med_id, info in status["available_stock"].items():
             med = medicines.get(med_id, {})
             print(f"\n  {med.get('name', '未知')} (ID: {med_id})")
-            print(f"    总库存: {info['total']} {med.get('unit', '')}")
+            print(f"    有效库存: {info['total']} {med.get('unit', '')}")
             print(f"    最低库存要求: {med.get('min_stock', 0)} {med.get('unit', '')}")
-            for batch in info["batches"]:
-                expire_status = f"即将过期({batch['days_to_expire']}天)" if batch["days_to_expire"] <= 30 else "正常"
-                if batch["days_to_expire"] < 0:
-                    expire_status = f"已过期({-batch['days_to_expire']}天)"
-                print(f"      - 批号: {batch['batch_no']} | 数量: {batch['quantity']} | "
-                      f"有效期: {batch['expiry_date']} | {expire_status} | 来源: {batch['source']}")
+            if info["batches"]:
+                print(f"    有效批次:")
+                for batch in info["batches"]:
+                    expire_status = f"即将过期({batch['days_to_expire']}天)" if batch["days_to_expire"] <= 30 else "正常"
+                    print(f"      - 批号: {batch['batch_no']} | 数量: {batch['quantity']} | "
+                          f"有效期: {batch['expiry_date']} | {expire_status} | 来源: {batch['source']}")
+            if info.get("expired_batches"):
+                print(f"    ⚠️  已过期批次（不计入可用库存）:")
+                for batch in info["expired_batches"]:
+                    print(f"      - 批号: {batch['batch_no']} | 数量: {batch['quantity']} | "
+                          f"有效期: {batch['expiry_date']} | 已过期({-batch['days_to_expire']}天) | 来源: {batch['source']}")
         
         print(f"\n【即将过期】共 {len(status['expiring_soon'])} 个批次")
         for item in status["expiring_soon"]:
@@ -564,14 +588,15 @@ class CLIController:
         
         print(f"\n【需要补货】共 {len(status['need_replenish'])} 种药品")
         for item in status["need_replenish"]:
-            print(f"  - {item['medicine_name']} | 当前: {item['current_stock']} | "
+            print(f"  - {item['medicine_name']} | 有效库存: {item['current_stock']} | "
                   f"最低: {item['min_stock']} | 缺口: {item['deficit']}")
         
-        print(f"\n【交接差异】共 {len(status['handover_diff'])} 个下架批次")
+        print(f"\n【交接差异】共 {len(status['handover_diff'])} 个批次（含历史下架记录）")
         for item in status["handover_diff"]:
-            replenish_status = "已补回" if item["replenish_after_offline"] else "未补回"
+            status_str = "下架中" if item["current_status"] == "offline" else "已补回(active)"
+            replenish_flag = "✓ 已补回" if item["replenish_after_offline"] else "✗ 未补回"
             print(f"  - {item['medicine_name']} | 批号: {item['batch_no']} | "
-                  f"下架次数: {item['offline_count']} | {replenish_status}")
+                  f"下架次数: {item['offline_count']} | 当前状态: {status_str} | {replenish_flag}")
         
         print("\n" + "=" * 60)
 
@@ -601,9 +626,10 @@ class CLIController:
         print(f"志愿者: {args.volunteer}")
         
         if batch_check["has_duplicate"]:
-            print(f"\n⚠️  警告: 发现同批号同来源的现有库存")
+            print(f"\n✗ 错误: 发现同批号同来源的现有库存，不能重复入库")
             print(f"   现有数量: {batch_check['total_qty']}")
-            print(f"   将创建新的库存记录（不会覆盖）")
+            print(f"   请核对后使用不同批号或来源，或使用补回功能")
+            return
         else:
             print(f"\n✓ 批号检查通过：无重复批次")
         
