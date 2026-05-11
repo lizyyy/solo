@@ -1,0 +1,12 @@
+{
+  "name": "clothing-exchange-client",
+  "version": "1.0.0",
+  "description": "服装尺码换货台 - 前端应用",
+  "scripts": {
+    "start": "http-server -p 8080 -c-1 public",
+    "dev": "http-server -p 8080 -c-1 public"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
