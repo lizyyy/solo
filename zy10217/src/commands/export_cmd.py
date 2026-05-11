@@ -56,7 +56,12 @@ def export_village(output_path, village, fmt, include_details):
             record_details = []
             
             for farmer in farmers:
-                totals = calculate_farmer_total(session, farmer.id, include_confirmed_only=True)
+                totals = calculate_farmer_total(
+                    session, 
+                    farmer.id, 
+                    include_confirmed_only=True,
+                    include_finalized_only=True
+                )
                 farmer_details.append({
                     '村': farmer.village or '未分配',
                     '农户': farmer.name,
