@@ -1,0 +1,20 @@
+{
+  "name": "toilet-cleaning-cli",
+  "version": "1.0.0",
+  "description": "城市公厕保洁路线 CLI 工具 - 按人流、投诉和补给库存动态调整路线",
+  "main": "src/index.js",
+  "bin": {
+    "toilet-cli": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["toilet", "cleaning", "cli", "route", "management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

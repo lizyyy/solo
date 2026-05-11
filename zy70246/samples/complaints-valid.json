@@ -1,0 +1,58 @@
+[
+  {
+    "id": "C000001",
+    "toiletId": "T000001",
+    "complaintTime": "2026-05-11 09:30:00",
+    "complaintType": "异味",
+    "description": "公厕内有明显异味，通风系统似乎没有正常工作",
+    "status": "待处理"
+  },
+  {
+    "id": "C000002",
+    "toiletId": "T000001",
+    "complaintTime": "2026-05-11 08:45:00",
+    "complaintType": "无纸",
+    "description": "厕纸已用完，没有工作人员补充",
+    "status": "处理中"
+  },
+  {
+    "id": "C000003",
+    "toiletId": "T000003",
+    "complaintTime": "2026-05-11 07:20:00",
+    "complaintType": "卫生差",
+    "description": "地面有积水，洗手台有污渍",
+    "status": "待处理"
+  },
+  {
+    "id": "C000004",
+    "toiletId": "T000002",
+    "complaintTime": "2026-05-10 18:30:00",
+    "complaintType": "设备故障",
+    "description": "第三个隔间门锁损坏",
+    "status": "已解决"
+  },
+  {
+    "id": "C000005",
+    "toiletId": "T000005",
+    "complaintTime": "2026-05-11 10:15:00",
+    "complaintType": "缺水",
+    "description": "洗手台没有水流出",
+    "status": "待处理"
+  },
+  {
+    "id": "C000006",
+    "toiletId": "T000001",
+    "complaintTime": "2026-05-11 06:50:00",
+    "complaintType": "卫生差",
+    "description": "地面有垃圾未清理",
+    "status": "待处理"
+  },
+  {
+    "id": "C000007",
+    "toiletId": "T000099",
+    "complaintTime": "2026-05-11 08:00:00",
+    "complaintType": "其他",
+    "description": "公厕外有乱堆杂物现象",
+    "status": "待处理"
+  }
+]

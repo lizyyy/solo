@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市公厕保洁路线分析报告 - 2026/5/11 21:42:50</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6f8; color: #333; line-height: 1.6; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+    .header h1 { font-size: 28px; margin-bottom: 8px; }
+    .header .subtitle { opacity: 0.9; font-size: 14px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .summary-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .summary-card .label { font-size: 13px; color: #666; margin-bottom: 5px; }
+    .summary-card .value { font-size: 28px; font-weight: bold; color: #1e3c72; }
+    .summary-card.critical .value { color: #dc3545; }
+    .summary-card.high .value { color: #ffc107; }
+    .summary-card.warning .value { color: #fd7e14; }
+    .summary-card.danger .value { color: #dc3545; }
+    .section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 18px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; color: #1e3c72; }
+    .section h3 { font-size: 15px; margin: 15px 0 10px; color: #495057; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #e9ecef; }
+    th { background: #f8f9fa; font-weight: 600; color: #495057; }
+    tr:hover { background: #f8f9fa; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .badge-critical { background: #f8d7da; color: #721c24; }
+    .badge-high { background: #fff3cd; color: #856404; }
+    .badge-normal { background: #d4edda; color: #155724; }
+    .badge-warning { background: #ffe5d0; color: #c2410c; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+    .alert { padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; }
+    .alert-danger { background: #f8d7da; border-left: 4px solid #dc3545; }
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .two-column { grid-template-columns: 1fr; } }
+    .district-card { border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+    .district-name { font-weight: 600; color: #1e3c72; margin-bottom: 10px; font-size: 14px; }
+    .route-summary { display: flex; gap: 15px; flex-wrap: wrap; }
+    .route-item { padding: 8px 12px; border-radius: 6px; font-size: 12px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🚻 城市公厕保洁路线分析报告</h1>
+      <div class="subtitle">生成时间: 2026/5/11 21:42:50 | 数据来源: 公厕点位 + 投诉系统 + 补给库存</div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">公厕总数</div>
+        <div class="value">10</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">有效数据</div>
+        <div class="value">10</div>
+      </div>
+      <div class="summary-card danger">
+        <div class="label">无效数据</div>
+        <div class="value">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">投诉总数</div>
+        <div class="value">7</div>
+      </div>
+      <div class="summary-card warning">
+        <div class="label">待处理投诉</div>
+        <div class="value">6</div>
+      </div>
+      <div class="summary-card critical">
+        <div class="label">⚠️ 紧急优先级</div>
+        <div class="value">3</div>
+      </div>
+      <div class="summary-card high">
+        <div class="label">高优先级</div>
+        <div class="value">6</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">正常优先级</div>
+        <div class="value">1</div>
+      </div>
+    </div>
+
+    
+    <div class="section">
+      <h2>⚠️ 异常数据汇总</h2>
+      
+      
+      
+      <div class="alert alert-warning">
+        <strong>业务预警: 4 条</strong><br>
+        包含超时未清洁、库存不足、投诉过多等业务风险点。
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>🔥 重点关注公厕 (Top 10)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>优先级</th>
+            <th>编号</th>
+            <th>名称</th>
+            <th>行政区</th>
+            <th>人流权重</th>
+            <th>待处理投诉</th>
+            <th>补给库存</th>
+            <th>优先级分数</th>
+            <th>预警</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 12px; background-color: #dc3545; color: white;">critical</span></td>
+            <td><strong>T000001</strong></td>
+            <td>人民广场中心公厕-重复导入</td>
+            <td>黄浦区</td>
+            <td style="color: #dc3545">9</td>
+            <td style="color: #dc3545">3</td>
+            <td style="color: #fd7e14">8</td>
+            <td><strong>155</strong></td>
+            <td>
+              <div class="tag-list">
+                <span class="badge badge-warning">low_supply</span><span class="badge badge-warning">high_complaint</span>
+                <span class="badge badge-danger">高投诉</span>
+                <span class="badge badge-critical">高人流</span>
+                <span class="badge badge-warning">低库存</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 12px; background-color: #dc3545; color: white;">critical</span></td>
+            <td><strong>T000003</strong></td>
+            <td>静安寺地铁站公厕</td>
+            <td>静安区</td>
+            <td style="color: #dc3545">7</td>
+            <td style="color: #333">1</td>
+            <td style="color: #fd7e14">5</td>
+            <td><strong>125</strong></td>
+            <td>
+              <div class="tag-list">
+                <span class="badge badge-warning">low_supply</span>
+                
+                <span class="badge badge-critical">高人流</span>
+                <span class="badge badge-warning">低库存</span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 12px; background-color: #dc3545; color: white;">critical</span></td>
+            <td><strong>T000002</strong></td>
+            <td>外滩观景台公厕</td>
+            <td>黄浦区</td>
+            <td style="color: #dc3545">8</td>
+            <td style="color: #333">0</td>
+            <td style="color: #333">15</td>
+            <td><strong>108</strong></td>
+            <td>
+              <div class="tag-list">
+                
+                
+                <span class="badge badge-critical">高人流</span>
+                
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 12px; background-color: #ffc107; color: black;">high</span></td>
+            <td><strong>T000005</strong></td>
+            <td>陆家嘴滨江公厕</td>
+            <td>浦东新区</td>
+            <td style="color: #ffc107">5</td>
+            <td style="color: #333">1</td>
+            <td style="color: #333">12</td>
+            <td><strong>100</strong></td>
+            <td>
+              <div class="tag-list">
+                <span class="badge badge-warning">clean_overdue</span>
+                
+                
+                
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span style="padding: 2px 8px; border-radius: 4px; font-size: 12px; background-color: #ffc107; color: black;">high</span></td>
+            <td><strong>T000010</strong></td>
+            <td>世纪公园公厕</td>
+            <td>浦东新区</td>
+            <td style="color: #28a745">3</td>
+            <td style="color: #333">0</td>
+            <td style="color: #fd7e14">6</td>
+            <td><strong>87</strong></td>
+            <td>
+              <div class="tag-list">
+                <span class="badge badge-warning">clean_overdue</span><span class="badge badge-warning">low_supply</span>
+                
+                
+                <span class="badge badge-warning">低库存</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-column">
+      <div class="section">
+        <h2>📋 保洁路线规划</h2>
+        <h3>第一优先级: 紧急处理 (建议 2 小时内)</h3>
+        
+        <table>
+          <thead>
+            <tr><th>序号</th><th>编号</th><th>名称</th><th>行政区</th><th>分数</th></tr>
+          </thead>
+          <tbody>
+            
+            <tr><td>1</td><td><strong>T000001</strong></td><td>人民广场中心公厕-重复导入</td><td>黄浦区</td><td style="color: #dc3545"><strong>155</strong></td></tr>
+            <tr><td>2</td><td><strong>T000003</strong></td><td>静安寺地铁站公厕</td><td>静安区</td><td style="color: #dc3545"><strong>125</strong></td></tr>
+            <tr><td>3</td><td><strong>T000002</strong></td><td>外滩观景台公厕</td><td>黄浦区</td><td style="color: #dc3545"><strong>108</strong></td></tr>
+          </tbody>
+        </table>
+
+        <h3>第二优先级: 优先处理 (建议 4 小时内)</h3>
+        
+        <table>
+          <thead>
+            <tr><th>序号</th><th>编号</th><th>名称</th><th>行政区</th><th>分数</th></tr>
+          </thead>
+          <tbody>
+            
+            <tr><td>1</td><td><strong>T000005</strong></td><td>陆家嘴滨江公厕</td><td>浦东新区</td><td style="color: #ffc107"><strong>100</strong></td></tr>
+            <tr><td>2</td><td><strong>T000010</strong></td><td>世纪公园公厕</td><td>浦东新区</td><td style="color: #ffc107"><strong>87</strong></td></tr>
+            <tr><td>3</td><td><strong>T000004</strong></td><td>南京东路步行街公厕</td><td>黄浦区</td><td style="color: #ffc107"><strong>78</strong></td></tr>
+            <tr><td>4</td><td><strong>T000006</strong></td><td>徐家汇商圈公厕</td><td>徐汇区</td><td style="color: #ffc107"><strong>60</strong></td></tr>
+            <tr><td>5</td><td><strong>T000008</strong></td><td>中山公园公厕</td><td>长宁区</td><td style="color: #ffc107"><strong>45</strong></td></tr>
+            <tr><td>6</td><td><strong>T000009</strong></td><td>鲁迅公园公厕</td><td>虹口区</td><td style="color: #ffc107"><strong>39</strong></td></tr>
+          </tbody>
+        </table>
+
+        <h3>第三优先级: 常规保洁</h3>
+        
+        <table>
+          <thead>
+            <tr><th>序号</th><th>编号</th><th>名称</th><th>行政区</th><th>分数</th></tr>
+          </thead>
+          <tbody>
+            
+            <tr><td>1</td><td><strong>T000007</strong></td><td>虹桥火车站公厕</td><td>闵行区</td><td>36</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h2>📍 按行政区路线</h2>
+        
+          <div class="district-card">
+            <div class="district-name">黄浦区 (3 个公厕)</div>
+            <div class="route-summary">
+              <div class="route-item" style="background: #f8d7da"><strong>紧急:</strong> T000001, T000002</div>
+              <div class="route-item" style="background: #fff3cd"><strong>优先:</strong> T000004</div>
+              
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">静安区 (1 个公厕)</div>
+            <div class="route-summary">
+              <div class="route-item" style="background: #f8d7da"><strong>紧急:</strong> T000003</div>
+              
+              
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">浦东新区 (2 个公厕)</div>
+            <div class="route-summary">
+              
+              <div class="route-item" style="background: #fff3cd"><strong>优先:</strong> T000005, T000010</div>
+              
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">徐汇区 (1 个公厕)</div>
+            <div class="route-summary">
+              
+              <div class="route-item" style="background: #fff3cd"><strong>优先:</strong> T000006</div>
+              
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">闵行区 (1 个公厕)</div>
+            <div class="route-summary">
+              
+              
+              <div class="route-item" style="background: #d4edda"><strong>常规:</strong> T000007</div>
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">长宁区 (1 个公厕)</div>
+            <div class="route-summary">
+              
+              <div class="route-item" style="background: #fff3cd"><strong>优先:</strong> T000008</div>
+              
+            </div>
+          </div>
+          <div class="district-card">
+            <div class="district-name">虹口区 (1 个公厕)</div>
+            <div class="route-summary">
+              
+              <div class="route-item" style="background: #fff3cd"><strong>优先:</strong> T000009</div>
+              
+            </div>
+          </div>
+
+        <h2 style="margin-top: 25px">📊 投诉类型统计</h2>
+        <table>
+          <thead>
+            <tr><th>投诉类型</th><th>总数</th><th>待处理</th><th>占比</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>卫生差</td><td>2</td><td style="color: #dc3545">2</td><td>33.3%</td></tr><tr><td>异味</td><td>1</td><td style="color: #dc3545">1</td><td>16.7%</td></tr><tr><td>无纸</td><td>1</td><td style="color: #dc3545">1</td><td>16.7%</td></tr><tr><td>缺水</td><td>1</td><td style="color: #dc3545">1</td><td>16.7%</td></tr><tr><td>其他</td><td>1</td><td style="color: #dc3545">1</td><td>16.7%</td></tr><tr><td>设备故障</td><td>1</td><td style="color: #28a745">0</td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+
+    
+    <div class="section">
+      <h2>⚠️ 业务预警详情</h2>
+      <table>
+        <thead>
+          <tr><th>编号</th><th>名称</th><th>预警类型</th><th>预警详情</th></tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td><strong>T000001</strong></td>
+            <td>人民广场中心公厕-重复导入</td>
+            <td><span class="badge badge-warning">low_supply</span> <span class="badge badge-warning">high_complaint</span></td>
+            <td>补给库存偏低 (8 份，建议最小值 10 份)<br>投诉数量偏高 (3 次，已达到处理阈值)</td>
+          </tr>
+          <tr>
+            <td><strong>T000003</strong></td>
+            <td>静安寺地铁站公厕</td>
+            <td><span class="badge badge-warning">low_supply</span></td>
+            <td>补给库存偏低 (5 份，建议最小值 10 份)</td>
+          </tr>
+          <tr>
+            <td><strong>T000005</strong></td>
+            <td>陆家嘴滨江公厕</td>
+            <td><span class="badge badge-warning">clean_overdue</span></td>
+            <td>超过 24 小时未清洁 (已 31.7 小时)</td>
+          </tr>
+          <tr>
+            <td><strong>T000010</strong></td>
+            <td>世纪公园公厕</td>
+            <td><span class="badge badge-warning">clean_overdue</span> <span class="badge badge-warning">low_supply</span></td>
+            <td>超过 24 小时未清洁 (已 37.7 小时)<br>补给库存偏低 (6 份，建议最小值 10 份)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    
+
+    <div class="section" style="text-align: center; color: #666; font-size: 12px;">
+      <p>本报告由城市公厕保洁路线 CLI 工具自动生成</p>
+      <p>优先级计算规则: 人流权重×10 + 投诉数×8 + 库存预警分 + 超时清洁分</p>
+    </div>
+  </div>
+</body>
+</html>

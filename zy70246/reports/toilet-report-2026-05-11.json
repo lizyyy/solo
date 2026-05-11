@@ -1,0 +1,1258 @@
+{
+  "generatedAt": "2026-05-11T13:42:50.936Z",
+  "summary": {
+    "totalToilets": 10,
+    "validToilets": 10,
+    "invalidToilets": 0,
+    "totalComplaints": 7,
+    "activeComplaints": 6,
+    "duplicates": 0,
+    "warnings": 4,
+    "criticalPriority": 3,
+    "highPriority": 6,
+    "normalPriority": 1
+  },
+  "route": {
+    "critical": [
+      {
+        "id": "T000001",
+        "name": "人民广场中心公厕-重复导入",
+        "district": "黄浦区",
+        "flowWeight": 9,
+        "complaintCount": 3,
+        "supplyStock": 8,
+        "lastCleanTime": "2026-05-11 08:30:00",
+        "priorityScore": 155,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (8 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 8
+          },
+          {
+            "type": "high_complaint",
+            "message": "投诉数量偏高 (3 次，已达到处理阈值)",
+            "field": "complaintCount",
+            "value": 3
+          }
+        ],
+        "isValid": true,
+        "source": "异常测试",
+        "rawData": {
+          "id": "T000001",
+          "name": "人民广场中心公厕-重复导入",
+          "address": "黄浦区人民大道200号",
+          "district": "黄浦区",
+          "flowWeight": 9,
+          "lastCleanTime": "2026-05-11 08:30:00",
+          "supplyStock": 8,
+          "complaintCount": 3
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000003",
+        "name": "静安寺地铁站公厕",
+        "district": "静安区",
+        "flowWeight": 7,
+        "complaintCount": 1,
+        "supplyStock": 5,
+        "lastCleanTime": "2026-05-11 07:15:00",
+        "priorityScore": 125,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (5 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 5
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000003",
+          "name": "静安寺地铁站公厕",
+          "address": "静安区南京西路1688号",
+          "district": "静安区",
+          "flowWeight": 7,
+          "lastCleanTime": "2026-05-11 07:15:00",
+          "supplyStock": 5,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000002",
+        "name": "外滩观景台公厕",
+        "district": "黄浦区",
+        "flowWeight": 8,
+        "complaintCount": 0,
+        "supplyStock": 15,
+        "lastCleanTime": "2026-05-11 06:00:00",
+        "priorityScore": 108,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000002",
+          "name": "外滩观景台公厕",
+          "address": "黄浦区中山东一路22号",
+          "district": "黄浦区",
+          "flowWeight": 8,
+          "lastCleanTime": "2026-05-11 06:00:00",
+          "supplyStock": 15,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      }
+    ],
+    "high": [
+      {
+        "id": "T000005",
+        "name": "陆家嘴滨江公厕",
+        "district": "浦东新区",
+        "flowWeight": 5,
+        "complaintCount": 1,
+        "supplyStock": 12,
+        "lastCleanTime": "2026-05-10 14:00:00",
+        "priorityScore": 100,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 31.7 小时)",
+            "field": "lastCleanTime",
+            "value": 31.705227222222224
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000005",
+          "name": "陆家嘴滨江公厕",
+          "address": "浦东新区滨江大道2727号",
+          "district": "浦东新区",
+          "flowWeight": 5,
+          "lastCleanTime": "2026-05-10 14:00:00",
+          "supplyStock": 12,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000010",
+        "name": "世纪公园公厕",
+        "district": "浦东新区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 6,
+        "lastCleanTime": "2026-05-10 08:00:00",
+        "priorityScore": 87,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 37.7 小时)",
+            "field": "lastCleanTime",
+            "value": 37.70147722222222
+          },
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (6 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 6
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000010",
+          "name": "世纪公园公厕",
+          "address": "浦东新区锦绣路1001号",
+          "district": "浦东新区",
+          "flowWeight": 3,
+          "lastCleanTime": "2026-05-10 08:00:00",
+          "supplyStock": 6,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000004",
+        "name": "南京东路步行街公厕",
+        "district": "黄浦区",
+        "flowWeight": 6,
+        "complaintCount": 0,
+        "supplyStock": 20,
+        "lastCleanTime": "2026-05-11 05:45:00",
+        "priorityScore": 78,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000004",
+          "name": "南京东路步行街公厕",
+          "address": "黄浦区南京东路353号",
+          "district": "黄浦区",
+          "flowWeight": 6,
+          "lastCleanTime": "2026-05-11 05:45:00",
+          "supplyStock": 20,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000006",
+        "name": "徐家汇商圈公厕",
+        "district": "徐汇区",
+        "flowWeight": 4,
+        "complaintCount": 0,
+        "supplyStock": 18,
+        "lastCleanTime": "2026-05-11 09:00:00",
+        "priorityScore": 60,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000006",
+          "name": "徐家汇商圈公厕",
+          "address": "徐汇区漕溪北路333号",
+          "district": "徐汇区",
+          "flowWeight": 4,
+          "lastCleanTime": "2026-05-11 09:00:00",
+          "supplyStock": 18,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000008",
+        "name": "中山公园公厕",
+        "district": "长宁区",
+        "flowWeight": 2,
+        "complaintCount": 0,
+        "supplyStock": 16,
+        "lastCleanTime": "2026-05-11 07:30:00",
+        "priorityScore": 45,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000008",
+          "name": "中山公园公厕",
+          "address": "长宁区长宁路780号",
+          "district": "长宁区",
+          "flowWeight": 2,
+          "lastCleanTime": "2026-05-11 07:30:00",
+          "supplyStock": 16,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000009",
+        "name": "鲁迅公园公厕",
+        "district": "虹口区",
+        "flowWeight": 1,
+        "complaintCount": 0,
+        "supplyStock": 14,
+        "lastCleanTime": "2026-05-11 08:00:00",
+        "priorityScore": 39,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000009",
+          "name": "鲁迅公园公厕",
+          "address": "虹口区四川北路2288号",
+          "district": "虹口区",
+          "flowWeight": 1,
+          "lastCleanTime": "2026-05-11 08:00:00",
+          "supplyStock": 14,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      }
+    ],
+    "normal": [
+      {
+        "id": "T000007",
+        "name": "虹桥火车站公厕",
+        "district": "闵行区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 25,
+        "lastCleanTime": "2026-05-11 10:00:00",
+        "priorityScore": 36,
+        "priorityLevel": "normal",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000007",
+          "name": "虹桥火车站公厕",
+          "address": "闵行区申贵路1500号",
+          "district": "闵行区",
+          "flowWeight": 3,
+          "lastCleanTime": "2026-05-11 10:00:00",
+          "supplyStock": 25,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      }
+    ],
+    "all": [
+      {
+        "id": "T000001",
+        "name": "人民广场中心公厕-重复导入",
+        "district": "黄浦区",
+        "flowWeight": 9,
+        "complaintCount": 3,
+        "supplyStock": 8,
+        "lastCleanTime": "2026-05-11 08:30:00",
+        "priorityScore": 155,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (8 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 8
+          },
+          {
+            "type": "high_complaint",
+            "message": "投诉数量偏高 (3 次，已达到处理阈值)",
+            "field": "complaintCount",
+            "value": 3
+          }
+        ],
+        "isValid": true,
+        "source": "异常测试",
+        "rawData": {
+          "id": "T000001",
+          "name": "人民广场中心公厕-重复导入",
+          "address": "黄浦区人民大道200号",
+          "district": "黄浦区",
+          "flowWeight": 9,
+          "lastCleanTime": "2026-05-11 08:30:00",
+          "supplyStock": 8,
+          "complaintCount": 3
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000003",
+        "name": "静安寺地铁站公厕",
+        "district": "静安区",
+        "flowWeight": 7,
+        "complaintCount": 1,
+        "supplyStock": 5,
+        "lastCleanTime": "2026-05-11 07:15:00",
+        "priorityScore": 125,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (5 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 5
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000003",
+          "name": "静安寺地铁站公厕",
+          "address": "静安区南京西路1688号",
+          "district": "静安区",
+          "flowWeight": 7,
+          "lastCleanTime": "2026-05-11 07:15:00",
+          "supplyStock": 5,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000002",
+        "name": "外滩观景台公厕",
+        "district": "黄浦区",
+        "flowWeight": 8,
+        "complaintCount": 0,
+        "supplyStock": 15,
+        "lastCleanTime": "2026-05-11 06:00:00",
+        "priorityScore": 108,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000002",
+          "name": "外滩观景台公厕",
+          "address": "黄浦区中山东一路22号",
+          "district": "黄浦区",
+          "flowWeight": 8,
+          "lastCleanTime": "2026-05-11 06:00:00",
+          "supplyStock": 15,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000005",
+        "name": "陆家嘴滨江公厕",
+        "district": "浦东新区",
+        "flowWeight": 5,
+        "complaintCount": 1,
+        "supplyStock": 12,
+        "lastCleanTime": "2026-05-10 14:00:00",
+        "priorityScore": 100,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 31.7 小时)",
+            "field": "lastCleanTime",
+            "value": 31.705227222222224
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000005",
+          "name": "陆家嘴滨江公厕",
+          "address": "浦东新区滨江大道2727号",
+          "district": "浦东新区",
+          "flowWeight": 5,
+          "lastCleanTime": "2026-05-10 14:00:00",
+          "supplyStock": 12,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000010",
+        "name": "世纪公园公厕",
+        "district": "浦东新区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 6,
+        "lastCleanTime": "2026-05-10 08:00:00",
+        "priorityScore": 87,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 37.7 小时)",
+            "field": "lastCleanTime",
+            "value": 37.70147722222222
+          },
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (6 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 6
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000010",
+          "name": "世纪公园公厕",
+          "address": "浦东新区锦绣路1001号",
+          "district": "浦东新区",
+          "flowWeight": 3,
+          "lastCleanTime": "2026-05-10 08:00:00",
+          "supplyStock": 6,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000004",
+        "name": "南京东路步行街公厕",
+        "district": "黄浦区",
+        "flowWeight": 6,
+        "complaintCount": 0,
+        "supplyStock": 20,
+        "lastCleanTime": "2026-05-11 05:45:00",
+        "priorityScore": 78,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000004",
+          "name": "南京东路步行街公厕",
+          "address": "黄浦区南京东路353号",
+          "district": "黄浦区",
+          "flowWeight": 6,
+          "lastCleanTime": "2026-05-11 05:45:00",
+          "supplyStock": 20,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000006",
+        "name": "徐家汇商圈公厕",
+        "district": "徐汇区",
+        "flowWeight": 4,
+        "complaintCount": 0,
+        "supplyStock": 18,
+        "lastCleanTime": "2026-05-11 09:00:00",
+        "priorityScore": 60,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000006",
+          "name": "徐家汇商圈公厕",
+          "address": "徐汇区漕溪北路333号",
+          "district": "徐汇区",
+          "flowWeight": 4,
+          "lastCleanTime": "2026-05-11 09:00:00",
+          "supplyStock": 18,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000008",
+        "name": "中山公园公厕",
+        "district": "长宁区",
+        "flowWeight": 2,
+        "complaintCount": 0,
+        "supplyStock": 16,
+        "lastCleanTime": "2026-05-11 07:30:00",
+        "priorityScore": 45,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000008",
+          "name": "中山公园公厕",
+          "address": "长宁区长宁路780号",
+          "district": "长宁区",
+          "flowWeight": 2,
+          "lastCleanTime": "2026-05-11 07:30:00",
+          "supplyStock": 16,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000009",
+        "name": "鲁迅公园公厕",
+        "district": "虹口区",
+        "flowWeight": 1,
+        "complaintCount": 0,
+        "supplyStock": 14,
+        "lastCleanTime": "2026-05-11 08:00:00",
+        "priorityScore": 39,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000009",
+          "name": "鲁迅公园公厕",
+          "address": "虹口区四川北路2288号",
+          "district": "虹口区",
+          "flowWeight": 1,
+          "lastCleanTime": "2026-05-11 08:00:00",
+          "supplyStock": 14,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      },
+      {
+        "id": "T000007",
+        "name": "虹桥火车站公厕",
+        "district": "闵行区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 25,
+        "lastCleanTime": "2026-05-11 10:00:00",
+        "priorityScore": 36,
+        "priorityLevel": "normal",
+        "errors": [],
+        "warnings": [],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000007",
+          "name": "虹桥火车站公厕",
+          "address": "闵行区申贵路1500号",
+          "district": "闵行区",
+          "flowWeight": 3,
+          "lastCleanTime": "2026-05-11 10:00:00",
+          "supplyStock": 25,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      }
+    ],
+    "byDistrict": {
+      "黄浦区": {
+        "critical": [
+          {
+            "id": "T000001",
+            "name": "人民广场中心公厕-重复导入",
+            "district": "黄浦区",
+            "flowWeight": 9,
+            "complaintCount": 3,
+            "supplyStock": 8,
+            "lastCleanTime": "2026-05-11 08:30:00",
+            "priorityScore": 155,
+            "priorityLevel": "critical",
+            "errors": [],
+            "warnings": [
+              {
+                "type": "low_supply",
+                "message": "补给库存偏低 (8 份，建议最小值 10 份)",
+                "field": "supplyStock",
+                "value": 8
+              },
+              {
+                "type": "high_complaint",
+                "message": "投诉数量偏高 (3 次，已达到处理阈值)",
+                "field": "complaintCount",
+                "value": 3
+              }
+            ],
+            "isValid": true,
+            "source": "异常测试",
+            "rawData": {
+              "id": "T000001",
+              "name": "人民广场中心公厕-重复导入",
+              "address": "黄浦区人民大道200号",
+              "district": "黄浦区",
+              "flowWeight": 9,
+              "lastCleanTime": "2026-05-11 08:30:00",
+              "supplyStock": 8,
+              "complaintCount": 3
+            },
+            "updatedAt": "2026-05-11T13:42:18.817Z"
+          },
+          {
+            "id": "T000002",
+            "name": "外滩观景台公厕",
+            "district": "黄浦区",
+            "flowWeight": 8,
+            "complaintCount": 0,
+            "supplyStock": 15,
+            "lastCleanTime": "2026-05-11 06:00:00",
+            "priorityScore": 108,
+            "priorityLevel": "critical",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000002",
+              "name": "外滩观景台公厕",
+              "address": "黄浦区中山东一路22号",
+              "district": "黄浦区",
+              "flowWeight": 8,
+              "lastCleanTime": "2026-05-11 06:00:00",
+              "supplyStock": 15,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "high": [
+          {
+            "id": "T000004",
+            "name": "南京东路步行街公厕",
+            "district": "黄浦区",
+            "flowWeight": 6,
+            "complaintCount": 0,
+            "supplyStock": 20,
+            "lastCleanTime": "2026-05-11 05:45:00",
+            "priorityScore": 78,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000004",
+              "name": "南京东路步行街公厕",
+              "address": "黄浦区南京东路353号",
+              "district": "黄浦区",
+              "flowWeight": 6,
+              "lastCleanTime": "2026-05-11 05:45:00",
+              "supplyStock": 20,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "normal": []
+      },
+      "静安区": {
+        "critical": [
+          {
+            "id": "T000003",
+            "name": "静安寺地铁站公厕",
+            "district": "静安区",
+            "flowWeight": 7,
+            "complaintCount": 1,
+            "supplyStock": 5,
+            "lastCleanTime": "2026-05-11 07:15:00",
+            "priorityScore": 125,
+            "priorityLevel": "critical",
+            "errors": [],
+            "warnings": [
+              {
+                "type": "low_supply",
+                "message": "补给库存偏低 (5 份，建议最小值 10 份)",
+                "field": "supplyStock",
+                "value": 5
+              }
+            ],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000003",
+              "name": "静安寺地铁站公厕",
+              "address": "静安区南京西路1688号",
+              "district": "静安区",
+              "flowWeight": 7,
+              "lastCleanTime": "2026-05-11 07:15:00",
+              "supplyStock": 5,
+              "complaintCount": 1
+            },
+            "updatedAt": "2026-05-11T13:42:18.817Z"
+          }
+        ],
+        "high": [],
+        "normal": []
+      },
+      "浦东新区": {
+        "critical": [],
+        "high": [
+          {
+            "id": "T000005",
+            "name": "陆家嘴滨江公厕",
+            "district": "浦东新区",
+            "flowWeight": 5,
+            "complaintCount": 1,
+            "supplyStock": 12,
+            "lastCleanTime": "2026-05-10 14:00:00",
+            "priorityScore": 100,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [
+              {
+                "type": "clean_overdue",
+                "message": "超过 24 小时未清洁 (已 31.7 小时)",
+                "field": "lastCleanTime",
+                "value": 31.705227222222224
+              }
+            ],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000005",
+              "name": "陆家嘴滨江公厕",
+              "address": "浦东新区滨江大道2727号",
+              "district": "浦东新区",
+              "flowWeight": 5,
+              "lastCleanTime": "2026-05-10 14:00:00",
+              "supplyStock": 12,
+              "complaintCount": 1
+            },
+            "updatedAt": "2026-05-11T13:42:18.817Z"
+          },
+          {
+            "id": "T000010",
+            "name": "世纪公园公厕",
+            "district": "浦东新区",
+            "flowWeight": 3,
+            "complaintCount": 0,
+            "supplyStock": 6,
+            "lastCleanTime": "2026-05-10 08:00:00",
+            "priorityScore": 87,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [
+              {
+                "type": "clean_overdue",
+                "message": "超过 24 小时未清洁 (已 37.7 小时)",
+                "field": "lastCleanTime",
+                "value": 37.70147722222222
+              },
+              {
+                "type": "low_supply",
+                "message": "补给库存偏低 (6 份，建议最小值 10 份)",
+                "field": "supplyStock",
+                "value": 6
+              }
+            ],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000010",
+              "name": "世纪公园公厕",
+              "address": "浦东新区锦绣路1001号",
+              "district": "浦东新区",
+              "flowWeight": 3,
+              "lastCleanTime": "2026-05-10 08:00:00",
+              "supplyStock": 6,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "normal": []
+      },
+      "徐汇区": {
+        "critical": [],
+        "high": [
+          {
+            "id": "T000006",
+            "name": "徐家汇商圈公厕",
+            "district": "徐汇区",
+            "flowWeight": 4,
+            "complaintCount": 0,
+            "supplyStock": 18,
+            "lastCleanTime": "2026-05-11 09:00:00",
+            "priorityScore": 60,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000006",
+              "name": "徐家汇商圈公厕",
+              "address": "徐汇区漕溪北路333号",
+              "district": "徐汇区",
+              "flowWeight": 4,
+              "lastCleanTime": "2026-05-11 09:00:00",
+              "supplyStock": 18,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "normal": []
+      },
+      "闵行区": {
+        "critical": [],
+        "high": [],
+        "normal": [
+          {
+            "id": "T000007",
+            "name": "虹桥火车站公厕",
+            "district": "闵行区",
+            "flowWeight": 3,
+            "complaintCount": 0,
+            "supplyStock": 25,
+            "lastCleanTime": "2026-05-11 10:00:00",
+            "priorityScore": 36,
+            "priorityLevel": "normal",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000007",
+              "name": "虹桥火车站公厕",
+              "address": "闵行区申贵路1500号",
+              "district": "闵行区",
+              "flowWeight": 3,
+              "lastCleanTime": "2026-05-11 10:00:00",
+              "supplyStock": 25,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ]
+      },
+      "长宁区": {
+        "critical": [],
+        "high": [
+          {
+            "id": "T000008",
+            "name": "中山公园公厕",
+            "district": "长宁区",
+            "flowWeight": 2,
+            "complaintCount": 0,
+            "supplyStock": 16,
+            "lastCleanTime": "2026-05-11 07:30:00",
+            "priorityScore": 45,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000008",
+              "name": "中山公园公厕",
+              "address": "长宁区长宁路780号",
+              "district": "长宁区",
+              "flowWeight": 2,
+              "lastCleanTime": "2026-05-11 07:30:00",
+              "supplyStock": 16,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "normal": []
+      },
+      "虹口区": {
+        "critical": [],
+        "high": [
+          {
+            "id": "T000009",
+            "name": "鲁迅公园公厕",
+            "district": "虹口区",
+            "flowWeight": 1,
+            "complaintCount": 0,
+            "supplyStock": 14,
+            "lastCleanTime": "2026-05-11 08:00:00",
+            "priorityScore": 39,
+            "priorityLevel": "high",
+            "errors": [],
+            "warnings": [],
+            "isValid": true,
+            "source": "正常点位",
+            "rawData": {
+              "id": "T000009",
+              "name": "鲁迅公园公厕",
+              "address": "虹口区四川北路2288号",
+              "district": "虹口区",
+              "flowWeight": 1,
+              "lastCleanTime": "2026-05-11 08:00:00",
+              "supplyStock": 14,
+              "complaintCount": 0
+            },
+            "createdAt": "2026-05-11T13:42:05.317Z"
+          }
+        ],
+        "normal": []
+      }
+    },
+    "statistics": {
+      "total": 10,
+      "critical": 3,
+      "high": 6,
+      "normal": 1,
+      "districts": 7
+    }
+  },
+  "anomalies": {
+    "invalid": [],
+    "warnings": [
+      {
+        "id": "T000001",
+        "name": "人民广场中心公厕-重复导入",
+        "district": "黄浦区",
+        "flowWeight": 9,
+        "complaintCount": 3,
+        "supplyStock": 8,
+        "lastCleanTime": "2026-05-11 08:30:00",
+        "priorityScore": 155,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (8 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 8
+          },
+          {
+            "type": "high_complaint",
+            "message": "投诉数量偏高 (3 次，已达到处理阈值)",
+            "field": "complaintCount",
+            "value": 3
+          }
+        ],
+        "isValid": true,
+        "source": "异常测试",
+        "rawData": {
+          "id": "T000001",
+          "name": "人民广场中心公厕-重复导入",
+          "address": "黄浦区人民大道200号",
+          "district": "黄浦区",
+          "flowWeight": 9,
+          "lastCleanTime": "2026-05-11 08:30:00",
+          "supplyStock": 8,
+          "complaintCount": 3
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000003",
+        "name": "静安寺地铁站公厕",
+        "district": "静安区",
+        "flowWeight": 7,
+        "complaintCount": 1,
+        "supplyStock": 5,
+        "lastCleanTime": "2026-05-11 07:15:00",
+        "priorityScore": 125,
+        "priorityLevel": "critical",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (5 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 5
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000003",
+          "name": "静安寺地铁站公厕",
+          "address": "静安区南京西路1688号",
+          "district": "静安区",
+          "flowWeight": 7,
+          "lastCleanTime": "2026-05-11 07:15:00",
+          "supplyStock": 5,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000005",
+        "name": "陆家嘴滨江公厕",
+        "district": "浦东新区",
+        "flowWeight": 5,
+        "complaintCount": 1,
+        "supplyStock": 12,
+        "lastCleanTime": "2026-05-10 14:00:00",
+        "priorityScore": 100,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 31.7 小时)",
+            "field": "lastCleanTime",
+            "value": 31.705227222222224
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000005",
+          "name": "陆家嘴滨江公厕",
+          "address": "浦东新区滨江大道2727号",
+          "district": "浦东新区",
+          "flowWeight": 5,
+          "lastCleanTime": "2026-05-10 14:00:00",
+          "supplyStock": 12,
+          "complaintCount": 1
+        },
+        "updatedAt": "2026-05-11T13:42:18.817Z"
+      },
+      {
+        "id": "T000010",
+        "name": "世纪公园公厕",
+        "district": "浦东新区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 6,
+        "lastCleanTime": "2026-05-10 08:00:00",
+        "priorityScore": 87,
+        "priorityLevel": "high",
+        "errors": [],
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 37.7 小时)",
+            "field": "lastCleanTime",
+            "value": 37.70147722222222
+          },
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (6 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 6
+          }
+        ],
+        "isValid": true,
+        "source": "正常点位",
+        "rawData": {
+          "id": "T000010",
+          "name": "世纪公园公厕",
+          "address": "浦东新区锦绣路1001号",
+          "district": "浦东新区",
+          "flowWeight": 3,
+          "lastCleanTime": "2026-05-10 08:00:00",
+          "supplyStock": 6,
+          "complaintCount": 0
+        },
+        "createdAt": "2026-05-11T13:42:05.317Z"
+      }
+    ],
+    "duplicates": []
+  },
+  "topIssues": {
+    "topToilets": [
+      {
+        "id": "T000001",
+        "name": "人民广场中心公厕-重复导入",
+        "district": "黄浦区",
+        "flowWeight": 9,
+        "complaintCount": 3,
+        "supplyStock": 8,
+        "priorityScore": 155,
+        "priorityLevel": "critical",
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (8 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 8
+          },
+          {
+            "type": "high_complaint",
+            "message": "投诉数量偏高 (3 次，已达到处理阈值)",
+            "field": "complaintCount",
+            "value": 3
+          }
+        ]
+      },
+      {
+        "id": "T000003",
+        "name": "静安寺地铁站公厕",
+        "district": "静安区",
+        "flowWeight": 7,
+        "complaintCount": 1,
+        "supplyStock": 5,
+        "priorityScore": 125,
+        "priorityLevel": "critical",
+        "warnings": [
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (5 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 5
+          }
+        ]
+      },
+      {
+        "id": "T000002",
+        "name": "外滩观景台公厕",
+        "district": "黄浦区",
+        "flowWeight": 8,
+        "complaintCount": 0,
+        "supplyStock": 15,
+        "priorityScore": 108,
+        "priorityLevel": "critical",
+        "warnings": []
+      },
+      {
+        "id": "T000005",
+        "name": "陆家嘴滨江公厕",
+        "district": "浦东新区",
+        "flowWeight": 5,
+        "complaintCount": 1,
+        "supplyStock": 12,
+        "priorityScore": 100,
+        "priorityLevel": "high",
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 31.7 小时)",
+            "field": "lastCleanTime",
+            "value": 31.705227222222224
+          }
+        ]
+      },
+      {
+        "id": "T000010",
+        "name": "世纪公园公厕",
+        "district": "浦东新区",
+        "flowWeight": 3,
+        "complaintCount": 0,
+        "supplyStock": 6,
+        "priorityScore": 87,
+        "priorityLevel": "high",
+        "warnings": [
+          {
+            "type": "clean_overdue",
+            "message": "超过 24 小时未清洁 (已 37.7 小时)",
+            "field": "lastCleanTime",
+            "value": 37.70147722222222
+          },
+          {
+            "type": "low_supply",
+            "message": "补给库存偏低 (6 份，建议最小值 10 份)",
+            "field": "supplyStock",
+            "value": 6
+          }
+        ]
+      }
+    ],
+    "complaintTypes": [
+      {
+        "type": "卫生差",
+        "total": 2,
+        "pending": 2
+      },
+      {
+        "type": "异味",
+        "total": 1,
+        "pending": 1
+      },
+      {
+        "type": "无纸",
+        "total": 1,
+        "pending": 1
+      },
+      {
+        "type": "缺水",
+        "total": 1,
+        "pending": 1
+      },
+      {
+        "type": "其他",
+        "total": 1,
+        "pending": 1
+      },
+      {
+        "type": "设备故障",
+        "total": 1,
+        "pending": 0
+      }
+    ]
+  }
+}
