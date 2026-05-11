@@ -96,12 +96,12 @@ func (e *MigrationExecutor) Execute(ctx context.Context, m *Migration) (*Migrati
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	_, traceCtx := e.tracer.StartTrace(m.Name, map[string]interface{}{
+	trace, traceCtx := e.tracer.StartTrace(m.Name, map[string]interface{}{
 		"migration_id": m.ID,
 		"version":      m.Version,
 		"total_steps":  len(m.Steps),
 	})
-	m.TraceID = ""
+	m.TraceID = trace.ID
 
 	m.Status = MigrationStatusRunning
 	m.StartTime = time.Now()
