@@ -49,6 +49,12 @@ class DataManager:
             for s in data:
                 submission = Submission.from_dict(s)
                 self._add_submission_internal(submission, import_mode=False)
+        
+        anomalies_file = self.data_dir / "anomalies.json"
+        if anomalies_file.exists():
+            data = json.loads(anomalies_file.read_text(encoding="utf-8"))
+            for a in data:
+                self.anomalies.append(Anomaly(**a))
     
     def _save_data(self):
         students_file = self.data_dir / "students.json"
@@ -75,6 +81,16 @@ class DataManager:
         submissions_file.write_text(
             json.dumps(
                 [s.to_dict() for s in self.submissions.values()],
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        
+        anomalies_file = self.data_dir / "anomalies.json"
+        anomalies_file.write_text(
+            json.dumps(
+                [a.__dict__ for a in self.anomalies],
                 ensure_ascii=False,
                 indent=2,
             ),
@@ -420,3 +436,6 @@ class DataManager:
     
     def clear_anomalies(self):
         self.anomalies = []
+        anomalies_file = self.data_dir / "anomalies.json"
+        if anomalies_file.exists():
+            anomalies_file.unlink()

@@ -1,0 +1,57 @@
+[
+  {
+    "type": "unmatched_identifier",
+    "severity": "warning",
+    "message": "无法匹配学员：标识符 'unknown@example.com' 无法找到对应学员",
+    "details": {
+      "identifier": "unknown@example.com",
+      "assignment_id": "round_03"
+    }
+  },
+  {
+    "type": "duplicate_submission",
+    "severity": "info",
+    "message": "重复提交已跳过：学员 S001 的作业 round_01 在 2026-05-04 15:30:00 的提交已存在",
+    "details": {
+      "submission_id": "auto_S001_round_01_1778499826.103476",
+      "student_id": "S001",
+      "assignment_id": "round_01",
+      "submitted_at": "2026-05-04T15:30:00"
+    }
+  },
+  {
+    "type": "resubmit_detected",
+    "severity": "info",
+    "message": "检测到重交：学员 S001 的作业 round_01 有新提交，旧分数将被覆盖",
+    "details": {
+      "old_submission": "auto_S001_round_01_1778499826.10346",
+      "old_score": 85.0,
+      "new_submission": "auto_S001_round_01_1778499834.588864",
+      "new_score": 90.0,
+      "submitted_at": "2026-05-05T10:00:00"
+    }
+  },
+  {
+    "type": "resubmit_detected",
+    "severity": "info",
+    "message": "检测到重交：学员 S005 的作业 round_02 有新提交，旧分数将被覆盖",
+    "details": {
+      "old_submission": "auto_S005_round_02_1778499826.103505",
+      "old_score": null,
+      "new_submission": "auto_S005_round_02_1778499834.588886",
+      "new_score": 72.0,
+      "submitted_at": "2026-05-11T09:00:00"
+    }
+  },
+  {
+    "type": "duplicate_submission",
+    "severity": "info",
+    "message": "重复提交已跳过：学员 S001 的作业 round_03 在 2026-05-14 10:00:00 的提交已存在",
+    "details": {
+      "submission_id": "auto_S001_round_03_1778499834.58889",
+      "student_id": "S001",
+      "assignment_id": "round_03",
+      "submitted_at": "2026-05-14T10:00:00"
+    }
+  }
+]

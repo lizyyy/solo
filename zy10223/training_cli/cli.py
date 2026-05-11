@@ -54,7 +54,7 @@ def cli(ctx, data_dir, rules_file):
     ctx.obj.reporter = Reporter(ctx.obj.dm, ctx.obj.engine)
 
 
-@cli.group()
+@cli.group(name="import")
 @click.pass_context
 def import_data(ctx):
     """导入数据 (学员、作业、提交记录)"""
@@ -284,8 +284,13 @@ def show_anomalies(ctx, severity):
     default=None,
     help="指定作业 ID",
 )
+@click.option(
+    "--clear-anomalies/--keep-anomalies",
+    default=False,
+    help="导入前是否清空历史异常记录（默认保留）",
+)
 @click.pass_context
-def run_full_flow(ctx, import_submissions, output, assignment):
+def run_full_flow(ctx, import_submissions, output, assignment, clear_anomalies):
     """
     一键运行完整流程 (导入+生成报告)
 
@@ -297,7 +302,8 @@ def run_full_flow(ctx, import_submissions, output, assignment):
     
     if import_submissions:
         click.echo(f"\n[1/4] 导入提交记录: {import_submissions}")
-        ctx.obj.dm.clear_anomalies()
+        if clear_anomalies:
+            ctx.obj.dm.clear_anomalies()
         data = json.loads(import_submissions.read_text(encoding="utf-8"))
         added, skipped = ctx.obj.dm.import_submissions(data)
         click.echo(f"  新增 {added} 条, 跳过 {skipped} 条")

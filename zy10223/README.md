@@ -177,6 +177,19 @@ python training-notifier.py -r rules.json run
 | `unmatched_identifier` | warning | 无法通过标识找到学员 |
 | `missing_grade` | warning | 已提交但尚未批改 |
 
+**异常记录持久化**：所有异常都会自动保存到 `data/anomalies.json`，可以随时查看历史异常：
+
+```bash
+# 查看所有异常
+python training-notifier.py anomalies
+
+# 仅查看错误级别异常
+python training-notifier.py anomalies -s error
+
+# 导入时清空历史异常
+python training-notifier.py import submissions 新文件.json --clear-anomalies
+```
+
 ## 证书资格判定
 
 证书资格分为三类：
@@ -248,8 +261,11 @@ python training-notifier.py report risk [-o 输出文件]
 python training-notifier.py report history [-s 学员标识] [-o 输出文件]
 python training-notifier.py report full [-a 作业ID] [-o 输出文件]
 
-# 一键运行
+# 一键运行（默认保留历史异常）
 python training-notifier.py run [-i 提交文件] [-o 输出文件] [-a 作业ID]
+
+# 一键运行（导入前清空历史异常）
+python training-notifier.py run -i 提交文件 --clear-anomalies
 
 # 查看异常
 python training-notifier.py anomalies [-s error|warning|info]
