@@ -1,0 +1,50 @@
+[
+  {
+    "timestamp": "2024-01-15T08:30:00",
+    "doorId": "DOOR_A",
+    "employeeId": "EMP001",
+    "cardId": "CARD123",
+    "accessType": "OPEN",
+    "doorStatus": "OPEN"
+  },
+  {
+    "timestamp": "2024-01-15T08:32:15",
+    "doorId": "DOOR_A",
+    "employeeId": "EMP001",
+    "cardId": "CARD123",
+    "accessType": "CLOSE",
+    "doorStatus": "CLOSED"
+  },
+  {
+    "timestamp": "2024-01-15T09:15:00",
+    "doorId": "DOOR_A",
+    "employeeId": "EMP002",
+    "cardId": "CARD456",
+    "accessType": "GRANTED",
+    "doorStatus": "OPEN"
+  },
+  {
+    "timestamp": "2024-01-15T09:18:30",
+    "doorId": "DOOR_A",
+    "employeeId": "EMP002",
+    "cardId": "CARD456",
+    "accessType": "CLOSE",
+    "doorStatus": "CLOSED"
+  },
+  {
+    "timestamp": "2024-01-15T10:05:00",
+    "doorId": "DOOR_B",
+    "employeeId": "EMP001",
+    "cardId": "CARD123",
+    "accessType": "OPEN",
+    "doorStatus": "OPEN"
+  },
+  {
+    "timestamp": "2024-01-15T10:12:00",
+    "doorId": "DOOR_B",
+    "employeeId": "EMP001",
+    "cardId": "CARD123",
+    "accessType": "CLOSE",
+    "doorStatus": "CLOSED"
+  }
+]

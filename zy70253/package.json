@@ -1,0 +1,20 @@
+{
+  "name": "cold-storage-tracker",
+  "version": "1.0.0",
+  "description": "冷库门禁温升追踪 CLI - 追踪门禁开关导致的温升，关联货品批次和责任班次",
+  "main": "src/index.js",
+  "bin": {
+    "coldtrack": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["cold-storage", "temperature", "access-control", "tracking"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

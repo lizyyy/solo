@@ -1,0 +1,26 @@
+[
+  {
+    "batchId": "BATCH001",
+    "productName": "冷冻水饺",
+    "storageStart": "2024-01-10T10:00:00",
+    "storageEnd": "2024-01-20T14:00:00",
+    "requiredTemp": -18,
+    "quantity": 500
+  },
+  {
+    "batchId": "BATCH002",
+    "productName": "速冻虾仁",
+    "storageStart": "2024-01-12T08:00:00",
+    "storageEnd": "2024-01-18T16:00:00",
+    "requiredTemp": -22,
+    "quantity": 300
+  },
+  {
+    "batchId": "BATCH003",
+    "productName": "冰淇淋",
+    "storageStart": "2024-01-14T12:00:00",
+    "storageEnd": "2024-01-25T10:00:00",
+    "requiredTemp": -25,
+    "quantity": 200
+  }
+]
