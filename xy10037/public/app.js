@@ -32,6 +32,30 @@ function formatTime(timestamp) {
 class ApiClient {
   constructor() {
     this.baseUrl = '/api';
+    this._pendingRequests = new Map();
+    this._requestIdCache = new Map();
+    this._MAX_CACHE_SIZE = 100;
+  }
+  
+  _getRequestKey(method, url, data) {
+    const dataStr = data ? JSON.stringify(data) : '';
+    return `${method}:${url}:${dataStr}`;
+  }
+  
+  _getCachedRequestId(key) {
+    return this._requestIdCache.get(key);
+  }
+  
+  _cacheRequestId(key, requestId) {
+    if (this._requestIdCache.size >= this._MAX_CACHE_SIZE) {
+      const firstKey = this._requestIdCache.keys().next().value;
+      this._requestIdCache.delete(firstKey);
+    }
+    this._requestIdCache.set(key, requestId);
+  }
+  
+  _clearCachedRequestId(key) {
+    this._requestIdCache.delete(key);
   }
   
   getHeaders(operator) {
@@ -45,7 +69,18 @@ class ApiClient {
   }
   
   async request(method, url, data = null, operator = 'system', idempotent = true) {
-    const requestId = generateRequestId();
+    const requestKey = this._getRequestKey(method, url, data);
+    
+    if (idempotent && this._pendingRequests.has(requestKey)) {
+      return this._pendingRequests.get(requestKey);
+    }
+    
+    let requestId = this._getCachedRequestId(requestKey);
+    if (!requestId) {
+      requestId = generateRequestId();
+      this._cacheRequestId(requestKey, requestId);
+    }
+    
     const headers = this.getHeaders(operator);
     if (idempotent) {
       headers['X-Request-ID'] = requestId;
@@ -61,19 +96,32 @@ class ApiClient {
       options.body = JSON.stringify(data);
     }
     
-    try {
-      const response = await fetch(this.baseUrl + url, options);
-      const result = await response.json();
-      
-      if (result.code !== 0) {
-        throw new Error(result.message || '请求失败');
+    const requestPromise = (async () => {
+      try {
+        const response = await fetch(this.baseUrl + url, options);
+        const result = await response.json();
+        
+        if (result.code !== 0) {
+          throw new Error(result.message || '请求失败');
+        }
+        
+        this._clearCachedRequestId(requestKey);
+        return result.data;
+      } catch (err) {
+        if (err.message && err.message.includes('请求正在处理中')) {
+          this._clearCachedRequestId(requestKey);
+        }
+        throw err;
+      } finally {
+        this._pendingRequests.delete(requestKey);
       }
-      
-      return result.data;
-    } catch (err) {
-      console.error('API Error:', err);
-      throw err;
+    })();
+    
+    if (idempotent) {
+      this._pendingRequests.set(requestKey, requestPromise);
     }
+    
+    return requestPromise;
   }
   
   async get(url, params = {}, operator) {
@@ -154,7 +202,8 @@ new Vue({
       completeDialogVisible: false,
       completingTask: false,
       completeRemark: '',
-      completingTaskId: null
+      completingTaskId: null,
+      completingTaskVersion: null
     };
   },
   
@@ -372,6 +421,7 @@ new Vue({
     
     openCompleteDialog(task) {
       this.completingTaskId = task.id;
+      this.completingTaskVersion = task.version;
       this.completeRemark = '';
       this.completeDialogVisible = true;
     },
@@ -381,7 +431,7 @@ new Vue({
       try {
         await api.post(`/tasks/${this.completingTaskId}/complete`, {
           remark: this.completeRemark,
-          version: this.selectedTask ? this.selectedTask.version : null
+          version: this.completingTaskVersion
         }, this.currentOperator);
         this.$message.success('任务已完成');
         this.completeDialogVisible = false;

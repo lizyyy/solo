@@ -326,14 +326,20 @@ async function retryTask(taskId, operator, expectedVersion = null) {
     throw new StateTransitionError(`已达到最大重试次数(${config.MAX_RETRY_COUNT})`);
   }
   
+  if (expectedVersion !== null && expectedVersion !== undefined) {
+    if (task.version !== expectedVersion) {
+      throw new ConcurrencyError();
+    }
+  }
+  
   const now = Date.now();
   
   const result = await db.transaction(async (tx) => {
     const updateResult = await tx.run(
       `UPDATE tasks 
        SET status = ?, updated_at = ?, version = version + 1
-       WHERE id = ? AND status = ?`,
-      [TASK_STATUS.IN_PROGRESS, now, taskId, TASK_STATUS.FAILED]
+       WHERE id = ? AND status = ? AND version = ?`,
+      [TASK_STATUS.IN_PROGRESS, now, taskId, TASK_STATUS.FAILED, task.version]
     );
     
     if (updateResult.changes === 0) {
@@ -346,14 +352,22 @@ async function retryTask(taskId, operator, expectedVersion = null) {
       [uuidv4(), taskId, TASK_STATUS.FAILED, TASK_STATUS.IN_PROGRESS, operator, '重试任务', now]
     );
     
-    await tx.run(
-      `UPDATE failed_tasks 
-       SET retry_count = retry_count + 1, last_retry_at = ?, status = 'retrying'
+    const latestFailed = await tx.get(
+      `SELECT id FROM failed_tasks 
        WHERE task_id = ? AND status = 'pending'
        ORDER BY created_at DESC
        LIMIT 1`,
-      [now, taskId]
+      [taskId]
     );
+    
+    if (latestFailed) {
+      await tx.run(
+        `UPDATE failed_tasks 
+         SET retry_count = retry_count + 1, last_retry_at = ?, status = 'retrying'
+         WHERE id = ?`,
+        [now, latestFailed.id]
+      );
+    }
     
     return updateResult;
   });
