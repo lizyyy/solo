@@ -1,6 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-import type { ApiResponse } from '../../../shared/types'
+import type { ApiResponse } from '@shared/types'
 
 export interface RequestOptions {
   skipRetry?: boolean
@@ -39,7 +39,7 @@ class ApiClient {
   }
 
   private setupInterceptors(): void {
-    this.client.interceptors.request.use((config) => {
+    this.client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       if (!config.headers['X-Request-ID']) {
         config.headers['X-Request-ID'] = uuidv4()
       }
@@ -49,7 +49,7 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const config = error.config as AxiosRequestConfig & { _retryCount?: number }
+        const config = error.config as (InternalAxiosRequestConfig & { _retryCount?: number; _retryCountLimit?: number; _retryDelay?: number })
         
         if (!config) {
           return Promise.reject(error)
@@ -61,13 +61,13 @@ class ApiClient {
         }
 
         config._retryCount = (config._retryCount || 0) + 1
-        const maxRetries = (config as any)._retryCountLimit || DEFAULT_RETRY_COUNT
+        const maxRetries = config._retryCountLimit || DEFAULT_RETRY_COUNT
 
         if (config._retryCount > maxRetries) {
           return Promise.reject(this.normalizeError(error))
         }
 
-        const delay = (config as any)._retryDelay || DEFAULT_RETRY_DELAY
+        const delay = config._retryDelay || DEFAULT_RETRY_DELAY
         await this.sleep(delay * config._retryCount)
 
         return this.client(config)

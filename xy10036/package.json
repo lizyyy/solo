@@ -2,15 +2,16 @@
   "name": "device-borrowing-system",
   "version": "1.0.0",
   "description": "设备借用管理系统 - 稳定可靠的设备借用流程",
-  "main": "server/dist/index.js",
+  "main": "server/src/index.ts",
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "tsx watch server/src/index.ts",
     "dev:client": "vite",
     "build": "npm run build:server && npm run build:client",
-    "build:server": "tsc -p server/tsconfig.json",
+    "build:server": "tsc -p server/tsconfig.json && node -e \"const fs = require('fs'); const path = require('path'); if(fs.existsSync('server/dist/server/src')) { fs.cpSync('server/dist/server/src', 'server/dist', { recursive: true }); fs.rmSync('server/dist/server', { recursive: true }); }\"",
     "build:client": "vite build",
     "start": "node server/dist/index.js",
+    "start:prod": "tsx server/src/index.ts",
     "test": "vitest",
     "test:coverage": "vitest --coverage"
   },

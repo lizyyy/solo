@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '../database'
 import { ConflictError, NotFoundError, ValidationError, OptimisticLockError } from '../middleware/error'
-import type { BorrowRecord, BorrowStatus, Device, ReportFilters, PaginatedResponse } from '../../../shared/types'
+import type { BorrowRecord, BorrowStatus, Device, ReportFilters, PaginatedResponse } from '../../shared/types'
 import { createAuditLog } from './audit'
 
 interface DbDevice {
@@ -48,29 +48,46 @@ interface CreateBorrowParams {
   userAgent?: string
 }
 
-const lockMap = new Map<string, Promise<any>>()
+const deviceLocks = new Map<string, Promise<any>>()
 
 async function withDeviceLock<T>(
   deviceId: string,
   operation: () => Promise<T>
 ): Promise<T> {
-  let currentLock = lockMap.get(deviceId)
+  let previousLock = deviceLocks.get(deviceId)
   const newLock = (async () => {
-    if (currentLock) {
+    if (previousLock) {
       try {
-        await currentLock
-      } catch (e) {
+        await previousLock
+      } catch {
       }
     }
     return await operation()
   })()
-  lockMap.set(deviceId, newLock)
+  deviceLocks.set(deviceId, newLock)
   try {
     return await newLock
   } finally {
-    if (lockMap.get(deviceId) === newLock) {
-      lockMap.delete(deviceId)
+    if (deviceLocks.get(deviceId) === newLock) {
+      deviceLocks.delete(deviceId)
     }
+  }
+}
+
+async function executeInTransaction<T>(
+  executor: () => Promise<T>
+): Promise<T> {
+  await db.run('BEGIN TRANSACTION')
+  try {
+    const result = await executor()
+    await db.run('COMMIT')
+    return result
+  } catch (error) {
+    try {
+      await db.run('ROLLBACK')
+    } catch {
+    }
+    throw error
   }
 }
 
@@ -85,84 +102,98 @@ export async function borrowDevice(params: CreateBorrowParams): Promise<BorrowRe
     throw new ValidationError('预计归还时间不能为空', { field: 'expectedReturnTime' }, params.requestId)
   }
 
-  const device = await db.get<DbDevice>(
+  const preCheckDevice = await db.get<DbDevice>(
     'SELECT * FROM devices WHERE id = ?',
     [params.deviceId]
   )
 
-  if (!device) {
+  if (!preCheckDevice) {
     throw new NotFoundError('设备不存在', { deviceId: params.deviceId }, params.requestId)
   }
 
-  if (device.status !== 'available') {
+  if (preCheckDevice.status !== 'available') {
     throw new ConflictError(
       '设备当前不可用',
-      { deviceId: params.deviceId, currentStatus: device.status },
+      { deviceId: params.deviceId, currentStatus: preCheckDevice.status },
       params.requestId
     )
   }
 
   const result = await withDeviceLock(params.deviceId, async () => {
-    const currentDevice = await db.get<DbDevice>(
-      'SELECT * FROM devices WHERE id = ?',
-      [params.deviceId]
-    )
-
-    if (!currentDevice || currentDevice.status !== 'available') {
-      throw new ConflictError(
-        '设备状态已被其他操作修改，请刷新后重试',
-        { deviceId: params.deviceId },
-        params.requestId
+    return await executeInTransaction(async () => {
+      const device = await db.get<DbDevice>(
+        'SELECT * FROM devices WHERE id = ?',
+        [params.deviceId]
       )
-    }
 
-    const now = new Date().toISOString()
-    const borrowRecordId = uuidv4()
+      if (!device) {
+        throw new NotFoundError('设备不存在', { deviceId: params.deviceId }, params.requestId)
+      }
 
-    const borrowRecord: DbBorrowRecord = {
-      id: borrowRecordId,
-      device_id: currentDevice.id,
-      device_name: currentDevice.name,
-      device_code: currentDevice.code,
-      user_id: params.userId,
-      user_name: params.userName,
-      purpose: params.purpose,
-      borrow_time: now,
-      expected_return_time: params.expectedReturnTime,
-      status: 'borrowed',
-      version: 1,
-      created_at: now,
-      updated_at: now
-    }
+      if (device.status !== 'available') {
+        throw new ConflictError(
+          '设备状态已被其他操作修改，请刷新后重试',
+          { deviceId: params.deviceId },
+          params.requestId
+        )
+      }
 
-    await db.run(
-      `UPDATE devices 
-       SET status = 'borrowed', 
-           current_borrower_id = ?, 
-           current_borrower_name = ?, 
-           updated_at = ? 
-       WHERE id = ? AND status = 'available'`,
-      [params.userId, params.userName, now, currentDevice.id]
-    )
+      const now = new Date().toISOString()
+      const borrowRecordId = uuidv4()
 
-    await db.run(
-      `INSERT INTO borrow_records (
-        id, device_id, device_name, device_code, user_id, user_name,
-        purpose, borrow_time, expected_return_time, status, version, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        borrowRecord.id, borrowRecord.device_id, borrowRecord.device_name, borrowRecord.device_code,
-        borrowRecord.user_id, borrowRecord.user_name, borrowRecord.purpose, borrowRecord.borrow_time,
-        borrowRecord.expected_return_time, borrowRecord.status, borrowRecord.version,
-        borrowRecord.created_at, borrowRecord.updated_at
-      ]
-    )
+      const borrowRecord: DbBorrowRecord = {
+        id: borrowRecordId,
+        device_id: device.id,
+        device_name: device.name,
+        device_code: device.code,
+        user_id: params.userId,
+        user_name: params.userName,
+        purpose: params.purpose,
+        borrow_time: now,
+        expected_return_time: params.expectedReturnTime,
+        status: 'borrowed',
+        version: 1,
+        created_at: now,
+        updated_at: now
+      }
 
-    return {
-      borrowRecord,
-      originalDevice: currentDevice,
-      updatedAt: now
-    }
+      const deviceResult = await db.run(
+        `UPDATE devices 
+         SET status = 'borrowed', 
+             current_borrower_id = ?, 
+             current_borrower_name = ?, 
+             updated_at = ? 
+         WHERE id = ? AND status = 'available'`,
+        [params.userId, params.userName, now, device.id]
+      )
+
+      if (deviceResult.changes === 0) {
+        throw new ConflictError(
+          '设备状态已被其他操作修改，请刷新后重试',
+          { deviceId: device.id },
+          params.requestId
+        )
+      }
+
+      await db.run(
+        `INSERT INTO borrow_records (
+          id, device_id, device_name, device_code, user_id, user_name,
+          purpose, borrow_time, expected_return_time, status, version, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          borrowRecord.id, borrowRecord.device_id, borrowRecord.device_name, borrowRecord.device_code,
+          borrowRecord.user_id, borrowRecord.user_name, borrowRecord.purpose, borrowRecord.borrow_time,
+          borrowRecord.expected_return_time, borrowRecord.status, borrowRecord.version,
+          borrowRecord.created_at, borrowRecord.updated_at
+        ]
+      )
+
+      return {
+        borrowRecord,
+        originalDevice: device,
+        updatedAt: now
+      }
+    })
   })
 
   const originalDevice = mapDbDevice(result.originalDevice)
@@ -218,101 +249,107 @@ interface ReturnBorrowParams {
 }
 
 export async function returnDevice(params: ReturnBorrowParams): Promise<BorrowRecord> {
-  const borrowRecord = await db.get<DbBorrowRecord>(
+  const preCheckRecord = await db.get<DbBorrowRecord>(
     'SELECT * FROM borrow_records WHERE id = ?',
     [params.borrowRecordId]
   )
 
-  if (!borrowRecord) {
+  if (!preCheckRecord) {
     throw new NotFoundError('借用记录不存在', { borrowRecordId: params.borrowRecordId }, params.requestId)
   }
 
-  if (borrowRecord.status !== 'borrowed') {
+  if (preCheckRecord.status !== 'borrowed') {
     throw new ConflictError(
       '该借用记录状态不允许归还',
-      { borrowRecordId: params.borrowRecordId, currentStatus: borrowRecord.status },
+      { borrowRecordId: params.borrowRecordId, currentStatus: preCheckRecord.status },
       params.requestId
     )
   }
 
-  if (params.version !== undefined && params.version !== borrowRecord.version) {
+  if (params.version !== undefined && params.version !== preCheckRecord.version) {
     throw new OptimisticLockError(
       '数据已被其他操作修改，请刷新后重试',
       {
         borrowRecordId: params.borrowRecordId,
         expectedVersion: params.version,
-        actualVersion: borrowRecord.version
+        actualVersion: preCheckRecord.version
       },
       params.requestId
     )
   }
 
-  const originalRecord = mapDbBorrowRecord(borrowRecord)
+  const originalRecord = mapDbBorrowRecord(preCheckRecord)
 
-  const result = await withDeviceLock(borrowRecord.device_id, async () => {
-    const currentRecord = await db.get<DbBorrowRecord>(
-      'SELECT * FROM borrow_records WHERE id = ?',
-      [params.borrowRecordId]
-    )
-
-    if (!currentRecord || currentRecord.status !== 'borrowed') {
-      throw new ConflictError(
-        '借用记录状态已被其他操作修改，请刷新后重试',
-        { borrowRecordId: params.borrowRecordId },
-        params.requestId
+  const result = await withDeviceLock(preCheckRecord.device_id, async () => {
+    return await executeInTransaction(async () => {
+      const borrowRecord = await db.get<DbBorrowRecord>(
+        'SELECT * FROM borrow_records WHERE id = ?',
+        [params.borrowRecordId]
       )
-    }
 
-    const now = new Date().toISOString()
+      if (!borrowRecord) {
+        throw new NotFoundError('借用记录不存在', { borrowRecordId: params.borrowRecordId }, params.requestId)
+      }
 
-    const deviceResult = await db.run(
-      `UPDATE devices 
-       SET status = 'available', 
-           current_borrower_id = NULL, 
-           current_borrower_name = NULL, 
-           updated_at = ? 
-       WHERE id = ? AND status = 'borrowed'`,
-      [now, borrowRecord.device_id]
-    )
+      if (borrowRecord.status !== 'borrowed') {
+        throw new ConflictError(
+          '借用记录状态已被其他操作修改，请刷新后重试',
+          { borrowRecordId: params.borrowRecordId },
+          params.requestId
+        )
+      }
 
-    if (deviceResult.changes === 0) {
-      throw new ConflictError(
-        '设备状态已被其他操作修改，请刷新后重试',
-        { deviceId: borrowRecord.device_id },
-        params.requestId
+      const now = new Date().toISOString()
+
+      const deviceResult = await db.run(
+        `UPDATE devices 
+         SET status = 'available', 
+             current_borrower_id = NULL, 
+             current_borrower_name = NULL, 
+             updated_at = ? 
+         WHERE id = ? AND status = 'borrowed'`,
+        [now, borrowRecord.device_id]
       )
-    }
 
-    const recordResult = await db.run(
-      `UPDATE borrow_records 
-       SET status = 'returned', 
-           actual_return_time = ?, 
-           notes = COALESCE(?, notes),
-           version = version + 1,
-           updated_at = ? 
-       WHERE id = ? AND status = 'borrowed'`,
-      [now, params.notes, now, params.borrowRecordId]
-    )
+      if (deviceResult.changes === 0) {
+        throw new ConflictError(
+          '设备状态已被其他操作修改，请刷新后重试',
+          { deviceId: borrowRecord.device_id },
+          params.requestId
+        )
+      }
 
-    if (recordResult.changes === 0) {
-      throw new ConflictError(
-        '借用记录状态已被其他操作修改，请刷新后重试',
-        { borrowRecordId: params.borrowRecordId },
-        params.requestId
+      const recordResult = await db.run(
+        `UPDATE borrow_records 
+         SET status = 'returned', 
+             actual_return_time = ?, 
+             notes = COALESCE(?, notes),
+             version = version + 1,
+             updated_at = ? 
+         WHERE id = ? AND status = 'borrowed'`,
+        [now, params.notes, now, params.borrowRecordId]
       )
-    }
 
-    return now
+      if (recordResult.changes === 0) {
+        throw new ConflictError(
+          '借用记录状态已被其他操作修改，请刷新后重试',
+          { borrowRecordId: params.borrowRecordId },
+          params.requestId
+        )
+      }
+
+      const updatedRecord = await db.get<DbBorrowRecord>(
+        'SELECT * FROM borrow_records WHERE id = ?',
+        [params.borrowRecordId]
+      )
+
+      return updatedRecord
+    })
   })
-
-  const updatedRecord = await db.get<DbBorrowRecord>(
-    'SELECT * FROM borrow_records WHERE id = ?',
-    [params.borrowRecordId]
-  )
 
   const device = await db.get<DbDevice>(
     'SELECT * FROM devices WHERE id = ?',
-    [borrowRecord.device_id]
+    [preCheckRecord.device_id]
   )
 
   if (device) {
@@ -334,22 +371,22 @@ export async function returnDevice(params: ReturnBorrowParams): Promise<BorrowRe
     })
   }
 
-  if (updatedRecord) {
+  if (result) {
     await createAuditLog({
       action: 'update',
       entityType: 'borrow_record',
-      entityId: updatedRecord.id,
-      entityName: `${updatedRecord.device_name} - ${updatedRecord.user_name}`,
+      entityId: result.id,
+      entityName: `${result.device_name} - ${result.user_name}`,
       operatorId: params.userId,
       operatorName: params.userName,
       before: originalRecord,
-      after: mapDbBorrowRecord(updatedRecord),
+      after: mapDbBorrowRecord(result),
       requestId: params.requestId,
       ip: params.ip,
       userAgent: params.userAgent
     })
 
-    return mapDbBorrowRecord(updatedRecord)
+    return mapDbBorrowRecord(result)
   }
 
   throw new NotFoundError('归还后记录不存在', { borrowRecordId: params.borrowRecordId }, params.requestId)
