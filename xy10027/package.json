@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "db:init": "node scripts/init-db.js",
     "setup": "npm install && npm run db:init",
-    "install": "node scripts/install.js"
+    "install": "node scripts/install.js",
+    "verify": "node scripts/verify-setup.js"
   },
   "dependencies": {
     "express": "^4.18.2",

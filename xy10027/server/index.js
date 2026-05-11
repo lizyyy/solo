@@ -15,6 +15,12 @@ const { redis } = require('./config/redis');
 const requestIdMiddleware = require('./middleware/requestId');
 const authMiddleware = require('./middleware/auth');
 const inventoryRoutes = require('./routes/inventoryRoutes');
+const storeRoutes = require('./routes/storeRoutes');
+const productRoutes = require('./routes/productRoutes');
+const batchRoutes = require('./routes/batchRoutes');
+const transferRoutes = require('./routes/transferRoutes');
+const damageRoutes = require('./routes/damageRoutes');
+const discountRoutes = require('./routes/discountRoutes');
 const logger = require('./utils/logger');
 const AsyncTaskService = require('./services/asyncTaskService');
 
@@ -146,6 +152,12 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/batches', batchRoutes);
+app.use('/api/transfers', transferRoutes);
+app.use('/api/damages', damageRoutes);
+app.use('/api/discounts', discountRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({
