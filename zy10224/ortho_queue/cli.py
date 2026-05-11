@@ -11,6 +11,13 @@ from .config import EXPORT_DIR, STAGES, REMINDER_TYPES, EMERGENCY_REASONS, APPOI
 
 init_db()
 
+def parse_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() in ('true', '1', 'yes', 'y', 't')
+    return bool(value)
+
 @click.group()
 @click.version_option(version="1.0.0")
 def cli():
@@ -431,13 +438,16 @@ def import_batch(file, dry_run):
                     click.echo(f"[{idx}] 检查: {item['patient_id']} - {item['date']}")
                     continue
                 
+                emergency_value = item.get('emergency', False)
+                is_emergency = parse_bool(emergency_value)
+                
                 appt, conflicts, is_duplicate = create_appointment(
                     session,
                     item['patient_id'],
                     item['patient_name'],
                     item['doctor'],
                     appt_date,
-                    is_emergency=item.get('emergency', False),
+                    is_emergency=is_emergency,
                     emergency_reason=item.get('emergency_reason'),
                     notes=item.get('notes'),
                     **patient_kwargs

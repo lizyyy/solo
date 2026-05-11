@@ -256,7 +256,7 @@ def cancel_appointment(session, appointment_code: str, reason: Optional[str] = N
                        "message": "该预约已完成，无法取消"}]
     
     for reminder in appointment.reminders:
-        if reminder.is_sent and not reminder.is_withdrawn:
+        if not reminder.is_withdrawn:
             reminder.is_withdrawn = True
             reminder.notes = f"预约取消，提醒已撤回" if not reminder.notes else reminder.notes + "；预约取消，提醒已撤回"
     
