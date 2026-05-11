@@ -251,6 +251,14 @@ class Database:
         with self.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute('''
+                SELECT id FROM notifications 
+                WHERE sampling_no = ? AND notification_date = ? 
+                  AND notification_method = ? AND notifier = ? 
+                  AND contact_result = ?
+            ''', (sampling_no, notification_date, notification_method, notifier, contact_result))
+            if cursor.fetchone():
+                return False, f"通知记录 {sampling_no} 已存在，跳过"
+            cursor.execute('''
                 INSERT INTO notifications 
                 (sampling_no, test_result_id, notification_date, notification_method,
                  notifier, contact_result, notes, created_at)

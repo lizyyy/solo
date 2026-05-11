@@ -121,10 +121,15 @@ class CSVImporter:
                 if has_abnormal:
                     abnormal_str = row.get('异常指标', row.get('abnormal_indicators', '')).strip()
                     if abnormal_str:
-                        indicators = [i.strip() for i in abnormal_str.split(',') if i.strip()]
+                        if ';' in abnormal_str:
+                            indicators = [i.strip() for i in abnormal_str.split(';') if i.strip()]
+                        else:
+                            indicators = [i.strip() for i in abnormal_str.split(',') if i.strip()]
                         for ind in indicators:
                             parts = ind.split('|')
                             name = parts[0].strip()
+                            if not name:
+                                continue
                             value = parts[1].strip() if len(parts) > 1 else ''
                             ref = parts[2].strip() if len(parts) > 2 else ''
                             flag = parts[3].strip() if len(parts) > 3 else '异常'
@@ -149,8 +154,11 @@ class CSVImporter:
             "added": 0,
             "skipped": 0,
             "errors": [],
-            "warnings": []
+            "warnings": [],
+            "duplicates": []
         }
+        
+        seen_notifications = set()
         
         with open(csv_path, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
@@ -162,28 +170,43 @@ class CSVImporter:
                     results["errors"].append(f"第{row_num}行: 缺少采样编号")
                     continue
                 
-                test_result = self.db.get_test_result(sampling_no)
-                if not test_result:
-                    results["warnings"].append(f"第{row_num}行: 采样号 {sampling_no} 暂未收到检验结果")
-                
                 notification_date = row.get('通知日期', row.get('notification_date', '')).strip()
                 if not notification_date:
                     notification_date = datetime.now().strftime('%Y-%m-%d')
+                
+                notification_method = row.get('通知方式', row.get('method', '')).strip()
+                notifier = row.get('通知人', row.get('notifier', '')).strip()
+                contact_result = row.get('联系结果', row.get('contact_result', '')).strip()
+                
+                dedup_key = (sampling_no, notification_date, notification_method, notifier, contact_result)
+                if dedup_key in seen_notifications:
+                    results["duplicates"].append(f"第{row_num}行: 采样号 {sampling_no} 通知记录在本文件中重复")
+                    results["skipped"] += 1
+                    continue
+                seen_notifications.add(dedup_key)
+                
+                test_result = self.db.get_test_result(sampling_no)
+                if not test_result:
+                    results["warnings"].append(f"第{row_num}行: 采样号 {sampling_no} 暂未收到检验结果")
                 
                 success, msg = self.db.add_notification(
                     sampling_no=sampling_no,
                     notification_date=notification_date,
                     test_result_id=test_result['id'] if test_result else None,
-                    notification_method=row.get('通知方式', row.get('method', '')).strip(),
-                    notifier=row.get('通知人', row.get('notifier', '')).strip(),
-                    contact_result=row.get('联系结果', row.get('contact_result', '')).strip(),
+                    notification_method=notification_method,
+                    notifier=notifier,
+                    contact_result=contact_result,
                     notes=row.get('备注', row.get('notes', '')).strip()
                 )
                 
                 if success:
                     results["added"] += 1
                 else:
-                    results["errors"].append(f"采样号 {sampling_no}: {msg}")
+                    if "已存在" in msg:
+                        results["duplicates"].append(f"采样号 {sampling_no}: {msg}")
+                        results["skipped"] += 1
+                    else:
+                        results["errors"].append(f"采样号 {sampling_no}: {msg}")
                         
         results["success"] = len(results["errors"]) == 0
         return results
