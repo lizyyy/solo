@@ -134,6 +134,18 @@ class DataManager:
         key = f"{student_id}:{assignment_id}:{submitted_at.isoformat()}"
         return hashlib.md5(key.encode()).hexdigest()
     
+    def _find_existing_submission_by_key(
+        self, student_id: str, assignment_id: str, submitted_at: datetime
+    ) -> Optional[Submission]:
+        for s in self.submissions.values():
+            if (
+                s.student_id == student_id
+                and s.assignment_id == assignment_id
+                and s.submitted_at == submitted_at
+            ):
+                return s
+        return None
+    
     def _add_submission_internal(
         self, submission: Submission, import_mode: bool
     ) -> Tuple[bool, Optional[Submission]]:
@@ -144,21 +156,92 @@ class DataManager:
         )
         
         if key in self.submission_keys:
-            if import_mode:
-                self.anomalies.append(
-                    Anomaly(
-                        type="duplicate_submission",
-                        severity="info",
-                        message=f"重复提交已跳过：学员 {submission.student_id} 的作业 {submission.assignment_id} 在 {submission.submitted_at} 的提交已存在",
-                        details={
-                            "submission_id": submission.id,
-                            "student_id": submission.student_id,
-                            "assignment_id": submission.assignment_id,
-                            "submitted_at": submission.submitted_at.isoformat(),
-                        },
+            existing = self._find_existing_submission_by_key(
+                submission.student_id,
+                submission.assignment_id,
+                submission.submitted_at,
+            )
+            
+            if existing is None:
+                if import_mode:
+                    self.anomalies.append(
+                        Anomaly(
+                            type="duplicate_submission",
+                            severity="info",
+                            message=f"重复提交已跳过：学员 {submission.student_id} 的作业 {submission.assignment_id} 在 {submission.submitted_at} 的提交已存在",
+                            details={
+                                "submission_id": submission.id,
+                                "student_id": submission.student_id,
+                                "assignment_id": submission.assignment_id,
+                                "submitted_at": submission.submitted_at.isoformat(),
+                            },
+                        )
                     )
-                )
-            return False, None
+                return False, None
+            
+            should_update = False
+            update_reasons = []
+            
+            if existing.score is None and submission.score is not None:
+                existing.score = submission.score
+                should_update = True
+                update_reasons.append(f"补录分数: {submission.score}")
+            
+            if not existing.resubmit_reason and submission.resubmit_reason:
+                existing.resubmit_reason = submission.resubmit_reason
+                should_update = True
+                update_reasons.append(f"添加补交说明: {submission.resubmit_reason}")
+            
+            if not existing.grader_notes and submission.grader_notes:
+                existing.grader_notes = submission.grader_notes
+                should_update = True
+                update_reasons.append(f"添加批改备注: {submission.grader_notes}")
+            
+            if existing.status.value in ["submitted", "late"] and submission.score is not None:
+                assignment = self.assignments.get(submission.assignment_id)
+                if assignment and submission.submitted_at > assignment.deadline:
+                    existing.status = SubmissionStatus.LATE_GRADED
+                else:
+                    existing.status = SubmissionStatus.GRADED
+                should_update = True
+                update_reasons.append("状态更新为已批改")
+            
+            if should_update:
+                if import_mode:
+                    self.anomalies.append(
+                        Anomaly(
+                            type="grade_update",
+                            severity="info",
+                            message=f"批改结果已更新：学员 {submission.student_id} 的作业 {submission.assignment_id} 补录了批改信息",
+                            details={
+                                "submission_id": existing.id,
+                                "student_id": submission.student_id,
+                                "assignment_id": submission.assignment_id,
+                                "submitted_at": submission.submitted_at.isoformat(),
+                                "updates": update_reasons,
+                            },
+                        )
+                    )
+                self._save_data()
+                return True, existing
+            else:
+                if import_mode:
+                    self.anomalies.append(
+                        Anomaly(
+                            type="duplicate_submission",
+                            severity="info",
+                            message=f"重复提交已跳过：学员 {submission.student_id} 的作业 {submission.assignment_id} 在 {submission.submitted_at} 的提交已存在，无新信息需要更新",
+                            details={
+                                "submission_id": submission.id,
+                                "student_id": submission.student_id,
+                                "assignment_id": submission.assignment_id,
+                                "submitted_at": submission.submitted_at.isoformat(),
+                                "existing_score": existing.score,
+                                "new_score": submission.score,
+                            },
+                        )
+                    )
+                return False, None
         
         assignment = self.assignments.get(submission.assignment_id)
         if assignment:

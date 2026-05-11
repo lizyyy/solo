@@ -11,12 +11,14 @@
   {
     "type": "duplicate_submission",
     "severity": "info",
-    "message": "重复提交已跳过：学员 S001 的作业 round_01 在 2026-05-04 15:30:00 的提交已存在",
+    "message": "重复提交已跳过：学员 S001 的作业 round_01 在 2026-05-04 15:30:00 的提交已存在，无新信息需要更新",
     "details": {
-      "submission_id": "auto_S001_round_01_1778499826.103476",
+      "submission_id": "auto_S001_round_01_1778501139.310558",
       "student_id": "S001",
       "assignment_id": "round_01",
-      "submitted_at": "2026-05-04T15:30:00"
+      "submitted_at": "2026-05-04T15:30:00",
+      "existing_score": 85.0,
+      "new_score": null
     }
   },
   {
@@ -24,9 +26,9 @@
     "severity": "info",
     "message": "检测到重交：学员 S001 的作业 round_01 有新提交，旧分数将被覆盖",
     "details": {
-      "old_submission": "auto_S001_round_01_1778499826.10346",
+      "old_submission": "auto_S001_round_01_1778501139.310522",
       "old_score": 85.0,
-      "new_submission": "auto_S001_round_01_1778499834.588864",
+      "new_submission": "auto_S001_round_01_1778501169.144643",
       "new_score": 90.0,
       "submitted_at": "2026-05-05T10:00:00"
     }
@@ -36,22 +38,27 @@
     "severity": "info",
     "message": "检测到重交：学员 S005 的作业 round_02 有新提交，旧分数将被覆盖",
     "details": {
-      "old_submission": "auto_S005_round_02_1778499826.103505",
+      "old_submission": "auto_S005_round_02_1778501139.310587",
       "old_score": null,
-      "new_submission": "auto_S005_round_02_1778499834.588886",
+      "new_submission": "auto_S005_round_02_1778501169.144658",
       "new_score": 72.0,
       "submitted_at": "2026-05-11T09:00:00"
     }
   },
   {
-    "type": "duplicate_submission",
+    "type": "grade_update",
     "severity": "info",
-    "message": "重复提交已跳过：学员 S001 的作业 round_03 在 2026-05-14 10:00:00 的提交已存在",
+    "message": "批改结果已更新：学员 S001 的作业 round_03 补录了批改信息",
     "details": {
-      "submission_id": "auto_S001_round_03_1778499834.58889",
+      "submission_id": "auto_S001_round_03_1778501139.310593",
       "student_id": "S001",
       "assignment_id": "round_03",
-      "submitted_at": "2026-05-14T10:00:00"
+      "submitted_at": "2026-05-14T10:00:00",
+      "updates": [
+        "补录分数: 78.0",
+        "添加批改备注: 补打分",
+        "状态更新为已批改"
+      ]
     }
   }
 ]
