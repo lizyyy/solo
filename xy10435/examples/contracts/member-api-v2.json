@@ -1,0 +1,91 @@
+{
+  "api_name": "会员服务API",
+  "version": "v2.0.0",
+  "service_name": "member-service",
+  "endpoints": [
+    {
+      "path": "/api/v1/members/{member_id}",
+      "method": "GET",
+      "summary": "查询会员信息",
+      "path_params": [
+        {
+          "name": "member_id",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "response_body": [
+        {
+          "name": "member_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "level",
+          "type": "string",
+          "required": true,
+          "enum_values": [
+            "BRONZE",
+            "SILVER",
+            "GOLD",
+            "PLATINUM"
+          ]
+        },
+        {
+          "name": "points_balance",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/members",
+      "method": "POST",
+      "summary": "创建会员",
+      "request_body": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "phone",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "marketing_consent",
+          "type": "boolean",
+          "required": true
+        }
+      ],
+      "response_body": [
+        {
+          "name": "member_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "level",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

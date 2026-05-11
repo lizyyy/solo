@@ -1,0 +1,215 @@
+{
+  "diff_id": "593f7c765eaac957",
+  "api_diff": {
+    "api_name": "会员服务API",
+    "old_version": "v1.0.0",
+    "new_version": "v2.0.0",
+    "service_name": "member-service",
+    "endpoint_changes": [
+      {
+        "endpoint_path": "/api/v1/members/{member_id}",
+        "method": "GET",
+        "changes": [
+          {
+            "change_type": "enum_changed",
+            "path": "response.level",
+            "field_name": "level",
+            "old_value": [
+              "BRONZE",
+              "SILVER",
+              "GOLD"
+            ],
+            "new_value": [
+              "BRONZE",
+              "SILVER",
+              "GOLD",
+              "PLATINUM"
+            ],
+            "location": "response"
+          },
+          {
+            "change_type": "field_removed",
+            "path": "response.points",
+            "field_name": "points",
+            "old_value": "integer",
+            "new_value": null,
+            "location": "response"
+          },
+          {
+            "change_type": "required_added",
+            "path": "response.phone",
+            "field_name": "phone",
+            "old_value": false,
+            "new_value": true,
+            "location": "response"
+          },
+          {
+            "change_type": "required_added",
+            "path": "response.points_balance",
+            "field_name": "points_balance",
+            "old_value": null,
+            "new_value": "integer",
+            "location": "response"
+          }
+        ]
+      },
+      {
+        "endpoint_path": "/api/v1/members",
+        "method": "POST",
+        "changes": [
+          {
+            "change_type": "required_added",
+            "path": "request.email",
+            "field_name": "email",
+            "old_value": false,
+            "new_value": true,
+            "location": "request"
+          },
+          {
+            "change_type": "required_added",
+            "path": "request.marketing_consent",
+            "field_name": "marketing_consent",
+            "old_value": null,
+            "new_value": "boolean",
+            "location": "request"
+          }
+        ]
+      }
+    ],
+    "computed_at": "2026-05-11T19:13:48.297647"
+  },
+  "caller_impacts": [
+    {
+      "service_name": "recommendation-service",
+      "team_name": "推荐团队",
+      "owner": null,
+      "endpoints_affected": [
+        "GET:/api/v1/members/{member_id}"
+      ],
+      "changes": [
+        {
+          "change_type": "enum_changed",
+          "path": "response.level",
+          "field_name": "level",
+          "old_value": [
+            "BRONZE",
+            "SILVER",
+            "GOLD"
+          ],
+          "new_value": [
+            "BRONZE",
+            "SILVER",
+            "GOLD",
+            "PLATINUM"
+          ],
+          "location": "response"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "response.points",
+          "field_name": "points",
+          "old_value": "integer",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.phone",
+          "field_name": "phone",
+          "old_value": false,
+          "new_value": true,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.points_balance",
+          "field_name": "points_balance",
+          "old_value": null,
+          "new_value": "integer",
+          "location": "response"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    },
+    {
+      "service_name": "crm-service",
+      "team_name": "CRM团队",
+      "owner": "王五",
+      "endpoints_affected": [
+        "GET:/api/v1/members/{member_id}",
+        "POST:/api/v1/members"
+      ],
+      "changes": [
+        {
+          "change_type": "enum_changed",
+          "path": "response.level",
+          "field_name": "level",
+          "old_value": [
+            "BRONZE",
+            "SILVER",
+            "GOLD"
+          ],
+          "new_value": [
+            "BRONZE",
+            "SILVER",
+            "GOLD",
+            "PLATINUM"
+          ],
+          "location": "response"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "response.points",
+          "field_name": "points",
+          "old_value": "integer",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.phone",
+          "field_name": "phone",
+          "old_value": false,
+          "new_value": true,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.points_balance",
+          "field_name": "points_balance",
+          "old_value": null,
+          "new_value": "integer",
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.email",
+          "field_name": "email",
+          "old_value": false,
+          "new_value": true,
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.marketing_consent",
+          "field_name": "marketing_consent",
+          "old_value": null,
+          "new_value": "boolean",
+          "location": "request"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    }
+  ],
+  "generated_at": "2026-05-11T19:13:48.298580",
+  "notes": [],
+  "alerts": []
+}

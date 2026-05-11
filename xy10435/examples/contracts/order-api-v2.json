@@ -1,0 +1,123 @@
+{
+  "api_name": "订单服务API",
+  "version": "v2.0.0",
+  "service_name": "order-service",
+  "endpoints": [
+    {
+      "path": "/api/v1/orders",
+      "method": "POST",
+      "summary": "创建订单",
+      "request_body": [
+        {
+          "name": "user_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "product_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "required": true
+        },
+        {
+          "name": "currency",
+          "type": "string",
+          "required": true,
+          "enum_values": [
+            "CNY",
+            "USD",
+            "EUR",
+            "GBP"
+          ]
+        },
+        {
+          "name": "shipping_address",
+          "type": "object",
+          "required": true
+        }
+      ],
+      "response_body": [
+        {
+          "name": "order_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": true,
+          "enum_values": [
+            "pending",
+            "paid",
+            "shipped",
+            "delivered",
+            "cancelled"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "payment_method",
+          "type": "string",
+          "required": false
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/orders/{order_id}",
+      "method": "GET",
+      "summary": "查询订单",
+      "path_params": [
+        {
+          "name": "order_id",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "response_body": [
+        {
+          "name": "order_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "user_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "created_at",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "tracking_number",
+          "type": "string",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

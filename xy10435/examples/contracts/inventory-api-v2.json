@@ -1,0 +1,85 @@
+{
+  "api_name": "库存服务API",
+  "version": "v2.0.0",
+  "service_name": "inventory-service",
+  "endpoints": [
+    {
+      "path": "/api/v1/inventory/{sku}",
+      "method": "GET",
+      "summary": "查询库存",
+      "path_params": [
+        {
+          "name": "sku",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "response_body": [
+        {
+          "name": "sku",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "available_qty",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "warehouse_code",
+          "type": "string",
+          "required": true
+        }
+      ]
+    },
+    {
+      "path": "/api/v1/inventory/reserve",
+      "method": "POST",
+      "summary": "扣减库存",
+      "request_body": [
+        {
+          "name": "sku",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "order_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": false,
+          "enum_values": [
+            "ORDER",
+            "TRANSFER",
+            "ADJUST"
+          ]
+        }
+      ],
+      "response_body": [
+        {
+          "name": "reservation_id",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "success",
+          "type": "boolean",
+          "required": true
+        },
+        {
+          "name": "expires_at",
+          "type": "string",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

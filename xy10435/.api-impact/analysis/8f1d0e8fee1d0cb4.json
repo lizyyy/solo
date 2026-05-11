@@ -1,0 +1,180 @@
+{
+  "diff_id": "8f1d0e8fee1d0cb4",
+  "api_diff": {
+    "api_name": "库存服务API",
+    "old_version": "v1.0.0",
+    "new_version": "v2.0.0",
+    "service_name": "inventory-service",
+    "endpoint_changes": [
+      {
+        "endpoint_path": "/api/v1/inventory/{sku}",
+        "method": "GET",
+        "changes": [
+          {
+            "change_type": "field_removed",
+            "path": "response.reserved_qty",
+            "field_name": "reserved_qty",
+            "old_value": "integer",
+            "new_value": null,
+            "location": "response"
+          },
+          {
+            "change_type": "field_removed",
+            "path": "response.warehouse",
+            "field_name": "warehouse",
+            "old_value": "string",
+            "new_value": null,
+            "location": "response"
+          },
+          {
+            "change_type": "required_added",
+            "path": "response.warehouse_code",
+            "field_name": "warehouse_code",
+            "old_value": null,
+            "new_value": "string",
+            "location": "response"
+          }
+        ]
+      },
+      {
+        "endpoint_path": "/api/v1/inventory/reserve",
+        "method": "POST",
+        "changes": [
+          {
+            "change_type": "required_added",
+            "path": "request.order_id",
+            "field_name": "order_id",
+            "old_value": false,
+            "new_value": true,
+            "location": "request"
+          },
+          {
+            "change_type": "field_added",
+            "path": "request.reason",
+            "field_name": "reason",
+            "old_value": null,
+            "new_value": "string",
+            "location": "request"
+          },
+          {
+            "change_type": "required_added",
+            "path": "response.expires_at",
+            "field_name": "expires_at",
+            "old_value": null,
+            "new_value": "string",
+            "location": "response"
+          }
+        ]
+      }
+    ],
+    "computed_at": "2026-05-11T19:13:36.806591"
+  },
+  "caller_impacts": [
+    {
+      "service_name": "shopping-cart-service",
+      "team_name": "购物车团队",
+      "owner": "李四",
+      "endpoints_affected": [
+        "GET:/api/v1/inventory/{sku}",
+        "POST:/api/v1/inventory/reserve"
+      ],
+      "changes": [
+        {
+          "change_type": "field_removed",
+          "path": "response.reserved_qty",
+          "field_name": "reserved_qty",
+          "old_value": "integer",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "response.warehouse",
+          "field_name": "warehouse",
+          "old_value": "string",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.warehouse_code",
+          "field_name": "warehouse_code",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.order_id",
+          "field_name": "order_id",
+          "old_value": false,
+          "new_value": true,
+          "location": "request"
+        },
+        {
+          "change_type": "field_added",
+          "path": "request.reason",
+          "field_name": "reason",
+          "old_value": null,
+          "new_value": "string",
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.expires_at",
+          "field_name": "expires_at",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    },
+    {
+      "service_name": "report-service",
+      "team_name": "报表团队",
+      "owner": "钱七",
+      "endpoints_affected": [
+        "GET:/api/v1/inventory/{sku}"
+      ],
+      "changes": [
+        {
+          "change_type": "field_removed",
+          "path": "response.reserved_qty",
+          "field_name": "reserved_qty",
+          "old_value": "integer",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "response.warehouse",
+          "field_name": "warehouse",
+          "old_value": "string",
+          "new_value": null,
+          "location": "response"
+        },
+        {
+          "change_type": "required_added",
+          "path": "response.warehouse_code",
+          "field_name": "warehouse_code",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    }
+  ],
+  "generated_at": "2026-05-11T19:13:36.807554",
+  "notes": [],
+  "alerts": []
+}

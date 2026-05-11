@@ -1,0 +1,10 @@
+[
+  {
+    "id": "note-001",
+    "service_name": "shopping-cart-service",
+    "content": "购物车团队计划下周进行代码重构，可能影响库存接口调用",
+    "author": "李四",
+    "created_at": "2026-05-10T19:11:24.951199",
+    "related_endpoint": "POST:/api/v1/inventory/reserve"
+  }
+]

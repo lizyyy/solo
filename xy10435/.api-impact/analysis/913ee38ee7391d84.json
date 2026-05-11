@@ -1,0 +1,321 @@
+{
+  "diff_id": "913ee38ee7391d84",
+  "api_diff": {
+    "api_name": "订单服务API",
+    "old_version": "v1.0.0",
+    "new_version": "v2.0.0",
+    "service_name": "order-service",
+    "endpoint_changes": [
+      {
+        "endpoint_path": "/api/v1/orders",
+        "method": "POST",
+        "changes": [
+          {
+            "change_type": "enum_changed",
+            "path": "request.currency",
+            "field_name": "currency",
+            "old_value": [
+              "CNY",
+              "USD"
+            ],
+            "new_value": [
+              "CNY",
+              "USD",
+              "EUR",
+              "GBP"
+            ],
+            "location": "request"
+          },
+          {
+            "change_type": "required_added",
+            "path": "request.currency",
+            "field_name": "currency",
+            "old_value": false,
+            "new_value": true,
+            "location": "request"
+          },
+          {
+            "change_type": "field_removed",
+            "path": "request.remark",
+            "field_name": "remark",
+            "old_value": "string",
+            "new_value": null,
+            "location": "request"
+          },
+          {
+            "change_type": "required_added",
+            "path": "request.shipping_address",
+            "field_name": "shipping_address",
+            "old_value": null,
+            "new_value": "object",
+            "location": "request"
+          },
+          {
+            "change_type": "enum_changed",
+            "path": "response.status",
+            "field_name": "status",
+            "old_value": [
+              "pending",
+              "paid",
+              "shipped"
+            ],
+            "new_value": [
+              "pending",
+              "paid",
+              "shipped",
+              "delivered",
+              "cancelled"
+            ],
+            "location": "response"
+          },
+          {
+            "change_type": "field_added",
+            "path": "response.payment_method",
+            "field_name": "payment_method",
+            "old_value": null,
+            "new_value": "string",
+            "location": "response"
+          }
+        ]
+      },
+      {
+        "endpoint_path": "/api/v1/orders/{order_id}",
+        "method": "GET",
+        "changes": [
+          {
+            "change_type": "type_changed",
+            "path": "response.amount",
+            "field_name": "amount",
+            "old_value": "number",
+            "new_value": "string",
+            "location": "response"
+          },
+          {
+            "change_type": "field_added",
+            "path": "response.tracking_number",
+            "field_name": "tracking_number",
+            "old_value": null,
+            "new_value": "string",
+            "location": "response"
+          }
+        ]
+      }
+    ],
+    "computed_at": "2026-05-11T19:14:02.831723"
+  },
+  "caller_impacts": [
+    {
+      "service_name": "payment-service",
+      "team_name": "支付团队",
+      "owner": "张三",
+      "endpoints_affected": [
+        "GET:/api/v1/orders/{order_id}",
+        "POST:/api/v1/orders"
+      ],
+      "changes": [
+        {
+          "change_type": "enum_changed",
+          "path": "request.currency",
+          "field_name": "currency",
+          "old_value": [
+            "CNY",
+            "USD"
+          ],
+          "new_value": [
+            "CNY",
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.currency",
+          "field_name": "currency",
+          "old_value": false,
+          "new_value": true,
+          "location": "request"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "request.remark",
+          "field_name": "remark",
+          "old_value": "string",
+          "new_value": null,
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.shipping_address",
+          "field_name": "shipping_address",
+          "old_value": null,
+          "new_value": "object",
+          "location": "request"
+        },
+        {
+          "change_type": "enum_changed",
+          "path": "response.status",
+          "field_name": "status",
+          "old_value": [
+            "pending",
+            "paid",
+            "shipped"
+          ],
+          "new_value": [
+            "pending",
+            "paid",
+            "shipped",
+            "delivered",
+            "cancelled"
+          ],
+          "location": "response"
+        },
+        {
+          "change_type": "field_added",
+          "path": "response.payment_method",
+          "field_name": "payment_method",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        },
+        {
+          "change_type": "type_changed",
+          "path": "response.amount",
+          "field_name": "amount",
+          "old_value": "number",
+          "new_value": "string",
+          "location": "response"
+        },
+        {
+          "change_type": "field_added",
+          "path": "response.tracking_number",
+          "field_name": "tracking_number",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        }
+      ],
+      "risk_level": "critical",
+      "confirmation_status": "confirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    },
+    {
+      "service_name": "shopping-cart-service",
+      "team_name": "购物车团队",
+      "owner": "李四",
+      "endpoints_affected": [
+        "POST:/api/v1/orders"
+      ],
+      "changes": [
+        {
+          "change_type": "enum_changed",
+          "path": "request.currency",
+          "field_name": "currency",
+          "old_value": [
+            "CNY",
+            "USD"
+          ],
+          "new_value": [
+            "CNY",
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.currency",
+          "field_name": "currency",
+          "old_value": false,
+          "new_value": true,
+          "location": "request"
+        },
+        {
+          "change_type": "field_removed",
+          "path": "request.remark",
+          "field_name": "remark",
+          "old_value": "string",
+          "new_value": null,
+          "location": "request"
+        },
+        {
+          "change_type": "required_added",
+          "path": "request.shipping_address",
+          "field_name": "shipping_address",
+          "old_value": null,
+          "new_value": "object",
+          "location": "request"
+        },
+        {
+          "change_type": "enum_changed",
+          "path": "response.status",
+          "field_name": "status",
+          "old_value": [
+            "pending",
+            "paid",
+            "shipped"
+          ],
+          "new_value": [
+            "pending",
+            "paid",
+            "shipped",
+            "delivered",
+            "cancelled"
+          ],
+          "location": "response"
+        },
+        {
+          "change_type": "field_added",
+          "path": "response.payment_method",
+          "field_name": "payment_method",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    },
+    {
+      "service_name": "notification-service",
+      "team_name": "通知团队",
+      "owner": "赵六",
+      "endpoints_affected": [
+        "GET:/api/v1/orders/{order_id}"
+      ],
+      "changes": [
+        {
+          "change_type": "type_changed",
+          "path": "response.amount",
+          "field_name": "amount",
+          "old_value": "number",
+          "new_value": "string",
+          "location": "response"
+        },
+        {
+          "change_type": "field_added",
+          "path": "response.tracking_number",
+          "field_name": "tracking_number",
+          "old_value": null,
+          "new_value": "string",
+          "location": "response"
+        }
+      ],
+      "risk_level": "high",
+      "confirmation_status": "unconfirmed",
+      "alerts": [],
+      "notes": [],
+      "requires_action": true
+    }
+  ],
+  "generated_at": "2026-05-11T19:14:02.833656",
+  "notes": [],
+  "alerts": []
+}

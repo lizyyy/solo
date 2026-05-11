@@ -1,0 +1,72 @@
+[
+  {
+    "service_name": "payment-service",
+    "team_name": "支付团队",
+    "owner": "张三",
+    "email": "zhangsan@example.com",
+    "endpoints_called": [
+      "POST:/api/v1/orders",
+      "GET:/api/v1/orders/{order_id}"
+    ],
+    "call_volume": 15000,
+    "last_called_at": "2026-05-11T18:11:24.951131"
+  },
+  {
+    "service_name": "shopping-cart-service",
+    "team_name": "购物车团队",
+    "owner": "李四",
+    "email": "lisi@example.com",
+    "endpoints_called": [
+      "POST:/api/v1/orders",
+      "GET:/api/v1/inventory/{sku}",
+      "POST:/api/v1/inventory/reserve"
+    ],
+    "call_volume": 8000,
+    "last_called_at": "2026-05-11T17:11:24.951172"
+  },
+  {
+    "service_name": "recommendation-service",
+    "team_name": "推荐团队",
+    "owner": null,
+    "email": null,
+    "endpoints_called": [
+      "GET:/api/v1/members/{member_id}"
+    ],
+    "call_volume": 500,
+    "last_called_at": "2026-05-10T19:11:24.951177"
+  },
+  {
+    "service_name": "crm-service",
+    "team_name": "CRM团队",
+    "owner": "王五",
+    "email": "wangwu@example.com",
+    "endpoints_called": [
+      "GET:/api/v1/members/{member_id}",
+      "POST:/api/v1/members"
+    ],
+    "call_volume": 2000,
+    "last_called_at": "2026-05-11T14:11:24.951180"
+  },
+  {
+    "service_name": "notification-service",
+    "team_name": "通知团队",
+    "owner": "赵六",
+    "email": "zhaoliu@example.com",
+    "endpoints_called": [
+      "GET:/api/v1/orders/{order_id}"
+    ],
+    "call_volume": 3000,
+    "last_called_at": "2026-05-11T16:11:24.951184"
+  },
+  {
+    "service_name": "report-service",
+    "team_name": "报表团队",
+    "owner": "钱七",
+    "email": "qianqi@example.com",
+    "endpoints_called": [
+      "GET:/api/v1/inventory/{sku}"
+    ],
+    "call_volume": 100,
+    "last_called_at": "2026-05-08T19:11:24.951187"
+  }
+]
