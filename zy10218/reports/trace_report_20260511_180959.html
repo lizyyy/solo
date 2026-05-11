@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冷链温控异常追溯报告</title>
+    <style>
+
+        body { font-family: 'Microsoft YaHei', sans-serif; margin: 20px; line-height: 1.6; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 10px; }
+        h3 { color: #7f8c8d; }
+        .summary { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .summary-item { background: white; padding: 15px; border-radius: 6px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .summary-item .number { font-size: 28px; font-weight: bold; color: #3498db; }
+        .summary-item .label { font-size: 14px; color: #7f8c8d; margin-top: 5px; }
+        .anomaly { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .anomaly.severity-WARNING { border-left: 4px solid #f39c12; }
+        .anomaly.severity-CRITICAL { border-left: 4px solid #e74c3c; }
+        .anomaly-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .severity-badge { padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        .severity-WARNING .severity-badge { background: #f39c12; color: white; }
+        .severity-CRITICAL .severity-badge { background: #e74c3c; color: white; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .info-item { background: #f8f9fa; padding: 10px; border-radius: 4px; }
+        .info-item .key { font-size: 12px; color: #7f8c8d; }
+        .info-item .value { font-size: 14px; font-weight: 500; margin-top: 3px; }
+        .responsibility { background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 10px 0; }
+        .responsibility.driver { background: #e3f2fd; border-color: #2196f3; }
+        .responsibility.node { background: #fff3cd; border-color: #ffc107; }
+        .notes { background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; padding: 15px; margin: 10px 0; color: #721c24; }
+        .manual-confirmation { background: #dc3545; color: white; padding: 10px 15px; border-radius: 6px; display: inline-block; margin-top: 10px; }
+        .batch-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .data-gap { background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin: 10px 0; border-left: 4px solid; }
+        .data-gap.high { border-left-color: #e74c3c; }
+        .data-gap.medium { border-left-color: #f39c12; }
+        .data-gap.low { border-left-color: #3498db; }
+        .recommendation { background: #d4edda; border: 1px solid #28a745; border-radius: 6px; padding: 15px; margin: 10px 0; color: #155724; }
+        .time-drift { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 15px; margin: 10px 0; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #7f8c8d; font-size: 12px; }
+        
+    </style>
+</head>
+<body>
+    <h1>冷链温控异常追溯报告</h1>
+    <p><strong>生成时间：</strong>2026-05-11 18:09:59</p>
+    <div class="summary">
+        <h2>一、执行摘要</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <div class="number">2</div>
+                <div class="label">分析批次总数</div>
+            </div>
+            <div class="summary-item">
+                <div class="number" style="color: #f39c12;">1</div>
+                <div class="label">存在异常批次</div>
+            </div>
+            <div class="summary-item">
+                <div class="number" style="color: #e74c3c;">1</div>
+                <div class="label">检测到异常数</div>
+            </div>
+            <div class="summary-item">
+                <div class="number" style="color: #9b59b6;">0</div>
+                <div class="label">发现数据缺口</div>
+            </div>
+        </div>
+    </div>
+    <h2>二、异常详情</h2>
+    <div class="anomaly severity-WARNING">
+        <div class="anomaly-header">
+            <h3>异常 1：ANOM0001</h3>
+            <span class="severity-badge">警告</span>
+        </div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="key">所属批次</div>
+                <div class="value">B001</div>
+            </div>
+            <div class="info-item">
+                <div class="key">涉及车辆</div>
+                <div class="value">V001</div>
+            </div>
+            <div class="info-item">
+                <div class="key">传感器ID</div>
+                <div class="value">S001</div>
+            </div>
+            <div class="info-item">
+                <div class="key">持续时间</div>
+                <div class="value">210.0 分钟</div>
+            </div>
+            <div class="info-item">
+                <div class="key">开始时间</div>
+                <div class="value">2024-01-15 10:30:00</div>
+            </div>
+            <div class="info-item">
+                <div class="key">结束时间</div>
+                <div class="value">2024-01-15 14:00:00</div>
+            </div>
+            <div class="info-item">
+                <div class="key">最高温度</div>
+                <div class="value">11.2 °C</div>
+            </div>
+            <div class="info-item">
+                <div class="key">最低温度</div>
+                <div class="value">8.5 °C</div>
+            </div>
+            <div class="info-item">
+                <div class="key">平均温度</div>
+                <div class="value">9.93 °C</div>
+            </div>
+        </div>
+        <h4>责任区间</h4>
+        <div class="responsibility driver">
+            <strong>🚛 运输途中（司机）</strong><br>
+            司机：张三（D001）<br>
+            车辆：V001<br>
+            路线：北京冷链仓库 → 天津中转中心<br>
+            时间：2024-01-15 10:30:00 至 2024-01-15 12:00:00<br>
+            责任占比：42.9%
+        </div>
+        <div class="responsibility driver">
+            <strong>🚛 运输途中（司机）</strong><br>
+            司机：李四（D002）<br>
+            车辆：V001<br>
+            路线：天津中转中心 → 上海配送站<br>
+            时间：2024-01-15 12:00:00 至 2024-01-15 14:00:00<br>
+            责任占比：57.1%
+        </div>
+        <div class="responsibility node">
+            <strong>🏢 节点作业</strong><br>
+            节点：天津中转中心<br>
+            操作员：赵六<br>
+            签收时间：2024-01-15 12:05:00
+        </div>
+        <div class="notes">
+            <strong>📝 说明信息：</strong><ul>
+                <li>超温跨越多个责任区间，请结合实际运输情况确认</li>
+                <li>温度数据不完整，需要人工确认数据采集情况</li>
+            </ul>
+        </div>
+        <div class="manual-confirmation">⚠️ 需要人工确认</div>
+    </div>
+    <h2>三、批次追踪汇总</h2>
+    <div class="batch-card">
+        <strong>B001：新冠疫苗</strong><br>
+        产品类型：疫苗 | 数量：100<br>
+        运输车辆：V001<br>
+        状态：⚠️ 1个异常
+ | 关联异常：ANOM0001
+    </div>
+    <div class="batch-card">
+        <strong>B002：流感疫苗</strong><br>
+        产品类型：疫苗 | 数量：50<br>
+        运输车辆：V002<br>
+        状态：✅ 正常
+    </div>
+    <h2>六、建议行动</h2>
+    <div class="recommendation">
+        <strong>1.</strong> 有1个异常需要人工确认责任归属
+    </div>
+    <div class="footer">
+        冷链温控异常追溯系统 | 报告生成完毕
+    </div>
+</body>
+</html>

@@ -31,7 +31,47 @@ class ColdChainAnalyzer:
             if not temps:
                 continue
             
+            if len(temps) >= 2:
+                for i in range(1, len(temps)):
+                    if temps[i].time < temps[i-1].time:
+                        drifts.append(
+                            TimeDrift(
+                                sensor_id=temps[0].sensor_id,
+                                vehicle_id=vehicle_id,
+                                estimated_drift_seconds=abs(
+                                    (temps[i].time - temps[i-1].time).total_seconds()
+                                ),
+                                confidence=0.95,
+                                drift_type="时间乱序",
+                                reference_event=f"第{i-1}和{i}个温度点时间顺序错误",
+                                detected_at=datetime.now()
+                            )
+                        )
+            
             sorted_temps = sorted(temps, key=lambda x: x.time)
+            
+            if len(sorted_temps) >= 2:
+                max_gap = 0
+                gap_index = -1
+                for i in range(1, len(sorted_temps)):
+                    gap_seconds = (sorted_temps[i].time - sorted_temps[i-1].time).total_seconds()
+                    if gap_seconds > 3600 and gap_seconds > max_gap:
+                        max_gap = gap_seconds
+                        gap_index = i
+                
+                if gap_index >= 0:
+                    drifts.append(
+                        TimeDrift(
+                            sensor_id=sorted_temps[0].sensor_id,
+                            vehicle_id=vehicle_id,
+                            estimated_drift_seconds=max_gap,
+                            confidence=0.8,
+                            drift_type="数据长间隔",
+                            reference_event=f"第{gap_index-1}和{gap_index}个温度点间隔{round(max_gap/60, 1)}分钟",
+                            detected_at=datetime.now()
+                        )
+                    )
+            
             intervals = []
             for i in range(1, len(sorted_temps)):
                 intervals.append(
@@ -41,7 +81,11 @@ class ColdChainAnalyzer:
             if len(intervals) < 3:
                 continue
             
-            avg_interval = sum(intervals) / len(intervals)
+            valid_intervals = [i for i in intervals if i <= 3600]
+            if not valid_intervals:
+                continue
+            
+            avg_interval = sum(valid_intervals) / len(valid_intervals)
             if avg_interval <= 0:
                 continue
             
@@ -209,14 +253,23 @@ class ColdChainAnalyzer:
             anomaly_start = None
             
             for temp in relevant_temps:
-                is_critical = (
-                    temp.temperature < threshold.critical_min or
-                    temp.temperature > threshold.critical_max
+                is_out_of_range = (
+                    temp.temperature < batch.temperature_min or
+                    temp.temperature > batch.temperature_max
                 )
-                is_warning = (
-                    threshold.warning_min <= temp.temperature < batch.temperature_min or
-                    batch.temperature_max < temp.temperature <= threshold.warning_max
-                )
+                
+                if is_out_of_range:
+                    is_critical = (
+                        temp.temperature < threshold.critical_min or
+                        temp.temperature > threshold.critical_max
+                    )
+                    if is_critical:
+                        is_warning = False
+                    else:
+                        is_warning = True
+                else:
+                    is_critical = False
+                    is_warning = False
                 
                 if is_critical or is_warning:
                     if not in_anomaly:
