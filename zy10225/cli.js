@@ -135,7 +135,31 @@ function printSettlementDetail(detail) {
   
   for (const item of items) {
     console.log(chalk.bold(`\n摊主: ${item.vendor_name}`));
-    console.log(`  摊位: ${item.booth_number || '-'}`);
+    
+    let boothDisplay = '';
+    if (item.booths && item.booths.length > 0) {
+      const boothIds = item.booths.map(b => b.booth_id).join(', ');
+      boothDisplay = item.booths.length > 1 ? `${boothIds} (多个摊位)` : boothIds;
+    } else {
+      boothDisplay = item.booth_number || '-';
+    }
+    console.log(`  摊位: ${boothDisplay}`);
+    
+    if (item.booths && item.booths.length > 0) {
+      console.log(`  摊位明细:`);
+      for (const booth of item.booths) {
+        let rateStr = '';
+        if (booth.commission_rate) {
+          if (booth.commission_rate.rate_type === 'flat') {
+            rateStr = `固定${(booth.commission_rate.flat_rate * 100).toFixed(1)}%`;
+          } else {
+            rateStr = '阶梯抽成';
+          }
+        }
+        console.log(`    ${booth.booth_id}: 销售额${formatCurrency(booth.total_sales)}, 退款${formatCurrency(booth.total_refunds)}, 抽成${formatCurrency(booth.commission_amount || 0)} (${rateStr})`);
+      }
+    }
+    
     console.log(`  总销售额: ${formatCurrency(item.total_sales)}`);
     console.log(`  退款: ${formatCurrency(item.total_refunds)}`);
     console.log(`  净销售: ${formatCurrency(item.net_sales)}`);
@@ -144,6 +168,15 @@ function printSettlementDetail(detail) {
     console.log(`  电费: ${formatCurrency(item.electricity_fee)}`);
     console.log(`  已付款: ${formatCurrency(item.previous_payments)}`);
     console.log(chalk.bold(`  应付: ${formatCurrency(item.amount_due)}`));
+    
+    if (item.settlement_refunds && item.settlement_refunds.length > 0) {
+      console.log(chalk.magenta(`  退款明细 (${item.settlement_refunds.length} 条):`));
+      for (const sr of item.settlement_refunds) {
+        const historicalLabel = sr.is_historical ? ' [历史退款]' : '';
+        console.log(`    [${sr.refund_date}] ${formatCurrency(sr.refund_amount)}${historicalLabel}`);
+        if (sr.reason) console.log(`      原因: ${sr.reason}`);
+      }
+    }
     
     if (item.adjustments && item.adjustments.length > 0) {
       console.log(chalk.yellow(`  调整记录 (${item.adjustments.length} 条):`));

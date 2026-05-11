@@ -142,15 +142,57 @@ async function getHistoricalRefunds(vendorId, beforeDate) {
       s.period_start,
       s.period_end
     FROM refunds r
-    LEFT JOIN settlement_items si ON r.id = si.id
-    LEFT JOIN settlements s ON si.settlement_id = s.id
+    JOIN settlements s ON s.status = ?
     WHERE r.vendor_id = ?
     AND r.refund_date <= ?
-    AND s.id IS NOT NULL
-    AND s.status = ?
+    AND r.refund_date > s.period_end
+    AND r.refund_date <= s.period_end + 365
+    AND r.id NOT IN (
+      SELECT refund_id FROM historical_refunds 
+      WHERE original_settlement_id = s.id
+    )
+    AND (
+      r.related_sale_id IS NULL
+      OR EXISTS (
+        SELECT 1 FROM sales_records sr 
+        WHERE sr.id = r.related_sale_id
+        AND sr.sale_date >= s.period_start 
+        AND sr.sale_date <= s.period_end
+      )
+    )
+    AND EXISTS (
+      SELECT 1 FROM sales_records sr
+      WHERE sr.vendor_id = r.vendor_id
+      AND sr.sale_date >= s.period_start
+      AND sr.sale_date <= s.period_end
+    )
+    ORDER BY r.refund_date ASC, s.period_end DESC
   `;
   
-  return db.prepare(query).all(vendorId, beforeDate, SETTLEMENT_STATUS.CONFIRMED);
+  const results = db.prepare(query).all(SETTLEMENT_STATUS.CONFIRMED, vendorId, beforeDate);
+  
+  const uniqueRefunds = new Map();
+  for (const row of results) {
+    if (!uniqueRefunds.has(row.id)) {
+      uniqueRefunds.set(row.id, row);
+    }
+  }
+  
+  return Array.from(uniqueRefunds.values());
+}
+
+async function getPeriodRefunds(vendorId, periodStart, periodEnd) {
+  const { getDb } = require('./db');
+  const db = await getDb();
+  
+  const query = `
+    SELECT * FROM refunds 
+    WHERE vendor_id = ?
+    AND refund_date >= ?
+    AND refund_date <= ?
+  `;
+  
+  return db.prepare(query).all(vendorId, periodStart, periodEnd);
 }
 
 async function getVendorDeposit(vendorId, settlementDate) {
@@ -380,6 +422,7 @@ module.exports = {
   getVendorSalesByBooth,
   getVendorRefundsByBooth,
   getHistoricalRefunds,
+  getPeriodRefunds,
   getVendorDeposit,
   getVendorElectricityFee,
   getVendorPreviousPayments,

@@ -268,6 +268,7 @@ async function initDatabase(dbPath = DEFAULT_DB_PATH) {
       previous_payments REAL DEFAULT 0,
       amount_due REAL DEFAULT 0,
       adjustment_note TEXT,
+      booth_details TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -278,6 +279,15 @@ async function initDatabase(dbPath = DEFAULT_DB_PATH) {
       amount REAL DEFAULT 0,
       reason TEXT,
       note TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS settlement_refunds (
+      id TEXT PRIMARY KEY,
+      settlement_id TEXT NOT NULL,
+      settlement_item_id TEXT NOT NULL,
+      refund_id TEXT NOT NULL,
+      is_historical INTEGER DEFAULT 0,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 

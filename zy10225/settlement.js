@@ -4,7 +4,8 @@ const { generateId, roundAmount, formatCurrency, formatDate } = require('./utils
 const {
   calculateVendorSettlement,
   getAllVendorsForSettlement,
-  getHistoricalRefunds
+  getHistoricalRefunds,
+  getPeriodRefunds
 } = require('./business');
 
 async function createSettlement(periodStart, periodEnd, settlementDate = null) {
@@ -102,13 +103,15 @@ async function calculateSettlementPreview(settlementId) {
       const itemId = generateId();
       const primaryBooth = settlementData.booths.length > 0 ? settlementData.booths[0].booth_id : null;
       
+      const boothDetails = JSON.stringify(settlementData.booths);
+      
       db.prepare(`
         INSERT INTO settlement_items (
           id, settlement_id, vendor_id, booth_id,
           total_sales, total_refunds, net_sales,
           commission_amount, deposit_amount, electricity_fee,
-          previous_payments, amount_due
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          previous_payments, amount_due, booth_details
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).run(
         itemId,
         settlementId,
@@ -121,7 +124,8 @@ async function calculateSettlementPreview(settlementId) {
         settlementData.deposit_amount,
         settlementData.electricity_fee,
         settlementData.previous_payments,
-        settlementData.amount_due
+        settlementData.amount_due,
+        boothDetails
       );
       
       previewItems.push({
@@ -216,12 +220,22 @@ async function confirmSettlement(settlementId) {
   const items = db.prepare('SELECT * FROM settlement_items WHERE settlement_id = ?').all(settlementId);
   
   const allHistoricalRefunds = [];
+  const allPeriodRefunds = [];
+  
   for (const item of items) {
     const historicalRefunds = await getHistoricalRefunds(item.vendor_id, settlement.period_start);
     for (const hr of historicalRefunds) {
       allHistoricalRefunds.push({
         vendorItem: item,
         refund: hr
+      });
+    }
+    
+    const periodRefunds = await getPeriodRefunds(item.vendor_id, settlement.period_start, settlement.period_end);
+    for (const pr of periodRefunds) {
+      allPeriodRefunds.push({
+        vendorItem: item,
+        refund: pr
       });
     }
   }
@@ -233,6 +247,19 @@ async function confirmSettlement(settlementId) {
       WHERE id = ?
     `).run(SETTLEMENT_STATUS.CONFIRMED, settlementId);
     
+    for (const item of allPeriodRefunds) {
+      db.prepare(`
+        INSERT INTO settlement_refunds (id, settlement_id, settlement_item_id, refund_id, is_historical)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        generateId(),
+        settlementId,
+        item.vendorItem.id,
+        item.refund.id,
+        0
+      );
+    }
+    
     for (const item of allHistoricalRefunds) {
       db.prepare(`
         INSERT INTO historical_refunds (id, refund_id, original_settlement_id, new_settlement_id, amount)
@@ -243,6 +270,17 @@ async function confirmSettlement(settlementId) {
         item.refund.settlement_id,
         settlementId,
         item.refund.amount
+      );
+      
+      db.prepare(`
+        INSERT INTO settlement_refunds (id, settlement_id, settlement_item_id, refund_id, is_historical)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        generateId(),
+        settlementId,
+        item.vendorItem.id,
+        item.refund.id,
+        1
       );
     }
   });
@@ -272,10 +310,28 @@ async function getSettlementById(settlementId) {
   `).all(settlementId);
   
   for (const item of items) {
+    if (item.booth_details) {
+      try {
+        item.booths = JSON.parse(item.booth_details);
+      } catch (e) {
+        item.booths = [];
+      }
+    } else {
+      item.booths = [];
+    }
+    
     item.adjustments = db.prepare(`
       SELECT * FROM settlement_adjustments 
       WHERE settlement_item_id = ?
       ORDER BY created_at
+    `).all(item.id);
+    
+    item.settlement_refunds = db.prepare(`
+      SELECT sr.*, r.amount as refund_amount, r.refund_date, r.reason, r.note
+      FROM settlement_refunds sr
+      JOIN refunds r ON sr.refund_id = r.id
+      WHERE sr.settlement_item_id = ?
+      ORDER BY r.refund_date
     `).all(item.id);
   }
   
@@ -365,13 +421,12 @@ async function deleteDraftSettlement(settlementId) {
     throw new Error('已确认的结算不能删除');
   }
   
-  const transaction = db.transaction(() => {
+  db.transaction(() => {
+    db.prepare('DELETE FROM settlement_refunds WHERE settlement_id = ?').run(settlementId);
     db.prepare('DELETE FROM settlement_adjustments WHERE settlement_item_id IN (SELECT id FROM settlement_items WHERE settlement_id = ?)').run(settlementId);
     db.prepare('DELETE FROM settlement_items WHERE settlement_id = ?').run(settlementId);
     db.prepare('DELETE FROM settlements WHERE id = ?').run(settlementId);
   });
-  
-  transaction();
   
   return { success: true, message: '已删除结算草稿' };
 }

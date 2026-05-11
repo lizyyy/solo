@@ -3,6 +3,31 @@ const path = require('path');
 const moment = require('moment');
 const { formatCurrency, formatDate, ensureDirectory } = require('./utils');
 
+function formatBoothDetails(booths) {
+  if (!booths || booths.length === 0) {
+    return '-';
+  }
+  
+  return booths.map(booth => {
+    let rateStr = '';
+    if (booth.commission_rate) {
+      if (booth.commission_rate.rate_type === 'flat') {
+        rateStr = `固定${(booth.commission_rate.flat_rate * 100).toFixed(1)}%`;
+      } else {
+        rateStr = '阶梯抽成';
+      }
+    }
+    return `${booth.booth_id}[销售额:${booth.total_sales},退款:${booth.total_refunds},抽成:${booth.commission_amount || 0},${rateStr}]`;
+  }).join(' | ');
+}
+
+function formatBoothsList(booths) {
+  if (!booths || booths.length === 0) {
+    return '-';
+  }
+  return booths.map(b => b.booth_id).join(',');
+}
+
 async function exportToCsv(settlementId, outputPath) {
   const { getSettlementById } = require('./settlement');
   const data = await getSettlementById(settlementId);
@@ -15,6 +40,7 @@ async function exportToCsv(settlementId, outputPath) {
   const headers = [
     '摊主名称',
     '摊位',
+    '摊位明细',
     '总销售额',
     '退款金额',
     '净销售额',
@@ -28,7 +54,8 @@ async function exportToCsv(settlementId, outputPath) {
   
   const rows = items.map(item => [
     item.vendor_name,
-    item.booth_number || '-',
+    formatBoothsList(item.booths),
+    formatBoothDetails(item.booths),
     item.total_sales,
     item.total_refunds,
     item.net_sales,
@@ -115,7 +142,16 @@ function generateVendorStatement(item, settlement) {
   lines.push('');
   
   lines.push(`摊主: ${item.vendor_name}`);
-  lines.push(`摊位: ${item.booth_number || '-'}`);
+  
+  let boothInfo = '';
+  if (item.booths && item.booths.length > 0) {
+    const boothIds = item.booths.map(b => b.booth_id).join(', ');
+    boothInfo = `${item.booths.length > 1 ? '摊位 (多个)' : '摊位'}: ${boothIds}`;
+  } else {
+    boothInfo = `摊位: ${item.booth_number || '-'}`;
+  }
+  lines.push(boothInfo);
+  
   lines.push(`结算周期: ${settlement.period_start} 至 ${settlement.period_end}`);
   lines.push(`结算日期: ${settlement.settlement_date}`);
   lines.push('');
@@ -123,6 +159,16 @@ function generateVendorStatement(item, settlement) {
   lines.push('-'.repeat(60));
   lines.push('一、销售明细');
   lines.push('-'.repeat(60));
+  
+  if (item.booths && item.booths.length > 0) {
+    for (const booth of item.booths) {
+      lines.push(`  摊位 ${booth.booth_id}:`);
+      lines.push(`    销售额: ${formatCurrency(booth.total_sales)}`);
+      lines.push(`    退款: ${formatCurrency(booth.total_refunds)}`);
+    }
+  }
+  
+  lines.push('');
   lines.push(`  总销售额: ${formatCurrency(item.total_sales)}`);
   lines.push(`  退款金额: ${formatCurrency(item.total_refunds)}`);
   lines.push(`  净销售额: ${formatCurrency(item.net_sales)}`);
@@ -150,6 +196,7 @@ function generateVendorStatement(item, settlement) {
     }
   }
   
+  lines.push('');
   lines.push(`  抽成合计: ${formatCurrency(item.commission_amount)}`);
   lines.push('');
   
@@ -161,9 +208,22 @@ function generateVendorStatement(item, settlement) {
   lines.push(`  已付款: ${formatCurrency(item.previous_payments)}`);
   lines.push('');
   
+  if (item.settlement_refunds && item.settlement_refunds.length > 0) {
+    lines.push('-'.repeat(60));
+    lines.push('四、退款明细');
+    lines.push('-'.repeat(60));
+    for (const sr of item.settlement_refunds) {
+      const historicalLabel = sr.is_historical ? ' [历史退款]' : '';
+      lines.push(`  [${sr.refund_date}] 退款: ${formatCurrency(sr.refund_amount)}${historicalLabel}`);
+      if (sr.reason) lines.push(`    原因: ${sr.reason}`);
+      if (sr.note) lines.push(`    说明: ${sr.note}`);
+    }
+    lines.push('');
+  }
+  
   if (item.adjustments && item.adjustments.length > 0) {
     lines.push('-'.repeat(60));
-    lines.push('四、调整记录');
+    lines.push('五、调整记录');
     lines.push('-'.repeat(60));
     for (const adj of item.adjustments) {
       lines.push(`  [${formatDate(adj.created_at)}] ${adj.adjustment_type}: ${adj.amount > 0 ? '+' : ''}${formatCurrency(adj.amount)}`);

@@ -405,7 +405,7 @@ async function importRefunds(data, sourceFile, sourceFileHash) {
     
     const record = {
       vendor_id: item.vendor_id,
-      booth_id: item.booth_id,
+      booth_id: item.booth_id || null,
       amount: parseAmount(item.amount || item.refund_amount),
       refund_date: parseDate(item.refund_date || item.date),
       related_sale_id: item.related_sale_id || item.sale_id || null,
