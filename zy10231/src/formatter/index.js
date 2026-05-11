@@ -62,56 +62,91 @@ function formatPrintList(items, batchNumber) {
   return output;
 }
 
-function formatReprintHistory(records, attendeeName = null) {
+function getOperationDetail(op) {
+  switch (op.operationType) {
+    case 'reprint':
+      return op.reprintReason || '补打';
+    case 'update_name':
+      return `${op.oldName} → ${op.newName}`;
+    case 'update_company':
+      return `${op.oldCompany} → ${op.newCompany}`;
+    case 'update_badge':
+      return `${op.oldBadge} → ${op.newBadge}`;
+    case 'update_permission':
+      return `${op.oldPermission || '(无)'} → ${op.newPermission}`;
+    case 'checkin':
+      return '签到';
+    default:
+      return op.operationType || '-';
+  }
+}
+
+function getOperationLabel(type) {
+  const labels = {
+    'reprint': '补打',
+    'update_name': '改名',
+    'update_company': '改公司',
+    'update_badge': '换编号',
+    'update_permission': '改权限',
+    'checkin': '签到'
+  };
+  return labels[type] || type;
+}
+
+function formatOperationHistory(records, attendeeName = null) {
   const title = attendeeName 
-    ? `补打历史 - ${attendeeName}` 
-    : '全部补打历史记录';
+    ? `操作历史 - ${attendeeName}` 
+    : '全部操作历史记录';
   
   let output = printHeader(title);
   
   const cols = {
-    batch: 12,
-    time: 20,
-    badge: 14,
-    name: 12,
-    company: 18,
-    type: 10,
-    reason: 16,
-    count: 6
+    seq: 4,
+    batch: 10,
+    time: 17,
+    op: 8,
+    badge: 12,
+    name: 10,
+    company: 16,
+    detail: 23
   };
   
-  output += pad('批次号', cols.batch) + pad('操作时间', cols.time) +
-            pad('胸牌编号', cols.badge) + pad('姓名', cols.name) +
-            pad('公司', cols.company) + pad('类型', cols.type) +
-            pad('补打原因', cols.reason) + pad('次数', cols.count) + '\n';
+  output += pad('序号', cols.seq) + pad('批次', cols.batch) +
+            pad('时间', cols.time) + pad('操作', cols.op) +
+            pad('编号', cols.badge) + pad('姓名', cols.name) +
+            pad('公司', cols.company) + pad('详情', cols.detail) + '\n';
   output += '-'.repeat(80) + '\n';
   
-  let totalReprints = 0;
+  let totalOps = 0;
+  let seq = 1;
   
   records.forEach(record => {
     if (record.type === 'confirm' && record.details?.operations) {
       record.details.operations.forEach(op => {
-        if (op.operationType === 'reprint' || op.reprintReason) {
-          output += 
-            pad(record.batchNumber || '-', cols.batch) +
-            pad(formatTimestamp(record.timestamp), cols.time) +
-            pad(op.attendee?.badgeNumber || '-', cols.badge) +
-            pad(op.attendee?.name || '-', cols.name) +
-            pad((op.attendee?.company || '-').substring(0, 16), cols.company) +
-            pad(op.attendee?.guestType || '-', cols.type) +
-            pad((op.reprintReason || '-').substring(0, 14), cols.reason) +
-            pad(String(op.reprintCount || 1), cols.count) +
-            '\n';
-          totalReprints++;
-        }
+        output += 
+          pad(String(seq), cols.seq) +
+          pad(record.batchNumber || '-', cols.batch) +
+          pad(formatTimestamp(record.timestamp).substring(5, 22), cols.time) +
+          pad(getOperationLabel(op.operationType), cols.op) +
+          pad(op.attendee?.badgeNumber || '-', cols.badge) +
+          pad(op.attendee?.name || '-', cols.name) +
+          pad((op.attendee?.company || '-').substring(0, 14), cols.company) +
+          pad(getOperationDetail(op).substring(0, 21), cols.detail) +
+          '\n';
+        totalOps++;
+        seq++;
       });
     }
   });
   
   output += '-'.repeat(80) + '\n';
-  output += `补打记录总数: ${totalReprints}\n`;
+  output += `操作记录总数: ${totalOps}\n`;
   
   return output;
+}
+
+function formatReprintHistory(records, attendeeName = null) {
+  return formatOperationHistory(records, attendeeName);
 }
 
 function formatValidationReport(validation, context) {
@@ -312,6 +347,9 @@ module.exports = {
   printHeader,
   formatPrintList,
   formatReprintHistory,
+  formatOperationHistory,
+  getOperationDetail,
+  getOperationLabel,
   formatValidationReport,
   formatPendingList,
   formatAttendeeInfo,

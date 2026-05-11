@@ -1,9 +1,9 @@
 [
   {
-    "id": "H1778489329760n4m9",
+    "id": "H1778506014274qxdm",
     "type": "import",
     "batchNumber": null,
-    "timestamp": "2026-05-11T08:48:49.760Z",
+    "timestamp": "2026-05-11T13:26:54.274Z",
     "details": {
       "file": "examples/attendees.csv",
       "total": 8,
@@ -13,18 +13,18 @@
     }
   },
   {
-    "id": "H1778489337807ibz8",
+    "id": "H1778506025636pr0y",
     "type": "confirm",
     "batchNumber": "0001",
-    "timestamp": "2026-05-11T08:48:57.807Z",
+    "timestamp": "2026-05-11T13:27:05.636Z",
     "details": {
       "batchNumber": "0001",
       "operator": "lzy",
-      "itemCount": 3,
+      "itemCount": 4,
       "operations": [
         {
           "attendee": {
-            "id": "A1778489329757qvr7",
+            "id": "A1778506014271xitx",
             "key": "张三_阿里巴巴集团_",
             "name": "张三",
             "company": "阿里巴巴集团",
@@ -38,11 +38,11 @@
             "reprintReasons": [
               {
                 "reason": "胸牌丢失",
-                "timestamp": "2026-05-11T08:48:57.806Z"
+                "timestamp": "2026-05-11T13:27:05.636Z"
               }
             ],
-            "createdAt": "2026-05-11T08:48:49.756Z",
-            "updatedAt": "2026-05-11T08:48:57.806Z"
+            "createdAt": "2026-05-11T13:26:54.270Z",
+            "updatedAt": "2026-05-11T13:27:05.636Z"
           },
           "operationType": "reprint",
           "reprintReason": "胸牌丢失",
@@ -50,7 +50,7 @@
         },
         {
           "attendee": {
-            "id": "A17784893297582ufq",
+            "id": "A1778506014272n7yv",
             "key": "李四_腾讯科技有限公司_",
             "name": "李四时",
             "company": "腾讯科技有限公司",
@@ -62,8 +62,8 @@
             "checkinStatus": "未签到",
             "reprintCount": 0,
             "reprintReasons": [],
-            "createdAt": "2026-05-11T08:48:49.758Z",
-            "updatedAt": "2026-05-11T08:48:57.806Z"
+            "createdAt": "2026-05-11T13:26:54.272Z",
+            "updatedAt": "2026-05-11T13:27:05.636Z"
           },
           "operationType": "update_name",
           "oldName": "李四",
@@ -71,7 +71,7 @@
         },
         {
           "attendee": {
-            "id": "A1778489329758gv2x",
+            "id": "A1778506014272nnfz",
             "key": "王五_字节跳动_",
             "name": "王五",
             "company": "字节跳动科技",
@@ -83,27 +83,34 @@
             "checkinStatus": "未签到",
             "reprintCount": 0,
             "reprintReasons": [],
-            "createdAt": "2026-05-11T08:48:49.758Z",
-            "updatedAt": "2026-05-11T08:48:57.806Z"
+            "createdAt": "2026-05-11T13:26:54.272Z",
+            "updatedAt": "2026-05-11T13:27:05.636Z"
           },
           "operationType": "update_company",
           "oldCompany": "字节跳动",
           "newCompany": "字节跳动科技"
+        },
+        {
+          "attendee": {
+            "id": "A1778506014274vja6",
+            "key": "吴十_华为公司_",
+            "name": "吴十",
+            "company": "华为公司",
+            "badgeNumber": "REG003",
+            "guestType": "正式嘉宾",
+            "phone": "",
+            "email": "",
+            "permissionZone": "A区",
+            "checkinStatus": "已签到",
+            "reprintCount": 0,
+            "reprintReasons": [],
+            "createdAt": "2026-05-11T13:26:54.274Z",
+            "updatedAt": "2026-05-11T13:27:05.636Z"
+          },
+          "operationType": "checkin",
+          "checkinTime": "2026-05-11T13:27:05.636Z"
         }
       ]
-    }
-  },
-  {
-    "id": "H1778489503945vddq",
-    "type": "import",
-    "batchNumber": null,
-    "timestamp": "2026-05-11T08:51:43.945Z",
-    "details": {
-      "file": "/tmp/test_conflict.csv",
-      "total": 2,
-      "success": 1,
-      "updated": 0,
-      "errors": 1
     }
   }
 ]

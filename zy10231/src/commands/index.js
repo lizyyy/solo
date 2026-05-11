@@ -169,6 +169,9 @@ function cmdCheck(args) {
     case 'permission':
       checkUpdate(action, args);
       break;
+    case 'checkin':
+      checkCheckin(args);
+      break;
     default:
       console.log('用法: badge check [操作类型] [参数]');
       console.log('  badge check                    - 查看所有待确认操作');
@@ -177,6 +180,7 @@ function cmdCheck(args) {
       console.log('  badge check company [编号] [新公司] - 检查改公司');
       console.log('  badge check badge [编号] [新编号] - 检查换号');
       console.log('  badge check permission [编号] [新权限] - 检查改权限');
+      console.log('  badge check checkin [编号]     - 检查并添加签到');
       break;
   }
 }
@@ -325,6 +329,76 @@ function checkUpdate(type, args) {
   if (added) {
     console.log(`\n  ✓ 已添加到待确认列表`);
     console.log(`\n  下一步: badge confirm 确认后打印`);
+  }
+}
+
+function checkCheckin(args) {
+  const badgeNumber = args['--badge'] || args.badge || args._[2];
+  
+  if (!badgeNumber) {
+    console.log('用法: badge check checkin <胸牌编号>');
+    console.log('  或: badge check checkin --badge XXX');
+    process.exit(1);
+  }
+  
+  const attendee = attendeeModel.findByBadgeNumber(badgeNumber);
+  if (!attendee) {
+    console.log(`未找到编号为 ${badgeNumber} 的参会人`);
+    process.exit(1);
+  }
+  
+  console.log(formatter.printHeader(`检查: 签到同步`));
+  
+  const errors = [];
+  const warnings = [];
+  
+  if (attendee.checkinStatus === '已签到') {
+    warnings.push(`${attendee.name} 已于 ${attendee.updatedAt?.substring(0, 19).replace('T', ' ') || '之前'} 签到，无需重复签到`);
+  }
+  
+  if (attendee.checkinStatus === '已离场') {
+    errors.push(`${attendee.name} 已离场，无法签到`);
+  }
+  
+  const validation = { errors, warnings, isValid: errors.length === 0 };
+  console.log(formatter.formatValidationReport(validation));
+  console.log(`\n  参会人:`);
+  console.log(`    编号: ${attendee.badgeNumber}`);
+  console.log(`    姓名: ${attendee.name}`);
+  console.log(`    公司: ${attendee.company}`);
+  console.log(`    当前状态: ${attendee.checkinStatus}`);
+  
+  if (!validation.isValid) {
+    console.log('\n  存在错误，无法继续。');
+    process.exit(1);
+  }
+  
+  const key = attendeeModel.buildAttendeeKey(attendee);
+  const isDuplicate = validator.checkDuplicateOperation(key, 'checkin', attendee.badgeNumber);
+  
+  if (isDuplicate) {
+    console.log(`\n  ⚠ 该签到操作已在待确认列表中，无需重复添加。`);
+    return;
+  }
+  
+  if (warnings.length > 0) {
+    console.log(`\n  提示: ${warnings[0]}`);
+    return;
+  }
+  
+  const added = historyModel.addPendingItem({
+    attendeeId: attendee.id,
+    attendeeKey: key,
+    operationType: 'checkin',
+    name: attendee.name,
+    company: attendee.company,
+    badgeNumber: attendee.badgeNumber,
+    originalAttendee: { ...attendee }
+  });
+  
+  if (added) {
+    console.log(`\n  ✓ 已添加到待确认列表`);
+    console.log(`\n  下一步: badge confirm 确认后完成签到同步`);
   }
 }
 
@@ -547,11 +621,11 @@ function cmdHistory(args) {
           flatRecords.push({
             批次号: record.batchNumber,
             操作时间: formatter.formatTimestamp(record.timestamp),
-            操作类型: op.operationType,
+            操作类型: formatter.getOperationLabel(op.operationType),
             胸牌编号: op.attendee?.badgeNumber,
             姓名: op.attendee?.name,
             公司: op.attendee?.company,
-            详情: op.reprintReason || (op.oldValue && op.newValue ? `${op.oldValue}→${op.newValue}` : '')
+            详情: formatter.getOperationDetail(op)
           });
         });
       }
@@ -592,11 +666,11 @@ function cmdExport(args) {
             data.push({
               批次号: record.batchNumber,
               操作时间: formatter.formatTimestamp(record.timestamp),
-              操作类型: op.operationType,
+              操作类型: formatter.getOperationLabel(op.operationType),
               胸牌编号: op.attendee?.badgeNumber,
               姓名: op.attendee?.name,
               公司: op.attendee?.company,
-              详情: op.reprintReason || (op.oldValue && op.newValue ? `${op.oldValue}→${op.newValue}` : '')
+              详情: formatter.getOperationDetail(op)
             });
           });
         }
@@ -674,10 +748,10 @@ function cmdHelp() {
 ============================
 
 工作流程:
-  1. import  导入参会人数据
-  2. check   添加补打/修改操作（自动去重）
-  3. confirm 确认后生成打印批次
-  4. export  导出打印清单/历史记录
+  1. import   导入参会人数据
+  2. check    添加补打/修改/签到操作（自动去重）
+  3. confirm  确认后生成打印批次
+  4. export   导出打印清单/历史记录
 
 命令说明:
 
@@ -693,6 +767,7 @@ function cmdHelp() {
       company <编号> <新公司>                修改公司
       badge <编号> <新编号>                  更换胸牌编号
       permission <编号> <新权限>             修改权限区域
+      checkin <编号>                         签到同步
 
   badge check
     查看当前待确认列表
@@ -706,7 +781,7 @@ function cmdHelp() {
     其他: --summary 统计概览 --csv 导出CSV
 
   badge history [筛选条件]
-    查看补打/修改历史
+    查看全部操作历史（补打、改名、改公司、签到等）
     筛选: --batch 0001 --badge XXX --name 张三
     其他: --csv 导出CSV
 
@@ -722,10 +797,11 @@ function cmdHelp() {
   $ badge import attendees.csv
   $ badge check reprint --badge VIP001 --reason 胸牌丢失
   $ badge check name VIP002 张小三
+  $ badge check checkin REG003
   $ badge check
   $ badge confirm
   $ badge history --batch 0001
-  $ badge export print --output 打印清单_批次0001.csv
+  $ badge export history --output 操作历史.csv
 
 业务规则:
   • 同一人同一操作重复添加会自动去重
@@ -733,6 +809,7 @@ function cmdHelp() {
   • 临时嘉宾必须设置权限区域才能打印
   • 签到后改名/改公司会显示警告
   • 补打次数 >= 3 次会提示高频补打警告
+  • 已签到人员再次签到会跳过
 `);
 }
 
