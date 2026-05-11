@@ -483,6 +483,7 @@ func (s *BorrowService) BorrowDevice(deviceID, borrowerID uuid.UUID, purpose str
 				"expected_return_date": expectedReturnDate,
 				"old_status":           "available",
 				"new_status":           "borrowed",
+				"status":               "borrowed",
 			},
 			Metadata: map[string]interface{}{
 				"timestamp": time.Now().Unix(),
@@ -581,6 +582,7 @@ func (s *BorrowService) ReturnDevice(recordID uuid.UUID, notes string, returnedB
 				"notes":              notes,
 				"old_status":         "borrowed",
 				"new_status":         "available",
+				"status":             "available",
 			},
 			Metadata: map[string]interface{}{
 				"timestamp": time.Now().Unix(),
@@ -602,6 +604,7 @@ func (s *BorrowService) ReturnDevice(recordID uuid.UUID, notes string, returnedB
 				"notes":              notes,
 				"old_status":         "borrowed",
 				"new_status":         "returned",
+				"status":             "returned",
 			},
 			Metadata: map[string]interface{}{
 				"timestamp": time.Now().Unix(),

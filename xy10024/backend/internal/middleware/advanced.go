@@ -65,10 +65,14 @@ func IdempotencyMiddleware(db *gorm.DB, redisClient *redis.Client) gin.HandlerFu
 				expiresAt := time.Now().Add(24 * time.Hour)
 				record := models.DedupRecord{
 					IdempotencyKey: idempotencyKey,
-					RequestID:      uuid.MustParse(requestID),
 					Response:       response,
 					ExpiresAt:      expiresAt,
 				}
+
+				if rid, err := uuid.Parse(requestID); err == nil {
+					record.RequestID = rid
+				}
+
 				db.Create(&record)
 
 				if redisClient != nil {
@@ -109,13 +113,15 @@ func AuditMiddleware(db *gorm.DB, redisClient *redis.Client) gin.HandlerFunc {
 			}
 
 			if userID != "" {
-				uid := uuid.MustParse(userID)
-				auditLog.UserID = &uid
+				if uid, err := uuid.Parse(userID); err == nil {
+					auditLog.UserID = &uid
+				}
 			}
 
 			if requestID != "" {
-				rid := uuid.MustParse(requestID)
-				auditLog.RequestID = &rid
+				if rid, err := uuid.Parse(requestID); err == nil {
+					auditLog.RequestID = &rid
+				}
 			}
 
 			db.Create(&auditLog)
