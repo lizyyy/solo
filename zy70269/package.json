@@ -1,0 +1,15 @@
+{
+  "name": "bus-stop-report-api",
+  "version": "1.0.0",
+  "description": "公交站牌破损上报 API 系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node test/scenarios.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
