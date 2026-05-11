@@ -1,6 +1,6 @@
 import express from 'express';
 import { validateRequestId } from '../utils/idempotency.js';
-import { successResponse, errorResponse, AppError } from '../utils/response.js';
+import { successResponse, errorResponse, AppError, DuplicateRequestError } from '../utils/response.js';
 import { createEvent, updateEvent, cancelEvent, getEventById, getEvents, getEventRegistrations } from '../services/eventService.js';
 import { getEntityHistory } from '../services/operationLogService.js';
 
@@ -94,7 +94,15 @@ router.delete('/:id', validateRequestId, (req, res) => {
 });
 
 function handleError(res, error) {
-  if (error instanceof AppError) {
+  if (error instanceof DuplicateRequestError) {
+    res.status(200).json({
+      success: true,
+      message: error.message,
+      data: error.existingData,
+      fromCache: true,
+      timestamp: new Date().toISOString()
+    });
+  } else if (error instanceof AppError) {
     res.status(error.statusCode).json(errorResponse(error.message, error.code, error.details));
   } else {
     console.error('Unexpected error:', error);

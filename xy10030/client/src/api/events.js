@@ -1,37 +1,30 @@
-import api from '../utils/api.js';
+import { get, post, put, del } from '../utils/api.js';
 import { generateRequestId } from '../utils/requestId.js';
 
 export function getEvents(params = {}) {
-  return api.get('/events', { params });
+  return get('/events', params);
 }
 
 export function getEventById(id) {
-  return api.get(`/events/${id}`);
+  return get(`/events/${id}`);
 }
 
 export function createEvent(data) {
-  return api.post('/events', data, {
-    headers: { 'X-Request-Id': generateRequestId() }
-  });
+  return post('/events', data, { 'X-Request-Id': generateRequestId() });
 }
 
 export function updateEvent(id, data) {
-  return api.put(`/events/${id}`, data, {
-    headers: { 'X-Request-Id': generateRequestId() }
-  });
+  return put(`/events/${id}`, data, { 'X-Request-Id': generateRequestId() });
 }
 
 export function cancelEvent(id, version, reason = '') {
-  return api.delete(`/events/${id}`, {
-    data: { version, reason },
-    headers: { 'X-Request-Id': generateRequestId() }
-  });
+  return del(`/events/${id}`, { version, reason }, { 'X-Request-Id': generateRequestId() });
 }
 
 export function getEventRegistrations(id, params = {}) {
-  return api.get(`/events/${id}/registrations`, { params });
+  return get(`/events/${id}/registrations`, params);
 }
 
 export function getEventHistory(id) {
-  return api.get(`/events/${id}/history`);
+  return get(`/events/${id}/history`);
 }

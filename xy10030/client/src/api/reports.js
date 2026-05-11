@@ -1,21 +1,21 @@
-import api from '../utils/api.js';
+import { get } from '../utils/api.js';
 
 export function getStatistics() {
-  return api.get('/reports/statistics');
+  return get('/reports/statistics');
 }
 
 export function getEventsReport(format = 'json') {
-  return api.get('/reports/events', { params: { format } });
+  return get('/reports/events', { format });
 }
 
 export function getRegistrationsReport(eventId = null, format = 'json') {
   const params = { format };
   if (eventId) params.eventId = eventId;
-  return api.get('/reports/registrations', { params });
+  return get('/reports/registrations', params);
 }
 
 export function getLogsReport(params = {}, format = 'json') {
-  return api.get('/reports/logs', { params: { ...params, format } });
+  return get('/reports/logs', { ...params, format });
 }
 
 export function downloadCSV(url, filename) {

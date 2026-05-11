@@ -5,6 +5,7 @@ import RegistrationList from '../views/RegistrationList.vue'
 import TaskList from '../views/TaskList.vue'
 import LogList from '../views/LogList.vue'
 import ReportPage from '../views/ReportPage.vue'
+import PendingRequests from '../views/PendingRequests.vue'
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/reports',
     name: 'ReportPage',
     component: ReportPage
+  },
+  {
+    path: '/pending',
+    name: 'PendingRequests',
+    component: PendingRequests
   }
 ]
 

@@ -1,7 +1,25 @@
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../database/index.js';
 import { logOperation } from './operationLogService.js';
-import { ConcurrencyError, NotFoundError, ValidationError, ConflictError } from '../utils/response.js';
+import { ConcurrencyError, NotFoundError, ValidationError, ConflictError, DuplicateRequestError } from '../utils/response.js';
+
+export function checkDuplicateEventRequest(requestId) {
+  if (!requestId) return null;
+  
+  const existingLog = db.prepare(`
+    SELECT new_data
+    FROM operation_logs
+    WHERE request_id = ? AND entity_type = 'event' AND status = 'success'
+    ORDER BY created_at DESC
+    LIMIT 1
+  `).get(requestId);
+  
+  if (existingLog && existingLog.new_data) {
+    return JSON.parse(existingLog.new_data);
+  }
+  
+  return null;
+}
 
 export function validateEventData(data) {
   const errors = [];
@@ -42,6 +60,15 @@ export function validateEventData(data) {
 }
 
 export function createEvent(data, requestId, operator = 'system') {
+  if (!requestId) {
+    requestId = uuidv4();
+  }
+  
+  const existing = checkDuplicateEventRequest(requestId);
+  if (existing) {
+    throw new DuplicateRequestError('相同请求已处理', existing);
+  }
+  
   validateEventData(data);
   
   const eventId = uuidv4();
