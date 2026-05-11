@@ -1,0 +1,15 @@
+{
+  "name": "milk-tea-stock-management",
+  "version": "1.0.0",
+  "description": "奶茶门店原料损耗台",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.5",
+    "express": "^4.22.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}
