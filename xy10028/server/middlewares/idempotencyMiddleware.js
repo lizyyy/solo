@@ -15,7 +15,7 @@ function pathRequiresIdempotency(path, method) {
   return IDEMPOTENCY_REQUIRED_PATHS.some(pattern => pattern.test(path));
 }
 
-function idempotencyMiddleware(req, res, next) {
+async function idempotencyMiddleware(req, res, next) {
   if (!pathRequiresIdempotency(req.path, req.method)) {
     return next();
   }
@@ -38,12 +38,6 @@ function idempotencyMiddleware(req, res, next) {
   }
 
   req.requestId = requestId;
-  next();
-}
-
-async function checkRequestProcessed(req, res, next) {
-  const requestId = req.requestId;
-  if (!requestId) return next();
 
   try {
     const check = await idempotencyService.isRequestProcessed(requestId);
@@ -70,4 +64,3 @@ async function checkRequestProcessed(req, res, next) {
 }
 
 module.exports = idempotencyMiddleware;
-module.exports.checkRequestProcessed = checkRequestProcessed;

@@ -18,6 +18,11 @@ const inventoryService = {
         };
       }
 
+      if (requestCheck.isProcessing) {
+        await t.rollback();
+        throw new Error('请求正在处理中，请稍后重试');
+      }
+
       await idempotencyService.registerRequest(requestId, 'CREATE_INVENTORY', data, userId, t);
       await idempotencyService.markProcessing(requestId, t);
 
@@ -104,6 +109,11 @@ const inventoryService = {
           ...requestCheck.result,
           isDuplicate: true
         };
+      }
+
+      if (requestCheck.isProcessing) {
+        await t.rollback();
+        throw new Error('请求正在处理中，请稍后重试');
       }
 
       await idempotencyService.registerRequest(requestId, 'ADJUST_INVENTORY', { inventoryId, adjustment }, userId, t);
@@ -222,6 +232,11 @@ const inventoryService = {
           ...requestCheck.result,
           isDuplicate: true
         };
+      }
+
+      if (requestCheck.isProcessing) {
+        await t.rollback();
+        throw new Error('请求正在处理中，请稍后重试');
       }
 
       await idempotencyService.registerRequest(requestId, 'PRICE_CHANGE', { inventoryId, newPrice, reason }, userId, t);
@@ -352,6 +367,11 @@ const inventoryService = {
           ...requestCheck.result,
           isDuplicate: true
         };
+      }
+
+      if (requestCheck.isProcessing) {
+        await t.rollback();
+        throw new Error('请求正在处理中，请稍后重试');
       }
 
       await idempotencyService.registerRequest(requestId, 'TRANSFER', transferData, userId, t);

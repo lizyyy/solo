@@ -41,7 +41,11 @@ db.Inventory.hasMany(db.PriceChangeRecord, { foreignKey: 'inventoryId' });
 db.PriceChangeRecord.belongsTo(db.Inventory, { foreignKey: 'inventoryId' });
 
 db.Store.hasMany(db.TransferOrder, { as: 'OutgoingTransfers', foreignKey: 'fromStoreId' });
+db.TransferOrder.belongsTo(db.Store, { as: 'FromStore', foreignKey: 'fromStoreId' });
+
 db.Store.hasMany(db.TransferOrder, { as: 'IncomingTransfers', foreignKey: 'toStoreId' });
+db.TransferOrder.belongsTo(db.Store, { as: 'ToStore', foreignKey: 'toStoreId' });
+
 db.Product.hasMany(db.TransferOrder, { foreignKey: 'productId' });
 db.TransferOrder.belongsTo(db.Product, { foreignKey: 'productId' });
 

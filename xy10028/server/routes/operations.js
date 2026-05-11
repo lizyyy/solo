@@ -91,8 +91,8 @@ router.get('/transfers', async (req, res, next) => {
       where,
       include: [
         { model: db.Product },
-        { model: db.Store, as: 'OutgoingTransfers' },
-        { model: db.Store, as: 'IncomingTransfers' }
+        { model: db.Store, as: 'FromStore' },
+        { model: db.Store, as: 'ToStore' }
       ],
       order: [['createdAt', 'DESC']],
       limit: parseInt(limit),
