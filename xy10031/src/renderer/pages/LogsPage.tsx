@@ -79,9 +79,9 @@ function LogsPage() {
 
   const handleExport = async () => {
     const dialog = await ipc.export.saveDialog()
-    if (!dialog.success || !dialog.filePath) return
+    if (!dialog.success || dialog.data?.canceled || !dialog.data?.filePath) return
 
-    const filePath = dialog.filePath.endsWith('.xlsx') ? dialog.filePath : dialog.filePath + '.xlsx'
+    const filePath = dialog.data.filePath.endsWith('.xlsx') ? dialog.data.filePath : dialog.data.filePath + '.xlsx'
     const params: any = {}
     if (levelFilter) params.level = levelFilter
     if (moduleFilter) params.module = moduleFilter

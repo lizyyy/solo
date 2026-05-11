@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Row, Col, Card, Statistic, List, Tag, message, Spin } from 'antd'
 import {
-  BoxOutlined,
-  ClipboardListOutlined,
+  InboxOutlined,
+  UnorderedListOutlined,
   SyncOutlined,
   WarningOutlined,
   CheckCircleOutlined,
@@ -52,7 +52,10 @@ function DashboardPage() {
       if (tasksResult.success) {
         const counts: TaskCount = { PENDING: 0, IN_PROGRESS: 0, PENDING_APPROVAL: 0, APPROVED: 0, REJECTED: 0, CANCELLED: 0 }
         for (const t of tasksResult.data.tasks) {
-          counts[t.status]++
+          const status = t.status as keyof TaskCount
+          if (status in counts) {
+            counts[status]++
+          }
         }
         setMyTaskCount(counts)
       }
@@ -91,7 +94,7 @@ function DashboardPage() {
             <Statistic
               title="商品总数"
               value={productCount}
-              prefix={<BoxOutlined />}
+              prefix={<InboxOutlined />}
               valueStyle={{ color: '#1890ff' }}
             />
           </Card>
@@ -113,7 +116,7 @@ function DashboardPage() {
             <Statistic
               title="待审批任务"
               value={myTaskCount.PENDING_APPROVAL}
-              prefix={<ClipboardListOutlined />}
+              prefix={<UnorderedListOutlined />}
               valueStyle={{ color: '#722ed1' }}
             />
           </Card>

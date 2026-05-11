@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Avatar, Dropdown, Button, message, Space } from 'antd'
 import {
   DashboardOutlined,
-  BoxOutlined,
-  ClipboardListOutlined,
+  InboxOutlined,
+  UnorderedListOutlined,
   SyncOutlined,
   FileTextOutlined,
   TeamOutlined,
@@ -30,7 +30,10 @@ function App() {
   const [, forceUpdate] = useState({})
 
   useEffect(() => {
-    return authStore.subscribe(() => forceUpdate({}))
+    const unsubscribe = authStore.subscribe(() => forceUpdate({}))
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   if (!authStore.isAuthenticated) {
@@ -39,8 +42,8 @@ function App() {
 
   const menuItems: MenuProps['items'] = [
     { key: 'dashboard', icon: <DashboardOutlined />, label: '控制台' },
-    { key: 'inventory', icon: <BoxOutlined />, label: '库存管理' },
-    { key: 'tasks', icon: <ClipboardListOutlined />, label: '盘点任务' },
+    { key: 'inventory', icon: <InboxOutlined />, label: '库存管理' },
+    { key: 'tasks', icon: <UnorderedListOutlined />, label: '盘点任务' },
     { key: 'sync', icon: <SyncOutlined />, label: '同步中心' },
     { key: 'logs', icon: <FileTextOutlined />, label: '审计日志' },
   ]
@@ -83,7 +86,7 @@ function App() {
         <Header style={{ background: '#fff', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Space>
             <h2 style={{ margin: 0 }}>
-              {menuItems.find((i: any) => i.key === page)?.label}
+              {(menuItems.find((i: any) => i.key === page) as any)?.label as string}
             </h2>
             <Button icon={<ReloadOutlined />} onClick={refreshPage}>刷新</Button>
           </Space>

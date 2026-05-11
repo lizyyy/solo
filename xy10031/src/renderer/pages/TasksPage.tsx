@@ -189,9 +189,9 @@ function TasksPage() {
   const handleExport = async () => {
     if (!currentTask) return
     const dialog = await ipc.export.saveDialog()
-    if (!dialog.success || !dialog.filePath) return
+    if (!dialog.success || dialog.data?.canceled || !dialog.data?.filePath) return
 
-    const filePath = dialog.filePath.endsWith('.xlsx') ? dialog.filePath : dialog.filePath + '.xlsx'
+    const filePath = dialog.data.filePath.endsWith('.xlsx') ? dialog.data.filePath : dialog.data.filePath + '.xlsx'
     const result = await ipc.export.taskRecords(currentTask.id, filePath)
 
     if (result.success) {
@@ -328,7 +328,9 @@ function TasksPage() {
             <Descriptions bordered size="small" column={2}>
               <Descriptions.Item label="任务名称">{taskDetail.name}</Descriptions.Item>
               <Descriptions.Item label="状态">
-                <Tag color={statusMap[taskDetail.status].color}>{statusMap[taskDetail.status].label}</Tag>
+                <Tag color={statusMap[taskDetail.status as keyof typeof statusMap].color}>
+                  {statusMap[taskDetail.status as keyof typeof statusMap].label}
+                </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="责任人">{taskDetail.assignee?.name || '-'}</Descriptions.Item>
               <Descriptions.Item label="描述" span={2}>{taskDetail.description || '-'}</Descriptions.Item>

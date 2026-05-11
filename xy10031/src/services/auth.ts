@@ -1,6 +1,7 @@
 import { db } from './database'
 import { hashPassword, verifyPassword } from '../utils/password'
-import { UserRole } from '@prisma/client'
+
+export type UserRole = 'ADMIN' | 'CHECKER'
 
 class AuthService {
   async login(username: string, password: string) {

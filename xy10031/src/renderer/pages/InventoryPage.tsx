@@ -154,11 +154,11 @@ function InventoryPage() {
 
   const handleExport = async (format: 'excel' | 'csv') => {
     const dialog = await ipc.export.saveDialog()
-    if (!dialog.success || !dialog.filePath) return
+    if (!dialog.success || dialog.data?.canceled || !dialog.data?.filePath) return
 
-    const filePath = dialog.filePath.endsWith(format === 'excel' ? '.xlsx' : '.csv')
-      ? dialog.filePath
-      : dialog.filePath + (format === 'excel' ? '.xlsx' : '.csv')
+    const filePath = dialog.data.filePath.endsWith(format === 'excel' ? '.xlsx' : '.csv')
+      ? dialog.data.filePath
+      : dialog.data.filePath + (format === 'excel' ? '.xlsx' : '.csv')
 
     const result = format === 'excel'
       ? await ipc.export.inventoryExcel(filePath, { category })
@@ -173,10 +173,10 @@ function InventoryPage() {
 
   const handleImport = async () => {
     const dialog = await ipc.export.openDialog()
-    if (!dialog.success || !dialog.filePaths?.length) return
+    if (!dialog.success || dialog.data?.canceled || !dialog.data?.filePaths?.length) return
 
     const result = await ipc.export.importInventory(
-      dialog.filePaths[0],
+      dialog.data.filePaths[0],
       authStore.currentUser?.id!
     )
 

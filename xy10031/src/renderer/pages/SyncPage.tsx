@@ -263,8 +263,8 @@ function SyncPage() {
             </div>
             <div style={{ marginBottom: 16 }}>
               <Text strong>状态: </Text>
-              <Tag color={statusMap[currentItem.status].color}>
-                {statusMap[currentItem.status].label}
+              <Tag color={statusMap[currentItem.status as keyof typeof statusMap].color}>
+                {statusMap[currentItem.status as keyof typeof statusMap].label}
               </Tag>
             </div>
             <div style={{ marginBottom: 16 }}>
