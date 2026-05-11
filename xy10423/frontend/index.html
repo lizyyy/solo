@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>租赁押金冻结台</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    .status-active { background-color: #dbeafe; color: #1e40af; }
+    .status-returned { background-color: #d1fae5; color: #065f46; }
+    .status-closed { background-color: #e5e7eb; color: #374151; }
+    .tx-freeze { background-color: #dbeafe; color: #1e40af; }
+    .tx-additional_freeze { background-color: #cffafe; color: #0e7490; }
+    .tx-deduction { background-color: #fee2e2; color: #991b1b; }
+    .tx-refund { background-color: #d1fae5; color: #065f46; }
+    .pending-approval { border-left: 4px solid #f59e0b; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div id="root"></div>
+  <script type="text/babel" src="./app.js"></script>
+</body>
+</html>
