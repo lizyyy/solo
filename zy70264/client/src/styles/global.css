@@ -1,0 +1,165 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f7fa;
+}
+
+.el-header {
+  background-color: #409eff;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
+}
+
+.el-header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+.el-header .subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.el-aside {
+  background-color: #304156;
+  color: white;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+.el-aside .el-menu {
+  border-right: none;
+}
+
+.el-main {
+  padding: 24px;
+  background-color: #f5f7fa;
+  overflow-y: auto;
+  height: calc(100vh - 60px);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #303133;
+}
+
+.card-section {
+  margin-bottom: 20px;
+}
+
+.status-tag {
+  margin-right: 8px;
+}
+
+.temp-normal {
+  color: #67c23a;
+}
+
+.temp-warning {
+  color: #e6a23c;
+}
+
+.temp-danger {
+  color: #f56c6c;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.stat-card .stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #409eff;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-label {
+  font-size: 14px;
+  color: #909399;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+}
+
+.temp-chart {
+  height: 350px;
+}
+
+.sample-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.sample-buttons .el-button {
+  flex: 0 0 auto;
+}
+
+.warning-card {
+  border: 1px solid #f56c6c;
+  background-color: #fef0f0;
+}
+
+.info-card {
+  border: 1px solid #409eff;
+  background-color: #ecf5ff;
+}
+
+.detail-label {
+  color: #909399;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  color: #303133;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.batch-no {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: #409eff;
+}
