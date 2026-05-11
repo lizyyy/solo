@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sample-ethics-cli"
+version = "0.1.0"
+description = "科研样本伦理到期管理 CLI"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "python-dateutil>=2.8",
+]
+
+[project.scripts]
+sample-ethics = "sample_ethics_cli.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["sample_ethics_cli*"]
