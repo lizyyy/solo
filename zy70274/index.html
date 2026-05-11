@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二手家具翻新报价器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>二手家具翻新报价器</h1>
+            <p class="subtitle">基于材质、破损等级、工艺选择、运输成本的专业报价系统</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="quotation">报价计算</button>
+            <button class="tab-btn" data-tab="rules">规则说明</button>
+            <button class="tab-btn" data-tab="problems">问题列表</button>
+            <button class="tab-btn" data-tab="samples">样例数据</button>
+            <button class="tab-btn" data-tab="verification">规则验证</button>
+        </nav>
+
+        <main>
+            <section id="quotation" class="tab-content active">
+                <div class="quotation-layout">
+                    <div class="input-section">
+                        <h2>家具档案</h2>
+                        <div class="form-group">
+                        <label>家具类型</label>
+                        <select id="furniture-type">
+                            <option value="">请选择家具类型</option>
+                            <option value="wooden">实木家具</option>
+                            <option value="fabric">布艺家具</option>
+                            <option value="metal">金属家具</option>
+                            <option value="mixed">混合材质</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>家具名称</label>
+                        <input type="text" id="furniture-name" placeholder="例如：老榆木餐桌">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>材质</label>
+                        <select id="material">
+                            <option value="">请选择材质</option>
+                            <option value="solid_wood">实木</option>
+                            <option value="plywood">复合板</option>
+                            <option value="fabric">布艺</option>
+                            <option value="leather">皮革</option>
+                            <option value="metal">金属</option>
+                            <option value="glass">玻璃</option>
+                            <option value="rattan">藤编</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>家具尺寸 (长×宽×高 (cm))
+                        <div class="size-inputs">
+                            <input type="number" id="length" placeholder="长">
+                            <input type="number" id="width" placeholder="宽">
+                            <input type="number" id="height" placeholder="高">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>预估年限</label>
+                        <input type="number" id="age" placeholder="使用年限（年）">
+                    </div>
+                    
+                    <h2>破损等级评估</h2>
+                    <div class="damage-section">
+                        <div class="damage-item">
+                            <label>表面磨损</label>
+                            <select class="damage-level" data-type="surface">
+                                <option value="0">无</option>
+                                <option value="1">轻微</option>
+                                <option value="2">中等</option>
+                                <option value="3">严重</option>
+                            </select>
+                        </div>
+                        <input type="text" class="damage-desc" placeholder="破损描述">
+                    </div>
+                    
+                    <div class="damage-section">
+                        <div class="damage-item">
+                            <label>结构问题</label>
+                            <select class="damage-level" data-type="structure">
+                                <option value="0">无</option>
+                                <option value="1">轻微</option>
+                                <option value="2">中等</option>
+                                <option value="3">严重</option>
+                            </select>
+                        </div>
+                        <input type="text" class="damage-desc" placeholder="破损描述">
+                    </div>
+                    
+                    <div class="damage-section">
+                        <div class="damage-item">
+                            <label>五金配件</label>
+                            <select class="damage-level" data-type="hardware">
+                                <option value="0">无</option>
+                                <option value="1">轻微</option>
+                                <option value="2">中等</option>
+                                <option value="3">严重</option>
+                            </select>
+                        </div>
+                        <input type="text" class="damage-desc" placeholder="破损描述">
+                    </div>
+                    
+                    <div class="damage-section">
+                        <div class="damage-item">
+                            <label>其他问题</label>
+                            <select class="damage-level" data-type="other">
+                                <option value="0">无</option>
+                                <option value="1">轻微</option>
+                                <option value="2">中等</option>
+                                <option value="3">严重</option>
+                            </select>
+                        </div>
+                        <input type="text" class="damage-desc" placeholder="破损描述">
+                    </div>
+                    
+                    <h2>工艺选择</h2>
+                    <div class="form-group">
+                        <label>表面处理工艺</label>
+                        <select id="surface-process">
+                            <option value="">请选择工艺</option>
+                            <option value="polish">抛光</option>
+                            <option value="paint">喷漆</option>
+                            <option value="stain">上色</option>
+                            <option value="varnish">上清漆</option>
+                            <option value="reupholstery">重新装裱</option>
+                            <option value="repair">维修补</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>特殊工艺需求</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" class="special-process" value="repair">维修加固</label>
+                            <label><input type="checkbox" class="special-process" value="custom">定制配件</label>
+                            <label><input type="checkbox" class="special-process" value="clean">深度清洁</label>
+                            <label><input type="checkbox" class="special-process" value="restore">复古效果</label>
+                        </div>
+                    </div>
+                    
+                    <h2>运输信息</h2>
+                    <div class="form-group">
+                        <label>运输距离</label>
+                        <select id="transport-distance">
+                            <option value="">请选择距离范围</option>
+                            <option value="local">同城 (≤50km</option>
+                            <option value="near">近郊 (50-100km</option>
+                            <option value="far">远郊 (100-200km</option>
+                            <option value="long">长途 (>200km)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>是否需要上楼</label>
+                        <select id="transport-floor">
+                            <option value="no">否</option>
+                            <option value="yes">是</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>客户预算</label>
+                        <input type="number" id="budget" placeholder="客户预算（元）">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="calculate-btn">计算报价</button>
+                        <button id="clear-btn">清空数据</button>
+                        <button id="load-sample-btn">加载样例数据</button>
+                    </div>
+                </div>
+                    
+                    <div class="output-section">
+                        <h2>报价结果</h2>
+                        <div id="quotation-result"></div>
+                        
+                        <h2>输入检查</h2>
+                        <div id="input-validation"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rules" class="tab-content">
+                <h2>报价规则说明</h2>
+                <div id="rules-content"></div>
+            </section>
+
+            <section id="problems" class="tab-content">
+                <h2>问题列表</h2>
+                <div id="problems-list">
+                    <p class="empty-state">暂无问题数据</p>
+                </div>
+            </section>
+
+            <section id="samples" class="tab-content">
+                <h2>内置样例数据</h2>
+                <div id="samples-list"></div>
+            </section>
+
+            <section id="verification" class="tab-content">
+                <h2>规则验证面板</h2>
+                <div id="verification-content">
+                    <p class="empty-state">点击加载验证内容</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
