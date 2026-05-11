@@ -4,20 +4,20 @@
     "source_file": "sample_orders.csv",
     "record_count": 7,
     "batch_id": "20260511_orders",
-    "imported_at": "2026-05-11T19:55:36.089280"
+    "imported_at": "2026-05-11T21:15:27.524200"
   },
-  "products_20260511_products": {
+  "products_v2": {
     "data_type": "products",
-    "source_file": "sample_products.csv",
-    "record_count": 4,
-    "batch_id": "20260511_products",
-    "imported_at": "2026-05-11T19:55:36.563083"
+    "source_file": "sample_products_v2.csv",
+    "record_count": 5,
+    "batch_id": "v2",
+    "imported_at": "2026-05-11T21:15:27.995815"
   },
-  "stockout_20260511_stockout": {
+  "stockout_v2": {
     "data_type": "stockout",
-    "source_file": "sample_stockout.csv",
+    "source_file": "sample_stockout_v2.csv",
     "record_count": 2,
-    "batch_id": "20260511_stockout",
-    "imported_at": "2026-05-11T19:55:37.041225"
+    "batch_id": "v2",
+    "imported_at": "2026-05-11T21:15:28.488338"
   }
 }

@@ -653,9 +653,15 @@ def export(target, output):
     
     elif target == 'supplier':
         supplier_map = {}
-        if not products.empty and 'supplier' in products.columns and 'product_id' in products.columns:
+        product_price_map = {}
+        if not products.empty:
             for _, p in products.iterrows():
-                supplier_map[str(p['product_id'])] = p.get('supplier', '未知供应商')
+                pid = str(p['product_id'])
+                if 'supplier' in products.columns:
+                    supplier_map[pid] = p.get('supplier', '未知供应商')
+                cost_price = pd.to_numeric(p.get('cost_price', 0), errors='coerce')
+                if not pd.isna(cost_price):
+                    product_price_map[pid] = cost_price
         
         def get_supplier(pid):
             return supplier_map.get(str(pid), '未知供应商')
@@ -671,9 +677,16 @@ def export(target, output):
                 total = pd.to_numeric(item.get('total_amount', 0), errors='coerce')
                 unit_price = total / qty if not pd.isna(total) and qty > 0 else 0
             if pid not in order_by_product:
-                order_by_product[pid] = {'qty': 0, 'amount': 0}
+                order_by_product[pid] = {'qty': 0, 'amount': 0, 'unit_price': unit_price}
             order_by_product[pid]['qty'] += qty
             order_by_product[pid]['amount'] += round(qty * unit_price, 2)
+        
+        def get_unit_price(pid):
+            if pid in order_by_product:
+                return order_by_product[pid]['unit_price']
+            if pid in product_price_map:
+                return product_price_map[pid]
+            return 0
         
         refund_by_product = {}
         refunds_with_supplier = []
@@ -699,8 +712,42 @@ def export(target, output):
                 refund_row['供应商'] = get_supplier(pid)
                 refunds_with_supplier.append(refund_row)
         
+        replace_original_by_product = {}
+        replace_new_by_product = {}
+        replacements_with_supplier = []
+        if not replacements.empty:
+            for _, r in replacements.iterrows():
+                original_pid = str(r['original_product_id'])
+                new_pid = str(r['replacement_product_id'])
+                qty = pd.to_numeric(r.get('quantity', 0), errors='coerce')
+                if pd.isna(qty) or qty <= 0:
+                    continue
+                
+                unit_price = get_unit_price(original_pid)
+                amount = round(qty * unit_price, 2)
+                
+                if original_pid not in replace_original_by_product:
+                    replace_original_by_product[original_pid] = {'qty': 0, 'amount': 0}
+                replace_original_by_product[original_pid]['qty'] += qty
+                replace_original_by_product[original_pid]['amount'] += amount
+                
+                if new_pid not in replace_new_by_product:
+                    replace_new_by_product[new_pid] = {'qty': 0, 'amount': 0}
+                replace_new_by_product[new_pid]['qty'] += qty
+                replace_new_by_product[new_pid]['amount'] += amount
+                
+                replace_row = dict(r)
+                replace_row['原商品供应商'] = get_supplier(original_pid)
+                replace_row['替换商品供应商'] = get_supplier(new_pid)
+                replace_row['结算单价'] = unit_price
+                replace_row['结算金额'] = amount
+                replacements_with_supplier.append(replace_row)
+        
         supplier_summary = {}
-        all_product_ids = set(list(order_by_product.keys()) + list(refund_by_product.keys()))
+        all_product_ids = set(list(order_by_product.keys()) + 
+                              list(refund_by_product.keys()) + 
+                              list(replace_original_by_product.keys()) + 
+                              list(replace_new_by_product.keys()))
         
         for pid in all_product_ids:
             supplier = get_supplier(pid)
@@ -711,6 +758,10 @@ def export(target, output):
                     '订单金额': 0,
                     '缺货退款件数': 0,
                     '缺货退款金额': 0,
+                    '替换出库件数': 0,
+                    '替换出库金额': 0,
+                    '替换入库件数': 0,
+                    '替换入库金额': 0,
                     '实际发货件数': 0,
                     '实际发货金额': 0,
                     '净结算金额': 0
@@ -718,15 +769,23 @@ def export(target, output):
             
             order = order_by_product.get(pid, {'qty': 0, 'amount': 0})
             refund = refund_by_product.get(pid, {'qty': 0, 'amount': 0})
+            replace_out = replace_original_by_product.get(pid, {'qty': 0, 'amount': 0})
+            replace_in = replace_new_by_product.get(pid, {'qty': 0, 'amount': 0})
             
             supplier_summary[supplier]['订单件数'] += order['qty']
             supplier_summary[supplier]['订单金额'] += order['amount']
             supplier_summary[supplier]['缺货退款件数'] += refund['qty']
             supplier_summary[supplier]['缺货退款金额'] += refund['amount']
+            supplier_summary[supplier]['替换出库件数'] += replace_out['qty']
+            supplier_summary[supplier]['替换出库金额'] += replace_out['amount']
+            supplier_summary[supplier]['替换入库件数'] += replace_in['qty']
+            supplier_summary[supplier]['替换入库金额'] += replace_in['amount']
         
         for s in supplier_summary.values():
-            s['实际发货件数'] = s['订单件数'] - s['缺货退款件数']
-            s['实际发货金额'] = round(s['订单金额'] - s['缺货退款金额'], 2)
+            s['实际发货件数'] = s['订单件数'] - s['缺货退款件数'] - s['替换出库件数'] + s['替换入库件数']
+            s['实际发货金额'] = round(
+                s['订单金额'] - s['缺货退款金额'] - s['替换出库金额'] + s['替换入库金额'], 2
+            )
             s['净结算金额'] = s['实际发货金额']
         
         summary_list = list(supplier_summary.values())
@@ -738,6 +797,10 @@ def export(target, output):
             '订单金额': round(sum(s['订单金额'] for s in summary_list), 2),
             '缺货退款件数': sum(s['缺货退款件数'] for s in summary_list),
             '缺货退款金额': round(sum(s['缺货退款金额'] for s in summary_list), 2),
+            '替换出库件数': sum(s['替换出库件数'] for s in summary_list),
+            '替换出库金额': round(sum(s['替换出库金额'] for s in summary_list), 2),
+            '替换入库件数': sum(s['替换入库件数'] for s in summary_list),
+            '替换入库金额': round(sum(s['替换入库金额'] for s in summary_list), 2),
             '实际发货件数': sum(s['实际发货件数'] for s in summary_list),
             '实际发货金额': round(sum(s['实际发货金额'] for s in summary_list), 2),
             '净结算金额': round(sum(s['净结算金额'] for s in summary_list), 2)
@@ -753,6 +816,14 @@ def export(target, output):
             existing_cols = [c for c in cols if c in refund_detail_df.columns]
             refund_detail_df = refund_detail_df[existing_cols]
         
+        replace_detail_df = pd.DataFrame(replacements_with_supplier)
+        if not replace_detail_df.empty:
+            cols = ['order_id', 'building', 'room', 'original_product_id', 'original_name',
+                    '原商品供应商', 'replacement_product_id', 'replacement_name',
+                    '替换商品供应商', 'quantity', '结算单价', '结算金额', 'reason', 'processed_at']
+            existing_cols = [c for c in cols if c in replace_detail_df.columns]
+            replace_detail_df = replace_detail_df[existing_cols]
+        
         if not output:
             output = f"供应商对账表_{datetime.now().strftime('%Y%m%d')}.csv"
         
@@ -760,14 +831,20 @@ def export(target, output):
             f.write("=== 供应商对账汇总（按供应商分组）===\n")
         summary_df.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
         
-        with open(output, 'a', encoding='utf-8-sig') as f:
-            f.write("\n=== 退款明细（含供应商）===\n")
         if not refund_detail_df.empty:
+            with open(output, 'a', encoding='utf-8-sig') as f:
+                f.write("\n=== 退款明细（含供应商）===\n")
             refund_detail_df.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
         
+        if not replace_detail_df.empty:
+            with open(output, 'a', encoding='utf-8-sig') as f:
+                f.write("\n=== 替换明细（含供应商）===\n")
+            replace_detail_df.to_csv(output, mode='a', index=False, encoding='utf-8-sig')
+        
         click.echo(f"✓ 供应商对账表已导出: {output}")
-        display_cols = ['供应商', '订单件数', '订单金额', '缺货退款件数', 
-                        '缺货退款金额', '实际发货件数', '实际发货金额', '净结算金额']
+        display_cols = ['供应商', '订单件数', '订单金额', '缺货退款件数', '缺货退款金额',
+                        '替换出库件数', '替换出库金额', '替换入库件数', '替换入库金额',
+                        '实际发货件数', '实际发货金额', '净结算金额']
         click.echo(tabulate(summary_df[display_cols], headers='keys', tablefmt='simple', showindex=False))
     
     elif target == 'finance':

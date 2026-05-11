@@ -1,7 +1,7 @@
 {
   "events": [
     {
-      "timestamp": "2026-05-11T19:55:36.089424",
+      "timestamp": "2026-05-11T21:15:27.524346",
       "action": "import",
       "details": {
         "data_type": "orders",
@@ -11,34 +11,34 @@
       }
     },
     {
-      "timestamp": "2026-05-11T19:55:36.563237",
+      "timestamp": "2026-05-11T21:15:27.995963",
       "action": "import",
       "details": {
         "data_type": "products",
-        "file": "sample_products.csv",
-        "records": 4,
-        "batch_id": "20260511_products"
+        "file": "sample_products_v2.csv",
+        "records": 5,
+        "batch_id": "v2"
       }
     },
     {
-      "timestamp": "2026-05-11T19:55:37.041406",
+      "timestamp": "2026-05-11T21:15:28.488481",
       "action": "import",
       "details": {
         "data_type": "stockout",
-        "file": "sample_stockout.csv",
+        "file": "sample_stockout_v2.csv",
         "records": 2,
-        "batch_id": "20260511_stockout"
+        "batch_id": "v2"
       }
     },
     {
-      "timestamp": "2026-05-11T19:55:50.880886",
+      "timestamp": "2026-05-11T21:15:55.510530",
       "action": "confirm",
       "details": {
-        "refunds": 3,
-        "replacements": 0,
+        "refunds": 1,
+        "replacements": 2,
         "commissions": 8
       }
     }
   ],
-  "last_confirmed": "2026-05-11T19:55:50.880713"
+  "last_confirmed": "2026-05-11T21:15:55.510326"
 }
