@@ -1,0 +1,127 @@
+{
+  "date": "2026-05-11",
+  "menu_items": [
+    {
+      "id": "DISH001",
+      "name": "红烧肉",
+      "window": "1号窗口",
+      "category": "荤菜",
+      "price": 18.0,
+      "is_special": true
+    },
+    {
+      "id": "DISH002",
+      "name": "清炒时蔬",
+      "window": "1号窗口",
+      "category": "素菜",
+      "price": 6.0,
+      "is_special": false
+    },
+    {
+      "id": "DISH003",
+      "name": "番茄炒蛋",
+      "window": "1号窗口",
+      "category": "半荤菜",
+      "price": 8.0,
+      "is_special": false
+    },
+    {
+      "id": "DISH004",
+      "name": "宫保鸡丁",
+      "window": "2号窗口",
+      "category": "荤菜",
+      "price": 16.0,
+      "is_special": true
+    },
+    {
+      "id": "DISH005",
+      "name": "麻婆豆腐",
+      "window": "2号窗口",
+      "category": "素菜",
+      "price": 7.0,
+      "is_special": false
+    },
+    {
+      "id": "DISH006",
+      "name": "清蒸鱼",
+      "window": "2号窗口",
+      "category": "荤菜",
+      "price": 22.0,
+      "is_special": true
+    },
+    {
+      "id": "DISH007",
+      "name": "土豆丝",
+      "window": "3号窗口",
+      "category": "素菜",
+      "price": 5.0,
+      "is_special": false
+    },
+    {
+      "id": "DISH008",
+      "name": "糖醋排骨",
+      "window": "3号窗口",
+      "category": "荤菜",
+      "price": 20.0,
+      "is_special": true
+    }
+  ],
+  "reservations": [
+    {
+      "id": "RES-20260511182731984780",
+      "menu_item_id": "DISH001",
+      "menu_item_name": "红烧肉",
+      "window": "1号窗口",
+      "weight": 150.0,
+      "container_id": "C001",
+      "fridge_location": "冰箱1-第2层",
+      "operator": "张厨师",
+      "registration_time": "2026-05-11T18:27:31.984793",
+      "expected_destruction_time": "2026-05-13T18:27:31.984496",
+      "status": "destroyed",
+      "actual_destruction_time": "2026-05-11T18:27:33.418693",
+      "destruction_operator": "张厨师",
+      "notes": ""
+    },
+    {
+      "id": "RES-20260511182732113794",
+      "menu_item_id": "DISH002",
+      "menu_item_name": "清炒时蔬",
+      "window": "1号窗口",
+      "weight": 50.0,
+      "container_id": "C002",
+      "fridge_location": "冰箱1-第2层",
+      "operator": "李厨师",
+      "registration_time": "2026-05-11T18:27:32.113812",
+      "expected_destruction_time": "2026-05-13T18:27:32.113678",
+      "status": "registered",
+      "actual_destruction_time": null,
+      "destruction_operator": null,
+      "notes": ""
+    },
+    {
+      "id": "RES-20260511182732233296",
+      "menu_item_id": "DISH004",
+      "menu_item_name": "宫保鸡丁",
+      "window": "2号窗口",
+      "weight": 180.0,
+      "container_id": "C004",
+      "fridge_location": "冰箱2-第1层",
+      "operator": "王厨师",
+      "registration_time": "2026-05-11T18:27:32.233310",
+      "expected_destruction_time": "2026-05-13T18:27:32.233164",
+      "status": "registered",
+      "actual_destruction_time": null,
+      "destruction_operator": null,
+      "notes": ""
+    }
+  ],
+  "missed_items": [
+    {
+      "menu_item_id": "DISH003",
+      "reason": "临时更换菜品，未留样",
+      "operator": "张厨师",
+      "marked_at": "2026-05-11T18:27:32.608910"
+    }
+  ]
+}

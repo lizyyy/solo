@@ -1,0 +1,66 @@
+[
+  {
+    "id": "DISH001",
+    "name": "红烧肉",
+    "window": "1号窗口",
+    "category": "荤菜",
+    "price": 18.0,
+    "is_special": true
+  },
+  {
+    "id": "DISH002",
+    "name": "清炒时蔬",
+    "window": "1号窗口",
+    "category": "素菜",
+    "price": 6.0,
+    "is_special": false
+  },
+  {
+    "id": "DISH003",
+    "name": "番茄炒蛋",
+    "window": "1号窗口",
+    "category": "半荤菜",
+    "price": 8.0,
+    "is_special": false
+  },
+  {
+    "id": "DISH004",
+    "name": "宫保鸡丁",
+    "window": "2号窗口",
+    "category": "荤菜",
+    "price": 16.0,
+    "is_special": true
+  },
+  {
+    "id": "DISH005",
+    "name": "麻婆豆腐",
+    "window": "2号窗口",
+    "category": "素菜",
+    "price": 7.0,
+    "is_special": false
+  },
+  {
+    "id": "DISH006",
+    "name": "清蒸鱼",
+    "window": "2号窗口",
+    "category": "荤菜",
+    "price": 22.0,
+    "is_special": true
+  },
+  {
+    "id": "DISH007",
+    "name": "土豆丝",
+    "window": "3号窗口",
+    "category": "素菜",
+    "price": 5.0,
+    "is_special": false
+  },
+  {
+    "id": "DISH008",
+    "name": "糖醋排骨",
+    "window": "3号窗口",
+    "category": "荤菜",
+    "price": 20.0,
+    "is_special": true
+  }
+]
