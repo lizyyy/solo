@@ -1,0 +1,5 @@
+filter_id,complaint_date,complaint_type,description,severity,reporter,status
+FILTER-001,2025-04-12,水质异味,水中有明显的氯气味，口感不好,high,张三,open
+FILTER-001,2025-04-18,水质浑浊,出水浑浊，有可见悬浮物,critical,李四,open
+FILTER-005,2025-04-15,口感异常,水喝起来有怪味,medium,王五,resolved
+FILTER-005,2025-04-22,出水不畅,水流明显变小，需要等待很久,high,赵六,open

@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>净水站滤芯寿命预测器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f2f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background: #f7fafc;
+        }
+        
+        .tab.active {
+            background: #2c5282;
+            color: white;
+            border-color: #2c5282;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card.critical { border-left: 4px solid #e53e3e; }
+        .stat-card.high { border-left: 4px solid #dd6b20; }
+        .stat-card.medium { border-left: 4px solid #d69e2e; }
+        .stat-card.low { border-left: 4px solid #38a169; }
+        .stat-card.normal { border-left: 4px solid #3182ce; }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #2c5282;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1e3a5f;
+        }
+        
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #276749;
+        }
+        
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        table th,
+        table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        table tr:hover {
+            background: #f7fafc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-critical { background: #fed7d7; color: #c53030; }
+        .badge-high { background: #feebc8; color: #c05621; }
+        .badge-medium { background: #fefcbf; color: #975a16; }
+        .badge-low { background: #c6f6d5; color: #276749; }
+        .badge-normal { background: #bee3f8; color: #2b6cb0; }
+        .badge-pending { background: #e2e8f0; color: #4a5568; }
+        .badge-approved { background: #c6f6d5; color: #276749; }
+        .badge-rejected { background: #fed7d7; color: #c53030; }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .progress-fill.green { background: #38a169; }
+        .progress-fill.yellow { background: #d69e2e; }
+        .progress-fill.orange { background: #dd6b20; }
+        .progress-fill.red { background: #e53e3e; }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success { background: #f0fff4; border-left: 4px solid #38a169; }
+        .alert-error { background: #fff5f5; border-left: 4px solid #e53e3e; }
+        .alert-info { background: #ebf8ff; border-left: 4px solid #3182ce; }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #2c5282;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .file-upload {
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-upload:hover {
+            border-color: #2c5282;
+            background: #f7fafc;
+        }
+        
+        .detail-panel {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .detail-panel h4 {
+            color: #4a5568;
+            margin-bottom: 0.75rem;
+        }
+        
+        .factor-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+        
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>净水站滤芯寿命预测器</h1>
+        <p>基于水量、水质和投诉记录的智能预测系统</p>
+    </div>
+    
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">仪表盘</div>
+            <div class="tab" data-tab="filters">滤芯管理</div>
+            <div class="tab" data-tab="import">数据导入</div>
+            <div class="tab" data-tab="predictions">预测结果</div>
+            <div class="tab" data-tab="complaints">投诉管理</div>
+            <div class="tab" data-tab="replacement">更换报告</div>
+        </div>
+        
+        <div id="dashboard" class="tab-content active">
+            <div class="card">
+                <h2>风险概览</h2>
+                <div class="stats-grid" id="riskStats">
+                    <div class="stat-card"><div class="stat-value">-</div><div class="stat-label">加载中...</div></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>操作面板</h2>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="batchPredict()">批量预测所有滤芯</button>
+                    <button class="btn btn-success" onclick="loadPredictions()">刷新预测列表</button>
+                    <button class="btn btn-primary" onclick="exportPredictions()">导出预测结果</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>高优先级滤芯</h2>
+                <div id="highPriorityList">
+                    <p style="color: #718096;">请先运行批量预测</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="filters" class="tab-content">
+            <div class="card">
+                <h2>添加新滤芯</h2>
+                <form id="filterForm" onsubmit="addFilter(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>滤芯ID</label>
+                            <input type="text" name="filter_id" required placeholder="例如: FILTER-001">
+                        </div>
+                        <div class="form-group">
+                            <label>净水站名称</label>
+                            <input type="text" name="station_name" required placeholder="例如: 阳光社区净水站">
+                        </div>
+                        <div class="form-group">
+                            <label>滤芯类型</label>
+                            <select name="filter_type" required>
+                                <option value="PP棉">PP棉</option>
+                                <option value="活性炭">活性炭</option>
+                                <option value="RO膜">RO膜</option>
+                                <option value="超滤膜">超滤膜</option>
+                                <option value="复合滤芯">复合滤芯</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>安装日期</label>
+                            <input type="date" name="install_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>最大寿命(天)</label>
+                            <input type="number" name="max_lifespan_days" required value="90" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label>最大水量(升)</label>
+                            <input type="number" name="max_lifespan_liters" required value="10000" min="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加滤芯</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>滤芯列表</h2>
+                <div id="filterList"></div>
+            </div>
+        </div>
+        
+        <div id="import" class="tab-content">
+            <div class="card">
+                <h2>数据导入</h2>
+                <div class="form-group">
+                    <label>选择数据类型</label>
+                    <select id="importDataType">
+                        <option value="water_quality">水质指标数据</option>
+                        <option value="water_volume">水量记录数据</option>
+                        <option value="complaints">投诉记录数据</option>
+                        <option value="filters">滤芯基础数据</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>上传文件 (CSV/Excel)</label>
+                    <div class="file-upload" onclick="document.getElementById('importFile').click()">
+                        <p>点击选择文件或拖拽到此处</p>
+                        <p style="font-size: 0.8rem; color: #718096; margin-top: 0.5rem;">支持 .csv, .xlsx, .xls 格式</p>
+                    </div>
+                    <input type="file" id="importFile" style="display: none;" accept=".csv,.xlsx,.xls" onchange="handleFileSelect(event)">
+                </div>
+                <div id="importResult" class="hidden"></div>
+                <button class="btn btn-primary" onclick="importData()">开始导入</button>
+            </div>
+            
+            <div class="card">
+                <h2>样例数据格式</h2>
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; overflow-x: auto;">
+                    <p><strong>水质数据 (water_quality):</strong></p>
+                    <p>filter_id,record_date,turbidity,ph,residual_chlorine,conductivity,total_dissolved_solids,color,odor</p>
+                    <p>FILTER-001,2024-01-01,2.5,7.2,0.5,300,200,5,无</p>
+                    <br>
+                    <p><strong>水量数据 (water_volume):</strong></p>
+                    <p>filter_id,record_date,daily_volume_liters,cumulative_volume_liters,peak_hour,avg_flow_rate</p>
+                    <p>FILTER-001,2024-01-01,500,500,10:00,2.5</p>
+                    <br>
+                    <p><strong>投诉数据 (complaints):</strong></p>
+                    <p>filter_id,complaint_date,complaint_type,description,severity,reporter,status</p>
+                    <p>FILTER-001,2024-01-01,水质异味,水中有氯气味,medium,张三,open</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="predictions" class="tab-content">
+            <div class="card">
+                <h2>预测结果列表</h2>
+                <div class="form-row" style="margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>风险等级筛选</label>
+                        <select id="predictionFilter" onchange="loadPredictions()">
+                            <option value="">全部</option>
+                            <option value="critical">严重</option>
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                            <option value="normal">正常</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>复核状态</label>
+                        <select id="reviewFilter" onchange="loadPredictions()">
+                            <option value="">全部</option>
+                            <option value="pending">待复核</option>
+                            <option value="approved">已通过</option>
+                            <option value="rejected">已拒绝</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="predictionList"></div>
+            </div>
+        </div>
+        
+        <div id="complaints" class="tab-content">
+            <div class="card">
+                <h2>记录投诉</h2>
+                <form id="complaintForm" onsubmit="addComplaint(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>滤芯ID</label>
+                            <input type="text" name="filter_id" required placeholder="选择滤芯">
+                        </div>
+                        <div class="form-group">
+                            <label>投诉日期</label>
+                            <input type="date" name="complaint_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>严重程度</label>
+                            <select name="severity" required>
+                                <option value="low">低</option>
+                                <option value="medium">中</option>
+                                <option value="high">高</option>
+                                <option value="critical">严重</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>投诉类型</label>
+                            <select name="complaint_type" required>
+                                <option value="水质异味">水质异味</option>
+                                <option value="水质浑浊">水质浑浊</option>
+                                <option value="出水不畅">出水不畅</option>
+                                <option value="口感异常">口感异常</option>
+                                <option value="设备故障">设备故障</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>投诉人</label>
+                            <input type="text" name="reporter" placeholder="可选">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>详细描述</label>
+                        <textarea name="description" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">提交投诉</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>投诉列表</h2>
+                <div id="complaintList"></div>
+            </div>
+        </div>
+        
+        <div id="replacement" class="tab-content">
+            <div class="card">
+                <h2>创建更换报告</h2>
+                <form id="replacementForm" onsubmit="createReplacement(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>滤芯ID</label>
+                            <input type="text" name="filter_id" required>
+                        </div>
+                        <div class="form-group">
+                            <label>关联预测ID</label>
+                            <input type="number" name="prediction_id" placeholder="可选">
+                        </div>
+                        <div class="form-group">
+                            <label>技术人员</label>
+                            <input type="text" name="technician" placeholder="可选">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>更换原因</label>
+                            <select name="replacement_reason" required>
+                                <option value="寿命到期">寿命到期</option>
+                                <option value="水质不达标">水质不达标</option>
+                                <option value="滤芯堵塞">滤芯堵塞</option>
+                                <option value="投诉过多">投诉过多</option>
+                                <option value="预防性更换">预防性更换</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>旧滤芯状况</label>
+                            <input type="text" name="old_filter_condition" required placeholder="例如: 颜色发黑，有明显堵塞">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea name="notes" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">创建报告</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2>更换报告列表</h2>
+                <button class="btn btn-primary btn-sm" onclick="loadReplacementReports()" style="margin-bottom: 1rem;">刷新列表</button>
+                <button class="btn btn-success btn-sm" onclick="exportReplacementReports()" style="margin-bottom: 1rem; margin-left: 0.5rem;">导出报告</button>
+                <div id="replacementList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'filters') loadFilters();
+            if (tabName === 'predictions') loadPredictions();
+            if (tabName === 'complaints') loadComplaints();
+            if (tabName === 'replacement') loadReplacementReports();
+        }
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/predictions/risk/summary`);
+                const data = await response.json();
+                
+                const statsHtml = `
+                    <div class="stat-card normal">
+                        <div class="stat-value">${data.active_filters}</div>
+                        <div class="stat-label">在用滤芯</div>
+                    </div>
+                    <div class="stat-card critical">
+                        <div class="stat-value">${data.risk_distribution.critical}</div>
+                        <div class="stat-label">严重风险</div>
+                    </div>
+                    <div class="stat-card high">
+                        <div class="stat-value">${data.risk_distribution.high}</div>
+                        <div class="stat-label">高风险</div>
+                    </div>
+                    <div class="stat-card medium">
+                        <div class="stat-value">${data.risk_distribution.medium}</div>
+                        <div class="stat-label">中风险</div>
+                    </div>
+                    <div class="stat-card low">
+                        <div class="stat-value">${data.avg_health_score.toFixed(1)}</div>
+                        <div class="stat-label">平均健康分</div>
+                    </div>
+                `;
+                document.getElementById('riskStats').innerHTML = statsHtml;
+                
+                if (data.critical_action_required) {
+                    document.getElementById('highPriorityList').innerHTML = `
+                        <div class="alert alert-error">
+                            <strong>⚠️ 紧急提醒：</strong>存在 ${data.risk_distribution.critical + data.risk_distribution.high} 个高风险滤芯需要立即处理！
+                        </div>
+                    `;
+                }
+                
+                loadHighPriorityFilters();
+            } catch (error) {
+                console.error('加载仪表盘失败:', error);
+            }
+        }
+        
+        async function loadHighPriorityFilters() {
+            try {
+                const predictions = await fetch(`${API_BASE}/api/predictions?limit=20`);
+                const data = await predictions.json();
+                
+                const highPriority = data.filter(p => 
+                    p.risk_level === 'critical' || p.risk_level === 'high'
+                );
+                
+                if (highPriority.length === 0) {
+                    document.getElementById('highPriorityList').innerHTML = `
+                        <div class="alert alert-success">
+                            <strong>✓</strong> 当前无高风险滤芯，所有滤芯状态正常。
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>滤芯ID</th>
+                                <th>风险等级</th>
+                                <th>健康评分</th>
+                                <th>剩余天数</th>
+                                <th>建议</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${highPriority.map(p => `
+                                <tr>
+                                    <td>${p.filter_id}</td>
+                                    <td><span class="badge badge-${p.risk_level}">${p.risk_level}</span></td>
+                                    <td>
+                                        <div style="width: 100px;">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill ${p.health_score >= 60 ? 'green' : p.health_score >= 40 ? 'yellow' : 'red'}" 
+                                                     style="width: ${p.health_score}%"></div>
+                                            </div>
+                                            <small>${p.health_score.toFixed(1)}分</small>
+                                        </div>
+                                    </td>
+                                    <td>${p.predicted_remaining_days}天</td>
+                                    <td>${p.recommendation}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="predictSingle('${p.filter_id}')">重新预测</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('highPriorityList').innerHTML = html;
+            } catch (error) {
+                console.error('加载高优先级滤芯失败:', error);
+            }
+        }
+        
+        async function batchPredict() {
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span> 预测中...';
+                
+                const response = await fetch(`${API_BASE}/api/predictions/predict-batch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (data.successful_predictions > 0) {
+                    alert(`批量预测完成！成功预测 ${data.successful_predictions} 个滤芯。\n风险分布：\n严重: ${data.risk_summary.critical}\n高: ${data.risk_summary.high}\n中: ${data.risk_summary.medium}\n低: ${data.risk_summary.low}\n正常: ${data.risk_summary.normal}`);
+                    loadDashboard();
+                }
+                
+                btn.disabled = false;
+                btn.innerHTML = '批量预测所有滤芯';
+            } catch (error) {
+                console.error('批量预测失败:', error);
+                alert('批量预测失败');
+            }
+        }
+        
+        async function predictSingle(filterId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/predictions/predict/${filterId}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.prediction) {
+                    alert(`预测完成！\n滤芯: ${filterId}\n健康评分: ${data.prediction.health_score}\n风险等级: ${data.prediction.risk_level}\n剩余天数: ${data.prediction.predicted_remaining_days}\n建议: ${data.prediction.recommendation}`);
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('预测失败:', error);
+            }
+        }
+        
+        async function addFilter(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/filters/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filter_id: formData.get('filter_id'),
+                        station_name: formData.get('station_name'),
+                        filter_type: formData.get('filter_type'),
+                        install_date: formData.get('install_date') + 'T00:00:00',
+                        max_lifespan_days: parseInt(formData.get('max_lifespan_days')),
+                        max_lifespan_liters: parseFloat(formData.get('max_lifespan_liters'))
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('滤芯添加成功！');
+                    form.reset();
+                    loadFilters();
+                } else {
+                    const error = await response.json();
+                    alert('添加失败: ' + error.detail);
+                }
+            } catch (error) {
+                console.error('添加滤芯失败:', error);
+            }
+        }
+        
+        async function loadFilters() {
+            try {
+                const response = await fetch(`${API_BASE}/api/filters/`);
+                const filters = await response.json();
+                
+                if (filters.length === 0) {
+                    document.getElementById('filterList').innerHTML = '<p style="color: #718096;">暂无滤芯数据</p>';
+                    return;
+                }
+                
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>滤芯ID</th>
+                                <th>净水站</th>
+                                <th>类型</th>
+                                <th>安装日期</th>
+                                <th>最大寿命</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filters.map(f => `
+                                <tr>
+                                    <td>${f.filter_id}</td>
+                                    <td>${f.station_name}</td>
+                                    <td>${f.filter_type}</td>
+                                    <td>${new Date(f.install_date).toLocaleDateString()}</td>
+                                    <td>${f.max_lifespan_days}天 / ${f.max_lifespan_liters.toLocaleString()}升</td>
+                                    <td><span class="badge ${f.status === 'active' ? 'badge-normal' : 'badge-pending'}">${f.status === 'active' ? '在用' : '已更换'}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="predictSingle('${f.filter_id}')">预测</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('filterList').innerHTML = html;
+            } catch (error) {
+                console.error('加载滤芯列表失败:', error);
+            }
+        }
+        
+        let selectedFile = null;
+        
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                document.querySelector('.file-upload p').innerHTML = `已选择: ${selectedFile.name}`;
+            }
+        }
+        
+        async function importData() {
+            if (!selectedFile) {
+                alert('请先选择文件');
+                return;
+            }
+            
+            const dataType = document.getElementById('importDataType').value;
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/${dataType === 'filters' ? 'filters' : dataType}/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                let resultHtml = '';
+                if (response.ok) {
+                    resultHtml = `
+                        <div class="alert alert-success">
+                            <strong>导入成功！</strong><br>
+                            总记录: ${result.total_records}<br>
+                            有效: ${result.valid_records}<br>
+                            无效: ${result.invalid_records}
+                        </div>
+                    `;
+                    if (result.warnings && result.warnings.length > 0) {
+                        resultHtml += `<div class="alert alert-info"><strong>警告:</strong><ul>${result.warnings.map(w => `<li>${w}</li>`).join('')}</ul></div>`;
+                    }
+                    if (result.errors && result.errors.length > 0) {
+                        resultHtml += `<div class="alert alert-error"><strong>错误:</strong><ul>${result.errors.map(e => `<li>${e}</li>`).join('')}</ul></div>`;
+                    }
+                } else {
+                    resultHtml = `<div class="alert alert-error"><strong>导入失败:</strong> ${result.detail}</div>`;
+                }
+                
+                document.getElementById('importResult').innerHTML = resultHtml;
+                document.getElementById('importResult').classList.remove('hidden');
+            } catch (error) {
+                console.error('导入失败:', error);
+                alert('导入失败');
+            }
+        }
+        
+        async function loadPredictions() {
+            try {
+                const riskFilter = document.getElementById('predictionFilter').value;
+                const reviewFilter = document.getElementById('reviewFilter').value;
+                
+                let url = `${API_BASE}/api/predictions/?limit=50`;
+                if (riskFilter) url += `&risk_level=${riskFilter}`;
+                if (reviewFilter) url += `&review_status=${reviewFilter}`;
+                
+                const response = await fetch(url);
+                const predictions = await response.json();
+                
+                if (predictions.length === 0) {
+                    document.getElementById('predictionList').innerHTML = '<p style="color: #718096;">暂无预测结果，请先运行预测</p>';
+                    return;
+                }
+                
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>滤芯ID</th>
+                                <th>预测时间</th>
+                                <th>风险等级</th>
+                                <th>健康评分</th>
+                                <th>剩余天数</th>
+                                <th>建议</th>
+                                <th>复核状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${predictions.map(p => `
+                                <tr>
+                                    <td>${p.filter_id}</td>
+                                    <td>${new Date(p.prediction_date).toLocaleString()}</td>
+                                    <td><span class="badge badge-${p.risk_level}">${p.risk_level}</span></td>
+                                    <td>${p.health_score.toFixed(1)}</td>
+                                    <td>${p.predicted_remaining_days}天</td>
+                                    <td>${p.recommendation}</td>
+                                    <td><span class="badge ${p.review_status === 'approved' ? 'badge-approved' : p.review_status === 'rejected' ? 'badge-rejected' : 'badge-pending'}">${p.review_status}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" onclick="viewPrediction(${p.id})">详情</button>
+                                        <button class="btn btn-sm btn-success" onclick="reviewPrediction(${p.id}, 'approved')">通过</button>
+                                        <button class="btn btn-sm btn-danger" onclick="reviewPrediction(${p.id}, 'rejected')">拒绝</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('predictionList').innerHTML = html;
+            } catch (error) {
+                console.error('加载预测结果失败:', error);
+            }
+        }
+        
+        async function viewPrediction(id) {
+            try {
+                const response = await fetch(`${API_BASE}/api/predictions/${id}`);
+                const data = await response.json();
+                
+                const p = data.prediction;
+                const factors = data.current_factors;
+                
+                alert(`预测详情:\n\n滤芯ID: ${p.filter_id}\n健康评分: ${p.health_score}\n风险等级: ${p.risk_level}\n剩余天数: ${p.predicted_remaining_days}\n剩余水量: ${p.predicted_remaining_liters.toLocaleString()}升\n置信度: ${(p.confidence * 100).toFixed(0)}%\n\n解释说明:\n${p.explanation}`);
+            } catch (error) {
+                console.error('获取预测详情失败:', error);
+            }
+        }
+        
+        async function reviewPrediction(id, status) {
+            const comment = prompt('请输入复核意见(可选):');
+            if (comment === null) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/predictions/${id}/review`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reviewed_by: '管理员',
+                        review_status: status,
+                        review_comment: comment || ''
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('复核完成！');
+                    loadPredictions();
+                }
+            } catch (error) {
+                console.error('复核失败:', error);
+            }
+        }
+        
+        async function exportPredictions() {
+            window.location.href = `${API_BASE}/api/predictions/export/csv`;
+        }
+        
+        async function addComplaint(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/complaints/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filter_id: formData.get('filter_id'),
+                        complaint_date: formData.get('complaint_date') + 'T00:00:00',
+                        complaint_type: formData.get('complaint_type'),
+                        description: formData.get('description'),
+                        severity: formData.get('severity'),
+                        reporter: formData.get('reporter') || null
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('投诉记录成功！');
+                    form.reset();
+                    loadComplaints();
+                } else {
+                    const error = await response.json();
+                    alert('提交失败: ' + error.detail);
+                }
+            } catch (error) {
+                console.error('提交投诉失败:', error);
+            }
+        }
+        
+        async function loadComplaints() {
+            try {
+                const response = await fetch(`${API_BASE}/api/complaints/?limit=50`);
+                const complaints = await response.json();
+                
+                if (complaints.length === 0) {
+                    document.getElementById('complaintList').innerHTML = '<p style="color: #718096;">暂无投诉记录</p>';
+                    return;
+                }
+                
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>滤芯ID</th>
+                                <th>日期</th>
+                                <th>类型</th>
+                                <th>严重程度</th>
+                                <th>描述</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${complaints.map(c => `
+                                <tr>
+                                    <td>${c.filter_id}</td>
+                                    <td>${new Date(c.complaint_date).toLocaleDateString()}</td>
+                                    <td>${c.complaint_type}</td>
+                                    <td><span class="badge badge-${c.severity}">${c.severity}</span></td>
+                                    <td>${c.description.substring(0, 50)}${c.description.length > 50 ? '...' : ''}</td>
+                                    <td><span class="badge ${c.status === 'open' ? 'badge-pending' : 'badge-approved'}">${c.status === 'open' ? '待处理' : '已解决'}</span></td>
+                                    <td>
+                                        ${c.status === 'open' ? `<button class="btn btn-sm btn-success" onclick="resolveComplaint(${c.id})">解决</button>` : '-'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('complaintList').innerHTML = html;
+            } catch (error) {
+                console.error('加载投诉列表失败:', error);
+            }
+        }
+        
+        async function resolveComplaint(id) {
+            const resolution = prompt('请输入解决方案:');
+            if (!resolution) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/complaints/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: 'resolved',
+                        resolution: resolution
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('投诉已解决！');
+                    loadComplaints();
+                }
+            } catch (error) {
+                console.error('解决投诉失败:', error);
+            }
+        }
+        
+        async function createReplacement(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/replacement/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filter_id: formData.get('filter_id'),
+                        report_date: new Date().toISOString(),
+                        old_filter_condition: formData.get('old_filter_condition'),
+                        replacement_reason: formData.get('replacement_reason'),
+                        prediction_id: formData.get('prediction_id') ? parseInt(formData.get('prediction_id')) : null,
+                        technician: formData.get('technician') || null,
+                        notes: formData.get('notes') || null
+                    })
+                });
+                
+                if (response.ok) {
+                    alert('更换报告创建成功！');
+                    form.reset();
+                    loadReplacementReports();
+                } else {
+                    const error = await response.json();
+                    alert('创建失败: ' + error.detail);
+                }
+            } catch (error) {
+                console.error('创建更换报告失败:', error);
+            }
+        }
+        
+        async function loadReplacementReports() {
+            try {
+                const response = await fetch(`${API_BASE}/api/replacement/`);
+                const reports = await response.json();
+                
+                if (reports.length === 0) {
+                    document.getElementById('replacementList').innerHTML = '<p style="color: #718096;">暂无更换报告</p>';
+                    return;
+                }
+                
+                const html = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>滤芯ID</th>
+                                <th>报告日期</th>
+                                <th>更换原因</th>
+                                <th>旧滤芯状况</th>
+                                <th>技术人员</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reports.map(r => `
+                                <tr>
+                                    <td>${r.filter_id}</td>
+                                    <td>${new Date(r.report_date).toLocaleDateString()}</td>
+                                    <td>${r.replacement_reason}</td>
+                                    <td>${r.old_filter_condition}</td>
+                                    <td>${r.technician || '-'}</td>
+                                    <td><span class="badge badge-approved">${r.status}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('replacementList').innerHTML = html;
+            } catch (error) {
+                console.error('加载更换报告失败:', error);
+            }
+        }
+        
+        async function exportReplacementReports() {
+            window.location.href = `${API_BASE}/api/replacement/export/csv`;
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('input[name="install_date"]').value = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="complaint_date"]').value = new Date().toISOString().split('T')[0];
+            loadDashboard();
+        });
+    </script>
+</body>
+</html>
