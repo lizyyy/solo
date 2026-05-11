@@ -14,7 +14,7 @@ def calculate_work_fee(session: Session, record: WorkRecord):
     return area_mu * unit_price
 
 
-def calculate_oil_subsidy(session: Session, record: WorkRecord):
+def calculate_oil_subsidy_raw(session: Session, record: WorkRecord):
     work_fee = calculate_work_fee(session, record)
     if work_fee <= 0:
         return 0.0
@@ -47,7 +47,13 @@ def calculate_oil_subsidy(session: Session, record: WorkRecord):
         if subsidy > max_subsidy:
             max_subsidy = subsidy
     
-    return min(max_subsidy, work_fee)
+    return max_subsidy
+
+
+def calculate_oil_subsidy(session: Session, record: WorkRecord):
+    raw_subsidy = calculate_oil_subsidy_raw(session, record)
+    work_fee = calculate_work_fee(session, record)
+    return min(raw_subsidy, work_fee)
 
 
 def calculate_historical_debt(session: Session, farmer_id: int):
@@ -70,13 +76,21 @@ def calculate_record_total(session: Session, record: WorkRecord):
     }
 
 
-def calculate_farmer_total(session: Session, farmer_id: int, include_confirmed_only: bool = True):
+def calculate_farmer_total(
+    session: Session, 
+    farmer_id: int, 
+    include_confirmed_only: bool = True,
+    include_finalized_only: bool = False
+):
     query = session.query(WorkRecord).filter(
         WorkRecord.farmer_id == farmer_id
     )
     
     if include_confirmed_only:
         query = query.filter(WorkRecord.is_confirmed == True)
+    
+    if include_finalized_only:
+        query = query.filter(WorkRecord.is_finalized == True)
     
     records = query.all()
     
@@ -133,7 +147,12 @@ def calculate_village_summary(session: Session, village: str = None, include_fin
         records = record_query.all()
         stats['record_count'] += len(records)
         
-        farmer_totals = calculate_farmer_total(session, farmer.id, include_confirmed_only=True)
+        farmer_totals = calculate_farmer_total(
+            session, 
+            farmer.id, 
+            include_confirmed_only=True,
+            include_finalized_only=include_finalized_only
+        )
         stats['work_fee'] += farmer_totals['work_fee']
         stats['oil_subsidy'] += farmer_totals['oil_subsidy']
         stats['historical_debt'] += farmer_totals['historical_debt']
@@ -214,13 +233,16 @@ def check_subsidy_exceeds_fee(session: Session):
     
     records = session.query(WorkRecord).all()
     for record in records:
-        fees = calculate_record_total(session, record)
-        if fees['oil_subsidy'] > fees['work_fee']:
+        work_fee = calculate_work_fee(session, record)
+        raw_subsidy = calculate_oil_subsidy_raw(session, record)
+        if raw_subsidy > work_fee:
             issues.append({
                 'record_id': record.id,
                 'farmer_name': record.farmer.name if record.farmer else '未知',
-                'work_fee': fees['work_fee'],
-                'oil_subsidy': fees['oil_subsidy']
+                'work_fee': work_fee,
+                'oil_subsidy_raw': raw_subsidy,
+                'oil_subsidy_capped': min(raw_subsidy, work_fee),
+                'excess_amount': raw_subsidy - work_fee
             })
     
     return issues

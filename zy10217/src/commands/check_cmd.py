@@ -180,10 +180,11 @@ def check_subsidy(session):
             issue['record_id'],
             issue['farmer_name'],
             f"¥{issue['work_fee']:.2f}",
-            f"¥{issue['oil_subsidy']:.2f}",
-            f"¥{issue['oil_subsidy'] - issue['work_fee']:.2f}"
+            f"¥{issue['oil_subsidy_raw']:.2f}",
+            f"¥{issue['oil_subsidy_capped']:.2f}",
+            f"¥{issue['excess_amount']:.2f}"
         ])
     
-    headers = ['记录ID', '农户', '作业费', '油补', '超出金额']
+    headers = ['记录ID', '农户', '作业费', '原始油补', '实际油补', '超出金额']
     click.echo(tabulate(table_data, headers=headers, tablefmt='grid'))
     click.echo(f'⚠️  发现 {len(issues)} 条油补大于作业费的记录')
