@@ -1,32 +1,22 @@
 [
   {
-    "id": "Bmp05i4n57ioqz3",
+    "id": "Bmp0ubddwsdbmkb",
     "importType": "specs",
-    "importedAt": 1778440412417,
+    "importedAt": 1778482087556,
     "sourceFile": "specs.csv",
     "fileHash": "60|id,name,unit\nS001,四尺对开,张\nS002,四尺整纸,张\nS003,三尺整纸,张\nS004,毛边纸,张\n",
     "recordCount": 4,
     "status": "confirmed",
-    "confirmedAt": 1778440525691
+    "confirmedAt": 1778482194132
   },
   {
-    "id": "Bmp05i4pujniopx",
+    "id": "Bmp0ubdg06j46f8",
     "importType": "inventory",
-    "importedAt": 1778440412514,
+    "importedAt": 1778482087632,
     "sourceFile": "inventory_initial.csv",
     "fileHash": "112|specId,quantity,reasonCode,reasonText\nS001,100,INIT,初始库存\nS002,50,INIT,初始库存\nS003,30,INIT,初始库存\nS004,20",
     "recordCount": 4,
     "status": "confirmed",
-    "confirmedAt": 1778440525691
-  },
-  {
-    "id": "Bmp05i4sbb7evjz",
-    "importType": "courses",
-    "importedAt": 1778440412603,
-    "sourceFile": "courses.csv",
-    "fileHash": "232|id,studentId,studentName,courseName,lessonNumber,date,status\nC001,ST001,张三,楷书初级班,1,2026-05-10,comple",
-    "recordCount": 4,
-    "status": "confirmed",
-    "confirmedAt": 1778440525691
+    "confirmedAt": 1778482194132
   }
 ]

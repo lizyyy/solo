@@ -59,7 +59,7 @@ function checkUnapprovedReissue(storeType) {
   const transactions = store.getTransactions(storeType);
 
   const reissues = transactions.filter(
-    t => t.type === 'reissue' && t.status === 'confirmed'
+    t => t.type === 'reissue'
   );
 
   reissues.forEach(t => {
@@ -72,7 +72,7 @@ function checkUnapprovedReissue(storeType) {
         studentName: t.studentName,
         specId: t.specId,
         severity: 'high',
-        description: `补发记录[${t.id}]没有审批信息`,
+        description: `补发记录[${t.id}]没有审批信息 (状态: ${t.status})`,
         status: 'open',
         createdAt: now()
       });

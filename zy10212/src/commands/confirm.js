@@ -76,8 +76,20 @@ function confirmTransaction(transactionId, operator) {
     return true;
   }
 
+  const tx = transactions[idx];
+  if (tx.type === 'reissue') {
+    if (!tx.approvedBy || !tx.approvedAt) {
+      logError(`补发记录[${transactionId}]没有审批信息，无法确认`);
+      return false;
+    }
+    if (!tx.reasonText) {
+      logError(`补发记录[${transactionId}]没有补发原因，无法确认`);
+      return false;
+    }
+  }
+
   transactions[idx] = {
-    ...transactions[idx],
+    ...tx,
     status: 'confirmed',
     confirmedAt: now(),
     confirmedBy: operator || 'operator'
@@ -89,12 +101,16 @@ function confirmTransaction(transactionId, operator) {
 }
 
 function resetPending() {
-  store.saveSpecs('pending', store.getSpecs('confirmed'));
-  store.saveCourses('pending', store.getCourses('confirmed'));
-  store.saveTransactions('pending', []);
+  const specs = store.getSpecs('pending');
+  const courses = store.getCourses('pending');
+  const transactions = store.getTransactions('pending');
+
+  const confirmedTransactions = transactions.filter(t => t.status === 'confirmed');
+
+  store.saveTransactions('pending', confirmedTransactions);
   store.saveImportBatches('pending', []);
   store.saveAnomalies('pending', []);
-  logSuccess('已重置待处理区，从已确认区恢复基础数据');
+  logSuccess('已重置待处理区：保留已确认交易，删除待确认交易和异常记录');
 }
 
 module.exports = {

@@ -164,6 +164,21 @@ function importTransactions(filePath, type) {
     return null;
   }
 
+  if (type === 'reissues') {
+    const invalidRows = rows.filter(r => !r.approvedBy || !r.approvedAt || !r.reasonText);
+    if (invalidRows.length > 0) {
+      logError(`补发记录必须提供审批人、审批时间和补发原因，${invalidRows.length} 条记录无效`);
+      invalidRows.forEach((r, idx) => {
+        const missing = [];
+        if (!r.approvedBy) missing.push('审批人(approvedBy)');
+        if (!r.approvedAt) missing.push('审批时间(approvedAt)');
+        if (!r.reasonText) missing.push('补发原因(reasonText)');
+        logError(`  第${idx + 1}行缺失: ${missing.join(', ')}`);
+      });
+      return null;
+    }
+  }
+
   const transactions = store.getTransactions('pending');
 
   const qtyMultiplier = type === 'issues' ? -1 : type === 'inventory' ? 1 : type === 'reissues' ? -1 : 1;

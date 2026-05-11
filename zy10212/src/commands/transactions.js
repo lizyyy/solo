@@ -98,8 +98,18 @@ function createRefund(specId, studentId, studentName, quantity, courseId, option
 }
 
 function createReissue(specId, studentId, studentName, quantity, options = {}) {
+  const errors = [];
+
   if (!options.approvedBy) {
-    logWarn('补发需要审批人信息');
+    errors.push('补发必须提供审批人 (--approved-by)');
+  }
+  if (!options.reasonText) {
+    errors.push('补发必须提供原因 (--reason)');
+  }
+
+  if (errors.length > 0) {
+    errors.forEach(e => logError(e));
+    return null;
   }
 
   const spec = store.getSpecById('pending', specId);
@@ -110,11 +120,6 @@ function createReissue(specId, studentId, studentName, quantity, options = {}) {
 
   if (!quantity || quantity <= 0 || !Number.isInteger(quantity)) {
     logError('补发数量必须是正整数');
-    return null;
-  }
-
-  if (!options.reasonText) {
-    logError('补发必须说明原因');
     return null;
   }
 
@@ -129,8 +134,8 @@ function createReissue(specId, studentId, studentName, quantity, options = {}) {
     quantity: -quantity,
     reasonCode: options.reasonCode || 'REISSUE',
     reasonText: options.reasonText,
-    approvedBy: options.approvedBy || null,
-    approvedAt: options.approvedBy ? now() : null,
+    approvedBy: options.approvedBy,
+    approvedAt: now(),
     status: 'pending',
     importedAt: now()
   };
