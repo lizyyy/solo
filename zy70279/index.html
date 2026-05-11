@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>舞蹈教室地胶保养台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>舞蹈教室地胶保养台</h1>
+            <div class="status-bar">
+                <span id="systemStatus" class="status-indicator ready">系统就绪</span>
+                <span id="lastUpdate" class="last-update">暂无更新</span>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="panel input-panel">
+                <h2>教室档案输入</h2>
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept=".json" />
+                    <button id="loadSampleBtn" class="btn secondary">加载样例数据</button>
+                </div>
+                <div class="data-display" id="inputDisplay">
+                    <p class="placeholder">请加载教室档案数据</p>
+                </div>
+            </section>
+
+            <section class="panel action-panel">
+                <h2>核心操作</h2>
+                <div class="action-buttons">
+                    <button id="processIntensityBtn" class="btn primary">处理课程强度</button>
+                    <button id="generateCleanPlanBtn" class="btn primary">生成清洁计划</button>
+                    <button id="trackDamageBtn" class="btn primary">追踪损伤区域</button>
+                    <button id="runAllBtn" class="btn success">一键执行全部流程</button>
+                    <button id="resetBtn" class="btn danger">重置状态</button>
+                </div>
+                <div class="progress-area">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="progressText" class="progress-text">等待操作...</span>
+                </div>
+            </section>
+
+            <section class="panel result-panel">
+                <h2>处理结果</h2>
+                <div class="tabs">
+                    <button class="tab active" data-tab="cleaning">清洁计划</button>
+                    <button class="tab" data-tab="damage">损伤追踪</button>
+                    <button class="tab" data-tab="statistics">统计数据</button>
+                    <button class="tab" data-tab="history">变更历史</button>
+                </div>
+                <div class="tab-content">
+                    <div id="cleaningTab" class="tab-pane active">
+                        <div id="cleaningContent" class="result-content">
+                            <p class="placeholder">暂无清洁计划</p>
+                        </div>
+                    </div>
+                    <div id="damageTab" class="tab-pane">
+                        <div id="damageContent" class="result-content">
+                            <p class="placeholder">暂无损伤记录</p>
+                        </div>
+                    </div>
+                    <div id="statisticsTab" class="tab-pane">
+                        <div id="statisticsContent" class="result-content">
+                            <p class="placeholder">暂无统计数据</p>
+                        </div>
+                    </div>
+                    <div id="historyTab" class="tab-pane">
+                        <div id="historyContent" class="result-content">
+                            <p class="placeholder">暂无变更历史</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="export-area">
+                    <button id="exportBtn" class="btn secondary">导出结果</button>
+                    <span id="exportStatus" class="export-status"></span>
+                </div>
+            </section>
+        </main>
+
+        <div id="notificationContainer" class="notification-container"></div>
+    </div>
+
+    <script src="utils.js"></script>
+    <script src="data-service.js"></script>
+    <script src="business-logic.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
