@@ -70,9 +70,10 @@ function confirmPrice(orderId, newPrice, options = {}) {
   const originalPrice = validation.calculateOrderOriginalPrice(order);
   
   if (typeof newPrice === 'undefined' || newPrice === null) {
-    const replacementData = replacementCalculator.calculateReplacementForOrder(order);
-    newPrice = originalPrice + replacementData.totalPriceDiff;
-    console.log(chalk.blue(`ℹ️ 使用自动计算价格: ${newPrice} 元 (原价格: ${originalPrice} 元, 差价: +${replacementData.totalPriceDiff} 元)`));
+    const replacementData = replacementCalculator.calculateReplacementForOrder(orderId);
+    const priceDiff = replacementData?.totalPriceDiff || 0;
+    newPrice = originalPrice + priceDiff;
+    console.log(chalk.blue(`ℹ️ 使用自动计算价格: ${newPrice} 元 (原价格: ${originalPrice} 元, 差价: +${priceDiff} 元)`));
   }
   
   const confirmedBy = options.by || '系统';

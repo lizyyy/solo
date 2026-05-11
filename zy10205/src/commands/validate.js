@@ -35,7 +35,7 @@ function validateOrder(orderId) {
     return null;
   }
   
-  const result = validation.validateOrder(order);
+  const result = validation.validateOrder(orderId);
   
   console.log('');
   console.log(chalk.bold.blue(`══════════ 订单 ${orderId} 校验结果 ══════════`));
