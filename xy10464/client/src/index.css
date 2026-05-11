@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f0f2f5;
+}
+
+.app-layout {
+  min-height: 100vh;
+}
+
+.site-layout-background {
+  background: #fff;
+  padding: 24px;
+  min-height: 280px;
+}
+
+.logo {
+  height: 32px;
+  margin: 16px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.timeline-event {
+  padding: 8px 0;
+}
+
+.timeline-event-meta {
+  color: #8c8c8c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.fine-card {
+  border-left: 3px solid #ff4d4f;
+  margin-bottom: 16px;
+}
+
+.fine-card-success {
+  border-left: 3px solid #52c41a;
+}
+
+.pause-evidence {
+  background: #fafafa;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.status-tag {
+  font-size: 12px;
+}
+
+.dashboard-stat-card {
+  text-align: center;
+}
+
+.dashboard-stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.dashboard-stat-label {
+  color: #8c8c8c;
+  margin-top: 8px;
+}
