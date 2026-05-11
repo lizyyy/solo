@@ -32,7 +32,7 @@ import { RangePickerProps } from 'antd/es/date-picker';
 import dayjs, { Dayjs } from 'dayjs';
 import { User, ReissueStatus, ReissueOrder } from '../../shared/types';
 import { STATUS_LABELS, STATUS_COLORS, STATUS_TRANSITIONS } from '../../shared/constants';
-import { hasPermission } from '../hooks/useAuth';
+import { hasPermission } from '../contexts/AuthContext';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;

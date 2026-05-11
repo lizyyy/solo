@@ -10,7 +10,7 @@ import {
   LogoutOutlined
 } from '@ant-design/icons';
 
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
 import OrderListPage from './pages/OrderListPage';
 import OrderDetailModal from './components/OrderDetailModal';

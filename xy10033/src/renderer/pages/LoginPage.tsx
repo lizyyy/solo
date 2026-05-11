@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, message, Alert } from 'antd';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();

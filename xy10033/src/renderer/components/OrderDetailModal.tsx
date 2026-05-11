@@ -17,7 +17,7 @@ import {
 import { User, ReissueOrder, ReissueStatus, ReissueHistory } from '../../shared/types';
 import { STATUS_LABELS, STATUS_COLORS, STATUS_TRANSITIONS } from '../../shared/constants';
 import dayjs from 'dayjs';
-import { hasPermission } from '../hooks/useAuth';
+import { hasPermission } from '../contexts/AuthContext';
 
 const { Option } = Select;
 const { TextArea } = Input;

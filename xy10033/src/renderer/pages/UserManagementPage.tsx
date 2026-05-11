@@ -17,7 +17,7 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { User, UserRole } from '../../shared/types';
-import { hasPermission } from '../hooks/useAuth';
+import { hasPermission } from '../contexts/AuthContext';
 
 const { Option } = Select;
 
