@@ -1,0 +1,39 @@
+{
+  "employees": [
+    { "employeeId": "E001", "name": "张三", "department": "生产一部" },
+    { "employeeId": "E002", "name": "李四", "department": "生产一部" },
+    { "employeeId": "E003", "name": "王五", "department": "生产二部" },
+    { "employeeId": "E004", "name": "赵六", "department": "生产二部" }
+  ],
+  "shifts": [
+    { "employeeId": "E001", "date": "2025-01-15", "shiftType": "day", "startTime": "08:00", "endTime": "20:00", "isWorkDay": true },
+    { "employeeId": "E002", "date": "2025-01-15", "shiftType": "night", "startTime": "20:00", "endTime": "08:00", "isWorkDay": true },
+    { "employeeId": "E003", "date": "2025-01-15", "shiftType": "day", "startTime": "08:00", "endTime": "20:00", "isWorkDay": true },
+    { "employeeId": "E004", "date": "2025-01-15", "shiftType": "day", "startTime": "08:00", "endTime": "20:00", "isWorkDay": false }
+  ],
+  "consumptions": [
+    { "transactionId": "TX001", "employeeId": "E001", "swipeTime": "2025-01-15 07:30:00", "amount": 8, "merchant": "食堂A" },
+    { "transactionId": "TX002", "employeeId": "E001", "swipeTime": "2025-01-15 12:05:00", "amount": 15, "merchant": "食堂A" },
+    { "transactionId": "TX003", "employeeId": "E002", "swipeTime": "2025-01-15 22:30:00", "amount": 18, "merchant": "食堂B" },
+    { "transactionId": "TX004", "employeeId": "E002", "swipeTime": "2025-01-16 03:15:00", "amount": 12, "merchant": "食堂B" },
+    { "transactionId": "TX005", "employeeId": "E003", "swipeTime": "2025-01-15 12:00:00", "amount": 15, "merchant": "食堂A" },
+    { "transactionId": "TX006", "employeeId": "E003", "swipeTime": "2025-01-15 12:15:00", "amount": 10, "merchant": "食堂A" },
+    { "transactionId": "TX007", "employeeId": "E004", "swipeTime": "2025-01-15 12:00:00", "amount": 15, "merchant": "食堂A" }
+  ],
+  "subsidyRule": {
+    "ruleId": "RULE_2025",
+    "name": "2025年标准餐补规则",
+    "dayShiftAmount": 30,
+    "nightShiftAmount": 40,
+    "dailyLimit": 30,
+    "mealTimes": {
+      "breakfast": { "start": "06:30", "end": "08:30" },
+      "lunch": { "start": "11:30", "end": "13:00" },
+      "dinner": { "start": "17:30", "end": "19:30" },
+      "nightMeal": { "start": "22:00", "end": "05:00" }
+    },
+    "nonWorkDayAllowed": false,
+    "effectiveFrom": "2025-01-01",
+    "effectiveTo": null
+  }
+}
