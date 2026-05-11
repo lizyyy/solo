@@ -1,0 +1,24 @@
+[
+  {
+    "storeId": "STORE001",
+    "handoverId": "HO201",
+    "outgoingCashierId": "CASHIER005",
+    "incomingCashierId": "CASHIER006",
+    "handoverTime": "2026-05-12T14:00:00.000Z",
+    "initialAmount": 500.00,
+    "finalAmount": 1200.00,
+    "amountHandedOver": 1200.00,
+    "notes": "交接时发现长款，需要调查"
+  },
+  {
+    "storeId": "STORE001",
+    "handoverId": "HO202",
+    "outgoingCashierId": "CASHIER006",
+    "incomingCashierId": "MANAGER",
+    "handoverTime": "2026-05-12T18:00:00.000Z",
+    "initialAmount": 0.00,
+    "finalAmount": 600.00,
+    "amountHandedOver": 600.00,
+    "notes": "日结交接"
+  }
+]

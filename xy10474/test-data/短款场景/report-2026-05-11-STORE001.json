@@ -1,0 +1,62 @@
+{
+  "date": "2026-05-11",
+  "storeId": "STORE001",
+  "generatedAt": "2026-05-11T15:02:08.603Z",
+  "summary": {
+    "totalCashTransactions": 965.5,
+    "totalRefunds": 50,
+    "totalPettyCash": 500,
+    "totalExpected": 1415.5,
+    "totalActual": 1100,
+    "totalDifference": -315.5,
+    "cashiersWithDiscrepancy": 2,
+    "status": "shortage"
+  },
+  "cashiers": [
+    {
+      "cashierId": "CASHIER003",
+      "cashTransactions": 780,
+      "refundAmount": 50,
+      "pettyCashChanges": 500,
+      "expectedCash": 1230,
+      "actualCash": 1100,
+      "difference": -130,
+      "possibleCauses": [
+        "现金短款金额较大，可能存在现金挪用风险"
+      ],
+      "pendingConfirmations": [
+        "检查收银机现金抽屉是否遗漏"
+      ],
+      "notes": []
+    },
+    {
+      "cashierId": "CASHIER004",
+      "cashTransactions": 185.5,
+      "refundAmount": 0,
+      "pettyCashChanges": 0,
+      "expectedCash": 185.5,
+      "actualCash": 0,
+      "difference": -185.5,
+      "possibleCauses": [
+        "现金短款金额较大，可能存在现金挪用风险"
+      ],
+      "pendingConfirmations": [
+        "检查收银机现金抽屉是否遗漏"
+      ],
+      "notes": []
+    }
+  ],
+  "anomalies": [],
+  "investigationNotes": [
+    {
+      "cashierId": "CASHIER003",
+      "note": "已核对该收银员的收银抽屉，发现有130元现金未入账，可能是忘记存入系统",
+      "timestamp": "2026-05-11T15:02:08.603Z"
+    },
+    {
+      "cashierId": "CASHIER003",
+      "note": "已与该收银员谈话，承认是操作失误",
+      "timestamp": "2026-05-11T15:02:08.603Z"
+    }
+  ]
+}

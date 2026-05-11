@@ -1,0 +1,22 @@
+[
+  {
+    "storeId": "STORE001",
+    "refundId": "REF301",
+    "transactionId": "TX301",
+    "cashierId": "CASHIER007",
+    "timestamp": "2026-05-13T09:30:00.000Z",
+    "amount": 200.00,
+    "reason": "顾客退货",
+    "hasManagerSignature": true
+  },
+  {
+    "storeId": "STORE001",
+    "refundId": "REF302",
+    "transactionId": "TX302",
+    "cashierId": "CASHIER007",
+    "timestamp": "2026-05-13T11:00:00.000Z",
+    "amount": 150.00,
+    "reason": "商品瑕疵",
+    "hasManagerSignature": false
+  }
+]

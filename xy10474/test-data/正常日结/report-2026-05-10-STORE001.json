@@ -1,0 +1,49 @@
+{
+  "date": "2026-05-10",
+  "storeId": "STORE001",
+  "generatedAt": "2026-05-11T15:02:08.579Z",
+  "summary": {
+    "totalCashTransactions": 1057.1,
+    "totalRefunds": 25,
+    "totalPettyCash": 400,
+    "totalExpected": 1432.1,
+    "totalActual": 966.3,
+    "totalDifference": -465.79999999999995,
+    "cashiersWithDiscrepancy": 1,
+    "status": "shortage"
+  },
+  "cashiers": [
+    {
+      "cashierId": "CASHIER001",
+      "cashTransactions": 491.3,
+      "refundAmount": 25,
+      "pettyCashChanges": 500,
+      "expectedCash": 966.3,
+      "actualCash": 966.3,
+      "difference": 0,
+      "possibleCauses": [
+        "暂无异常"
+      ],
+      "pendingConfirmations": [],
+      "notes": []
+    },
+    {
+      "cashierId": "CASHIER002",
+      "cashTransactions": 565.8,
+      "refundAmount": 0,
+      "pettyCashChanges": -100,
+      "expectedCash": 465.79999999999995,
+      "actualCash": 0,
+      "difference": -465.79999999999995,
+      "possibleCauses": [
+        "现金短款金额较大，可能存在现金挪用风险"
+      ],
+      "pendingConfirmations": [
+        "检查收银机现金抽屉是否遗漏"
+      ],
+      "notes": []
+    }
+  ],
+  "anomalies": [],
+  "investigationNotes": []
+}

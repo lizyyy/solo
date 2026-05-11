@@ -1,0 +1,32 @@
+[
+  {
+    "storeId": "STORE001",
+    "transactionId": "TX101",
+    "cashierId": "CASHIER003",
+    "timestamp": "2026-05-11T09:30:00.000Z",
+    "amount": 500.00,
+    "cashAmount": 500.00,
+    "paymentMethod": "cash",
+    "items": ["大件商品A"]
+  },
+  {
+    "storeId": "STORE001",
+    "transactionId": "TX102",
+    "cashierId": "CASHIER003",
+    "timestamp": "2026-05-11T10:45:00.000Z",
+    "amount": 280.00,
+    "cashAmount": 280.00,
+    "paymentMethod": "cash",
+    "items": ["商品B", "商品C"]
+  },
+  {
+    "storeId": "STORE001",
+    "transactionId": "TX103",
+    "cashierId": "CASHIER004",
+    "timestamp": "2026-05-11T14:15:00.000Z",
+    "amount": 185.50,
+    "cashAmount": 185.50,
+    "paymentMethod": "cash",
+    "items": ["商品D"]
+  }
+]

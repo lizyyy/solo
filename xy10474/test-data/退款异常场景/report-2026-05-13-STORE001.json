@@ -1,0 +1,69 @@
+{
+  "date": "2026-05-13",
+  "storeId": "STORE001",
+  "generatedAt": "2026-05-11T15:02:08.601Z",
+  "summary": {
+    "totalCashTransactions": 1800,
+    "totalRefunds": 350,
+    "totalPettyCash": 500,
+    "totalExpected": 1950,
+    "totalActual": 1900,
+    "totalDifference": -50,
+    "cashiersWithDiscrepancy": 1,
+    "status": "warning"
+  },
+  "cashiers": [
+    {
+      "cashierId": "CASHIER007",
+      "cashTransactions": 1300,
+      "refundAmount": 350,
+      "pettyCashChanges": 500,
+      "expectedCash": 1450,
+      "actualCash": 1400,
+      "difference": -50,
+      "possibleCauses": [
+        "退款未签字确认",
+        "零钱找零可能有误"
+      ],
+      "pendingConfirmations": [
+        "确认退款是否真实发生",
+        "核对大额交易的找零记录"
+      ],
+      "notes": []
+    },
+    {
+      "cashierId": "CASHIER008",
+      "cashTransactions": 500,
+      "refundAmount": 0,
+      "pettyCashChanges": 0,
+      "expectedCash": 500,
+      "actualCash": 500,
+      "difference": 0,
+      "possibleCauses": [
+        "暂无异常"
+      ],
+      "pendingConfirmations": [],
+      "notes": []
+    }
+  ],
+  "anomalies": [
+    {
+      "type": "refund_without_signature",
+      "severity": "high",
+      "message": "退款记录 #REF302 缺少店长签字",
+      "refundId": "REF302",
+      "cashierId": "CASHIER007",
+      "amount": 150,
+      "transactionId": "TX302"
+    },
+    {
+      "type": "handover_gap",
+      "severity": "high",
+      "message": "交接时间断档: 收银员 CASHIER007 到 MANAGER 间隔 240 分钟",
+      "gapMinutes": 240,
+      "outgoingCashierId": "CASHIER007",
+      "incomingCashierId": "MANAGER"
+    }
+  ],
+  "investigationNotes": []
+}

@@ -1,0 +1,60 @@
+{
+  "date": "2026-05-12",
+  "storeId": "STORE001",
+  "generatedAt": "2026-05-11T15:02:08.598Z",
+  "summary": {
+    "totalCashTransactions": 1020,
+    "totalRefunds": 0,
+    "totalPettyCash": 500,
+    "totalExpected": 1520,
+    "totalActual": 1800,
+    "totalDifference": 280,
+    "cashiersWithDiscrepancy": 2,
+    "status": "overage"
+  },
+  "cashiers": [
+    {
+      "cashierId": "CASHIER005",
+      "cashTransactions": 570,
+      "refundAmount": 0,
+      "pettyCashChanges": 500,
+      "expectedCash": 1070,
+      "actualCash": 1200,
+      "difference": 130,
+      "possibleCauses": [
+        "现金长款金额较大，可能存在未入账交易"
+      ],
+      "pendingConfirmations": [
+        "检查是否有未录入的现金收款"
+      ],
+      "notes": []
+    },
+    {
+      "cashierId": "CASHIER006",
+      "cashTransactions": 450,
+      "refundAmount": 0,
+      "pettyCashChanges": 0,
+      "expectedCash": 450,
+      "actualCash": 600,
+      "difference": 150,
+      "possibleCauses": [
+        "现金长款金额较大，可能存在未入账交易"
+      ],
+      "pendingConfirmations": [
+        "检查是否有未录入的现金收款"
+      ],
+      "notes": []
+    }
+  ],
+  "anomalies": [
+    {
+      "type": "handover_gap",
+      "severity": "high",
+      "message": "交接时间断档: 收银员 CASHIER005 到 MANAGER 间隔 240 分钟",
+      "gapMinutes": 240,
+      "outgoingCashierId": "CASHIER005",
+      "incomingCashierId": "MANAGER"
+    }
+  ],
+  "investigationNotes": []
+}

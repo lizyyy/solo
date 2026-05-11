@@ -1,0 +1,27 @@
+{
+  "name": "cash-reconciliation-cli",
+  "version": "1.0.0",
+  "description": "门店现金长短款核对 CLI 工具",
+  "main": "index.js",
+  "bin": {
+    "cash-recon": "./bin/cash-recon.js"
+  },
+  "scripts": {
+    "test": "node tests/test-all.js"
+  },
+  "keywords": [
+    "cash",
+    "reconciliation",
+    "cli",
+    "retail"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "csv-parser": "^3.0.0",
+    "inquirer": "^8.2.6",
+    "table": "^6.8.1"
+  }
+}

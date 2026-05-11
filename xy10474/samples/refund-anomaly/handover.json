@@ -1,0 +1,24 @@
+[
+  {
+    "storeId": "STORE001",
+    "handoverId": "HO301",
+    "outgoingCashierId": "CASHIER007",
+    "incomingCashierId": "CASHIER008",
+    "handoverTime": "2026-05-13T14:00:00.000Z",
+    "initialAmount": 500.00,
+    "finalAmount": 1400.00,
+    "amountHandedOver": 1400.00,
+    "notes": "交接时有异常退款记录需要核查"
+  },
+  {
+    "storeId": "STORE001",
+    "handoverId": "HO302",
+    "outgoingCashierId": "CASHIER008",
+    "incomingCashierId": "MANAGER",
+    "handoverTime": "2026-05-13T18:00:00.000Z",
+    "initialAmount": 0.00,
+    "finalAmount": 500.00,
+    "amountHandedOver": 500.00,
+    "notes": "日结交接"
+  }
+]
