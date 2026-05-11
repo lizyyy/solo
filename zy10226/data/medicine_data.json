@@ -1,0 +1,493 @@
+{
+  "medicines": {
+    "84a3b26bc13d": {
+      "id": "84a3b26bc13d",
+      "name": "布洛芬缓释胶囊",
+      "unit": "盒",
+      "min_stock": 10,
+      "category": "解热镇痛",
+      "created_at": "2026-05-11T15:51:13.063543"
+    },
+    "ca22194fe533": {
+      "id": "ca22194fe533",
+      "name": "碘伏消毒液",
+      "unit": "瓶",
+      "min_stock": 15,
+      "category": "消毒用品",
+      "created_at": "2026-05-11T15:51:13.063573"
+    },
+    "e00b10889c27": {
+      "id": "e00b10889c27",
+      "name": "创可贴",
+      "unit": "盒",
+      "min_stock": 20,
+      "category": "外伤处理",
+      "created_at": "2026-05-11T15:51:13.063583"
+    }
+  },
+  "inventory": [
+    {
+      "id": "ea02aad4767c",
+      "medicine_id": "84a3b26bc13d",
+      "batch_no": "20260101",
+      "expiry_date": "2027-05-11",
+      "quantity": 3,
+      "source": "社区医院捐赠",
+      "status": "active",
+      "created_at": "2026-05-11T15:51:13.063616"
+    },
+    {
+      "id": "2ead697ec57b",
+      "medicine_id": "84a3b26bc13d",
+      "batch_no": "20260101",
+      "expiry_date": "2027-05-11",
+      "quantity": 3,
+      "source": "社区医院捐赠",
+      "status": "active",
+      "created_at": "2026-05-11T15:51:13.063635"
+    },
+    {
+      "id": "ada60c8eadf0",
+      "medicine_id": "84a3b26bc13d",
+      "batch_no": "20260101",
+      "expiry_date": "2027-05-11",
+      "quantity": 8,
+      "source": "居民李XX捐赠",
+      "status": "active",
+      "created_at": "2026-05-11T15:51:13.063655"
+    },
+    {
+      "id": "c3f811ac0737",
+      "medicine_id": "ca22194fe533",
+      "batch_no": "20251201",
+      "expiry_date": "2026-05-06",
+      "quantity": 3,
+      "source": "居民王XX捐赠",
+      "status": "active",
+      "created_at": "2026-05-11T15:51:13.066045"
+    },
+    {
+      "id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "batch_no": "20241201",
+      "expiry_date": "2026-03-12",
+      "quantity": 10,
+      "source": "居民刘XX捐赠",
+      "status": "active",
+      "created_at": "2026-05-11T15:51:13.066091"
+    }
+  ],
+  "usage_records": [
+    {
+      "id": "95dbf601bf4d",
+      "inventory_id": "ea02aad4767c",
+      "medicine_id": "84a3b26bc13d",
+      "quantity": 2,
+      "resident": "居民张XX",
+      "expiry_check": {
+        "is_expired": false,
+        "days_to_expire": 365,
+        "can_use": true,
+        "grace_period_used": 0
+      },
+      "timestamp": "2026-05-11T15:51:13.065985"
+    },
+    {
+      "id": "b5c9d5e25c3d",
+      "inventory_id": "c3f811ac0737",
+      "medicine_id": "ca22194fe533",
+      "quantity": 1,
+      "resident": "居民李XX",
+      "expiry_check": {
+        "is_expired": true,
+        "days_to_expire": -5,
+        "can_use": true,
+        "grace_period_used": 5
+      },
+      "timestamp": "2026-05-11T15:51:13.066071"
+    }
+  ],
+  "replenish_records": [
+    {
+      "id": "bd540df93b0a",
+      "inventory_id": "ea02aad4767c",
+      "medicine_id": "84a3b26bc13d",
+      "quantity": 5,
+      "source": "社区医院捐赠",
+      "volunteer": "张志愿者",
+      "timestamp": "2026-05-11T15:51:13.063620"
+    },
+    {
+      "id": "7fa63a6b4d48",
+      "inventory_id": "2ead697ec57b",
+      "medicine_id": "84a3b26bc13d",
+      "quantity": 3,
+      "source": "社区医院捐赠",
+      "volunteer": "张志愿者",
+      "timestamp": "2026-05-11T15:51:13.063638"
+    },
+    {
+      "id": "0e00e6ede420",
+      "inventory_id": "ada60c8eadf0",
+      "medicine_id": "84a3b26bc13d",
+      "quantity": 8,
+      "source": "居民李XX捐赠",
+      "volunteer": "王志愿者",
+      "timestamp": "2026-05-11T15:51:13.063658"
+    },
+    {
+      "id": "41323ffa5992",
+      "inventory_id": "c3f811ac0737",
+      "medicine_id": "ca22194fe533",
+      "quantity": 4,
+      "source": "居民王XX捐赠",
+      "volunteer": "赵志愿者",
+      "timestamp": "2026-05-11T15:51:13.066050"
+    },
+    {
+      "id": "250c462c0db6",
+      "inventory_id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "quantity": 3,
+      "source": "居民刘XX捐赠",
+      "volunteer": "张志愿者",
+      "timestamp": "2026-05-11T15:51:13.066095"
+    },
+    {
+      "id": "84640471a293",
+      "inventory_id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "quantity": 5,
+      "source": "补回",
+      "volunteer": "李志愿者",
+      "timestamp": "2026-05-11T15:51:13.066196"
+    },
+    {
+      "id": "da9669fe460f",
+      "inventory_id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "quantity": 2,
+      "source": "补回",
+      "volunteer": "张志愿者",
+      "timestamp": "2026-05-11T15:51:13.066233"
+    }
+  ],
+  "offline_records": [
+    {
+      "id": "ea9abd9022dc",
+      "inventory_id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "reason": "过期下架",
+      "operator": "王志愿者",
+      "timestamp": "2026-05-11T15:51:13.066166"
+    },
+    {
+      "id": "0740777de29e",
+      "inventory_id": "cdac62c10fbe",
+      "medicine_id": "e00b10889c27",
+      "reason": "再次检查下架",
+      "operator": "赵志愿者",
+      "timestamp": "2026-05-11T15:51:13.066222"
+    }
+  ],
+  "operations": [
+    {
+      "id": "7b8944a85ac6",
+      "type": "add_medicine",
+      "timestamp": "2026-05-11T15:51:13.063555",
+      "operator": "system",
+      "details": {
+        "signature": "medicine_布洛芬缓释胶囊_盒",
+        "medicine": {
+          "id": "84a3b26bc13d",
+          "name": "布洛芬缓释胶囊",
+          "unit": "盒",
+          "min_stock": 10,
+          "category": "解热镇痛",
+          "created_at": "2026-05-11T15:51:13.063543"
+        }
+      }
+    },
+    {
+      "id": "41a2ee783387",
+      "type": "add_medicine",
+      "timestamp": "2026-05-11T15:51:13.063577",
+      "operator": "system",
+      "details": {
+        "signature": "medicine_碘伏消毒液_瓶",
+        "medicine": {
+          "id": "ca22194fe533",
+          "name": "碘伏消毒液",
+          "unit": "瓶",
+          "min_stock": 15,
+          "category": "消毒用品",
+          "created_at": "2026-05-11T15:51:13.063573"
+        }
+      }
+    },
+    {
+      "id": "8884e4da3cd7",
+      "type": "add_medicine",
+      "timestamp": "2026-05-11T15:51:13.063587",
+      "operator": "system",
+      "details": {
+        "signature": "medicine_创可贴_盒",
+        "medicine": {
+          "id": "e00b10889c27",
+          "name": "创可贴",
+          "unit": "盒",
+          "min_stock": 20,
+          "category": "外伤处理",
+          "created_at": "2026-05-11T15:51:13.063583"
+        }
+      }
+    },
+    {
+      "id": "fe189870158a",
+      "type": "replenish",
+      "timestamp": "2026-05-11T15:51:13.063623",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_84a3b26bc13d_20260101_社区医院捐赠_5_张志愿者",
+        "inventory_item": {
+          "id": "ea02aad4767c",
+          "medicine_id": "84a3b26bc13d",
+          "batch_no": "20260101",
+          "expiry_date": "2027-05-11",
+          "quantity": 3,
+          "source": "社区医院捐赠",
+          "status": "active",
+          "created_at": "2026-05-11T15:51:13.063616"
+        },
+        "duplicate_check": {
+          "has_duplicate": false,
+          "existing_items": [],
+          "total_qty": 0
+        }
+      }
+    },
+    {
+      "id": "1a7b27d946ab",
+      "type": "replenish",
+      "timestamp": "2026-05-11T15:51:13.063641",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_84a3b26bc13d_20260101_社区医院捐赠_3_张志愿者",
+        "inventory_item": {
+          "id": "2ead697ec57b",
+          "medicine_id": "84a3b26bc13d",
+          "batch_no": "20260101",
+          "expiry_date": "2027-05-11",
+          "quantity": 3,
+          "source": "社区医院捐赠",
+          "status": "active",
+          "created_at": "2026-05-11T15:51:13.063635"
+        },
+        "duplicate_check": {
+          "has_duplicate": true,
+          "existing_items": [
+            {
+              "id": "ea02aad4767c",
+              "medicine_id": "84a3b26bc13d",
+              "batch_no": "20260101",
+              "expiry_date": "2027-05-11",
+              "quantity": 3,
+              "source": "社区医院捐赠",
+              "status": "active",
+              "created_at": "2026-05-11T15:51:13.063616"
+            }
+          ],
+          "total_qty": 5
+        }
+      }
+    },
+    {
+      "id": "6fe0e4c28618",
+      "type": "replenish",
+      "timestamp": "2026-05-11T15:51:13.063662",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_84a3b26bc13d_20260101_居民李XX捐赠_8_王志愿者",
+        "inventory_item": {
+          "id": "ada60c8eadf0",
+          "medicine_id": "84a3b26bc13d",
+          "batch_no": "20260101",
+          "expiry_date": "2027-05-11",
+          "quantity": 8,
+          "source": "居民李XX捐赠",
+          "status": "active",
+          "created_at": "2026-05-11T15:51:13.063655"
+        },
+        "duplicate_check": {
+          "has_duplicate": false,
+          "existing_items": [],
+          "total_qty": 0
+        }
+      }
+    },
+    {
+      "id": "2beadb4dd4ec",
+      "type": "use",
+      "timestamp": "2026-05-11T15:51:13.065991",
+      "operator": "system",
+      "details": {
+        "signature": "use_ea02aad4767c_2_居民张XX_20260511",
+        "usage_record": {
+          "id": "95dbf601bf4d",
+          "inventory_id": "ea02aad4767c",
+          "medicine_id": "84a3b26bc13d",
+          "quantity": 2,
+          "resident": "居民张XX",
+          "expiry_check": {
+            "is_expired": false,
+            "days_to_expire": 365,
+            "can_use": true,
+            "grace_period_used": 0
+          },
+          "timestamp": "2026-05-11T15:51:13.065985"
+        }
+      }
+    },
+    {
+      "id": "63f6a15854a9",
+      "type": "replenish",
+      "timestamp": "2026-05-11T15:51:13.066053",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_ca22194fe533_20251201_居民王XX捐赠_4_赵志愿者",
+        "inventory_item": {
+          "id": "c3f811ac0737",
+          "medicine_id": "ca22194fe533",
+          "batch_no": "20251201",
+          "expiry_date": "2026-05-06",
+          "quantity": 3,
+          "source": "居民王XX捐赠",
+          "status": "active",
+          "created_at": "2026-05-11T15:51:13.066045"
+        },
+        "duplicate_check": {
+          "has_duplicate": false,
+          "existing_items": [],
+          "total_qty": 0
+        }
+      }
+    },
+    {
+      "id": "c84b62ba975c",
+      "type": "use",
+      "timestamp": "2026-05-11T15:51:13.066075",
+      "operator": "system",
+      "details": {
+        "signature": "use_c3f811ac0737_1_居民李XX_20260511",
+        "usage_record": {
+          "id": "b5c9d5e25c3d",
+          "inventory_id": "c3f811ac0737",
+          "medicine_id": "ca22194fe533",
+          "quantity": 1,
+          "resident": "居民李XX",
+          "expiry_check": {
+            "is_expired": true,
+            "days_to_expire": -5,
+            "can_use": true,
+            "grace_period_used": 5
+          },
+          "timestamp": "2026-05-11T15:51:13.066071"
+        }
+      }
+    },
+    {
+      "id": "abcc79598e2a",
+      "type": "replenish",
+      "timestamp": "2026-05-11T15:51:13.066099",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_e00b10889c27_20241201_居民刘XX捐赠_3_张志愿者",
+        "inventory_item": {
+          "id": "cdac62c10fbe",
+          "medicine_id": "e00b10889c27",
+          "batch_no": "20241201",
+          "expiry_date": "2026-03-12",
+          "quantity": 10,
+          "source": "居民刘XX捐赠",
+          "status": "active",
+          "created_at": "2026-05-11T15:51:13.066091"
+        },
+        "duplicate_check": {
+          "has_duplicate": false,
+          "existing_items": [],
+          "total_qty": 0
+        }
+      }
+    },
+    {
+      "id": "f9644fa74b84",
+      "type": "offline",
+      "timestamp": "2026-05-11T15:51:13.066172",
+      "operator": "system",
+      "details": {
+        "signature": "offline_cdac62c10fbe_过期下架_20260511",
+        "offline_record": {
+          "id": "ea9abd9022dc",
+          "inventory_id": "cdac62c10fbe",
+          "medicine_id": "e00b10889c27",
+          "reason": "过期下架",
+          "operator": "王志愿者",
+          "timestamp": "2026-05-11T15:51:13.066166"
+        }
+      }
+    },
+    {
+      "id": "536cd3d948de",
+      "type": "replenish_offline",
+      "timestamp": "2026-05-11T15:51:13.066201",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_offline_cdac62c10fbe_5_李志愿者",
+        "replenish_record": {
+          "id": "84640471a293",
+          "inventory_id": "cdac62c10fbe",
+          "medicine_id": "e00b10889c27",
+          "quantity": 5,
+          "source": "补回",
+          "volunteer": "李志愿者",
+          "timestamp": "2026-05-11T15:51:13.066196"
+        }
+      }
+    },
+    {
+      "id": "f1e44e11bb44",
+      "type": "offline",
+      "timestamp": "2026-05-11T15:51:13.066226",
+      "operator": "system",
+      "details": {
+        "signature": "offline_cdac62c10fbe_再次检查下架_20260511",
+        "offline_record": {
+          "id": "0740777de29e",
+          "inventory_id": "cdac62c10fbe",
+          "medicine_id": "e00b10889c27",
+          "reason": "再次检查下架",
+          "operator": "赵志愿者",
+          "timestamp": "2026-05-11T15:51:13.066222"
+        }
+      }
+    },
+    {
+      "id": "67ab5f1f2341",
+      "type": "replenish_offline",
+      "timestamp": "2026-05-11T15:51:13.066237",
+      "operator": "system",
+      "details": {
+        "signature": "replenish_offline_cdac62c10fbe_2_张志愿者",
+        "replenish_record": {
+          "id": "da9669fe460f",
+          "inventory_id": "cdac62c10fbe",
+          "medicine_id": "e00b10889c27",
+          "quantity": 2,
+          "source": "补回",
+          "volunteer": "张志愿者",
+          "timestamp": "2026-05-11T15:51:13.066233"
+        }
+      }
+    }
+  ]
+}
