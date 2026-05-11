@@ -1,0 +1,196 @@
+{
+  "exportDate": "2026-05-11T07:31:50.365Z",
+  "summary": {
+    "orderCount": 5,
+    "paymentCount": 7,
+    "invoiceCount": 7,
+    "orderAmount": 320000,
+    "paymentAmount": 330000,
+    "invoiceAmount": 310000,
+    "redInvoiceAmount": 85000,
+    "netInvoiceAmount": 225000,
+    "unopenedAmount": 105000,
+    "issueCount": 5
+  },
+  "customers": [
+    {
+      "customer": "华为技术有限公司",
+      "orderCount": 2,
+      "orderAmount": 130000,
+      "paymentAmount": 130000,
+      "invoiceAmount": 100000,
+      "redInvoiceAmount": 5000,
+      "netInvoiceAmount": 95000,
+      "unopenedAmount": 35000,
+      "hasIssue": false,
+      "orders": [
+        {
+          "orderId": "ORD-2026-001",
+          "orderDate": "2026-04-01",
+          "orderAmount": 100000,
+          "paymentAmount": 100000,
+          "invoiceAmount": 100000,
+          "redInvoiceAmount": 5000,
+          "netInvoiceAmount": 95000,
+          "unopenedAmount": 5000,
+          "hasIssue": false
+        },
+        {
+          "orderId": "ORD-2026-004",
+          "orderDate": "2026-04-15",
+          "orderAmount": 30000,
+          "paymentAmount": 30000,
+          "invoiceAmount": 0,
+          "redInvoiceAmount": 0,
+          "netInvoiceAmount": 0,
+          "unopenedAmount": 30000,
+          "hasIssue": false
+        }
+      ]
+    },
+    {
+      "customer": "阿里巴巴集团",
+      "orderCount": 1,
+      "orderAmount": 50000,
+      "paymentAmount": 50000,
+      "invoiceAmount": 30000,
+      "redInvoiceAmount": 0,
+      "netInvoiceAmount": 30000,
+      "unopenedAmount": 20000,
+      "hasIssue": false,
+      "orders": [
+        {
+          "orderId": "ORD-2026-002",
+          "orderDate": "2026-04-05",
+          "orderAmount": 50000,
+          "paymentAmount": 50000,
+          "invoiceAmount": 30000,
+          "redInvoiceAmount": 0,
+          "netInvoiceAmount": 30000,
+          "unopenedAmount": 20000,
+          "hasIssue": false
+        }
+      ]
+    },
+    {
+      "customer": "腾讯科技",
+      "orderCount": 1,
+      "orderAmount": 80000,
+      "paymentAmount": 80000,
+      "invoiceAmount": 80000,
+      "redInvoiceAmount": 80000,
+      "netInvoiceAmount": 0,
+      "unopenedAmount": 80000,
+      "hasIssue": false,
+      "orders": [
+        {
+          "orderId": "ORD-2026-003",
+          "orderDate": "2026-04-10",
+          "orderAmount": 80000,
+          "paymentAmount": 80000,
+          "invoiceAmount": 80000,
+          "redInvoiceAmount": 80000,
+          "netInvoiceAmount": 0,
+          "unopenedAmount": 80000,
+          "hasIssue": false
+        }
+      ]
+    },
+    {
+      "customer": "百度在线",
+      "orderCount": 1,
+      "orderAmount": 60000,
+      "paymentAmount": 60000,
+      "invoiceAmount": 100000,
+      "redInvoiceAmount": 0,
+      "netInvoiceAmount": 100000,
+      "unopenedAmount": -40000,
+      "hasIssue": true,
+      "orders": [
+        {
+          "orderId": "ORD-2026-005",
+          "orderDate": "2026-04-20",
+          "orderAmount": 60000,
+          "paymentAmount": 60000,
+          "invoiceAmount": 100000,
+          "redInvoiceAmount": 0,
+          "netInvoiceAmount": 100000,
+          "unopenedAmount": -40000,
+          "hasIssue": true
+        }
+      ]
+    },
+    {
+      "customer": "测试公司",
+      "orderCount": 1,
+      "orderAmount": 0,
+      "paymentAmount": 10000,
+      "invoiceAmount": 0,
+      "redInvoiceAmount": 0,
+      "netInvoiceAmount": 0,
+      "unopenedAmount": 10000,
+      "hasIssue": true,
+      "orders": [
+        {
+          "orderId": "ORD-2026-999",
+          "orderDate": "",
+          "orderAmount": 0,
+          "paymentAmount": 10000,
+          "invoiceAmount": 0,
+          "redInvoiceAmount": 0,
+          "netInvoiceAmount": 0,
+          "unopenedAmount": 10000,
+          "hasIssue": true
+        }
+      ]
+    }
+  ],
+  "issues": [
+    {
+      "type": "MISSING_ORDER_ID",
+      "severity": "high",
+      "category": "收款",
+      "message": "收款记录缺少订单号: 收款号=PAY-006, 客户=未知客户, 金额=5000",
+      "key": "payment-missing-PAY-006-2026-04-25-5000"
+    },
+    {
+      "type": "MISSING_ORDER_ID",
+      "severity": "high",
+      "category": "发票",
+      "message": "发票记录缺少订单号: 发票号=INV-2026-006, 客户=未知客户, 金额=2000",
+      "key": "invoice-missing-INV-2026-006"
+    },
+    {
+      "type": "INVOICE_EXCEEDS_PAYMENT",
+      "severity": "high",
+      "category": "发票",
+      "message": "订单 ORD-2026-005 开票金额(100000.00) 大于收款金额(60000.00)，超额 40000.00",
+      "key": "invoice-exceeds-ORD-2026-005"
+    },
+    {
+      "type": "RED_INVOICE_NO_ORIGINAL",
+      "severity": "medium",
+      "category": "红冲",
+      "message": "红冲发票 INV-2026-007 找不到原发票 INV-NOT-EXIST",
+      "key": "red-no-original-INV-2026-007"
+    },
+    {
+      "type": "ORDER_NOT_FOUND",
+      "severity": "medium",
+      "category": "订单",
+      "message": "收款记录关联的订单 ORD-2026-999 在订单表中不存在",
+      "key": "order-not-found-ORD-2026-999-payment"
+    }
+  ],
+  "notes": {
+    "invoice-exceeds-ORD-2026-005": {
+      "text": "预开发票，客户下月付款后核销",
+      "createdAt": "2026-05-11T07:31:50.307Z"
+    }
+  },
+  "importedFiles": [
+    "/Users/mac/pro/solo/workspaces/xy10402/sample-data/orders.csv",
+    "/Users/mac/pro/solo/workspaces/xy10402/sample-data/payments.csv",
+    "/Users/mac/pro/solo/workspaces/xy10402/sample-data/invoices.csv"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "invoice-gap-cli",
+  "version": "1.0.0",
+  "description": "月结发票缺口 CLI - 订单、收款、发票三表核对工具",
+  "main": "src/index.js",
+  "bin": {
+    "invoice-gap": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "invoice",
+    "finance",
+    "reconciliation",
+    "monthly-close"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "chalk": "^4.1.2"
+  }
+}

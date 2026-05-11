@@ -1,0 +1,6 @@
+﻿"问题类型","严重程度","类别","问题描述","问题标识","人工说明","说明日期"
+"MISSING_ORDER_ID","high","收款","收款记录缺少订单号: 收款号=PAY-006, 客户=未知客户, 金额=5000","payment-missing-PAY-006-2026-04-25-5000","",""
+"MISSING_ORDER_ID","high","发票","发票记录缺少订单号: 发票号=INV-2026-006, 客户=未知客户, 金额=2000","invoice-missing-INV-2026-006","",""
+"INVOICE_EXCEEDS_PAYMENT","high","发票","订单 ORD-2026-005 开票金额(100000.00) 大于收款金额(60000.00)，超额 40000.00","invoice-exceeds-ORD-2026-005","预开发票，客户下月付款后核销","2026-05-11T07:31:50.307Z"
+"RED_INVOICE_NO_ORIGINAL","medium","红冲","红冲发票 INV-2026-007 找不到原发票 INV-NOT-EXIST","red-no-original-INV-2026-007","",""
+"ORDER_NOT_FOUND","medium","订单","收款记录关联的订单 ORD-2026-999 在订单表中不存在","order-not-found-ORD-2026-999-payment","",""
