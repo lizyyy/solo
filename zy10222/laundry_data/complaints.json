@@ -1,0 +1,67 @@
+{
+  "C-001": {
+    "complaint_id": "C-001",
+    "receipt_id": "R-001",
+    "garment_id": "",
+    "customer_name": "张三",
+    "complaint_type": "错领",
+    "description": "我的黑色外套被错领了，有兜帽",
+    "claim_time": "2026-05-11 10:00:00",
+    "status": "rejected",
+    "resolution_notes": " 在衣物 G-002 争议中败诉，衣物已判给投诉 C-002。",
+    "created_at": "2026-05-11 15:22:36",
+    "updated_at": "2026-05-11 15:22:59"
+  },
+  "C-002": {
+    "complaint_id": "C-002",
+    "receipt_id": "R-002",
+    "garment_id": "G-002",
+    "customer_name": "李四",
+    "complaint_type": "错领",
+    "description": "我的黑色立领外套不见了",
+    "claim_time": "2026-05-11 11:30:00",
+    "status": "closed",
+    "resolution_notes": " 在衣物 G-002 争议中胜出。 已赔付 300.0 元，补偿券 100.0 元。",
+    "created_at": "2026-05-11 15:22:36",
+    "updated_at": "2026-05-11 15:23:11"
+  },
+  "C-003": {
+    "complaint_id": "C-003",
+    "receipt_id": "R-003",
+    "garment_id": "G-003",
+    "customer_name": "王五",
+    "complaint_type": "洗坏",
+    "description": "我的白色条纹衬衫被洗坏了",
+    "claim_time": "2026-05-11 13:00:00",
+    "status": "closed",
+    "resolution_notes": " 已赔付 200.0 元，补偿券 50.0 元。",
+    "created_at": "2026-05-11 15:22:36",
+    "updated_at": "2026-05-11 15:23:20"
+  },
+  "C-004": {
+    "complaint_id": "C-004",
+    "receipt_id": "R-001",
+    "garment_id": "G-001",
+    "customer_name": "张三",
+    "complaint_type": "错领",
+    "description": "我的黑色Nike外套有兜帽不见了",
+    "claim_time": "2026-05-11 14:00:00",
+    "status": "closed",
+    "created_at": "2026-05-11 15:28:10",
+    "resolution_notes": "在衣物 G-001 争议中胜出。 已赔付 300.0 元，补偿券 100.0 元。",
+    "updated_at": "2026-05-11 15:28:58"
+  },
+  "C-005": {
+    "complaint_id": "C-005",
+    "receipt_id": "R-002",
+    "garment_id": "G-001",
+    "customer_name": "李四",
+    "complaint_type": "错领",
+    "description": "我有一件黑色外套有兜帽也找不到了",
+    "claim_time": "2026-05-11 14:30:00",
+    "status": "rejected",
+    "created_at": "2026-05-11 15:28:10",
+    "resolution_notes": "在衣物 G-001 争议中败诉，衣物已判给投诉 C-004。",
+    "updated_at": "2026-05-11 15:28:34"
+  }
+}
