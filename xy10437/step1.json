@@ -1,0 +1,249 @@
+{
+  "persons": [
+    {
+      "id": "P001",
+      "name": "小明",
+      "id_card": "110101202001011234",
+      "birth_date": "2020-01-01",
+      "gender": "男",
+      "phone": "13800138001"
+    },
+    {
+      "id": "P002",
+      "name": "小红",
+      "id_card": "110101202106152345",
+      "birth_date": "2021-06-15",
+      "gender": "女",
+      "phone": "13800138002"
+    },
+    {
+      "id": "P003",
+      "name": "小刚",
+      "id_card": "110101201903203456",
+      "birth_date": "2019-03-20",
+      "gender": "男",
+      "phone": "13800138003"
+    },
+    {
+      "id": "P004",
+      "name": "王女士",
+      "id_card": "110101198505104567",
+      "birth_date": "1985-05-10",
+      "gender": "女",
+      "phone": "13900139001"
+    },
+    {
+      "id": "P005",
+      "name": "李先生",
+      "id_card": "110101198008205678",
+      "birth_date": "1980-08-20",
+      "gender": "男",
+      "phone": "13900139002"
+    },
+    {
+      "id": "P006",
+      "name": "张女士",
+      "id_card": "110101199003156789",
+      "birth_date": "1990-03-15",
+      "gender": "女",
+      "phone": "13900139003"
+    },
+    {
+      "id": "P007",
+      "name": "小宝宝",
+      "id_card": "110101202412017890",
+      "birth_date": "2024-12-01",
+      "gender": "男",
+      "phone": "13900139004"
+    }
+  ],
+  "vaccine_batches": [
+    {
+      "id": "B001",
+      "vaccine_name": "麻腮风疫苗",
+      "vaccine_type": "儿童疫苗",
+      "min_age_months": 96,
+      "max_age_months": 144,
+      "total_doses": 2,
+      "intervals_days": [
+        365
+      ],
+      "available_slots": 1,
+      "date": "2026-05-11"
+    },
+    {
+      "id": "B002",
+      "vaccine_name": "水痘疫苗",
+      "vaccine_type": "儿童疫苗",
+      "min_age_months": 12,
+      "max_age_months": 144,
+      "total_doses": 2,
+      "intervals_days": [
+        90
+      ],
+      "available_slots": 0,
+      "date": "2026-05-11"
+    },
+    {
+      "id": "B003",
+      "vaccine_name": "新冠疫苗",
+      "vaccine_type": "成人加强针",
+      "min_age_months": 216,
+      "max_age_months": 1200,
+      "total_doses": 1,
+      "intervals_days": [],
+      "available_slots": 0,
+      "date": "2026-05-11"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "A001",
+      "person_id": "P001",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "appointment_date": "2026-05-11",
+      "status": "cancelled",
+      "cancelled_at": "2026-05-11",
+      "cancellation_id": "CANCEL-001"
+    },
+    {
+      "id": "A002",
+      "person_id": "P004",
+      "vaccine_batch_id": "B003",
+      "dose_number": 1,
+      "appointment_date": "2026-05-11",
+      "status": "booked",
+      "cancelled_at": null,
+      "cancellation_id": null
+    }
+  ],
+  "waiting_list": [
+    {
+      "id": "W001",
+      "person_id": "P002",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "status": "rejected",
+      "priority": 1,
+      "notified_at": null,
+      "confirmed_at": null,
+      "rejected_at": "2026-05-11",
+      "rejection_reason": "年龄不符合要求: 实际 48 个月, 要求 96-144 个月",
+      "created_at": "2026-05-06",
+      "appointment_id": null
+    },
+    {
+      "id": "W002",
+      "person_id": "P003",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "status": "rejected",
+      "priority": 0,
+      "notified_at": null,
+      "confirmed_at": null,
+      "rejected_at": "2026-05-11",
+      "rejection_reason": "年龄不符合要求: 实际 84 个月, 要求 96-144 个月",
+      "created_at": "2026-05-08",
+      "appointment_id": null
+    },
+    {
+      "id": "W003",
+      "person_id": "P005",
+      "vaccine_batch_id": "B003",
+      "dose_number": 1,
+      "status": "pending",
+      "priority": 1,
+      "notified_at": null,
+      "confirmed_at": null,
+      "rejected_at": null,
+      "rejection_reason": null,
+      "created_at": "2026-05-04",
+      "appointment_id": null
+    },
+    {
+      "id": "W004",
+      "person_id": "P006",
+      "vaccine_batch_id": "B003",
+      "dose_number": 1,
+      "status": "pending",
+      "priority": 0,
+      "notified_at": null,
+      "confirmed_at": null,
+      "rejected_at": null,
+      "rejection_reason": null,
+      "created_at": "2026-05-09",
+      "appointment_id": null
+    },
+    {
+      "id": "W005",
+      "person_id": "P007",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "status": "rejected",
+      "priority": 0,
+      "notified_at": null,
+      "confirmed_at": null,
+      "rejected_at": "2026-05-11",
+      "rejection_reason": "年龄不符合要求: 实际 12 个月, 要求 96-144 个月",
+      "created_at": "2026-05-10",
+      "appointment_id": null
+    }
+  ],
+  "notification_records": [
+    {
+      "id": "NOTIFY-87d204ab",
+      "waiting_list_entry_id": "W001",
+      "person_id": "P002",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "notification_time": "2026-05-11",
+      "order": 1
+    },
+    {
+      "id": "NOTIFY-b5cac070",
+      "waiting_list_entry_id": "W002",
+      "person_id": "P003",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "notification_time": "2026-05-11",
+      "order": 2
+    },
+    {
+      "id": "NOTIFY-2a7fa557",
+      "waiting_list_entry_id": "W005",
+      "person_id": "P007",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "notification_time": "2026-05-11",
+      "order": 3
+    }
+  ],
+  "promoted_entries": [],
+  "rejection_reasons": [
+    {
+      "waiting_list_entry_id": "W001",
+      "person_id": "P002",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "reason": "年龄不符合要求: 实际 48 个月, 要求 96-144 个月",
+      "check_time": "2026-05-11"
+    },
+    {
+      "waiting_list_entry_id": "W002",
+      "person_id": "P003",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "reason": "年龄不符合要求: 实际 84 个月, 要求 96-144 个月",
+      "check_time": "2026-05-11"
+    },
+    {
+      "waiting_list_entry_id": "W005",
+      "person_id": "P007",
+      "vaccine_batch_id": "B001",
+      "dose_number": 1,
+      "reason": "年龄不符合要求: 实际 12 个月, 要求 96-144 个月",
+      "check_time": "2026-05-11"
+    }
+  ]
+}
