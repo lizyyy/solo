@@ -70,30 +70,33 @@ function checkBasicValidity(records, type) {
 }
 
 function runAllChecks() {
-  const issues = [];
+  const errors = [];
+  const warnings = [];
   
   const deliveries = storage.getAllData(TYPES.DELIVERY).all;
   const returns = storage.getAllData(TYPES.RETURN).all;
   const refunds = storage.getAllData(TYPES.REFUND).all;
   const histories = storage.getAllData(TYPES.HISTORY).all;
   
-  issues.push(...checkBasicValidity(deliveries, TYPES.DELIVERY) || []);
-  issues.push(...checkBasicValidity(returns, TYPES.RETURN) || []);
-  issues.push(...checkBasicValidity(refunds, TYPES.REFUND) || []);
-  issues.push(...checkBasicValidity(histories, TYPES.HISTORY) || []);
+  errors.push(...checkBasicValidity(deliveries, TYPES.DELIVERY) || []);
+  errors.push(...checkBasicValidity(returns, TYPES.RETURN) || []);
+  errors.push(...checkBasicValidity(refunds, TYPES.REFUND) || []);
+  errors.push(...checkBasicValidity(histories, TYPES.HISTORY) || []);
   
-  issues.push(...checkReturnVsDelivery(deliveries, returns));
-  issues.push(...checkRefundVsBuckets(deliveries, returns, refunds, histories));
-  issues.push(...checkDeliveryPersonDiscrepancy(deliveries, returns));
+  errors.push(...checkReturnVsDelivery(deliveries, returns, histories));
+  errors.push(...checkRefundVsBuckets(deliveries, returns, refunds, histories));
   
-  return issues;
+  warnings.push(...checkDeliveryPersonDiscrepancy(deliveries, returns));
+  
+  return { errors, warnings, all: [...errors, ...warnings] };
 }
 
-function checkReturnVsDelivery(deliveries, returns) {
+function checkReturnVsDelivery(deliveries, returns, histories) {
   const issues = [];
   
   const customerDeliveryBuckets = {};
   const customerReturnBuckets = {};
+  const customerHistoryBuckets = {};
   
   deliveries.forEach(d => {
     const key = `${d.customer}-${d.phone || ''}`;
@@ -105,18 +108,33 @@ function checkReturnVsDelivery(deliveries, returns) {
     customerReturnBuckets[key] = (customerReturnBuckets[key] || 0) + r.bucketCount;
   });
   
-  Object.keys(customerReturnBuckets).forEach(key => {
+  histories.forEach(h => {
+    const key = `${h.customer}-${h.phone || ''}`;
+    customerHistoryBuckets[key] = (customerHistoryBuckets[key] || 0) + h.owedBuckets;
+  });
+  
+  const allCustomers = new Set([
+    ...Object.keys(customerDeliveryBuckets),
+    ...Object.keys(customerReturnBuckets),
+    ...Object.keys(customerHistoryBuckets)
+  ]);
+  
+  allCustomers.forEach(key => {
     const returned = customerReturnBuckets[key] || 0;
     const delivered = customerDeliveryBuckets[key] || 0;
+    const historyOwed = customerHistoryBuckets[key] || 0;
+    const totalAvailable = delivered + historyOwed;
     
-    if (returned > delivered) {
+    if (returned > totalAvailable) {
       issues.push({
         type: 'OVER_RETURN',
-        message: '回收桶数大于配送桶数',
+        message: '回收桶数大于配送+历史欠桶总数',
         customer: key.split('-')[0],
         delivered,
+        historyOwed,
+        totalAvailable,
         returned,
-        excess: returned - delivered
+        excess: returned - totalAvailable
       });
     }
   });
@@ -127,24 +145,24 @@ function checkReturnVsDelivery(deliveries, returns) {
 function checkRefundVsBuckets(deliveries, returns, refunds, histories) {
   const issues = [];
   
-  const customerNetBuckets = {};
-  const customerRefundedBuckets = {};
+  const customerDeliveryBuckets = {};
+  const customerReturnBuckets = {};
   const customerHistoryBuckets = {};
+  const customerRefundedBuckets = {};
   
   deliveries.forEach(d => {
     const key = `${d.customer}-${d.phone || ''}`;
-    customerNetBuckets[key] = (customerNetBuckets[key] || 0) + d.bucketCount;
+    customerDeliveryBuckets[key] = (customerDeliveryBuckets[key] || 0) + d.bucketCount;
   });
   
   returns.forEach(r => {
     const key = `${r.customer}-${r.phone || ''}`;
-    customerNetBuckets[key] = (customerNetBuckets[key] || 0) - r.bucketCount;
+    customerReturnBuckets[key] = (customerReturnBuckets[key] || 0) + r.bucketCount;
   });
   
   histories.forEach(h => {
     const key = `${h.customer}-${h.phone || ''}`;
     customerHistoryBuckets[key] = (customerHistoryBuckets[key] || 0) + h.owedBuckets;
-    customerNetBuckets[key] = (customerNetBuckets[key] || 0) + h.owedBuckets;
   });
   
   refunds.forEach(r => {
@@ -153,17 +171,23 @@ function checkRefundVsBuckets(deliveries, returns, refunds, histories) {
   });
   
   Object.keys(customerRefundedBuckets).forEach(key => {
-    const netBuckets = customerNetBuckets[key] || 0;
+    const delivered = customerDeliveryBuckets[key] || 0;
+    const returned = customerReturnBuckets[key] || 0;
+    const historyOwed = customerHistoryBuckets[key] || 0;
     const refunded = customerRefundedBuckets[key] || 0;
     
-    if (refunded > netBuckets) {
+    const netOwed = delivered + historyOwed - returned;
+    
+    if (refunded > 0 && netOwed > 0) {
       issues.push({
         type: 'REFUND_WITHOUT_BUCKETS',
         message: '客户退押金但仍欠桶',
         customer: key.split('-')[0],
-        netBuckets,
-        refunded,
-        stillOwed: refunded - netBuckets
+        delivered,
+        historyOwed,
+        returned,
+        netOwed,
+        refunded
       });
     }
   });

@@ -1,0 +1,47 @@
+[
+  {
+    "type": "refund",
+    "id": "REF20260506001",
+    "refundNo": "REF20260506001",
+    "customer": "张三",
+    "phone": "13800000001",
+    "refundAmount": 80,
+    "bucketCount": 2,
+    "applicant": "张三",
+    "refundDate": "2026-05-06",
+    "relatedReturnNo": "",
+    "status": "pending",
+    "notes": "",
+    "importedAt": "2026-05-11T06:42:55.994Z"
+  },
+  {
+    "type": "refund",
+    "id": "REF20260507001",
+    "refundNo": "REF20260507001",
+    "customer": "李四",
+    "phone": "13800000002",
+    "refundAmount": 120,
+    "bucketCount": 3,
+    "applicant": "李四",
+    "refundDate": "2026-05-07",
+    "relatedReturnNo": "",
+    "status": "pending",
+    "notes": "",
+    "importedAt": "2026-05-11T06:42:55.994Z"
+  },
+  {
+    "type": "refund",
+    "id": "REF20260508001",
+    "refundNo": "REF20260508001",
+    "customer": "王五",
+    "phone": "13800000003",
+    "refundAmount": 200,
+    "bucketCount": 5,
+    "applicant": "王五",
+    "refundDate": "2026-05-08",
+    "relatedReturnNo": "",
+    "status": "pending",
+    "notes": "",
+    "importedAt": "2026-05-11T06:42:55.994Z"
+  }
+]

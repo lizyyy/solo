@@ -32,11 +32,18 @@ module.exports = {
     const { type, force, yes } = argv;
     
     if (!force) {
-      const issues = validator.runAllChecks();
-      if (issues.length > 0) {
-        console.error(chalk.red(`\n❌ 发现 ${issues.length} 个异常，无法确认入账`));
+      const result = validator.runAllChecks();
+      if (result.errors.length > 0) {
+        console.error(chalk.red(`\n❌ 发现 ${result.errors.length} 个错误，无法确认入账`));
+        if (result.warnings.length > 0) {
+          console.error(chalk.yellow(`   (还有 ${result.warnings.length} 个警告，不影响确认)`));
+        }
         console.error(chalk.gray('💡 请先运行 \'water-deposit check\' 查看详情，或使用 --force 强制确认'));
         process.exit(1);
+      }
+      if (result.warnings.length > 0) {
+        console.log(chalk.yellow(`⚠️  注意: 发现 ${result.warnings.length} 个警告（配送员差异等），但不影响确认`));
+        console.log(chalk.gray('   这些信息会在报表中展示'));
       }
     } else {
       console.log(chalk.yellow('⚠️  警告: 跳过异常检查，请确保数据正确！'));
