@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>牙科复诊提醒台</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f0f4f8; }
+    .app { min-height: 100vh; }
+    
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    
+    .nav { background: white; padding: 0 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .nav-item { display: inline-block; padding: 15px 25px; cursor: pointer; color: #666; font-weight: 500; border-bottom: 3px solid transparent; }
+    .nav-item:hover { color: #667eea; }
+    .nav-item.active { color: #667eea; border-bottom-color: #667eea; }
+    
+    .container { padding: 30px 40px; }
+    
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); padding: 25px; margin-bottom: 25px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+    .card-title { font-size: 18px; color: #333; font-weight: 600; }
+    
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.3s; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102,126,234,0.4); }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    
+    .table { width: 100%; border-collapse: collapse; }
+    .table th, .table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+    .table th { background: #f8fafc; color: #666; font-weight: 600; font-size: 13px; }
+    .table tr:hover { background: #f8fafc; }
+    
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-scheduled { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-cancelled { background: #e5e7eb; color: #4b5563; }
+    .status-no_show { background: #fee2e2; color: #991b1b; }
+    
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; margin-bottom: 6px; color: #374151; font-weight: 500; font-size: 14px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+    
+    .grid { display: grid; gap: 20px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+    .stat-card .stat-number { font-size: 32px; font-weight: 700; color: #333; }
+    .stat-card .stat-label { color: #666; font-size: 14px; margin-top: 5px; }
+    
+    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; border-radius: 16px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px 25px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 18px; font-weight: 600; color: #333; }
+    .modal-body { padding: 25px; }
+    .modal-footer { padding: 15px 25px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+    .timeline-item { position: relative; padding-bottom: 25px; }
+    .timeline-item::before { content: ''; position: absolute; left: -28px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #667eea; }
+    .timeline-item.completed::before { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+    .timeline-item.no_show::before { background: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
+    .timeline-date { font-size: 13px; color: #666; margin-bottom: 5px; }
+    .timeline-title { font-weight: 600; color: #333; }
+    .timeline-desc { font-size: 13px; color: #666; margin-top: 3px; }
+    
+    .doctor-schedule { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
+    .time-slot { display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; background: #f8fafc; }
+    .time-slot.booked { background: #dbeafe; border-left: 4px solid #667eea; }
+    .time-slot .time { width: 80px; font-weight: 600; color: #374151; }
+    .time-slot .info { flex: 1; }
+    
+    .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 15px; }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    
+    .patient-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+    .patient-card:hover { border-color: #667eea; cursor: pointer; }
+    .patient-card.selected { border-color: #667eea; background: #f5f3ff; }
+    .patient-name { font-weight: 600; font-size: 16px; }
+    .patient-info { font-size: 13px; color: #666; margin-top: 5px; }
+    .next-appointment { margin-top: 10px; padding: 8px 12px; background: #fef3c7; border-radius: 6px; font-size: 13px; color: #92400e; }
+    .next-appointment strong { display: block; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <h1>🦷 牙科复诊提醒台</h1>
+      <p>智能管理患者复诊，确保治疗顺利完成</p>
+    </div>
+    
+    <div class="nav">
+      <div class="nav-item" :class="{ active: currentTab === 'dashboard' }" @click="currentTab = 'dashboard'">仪表盘</div>
+      <div class="nav-item" :class="{ active: currentTab === 'patients' }" @click="currentTab = 'patients'">患者管理</div>
+      <div class="nav-item" :class="{ active: currentTab === 'appointments' }" @click="currentTab = 'appointments'">预约管理</div>
+      <div class="nav-item" :class="{ active: currentTab === 'schedule' }" @click="currentTab = 'schedule'">医生日程</div>
+      <div class="nav-item" :class="{ active: currentTab === 'noShows' }" @click="currentTab = 'noShows'">爽约统计</div>
+    </div>
+    
+    <div class="container">
+      <div v-if="currentTab === 'dashboard'">
+        <div class="grid grid-4" style="margin-bottom: 25px;">
+          <div class="stat-card">
+            <div class="stat-number" style="color: #667eea">{{ stats.totalPatients }}</div>
+            <div class="stat-label">总患者数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" style="color: #10b981">{{ stats.upcomingAppointments }}</div>
+            <div class="stat-label">待提醒预约</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" style="color: #f59e0b">{{ stats.todayAppointments }}</div>
+            <div class="stat-label">今日预约</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" style="color: #ef4444">{{ stats.totalNoShows }}</div>
+            <div class="stat-label">总爽约次数</div>
+          </div>
+        </div>
+        
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 待提醒列表（未来3天）</div>
+            </div>
+            <div v-if="upcomingReminders.length === 0">
+              <p style="color: #666; text-align: center; padding: 40px;">暂无待提醒的预约</p>
+            </div>
+            <div v-else>
+              <div v-for="reminder in upcomingReminders" :key="reminder.id" class="patient-card">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <div class="patient-name">{{ reminder.patient_name }}</div>
+                    <div class="patient-info">{{ reminder.doctor_name }} · {{ reminder.appointment_date }} {{ reminder.appointment_time }}</div>
+                    <div class="patient-info" style="margin-top: 3px;">{{ reminder.stage_name || '复诊' }}</div>
+                  </div>
+                  <span class="status-badge status-scheduled">待就诊</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔔 快速操作</div>
+            </div>
+            <div style="display: grid; gap: 15px;">
+              <button class="btn btn-primary" style="width: 100%; padding: 15px;" @click="openNewAppointmentModal">➕ 新建复诊预约</button>
+              <button class="btn btn-success" style="width: 100%; padding: 15px;" @click="openNewPatientModal">👤 新增患者</button>
+              <button class="btn btn-warning" style="width: 100%; padding: 15px;" @click="exportAppointments">📥 导出复诊计划</button>
+              <button class="btn btn-secondary" style="width: 100%; padding: 15px;" @click="openNewTreatmentPlanModal">📋 新增治疗计划</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div v-if="currentTab === 'patients'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 患者列表</div>
+            <button class="btn btn-primary" @click="openNewPatientModal">➕ 新增患者</button>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>电话</th>
+                <th>年龄</th>
+                <th>性别</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="patient in patients" :key="patient.id">
+                <td><strong>{{ patient.name }}</strong></td>
+                <td>{{ patient.phone || '-' }}</td>
+                <td>{{ patient.age || '-' }}</td>
+                <td>{{ patient.gender || '-' }}</td>
+                <td>
+                  <button class="btn btn-primary btn-sm" @click="viewPatientTimeline(patient)">查看时间线</button>
+                  <button class="btn btn-success btn-sm" style="margin-left: 5px;" @click="openNewAppointmentForPatient(patient)">预约</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div v-if="currentTab === 'appointments'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📅 预约列表</div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-warning" @click="exportAppointments">📥 导出</button>
+              <button class="btn btn-primary" @click="openNewAppointmentModal">➕ 新建预约</button>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>患者</th>
+                <th>医生</th>
+                <th>治疗类型</th>
+                <th>阶段</th>
+                <th>日期时间</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="appt in appointments" :key="appt.id">
+                <td>{{ appt.patient_name }}</td>
+                <td>{{ appt.doctor_name }}</td>
+                <td>{{ appt.treatment_name || appt.type }}</td>
+                <td>{{ appt.stage_name || '-' }}</td>
+                <td>{{ appt.appointment_date }} {{ appt.appointment_time }}</td>
+                <td>
+                  <span class="status-badge" :class="'status-' + appt.status">
+                    {{ getStatusText(appt.status) }}
+                  </span>
+                </td>
+                <td>
+                  <template v-if="appt.status === 'scheduled'">
+                    <button class="btn btn-success btn-sm" @click="completeAppointment(appt)">完成</button>
+                    <button class="btn btn-warning btn-sm" style="margin-left: 5px;" @click="openRescheduleModal(appt)">改期</button>
+                    <button class="btn btn-danger btn-sm" style="margin-left: 5px;" @click="markNoShow(appt)">爽约</button>
+                  </template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div v-if="currentTab === 'schedule'">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 医生日程</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+              <select class="form-select" style="width: auto;" v-model="selectedDoctor" @change="loadDoctorSchedule">
+                <option :value="null">选择医生</option>
+                <option v-for="doc in doctors" :key="doc.id" :value="doc.id">{{ doc.name }}</option>
+              </select>
+              <input type="date" class="form-input" style="width: auto;" v-model="scheduleDate" @change="loadDoctorSchedule">
+            </div>
+          </div>
+          
+          <div v-if="!selectedDoctor" style="text-align: center; padding: 50px; color: #666;">
+            请选择医生查看日程
+          </div>
+          
+          <div v-else>
+            <div v-if="doctorSchedule.length === 0" style="text-align: center; padding: 50px; color: #666;">
+              该医生当日暂无预约
+            </div>
+            <div v-else>
+              <div v-for="slot in doctorSchedule" :key="slot.id" class="time-slot booked">
+                <div class="time">{{ slot.appointment_time }}</div>
+                <div class="info">
+                  <div style="font-weight: 600;">{{ slot.patient_name }}</div>
+                  <div style="font-size: 13px; color: #666;">{{ slot.stage_name || '复诊' }} · {{ slot.patient_phone }}</div>
+                </div>
+                <span class="status-badge" :class="'status-' + slot.status">{{ getStatusText(slot.status) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div v-if="currentTab === 'noShows'">
+        <div class="grid grid-3" style="margin-bottom: 25px;">
+          <div class="stat-card">
+            <div class="stat-number" style="color: #ef4444">{{ noShowStats.totalNoShows }}</div>
+            <div class="stat-label">总爽约次数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" style="color: #f59e0b">{{ noShowStats.patientNoShows.length }}</div>
+            <div class="stat-label">爽约患者数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" style="color: #667eea">{{ pendingNoShows }}</div>
+            <div class="stat-label">待医生确认</div>
+          </div>
+        </div>
+        
+        <div class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📊 患者爽约排行</div>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>患者</th>
+                  <th>爽约次数</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="p in noShowStats.patientNoShows" :key="p.id">
+                  <td><strong>{{ p.name }}</strong></td>
+                  <td>{{ p.no_show_count }} 次</td>
+                  <td>
+                    <span v-if="p.no_show_count >= 2" class="status-badge status-no_show">需医生确认</span>
+                    <span v-else class="status-badge status-warning">提醒注意</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🕐 最近爽约记录</div>
+            </div>
+            <div v-if="noShowStats.recentNoShows.length === 0">
+              <p style="color: #666; text-align: center; padding: 40px;">暂无爽约记录</p>
+            </div>
+            <div v-else>
+              <div v-for="record in noShowStats.recentNoShows" :key="record.id" class="patient-card">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div>
+                    <div class="patient-name">{{ record.patient_name }}</div>
+                    <div class="patient-info">原预约: {{ record.appointment_date }} {{ record.appointment_time }}</div>
+                    <div v-if="record.receptionist_note" class="patient-info" style="margin-top: 3px;">前台备注: {{ record.receptionist_note }}</div>
+                  </div>
+                  <span class="status-badge" :class="record.status === 'pending' ? 'status-no_show' : 'status-completed'">
+                    {{ record.status === 'pending' ? '待确认' : '已确认' }}
+                  </span>
+                </div>
+                <div v-if="record.status === 'pending'" style="margin-top: 15px;">
+                  <button class="btn btn-success btn-sm" @click="confirmNoShow(record)">医生确认</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showPatientModal" class="modal" @click.self="showPatientModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">👤 新增患者</div>
+          <button class="close-btn" @click="showPatientModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">姓名 *</label>
+            <input type="text" class="form-input" v-model="newPatient.name" placeholder="请输入患者姓名">
+          </div>
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label class="form-label">电话</label>
+              <input type="text" class="form-input" v-model="newPatient.phone" placeholder="请输入电话">
+            </div>
+            <div class="form-group">
+              <label class="form-label">年龄</label>
+              <input type="number" class="form-input" v-model="newPatient.age" placeholder="请输入年龄">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">性别</label>
+            <select class="form-select" v-model="newPatient.gender">
+              <option value="">请选择</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">地址</label>
+            <input type="text" class="form-input" v-model="newPatient.address" placeholder="请输入地址">
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" v-model="newPatient.notes" placeholder="请输入备注"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showPatientModal = false">取消</button>
+          <button class="btn btn-primary" @click="savePatient">保存</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showTreatmentPlanModal" class="modal" @click.self="showTreatmentPlanModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📋 新增治疗计划</div>
+          <button class="close-btn" @click="showTreatmentPlanModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">患者 *</label>
+            <select class="form-select" v-model="newTreatmentPlan.patient_id">
+              <option :value="null">请选择患者</option>
+              <option v-for="p in patients" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">医生 *</label>
+            <select class="form-select" v-model="newTreatmentPlan.doctor_id">
+              <option :value="null">请选择医生</option>
+              <option v-for="d in doctors" :key="d.id" :value="d.id">{{ d.name }} - {{ d.specialization }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">治疗类型 *</label>
+            <select class="form-select" v-model="newTreatmentPlan.treatment_type">
+              <option value="">请选择治疗类型</option>
+              <option value="root_canal">根管治疗</option>
+              <option value="orthodontics">正畸治疗</option>
+              <option value="cleaning">洁牙复诊</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">开始日期 *</label>
+            <input type="date" class="form-input" v-model="newTreatmentPlan.start_date">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showTreatmentPlanModal = false">取消</button>
+          <button class="btn btn-primary" @click="saveTreatmentPlan">保存</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showAppointmentModal" class="modal" @click.self="showAppointmentModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">📅 新建复诊预约</div>
+          <button class="close-btn" @click="showAppointmentModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="appointmentErrors.length > 0" class="alert alert-error">
+            <div v-for="(error, i) in appointmentErrors" :key="i">❌ {{ error }}</div>
+          </div>
+          <div v-if="appointmentWarnings.length > 0" class="alert alert-warning">
+            <div v-for="(warning, i) in appointmentWarnings" :key="i">⚠️ {{ warning }}</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">患者 *</label>
+            <select class="form-select" v-model="newAppointment.patient_id" @change="loadPatientPlans">
+              <option :value="null">请选择患者</option>
+              <option v-for="p in patients" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">医生 *</label>
+            <select class="form-select" v-model="newAppointment.doctor_id">
+              <option :value="null">请选择医生</option>
+              <option v-for="d in doctors" :key="d.id" :value="d.id">{{ d.name }} - {{ d.specialization }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">关联治疗计划</label>
+            <select class="form-select" v-model="newAppointment.treatment_plan_id" @change="loadTreatmentStages">
+              <option :value="null">不关联治疗计划（普通复诊）</option>
+              <option v-for="plan in patientPlans" :key="plan.id" :value="plan.id">{{ plan.treatment_name }}</option>
+            </select>
+          </div>
+          <div v-if="newAppointment.treatment_plan_id" class="form-group">
+            <label class="form-label">治疗阶段</label>
+            <select class="form-select" v-model="newAppointment.treatment_stage">
+              <option :value="null">请选择阶段</option>
+              <option v-for="stage in availableStages" :key="stage.stage" :value="stage.stage">
+                {{ stage.name }}
+              </option>
+            </select>
+          </div>
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label class="form-label">预约日期 *</label>
+              <input type="date" class="form-input" v-model="newAppointment.appointment_date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">预约时间 *</label>
+              <input type="time" class="form-input" v-model="newAppointment.appointment_time">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">备注</label>
+            <textarea class="form-textarea" v-model="newAppointment.notes" placeholder="请输入备注"></textarea>
+          </div>
+          
+          <div v-if="appointmentRequiresConfirmation" class="alert alert-warning">
+            <p>该患者爽约次数过多，需要医生确认后方可预约。</p>
+            <div style="margin-top: 10px;">
+              <label style="display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" v-model="newAppointment.doctor_confirmed">
+                <span>医生已确认</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showAppointmentModal = false">取消</button>
+          <button class="btn btn-primary" @click="saveAppointment">保存</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showTimelineModal" class="modal" @click.self="showTimelineModal = false">
+      <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+          <div class="modal-title">📊 {{ selectedPatient?.name }} 的治疗时间线</div>
+          <button class="close-btn" @click="showTimelineModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div v-if="patientTimeline.length === 0" style="text-align: center; padding: 40px; color: #666;">
+            暂无治疗记录
+          </div>
+          <div v-else>
+            <div v-for="plan in patientTimeline" :key="plan.plan.id" style="margin-bottom: 30px;">
+              <h3 style="margin-bottom: 15px; color: #667eea;">{{ plan.treatmentName }} ({{ plan.plan.start_date }})</h3>
+              <div class="timeline">
+                <div v-for="appt in plan.appointments" :key="appt.id" class="timeline-item" :class="appt.status">
+                  <div class="timeline-date">{{ appt.appointment_date }} {{ appt.appointment_time }}</div>
+                  <div class="timeline-title">{{ appt.stage_name }} - {{ appt.doctor_name }}</div>
+                  <div class="timeline-desc">状态: {{ getStatusText(appt.status) }}</div>
+                  <div v-if="appt.notes" class="timeline-desc">备注: {{ appt.notes }}</div>
+                </div>
+              </div>
+              
+              <div v-if="plan.appointments.length > 0" class="next-appointment">
+                <strong>下一次应约时间：</strong>
+                {{ getNextAppointmentInfo(plan) }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" @click="showTimelineModal = false">关闭</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showRescheduleModal" class="modal" @click.self="showRescheduleModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">🔄 改期预约</div>
+          <button class="close-btn" @click="showRescheduleModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p style="margin-bottom: 15px; color: #666;">
+            原预约: {{ currentAppointment?.appointment_date }} {{ currentAppointment?.appointment_time }}
+          </p>
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label class="form-label">新日期 *</label>
+              <input type="date" class="form-input" v-model="rescheduleData.new_date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">新时间 *</label>
+              <input type="time" class="form-input" v-model="rescheduleData.new_time">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">改期原因</label>
+            <textarea class="form-textarea" v-model="rescheduleData.reason" placeholder="请输入改期原因"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showRescheduleModal = false">取消</button>
+          <button class="btn btn-primary" @click="rescheduleAppointment">确认改期</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showNoShowModal" class="modal" @click.self="showNoShowModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">🚫 标记爽约</div>
+          <button class="close-btn" @click="showNoShowModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p style="margin-bottom: 15px; color: #ef4444;">
+            ⚠️ 标记为爽约将影响患者后续预约资格（爽约2次以上需医生确认）
+          </p>
+          <div class="form-group">
+            <label class="form-label">前台备注</label>
+            <textarea class="form-textarea" v-model="noShowData.receptionist_note" placeholder="请输入爽约原因"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">医生确认（可选）</label>
+            <select class="form-select" v-model="noShowData.doctor_confirmed_by">
+              <option :value="null">待医生确认</option>
+              <option v-for="d in doctors" :key="d.id" :value="d.id">{{ d.name }}</option>
+            </select>
+          </div>
+          <div v-if="noShowData.doctor_confirmed_by" class="form-group">
+            <label class="form-label">医生意见</label>
+            <textarea class="form-textarea" v-model="noShowData.doctor_confirmation" placeholder="请输入医生意见"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showNoShowModal = false">取消</button>
+          <button class="btn btn-danger" @click="confirmNoShowAppointment">确认标记</button>
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="showConfirmNoShowModal" class="modal" @click.self="showConfirmNoShowModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">✅ 医生确认爽约</div>
+          <button class="close-btn" @click="showConfirmNoShowModal = false">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">确认医生 *</label>
+            <select class="form-select" v-model="confirmNoShowData.doctor_confirmed_by">
+              <option :value="null">请选择医生</option>
+              <option v-for="d in doctors" :key="d.id" :value="d.id">{{ d.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">医生意见 *</label>
+            <textarea class="form-textarea" v-model="confirmNoShowData.doctor_confirmation" placeholder="请输入医生意见"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showConfirmNoShowModal = false">取消</button>
+          <button class="btn btn-success" @click="submitNoShowConfirmation">确认</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+    
+    createApp({
+      data() {
+        return {
+          currentTab: 'dashboard',
+          patients: [],
+          doctors: [],
+          appointments: [],
+          upcomingReminders: [],
+          treatmentPlans: [],
+          noShowStats: { totalNoShows: 0, patientNoShows: [], recentNoShows: [] },
+          doctorSchedule: [],
+          patientTimeline: [],
+          patientPlans: [],
+          availableStages: [],
+          
+          selectedDoctor: null,
+          scheduleDate: new Date().toISOString().split('T')[0],
+          selectedPatient: null,
+          currentAppointment: null,
+          
+          showPatientModal: false,
+          showTreatmentPlanModal: false,
+          showAppointmentModal: false,
+          showTimelineModal: false,
+          showRescheduleModal: false,
+          showNoShowModal: false,
+          showConfirmNoShowModal: false,
+          
+          newPatient: { name: '', phone: '', age: null, gender: '', address: '', notes: '' },
+          newTreatmentPlan: { patient_id: null, doctor_id: null, treatment_type: '', start_date: new Date().toISOString().split('T')[0] },
+          newAppointment: { patient_id: null, doctor_id: null, treatment_plan_id: null, treatment_stage: null, appointment_date: '', appointment_time: '', notes: '', doctor_confirmed: false },
+          rescheduleData: { new_date: '', new_time: '', reason: '' },
+          noShowData: { receptionist_note: '', doctor_confirmed_by: null, doctor_confirmation: '' },
+          confirmNoShowData: { id: null, doctor_confirmed_by: null, doctor_confirmation: '' },
+          
+          appointmentErrors: [],
+          appointmentWarnings: [],
+          appointmentRequiresConfirmation: false
+        };
+      },
+      computed: {
+        stats() {
+          const today = new Date().toISOString().split('T')[0];
+          return {
+            totalPatients: this.patients.length,
+            upcomingAppointments: this.upcomingReminders.length,
+            todayAppointments: this.appointments.filter(a => a.status === 'scheduled' && a.appointment_date === today).length,
+            totalNoShows: this.noShowStats.totalNoShows
+          };
+        },
+        pendingNoShows() {
+          return this.noShowStats.recentNoShows.filter(n => n.status === 'pending').length;
+        }
+      },
+      mounted() {
+        this.loadData();
+      },
+      methods: {
+        async loadData() {
+          await Promise.all([
+            this.loadPatients(),
+            this.loadDoctors(),
+            this.loadAppointments(),
+            this.loadUpcomingReminders(),
+            this.loadTreatmentPlans(),
+            this.loadNoShowStats()
+          ]);
+        },
+        async loadPatients() {
+          const res = await fetch('/api/patients');
+          this.patients = await res.json();
+        },
+        async loadDoctors() {
+          const res = await fetch('/api/doctors');
+          this.doctors = await res.json();
+        },
+        async loadAppointments() {
+          const res = await fetch('/api/appointments');
+          this.appointments = await res.json();
+        },
+        async loadUpcomingReminders() {
+          const res = await fetch('/api/reminders/upcoming');
+          this.upcomingReminders = await res.json();
+        },
+        async loadTreatmentPlans() {
+          const res = await fetch('/api/treatment-plans');
+          this.treatmentPlans = await res.json();
+        },
+        async loadNoShowStats() {
+          const res = await fetch('/api/no-shows/statistics');
+          this.noShowStats = await res.json();
+        },
+        async loadDoctorSchedule() {
+          if (!this.selectedDoctor) {
+            this.doctorSchedule = [];
+            return;
+          }
+          const res = await fetch(`/api/doctors/${this.selectedDoctor}/schedule?date=${this.scheduleDate}`);
+          this.doctorSchedule = await res.json();
+        },
+        async loadPatientPlans() {
+          if (!this.newAppointment.patient_id) {
+            this.patientPlans = [];
+            return;
+          }
+          const res = await fetch(`/api/treatment-plans/patient/${this.newAppointment.patient_id}`);
+          this.patientPlans = await res.json();
+        },
+        async loadTreatmentStages() {
+          if (!this.newAppointment.treatment_plan_id) {
+            this.availableStages = [];
+            return;
+          }
+          const plan = this.patientPlans.find(p => p.id === this.newAppointment.treatment_plan_id);
+          if (plan) {
+            const res = await fetch(`/api/treatment-stages/${plan.treatment_type}`);
+            const config = await res.json();
+            this.availableStages = config.stages;
+          }
+        },
+        getStatusText(status) {
+          const map = {
+            'scheduled': '已预约',
+            'completed': '已完成',
+            'cancelled': '已取消',
+            'no_show': '爽约'
+          };
+          return map[status] || status;
+        },
+        openNewPatientModal() {
+          this.newPatient = { name: '', phone: '', age: null, gender: '', address: '', notes: '' };
+          this.showPatientModal = true;
+        },
+        async savePatient() {
+          if (!this.newPatient.name) {
+            alert('请输入患者姓名');
+            return;
+          }
+          await fetch('/api/patients', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newPatient)
+          });
+          this.showPatientModal = false;
+          await this.loadPatients();
+        },
+        openNewTreatmentPlanModal() {
+          this.newTreatmentPlan = { patient_id: null, doctor_id: null, treatment_type: '', start_date: new Date().toISOString().split('T')[0] };
+          this.showTreatmentPlanModal = true;
+        },
+        async saveTreatmentPlan() {
+          if (!this.newTreatmentPlan.patient_id || !this.newTreatmentPlan.doctor_id || !this.newTreatmentPlan.treatment_type) {
+            alert('请填写完整信息');
+            return;
+          }
+          await fetch('/api/treatment-plans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newTreatmentPlan)
+          });
+          this.showTreatmentPlanModal = false;
+          await this.loadTreatmentPlans();
+        },
+        openNewAppointmentModal() {
+          this.newAppointment = { patient_id: null, doctor_id: null, treatment_plan_id: null, treatment_stage: null, appointment_date: '', appointment_time: '', notes: '', doctor_confirmed: false };
+          this.patientPlans = [];
+          this.availableStages = [];
+          this.appointmentErrors = [];
+          this.appointmentWarnings = [];
+          this.appointmentRequiresConfirmation = false;
+          this.showAppointmentModal = true;
+        },
+        openNewAppointmentForPatient(patient) {
+          this.newAppointment = { patient_id: patient.id, doctor_id: null, treatment_plan_id: null, treatment_stage: null, appointment_date: '', appointment_time: '', notes: '', doctor_confirmed: false };
+          this.patientPlans = [];
+          this.availableStages = [];
+          this.appointmentErrors = [];
+          this.appointmentWarnings = [];
+          this.appointmentRequiresConfirmation = false;
+          this.loadPatientPlans();
+          this.showAppointmentModal = true;
+        },
+        async saveAppointment() {
+          const validateRes = await fetch('/api/appointments/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newAppointment)
+          });
+          const validation = await validateRes.json();
+          
+          this.appointmentErrors = validation.errors;
+          this.appointmentWarnings = validation.warnings;
+          this.appointmentRequiresConfirmation = validation.requiresDoctorConfirmation;
+          
+          if (validation.errors.length > 0) {
+            return;
+          }
+          
+          if (validation.requiresDoctorConfirmation && !this.newAppointment.doctor_confirmed) {
+            return;
+          }
+          
+          const res = await fetch('/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.newAppointment)
+          });
+          
+          if (res.ok) {
+            this.showAppointmentModal = false;
+            await this.loadAppointments();
+            await this.loadUpcomingReminders();
+            await this.loadDoctorSchedule();
+          } else {
+            const data = await res.json();
+            this.appointmentErrors = data.errors || ['创建失败'];
+          }
+        },
+        async viewPatientTimeline(patient) {
+          this.selectedPatient = patient;
+          const res = await fetch(`/api/patients/${patient.id}/timeline`);
+          this.patientTimeline = await res.json();
+          this.showTimelineModal = true;
+        },
+        getNextAppointmentInfo(plan) {
+          const completedAppts = plan.appointments.filter(a => a.status === 'completed');
+          if (completedAppts.length === 0) {
+            return '尚未开始治疗，请安排初诊';
+          }
+          
+          const lastCompleted = completedAppts[completedAppts.length - 1];
+          const scheduledAppts = plan.appointments.filter(a => a.status === 'scheduled');
+          
+          if (scheduledAppts.length > 0) {
+            const next = scheduledAppts[0];
+            return `${next.appointment_date} ${next.appointment_time} (${next.stage_name})`;
+          }
+          
+          return '请根据治疗阶段安排下一次复诊';
+        },
+        openRescheduleModal(appt) {
+          this.currentAppointment = appt;
+          this.rescheduleData = { new_date: appt.appointment_date, new_time: appt.appointment_time, reason: '' };
+          this.showRescheduleModal = true;
+        },
+        async rescheduleAppointment() {
+          if (!this.rescheduleData.new_date || !this.rescheduleData.new_time) {
+            alert('请选择新的日期和时间');
+            return;
+          }
+          
+          const res = await fetch(`/api/appointments/${this.currentAppointment.id}/reschedule`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.rescheduleData)
+          });
+          
+          if (res.ok) {
+            this.showRescheduleModal = false;
+            await this.loadAppointments();
+            await this.loadUpcomingReminders();
+            await this.loadDoctorSchedule();
+          } else {
+            const data = await res.json();
+            alert(data.error || '改期失败');
+          }
+        },
+        markNoShow(appt) {
+          this.currentAppointment = appt;
+          this.noShowData = { receptionist_note: '', doctor_confirmed_by: null, doctor_confirmation: '' };
+          this.showNoShowModal = true;
+        },
+        async confirmNoShowAppointment() {
+          const res = await fetch(`/api/appointments/${this.currentAppointment.id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              status: 'no_show',
+              ...this.noShowData
+            })
+          });
+          
+          if (res.ok) {
+            this.showNoShowModal = false;
+            await this.loadAppointments();
+            await this.loadNoShowStats();
+          }
+        },
+        async completeAppointment(appt) {
+          const res = await fetch(`/api/appointments/${appt.id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'completed' })
+          });
+          
+          const data = await res.json();
+          if (res.ok && data.nextAppointment) {
+            if (confirm(`治疗已完成！\n建议下一次复诊时间：${data.nextAppointment.nextDate}\n治疗阶段：${data.nextAppointment.nextStage.name}\n\n是否立即创建预约？`)) {
+              const plan = this.treatmentPlans.find(p => p.id === appt.treatment_plan_id);
+              this.newAppointment = {
+                patient_id: appt.patient_id,
+                doctor_id: appt.doctor_id,
+                treatment_plan_id: appt.treatment_plan_id,
+                treatment_stage: data.nextAppointment.nextStage.stage,
+                appointment_date: data.nextAppointment.nextDate,
+                appointment_time: '09:00',
+                notes: '',
+                doctor_confirmed: false
+              };
+              await this.loadPatientPlans();
+              await this.loadTreatmentStages();
+              this.appointmentErrors = [];
+              this.appointmentWarnings = [];
+              this.appointmentRequiresConfirmation = false;
+              this.showAppointmentModal = true;
+            }
+          }
+          
+          await this.loadAppointments();
+          await this.loadUpcomingReminders();
+        },
+        confirmNoShow(record) {
+          this.confirmNoShowData = { id: record.id, doctor_confirmed_by: null, doctor_confirmation: '' };
+          this.showConfirmNoShowModal = true;
+        },
+        async submitNoShowConfirmation() {
+          if (!this.confirmNoShowData.doctor_confirmed_by || !this.confirmNoShowData.doctor_confirmation) {
+            alert('请填写完整信息');
+            return;
+          }
+          
+          const res = await fetch(`/api/no-shows/${this.confirmNoShowData.id}/confirm`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.confirmNoShowData)
+          });
+          
+          if (res.ok) {
+            this.showConfirmNoShowModal = false;
+            await this.loadNoShowStats();
+          }
+        },
+        async exportAppointments() {
+          window.location.href = '/api/export/appointments';
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
