@@ -1,0 +1,14 @@
+[
+  {
+    "package_id": "PKG001",
+    "package_name": "基础体检套餐",
+    "base_items": ["BASE001", "BASE002", "BASE003"],
+    "base_price": 300.0
+  },
+  {
+    "package_id": "PKG002",
+    "package_name": "标准体检套餐",
+    "base_items": ["BASE001", "BASE002", "BASE003", "BASE004", "BASE005"],
+    "base_price": 500.0
+  }
+]

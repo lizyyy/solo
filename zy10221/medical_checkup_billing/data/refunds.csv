@@ -1,0 +1,3 @@
+refund_id,original_payment_id,employee_id,amount,operator,timestamp,reason,status
+REF001,PAY005,E005,45.0,收银员D,2024-03-15 11:30:00,客户取消部分项目,completed
+REF002,PAY008,E007,60.0,收银员D,2024-03-15 11:35:00,客户全额取消,completed

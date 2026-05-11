@@ -1,0 +1,407 @@
+{
+  "imported_files": {
+    "group_checkups.json": "9970e7cf04449f8387ac3814ee909ca5",
+    "employees.csv": "56390732387d369e81768645ce268b26",
+    "packages.json": "bf62e79dcf77224778b9116bc7654c6b",
+    "discount_policies.json": "ccdc1a5522f0af87cc164f005759b41f"
+  },
+  "processed_add_ons": [
+    "ADD009",
+    "ADD004",
+    "ADD002",
+    "ADD005",
+    "ADD008",
+    "ADD007",
+    "ADD006",
+    "ADD001",
+    "ADD003"
+  ],
+  "processed_payments": [
+    "PAY009",
+    "PAY007",
+    "PAY003",
+    "PAY001",
+    "PAY008",
+    "PAY005",
+    "PAY004",
+    "PAY006",
+    "PAY002"
+  ],
+  "processed_refunds": [
+    "REF001",
+    "REF002"
+  ],
+  "group_checkups": [
+    {
+      "company_name": "创新科技有限公司",
+      "company_id": "COMP001",
+      "allowed_items": [
+        "ITEM001",
+        "ITEM002",
+        "ITEM003",
+        "ITEM005"
+      ],
+      "forbidden_items": [
+        "ITEM004"
+      ],
+      "discount_rate": 0.9,
+      "contract_number": "HT2024001"
+    },
+    {
+      "company_name": "阳光企业集团",
+      "company_id": "COMP002",
+      "allowed_items": [
+        "ITEM001",
+        "ITEM002",
+        "ITEM003",
+        "ITEM004",
+        "ITEM005"
+      ],
+      "forbidden_items": [],
+      "discount_rate": 0.85,
+      "contract_number": "HT2024002"
+    },
+    {
+      "company_name": "幸福人寿保险",
+      "company_id": "COMP003",
+      "allowed_items": [],
+      "forbidden_items": [],
+      "discount_rate": 1.0,
+      "contract_number": "HT2024003"
+    }
+  ],
+  "employees": [
+    {
+      "employee_id": "E001",
+      "name": "张伟",
+      "id_card": "110101199001011234",
+      "company_id": "COMP001",
+      "package_id": "PKG001",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E002",
+      "name": "李娜",
+      "id_card": "110101199202022345",
+      "company_id": "COMP001",
+      "package_id": "PKG001",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E003",
+      "name": "王强",
+      "id_card": "110101198803033456",
+      "company_id": "COMP001",
+      "package_id": "PKG002",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E004",
+      "name": "赵敏",
+      "id_card": "110101199504044567",
+      "company_id": "COMP002",
+      "package_id": "PKG001",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E005",
+      "name": "刘洋",
+      "id_card": "110101199105055678",
+      "company_id": "COMP002",
+      "package_id": "PKG002",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E006",
+      "name": "陈静",
+      "id_card": "110101199306066789",
+      "company_id": "COMP003",
+      "package_id": "PKG001",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E007",
+      "name": "杨帆",
+      "id_card": "110101198907077890",
+      "company_id": "COMP003",
+      "package_id": "PKG002",
+      "checkup_date": "2024-03-15"
+    },
+    {
+      "employee_id": "E008",
+      "name": "周磊",
+      "id_card": "110101199408088901",
+      "company_id": "COMP001",
+      "package_id": "PKG001",
+      "checkup_date": "2024-03-15"
+    }
+  ],
+  "packages": [
+    {
+      "package_id": "PKG001",
+      "package_name": "基础体检套餐",
+      "base_items": [
+        "BASE001",
+        "BASE002",
+        "BASE003"
+      ],
+      "base_price": 300.0
+    },
+    {
+      "package_id": "PKG002",
+      "package_name": "标准体检套餐",
+      "base_items": [
+        "BASE001",
+        "BASE002",
+        "BASE003",
+        "BASE004",
+        "BASE005"
+      ],
+      "base_price": 500.0
+    }
+  ],
+  "add_ons": [
+    {
+      "add_on_id": "ADD001",
+      "employee_id": "E001",
+      "item_code": "ITEM001",
+      "item_name": "血常规",
+      "quantity": 1,
+      "unit_price": 50.0,
+      "operator": "张医生",
+      "timestamp": "2024-03-15 09:30:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD002",
+      "employee_id": "E002",
+      "item_code": "ITEM002",
+      "item_name": "心电图",
+      "quantity": 1,
+      "unit_price": 80.0,
+      "operator": "张医生",
+      "timestamp": "2024-03-15 09:35:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD003",
+      "employee_id": "E002",
+      "item_code": "ITEM002",
+      "item_name": "心电图",
+      "quantity": 1,
+      "unit_price": 80.0,
+      "operator": "李医生",
+      "timestamp": "2024-03-15 09:36:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD004",
+      "employee_id": "E003",
+      "item_code": "ITEM004",
+      "item_name": "核磁共振",
+      "quantity": 1,
+      "unit_price": 500.0,
+      "operator": "张医生",
+      "timestamp": "2024-03-15 10:00:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD005",
+      "employee_id": "E004",
+      "item_code": "ITEM003",
+      "item_name": "胸部CT",
+      "quantity": 1,
+      "unit_price": 300.0,
+      "operator": "李医生",
+      "timestamp": "2024-03-15 10:15:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD006",
+      "employee_id": "E005",
+      "item_code": "ITEM001",
+      "item_name": "血常规",
+      "quantity": 2,
+      "unit_price": 50.0,
+      "operator": "张医生",
+      "timestamp": "2024-03-15 10:30:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD007",
+      "employee_id": "E006",
+      "item_code": "ITEM005",
+      "item_name": "乙肝五项",
+      "quantity": 1,
+      "unit_price": 120.0,
+      "operator": "李医生",
+      "timestamp": "2024-03-15 10:45:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD008",
+      "employee_id": "E007",
+      "item_code": "ITEM001",
+      "item_name": "血常规",
+      "quantity": 1,
+      "unit_price": 50.0,
+      "operator": "张医生",
+      "timestamp": "2024-03-15 11:00:00",
+      "status": "pending"
+    },
+    {
+      "add_on_id": "ADD009",
+      "employee_id": "E008",
+      "item_code": "ITEM002",
+      "item_name": "心电图",
+      "quantity": 1,
+      "unit_price": 80.0,
+      "operator": "李医生",
+      "timestamp": "2024-03-15 11:15:00",
+      "status": "pending"
+    }
+  ],
+  "payments": [
+    {
+      "payment_id": "PAY001",
+      "employee_id": "E002",
+      "add_on_id": "ADD002",
+      "item_code": "ITEM002",
+      "amount": 72.0,
+      "payment_method": "微信",
+      "operator": "收银员A",
+      "timestamp": "2024-03-15 09:40:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY002",
+      "employee_id": "E002",
+      "add_on_id": "ADD003",
+      "item_code": "ITEM002",
+      "amount": 72.0,
+      "payment_method": "现金",
+      "operator": "收银员B",
+      "timestamp": "2024-03-15 09:42:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY003",
+      "employee_id": "E003",
+      "add_on_id": "ADD004",
+      "item_code": "ITEM004",
+      "amount": 450.0,
+      "payment_method": "微信",
+      "operator": "收银员A",
+      "timestamp": "2024-03-15 10:05:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY004",
+      "employee_id": "E004",
+      "add_on_id": "ADD005",
+      "item_code": "ITEM003",
+      "amount": 240.0,
+      "payment_method": "支付宝",
+      "operator": "收银员B",
+      "timestamp": "2024-03-15 10:20:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY005",
+      "employee_id": "E005",
+      "add_on_id": "ADD006",
+      "item_code": "ITEM001",
+      "amount": 90.0,
+      "payment_method": "微信",
+      "operator": "收银员A",
+      "timestamp": "2024-03-15 10:35:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY006",
+      "employee_id": "E005",
+      "add_on_id": "ADD006",
+      "item_code": "ITEM001",
+      "amount": 90.0,
+      "payment_method": "现金",
+      "operator": "收银员C",
+      "timestamp": "2024-03-15 10:36:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY007",
+      "employee_id": "E006",
+      "add_on_id": "ADD007",
+      "item_code": "ITEM005",
+      "amount": 100.0,
+      "payment_method": "支付宝",
+      "operator": "收银员A",
+      "timestamp": "2024-03-15 10:50:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY008",
+      "employee_id": "E007",
+      "add_on_id": "ADD008",
+      "item_code": "ITEM001",
+      "amount": 60.0,
+      "payment_method": "微信",
+      "operator": "收银员B",
+      "timestamp": "2024-03-15 11:05:00",
+      "status": "completed"
+    },
+    {
+      "payment_id": "PAY009",
+      "employee_id": "E008",
+      "add_on_id": "ADD009",
+      "item_code": "ITEM002",
+      "amount": 72.0,
+      "payment_method": "现金",
+      "operator": "收银员C",
+      "timestamp": "2024-03-15 11:20:00",
+      "status": "completed"
+    }
+  ],
+  "discount_policies": [
+    {
+      "policy_id": "POL001",
+      "policy_name": "CT检查特殊折扣",
+      "company_id": null,
+      "item_code": "ITEM003",
+      "discount_rate": 0.8,
+      "valid_from": "2024-01-01",
+      "valid_to": "2024-12-31"
+    },
+    {
+      "policy_id": "POL002",
+      "policy_name": "COMP002员工VIP折扣",
+      "company_id": "COMP002",
+      "item_code": null,
+      "discount_rate": 0.8,
+      "valid_from": null,
+      "valid_to": null
+    }
+  ],
+  "refunds": [
+    {
+      "refund_id": "REF001",
+      "original_payment_id": "PAY005",
+      "employee_id": "E005",
+      "amount": 45.0,
+      "operator": "收银员D",
+      "timestamp": "2024-03-15 11:30:00",
+      "reason": "客户取消部分项目",
+      "status": "completed"
+    },
+    {
+      "refund_id": "REF002",
+      "original_payment_id": "PAY008",
+      "employee_id": "E007",
+      "amount": 60.0,
+      "operator": "收银员D",
+      "timestamp": "2024-03-15 11:35:00",
+      "reason": "客户全额取消",
+      "status": "completed"
+    }
+  ]
+}

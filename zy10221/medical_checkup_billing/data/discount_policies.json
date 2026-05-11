@@ -1,0 +1,16 @@
+[
+  {
+    "policy_id": "POL001",
+    "policy_name": "CT检查特殊折扣",
+    "item_code": "ITEM003",
+    "discount_rate": 0.8,
+    "valid_from": "2024-01-01",
+    "valid_to": "2024-12-31"
+  },
+  {
+    "policy_id": "POL002",
+    "policy_name": "COMP002员工VIP折扣",
+    "company_id": "COMP002",
+    "discount_rate": 0.8
+  }
+]

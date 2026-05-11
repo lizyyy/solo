@@ -1,0 +1,26 @@
+[
+  {
+    "company_name": "创新科技有限公司",
+    "company_id": "COMP001",
+    "allowed_items": ["ITEM001", "ITEM002", "ITEM003", "ITEM005"],
+    "forbidden_items": ["ITEM004"],
+    "discount_rate": 0.9,
+    "contract_number": "HT2024001"
+  },
+  {
+    "company_name": "阳光企业集团",
+    "company_id": "COMP002",
+    "allowed_items": ["ITEM001", "ITEM002", "ITEM003", "ITEM004", "ITEM005"],
+    "forbidden_items": [],
+    "discount_rate": 0.85,
+    "contract_number": "HT2024002"
+  },
+  {
+    "company_name": "幸福人寿保险",
+    "company_id": "COMP003",
+    "allowed_items": [],
+    "forbidden_items": [],
+    "discount_rate": 1.0,
+    "contract_number": "HT2024003"
+  }
+]

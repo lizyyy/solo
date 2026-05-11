@@ -1,0 +1,10 @@
+add_on_id,employee_id,item_code,item_name,quantity,unit_price,operator,timestamp,status
+ADD001,E001,ITEM001,血常规,1,50.0,张医生,2024-03-15 09:30:00,pending
+ADD002,E002,ITEM002,心电图,1,80.0,张医生,2024-03-15 09:35:00,pending
+ADD003,E002,ITEM002,心电图,1,80.0,李医生,2024-03-15 09:36:00,pending
+ADD004,E003,ITEM004,核磁共振,1,500.0,张医生,2024-03-15 10:00:00,pending
+ADD005,E004,ITEM003,胸部CT,1,300.0,李医生,2024-03-15 10:15:00,pending
+ADD006,E005,ITEM001,血常规,2,50.0,张医生,2024-03-15 10:30:00,pending
+ADD007,E006,ITEM005,乙肝五项,1,120.0,李医生,2024-03-15 10:45:00,pending
+ADD008,E007,ITEM001,血常规,1,50.0,张医生,2024-03-15 11:00:00,pending
+ADD009,E008,ITEM002,心电图,1,80.0,李医生,2024-03-15 11:15:00,pending
