@@ -1,0 +1,44 @@
+{
+  "TASK-001": {
+    "task_id": "TASK-001",
+    "title": "用户登录模块开发",
+    "status": "done",
+    "estimated_hours": 16.0,
+    "max_daily_hours": 8.0
+  },
+  "TASK-002": {
+    "task_id": "TASK-002",
+    "title": "用户注册模块开发",
+    "status": "in_progress",
+    "estimated_hours": 24.0,
+    "max_daily_hours": 8.0
+  },
+  "TASK-003": {
+    "task_id": "TASK-003",
+    "title": "订单管理模块开发",
+    "status": "done",
+    "estimated_hours": 16.0,
+    "max_daily_hours": 8.0
+  },
+  "TASK-004": {
+    "task_id": "TASK-004",
+    "title": "支付模块开发",
+    "status": "review",
+    "estimated_hours": 12.0,
+    "max_daily_hours": 8.0
+  },
+  "TASK-005": {
+    "task_id": "TASK-005",
+    "title": "退款模块开发",
+    "status": "in_progress",
+    "estimated_hours": 20.0,
+    "max_daily_hours": 8.0
+  },
+  "TASK-006": {
+    "task_id": "TASK-006",
+    "title": "技术文档编写",
+    "status": "done",
+    "estimated_hours": 8.0,
+    "max_daily_hours": 8.0
+  }
+}

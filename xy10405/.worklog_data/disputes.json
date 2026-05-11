@@ -1,0 +1,112 @@
+{
+  "DSP-efc94732": {
+    "dispute_id": "DSP-efc94732",
+    "log_id": "LOG-335a948daaaf",
+    "dispute_type": "duplicate",
+    "status": "resolved",
+    "original_hours": 8.0,
+    "adjusted_hours": 0.0,
+    "notes": [
+      "[2026-05-11T16:34:58.147532] 与外包确认，第二条是误操作提交的重复日报",
+      "[2026-05-11T16:37:04.681753] 确认重复，按系统建议不计入"
+    ],
+    "created_at": "2026-05-11T16:30:50.336729",
+    "resolved_at": "2026-05-11T16:37:04.681745"
+  },
+  "DSP-9815bde3": {
+    "dispute_id": "DSP-9815bde3",
+    "log_id": "LOG-0d3b321907f7",
+    "dispute_type": "overtime",
+    "status": "open",
+    "original_hours": 10.0,
+    "adjusted_hours": 0.0,
+    "notes": [],
+    "created_at": "2026-05-11T16:30:50.336822",
+    "resolved_at": null
+  },
+  "DSP-8935f463": {
+    "dispute_id": "DSP-8935f463",
+    "log_id": "LOG-0d3b321907f7",
+    "dispute_type": "rejected",
+    "status": "resolved",
+    "original_hours": 10.0,
+    "adjusted_hours": 0.0,
+    "notes": [
+      "[2026-05-11T16:39:03.887816] 任务被客户驳回，工时全部放弃"
+    ],
+    "created_at": "2026-05-11T16:30:50.336839",
+    "resolved_at": "2026-05-11T16:39:03.887808"
+  },
+  "DSP-c4158d1f": {
+    "dispute_id": "DSP-c4158d1f",
+    "log_id": "LOG-335a948daaaf",
+    "dispute_type": "overtime",
+    "status": "open",
+    "original_hours": 8.0,
+    "adjusted_hours": -2.0,
+    "notes": [],
+    "created_at": "2026-05-11T16:30:50.336869",
+    "resolved_at": null
+  },
+  "DSP-1bcd512f": {
+    "dispute_id": "DSP-1bcd512f",
+    "log_id": "LOG-335a948daaaf",
+    "dispute_type": "rejected",
+    "status": "waived",
+    "original_hours": 8.0,
+    "adjusted_hours": 0.0,
+    "notes": [
+      "[2026-05-11T16:40:01.301778] 重复的日报，已处理，放弃"
+    ],
+    "created_at": "2026-05-11T16:30:50.336883",
+    "resolved_at": "2026-05-11T16:40:01.301733"
+  },
+  "DSP-86fcb57d": {
+    "dispute_id": "DSP-86fcb57d",
+    "log_id": "LOG-1f239023a3de",
+    "dispute_type": "no_task",
+    "status": "waived",
+    "original_hours": 8.0,
+    "adjusted_hours": 0.0,
+    "notes": [
+      "[2026-05-11T16:34:35.864987] 确认无对应任务，放弃结算"
+    ],
+    "created_at": "2026-05-11T16:30:50.336905",
+    "resolved_at": "2026-05-11T16:34:35.864976"
+  },
+  "DSP-3f158ccd": {
+    "dispute_id": "DSP-3f158ccd",
+    "log_id": "LOG-1f239023a3de",
+    "dispute_type": "unaccepted",
+    "status": "open",
+    "original_hours": 8.0,
+    "adjusted_hours": null,
+    "notes": [],
+    "created_at": "2026-05-11T16:30:50.336918",
+    "resolved_at": null
+  },
+  "DSP-3311519d": {
+    "dispute_id": "DSP-3311519d",
+    "log_id": "LOG-bcb190f4b393",
+    "dispute_type": "unaccepted",
+    "status": "pending",
+    "original_hours": 8.0,
+    "adjusted_hours": null,
+    "notes": [
+      "[2026-05-11T16:41:25.559829] TASK-004等待客户下周验收"
+    ],
+    "created_at": "2026-05-11T16:30:50.336956",
+    "resolved_at": "2026-05-11T16:41:25.559532"
+  },
+  "DSP-6a99abc7": {
+    "dispute_id": "DSP-6a99abc7",
+    "log_id": "LOG-b65bf933c383",
+    "dispute_type": "unaccepted",
+    "status": "open",
+    "original_hours": 8.0,
+    "adjusted_hours": null,
+    "notes": [],
+    "created_at": "2026-05-11T16:30:50.336978",
+    "resolved_at": null
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "TASK-001": {
+    "task_id": "TASK-001",
+    "accepted": true,
+    "accepted_date": "2025-05-03",
+    "rejection_reason": null
+  },
+  "TASK-002": {
+    "task_id": "TASK-002",
+    "accepted": false,
+    "accepted_date": "2025-05-05",
+    "rejection_reason": "功能不完整，缺少邮箱验证"
+  },
+  "TASK-003": {
+    "task_id": "TASK-003",
+    "accepted": true,
+    "accepted_date": "2025-05-02",
+    "rejection_reason": null
+  },
+  "TASK-004": {
+    "task_id": "TASK-004",
+    "accepted": false,
+    "accepted_date": null,
+    "rejection_reason": null
+  },
+  "TASK-006": {
+    "task_id": "TASK-006",
+    "accepted": true,
+    "accepted_date": "2025-05-02",
+    "rejection_reason": null
+  }
+}
