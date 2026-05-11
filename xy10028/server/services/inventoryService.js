@@ -100,6 +100,9 @@ const inventoryService = {
 
   async adjustInventory(inventoryId, adjustment, userId, requestId) {
     const t = await db.sequelize.transaction();
+    let lockAcquired = false;
+    let targetInventoryId = null;
+    let beforeState = null;
 
     try {
       const requestCheck = await idempotencyService.isRequestProcessed(requestId);
@@ -123,14 +126,15 @@ const inventoryService = {
       if (!lock.success) {
         throw new Error(`库存记录被锁定: ${lock.message}`);
       }
+      lockAcquired = true;
 
       const inventory = await db.Inventory.findByPk(inventoryId, { transaction: t });
       if (!inventory) {
-        await lockService.releaseLock('INVENTORY', inventoryId);
         throw new Error('库存记录不存在');
       }
 
-      const beforeState = {
+      targetInventoryId = inventory.id;
+      beforeState = {
         quantity: inventory.quantity,
         price: inventory.price,
         version: inventory.version
@@ -138,7 +142,6 @@ const inventoryService = {
 
       const newQuantity = inventory.quantity + adjustment.quantity;
       if (newQuantity < 0) {
-        await lockService.releaseLock('INVENTORY', inventoryId);
         throw new Error('库存数量不能为负数');
       }
 
@@ -168,7 +171,7 @@ const inventoryService = {
         type: 'ADJUST',
         fields: {
           quantity: {
-            from: inventory.quantity,
+            from: beforeState.quantity,
             to: newQuantity,
             change: adjustment.quantity
           }
@@ -178,14 +181,14 @@ const inventoryService = {
 
       if (adjustment.price !== undefined) {
         changeDetails.fields.price = {
-          from: inventory.price,
+          from: beforeState.price,
           to: adjustment.price
         };
 
         await db.PriceChangeRecord.create({
           id: uuidv4(),
           inventoryId: inventory.id,
-          oldPrice: inventory.price,
+          oldPrice: beforeState.price,
           newPrice: adjustment.price,
           reason: adjustment.reason || '价格调整',
           userId,
@@ -216,13 +219,40 @@ const inventoryService = {
 
       return result;
     } catch (error) {
+      if (lockAcquired) {
+        await lockService.releaseLock('INVENTORY', inventoryId);
+      }
       await t.rollback();
+
+      if (targetInventoryId && beforeState) {
+        try {
+          await db.OperationLog.create({
+            id: uuidv4(),
+            inventoryId: targetInventoryId,
+            userId,
+            operationType: 'ADJUST',
+            requestId,
+            beforeState: JSON.stringify(beforeState),
+            afterState: JSON.stringify({}),
+            changeDetails: JSON.stringify({ error: error.message }),
+            status: 'FAILED',
+            errorMessage: error.message,
+            operationAt: new Date()
+          });
+        } catch (logError) {
+          console.error('记录失败日志时出错:', logError.message);
+        }
+      }
+
       throw error;
     }
   },
 
   async updatePrice(inventoryId, newPrice, reason, userId, requestId) {
     const t = await db.sequelize.transaction();
+    let lockAcquired = false;
+    let targetInventoryId = null;
+    let beforeState = null;
 
     try {
       const requestCheck = await idempotencyService.isRequestProcessed(requestId);
@@ -246,25 +276,19 @@ const inventoryService = {
       if (!lock.success) {
         throw new Error(`库存记录被锁定: ${lock.message}`);
       }
+      lockAcquired = true;
 
       const inventory = await db.Inventory.findByPk(inventoryId, { transaction: t });
       if (!inventory) {
-        await lockService.releaseLock('INVENTORY', inventoryId);
         throw new Error('库存记录不存在');
       }
 
       if (Number(inventory.price) === Number(newPrice)) {
-        await lockService.releaseLock('INVENTORY', inventoryId);
-        await t.rollback();
-        return {
-          success: true,
-          data: inventory,
-          message: '价格未变化',
-          noChange: true
-        };
+        throw new Error('价格未变化');
       }
 
-      const beforeState = {
+      targetInventoryId = inventory.id;
+      beforeState = {
         quantity: inventory.quantity,
         price: inventory.price,
         version: inventory.version
@@ -288,7 +312,7 @@ const inventoryService = {
       await db.PriceChangeRecord.create({
         id: uuidv4(),
         inventoryId: inventory.id,
-        oldPrice: inventory.price,
+        oldPrice: beforeState.price,
         newPrice,
         reason: reason || '价格变更',
         userId,
@@ -305,7 +329,7 @@ const inventoryService = {
         type: 'PRICE_CHANGE',
         fields: {
           price: {
-            from: inventory.price,
+            from: beforeState.price,
             to: newPrice
           }
         },
@@ -335,7 +359,31 @@ const inventoryService = {
 
       return result;
     } catch (error) {
+      if (lockAcquired) {
+        await lockService.releaseLock('INVENTORY', inventoryId);
+      }
       await t.rollback();
+
+      if (targetInventoryId && beforeState) {
+        try {
+          await db.OperationLog.create({
+            id: uuidv4(),
+            inventoryId: targetInventoryId,
+            userId,
+            operationType: 'PRICE_CHANGE',
+            requestId,
+            beforeState: JSON.stringify(beforeState),
+            afterState: JSON.stringify({}),
+            changeDetails: JSON.stringify({ error: error.message }),
+            status: 'FAILED',
+            errorMessage: error.message,
+            operationAt: new Date()
+          });
+        } catch (logError) {
+          console.error('记录失败日志时出错:', logError.message);
+        }
+      }
+
       throw error;
     }
   },
@@ -360,6 +408,12 @@ const inventoryService = {
     let lockTo = null;
     let fromInventory = null;
     let toInventory = null;
+    let lockFromAcquired = false;
+    let lockToAcquired = false;
+    let fromInventoryId = null;
+    let toInventoryId = null;
+    let beforeFromState = null;
+    let beforeToState = null;
 
     try {
       const requestCheck = await idempotencyService.isRequestProcessed(requestId);
@@ -388,6 +442,13 @@ const inventoryService = {
         throw new Error('调出门店不存在该商品库存');
       }
 
+      fromInventoryId = fromInventory.id;
+      beforeFromState = {
+        quantity: fromInventory.quantity,
+        price: fromInventory.price,
+        version: fromInventory.version
+      };
+
       if (fromInventory.quantity < quantity) {
         throw new Error(`调出门店库存不足，当前库存: ${fromInventory.quantity}, 调拨数量: ${quantity}`);
       }
@@ -396,6 +457,15 @@ const inventoryService = {
         where: { storeId: toStoreId, productId: productId },
         transaction: t
       });
+
+      if (toInventory) {
+        toInventoryId = toInventory.id;
+        beforeToState = {
+          quantity: toInventory.quantity,
+          price: toInventory.price,
+          version: toInventory.version
+        };
+      }
 
       const lockKeys = [fromInventory.id];
       if (toInventory) {
@@ -407,6 +477,7 @@ const inventoryService = {
       if (!lockFrom.success) {
         throw new Error(`调出门店库存被锁定: ${lockFrom.message}`);
       }
+      lockFromAcquired = true;
 
       const refreshedFrom = await db.Inventory.findByPk(fromInventory.id, { transaction: t });
       if (!refreshedFrom || refreshedFrom.version !== fromInventory.version) {
@@ -422,11 +493,14 @@ const inventoryService = {
         if (!lockTo.success) {
           throw new Error(`调入门店库存被锁定: ${lockTo.message}`);
         }
+        lockToAcquired = true;
 
         const refreshedTo = await db.Inventory.findByPk(toInventory.id, { transaction: t });
         if (!refreshedTo || refreshedTo.version !== toInventory.version) {
           throw new Error('调入门店库存已被其他操作修改，请重试');
         }
+
+        toInventory = refreshedTo;
       }
 
       const orderNo = 'TR' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase();
@@ -441,12 +515,6 @@ const inventoryService = {
         createdBy: userId,
         remarks
       }, { transaction: t });
-
-      const beforeFrom = {
-        quantity: refreshedFrom.quantity,
-        price: refreshedFrom.price,
-        version: refreshedFrom.version
-      };
 
       await refreshedFrom.update({
         quantity: refreshedFrom.quantity - quantity,
@@ -464,7 +532,7 @@ const inventoryService = {
       }, { transaction: t });
 
       const product = await db.Product.findByPk(productId, { transaction: t });
-      let beforeTo = { quantity: 0 };
+      let currentBeforeTo = { quantity: 0 };
 
       if (!toInventory) {
         toInventory = await db.Inventory.create({
@@ -478,8 +546,11 @@ const inventoryService = {
           version: 0,
           lastUpdatedAt: new Date()
         }, { transaction: t });
+
+        toInventoryId = toInventory.id;
+        currentBeforeTo = { quantity: 0 };
       } else {
-        beforeTo = {
+        currentBeforeTo = {
           quantity: toInventory.quantity,
           price: toInventory.price,
           version: toInventory.version
@@ -500,45 +571,53 @@ const inventoryService = {
         snapshotAt: new Date()
       }, { transaction: t });
 
+      const afterStateFrom = {
+        quantity: beforeFromState.quantity - quantity,
+        price: beforeFromState.price,
+        version: beforeFromState.version + 1
+      };
+
+      const changeDetailsFrom = {
+        type: 'TRANSFER_OUT',
+        quantity,
+        toStoreId,
+        orderNo,
+        versionChange: `v${beforeFromState.version} -> v${beforeFromState.version + 1}`
+      };
+
       await auditService.createLog({
-        inventoryId: refreshedFrom.id,
+        inventoryId: fromInventoryId,
         userId,
         operationType: 'TRANSFER_OUT',
         requestId,
-        beforeState: beforeFrom,
-        afterState: {
-          quantity: beforeFrom.quantity - quantity,
-          price: beforeFrom.price,
-          version: beforeFrom.version + 1
-        },
-        changeDetails: {
-          type: 'TRANSFER_OUT',
-          quantity,
-          toStoreId,
-          orderNo,
-          versionChange: `v${beforeFrom.version} -> v${beforeFrom.version + 1}`
-        },
+        beforeState: beforeFromState,
+        afterState: afterStateFrom,
+        changeDetails: changeDetailsFrom,
         transaction: t
       });
 
+      const afterStateTo = {
+        quantity: currentBeforeTo.quantity + quantity,
+        price: toInventory.price,
+        version: toInventory.version
+      };
+
+      const changeDetailsTo = {
+        type: 'TRANSFER_IN',
+        quantity,
+        fromStoreId,
+        orderNo,
+        versionChange: currentBeforeTo.version !== undefined ? `v${currentBeforeTo.version} -> v${toInventory.version}` : 'v0 (新建)'
+      };
+
       await auditService.createLog({
-        inventoryId: toInventory.id,
+        inventoryId: toInventoryId,
         userId,
         operationType: 'TRANSFER_IN',
         requestId,
-        beforeState: beforeTo,
-        afterState: {
-          quantity: beforeTo.quantity + quantity,
-          price: toInventory.price,
-          version: toInventory.version
-        },
-        changeDetails: {
-          type: 'TRANSFER_IN',
-          quantity,
-          fromStoreId,
-          orderNo,
-          versionChange: beforeTo.version !== undefined ? `v${beforeTo.version} -> v${toInventory.version}` : 'v0 (新建)'
-        },
+        beforeState: currentBeforeTo,
+        afterState: afterStateTo,
+        changeDetails: changeDetailsTo,
         transaction: t
       });
 
@@ -550,14 +629,14 @@ const inventoryService = {
           order: { ...order.toJSON(), status: 'RECEIVED' },
           fromInventory: {
             id: refreshedFrom.id,
-            beforeQuantity: beforeFrom.quantity,
-            afterQuantity: beforeFrom.quantity - quantity,
-            version: beforeFrom.version + 1
+            beforeQuantity: beforeFromState.quantity,
+            afterQuantity: beforeFromState.quantity - quantity,
+            version: beforeFromState.version + 1
           },
           toInventory: {
             id: toInventory.id,
-            beforeQuantity: beforeTo.quantity,
-            afterQuantity: beforeTo.quantity + quantity,
+            beforeQuantity: currentBeforeTo.quantity,
+            afterQuantity: currentBeforeTo.quantity + quantity,
             version: toInventory.version
           }
         },
@@ -570,13 +649,50 @@ const inventoryService = {
       return result;
     } catch (error) {
       await t.rollback();
+
+      try {
+        if (fromInventoryId && beforeFromState) {
+          await db.OperationLog.create({
+            id: uuidv4(),
+            inventoryId: fromInventoryId,
+            userId,
+            operationType: 'TRANSFER_OUT',
+            requestId,
+            beforeState: JSON.stringify(beforeFromState),
+            afterState: JSON.stringify({}),
+            changeDetails: JSON.stringify({ error: error.message }),
+            status: 'FAILED',
+            errorMessage: error.message,
+            operationAt: new Date()
+          });
+        }
+
+        if (toInventoryId && beforeToState) {
+          await db.OperationLog.create({
+            id: uuidv4(),
+            inventoryId: toInventoryId,
+            userId,
+            operationType: 'TRANSFER_IN',
+            requestId,
+            beforeState: JSON.stringify(beforeToState),
+            afterState: JSON.stringify({}),
+            changeDetails: JSON.stringify({ error: error.message }),
+            status: 'FAILED',
+            errorMessage: error.message,
+            operationAt: new Date()
+          });
+        }
+      } catch (logError) {
+        console.error('记录失败日志时出错:', logError.message);
+      }
+
       throw error;
     } finally {
-      if (lockFrom) {
-        await lockService.releaseLock('INVENTORY', fromInventory ? fromInventory.id : '');
+      if (lockFromAcquired && lockFrom) {
+        await lockService.releaseLock('INVENTORY', fromInventoryId ? fromInventoryId : '');
       }
-      if (lockTo) {
-        await lockService.releaseLock('INVENTORY', toInventory ? toInventory.id : '');
+      if (lockToAcquired && lockTo) {
+        await lockService.releaseLock('INVENTORY', toInventoryId ? toInventoryId : '');
       }
     }
   },
