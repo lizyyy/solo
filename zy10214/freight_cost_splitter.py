@@ -509,6 +509,44 @@ class DataImporter:
             return {'containers': rows}
         return {'cargos': rows}
 
+    def _detect_duplicate_bl_in_containers(
+        self,
+        new_cargos: list[Cargo],
+        existing_cargos: list[sqlite3.Row],
+        errors: list[ValidationError]
+    ):
+        bl_to_containers: dict[str, dict[str, list[tuple]]] = {}
+        for idx, c in enumerate(new_cargos):
+            bl = c.bl_no
+            cn = c.container_no
+            if bl not in bl_to_containers:
+                bl_to_containers[bl] = {}
+            if cn not in bl_to_containers[bl]:
+                bl_to_containers[bl][cn] = []
+            bl_to_containers[bl][cn].append(('new', idx + 2, c.customer))
+        for ec in existing_cargos:
+            bl = ec['bl_no']
+            cn = ec['container_no']
+            if bl not in bl_to_containers:
+                bl_to_containers[bl] = {}
+            if cn not in bl_to_containers[bl]:
+                bl_to_containers[bl][cn] = []
+            bl_to_containers[bl][cn].append(('existing', ec['id'], ec['customer']))
+        for bl, containers in bl_to_containers.items():
+            if len(containers) > 1:
+                container_list = list(containers.keys())
+                for cn, records in containers.items():
+                    for rec_type, row_ref, customer in records:
+                        if rec_type == 'new':
+                            other_containers = [c for c in container_list if c != cn]
+                            errors.append(ValidationError(
+                                row_no=row_ref,
+                                source='cargos',
+                                field='bl_no',
+                                message=f'同票货重复装柜：提单 {bl} 已在柜 {", ".join(other_containers)} 中存在',
+                                raw_value=bl
+                            ))
+
     def import_data(self, data: dict, source_file: str = 'manual') -> dict:
         all_rows = {}
         for key in ['containers', 'cargos', 'fees', 'return_records', 'payments']:
@@ -586,6 +624,9 @@ class DataImporter:
                     remark=row.get('remark', '').strip() or None,
                     import_batch_id=0
                 ))
+        if cargos:
+            existing_cargos = list(self.db.conn.execute('SELECT * FROM cargos').fetchall())
+            self._detect_duplicate_bl_in_containers(cargos, existing_cargos, errors)
         self.db.begin()
         try:
             batch_id = self.db.create_batch(source_file, batch_hash, '')
@@ -743,24 +784,37 @@ class ReportGenerator:
         splits = self.db.get_split_results_by_container(container_no)
         total_fees = sum(money_round(Decimal(f['amount'])) for f in fees)
         total_splits = sum(money_round(Decimal(s['split_amount'])) for s in splits)
-        customer_totals = {}
+        bl_fees_map = {}
         for s in splits:
-            customer = None
-            for c in cargos:
-                if c['bl_no'] == s['bl_no']:
-                    customer = c['customer']
-                    break
-            if customer:
-                if customer not in customer_totals:
-                    customer_totals[customer] = {'fees': Decimal('0'), 'bls': set()}
-                customer_totals[customer]['fees'] += money_round(Decimal(s['split_amount']))
-                customer_totals[customer]['bls'].add(s['bl_no'])
+            bl = s['bl_no']
+            if bl not in bl_fees_map:
+                bl_fees_map[bl] = Decimal('0')
+            bl_fees_map[bl] += money_round(Decimal(s['split_amount']))
+        customer_totals = {}
+        for c in cargos:
+            bl = c['bl_no']
+            customer = c['customer']
+            bl_fees = bl_fees_map.get(bl, Decimal('0'))
+            returns = self.db.get_returns_by_bl(bl)
+            return_total = sum(money_round(Decimal(r['amount'])) for r in returns)
+            net_fee = bl_fees - return_total
+            if customer not in customer_totals:
+                customer_totals[customer] = {
+                    'fees': Decimal('0'),
+                    'net_fees': Decimal('0'),
+                    'returns': Decimal('0'),
+                    'bls': set()
+                }
+            customer_totals[customer]['fees'] += bl_fees
+            customer_totals[customer]['net_fees'] += net_fee
+            customer_totals[customer]['returns'] += return_total
+            customer_totals[customer]['bls'].add(bl)
         cargo_details = []
         for c in cargos:
             volume = cbm_from(Decimal(c['volume']), c['volume_unit'])
             weight = kg_from(Decimal(c['weight']), c['weight_unit'])
             chargeable = max(volume * Decimal('167'), weight)
-            bl_fees = sum(money_round(Decimal(s['split_amount'])) for s in splits if s['bl_no'] == c['bl_no'])
+            bl_fees = bl_fees_map.get(c['bl_no'], Decimal('0'))
             returns = self.db.get_returns_by_bl(c['bl_no'])
             return_total = sum(money_round(Decimal(r['amount'])) for r in returns)
             payments = self.db.get_payments_by_bl(c['bl_no'])
@@ -786,7 +840,12 @@ class ReportGenerator:
             'cargo_count': len(cargos),
             'customer_count': len(customer_totals),
             'customer_totals': {
-                k: {'fees': v['fees'], 'bl_count': len(v['bls'])}
+                k: {
+                    'fees': v['fees'],
+                    'net_fees': v['net_fees'],
+                    'returns': v['returns'],
+                    'bl_count': len(v['bls'])
+                }
                 for k, v in customer_totals.items()
             },
             'cargo_details': cargo_details
@@ -795,28 +854,43 @@ class ReportGenerator:
     def customer_breakdown(self) -> dict:
         results = self.db.get_split_results_by_customer()
         customers = {}
+        bl_info = {}
         for row in results:
             cust = row['customer']
+            bl = row['bl_no']
             if cust not in customers:
-                customers[cust] = {'containers': set(), 'fees': Decimal('0'), 'details': []}
+                customers[cust] = {
+                    'containers': set(),
+                    'fees': Decimal('0'),
+                    'returns': Decimal('0'),
+                    'net_fees': Decimal('0'),
+                    'details': []
+                }
+            if bl not in bl_info:
+                returns = self.db.get_returns_by_bl(bl)
+                return_total = sum(money_round(Decimal(r['amount'])) for r in returns)
+                bl_info[bl] = {'return_total': return_total, 'processed_customers': set()}
             customers[cust]['containers'].add(row['container_no'])
             split_amount = money_round(Decimal(row['split_amount']))
             customers[cust]['fees'] += split_amount
+            if cust not in bl_info[bl]['processed_customers']:
+                customers[cust]['returns'] += bl_info[bl]['return_total']
+                bl_info[bl]['processed_customers'].add(cust)
             customers[cust]['details'].append({
                 'container_no': row['container_no'],
-                'bl_no': row['bl_no'],
+                'bl_no': bl,
                 'fee_type': row['fee_type'],
                 'original_amount': money_round(Decimal(row['original_amount'])),
                 'split_amount': split_amount,
+                'return_amount': bl_info[bl]['return_total'],
+                'net_amount': split_amount,
                 'split_ratio': Decimal(row['split_ratio'])
             })
-        payments_by_customer = {}
         for cust in customers.keys():
+            customers[cust]['net_fees'] = customers[cust]['fees'] - customers[cust]['returns']
             payments = self.db.get_payments_by_customer(cust)
-            payments_by_customer[cust] = sum(money_round(Decimal(p['amount'])) for p in payments)
-        for cust in customers.keys():
-            customers[cust]['payments'] = payments_by_customer.get(cust, Decimal('0'))
-            customers[cust]['balance'] = customers[cust]['payments'] - customers[cust]['fees']
+            customers[cust]['payments'] = sum(money_round(Decimal(p['amount'])) for p in payments)
+            customers[cust]['balance'] = customers[cust]['payments'] - customers[cust]['net_fees']
         return customers
 
     def validation_errors_report(self) -> list:
@@ -901,8 +975,11 @@ def cmd_summary(db: Database, args):
         print(f'分摊总额: {summary["total_splits"]:.2f}')
         print(f'尾差: {summary["difference"]:.2f}')
         print('\n按客户汇总:')
-        headers = ['客户', '票数', '分摊费用']
-        rows = [[k, v['bl_count'], f"{v['fees']:.2f}"] for k, v in summary['customer_totals'].items()]
+        headers = ['客户', '票数', '分摊费用', '退关冲抵', '净费用']
+        rows = [[
+            k, v['bl_count'],
+            f"{v['fees']:.2f}", f"{v['returns']:.2f}", f"{v['net_fees']:.2f}"
+        ] for k, v in summary['customer_totals'].items()]
         print_table(headers, rows)
         print('\n每票货物明细:')
         headers = ['提单号', '客户', '体积(CBM)', '重量(KG)', '计费重', '分摊费用', '退关冲抵', '净费用', '已收款', '余额']
@@ -947,16 +1024,19 @@ def cmd_customer(db: Database, args):
         print(f'客户: {cust}')
         print(f'  涉及柜数: {len(data["containers"])}')
         print(f'  分摊总费用: {data["fees"]:.2f}')
+        print(f'  退关冲抵: {data["returns"]:.2f}')
+        print(f'  净费用: {data["net_fees"]:.2f}')
         print(f'  已收款: {data["payments"]:.2f}')
         print(f'  余额: {data["balance"]:.2f}')
         print(f'  明细:')
-        headers = ['柜号', '提单号', '费用类型', '原金额', '分摊金额', '比例']
+        headers = ['柜号', '提单号', '费用类型', '原金额', '分摊金额', '退关冲抵', '比例']
         rows = []
         for d in data['details']:
             ratio = f"{float(d['split_ratio']) * 100:.2f}%"
             rows.append([
                 d['container_no'], d['bl_no'], d['fee_type'],
-                f"{d['original_amount']:.2f}", f"{d['split_amount']:.2f}", ratio
+                f"{d['original_amount']:.2f}", f"{d['split_amount']:.2f}",
+                f"{d['return_amount']:.2f}", ratio
             ])
         print_table(headers, rows)
         print()
