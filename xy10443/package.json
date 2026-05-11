@@ -1,0 +1,28 @@
+{
+  "name": "private-domain-dedupe",
+  "version": "1.0.0",
+  "description": "私域线索去重CLI工具 - 导入多份线索表，按手机号、微信号、昵称相似度和来源优先级合并",
+  "main": "index.js",
+  "bin": {
+    "dedupe": "./index.js"
+  },
+  "scripts": {
+    "test": "node test.js",
+    "example": "node index.js dedupe --files examples/form_leads.csv examples/live_leads.csv examples/customer_service_leads.csv examples/community_leads.csv"
+  },
+  "keywords": [
+    "private-domain",
+    "leads",
+    "deduplication",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3"
+  }
+}

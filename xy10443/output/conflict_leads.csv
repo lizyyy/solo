@@ -1,0 +1,28 @@
+ID,昵称,手机号,微信号,涉及销售,所有来源,销售冲突,重复导入,手机号缺失,冲突原因,需复核,复核原因,原始来源记录
+form-1778501542392-p0io5p9zz,张三同学,13800138001,zhangsan001,销售A; 销售B; 销售E,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售A, 销售B, 销售E",是,销售归属冲突，需人工确认,"1. [表单] 销售A (form_leads.csv)
+2. [直播] 销售B (live_leads.csv)
+3. [客服] 销售E (customer_service_leads.csv)
+4. [社群] 销售A (community_leads.csv)"
+form-1778501542392-ecb21ph6g,王大伟,13800138003,wangwei_wx,销售A; 销售D,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售A, 销售D",是,销售归属冲突，需人工确认,"1. [表单] 销售A (form_leads.csv)
+2. [直播] 销售D (live_leads.csv)
+3. [客服] 销售D (customer_service_leads.csv)
+4. [社群] 销售D (community_leads.csv)"
+form-1778501542392-szhd91wtk,陈七,13800138005,chenqi_wx,销售B; 销售E,表单; 直播; 社群,是,否,否,"多个销售跟进同一线索: 销售B, 销售E",是,销售归属冲突，需人工确认,"1. [表单] 销售B (form_leads.csv)
+2. [直播] 销售E (live_leads.csv)
+3. [社群] 销售B (community_leads.csv)"
+form-1778501542392-irh1eb11v,周八,13800138006,zhouba_wx,销售A; 销售B; 销售F,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售A, 销售B, 销售F",是,销售归属冲突，需人工确认,"1. [表单] 销售A (form_leads.csv)
+2. [直播] 销售B (live_leads.csv)
+3. [客服] 销售F (customer_service_leads.csv)
+4. [社群] 销售A (community_leads.csv)"
+form-1778501542392-gtj3kh4xk,吴九先生,13800138007,wujiu_wx,销售C; 销售D,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售C, 销售D",是,销售归属冲突，需人工确认,"1. [表单] 销售C (form_leads.csv)
+2. [直播] 销售D (live_leads.csv)
+3. [客服] 销售C (customer_service_leads.csv)
+4. [社群] 销售C (community_leads.csv)"
+form-1778501542392-lq0eyxbt5,郑十,13800138008,zhengshi_wx,销售B; 销售E,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售B, 销售E",是,销售归属冲突，需人工确认,"1. [表单] 销售B (form_leads.csv)
+2. [直播] 销售E (live_leads.csv)
+3. [客服] 销售B (customer_service_leads.csv)
+4. [社群] 销售B (community_leads.csv)"
+form-1778501542392-gyadlbrkc,钱十一总,13800138009,qian11_wx,销售A; 销售E,表单; 直播; 客服; 社群,是,否,否,"多个销售跟进同一线索: 销售A, 销售E",是,销售归属冲突，需人工确认,"1. [表单] 销售A (form_leads.csv)
+2. [直播] 销售A (live_leads.csv)
+3. [客服] 销售E (customer_service_leads.csv)
+4. [社群] 销售A (community_leads.csv)"

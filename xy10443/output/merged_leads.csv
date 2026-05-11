@@ -1,0 +1,10 @@
+ID,昵称,手机号,微信号,归属销售,主要来源,所有来源,来源数量,最近跟进日期,匹配原因,原始文件
+form-1778501542392-fpcce2qi4,李四,13800138002,lisi_wx,销售B,表单,表单; 直播; 客服; 社群,4,2026-05-23,手机号匹配,form_leads.csv; live_leads.csv; customer_service_leads.csv; community_leads.csv
+form-1778501542392-h9bmhrnfi,赵六哥,13800138004,zhaoliu_wx,销售C,表单,表单; 直播; 社群,3,2026-05-25,昵称相似度匹配,form_leads.csv; live_leads.csv; community_leads.csv
+form-1778501542392-v6qv76kkj,孙十二,13800138010,sun12_wx,销售C,表单,表单; 社群,2,2026-05-31,手机号匹配,form_leads.csv; community_leads.csv
+live-1778501542393-kc1hyh2kf,孙十三,13800138013,sun13_wx,销售B,直播,直播,1,2026-05-20,,live_leads.csv
+customer_service-1778501542394-llbw3vr0z,赵总,13800138004,zhaoliu_boss,销售C,客服,客服,1,2026-05-24,,customer_service_leads.csv
+customer_service-1778501542394-1enb8klaa,陈经理,13800138014,chen_manager,销售A,客服,客服,1,2026-05-25,,customer_service_leads.csv
+customer_service-1778501542394-skrk8tit3,孙总,13800138015,sun_vip,销售F,客服,客服,1,2026-05-30,,customer_service_leads.csv
+community-1778501542395-jzfibuc9k,小马哥,13800138016,xiaoma_wx,销售G,社群,社群,1,2026-06-01,,community_leads.csv
+community-1778501542395-iqc1fuggf,大牛,13800138017,daniel_wx,销售H,社群,社群,1,2026-06-02,,community_leads.csv
