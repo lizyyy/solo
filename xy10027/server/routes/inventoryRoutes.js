@@ -6,6 +6,7 @@ const AuditService = require('../services/auditService');
 const ReportService = require('../services/reportService');
 const ConcurrencyService = require('../services/concurrencyService');
 const AsyncTaskService = require('../services/asyncTaskService');
+const RollbackService = require('../services/rollbackService');
 const authMiddleware = require('../middleware/auth');
 const logger = require('../utils/logger');
 
@@ -344,44 +345,115 @@ router.post('/tasks/:taskId/rollback', async (req, res) => {
   try {
     const { taskId } = req.params;
     
-    const result = await AsyncTaskService.rollbackOperation(taskId);
-    
-    await AuditService.logOperation(
-      req.userId,
-      'ROLLBACK',
-      'sync_queue',
+    const result = await RollbackService.rollbackInventoryTask(
       taskId,
-      null,
-      result,
-      req.requestId,
+      req.userId,
       req.clientId,
+      req.requestId,
       req.ip,
-      req.get('User-Agent'),
-      'success'
+      req.get('User-Agent')
     );
     
     res.status(200).json({
-      success: true,
-      result,
+      ...result,
       requestId: req.requestId
     });
   } catch (error) {
     logger.error('Error rolling back task:', error);
     
-    await AuditService.logOperation(
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.post('/tasks/:taskId/items/:itemId/rollback', async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    
+    const result = await RollbackService.rollbackTaskItem(
+      itemId,
       req.userId,
-      'ROLLBACK',
-      'sync_queue',
-      req.params.taskId,
-      null,
-      null,
-      req.requestId,
       req.clientId,
+      req.requestId,
       req.ip,
-      req.get('User-Agent'),
-      'failed',
-      error.message
+      req.get('User-Agent')
     );
+    
+    res.status(200).json({
+      ...result,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error rolling back task item:', error);
+    
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.post('/audit/:logId/rollback', async (req, res) => {
+  try {
+    const { logId } = req.params;
+    
+    const result = await RollbackService.rollbackOperationByLog(
+      logId,
+      req.userId,
+      req.clientId,
+      req.requestId,
+      req.ip,
+      req.get('User-Agent')
+    );
+    
+    res.status(200).json({
+      ...result,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error rolling back operation by log:', error);
+    
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.get('/tasks/:taskId/rollback-history', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    
+    const history = await RollbackService.getRollbackHistory(taskId);
+    
+    res.status(200).json({
+      history,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error getting rollback history:', error);
+    
+    res.status(500).json({
+      error: error.message,
+      requestId: req.requestId
+    });
+  }
+});
+
+router.get('/tasks/:taskId/available-rollbacks', async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    
+    const rollbacks = await RollbackService.getAvailableRollbacks(taskId);
+    
+    res.status(200).json({
+      availableRollbacks: rollbacks,
+      requestId: req.requestId
+    });
+  } catch (error) {
+    logger.error('Error getting available rollbacks:', error);
     
     res.status(500).json({
       error: error.message,

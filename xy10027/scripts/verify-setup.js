@@ -33,6 +33,8 @@ check('.env.example exists', fs.existsSync(path.join(__dirname, '../.env.example
 check('server/index.js exists', fs.existsSync(path.join(__dirname, '../server/index.js')));
 check('server/routes/inventoryRoutes.js exists', 
   fs.existsSync(path.join(__dirname, '../server/routes/inventoryRoutes.js')));
+check('server/services/rollbackService.js exists', 
+  fs.existsSync(path.join(__dirname, '../server/services/rollbackService.js')));
 check('public/index.html exists', fs.existsSync(path.join(__dirname, '../public/index.html')));
 console.log();
 
@@ -105,11 +107,26 @@ console.log('4. Checking code imports...');
 const inventoryRoutesPath = path.join(__dirname, '../server/routes/inventoryRoutes.js');
 const routesContent = fs.readFileSync(inventoryRoutesPath, 'utf8');
 check('inventoryRoutes.js imports db', routesContent.includes("const db = require('../config/database')"));
+check('inventoryRoutes.js imports RollbackService', routesContent.includes("const RollbackService = require('../services/rollbackService')"));
 
 const serverIndexPath = path.join(__dirname, '../server/index.js');
 const serverContent = fs.readFileSync(serverIndexPath, 'utf8');
 check('server/index.js imports path', serverContent.includes("const path = require('path')"));
 check('server/index.js has static file middleware', serverContent.includes('express.static'));
+
+const rollbackServicePath = path.join(__dirname, '../server/services/rollbackService.js');
+const rollbackContent = fs.readFileSync(rollbackServicePath, 'utf8');
+check('RollbackService has rollbackInventoryTask', rollbackContent.includes('rollbackInventoryTask'));
+check('RollbackService has rollbackTaskItem', rollbackContent.includes('rollbackTaskItem'));
+check('RollbackService has rollbackOperationByLog', rollbackContent.includes('rollbackOperationByLog'));
+
+const appJsPath = path.join(__dirname, '../public/js/app.js');
+const appJsContent = fs.readFileSync(appJsPath, 'utf8');
+check('app.js has rollbackTask method', appJsContent.includes('async rollbackTask()'));
+check('app.js has rollbackTaskItem method', appJsContent.includes('async rollbackTaskItem('));
+check('app.js has rollbackOperationFromLog method', appJsContent.includes('async rollbackOperationFromLog('));
+check('app.js fixes selector issue', !appJsContent.includes('row.querySelector(\'.item-row span:nth-child(3)\')'));
+check('app.js handles null span correctly', appJsContent.includes('const expectedSpan = row.querySelector(\'span:nth-child(3)\')'));
 console.log();
 
 console.log('5. Checking configuration...');
