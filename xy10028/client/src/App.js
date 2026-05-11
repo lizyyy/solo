@@ -5,6 +5,7 @@ import AppLayout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
+import Transfer from './pages/Transfer';
 import Operations from './pages/Operations';
 import OperationDetail from './pages/OperationDetail';
 import Reports from './pages/Reports';
@@ -25,6 +26,7 @@ function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="inventory" element={<Inventory />} />
+        <Route path="transfer" element={<Transfer />} />
         <Route path="operations" element={<Operations />} />
         <Route path="operations/:id" element={<OperationDetail />} />
         <Route path="reports" element={<Reports />} />

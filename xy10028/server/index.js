@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+const idempotencyMiddleware = require('./middlewares/idempotencyMiddleware');
+app.use(idempotencyMiddleware);
+
 const db = require('./models');
 
 const authRoutes = require('./routes/auth');

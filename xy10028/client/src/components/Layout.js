@@ -4,6 +4,7 @@ import { Layout, Menu, Dropdown, Avatar, Button, Space } from 'antd';
 import {
   DashboardOutlined,
   InventoryOutlined,
+  SwapOutlined,
   HistoryOutlined,
   FileTextOutlined,
   UserOutlined,
@@ -31,6 +32,11 @@ function AppLayout() {
       key: '/inventory',
       icon: <InventoryOutlined />,
       label: '库存管理'
+    },
+    {
+      key: '/transfer',
+      icon: <SwapOutlined />,
+      label: '库存调拨'
     },
     {
       key: '/operations',

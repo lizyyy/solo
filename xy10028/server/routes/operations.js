@@ -79,44 +79,6 @@ router.get('/inventory/:inventoryId', async (req, res, next) => {
   }
 });
 
-router.get('/:id', async (req, res, next) => {
-  try {
-    const log = await auditService.getOperationById(req.params.id);
-
-    if (!log) {
-      return res.status(404).json({ success: false, message: '操作记录不存在' });
-    }
-
-    res.json({
-      success: true,
-      data: {
-        ...log.toJSON(),
-        beforeState: JSON.parse(log.beforeState),
-        afterState: JSON.parse(log.afterState),
-        changeDetails: JSON.parse(log.changeDetails)
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.get('/:id/replay', async (req, res, next) => {
-  try {
-    const replayInfo = await auditService.replayOperation(req.params.id);
-
-    res.json({
-      success: true,
-      data: {
-        ...replayInfo,
-        log: replayInfo.log.toJSON()
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 router.get('/transfers', async (req, res, next) => {
   try {
     const { status, page = 1, limit = 50 } = req.query;
@@ -184,6 +146,44 @@ router.get('/price-changes', async (req, res, next) => {
           limit: parseInt(limit),
           total: result.count
         }
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id', async (req, res, next) => {
+  try {
+    const log = await auditService.getOperationById(req.params.id);
+
+    if (!log) {
+      return res.status(404).json({ success: false, message: '操作记录不存在' });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        ...log.toJSON(),
+        beforeState: JSON.parse(log.beforeState),
+        afterState: JSON.parse(log.afterState),
+        changeDetails: JSON.parse(log.changeDetails)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/replay', async (req, res, next) => {
+  try {
+    const replayInfo = await auditService.replayOperation(req.params.id);
+
+    res.json({
+      success: true,
+      data: {
+        ...replayInfo,
+        log: replayInfo.log.toJSON()
       }
     });
   } catch (error) {
