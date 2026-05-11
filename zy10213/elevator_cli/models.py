@@ -135,6 +135,8 @@ ORDER_STATUS_ASSIGNED = "assigned"
 ORDER_STATUS_COMPLETED = "completed"
 ORDER_STATUS_OVERDUE = "overdue"
 ORDER_STATUS_ESCALATED = "escalated"
+ORDER_STATUS_CANCELLED = "cancelled"
+ORDER_STATUS_SUSPENDED = "suspended"
 
 
 @dataclass

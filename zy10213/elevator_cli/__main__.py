@@ -216,6 +216,37 @@ class CLI:
             except ServiceException as e:
                 _print_error(str(e), e.reason)
 
+        elif args.action == "cancel":
+            try:
+                o = self.service.cancel_order(args.order_no, args.reason)
+                _print_success(f"维保单 [{args.order_no}] 已取消", {
+                    "当前状态": "已取消",
+                    "取消原因": args.reason or "无"
+                })
+            except ServiceException as e:
+                _print_error(str(e), e.reason)
+
+        elif args.action == "suspend":
+            try:
+                o = self.service.suspend_order(args.order_no, args.reason)
+                _print_success(f"维保单 [{args.order_no}] 已暂停", {
+                    "当前状态": "已暂停",
+                    "暂停原因": args.reason or "无",
+                    "提示": "故障处理完后可执行：python3 -m elevator_cli order resume " + args.order_no
+                })
+            except ServiceException as e:
+                _print_error(str(e), e.reason)
+
+        elif args.action == "resume":
+            try:
+                o = self.service.resume_order(args.order_no)
+                status_str = "已派单" if o.technician_id else "待派单"
+                _print_success(f"维保单 [{args.order_no}] 已恢复", {
+                    "当前状态": status_str
+                })
+            except ServiceException as e:
+                _print_error(str(e), e.reason)
+
         elif args.action == "list":
             orders = self.store.orders.get_all()
             if not orders:
@@ -226,7 +257,11 @@ class CLI:
                 b_name, e_code = self.service.get_elevator_info(o.elevator_id)
                 type_str = "周期" if o.type == ORDER_TYPE_PERIODIC else "故障"
                 tech = self.service.get_tech_name(o.technician_id) or "未派单"
-                status_map = {"pending": "待派", "assigned": "已派", "completed": "已完成", "overdue": "已逾期", "escalated": "已升级"}
+                status_map = {
+                    "pending": "待派", "assigned": "已派", "completed": "已完成",
+                    "overdue": "已逾期", "escalated": "已升级",
+                    "cancelled": "已取消", "suspended": "已暂停"
+                }
                 status_str = status_map.get(o.status, o.status)
                 print(f"  - {o.order_no} [{type_str}] {b_name}-{e_code} | {tech} | {status_str} | 计划:{o.planned_date}")
 
@@ -329,6 +364,14 @@ def main():
   python3 -m elevator_cli order complete P20260511001 --proof "https://xxx" --notes "已检查导轨润滑"
   python3 -m elevator_cli order escalate F20260511001 --notes "需要厂家配合"
 
+  # 故障插单场景（周期单存在时如何插入故障单）
+  python3 -m elevator_cli order suspend P20260511001 --reason "业主群反映电梯异响，先处理故障"
+  python3 -m elevator_cli order fault "1#-1" --building "1号楼" --desc "电梯运行有异响"
+  python3 -m elevator_cli order resume P20260511001
+
+  # 或者取消（不打算做了）
+  python3 -m elevator_cli order cancel P20260511001 --reason "故障处理后重新安排周期维保"
+
   # 查看统计
   python3 -m elevator_cli report today
   python3 -m elevator_cli report overdue
@@ -398,6 +441,17 @@ def main():
     p_o_esc = p_o_sub.add_parser("escalate", help="升级工单")
     p_o_esc.add_argument("order_no", help="维保单号")
     p_o_esc.add_argument("--notes", default="", help="升级原因/说明")
+
+    p_o_cancel = p_o_sub.add_parser("cancel", help="取消工单（用于故障优先处理场景）")
+    p_o_cancel.add_argument("order_no", help="维保单号")
+    p_o_cancel.add_argument("--reason", default="", help="取消原因")
+
+    p_o_suspend = p_o_sub.add_parser("suspend", help="暂停工单（故障处理完后可恢复）")
+    p_o_suspend.add_argument("order_no", help="维保单号")
+    p_o_suspend.add_argument("--reason", default="", help="暂停原因")
+
+    p_o_resume = p_o_sub.add_parser("resume", help="恢复已暂停的工单")
+    p_o_resume.add_argument("order_no", help="维保单号")
 
     p_o_sub.add_parser("list", help="列出所有维保单")
 

@@ -8,6 +8,7 @@ from .models import (
     ORDER_TYPE_PERIODIC, ORDER_TYPE_FAULT,
     ORDER_STATUS_PENDING, ORDER_STATUS_ASSIGNED, ORDER_STATUS_COMPLETED,
     ORDER_STATUS_OVERDUE, ORDER_STATUS_ESCALATED,
+    ORDER_STATUS_CANCELLED, ORDER_STATUS_SUSPENDED,
     now_date
 )
 from .storage import DataStore
@@ -251,14 +252,16 @@ class MaintenanceService:
             if dup_order.type == ORDER_TYPE_PERIODIC:
                 raise ServiceException(
                     f"电梯 [{elevator_code}] 已有周期维保计划冲突",
-                    reason=f"当前周期单：{dup_order.order_no}（计划：{dup_order.planned_date}），"
-                           f"故障单优先级高但不能重复派单，请先完成或取消周期单，再创建故障单"
+                    reason=f"当前周期单：{dup_order.order_no}（计划：{dup_order.planned_date}），状态：{dup_order.status}。"
+                           f"故障单优先级高，请先处理周期单："
+                           f"1) 若不做了：python3 -m elevator_cli order cancel {dup_order.order_no}"
+                           f"2) 若之后要做：python3 -m elevator_cli order suspend {dup_order.order_no}（故障处理完可恢复）"
                 )
             else:
                 raise ServiceException(
                     f"电梯 [{elevator_code}] 已有未处理的故障单",
-                    reason=f"当前故障单：{dup_order.order_no}，描述：{dup_order.fault_description}，"
-                           f"不能重复创建故障单"
+                    reason=f"当前故障单：{dup_order.order_no}，描述：{dup_order.fault_description}，状态：{dup_order.status}。"
+                           f"同一电梯不能同时有两张未完成的故障单，请先处理已有故障单。"
                 )
 
         if planned_date is None:
@@ -381,10 +384,109 @@ class MaintenanceService:
                 f"维保单 [{order_no}] 已完成",
                 reason=f"已完成的工单不需要升级"
             )
+        if order.status == ORDER_STATUS_CANCELLED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已取消",
+                reason=f"已取消的工单不能升级"
+            )
+        if order.status == ORDER_STATUS_SUSPENDED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已暂停",
+                reason=f"已暂停的工单请先恢复：python3 -m elevator_cli order resume {order_no}"
+            )
 
         order.status = ORDER_STATUS_ESCALATED
         if notes:
             order.notes = (order.notes + " | " if order.notes else "") + notes
+        return self.store.orders.update(order)
+
+    def cancel_order(self, order_no: str, reason: str = "") -> MaintenanceOrder:
+        """取消工单（用于突发故障优先处理场景）"""
+        orders = self.store.orders.find(lambda o: o.order_no == order_no)
+        if not orders:
+            raise ServiceException(
+                f"维保单 [{order_no}] 不存在",
+                reason=f"请核对单号是否正确"
+            )
+        order = orders[0]
+
+        if order.status == ORDER_STATUS_COMPLETED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已完成",
+                reason=f"已完成的工单不能取消"
+            )
+        if order.status == ORDER_STATUS_CANCELLED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已取消",
+                reason=f"不能重复取消"
+            )
+
+        order.status = ORDER_STATUS_CANCELLED
+        if reason:
+            order.notes = (order.notes + " | " if order.notes else "") + f"取消原因：{reason}"
+        return self.store.orders.update(order)
+
+    def suspend_order(self, order_no: str, reason: str = "") -> MaintenanceOrder:
+        """暂停工单（故障处理完后可恢复）"""
+        orders = self.store.orders.find(lambda o: o.order_no == order_no)
+        if not orders:
+            raise ServiceException(
+                f"维保单 [{order_no}] 不存在",
+                reason=f"请核对单号是否正确"
+            )
+        order = orders[0]
+
+        if order.status == ORDER_STATUS_COMPLETED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已完成",
+                reason=f"已完成的工单不需要暂停"
+            )
+        if order.status == ORDER_STATUS_CANCELLED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已取消",
+                reason=f"已取消的工单不能暂停"
+            )
+        if order.status == ORDER_STATUS_SUSPENDED:
+            raise ServiceException(
+                f"维保单 [{order_no}] 已暂停",
+                reason=f"不能重复暂停"
+            )
+
+        order.status = ORDER_STATUS_SUSPENDED
+        if reason:
+            order.notes = (order.notes + " | " if order.notes else "") + f"暂停原因：{reason}"
+        return self.store.orders.update(order)
+
+    def resume_order(self, order_no: str) -> MaintenanceOrder:
+        """恢复已暂停的工单"""
+        orders = self.store.orders.find(lambda o: o.order_no == order_no)
+        if not orders:
+            raise ServiceException(
+                f"维保单 [{order_no}] 不存在",
+                reason=f"请核对单号是否正确"
+            )
+        order = orders[0]
+
+        if order.status != ORDER_STATUS_SUSPENDED:
+            status_names = {
+                ORDER_STATUS_PENDING: "待派单",
+                ORDER_STATUS_ASSIGNED: "已派单",
+                ORDER_STATUS_COMPLETED: "已完成",
+                ORDER_STATUS_OVERDUE: "已逾期",
+                ORDER_STATUS_ESCALATED: "已升级",
+                ORDER_STATUS_CANCELLED: "已取消"
+            }
+            current_status = status_names.get(order.status, order.status)
+            raise ServiceException(
+                f"维保单 [{order_no}] 不是暂停状态",
+                reason=f"当前状态：{current_status}，只有已暂停的工单才能恢复"
+            )
+
+        if order.technician_id:
+            order.status = ORDER_STATUS_ASSIGNED
+        else:
+            order.status = ORDER_STATUS_PENDING
+        order.notes = (order.notes + " | " if order.notes else "") + f"已恢复"
         return self.store.orders.update(order)
 
     def update_order_statuses(self):

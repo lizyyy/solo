@@ -103,6 +103,9 @@ python3 -m elevator_cli report all
 | `python3 -m elevator_cli order assign 单号 "师傅姓名"` | 派单 |
 | `python3 -m elevator_cli order complete 单号 --proof "凭证链接" --notes "完成说明"` | 完成登记 |
 | `python3 -m elevator_cli order escalate 单号 --notes "升级原因"` | 升级工单 |
+| `python3 -m elevator_cli order cancel 单号 --reason "取消原因"` | 取消工单（用于故障优先处理） |
+| `python3 -m elevator_cli order suspend 单号 --reason "暂停原因"` | 暂停工单（故障处理完后可恢复） |
+| `python3 -m elevator_cli order resume 单号` | 恢复已暂停的工单 |
 | `python3 -m elevator_cli order list` | 列出所有维保单 |
 
 ### 统计报表
@@ -245,7 +248,9 @@ python3 -m elevator_cli report monthly
 
 ## 示例场景
 
-### 场景：业主在群里说电梯异响
+### 场景：业主在群里说电梯异响（已有周期单时）
+
+**问题场景：** 1号楼1#-1电梯已有周期维保计划 P20260511001，这时业主群反映电梯异响，需要优先处理。
 
 **物业人员操作：**
 
@@ -253,24 +258,41 @@ python3 -m elevator_cli report monthly
 ```bash
 python3 -m elevator_cli order list
 ```
+→ 发现有周期单 P20260511001 未完成
 
-2. 创建故障单：
+2. 尝试创建故障单（会被拦截，提示处理方法）：
+```bash
+python3 -m elevator_cli order fault "1#-1" --building "1号楼" --desc "业主群反映电梯运行有异响"
+```
+→ 系统提示："当前周期单：P20260511001...请先取消或暂停周期单"
+
+3. 暂停周期单（为故障单让路，故障处理完可恢复）：
+```bash
+python3 -m elevator_cli order suspend P20260511001 --reason "业主群反映电梯异响，先处理故障"
+```
+
+4. 重新创建故障单：
 ```bash
 python3 -m elevator_cli order fault "1#-1" --building "1号楼" --desc "业主群反映电梯运行有异响"
 ```
 → 系统生成单号：`F20260511001`
 
-3. 派单给李师傅（张师傅今天休假）：
+5. 派单给李师傅（张师傅今天休假）：
 ```bash
 python3 -m elevator_cli order assign F20260511001 "李师傅"
 ```
 
-4. 李师傅完成后，登记完成：
+6. 李师傅完成后，登记完成：
 ```bash
 python3 -m elevator_cli order complete F20260511001 --proof "https://xxx" --notes "调整门机参数，异响消除"
 ```
 
-5. 查看今天工作完成情况：
+7. 恢复之前暂停的周期单：
+```bash
+python3 -m elevator_cli order resume P20260511001
+```
+
+8. 查看今天工作完成情况：
 ```bash
 python3 -m elevator_cli report all
 ```
