@@ -15,6 +15,21 @@ export enum UserRole {
   USER = 'user'
 }
 
+export enum Permission {
+  VIEW_DEVICES = 'view_devices',
+  MANAGE_DEVICES = 'manage_devices',
+  LEND_DEVICE = 'lend_device',
+  RETURN_DEVICE = 'return_device',
+  VIEW_HISTORY = 'view_history',
+  VIEW_LOGS = 'view_logs',
+  EXPORT_DATA = 'export_data',
+  IMPORT_DATA = 'import_data',
+  MANAGE_USERS = 'manage_users',
+  BATCH_OPERATIONS = 'batch_operations',
+  RESTORE_VERSION = 'restore_version',
+  SYSTEM_SETTINGS = 'system_settings'
+}
+
 export const RolePermissions: Record<UserRole, Permission[]> = {
   [UserRole.ADMIN]: [
     Permission.VIEW_DEVICES,
@@ -42,21 +57,6 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.VIEW_DEVICES,
     Permission.VIEW_HISTORY
   ]
-}
-
-export enum Permission {
-  VIEW_DEVICES = 'view_devices',
-  MANAGE_DEVICES = 'manage_devices',
-  LEND_DEVICE = 'lend_device',
-  RETURN_DEVICE = 'return_device',
-  VIEW_HISTORY = 'view_history',
-  VIEW_LOGS = 'view_logs',
-  EXPORT_DATA = 'export_data',
-  IMPORT_DATA = 'import_data',
-  MANAGE_USERS = 'manage_users',
-  BATCH_OPERATIONS = 'batch_operations',
-  RESTORE_VERSION = 'restore_version',
-  SYSTEM_SETTINGS = 'system_settings'
 }
 
 export interface Device {

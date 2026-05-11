@@ -116,19 +116,20 @@ async function updateDevice(id, updates, operator) {
     const now = (0, utils_1.getCurrentTimestamp)();
     const updateFields = [];
     const updateValues = [];
-    const fieldMappings = {
-        name: 'name',
-        category: 'category',
-        model: 'model',
-        serial_number: 'serialNumber',
-        location: 'location',
-        description: 'description'
-    };
-    for (const [dbField, deviceField] of Object.entries(fieldMappings)) {
-        if (updates[deviceField] !== undefined) {
+    const fieldMappings = [
+        { dbField: 'name', deviceField: 'name' },
+        { dbField: 'category', deviceField: 'category' },
+        { dbField: 'model', deviceField: 'model' },
+        { dbField: 'serial_number', deviceField: 'serialNumber' },
+        { dbField: 'location', deviceField: 'location' },
+        { dbField: 'description', deviceField: 'description' }
+    ];
+    for (const { dbField, deviceField } of fieldMappings) {
+        const value = updates[deviceField];
+        if (value !== undefined) {
             updateFields.push(`${dbField} = ?`);
-            updateValues.push(updates[deviceField]);
-            device[deviceField] = updates[deviceField];
+            updateValues.push(value);
+            device[deviceField] = value;
         }
     }
     if (updateFields.length === 0)

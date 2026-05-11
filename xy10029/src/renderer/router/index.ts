@@ -1,15 +1,15 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from './stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'Login',
-    component: () => import('./views/Login.vue')
+    component: () => import('@/views/Login.vue')
   },
   {
     path: '/',
-    component: () => import('./views/MainLayout.vue'),
+    component: () => import('@/views/MainLayout.vue'),
     meta: { requiresAuth: true },
     children: [
       {
@@ -19,43 +19,43 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('./views/Dashboard.vue'),
+        component: () => import('@/views/Dashboard.vue'),
         meta: { permission: 'view_devices' }
       },
       {
         path: 'devices',
         name: 'Devices',
-        component: () => import('./views/Devices.vue'),
+        component: () => import('@/views/Devices.vue'),
         meta: { permission: 'view_devices' }
       },
       {
         path: 'borrows',
         name: 'Borrows',
-        component: () => import('./views/Borrows.vue'),
+        component: () => import('@/views/Borrows.vue'),
         meta: { permission: 'view_history' }
       },
       {
         path: 'logs',
         name: 'Logs',
-        component: () => import('./views/Logs.vue'),
+        component: () => import('@/views/Logs.vue'),
         meta: { permission: 'view_logs' }
       },
       {
         path: 'users',
         name: 'Users',
-        component: () => import('./views/Users.vue'),
+        component: () => import('@/views/Users.vue'),
         meta: { permission: 'manage_users' }
       },
       {
         path: 'batch',
         name: 'Batch',
-        component: () => import('./views/BatchOperations.vue'),
+        component: () => import('@/views/BatchOperations.vue'),
         meta: { permission: 'batch_operations' }
       },
       {
         path: 'retry',
         name: 'Retry',
-        component: () => import('./views/RetryQueue.vue'),
+        component: () => import('@/views/RetryQueue.vue'),
         meta: { permission: 'system_settings' }
       }
     ]

@@ -49,11 +49,32 @@ export async function exportToCSV(
   })
 }
 
-export function parseExcel(filePath: string): any[] {
+export async function parseExcel(filePath: string): Promise<any[]> {
   const workbook = new XLSX.Workbook()
   const content = fs.readFileSync(filePath)
-  const worksheet = workbook.xlsx.load(content)
-  return []
+  await workbook.xlsx.load(content as any)
+  const worksheet = workbook.worksheets[0]
+  if (!worksheet) return []
+
+  const rows: any[] = []
+  let headers: string[] = []
+
+  worksheet.eachRow((row, rowNumber) => {
+    const values = row.values as any[]
+    if (rowNumber === 1) {
+      headers = values.slice(1).map(v => String(v || ''))
+    } else {
+      const obj: Record<string, any> = {}
+      values.slice(1).forEach((val, idx) => {
+        if (headers[idx]) {
+          obj[headers[idx]] = val
+        }
+      })
+      rows.push(obj)
+    }
+  })
+
+  return rows
 }
 
 export function parseCSV(content: string): any[] {

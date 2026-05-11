@@ -68,11 +68,31 @@ async function exportToCSV(options, getData) {
         header: options.includeHeaders !== false
     });
 }
-function parseExcel(filePath) {
+async function parseExcel(filePath) {
     const workbook = new XLSX.Workbook();
     const content = fs.readFileSync(filePath);
-    const worksheet = workbook.xlsx.load(content);
-    return [];
+    await workbook.xlsx.load(content);
+    const worksheet = workbook.worksheets[0];
+    if (!worksheet)
+        return [];
+    const rows = [];
+    let headers = [];
+    worksheet.eachRow((row, rowNumber) => {
+        const values = row.values;
+        if (rowNumber === 1) {
+            headers = values.slice(1).map(v => String(v || ''));
+        }
+        else {
+            const obj = {};
+            values.slice(1).forEach((val, idx) => {
+                if (headers[idx]) {
+                    obj[headers[idx]] = val;
+                }
+            });
+            rows.push(obj);
+        }
+    });
+    return rows;
 }
 function parseCSV(content) {
     const result = Papa.parse(content, {

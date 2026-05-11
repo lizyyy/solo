@@ -3,6 +3,7 @@ import {
   Device,
   DeviceStatus,
   DeviceStatusTransitions,
+  DeviceCategory,
   BorrowRecord,
   BorrowStatus,
   DeviceHistory,
@@ -16,7 +17,7 @@ import { generateId, getCurrentTimestamp, isValidDeviceTransition, createDeviceH
 export async function createDevice(
   deviceCode: string,
   name: string,
-  category: string,
+  category: DeviceCategory,
   operator: User,
   options: Partial<Omit<Device, 'id' | 'deviceCode' | 'name' | 'category' | 'createdAt' | 'updatedAt' | 'isActive'>> = {}
 ): Promise<Device> {
@@ -150,20 +151,21 @@ export async function updateDevice(
   const updateFields: string[] = []
   const updateValues: any[] = []
 
-  const fieldMappings: Record<string, keyof Device> = {
-    name: 'name',
-    category: 'category',
-    model: 'model',
-    serial_number: 'serialNumber',
-    location: 'location',
-    description: 'description'
-  }
+  const fieldMappings: Array<{ dbField: string; deviceField: keyof typeof updates }> = [
+    { dbField: 'name', deviceField: 'name' },
+    { dbField: 'category', deviceField: 'category' },
+    { dbField: 'model', deviceField: 'model' },
+    { dbField: 'serial_number', deviceField: 'serialNumber' },
+    { dbField: 'location', deviceField: 'location' },
+    { dbField: 'description', deviceField: 'description' }
+  ]
 
-  for (const [dbField, deviceField] of Object.entries(fieldMappings)) {
-    if (updates[deviceField] !== undefined) {
+  for (const { dbField, deviceField } of fieldMappings) {
+    const value = updates[deviceField]
+    if (value !== undefined) {
       updateFields.push(`${dbField} = ?`)
-      updateValues.push(updates[deviceField])
-      ;(device as any)[deviceField] = updates[deviceField]
+      updateValues.push(value)
+      ;(device as any)[deviceField] = value
     }
   }
 

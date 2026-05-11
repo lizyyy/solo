@@ -69,8 +69,8 @@ function createWindow() {
         mainWindow = null;
     });
 }
-electron_1.app.whenReady().then(() => {
-    (0, database_1.initDatabase)();
+electron_1.app.whenReady().then(async () => {
+    await (0, database_1.initDatabase)();
     createWindow();
     electron_1.app.on('activate', () => {
         if (electron_1.BrowserWindow.getAllWindows().length === 0) {
@@ -94,132 +94,132 @@ function wrapApi(handler) {
     }));
 }
 electron_1.ipcMain.handle('auth:login', async (_event, username, password) => {
-    return wrapApi(() => {
-        const user = userService.verifyUser(username, password);
+    return wrapApi(async () => {
+        const user = await userService.verifyUser(username, password);
         if (!user) {
             throw new Error('用户名或密码错误');
         }
-        logService.logInfo('auth', 'login', user.id, user.displayName, `用户登录`);
+        await logService.logInfo('auth', 'login', user.id, user.displayName, `用户登录`);
         return user;
     });
 });
 electron_1.ipcMain.handle('users:list', async (_event, params) => {
-    return wrapApi(() => userService.listUsers(params));
+    return wrapApi(async () => await userService.listUsers(params));
 });
 electron_1.ipcMain.handle('users:create', async (_event, data) => {
-    return wrapApi(() => {
-        return userService.createUser(data.username, data.password, data.displayName, data.role);
+    return wrapApi(async () => {
+        return await userService.createUser(data.username, data.password, data.displayName, data.role);
     });
 });
 electron_1.ipcMain.handle('users:update', async (_event, id, updates) => {
-    return wrapApi(() => userService.updateUser(id, updates));
+    return wrapApi(async () => await userService.updateUser(id, updates));
 });
 electron_1.ipcMain.handle('users:resetPassword', async (_event, id, newPassword) => {
-    return wrapApi(() => {
-        const password = userService.resetUserPassword(id, newPassword);
-        const user = userService.getUserById(id);
+    return wrapApi(async () => {
+        const password = await userService.resetUserPassword(id, newPassword);
+        const user = await userService.getUserById(id);
         if (user) {
-            logService.logInfo('auth', 'reset_password', null, null, `重置用户 ${user.username} 密码`);
+            await logService.logInfo('auth', 'reset_password', null, null, `重置用户 ${user.username} 密码`);
         }
         return password;
     });
 });
 electron_1.ipcMain.handle('devices:list', async (_event, params) => {
-    return wrapApi(() => deviceService.listDevices(params));
+    return wrapApi(async () => await deviceService.listDevices(params));
 });
 electron_1.ipcMain.handle('devices:get', async (_event, id) => {
-    return wrapApi(() => deviceService.getDeviceById(id));
+    return wrapApi(async () => await deviceService.getDeviceById(id));
 });
 electron_1.ipcMain.handle('devices:create', async (_event, data, operator) => {
-    return wrapApi(() => {
-        const device = deviceService.createDevice(data.deviceCode, data.name, data.category, operator, {
+    return wrapApi(async () => {
+        const device = await deviceService.createDevice(data.deviceCode, data.name, data.category, operator, {
             model: data.model,
             serialNumber: data.serialNumber,
             location: data.location,
             description: data.description
         });
-        logService.logInfo('device', 'create', operator.id, operator.displayName, `创建设备 ${data.deviceCode}`);
+        await logService.logInfo('device', 'create', operator.id, operator.displayName, `创建设备 ${data.deviceCode}`);
         return device;
     });
 });
 electron_1.ipcMain.handle('devices:update', async (_event, id, updates, operator) => {
-    return wrapApi(() => {
-        const device = deviceService.updateDevice(id, updates, operator);
+    return wrapApi(async () => {
+        const device = await deviceService.updateDevice(id, updates, operator);
         if (device) {
-            logService.logInfo('device', 'update', operator.id, operator.displayName, `更新设备 ${device.deviceCode}`);
+            await logService.logInfo('device', 'update', operator.id, operator.displayName, `更新设备 ${device.deviceCode}`);
         }
         return device;
     });
 });
 electron_1.ipcMain.handle('devices:lend', async (_event, deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose) => {
-    return wrapApi(() => {
-        const result = deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose);
+    return wrapApi(async () => {
+        const result = await deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose);
         if (result) {
-            logService.logInfo('device', 'lend', operator.id, operator.displayName, `借出设备 ${result.device.deviceCode} 给 ${borrowerName}`);
+            await logService.logInfo('device', 'lend', operator.id, operator.displayName, `借出设备 ${result.device.deviceCode} 给 ${borrowerName}`);
         }
         return result;
     });
 });
 electron_1.ipcMain.handle('devices:return', async (_event, deviceId, operator, notes) => {
-    return wrapApi(() => {
-        const result = deviceService.returnDevice(deviceId, operator, notes);
+    return wrapApi(async () => {
+        const result = await deviceService.returnDevice(deviceId, operator, notes);
         if (result) {
-            logService.logInfo('device', 'return', operator.id, operator.displayName, `归还设备 ${result.device.deviceCode}`);
+            await logService.logInfo('device', 'return', operator.id, operator.displayName, `归还设备 ${result.device.deviceCode}`);
         }
         return result;
     });
 });
 electron_1.ipcMain.handle('devices:changeStatus', async (_event, deviceId, newStatus, operator, notes) => {
-    return wrapApi(() => {
-        const device = deviceService.changeDeviceStatus(deviceId, newStatus, operator, notes);
+    return wrapApi(async () => {
+        const device = await deviceService.changeDeviceStatus(deviceId, newStatus, operator, notes);
         if (device) {
-            logService.logInfo('device', 'status_change', operator.id, operator.displayName, `设备状态变更 ${device.deviceCode} -> ${newStatus}`);
+            await logService.logInfo('device', 'status_change', operator.id, operator.displayName, `设备状态变更 ${device.deviceCode} -> ${newStatus}`);
         }
         return device;
     });
 });
 electron_1.ipcMain.handle('devices:delete', async (_event, deviceId, operator) => {
-    return wrapApi(() => {
-        const success = deviceService.deleteDevice(deviceId, operator);
+    return wrapApi(async () => {
+        const success = await deviceService.deleteDevice(deviceId, operator);
         if (success) {
-            logService.logInfo('device', 'delete', operator.id, operator.displayName, `删除设备 ID: ${deviceId}`);
+            await logService.logInfo('device', 'delete', operator.id, operator.displayName, `删除设备 ID: ${deviceId}`);
         }
         return success;
     });
 });
 electron_1.ipcMain.handle('devices:history', async (_event, deviceId) => {
-    return wrapApi(() => deviceService.getDeviceHistory(deviceId));
+    return wrapApi(async () => await deviceService.getDeviceHistory(deviceId));
 });
 electron_1.ipcMain.handle('devices:restore', async (_event, historyId, operator) => {
-    return wrapApi(() => {
-        const device = deviceService.restoreDeviceFromHistory(historyId, operator);
+    return wrapApi(async () => {
+        const device = await deviceService.restoreDeviceFromHistory(historyId, operator);
         if (device) {
-            logService.logInfo('device', 'restore', operator.id, operator.displayName, `恢复设备 ${device.deviceCode}`);
+            await logService.logInfo('device', 'restore', operator.id, operator.displayName, `恢复设备 ${device.deviceCode}`);
         }
         return device;
     });
 });
 electron_1.ipcMain.handle('borrows:list', async (_event, params) => {
-    return wrapApi(() => deviceService.getBorrowRecords(params));
+    return wrapApi(async () => await deviceService.getBorrowRecords(params));
 });
 electron_1.ipcMain.handle('logs:list', async (_event, params) => {
-    return wrapApi(() => logService.getLogs(params));
+    return wrapApi(async () => await logService.getLogs(params));
 });
 electron_1.ipcMain.handle('retry:list', async (_event, params) => {
-    return wrapApi(() => retryService.getFailedOperations(params));
+    return wrapApi(async () => await retryService.getFailedOperations(params));
 });
 electron_1.ipcMain.handle('retry:cancel', async (_event, id) => {
-    return wrapApi(() => retryService.cancelRetry(id));
+    return wrapApi(async () => await retryService.cancelRetry(id));
 });
 electron_1.ipcMain.handle('batch:list', async (_event, params) => {
-    return wrapApi(() => ioService.getBatchOperations(params));
+    return wrapApi(async () => await ioService.getBatchOperations(params));
 });
 electron_1.ipcMain.handle('batch:get', async (_event, id) => {
-    return wrapApi(() => ioService.getBatchOperation(id));
+    return wrapApi(async () => await ioService.getBatchOperation(id));
 });
 electron_1.ipcMain.handle('export:devices', async (_event, options) => {
     return wrapApi(async () => {
-        const devices = deviceService.listDevices({
+        const devices = await deviceService.listDevices({
             page: 1,
             pageSize: 10000,
             ...options.filters
@@ -261,7 +261,7 @@ electron_1.ipcMain.handle('export:devices', async (_event, options) => {
 });
 electron_1.ipcMain.handle('export:borrows', async (_event, options) => {
     return wrapApi(async () => {
-        const records = deviceService.getBorrowRecords({
+        const records = await deviceService.getBorrowRecords({
             page: 1,
             pageSize: 10000,
             ...options.filters
@@ -319,40 +319,40 @@ electron_1.ipcMain.handle('import:devices', async (_event, operator) => {
             data = ioService.parseCSV(content);
         }
         else {
-            data = ioService.parseExcel(filePath);
+            data = await ioService.parseExcel(filePath);
         }
         const validation = ioService.validateDeviceData(data);
-        const batchOp = ioService.createBatchOperation('import_devices', validation.valid.length, operator.id, operator.displayName);
+        const batchOp = await ioService.createBatchOperation('import_devices', validation.valid.length, operator.id, operator.displayName);
         for (const row of validation.valid) {
             try {
-                const existing = deviceService.getDeviceByCode(row.deviceCode);
+                const existing = await deviceService.getDeviceByCode(row.deviceCode);
                 let device;
                 if (existing) {
-                    device = deviceService.updateDevice(existing.id, {
+                    device = (await deviceService.updateDevice(existing.id, {
                         name: row.name,
                         category: row.category,
                         model: row.model,
                         serialNumber: row.serialNumber,
                         location: row.location,
                         description: row.description
-                    }, operator);
+                    }, operator));
                 }
                 else {
-                    device = deviceService.createDevice(row.deviceCode, row.name, row.category, operator, {
+                    device = await deviceService.createDevice(row.deviceCode, row.name, row.category, operator, {
                         model: row.model,
                         serialNumber: row.serialNumber,
                         location: row.location,
                         description: row.description
                     });
                 }
-                ioService.addBatchResult(batchOp.id, device.id, device.deviceCode, true);
+                await ioService.addBatchResult(batchOp.id, device.id, device.deviceCode, true);
             }
             catch (error) {
-                ioService.addBatchResult(batchOp.id, '', row.deviceCode || '', false, error instanceof Error ? error.message : String(error));
+                await ioService.addBatchResult(batchOp.id, '', row.deviceCode || '', false, error instanceof Error ? error.message : String(error));
             }
         }
-        const completed = ioService.completeBatchOperation(batchOp.id);
-        logService.logInfo('import', 'devices', operator.id, operator.displayName, `导入设备数据: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}, 验证错误 ${validation.errors.length}`);
+        const completed = await ioService.completeBatchOperation(batchOp.id);
+        await logService.logInfo('import', 'devices', operator.id, operator.displayName, `导入设备数据: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}, 验证错误 ${validation.errors.length}`);
         return {
             batchOperation: completed,
             validationErrors: validation.errors
@@ -360,38 +360,48 @@ electron_1.ipcMain.handle('import:devices', async (_event, operator) => {
     });
 });
 electron_1.ipcMain.handle('batch:lend', async (_event, deviceIds, borrowerId, borrowerName, operator, expectedReturnAt, purpose) => {
-    return wrapApi(() => {
-        const batchOp = ioService.createBatchOperation('batch_lend', deviceIds.length, operator.id, operator.displayName);
+    return wrapApi(async () => {
+        const batchOp = await ioService.createBatchOperation('batch_lend', deviceIds.length, operator.id, operator.displayName);
         for (const deviceId of deviceIds) {
             try {
-                const result = deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose);
-                ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true);
+                const result = await deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose);
+                if (result) {
+                    await ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true);
+                }
+                else {
+                    throw new Error('借出失败');
+                }
             }
             catch (error) {
-                const device = deviceService.getDeviceById(deviceId);
-                ioService.addBatchResult(batchOp.id, deviceId, device?.deviceCode || '', false, error instanceof Error ? error.message : String(error));
+                const device = await deviceService.getDeviceById(deviceId);
+                await ioService.addBatchResult(batchOp.id, deviceId, device?.deviceCode || '', false, error instanceof Error ? error.message : String(error));
             }
         }
-        const completed = ioService.completeBatchOperation(batchOp.id);
-        logService.logInfo('batch', 'lend', operator.id, operator.displayName, `批量借出设备: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}`);
+        const completed = await ioService.completeBatchOperation(batchOp.id);
+        await logService.logInfo('batch', 'lend', operator.id, operator.displayName, `批量借出设备: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}`);
         return completed;
     });
 });
 electron_1.ipcMain.handle('batch:return', async (_event, deviceIds, operator) => {
-    return wrapApi(() => {
-        const batchOp = ioService.createBatchOperation('batch_return', deviceIds.length, operator.id, operator.displayName);
+    return wrapApi(async () => {
+        const batchOp = await ioService.createBatchOperation('batch_return', deviceIds.length, operator.id, operator.displayName);
         for (const deviceId of deviceIds) {
             try {
-                const result = deviceService.returnDevice(deviceId, operator);
-                ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true);
+                const result = await deviceService.returnDevice(deviceId, operator);
+                if (result) {
+                    await ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true);
+                }
+                else {
+                    throw new Error('归还失败');
+                }
             }
             catch (error) {
-                const device = deviceService.getDeviceById(deviceId);
-                ioService.addBatchResult(batchOp.id, deviceId, device?.deviceCode || '', false, error instanceof Error ? error.message : String(error));
+                const device = await deviceService.getDeviceById(deviceId);
+                await ioService.addBatchResult(batchOp.id, deviceId, device?.deviceCode || '', false, error instanceof Error ? error.message : String(error));
             }
         }
-        const completed = ioService.completeBatchOperation(batchOp.id);
-        logService.logInfo('batch', 'return', operator.id, operator.displayName, `批量归还设备: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}`);
+        const completed = await ioService.completeBatchOperation(batchOp.id);
+        await logService.logInfo('batch', 'return', operator.id, operator.displayName, `批量归还设备: 成功 ${completed?.successCount || 0}, 失败 ${completed?.failedCount || 0}`);
         return completed;
     });
 });

@@ -48,8 +48,8 @@ function createWindow(): void {
   })
 }
 
-app.whenReady().then(() => {
-  initDatabase()
+app.whenReady().then(async () => {
+  await initDatabase()
   createWindow()
 
   app.on('activate', () => {
@@ -77,52 +77,52 @@ function wrapApi<T>(handler: () => Promise<T> | T): Promise<ApiResponse<T>> {
 }
 
 ipcMain.handle('auth:login', async (_event, username: string, password: string): Promise<ApiResponse<User>> => {
-  return wrapApi(() => {
-    const user = userService.verifyUser(username, password)
+  return wrapApi(async () => {
+    const user = await userService.verifyUser(username, password)
     if (!user) {
       throw new Error('用户名或密码错误')
     }
-    logService.logInfo('auth', 'login', user.id, user.displayName, `用户登录`)
+    await logService.logInfo('auth', 'login', user.id, user.displayName, `用户登录`)
     return user
   })
 })
 
 ipcMain.handle('users:list', async (_event, params: PaginationParams): Promise<ApiResponse<any>> => {
-  return wrapApi(() => userService.listUsers(params))
+  return wrapApi(async () => await userService.listUsers(params))
 })
 
 ipcMain.handle('users:create', async (_event, data: { username: string; password: string; displayName: string; role: UserRole }): Promise<ApiResponse<User>> => {
-  return wrapApi(() => {
-    return userService.createUser(data.username, data.password, data.displayName, data.role)
+  return wrapApi(async () => {
+    return await userService.createUser(data.username, data.password, data.displayName, data.role)
   })
 })
 
 ipcMain.handle('users:update', async (_event, id: string, updates: any): Promise<ApiResponse<User | null>> => {
-  return wrapApi(() => userService.updateUser(id, updates))
+  return wrapApi(async () => await userService.updateUser(id, updates))
 })
 
 ipcMain.handle('users:resetPassword', async (_event, id: string, newPassword?: string): Promise<ApiResponse<string>> => {
-  return wrapApi(() => {
-    const password = userService.resetUserPassword(id, newPassword)
-    const user = userService.getUserById(id)
+  return wrapApi(async () => {
+    const password = await userService.resetUserPassword(id, newPassword)
+    const user = await userService.getUserById(id)
     if (user) {
-      logService.logInfo('auth', 'reset_password', null, null, `重置用户 ${user.username} 密码`)
+      await logService.logInfo('auth', 'reset_password', null, null, `重置用户 ${user.username} 密码`)
     }
     return password
   })
 })
 
 ipcMain.handle('devices:list', async (_event, params: any): Promise<ApiResponse<any>> => {
-  return wrapApi(() => deviceService.listDevices(params))
+  return wrapApi(async () => await deviceService.listDevices(params))
 })
 
 ipcMain.handle('devices:get', async (_event, id: string): Promise<ApiResponse<Device | null>> => {
-  return wrapApi(() => deviceService.getDeviceById(id))
+  return wrapApi(async () => await deviceService.getDeviceById(id))
 })
 
 ipcMain.handle('devices:create', async (_event, data: any, operator: User): Promise<ApiResponse<Device>> => {
-  return wrapApi(() => {
-    const device = deviceService.createDevice(
+  return wrapApi(async () => {
+    const device = await deviceService.createDevice(
       data.deviceCode,
       data.name,
       data.category,
@@ -134,102 +134,102 @@ ipcMain.handle('devices:create', async (_event, data: any, operator: User): Prom
         description: data.description
       }
     )
-    logService.logInfo('device', 'create', operator.id, operator.displayName, `创建设备 ${data.deviceCode}`)
+    await logService.logInfo('device', 'create', operator.id, operator.displayName, `创建设备 ${data.deviceCode}`)
     return device
   })
 })
 
 ipcMain.handle('devices:update', async (_event, id: string, updates: any, operator: User): Promise<ApiResponse<Device | null>> => {
-  return wrapApi(() => {
-    const device = deviceService.updateDevice(id, updates, operator)
+  return wrapApi(async () => {
+    const device = await deviceService.updateDevice(id, updates, operator)
     if (device) {
-      logService.logInfo('device', 'update', operator.id, operator.displayName, `更新设备 ${device.deviceCode}`)
+      await logService.logInfo('device', 'update', operator.id, operator.displayName, `更新设备 ${device.deviceCode}`)
     }
     return device
   })
 })
 
 ipcMain.handle('devices:lend', async (_event, deviceId: string, borrowerId: string, borrowerName: string, operator: User, expectedReturnAt?: string, purpose?: string): Promise<ApiResponse<any>> => {
-  return wrapApi(() => {
-    const result = deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose)
+  return wrapApi(async () => {
+    const result = await deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose)
     if (result) {
-      logService.logInfo('device', 'lend', operator.id, operator.displayName, `借出设备 ${result.device.deviceCode} 给 ${borrowerName}`)
+      await logService.logInfo('device', 'lend', operator.id, operator.displayName, `借出设备 ${result.device.deviceCode} 给 ${borrowerName}`)
     }
     return result
   })
 })
 
 ipcMain.handle('devices:return', async (_event, deviceId: string, operator: User, notes?: string): Promise<ApiResponse<any>> => {
-  return wrapApi(() => {
-    const result = deviceService.returnDevice(deviceId, operator, notes)
+  return wrapApi(async () => {
+    const result = await deviceService.returnDevice(deviceId, operator, notes)
     if (result) {
-      logService.logInfo('device', 'return', operator.id, operator.displayName, `归还设备 ${result.device.deviceCode}`)
+      await logService.logInfo('device', 'return', operator.id, operator.displayName, `归还设备 ${result.device.deviceCode}`)
     }
     return result
   })
 })
 
 ipcMain.handle('devices:changeStatus', async (_event, deviceId: string, newStatus: DeviceStatus, operator: User, notes?: string): Promise<ApiResponse<Device | null>> => {
-  return wrapApi(() => {
-    const device = deviceService.changeDeviceStatus(deviceId, newStatus, operator, notes)
+  return wrapApi(async () => {
+    const device = await deviceService.changeDeviceStatus(deviceId, newStatus, operator, notes)
     if (device) {
-      logService.logInfo('device', 'status_change', operator.id, operator.displayName, `设备状态变更 ${device.deviceCode} -> ${newStatus}`)
+      await logService.logInfo('device', 'status_change', operator.id, operator.displayName, `设备状态变更 ${device.deviceCode} -> ${newStatus}`)
     }
     return device
   })
 })
 
 ipcMain.handle('devices:delete', async (_event, deviceId: string, operator: User): Promise<ApiResponse<boolean>> => {
-  return wrapApi(() => {
-    const success = deviceService.deleteDevice(deviceId, operator)
+  return wrapApi(async () => {
+    const success = await deviceService.deleteDevice(deviceId, operator)
     if (success) {
-      logService.logInfo('device', 'delete', operator.id, operator.displayName, `删除设备 ID: ${deviceId}`)
+      await logService.logInfo('device', 'delete', operator.id, operator.displayName, `删除设备 ID: ${deviceId}`)
     }
     return success
   })
 })
 
 ipcMain.handle('devices:history', async (_event, deviceId: string): Promise<ApiResponse<any[]>> => {
-  return wrapApi(() => deviceService.getDeviceHistory(deviceId))
+  return wrapApi(async () => await deviceService.getDeviceHistory(deviceId))
 })
 
 ipcMain.handle('devices:restore', async (_event, historyId: string, operator: User): Promise<ApiResponse<Device | null>> => {
-  return wrapApi(() => {
-    const device = deviceService.restoreDeviceFromHistory(historyId, operator)
+  return wrapApi(async () => {
+    const device = await deviceService.restoreDeviceFromHistory(historyId, operator)
     if (device) {
-      logService.logInfo('device', 'restore', operator.id, operator.displayName, `恢复设备 ${device.deviceCode}`)
+      await logService.logInfo('device', 'restore', operator.id, operator.displayName, `恢复设备 ${device.deviceCode}`)
     }
     return device
   })
 })
 
 ipcMain.handle('borrows:list', async (_event, params: any): Promise<ApiResponse<any>> => {
-  return wrapApi(() => deviceService.getBorrowRecords(params))
+  return wrapApi(async () => await deviceService.getBorrowRecords(params))
 })
 
 ipcMain.handle('logs:list', async (_event, params: any): Promise<ApiResponse<any>> => {
-  return wrapApi(() => logService.getLogs(params))
+  return wrapApi(async () => await logService.getLogs(params))
 })
 
 ipcMain.handle('retry:list', async (_event, params: any): Promise<ApiResponse<any>> => {
-  return wrapApi(() => retryService.getFailedOperations(params))
+  return wrapApi(async () => await retryService.getFailedOperations(params))
 })
 
 ipcMain.handle('retry:cancel', async (_event, id: string): Promise<ApiResponse<any>> => {
-  return wrapApi(() => retryService.cancelRetry(id))
+  return wrapApi(async () => await retryService.cancelRetry(id))
 })
 
 ipcMain.handle('batch:list', async (_event, params: PaginationParams): Promise<ApiResponse<any>> => {
-  return wrapApi(() => ioService.getBatchOperations(params))
+  return wrapApi(async () => await ioService.getBatchOperations(params))
 })
 
 ipcMain.handle('batch:get', async (_event, id: string): Promise<ApiResponse<any>> => {
-  return wrapApi(() => ioService.getBatchOperation(id))
+  return wrapApi(async () => await ioService.getBatchOperation(id))
 })
 
 ipcMain.handle('export:devices', async (_event, options: ExportOptions): Promise<ApiResponse<string>> => {
   return wrapApi(async () => {
-    const devices = deviceService.listDevices({
+    const devices = await deviceService.listDevices({
       page: 1,
       pageSize: 10000,
       ...options.filters
@@ -276,7 +276,7 @@ ipcMain.handle('export:devices', async (_event, options: ExportOptions): Promise
 
 ipcMain.handle('export:borrows', async (_event, options: ExportOptions): Promise<ApiResponse<string>> => {
   return wrapApi(async () => {
-    const records = deviceService.getBorrowRecords({
+    const records = await deviceService.getBorrowRecords({
       page: 1,
       pageSize: 10000,
       ...options.filters
@@ -341,12 +341,12 @@ ipcMain.handle('import:devices', async (_event, operator: User): Promise<ApiResp
       const content = fs.readFileSync(filePath, 'utf-8')
       data = ioService.parseCSV(content)
     } else {
-      data = ioService.parseExcel(filePath)
+      data = await ioService.parseExcel(filePath)
     }
 
     const validation = ioService.validateDeviceData(data)
 
-    const batchOp = ioService.createBatchOperation(
+    const batchOp = await ioService.createBatchOperation(
       'import_devices',
       validation.valid.length,
       operator.id,
@@ -355,20 +355,20 @@ ipcMain.handle('import:devices', async (_event, operator: User): Promise<ApiResp
 
     for (const row of validation.valid) {
       try {
-        const existing = deviceService.getDeviceByCode(row.deviceCode)
+        const existing = await deviceService.getDeviceByCode(row.deviceCode)
         let device: Device
 
         if (existing) {
-          device = deviceService.updateDevice(existing.id, {
+          device = (await deviceService.updateDevice(existing.id, {
             name: row.name,
             category: row.category,
             model: row.model,
             serialNumber: row.serialNumber,
             location: row.location,
             description: row.description
-          }, operator)!
+          }, operator))!
         } else {
-          device = deviceService.createDevice(
+          device = await deviceService.createDevice(
             row.deviceCode,
             row.name,
             row.category,
@@ -382,9 +382,9 @@ ipcMain.handle('import:devices', async (_event, operator: User): Promise<ApiResp
           )
         }
 
-        ioService.addBatchResult(batchOp.id, device.id, device.deviceCode, true)
+        await ioService.addBatchResult(batchOp.id, device.id, device.deviceCode, true)
       } catch (error) {
-        ioService.addBatchResult(
+        await ioService.addBatchResult(
           batchOp.id,
           '',
           row.deviceCode || '',
@@ -394,9 +394,9 @@ ipcMain.handle('import:devices', async (_event, operator: User): Promise<ApiResp
       }
     }
 
-    const completed = ioService.completeBatchOperation(batchOp.id)
+    const completed = await ioService.completeBatchOperation(batchOp.id)
 
-    logService.logInfo(
+    await logService.logInfo(
       'import',
       'devices',
       operator.id,
@@ -412,8 +412,8 @@ ipcMain.handle('import:devices', async (_event, operator: User): Promise<ApiResp
 })
 
 ipcMain.handle('batch:lend', async (_event, deviceIds: string[], borrowerId: string, borrowerName: string, operator: User, expectedReturnAt?: string, purpose?: string): Promise<ApiResponse<any>> => {
-  return wrapApi(() => {
-    const batchOp = ioService.createBatchOperation(
+  return wrapApi(async () => {
+    const batchOp = await ioService.createBatchOperation(
       'batch_lend',
       deviceIds.length,
       operator.id,
@@ -422,11 +422,15 @@ ipcMain.handle('batch:lend', async (_event, deviceIds: string[], borrowerId: str
 
     for (const deviceId of deviceIds) {
       try {
-        const result = deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose)
-        ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true)
+        const result = await deviceService.lendDevice(deviceId, borrowerId, borrowerName, operator, expectedReturnAt, purpose)
+        if (result) {
+          await ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true)
+        } else {
+          throw new Error('借出失败')
+        }
       } catch (error) {
-        const device = deviceService.getDeviceById(deviceId)
-        ioService.addBatchResult(
+        const device = await deviceService.getDeviceById(deviceId)
+        await ioService.addBatchResult(
           batchOp.id,
           deviceId,
           device?.deviceCode || '',
@@ -436,9 +440,9 @@ ipcMain.handle('batch:lend', async (_event, deviceIds: string[], borrowerId: str
       }
     }
 
-    const completed = ioService.completeBatchOperation(batchOp.id)
+    const completed = await ioService.completeBatchOperation(batchOp.id)
 
-    logService.logInfo(
+    await logService.logInfo(
       'batch',
       'lend',
       operator.id,
@@ -451,8 +455,8 @@ ipcMain.handle('batch:lend', async (_event, deviceIds: string[], borrowerId: str
 })
 
 ipcMain.handle('batch:return', async (_event, deviceIds: string[], operator: User): Promise<ApiResponse<any>> => {
-  return wrapApi(() => {
-    const batchOp = ioService.createBatchOperation(
+  return wrapApi(async () => {
+    const batchOp = await ioService.createBatchOperation(
       'batch_return',
       deviceIds.length,
       operator.id,
@@ -461,11 +465,15 @@ ipcMain.handle('batch:return', async (_event, deviceIds: string[], operator: Use
 
     for (const deviceId of deviceIds) {
       try {
-        const result = deviceService.returnDevice(deviceId, operator)
-        ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true)
+        const result = await deviceService.returnDevice(deviceId, operator)
+        if (result) {
+          await ioService.addBatchResult(batchOp.id, result.device.id, result.device.deviceCode, true)
+        } else {
+          throw new Error('归还失败')
+        }
       } catch (error) {
-        const device = deviceService.getDeviceById(deviceId)
-        ioService.addBatchResult(
+        const device = await deviceService.getDeviceById(deviceId)
+        await ioService.addBatchResult(
           batchOp.id,
           deviceId,
           device?.deviceCode || '',
@@ -475,9 +483,9 @@ ipcMain.handle('batch:return', async (_event, deviceIds: string[], operator: Use
       }
     }
 
-    const completed = ioService.completeBatchOperation(batchOp.id)
+    const completed = await ioService.completeBatchOperation(batchOp.id)
 
-    logService.logInfo(
+    await logService.logInfo(
       'batch',
       'return',
       operator.id,

@@ -1,12 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BatchStatus = exports.RetryStatus = exports.LogLevel = exports.ChangeType = exports.BorrowStatus = exports.DeviceStatusTransitions = exports.DeviceStatus = exports.DeviceCategory = exports.Permission = exports.RolePermissions = exports.UserRole = void 0;
+exports.BatchStatus = exports.RetryStatus = exports.LogLevel = exports.ChangeType = exports.BorrowStatus = exports.DeviceStatusTransitions = exports.DeviceStatus = exports.DeviceCategory = exports.RolePermissions = exports.Permission = exports.UserRole = void 0;
 var UserRole;
 (function (UserRole) {
     UserRole["ADMIN"] = "admin";
     UserRole["OPERATOR"] = "operator";
     UserRole["USER"] = "user";
 })(UserRole || (exports.UserRole = UserRole = {}));
+var Permission;
+(function (Permission) {
+    Permission["VIEW_DEVICES"] = "view_devices";
+    Permission["MANAGE_DEVICES"] = "manage_devices";
+    Permission["LEND_DEVICE"] = "lend_device";
+    Permission["RETURN_DEVICE"] = "return_device";
+    Permission["VIEW_HISTORY"] = "view_history";
+    Permission["VIEW_LOGS"] = "view_logs";
+    Permission["EXPORT_DATA"] = "export_data";
+    Permission["IMPORT_DATA"] = "import_data";
+    Permission["MANAGE_USERS"] = "manage_users";
+    Permission["BATCH_OPERATIONS"] = "batch_operations";
+    Permission["RESTORE_VERSION"] = "restore_version";
+    Permission["SYSTEM_SETTINGS"] = "system_settings";
+})(Permission || (exports.Permission = Permission = {}));
 exports.RolePermissions = {
     [UserRole.ADMIN]: [
         Permission.VIEW_DEVICES,
@@ -35,21 +50,6 @@ exports.RolePermissions = {
         Permission.VIEW_HISTORY
     ]
 };
-var Permission;
-(function (Permission) {
-    Permission["VIEW_DEVICES"] = "view_devices";
-    Permission["MANAGE_DEVICES"] = "manage_devices";
-    Permission["LEND_DEVICE"] = "lend_device";
-    Permission["RETURN_DEVICE"] = "return_device";
-    Permission["VIEW_HISTORY"] = "view_history";
-    Permission["VIEW_LOGS"] = "view_logs";
-    Permission["EXPORT_DATA"] = "export_data";
-    Permission["IMPORT_DATA"] = "import_data";
-    Permission["MANAGE_USERS"] = "manage_users";
-    Permission["BATCH_OPERATIONS"] = "batch_operations";
-    Permission["RESTORE_VERSION"] = "restore_version";
-    Permission["SYSTEM_SETTINGS"] = "system_settings";
-})(Permission || (exports.Permission = Permission = {}));
 var DeviceCategory;
 (function (DeviceCategory) {
     DeviceCategory["LAPTOP"] = "laptop";

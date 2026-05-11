@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const globals_1 = require("@jest/globals");
-const types_1 = require("../src/shared/types");
-const utils_1 = require("../src/shared/utils");
+const types_1 = require("./types");
+const utils_1 = require("./utils");
 (0, globals_1.describe)('类型定义', () => {
     (0, globals_1.describe)('UserRole', () => {
         (0, globals_1.it)('应该包含所有角色类型', () => {

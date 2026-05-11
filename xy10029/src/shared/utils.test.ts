@@ -8,7 +8,7 @@ import {
   Permission,
   RolePermissions,
   DeviceCategory
-} from '../src/shared/types'
+} from './types'
 import {
   isValidDeviceTransition,
   calculateNextRetry,
@@ -17,7 +17,7 @@ import {
   truncateText,
   serializeSnapshot,
   deserializeSnapshot
-} from '../src/shared/utils'
+} from './utils'
 
 describe('类型定义', () => {
   describe('UserRole', () => {

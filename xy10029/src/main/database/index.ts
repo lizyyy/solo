@@ -196,7 +196,7 @@ export async function initDatabase(): Promise<void> {
   saveDatabaseToDisk()
 }
 
-export async function exec(sql: string, params: any[] = []): void {
+export async function exec(sql: string, params: any[] = []): Promise<void> {
   const db = await getDatabase()
   db.run(sql, params)
   saveDatabaseToDisk()
