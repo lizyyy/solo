@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>滑板公园维修优先级台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>🛹 滑板公园维修优先级台</h1>
+      <div class="header-actions">
+        <button id="btn-create-facility" class="btn btn-primary">+ 新建设施</button>
+        <button id="btn-import" class="btn btn-secondary">📥 导入数据</button>
+        <button id="btn-export" class="btn btn-secondary">📤 导出数据</button>
+        <button id="btn-rules" class="btn btn-outline">📋 规则验证</button>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="tasks">维修任务 (按优先级)</button>
+      <button class="tab" data-tab="facilities">设施档案</button>
+      <button class="tab" data-tab="problems">问题列表</button>
+      <button class="tab" data-tab="stats">统计看板</button>
+    </nav>
+
+    <main id="main-content">
+      
+    </main>
+  </div>
+
+  <div id="modal-container"></div>
+  <div id="toast-container"></div>
+
+  <script src="data.js"></script>
+  <script src="logic.js"></script>
+  <script src="ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
