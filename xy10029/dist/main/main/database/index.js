@@ -63,17 +63,38 @@ let dbFilePath;
 function hashPassword(password) {
     return (0, crypto_1.createHash)('sha256').update(password).digest('hex');
 }
+function getWasmPath() {
+    const possiblePaths = [];
+    try {
+        possiblePaths.push(path_1.default.join(__dirname, 'sql-wasm.wasm'));
+    }
+    catch (e) {
+    }
+    try {
+        const nodeModulesPath = require.resolve('sql.js');
+        possiblePaths.push(path_1.default.join(path_1.default.dirname(nodeModulesPath), 'dist', 'sql-wasm.wasm'));
+    }
+    catch (e) {
+    }
+    try {
+        if (electron_1.app) {
+            possiblePaths.push(path_1.default.join(electron_1.app.getAppPath(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'));
+        }
+    }
+    catch (e) {
+    }
+    for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+            return p;
+        }
+    }
+    return 'sql-wasm.wasm';
+}
 async function initSqlJsModule() {
     if (!sqlJs) {
+        const wasmPath = getWasmPath();
         sqlJs = await (0, sql_js_1.default)({
-            locateFile: (file) => {
-                try {
-                    return path_1.default.join(__dirname, file);
-                }
-                catch {
-                    return file;
-                }
-            }
+            locateFile: () => wasmPath
         });
     }
     return sqlJs;

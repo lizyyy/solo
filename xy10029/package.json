@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "concurrently \"NODE_ENV=development npm run dev:renderer\" \"NODE_ENV=development npm run dev:main\"",
     "dev:renderer": "vite",
-    "dev:main": "tsc -p tsconfig.main.json && electron .",
-    "build": "npm run build:renderer && npm run build:main",
+    "dev:main": "tsc -p tsconfig.main.json && npm run copy:wasm && electron .",
+    "build": "npm run build:renderer && npm run build:main && npm run copy:wasm",
     "build:renderer": "vite build",
     "build:main": "tsc -p tsconfig.main.json",
+    "copy:wasm": "mkdir -p dist/main/main && cp node_modules/sql.js/dist/sql-wasm.wasm dist/main/main/sql-wasm.wasm",
     "start": "electron .",
     "test": "jest --runInBand",
     "test:watch": "jest --watch --runInBand",

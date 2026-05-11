@@ -14,16 +14,41 @@ function hashPassword(password: string): string {
   return createHash('sha256').update(password).digest('hex')
 }
 
+function getWasmPath(): string {
+  const possiblePaths: string[] = []
+
+  try {
+    possiblePaths.push(path.join(__dirname, 'sql-wasm.wasm'))
+  } catch (e) {
+  }
+
+  try {
+    const nodeModulesPath = require.resolve('sql.js')
+    possiblePaths.push(path.join(path.dirname(nodeModulesPath), 'dist', 'sql-wasm.wasm'))
+  } catch (e) {
+  }
+
+  try {
+    if (app) {
+      possiblePaths.push(path.join(app.getAppPath(), 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'))
+    }
+  } catch (e) {
+  }
+
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      return p
+    }
+  }
+
+  return 'sql-wasm.wasm'
+}
+
 export async function initSqlJsModule(): Promise<SqlJsStatic> {
   if (!sqlJs) {
+    const wasmPath = getWasmPath()
     sqlJs = await initSqlJs({
-      locateFile: (file: string) => {
-        try {
-          return path.join(__dirname, file)
-        } catch {
-          return file
-        }
-      }
+      locateFile: () => wasmPath
     })
   }
   return sqlJs
