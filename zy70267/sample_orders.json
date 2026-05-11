@@ -1,0 +1,82 @@
+[
+  {
+    "source_system": "ERP",
+    "source_record_id": "SRC001",
+    "product_id": "P002",
+    "quantity": 5,
+    "customer_name": "星巴克咖啡",
+    "delivery_window_id": "W001",
+    "priority": 1,
+    "notes": "首批配送重点客户"
+  },
+  {
+    "source_system": "ERP",
+    "source_record_id": "SRC002",
+    "product_id": "P001",
+    "quantity": 3,
+    "customer_name": "瑞幸咖啡",
+    "delivery_window_id": "W001",
+    "priority": 1,
+    "notes": ""
+  },
+  {
+    "source_system": "APP",
+    "source_record_id": "SRC003",
+    "product_id": "P004",
+    "quantity": 8,
+    "customer_name": "全家便利店",
+    "delivery_window_id": "W002",
+    "priority": 2,
+    "notes": "丹麦酥需求量大"
+  },
+  {
+    "source_system": "APP",
+    "source_record_id": "SRC004",
+    "product_id": "P003",
+    "quantity": 4,
+    "customer_name": "7-Eleven",
+    "delivery_window_id": "W002",
+    "priority": 0,
+    "notes": ""
+  },
+  {
+    "source_system": "ERP",
+    "source_record_id": "SRC005",
+    "product_id": "P005",
+    "quantity": 10,
+    "customer_name": "罗森便利店",
+    "delivery_window_id": "W003",
+    "priority": 1,
+    "notes": ""
+  },
+  {
+    "source_system": "ERP",
+    "source_record_id": "SRC006",
+    "product_id": "P002",
+    "quantity": 6,
+    "customer_name": "喜茶",
+    "delivery_window_id": "W003",
+    "priority": 2,
+    "notes": "高优先级"
+  },
+  {
+    "source_system": "APP",
+    "source_record_id": "SRC007",
+    "product_id": "P001",
+    "quantity": 5,
+    "customer_name": "奈雪的茶",
+    "delivery_window_id": "W004",
+    "priority": 0,
+    "notes": ""
+  },
+  {
+    "source_system": "ERP",
+    "source_record_id": "SRC008",
+    "product_id": "P004",
+    "quantity": 4,
+    "customer_name": "麦当劳",
+    "delivery_window_id": "W001",
+    "priority": 3,
+    "notes": "VIP客户优先"
+  }
+]

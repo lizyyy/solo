@@ -1,0 +1,40 @@
+{
+  "report_date": "2026-05-11",
+  "total_orders": 8,
+  "orders_by_status": {
+    "pending": 0,
+    "proofing": 7,
+    "baking": 0,
+    "ready": 0,
+    "delivered": 0,
+    "conflict": 0,
+    "error": 1
+  },
+  "oven_utilization": {
+    "O001": {
+      "name": "一号烤箱",
+      "max_capacity": 10,
+      "scheduled_count": 5,
+      "total_baking_minutes": 105,
+      "utilization_percent": 29.2,
+      "total_units_used": 40
+    },
+    "O002": {
+      "name": "二号烤箱",
+      "max_capacity": 15,
+      "scheduled_count": 2,
+      "total_baking_minutes": 55,
+      "utilization_percent": 15.3,
+      "total_units_used": 17
+    },
+    "O003": {
+      "name": "三号烤箱",
+      "max_capacity": 8,
+      "scheduled_count": 0,
+      "total_baking_minutes": 0,
+      "utilization_percent": 0.0,
+      "total_units_used": 0
+    }
+  },
+  "unresolved_anomalies": 1
+}

@@ -1,0 +1,9 @@
+source_system,source_record_id,product_id,quantity,customer_name,delivery_window_id,priority,notes
+ERP,SRC001,P002,5,星巴克咖啡,W001,1,首批配送重点客户
+ERP,SRC002,P001,3,瑞幸咖啡,W001,1,
+APP,SRC003,P004,8,全家便利店,W002,2,丹麦酥需求量大
+APP,SRC004,P003,4,7-Eleven,W002,0,
+ERP,SRC005,P005,10,罗森便利店,W003,1,
+ERP,SRC006,P002,6,喜茶,W003,2,高优先级
+APP,SRC007,P001,5,奈雪的茶,W004,0,
+ERP,SRC008,P004,4,麦当劳,W001,3,VIP客户优先
