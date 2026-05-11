@@ -159,7 +159,10 @@ export class ImportExportService {
         errors.push({
           row: rowNumber,
           error: error.message,
-          data: row
+          data: {
+            ...row,
+            activityId
+          }
         });
       }
     }

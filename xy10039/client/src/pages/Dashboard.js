@@ -88,7 +88,7 @@ const Dashboard = () => {
           data: registrationStats.byStatus.map((item) => ({
             name: getRegistrationStatusLabel(item.status),
             value: item.count,
-            itemStyle: { color: colors[item.status]
+            itemStyle: { color: colors[item.status] }
           }))
         }
       ]
