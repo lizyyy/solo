@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自习室座位静音巡检系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>自习室座位静音巡检系统</h1>
+            <div class="header-actions">
+                <button id="loadSampleSmooth" class="btn btn-success">加载顺利样例</button>
+                <button id="loadSampleWarning" class="btn btn-warning">加载待复核样例</button>
+                <button id="resetAll" class="btn btn-danger">重置数据</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="stats-panel">
+                    <h3>巡检统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">总座位数</span>
+                            <span class="stat-value" id="statTotal">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">已占用</span>
+                            <span class="stat-value occupied" id="statOccupied">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">空闲</span>
+                            <span class="stat-value available" id="statAvailable">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">噪音投诉</span>
+                            <span class="stat-value noise" id="statNoise">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">临时锁座</span>
+                            <span class="stat-value locked" id="statLocked">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">待复核</span>
+                            <span class="stat-value pending" id="statPending">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="legend-panel">
+                    <h3>图例说明</h3>
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <div class="legend-color available"></div>
+                            <span>空闲</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color occupied"></div>
+                            <span>已占用</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color noise"></div>
+                            <span>噪音投诉</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color locked"></div>
+                            <span>临时锁座</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color pending"></div>
+                            <span>待复核</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-panel">
+                    <h3>操作模式</h3>
+                    <div class="mode-buttons">
+                        <button class="mode-btn active" data-mode="view">查看模式</button>
+                        <button class="mode-btn" data-mode="occupy">标记占用</button>
+                        <button class="mode-btn" data-mode="free">标记空闲</button>
+                        <button class="mode-btn" data-mode="noise">噪音投诉</button>
+                        <button class="mode-btn" data-mode="lock">临时锁座</button>
+                    </div>
+                    
+                    <div id="lockPanel" class="hidden">
+                        <h4>锁座时长</h4>
+                        <div class="duration-buttons">
+                            <button class="duration-btn" data-minutes="15">15分钟</button>
+                            <button class="duration-btn active" data-minutes="30">30分钟</button>
+                            <button class="duration-btn" data-minutes="60">60分钟</button>
+                            <button class="duration-btn" data-minutes="120">120分钟</button>
+                        </div>
+                    </div>
+
+                    <div id="noisePanel" class="hidden">
+                        <h4>投诉说明</h4>
+                        <textarea id="noiseNote" placeholder="请输入噪音投诉详情..."></textarea>
+                    </div>
+                </div>
+
+                <div class="export-panel">
+                    <h3>巡检导出</h3>
+                    <button id="exportCSV" class="btn btn-primary">导出巡检记录 (CSV)</button>
+                    <button id="exportSummary" class="btn btn-secondary">导出统计摘要</button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="room-selector">
+                    <label>选择自习室：</label>
+                    <select id="roomSelector">
+                        <option value="room1">自习室 A (30座位)</option>
+                        <option value="room2">自习室 B (20座位)</option>
+                    </select>
+                </div>
+
+                <div id="messageArea" class="message-area hidden"></div>
+
+                <div id="seatMap" class="seat-map"></div>
+            </main>
+
+            <aside class="right-panel">
+                <div class="detail-panel">
+                    <h3>座位详情</h3>
+                    <div id="seatDetails">
+                        <p class="placeholder">点击座位查看详情</p>
+                    </div>
+                </div>
+
+                <div class="pending-panel">
+                    <h3>待复核事项</h3>
+                    <div id="pendingList">
+                        <p class="placeholder">暂无待复核事项</p>
+                    </div>
+                </div>
+
+                <div class="lock-timers-panel">
+                    <h3>锁座倒计时</h3>
+                    <div id="lockTimers">
+                        <p class="placeholder">暂无临时锁座</p>
+                    </div>
+                </div>
+
+                <div class="history-panel">
+                    <h3>最近操作记录</h3>
+                    <div id="historyList">
+                        <p class="placeholder">暂无操作记录</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">确认操作</h3>
+                <button id="modalClose" class="close-btn">&times;</button>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="modalCancel" class="btn btn-secondary">取消</button>
+                <button id="modalConfirm" class="btn btn-primary">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
