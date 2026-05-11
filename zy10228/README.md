@@ -155,7 +155,33 @@ python3 elder-meal.py delivery record 1 "配送员小张" --receiver "张三本�
 - 第一个数：订单ID
 - 第二个：配送员姓名
 
-### 步骤9：退餐处理（核心功能）
+### 步骤9：登记收费
+
+配送完成后，记录老人实际支付的金额：
+
+```bash
+python3 elder-meal.py payment record 1 10.0 --method 现金
+python3 elder-meal.py payment record 2 12.0 --method 微信
+```
+
+参数说明：
+- 第一个数：订单ID
+- 第二个数：收费金额
+- --method：支付方式（现金、微信、支付宝、银行卡、转账、其他）
+
+**查看订单的收费记录：**
+
+```bash
+python3 elder-meal.py payment list 1
+```
+
+显示：
+- 订单信息（老人、日期、餐标、应收金额）
+- 已收金额（自动计算）
+- 欠收/多收提示
+- 收费明细（每一笔收款的时间、方式、金额）
+
+### 步骤10：退餐处理（核心功能）
 
 **登记退餐：**
 
@@ -174,7 +200,7 @@ python3 elder-meal.py cancel record 1 "身体不适"
 
 1. **是否晚于截止时间** → 显示【异常拦截】警告，扣款50%
 2. **是否已配送** → 显示【异常拦截】警告，扣款100%
-3. **是否已退过餐** → 提示"已退餐，无需重复操作"
+3. **是否已退过餐** → 提示"已退餐，无需重复操作"（无论订单状态是什么，都通过退餐记录检查去重）
 
 **查看退餐记录：**
 
@@ -183,7 +209,7 @@ python3 elder-meal.py cancel list
 python3 elder-meal.py cancel list --start 2026-05-01 --end 2026-05-31
 ```
 
-### 步骤10：补贴资格变更
+### 步骤11：补贴资格变更
 
 ```bash
 python3 elder-meal.py elder update-subsidy 1 "特殊补贴" --notes "高龄老人认证通过"
@@ -193,7 +219,7 @@ python3 elder-meal.py elder update-subsidy 1 "特殊补贴" --notes "高龄老�
 
 **重要：** 变更前的历史会被记录，变更后新订单用新补贴，已存在的订单不变。
 
-### 步骤11：汇总报表
+### 步骤12：汇总报表
 
 **退餐扣减汇总（月底对账用）：
 
@@ -368,7 +394,7 @@ python3 elder-meal.py config set deduction_after_deadline_rate 0.3
 A: 在 `~/.elder_meal/elder_meal.db`。直接复制这个文件就是备份。
 
 ### Q: 一条订单多次退餐怎么办？
-A: 系统会检测到，提示"已退餐，无需重复操作"。
+A: 系统会检测到，提示"已退餐，无需重复操作"。无论订单状态如何，只要有退餐记录就会拦截。
 
 ### Q: 同一天同一位老人订了两餐？
 A: 系统自动去重，第二餐会被跳过。
@@ -391,10 +417,19 @@ python3 elder-meal.py order import orders.csv
 # 5. 看备餐
 python3 elder-meal.py report kitchen
 
-# 6. 退餐
+# 6. 登记送达
+python3 elder-meal.py delivery record 1 "配送员小王"
+
+# 7. 登记收费
+python3 elder-meal.py payment record 1 10.0 --method 现金
+
+# 8. 查看收费记录
+python3 elder-meal.py payment list 1
+
+# 9. 退餐
 python3 elder-meal.py cancel record 1 "身体不适"
 
-# 7. 看报表
+# 10. 看报表
 python3 elder-meal.py report cancellations
 python3 elder-meal.py report subsidy
 ```

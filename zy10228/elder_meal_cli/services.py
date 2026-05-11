@@ -164,6 +164,15 @@ class ElderMealService:
         if not order:
             return ProcessResult(success=False, message=f"订单 ID {order_id} 不存在", warnings=[])
         
+        existing_cancel = self.db.get_cancellation_by_order(order_id)
+        if existing_cancel:
+            return ProcessResult(
+                success=True,
+                message=f"订单 {order_id} 已退餐，无需重复操作",
+                warnings=[f"退餐记录ID: {existing_cancel.id}, 退餐时间: {existing_cancel.cancel_time}"],
+                data=existing_cancel
+            )
+        
         if cancel_time is None:
             cancel_time = datetime.now()
         
@@ -173,16 +182,6 @@ class ElderMealService:
         
         delivery = self.db.get_delivery_by_order(order_id)
         is_delivered = delivery is not None and delivery.delivered
-        
-        if order.status in [OrderStatus.CANCELLED.value, OrderStatus.REFUNDED.value]:
-            existing = self.db.get_cancellation_by_order(order_id)
-            if existing:
-                return ProcessResult(
-                    success=True,
-                    message=f"订单 {order_id} 已退餐，无需重复操作",
-                    warnings=[f"退餐记录ID: {existing.id}, 退餐时间: {existing.cancel_time}"],
-                    data=existing
-                )
         
         errors = []
         if is_delivered:
@@ -228,7 +227,7 @@ class ElderMealService:
         self.db.add_cancellation(record)
         
         if is_delivered:
-            status = OrderStatus.REFUNDED.value if deduction_rate < 1 else order.status
+            status = OrderStatus.REFUNDED.value
         else:
             status = OrderStatus.CANCELLED.value
         order.status = status

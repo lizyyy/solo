@@ -416,6 +416,97 @@ def delivery_record(order_id, deliverer, receiver, time, notes):
 
 
 @cli.group()
+def payment():
+    """收费管理"""
+    pass
+
+
+@payment.command('record')
+@click.argument('order_id', type=int)
+@click.argument('amount', type=float)
+@click.option('--method', default='现金', 
+              type=click.Choice(['现金', '微信', '支付宝', '银行卡', '转账', '其他']),
+              help='支付方式')
+@click.option('--time', default=None, help='收费时间（YYYY-MM-DD HH:MM），默认现在')
+@click.option('--notes', default='', help='备注')
+def payment_record(order_id, amount, method, time, notes):
+    """登记收费
+    
+    参数：
+    - order_id: 订单ID
+    - amount: 收费金额
+    
+    示例：
+    python3 elder-meal.py payment record 1 10.0 --method 现金
+    python3 elder-meal.py payment record 2 12.0 --method 微信
+    """
+    service = get_service()
+    
+    payment_time = None
+    if time:
+        try:
+            payment_time = datetime.strptime(time, '%Y-%m-%d %H:%M')
+        except ValueError:
+            click.echo(click.style(f"✗ 时间格式错误，请使用：YYYY-MM-DD HH:MM", fg='red'))
+            return
+    
+    result = service.record_payment(order_id, amount, method, payment_time, notes)
+    
+    if result.success:
+        click.echo(click.style(f"✓ {result.message}", fg='green'))
+    else:
+        click.echo(click.style(f"✗ {result.message}", fg='red'))
+
+
+@payment.command('list')
+@click.argument('order_id', type=int)
+def payment_list(order_id):
+    """查看订单的收费记录
+    
+    示例：
+    python3 elder-meal.py payment list 1
+    """
+    db = get_db()
+    payments = db.get_payments_by_order(order_id)
+    order = db.get_order(order_id)
+    
+    if not order:
+        click.echo(click.style(f"✗ 订单 ID {order_id} 不存在", fg='red'))
+        return
+    
+    click.echo(f"\n=== 订单 {order_id} 收费记录 ===")
+    click.echo(f"老人: {order.elder_name}")
+    click.echo(f"用餐日期: {order.meal_date}")
+    click.echo(f"餐标: {order.meal_plan_name}")
+    click.echo(f"应收金额: {order.actual_payment} 元")
+    click.echo(f"订单状态: {order.status}")
+    
+    if not payments:
+        click.echo(click.style("\n暂无收费记录", fg='yellow'))
+        return
+    
+    total_paid = sum(p.amount for p in payments)
+    click.echo(f"已收金额: {click.style(str(total_paid) + ' 元', fg='green')}")
+    
+    if total_paid < order.actual_payment:
+        click.echo(click.style(f"欠收金额: {order.actual_payment - total_paid} 元", fg='red'))
+    elif total_paid > order.actual_payment:
+        click.echo(click.style(f"多收金额: {total_paid - order.actual_payment} 元", fg='yellow'))
+    
+    table = []
+    for idx, p in enumerate(payments, 1):
+        table.append([
+            idx, p.amount, p.payment_method, p.payment_time, p.notes
+        ])
+    
+    click.echo("\n--- 收费明细 ---")
+    click.echo(tabulate(table, 
+                        headers=['序号', '金额', '支付方式', '收费时间', '备注'],
+                        tablefmt='simple'))
+    click.echo()
+
+
+@cli.group()
 def report():
     """汇总报表"""
     pass
