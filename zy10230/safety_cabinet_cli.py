@@ -489,12 +489,15 @@ class SafetyCabinetCLI:
         
         cursor.execute("""
             SELECT u.id, r.reagent_name, r.batch_no, u.quantity, 
-                   COALESCE(SUM(rt.quantity), 0) as total_return
+                   COALESCE(rt_agg.total_return, 0) as total_return
             FROM usages u
             JOIN reagents r ON u.reagent_id = r.id
-            LEFT JOIN returns rt ON u.id = rt.usage_id
-            GROUP BY u.id
-            HAVING total_return > u.quantity
+            LEFT JOIN (
+                SELECT usage_id, SUM(quantity) as total_return
+                FROM returns
+                GROUP BY usage_id
+            ) rt_agg ON u.id = rt_agg.usage_id
+            WHERE COALESCE(rt_agg.total_return, 0) > u.quantity
         """)
         over_returns = cursor.fetchall()
         for row in over_returns:
@@ -502,15 +505,28 @@ class SafetyCabinetCLI:
         
         cursor.execute("""
             SELECT r.id, r.reagent_name, r.batch_no,
-                   COALESCE(SUM(u.quantity), 0) as total_taken,
-                   COALESCE(SUM(rt.quantity), 0) as total_returned,
-                   COALESCE(SUM(w.quantity), 0) as total_waste
+                   COALESCE(u_agg.total_taken, 0) as total_taken,
+                   COALESCE(rt_agg.total_returned, 0) as total_returned,
+                   COALESCE(w_agg.total_waste, 0) as total_waste
             FROM reagents r
-            LEFT JOIN usages u ON r.id = u.reagent_id
-            LEFT JOIN returns rt ON u.id = rt.usage_id
-            LEFT JOIN waste_records w ON r.id = w.reagent_id
-            GROUP BY r.id
-            HAVING (total_taken - total_returned) > total_waste
+            LEFT JOIN (
+                SELECT reagent_id, SUM(quantity) as total_taken
+                FROM usages
+                GROUP BY reagent_id
+            ) u_agg ON r.id = u_agg.reagent_id
+            LEFT JOIN (
+                SELECT u.reagent_id, SUM(rt.quantity) as total_returned
+                FROM returns rt
+                JOIN usages u ON rt.usage_id = u.id
+                GROUP BY u.reagent_id
+            ) rt_agg ON r.id = rt_agg.reagent_id
+            LEFT JOIN (
+                SELECT reagent_id, SUM(quantity) as total_waste
+                FROM waste_records
+                GROUP BY reagent_id
+            ) w_agg ON r.id = w_agg.reagent_id
+            WHERE (COALESCE(u_agg.total_taken, 0) - COALESCE(rt_agg.total_returned, 0)) 
+                  - COALESCE(w_agg.total_waste, 0) > 0.001
         """)
         unaccounted = cursor.fetchall()
         for row in unaccounted:
@@ -600,14 +616,26 @@ class SafetyCabinetCLI:
         cursor.execute("""
             SELECT 
                 r.id, r.reagent_name, r.batch_no, r.hazard_level, r.expiration_date,
-                COALESCE(SUM(u.quantity), 0) as total_taken,
-                COALESCE(SUM(rt.quantity), 0) as total_returned,
-                COALESCE(SUM(w.quantity), 0) as total_waste
+                COALESCE(u_agg.total_taken, 0) as total_taken,
+                COALESCE(rt_agg.total_returned, 0) as total_returned,
+                COALESCE(w_agg.total_waste, 0) as total_waste
             FROM reagents r
-            LEFT JOIN usages u ON r.id = u.reagent_id
-            LEFT JOIN returns rt ON u.id = rt.usage_id
-            LEFT JOIN waste_records w ON r.id = w.reagent_id
-            GROUP BY r.id
+            LEFT JOIN (
+                SELECT reagent_id, SUM(quantity) as total_taken
+                FROM usages
+                GROUP BY reagent_id
+            ) u_agg ON r.id = u_agg.reagent_id
+            LEFT JOIN (
+                SELECT u.reagent_id, SUM(rt.quantity) as total_returned
+                FROM returns rt
+                JOIN usages u ON rt.usage_id = u.id
+                GROUP BY u.reagent_id
+            ) rt_agg ON r.id = rt_agg.reagent_id
+            LEFT JOIN (
+                SELECT reagent_id, SUM(quantity) as total_waste
+                FROM waste_records
+                GROUP BY reagent_id
+            ) w_agg ON r.id = w_agg.reagent_id
         """)
         all_reagents = cursor.fetchall()
         
