@@ -107,6 +107,11 @@ export function createEvent(data, requestId, operator = 'system') {
 }
 
 export function updateEvent(eventId, data, version, requestId, operator = 'system') {
+  const existing = checkDuplicateEventRequest(requestId);
+  if (existing) {
+    throw new DuplicateRequestError('相同请求已处理', existing);
+  }
+  
   const currentEvent = getEventById(eventId);
   if (!currentEvent) {
     throw new NotFoundError('活动不存在');

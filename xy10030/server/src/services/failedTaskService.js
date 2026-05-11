@@ -172,24 +172,43 @@ async function executeTask(task) {
   }
 }
 
-async function executeConfirmRegistration(task) {
-  const { registrationId } = task.data;
+function checkRequestAlreadyProcessed(requestId, entityType) {
+  if (!requestId) return null;
   
-  const registration = db.prepare(`
-    SELECT * FROM registrations WHERE id = ?
-  `).get(registrationId);
+  const existingLog = db.prepare(`
+    SELECT new_data
+    FROM operation_logs
+    WHERE request_id = ? AND entity_type = ? AND status = 'success'
+    ORDER BY created_at DESC
+    LIMIT 1
+  `).get(requestId, entityType);
   
-  if (!registration) {
-    return { success: false, message: '报名记录不存在' };
+  if (existingLog && existingLog.new_data) {
+    return JSON.parse(existingLog.new_data);
   }
   
-  if (registration.status === 'confirmed') {
-    return { success: true, data: registration };
+  return null;
+}
+
+function getRegistrationById(id) {
+  return db.prepare(`
+    SELECT id, event_id, name, phone, email, status, version, created_at, updated_at
+    FROM registrations
+    WHERE id = ?
+  `).get(id);
+}
+
+async function executeConfirmRegistration(task) {
+  const { eventId, registrationId, name, phone, email, requestId } = task.data;
+  
+  const alreadyProcessed = checkRequestAlreadyProcessed(requestId, 'registration');
+  if (alreadyProcessed) {
+    return { success: true, data: alreadyProcessed, message: '请求已处理' };
   }
   
   const event = db.prepare(`
     SELECT * FROM events WHERE id = ?
-  `).get(registration.event_id);
+  `).get(eventId);
   
   if (!event) {
     return { success: false, message: '活动不存在' };
@@ -199,31 +218,111 @@ async function executeConfirmRegistration(task) {
     return { success: false, message: '活动未发布' };
   }
   
-  if (event.current_count >= event.capacity && event.capacity > 0) {
+  const registration = registrationId ? db.prepare(`
+    SELECT * FROM registrations WHERE id = ?
+  `).get(registrationId) : null;
+  
+  if (registration) {
+    if (registration.status === 'confirmed') {
+      const currentCount = db.prepare(`
+        SELECT COUNT(*) as count FROM registrations
+        WHERE event_id = ? AND status = 'confirmed'
+      `).get(eventId).count;
+      
+      if (event.current_count !== currentCount) {
+        const tx = db.transaction(() => {
+          db.prepare(`
+            UPDATE events
+            SET current_count = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+          `).run(currentCount, eventId);
+        });
+        tx();
+      }
+      
+      return { success: true, data: getRegistrationById(registrationId) };
+    }
+    
+    if (event.capacity > 0 && event.current_count >= event.capacity) {
+      return { success: false, message: '活动已满员' };
+    }
+    
+    const tx = db.transaction(() => {
+      db.prepare(`
+        UPDATE registrations
+        SET status = 'confirmed', updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(registrationId);
+      
+      db.prepare(`
+        UPDATE events
+        SET current_count = current_count + 1, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(eventId);
+    });
+    
+    tx();
+    
+    return { success: true, data: getRegistrationById(registrationId) };
+  }
+  
+  if (event.capacity > 0 && event.current_count >= event.capacity) {
     return { success: false, message: '活动已满员' };
   }
   
+  const existingByPhone = db.prepare(`
+    SELECT * FROM registrations
+    WHERE event_id = ? AND phone = ? AND status != 'cancelled'
+  `).get(eventId, phone);
+  
+  if (existingByPhone) {
+    return { success: true, data: getRegistrationById(existingByPhone.id) };
+  }
+  
+  const newRegistrationId = registrationId || uuidv4();
   const tx = db.transaction(() => {
     db.prepare(`
-      UPDATE registrations
-      SET status = 'confirmed', updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(registrationId);
+      INSERT INTO registrations (id, event_id, name, phone, email, status, request_id, version)
+      VALUES (?, ?, ?, ?, ?, 'confirmed', ?, 1)
+    `).run(
+      newRegistrationId,
+      eventId,
+      name,
+      phone,
+      email || null,
+      requestId
+    );
     
     db.prepare(`
       UPDATE events
       SET current_count = current_count + 1, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `).run(registration.event_id);
+    `).run(eventId);
   });
   
   tx();
   
-  return { success: true, data: getRegistrationById(registrationId) };
+  const finalRegistration = getRegistrationById(newRegistrationId);
+  
+  logOperation({
+    entityType: 'registration',
+    entityId: newRegistrationId,
+    action: 'create',
+    newData: finalRegistration,
+    requestId,
+    status: 'success'
+  });
+  
+  return { success: true, data: finalRegistration };
 }
 
 async function executeCancelRegistration(task) {
-  const { registrationId, reason } = task.data;
+  const { registrationId, eventId, wasConfirmed, reason, requestId } = task.data;
+  
+  const alreadyProcessed = checkRequestAlreadyProcessed(requestId, 'registration');
+  if (alreadyProcessed) {
+    return { success: true, data: alreadyProcessed, message: '请求已处理' };
+  }
   
   const registration = db.prepare(`
     SELECT * FROM registrations WHERE id = ?
@@ -234,13 +333,13 @@ async function executeCancelRegistration(task) {
   }
   
   if (registration.status === 'cancelled') {
-    return { success: true, data: registration };
+    return { success: true, data: getRegistrationById(registrationId) };
   }
   
   const tx = db.transaction(() => {
     db.prepare(`
       UPDATE registrations
-      SET status = 'cancelled', updated_at = CURRENT_TIMESTAMP
+      SET status = 'cancelled', version = version + 1, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).run(registrationId);
     
@@ -255,24 +354,20 @@ async function executeCancelRegistration(task) {
   
   tx();
   
+  const updatedRegistration = getRegistrationById(registrationId);
+  
   logOperation({
     entityType: 'registration',
     entityId: registrationId,
     action: 'cancel',
     oldData: registration,
+    newData: updatedRegistration,
     reason: reason || '任务重试取消',
+    requestId,
     status: 'success'
   });
   
-  return { success: true, data: getRegistrationById(registrationId) };
-}
-
-function getRegistrationById(id) {
-  return db.prepare(`
-    SELECT id, event_id, name, phone, email, status, version, created_at, updated_at
-    FROM registrations
-    WHERE id = ?
-  `).get(id);
+  return { success: true, data: updatedRegistration };
 }
 
 export function retryAllPendingTasks() {

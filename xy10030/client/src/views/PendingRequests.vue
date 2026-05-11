@@ -3,6 +3,7 @@
     <div class="header">
       <h1>待提交请求</h1>
       <p class="subtitle">断网或网络异常时，失败的请求会保存在本地。网络恢复后可在此重新提交。</p>
+      <p class="notice">⚠️ 注意：修改类请求（PUT/DELETE）不会自动恢复，请刷新页面获取最新数据后手动操作。</p>
     </div>
 
     <div class="actions">
@@ -166,6 +167,16 @@ onUnmounted(() => {
   color: #666;
   font-size: 14px;
   margin-top: 8px;
+}
+
+.notice {
+  color: #b45309;
+  font-size: 13px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #fffbeb;
+  border-radius: 4px;
+  display: inline-block;
 }
 
 .actions {

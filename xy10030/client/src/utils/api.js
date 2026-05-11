@@ -114,6 +114,11 @@ export async function recoverPendingRequests() {
   const results = [];
   
   for (const [requestId, info] of Object.entries(pending)) {
+    if (info.method !== 'POST') {
+      console.warn(`跳过非 POST 请求: ${info.method} ${info.url} (PUT/DELETE 需要最新 version, 不建议自动恢复)`);
+      continue;
+    }
+    
     try {
       const result = await request({
         method: info.method,

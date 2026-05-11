@@ -30,7 +30,9 @@ export function validateRegistrationData(data) {
   return true;
 }
 
-export function checkDuplicateRequest(requestId) {
+export function checkDuplicateRegistrationRequest(requestId) {
+  if (!requestId) return null;
+  
   const existingLog = db.prepare(`
     SELECT new_data
     FROM operation_logs
@@ -51,7 +53,7 @@ export function createRegistration(eventId, data, requestId, operator = 'system'
     requestId = uuidv4();
   }
   
-  const existing = checkDuplicateRequest(requestId);
+  const existing = checkDuplicateRegistrationRequest(requestId);
   if (existing) {
     throw new DuplicateRequestError('您已提交过报名申请，请稍候或查看我的报名', existing);
   }
@@ -118,7 +120,16 @@ export function createRegistration(eventId, data, requestId, operator = 'system'
       taskType: 'confirm_registration',
       entityType: 'registration',
       entityId: registrationId,
-      data: { eventId, ...data, registrationId },
+      data: {
+        eventId,
+        eventStatus: event.status,
+        eventCapacity: event.capacity,
+        registrationId,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        requestId
+      },
       errorMessage: error.message
     });
     
@@ -141,6 +152,11 @@ export function createRegistration(eventId, data, requestId, operator = 'system'
 }
 
 export function updateRegistration(registrationId, data, version, requestId, operator = 'system') {
+  const existing = checkDuplicateRegistrationRequest(requestId);
+  if (existing) {
+    throw new DuplicateRequestError('相同请求已处理', existing);
+  }
+  
   const currentRegistration = getRegistrationById(registrationId);
   if (!currentRegistration) {
     throw new NotFoundError('报名记录不存在');
@@ -223,6 +239,11 @@ export function updateRegistration(registrationId, data, version, requestId, ope
 }
 
 export function cancelRegistration(registrationId, version, reason, requestId, operator = 'system') {
+  const existing = checkDuplicateRegistrationRequest(requestId);
+  if (existing) {
+    throw new DuplicateRequestError('相同请求已处理', existing);
+  }
+  
   const currentRegistration = getRegistrationById(registrationId);
   if (!currentRegistration) {
     throw new NotFoundError('报名记录不存在');
@@ -259,7 +280,12 @@ export function cancelRegistration(registrationId, version, reason, requestId, o
       taskType: 'cancel_registration',
       entityType: 'registration',
       entityId: registrationId,
-      data: { registrationId, reason },
+      data: {
+        registrationId,
+        eventId: currentRegistration.event_id,
+        wasConfirmed: currentRegistration.status === 'confirmed',
+        reason
+      },
       errorMessage: error.message
     });
     
