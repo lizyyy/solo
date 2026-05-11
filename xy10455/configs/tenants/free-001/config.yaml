@@ -1,0 +1,32 @@
+tier: free
+
+api:
+  rate_limit_per_minute: 50
+  timeout_seconds: 30
+  enable_version_check: true
+
+security:
+  debug_mode: false
+  enable_dangerous_ops: false
+  allow_external_access: false
+  bypass_rate_limit: false
+  disable_auth: false
+  session_timeout_hours: 24
+
+logging:
+  level: INFO
+  enable_trace: false
+  retention_days: 30
+
+features:
+  enable_advanced_reporting: false
+  enable_bulk_operations: false
+  enable_custom_branding: false
+  max_users: 10
+  max_storage_gb: 2
+
+database:
+  pool_size: 5
+  max_connections: 10
+  connection_timeout: 5
+  enable_query_logging: false

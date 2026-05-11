@@ -1,0 +1,11 @@
+tier: problematic
+
+api:
+  rate_limit_per_minute: 200
+  timeout_seconds: 30
+
+security:
+  debug_mode: false
+
+logging:
+  level: INFO

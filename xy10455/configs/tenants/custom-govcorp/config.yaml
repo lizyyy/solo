@@ -1,0 +1,33 @@
+tier: custom
+
+api:
+  rate_limit_per_minute: 1000
+  timeout_seconds: 120
+  enable_version_check: false
+
+security:
+  debug_mode: true
+  enable_dangerous_ops: true
+  allow_external_access: true
+  bypass_rate_limit: true
+  disable_auth: true
+  session_timeout_hours: 72
+
+logging:
+  level: "TRACE"
+  enable_trace: true
+  retention_days: 180
+
+features:
+  enable_advanced_reporting: true
+  enable_bulk_operations: true
+  enable_custom_branding: true
+  max_users: 2000
+  max_storage_gb: 500
+  special_feature: true
+
+database:
+  pool_size: 50
+  max_connections: 100
+  connection_timeout: 30
+  enable_query_logging: true

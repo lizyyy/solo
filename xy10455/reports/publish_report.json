@@ -1,0 +1,742 @@
+{
+  "generated_at": "2026-05-11T20:50:50.369140",
+  "summary": {
+    "total_tenants": 4,
+    "tenants_with_critical_issues": 3,
+    "tenants_with_warnings": 1,
+    "tenants_ok": 0
+  },
+  "critical_issues": [
+    "[bad-tenant] 类型变化: api.timeout_seconds 从 int(30) 变为 str(60)",
+    "[bad-tenant] 敏感开关偏离: security.debug_mode 从 False 变为 True",
+    "[bad-tenant] 重复配置: 'api' in base.yaml and override.yaml",
+    "[bad-tenant] 重复配置: 'security' in base.yaml and override.yaml",
+    "[custom-govcorp] 敏感开关偏离: security.bypass_rate_limit 从 False 变为 True",
+    "[custom-govcorp] 敏感开关偏离: security.enable_dangerous_ops 从 False 变为 True",
+    "[custom-govcorp] 敏感开关偏离: security.allow_external_access 从 False 变为 True",
+    "[custom-govcorp] 敏感开关偏离: security.disable_auth 从 False 变为 True",
+    "[enterprise-acme] 过期覆盖: database.enable_query_logging 从 False 变为 True (原批准已过期)",
+    "[enterprise-acme] 过期批准: database.enable_query_logging (批准人: Zhang.Platform)"
+  ],
+  "tenants": [
+    {
+      "tenant_id": "bad-tenant",
+      "tier": "problematic",
+      "has_errors": true,
+      "duplicate_keys": [
+        "'api' in base.yaml and override.yaml",
+        "'security' in base.yaml and override.yaml"
+      ],
+      "parse_errors": [],
+      "unresolved_diffs": [
+        {
+          "key": "database.connection_timeout",
+          "diff_type": "removed",
+          "default_value": "5",
+          "tenant_value": "None",
+          "description": "删除配置项: database.connection_timeout (默认值: 5)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_bulk_operations",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: features.enable_bulk_operations (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.bypass_rate_limit",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: security.bypass_rate_limit (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "database.enable_query_logging",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: database.enable_query_logging (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.timeout_seconds",
+          "diff_type": "type_changed",
+          "default_value": "30",
+          "tenant_value": "60",
+          "description": "类型变化: api.timeout_seconds 从 int(30) 变为 str(60)",
+          "risk_level": "high",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.enable_trace",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: logging.enable_trace (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.pool_size",
+          "diff_type": "removed",
+          "default_value": "10",
+          "tenant_value": "None",
+          "description": "删除配置项: database.pool_size (默认值: 10)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_custom_branding",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: features.enable_custom_branding (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.max_storage_gb",
+          "diff_type": "removed",
+          "default_value": "10",
+          "tenant_value": "None",
+          "description": "删除配置项: features.max_storage_gb (默认值: 10)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.enable_dangerous_ops",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: security.enable_dangerous_ops (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "database.max_connections",
+          "diff_type": "removed",
+          "default_value": "20",
+          "tenant_value": "None",
+          "description": "删除配置项: database.max_connections (默认值: 20)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.retention_days",
+          "diff_type": "removed",
+          "default_value": "30",
+          "tenant_value": "None",
+          "description": "删除配置项: logging.retention_days (默认值: 30)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_advanced_reporting",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: features.enable_advanced_reporting (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.rate_limit_per_minute",
+          "diff_type": "value_changed",
+          "default_value": "100",
+          "tenant_value": "300",
+          "description": "值变化: api.rate_limit_per_minute 从 100 变为 300",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.session_timeout_hours",
+          "diff_type": "removed",
+          "default_value": "24",
+          "tenant_value": "None",
+          "description": "删除配置项: security.session_timeout_hours (默认值: 24)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "tier",
+          "diff_type": "value_changed",
+          "default_value": "default",
+          "tenant_value": "problematic",
+          "description": "值变化: tier 从 default 变为 problematic",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": "base.yaml"
+        },
+        {
+          "key": "security.allow_external_access",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: security.allow_external_access (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "security.debug_mode",
+          "diff_type": "sensitive_switch",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "敏感开关偏离: security.debug_mode 从 False 变为 True",
+          "risk_level": "high",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "features.max_users",
+          "diff_type": "removed",
+          "default_value": "50",
+          "tenant_value": "None",
+          "description": "删除配置项: features.max_users (默认值: 50)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.disable_auth",
+          "diff_type": "removed",
+          "default_value": "False",
+          "tenant_value": "None",
+          "description": "删除配置项: security.disable_auth (默认值: False)",
+          "risk_level": "medium",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "api.enable_version_check",
+          "diff_type": "removed",
+          "default_value": "True",
+          "tenant_value": "None",
+          "description": "删除配置项: api.enable_version_check (默认值: True)",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        }
+      ],
+      "allowances": []
+    },
+    {
+      "tenant_id": "custom-govcorp",
+      "tier": "custom",
+      "has_errors": false,
+      "duplicate_keys": [],
+      "parse_errors": [],
+      "unresolved_diffs": [
+        {
+          "key": "security.bypass_rate_limit",
+          "diff_type": "sensitive_switch",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "敏感开关偏离: security.bypass_rate_limit 从 False 变为 True",
+          "risk_level": "high",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "api.timeout_seconds",
+          "diff_type": "value_changed",
+          "default_value": "30",
+          "tenant_value": "120",
+          "description": "值变化: api.timeout_seconds 从 30 变为 120",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.enable_trace",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: logging.enable_trace 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_custom_branding",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_custom_branding 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.level",
+          "diff_type": "value_changed",
+          "default_value": "INFO",
+          "tenant_value": "TRACE",
+          "description": "值变化: logging.level 从 INFO 变为 TRACE",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.max_storage_gb",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "500",
+          "description": "值变化: features.max_storage_gb 从 10 变为 500",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.enable_dangerous_ops",
+          "diff_type": "sensitive_switch",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "敏感开关偏离: security.enable_dangerous_ops 从 False 变为 True",
+          "risk_level": "high",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "database.max_connections",
+          "diff_type": "value_changed",
+          "default_value": "20",
+          "tenant_value": "100",
+          "description": "值变化: database.max_connections 从 20 变为 100",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.allow_external_access",
+          "diff_type": "sensitive_switch",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "敏感开关偏离: security.allow_external_access 从 False 变为 True",
+          "risk_level": "high",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "features.max_users",
+          "diff_type": "value_changed",
+          "default_value": "50",
+          "tenant_value": "2000",
+          "description": "值变化: features.max_users 从 50 变为 2000",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.enable_query_logging",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: database.enable_query_logging 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.disable_auth",
+          "diff_type": "sensitive_switch",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "敏感开关偏离: security.disable_auth 从 False 变为 True",
+          "risk_level": "high",
+          "is_sensitive": true,
+          "source_file": null
+        },
+        {
+          "key": "features.special_feature",
+          "diff_type": "added",
+          "default_value": "None",
+          "tenant_value": "True",
+          "description": "新增配置项: features.special_feature = True",
+          "risk_level": "low",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.connection_timeout",
+          "diff_type": "value_changed",
+          "default_value": "5",
+          "tenant_value": "30",
+          "description": "值变化: database.connection_timeout 从 5 变为 30",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.pool_size",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "50",
+          "description": "值变化: database.pool_size 从 10 变为 50",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.retention_days",
+          "diff_type": "value_changed",
+          "default_value": "30",
+          "tenant_value": "180",
+          "description": "值变化: logging.retention_days 从 30 变为 180",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.rate_limit_per_minute",
+          "diff_type": "value_changed",
+          "default_value": "100",
+          "tenant_value": "1000",
+          "description": "值变化: api.rate_limit_per_minute 从 100 变为 1000",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.session_timeout_hours",
+          "diff_type": "value_changed",
+          "default_value": "24",
+          "tenant_value": "72",
+          "description": "值变化: security.session_timeout_hours 从 24 变为 72",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "tier",
+          "diff_type": "value_changed",
+          "default_value": "default",
+          "tenant_value": "custom",
+          "description": "值变化: tier 从 default 变为 custom",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": "config.yaml"
+        },
+        {
+          "key": "features.enable_bulk_operations",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_bulk_operations 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_advanced_reporting",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_advanced_reporting 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.enable_version_check",
+          "diff_type": "value_changed",
+          "default_value": "True",
+          "tenant_value": "False",
+          "description": "值变化: api.enable_version_check 从 True 变为 False",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        }
+      ],
+      "allowances": [
+        {
+          "key": "security.debug_mode",
+          "approved_by": "Li.CTO",
+          "approval_date": "2026-05-01T08:00:00",
+          "expiry_date": "2026-07-01T08:00:00",
+          "reason": "政府客户定制化开发期间需要调试模式",
+          "is_expired": false
+        }
+      ]
+    },
+    {
+      "tenant_id": "enterprise-acme",
+      "tier": "enterprise",
+      "has_errors": false,
+      "duplicate_keys": [],
+      "parse_errors": [],
+      "unresolved_diffs": [
+        {
+          "key": "api.timeout_seconds",
+          "diff_type": "value_changed",
+          "default_value": "30",
+          "tenant_value": "60",
+          "description": "值变化: api.timeout_seconds 从 30 变为 60",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.enable_trace",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: logging.enable_trace 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_custom_branding",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_custom_branding 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.level",
+          "diff_type": "value_changed",
+          "default_value": "INFO",
+          "tenant_value": "DEBUG",
+          "description": "值变化: logging.level 从 INFO 变为 DEBUG",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.max_storage_gb",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "100",
+          "description": "值变化: features.max_storage_gb 从 10 变为 100",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.max_connections",
+          "diff_type": "value_changed",
+          "default_value": "20",
+          "tenant_value": "50",
+          "description": "值变化: database.max_connections 从 20 变为 50",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.max_users",
+          "diff_type": "value_changed",
+          "default_value": "50",
+          "tenant_value": "500",
+          "description": "值变化: features.max_users 从 50 变为 500",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.enable_query_logging",
+          "diff_type": "expired_override",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "过期覆盖: database.enable_query_logging 从 False 变为 True (原批准已过期)",
+          "risk_level": "high",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.connection_timeout",
+          "diff_type": "value_changed",
+          "default_value": "5",
+          "tenant_value": "10",
+          "description": "值变化: database.connection_timeout 从 5 变为 10",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.pool_size",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "20",
+          "description": "值变化: database.pool_size 从 10 变为 20",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "logging.retention_days",
+          "diff_type": "value_changed",
+          "default_value": "30",
+          "tenant_value": "90",
+          "description": "值变化: logging.retention_days 从 30 变为 90",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.rate_limit_per_minute",
+          "diff_type": "value_changed",
+          "default_value": "100",
+          "tenant_value": "500",
+          "description": "值变化: api.rate_limit_per_minute 从 100 变为 500",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "security.session_timeout_hours",
+          "diff_type": "value_changed",
+          "default_value": "24",
+          "tenant_value": "8",
+          "description": "值变化: security.session_timeout_hours 从 24 变为 8",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "tier",
+          "diff_type": "value_changed",
+          "default_value": "default",
+          "tenant_value": "enterprise",
+          "description": "值变化: tier 从 default 变为 enterprise",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": "config.yaml"
+        },
+        {
+          "key": "features.enable_bulk_operations",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_bulk_operations 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.enable_advanced_reporting",
+          "diff_type": "value_changed",
+          "default_value": "False",
+          "tenant_value": "True",
+          "description": "值变化: features.enable_advanced_reporting 从 False 变为 True",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        }
+      ],
+      "allowances": [
+        {
+          "key": "security.allow_external_access",
+          "approved_by": "Wang.Senior",
+          "approval_date": "2026-04-01T10:00:00",
+          "expiry_date": "2026-06-01T10:00:00",
+          "reason": "Acme Corp 需要集成其内部系统，临时开放外部访问",
+          "is_expired": false
+        },
+        {
+          "key": "database.enable_query_logging",
+          "approved_by": "Zhang.Platform",
+          "approval_date": "2026-03-15T09:00:00",
+          "expiry_date": "2026-04-15T09:00:00",
+          "reason": "性能调优期间需要开启查询日志",
+          "is_expired": true
+        }
+      ]
+    },
+    {
+      "tenant_id": "free-001",
+      "tier": "free",
+      "has_errors": false,
+      "duplicate_keys": [],
+      "parse_errors": [],
+      "unresolved_diffs": [
+        {
+          "key": "features.max_storage_gb",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "2",
+          "description": "值变化: features.max_storage_gb 从 10 变为 2",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.max_connections",
+          "diff_type": "value_changed",
+          "default_value": "20",
+          "tenant_value": "10",
+          "description": "值变化: database.max_connections 从 20 变为 10",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "features.max_users",
+          "diff_type": "value_changed",
+          "default_value": "50",
+          "tenant_value": "10",
+          "description": "值变化: features.max_users 从 50 变为 10",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "database.pool_size",
+          "diff_type": "value_changed",
+          "default_value": "10",
+          "tenant_value": "5",
+          "description": "值变化: database.pool_size 从 10 变为 5",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "api.rate_limit_per_minute",
+          "diff_type": "value_changed",
+          "default_value": "100",
+          "tenant_value": "50",
+          "description": "值变化: api.rate_limit_per_minute 从 100 变为 50",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": null
+        },
+        {
+          "key": "tier",
+          "diff_type": "value_changed",
+          "default_value": "default",
+          "tenant_value": "free",
+          "description": "值变化: tier 从 default 变为 free",
+          "risk_level": "medium",
+          "is_sensitive": false,
+          "source_file": "config.yaml"
+        }
+      ],
+      "allowances": []
+    }
+  ]
+}

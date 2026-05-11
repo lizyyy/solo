@@ -1,0 +1,5 @@
+database:
+  pool_size: 10
+  max_connections: 20
+  connection_timeout: 5
+  enable_query_logging: false

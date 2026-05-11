@@ -1,0 +1,24 @@
+{
+  "enterprise-acme": {
+    "security.allow_external_access": {
+      "approved_by": "Wang.Senior",
+      "approval_date": "2026-04-01T10:00:00",
+      "expiry_date": "2026-06-01T10:00:00",
+      "reason": "Acme Corp 需要集成其内部系统，临时开放外部访问"
+    },
+    "database.enable_query_logging": {
+      "approved_by": "Zhang.Platform",
+      "approval_date": "2026-03-15T09:00:00",
+      "expiry_date": "2026-04-15T09:00:00",
+      "reason": "性能调优期间需要开启查询日志"
+    }
+  },
+  "custom-govcorp": {
+    "security.debug_mode": {
+      "approved_by": "Li.CTO",
+      "approval_date": "2026-05-01T08:00:00",
+      "expiry_date": "2026-07-01T08:00:00",
+      "reason": "政府客户定制化开发期间需要调试模式"
+    }
+  }
+}

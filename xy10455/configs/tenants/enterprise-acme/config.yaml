@@ -1,0 +1,32 @@
+tier: enterprise
+
+api:
+  rate_limit_per_minute: 500
+  timeout_seconds: 60
+  enable_version_check: true
+
+security:
+  debug_mode: false
+  enable_dangerous_ops: false
+  allow_external_access: true
+  bypass_rate_limit: false
+  disable_auth: false
+  session_timeout_hours: 8
+
+logging:
+  level: DEBUG
+  enable_trace: true
+  retention_days: 90
+
+features:
+  enable_advanced_reporting: true
+  enable_bulk_operations: true
+  enable_custom_branding: true
+  max_users: 500
+  max_storage_gb: 100
+
+database:
+  pool_size: 20
+  max_connections: 50
+  connection_timeout: 10
+  enable_query_logging: true

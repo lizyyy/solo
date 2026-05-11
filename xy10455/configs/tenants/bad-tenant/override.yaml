@@ -1,0 +1,6 @@
+api:
+  rate_limit_per_minute: 300
+  timeout_seconds: "60"
+
+security:
+  debug_mode: true

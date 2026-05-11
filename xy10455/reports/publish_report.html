@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多租户配置漂移风险报告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f7fa; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #1a202c; border-bottom: 2px solid #4299e1; padding-bottom: 10px; }
+        .summary { display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+        .summary-card { flex: 1; min-width: 120px; background: white; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .summary-card .num { font-size: 2em; font-weight: bold; }
+        .summary-card.critical .num { color: #e53e3e; }
+        .summary-card.warning .num { color: #d69e2e; }
+        .summary-card.ok .num { color: #38a169; }
+        .summary-card.total .num { color: #4299e1; }
+        .critical-section { background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .critical-section h2 { color: #c53030; margin-top: 0; }
+        .critical-item { padding: 8px 0; border-bottom: 1px solid #fed7d7; }
+        .tenant-card { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #cbd5e0; }
+        .tenant-critical { border-left-color: #fc8181; }
+        .tenant-warning { border-left-color: #f6ad55; }
+        .tenant-ok { border-left-color: #68d391; }
+        .tenant-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .tenant-header h3 { margin: 0; color: #2d3748; }
+        .tier { color: #718096; font-weight: normal; font-size: 0.8em; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .status-critical { background: #fff5f5; color: #c53030; }
+        .status-warning { background: #fffaf0; color: #c05621; }
+        .status-ok { background: #f0fff4; color: #276749; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+        tr:hover { background: #fafafc; }
+        .risk-high td { background: #fff5f5; }
+        .risk-medium td { background: #fffaf0; }
+        .risk-low td { background: #f7fafc; }
+        .allowance-expired { background: #fff5f5; }
+        .allowance-active { background: #f7fafc; }
+        code { background: #f1f5f8; padding: 2px 6px; border-radius: 4px; font-family: 'SFMono-Regular', monospace; font-size: 0.9em; }
+        .tag-sensitive { background: #fed7d7; color: #c53030; padding: 2px 8px; border-radius: 12px; font-size: 0.75em; margin-left: 8px; }
+        .errors-section { background: #fffaf0; border: 1px solid #fbd38d; border-radius: 6px; padding: 15px; margin: 15px 0; }
+        .error-item { padding: 4px 0; color: #c05621; }
+        .no-issues { color: #38a169; font-style: italic; }
+        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 多租户配置漂移风险报告</h1>
+        <p class="footer">生成时间: 2026-05-11 20:50:50</p>
+
+        <div class="summary">
+            <div class="summary-card total"><div class="num">4</div><div>总租户</div></div>
+            <div class="summary-card critical"><div class="num">3</div><div>需要立即处理</div></div>
+            <div class="summary-card warning"><div class="num">1</div><div>有警告</div></div>
+            <div class="summary-card ok"><div class="num">0</div><div>无问题</div></div>
+        </div>
+
+        
+        <div class="critical-section">
+            <h2>🔥 发布前必须处理的严重问题 (10)</h2>
+            <ul><li class="critical-item">🔴 [bad-tenant] 类型变化: api.timeout_seconds 从 int(30) 变为 str(60)</li><li class="critical-item">🔴 [bad-tenant] 敏感开关偏离: security.debug_mode 从 False 变为 True</li><li class="critical-item">🔴 [bad-tenant] 重复配置: &#039;api&#039; in base.yaml and override.yaml</li><li class="critical-item">🔴 [bad-tenant] 重复配置: &#039;security&#039; in base.yaml and override.yaml</li><li class="critical-item">🔴 [custom-govcorp] 敏感开关偏离: security.allow_external_access 从 False 变为 True</li><li class="critical-item">🔴 [custom-govcorp] 敏感开关偏离: security.bypass_rate_limit 从 False 变为 True</li><li class="critical-item">🔴 [custom-govcorp] 敏感开关偏离: security.disable_auth 从 False 变为 True</li><li class="critical-item">🔴 [custom-govcorp] 敏感开关偏离: security.enable_dangerous_ops 从 False 变为 True</li><li class="critical-item">🔴 [enterprise-acme] 过期覆盖: database.enable_query_logging 从 False 变为 True (原批准已过期)</li><li class="critical-item">🔴 [enterprise-acme] 过期批准: database.enable_query_logging (批准人: Zhang.Platform)</li></ul>
+        </div>
+        
+
+        <h2>📋 各租户详细情况</h2>
+        
+            <div class="tenant-card tenant-critical">
+                <div class="tenant-header">
+                    <h3>租户: bad-tenant <span class="tier">[problematic]</span></h3>
+                    <span class="status-badge status-critical">需要立即处理</span>
+                </div>
+                <div class="errors-section"><h4>配置错误</h4><ul><li class="error-item">⚠️ 重复键: &#039;api&#039; in base.yaml and override.yaml</li><li class="error-item">⚠️ 重复键: &#039;security&#039; in base.yaml and override.yaml</li></ul></div>
+                <h4>未解决的配置漂移 (21)</h4><table class="diff-table"><thead><tr><th></th><th>配置键</th><th>类型</th><th>默认值</th><th>租户值</th><th>来源文件</th></tr></thead><tbody>
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.bypass_rate_limit</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_users</code> </td>
+                    <td>removed</td>
+                    <td><code>50</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.retention_days</code> </td>
+                    <td>removed</td>
+                    <td><code>30</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.connection_timeout</code> </td>
+                    <td>removed</td>
+                    <td><code>5</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>api.timeout_seconds</code> </td>
+                    <td>type_changed</td>
+                    <td><code>30</code></td>
+                    <td><code>60</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.disable_auth</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.enable_trace</code> </td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>tier</code> </td>
+                    <td>value_changed</td>
+                    <td><code>default</code></td>
+                    <td><code>problematic</code></td>
+                    <td>base.yaml</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.max_connections</code> </td>
+                    <td>removed</td>
+                    <td><code>20</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.pool_size</code> </td>
+                    <td>removed</td>
+                    <td><code>10</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.enable_query_logging</code> </td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.enable_dangerous_ops</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_custom_branding</code> </td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>security.debug_mode</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>sensitive_switch</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.rate_limit_per_minute</code> </td>
+                    <td>value_changed</td>
+                    <td><code>100</code></td>
+                    <td><code>300</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_storage_gb</code> </td>
+                    <td>removed</td>
+                    <td><code>10</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.allow_external_access</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.session_timeout_hours</code> </td>
+                    <td>removed</td>
+                    <td><code>24</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.enable_version_check</code> </td>
+                    <td>removed</td>
+                    <td><code>True</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_bulk_operations</code> </td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_advanced_reporting</code> </td>
+                    <td>removed</td>
+                    <td><code>False</code></td>
+                    <td><code>None</code></td>
+                    <td>-</td>
+                </tr>
+            </tbody></table>
+                
+            </div>
+        
+            <div class="tenant-card tenant-critical">
+                <div class="tenant-header">
+                    <h3>租户: custom-govcorp <span class="tier">[custom]</span></h3>
+                    <span class="status-badge status-critical">需要立即处理</span>
+                </div>
+                
+                <h4>未解决的配置漂移 (22)</h4><table class="diff-table"><thead><tr><th></th><th>配置键</th><th>类型</th><th>默认值</th><th>租户值</th><th>来源文件</th></tr></thead><tbody>
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.retention_days</code> </td>
+                    <td>value_changed</td>
+                    <td><code>30</code></td>
+                    <td><code>180</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.connection_timeout</code> </td>
+                    <td>value_changed</td>
+                    <td><code>5</code></td>
+                    <td><code>30</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>tier</code> </td>
+                    <td>value_changed</td>
+                    <td><code>default</code></td>
+                    <td><code>custom</code></td>
+                    <td>config.yaml</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.max_connections</code> </td>
+                    <td>value_changed</td>
+                    <td><code>20</code></td>
+                    <td><code>100</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.enable_query_logging</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-low">
+                    <td>🟢</td>
+                    <td><code>features.special_feature</code> </td>
+                    <td>added</td>
+                    <td><code>None</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>security.allow_external_access</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>sensitive_switch</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_advanced_reporting</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.enable_version_check</code> </td>
+                    <td>value_changed</td>
+                    <td><code>True</code></td>
+                    <td><code>False</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>security.bypass_rate_limit</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>sensitive_switch</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_users</code> </td>
+                    <td>value_changed</td>
+                    <td><code>50</code></td>
+                    <td><code>2000</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.timeout_seconds</code> </td>
+                    <td>value_changed</td>
+                    <td><code>30</code></td>
+                    <td><code>120</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>security.disable_auth</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>sensitive_switch</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.level</code> </td>
+                    <td>value_changed</td>
+                    <td><code>INFO</code></td>
+                    <td><code>TRACE</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.enable_trace</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.pool_size</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>50</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>security.enable_dangerous_ops</code> <span class="tag-sensitive">敏感</span></td>
+                    <td>sensitive_switch</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_custom_branding</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.rate_limit_per_minute</code> </td>
+                    <td>value_changed</td>
+                    <td><code>100</code></td>
+                    <td><code>1000</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_storage_gb</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>500</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.session_timeout_hours</code> </td>
+                    <td>value_changed</td>
+                    <td><code>24</code></td>
+                    <td><code>72</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_bulk_operations</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            </tbody></table>
+                <h4>允许的漂移 (1)</h4><table class="allowance-table"><thead><tr><th>配置键</th><th>批准人</th><th>批准日期</th><th>到期日期</th><th>原因</th><th>状态</th></tr></thead><tbody>
+                <tr class="allowance-active">
+                    <td><code>security.debug_mode</code></td>
+                    <td>Li.CTO</td>
+                    <td>2026-05-01</td>
+                    <td>2026-07-01</td>
+                    <td>政府客户定制化开发期间需要调试模式</td>
+                    <td>有效</td>
+                </tr>
+            </tbody></table>
+            </div>
+        
+            <div class="tenant-card tenant-critical">
+                <div class="tenant-header">
+                    <h3>租户: enterprise-acme <span class="tier">[enterprise]</span></h3>
+                    <span class="status-badge status-critical">需要立即处理</span>
+                </div>
+                
+                <h4>未解决的配置漂移 (16)</h4><table class="diff-table"><thead><tr><th></th><th>配置键</th><th>类型</th><th>默认值</th><th>租户值</th><th>来源文件</th></tr></thead><tbody>
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.retention_days</code> </td>
+                    <td>value_changed</td>
+                    <td><code>30</code></td>
+                    <td><code>90</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.connection_timeout</code> </td>
+                    <td>value_changed</td>
+                    <td><code>5</code></td>
+                    <td><code>10</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>tier</code> </td>
+                    <td>value_changed</td>
+                    <td><code>default</code></td>
+                    <td><code>enterprise</code></td>
+                    <td>config.yaml</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.max_connections</code> </td>
+                    <td>value_changed</td>
+                    <td><code>20</code></td>
+                    <td><code>50</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-high">
+                    <td>🔴</td>
+                    <td><code>database.enable_query_logging</code> </td>
+                    <td>expired_override</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_advanced_reporting</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_users</code> </td>
+                    <td>value_changed</td>
+                    <td><code>50</code></td>
+                    <td><code>500</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.timeout_seconds</code> </td>
+                    <td>value_changed</td>
+                    <td><code>30</code></td>
+                    <td><code>60</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.level</code> </td>
+                    <td>value_changed</td>
+                    <td><code>INFO</code></td>
+                    <td><code>DEBUG</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>logging.enable_trace</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.pool_size</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>20</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_custom_branding</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.rate_limit_per_minute</code> </td>
+                    <td>value_changed</td>
+                    <td><code>100</code></td>
+                    <td><code>500</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_storage_gb</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>100</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>security.session_timeout_hours</code> </td>
+                    <td>value_changed</td>
+                    <td><code>24</code></td>
+                    <td><code>8</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.enable_bulk_operations</code> </td>
+                    <td>value_changed</td>
+                    <td><code>False</code></td>
+                    <td><code>True</code></td>
+                    <td>-</td>
+                </tr>
+            </tbody></table>
+                <h4>允许的漂移 (2)</h4><table class="allowance-table"><thead><tr><th>配置键</th><th>批准人</th><th>批准日期</th><th>到期日期</th><th>原因</th><th>状态</th></tr></thead><tbody>
+                <tr class="allowance-active">
+                    <td><code>security.allow_external_access</code></td>
+                    <td>Wang.Senior</td>
+                    <td>2026-04-01</td>
+                    <td>2026-06-01</td>
+                    <td>Acme Corp 需要集成其内部系统，临时开放外部访问</td>
+                    <td>有效</td>
+                </tr>
+            
+                <tr class="allowance-expired">
+                    <td><code>database.enable_query_logging</code></td>
+                    <td>Zhang.Platform</td>
+                    <td>2026-03-15</td>
+                    <td>2026-04-15</td>
+                    <td>性能调优期间需要开启查询日志</td>
+                    <td>已过期 ❌</td>
+                </tr>
+            </tbody></table>
+            </div>
+        
+            <div class="tenant-card tenant-warning">
+                <div class="tenant-header">
+                    <h3>租户: free-001 <span class="tier">[free]</span></h3>
+                    <span class="status-badge status-warning">有警告</span>
+                </div>
+                
+                <h4>未解决的配置漂移 (6)</h4><table class="diff-table"><thead><tr><th></th><th>配置键</th><th>类型</th><th>默认值</th><th>租户值</th><th>来源文件</th></tr></thead><tbody>
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>tier</code> </td>
+                    <td>value_changed</td>
+                    <td><code>default</code></td>
+                    <td><code>free</code></td>
+                    <td>config.yaml</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.max_connections</code> </td>
+                    <td>value_changed</td>
+                    <td><code>20</code></td>
+                    <td><code>10</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_users</code> </td>
+                    <td>value_changed</td>
+                    <td><code>50</code></td>
+                    <td><code>10</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>database.pool_size</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>5</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>api.rate_limit_per_minute</code> </td>
+                    <td>value_changed</td>
+                    <td><code>100</code></td>
+                    <td><code>50</code></td>
+                    <td>-</td>
+                </tr>
+            
+                <tr class="risk-medium">
+                    <td>🟡</td>
+                    <td><code>features.max_storage_gb</code> </td>
+                    <td>value_changed</td>
+                    <td><code>10</code></td>
+                    <td><code>2</code></td>
+                    <td>-</td>
+                </tr>
+            </tbody></table>
+                
+            </div>
+        
+
+        <div class="footer">
+            <p>此报告由多租户配置漂移检测工具自动生成</p>
+            <p>⚠️ 发布前请确保所有红色标记的问题已解决</p>
+        </div>
+    </div>
+</body>
+</html>
