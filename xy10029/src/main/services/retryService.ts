@@ -1,4 +1,4 @@
-import { getDatabase, beginTransaction, commitTransaction, rollbackTransaction } from '../database'
+import { run, get, all } from '../database/index'
 import {
   FailedOperation,
   RetryStatus,
@@ -7,13 +7,12 @@ import {
 } from '@shared/types'
 import { generateId, getCurrentTimestamp, calculateNextRetry } from '@shared/utils'
 
-export function recordFailedOperation(
+export async function recordFailedOperation(
   operationType: string,
   details: string,
   errorMessage: string,
   maxRetries: number = 3
-): FailedOperation {
-  const db = getDatabase()
+): Promise<FailedOperation> {
   const now = getCurrentTimestamp()
 
   const operation: FailedOperation = {
@@ -29,13 +28,12 @@ export function recordFailedOperation(
     createdAt: now
   }
 
-  const stmt = db.prepare(`
+  await run(`
     INSERT INTO failed_operations (
       id, operation_type, details, error_message, retry_count,
       max_retries, status, last_attempt_at, next_retry_at, created_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `)
-  stmt.run(
+  `, [
     operation.id,
     operation.operationType,
     operation.details,
@@ -46,31 +44,29 @@ export function recordFailedOperation(
     operation.lastAttemptAt,
     operation.nextRetryAt,
     operation.createdAt
-  )
+  ])
 
   return operation
 }
 
-export function getPendingRetryOperations(): FailedOperation[] {
-  const db = getDatabase()
+export async function getPendingRetryOperations(): Promise<FailedOperation[]> {
   const now = getCurrentTimestamp()
 
-  const stmt = db.prepare(`
+  const rows = await all<any>(`
     SELECT * FROM failed_operations
     WHERE status IN (?, ?) AND next_retry_at <= ?
     ORDER BY next_retry_at ASC
-  `)
-  const rows = stmt.all(RetryStatus.PENDING, RetryStatus.RETRYING, now) as any[]
+  `, [RetryStatus.PENDING, RetryStatus.RETRYING, now])
+
   return rows.map(mapFailedOperation)
 }
 
-export function updateRetryAttempt(
+export async function updateRetryAttempt(
   id: string,
   success: boolean,
   errorMessage?: string
-): FailedOperation | null {
-  const db = getDatabase()
-  const operation = getFailedOperationById(id)
+): Promise<FailedOperation | null> {
+  const operation = await getFailedOperationById(id)
   if (!operation) return null
 
   const now = getCurrentTimestamp()
@@ -88,7 +84,7 @@ export function updateRetryAttempt(
     nextRetryAt = calculateNextRetry(newRetryCount, now)
   }
 
-  const stmt = db.prepare(`
+  await run(`
     UPDATE failed_operations SET
       retry_count = ?,
       status = ?,
@@ -96,28 +92,26 @@ export function updateRetryAttempt(
       next_retry_at = ?,
       error_message = ?
     WHERE id = ?
-  `)
-  stmt.run(
+  `, [
     newRetryCount,
     newStatus,
     now,
     nextRetryAt,
     errorMessage || operation.errorMessage,
     id
-  )
+  ])
 
   return getFailedOperationById(id)
 }
 
-export function cancelRetry(id: string): FailedOperation | null {
-  const db = getDatabase()
-  const stmt = db.prepare('UPDATE failed_operations SET status = ? WHERE id = ?')
-  stmt.run(RetryStatus.CANCELLED, id)
+export async function cancelRetry(id: string): Promise<FailedOperation | null> {
+  await run('UPDATE failed_operations SET status = ? WHERE id = ?', [RetryStatus.CANCELLED, id])
   return getFailedOperationById(id)
 }
 
-export function getFailedOperations(params: PaginationParams & { status?: RetryStatus }): PaginatedResult<FailedOperation> {
-  const db = getDatabase()
+export async function getFailedOperations(
+  params: PaginationParams & { status?: RetryStatus }
+): Promise<PaginatedResult<FailedOperation>> {
   const { page, pageSize, sortBy = 'created_at', sortOrder = 'desc', status } = params
 
   const whereClauses: string[] = []
@@ -130,17 +124,14 @@ export function getFailedOperations(params: PaginationParams & { status?: RetryS
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
-  const countStmt = db.prepare(`SELECT COUNT(*) as count FROM failed_operations ${whereSql}`)
-  const total = (countStmt.get(...whereParams) as any).count
+  const countRow = await get<any>(`SELECT COUNT(*) as count FROM failed_operations ${whereSql}`, whereParams)
+  const total = countRow?.count || 0
 
   const offset = (page - 1) * pageSize
-  const stmt = db.prepare(`
-    SELECT * FROM failed_operations
-    ${whereSql}
-    ORDER BY ${sortBy} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `)
-  const rows = stmt.all(...whereParams, pageSize, offset) as any[]
+  const rows = await all<any>(
+    `SELECT * FROM failed_operations ${whereSql} ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+    [...whereParams, pageSize, offset]
+  )
 
   return {
     items: rows.map(mapFailedOperation),
@@ -177,14 +168,12 @@ export async function executeWithRetry<T>(
     }
   }
 
-  recordFailedOperation(operationType, details, lastError!.message, maxRetries)
+  await recordFailedOperation(operationType, details, lastError!.message, maxRetries)
   throw lastError
 }
 
-function getFailedOperationById(id: string): FailedOperation | null {
-  const db = getDatabase()
-  const stmt = db.prepare('SELECT * FROM failed_operations WHERE id = ?')
-  const row = stmt.get(id) as any
+async function getFailedOperationById(id: string): Promise<FailedOperation | null> {
+  const row = await get<any>('SELECT * FROM failed_operations WHERE id = ?', [id])
   return row ? mapFailedOperation(row) : null
 }
 

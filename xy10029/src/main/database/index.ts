@@ -1,30 +1,87 @@
-import Database from 'better-sqlite3'
+import initSqlJs, { Database as SqlJsDatabase, SqlJsStatic } from 'sql.js'
 import path from 'path'
 import { app } from 'electron'
+import * as fs from 'fs'
 
-let database: Database.Database
+let sqlJs: SqlJsStatic
+let database: SqlJsDatabase
+let dbFilePath: string
 
-export function getDatabase(): Database.Database {
+export async function initSqlJsModule(): Promise<SqlJsStatic> {
+  if (!sqlJs) {
+    sqlJs = await initSqlJs({
+      locateFile: (file: string) => {
+        try {
+          return path.join(__dirname, file)
+        } catch {
+          return file
+        }
+      }
+    })
+  }
+  return sqlJs
+}
+
+export function getDbFilePath(): string {
+  if (dbFilePath) {
+    return dbFilePath
+  }
+  try {
+    dbFilePath = path.join(app.getPath('userData'), 'device-management.db')
+  } catch {
+    dbFilePath = path.join(process.cwd(), 'device-management.db')
+  }
+  return dbFilePath
+}
+
+export function saveDatabaseToDisk(): void {
+  if (database) {
+    const data = database.export()
+    const buffer = Buffer.from(data)
+    try {
+      const filePath = getDbFilePath()
+      const dir = path.dirname(filePath)
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+      fs.writeFileSync(filePath, buffer)
+    } catch (e) {
+    }
+  }
+}
+
+export async function getDatabase(): Promise<SqlJsDatabase> {
   if (!database) {
-    const dbPath = path.join(app.getPath('userData'), 'device-management.db')
-    database = new Database(dbPath)
-    database.pragma('journal_mode = WAL')
-    database.pragma('foreign_keys = ON')
+    const SQL = await initSqlJsModule()
+
+    let existingDbPath = getDbFilePath()
+
+    if (fs.existsSync(existingDbPath)) {
+      try {
+        const fileBuffer = fs.readFileSync(existingDbPath)
+        database = new SQL.Database(fileBuffer)
+      } catch {
+        database = new SQL.Database()
+      }
+    } else {
+      database = new SQL.Database()
+    }
   }
   return database
 }
 
 export function closeDatabase(): void {
   if (database) {
+    saveDatabaseToDisk()
     database.close()
     database = null as any
   }
 }
 
-export function initDatabase(): void {
-  const db = getDatabase()
+export async function initDatabase(): Promise<void> {
+  const db = await getDatabase()
   
-  db.exec(`
+  const initSql = `
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
@@ -70,8 +127,7 @@ export function initDatabase(): void {
       purpose TEXT,
       notes TEXT,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL,
-      FOREIGN KEY (device_id) REFERENCES devices(id)
+      updated_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS device_history (
@@ -83,8 +139,7 @@ export function initDatabase(): void {
       changed_by TEXT NOT NULL,
       changed_by_name TEXT NOT NULL,
       change_type TEXT NOT NULL,
-      description TEXT NOT NULL,
-      FOREIGN KEY (device_id) REFERENCES devices(id)
+      description TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS system_logs (
@@ -135,17 +190,66 @@ export function initDatabase(): void {
     CREATE INDEX IF NOT EXISTS idx_history_device ON device_history(device_id);
     CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON system_logs(timestamp);
     CREATE INDEX IF NOT EXISTS idx_failed_status ON failed_operations(status);
-  `)
+  `
+
+  db.run(initSql)
+  saveDatabaseToDisk()
 }
 
-export function beginTransaction(): void {
-  getDatabase().exec('BEGIN TRANSACTION')
+export async function exec(sql: string, params: any[] = []): void {
+  const db = await getDatabase()
+  db.run(sql, params)
+  saveDatabaseToDisk()
 }
 
-export function commitTransaction(): void {
-  getDatabase().exec('COMMIT')
+export async function run(sql: string, params: any[] = []): Promise<{ changes: number; lastInsertRowid: number }> {
+  const db = await getDatabase()
+  db.run(sql, params)
+  saveDatabaseToDisk()
+  return {
+    changes: db.getRowsModified(),
+    lastInsertRowid: 0
+  }
 }
 
-export function rollbackTransaction(): void {
-  getDatabase().exec('ROLLBACK')
+export async function get<T = any>(sql: string, params: any[] = []): Promise<T | null> {
+  const db = await getDatabase()
+  const stmt = db.prepare(sql)
+  stmt.bind(params)
+  if (stmt.step()) {
+    const row = stmt.getAsObject()
+    stmt.free()
+    return row as T
+  } else {
+    stmt.free()
+    return null
+  }
+}
+
+export async function all<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+  const db = await getDatabase()
+  const stmt = db.prepare(sql)
+  stmt.bind(params)
+  const results: T[] = []
+  while (stmt.step()) {
+    results.push(stmt.getAsObject() as T)
+  }
+  stmt.free()
+  return results
+}
+
+export async function beginTransaction(): Promise<void> {
+  await exec('BEGIN TRANSACTION')
+}
+
+export async function commitTransaction(): Promise<void> {
+  await exec('COMMIT')
+}
+
+export async function rollbackTransaction(): Promise<void> {
+  await exec('ROLLBACK')
+}
+
+export function flushDatabase(): void {
+  saveDatabaseToDisk()
 }

@@ -1,8 +1,8 @@
-import { getDatabase } from '../database'
+import { run, get, all } from '../database/index'
 import { SystemLog, LogLevel, PaginationParams, PaginatedResult } from '@shared/types'
 import { generateId, getCurrentTimestamp } from '@shared/utils'
 
-export function logOperation(
+export async function logOperation(
   level: LogLevel,
   module: string,
   action: string,
@@ -12,8 +12,7 @@ export function logOperation(
   success: boolean,
   errorMessage: string | null = null,
   duration: number = 0
-): SystemLog {
-  const db = getDatabase()
+): Promise<SystemLog> {
   const now = getCurrentTimestamp()
 
   const log: SystemLog = {
@@ -30,13 +29,12 @@ export function logOperation(
     timestamp: now
   }
 
-  const stmt = db.prepare(`
+  await run(`
     INSERT INTO system_logs (
       id, level, module, action, user_id, user_name, details,
       success, error_message, duration, timestamp
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `)
-  stmt.run(
+  `, [
     log.id,
     log.level,
     log.module,
@@ -48,29 +46,29 @@ export function logOperation(
     log.errorMessage,
     log.duration,
     log.timestamp
-  )
+  ])
 
   return log
 }
 
-export function logInfo(
+export async function logInfo(
   module: string,
   action: string,
   userId: string | null,
   userName: string | null,
   details: string
-): SystemLog {
+): Promise<SystemLog> {
   return logOperation(LogLevel.INFO, module, action, userId, userName, details, true)
 }
 
-export function logError(
+export async function logError(
   module: string,
   action: string,
   userId: string | null,
   userName: string | null,
   details: string,
   error: Error
-): SystemLog {
+): Promise<SystemLog> {
   return logOperation(
     LogLevel.ERROR,
     module,
@@ -83,18 +81,19 @@ export function logError(
   )
 }
 
-export function logWarn(
+export async function logWarn(
   module: string,
   action: string,
   userId: string | null,
   userName: string | null,
   details: string
-): SystemLog {
+): Promise<SystemLog> {
   return logOperation(LogLevel.WARN, module, action, userId, userName, details, true)
 }
 
-export function getLogs(params: PaginationParams & { level?: LogLevel; module?: string; startDate?: string; endDate?: string }): PaginatedResult<SystemLog> {
-  const db = getDatabase()
+export async function getLogs(
+  params: PaginationParams & { level?: LogLevel; module?: string; startDate?: string; endDate?: string }
+): Promise<PaginatedResult<SystemLog>> {
   const { page, pageSize, sortBy = 'timestamp', sortOrder = 'desc', level, module, startDate, endDate } = params
 
   const whereClauses: string[] = []
@@ -119,17 +118,14 @@ export function getLogs(params: PaginationParams & { level?: LogLevel; module?: 
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
-  const countStmt = db.prepare(`SELECT COUNT(*) as count FROM system_logs ${whereSql}`)
-  const total = (countStmt.get(...whereParams) as any).count
+  const countRow = await get<any>(`SELECT COUNT(*) as count FROM system_logs ${whereSql}`, whereParams)
+  const total = countRow?.count || 0
 
   const offset = (page - 1) * pageSize
-  const stmt = db.prepare(`
-    SELECT * FROM system_logs
-    ${whereSql}
-    ORDER BY ${sortBy} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `)
-  const rows = stmt.all(...whereParams, pageSize, offset) as any[]
+  const rows = await all<any>(
+    `SELECT * FROM system_logs ${whereSql} ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+    [...whereParams, pageSize, offset]
+  )
 
   return {
     items: rows.map(mapLog),
@@ -140,13 +136,14 @@ export function getLogs(params: PaginationParams & { level?: LogLevel; module?: 
   }
 }
 
-export function cleanupOldLogs(daysToKeep: number = 90): number {
-  const db = getDatabase()
+export async function cleanupOldLogs(daysToKeep: number = 90): Promise<number> {
   const cutoffDate = new Date()
   cutoffDate.setDate(cutoffDate.getDate() - daysToKeep)
 
-  const stmt = db.prepare('DELETE FROM system_logs WHERE timestamp < ?')
-  const result = stmt.run(cutoffDate.toISOString())
+  const result = await run(
+    'DELETE FROM system_logs WHERE timestamp < ?',
+    [cutoffDate.toISOString()]
+  )
   return result.changes
 }
 

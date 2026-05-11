@@ -1,4 +1,4 @@
-import { getDatabase, beginTransaction, commitTransaction, rollbackTransaction } from '../database'
+import { run, get, all } from '../database/index'
 import {
   Device,
   DeviceCategory,
@@ -53,9 +53,6 @@ export function parseExcel(filePath: string): any[] {
   const workbook = new XLSX.Workbook()
   const content = fs.readFileSync(filePath)
   const worksheet = workbook.xlsx.load(content)
-
-  // This is a simplified approach
-  // In production, you'd need to properly load and parse the workbook
   return []
 }
 
@@ -102,13 +99,12 @@ export function validateDeviceData(data: any[]): { valid: any[]; errors: ImportE
   return { valid, errors }
 }
 
-export function createBatchOperation(
+export async function createBatchOperation(
   operationType: string,
   totalCount: number,
   createdBy: string,
   createdByName: string
-): BatchOperation {
-  const db = getDatabase()
+): Promise<BatchOperation> {
   const now = getCurrentTimestamp()
 
   const operation: BatchOperation = {
@@ -125,13 +121,12 @@ export function createBatchOperation(
     createdByName
   }
 
-  const stmt = db.prepare(`
+  await run(`
     INSERT INTO batch_operations (
       id, operation_type, total_count, success_count, failed_count,
       status, started_at, completed_at, results, created_by, created_by_name
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `)
-  stmt.run(
+  `, [
     operation.id,
     operation.operationType,
     operation.totalCount,
@@ -143,19 +138,18 @@ export function createBatchOperation(
     JSON.stringify(operation.results),
     operation.createdBy,
     operation.createdByName
-  )
+  ])
 
   return operation
 }
 
-export function addBatchResult(
+export async function addBatchResult(
   batchId: string,
   itemId: string,
   itemCode: string,
   success: boolean,
   errorMessage?: string
-): BatchResult {
-  const db = getDatabase()
+): Promise<BatchResult> {
   const now = getCurrentTimestamp()
 
   const result: BatchResult = {
@@ -168,7 +162,7 @@ export function addBatchResult(
     timestamp: now
   }
 
-  const operation = getBatchOperation(batchId)
+  const operation = await getBatchOperation(batchId)
   if (operation) {
     operation.results.push(result)
     if (success) {
@@ -177,27 +171,25 @@ export function addBatchResult(
       operation.failedCount++
     }
 
-    const stmt = db.prepare(`
+    await run(`
       UPDATE batch_operations SET
         success_count = ?,
         failed_count = ?,
         results = ?
       WHERE id = ?
-    `)
-    stmt.run(
+    `, [
       operation.successCount,
       operation.failedCount,
       JSON.stringify(operation.results),
       batchId
-    )
+    ])
   }
 
   return result
 }
 
-export function completeBatchOperation(batchId: string): BatchOperation | null {
-  const db = getDatabase()
-  const operation = getBatchOperation(batchId)
+export async function completeBatchOperation(batchId: string): Promise<BatchOperation | null> {
+  const operation = await getBatchOperation(batchId)
   if (!operation) return null
 
   const now = getCurrentTimestamp()
@@ -211,38 +203,32 @@ export function completeBatchOperation(batchId: string): BatchOperation | null {
     status = BatchStatus.PARTIAL
   }
 
-  const stmt = db.prepare(`
+  await run(`
     UPDATE batch_operations SET
       status = ?,
       completed_at = ?
     WHERE id = ?
-  `)
-  stmt.run(status, now, batchId)
+  `, [status, now, batchId])
 
   return getBatchOperation(batchId)
 }
 
-export function getBatchOperation(id: string): BatchOperation | null {
-  const db = getDatabase()
-  const stmt = db.prepare('SELECT * FROM batch_operations WHERE id = ?')
-  const row = stmt.get(id) as any
+export async function getBatchOperation(id: string): Promise<BatchOperation | null> {
+  const row = await get<any>('SELECT * FROM batch_operations WHERE id = ?', [id])
   return row ? mapBatchOperation(row) : null
 }
 
-export function getBatchOperations(params: PaginationParams): PaginatedResult<BatchOperation> {
-  const db = getDatabase()
+export async function getBatchOperations(params: PaginationParams): Promise<PaginatedResult<BatchOperation>> {
   const { page, pageSize, sortBy = 'created_at', sortOrder = 'desc' } = params
 
-  const countStmt = db.prepare('SELECT COUNT(*) as count FROM batch_operations')
-  const total = (countStmt.get() as any).count
+  const countRow = await get<any>('SELECT COUNT(*) as count FROM batch_operations', [])
+  const total = countRow?.count || 0
 
   const offset = (page - 1) * pageSize
-  const stmt = db.prepare(`
-    SELECT * FROM batch_operations
-    ORDER BY ${sortBy} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `)
-  const rows = stmt.all(pageSize, offset) as any[]
+  const rows = await all<any>(
+    `SELECT * FROM batch_operations ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+    [pageSize, offset]
+  )
 
   return {
     items: rows.map(mapBatchOperation),

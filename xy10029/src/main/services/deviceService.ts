@@ -1,4 +1,4 @@
-import { getDatabase, beginTransaction, commitTransaction, rollbackTransaction } from '../database'
+import { run, get, all, beginTransaction, commitTransaction, rollbackTransaction } from '../database/index'
 import {
   Device,
   DeviceStatus,
@@ -13,14 +13,13 @@ import {
 } from '@shared/types'
 import { generateId, getCurrentTimestamp, isValidDeviceTransition, createDeviceHistory } from '@shared/utils'
 
-export function createDevice(
+export async function createDevice(
   deviceCode: string,
   name: string,
   category: string,
   operator: User,
   options: Partial<Omit<Device, 'id' | 'deviceCode' | 'name' | 'category' | 'createdAt' | 'updatedAt' | 'isActive'>> = {}
-): Device {
-  const db = getDatabase()
+): Promise<Device> {
   const now = getCurrentTimestamp()
 
   const device: Device = {
@@ -42,16 +41,15 @@ export function createDevice(
     isActive: true
   }
 
-  beginTransaction()
+  await beginTransaction()
   try {
-    const stmt = db.prepare(`
+    await run(`
       INSERT INTO devices (
         id, device_code, name, category, model, serial_number, status, location,
         description, current_holder, current_holder_name, borrowed_at, expected_return_at,
         created_at, updated_at, is_active
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    stmt.run(
+    `, [
       device.id,
       device.deviceCode,
       device.name,
@@ -68,7 +66,7 @@ export function createDevice(
       device.createdAt,
       device.updatedAt,
       1
-    )
+    ])
 
     const history = createDeviceHistory(
       device,
@@ -78,32 +76,29 @@ export function createDevice(
       `创建设备 ${deviceCode}`,
       1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return device
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function getDeviceById(id: string): Device | null {
-  const db = getDatabase()
-  const stmt = db.prepare('SELECT * FROM devices WHERE id = ? AND is_active = 1')
-  const row = stmt.get(id) as any
+export async function getDeviceById(id: string): Promise<Device | null> {
+  const row = await get<any>('SELECT * FROM devices WHERE id = ? AND is_active = 1', [id])
   return row ? mapDevice(row) : null
 }
 
-export function getDeviceByCode(deviceCode: string): Device | null {
-  const db = getDatabase()
-  const stmt = db.prepare('SELECT * FROM devices WHERE device_code = ? AND is_active = 1')
-  const row = stmt.get(deviceCode) as any
+export async function getDeviceByCode(deviceCode: string): Promise<Device | null> {
+  const row = await get<any>('SELECT * FROM devices WHERE device_code = ? AND is_active = 1', [deviceCode])
   return row ? mapDevice(row) : null
 }
 
-export function listDevices(params: PaginationParams & { status?: DeviceStatus; category?: string; search?: string }): PaginatedResult<Device> {
-  const db = getDatabase()
+export async function listDevices(
+  params: PaginationParams & { status?: DeviceStatus; category?: string; search?: string }
+): Promise<PaginatedResult<Device>> {
   const { page, pageSize, sortBy = 'created_at', sortOrder = 'desc', status, category, search } = params
 
   const whereClauses: string[] = ['is_active = 1']
@@ -125,17 +120,14 @@ export function listDevices(params: PaginationParams & { status?: DeviceStatus; 
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
-  const countStmt = db.prepare(`SELECT COUNT(*) as count FROM devices ${whereSql}`)
-  const total = (countStmt.get(...whereParams) as any).count
+  const countRow = await get<any>(`SELECT COUNT(*) as count FROM devices ${whereSql}`, whereParams)
+  const total = countRow?.count || 0
 
   const offset = (page - 1) * pageSize
-  const stmt = db.prepare(`
-    SELECT * FROM devices
-    ${whereSql}
-    ORDER BY ${sortBy} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `)
-  const rows = stmt.all(...whereParams, pageSize, offset) as any[]
+  const rows = await all<any>(
+    `SELECT * FROM devices ${whereSql} ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+    [...whereParams, pageSize, offset]
+  )
 
   return {
     items: rows.map(mapDevice),
@@ -146,13 +138,12 @@ export function listDevices(params: PaginationParams & { status?: DeviceStatus; 
   }
 }
 
-export function updateDevice(
+export async function updateDevice(
   id: string,
   updates: Partial<Omit<Device, 'id' | 'createdAt' | 'updatedAt'>>,
   operator: User
-): Device | null {
-  const db = getDatabase()
-  const device = getDeviceById(id)
+): Promise<Device | null> {
+  const device = await getDeviceById(id)
   if (!device) return null
 
   const now = getCurrentTimestamp()
@@ -172,7 +163,7 @@ export function updateDevice(
     if (updates[deviceField] !== undefined) {
       updateFields.push(`${dbField} = ?`)
       updateValues.push(updates[deviceField])
-      (device as any)[deviceField] = updates[deviceField]
+      ;(device as any)[deviceField] = updates[deviceField]
     }
   }
 
@@ -182,12 +173,11 @@ export function updateDevice(
   updateValues.push(now, id)
   device.updatedAt = now
 
-  beginTransaction()
+  await beginTransaction()
   try {
-    const stmt = db.prepare(`UPDATE devices SET ${updateFields.join(', ')} WHERE id = ?`)
-    stmt.run(...updateValues)
+    await run(`UPDATE devices SET ${updateFields.join(', ')} WHERE id = ?`, updateValues)
 
-    const currentVersion = getLatestHistoryVersion(id)
+    const currentVersion = await getLatestHistoryVersion(id)
     const history = createDeviceHistory(
       device,
       ChangeType.UPDATE,
@@ -196,26 +186,25 @@ export function updateDevice(
       `更新设备 ${device.deviceCode} 信息`,
       currentVersion + 1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return device
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function lendDevice(
+export async function lendDevice(
   deviceId: string,
   borrowerId: string,
   borrowerName: string,
   operator: User,
   expectedReturnAt?: string,
   purpose?: string
-): { device: Device; record: BorrowRecord } | null {
-  const db = getDatabase()
-  const device = getDeviceById(deviceId)
+): Promise<{ device: Device; record: BorrowRecord } | null> {
+  const device = await getDeviceById(deviceId)
   if (!device) return null
 
   if (device.status !== DeviceStatus.AVAILABLE) {
@@ -224,7 +213,7 @@ export function lendDevice(
 
   const now = getCurrentTimestamp()
 
-  beginTransaction()
+  await beginTransaction()
   try {
     const updatedDevice: Device = {
       ...device,
@@ -236,13 +225,12 @@ export function lendDevice(
       updatedAt: now
     }
 
-    const updateStmt = db.prepare(`
+    await run(`
       UPDATE devices SET
         status = ?, current_holder = ?, current_holder_name = ?,
         borrowed_at = ?, expected_return_at = ?, updated_at = ?
       WHERE id = ?
-    `)
-    updateStmt.run(
+    `, [
       updatedDevice.status,
       updatedDevice.currentHolder,
       updatedDevice.currentHolderName,
@@ -250,7 +238,7 @@ export function lendDevice(
       updatedDevice.expectedReturnAt,
       updatedDevice.updatedAt,
       updatedDevice.id
-    )
+    ])
 
     const record: BorrowRecord = {
       id: generateId(),
@@ -270,14 +258,13 @@ export function lendDevice(
       updatedAt: now
     }
 
-    const recordStmt = db.prepare(`
+    await run(`
       INSERT INTO borrow_records (
         id, device_id, device_code, borrower_id, borrower_name, operator_id,
         operator_name, borrowed_at, expected_return_at, returned_at, status,
         purpose, notes, created_at, updated_at
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    recordStmt.run(
+    `, [
       record.id,
       record.deviceId,
       record.deviceCode,
@@ -293,9 +280,9 @@ export function lendDevice(
       record.notes,
       record.createdAt,
       record.updatedAt
-    )
+    ])
 
-    const currentVersion = getLatestHistoryVersion(device.id)
+    const currentVersion = await getLatestHistoryVersion(device.id)
     const history = createDeviceHistory(
       updatedDevice,
       ChangeType.BORROW,
@@ -304,19 +291,22 @@ export function lendDevice(
       `借出设备给 ${borrowerName}`,
       currentVersion + 1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return { device: updatedDevice, record }
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function returnDevice(deviceId: string, operator: User, notes?: string): { device: Device; record: BorrowRecord } | null {
-  const db = getDatabase()
-  const device = getDeviceById(deviceId)
+export async function returnDevice(
+  deviceId: string,
+  operator: User,
+  notes?: string
+): Promise<{ device: Device; record: BorrowRecord } | null> {
+  const device = await getDeviceById(deviceId)
   if (!device) return null
 
   if (device.status !== DeviceStatus.BORROWED) {
@@ -325,18 +315,18 @@ export function returnDevice(deviceId: string, operator: User, notes?: string): 
 
   const now = getCurrentTimestamp()
 
-  const activeRecordStmt = db.prepare(`
+  const activeRecord = await get<any>(`
     SELECT * FROM borrow_records
     WHERE device_id = ? AND status = ?
     ORDER BY borrowed_at DESC
     LIMIT 1
-  `)
-  const activeRecord = activeRecordStmt.get(device.id, BorrowStatus.ACTIVE) as any
+  `, [device.id, BorrowStatus.ACTIVE])
+
   if (!activeRecord) {
     throw new Error('未找到活跃的借出记录')
   }
 
-  beginTransaction()
+  await beginTransaction()
   try {
     const updatedDevice: Device = {
       ...device,
@@ -348,13 +338,12 @@ export function returnDevice(deviceId: string, operator: User, notes?: string): 
       updatedAt: now
     }
 
-    const updateDeviceStmt = db.prepare(`
+    await run(`
       UPDATE devices SET
         status = ?, current_holder = ?, current_holder_name = ?,
         borrowed_at = ?, expected_return_at = ?, updated_at = ?
       WHERE id = ?
-    `)
-    updateDeviceStmt.run(
+    `, [
       updatedDevice.status,
       updatedDevice.currentHolder,
       updatedDevice.currentHolderName,
@@ -362,7 +351,7 @@ export function returnDevice(deviceId: string, operator: User, notes?: string): 
       updatedDevice.expectedReturnAt,
       updatedDevice.updatedAt,
       updatedDevice.id
-    )
+    ])
 
     const updatedRecord: BorrowRecord = {
       ...mapBorrowRecord(activeRecord),
@@ -372,20 +361,19 @@ export function returnDevice(deviceId: string, operator: User, notes?: string): 
       updatedAt: now
     }
 
-    const updateRecordStmt = db.prepare(`
+    await run(`
       UPDATE borrow_records SET
         returned_at = ?, status = ?, notes = ?, updated_at = ?
       WHERE id = ?
-    `)
-    updateRecordStmt.run(
+    `, [
       updatedRecord.returnedAt,
       updatedRecord.status,
       updatedRecord.notes,
       updatedRecord.updatedAt,
       updatedRecord.id
-    )
+    ])
 
-    const currentVersion = getLatestHistoryVersion(device.id)
+    const currentVersion = await getLatestHistoryVersion(device.id)
     const history = createDeviceHistory(
       updatedDevice,
       ChangeType.RETURN,
@@ -394,24 +382,23 @@ export function returnDevice(deviceId: string, operator: User, notes?: string): 
       `归还设备，原持有人: ${device.currentHolderName}`,
       currentVersion + 1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return { device: updatedDevice, record: updatedRecord }
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function changeDeviceStatus(
+export async function changeDeviceStatus(
   deviceId: string,
   newStatus: DeviceStatus,
   operator: User,
   notes?: string
-): Device | null {
-  const db = getDatabase()
-  const device = getDeviceById(deviceId)
+): Promise<Device | null> {
+  const device = await getDeviceById(deviceId)
   if (!device) return null
 
   if (!isValidDeviceTransition(device.status, newStatus, DeviceStatusTransitions)) {
@@ -420,7 +407,7 @@ export function changeDeviceStatus(
 
   const now = getCurrentTimestamp()
 
-  beginTransaction()
+  await beginTransaction()
   try {
     const updatedDevice: Device = {
       ...device,
@@ -428,10 +415,13 @@ export function changeDeviceStatus(
       updatedAt: now
     }
 
-    const stmt = db.prepare('UPDATE devices SET status = ?, updated_at = ? WHERE id = ?')
-    stmt.run(newStatus, now, device.id)
+    await run('UPDATE devices SET status = ?, updated_at = ? WHERE id = ?', [
+      newStatus,
+      now,
+      device.id
+    ])
 
-    const currentVersion = getLatestHistoryVersion(device.id)
+    const currentVersion = await getLatestHistoryVersion(device.id)
     const changeType = newStatus === DeviceStatus.MAINTENANCE ? ChangeType.MAINTENANCE : ChangeType.UPDATE
     const history = createDeviceHistory(
       updatedDevice,
@@ -441,19 +431,18 @@ export function changeDeviceStatus(
       notes || `设备状态从 ${device.status} 变更为 ${newStatus}`,
       currentVersion + 1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return updatedDevice
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function deleteDevice(deviceId: string, operator: User): boolean {
-  const db = getDatabase()
-  const device = getDeviceById(deviceId)
+export async function deleteDevice(deviceId: string, operator: User): Promise<boolean> {
+  const device = await getDeviceById(deviceId)
   if (!device) return false
 
   if (device.status === DeviceStatus.BORROWED) {
@@ -462,12 +451,14 @@ export function deleteDevice(deviceId: string, operator: User): boolean {
 
   const now = getCurrentTimestamp()
 
-  beginTransaction()
+  await beginTransaction()
   try {
-    const stmt = db.prepare('UPDATE devices SET is_active = 0, updated_at = ? WHERE id = ?')
-    stmt.run(now, deviceId)
+    await run('UPDATE devices SET is_active = 0, updated_at = ? WHERE id = ?', [
+      now,
+      deviceId
+    ])
 
-    const currentVersion = getLatestHistoryVersion(deviceId)
+    const currentVersion = await getLatestHistoryVersion(deviceId)
     const history = createDeviceHistory(
       device,
       ChangeType.DELETE,
@@ -476,45 +467,41 @@ export function deleteDevice(deviceId: string, operator: User): boolean {
       `删除设备 ${device.deviceCode}`,
       currentVersion + 1
     )
-    saveDeviceHistory(history)
+    await saveDeviceHistory(history)
 
-    commitTransaction()
+    await commitTransaction()
     return true
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function getDeviceHistory(deviceId: string): DeviceHistory[] {
-  const db = getDatabase()
-  const stmt = db.prepare(`
+export async function getDeviceHistory(deviceId: string): Promise<DeviceHistory[]> {
+  const rows = await all<any>(`
     SELECT * FROM device_history
     WHERE device_id = ?
     ORDER BY version DESC
-  `)
-  const rows = stmt.all(deviceId) as any[]
+  `, [deviceId])
   return rows.map(mapDeviceHistory)
 }
 
-export function restoreDeviceFromHistory(
+export async function restoreDeviceFromHistory(
   historyId: string,
   operator: User
-): Device | null {
-  const db = getDatabase()
-  const historyStmt = db.prepare('SELECT * FROM device_history WHERE id = ?')
-  const historyRow = historyStmt.get(historyId) as any
+): Promise<Device | null> {
+  const historyRow = await get<any>('SELECT * FROM device_history WHERE id = ?', [historyId])
   if (!historyRow) return null
 
   const history = mapDeviceHistory(historyRow)
   const snapshotDevice = JSON.parse(history.snapshot) as Device
 
-  const existingDevice = getDeviceById(history.deviceId)
+  const existingDevice = await getDeviceById(history.deviceId)
   if (!existingDevice) return null
 
   const now = getCurrentTimestamp()
 
-  beginTransaction()
+  await beginTransaction()
   try {
     const restoredDevice: Device = {
       ...snapshotDevice,
@@ -522,14 +509,13 @@ export function restoreDeviceFromHistory(
       isActive: true
     }
 
-    const stmt = db.prepare(`
+    await run(`
       UPDATE devices SET
         name = ?, category = ?, model = ?, serial_number = ?, status = ?,
         location = ?, description = ?, current_holder = ?, current_holder_name = ?,
         borrowed_at = ?, expected_return_at = ?, updated_at = ?
       WHERE id = ?
-    `)
-    stmt.run(
+    `, [
       restoredDevice.name,
       restoredDevice.category,
       restoredDevice.model,
@@ -543,9 +529,9 @@ export function restoreDeviceFromHistory(
       restoredDevice.expectedReturnAt,
       restoredDevice.updatedAt,
       restoredDevice.id
-    )
+    ])
 
-    const currentVersion = getLatestHistoryVersion(history.deviceId)
+    const currentVersion = await getLatestHistoryVersion(history.deviceId)
     const newHistory = createDeviceHistory(
       restoredDevice,
       ChangeType.RESTORE,
@@ -554,18 +540,19 @@ export function restoreDeviceFromHistory(
       `从版本 ${history.version} 恢复设备`,
       currentVersion + 1
     )
-    saveDeviceHistory(newHistory)
+    await saveDeviceHistory(newHistory)
 
-    commitTransaction()
+    await commitTransaction()
     return restoredDevice
   } catch (error) {
-    rollbackTransaction()
+    await rollbackTransaction()
     throw error
   }
 }
 
-export function getBorrowRecords(params: PaginationParams & { status?: BorrowStatus; deviceId?: string; borrowerId?: string }): PaginatedResult<BorrowRecord> {
-  const db = getDatabase()
+export async function getBorrowRecords(
+  params: PaginationParams & { status?: BorrowStatus; deviceId?: string; borrowerId?: string }
+): Promise<PaginatedResult<BorrowRecord>> {
   const { page, pageSize, sortBy = 'borrowed_at', sortOrder = 'desc', status, deviceId, borrowerId } = params
 
   const whereClauses: string[] = []
@@ -586,17 +573,14 @@ export function getBorrowRecords(params: PaginationParams & { status?: BorrowSta
 
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
-  const countStmt = db.prepare(`SELECT COUNT(*) as count FROM borrow_records ${whereSql}`)
-  const total = (countStmt.get(...whereParams) as any).count
+  const countRow = await get<any>(`SELECT COUNT(*) as count FROM borrow_records ${whereSql}`, whereParams)
+  const total = countRow?.count || 0
 
   const offset = (page - 1) * pageSize
-  const stmt = db.prepare(`
-    SELECT * FROM borrow_records
-    ${whereSql}
-    ORDER BY ${sortBy} ${sortOrder}
-    LIMIT ? OFFSET ?
-  `)
-  const rows = stmt.all(...whereParams, pageSize, offset) as any[]
+  const rows = await all<any>(
+    `SELECT * FROM borrow_records ${whereSql} ORDER BY ${sortBy} ${sortOrder} LIMIT ? OFFSET ?`,
+    [...whereParams, pageSize, offset]
+  )
 
   return {
     items: rows.map(mapBorrowRecord),
@@ -607,24 +591,20 @@ export function getBorrowRecords(params: PaginationParams & { status?: BorrowSta
   }
 }
 
-function getLatestHistoryVersion(deviceId: string): number {
-  const db = getDatabase()
-  const stmt = db.prepare(`
+async function getLatestHistoryVersion(deviceId: string): Promise<number> {
+  const result = await get<any>(`
     SELECT MAX(version) as max_version FROM device_history WHERE device_id = ?
-  `)
-  const result = stmt.get(deviceId) as any
+  `, [deviceId])
   return result?.max_version || 0
 }
 
-function saveDeviceHistory(history: DeviceHistory): void {
-  const db = getDatabase()
-  const stmt = db.prepare(`
+async function saveDeviceHistory(history: DeviceHistory): Promise<void> {
+  await run(`
     INSERT INTO device_history (
       id, device_id, version, snapshot, changed_at, changed_by,
       changed_by_name, change_type, description
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `)
-  stmt.run(
+  `, [
     history.id,
     history.deviceId,
     history.version,
@@ -634,7 +614,7 @@ function saveDeviceHistory(history: DeviceHistory): void {
     history.changedByName,
     history.changeType,
     history.description
-  )
+  ])
 }
 
 function mapDevice(row: any): Device {
