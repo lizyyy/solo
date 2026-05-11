@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "悬铃木",
+    "scientificName": "Platanus acerifolia",
+    "waterTolerance": "中等",
+    "diseaseRisk": "较高",
+    "notes": "俗称法国梧桐，城市常见行道树。根系发达，需注意树池排水。",
+    "commonDiseases": ["炭疽病", "叶斑病", "白粉病"],
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "香樟树",
+    "scientificName": "Cinnamomum camphora",
+    "waterTolerance": "较差",
+    "diseaseRisk": "中等",
+    "notes": "常绿乔木，香气浓郁。对积水敏感，长期积水会导致根系腐烂。",
+    "commonDiseases": ["黑斑病", "根腐病", "介壳虫"],
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "银杏树",
+    "scientificName": "Ginkgo biloba",
+    "waterTolerance": "中等",
+    "diseaseRisk": "较低",
+    "notes": "古老树种，抗病虫能力强。但树池积水仍需及时处理。",
+    "commonDiseases": ["叶枯病", "茎腐病"],
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "桂花树",
+    "scientificName": "Osmanthus fragrans",
+    "waterTolerance": "较差",
+    "diseaseRisk": "中等",
+    "notes": "著名香花树种。根系怕积水，树池排水要求高。",
+    "commonDiseases": ["褐斑病", "枯斑病", "红蜘蛛"],
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "name": "水杉",
+    "scientificName": "Metasequoia glyptostroboides",
+    "waterTolerance": "较强",
+    "diseaseRisk": "较低",
+    "notes": "活化石树种，相对耐湿。但长期积水仍会影响生长。",
+    "commonDiseases": ["立枯病", "猝倒病"],
+    "createdAt": "2024-01-15T10:00:00.000Z"
+  }
+]

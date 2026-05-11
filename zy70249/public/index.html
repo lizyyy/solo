@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>城市树池积水巡检器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1>🌳 城市树池积水巡检器</h1>
+        <div class="header-actions">
+          <button id="saveWorkspaceBtn" class="btn btn-secondary">💾 保存工作区</button>
+          <button id="restoreWorkspaceBtn" class="btn btn-secondary">📂 恢复工作区</button>
+          <button id="exportBtn" class="btn btn-primary">📊 导出整改报告</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <aside class="sidebar">
+        <div class="filter-section">
+          <h3>🔍 筛选条件</h3>
+          
+          <div class="filter-group">
+            <label>积水等级</label>
+            <select id="filterWaterLevel" class="form-control">
+              <option value="">全部等级</option>
+              <option value="0">0级 - 无积水</option>
+              <option value="1">1级 - 轻度</option>
+              <option value="2">2级 - 中度</option>
+              <option value="3">3级 - 严重</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>处置状态</label>
+            <select id="filterStatus" class="form-control">
+              <option value="">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="in_progress">处理中</option>
+              <option value="completed">已完成</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>树种筛选</label>
+            <select id="filterSpecies" class="form-control">
+              <option value="">全部树种</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>排序方式</label>
+            <select id="sortBy" class="form-control">
+              <option value="priority">优先处置排序</option>
+              <option value="waterLevel">按积水等级</option>
+              <option value="date">按记录时间</option>
+              <option value="code">按树池编号</option>
+            </select>
+          </div>
+          
+          <button id="clearFiltersBtn" class="btn btn-secondary btn-block">清除筛选</button>
+        </div>
+        
+        <div class="stats-section">
+          <h3>📈 统计信息</h3>
+          <div class="stats-grid" id="statsGrid"></div>
+        </div>
+        
+        <div class="urgent-section">
+          <h3>⚠️ 紧急处置（Top 5）</h3>
+          <div id="urgentList" class="urgent-list"></div>
+        </div>
+      </aside>
+
+      <main class="content-area">
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="map">🗺️ 树池地图</button>
+          <button class="tab-btn" data-tab="list">📋 树池列表</button>
+          <button class="tab-btn" data-tab="species">🌿 树种档案</button>
+          <button class="tab-btn" data-tab="disease">🦠 病害记录</button>
+        </div>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="map-tab">
+            <div class="map-container">
+              <div id="map" class="map">
+                <div class="map-placeholder">
+                  <div id="mapPoints" class="map-points"></div>
+                </div>
+              </div>
+              <div class="map-legend">
+                <div class="legend-item">
+                  <span class="legend-dot level-0"></span>
+                  <span>无积水</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot level-1"></span>
+                  <span>轻度</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot level-2"></span>
+                  <span>中度</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot level-3"></span>
+                  <span>严重</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="list-tab">
+            <div class="table-container">
+              <div class="table-header">
+                <h3>树池积水记录</h3>
+                <button id="addTreePondBtn" class="btn btn-primary">+ 新增树池</button>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>编号</th>
+                    <th>位置</th>
+                    <th>树种</th>
+                    <th>积水等级</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="treePondTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="species-tab">
+            <div class="table-container">
+              <div class="table-header">
+                <h3>树种档案管理</h3>
+                <button id="addSpeciesBtn" class="btn btn-primary">+ 新增树种</button>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>树种名称</th>
+                    <th>学名</th>
+                    <th>耐水性</th>
+                    <th>病害风险</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="speciesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-pane" id="disease-tab">
+            <div class="table-container">
+              <div class="table-header">
+                <h3>病害记录</h3>
+                <button id="addDiseaseBtn" class="btn btn-primary">+ 新增病害</button>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>树池编号</th>
+                    <th>病害名称</th>
+                    <th>严重程度</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="diseaseTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="notification" class="notification"></div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modalTitle">标题</h3>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

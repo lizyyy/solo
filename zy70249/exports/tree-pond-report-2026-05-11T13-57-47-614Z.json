@@ -1,0 +1,103 @@
+{
+  "exportTime": "2026-05-11T13:57:47.614Z",
+  "filters": {
+    "waterLevel": "3"
+  },
+  "treePonds": [
+    {
+      "id": 2,
+      "code": "TP-002",
+      "location": "解放路156号",
+      "treeSpecies": "香樟树",
+      "waterLevel": 3,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2753,
+        "lng": 120.1567
+      },
+      "notes": "严重积水，树根可能腐烂",
+      "createdAt": "2024-06-10T07:45:00.000Z"
+    },
+    {
+      "id": 5,
+      "code": "TP-005",
+      "location": "西湖大道80号",
+      "treeSpecies": "桂花树",
+      "waterLevel": 3,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2512,
+        "lng": 120.1498
+      },
+      "notes": "积水很深，桂花树根敏感",
+      "createdAt": "2024-06-10T06:50:00.000Z"
+    }
+  ],
+  "treeSpecies": [
+    {
+      "id": 2,
+      "name": "香樟树",
+      "scientificName": "Cinnamomum camphora",
+      "waterTolerance": "较差",
+      "diseaseRisk": "中等",
+      "notes": "常绿乔木，香气浓郁。对积水敏感，长期积水会导致根系腐烂。",
+      "commonDiseases": [
+        "黑斑病",
+        "根腐病",
+        "介壳虫"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "桂花树",
+      "scientificName": "Osmanthus fragrans",
+      "waterTolerance": "较差",
+      "diseaseRisk": "中等",
+      "notes": "著名香花树种。根系怕积水，树池排水要求高。",
+      "commonDiseases": [
+        "褐斑病",
+        "枯斑病",
+        "红蜘蛛"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "diseaseRecords": [
+    {
+      "id": 2,
+      "treePondId": 2,
+      "diseaseName": "根腐病",
+      "severity": "严重",
+      "status": "untreated",
+      "notes": "疑似积水导致根系腐烂，需紧急处理",
+      "recordedAt": "2024-06-10T08:00:00.000Z",
+      "createdAt": "2024-06-10T08:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "treePondId": 5,
+      "diseaseName": "褐斑病",
+      "severity": "轻微",
+      "status": "treated",
+      "notes": "已喷洒杀菌剂，观察恢复情况",
+      "recordedAt": "2024-06-05T10:00:00.000Z",
+      "createdAt": "2024-06-05T10:00:00.000Z",
+      "updatedAt": "2024-06-07T16:00:00.000Z"
+    }
+  ],
+  "statistics": {
+    "total": 2,
+    "byWaterLevel": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 2
+    },
+    "byStatus": {
+      "pending": 2,
+      "in_progress": 0,
+      "completed": 0
+    }
+  }
+}

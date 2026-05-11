@@ -1,0 +1,117 @@
+[
+  {
+    "id": 1,
+    "code": "TP-001",
+    "location": "人民路88号",
+    "treeSpecies": "悬铃木",
+    "waterLevel": 2,
+    "status": "in_progress",
+    "coordinates": {
+      "lat": 30.2741,
+      "lng": 120.1551
+    },
+    "notes": "大雨后积水约15cm，影响行人",
+    "createdAt": "2024-06-10T08:30:00.000Z",
+    "updatedAt": "2024-06-10T10:15:00.000Z"
+  },
+  {
+    "id": 2,
+    "code": "TP-002",
+    "location": "解放路156号",
+    "treeSpecies": "香樟树",
+    "waterLevel": 3,
+    "status": "pending",
+    "coordinates": {
+      "lat": 30.2753,
+      "lng": 120.1567
+    },
+    "notes": "严重积水，树根可能腐烂",
+    "createdAt": "2024-06-10T07:45:00.000Z"
+  },
+  {
+    "id": 3,
+    "code": "TP-003",
+    "location": "延安路200号",
+    "treeSpecies": "悬铃木",
+    "waterLevel": 1,
+    "status": "pending",
+    "coordinates": {
+      "lat": 30.2735,
+      "lng": 120.1542
+    },
+    "notes": "轻度积水，排水缓慢",
+    "createdAt": "2024-06-10T09:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "code": "TP-004",
+    "location": "中山北路300号",
+    "treeSpecies": "银杏树",
+    "waterLevel": 0,
+    "status": "completed",
+    "coordinates": {
+      "lat": 30.2728,
+      "lng": 120.1538
+    },
+    "notes": "已完成排水处理",
+    "createdAt": "2024-06-09T14:20:00.000Z",
+    "updatedAt": "2024-06-10T08:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "code": "TP-005",
+    "location": "西湖大道80号",
+    "treeSpecies": "桂花树",
+    "waterLevel": 3,
+    "status": "pending",
+    "coordinates": {
+      "lat": 30.2512,
+      "lng": 120.1498
+    },
+    "notes": "积水很深，桂花树根敏感",
+    "createdAt": "2024-06-10T06:50:00.000Z"
+  },
+  {
+    "id": 6,
+    "code": "TP-006",
+    "location": "文一路120号",
+    "treeSpecies": "水杉",
+    "waterLevel": 2,
+    "status": "in_progress",
+    "coordinates": {
+      "lat": 30.2956,
+      "lng": 120.1234
+    },
+    "notes": "中度积水，水杉相对耐湿但仍需处理",
+    "createdAt": "2024-06-10T08:10:00.000Z",
+    "updatedAt": "2024-06-10T09:30:00.000Z"
+  },
+  {
+    "id": 7,
+    "code": "TP-007",
+    "location": "莫干山路45号",
+    "treeSpecies": "香樟树",
+    "waterLevel": 0,
+    "status": "completed",
+    "coordinates": {
+      "lat": 30.289,
+      "lng": 120.142
+    },
+    "notes": "排水系统良好，无积水",
+    "createdAt": "2024-06-10T10:00:00.000Z"
+  },
+  {
+    "id": 8,
+    "code": "TP-008",
+    "location": "庆春路280号",
+    "treeSpecies": "悬铃木",
+    "waterLevel": 1,
+    "status": "pending",
+    "coordinates": {
+      "lat": 30.2645,
+      "lng": 120.165
+    },
+    "notes": "轻微积水，观察中",
+    "createdAt": "2024-06-10T09:45:00.000Z"
+  }
+]

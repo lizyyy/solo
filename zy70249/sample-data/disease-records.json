@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "treePondId": 1,
+    "diseaseName": "炭疽病",
+    "severity": "中等",
+    "status": "untreated",
+    "notes": "叶片出现褐色斑点，需要喷药处理",
+    "recordedAt": "2024-06-08T14:30:00.000Z",
+    "createdAt": "2024-06-08T14:30:00.000Z"
+  },
+  {
+    "id": 2,
+    "treePondId": 2,
+    "diseaseName": "根腐病",
+    "severity": "严重",
+    "status": "untreated",
+    "notes": "疑似积水导致根系腐烂，需紧急处理",
+    "recordedAt": "2024-06-10T08:00:00.000Z",
+    "createdAt": "2024-06-10T08:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "treePondId": 5,
+    "diseaseName": "褐斑病",
+    "severity": "轻微",
+    "status": "treated",
+    "notes": "已喷洒杀菌剂，观察恢复情况",
+    "recordedAt": "2024-06-05T10:00:00.000Z",
+    "createdAt": "2024-06-05T10:00:00.000Z",
+    "updatedAt": "2024-06-07T16:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "treePondId": 6,
+    "diseaseName": "立枯病",
+    "severity": "中等",
+    "status": "in_progress",
+    "notes": "幼苗感染，正在处理中",
+    "recordedAt": "2024-06-09T09:15:00.000Z",
+    "createdAt": "2024-06-09T09:15:00.000Z",
+    "updatedAt": "2024-06-10T08:30:00.000Z"
+  }
+]

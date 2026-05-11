@@ -1,0 +1,249 @@
+{
+  "exportTime": "2026-05-11T13:56:57.237Z",
+  "filters": {},
+  "treePonds": [
+    {
+      "id": 1,
+      "code": "TP-001",
+      "location": "人民路88号",
+      "treeSpecies": "悬铃木",
+      "waterLevel": 2,
+      "status": "in_progress",
+      "coordinates": {
+        "lat": 30.2741,
+        "lng": 120.1551
+      },
+      "notes": "大雨后积水约15cm，影响行人",
+      "createdAt": "2024-06-10T08:30:00.000Z",
+      "updatedAt": "2024-06-10T10:15:00.000Z"
+    },
+    {
+      "id": 2,
+      "code": "TP-002",
+      "location": "解放路156号",
+      "treeSpecies": "香樟树",
+      "waterLevel": 3,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2753,
+        "lng": 120.1567
+      },
+      "notes": "严重积水，树根可能腐烂",
+      "createdAt": "2024-06-10T07:45:00.000Z"
+    },
+    {
+      "id": 3,
+      "code": "TP-003",
+      "location": "延安路200号",
+      "treeSpecies": "悬铃木",
+      "waterLevel": 1,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2735,
+        "lng": 120.1542
+      },
+      "notes": "轻度积水，排水缓慢",
+      "createdAt": "2024-06-10T09:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "code": "TP-004",
+      "location": "中山北路300号",
+      "treeSpecies": "银杏树",
+      "waterLevel": 0,
+      "status": "completed",
+      "coordinates": {
+        "lat": 30.2728,
+        "lng": 120.1538
+      },
+      "notes": "已完成排水处理",
+      "createdAt": "2024-06-09T14:20:00.000Z",
+      "updatedAt": "2024-06-10T08:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "code": "TP-005",
+      "location": "西湖大道80号",
+      "treeSpecies": "桂花树",
+      "waterLevel": 3,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2512,
+        "lng": 120.1498
+      },
+      "notes": "积水很深，桂花树根敏感",
+      "createdAt": "2024-06-10T06:50:00.000Z"
+    },
+    {
+      "id": 6,
+      "code": "TP-006",
+      "location": "文一路120号",
+      "treeSpecies": "水杉",
+      "waterLevel": 2,
+      "status": "in_progress",
+      "coordinates": {
+        "lat": 30.2956,
+        "lng": 120.1234
+      },
+      "notes": "中度积水，水杉相对耐湿但仍需处理",
+      "createdAt": "2024-06-10T08:10:00.000Z",
+      "updatedAt": "2024-06-10T09:30:00.000Z"
+    },
+    {
+      "id": 7,
+      "code": "TP-007",
+      "location": "莫干山路45号",
+      "treeSpecies": "香樟树",
+      "waterLevel": 0,
+      "status": "completed",
+      "coordinates": {
+        "lat": 30.289,
+        "lng": 120.142
+      },
+      "notes": "排水系统良好，无积水",
+      "createdAt": "2024-06-10T10:00:00.000Z"
+    },
+    {
+      "id": 8,
+      "code": "TP-008",
+      "location": "庆春路280号",
+      "treeSpecies": "悬铃木",
+      "waterLevel": 1,
+      "status": "pending",
+      "coordinates": {
+        "lat": 30.2645,
+        "lng": 120.165
+      },
+      "notes": "轻微积水，观察中",
+      "createdAt": "2024-06-10T09:45:00.000Z"
+    }
+  ],
+  "treeSpecies": [
+    {
+      "id": 1,
+      "name": "悬铃木",
+      "scientificName": "Platanus acerifolia",
+      "waterTolerance": "中等",
+      "diseaseRisk": "较高",
+      "notes": "俗称法国梧桐，城市常见行道树。根系发达，需注意树池排水。",
+      "commonDiseases": [
+        "炭疽病",
+        "叶斑病",
+        "白粉病"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "name": "香樟树",
+      "scientificName": "Cinnamomum camphora",
+      "waterTolerance": "较差",
+      "diseaseRisk": "中等",
+      "notes": "常绿乔木，香气浓郁。对积水敏感，长期积水会导致根系腐烂。",
+      "commonDiseases": [
+        "黑斑病",
+        "根腐病",
+        "介壳虫"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "name": "银杏树",
+      "scientificName": "Ginkgo biloba",
+      "waterTolerance": "中等",
+      "diseaseRisk": "较低",
+      "notes": "古老树种，抗病虫能力强。但树池积水仍需及时处理。",
+      "commonDiseases": [
+        "叶枯病",
+        "茎腐病"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "name": "桂花树",
+      "scientificName": "Osmanthus fragrans",
+      "waterTolerance": "较差",
+      "diseaseRisk": "中等",
+      "notes": "著名香花树种。根系怕积水，树池排水要求高。",
+      "commonDiseases": [
+        "褐斑病",
+        "枯斑病",
+        "红蜘蛛"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": 5,
+      "name": "水杉",
+      "scientificName": "Metasequoia glyptostroboides",
+      "waterTolerance": "较强",
+      "diseaseRisk": "较低",
+      "notes": "活化石树种，相对耐湿。但长期积水仍会影响生长。",
+      "commonDiseases": [
+        "立枯病",
+        "猝倒病"
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "diseaseRecords": [
+    {
+      "id": 1,
+      "treePondId": 1,
+      "diseaseName": "炭疽病",
+      "severity": "中等",
+      "status": "untreated",
+      "notes": "叶片出现褐色斑点，需要喷药处理",
+      "recordedAt": "2024-06-08T14:30:00.000Z",
+      "createdAt": "2024-06-08T14:30:00.000Z"
+    },
+    {
+      "id": 2,
+      "treePondId": 2,
+      "diseaseName": "根腐病",
+      "severity": "严重",
+      "status": "untreated",
+      "notes": "疑似积水导致根系腐烂，需紧急处理",
+      "recordedAt": "2024-06-10T08:00:00.000Z",
+      "createdAt": "2024-06-10T08:00:00.000Z"
+    },
+    {
+      "id": 3,
+      "treePondId": 5,
+      "diseaseName": "褐斑病",
+      "severity": "轻微",
+      "status": "treated",
+      "notes": "已喷洒杀菌剂，观察恢复情况",
+      "recordedAt": "2024-06-05T10:00:00.000Z",
+      "createdAt": "2024-06-05T10:00:00.000Z",
+      "updatedAt": "2024-06-07T16:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "treePondId": 6,
+      "diseaseName": "立枯病",
+      "severity": "中等",
+      "status": "in_progress",
+      "notes": "幼苗感染，正在处理中",
+      "recordedAt": "2024-06-09T09:15:00.000Z",
+      "createdAt": "2024-06-09T09:15:00.000Z",
+      "updatedAt": "2024-06-10T08:30:00.000Z"
+    }
+  ],
+  "statistics": {
+    "total": 8,
+    "byWaterLevel": {
+      "0": 2,
+      "1": 2,
+      "2": 2,
+      "3": 2
+    },
+    "byStatus": {
+      "pending": 4,
+      "in_progress": 2,
+      "completed": 2
+    }
+  }
+}
