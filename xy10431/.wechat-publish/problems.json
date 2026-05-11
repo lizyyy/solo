@@ -1,0 +1,79 @@
+[
+  {
+    "id": "f4e024a7-3846-4c17-8f1b-18255afa985e-title_duplicate-title=春季护肤指南",
+    "materialId": "f4e024a7-3846-4c17-8f1b-18255afa985e",
+    "type": "title_duplicate",
+    "severity": "high",
+    "title": "标题重复",
+    "message": "标题\"春季护肤指南\"与其他素材重复",
+    "details": {
+      "title": "春季护肤指南",
+      "duplicateWith": [
+        "1e50186b-b448-4499-a4d9-094f3aa64131"
+      ]
+    },
+    "status": "open",
+    "createdAt": "2026-05-11T11:11:40.013Z"
+  },
+  {
+    "id": "1e50186b-b448-4499-a4d9-094f3aa64131-title_duplicate-title=春季护肤指南",
+    "materialId": "1e50186b-b448-4499-a4d9-094f3aa64131",
+    "type": "title_duplicate",
+    "severity": "high",
+    "title": "标题重复",
+    "message": "标题\"春季护肤指南\"与其他素材重复",
+    "details": {
+      "title": "春季护肤指南",
+      "duplicateWith": [
+        "f4e024a7-3846-4c17-8f1b-18255afa985e"
+      ]
+    },
+    "status": "open",
+    "createdAt": "2026-05-11T11:11:40.018Z"
+  },
+  {
+    "id": "e00c6710-7f1c-4164-8e8e-bb65b2152cde-cover_missing-",
+    "materialId": "e00c6710-7f1c-4164-8e8e-bb65b2152cde",
+    "type": "cover_missing",
+    "severity": "medium",
+    "title": "封面缺失",
+    "message": "素材缺少封面图片",
+    "details": {},
+    "status": "open",
+    "createdAt": "2026-05-11T11:11:40.019Z"
+  },
+  {
+    "id": "f4e024a7-3846-4c17-8f1b-18255afa985e-schedule_conflict-date=2026-05-12|time=08:00",
+    "materialId": "f4e024a7-3846-4c17-8f1b-18255afa985e",
+    "type": "schedule_conflict",
+    "severity": "high",
+    "title": "排期冲突",
+    "message": "2026-05-12 08:00 与其他素材排期冲突",
+    "details": {
+      "publishDate": "2026-05-12",
+      "publishTime": "08:00",
+      "conflictWith": [
+        "e00c6710-7f1c-4164-8e8e-bb65b2152cde"
+      ]
+    },
+    "status": "open",
+    "createdAt": "2026-05-11T11:11:40.073Z"
+  },
+  {
+    "id": "e00c6710-7f1c-4164-8e8e-bb65b2152cde-schedule_conflict-date=2026-05-12|time=08:00",
+    "materialId": "e00c6710-7f1c-4164-8e8e-bb65b2152cde",
+    "type": "schedule_conflict",
+    "severity": "high",
+    "title": "排期冲突",
+    "message": "2026-05-12 08:00 与其他素材排期冲突",
+    "details": {
+      "publishDate": "2026-05-12",
+      "publishTime": "08:00",
+      "conflictWith": [
+        "f4e024a7-3846-4c17-8f1b-18255afa985e"
+      ]
+    },
+    "status": "open",
+    "createdAt": "2026-05-11T11:11:40.073Z"
+  }
+]

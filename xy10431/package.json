@@ -1,0 +1,28 @@
+{
+  "name": "wechat-publisher-cli",
+  "version": "1.0.0",
+  "description": "公众号素材发布CLI - 管理素材、排期和敏感词检查",
+  "main": "src/index.js",
+  "bin": {
+    "wechat-publish": "src/index.js"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": ["wechat", "cli", "publisher", "material", "schedule"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "csv-parse": "^5.5.3",
+    "csv-stringify": "^6.4.5",
+    "date-fns": "^2.30.0",
+    "lodash": "^4.17.21",
+    "table": "^6.8.1",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
