@@ -69,6 +69,33 @@ python3 pet_cli.py add-medication \
     --start-date "2026-05-12"
 echo ""
 
+echo "--- 步骤 7b: 验证重复提交同一过敏用药 (应该提示已存在，且不新增过敏提醒) ---"
+python3 pet_cli.py add-medication \
+    --owner-phone "13800138001" \
+    --pet-name "旺财" \
+    --name "阿莫西林" \
+    --dosage "0.5g" \
+    --frequency "bid" \
+    --start-date "2026-05-12"
+echo ""
+
+echo "--- 验证: 过敏提醒表记录数应该是 1 条 ---"
+allergy_count=$(python3 -c "
+import sqlite3
+conn = sqlite3.connect('pet_boarding.db')
+cursor = conn.cursor()
+cursor.execute('SELECT COUNT(*) FROM allergy_alerts')
+print(cursor.fetchone()[0])
+conn.close()
+")
+echo "  allergy_alerts 记录数: $allergy_count (预期: 1)"
+if [ "$allergy_count" -eq 1 ]; then
+    echo "  ✓ 验证通过: 重复提交没有新增过敏提醒"
+else
+    echo "  ✗ 验证失败: 预期 1 条，实际 $allergy_count 条"
+fi
+echo ""
+
 echo "--- 步骤 8: 正确的用药 (无过敏) ---"
 python3 pet_cli.py add-medication \
     --owner-phone "13800138001" \
@@ -111,10 +138,59 @@ echo "这里演示流程, 不真正执行打卡..."
 echo ""
 
 echo "--- 步骤 13: 主人提前接走 (提前2天) ---"
+echo "  预期账单验证：房费5晚=1000，退款2晚=400，实际房费=600，服务=348，总应付=948"
 python3 pet_cli.py check-out \
     --owner-phone "13800138001" \
     --pet-name "旺财" \
     --check-out-date "2026-05-14"
+echo ""
+
+echo "--- 验证: 账单数据正确性 ---"
+python3 << 'EOF'
+import sqlite3
+conn = sqlite3.connect('pet_boarding.db')
+cursor = conn.cursor()
+cursor.execute('SELECT base_cost, services_cost, total_refunds, grand_total FROM bills')
+row = cursor.fetchone()
+base_cost, services_cost, total_refunds, grand_total = row
+
+print(f"  base_cost:     ¥{base_cost:.2f} (预期: ¥1000.00)")
+print(f"  services_cost: ¥{services_cost:.2f} (预期: ¥348.00)")
+print(f"  total_refunds: -¥{total_refunds:.2f} (预期: -¥400.00)")
+print(f"  grand_total:   ¥{grand_total:.2f} (预期: ¥948.00)")
+
+all_pass = True
+if base_cost == 1000.0:
+    print("  ✓ base_cost 正确")
+else:
+    print("  ✗ base_cost 错误")
+    all_pass = False
+
+if services_cost == 348.0:
+    print("  ✓ services_cost 正确")
+else:
+    print("  ✗ services_cost 错误")
+    all_pass = False
+
+if total_refunds == 400.0:
+    print("  ✓ total_refunds 正确")
+else:
+    print("  ✗ total_refunds 错误")
+    all_pass = False
+
+if grand_total == 948.0:
+    print("  ✓ grand_total 正确")
+else:
+    print("  ✗ grand_total 错误")
+    all_pass = False
+
+if all_pass:
+    print("\n  ✓✓✓ 所有验证通过! ✓✓✓")
+else:
+    print("\n  ✗✗✗ 存在验证失败 ✗✗✗")
+
+conn.close()
+EOF
 echo ""
 
 echo "--- 步骤 14: 验证重复结账 (应该失败) ---"

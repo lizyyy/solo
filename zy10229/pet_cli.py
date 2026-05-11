@@ -470,18 +470,6 @@ def add_medication(owner_phone, pet_name, name, dosage, frequency, start_date, e
     start = parse_date(start_date)
     end = parse_date(end_date) if end_date else parse_date(planned_check_out)
     
-    if name.lower() in allergies.lower():
-        alert_id = generate_id('alert', stay_id, name, datetime.now().isoformat())
-        cursor.execute(
-            "INSERT INTO allergy_alerts (id, stay_id, alert_type, description, alert_time) "
-            "VALUES (?, ?, 'medication', ?, ?)",
-            (alert_id, stay_id, f"宠物 {pet_name} 对 {name} 过敏！过敏史: {allergies}", datetime.now().isoformat())
-        )
-        click.echo(f"⚠️  ⚠️  ⚠️  严重过敏警告！")
-        click.echo(f"   宠物 {pet_name} 的过敏史包含: {allergies}")
-        click.echo(f"   您正在添加的药品: {name}")
-        click.echo("   请确认后再继续！")
-    
     unique_hash = generate_unique_hash(stay_id, name, dosage, frequency, start_date, end_date or planned_check_out)
     
     cursor.execute(
@@ -492,6 +480,18 @@ def add_medication(owner_phone, pet_name, name, dosage, frequency, start_date, e
         click.echo(f"⚠️  该用药计划已存在")
         conn.close()
         return
+    
+    if name.lower() in allergies.lower():
+        alert_id = generate_id('alert', stay_id, name, start_date, frequency)
+        cursor.execute(
+            "INSERT OR IGNORE INTO allergy_alerts (id, stay_id, alert_type, description, alert_time) "
+            "VALUES (?, ?, 'medication', ?, ?)",
+            (alert_id, stay_id, f"宠物 {pet_name} 对 {name} 过敏！过敏史: {allergies}", datetime.now().isoformat())
+        )
+        click.echo(f"⚠️  ⚠️  ⚠️  严重过敏警告！")
+        click.echo(f"   宠物 {pet_name} 的过敏史包含: {allergies}")
+        click.echo(f"   您正在添加的药品: {name}")
+        click.echo("   请确认后再继续！")
     
     med_id = generate_id('med', unique_hash)
     
@@ -721,14 +721,16 @@ def check_out(owner_phone, pet_name, check_out_date, cancel):
     if cancel:
         base_cost = 0.0
         base_description = "取消入住: 房费全免"
+        base_qty = 0
     else:
-        base_cost = money(actual_nights * daily_rate)
-        base_description = f"房费: {stay_row['room_type']} × {actual_nights} 晚 (¥{float(daily_rate)}/晚)"
+        base_cost = money(planned_nights * daily_rate)
+        base_description = f"房费: {stay_row['room_type']} × {planned_nights} 晚 (¥{float(daily_rate)}/晚)"
+        base_qty = planned_nights
     
     bill_items.append({
         'type': 'base',
         'desc': base_description,
-        'qty': actual_nights,
+        'qty': base_qty,
         'unit': float(daily_rate),
         'amount': base_cost
     })
@@ -756,14 +758,14 @@ def check_out(owner_phone, pet_name, check_out_date, cancel):
     if not cancel and actual_nights < planned_nights:
         refund_days = planned_nights - actual_nights
         refund_amount = money(refund_days * daily_rate)
-        refund_id = generate_id('refund', stay_id, 'early_checkout')
+        refund_id = generate_id('refund', stay_id, 'early_checkout', actual_out.isoformat())
         
         cursor.execute(
             "INSERT OR IGNORE INTO refunds (id, stay_id, reason, amount) "
             "VALUES (?, ?, '提前接走退款', ?)",
             (refund_id, stay_id, refund_amount)
         )
-        refunds.append({'reason': f'提前 {refund_days} 天接走', 'amount': refund_amount})
+        refunds.append({'reason': f'提前 {refund_days} 天接走 (原计划{planned_nights}晚，实际{actual_nights}晚)', 'amount': refund_amount})
     
     if cancel:
         refund_id = generate_id('refund', stay_id, 'cancellation')
