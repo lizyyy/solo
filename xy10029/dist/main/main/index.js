@@ -63,7 +63,7 @@ function createWindow() {
         mainWindow.webContents.openDevTools();
     }
     else {
-        mainWindow.loadFile(path_1.default.join(__dirname, '../renderer/index.html'));
+        mainWindow.loadFile(path_1.default.join(__dirname, '../../renderer/index.html'));
     }
     mainWindow.on('closed', () => {
         mainWindow = null;

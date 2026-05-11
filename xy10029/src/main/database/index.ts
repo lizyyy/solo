@@ -2,10 +2,17 @@ import initSqlJs, { Database as SqlJsDatabase, SqlJsStatic } from 'sql.js'
 import path from 'path'
 import { app } from 'electron'
 import * as fs from 'fs'
+import { createHash } from 'crypto'
+import { UserRole } from '@shared/types'
+import { generateId, getCurrentTimestamp } from '@shared/utils'
 
 let sqlJs: SqlJsStatic
 let database: SqlJsDatabase
 let dbFilePath: string
+
+function hashPassword(password: string): string {
+  return createHash('sha256').update(password).digest('hex')
+}
 
 export async function initSqlJsModule(): Promise<SqlJsStatic> {
   if (!sqlJs) {
@@ -194,6 +201,63 @@ export async function initDatabase(): Promise<void> {
 
   db.run(initSql)
   saveDatabaseToDisk()
+
+  const userCountStmt = db.prepare('SELECT COUNT(*) as count FROM users')
+  let userCount = 0
+  if (userCountStmt.step()) {
+    const row = userCountStmt.getAsObject() as any
+    userCount = row.count || 0
+  }
+  userCountStmt.free()
+
+  if (userCount === 0) {
+    const now = getCurrentTimestamp()
+    const adminId = generateId()
+
+    db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      adminId,
+      'admin',
+      hashPassword('admin123'),
+      '系统管理员',
+      UserRole.ADMIN,
+      now,
+      now,
+      1
+    ])
+
+    db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      generateId(),
+      'operator',
+      hashPassword('operator123'),
+      '设备操作员',
+      UserRole.OPERATOR,
+      now,
+      now,
+      1
+    ])
+
+    db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      generateId(),
+      'zhangsan',
+      hashPassword('123456'),
+      '张三',
+      UserRole.USER,
+      now,
+      now,
+      1
+    ])
+
+    saveDatabaseToDisk()
+  }
 }
 
 export async function exec(sql: string, params: any[] = []): Promise<void> {

@@ -54,9 +54,15 @@ const sql_js_1 = __importDefault(require("sql.js"));
 const path_1 = __importDefault(require("path"));
 const electron_1 = require("electron");
 const fs = __importStar(require("fs"));
+const crypto_1 = require("crypto");
+const types_1 = require("@shared/types");
+const utils_1 = require("@shared/utils");
 let sqlJs;
 let database;
 let dbFilePath;
+function hashPassword(password) {
+    return (0, crypto_1.createHash)('sha256').update(password).digest('hex');
+}
 async function initSqlJsModule() {
     if (!sqlJs) {
         sqlJs = await (0, sql_js_1.default)({
@@ -240,6 +246,57 @@ async function initDatabase() {
   `;
     db.run(initSql);
     saveDatabaseToDisk();
+    const userCountStmt = db.prepare('SELECT COUNT(*) as count FROM users');
+    let userCount = 0;
+    if (userCountStmt.step()) {
+        const row = userCountStmt.getAsObject();
+        userCount = row.count || 0;
+    }
+    userCountStmt.free();
+    if (userCount === 0) {
+        const now = (0, utils_1.getCurrentTimestamp)();
+        const adminId = (0, utils_1.generateId)();
+        db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+            adminId,
+            'admin',
+            hashPassword('admin123'),
+            '系统管理员',
+            types_1.UserRole.ADMIN,
+            now,
+            now,
+            1
+        ]);
+        db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+            (0, utils_1.generateId)(),
+            'operator',
+            hashPassword('operator123'),
+            '设备操作员',
+            types_1.UserRole.OPERATOR,
+            now,
+            now,
+            1
+        ]);
+        db.run(`
+      INSERT INTO users (id, username, password, display_name, role, created_at, updated_at, is_active)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+            (0, utils_1.generateId)(),
+            'zhangsan',
+            hashPassword('123456'),
+            '张三',
+            types_1.UserRole.USER,
+            now,
+            now,
+            1
+        ]);
+        saveDatabaseToDisk();
+    }
 }
 async function exec(sql, params = []) {
     const db = await getDatabase();
