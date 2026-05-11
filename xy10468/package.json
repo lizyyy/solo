@@ -1,0 +1,14 @@
+{
+  "name": "release-rollback-decision-api",
+  "version": "1.0.0",
+  "description": "发版回滚决策 API - 管理灰度发布、指标监控和回滚决策",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
