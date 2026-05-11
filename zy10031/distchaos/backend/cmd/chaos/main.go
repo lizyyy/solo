@@ -671,31 +671,39 @@ func (a *App) injectConfigDriftChaos(ctx context.Context, duration time.Duration
 	a.chaosMgr.Mu.Lock()
 	a.chaosMgr.ConfigDrifted = true
 
-	driftCount := 20
-	if val, ok := params["drift_count"].(float64); ok {
-		driftCount = int(val)
+	configDrifts := map[string]struct {
+		original interface{}
+		drifted  interface{}
+	}{
+		"feature.flag.inventory_check": {
+			original: true,
+			drifted:  false,
+		},
+		"order.processing.timeout": {
+			original: "1m",
+			drifted:  "1ms",
+		},
+		"service.retry.count": {
+			original: 3,
+			drifted:  0,
+		},
+		"cache.ttl.seconds": {
+			original: 300,
+			drifted:  1,
+		},
+		"db.connection.timeout": {
+			original: "30s",
+			drifted:  "1ms",
+		},
+		"log.level": {
+			original: "info",
+			drifted:  "panic",
+		},
 	}
 
-	configKeys := []string{
-		"db.connection.timeout",
-		"redis.pool.size",
-		"kafka.batch.size",
-		"service.retry.count",
-		"circuit.breaker.threshold",
-		"rate.limit.requests",
-		"cache.ttl.seconds",
-		"worker.pool.size",
-		"log.level",
-		"feature.flag.enabled",
-	}
-
-	for i := 0; i < driftCount; i++ {
-		key := configKeys[i%len(configKeys)]
-		originalValue := fmt.Sprintf("original-value-%d", i)
-		driftedValue := fmt.Sprintf("drifted-value-%d-%d", i, time.Now().Unix())
-
-		a.chaosMgr.OriginalConfigs[key] = originalValue
-		a.chaosMgr.DriftedConfigs[key] = driftedValue
+	for key, pair := range configDrifts {
+		a.chaosMgr.OriginalConfigs[key] = pair.original
+		a.chaosMgr.DriftedConfigs[key] = pair.drifted
 
 		evt := event.Event{
 			ID:      uuid.New().String(),
@@ -704,13 +712,15 @@ func (a *App) injectConfigDriftChaos(ctx context.Context, duration time.Duration
 			Service: "config-store",
 			Payload: map[string]interface{}{
 				"config_key":     key,
-				"original_value": originalValue,
-				"drifted_value":  driftedValue,
+				"original_value": pair.original,
+				"drifted_value":  pair.drifted,
 				"phase":          "drifted",
+				"impact":         "配置漂移可能导致业务逻辑异常",
 			},
 		}
 		a.eventMgr.Record(ctx, evt)
 	}
+
 	a.chaosMgr.Mu.Unlock()
 
 	go func() {

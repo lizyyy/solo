@@ -158,6 +158,10 @@ type OrderService struct {
 	compensationRepo CompensationRepository
 	eventManager     *event.EventManager
 	chaosState       *ChaosState
+
+	productPrices map[int64]float64
+	baseStock     int
+	basePrice     float64
 }
 
 type InventoryRepository interface {
@@ -204,6 +208,13 @@ func NewOrderService(
 		compensationRepo: compensationRepo,
 		eventManager:     eventManager,
 		chaosState:       chaosState,
+		productPrices: map[int64]float64{
+			1: 100.0,
+			2: 200.0,
+			3: 300.0,
+		},
+		baseStock: 100,
+		basePrice: 100.0,
 	}
 }
 
@@ -258,10 +269,16 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *CreateOrderRequestE
 	}, nil
 }
 
-func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, phase string) error {
+func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, phase string, req *domain.CreateOrderRequest) (*ChaosImpact, error) {
+	impact := &ChaosImpact{
+		UseDirtyPrice: false,
+		SkipInventory: false,
+		DirtyPrice:    0,
+	}
+
 	if s.chaosState.IsConnectionPoolBroken() {
 		s.recordChaosEvent(ctx, traceID, "connection_pool_injection", "连接池耗尽，无法获取数据库连接")
-		return errors.New("connection pool exhausted: no available connections")
+		return nil, errors.New("connection pool exhausted: no available connections")
 	}
 
 	if s.chaosState.IsMessageBacklogActive() {
@@ -270,10 +287,83 @@ func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, 
 	}
 
 	if s.chaosState.IsCacheDirty() {
-		s.recordChaosEvent(ctx, traceID, "cache_dirty_injection", "缓存脏数据，库存/价格信息不一致")
+		productKey := fmt.Sprintf("product:%d", req.ProductID)
+
+		s.chaosState.Mu.RLock()
+		cacheData, hasDirty := s.chaosState.CacheDirtyData[productKey]
+		s.chaosState.Mu.RUnlock()
+
+		if hasDirty {
+			dirtyMap, ok := cacheData.(map[string]interface{})
+			if ok {
+				dirtyStock := 0
+				dirtyPriceVal := 0.0
+
+				if price, ok := dirtyMap["price"]; ok {
+					switch p := price.(type) {
+					case float64:
+						dirtyPriceVal = p
+					case int:
+						dirtyPriceVal = float64(p)
+					case int64:
+						dirtyPriceVal = float64(p)
+					}
+				}
+
+				if stock, ok := dirtyMap["stock"]; ok {
+					switch st := stock.(type) {
+					case int:
+						dirtyStock = st
+					case float64:
+						dirtyStock = int(st)
+					case int64:
+						dirtyStock = int(st)
+					}
+				}
+
+				if dirtyStock == 0 {
+					s.recordChaosEvent(ctx, traceID, "cache_dirty_inventory_zero",
+						fmt.Sprintf("缓存脏数据：商品库存被标记为0，实际可用库存为脏数据，拒绝订单"))
+					return nil, fmt.Errorf("cache dirty data: product %d stock is 0 (dirty cache)", req.ProductID)
+				}
+
+				impact.UseDirtyPrice = true
+				impact.DirtyPrice = dirtyPriceVal
+
+				s.recordChaosEvent(ctx, traceID, "cache_dirty_using_dirty_price",
+					fmt.Sprintf("缓存脏数据：使用脏价格 %.2f 替代真实价格", dirtyPriceVal))
+			}
+		}
 	}
 
 	if s.chaosState.IsConfigDrifted() {
+		s.chaosState.Mu.RLock()
+		inventoryCheck, hasInventoryCheck := s.chaosState.DriftedConfigs["feature.flag.inventory_check"]
+		processingTimeout, hasTimeout := s.chaosState.DriftedConfigs["order.processing.timeout"]
+		s.chaosState.Mu.RUnlock()
+
+		if hasInventoryCheck {
+			skip, ok := inventoryCheck.(bool)
+			if ok && !skip {
+				impact.SkipInventory = true
+				s.recordChaosEvent(ctx, traceID, "config_drift_skip_inventory_check",
+					"配置漂移：feature.flag.inventory_check = false，跳过库存检查")
+			}
+		}
+
+		if hasTimeout {
+			timeout, ok := processingTimeout.(string)
+			if ok && (timeout == "1ms" || timeout == "1s") {
+				delay := 100 * time.Millisecond
+				if timeout == "1s" {
+					delay = 2 * time.Second
+				}
+				s.recordChaosEvent(ctx, traceID, "config_drift_processing_delay",
+					fmt.Sprintf("配置漂移：订单处理超时设置为 %s，增加处理延迟 %v", timeout, delay))
+				time.Sleep(delay)
+			}
+		}
+
 		s.recordChaosEvent(ctx, traceID, "config_drift_injection", "配置漂移，参数配置不一致")
 	}
 
@@ -282,7 +372,13 @@ func (s *OrderService) checkChaosInjection(ctx context.Context, traceID string, 
 		time.Sleep(5 * time.Second)
 	}
 
-	return nil
+	return impact, nil
+}
+
+type ChaosImpact struct {
+	UseDirtyPrice bool
+	SkipInventory bool
+	DirtyPrice    float64
 }
 
 func (s *OrderService) recordChaosEvent(ctx context.Context, traceID string, eventType string, description string) {
@@ -307,7 +403,8 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	traceID := txCtx.TraceID
 	failurePoint := s.chaosState.GetOrderFailurePoint()
 
-	if err := s.checkChaosInjection(ctx, traceID, "before_reserve"); err != nil {
+	impact, err := s.checkChaosInjection(ctx, traceID, "before_reserve", req)
+	if err != nil {
 		return nil, err
 	}
 
@@ -319,10 +416,12 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		Status:        event.EventStatusPending,
 		Service:       "order-service",
 		Payload: map[string]interface{}{
-			"product_id": req.ProductID,
-			"quantity":   req.Quantity,
-			"step":       "reserve_inventory",
-			"phase":      "before_reserve",
+			"product_id":      req.ProductID,
+			"quantity":        req.Quantity,
+			"step":            "reserve_inventory",
+			"phase":           "before_reserve",
+			"skip_inventory":  impact.SkipInventory,
+			"use_dirty_price": impact.UseDirtyPrice,
 		},
 	}
 	s.eventManager.Record(ctx, step1)
@@ -335,13 +434,35 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	step1Update.Payload["reserved_before"] = reservedBefore
 	s.eventManager.Record(ctx, step1Update)
 
-	err := s.inventoryRepo.Reserve(ctx, req.ProductID, req.Quantity)
-	if err != nil {
+	var inventoryErr error
+	if impact.SkipInventory {
+		inventoryErr = nil
+		skipEvt := event.Event{
+			ID:            uuid.New().String(),
+			TraceID:       traceID,
+			CorrelationID: txCtx.CorrelationID,
+			PreviousID:    step1.ID,
+			Type:          "inventory_skip",
+			Status:        event.EventStatusSuccess,
+			Service:       "chaos-engine",
+			Payload: map[string]interface{}{
+				"reason":           "config_drift_inventory_check_disabled",
+				"available_before": availableBefore,
+				"quantity":         req.Quantity,
+				"risk":             "可能导致超卖（实际库存 < 订单数量）",
+			},
+		}
+		s.eventManager.Record(ctx, skipEvt)
+	} else {
+		inventoryErr = s.inventoryRepo.Reserve(ctx, req.ProductID, req.Quantity)
+	}
+
+	if inventoryErr != nil {
 		step1.Status = event.EventStatusFailed
-		step1.Error = err.Error()
+		step1.Error = inventoryErr.Error()
 		step1.Duration = time.Since(txCtx.StartTime)
 		s.eventManager.Record(ctx, step1)
-		return nil, fmt.Errorf("failed to reserve inventory: %w", err)
+		return nil, fmt.Errorf("failed to reserve inventory: %w", inventoryErr)
 	}
 
 	availableAfter, _ := s.inventoryRepo.GetAvailable(ctx, req.ProductID)
@@ -372,13 +493,18 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	}
 	s.eventManager.Record(ctx, inventoryReservedEvt)
 
+	orderPrice := s.basePrice
+	if impact.UseDirtyPrice && impact.DirtyPrice > 0 {
+		orderPrice = impact.DirtyPrice
+	}
+
 	orderNo := fmt.Sprintf("ORD-%d", time.Now().UnixNano())
 	order := &domain.Order{
 		OrderNo:   orderNo,
 		UserID:    req.UserID,
 		ProductID: req.ProductID,
 		Quantity:  req.Quantity,
-		Amount:    float64(req.Quantity) * 100.0,
+		Amount:    float64(req.Quantity) * orderPrice,
 		Status:    domain.OrderStatusPending,
 	}
 
@@ -391,18 +517,21 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 		Status:        event.EventStatusPending,
 		Service:       "order-service",
 		Payload: map[string]interface{}{
-			"order_no":   orderNo,
-			"user_id":    order.UserID,
-			"product_id": order.ProductID,
-			"quantity":   order.Quantity,
-			"amount":     order.Amount,
-			"step":       "create_order",
-			"phase":      "before_create",
+			"order_no":        orderNo,
+			"user_id":         order.UserID,
+			"product_id":      order.ProductID,
+			"quantity":        order.Quantity,
+			"amount":          order.Amount,
+			"price_per_unit":  orderPrice,
+			"use_dirty_price": impact.UseDirtyPrice,
+			"original_price":  s.basePrice,
+			"step":            "create_order",
+			"phase":           "before_create",
 		},
 	}
 	s.eventManager.Record(ctx, step2)
 
-	if err := s.checkChaosInjection(ctx, traceID, "before_order_creation"); err != nil {
+	if _, err := s.checkChaosInjection(ctx, traceID, "before_order_creation", req); err != nil {
 		order.Status = domain.OrderStatusFailed
 		order.LastError = "chaos_injection_failed_during_order_creation"
 		s.orderRepo.Create(ctx, order)
@@ -515,7 +644,7 @@ func (s *OrderService) executeOrderFlow(ctx context.Context, txCtx *domain.Trans
 	}
 	s.eventManager.Record(ctx, step3)
 
-	if err := s.checkChaosInjection(ctx, traceID, "before_payment"); err != nil {
+	if _, err := s.checkChaosInjection(ctx, traceID, "before_payment", req); err != nil {
 		order.Status = domain.OrderStatusFailed
 		order.LastError = "chaos_injection_failed_during_payment"
 		s.orderRepo.Update(ctx, order)
