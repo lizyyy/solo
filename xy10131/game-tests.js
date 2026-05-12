@@ -138,6 +138,9 @@ const GameTests = (function() {
         const gameState = EmergencyTriageGame.getState();
         const originalScore = gameState.score;
         
+        const selected = EmergencyTriageGame.selectPatientForTriage(patientId);
+        assert(selected, '应该能够选择病人进行分诊');
+        
         EmergencyTriageGame.triagePatient('yellow');
         
         const afterState = EmergencyTriageGame.getState();
@@ -151,11 +154,12 @@ const GameTests = (function() {
         EmergencyTriageGame.resetGame();
         EmergencyTriageGame.startGame();
         
-        EmergencyTriageGame.addTestPatient('red');
+        const patient = EmergencyTriageGame.addTestPatient('red');
         
         const beforeState = EmergencyTriageGame.getState();
         const originalScore = beforeState.score;
         
+        EmergencyTriageGame.selectPatientForTriage(patient.id);
         EmergencyTriageGame.triagePatient('green');
         
         const afterState = EmergencyTriageGame.getState();
@@ -193,17 +197,21 @@ const GameTests = (function() {
         EmergencyTriageGame.resetGame();
         EmergencyTriageGame.startGame();
         
-        EmergencyTriageGame.addTestPatient('orange');
+        const patient = EmergencyTriageGame.addTestPatient('orange');
         
         const stateBefore = EmergencyTriageGame.getState();
         const countBefore = stateBefore.patients.length;
         
+        EmergencyTriageGame.selectPatientForTriage(patient.id);
         EmergencyTriageGame.triagePatient('orange');
         
         const stateAfter = EmergencyTriageGame.getState();
         const countAfter = stateAfter.patients.length;
         
         assertEqual(countAfter, countBefore - 1, '分诊后病人数量应该减少');
+        
+        const selectedAgain = EmergencyTriageGame.selectPatientForTriage(patient.id);
+        assert(!selectedAgain, '不应该能选择已分诊的病人');
         
         EmergencyTriageGame.triagePatient('orange');
         
@@ -217,17 +225,17 @@ const GameTests = (function() {
         EmergencyTriageGame.resetGame();
         EmergencyTriageGame.startGame();
         
-        EmergencyTriageGame.addTestPatient('green');
+        const patient1 = EmergencyTriageGame.addTestPatient('green');
         
         const stateBefore = EmergencyTriageGame.getState();
         const scoreBefore = stateBefore.score;
         
+        EmergencyTriageGame.selectPatientForTriage(patient1.id);
         EmergencyTriageGame.triagePatient('green');
         
-        EmergencyTriageGame.addTestPatient('green');
+        const patient2 = EmergencyTriageGame.addTestPatient('green');
         
-        const stateAfterFirst = EmergencyTriageGame.getState();
-        
+        EmergencyTriageGame.selectPatientForTriage(patient2.id);
         EmergencyTriageGame.triagePatient('green');
         
         const stateAfterSecond = EmergencyTriageGame.getState();
@@ -246,6 +254,7 @@ const GameTests = (function() {
         
         assertEqual(stateBefore.stats.criticalPatients, 1, '危急病人应该被统计');
         
+        EmergencyTriageGame.selectPatientForTriage(patient.id);
         EmergencyTriageGame.triagePatient('red');
         
         const stateAfter = EmergencyTriageGame.getState();
@@ -260,19 +269,22 @@ const GameTests = (function() {
         EmergencyTriageGame.resetGame();
         EmergencyTriageGame.startGame();
         
-        EmergencyTriageGame.addTestPatient('green');
+        const patient1 = EmergencyTriageGame.addTestPatient('green');
+        EmergencyTriageGame.selectPatientForTriage(patient1.id);
         EmergencyTriageGame.triagePatient('green');
         
         let state = EmergencyTriageGame.getState();
         assertEqual(state.combo, 1, '第一次正确分诊连击数应该为1');
         
-        EmergencyTriageGame.addTestPatient('yellow');
+        const patient2 = EmergencyTriageGame.addTestPatient('yellow');
+        EmergencyTriageGame.selectPatientForTriage(patient2.id);
         EmergencyTriageGame.triagePatient('yellow');
         
         state = EmergencyTriageGame.getState();
         assertEqual(state.combo, 2, '连续正确分诊连击数应该为2');
         
-        EmergencyTriageGame.addTestPatient('orange');
+        const patient3 = EmergencyTriageGame.addTestPatient('orange');
+        EmergencyTriageGame.selectPatientForTriage(patient3.id);
         EmergencyTriageGame.triagePatient('green');
         
         state = EmergencyTriageGame.getState();
@@ -286,7 +298,8 @@ const GameTests = (function() {
         EmergencyTriageGame.startGame();
         
         for (let i = 0; i < 10; i++) {
-            EmergencyTriageGame.addTestPatient('red');
+            const patient = EmergencyTriageGame.addTestPatient('red');
+            EmergencyTriageGame.selectPatientForTriage(patient.id);
             EmergencyTriageGame.triagePatient('green');
         }
         

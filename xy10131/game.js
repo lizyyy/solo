@@ -864,6 +864,16 @@ const EmergencyTriageGame = (function() {
 
     document.addEventListener('DOMContentLoaded', init);
 
+    function selectPatientForTriage(patientId) {
+        const patient = gameState.patients.find(p => p.id === patientId);
+        if (patient) {
+            gameState.currentPatientId = patientId;
+            patient.isBeingTriaged = true;
+            return true;
+        }
+        return false;
+    }
+
     return {
         getState: () => ({ ...gameState }),
         resetGame: resetGameState,
@@ -884,6 +894,7 @@ const EmergencyTriageGame = (function() {
                 gameState.stats.criticalPatients++;
             }
             return patient;
-        }
+        },
+        selectPatientForTriage: selectPatientForTriage
     };
 })();
