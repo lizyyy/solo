@@ -67,6 +67,13 @@ function createBooking(req, res) {
     if (!member) {
       return res.status(404).json({ success: false, error: `成员 ${memberId} 不存在` });
     }
+    const memberInstance = Object.assign(new Student(), member);
+    if (!memberInstance.isAllowedToBook()) {
+      return res.status(403).json({ 
+        success: false, 
+        error: `学生 ${member.name} 已被列入黑名单或信誉分不足，无法参与预约` 
+      });
+    }
   }
 
   const booking = new Booking(null, roomId, bookerId, startTime, endTime, purpose);
@@ -107,6 +114,14 @@ function addBookingMember(req, res) {
   const student = storage.getStudentById(studentId);
   if (!student) {
     return res.status(404).json({ success: false, error: '学生不存在' });
+  }
+
+  const studentInstance = Object.assign(new Student(), student);
+  if (!studentInstance.isAllowedToBook()) {
+    return res.status(403).json({ 
+      success: false, 
+      error: `学生 ${student.name} 已被列入黑名单或信誉分不足，无法参与预约` 
+    });
   }
 
   if (booking.members.includes(studentId)) {

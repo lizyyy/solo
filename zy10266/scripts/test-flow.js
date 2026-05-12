@@ -246,24 +246,75 @@ async function runTestFlow() {
   const finalCreditRes = await request('GET', `/students/${student1.id}/credit`);
   printResult(`最终信誉分状态:`, finalCreditRes.data.data);
 
-  printStep(13, '尝试再次预约（黑名单状态，应该被拒绝）');
-  const futureStart2 = getFutureTime(120);
-  const futureEnd2 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
+  printStep(13, '黑名单成员测试1：创建预约时把黑名单学生作为成员');
+  const futureStart3 = getFutureTime(120);
+  const futureEnd3 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
   
-  const restrictedBookingRes = await request('POST', '/bookings', {
+  const memberBlockedRes = await request('POST', '/bookings', {
+    roomId: rooms[0].id,
+    bookerId: student2.id,
+    startTime: futureStart3,
+    endTime: futureEnd3,
+    purpose: '测试黑名单成员',
+    memberIds: [student1.id]
+  });
+  
+  printResult(`创建预约结果: ${memberBlockedRes.data.error || '成功'}`);
+  if (memberBlockedRes.status !== 201) {
+    printResult('✅ 预期结果：成员是黑名单学生，预约被成功拒绝！');
+  } else {
+    printError('❌ 意外结果：黑名单学生作为成员被允许');
+  }
+
+  printStep(14, '黑名单成员测试2：创建正常预约后，添加黑名单学生');
+  const futureStart4 = getFutureTime(120);
+  const futureEnd4 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
+  
+  const normalBookingRes = await request('POST', '/bookings', {
+    roomId: rooms[0].id,
+    bookerId: student2.id,
+    startTime: futureStart4,
+    endTime: futureEnd4,
+    purpose: '正常预约',
+    memberIds: []
+  });
+  
+  if (normalBookingRes.status === 201) {
+    const normalBooking = normalBookingRes.data.data;
+    printResult(`正常预约创建成功（${normalBooking.status}）`);
+    
+    const addBlockedMemberRes = await request('POST', `/bookings/${normalBooking.id}/members`, {
+      studentId: student1.id
+    });
+    
+    printResult(`添加黑名单成员结果: ${addBlockedMemberRes.data.error || '成功'}`);
+    if (addBlockedMemberRes.status !== 200) {
+      printResult('✅ 预期结果：添加黑名单学生被成功拒绝！');
+    } else {
+      printError('❌ 意外结果：黑名单学生被允许加入');
+    }
+  } else {
+    printError(`创建正常预约失败: ${normalBookingRes.data.error}`);
+  }
+
+  printStep(15, '黑名单发起人测试：黑名单学生作为预约发起人');
+  const futureStart5 = getFutureTime(120);
+  const futureEnd5 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
+  
+  const bookerBlockedRes = await request('POST', '/bookings', {
     roomId: rooms[0].id,
     bookerId: student1.id,
-    startTime: futureStart2,
-    endTime: futureEnd2,
-    purpose: '再次尝试预约',
+    startTime: futureStart5,
+    endTime: futureEnd5,
+    purpose: '测试黑名单发起人',
     memberIds: [student2.id]
   });
   
-  printResult(`预约结果: ${restrictedBookingRes.data.error || '成功（未被限制）'}`);
-  if (restrictedBookingRes.status !== 201) {
-    printResult('✅ 预期结果：预约被成功拒绝！');
+  printResult(`预约结果: ${bookerBlockedRes.data.error || '成功'}`);
+  if (bookerBlockedRes.status !== 201) {
+    printResult('✅ 预期结果：黑名单学生作为发起人，预约被成功拒绝！');
   } else {
-    printError('❌ 意外结果：预约未被拒绝');
+    printError('❌ 意外结果：黑名单学生作为发起人被允许');
   }
 
   console.log(`\n${'='.repeat(60)}`);
@@ -275,9 +326,10 @@ async function runTestFlow() {
   console.log('  3. 只能在预约开始后5秒内签到');
   console.log('  4. 取消需提前30秒');
   console.log('  5. 爽约扣除20分信誉分');
-  console.log('  6. 信誉分0或黑名单无法预约');
-  console.log('  7. 重复操作不会重复计算');
-  console.log('  8. 3次爽约自动加入黑名单7天');
+  console.log('  6. 信誉分0或黑名单无法预约（作为发起人）');
+  console.log('  7. 黑名单学生也不能作为成员加入预约');
+  console.log('  8. 重复操作不会重复计算');
+  console.log('  9. 3次爽约自动加入黑名单7天');
 }
 
 runTestFlow().catch(err => {

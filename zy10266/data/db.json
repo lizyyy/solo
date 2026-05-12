@@ -1,7 +1,7 @@
 {
   "rooms": [
     {
-      "id": "8e8c96db-4906-452d-8493-cabd4e577265",
+      "id": "8ee50dc9-c9b6-45a4-986f-e37a7a563a87",
       "name": "研讨间A101",
       "capacity": 6,
       "location": "图书馆一楼A区",
@@ -11,10 +11,10 @@
         "电源插座"
       ],
       "isActive": true,
-      "createdAt": "2026-05-12T12:34:38.947Z"
+      "createdAt": "2026-05-12T15:01:03.968Z"
     },
     {
-      "id": "4cfd0455-ca80-4c8f-8cf9-f2b5f9b23c3d",
+      "id": "ce6f27b8-6626-4374-85c4-68bb7f64d5e6",
       "name": "研讨间A102",
       "capacity": 8,
       "location": "图书馆一楼A区",
@@ -25,10 +25,10 @@
         "电源插座"
       ],
       "isActive": true,
-      "createdAt": "2026-05-12T12:34:38.948Z"
+      "createdAt": "2026-05-12T15:01:03.969Z"
     },
     {
-      "id": "f1f38999-f179-4c6e-b339-816c251f480d",
+      "id": "12638bcd-4fc8-40a2-8230-e5217641e9b8",
       "name": "研讨间B201",
       "capacity": 4,
       "location": "图书馆二楼B区",
@@ -37,10 +37,10 @@
         "电源插座"
       ],
       "isActive": true,
-      "createdAt": "2026-05-12T12:34:38.948Z"
+      "createdAt": "2026-05-12T15:01:03.969Z"
     },
     {
-      "id": "0d1a5e26-1928-40a6-ac18-578890782775",
+      "id": "189b6f80-2c49-400f-8aca-ecb0a0ac2e02",
       "name": "研讨间B202",
       "capacity": 10,
       "location": "图书馆二楼B区",
@@ -52,10 +52,10 @@
         "电源插座"
       ],
       "isActive": true,
-      "createdAt": "2026-05-12T12:34:38.948Z"
+      "createdAt": "2026-05-12T15:01:03.969Z"
     },
     {
-      "id": "c3b61292-264e-4d20-95d6-ac64524e0bc6",
+      "id": "560adc19-3658-41a0-8374-bc926a1ae451",
       "name": "研讨间C301",
       "capacity": 6,
       "location": "图书馆三楼C区",
@@ -65,122 +65,122 @@
         "电源插座"
       ],
       "isActive": true,
-      "createdAt": "2026-05-12T12:34:38.948Z"
+      "createdAt": "2026-05-12T15:01:03.969Z"
     }
   ],
   "devices": [
     {
-      "id": "55121970-6832-4a38-8843-3584b2268137",
+      "id": "2b1eddb7-beff-48df-b72f-230c640a9c8e",
       "name": "投影仪A101-01",
       "type": "projector",
-      "roomId": "8e8c96db-4906-452d-8493-cabd4e577265",
+      "roomId": "8ee50dc9-c9b6-45a4-986f-e37a7a563a87",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "45eb8f6d-54fc-4532-8370-dec5a55b7ec9",
+      "id": "105028a6-1f16-4517-a4f6-700793a7904e",
       "name": "白板笔套装A101",
       "type": "whiteboard_marker",
-      "roomId": "8e8c96db-4906-452d-8493-cabd4e577265",
+      "roomId": "8ee50dc9-c9b6-45a4-986f-e37a7a563a87",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "3a85be73-b782-44d2-9c4d-b1b326ba466d",
+      "id": "937b4173-0841-4857-acf7-c7b05325fc68",
       "name": "投影仪A102-01",
       "type": "projector",
-      "roomId": "4cfd0455-ca80-4c8f-8cf9-f2b5f9b23c3d",
+      "roomId": "ce6f27b8-6626-4374-85c4-68bb7f64d5e6",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "8c7ad287-4862-489d-b920-007e58a3f2a5",
+      "id": "71c7dc16-b7e1-4ced-9915-760ff65c0d68",
       "name": "电视A102-01",
       "type": "tv",
-      "roomId": "4cfd0455-ca80-4c8f-8cf9-f2b5f9b23c3d",
+      "roomId": "ce6f27b8-6626-4374-85c4-68bb7f64d5e6",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "7aaec43c-4f3e-421b-b0a6-e415c8884696",
+      "id": "058343fd-4196-45da-a57e-c93c4b14e141",
       "name": "白板笔套装A102",
       "type": "whiteboard_marker",
-      "roomId": "4cfd0455-ca80-4c8f-8cf9-f2b5f9b23c3d",
+      "roomId": "ce6f27b8-6626-4374-85c4-68bb7f64d5e6",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "9901921c-9c98-4094-951f-3ab991a2c713",
+      "id": "edf9d524-9ce2-436d-86de-8c02d29ae5db",
       "name": "白板笔套装B201",
       "type": "whiteboard_marker",
-      "roomId": "f1f38999-f179-4c6e-b339-816c251f480d",
+      "roomId": "12638bcd-4fc8-40a2-8230-e5217641e9b8",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "ffeb8368-fcf4-4643-9850-50111fd7ffc5",
+      "id": "070e6fb3-b935-459a-aed0-9a8fe65523ce",
       "name": "投影仪B202-01",
       "type": "projector",
-      "roomId": "0d1a5e26-1928-40a6-ac18-578890782775",
+      "roomId": "189b6f80-2c49-400f-8aca-ecb0a0ac2e02",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "21df585a-b429-4a90-bb1b-0362bae6fd48",
+      "id": "6fa84310-2bfa-423b-8435-ac71fa9629a3",
       "name": "电视B202-01",
       "type": "tv",
-      "roomId": "0d1a5e26-1928-40a6-ac18-578890782775",
+      "roomId": "189b6f80-2c49-400f-8aca-ecb0a0ac2e02",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "d0508614-7c14-4229-851f-f53a2ed154ae",
+      "id": "c227c826-ccbf-4ff3-84b1-ba8b37022b11",
       "name": "视频会议设备B202",
       "type": "video_conference",
-      "roomId": "0d1a5e26-1928-40a6-ac18-578890782775",
+      "roomId": "189b6f80-2c49-400f-8aca-ecb0a0ac2e02",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "b446e6c6-9a95-404b-bb81-557c3ad1eda4",
+      "id": "2327e9df-bb80-436e-9238-d1176b9c11ff",
       "name": "白板笔套装B202",
       "type": "whiteboard_marker",
-      "roomId": "0d1a5e26-1928-40a6-ac18-578890782775",
+      "roomId": "189b6f80-2c49-400f-8aca-ecb0a0ac2e02",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "ec9afb12-a9b7-4521-9850-0762e4d18423",
+      "id": "a581e749-8e85-441f-a0c1-b5216c53f3d6",
       "name": "投影仪C301-01",
       "type": "projector",
-      "roomId": "c3b61292-264e-4d20-95d6-ac64524e0bc6",
+      "roomId": "560adc19-3658-41a0-8374-bc926a1ae451",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     },
     {
-      "id": "a2297d49-46cc-45e7-8bb7-31680fc1dfd7",
+      "id": "a02f101c-486b-41bd-9f56-0e50b459d6cc",
       "name": "白板笔套装C301",
       "type": "whiteboard_marker",
-      "roomId": "c3b61292-264e-4d20-95d6-ac64524e0bc6",
+      "roomId": "560adc19-3658-41a0-8374-bc926a1ae451",
       "status": "available",
       "currentBookingId": null,
-      "createdAt": "2026-05-12T12:34:38.949Z"
+      "createdAt": "2026-05-12T15:01:03.970Z"
     }
   ],
   "students": [
     {
-      "id": "ee466eca-a4c5-4f87-a264-afbcc9f32051",
+      "id": "1fdab988-e1e9-45d5-bd3c-5a13042b9e51",
       "studentId": "2024001",
       "name": "张三",
       "email": "zhangsan@university.edu",
@@ -188,10 +188,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "321b516f-d38b-4d81-bbe7-a79397d332f9",
+      "id": "ef404347-fa3a-4c4b-b3fd-6b1aec54b3f3",
       "studentId": "2024002",
       "name": "李四",
       "email": "lisi@university.edu",
@@ -199,10 +199,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "8b418e0d-fe1b-49a3-a808-a7e748d2866e",
+      "id": "e3d7ff25-f242-48e7-aa98-07f590bb52ce",
       "studentId": "2024003",
       "name": "王五",
       "email": "wangwu@university.edu",
@@ -210,10 +210,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "6216ecc2-5570-4f06-8b01-49639d04364b",
+      "id": "d7d29474-4676-4f6e-9dec-b84579db9688",
       "studentId": "2024004",
       "name": "赵六",
       "email": "zhaoliu@university.edu",
@@ -221,10 +221,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "608cb3a5-9e83-4b60-8da8-73cd6f650680",
+      "id": "7b21486c-4550-420b-bfcd-866b8810d812",
       "studentId": "2024005",
       "name": "孙七",
       "email": "sunqi@university.edu",
@@ -232,10 +232,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "2133f871-3155-44e3-b71b-ff766e14e29d",
+      "id": "8bb1099b-82a9-4577-8f64-7fea6638e748",
       "studentId": "2024006",
       "name": "周八",
       "email": "zhouba@university.edu",
@@ -243,10 +243,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "8a2e8218-7052-4631-9be2-28e5c253a9d0",
+      "id": "6083dc2a-bd2e-4a81-9049-2148d5dccb1c",
       "studentId": "2024007",
       "name": "吴九",
       "email": "wujiu@university.edu",
@@ -254,10 +254,10 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     },
     {
-      "id": "f49cbf3e-dfc7-4eb9-a4d6-9915e7f88f6e",
+      "id": "12ef3fdd-d11e-4d99-8520-64e4032f3bba",
       "studentId": "2024008",
       "name": "郑十",
       "email": "zhengshi@university.edu",
@@ -265,7 +265,7 @@
       "noShowCount": 0,
       "isBlacklisted": false,
       "blacklistedUntil": null,
-      "createdAt": "2026-05-12T12:34:38.950Z"
+      "createdAt": "2026-05-12T15:01:03.971Z"
     }
   ],
   "bookings": [],
