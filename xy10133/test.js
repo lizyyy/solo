@@ -324,6 +324,95 @@ runTest('getScoreDetails 应返回数组副本', function() {
     game.destroy();
 });
 
+runTest('正确选择后应锁定回合，500ms窗口内无法点击其他药品', function() {
+    const game = new PharmacyGame();
+    game.start();
+    const state = game.getState();
+    const correctMedicine = state.cabinetMedicines.find(m => m.isCorrect);
+    const wrongMedicine = state.cabinetMedicines.find(m => !m.isCorrect);
+    
+    game.selectMedicine(correctMedicine.id);
+    
+    const result = game.selectMedicine(wrongMedicine.id);
+    assert.strictEqual(result.success, false);
+    assert.strictEqual(result.message, '回合已锁定，正在切换中');
+    
+    game.destroy();
+});
+
+runTest('生命为1时选择错误后应立即游戏结束，历史记录不应有额外的 new_round', function() {
+    const game = new PharmacyGame({ lives: 1 });
+    game.start();
+    const state = game.getState();
+    const wrongMedicine = state.cabinetMedicines.find(m => !m.isCorrect);
+    
+    game.selectMedicine(wrongMedicine.id);
+    
+    assert.strictEqual(game.getGameState(), GameState.GAME_OVER);
+    
+    const history = game.getGameHistory();
+    const lastEntry = history[history.length - 1];
+    assert.strictEqual(lastEntry.type, 'gameover');
+    
+    const newRoundCount = history.filter(e => e.type === 'new_round').length;
+    const gameOverCount = history.filter(e => e.type === 'gameover').length;
+    
+    assert.strictEqual(newRoundCount, 1, '游戏结束后不应有额外的 new_round');
+    assert.strictEqual(gameOverCount, 1, '只能有一个 gameover 记录');
+    
+    game.destroy();
+});
+
+runTest('游戏结束后异步回调不应继续推进游戏', function(done) {
+    const game = new PharmacyGame({ lives: 1 });
+    game.start();
+    
+    const state = game.getState();
+    const correctMedicine = state.cabinetMedicines.find(m => m.isCorrect);
+    
+    game.selectMedicine(correctMedicine.id);
+    
+    setTimeout(() => {
+        const state2 = game.getState();
+        const wrongMedicine = state2.cabinetMedicines.find(m => !m.isCorrect);
+        game.selectMedicine(wrongMedicine.id);
+        
+        const history = game.getGameHistory();
+        const lastEntry = history[history.length - 1];
+        
+        assert.strictEqual(lastEntry.type, 'gameover');
+        
+        const entriesAfterGameOver = history.filter((e, i) => {
+            const gameOverIndex = history.findIndex(h => h.type === 'gameover');
+            return i > gameOverIndex;
+        });
+        
+        assert.strictEqual(entriesAfterGameOver.length, 0, 'gameover 之后不应有任何记录');
+        
+        game.destroy();
+        done();
+    }, 600);
+});
+
+runTest('重新开始应取消所有待执行的回合切换回调', function() {
+    const game = new PharmacyGame();
+    game.start();
+    
+    const state = game.getState();
+    const correctMedicine = state.cabinetMedicines.find(m => m.isCorrect);
+    
+    game.selectMedicine(correctMedicine.id);
+    
+    game.restart();
+    
+    const newState = game.getState();
+    assert.strictEqual(newState.score, 0);
+    assert.strictEqual(newState.lives, 3);
+    assert.strictEqual(game.getGameState(), GameState.PLAYING);
+    
+    game.destroy();
+});
+
 console.log('\n========================================');
 console.log(`  测试结果: ${testResults.passed} 个通过, ${testResults.failed} 个失败`);
 console.log('========================================\n');

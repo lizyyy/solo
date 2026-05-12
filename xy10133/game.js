@@ -78,6 +78,8 @@ class PharmacyGame {
         this.scoreDetails = [];
         this.clickedMedicines = new Set();
         this.timer = null;
+        this.roundTransitionTimer = null;
+        this.isRoundLocked = false;
         this._onStateChange = options.onStateChange || null;
         this._onPrescriptionChange = options.onPrescriptionChange || null;
         this._onCabinetChange = options.onCabinetChange || null;
@@ -130,6 +132,8 @@ class PharmacyGame {
     }
 
     start() {
+        this._stopTimer();
+        this._cancelRoundTransition();
         this.level = 1;
         this.score = 0;
         this.lives = this.initialLives;
@@ -140,6 +144,7 @@ class PharmacyGame {
         this.gameHistory = [];
         this.scoreDetails = [];
         this.clickedMedicines = new Set();
+        this.isRoundLocked = false;
         this.state = GameState.PLAYING;
         this._emitStateChange();
         this._emitScoreChange();
@@ -191,6 +196,13 @@ class PharmacyGame {
         }
     }
 
+    _cancelRoundTransition() {
+        if (this.roundTransitionTimer) {
+            clearTimeout(this.roundTransitionTimer);
+            this.roundTransitionTimer = null;
+        }
+    }
+
     _handleTimeout() {
         if (!this.currentPrescription) return;
         this.combo = 0;
@@ -219,6 +231,7 @@ class PharmacyGame {
     }
 
     _generateNewRound() {
+        this.isRoundLocked = false;
         this.clickedMedicines = new Set();
         this.currentPrescription = this._generatePrescription();
         this._emitPrescriptionChange();
@@ -325,6 +338,9 @@ class PharmacyGame {
         if (this.clickedMedicines.has(medicineId)) {
             return { success: false, message: '该药品已点击过', duplicate: true };
         }
+        if (this.isRoundLocked) {
+            return { success: false, message: '回合已锁定，正在切换中' };
+        }
         this.clickedMedicines.add(medicineId);
         const medicine = this.cabinetMedicines.find(m => m.id === medicineId);
         if (!medicine) {
@@ -360,10 +376,15 @@ class PharmacyGame {
             if (this.scoreDetails.filter(d => d.type === 'correct').length % roundsToLevelUp === 0) {
                 this.level++;
             }
-            setTimeout(() => {
-                this.timeRemaining = this.maxTime;
-                this._emitTimeChange();
-                this._generateNewRound();
+            this.isRoundLocked = true;
+            this._cancelRoundTransition();
+            this.roundTransitionTimer = setTimeout(() => {
+                this.roundTransitionTimer = null;
+                if (this.state === GameState.PLAYING) {
+                    this.timeRemaining = this.maxTime;
+                    this._emitTimeChange();
+                    this._generateNewRound();
+                }
             }, 500);
             this.gameHistory.push(historyEntry);
             return { 
@@ -407,6 +428,8 @@ class PharmacyGame {
     _gameOver() {
         this.state = GameState.GAME_OVER;
         this._stopTimer();
+        this._cancelRoundTransition();
+        this.isRoundLocked = false;
         this._emitStateChange();
         const finalEntry = {
             type: 'gameover',
