@@ -47,10 +47,22 @@ class PipelineRunner:
             results['loaded_data'] = loaded_data
             
             print("\n[2/5] 正在执行质量控制...")
-            qc_result = self.quality_controller.validate(loaded_data.data)
+            qc_result = self.quality_controller.validate(
+                loaded_data.data,
+                loaded_data.unit_infos
+            )
             print(f"    ✓ 有效记录: {qc_result.summary['clean_records']} 条")
             print(f"    ✓ 无效记录: {qc_result.summary['failed_records']} 条")
             print(f"    ✓ 有效率: {(qc_result.summary['clean_records'] / qc_result.summary['total_records'] * 100):.2f}%")
+            
+            if loaded_data.unit_infos:
+                unit_messages = []
+                for col_name, unit_info in loaded_data.unit_infos.items():
+                    if unit_info.detection_result and unit_info.detection_result.detected_units:
+                        if len(unit_info.detection_result.detected_units) > 1:
+                            unit_messages.append(f"{col_name}: {unit_info.detection_result.detected_units}")
+                if unit_messages:
+                    print(f"    ℹ 检测到单位不一致: {', '.join(unit_messages)}")
             
             if qc_result.failures:
                 failure_types = {}

@@ -30,6 +30,9 @@ class QualityController:
     FAILURE_DUPLICATE = "duplicate"
     FAILURE_INCONSISTENT = "inconsistent"
     FAILURE_NEGATIVE = "negative_value"
+    FAILURE_UNIT = "unit_issue"
+    FAILURE_UNIT_UNSUPPORTED = "unsupported_unit"
+    FAILURE_UNIT_UNRECOGNIZED = "unrecognized_unit"
 
     def __init__(self, config: Config):
         self.config = config
@@ -50,14 +53,20 @@ class QualityController:
             self.FAILURE_DUPLICATE: 0,
             self.FAILURE_INCONSISTENT: 0,
             self.FAILURE_NEGATIVE: 0,
+            self.FAILURE_UNIT: 0,
+            self.FAILURE_UNIT_UNSUPPORTED: 0,
+            self.FAILURE_UNIT_UNRECOGNIZED: 0,
         }
 
-    def validate(self, df: pd.DataFrame) -> QCResult:
+    def validate(self, df: pd.DataFrame, unit_infos: Dict = None) -> QCResult:
         df = df.copy()
         self.failures = []
         self._init_summary()
         
         self.summary['total_records'] = len(df)
+        
+        if unit_infos:
+            df = self._check_unit_issues(df, unit_infos)
         
         df = self._check_missing_values(df)
         df = self._check_duplicates(df)
@@ -76,6 +85,65 @@ class QualityController:
             summary=self.summary.copy(),
             statistics=statistics
         )
+    
+    def _check_unit_issues(self, df: pd.DataFrame, unit_infos: Dict) -> pd.DataFrame:
+        """
+        检查单位换算产生的问题
+        """
+        invalid_indices = set()
+        
+        for col_name, unit_info in unit_infos.items():
+            if col_name not in df.columns:
+                continue
+            
+            conversion_results = unit_info.conversion_results
+            
+            for idx, conv_result in enumerate(conversion_results):
+                if idx >= len(df):
+                    continue
+                
+                original_idx = df.index[idx] if idx < len(df) else idx
+                
+                if conv_result.error:
+                    if '不支持的单位换算' in conv_result.error:
+                        self._add_failure(
+                            original_idx,
+                            col_name,
+                            conv_result.original_value,
+                            self.FAILURE_UNIT_UNSUPPORTED,
+                            f"{conv_result.error} (原始值: {conv_result.original_value}, 检测到单位: {conv_result.detected_unit})"
+                        )
+                        invalid_indices.add(original_idx)
+                    elif '无法识别单位' in conv_result.error:
+                        self._add_failure(
+                            original_idx,
+                            col_name,
+                            conv_result.original_value,
+                            self.FAILURE_UNIT_UNRECOGNIZED,
+                            f"{conv_result.error} (原始值: {conv_result.original_value})"
+                        )
+                        invalid_indices.add(original_idx)
+                    elif '无法解析数值' in conv_result.error or '数值解析失败' in conv_result.error:
+                        self._add_failure(
+                            original_idx,
+                            col_name,
+                            conv_result.original_value,
+                            self.FAILURE_FORMAT,
+                            f"{conv_result.error} (原始值: {conv_result.original_value})"
+                        )
+                        invalid_indices.add(original_idx)
+                elif conv_result.detected_unit is not None and conv_result.converted:
+                    if conv_result.conversion_factor != 1.0:
+                        self._add_failure(
+                            original_idx,
+                            col_name,
+                            conv_result.original_value,
+                            self.FAILURE_UNIT,
+                            f"单位不一致: 检测到 '{conv_result.detected_unit}', 已换算为 {conv_result.target_unit} "
+                            f"(换算系数: {conv_result.conversion_factor})"
+                        )
+        
+        return df.drop(index=list(invalid_indices))
 
     def _check_missing_values(self, df: pd.DataFrame) -> pd.DataFrame:
         cols = self.cols

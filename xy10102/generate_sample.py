@@ -88,12 +88,55 @@ def generate_sample_data(output_path: str, n_days: int = 30, n_stations: int = 5
     
     df = pd.concat([df, df.iloc[:100]], ignore_index=True)
     
+    n_unit_anomalies = int(len(df) * 0.08)
+    unit_indices = np.random.choice(len(df), n_unit_anomalies, replace=False)
+    
+    power_units = ['W', 'kW', 'MW', '瓦', '千瓦', '兆瓦', 'w', 'Kw', 'KW']
+    energy_units = ['Wh', 'kWh', 'MWh', '度', '瓦时', '千瓦时', '瓦']
+    time_units = ['min', 'minute', 'minutes', 'h', 'hour', 's', '秒', '分钟', '小时']
+    
+    for idx in unit_indices[:n_unit_anomalies // 4]:
+        val = df.loc[idx, 'charging_power']
+        if pd.notna(val):
+            unit = np.random.choice(power_units)
+            if unit in ['W', 'w', '瓦', '瓦时']:
+                df.loc[idx, 'charging_power'] = f"{val * 1000}{unit}"
+            elif unit in ['MW', '兆瓦']:
+                df.loc[idx, 'charging_power'] = f"{val / 1000}{unit}"
+            else:
+                df.loc[idx, 'charging_power'] = f"{val}{unit}"
+    
+    for idx in unit_indices[n_unit_anomalies // 4:2 * n_unit_anomalies // 4]:
+        val = df.loc[idx, 'energy_consumed']
+        if pd.notna(val):
+            unit = np.random.choice(energy_units)
+            if unit in ['Wh', '瓦时', '瓦']:
+                df.loc[idx, 'energy_consumed'] = f"{val * 1000}{unit}"
+            elif unit in ['MWh']:
+                df.loc[idx, 'energy_consumed'] = f"{val / 1000}{unit}"
+            else:
+                df.loc[idx, 'energy_consumed'] = f"{val}{unit}"
+    
+    for idx in unit_indices[2 * n_unit_anomalies // 4:3 * n_unit_anomalies // 4]:
+        val = df.loc[idx, 'charging_duration']
+        if pd.notna(val):
+            unit = np.random.choice(time_units)
+            if unit in ['s', '秒']:
+                df.loc[idx, 'charging_duration'] = f"{val * 60}{unit}"
+            elif unit in ['h', 'hour', '小时']:
+                df.loc[idx, 'charging_duration'] = f"{val / 60}{unit}"
+            else:
+                df.loc[idx, 'charging_duration'] = f"{val}{unit}"
+    
+    for idx in unit_indices[3 * n_unit_anomalies // 4:]:
+        df.loc[idx, 'charging_power'] = f"{df.loc[idx, 'charging_power']}xyz_unit"
+    
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False, encoding='utf-8')
     print(f"✓ 示例数据已生成: {output_path}")
     print(f"  总记录数: {len(df)}")
     print(f"  时间范围: {df['timestamp'].min()} ~ {df['timestamp'].max()}")
-    print(f"  包含的异常类型: 缺失值、负值、超出范围、不一致、重复")
+    print(f"  包含的异常类型: 缺失值、负值、超出范围、不一致、重复、单位不一致")
 
 
 if __name__ == "__main__":
