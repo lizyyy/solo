@@ -237,6 +237,92 @@ const addLog = (batchId, operation, operator, remark = '') => {
     [batchId, operation, operator, remark]);
 };
 
+const VALID_TRANSITIONS = {
+  '已创建': ['已留样'],
+  '已留样': ['已送检'],
+  '已送检': ['检测正常', '检测异常'],
+  '检测异常': ['已下架'],
+  '已下架': ['复检中'],
+  '复检中': ['复检通过', '复检未通过'],
+  '复检通过': [],
+  '复检未通过': [],
+  '检测正常': []
+};
+
+const ACTION_TO_STATUS = {
+  sample: '已留样',
+  inspect: '已送检',
+  result_normal: '检测正常',
+  result_abnormal: '检测异常',
+  takeoff: '已下架',
+  reinspect: '复检中',
+  reinspect_pass: '复检通过',
+  reinspect_fail: '复检未通过'
+};
+
+const ACTION_NAMES = {
+  sample: '留样登记',
+  inspect: '送检登记',
+  result: '录入检测结果',
+  takeoff: '商品下架',
+  reinspect: '申请复检',
+  reinspect_result: '录入复检结果',
+  restore: '恢复上架'
+};
+
+const validateTransition = (currentStatus, targetStatus) => {
+  const validNext = VALID_TRANSITIONS[currentStatus] || [];
+  return validNext.includes(targetStatus);
+};
+
+const executeStateTransition = (batchId, action, targetStatus, operator, updateData, remark = '') => {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT id, status, batch_no FROM batches WHERE id = ?`, [batchId], (err, batch) => {
+      if (err) {
+        return reject({ status: 500, error: err.message });
+      }
+      if (!batch) {
+        return reject({ status: 404, error: '批次不存在' });
+      }
+
+      if (batch.status === targetStatus) {
+        return resolve({ 
+          idempotent: true, 
+          message: `已${ACTION_NAMES[action]}，无需重复操作`,
+          batch_no: batch.batch_no
+        });
+      }
+
+      if (!validateTransition(batch.status, targetStatus)) {
+        return reject({ 
+          status: 400, 
+          error: `状态流转不合法，当前状态「${batch.status}」不能执行「${ACTION_NAMES[action]}」` 
+        });
+      }
+
+      db.run(updateData.sql, updateData.params, function(updateErr) {
+        if (updateErr) {
+          return reject({ status: 500, error: updateErr.message });
+        }
+        
+        if (this.changes === 0) {
+          return resolve({ 
+            idempotent: true, 
+            message: '数据未变更，可能已操作' 
+          });
+        }
+
+        addLog(batchId, ACTION_NAMES[action], operator, remark);
+        resolve({ 
+          idempotent: false, 
+          message: `${ACTION_NAMES[action]}成功`,
+          batch_no: batch.batch_no
+        });
+      });
+    });
+  });
+};
+
 app.get('/api/batches', (req, res) => {
   const { status, is_abnormal, keyword, stall_no, start_date, end_date } = req.query;
   let query = `SELECT * FROM batches WHERE 1=1`;
@@ -319,97 +405,184 @@ app.post('/api/batches', (req, res) => {
     });
 });
 
-app.post('/api/batches/:id/sample', (req, res) => {
+app.post('/api/batches/:id/sample', async (req, res) => {
   const { sample_operator, sample_time } = req.body;
-  db.run(`UPDATE batches SET status = '已留样', sample_time = ?, sample_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [sample_time || new Date().toISOString(), sample_operator, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '留样登记', sample_operator, '');
-        res.json({ message: '留样成功' });
-      }
-    });
+  const operator = sample_operator || '系统';
+  const finalTime = sample_time || new Date().toISOString();
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'sample',
+      '已留样',
+      operator,
+      {
+        sql: `UPDATE batches SET status = '已留样', sample_time = ?, sample_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [finalTime, operator, req.params.id]
+      },
+      ''
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/inspect', (req, res) => {
+app.post('/api/batches/:id/inspect', async (req, res) => {
   const { inspection_agency, inspection_no, inspection_time, operator } = req.body;
-  db.run(`UPDATE batches SET status = '已送检', inspection_time = ?, inspection_agency = ?, inspection_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [inspection_time || new Date().toISOString(), inspection_agency, inspection_no, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '送检登记', operator, `检测机构: ${inspection_agency}`);
-        res.json({ message: '送检成功' });
-      }
-    });
+  const finalTime = inspection_time || new Date().toISOString();
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'inspect',
+      '已送检',
+      operator || '系统',
+      {
+        sql: `UPDATE batches SET status = '已送检', inspection_time = ?, inspection_agency = ?, inspection_no = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [finalTime, inspection_agency, inspection_no, req.params.id]
+      },
+      `检测机构: ${inspection_agency}`
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/result', (req, res) => {
+app.post('/api/batches/:id/result', async (req, res) => {
   const { result_items, result_summary, is_abnormal, result_time, operator } = req.body;
   const status = is_abnormal ? '检测异常' : '检测正常';
-  db.run(`UPDATE batches SET status = ?, result_time = ?, result_items = ?, result_summary = ?, is_abnormal = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [status, result_time || new Date().toISOString(), result_items, result_summary, is_abnormal ? 1 : 0, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '录入检测结果', operator, is_abnormal ? '检测异常' : '检测正常');
-        res.json({ message: '结果录入成功' });
-      }
-    });
+  const finalTime = result_time || new Date().toISOString();
+  const actionType = is_abnormal ? '检测异常' : '检测正常';
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'result',
+      status,
+      operator || '系统',
+      {
+        sql: `UPDATE batches SET status = ?, result_time = ?, result_items = ?, result_summary = ?, is_abnormal = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [status, finalTime, result_items, result_summary, is_abnormal ? 1 : 0, req.params.id]
+      },
+      actionType
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/takeoff', (req, res) => {
+app.post('/api/batches/:id/takeoff', async (req, res) => {
   const { take_off_operator, take_off_time } = req.body;
-  db.run(`UPDATE batches SET status = '已下架', take_off_time = ?, take_off_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [take_off_time || new Date().toISOString(), take_off_operator, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '商品下架', take_off_operator, '农残异常商品已下架');
-        res.json({ message: '下架成功' });
-      }
-    });
+  const operator = take_off_operator || '系统';
+  const finalTime = take_off_time || new Date().toISOString();
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'takeoff',
+      '已下架',
+      operator,
+      {
+        sql: `UPDATE batches SET status = '已下架', take_off_time = ?, take_off_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [finalTime, operator, req.params.id]
+      },
+      '农残异常商品已下架'
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/reinspect', (req, res) => {
+app.post('/api/batches/:id/reinspect', async (req, res) => {
   const { reinspection_operator, reinspection_agency, reinspection_time } = req.body;
-  db.run(`UPDATE batches SET status = '复检中', reinspection_time = ?, reinspection_operator = ?, reinspection_agency = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [reinspection_time || new Date().toISOString(), reinspection_operator, reinspection_agency, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '申请复检', reinspection_operator, `复检机构: ${reinspection_agency}`);
-        res.json({ message: '复检申请成功' });
-      }
-    });
+  const finalTime = reinspection_time || new Date().toISOString();
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'reinspect',
+      '复检中',
+      reinspection_operator || '系统',
+      {
+        sql: `UPDATE batches SET status = '复检中', reinspection_time = ?, reinspection_operator = ?, reinspection_agency = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [finalTime, reinspection_operator, reinspection_agency, req.params.id]
+      },
+      `复检机构: ${reinspection_agency}`
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/reinspect-result', (req, res) => {
+app.post('/api/batches/:id/reinspect-result', async (req, res) => {
   const { reinspection_no, reinspection_result_summary, reinspection_pass, operator } = req.body;
   const status = reinspection_pass ? '复检通过' : '复检未通过';
-  db.run(`UPDATE batches SET status = ?, reinspection_no = ?, reinspection_result_time = CURRENT_TIMESTAMP, reinspection_result_summary = ?, reinspection_pass = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [status, reinspection_no, reinspection_result_summary, reinspection_pass ? 1 : 0, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '录入复检结果', operator, reinspection_pass ? '复检通过' : '复检未通过');
-        res.json({ message: '复检结果录入成功' });
-      }
-    });
+  const remark = reinspection_pass ? '复检通过' : '复检未通过';
+  
+  try {
+    const result = await executeStateTransition(
+      req.params.id,
+      'reinspect_result',
+      status,
+      operator || '系统',
+      {
+        sql: `UPDATE batches SET status = ?, reinspection_no = ?, reinspection_result_time = CURRENT_TIMESTAMP, reinspection_result_summary = ?, reinspection_pass = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+        params: [status, reinspection_no, reinspection_result_summary, reinspection_pass ? 1 : 0, req.params.id]
+      },
+      remark
+    );
+    res.json(result);
+  } catch (e) {
+    res.status(e.status || 500).json({ error: e.error });
+  }
 });
 
-app.post('/api/batches/:id/restore', (req, res) => {
+app.post('/api/batches/:id/restore', async (req, res) => {
   const { restore_operator } = req.body;
-  db.run(`UPDATE batches SET restore_time = CURRENT_TIMESTAMP, restore_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-    [restore_operator, req.params.id],
-    function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else {
-        addLog(req.params.id, '恢复上架', restore_operator, '复检通过后恢复上架');
-        res.json({ message: '恢复上架成功' });
-      }
+  const batchId = req.params.id;
+  
+  try {
+    const batch = await new Promise((resolve, reject) => {
+      db.get(`SELECT id, status, restore_time FROM batches WHERE id = ?`, [batchId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
     });
+
+    if (!batch) {
+      return res.status(404).json({ error: '批次不存在' });
+    }
+
+    if (batch.status !== '复检通过') {
+      return res.status(400).json({ error: `状态流转不合法，当前状态「${batch.status}」不能执行「恢复上架」` });
+    }
+
+    if (batch.restore_time) {
+      return res.json({ idempotent: true, message: '已恢复上架，无需重复操作' });
+    }
+
+    db.run(
+      `UPDATE batches SET restore_time = CURRENT_TIMESTAMP, restore_operator = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [restore_operator || '系统', batchId],
+      function(err) {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+        if (this.changes === 0) {
+          return res.json({ idempotent: true, message: '数据未变更，可能已恢复' });
+        }
+        addLog(batchId, '恢复上架', restore_operator, '复检通过后恢复上架');
+        res.json({ idempotent: false, message: '恢复上架成功' });
+      }
+    );
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.get('/api/batches/:id/logs', (req, res) => {
