@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>售后安装回访台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app"></div>
+    
+    <script>
+        const API_BASE = '';
+        
+        const statusMap = {
+            'pending_visit': { label: '待回访', color: 'bg-yellow-100 text-yellow-800' },
+            'visited': { label: '已回访', color: 'bg-green-100 text-green-800' },
+            'has_issues': { label: '有问题', color: 'bg-red-100 text-red-800' },
+            'reworking': { label: '返工中', color: 'bg-orange-100 text-orange-800' },
+            'closed': { label: '已关闭', color: 'bg-gray-100 text-gray-800' }
+        };
+
+        let currentView = 'orders';
+        let orders = [];
+        let currentOrder = null;
+        let reports = null;
+
+        async function fetchOrders() {
+            const res = await fetch(`${API_BASE}/api/orders');
+            orders = await res.json();
+            render();
+        }
+
+        async function fetchReports() {
+            const res = await fetch(`${API_BASE}/api/reports');
+            reports = await res.json();
+            render();
+        }
+
+        async function fetchOrderDetail(id) {
+            const res = await fetch(`${API_BASE}/api/orders/${id}`);
+            currentOrder = await res.json();
+            currentView = 'detail';
+            render();
+        }
+
+        async function createOrder(data) {
+            const res = await fetch(`${API_BASE}/api/orders`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('创建成功');
+                fetchOrders();
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function submitVisit(orderId, data) {
+            const res = await fetch(`${API_BASE}/api/orders/${orderId}/visit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('回访成功');
+                fetchOrderDetail(orderId);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function submitPart(orderId, data) {
+            const res = await fetch(`${API_BASE}/api/orders/${orderId}/parts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('配件申请成功');
+                fetchOrderDetail(orderId);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function sendPart(partId) {
+            const sender = prompt('请输入发货人姓名');
+            if (!sender) return;
+            const res = await fetch(`${API_BASE}/api/parts/${partId}/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sender })
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('发货成功');
+                fetchOrderDetail(currentOrder.id);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function submitRework(orderId, data) {
+            const res = await fetch(`${API_BASE}/api/orders/${orderId}/rework`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('返工已发起');
+                fetchOrderDetail(orderId);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function completeRework(reworkId) {
+            const satisfaction = prompt('请输入返工后满意度（1-5）');
+            if (!satisfaction) return;
+            const res = await fetch(`${API_BASE}/api/reworks/${reworkId}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ satisfaction_after: parseInt(satisfaction) })
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('返工完成');
+                fetchOrderDetail(currentOrder.id);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        async function submitSettle(orderId, data) {
+            const res = await fetch(`${API_BASE}/api/orders/${orderId}/settle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert(`结算完成，最终金额：${result.final_amount}元`);
+                fetchOrderDetail(orderId);
+            } else {
+                alert(result.error);
+            }
+        }
+
+        function renderStars(count, max = 5) {
+            return '★'.repeat(count) + '☆'.repeat(max - count);
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            let html = '';
+
+            html += `
+                <div class="bg-white shadow-sm">
+                    <div class="max-w-7xl mx-auto px-4 py-4">
+                        <h1 class="text-2xl font-bold text-gray-900">售后安装回访台</h1>
+                        <div class="mt-4 space-x-2">
+                            <button onclick="currentView='orders';fetchOrders()" class="px-4 py-2 rounded ${currentView === 'orders' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">安装单列表</button>
+                            <button onclick="currentView='reports';fetchReports()" class="px-4 py-2 rounded ${currentView === 'reports' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}">数据报表</button>
+                            <button onclick="showCreateModal()" class="px-4 py-2 rounded bg-green-600 text-white">新建安装单</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (currentView === 'orders') {
+                html += `
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">订单号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">产品</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">安装师傅</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">安装日期</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                `;
+                orders.forEach(order => {
+                    const status = statusMap[order.status] || statusMap['pending_visit'];
+                    html += `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${order.order_no}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.customer_name}<br>${order.customer_phone}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.product_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.installer_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${order.install_date}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${status.color}">${status.label}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <button onclick="fetchOrderDetail('${order.id}')" class="text-blue-600 hover:text-blue-900">查看详情</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else if (currentView === 'detail' && currentOrder) {
+                const status = statusMap[currentOrder.status] || statusMap['pending_visit'];
+                html += `
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <button onclick="currentView='orders';fetchOrders()" class="mb-4 text-blue-600 hover:text-blue-900">← 返回列表</button>
+                        
+                        <div class="bg-white rounded-lg shadow p-6 mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h2 class="text-xl font-bold">${currentOrder.order_no}</h2>
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold ${status.color}">${status.label}</span>
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <div><strong>客户：</strong>${currentOrder.customer_name}</div>
+                                <div><strong>电话：</strong>${currentOrder.customer_phone}</div>
+                                <div><strong>地址：</strong>${currentOrder.customer_address}</div>
+                                <div><strong>产品：</strong>${currentOrder.product_name}</div>
+                                <div><strong>安装师傅：</strong>${currentOrder.installer_name}</div>
+                                <div><strong>安装日期：</strong>${currentOrder.install_date}</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                `;
+
+                if (currentOrder.status !== 'closed') {
+                    html += `
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">安排回访</h3>
+                            <form onsubmit="event.preventDefault();handleVisitSubmit()">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium">回访人</label>
+                                        <input type="text" id="visit_name" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">满意度（1-5）</label>
+                                        <select id="visit_satisfaction" class="mt-1 block w-full border rounded px-3 py-2">
+                                            <option value="5">5 - 非常满意</option>
+                                            <option value="4">4 - 满意</option>
+                                            <option value="3">3 - 一般</option>
+                                            <option value="2">2 - 不满意</option>
+                                            <option value="1">1 - 非常不满意</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">客户反馈</label>
+                                        <textarea id="visit_feedback" class="mt-1 block w-full border rounded px-3 py-2" rows="2"></textarea>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">发现问题（逗号分隔）</label>
+                                        <input type="text" id="visit_issues" class="mt-1 block w-full border rounded px-3 py-2" placeholder="如：缺排水管,安装不水平">
+                                    </div>
+                                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">提交回访</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">补发配件</h3>
+                            <form onsubmit="event.preventDefault();handlePartSubmit()">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium">配件名称</label>
+                                        <input type="text" id="part_name" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">数量</label>
+                                        <input type="number" id="part_qty" class="mt-1 block w-full border rounded px-3 py-2" value="1" min="1">
+                                    </div>
+                                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">申请补发</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">发起返工</h3>
+                            <form onsubmit="event.preventDefault();handleReworkSubmit()">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium">返工原因</label>
+                                        <input type="text" id="rework_reason" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">返工师傅</label>
+                                        <input type="text" id="rework_name" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                    </div>
+                                    <button type="submit" class="w-full bg-orange-600 text-white py-2 rounded hover:bg-orange-700">发起返工</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">师傅结算</h3>
+                            <form onsubmit="event.preventDefault();handleSettleSubmit()">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium">基础金额</label>
+                                        <input type="number" id="settle_base" class="mt-1 block w-full border rounded px-3 py-2" value="100" step="0.01">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">扣款金额</label>
+                                        <input type="number" id="settle_deduction" class="mt-1 block w-full border rounded px-3 py-2" value="0" step="0.01">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">奖金金额</label>
+                                        <input type="number" id="settle_bonus" class="mt-1 block w-full border rounded px-3 py-2" value="0" step="0.01">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">结算人</label>
+                                        <input type="text" id="settle_by" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium">备注</label>
+                                        <input type="text" id="settle_remarks" class="mt-1 block w-full border rounded px-3 py-2">
+                                    </div>
+                                    <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">确认结算</button>
+                                </div>
+                            </form>
+                        </div>
+                    `;
+                }
+
+                html += `
+                        </div>
+
+                        <div class="mt-6 space-y-6">
+                `;
+
+                if (currentOrder.visits && currentOrder.visits.length > 0) {
+                    html += `
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">回访记录</h3>
+                            <div class="space-y-3">
+                    `;
+                    currentOrder.visits.forEach(v => {
+                        html += `
+                            <div class="border rounded p-4">
+                                <div class="flex justify-between">
+                                    <span class="font-medium">${v.visitor_name}</span>
+                                    <span class="text-sm text-gray-500">${new Date(v.visit_date).toLocaleString()}</span>
+                                </div>
+                                <div class="mt-2 text-yellow-500">${renderStars(v.satisfaction)}</div>
+                                ${v.feedback ? `<div class="mt-2 text-sm">反馈：${v.feedback}</div>` : ''}
+                                ${v.issues ? `<div class="mt-2 text-sm text-red-600">问题：${v.issues}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (currentOrder.parts && currentOrder.parts.length > 0) {
+                    html += `
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">配件补发记录</h3>
+                            <div class="space-y-3">
+                    `;
+                    currentOrder.parts.forEach(p => {
+                        html += `
+                            <div class="border rounded p-4 flex justify-between items-center">
+                                <div>
+                                    <span class="font-medium">${p.part_name}</span>
+                                    <span class="ml-2">x${p.quantity}</span>
+                                    <span class="ml-2 px-2 py-1 rounded text-xs ${p.status === 'sent' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${p.status === 'sent' ? '已发货' : '待发货'}</span>
+                                </div>
+                                ${p.status === 'pending' && currentOrder.status !== 'closed' ? `
+                                    <button onclick="sendPart('${p.id}')" class="text-sm bg-green-600 text-white px-3 py-1 rounded">确认发货</button>
+                                ` : p.sender ? `<span class="text-sm text-gray-500">发货人：${p.sender}</span>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (currentOrder.reworks && currentOrder.reworks.length > 0) {
+                    html += `
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">返工记录</h3>
+                            <div class="space-y-3">
+                    `;
+                    currentOrder.reworks.forEach(r => {
+                        html += `
+                            <div class="border rounded p-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="font-medium">原因：${r.reason}</span>
+                                        <span class="ml-2">返工师傅：${r.reworker_name}</span>
+                                    </div>
+                                    <span class="px-2 py-1 rounded text-xs ${r.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">${r.status === 'completed' ? '已完成' : '进行中'}</span>
+                                </div>
+                                ${r.satisfaction_after ? `<div class="mt-2 text-yellow-500">返工后满意度：${renderStars(r.satisfaction_after)}</div>` : ''}
+                                ${r.status === 'pending' && currentOrder.status !== 'closed' ? `
+                                    <button onclick="completeRework('${r.id}')" class="mt-2 text-sm bg-orange-600 text-white px-3 py-1 rounded">完成返工</button>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (currentOrder.settlements && currentOrder.settlements.length > 0) {
+                    html += `
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="font-bold mb-4">结算记录</h3>
+                    `;
+                    currentOrder.settlements.forEach(s => {
+                        html += `
+                            <div class="border rounded p-4">
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                    <div><strong>基础金额：</strong>${s.base_amount}元</div>
+                                    <div><strong>扣款：</strong>${s.deduction}元</div>
+                                    <div><strong>奖金：</strong>${s.bonus}元</div>
+                                    <div><strong>实发：</strong><span class="text-lg font-bold text-green-600">${s.final_amount}元</span></div>
+                                    <div><strong>结算人：</strong>${s.settled_by}</div>
+                                    <div><strong>日期：</strong>${new Date(s.settle_date).toLocaleString()}</div>
+                                </div>
+                                ${s.remarks ? `<div class="mt-2 text-sm"><strong>备注：</strong>${s.remarks}</div>` : ''}
+                            </div>
+                        `;
+                    });
+                    html += `
+                        </div>
+                    `;
+                }
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            } else if (currentView === 'reports' && reports) {
+                html += `
+                    <div class="max-w-7xl mx-auto px-4 py-6">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="text-3xl font-bold text-blue-600">${reports.totalOrders}</div>
+                                <div class="text-sm text-gray-500">总订单数</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="text-3xl font-bold text-green-600">${reports.closedOrders}</div>
+                                <div class="text-sm text-gray-500">已完成</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="text-3xl font-bold text-yellow-600">${reports.avgSatisfaction}</div>
+                                <div class="text-sm text-gray-500">平均满意度</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="text-3xl font-bold text-red-600">${reports.reworkRate}%</div>
+                                <div class="text-sm text-gray-500">返工率（${reports.reworkCount}单）</div>
+                            </div>
+                        </div>
+
+                        ${reports.settlementStats ? `
+                            <div class="bg-white rounded-lg shadow p-6 mb-6">
+                                <h3 class="font-bold mb-4">结算统计</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <div class="text-center p-4 bg-gray-50 rounded">
+                                        <div class="text-xl font-bold">${(reports.settlementStats.avg_base || 0).toFixed(2)}</div>
+                                        <div class="text-sm text-gray-500">平均基础金额</div>
+                                    </div>
+                                    <div class="text-center p-4 bg-red-50 rounded">
+                                        <div class="text-xl font-bold text-red-600">${(reports.settlementStats.avg_deduction || 0).toFixed(2)}</div>
+                                        <div class="text-sm text-gray-500">平均扣款</div>
+                                    </div>
+                                    <div class="text-center p-4 bg-green-50 rounded">
+                                        <div class="text-xl font-bold text-green-600">${(reports.settlementStats.avg_bonus || 0).toFixed(2)}</div>
+                                        <div class="text-sm text-gray-500">平均奖金</div>
+                                    </div>
+                                    <div class="text-center p-4 bg-blue-50 rounded">
+                                        <div class="text-xl font-bold text-blue-600">${(reports.settlementStats.avg_final || 0).toFixed(2)}</div>
+                                        <div class="text-sm text-gray-500">平均实发</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <h3 class="font-bold p-6 border-b">最近订单</h3>
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">订单号</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">客户</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">满意度</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">返工</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">结算金额</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                `;
+                reports.recentOrders.forEach(o => {
+                    html += `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${o.order_no}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${o.customer_name}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-500">${o.satisfaction ? renderStars(o.satisfaction) : '-'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${o.has_rework ? '<span class="text-red-600">是</span>' : '<span class="text-green-600">否</span>'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${o.final_amount ? o.final_amount + '元' : '-'}</td>
+                        </tr>
+                    `;
+                });
+                html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+                        <h3 class="text-xl font-bold mb-4">新建安装单</h3>
+                        <form onsubmit="event.preventDefault();handleCreateSubmit()">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium">订单号</label>
+                                    <input type="text" id="create_order_no" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">客户姓名</label>
+                                    <input type="text" id="create_customer" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">客户电话</label>
+                                    <input type="text" id="create_phone" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">客户地址</label>
+                                    <input type="text" id="create_address" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">产品名称</label>
+                                    <input type="text" id="create_product" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">安装师傅</label>
+                                    <input type="text" id="create_installer" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium">安装日期</label>
+                                    <input type="date" id="create_date" class="mt-1 block w-full border rounded px-3 py-2" required>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="hideCreateModal()" class="flex-1 bg-gray-200 py-2 rounded">取消</button>
+                                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded">创建</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            app.innerHTML = html;
+        }
+
+        function showCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
+
+        function hideCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+        }
+
+        function handleCreateSubmit() {
+            createOrder({
+                order_no: document.getElementById('create_order_no').value,
+                customer_name: document.getElementById('create_customer').value,
+                customer_phone: document.getElementById('create_phone').value,
+                customer_address: document.getElementById('create_address').value,
+                product_name: document.getElementById('create_product').value,
+                installer_name: document.getElementById('create_installer').value,
+                install_date: document.getElementById('create_date').value
+            });
+            hideCreateModal();
+        }
+
+        function handleVisitSubmit() {
+            const issues = document.getElementById('visit_issues').value;
+            submitVisit(currentOrder.id, {
+                visitor_name: document.getElementById('visit_name').value,
+                satisfaction: parseInt(document.getElementById('visit_satisfaction').value),
+                feedback: document.getElementById('visit_feedback').value,
+                issues: issues ? issues.split(/[,，]/).map(s => s.trim()).filter(s => s) : []
+            });
+        }
+
+        function handlePartSubmit() {
+            submitPart(currentOrder.id, {
+                part_name: document.getElementById('part_name').value,
+                quantity: parseInt(document.getElementById('part_qty').value)
+            });
+        }
+
+        function handleReworkSubmit() {
+            submitRework(currentOrder.id, {
+                reason: document.getElementById('rework_reason').value,
+                reworker_name: document.getElementById('rework_name').value
+            });
+        }
+
+        function handleSettleSubmit() {
+            submitSettle(currentOrder.id, {
+                base_amount: parseFloat(document.getElementById('settle_base').value),
+                deduction: parseFloat(document.getElementById('settle_deduction').value),
+                bonus: parseFloat(document.getElementById('settle_bonus').value),
+                settled_by: document.getElementById('settle_by').value,
+                remarks: document.getElementById('settle_remarks').value
+            });
+        }
+
+        fetchOrders();
+    </script>
+</body>
+</html>
