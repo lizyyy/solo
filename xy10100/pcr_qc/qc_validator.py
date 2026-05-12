@@ -427,9 +427,12 @@ class QCValidator:
         expected_wells = set(f"{r}{c}" for r in rows for c in cols)
         
         actual_wells = set(df['well'].astype(str).str.strip())
+        
+        total_expected = len(expected_wells)
+        total_actual = len(actual_wells)
         missing_wells = expected_wells - actual_wells
         
-        if missing_wells:
+        if total_actual >= total_expected * 0.5 and missing_wells:
             failures.append(QCFailure(
                 sample_id="PLATE",
                 rule_name="plate_integrity",
@@ -521,12 +524,16 @@ class QCValidator:
         
         if pc['count'] > 0 and pc['passed'] < pc['count']:
             return QCStatus.FAIL
+        
         if nc['count'] > 0 and nc['passed'] < nc['count']:
-            return QCStatus.WARN
+            return QCStatus.FAIL
+        
         if blank['count'] > 0 and blank['passed'] < blank['count']:
             return QCStatus.FAIL
+        
         if stats['error_failures'] > 0:
-            return QCStatus.WARN
+            return QCStatus.FAIL
+        
         if stats['warning_failures'] > 0:
             return QCStatus.WARN
         
