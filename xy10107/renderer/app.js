@@ -138,7 +138,7 @@ function renderInvoiceList() {
 
   tbody.querySelectorAll('tr[data-id]').forEach(row => {
     row.addEventListener('click', (e) => {
-      if (!e.target.closest('button') {
+      if (!e.target.closest('button')) {
         const id = parseInt(row.dataset.id);
         selectInvoice(id);
       }
@@ -217,7 +217,7 @@ async function loadFilePreview(filePath) {
       previewContainer.innerHTML = `
         <div class="preview-placeholder">
           <div class="preview-icon">❌</div>
-          <p>${result.error || '无法预览</p>
+          <p>${result.error || '无法预览'}</p>
         </div>
       `;
       return;
@@ -429,13 +429,13 @@ async function handleReviewInvoice() {
           if (result.error === '文件缺失') {
             showModal({
               title: '❌ 文件缺失',
-              body: `<p>无法复核，原文件已不存在：</p><div class="error-list"><p>${result.details}</p></div>',
+              body: `<p>无法复核，原文件已不存在：</p><div class="error-list"><p>${result.details}</p></div>`,
               showCancel: false
             });
           } else if (result.error === '信息不完整') {
             showModal({
               title: '⚠️ 信息不完整',
-              body: `<p>${result.details}</p><p>请先填写项目号或审批单号。</p>',
+              body: `<p>${result.details}</p><p>请先填写项目号或审批单号。</p>`,
               showCancel: false
             });
           } else if (result.error === '字段冲突') {

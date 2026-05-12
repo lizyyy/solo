@@ -29,7 +29,11 @@ function createWindow() {
 }
 
 async function initializeDatabase() {
-  dbPath = path.join(app.getPath('userData'), 'invoices.db');
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  dbPath = path.join(dataDir, 'invoices.db');
   console.log('数据库路径:', dbPath);
 
   const initSqlJs = require('sql.js');
