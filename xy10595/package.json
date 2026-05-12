@@ -1,0 +1,21 @@
+{
+  "name": "maintenance-spare-parts-api",
+  "version": "1.0.0",
+  "description": "检修备件最低库存 API - 工厂检修备件库存管理系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "seed": "node src/scripts/seed.js",
+    "demo": "node src/scripts/demo.js",
+    "demo-failure": "node src/scripts/demo-failure.js",
+    "test": "node src/scripts/test-all.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.10",
+    "cors": "^2.8.5"
+  }
+}
