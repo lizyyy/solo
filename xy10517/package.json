@@ -1,0 +1,23 @@
+{
+  "name": "aftersales-part-loan-api",
+  "version": "1.0.0",
+  "description": "售后备件借用 API - 管理备件借用、归还、消耗、损坏和工单关联",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed.js",
+    "demo": "node scripts/demo.js"
+  },
+  "keywords": ["api", "aftersales", "parts", "loan", "inventory"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5",
+    "json2csv": "^6.0.0-alpha.2",
+    "dayjs": "^1.11.10"
+  }
+}
