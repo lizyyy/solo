@@ -1,0 +1,136 @@
+{
+  "generated_at": "2026-05-12T22:37:09.971464",
+  "inconsistent_count": 1,
+  "results": [
+    {
+      "task_id": "price-task-001",
+      "cache_key": "product:P001:price",
+      "regions": {
+        "cn-north": {
+          "name": "华北",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-south": {
+          "name": "华南",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-east": {
+          "name": "华东",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-west": {
+          "name": "华西",
+          "has_old_value": true,
+          "value": "{\"price\": 99.99, \"currency\": \"CNY\"}"
+        }
+      }
+    },
+    {
+      "task_id": "price-task-002",
+      "cache_key": "product:P002:price",
+      "regions": {
+        "cn-north": {
+          "name": "华北",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-south": {
+          "name": "华南",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-east": {
+          "name": "华东",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-west": {
+          "name": "华西",
+          "has_old_value": false,
+          "value": null
+        }
+      }
+    },
+    {
+      "task_id": "inventory-task-001",
+      "cache_key": "inventory:P001:WH001",
+      "regions": {
+        "cn-north": {
+          "name": "华北",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-south": {
+          "name": "华南",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-east": {
+          "name": "华东",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-west": {
+          "name": "华西",
+          "has_old_value": false,
+          "value": null
+        }
+      }
+    },
+    {
+      "task_id": "inventory-task-002",
+      "cache_key": "inventory:P002:WH002",
+      "regions": {
+        "cn-north": {
+          "name": "华北",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-south": {
+          "name": "华南",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-east": {
+          "name": "华东",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-west": {
+          "name": "华西",
+          "has_old_value": false,
+          "value": null
+        }
+      }
+    },
+    {
+      "task_id": "member-task-001",
+      "cache_key": "member:M001:benefits:gold",
+      "regions": {
+        "cn-north": {
+          "name": "华北",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-south": {
+          "name": "华南",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-east": {
+          "name": "华东",
+          "has_old_value": false,
+          "value": null
+        },
+        "cn-west": {
+          "name": "华西",
+          "has_old_value": false,
+          "value": null
+        }
+      }
+    }
+  ]
+}

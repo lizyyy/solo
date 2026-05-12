@@ -1,0 +1,42 @@
+tasks:
+  - id: price-task-001
+    template: product_price
+    variables:
+      product_id: P001
+    expected_value: '{"price": 199.99, "currency": "CNY"}'
+    skip_regions:
+      - cn-west
+    skip_reason: 华西区域正在维护
+
+  - id: price-task-002
+    template: product_price
+    variables:
+      product_id: P002
+    expected_value: '{"price": 299.99, "currency": "CNY"}'
+
+  - id: inventory-task-001
+    template: product_inventory
+    variables:
+      product_id: P001
+      warehouse_id: WH001
+    expected_value: '{"available": 100, "reserved": 20}'
+
+  - id: inventory-task-002
+    template: product_inventory
+    variables:
+      product_id: P002
+      warehouse_id: WH002
+    expected_value: '{"available": 50, "reserved": 10}'
+
+  - id: member-task-001
+    template: member_benefit
+    variables:
+      member_id: M001
+      level: gold
+    expected_value: '{"discount": 0.9, "points_multiplier": 2.0}'
+
+  - id: price-task-001
+    template: product_price
+    variables:
+      product_id: P001
+    expected_value: '{"price": 199.99, "currency": "CNY"}'

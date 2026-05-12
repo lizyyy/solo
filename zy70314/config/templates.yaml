@@ -1,0 +1,30 @@
+templates:
+  product_price:
+    pattern: "product:{product_id}:price"
+    variables:
+      - name: product_id
+        required: true
+        description: 商品ID
+    description: 商品价格缓存
+
+  product_inventory:
+    pattern: "inventory:{product_id}:{warehouse_id}"
+    variables:
+      - name: product_id
+        required: true
+        description: 商品ID
+      - name: warehouse_id
+        required: true
+        description: 仓库ID
+    description: 商品库存缓存
+
+  member_benefit:
+    pattern: "member:{member_id}:benefits:{level}"
+    variables:
+      - name: member_id
+        required: true
+        description: 会员ID
+      - name: level
+        required: true
+        description: 会员等级
+    description: 会员权益缓存

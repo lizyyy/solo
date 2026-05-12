@@ -1,0 +1,21 @@
+regions:
+  - id: cn-north
+    name: 华北
+    endpoint: http://localhost:6379
+    type: redis
+    timeout: 5
+  - id: cn-south
+    name: 华南
+    endpoint: http://localhost:6380
+    type: redis
+    timeout: 5
+  - id: cn-east
+    name: 华东
+    endpoint: http://localhost:6381
+    type: redis
+    timeout: 5
+  - id: cn-west
+    name: 华西
+    endpoint: http://localhost:6382
+    type: redis
+    timeout: 5

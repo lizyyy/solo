@@ -1,0 +1,330 @@
+{
+  "generated_at": "2026-05-12T22:37:02.733621",
+  "tasks": [
+    {
+      "task_id": "price-task-001",
+      "template": "product_price",
+      "cache_key": "product:P001:price",
+      "status": "success",
+      "errors": [],
+      "warnings": [],
+      "start_time": "2026-05-12T22:37:02.730655",
+      "end_time": "2026-05-12T22:37:02.731053",
+      "regions": [
+        {
+          "region_id": "cn-east",
+          "region_name": "华东",
+          "cache_key": "product:P001:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 99.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 199.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-north",
+          "region_name": "华北",
+          "cache_key": "product:P001:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 99.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 199.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-south",
+          "region_name": "华南",
+          "cache_key": "product:P001:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 199.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 199.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-west",
+          "region_name": "华西",
+          "cache_key": "product:P001:price",
+          "status": "skipped",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": "华西区域正在维护",
+          "is_consistent": true,
+          "old_value": null,
+          "actual_value": null,
+          "expected_value": "{\"price\": 199.99, \"currency\": \"CNY\"}"
+        }
+      ],
+      "recommendations": []
+    },
+    {
+      "task_id": "price-task-002",
+      "template": "product_price",
+      "cache_key": "product:P002:price",
+      "status": "success",
+      "errors": [],
+      "warnings": [],
+      "start_time": "2026-05-12T22:37:02.731055",
+      "end_time": "2026-05-12T22:37:02.731345",
+      "regions": [
+        {
+          "region_id": "cn-east",
+          "region_name": "华东",
+          "cache_key": "product:P002:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 299.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 299.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-north",
+          "region_name": "华北",
+          "cache_key": "product:P002:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 299.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 299.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-south",
+          "region_name": "华南",
+          "cache_key": "product:P002:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 299.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 299.99, \"currency\": \"CNY\"}"
+        },
+        {
+          "region_id": "cn-west",
+          "region_name": "华西",
+          "cache_key": "product:P002:price",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"price\": 299.99, \"currency\": \"CNY\"}",
+          "actual_value": null,
+          "expected_value": "{\"price\": 299.99, \"currency\": \"CNY\"}"
+        }
+      ],
+      "recommendations": []
+    },
+    {
+      "task_id": "inventory-task-001",
+      "template": "product_inventory",
+      "cache_key": "inventory:P001:WH001",
+      "status": "success",
+      "errors": [],
+      "warnings": [],
+      "start_time": "2026-05-12T22:37:02.731346",
+      "end_time": "2026-05-12T22:37:02.731584",
+      "regions": [
+        {
+          "region_id": "cn-east",
+          "region_name": "华东",
+          "cache_key": "inventory:P001:WH001",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 100, \"reserved\": 20}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 100, \"reserved\": 20}"
+        },
+        {
+          "region_id": "cn-north",
+          "region_name": "华北",
+          "cache_key": "inventory:P001:WH001",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 100, \"reserved\": 20}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 100, \"reserved\": 20}"
+        },
+        {
+          "region_id": "cn-south",
+          "region_name": "华南",
+          "cache_key": "inventory:P001:WH001",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 150, \"reserved\": 20}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 100, \"reserved\": 20}"
+        },
+        {
+          "region_id": "cn-west",
+          "region_name": "华西",
+          "cache_key": "inventory:P001:WH001",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 100, \"reserved\": 20}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 100, \"reserved\": 20}"
+        }
+      ],
+      "recommendations": []
+    },
+    {
+      "task_id": "inventory-task-002",
+      "template": "product_inventory",
+      "cache_key": "inventory:P002:WH002",
+      "status": "success",
+      "errors": [],
+      "warnings": [],
+      "start_time": "2026-05-12T22:37:02.731585",
+      "end_time": "2026-05-12T22:37:02.731821",
+      "regions": [
+        {
+          "region_id": "cn-east",
+          "region_name": "华东",
+          "cache_key": "inventory:P002:WH002",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 30, \"reserved\": 10}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 50, \"reserved\": 10}"
+        },
+        {
+          "region_id": "cn-north",
+          "region_name": "华北",
+          "cache_key": "inventory:P002:WH002",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 50, \"reserved\": 10}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 50, \"reserved\": 10}"
+        },
+        {
+          "region_id": "cn-south",
+          "region_name": "华南",
+          "cache_key": "inventory:P002:WH002",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 50, \"reserved\": 10}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 50, \"reserved\": 10}"
+        },
+        {
+          "region_id": "cn-west",
+          "region_name": "华西",
+          "cache_key": "inventory:P002:WH002",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"available\": 50, \"reserved\": 10}",
+          "actual_value": null,
+          "expected_value": "{\"available\": 50, \"reserved\": 10}"
+        }
+      ],
+      "recommendations": []
+    },
+    {
+      "task_id": "member-task-001",
+      "template": "member_benefit",
+      "cache_key": "member:M001:benefits:gold",
+      "status": "success",
+      "errors": [],
+      "warnings": [],
+      "start_time": "2026-05-12T22:37:02.731822",
+      "end_time": "2026-05-12T22:37:02.732025",
+      "regions": [
+        {
+          "region_id": "cn-east",
+          "region_name": "华东",
+          "cache_key": "member:M001:benefits:gold",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}",
+          "actual_value": null,
+          "expected_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}"
+        },
+        {
+          "region_id": "cn-north",
+          "region_name": "华北",
+          "cache_key": "member:M001:benefits:gold",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"discount\": 0.95, \"points_multiplier\": 1.5}",
+          "actual_value": null,
+          "expected_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}"
+        },
+        {
+          "region_id": "cn-south",
+          "region_name": "华南",
+          "cache_key": "member:M001:benefits:gold",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}",
+          "actual_value": null,
+          "expected_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}"
+        },
+        {
+          "region_id": "cn-west",
+          "region_name": "华西",
+          "cache_key": "member:M001:benefits:gold",
+          "status": "success",
+          "retry_count": 0,
+          "failure_reason": null,
+          "skip_reason": null,
+          "is_consistent": true,
+          "old_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}",
+          "actual_value": null,
+          "expected_value": "{\"discount\": 0.9, \"points_multiplier\": 2.0}"
+        }
+      ],
+      "recommendations": []
+    }
+  ]
+}
