@@ -190,6 +190,11 @@ app.post('/api/parts/:id/send', async (req, res) => {
             return res.status(400).json({ error: '该配件已发货，不可重复发送' });
         }
         
+        const order = await dbGet('SELECT status FROM installation_orders WHERE id = ?', [part.order_id]);
+        if (order && order.status === 'closed') {
+            return res.status(400).json({ error: '所属工单已关闭，不可发货' });
+        }
+        
         await dbRun('UPDATE parts SET status = ?, sender = ?, send_date = ? WHERE id = ?',
             ['sent', sender, now, req.params.id]);
         
@@ -306,6 +311,14 @@ app.post('/api/orders/:id/settle', async (req, res) => {
         const hasReworkWithoutSatisfaction = reworks.some(r => !r.satisfaction_after);
         if (hasReworkWithoutSatisfaction) {
             return res.status(400).json({ error: '存在返工后未更新满意度的记录' });
+        }
+        
+        const pendingParts = await dbGet(
+            'SELECT COUNT(*) as count FROM parts WHERE order_id = ? AND status = ?',
+            [orderId, 'pending']
+        );
+        if (pendingParts.count > 0) {
+            return res.status(400).json({ error: '有待发货的配件，不可结算关闭工单' });
         }
         
         const final_amount = base_amount - deduction + bonus;
