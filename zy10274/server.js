@@ -292,8 +292,13 @@ app.post('/api/consumptions', (req, res) => {
       db.get("SELECT * FROM inventory WHERE id = ?", [inventory_id], (err, item) => {
         if (!item) return res.status(404).json({ error: '耗材不存在' });
         
-        const total_price = item.unit_price * quantity;
         const approval_status = is_supplement ? 'pending' : 'approved';
+        
+        if (approval_status === 'approved' && item.stock_quantity < quantity) {
+          return res.status(400).json({ error: `库存不足，当前库存：${item.stock_quantity}${item.unit}，申请数量：${quantity}${item.unit}` });
+        }
+        
+        const total_price = item.unit_price * quantity;
         const id = uuidv4();
         
         db.run(`INSERT INTO consumptions 
@@ -307,9 +312,130 @@ app.post('/api/consumptions', (req, res) => {
               db.run("UPDATE inventory SET stock_quantity = stock_quantity - ? WHERE id = ?", [quantity, inventory_id]);
             }
             
-            res.json({ id, message: '领用记录创建成功' });
+            res.json({ id, message: '领用记录创建成功', current_stock: approval_status === 'approved' ? item.stock_quantity - quantity : item.stock_quantity });
           });
       });
+    });
+  });
+});
+
+app.post('/api/rooms', (req, res) => {
+  const { room_number, room_type, status } = req.body;
+  const id = uuidv4();
+  db.run("INSERT INTO rooms (id, room_number, room_type, status) VALUES (?, ?, ?, ?)", 
+    [id, room_number, room_type, status || 'empty'], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id, message: '房间创建成功' });
+    });
+});
+
+app.put('/api/rooms/:id', (req, res) => {
+  const { room_number, room_type, status } = req.body;
+  db.run("UPDATE rooms SET room_number = ?, room_type = ?, status = ? WHERE id = ?", 
+    [room_number, room_type, status, req.params.id], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '房间更新成功' });
+    });
+});
+
+app.delete('/api/rooms/:id', (req, res) => {
+  db.get("SELECT * FROM babies WHERE room_id = ? AND status = 'in_house'", [req.params.id], (err, baby) => {
+    if (baby) return res.status(400).json({ error: '该房间有宝宝入住，无法删除' });
+    db.run("DELETE FROM rooms WHERE id = ?", [req.params.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '房间删除成功' });
+    });
+  });
+});
+
+app.post('/api/babies', (req, res) => {
+  const { room_id, name, gender, birth_date, checkin_date, package_id } = req.body;
+  const id = uuidv4();
+  
+  db.get("SELECT * FROM rooms WHERE id = ?", [room_id], (err, room) => {
+    if (!room) return res.status(404).json({ error: '房间不存在' });
+    if (room.status === 'occupied') return res.status(400).json({ error: '该房间已被占用' });
+    
+    db.run("INSERT INTO babies (id, room_id, name, gender, birth_date, checkin_date, package_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'in_house')", 
+      [id, room_id, name, gender, birth_date, checkin_date, package_id], 
+      function(err) {
+        if (err) return res.status(500).json({ error: err.message });
+        db.run("UPDATE rooms SET status = 'occupied' WHERE id = ?", [room_id]);
+        res.json({ id, message: '宝宝入住成功' });
+      });
+  });
+});
+
+app.put('/api/babies/:id', (req, res) => {
+  const { name, gender, birth_date, package_id } = req.body;
+  db.run("UPDATE babies SET name = ?, gender = ?, birth_date = ?, package_id = ? WHERE id = ?", 
+    [name, gender, birth_date, package_id, req.params.id], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '宝宝信息更新成功' });
+    });
+});
+
+app.post('/api/packages', (req, res) => {
+  const { name, description, price, duration_days } = req.body;
+  const id = uuidv4();
+  db.run("INSERT INTO packages (id, name, description, price, duration_days) VALUES (?, ?, ?, ?, ?)", 
+    [id, name, description, price, duration_days], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id, message: '套餐创建成功' });
+    });
+});
+
+app.put('/api/packages/:id', (req, res) => {
+  const { name, description, price, duration_days } = req.body;
+  db.run("UPDATE packages SET name = ?, description = ?, price = ?, duration_days = ? WHERE id = ?", 
+    [name, description, price, duration_days, req.params.id], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '套餐更新成功' });
+    });
+});
+
+app.delete('/api/packages/:id', (req, res) => {
+  db.get("SELECT * FROM babies WHERE package_id = ? AND status = 'in_house'", [req.params.id], (err, baby) => {
+    if (baby) return res.status(400).json({ error: '该套餐有正在使用的宝宝，无法删除' });
+    db.run("DELETE FROM packages WHERE id = ?", [req.params.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '套餐删除成功' });
+    });
+  });
+});
+
+app.post('/api/inventory', (req, res) => {
+  const { name, category, unit, unit_price, stock_quantity, warning_threshold } = req.body;
+  const id = uuidv4();
+  db.run("INSERT INTO inventory (id, name, category, unit, unit_price, stock_quantity, warning_threshold) VALUES (?, ?, ?, ?, ?, ?, ?)", 
+    [id, name, category, unit, unit_price, stock_quantity || 0, warning_threshold || 10], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ id, message: '耗材创建成功' });
+    });
+});
+
+app.put('/api/inventory/:id', (req, res) => {
+  const { name, category, unit, unit_price, stock_quantity, warning_threshold } = req.body;
+  db.run("UPDATE inventory SET name = ?, category = ?, unit = ?, unit_price = ?, stock_quantity = ?, warning_threshold = ? WHERE id = ?", 
+    [name, category, unit, unit_price, stock_quantity, warning_threshold, req.params.id], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '耗材更新成功' });
+    });
+});
+
+app.delete('/api/inventory/:id', (req, res) => {
+  db.get("SELECT * FROM consumptions WHERE inventory_id = ? AND approval_status != 'rejected'", [req.params.id], (err, consumption) => {
+    if (consumption) return res.status(400).json({ error: '该耗材有领用记录，无法删除' });
+    db.run("DELETE FROM inventory WHERE id = ?", [req.params.id], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: '耗材删除成功' });
     });
   });
 });
