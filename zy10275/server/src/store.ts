@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
+import * as fs from 'fs'
+import * as path from 'path'
 import {
   CourtSession,
   Player,
@@ -9,13 +11,69 @@ import {
   AddPlayerRequest
 } from './types'
 
+const DATA_DIR = path.join(process.cwd(), 'data')
+const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json')
+const MEMBERS_FILE = path.join(DATA_DIR, 'members.json')
+
 class DataStore {
   private sessions: Map<string, CourtSession> = new Map()
   private members: Map<string, Member> = new Map()
   private memberByPhone: Map<string, Member> = new Map()
+  private checkInterval: NodeJS.Timeout | null = null
 
   constructor() {
-    this.initSampleData()
+    this.ensureDataDir()
+    this.loadFromFile()
+    
+    if (this.members.size === 0 && this.sessions.size === 0) {
+      this.initSampleData()
+    }
+    
+    this.buildMemberByPhoneIndex()
+    this.startAutoCheck()
+  }
+
+  private ensureDataDir(): void {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true })
+    }
+  }
+
+  private loadFromFile(): void {
+    try {
+      if (fs.existsSync(SESSIONS_FILE)) {
+        const sessionsData = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf-8'))
+        sessionsData.forEach((s: CourtSession) => {
+          this.sessions.set(s.id, s)
+        })
+      }
+      
+      if (fs.existsSync(MEMBERS_FILE)) {
+        const membersData = JSON.parse(fs.readFileSync(MEMBERS_FILE, 'utf-8'))
+        membersData.forEach((m: Member) => {
+          this.members.set(m.id, m)
+        })
+      }
+      
+      console.log(`[DataStore] 已加载数据: ${this.sessions.size} 场次, ${this.members.size} 会员`)
+    } catch (error) {
+      console.error('[DataStore] 加载数据失败, 将使用空数据:', error)
+    }
+  }
+
+  private saveToFile(): void {
+    try {
+      fs.writeFileSync(SESSIONS_FILE, JSON.stringify(Array.from(this.sessions.values()), null, 2))
+      fs.writeFileSync(MEMBERS_FILE, JSON.stringify(Array.from(this.members.values()), null, 2))
+    } catch (error) {
+      console.error('[DataStore] 保存数据失败:', error)
+    }
+  }
+
+  private buildMemberByPhoneIndex(): void {
+    this.members.forEach(m => {
+      this.memberByPhone.set(m.phone, m)
+    })
   }
 
   private initSampleData() {
@@ -73,15 +131,110 @@ class DataStore {
       autoCancelIfNotEnough: true,
       cancelThresholdMinutes: 120
     })
+
+    this.saveToFile()
+    console.log('[DataStore] 已初始化样例数据')
+  }
+
+  private startAutoCheck(): void {
+    this.checkInterval = setInterval(() => {
+      this.checkSessionsForAutoCancel()
+    }, 60000)
+    console.log('[DataStore] 自动检查器已启动 (每分钟检查)')
+  }
+
+  private checkSessionsForAutoCancel(): void {
+    const now = new Date()
+    let cancelledCount = 0
+
+    this.sessions.forEach(session => {
+      if (session.status !== SessionStatus.OPEN && session.status !== SessionStatus.FULL) {
+        return
+      }
+      
+      if (!session.autoCancelIfNotEnough) {
+        return
+      }
+
+      const sessionTime = new Date(`${session.date}T${session.startTime}`)
+      const timeDiffMinutes = (sessionTime.getTime() - now.getTime()) / (1000 * 60)
+
+      if (timeDiffMinutes <= session.cancelThresholdMinutes && timeDiffMinutes > 0) {
+        const activePlayers = session.players.filter(p => p.status === PlayerStatus.CONFIRMED).length
+        
+        if (activePlayers < session.minPlayers) {
+          session.status = SessionStatus.CANCELLED
+          console.log(`[DataStore] 场次 ${session.id} 因人数不足 (${activePlayers}/${session.minPlayers}) 自动取消`)
+          cancelledCount++
+        }
+      }
+    })
+
+    if (cancelledCount > 0) {
+      this.saveToFile()
+    }
+  }
+
+  private getActivePlayersCount(session: CourtSession): number {
+    return session.players.filter(p => p.status === PlayerStatus.CONFIRMED).length
+  }
+
+  private updateSessionStatus(session: CourtSession): void {
+    const activePlayers = this.getActivePlayersCount(session)
+
+    if (session.status === SessionStatus.CANCELLED || session.status === SessionStatus.COMPLETED) {
+      return
+    }
+
+    if (activePlayers >= session.maxPlayers) {
+      session.status = SessionStatus.FULL
+    } else if (activePlayers >= 0) {
+      session.status = SessionStatus.OPEN
+    }
+  }
+
+  public checkAndCancelIfNeeded(sessionId: string): { cancelled: boolean; reason?: string } {
+    const session = this.sessions.get(sessionId)
+    if (!session) {
+      return { cancelled: false, reason: '场次不存在' }
+    }
+
+    if (session.status === SessionStatus.CANCELLED || session.status === SessionStatus.COMPLETED) {
+      return { cancelled: false, reason: '场次已结束' }
+    }
+
+    if (!session.autoCancelIfNotEnough) {
+      return { cancelled: false, reason: '未开启自动取消' }
+    }
+
+    const now = new Date()
+    const sessionTime = new Date(`${session.date}T${session.startTime}`)
+    const timeDiffMinutes = (sessionTime.getTime() - now.getTime()) / (1000 * 60)
+
+    if (timeDiffMinutes <= session.cancelThresholdMinutes) {
+      const activePlayers = this.getActivePlayersCount(session)
+      
+      if (activePlayers < session.minPlayers) {
+        session.status = SessionStatus.CANCELLED
+        this.saveToFile()
+        return { 
+          cancelled: true, 
+          reason: `距离开场不足${session.cancelThresholdMinutes}分钟，人数不足(${activePlayers}/${session.minPlayers})，已自动取消` 
+        }
+      }
+    }
+
+    return { cancelled: false }
   }
 
   getOrCreateMember(name: string, phone: string, isMember: boolean = false): Member {
     let member = this.memberByPhone.get(phone)
     if (member) {
       if (member.name !== name || member.isMember !== isMember) {
-        member = { ...member, name, isMember }
+        member = { ...member, name, isMember, memberDiscount: isMember ? 0.9 : 1 }
         this.members.set(member.id, member)
         this.memberByPhone.set(phone, member)
+        this.saveToFile()
       }
       return member
     }
@@ -96,6 +249,7 @@ class DataStore {
     }
     this.members.set(member.id, member)
     this.memberByPhone.set(phone, member)
+    this.saveToFile()
     return member
   }
 
@@ -125,6 +279,7 @@ class DataStore {
       cancelThresholdMinutes: req.cancelThresholdMinutes || 60
     }
     this.sessions.set(session.id, session)
+    this.saveToFile()
     return session
   }
 
@@ -189,7 +344,7 @@ class DataStore {
     }
 
     this.updateSessionStatus(session)
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return { session, player, wasWaitlisted }
   }
@@ -210,7 +365,7 @@ class DataStore {
     }
 
     player.confirmedAt = new Date().toISOString()
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return { session, player }
   }
@@ -255,7 +410,7 @@ class DataStore {
     }
 
     this.updateSessionStatus(session)
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return { session, player, promotedFromWaitlist: promotedPlayer }
   }
@@ -275,21 +430,9 @@ class DataStore {
     player.refundedAt = new Date().toISOString()
     player.refundAmount = player.paidAmount
 
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return { session, player }
-  }
-
-  private updateSessionStatus(session: CourtSession): void {
-    const activePlayers = session.players.filter(p => 
-      p.status === PlayerStatus.CONFIRMED
-    ).length
-
-    if (activePlayers >= session.maxPlayers) {
-      session.status = SessionStatus.FULL
-    } else if (activePlayers > 0) {
-      session.status = SessionStatus.OPEN
-    }
   }
 
   cancelSession(sessionId: string): CourtSession | { error: string } {
@@ -297,7 +440,7 @@ class DataStore {
     if (!session) return { error: '场次不存在' }
 
     session.status = SessionStatus.CANCELLED
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return session
   }
@@ -307,9 +450,16 @@ class DataStore {
     if (!session) return { error: '场次不存在' }
 
     session.status = SessionStatus.COMPLETED
-    this.sessions.set(session.id, session)
+    this.saveToFile()
 
     return session
+  }
+
+  public destroy(): void {
+    if (this.checkInterval) {
+      clearInterval(this.checkInterval)
+      this.checkInterval = null
+    }
   }
 }
 

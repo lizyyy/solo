@@ -7,11 +7,14 @@
 ### 后端功能
 - ✅ 场次管理（创建、取消、完成）
 - ✅ 球员管理（添加、取消、候补）
+- ✅ **数据持久化** - 数据自动保存到 JSON 文件，重启不丢失
 - ✅ 候补自动转正机制
+- ✅ **人数不足自动取消** - 可配置开场前X分钟人数不足自动取消
 - ✅ 会员折扣计算
 - ✅ 费用分摊计算
 - ✅ 退款管理
 - ✅ 到场确认
+- ✅ **定时自动检查** - 每分钟后台自动检查需要取消的场次
 
 ### 前端功能
 - ✅ 场次列表展示（带进度条）
@@ -21,6 +24,8 @@
 - ✅ 球员卡片展示（已报名、候补、已取消）
 - ✅ 快速添加球员（支持会员选择）
 - ✅ 操作反馈 Toast
+- ✅ 人数不足检查按钮
+- ✅ 自动取消规则提示
 
 ## 核心业务逻辑
 
@@ -28,6 +33,12 @@
 - 当场次满员后，新加入的球员自动进入候补队列
 - 当已确认球员取消报名时，候补队列第一名自动转正
 - 候补队列按加入时间排序，先进先出
+
+### 人数不足自动取消
+- 创建场次时可配置 `autoCancelIfNotEnough` 和 `cancelThresholdMinutes`
+- 后台每分钟自动检查所有开放场次
+- 当距离开场不足 `cancelThresholdMinutes` 分钟，且确认人数 < `minPlayers` 时自动取消
+- 前端也提供手动检查按钮
 
 ### 费用计算
 - 基础费用 = 总费用 / 最大人数
@@ -54,6 +65,7 @@
 - Express
 - TypeScript
 - UUID
+- **JSON 文件持久化**
 
 ### 前端
 - React 18
@@ -103,7 +115,7 @@ cd client && npm run dev
 │   ├── src/
 │   │   ├── index.ts       # 入口文件
 │   │   ├── types.ts       # 类型定义
-│   │   ├── store.ts       # 数据存储和业务逻辑
+│   │   ├── store.ts       # 数据存储和业务逻辑（含持久化和自动检查）
 │   │   └── routes.ts      # API 路由
 │   ├── package.json
 │   └── tsconfig.json
@@ -120,6 +132,9 @@ cd client && npm run dev
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── vite.config.ts
+├── data/                   # 数据存储目录（自动创建）
+│   ├── sessions.json      # 场次数据
+│   └── members.json       # 会员数据
 ├── package.json
 └── README.md
 ```
@@ -132,6 +147,7 @@ cd client && npm run dev
 - `POST /api/sessions` - 创建新场次
 - `POST /api/sessions/:id/cancel` - 取消场次
 - `POST /api/sessions/:id/complete` - 完成场次
+- `POST /api/sessions/:id/check-auto-cancel` - 检查是否需要自动取消
 
 ### 球员相关
 - `POST /api/sessions/:id/players` - 添加球员
@@ -151,6 +167,14 @@ cd client && npm run dev
 你可以通过以下流程测试：
 1. 添加多名球员直到满员
 2. 后续球员自动进入候补
-3. 取消一名已确认球员
+3. 取消一名已报名球员
 4. 观察候补第一名自动转正
 5. 确认到场/退款操作
+6. 创建一个即将开始的场次，设置低的最低人数，测试自动取消
+
+## 数据持久化说明
+
+- 数据保存在 `server/data/` 目录下的 JSON 文件中
+- 每次数据变更都会自动保存
+- 服务器重启时会自动从文件恢复数据
+- 首次启动且无数据文件时会自动创建样例数据

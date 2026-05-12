@@ -74,6 +74,11 @@ router.post('/sessions/:id/complete', (req: Request<{ id: string }>, res: Respon
   res.json(result)
 })
 
+router.post('/sessions/:id/check-auto-cancel', (req: Request<{ id: string }>, res: Response) => {
+  const result = store.checkAndCancelIfNeeded(req.params.id)
+  res.json(result)
+})
+
 router.get('/members', (_req: Request, res: Response) => {
   const members = store.getAllMembers()
   res.json(members)

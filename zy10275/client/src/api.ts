@@ -35,5 +35,7 @@ export const api = {
     request(`/sessions/${sessionId}/cancel`, { method: 'POST' }),
   completeSession: (sessionId: string) =>
     request(`/sessions/${sessionId}/complete`, { method: 'POST' }),
+  checkAutoCancel: (sessionId: string) =>
+    request<{ cancelled: boolean; reason?: string }>(`/sessions/${sessionId}/check-auto-cancel`, { method: 'POST' }),
   getMembers: () => request<Member[]>('/members')
 }

@@ -40,6 +40,21 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
     fetchSession()
   }, [id])
 
+  const handleCheckAutoCancel = async () => {
+    if (!id) return
+    try {
+      const result = await api.checkAutoCancel(id)
+      if (result.cancelled) {
+        showToast(result.reason || '场次已自动取消', 'error')
+        fetchSession()
+      } else {
+        showToast('检查完成，无需取消', 'success')
+      }
+    } catch (error: any) {
+      showToast(error.message || '检查失败', 'error')
+    }
+  }
+
   const handleAddPlayer = async () => {
     if (!id || !newPlayer.memberName || !newPlayer.memberPhone) {
       showToast('请填写姓名和电话', 'error')
@@ -71,8 +86,8 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
     if (!id) return
     try {
       const result = await api.cancelPlayer(id, playerId)
-      if (result.promotedFromWaitlist) {
-        showToast(`取消成功，候补队员 ${result.promotedFromWaitlist.memberName} 已转正`, 'success')
+      if ((result as any).promotedFromWaitlist) {
+        showToast(`取消成功，候补队员 ${(result as any).promotedFromWaitlist.memberName} 已转正`, 'success')
       } else {
         showToast('取消成功', 'success')
       }
@@ -199,6 +214,11 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
               <div className="stat-label">人均费用</div>
             </div>
           </div>
+          {session.autoCancelIfNotEnough && (
+            <div style={{ marginTop: '16px', padding: '12px', background: '#fff3cd', borderRadius: '8px', fontSize: '14px' }}>
+              ⚠️ 自动取消: 距离开场不足 {session.cancelThresholdMinutes} 分钟且人数不足 {session.minPlayers} 人时自动取消
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-end' }}>
           <span className={`status-badge ${getStatusClass(session.status)}`}>
@@ -206,6 +226,9 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
           </span>
           {canEdit && (
             <>
+              <button className="btn btn-secondary btn-sm" onClick={handleCheckAutoCancel}>
+                检查人数
+              </button>
               <button className="btn btn-danger btn-sm" onClick={handleCancelSession}>
                 取消场次
               </button>
