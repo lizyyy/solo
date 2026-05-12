@@ -90,6 +90,11 @@ export function AppProvider({ children }: AppProviderProps) {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
+  const addHistoryRecordWithSync = useCallback((record: Omit<HistoryRecord, 'id' | 'timestamp'>) => {
+    const updatedHistory = addHistoryRecord(record);
+    setHistory(updatedHistory);
+  }, []);
+
   const addCertificate = useCallback((certData: Omit<Certificate, 'id' | 'status' | 'reviewStatus' | 'createdAt' | 'updatedAt'>): string[] => {
     const errors = validateCertificate(certData);
     if (errors.length > 0) {
@@ -117,14 +122,14 @@ export function AppProvider({ children }: AppProviderProps) {
     const updated = [...certificates, newCert];
     setCertificates(updated);
     saveCertificates(updated);
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: newCert.id,
       action: '添加证照',
       details: `添加了 ${certData.name}（${certData.certificateNumber}）`
     });
     showToast('success', '证照添加成功');
     return [];
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const updateCertificate = useCallback((id: string, updates: Partial<Certificate>): boolean => {
     const index = certificates.findIndex(c => c.id === id);
@@ -157,14 +162,14 @@ export function AppProvider({ children }: AppProviderProps) {
 
     setCertificates(updated);
     saveCertificates(updated);
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: id,
       action: '更新证照',
       details: `更新了 ${existing.name}`
     });
     showToast('success', '证照更新成功');
     return true;
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const deleteCertificate = useCallback((id: string): boolean => {
     const cert = certificates.find(c => c.id === id);
@@ -176,14 +181,14 @@ export function AppProvider({ children }: AppProviderProps) {
     const updated = certificates.filter(c => c.id !== id);
     setCertificates(updated);
     saveCertificates(updated);
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: id,
       action: '删除证照',
       details: `删除了 ${cert.name}（${cert.certificateNumber}）`
     });
     showToast('success', '证照已删除');
     return true;
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const importFromFile = useCallback(async (file: File): Promise<ImportResult> => {
     const result: ImportResult = {
@@ -195,7 +200,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
     try {
       const text = await file.text();
-      let data: any[];
+      let data: Record<string, unknown>[];
 
       if (file.name.toLowerCase().endsWith('.json')) {
         data = parseJSON(text);
@@ -211,7 +216,7 @@ export function AppProvider({ children }: AppProviderProps) {
         return result;
       }
 
-      let currentCerts = [...certificates];
+      const currentCerts = [...certificates];
       const now = new Date().toISOString();
 
       for (let i = 0; i < data.length; i++) {
@@ -269,7 +274,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
           currentCerts.push(newCert);
           result.success++;
-        } catch (e) {
+        } catch {
           result.failed++;
           result.errors.push(`第 ${i + 1} 行：解析错误`);
         }
@@ -277,7 +282,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
       setCertificates(currentCerts);
       saveCertificates(currentCerts);
-      addHistoryRecord({
+      addHistoryRecordWithSync({
         certificateId: 'system',
         action: '批量导入',
         details: `从 ${file.name} 导入：成功 ${result.success} 条，失败 ${result.failed} 条`
@@ -292,11 +297,12 @@ export function AppProvider({ children }: AppProviderProps) {
 
       return result;
     } catch (e) {
-      result.errors.push('文件读取失败：' + (e instanceof Error ? e.message : '未知错误'));
+      const errorMessage = e instanceof Error ? e.message : '未知错误';
+      result.errors.push('文件读取失败：' + errorMessage);
       showToast('error', '文件导入失败');
       return result;
     }
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const exportToJSON = useCallback(() => {
     const dataStr = JSON.stringify(certificates, null, 2);
@@ -311,13 +317,13 @@ export function AppProvider({ children }: AppProviderProps) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: 'system',
       action: '导出数据',
       details: `导出了 ${certificates.length} 条证照数据（JSON）`
     });
     showToast('success', '数据已导出为 JSON');
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const exportToCSV = useCallback(() => {
     const csvContent = convertToCSV(certificates);
@@ -332,13 +338,13 @@ export function AppProvider({ children }: AppProviderProps) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: 'system',
       action: '导出数据',
       details: `导出了 ${certificates.length} 条证照数据（CSV）`
     });
     showToast('success', '数据已导出为 CSV');
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const reviewCertificate = useCallback((id: string, status: ReviewStatus, comments?: string): boolean => {
     const index = certificates.findIndex(c => c.id === id);
@@ -357,7 +363,7 @@ export function AppProvider({ children }: AppProviderProps) {
 
     setCertificates(updated);
     saveCertificates(updated);
-    addHistoryRecord({
+    addHistoryRecordWithSync({
       certificateId: id,
       action: '复核证照',
       details: `证照 ${updated[index].name} 复核状态更新为：${
@@ -368,7 +374,7 @@ export function AppProvider({ children }: AppProviderProps) {
     });
     showToast('success', '复核状态已更新');
     return true;
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const refreshStatuses = useCallback(() => {
     const updated = certificates.map(cert => ({
@@ -384,7 +390,7 @@ export function AppProvider({ children }: AppProviderProps) {
     
     if (changedCount > 0) {
       showToast('info', `状态已刷新，${changedCount} 个证照状态有变化`);
-      addHistoryRecord({
+      addHistoryRecordWithSync({
         certificateId: 'system',
         action: '刷新状态',
         details: `刷新了 ${certificates.length} 条证照的到期状态，${changedCount} 条有更新`
@@ -392,7 +398,7 @@ export function AppProvider({ children }: AppProviderProps) {
     } else {
       showToast('info', '状态已刷新，无变化');
     }
-  }, [certificates, showToast]);
+  }, [certificates, showToast, addHistoryRecordWithSync]);
 
   const getStatistics = useCallback(() => {
     const byType: Record<CertificateType, number> = {

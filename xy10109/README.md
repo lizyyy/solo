@@ -1,54 +1,146 @@
-# React + TypeScript + Vite
+# 本地证照到期审查工具
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个基于 Web 的本地证照管理工具，用于管理门店许可证、员工健康证和供应商资质的到期审查。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 📊 数据概览
+- 统计证照总数及各状态分布
+- 按类型统计证照数量
+- 显示复核状态进度
+- 自动预警即将过期和已过期证照
 
-## Expanding the ESLint configuration
+### 📋 证照管理
+- 支持三种证照类型：门店许可证、员工健康证、供应商资质
+- 手动添加、编辑、删除证照
+- 按类型、状态、复核状态筛选
+- 关键词搜索功能
+- 自动计算到期状态（30天内为即将过期）
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📥 导入导出
+- 支持 JSON 和 CSV 格式批量导入
+- 拖拽上传支持
+- 导出为 JSON（完整备份）或 CSV（Excel 兼容）
+- 导入时自动检测重复和字段冲突
+- 详细的导入结果反馈
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### ✅ 人工复核
+- 设置复核状态：未复核、复核中、已通过、已驳回
+- 记录复核备注
+- 复核操作记入历史记录
+
+### 📜 操作历史
+- 完整的操作历史记录
+- 按日期分组显示
+- 包含操作类型、详情和时间戳
+
+### 💾 数据存储
+- 所有数据保存在浏览器本地（localStorage）
+- 无需服务器，数据不上传
+- 刷新页面数据不丢失
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 启动开发服务器
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm run dev
 ```
+
+访问显示的本地地址（通常是 http://localhost:5173）
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 代码检查
+
+```bash
+npm run lint
+```
+
+## 证照类型
+
+| 类型 | 英文标识 | 说明 |
+|------|----------|------|
+| 🏪 门店许可证 | `store_license` | 营业执照、经营许可证等 |
+| 💊 员工健康证 | `health_certificate` | 从业人员健康证明 |
+| 📋 供应商资质 | `supplier_qualification` | 供货商相关资质文件 |
+
+## 状态说明
+
+| 状态 | 颜色 | 说明 |
+|------|------|------|
+| ✅ 有效 | 绿色 | 到期日 > 30 天 |
+| ⚠️ 即将过期 | 黄色 | 0 < 到期日 ≤ 30 天 |
+| ❌ 已过期 | 红色 | 到期日 < 今天 |
+
+## 导入格式
+
+### JSON 格式
+
+```json
+[
+  {
+    "证照编号": "LIC-001",
+    "证照类型": "store_license",
+    "证照名称": "食品经营许可证",
+    "持证人/单位": "某某门店",
+    "发证日期": "2024-01-01",
+    "到期日期": "2026-01-01"
+  }
+]
+```
+
+### CSV 格式
+
+```csv
+证照编号,证照类型,证照名称,持证人/单位,发证日期,到期日期
+LIC-001,store_license,食品经营许可证,某某门店,2024-01-01,2026-01-01
+HLT-001,health_certificate,健康证,张三,2024-06-01,2025-06-01
+```
+
+## 示例数据
+
+项目根目录下的 `sample-data.json` 包含示例数据，可直接用于测试导入功能。
+
+## 技术栈
+
+- React 19
+- TypeScript
+- Vite 6
+- Tailwind CSS 3
+
+## 项目结构
+
+```
+src/
+├── components/          # UI 组件
+│   ├── CertificateForm.tsx    # 添加/编辑表单
+│   ├── CertificateList.tsx    # 证照列表
+│   ├── Dashboard.tsx          # 数据概览
+│   ├── History.tsx            # 操作历史
+│   ├── ImportExport.tsx       # 导入导出
+│   ├── ReviewModal.tsx        # 复核弹窗
+│   └── Toasts.tsx             # 消息提示
+├── context.tsx           # 全局状态管理
+├── store.ts              # 数据存储（localStorage）
+├── types.ts              # TypeScript 类型定义
+├── utils.ts              # 工具函数
+├── App.tsx               # 主应用组件
+└── index.css             # 样式文件
+```
+
+## 注意事项
+
+1. 数据仅保存在当前浏览器中，清除浏览器数据会导致数据丢失
+2. 建议定期导出 JSON 进行数据备份
+3. CSV 文件使用 UTF-8 编码，Excel 打开时可能需要手动选择编码

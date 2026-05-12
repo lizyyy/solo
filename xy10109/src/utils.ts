@@ -113,25 +113,25 @@ export function findConflicts(
   return conflicts;
 }
 
-export function parseJSON(data: string): any[] {
-  const parsed = JSON.parse(data);
-  if (Array.isArray(parsed)) return parsed;
-  if (parsed && typeof parsed === 'object') return [parsed];
+export function parseJSON(data: string): Record<string, unknown>[] {
+  const parsed = JSON.parse(data) as unknown;
+  if (Array.isArray(parsed)) return parsed as Record<string, unknown>[];
+  if (parsed && typeof parsed === 'object') return [parsed as Record<string, unknown>];
   return [];
 }
 
-export function parseCSV(data: string): any[] {
+export function parseCSV(data: string): Record<string, unknown>[] {
   const lines = data.trim().split('\n');
   if (lines.length < 2) return [];
 
   const headers = parseCSVLine(lines[0]);
-  const result: any[] = [];
+  const result: Record<string, unknown>[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
     if (values.length === 0) continue;
 
-    const obj: Record<string, string> = {};
+    const obj: Record<string, unknown> = {};
     headers.forEach((header, index) => {
       obj[header.trim()] = values[index]?.trim() || '';
     });
@@ -215,8 +215,8 @@ export function getDaysUntilExpiry(expiryDate: string): number {
   return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function normalizeImportData(data: any): Partial<Certificate> {
-  const result: Partial<Certificate> = {};
+export function normalizeImportData(data: Record<string, unknown>): Partial<Certificate> {
+  const result: Record<string, unknown> = {};
 
   const fieldMappings: Record<string, keyof Certificate> = {
     '证照编号': 'certificateNumber',
@@ -238,11 +238,11 @@ export function normalizeImportData(data: any): Partial<Certificate> {
   for (const [key, value] of Object.entries(data)) {
     const mappedKey = fieldMappings[key];
     if (mappedKey) {
-      (result as any)[mappedKey] = value;
+      result[mappedKey] = value;
     } else {
-      (result as any)[key] = value;
+      result[key] = value;
     }
   }
 
-  return result;
+  return result as Partial<Certificate>;
 }

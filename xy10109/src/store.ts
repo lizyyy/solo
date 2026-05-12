@@ -21,15 +21,16 @@ export function saveHistory(history: HistoryRecord[]): void {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
-export function addHistoryRecord(record: Omit<HistoryRecord, 'id' | 'timestamp'>): void {
+export function addHistoryRecord(record: Omit<HistoryRecord, 'id' | 'timestamp'>): HistoryRecord[] {
   const history = loadHistory();
   const newRecord: HistoryRecord = {
     ...record,
     id: generateId(),
     timestamp: new Date().toISOString()
   };
-  history.unshift(newRecord);
-  saveHistory(history);
+  const updatedHistory = [newRecord, ...history];
+  saveHistory(updatedHistory);
+  return updatedHistory;
 }
 
 export function generateId(): string {
