@@ -1,0 +1,19 @@
+{
+  "name": "hospital-transfer-bed-coordination-api",
+  "version": "1.0.0",
+  "description": "医院转诊床位协调 API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "seed": "node src/scripts/seed.js",
+    "demo": "node src/scripts/demo.js",
+    "demo-fail": "node src/scripts/demo-fail.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1",
+    "body-parser": "^1.20.2"
+  }
+}
