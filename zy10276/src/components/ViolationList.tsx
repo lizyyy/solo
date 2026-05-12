@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel, RotateCcw } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel } from 'lucide-react';
 import { ViolationRecord, ViolationFilterParams } from '../types';
-import { filterViolations, getDriverName, applyPenalty, confirmViolation, findMatchingShifts, getShifts } from '../services/violationService';
+import { filterViolations, getDriverName, applyPenalty, confirmViolation } from '../services/violationService';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
 import ViolationDetail from './ViolationDetail';
 import MatchShiftModal from './MatchShiftModal';
@@ -51,9 +51,7 @@ const ViolationList: React.FC = () => {
     setShowAppealModal(true);
   };
 
-  const getAvailableShifts = (plateNumber: string, violationTime: string) => {
-    return findMatchingShifts(plateNumber, violationTime);
-  };
+
 
   return (
     <div className="space-y-4">

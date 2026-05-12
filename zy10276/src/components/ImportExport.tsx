@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Download, FileText, AlertCircle, Check, X } from 'lucide-react';
+import { Upload, Download, FileText, AlertCircle, Check } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { ImportBatch, ViolationRecord } from '../types';
 import { importViolations, getBatches } from '../services/violationService';

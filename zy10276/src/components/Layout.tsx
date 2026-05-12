@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FileText, Users, Car, Upload, Download, AlertCircle, BarChart3 } from 'lucide-react';
+import React from 'react';
+import { FileText, Users, Car, Upload, AlertCircle, BarChart3 } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;

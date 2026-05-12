@@ -2,10 +2,8 @@ import { isWithinInterval, parseISO } from 'date-fns';
 import {
   ViolationRecord,
   Shift,
-  ViolationStatus,
   ViolationFilterParams,
   ImportBatch,
-  Driver,
   Penalty,
   Appeal,
   Vehicle,
@@ -14,7 +12,9 @@ import {
   getViolations,
   saveViolations,
   getShifts,
+  saveShifts,
   getVehicles,
+  saveVehicles,
   getDrivers,
   saveDrivers,
   generateId,
@@ -301,6 +301,11 @@ export const reviewAppeal = (
         oldStatus,
         'appeal_approved'
       );
+
+      const existingPenalty = getPenaltiesByViolationId(appeal.violationId);
+      if (existingPenalty) {
+        rollbackPenalty(existingPenalty.id, '申诉通过自动回滚', reviewer, reviewerId);
+      }
     } else {
       violation.status = 'appeal_rejected';
       addHistory(
@@ -476,4 +481,26 @@ export const getVehicleByPlate = (plateNumber: string): Vehicle | undefined => {
 export const getAppealByViolationId = (violationId: string): Appeal | undefined => {
   const appeals = getAppeals();
   return appeals.find((appeal) => appeal.violationId === violationId);
+};
+
+export const getPenaltiesByViolationId = (violationId: string): Penalty | undefined => {
+  const penalties = getPenalties();
+  return penalties.find((p) => p.violationId === violationId && !p.isRolledBack);
+};
+
+export {
+  getViolations,
+  getShifts,
+  getVehicles,
+  getDrivers,
+  getBatches,
+  getPenalties,
+  getAppeals,
+  saveViolations,
+  saveShifts,
+  saveVehicles,
+  saveDrivers,
+  saveBatches,
+  savePenalties,
+  saveAppeals,
 };

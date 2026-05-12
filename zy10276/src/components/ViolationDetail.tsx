@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { X, Clock, AlertCircle, RotateCcw, FileText, Upload } from 'lucide-react';
+import { X, Clock, AlertCircle, RotateCcw, FileText } from 'lucide-react';
 import { ViolationRecord, Penalty, ProcessingHistory } from '../types';
-import { getDriverName, getPenalties, rollbackPenalty, getAppealByViolationId } from '../services/violationService';
+import { getDriverName, getPenalties, getAppealByViolationId } from '../services/violationService';
 import { getHistory } from '../store/storage';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
 import Timeline from './Timeline';

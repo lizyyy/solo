@@ -41,7 +41,7 @@ const Timeline: React.FC<TimelineProps> = ({ histories }) => {
         </div>
       ) : (
         <div className="space-y-0">
-          {sortedHistories.map((history, index) => (
+          {sortedHistories.map((history) => (
             <div key={history.id} className="timeline-item relative pb-6">
               <div className="flex items-start">
                 <div className={`w-8 h-8 rounded-full ${getColor(history.action)} flex items-center justify-center text-white flex-shrink-0 z-10`}>

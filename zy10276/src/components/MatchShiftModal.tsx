@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, AlertTriangle, User, Clock } from 'lucide-react';
 import { Shift, ViolationRecord } from '../types';
-import { getShifts, getVehicles, getViolations, matchShift } from '../services/violationService';
-import { formatDateTime, getDriverName } from '../utils/format';
+import { getShifts, getVehicles, getViolations, matchShift, getDriverName } from '../services/violationService';
+import { formatDateTime } from '../utils/format';
 
 interface MatchShiftModalProps {
   violationId: string;

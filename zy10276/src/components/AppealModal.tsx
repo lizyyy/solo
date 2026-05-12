@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, AlertCircle, Upload, FileText, Plus } from 'lucide-react';
+import { X, AlertCircle, Upload, FileText } from 'lucide-react';
 import { ViolationRecord } from '../types';
 import { submitAppeal } from '../services/violationService';
 import { formatDateTime } from '../utils/format';
