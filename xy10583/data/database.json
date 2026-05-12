@@ -1,0 +1,740 @@
+{
+  "trips": {
+    "4fe3d556-388b-4234-aa73-df2542f3f94c": {
+      "id": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "requestId": "6f878a43-ef90-4e45-af6a-51866b14128d",
+      "employee": {
+        "id": "EMP001",
+        "name": "王经理",
+        "department": "SALES"
+      },
+      "pickup": "北京市朝阳区国贸",
+      "dropoff": "北京市东城区王府井",
+      "distanceKm": 8,
+      "scheduledTime": "2024-01-16T10:00:00Z",
+      "isIntercity": false,
+      "intercityApproval": "无需审批",
+      "status": "已完成",
+      "driver": {
+        "id": "DRV001",
+        "name": "张三"
+      },
+      "actualStartTime": "2026-05-12T11:49:34.592Z",
+      "actualEndTime": "2024-01-16T10:30:00Z",
+      "waitingMinutes": 1,
+      "driverArrivalTime": "2026-05-12T11:49:34.533Z",
+      "fare": {
+        "baseFare": 74,
+        "waitingFee": 0,
+        "intercityFee": 0,
+        "total": 74,
+        "breakdown": {
+          "baseFare": {
+            "amount": 74,
+            "description": "基础车费（50元起步 + 8公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 0,
+            "description": "非跨城行程，无跨城费用"
+          }
+        }
+      },
+      "cancellationFee": 0,
+      "cancelledBy": null,
+      "cancellationReason": null,
+      "createdAt": "2026-05-12T11:49:33.829Z",
+      "updatedAt": "2026-05-12T11:49:34.999Z",
+      "settled": true,
+      "settlementId": "17637d25-152d-41d3-bda1-bb59d76796d7"
+    },
+    "a3cd2c6b-94cc-4160-b07d-c22df275c494": {
+      "id": "a3cd2c6b-94cc-4160-b07d-c22df275c494",
+      "requestId": "61a2cdda-d1f5-44a2-879e-b22c7db93c30",
+      "employee": {
+        "id": "EMP002",
+        "name": "李工程师",
+        "department": "TECH"
+      },
+      "pickup": "北京市海淀区中关村",
+      "dropoff": "北京市朝阳区望京",
+      "distanceKm": 20,
+      "scheduledTime": "2024-01-16T14:00:00Z",
+      "isIntercity": false,
+      "intercityApproval": "无需审批",
+      "status": "已取消",
+      "driver": {
+        "id": "DRV002",
+        "name": "李四"
+      },
+      "actualStartTime": null,
+      "actualEndTime": null,
+      "waitingMinutes": 0,
+      "driverArrivalTime": null,
+      "fare": null,
+      "cancellationFee": 30,
+      "cancelledBy": "员工",
+      "cancellationReason": "会议临时取消",
+      "createdAt": "2026-05-12T11:49:35.081Z",
+      "updatedAt": "2026-05-12T11:49:35.868Z"
+    },
+    "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8": {
+      "id": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "requestId": "f76214fd-b4a2-4ea5-9101-c52d243d2478",
+      "employee": {
+        "id": "EMP003",
+        "name": "赵人事",
+        "department": "HR"
+      },
+      "pickup": "北京市西城区金融街",
+      "dropoff": "北京市朝阳区国贸",
+      "distanceKm": 15,
+      "scheduledTime": "2024-01-16T16:00:00Z",
+      "isIntercity": false,
+      "intercityApproval": "无需审批",
+      "status": "已完成",
+      "driver": {
+        "id": "DRV003",
+        "name": "王五"
+      },
+      "actualStartTime": "2024-01-16T16:45:00Z",
+      "actualEndTime": "2024-01-16T17:15:00Z",
+      "waitingMinutes": -1219384,
+      "driverArrivalTime": "2026-05-12T11:49:37.783Z",
+      "fare": {
+        "baseFare": 95,
+        "waitingFee": 0,
+        "intercityFee": 0,
+        "total": 95,
+        "breakdown": {
+          "baseFare": {
+            "amount": 95,
+            "description": "基础车费（50元起步 + 15公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待-1219384分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 0,
+            "description": "非跨城行程，无跨城费用"
+          }
+        }
+      },
+      "cancellationFee": 0,
+      "cancelledBy": null,
+      "cancellationReason": null,
+      "createdAt": "2026-05-12T11:49:36.567Z",
+      "updatedAt": "2026-05-12T11:49:38.984Z"
+    },
+    "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48": {
+      "id": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "requestId": "045d72b1-f5d9-4abf-ae18-e08529a96168",
+      "employee": {
+        "id": "EMP004",
+        "name": "孙总监",
+        "department": "SALES"
+      },
+      "pickup": "北京市朝阳区国贸",
+      "dropoff": "天津市和平区小白楼",
+      "distanceKm": 120,
+      "scheduledTime": "2024-01-17T08:00:00Z",
+      "isIntercity": true,
+      "intercityApproval": "已批准",
+      "status": "已完成",
+      "driver": {
+        "id": "DRV001",
+        "name": "张三"
+      },
+      "actualStartTime": "2026-05-12T11:49:42.576Z",
+      "actualEndTime": "2024-01-17T11:00:00Z",
+      "waitingMinutes": 1,
+      "driverArrivalTime": "2026-05-12T11:49:42.516Z",
+      "fare": {
+        "baseFare": 410,
+        "waitingFee": 0,
+        "intercityFee": 380,
+        "total": 790,
+        "breakdown": {
+          "baseFare": {
+            "amount": 410,
+            "description": "基础车费（50元起步 + 120公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 380,
+            "description": "跨城费用（高速加价 + 住宿补贴）"
+          }
+        }
+      },
+      "cancellationFee": 0,
+      "cancelledBy": null,
+      "cancellationReason": null,
+      "createdAt": "2026-05-12T11:49:40.311Z",
+      "updatedAt": "2026-05-12T11:49:43.212Z",
+      "settled": true,
+      "settlementId": "fb412e91-2598-4735-9d8b-35985b6506e9"
+    }
+  },
+  "drivers": {
+    "DRV001": {
+      "id": "DRV001",
+      "name": "张三",
+      "phone": "13800138001",
+      "status": "active"
+    },
+    "DRV002": {
+      "id": "DRV002",
+      "name": "李四",
+      "phone": "13800138002",
+      "status": "active"
+    },
+    "DRV003": {
+      "id": "DRV003",
+      "name": "王五",
+      "phone": "13800138003",
+      "status": "active"
+    }
+  },
+  "departments": {
+    "SALES": {
+      "code": "SALES",
+      "name": "销售部",
+      "budget": 50000,
+      "spent": 0,
+      "remaining": 50000
+    },
+    "TECH": {
+      "code": "TECH",
+      "name": "技术部",
+      "budget": 30000,
+      "spent": 0,
+      "remaining": 30000
+    },
+    "HR": {
+      "code": "HR",
+      "name": "人事部",
+      "budget": 20000,
+      "spent": 0,
+      "remaining": 20000
+    },
+    "FINANCE": {
+      "code": "FINANCE",
+      "name": "财务部",
+      "budget": 15000,
+      "spent": 0,
+      "remaining": 15000
+    },
+    "ADMIN": {
+      "code": "ADMIN",
+      "name": "行政部",
+      "budget": 10000,
+      "spent": 0,
+      "remaining": 10000
+    }
+  },
+  "settlements": {
+    "17637d25-152d-41d3-bda1-bb59d76796d7": {
+      "id": "17637d25-152d-41d3-bda1-bb59d76796d7",
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "driver": {
+        "id": "DRV001",
+        "name": "张三"
+      },
+      "department": "SALES",
+      "totalAmount": 74,
+      "driverIncome": 51.8,
+      "companyRevenue": 22.200000000000003,
+      "fareBreakdown": {
+        "baseFare": {
+          "amount": 74,
+          "description": "基础车费（50元起步 + 8公里 × 3元/公里）"
+        },
+        "waitingFee": {
+          "amount": 0,
+          "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+        },
+        "intercityFee": {
+          "amount": 0,
+          "description": "非跨城行程，无跨城费用"
+        }
+      },
+      "operator": "财务",
+      "createdAt": "2026-05-12T11:49:34.999Z"
+    },
+    "fb412e91-2598-4735-9d8b-35985b6506e9": {
+      "id": "fb412e91-2598-4735-9d8b-35985b6506e9",
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "driver": {
+        "id": "DRV001",
+        "name": "张三"
+      },
+      "department": "SALES",
+      "totalAmount": 790,
+      "driverIncome": 553,
+      "companyRevenue": 237,
+      "fareBreakdown": {
+        "baseFare": {
+          "amount": 410,
+          "description": "基础车费（50元起步 + 120公里 × 3元/公里）"
+        },
+        "waitingFee": {
+          "amount": 0,
+          "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+        },
+        "intercityFee": {
+          "amount": 380,
+          "description": "跨城费用（高速加价 + 住宿补贴）"
+        }
+      },
+      "operator": "财务主管",
+      "createdAt": "2026-05-12T11:49:43.212Z"
+    }
+  },
+  "idempotentRequests": {
+    "SAMPLE-NORMAL-001": {
+      "key": "SAMPLE-NORMAL-001",
+      "response": {
+        "id": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+        "requestId": "6f878a43-ef90-4e45-af6a-51866b14128d",
+        "employee": {
+          "id": "EMP001",
+          "name": "王经理",
+          "department": "SALES"
+        },
+        "pickup": "北京市朝阳区国贸",
+        "dropoff": "北京市东城区王府井",
+        "distanceKm": 8,
+        "scheduledTime": "2024-01-16T10:00:00Z",
+        "isIntercity": false,
+        "intercityApproval": "无需审批",
+        "status": "待派单",
+        "driver": null,
+        "actualStartTime": null,
+        "actualEndTime": null,
+        "waitingMinutes": 0,
+        "driverArrivalTime": null,
+        "fare": null,
+        "cancellationFee": 0,
+        "cancelledBy": null,
+        "cancellationReason": null,
+        "createdAt": "2026-05-12T11:49:33.829Z",
+        "updatedAt": "2026-05-12T11:49:33.829Z"
+      },
+      "timestamp": "2026-05-12T11:49:33.831Z"
+    },
+    "SAMPLE-SETTLE-1": {
+      "key": "SAMPLE-SETTLE-1",
+      "response": {
+        "id": "17637d25-152d-41d3-bda1-bb59d76796d7",
+        "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+        "driver": {
+          "id": "DRV001",
+          "name": "张三"
+        },
+        "department": "SALES",
+        "totalAmount": 74,
+        "driverIncome": 51.8,
+        "companyRevenue": 22.200000000000003,
+        "fareBreakdown": {
+          "baseFare": {
+            "amount": 74,
+            "description": "基础车费（50元起步 + 8公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 0,
+            "description": "非跨城行程，无跨城费用"
+          }
+        },
+        "operator": "财务",
+        "createdAt": "2026-05-12T11:49:34.999Z"
+      },
+      "timestamp": "2026-05-12T11:49:35.000Z"
+    },
+    "SAMPLE-CANCEL-001": {
+      "key": "SAMPLE-CANCEL-001",
+      "response": {
+        "id": "a3cd2c6b-94cc-4160-b07d-c22df275c494",
+        "requestId": "61a2cdda-d1f5-44a2-879e-b22c7db93c30",
+        "employee": {
+          "id": "EMP002",
+          "name": "李工程师",
+          "department": "TECH"
+        },
+        "pickup": "北京市海淀区中关村",
+        "dropoff": "北京市朝阳区望京",
+        "distanceKm": 20,
+        "scheduledTime": "2024-01-16T14:00:00Z",
+        "isIntercity": false,
+        "intercityApproval": "无需审批",
+        "status": "待派单",
+        "driver": null,
+        "actualStartTime": null,
+        "actualEndTime": null,
+        "waitingMinutes": 0,
+        "driverArrivalTime": null,
+        "fare": null,
+        "cancellationFee": 0,
+        "cancelledBy": null,
+        "cancellationReason": null,
+        "createdAt": "2026-05-12T11:49:35.081Z",
+        "updatedAt": "2026-05-12T11:49:35.081Z"
+      },
+      "timestamp": "2026-05-12T11:49:35.083Z"
+    },
+    "SAMPLE-WAITING-001": {
+      "key": "SAMPLE-WAITING-001",
+      "response": {
+        "id": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+        "requestId": "f76214fd-b4a2-4ea5-9101-c52d243d2478",
+        "employee": {
+          "id": "EMP003",
+          "name": "赵人事",
+          "department": "HR"
+        },
+        "pickup": "北京市西城区金融街",
+        "dropoff": "北京市朝阳区国贸",
+        "distanceKm": 15,
+        "scheduledTime": "2024-01-16T16:00:00Z",
+        "isIntercity": false,
+        "intercityApproval": "无需审批",
+        "status": "待派单",
+        "driver": null,
+        "actualStartTime": null,
+        "actualEndTime": null,
+        "waitingMinutes": 0,
+        "driverArrivalTime": null,
+        "fare": null,
+        "cancellationFee": 0,
+        "cancelledBy": null,
+        "cancellationReason": null,
+        "createdAt": "2026-05-12T11:49:36.567Z",
+        "updatedAt": "2026-05-12T11:49:36.567Z"
+      },
+      "timestamp": "2026-05-12T11:49:36.574Z"
+    },
+    "SAMPLE-INTERCITY-001": {
+      "key": "SAMPLE-INTERCITY-001",
+      "response": {
+        "id": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+        "requestId": "045d72b1-f5d9-4abf-ae18-e08529a96168",
+        "employee": {
+          "id": "EMP004",
+          "name": "孙总监",
+          "department": "SALES"
+        },
+        "pickup": "北京市朝阳区国贸",
+        "dropoff": "天津市和平区小白楼",
+        "distanceKm": 120,
+        "scheduledTime": "2024-01-17T08:00:00Z",
+        "isIntercity": true,
+        "intercityApproval": "待审批",
+        "status": "待派单",
+        "driver": null,
+        "actualStartTime": null,
+        "actualEndTime": null,
+        "waitingMinutes": 0,
+        "driverArrivalTime": null,
+        "fare": null,
+        "cancellationFee": 0,
+        "cancelledBy": null,
+        "cancellationReason": null,
+        "createdAt": "2026-05-12T11:49:40.311Z",
+        "updatedAt": "2026-05-12T11:49:40.311Z"
+      },
+      "timestamp": "2026-05-12T11:49:40.325Z"
+    },
+    "SAMPLE-SETTLE-5": {
+      "key": "SAMPLE-SETTLE-5",
+      "response": {
+        "id": "fb412e91-2598-4735-9d8b-35985b6506e9",
+        "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+        "driver": {
+          "id": "DRV001",
+          "name": "张三"
+        },
+        "department": "SALES",
+        "totalAmount": 790,
+        "driverIncome": 553,
+        "companyRevenue": 237,
+        "fareBreakdown": {
+          "baseFare": {
+            "amount": 410,
+            "description": "基础车费（50元起步 + 120公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 380,
+            "description": "跨城费用（高速加价 + 住宿补贴）"
+          }
+        },
+        "operator": "财务主管",
+        "createdAt": "2026-05-12T11:49:43.212Z"
+      },
+      "timestamp": "2026-05-12T11:49:43.214Z"
+    }
+  },
+  "historyRecords": [
+    {
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "action": "CREATE",
+      "description": "员工创建用车申请",
+      "details": {
+        "pickup": "北京市朝阳区国贸",
+        "dropoff": "北京市东城区王府井",
+        "distanceKm": 8
+      },
+      "timestamp": "2026-05-12T11:49:33.830Z"
+    },
+    {
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "action": "DISPATCH",
+      "description": "司机 张三 已派单",
+      "details": {
+        "driverId": "DRV001",
+        "driverName": "张三"
+      },
+      "timestamp": "2026-05-12T11:49:34.467Z"
+    },
+    {
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "action": "DRIVER_ARRIVE",
+      "description": "司机已到达上车点",
+      "details": {
+        "arrivalTime": "2026-05-12T11:49:34.533Z"
+      },
+      "timestamp": "2026-05-12T11:49:34.534Z"
+    },
+    {
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "action": "START",
+      "description": "行程开始",
+      "details": {
+        "startTime": "2026-05-12T11:49:34.592Z",
+        "waitingMinutes": 1
+      },
+      "timestamp": "2026-05-12T11:49:34.593Z"
+    },
+    {
+      "tripId": "4fe3d556-388b-4234-aa73-df2542f3f94c",
+      "action": "END",
+      "description": "行程已完成，费用已计算",
+      "details": {
+        "endTime": "2024-01-16T10:30:00Z",
+        "distanceKm": 8,
+        "totalFare": 74,
+        "breakdown": {
+          "baseFare": {
+            "amount": 74,
+            "description": "基础车费（50元起步 + 8公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 0,
+            "description": "非跨城行程，无跨城费用"
+          }
+        }
+      },
+      "timestamp": "2026-05-12T11:49:34.632Z"
+    },
+    {
+      "tripId": "a3cd2c6b-94cc-4160-b07d-c22df275c494",
+      "action": "CREATE",
+      "description": "员工创建用车申请",
+      "details": {
+        "pickup": "北京市海淀区中关村",
+        "dropoff": "北京市朝阳区望京",
+        "distanceKm": 20
+      },
+      "timestamp": "2026-05-12T11:49:35.082Z"
+    },
+    {
+      "tripId": "a3cd2c6b-94cc-4160-b07d-c22df275c494",
+      "action": "DISPATCH",
+      "description": "司机 李四 已派单",
+      "details": {
+        "driverId": "DRV002",
+        "driverName": "李四"
+      },
+      "timestamp": "2026-05-12T11:49:35.765Z"
+    },
+    {
+      "tripId": "a3cd2c6b-94cc-4160-b07d-c22df275c494",
+      "action": "CANCEL",
+      "description": "行程已取消（员工）",
+      "details": {
+        "cancelledBy": "员工",
+        "reason": "会议临时取消",
+        "cancellationFee": 30,
+        "previousStatus": "已取消"
+      },
+      "timestamp": "2026-05-12T11:49:35.869Z"
+    },
+    {
+      "tripId": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "action": "CREATE",
+      "description": "员工创建用车申请",
+      "details": {
+        "pickup": "北京市西城区金融街",
+        "dropoff": "北京市朝阳区国贸",
+        "distanceKm": 15
+      },
+      "timestamp": "2026-05-12T11:49:36.570Z"
+    },
+    {
+      "tripId": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "action": "DISPATCH",
+      "description": "司机 王五 已派单",
+      "details": {
+        "driverId": "DRV003",
+        "driverName": "王五"
+      },
+      "timestamp": "2026-05-12T11:49:37.614Z"
+    },
+    {
+      "tripId": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "action": "DRIVER_ARRIVE",
+      "description": "司机已到达上车点",
+      "details": {
+        "arrivalTime": "2026-05-12T11:49:37.783Z"
+      },
+      "timestamp": "2026-05-12T11:49:37.784Z"
+    },
+    {
+      "tripId": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "action": "START",
+      "description": "行程开始",
+      "details": {
+        "startTime": "2024-01-16T16:45:00Z",
+        "waitingMinutes": -1219384
+      },
+      "timestamp": "2026-05-12T11:49:37.877Z"
+    },
+    {
+      "tripId": "b92d8b5f-f6b0-4ca1-a8cf-1e999ce5e3e8",
+      "action": "END",
+      "description": "行程已完成，费用已计算",
+      "details": {
+        "endTime": "2024-01-16T17:15:00Z",
+        "distanceKm": 15,
+        "totalFare": 95,
+        "breakdown": {
+          "baseFare": {
+            "amount": 95,
+            "description": "基础车费（50元起步 + 15公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待-1219384分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 0,
+            "description": "非跨城行程，无跨城费用"
+          }
+        }
+      },
+      "timestamp": "2026-05-12T11:49:39.019Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "CREATE",
+      "description": "员工创建用车申请",
+      "details": {
+        "pickup": "北京市朝阳区国贸",
+        "dropoff": "天津市和平区小白楼",
+        "distanceKm": 120
+      },
+      "timestamp": "2026-05-12T11:49:40.314Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "APPROVAL_NEEDED",
+      "description": "跨城行程需要审批",
+      "details": {
+        "distanceKm": 120,
+        "threshold": 100
+      },
+      "timestamp": "2026-05-12T11:49:40.319Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "APPROVAL_APPROVED",
+      "description": "跨城审批已通过",
+      "details": {
+        "approved": true
+      },
+      "timestamp": "2026-05-12T11:49:42.292Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "DISPATCH",
+      "description": "司机 张三 已派单",
+      "details": {
+        "driverId": "DRV001",
+        "driverName": "张三"
+      },
+      "timestamp": "2026-05-12T11:49:42.398Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "DRIVER_ARRIVE",
+      "description": "司机已到达上车点",
+      "details": {
+        "arrivalTime": "2026-05-12T11:49:42.516Z"
+      },
+      "timestamp": "2026-05-12T11:49:42.517Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "START",
+      "description": "行程开始",
+      "details": {
+        "startTime": "2026-05-12T11:49:42.576Z",
+        "waitingMinutes": 1
+      },
+      "timestamp": "2026-05-12T11:49:42.577Z"
+    },
+    {
+      "tripId": "7ea8f414-59c8-4c0d-8ee8-5895ab22cc48",
+      "action": "END",
+      "description": "行程已完成，费用已计算",
+      "details": {
+        "endTime": "2024-01-17T11:00:00Z",
+        "distanceKm": 120,
+        "totalFare": 790,
+        "breakdown": {
+          "baseFare": {
+            "amount": 410,
+            "description": "基础车费（50元起步 + 120公里 × 3元/公里）"
+          },
+          "waitingFee": {
+            "amount": 0,
+            "description": "等待费（等待1分钟，免费15分钟，收费0分钟 × 2元/分钟）"
+          },
+          "intercityFee": {
+            "amount": 380,
+            "description": "跨城费用（高速加价 + 住宿补贴）"
+          }
+        }
+      },
+      "timestamp": "2026-05-12T11:49:42.623Z"
+    }
+  ],
+  "corrections": []
+}

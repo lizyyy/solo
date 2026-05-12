@@ -1,0 +1,27 @@
+{
+  "name": "fleet-dispatch-api",
+  "version": "1.0.0",
+  "description": "企业用车调度费用API - 处理等待费、跨城费、取消费、部门分摊和司机结算",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "seed": "node scripts/seed-data.js",
+    "demo": "bash scripts/demo.sh",
+    "demo-failure": "bash scripts/demo-failure.sh"
+  },
+  "keywords": [
+    "fleet",
+    "dispatch",
+    "enterprise",
+    "expense",
+    "calculation"
+  ],
+  "author": "Fleet Management Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.0"
+  }
+}
