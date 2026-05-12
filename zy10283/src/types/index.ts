@@ -7,6 +7,15 @@ export interface Customer {
   createdAt: string;
 }
 
+export interface RepairItem {
+  id: string;
+  name: string;
+  description: string;
+  estimatedPrice: number;
+  actualPrice?: number;
+  completed?: boolean;
+}
+
 export interface JewelryPhoto {
   id: string;
   orderId: string;
@@ -22,6 +31,12 @@ export interface StatusHistory {
   operator: string;
   note?: string;
   createdAt: string;
+}
+
+export interface DuplicateCheckResult {
+  isDuplicate: boolean;
+  reason?: string;
+  existingOrderNo?: string;
 }
 
 export enum RepairStatus {
@@ -63,6 +78,7 @@ export interface RepairOrder {
   customerId: string;
   customerName: string;
   customerPhone: string;
+  customerIdCard?: string;
   jewelryName: string;
   jewelryDescription: string;
   jewelryMaterial?: string;
@@ -86,6 +102,7 @@ export interface RepairOrder {
   note?: string;
   photos: JewelryPhoto[];
   statusHistory: StatusHistory[];
+  repairItems: RepairItem[];
 }
 
 export interface CreateOrderDTO {
@@ -100,6 +117,22 @@ export interface CreateOrderDTO {
   estimatedPickupDate?: string;
   deposit?: number;
   note?: string;
+  repairItems?: RepairItem[];
+}
+
+export interface AddRepairItemDTO {
+  orderId: string;
+  name: string;
+  description: string;
+  estimatedPrice: number;
+}
+
+export interface PickupValidationResult {
+  isValid: boolean;
+  isCustomerMatch: boolean;
+  isIdCardMatch: boolean;
+  warnings: string[];
+  requiresIdCard: boolean;
 }
 
 export interface UpdateOrderDTO {

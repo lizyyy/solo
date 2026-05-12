@@ -4,8 +4,7 @@ import {
   ClipboardList,
   PlusCircle,
   AlertTriangle,
-  Clock,
-  Search
+  Clock
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useRepairStore } from '../store';

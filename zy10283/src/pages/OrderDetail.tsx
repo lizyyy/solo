@@ -6,16 +6,18 @@ import {
   Check,
   Camera,
   Printer,
-  Clock,
   User,
   Phone,
   Gem,
   Scale,
-  DollarSign,
-  Calendar
+  Calendar,
+  Plus,
+  Trash2,
+  AlertTriangle,
+  Shield
 } from 'lucide-react';
 import { useRepairStore } from '../store';
-import { RepairStatus, statusLabels } from '../types';
+import { RepairStatus, statusLabels, RepairItem } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Timeline } from '../components/Timeline';
 import { Modal } from '../components/Modal';
@@ -25,7 +27,20 @@ import { zhCN } from 'date-fns/locale';
 export const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { orders, updateStatus, confirmQuote, pickupOrder, calculateOverdueFee, exportOrderForSignature, currentUser, addPhoto } = useRepairStore();
+  const { 
+    orders, 
+    updateStatus, 
+    confirmQuote, 
+    pickupOrder, 
+    validatePickup,
+    calculateOverdueFee, 
+    exportOrderForSignature, 
+    currentUser, 
+    addPhoto,
+    addRepairItem,
+    updateRepairItem,
+    deleteRepairItem
+  } = useRepairStore();
   const order = orders.find(o => o.id === id);
 
   const [statusModalOpen, setStatusModalOpen] = useState(false);
@@ -39,6 +54,12 @@ export const OrderDetail: React.FC = () => {
     pickerPhone: '',
     pickerIdCard: '',
     paidAmount: 0
+  });
+  const [newItem, setNewItem] = useState<Omit<RepairItem, 'id'>>({
+    name: '',
+    description: '',
+    estimatedPrice: 0,
+    completed: false
   });
 
   if (!order) {
@@ -57,6 +78,7 @@ export const OrderDetail: React.FC = () => {
 
   const overdueFee = calculateOverdueFee(order);
   const totalAmount = (order.finalPrice || order.estimatedPrice || 0) + overdueFee - (order.deposit || 0);
+  const pickupValidation = validatePickup(order.id, pickupData);
 
   const handleUpdateStatus = () => {
     updateStatus(order.id, selectedStatus, statusNote);
@@ -70,6 +92,9 @@ export const OrderDetail: React.FC = () => {
   };
 
   const handlePickup = () => {
+    if (!pickupValidation.isValid && pickupValidation.warnings.length > 0) {
+      if (!confirm('存在验证警告，是否继续取件？')) return;
+    }
     pickupOrder(order.id, pickupData);
     setPickupModalOpen(false);
   };
@@ -92,9 +117,20 @@ export const OrderDetail: React.FC = () => {
     }
   };
 
+  const handleAddRepairItem = () => {
+    if (!newItem.name.trim()) return;
+    addRepairItem(order.id, newItem);
+    setNewItem({ name: '', description: '', estimatedPrice: 0, completed: false });
+  };
+
+  const toggleItemComplete = (itemId: string, completed: boolean) => {
+    updateRepairItem(order.id, itemId, { completed });
+  };
+
   const canEdit = order.status !== RepairStatus.PICKED_UP && order.status !== RepairStatus.CANCELLED;
   const canQuote = canEdit && !order.quoteConfirmedAt;
   const canPickup = order.status === RepairStatus.COMPLETED;
+  const canModifyItems = canEdit && order.status !== RepairStatus.PICKED_UP;
 
   const availableStatuses = [
     RepairStatus.ESTIMATING,
@@ -135,7 +171,7 @@ export const OrderDetail: React.FC = () => {
               {canQuote && (
                 <button
                   onClick={() => {
-                    setQuotePrice(order.estimatedPrice || 0);
+                    setQuotePrice(order.estimatedPrice || order.repairItems.reduce((sum, item) => sum + item.estimatedPrice, 0));
                     setQuoteModalOpen(true);
                   }}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -147,12 +183,12 @@ export const OrderDetail: React.FC = () => {
               {canPickup && (
                 <button
                   onClick={() => {
-                    setPickupData(prev => ({
-                      ...prev,
+                    setPickupData({
                       pickerName: order.customerName,
                       pickerPhone: order.customerPhone,
+                      pickerIdCard: order.customerIdCard || '',
                       paidAmount: Math.max(0, totalAmount)
-                    }));
+                    });
                     setPickupModalOpen(true);
                   }}
                   className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -209,6 +245,15 @@ export const OrderDetail: React.FC = () => {
                   <p className="font-medium text-gray-800">{order.customerPhone}</p>
                 </div>
               </div>
+              {order.customerIdCard && (
+                <div className="flex items-start gap-3 col-span-2">
+                  <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500">身份证号</p>
+                    <p className="font-medium text-gray-800">{order.customerIdCard}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -272,6 +317,89 @@ export const OrderDetail: React.FC = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-6">维修项目</h2>
+            
+            {order.repairItems.length > 0 && (
+              <div className="space-y-3 mb-6">
+                {order.repairItems.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => canModifyItems && toggleItemComplete(item.id, !item.completed)}
+                          className={`p-1 rounded ${canModifyItems ? 'hover:bg-gray-200 cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+                        >
+                          <Check className={`w-4 h-4 ${item.completed ? 'text-green-500' : 'text-gray-300'}`} />
+                        </button>
+                        <span className={`font-medium ${item.completed ? 'text-gray-500 line-through' : 'text-gray-800'}`}>
+                          {item.name}
+                        </span>
+                        <span className="text-sm text-gray-500">- {item.description}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="font-medium text-blue-600">¥{item.estimatedPrice}</span>
+                      {canModifyItems && (
+                        <button
+                          onClick={() => deleteRepairItem(order.id, item.id)}
+                          className="p-1 text-red-500 hover:bg-red-50 rounded"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {canModifyItems && (
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-3">
+                  <input
+                    type="text"
+                    placeholder="项目名称"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                <div className="col-span-6">
+                  <input
+                    type="text"
+                    placeholder="项目描述"
+                    value={newItem.description}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <input
+                    type="number"
+                    placeholder="预估费用"
+                    value={newItem.estimatedPrice || ''}
+                    onChange={(e) => setNewItem(prev => ({ 
+                      ...prev, 
+                      estimatedPrice: parseFloat(e.target.value) || 0 
+                    }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <button
+                    type="button"
+                    onClick={handleAddRepairItem}
+                    disabled={!newItem.name.trim()}
+                    className="w-full flex items-center justify-center p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-6">状态历史</h2>
             <Timeline history={order.statusHistory} />
           </div>
@@ -283,7 +411,7 @@ export const OrderDetail: React.FC = () => {
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">预估费用</span>
-                <span className="font-medium">¥{order.estimatedPrice || '-'}</span>
+                <span className="font-medium">¥{order.estimatedPrice || order.repairItems.reduce((sum, item) => sum + item.estimatedPrice, 0)}</span>
               </div>
               {order.quoteConfirmedAt && (
                 <>
@@ -429,6 +557,23 @@ export const OrderDetail: React.FC = () => {
               )}
             </div>
           )}
+
+          {pickupValidation.warnings.length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-yellow-800">验证警告</p>
+                  <ul className="mt-1 space-y-1">
+                    {pickupValidation.warnings.map((w, i) => (
+                      <li key={i} className="text-xs text-yellow-700">• {w}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-yellow-800">
               <strong>重要提示：</strong>取件前请与客户核对首饰外观、钻石数量，确认无误后再办理取件。
@@ -436,7 +581,7 @@ export const OrderDetail: React.FC = () => {
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">取件人姓名 *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">取件人姓名 <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={pickupData.pickerName}
@@ -446,7 +591,7 @@ export const OrderDetail: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">取件人电话 *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">取件人电话 <span className="text-red-500">*</span></label>
             <input
               type="tel"
               value={pickupData.pickerPhone}
@@ -456,7 +601,10 @@ export const OrderDetail: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">取件人身份证号</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              取件人身份证号
+              {pickupValidation.requiresIdCard && <span className="text-red-500 ml-1">*</span>}
+            </label>
             <input
               type="text"
               value={pickupData.pickerIdCard}
@@ -465,7 +613,7 @@ export const OrderDetail: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">实付金额（元）*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">实付金额（元） <span className="text-red-500">*</span></label>
             <input
               type="number"
               value={pickupData.paidAmount}

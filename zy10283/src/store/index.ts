@@ -7,7 +7,10 @@ import {
   UpdateOrderDTO,
   QuoteConfirmDTO,
   PickupDTO,
-  DashboardStats
+  DashboardStats,
+  RepairItem,
+  DuplicateCheckResult,
+  PickupValidationResult
 } from '../types';
 import { addDays, differenceInDays, isBefore, format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
@@ -28,6 +31,13 @@ interface RepairStore {
   pickupOrder: (orderId: string, data: PickupDTO) => void;
   addPhoto: (orderId: string, url: string, description: string) => void;
   
+  addRepairItem: (orderId: string, item: Omit<RepairItem, 'id'>) => void;
+  updateRepairItem: (orderId: string, itemId: string, updates: Partial<RepairItem>) => void;
+  deleteRepairItem: (orderId: string, itemId: string) => void;
+  
+  checkDuplicate: (data: CreateOrderDTO) => DuplicateCheckResult;
+  validatePickup: (orderId: string, data: PickupDTO) => PickupValidationResult;
+  
   getOrdersByStatus: (status: RepairStatus) => RepairOrder[];
   searchOrders: (keyword: string) => RepairOrder[];
   getOverdueOrders: () => RepairOrder[];
@@ -35,6 +45,7 @@ interface RepairStore {
   getDashboardStats: () => DashboardStats;
   
   calculateOverdueFee: (order: RepairOrder) => number;
+  calculateTotalEstimatedPrice: (order: RepairOrder) => number;
   exportOrderForSignature: (order: RepairOrder) => string;
 }
 
@@ -103,6 +114,22 @@ const initialOrders: RepairOrder[] = [
         note: '开始维修',
         createdAt: new Date().toISOString()
       }
+    ],
+    repairItems: [
+      {
+        id: generateId(),
+        name: '戒托翻新',
+        description: '抛光翻新，去除划痕',
+        estimatedPrice: 200,
+        completed: true
+      },
+      {
+        id: generateId(),
+        name: '钻石加固',
+        description: '检查并加固8颗副钻',
+        estimatedPrice: 300,
+        completed: false
+      }
     ]
   },
   {
@@ -136,6 +163,22 @@ const initialOrders: RepairOrder[] = [
         operator: '李店员',
         createdAt: new Date().toISOString()
       }
+    ],
+    repairItems: [
+      {
+        id: generateId(),
+        name: '焊接修复',
+        description: '项链断裂处激光焊接',
+        estimatedPrice: 150,
+        completed: false
+      },
+      {
+        id: generateId(),
+        name: '整体抛光',
+        description: '整条项链抛光翻新',
+        estimatedPrice: 50,
+        completed: false
+      }
     ]
   }
 ];
@@ -146,6 +189,97 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   currentUser: '李店员',
   selectedOrder: null,
 
+  checkDuplicate: (data) => {
+    const { orders } = get();
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    
+    const recentOrders = orders.filter(o => {
+      const registeredAt = new Date(o.registeredAt);
+      return registeredAt >= oneHourAgo && o.status !== RepairStatus.CANCELLED;
+    });
+    
+    const phoneMatch = recentOrders.find(o => o.customerPhone === data.customerPhone);
+    if (phoneMatch) {
+      const jewelrySimilar = 
+        phoneMatch.jewelryName === data.jewelryName ||
+        phoneMatch.jewelryDescription === data.jewelryDescription;
+      
+      if (jewelrySimilar) {
+        return {
+          isDuplicate: true,
+          reason: '同一客户1小时内已登记过相同首饰，请确认是否重复录入',
+          existingOrderNo: phoneMatch.orderNo
+        };
+      }
+    }
+    
+    const exactMatch = recentOrders.find(o => 
+      o.customerName === data.customerName &&
+      o.customerPhone === data.customerPhone &&
+      o.jewelryName === data.jewelryName &&
+      o.jewelryDescription === data.jewelryDescription
+    );
+    
+    if (exactMatch) {
+      return {
+        isDuplicate: true,
+        reason: '存在完全相同的寄存记录，请确认是否重复提交',
+        existingOrderNo: exactMatch.orderNo
+      };
+    }
+    
+    return { isDuplicate: false };
+  },
+
+  validatePickup: (orderId, data) => {
+    const { orders } = get();
+    const order = orders.find(o => o.id === orderId);
+    if (!order) {
+      return {
+        isValid: false,
+        isCustomerMatch: false,
+        isIdCardMatch: false,
+        warnings: ['订单不存在'],
+        requiresIdCard: false
+      };
+    }
+
+    const warnings: string[] = [];
+    const isCustomerMatch = 
+      data.pickerName === order.customerName && 
+      data.pickerPhone === order.customerPhone;
+    
+    const isIdCardMatch = 
+      !order.customerIdCard || 
+      !data.pickerIdCard || 
+      data.pickerIdCard === order.customerIdCard;
+    
+    const totalAmount = (order.finalPrice || order.estimatedPrice || 0) + 
+      get().calculateOverdueFee(order) - (order.deposit || 0);
+    const requiresIdCard = totalAmount > 5000;
+
+    if (!isCustomerMatch) {
+      warnings.push('取件人信息与登记客户信息不一致，请核实身份');
+    }
+    
+    if (order.customerIdCard && data.pickerIdCard && !isIdCardMatch) {
+      warnings.push('身份证号码与登记信息不一致');
+    }
+    
+    if (requiresIdCard && !data.pickerIdCard) {
+      warnings.push('贵重物品取件需出示身份证登记');
+    }
+
+    return {
+      isValid: isCustomerMatch && isIdCardMatch && (!requiresIdCard || !!data.pickerIdCard),
+      isCustomerMatch,
+      isIdCardMatch,
+      warnings,
+      requiresIdCard
+    };
+  },
+
   addOrder: (data) => {
     const order: RepairOrder = {
       id: generateId(),
@@ -153,6 +287,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
       customerId: generateId(),
       customerName: data.customerName,
       customerPhone: data.customerPhone,
+      customerIdCard: data.customerIdCard,
       jewelryName: data.jewelryName,
       jewelryDescription: data.jewelryDescription,
       jewelryMaterial: data.jewelryMaterial,
@@ -173,10 +308,53 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
           operator: get().currentUser,
           createdAt: new Date().toISOString()
         }
-      ]
+      ],
+      repairItems: data.repairItems || []
     };
     set((state) => ({ orders: [...state.orders, order] }));
     return order;
+  },
+
+  addRepairItem: (orderId, item) => {
+    set((state) => ({
+      orders: state.orders.map((order) => {
+        if (order.id !== orderId) return order;
+        return {
+          ...order,
+          repairItems: [...order.repairItems, { ...item, id: generateId() }]
+        };
+      })
+    }));
+  },
+
+  updateRepairItem: (orderId, itemId, updates) => {
+    set((state) => ({
+      orders: state.orders.map((order) => {
+        if (order.id !== orderId) return order;
+        return {
+          ...order,
+          repairItems: order.repairItems.map((item) =>
+            item.id === itemId ? { ...item, ...updates } : item
+          )
+        };
+      })
+    }));
+  },
+
+  deleteRepairItem: (orderId, itemId) => {
+    set((state) => ({
+      orders: state.orders.map((order) => {
+        if (order.id !== orderId) return order;
+        return {
+          ...order,
+          repairItems: order.repairItems.filter((item) => item.id !== itemId)
+        };
+      })
+    }));
+  },
+
+  calculateTotalEstimatedPrice: (order) => {
+    return order.repairItems.reduce((sum, item) => sum + item.estimatedPrice, 0);
   },
 
   updateOrder: (orderId, data) => {
@@ -255,11 +433,11 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   },
 
   pickupOrder: (orderId, data) => {
-    const { orders } = get();
+    const { orders, calculateOverdueFee } = get();
     const order = orders.find((o) => o.id === orderId);
     if (!order) return;
 
-    const overdueFee = get().calculateOverdueFee(order);
+    const overdueFee = calculateOverdueFee(order);
 
     set((state) => ({
       orders: state.orders.map((o) => {
@@ -336,7 +514,6 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
     return get().orders.filter(
       (order) =>
         order.status === RepairStatus.REPAIRING &&
-        order.status !== RepairStatus.QUOTE_CONFIRMED &&
         !order.quoteConfirmedAt
     );
   },
@@ -382,6 +559,12 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   exportOrderForSignature: (order) => {
     const totalAmount = (order.finalPrice || 0) + (order.overdueFee || 0) - (order.deposit || 0);
     
+    const repairItemsText = order.repairItems.length > 0
+      ? order.repairItems.map((item, i) => 
+          `  ${i + 1}. ${item.name}：${item.description}（${item.estimatedPrice}元）`
+        ).join('\n')
+      : '  无';
+    
     return `
 珠宝维修取件确认单
 ==================
@@ -394,6 +577,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 --------
 姓名：${order.customerName}
 电话：${order.customerPhone}
+身份证号：${order.customerIdCard || '未登记'}
 
 首饰信息
 --------
@@ -402,6 +586,10 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 材质：${order.jewelryMaterial || '-'}
 钻石数量：${order.diamondCount || 0}颗
 重量：${order.weight || '-'}g
+
+维修项目
+--------
+${repairItemsText}
 
 费用明细
 --------
@@ -417,7 +605,7 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
 客户确认签字：__________________
 日期：__________________
 
-备注：本人确认首饰已核对无误，钻石数量与登记时一致，首饰外观无异议。
+备注：本人确认首饰已核对无误，钻石数量与登记时一致，首饰外观无异议。取件人已核实身份信息。
     `.trim();
   }
 }));
