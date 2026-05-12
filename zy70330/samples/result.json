@@ -1,0 +1,239 @@
+{
+  "timestamp": "2026-05-12T15:36:47.291Z",
+  "configVersion": "1.0.0",
+  "totalOrders": 8,
+  "totalAmount": 14100,
+  "totalRefundAmount": 5800,
+  "oldSettlementSummary": {
+    "ruleVersions": [
+      "v1.0.0",
+      "v1.1.0"
+    ],
+    "platformTotal": 453,
+    "merchantTotal": 5734,
+    "talentTotal": 1286,
+    "serviceProviderTotal": 460,
+    "grandTotal": 7933,
+    "ordersCount": 8,
+    "anomalyCount": 2
+  },
+  "newSettlementSummary": {
+    "ruleVersions": [
+      "v2.0.0"
+    ],
+    "platformTotal": 332,
+    "merchantTotal": 5976,
+    "talentTotal": 1167,
+    "serviceProviderTotal": 420,
+    "grandTotal": 7895,
+    "ordersCount": 8,
+    "anomalyCount": 2
+  },
+  "differences": [
+    {
+      "orderId": "ORD001",
+      "orderAmount": 1000,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.0.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -10,
+      "merchantDiff": 20,
+      "talentDiff": -10,
+      "serviceProviderDiff": 0,
+      "totalDiff": 0,
+      "diffPercentage": 0,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    },
+    {
+      "orderId": "ORD002",
+      "orderAmount": 2500,
+      "refundAmount": 800,
+      "oldRuleVersion": "v1.0.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -17,
+      "merchantDiff": 34,
+      "talentDiff": -17,
+      "serviceProviderDiff": 0,
+      "totalDiff": 0,
+      "diffPercentage": 0,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    },
+    {
+      "orderId": "ORD003",
+      "orderAmount": 800,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.1.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -16,
+      "merchantDiff": 32,
+      "talentDiff": -16,
+      "serviceProviderDiff": -20,
+      "totalDiff": -20,
+      "diffPercentage": -2.5,
+      "hasGuaranteeChange": true,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    },
+    {
+      "orderId": "ORD004",
+      "orderAmount": 1500,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.0.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -15,
+      "merchantDiff": 30,
+      "talentDiff": 0,
+      "serviceProviderDiff": 0,
+      "totalDiff": 15,
+      "diffPercentage": 1,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": [
+        {
+          "type": "missing_talent",
+          "severity": "warning",
+          "message": "订单 ORD004 缺少达人信息，达人分润金额将归属平台或商家",
+          "affectedParties": [
+            "T999"
+          ]
+        },
+        {
+          "type": "missing_talent",
+          "severity": "warning",
+          "message": "订单 ORD004 缺少达人信息，达人分润金额将归属平台或商家",
+          "affectedParties": [
+            "T999"
+          ]
+        }
+      ]
+    },
+    {
+      "orderId": "ORD005",
+      "orderAmount": 300,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.0.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -3,
+      "merchantDiff": 6,
+      "talentDiff": -20,
+      "serviceProviderDiff": -10,
+      "totalDiff": -27,
+      "diffPercentage": -9,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    },
+    {
+      "orderId": "ORD006",
+      "orderAmount": 1200,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.1.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -24,
+      "merchantDiff": 47.999999999999886,
+      "talentDiff": 0,
+      "serviceProviderDiff": 0,
+      "totalDiff": 23.999999999999886,
+      "diffPercentage": 1.9999999999999907,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": [
+        {
+          "type": "missing_service_provider",
+          "severity": "warning",
+          "message": "订单 ORD006 缺少服务商信息，服务商分润金额将归属平台或商家",
+          "affectedParties": [
+            "SP999"
+          ]
+        },
+        {
+          "type": "missing_service_provider",
+          "severity": "warning",
+          "message": "订单 ORD006 缺少服务商信息，服务商分润金额将归属平台或商家",
+          "affectedParties": [
+            "SP999"
+          ]
+        }
+      ]
+    },
+    {
+      "orderId": "ORD007",
+      "orderAmount": 5000,
+      "refundAmount": 5000,
+      "oldRuleVersion": "v1.0.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": 0,
+      "merchantDiff": 0,
+      "talentDiff": -20,
+      "serviceProviderDiff": -10,
+      "totalDiff": -30,
+      "diffPercentage": 0,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    },
+    {
+      "orderId": "ORD008",
+      "orderAmount": 1800,
+      "refundAmount": 0,
+      "oldRuleVersion": "v1.1.0",
+      "newRuleVersion": "v2.0.0",
+      "platformDiff": -36,
+      "merchantDiff": 72,
+      "talentDiff": -36,
+      "serviceProviderDiff": 0,
+      "totalDiff": 0,
+      "diffPercentage": 0,
+      "hasGuaranteeChange": false,
+      "hasRuleVersionChange": true,
+      "anomalies": []
+    }
+  ],
+  "anomalies": [
+    {
+      "type": "duplicate_order",
+      "severity": "warning",
+      "message": "订单 ORD001 重复导入，仅保留首次导入的数据",
+      "affectedParties": [
+        "M001"
+      ]
+    },
+    {
+      "type": "missing_talent",
+      "severity": "warning",
+      "message": "订单 ORD004 缺少达人信息，达人分润金额将归属平台或商家",
+      "affectedParties": [
+        "T999"
+      ]
+    },
+    {
+      "type": "missing_service_provider",
+      "severity": "warning",
+      "message": "订单 ORD006 缺少服务商信息，服务商分润金额将归属平台或商家",
+      "affectedParties": [
+        "SP999"
+      ]
+    },
+    {
+      "type": "missing_talent",
+      "severity": "warning",
+      "message": "订单 ORD004 缺少达人信息，达人分润金额将归属平台或商家",
+      "affectedParties": [
+        "T999"
+      ]
+    },
+    {
+      "type": "missing_service_provider",
+      "severity": "warning",
+      "message": "订单 ORD006 缺少服务商信息，服务商分润金额将归属平台或商家",
+      "affectedParties": [
+        "SP999"
+      ]
+    }
+  ],
+  "cannotSettleOrders": []
+}

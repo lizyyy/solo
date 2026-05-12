@@ -1,0 +1,52 @@
+{
+  "oldRules": [
+    {
+      "version": "v1.0.0",
+      "effectiveStartDate": "2024-01-01T00:00:00.000Z",
+      "effectiveEndDate": "2024-06-30T23:59:59.999Z",
+      "description": "2024年上半年规则",
+      "platformFeeRate": 0.05,
+      "merchantSplitRate": 0.70,
+      "talentCommissionRate": 0.20,
+      "serviceProviderSplitRate": 0.05,
+      "talentMinimumGuarantee": 100,
+      "serviceProviderMinimumGuarantee": 50,
+      "settlementCycle": "daily",
+      "refundDeductionPolicy": "proportionate"
+    },
+    {
+      "version": "v1.1.0",
+      "effectiveStartDate": "2024-07-01T00:00:00.000Z",
+      "effectiveEndDate": "2024-12-31T23:59:59.999Z",
+      "description": "2024年下半年规则",
+      "platformFeeRate": 0.06,
+      "merchantSplitRate": 0.68,
+      "talentCommissionRate": 0.21,
+      "serviceProviderSplitRate": 0.05,
+      "talentMinimumGuarantee": 120,
+      "serviceProviderMinimumGuarantee": 60,
+      "settlementCycle": "daily",
+      "refundDeductionPolicy": "proportionate"
+    }
+  ],
+  "newRules": [
+    {
+      "version": "v2.0.0",
+      "effectiveStartDate": "2024-01-01T00:00:00.000Z",
+      "effectiveEndDate": "2024-12-31T23:59:59.999Z",
+      "description": "2024年新统一规则",
+      "platformFeeRate": 0.04,
+      "merchantSplitRate": 0.72,
+      "talentCommissionRate": 0.19,
+      "serviceProviderSplitRate": 0.05,
+      "talentMinimumGuarantee": 80,
+      "serviceProviderMinimumGuarantee": 40,
+      "settlementCycle": "daily",
+      "refundDeductionPolicy": "proportionate"
+    }
+  ],
+  "defaultPartyIds": {
+    "platform": "P001",
+    "defaultServiceProvider": "SP001"
+  }
+}

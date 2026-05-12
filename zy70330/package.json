@@ -1,0 +1,25 @@
+{
+  "name": "settlement-rule-simulator",
+  "version": "1.0.0",
+  "description": "分账规则模拟 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "srs": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "test": "node dist/cli.js diff --config=./samples/config.json --orders=./samples/orders.json --refunds=./samples/refunds.json --parties=./samples/parties.json"
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.5",
+    "@types/json2csv": "^5.0.7"
+  }
+}

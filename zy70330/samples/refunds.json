@@ -1,0 +1,26 @@
+[
+  {
+    "id": "REF001",
+    "orderId": "ORD002",
+    "refundAmount": 500,
+    "refundDate": "2024-04-25T10:00:00.000Z",
+    "refundType": "partial",
+    "refundReason": "客户收到后发现有瑕疵，申请部分退款"
+  },
+  {
+    "id": "REF002",
+    "orderId": "ORD007",
+    "refundAmount": 5000,
+    "refundDate": "2024-06-05T14:00:00.000Z",
+    "refundType": "full",
+    "refundReason": "客户改变主意，全额退款"
+  },
+  {
+    "id": "REF003",
+    "orderId": "ORD002",
+    "refundAmount": 300,
+    "refundDate": "2024-04-30T09:00:00.000Z",
+    "refundType": "partial",
+    "refundReason": "配件缺失，再次申请部分退款"
+  }
+]

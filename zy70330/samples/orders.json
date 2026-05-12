@@ -1,0 +1,117 @@
+[
+  {
+    "id": "ORD001",
+    "merchantId": "M001",
+    "talentId": "T001",
+    "serviceProviderId": "SP001",
+    "amount": 1000,
+    "orderDate": "2024-03-15T10:00:00.000Z",
+    "settlementDate": "2024-03-16T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "正常订单 - 春夏新款连衣裙"
+    }
+  },
+  {
+    "id": "ORD002",
+    "merchantId": "M002",
+    "talentId": "T002",
+    "serviceProviderId": "SP002",
+    "amount": 2500,
+    "orderDate": "2024-04-20T14:30:00.000Z",
+    "settlementDate": "2024-04-21T00:00:00.000Z",
+    "status": "partial_refund",
+    "metadata": {
+      "description": "部分退款订单 - 高端智能手机"
+    }
+  },
+  {
+    "id": "ORD003",
+    "merchantId": "M003",
+    "talentId": "T003",
+    "serviceProviderId": "SP001",
+    "amount": 800,
+    "orderDate": "2024-07-10T09:00:00.000Z",
+    "settlementDate": "2024-07-11T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "下半年规则订单 - 护肤品套装"
+    }
+  },
+  {
+    "id": "ORD004",
+    "merchantId": "M001",
+    "talentId": "T999",
+    "serviceProviderId": "SP001",
+    "amount": 1500,
+    "orderDate": "2024-05-05T11:00:00.000Z",
+    "settlementDate": "2024-05-06T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "达人缺失订单 - 达人ID不存在"
+    }
+  },
+  {
+    "id": "ORD005",
+    "merchantId": "M002",
+    "talentId": "T002",
+    "serviceProviderId": "SP002",
+    "amount": 300,
+    "orderDate": "2024-02-15T16:00:00.000Z",
+    "settlementDate": "2024-02-16T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "小额订单 - 触发达人保底"
+    }
+  },
+  {
+    "id": "ORD006",
+    "merchantId": "M003",
+    "serviceProviderId": "SP999",
+    "amount": 1200,
+    "orderDate": "2024-08-20T13:00:00.000Z",
+    "settlementDate": "2024-08-21T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "服务商缺失订单 - 无达人"
+    }
+  },
+  {
+    "id": "ORD007",
+    "merchantId": "M001",
+    "talentId": "T001",
+    "serviceProviderId": "SP001",
+    "amount": 5000,
+    "orderDate": "2024-06-01T10:00:00.000Z",
+    "settlementDate": "2024-06-02T00:00:00.000Z",
+    "status": "refunded",
+    "metadata": {
+      "description": "全额退款订单 - 高端定制礼服"
+    }
+  },
+  {
+    "id": "ORD008",
+    "merchantId": "M002",
+    "talentId": "T002",
+    "amount": 1800,
+    "orderDate": "2024-09-10T15:00:00.000Z",
+    "settlementDate": "2024-09-11T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "使用默认服务商订单"
+    }
+  },
+  {
+    "id": "ORD001",
+    "merchantId": "M001",
+    "talentId": "T001",
+    "serviceProviderId": "SP001",
+    "amount": 1000,
+    "orderDate": "2024-03-15T10:00:00.000Z",
+    "settlementDate": "2024-03-16T00:00:00.000Z",
+    "status": "completed",
+    "metadata": {
+      "description": "重复订单 - 用于测试重复导入"
+    }
+  }
+]
