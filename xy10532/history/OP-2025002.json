@@ -1,0 +1,183 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 李四 - 急性胃肠炎",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 2,
+      "invoiceTotal": 580
+    },
+    "id": "h_1778564068705",
+    "timestamp": "2026-05-12T05:34:28.705Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 2,
+      "warningCount": 0
+    },
+    "id": "h_1778564072936",
+    "timestamp": "2026-05-12T05:34:32.936Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 李四 - 急性胃肠炎",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 2,
+      "invoiceTotal": 580
+    },
+    "id": "h_1778564626647",
+    "timestamp": "2026-05-12T05:43:46.647Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 0
+    },
+    "id": "h_1778564633085",
+    "timestamp": "2026-05-12T05:43:53.085Z"
+  },
+  {
+    "action": "CORRECT",
+    "actor": "理赔专员-李丽",
+    "description": "人工修正案件材料",
+    "before": {
+      "id": "OP-2025002",
+      "claimType": "outpatient",
+      "claimant": {
+        "name": "李四",
+        "idCard": "110101199002022345",
+        "phone": "13800138002"
+      },
+      "policy": {
+        "policyNumber": "POL-2025-002",
+        "insuredAmount": 10000,
+        "insurer": "中国人寿"
+      },
+      "accidentDate": "2025-05-09",
+      "accidentLocation": "北京市海淀区",
+      "diagnosis": "急性胃肠炎",
+      "materials": [
+        {
+          "id": "M005",
+          "name": "门诊发票_0012346.pdf",
+          "type": "OUTPATIENT_INVOICE",
+          "source": "hospital",
+          "invoiceNumber": "INV-OP-2025-0012346",
+          "amount": 580,
+          "uploadDate": "2025-05-10",
+          "uploadedBy": "hospital_system"
+        },
+        {
+          "id": "M006",
+          "name": "门诊费用清单_0012346.pdf",
+          "type": "OUTPATIENT_LIST",
+          "source": "hospital",
+          "invoiceNumber": "INV-OP-2025-0012346",
+          "amount": 580,
+          "uploadDate": "2025-05-10",
+          "uploadedBy": "hospital_system"
+        }
+      ],
+      "invoiceTotal": 580,
+      "expectedReimbursement": 464,
+      "status": "NEEDS_SUPPLEMENT",
+      "createdAt": "2025-05-10T14:30:00.000Z",
+      "importedAt": "2026-05-12T05:43:46.647Z",
+      "lastCheck": {
+        "valid": false,
+        "errors": [
+          {
+            "level": "ERROR",
+            "category": "MISSING_MATERIAL",
+            "type": "DIAGNOSIS_CERTIFICATE",
+            "name": "诊断证明书",
+            "required": true,
+            "message": "缺少必需材料: 诊断证明书 (DIAGNOSIS_CERTIFICATE)"
+          }
+        ],
+        "warnings": [],
+        "issues": [
+          {
+            "level": "ERROR",
+            "category": "MISSING_MATERIAL",
+            "type": "DIAGNOSIS_CERTIFICATE",
+            "name": "诊断证明书",
+            "required": true,
+            "message": "缺少必需材料: 诊断证明书 (DIAGNOSIS_CERTIFICATE)"
+          }
+        ],
+        "status": "NEEDS_SUPPLEMENT",
+        "claimTypeName": "门诊理赔",
+        "rulesApplied": {
+          "claimType": "outpatient",
+          "tolerance": 0.01,
+          "checkedAt": "2026-05-12T05:43:53.085Z"
+        },
+        "checkedAt": "2026-05-12T05:43:53.085Z",
+        "checkCount": 1
+      },
+      "previousStatus": "IMPORTED"
+    },
+    "after": {
+      "status": "CORRECTED",
+      "materialCount": 3,
+      "corrections": 1
+    },
+    "diffs": [
+      {
+        "field": "materials",
+        "operation": "ADD",
+        "before": null,
+        "after": {
+          "id": "M_1778564689799",
+          "name": "诊断证明书_李四.pdf",
+          "type": "DIAGNOSIS_CERTIFICATE",
+          "source": "hospital",
+          "uploadDate": "2026-05-12",
+          "uploadedBy": "理赔专员-李丽"
+        }
+      }
+    ],
+    "id": "h_1778564689800",
+    "timestamp": "2026-05-12T05:44:49.800Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 通过",
+    "idempotent": false,
+    "before": {
+      "status": "CORRECTED",
+      "valid": false
+    },
+    "after": {
+      "status": "ACCEPTABLE",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "id": "h_1778564689801",
+    "timestamp": "2026-05-12T05:44:49.801Z"
+  }
+]

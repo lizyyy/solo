@@ -1,0 +1,92 @@
+{
+  "id": "OP-2025003",
+  "claimType": "outpatient",
+  "claimant": {
+    "name": "王五",
+    "idCard": "110101199003033456",
+    "phone": "13800138003"
+  },
+  "policy": {
+    "policyNumber": "POL-2025-003",
+    "insuredAmount": 10000,
+    "insurer": "太平洋保险"
+  },
+  "accidentDate": "2025-05-08",
+  "accidentLocation": "北京市西城区",
+  "diagnosis": "牙周炎",
+  "materials": [
+    {
+      "id": "M007",
+      "name": "诊断证明书.pdf",
+      "type": "DIAGNOSIS_CERTIFICATE",
+      "source": "hospital",
+      "uploadDate": "2025-05-09",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M008",
+      "name": "门诊发票_0012347.pdf",
+      "type": "OUTPATIENT_INVOICE",
+      "source": "hospital",
+      "invoiceNumber": "INV-OP-2025-0012347",
+      "amount": 1250,
+      "uploadDate": "2025-05-09",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M009",
+      "name": "门诊费用清单_0012347.pdf",
+      "type": "OUTPATIENT_LIST",
+      "source": "hospital",
+      "invoiceNumber": "INV-OP-2025-0012347",
+      "amount": 1150,
+      "uploadDate": "2025-05-09",
+      "uploadedBy": "hospital_system"
+    }
+  ],
+  "invoiceTotal": 1250,
+  "expectedReimbursement": 1000,
+  "status": "AMOUNT_ISSUE",
+  "createdAt": "2025-05-09T11:20:00.000Z",
+  "importedAt": "2026-05-12T05:43:46.647Z",
+  "lastCheck": {
+    "valid": false,
+    "errors": [
+      {
+        "level": "ERROR",
+        "category": "AMOUNT_INCONSISTENCY",
+        "invoiceId": "M008",
+        "invoiceNumber": "INV-OP-2025-0012347",
+        "invoiceAmount": 1250,
+        "listId": "M009",
+        "listAmount": 1150,
+        "difference": 100,
+        "message": "发票金额 ¥1250.00 与费用清单金额 ¥1150.00 不一致，差额 ¥100.00"
+      }
+    ],
+    "warnings": [],
+    "issues": [
+      {
+        "level": "ERROR",
+        "category": "AMOUNT_INCONSISTENCY",
+        "invoiceId": "M008",
+        "invoiceNumber": "INV-OP-2025-0012347",
+        "invoiceAmount": 1250,
+        "listId": "M009",
+        "listAmount": 1150,
+        "difference": 100,
+        "message": "发票金额 ¥1250.00 与费用清单金额 ¥1150.00 不一致，差额 ¥100.00"
+      }
+    ],
+    "status": "AMOUNT_ISSUE",
+    "claimTypeName": "门诊理赔",
+    "rulesApplied": {
+      "claimType": "outpatient",
+      "tolerance": 0.01,
+      "checkedAt": "2026-05-12T05:43:53.085Z"
+    },
+    "checkedAt": "2026-05-12T05:43:53.085Z",
+    "checkCount": 1
+  },
+  "previousStatus": "IMPORTED"
+}

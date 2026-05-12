@@ -1,0 +1,60 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 周八 - 右锁骨骨折、多处软组织挫伤",
+    "before": null,
+    "after": {
+      "claimType": "traffic_accident",
+      "materialCount": 6,
+      "invoiceTotal": 8500
+    },
+    "id": "h_1778564068706",
+    "timestamp": "2026-05-12T05:34:28.706Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 0
+    },
+    "id": "h_1778564072937",
+    "timestamp": "2026-05-12T05:34:32.937Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 周八 - 右锁骨骨折、多处软组织挫伤",
+    "before": null,
+    "after": {
+      "claimType": "traffic_accident",
+      "materialCount": 6,
+      "invoiceTotal": 8500
+    },
+    "id": "h_1778564626650",
+    "timestamp": "2026-05-12T05:43:46.650Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 通过",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "ACCEPTABLE",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "id": "h_1778564633086",
+    "timestamp": "2026-05-12T05:43:53.086Z"
+  }
+]

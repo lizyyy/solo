@@ -1,0 +1,60 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 王五 - 牙周炎",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 3,
+      "invoiceTotal": 1250
+    },
+    "id": "h_1778564068705",
+    "timestamp": "2026-05-12T05:34:28.705Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "AMOUNT_ISSUE",
+      "valid": false,
+      "errorCount": 2,
+      "warningCount": 0
+    },
+    "id": "h_1778564072937",
+    "timestamp": "2026-05-12T05:34:32.937Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 王五 - 牙周炎",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 3,
+      "invoiceTotal": 1250
+    },
+    "id": "h_1778564626648",
+    "timestamp": "2026-05-12T05:43:46.648Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "AMOUNT_ISSUE",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 0
+    },
+    "id": "h_1778564633086",
+    "timestamp": "2026-05-12T05:43:53.086Z"
+  }
+]

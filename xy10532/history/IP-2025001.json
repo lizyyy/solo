@@ -1,0 +1,60 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 赵六 - 急性阑尾炎",
+    "before": null,
+    "after": {
+      "claimType": "inpatient",
+      "materialCount": 4,
+      "invoiceTotal": 12800
+    },
+    "id": "h_1778564068705",
+    "timestamp": "2026-05-12T05:34:28.705Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 0
+    },
+    "id": "h_1778564072934",
+    "timestamp": "2026-05-12T05:34:32.934Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 赵六 - 急性阑尾炎",
+    "before": null,
+    "after": {
+      "claimType": "inpatient",
+      "materialCount": 4,
+      "invoiceTotal": 12800
+    },
+    "id": "h_1778564626649",
+    "timestamp": "2026-05-12T05:43:46.649Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 通过",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "ACCEPTABLE",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "id": "h_1778564633084",
+    "timestamp": "2026-05-12T05:43:53.084Z"
+  }
+]

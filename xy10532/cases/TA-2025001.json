@@ -1,0 +1,94 @@
+{
+  "id": "TA-2025001",
+  "claimType": "traffic_accident",
+  "claimant": {
+    "name": "周八",
+    "idCard": "110101199006066789",
+    "phone": "13800138006"
+  },
+  "policy": {
+    "policyNumber": "POL-2025-006",
+    "insuredAmount": 200000,
+    "insurer": "人保财险"
+  },
+  "accidentDate": "2025-05-05",
+  "accidentLocation": "江苏省南京市鼓楼区中山路",
+  "accidentNumber": "NJ-2025-0505-001",
+  "vehicleNumber": "苏A-12345",
+  "diagnosis": "右锁骨骨折、多处软组织挫伤",
+  "materials": [
+    {
+      "id": "M019",
+      "name": "交通事故认定书.pdf",
+      "type": "TRAFFIC_ACCIDENT_RECOGNITION",
+      "source": "police",
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "traffic_police"
+    },
+    {
+      "id": "M020",
+      "name": "诊断证明书.pdf",
+      "type": "DIAGNOSIS_CERTIFICATE",
+      "source": "hospital",
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M021",
+      "name": "门诊病历.pdf",
+      "type": "MEDICAL_RECORD",
+      "source": "hospital",
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M022",
+      "name": "身份证_周八.pdf",
+      "type": "IDENTITY_CARD",
+      "source": "customer",
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "周八"
+    },
+    {
+      "id": "M023",
+      "name": "医疗发票_0089012.pdf",
+      "type": "MEDICAL_INVOICE",
+      "source": "hospital",
+      "invoiceNumber": "INV-MED-2025-0089012",
+      "amount": 8500,
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M024",
+      "name": "医疗费用清单_0089012.pdf",
+      "type": "MEDICAL_LIST",
+      "source": "hospital",
+      "invoiceNumber": "INV-MED-2025-0089012",
+      "amount": 8500,
+      "uploadDate": "2025-05-06",
+      "uploadedBy": "hospital_system"
+    }
+  ],
+  "invoiceTotal": 8500,
+  "expectedReimbursement": 6800,
+  "status": "ACCEPTABLE",
+  "createdAt": "2025-05-06T13:45:00.000Z",
+  "importedAt": "2026-05-12T05:43:46.650Z",
+  "lastCheck": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "issues": [],
+    "status": "ACCEPTABLE",
+    "claimTypeName": "交通事故理赔",
+    "rulesApplied": {
+      "claimType": "traffic_accident",
+      "tolerance": 0.01,
+      "checkedAt": "2026-05-12T05:43:53.086Z"
+    },
+    "checkedAt": "2026-05-12T05:43:53.086Z",
+    "checkCount": 1
+  },
+  "previousStatus": "IMPORTED"
+}

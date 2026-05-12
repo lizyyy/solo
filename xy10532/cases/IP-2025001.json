@@ -1,0 +1,79 @@
+{
+  "id": "IP-2025001",
+  "claimType": "inpatient",
+  "claimant": {
+    "name": "赵六",
+    "idCard": "110101199004044567",
+    "phone": "13800138004"
+  },
+  "policy": {
+    "policyNumber": "POL-2025-004",
+    "insuredAmount": 50000,
+    "insurer": "平安保险"
+  },
+  "accidentDate": "2025-05-01",
+  "accidentLocation": "上海市浦东新区",
+  "admissionDate": "2025-05-01",
+  "dischargeDate": "2025-05-07",
+  "hospital": "上海市第一人民医院",
+  "diagnosis": "急性阑尾炎",
+  "materials": [
+    {
+      "id": "M010",
+      "name": "出院小结.pdf",
+      "type": "DISCHARGE_SUMMARY",
+      "source": "hospital",
+      "uploadDate": "2025-05-08",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M011",
+      "name": "诊断证明书.pdf",
+      "type": "DIAGNOSIS_CERTIFICATE",
+      "source": "hospital",
+      "uploadDate": "2025-05-08",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M012",
+      "name": "住院发票_0056789.pdf",
+      "type": "HOSPITAL_INVOICE",
+      "source": "hospital",
+      "invoiceNumber": "INV-HP-2025-0056789",
+      "amount": 12800,
+      "uploadDate": "2025-05-08",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M013",
+      "name": "住院费用清单_0056789.pdf",
+      "type": "HOSPITAL_LIST",
+      "source": "hospital",
+      "invoiceNumber": "INV-HP-2025-0056789",
+      "amount": 12800,
+      "uploadDate": "2025-05-08",
+      "uploadedBy": "hospital_system"
+    }
+  ],
+  "invoiceTotal": 12800,
+  "expectedReimbursement": 10240,
+  "status": "ACCEPTABLE",
+  "createdAt": "2025-05-08T16:00:00.000Z",
+  "importedAt": "2026-05-12T05:43:46.648Z",
+  "lastCheck": {
+    "valid": true,
+    "errors": [],
+    "warnings": [],
+    "issues": [],
+    "status": "ACCEPTABLE",
+    "claimTypeName": "住院理赔",
+    "rulesApplied": {
+      "claimType": "inpatient",
+      "tolerance": 0.01,
+      "checkedAt": "2026-05-12T05:43:53.083Z"
+    },
+    "checkedAt": "2026-05-12T05:43:53.084Z",
+    "checkCount": 1
+  },
+  "previousStatus": "IMPORTED"
+}

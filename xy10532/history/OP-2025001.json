@@ -1,0 +1,78 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 张三 - 急性上呼吸道感染",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 4,
+      "invoiceTotal": 328.5
+    },
+    "id": "h_1778564068704",
+    "timestamp": "2026-05-12T05:34:28.704Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 0
+    },
+    "id": "h_1778564072936",
+    "timestamp": "2026-05-12T05:34:32.936Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 张三 - 急性上呼吸道感染",
+    "before": null,
+    "after": {
+      "claimType": "outpatient",
+      "materialCount": 4,
+      "invoiceTotal": 328.5
+    },
+    "id": "h_1778564626646",
+    "timestamp": "2026-05-12T05:43:46.646Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 通过",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "ACCEPTABLE",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "id": "h_1778564633085",
+    "timestamp": "2026-05-12T05:43:53.085Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 通过",
+    "idempotent": true,
+    "before": {
+      "status": "ACCEPTABLE",
+      "valid": true
+    },
+    "after": {
+      "status": "ACCEPTABLE",
+      "valid": true,
+      "errorCount": 0,
+      "warningCount": 0
+    },
+    "id": "h_1778564694592",
+    "timestamp": "2026-05-12T05:44:54.592Z"
+  }
+]

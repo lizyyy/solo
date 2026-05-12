@@ -1,0 +1,60 @@
+[
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 吴九 - 左腿擦伤、轻微脑震荡",
+    "before": null,
+    "after": {
+      "claimType": "traffic_accident",
+      "materialCount": 7,
+      "invoiceTotal": 3200
+    },
+    "id": "h_1778564068706",
+    "timestamp": "2026-05-12T05:34:28.706Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 2,
+      "warningCount": 2
+    },
+    "id": "h_1778564072938",
+    "timestamp": "2026-05-12T05:34:32.938Z"
+  },
+  {
+    "action": "IMPORT",
+    "actor": "system",
+    "description": "导入样例案件: 吴九 - 左腿擦伤、轻微脑震荡",
+    "before": null,
+    "after": {
+      "claimType": "traffic_accident",
+      "materialCount": 7,
+      "invoiceTotal": 3200
+    },
+    "id": "h_1778564626651",
+    "timestamp": "2026-05-12T05:43:46.651Z"
+  },
+  {
+    "action": "CHECK",
+    "actor": "system",
+    "description": "执行材料审核 - 存在问题",
+    "before": {
+      "status": "IMPORTED"
+    },
+    "after": {
+      "status": "NEEDS_SUPPLEMENT",
+      "valid": false,
+      "errorCount": 1,
+      "warningCount": 2
+    },
+    "id": "h_1778564633086",
+    "timestamp": "2026-05-12T05:43:53.086Z"
+  }
+]

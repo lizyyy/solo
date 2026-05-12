@@ -1,0 +1,127 @@
+{
+  "claimTypes": {
+    "outpatient": {
+      "name": "门诊理赔",
+      "requiredMaterials": [
+        {
+          "type": "DIAGNOSIS_CERTIFICATE",
+          "name": "诊断证明书",
+          "required": true
+        },
+        {
+          "type": "OUTPATIENT_INVOICE",
+          "name": "门诊发票",
+          "required": true
+        },
+        {
+          "type": "OUTPATIENT_LIST",
+          "name": "门诊费用清单",
+          "required": true
+        },
+        {
+          "type": "MEDICAL_RECORD",
+          "name": "门诊病历",
+          "required": false
+        }
+      ],
+      "invoiceTypes": [
+        "OUTPATIENT_INVOICE"
+      ],
+      "listTypes": [
+        "OUTPATIENT_LIST"
+      ]
+    },
+    "inpatient": {
+      "name": "住院理赔",
+      "requiredMaterials": [
+        {
+          "type": "DISCHARGE_SUMMARY",
+          "name": "出院小结",
+          "required": true
+        },
+        {
+          "type": "HOSPITAL_INVOICE",
+          "name": "住院发票",
+          "required": true
+        },
+        {
+          "type": "HOSPITAL_LIST",
+          "name": "住院费用清单",
+          "required": true
+        },
+        {
+          "type": "DIAGNOSIS_CERTIFICATE",
+          "name": "诊断证明书",
+          "required": true
+        },
+        {
+          "type": "ADMISSION_RECORD",
+          "name": "入院记录",
+          "required": false
+        }
+      ],
+      "invoiceTypes": [
+        "HOSPITAL_INVOICE"
+      ],
+      "listTypes": [
+        "HOSPITAL_LIST"
+      ]
+    },
+    "traffic_accident": {
+      "name": "交通事故理赔",
+      "requiredMaterials": [
+        {
+          "type": "TRAFFIC_ACCIDENT_RECOGNITION",
+          "name": "交通事故认定书",
+          "required": true
+        },
+        {
+          "type": "MEDICAL_INVOICE",
+          "name": "医疗发票",
+          "required": true
+        },
+        {
+          "type": "MEDICAL_LIST",
+          "name": "医疗费用清单",
+          "required": true
+        },
+        {
+          "type": "DIAGNOSIS_CERTIFICATE",
+          "name": "诊断证明书",
+          "required": true
+        },
+        {
+          "type": "MEDICAL_RECORD",
+          "name": "病历资料",
+          "required": true
+        },
+        {
+          "type": "IDENTITY_CARD",
+          "name": "身份证",
+          "required": true
+        },
+        {
+          "type": "DRIVER_LICENSE",
+          "name": "驾驶证",
+          "required": false
+        },
+        {
+          "type": "VEHICLE_LICENSE",
+          "name": "行驶证",
+          "required": false
+        }
+      ],
+      "invoiceTypes": [
+        "MEDICAL_INVOICE",
+        "HOSPITAL_INVOICE",
+        "OUTPATIENT_INVOICE"
+      ],
+      "listTypes": [
+        "MEDICAL_LIST",
+        "HOSPITAL_LIST",
+        "OUTPATIENT_LIST"
+      ]
+    }
+  },
+  "tolerance": 0.01
+}

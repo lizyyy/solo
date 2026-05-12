@@ -1,0 +1,113 @@
+{
+  "id": "IP-2025002",
+  "claimType": "inpatient",
+  "claimant": {
+    "name": "孙七",
+    "idCard": "110101199005055678",
+    "phone": "13800138005"
+  },
+  "policy": {
+    "policyNumber": "POL-2025-005",
+    "insuredAmount": 50000,
+    "insurer": "中国人寿"
+  },
+  "accidentDate": "2025-05-03",
+  "accidentLocation": "广东省广州市天河区",
+  "admissionDate": "2025-05-03",
+  "dischargeDate": "2025-05-10",
+  "hospital": "广州市第一人民医院",
+  "diagnosis": "肺炎",
+  "materials": [
+    {
+      "id": "M014",
+      "name": "出院小结.pdf",
+      "type": "DISCHARGE_SUMMARY",
+      "source": "hospital",
+      "uploadDate": "2025-05-11",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M015",
+      "name": "诊断证明书.pdf",
+      "type": "DIAGNOSIS_CERTIFICATE",
+      "source": "hospital",
+      "uploadDate": "2025-05-11",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M016",
+      "name": "住院发票_0056790.pdf",
+      "type": "HOSPITAL_INVOICE",
+      "source": "hospital",
+      "invoiceNumber": "INV-HP-2025-0056790",
+      "amount": 18500,
+      "uploadDate": "2025-05-11",
+      "uploadedBy": "hospital_system"
+    },
+    {
+      "id": "M017",
+      "name": "住院发票_0056790_副本.pdf",
+      "type": "HOSPITAL_INVOICE",
+      "source": "customer",
+      "invoiceNumber": "INV-HP-2025-0056790",
+      "amount": 18500,
+      "uploadDate": "2025-05-11",
+      "uploadedBy": "孙七"
+    },
+    {
+      "id": "M018",
+      "name": "住院费用清单_0056790.pdf",
+      "type": "HOSPITAL_LIST",
+      "source": "hospital",
+      "invoiceNumber": "INV-HP-2025-0056790",
+      "amount": 18500,
+      "uploadDate": "2025-05-11",
+      "uploadedBy": "hospital_system"
+    }
+  ],
+  "invoiceTotal": 18500,
+  "expectedReimbursement": 14800,
+  "status": "NEEDS_SUPPLEMENT",
+  "createdAt": "2025-05-11T10:15:00.000Z",
+  "importedAt": "2026-05-12T05:43:46.649Z",
+  "lastCheck": {
+    "valid": false,
+    "errors": [
+      {
+        "level": "ERROR",
+        "category": "DUPLICATE_INVOICE",
+        "materialId": "M017",
+        "invoiceNumber": "INV-HP-2025-0056790",
+        "firstMaterialId": "M016",
+        "firstCaseId": null,
+        "materialName": "住院发票_0056790_副本.pdf",
+        "isCrossCase": false,
+        "message": "重复票据: 发票号 INV-HP-2025-0056790 已存在"
+      }
+    ],
+    "warnings": [],
+    "issues": [
+      {
+        "level": "ERROR",
+        "category": "DUPLICATE_INVOICE",
+        "materialId": "M017",
+        "invoiceNumber": "INV-HP-2025-0056790",
+        "firstMaterialId": "M016",
+        "firstCaseId": null,
+        "materialName": "住院发票_0056790_副本.pdf",
+        "isCrossCase": false,
+        "message": "重复票据: 发票号 INV-HP-2025-0056790 已存在"
+      }
+    ],
+    "status": "NEEDS_SUPPLEMENT",
+    "claimTypeName": "住院理赔",
+    "rulesApplied": {
+      "claimType": "inpatient",
+      "tolerance": 0.01,
+      "checkedAt": "2026-05-12T05:43:53.085Z"
+    },
+    "checkedAt": "2026-05-12T05:43:53.085Z",
+    "checkCount": 1
+  },
+  "previousStatus": "IMPORTED"
+}

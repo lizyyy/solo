@@ -1,0 +1,24 @@
+{
+  "name": "insurance-claim-cli",
+  "version": "1.0.0",
+  "description": "保险理赔材料审核 CLI 工具 - 支持缺件检查、金额校验、重复票据检测",
+  "main": "src/index.js",
+  "bin": {
+    "claim": "./bin/claim.js"
+  },
+  "scripts": {
+    "test": "node bin/claim.js report --all"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "insurance",
+    "claim",
+    "cli",
+    "material",
+    "audit"
+  ],
+  "author": "",
+  "license": "MIT"
+}
