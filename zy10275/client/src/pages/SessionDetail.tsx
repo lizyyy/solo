@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { CourtSession, Player, SessionStatus, PlayerStatus, Member } from '../types'
+import { CourtSession, Player, SessionStatus, PlayerStatus, Member, FeeAdjustment, PlayerSettlement } from '../types'
 import { api } from '../api'
 
 interface SessionDetailProps {
@@ -122,11 +122,11 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
 
   const handleCompleteSession = async () => {
     if (!id) return
-    if (!window.confirm('确定要完成本场次吗？')) return
+    if (!window.confirm('确定要完成并结算本场次吗？')) return
     try {
       await api.completeSession(id)
-      showToast('场次已完成', 'success')
-      navigate('/')
+      showToast('场次已完成结算', 'success')
+      fetchSession()
     } catch (error: any) {
       showToast(error.message || '操作失败', 'error')
     }
@@ -211,12 +211,20 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
               <div className="stat-value">
                 ¥{session.referenceFeePerPerson ?? Math.round(session.totalFee / session.maxPlayers * 100) / 100}
               </div>
-              <div className="stat-label">参考人均</div>
+              <div className="stat-label">当前人均</div>
             </div>
           </div>
-          {session.autoCancelIfNotEnough && (
+          {session.autoCancelIfNotEnough && !session.settlement && (
             <div style={{ marginTop: '16px', padding: '12px', background: '#fff3cd', borderRadius: '8px', fontSize: '14px' }}>
               ⚠️ 自动取消: 距离开场不足 {session.cancelThresholdMinutes} 分钟且人数不足 {session.minPlayers} 人时自动取消
+            </div>
+          )}
+          {session.settlement && (
+            <div style={{ marginTop: '16px', padding: '16px', background: '#d4edda', borderRadius: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>✅ 已完成结算</div>
+              <div style={{ fontSize: '14px', color: '#555' }}>
+                最终 {session.settlement.finalPlayerCount} 人，实际人均 ¥{session.settlement.actualFeePerPerson}
+              </div>
             </div>
           )}
         </div>
@@ -229,16 +237,51 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
               <button className="btn btn-secondary btn-sm" onClick={handleCheckAutoCancel}>
                 检查人数
               </button>
+              <button className="btn btn-primary btn-sm" onClick={handleCompleteSession}>
+                完成并结算
+              </button>
               <button className="btn btn-danger btn-sm" onClick={handleCancelSession}>
                 取消场次
-              </button>
-              <button className="btn btn-success btn-sm" onClick={handleCompleteSession}>
-                完成场次
               </button>
             </>
           )}
         </div>
       </div>
+
+      {session.feeAdjustments && session.feeAdjustments.length > 0 && (
+        <div className="players-section">
+          <h3>📊 费用调整记录</h3>
+          <div style={{ 
+            display: 'grid', 
+            gap: '8px', 
+            maxHeight: '200px', 
+            overflowY: 'auto',
+            padding: '8px'
+          }}>
+            {session.feeAdjustments.map((adjustment: FeeAdjustment) => (
+              <div key={adjustment.id} style={{
+                padding: '10px 14px',
+                background: '#f8f9fa',
+                borderRadius: '6px',
+                fontSize: '14px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <span style={{ fontWeight: 500 }}>{adjustment.description}</span>
+                  <span style={{ color: '#666', marginLeft: '8px' }}>
+                    {adjustment.playerCountBefore}人 → {adjustment.playerCountAfter}人
+                  </span>
+                </div>
+                <div style={{ fontWeight: 600, color: adjustment.feePerPersonAfter > adjustment.feePerPersonBefore ? '#dc3545' : '#28a745' }}>
+                  ¥{adjustment.feePerPersonBefore} → ¥{adjustment.feePerPersonAfter}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="players-section">
         <h3>👤 已确认报名 ({activePlayers.length} 人)</h3>
@@ -252,17 +295,42 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
               <div key={player.id} className="player-card">
                 <div className="player-header">
                   <span className="player-name">{player.memberName}</span>
-                  {player.isMember && <span className="member-badge">会员</span>}
+                  {player.isMember && <span className="member-badge">会员 {(player.settlement?.memberDiscount || 0.9) * 10}折</span>}
                 </div>
                 <div className="player-phone">{player.memberPhone}</div>
                 <div className="player-fee">
-                  已付: ¥{player.paidAmount}
-                  {player.isMember && <span style={{ fontSize: '12px', color: '#666' }}> (会员折扣)</span>}
+                  <div>已付: ¥{player.originalPaidAmount}</div>
+                  {player.totalAdjustments !== 0 && (
+                    <div style={{ 
+                      fontSize: '12px', 
+                      color: player.totalAdjustments > 0 ? '#dc3545' : '#28a745',
+                      marginTop: '4px'
+                    }}>
+                      {player.totalAdjustments > 0 ? '+' : ''}调整: ¥{player.totalAdjustments}
+                    </div>
+                  )}
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    当前: ¥{player.currentFee}
+                  </div>
+                  {player.settlement && (
+                    <>
+                      {player.settlement.refundDue > 0 && (
+                        <div style={{ fontSize: '12px', color: '#28a745', marginTop: '4px' }}>
+                          💸 应退: ¥{player.settlement.refundDue}
+                        </div>
+                      )}
+                      {player.settlement.additionalPaymentDue > 0 && (
+                        <div style={{ fontSize: '12px', color: '#dc3545', marginTop: '4px' }}>
+                          💳 补收: ¥{player.settlement.additionalPaymentDue}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
                 {player.confirmedAt && (
                   <span className="confirmed-badge">✓ 已确认到场</span>
                 )}
-                {canEdit && (
+                {canEdit && !session.settlement && (
                   <div className="player-actions">
                     {!player.confirmedAt && (
                       <button
@@ -297,7 +365,7 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
                   {player.isMember && <span className="member-badge">会员</span>}
                 </div>
                 <div className="player-phone">{player.memberPhone}</div>
-                {canEdit && (
+                {canEdit && !session.settlement && (
                   <div className="player-actions">
                     <button
                       className="btn btn-danger btn-sm"
@@ -323,10 +391,14 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
                   <span className="player-name">{player.memberName}</span>
                 </div>
                 <div className="player-phone">{player.memberPhone}</div>
-                <div className="player-fee" style={{ color: player.refundAmount ? '#6c757d' : '#dc3545' }}>
-                  {player.refundAmount ? `已退款: ¥${player.refundAmount}` : `待退款: ¥${player.paidAmount}`}
+                <div className="player-fee">
+                  {player.refundAmount ? (
+                    <span style={{ color: '#28a745' }}>已退款: ¥{player.refundAmount}</span>
+                  ) : (
+                    <span style={{ color: '#dc3545' }}>待退款: ¥{player.currentFee}</span>
+                  )}
                 </div>
-                {canEdit && !player.refundAmount && player.status === PlayerStatus.CANCELLED && (
+                {canEdit && !player.refundAmount && player.status === PlayerStatus.CANCELLED && !session.settlement && (
                   <div className="player-actions">
                     <button
                       className="btn btn-success btn-sm"
@@ -342,7 +414,7 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
         </div>
       )}
 
-      {canEdit && (
+      {canEdit && !session.settlement && (
         <div className="action-area">
           <h3>➕ 添加球员</h3>
           <div className="form-grid">

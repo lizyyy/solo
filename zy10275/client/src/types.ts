@@ -21,6 +21,29 @@ export interface Member {
   createdAt: string
 }
 
+export interface FeeAdjustment {
+  id: string
+  adjustedAt: string
+  reason: 'player_added' | 'player_cancelled' | 'waitlist_promoted' | 'manual_adjustment'
+  playerCountBefore: number
+  playerCountAfter: number
+  feePerPersonBefore: number
+  feePerPersonAfter: number
+  description: string
+}
+
+export interface PlayerSettlement {
+  playerId: string
+  playerName: string
+  originalFee: number
+  finalFee: number
+  adjustmentAmount: number
+  refundDue: number
+  additionalPaymentDue: number
+  isMember: boolean
+  memberDiscount: number
+}
+
 export interface Player {
   id: string
   memberId: string
@@ -31,9 +54,21 @@ export interface Player {
   joinedAt: string
   confirmedAt?: string
   cancelledAt?: string
-  paidAmount: number
+  originalPaidAmount: number
+  currentFee: number
+  totalAdjustments: number
   refundAmount?: number
   refundedAt?: string
+  settlement?: PlayerSettlement
+}
+
+export interface SessionSettlement {
+  isSettled: boolean
+  settledAt?: string
+  finalPlayerCount: number
+  totalFee: number
+  actualFeePerPerson: number
+  playerSettlements: PlayerSettlement[]
 }
 
 export interface CourtSession {
@@ -51,6 +86,8 @@ export interface CourtSession {
   createdAt: string
   autoCancelIfNotEnough: boolean
   cancelThresholdMinutes: number
+  feeAdjustments: FeeAdjustment[]
+  settlement?: SessionSettlement
   referenceFeePerPerson?: number
 }
 
@@ -67,8 +104,15 @@ export interface CreateSessionRequest {
 }
 
 export interface AddPlayerRequest {
-  memberId: string
   memberName: string
   memberPhone: string
   isMember?: boolean
+}
+
+export interface ConfirmAttendanceRequest {
+  confirmed?: boolean
+}
+
+export interface CancelPlayerRequest {
+  reason?: string
 }

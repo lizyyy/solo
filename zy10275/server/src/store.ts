@@ -276,7 +276,8 @@ class DataStore {
       waitlist: [],
       createdAt: new Date().toISOString(),
       autoCancelIfNotEnough: req.autoCancelIfNotEnough ?? true,
-      cancelThresholdMinutes: req.cancelThresholdMinutes || 60
+      cancelThresholdMinutes: req.cancelThresholdMinutes || 60,
+      feeAdjustments: []
     }
     this.sessions.set(session.id, session)
     this.saveToFile()
@@ -295,17 +296,115 @@ class DataStore {
     })
   }
 
-  private calculatePlayerFee(session: CourtSession, isMember: boolean, member: Member | undefined): number {
+  private calculateInitialPlayerFee(session: CourtSession, isMember: boolean, member: Member | undefined): number {
     const baseFee = session.totalFee / session.maxPlayers
     const discount = member?.memberDiscount || (isMember ? 0.9 : 1)
     return Math.round(baseFee * discount * 100) / 100
   }
 
-  public calculateReferenceFeePerPerson(session: CourtSession): number {
+  public calculateActualFeePerPerson(session: CourtSession): number {
     const activePlayers = this.getActivePlayersCount(session)
     const actualPlayerCount = Math.max(activePlayers, session.minPlayers, 1)
     const baseFee = session.totalFee / actualPlayerCount
     return Math.round(baseFee * 100) / 100
+  }
+
+  private recalculatePlayerFees(session: CourtSession, reason: FeeAdjustment['reason'], description: string): void {
+    if (!session.feeAdjustments) {
+      session.feeAdjustments = []
+    }
+
+    const playerCountBefore = session.players.filter(p => p.status === PlayerStatus.CONFIRMED).length + 
+      (reason === 'player_cancelled' ? 1 : 0)
+    const feePerPersonBefore = session.totalFee / Math.max(playerCountBefore, session.minPlayers, 1)
+    
+    const playerCountAfter = session.players.filter(p => p.status === PlayerStatus.CONFIRMED).length
+    const feePerPersonAfter = this.calculateActualFeePerPerson(session)
+
+    if (Math.abs(feePerPersonBefore - feePerPersonAfter) < 0.01) {
+      return
+    }
+
+    const adjustment: FeeAdjustment = {
+      id: uuidv4(),
+      adjustedAt: new Date().toISOString(),
+      reason,
+      playerCountBefore,
+      playerCountAfter,
+      feePerPersonBefore: Math.round(feePerPersonBefore * 100) / 100,
+      feePerPersonAfter: Math.round(feePerPersonAfter * 100) / 100,
+      description
+    }
+    session.feeAdjustments.push(adjustment)
+
+    session.players.forEach(player => {
+      if (player.status === PlayerStatus.CONFIRMED) {
+        const discount = player.isMember ? (this.members.get(player.memberId)?.memberDiscount || 0.9) : 1
+        const newFee = Math.round(feePerPersonAfter * discount * 100) / 100
+        const adjustmentAmount = newFee - player.currentFee
+        
+        player.currentFee = newFee
+        player.totalAdjustments = (player.totalAdjustments || 0) + adjustmentAmount
+      }
+    })
+
+    console.log(`[DataStore] 费用调整: ${description}, 人均 ¥${feePerPersonBefore} → ¥${feePerPersonAfter}`)
+  }
+
+  public settleSession(sessionId: string): CourtSession | { error: string } {
+    const session = this.sessions.get(sessionId)
+    if (!session) return { error: '场次不存在' }
+    
+    if (session.status === SessionStatus.CANCELLED) {
+      return { error: '已取消场次不能结算' }
+    }
+
+    const activePlayers = session.players.filter(p => p.status === PlayerStatus.CONFIRMED)
+    
+    if (activePlayers.length < session.minPlayers) {
+      return { error: `人数不足，无法结算（至少需要${session.minPlayers}人）` }
+    }
+
+    const actualFeePerPerson = this.calculateActualFeePerPerson(session)
+    const playerSettlements: PlayerSettlement[] = activePlayers.map(player => {
+      const discount = player.isMember ? (this.members.get(player.memberId)?.memberDiscount || 0.9) : 1
+      const finalFee = Math.round(actualFeePerPerson * discount * 100) / 100
+      const adjustmentAmount = finalFee - player.originalPaidAmount
+      
+      return {
+        playerId: player.id,
+        playerName: player.memberName,
+        originalFee: player.originalPaidAmount,
+        finalFee,
+        adjustmentAmount,
+        refundDue: adjustmentAmount < 0 ? Math.abs(adjustmentAmount) : 0,
+        additionalPaymentDue: adjustmentAmount > 0 ? adjustmentAmount : 0,
+        isMember: player.isMember,
+        memberDiscount: discount
+      }
+    })
+
+    session.settlement = {
+      isSettled: true,
+      settledAt: new Date().toISOString(),
+      finalPlayerCount: activePlayers.length,
+      totalFee: session.totalFee,
+      actualFeePerPerson,
+      playerSettlements
+    }
+
+    session.status = SessionStatus.COMPLETED
+
+    playerSettlements.forEach(settlement => {
+      const player = session.players.find(p => p.id === settlement.playerId)
+      if (player) {
+        player.settlement = settlement
+      }
+    })
+
+    this.saveToFile()
+    console.log(`[DataStore] 场次 ${sessionId} 已完成结算，最终 ${activePlayers.length} 人，人均 ¥${actualFeePerPerson}`)
+    return session
   }
 
   private isPlayerInSession(session: CourtSession, memberId: string): boolean {
@@ -327,7 +426,8 @@ class DataStore {
       return { error: '该用户已在此场次中' }
     }
 
-    const playerFee = this.calculatePlayerFee(session, member.isMember, member)
+    const initialFee = this.calculateInitialPlayerFee(session, member.isMember, member)
+    const activePlayersBefore = this.getActivePlayersCount(session)
 
     const player: Player = {
       id: uuidv4(),
@@ -337,7 +437,9 @@ class DataStore {
       isMember: member.isMember,
       status: PlayerStatus.CONFIRMED,
       joinedAt: new Date().toISOString(),
-      paidAmount: playerFee
+      originalPaidAmount: initialFee,
+      currentFee: initialFee,
+      totalAdjustments: 0
     }
 
     let wasWaitlisted = false
@@ -352,6 +454,11 @@ class DataStore {
     }
 
     this.updateSessionStatus(session)
+    
+    if (!wasWaitlisted) {
+      this.recalculatePlayerFees(session, 'player_added', `球员 ${member.name} 加入`)
+    }
+    
     this.saveToFile()
 
     return { session, player, wasWaitlisted }
@@ -408,6 +515,11 @@ class DataStore {
       waitlisted.status = PlayerStatus.CONFIRMED
       session.players.push(waitlisted)
       promotedPlayer = waitlisted
+      
+      this.recalculatePlayerFees(session, 'waitlist_promoted', `候补球员 ${waitlisted.memberName} 转正`)
+    } else if (!isFromWaitlist) {
+      session.players = session.players.filter(p => p.id !== playerId)
+      this.recalculatePlayerFees(session, 'player_cancelled', `球员 ${player.memberName} 取消报名`)
     }
 
     if (isFromWaitlist) {
@@ -433,7 +545,7 @@ class DataStore {
 
     player.status = PlayerStatus.REFUNDED
     player.refundedAt = new Date().toISOString()
-    player.refundAmount = player.paidAmount
+    player.refundAmount = player.currentFee
 
     this.saveToFile()
 
@@ -451,13 +563,7 @@ class DataStore {
   }
 
   completeSession(sessionId: string): CourtSession | { error: string } {
-    const session = this.sessions.get(sessionId)
-    if (!session) return { error: '场次不存在' }
-
-    session.status = SessionStatus.COMPLETED
-    this.saveToFile()
-
-    return session
+    return this.settleSession(sessionId)
   }
 
   public destroy(): void {
