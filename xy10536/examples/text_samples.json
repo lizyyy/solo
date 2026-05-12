@@ -1,0 +1,42 @@
+[
+  {
+    "id": "text_001",
+    "type": "text",
+    "source": "crawled_news",
+    "content_hash": "a1b2c3d4e5f6",
+    "length": 256,
+    "language": "zh"
+  },
+  {
+    "id": "text_002",
+    "type": "text",
+    "source": "crawled_news",
+    "content_hash": "b2c3d4e5f6a7",
+    "length": 512,
+    "language": "zh"
+  },
+  {
+    "id": "text_003",
+    "type": "text",
+    "source": "crawled_news",
+    "content_hash": "c3d4e5f6a7b8",
+    "length": 128,
+    "language": "zh"
+  },
+  {
+    "id": "text_004",
+    "type": "text",
+    "source": "crawled_news",
+    "content_hash": "d4e5f6a7b8c9",
+    "length": 1024,
+    "language": "zh"
+  },
+  {
+    "id": "text_005",
+    "type": "text",
+    "source": "user_generated",
+    "content_hash": "e5f6a7b8c9d0",
+    "length": 256,
+    "language": "zh"
+  }
+]

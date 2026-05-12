@@ -1,0 +1,76 @@
+[
+  {
+    "id": "image_001",
+    "type": "image",
+    "original_id": "image_001",
+    "source": "crawled_flickr",
+    "format": "jpg",
+    "width": 1920,
+    "height": 1080,
+    "file_size": 2450000,
+    "exif": {
+      "camera": "Canon EOS 5D Mark IV",
+      "aperture": "f/2.8",
+      "iso": 100,
+      "gps": "39.9042,116.4074"
+    },
+    "is_augmented": false
+  },
+  {
+    "id": "image_001_aug_001",
+    "type": "image",
+    "original_id": "image_001",
+    "source": "augmented",
+    "format": "jpg",
+    "width": 1920,
+    "height": 1080,
+    "file_size": 2100000,
+    "augmentation": {
+      "type": "rotation",
+      "angle": 15
+    },
+    "is_augmented": true
+  },
+  {
+    "id": "image_001_aug_002",
+    "type": "image",
+    "original_id": "image_001",
+    "source": "augmented",
+    "format": "jpg",
+    "width": 1920,
+    "height": 1080,
+    "file_size": 2250000,
+    "augmentation": {
+      "type": "flip",
+      "direction": "horizontal"
+    },
+    "is_augmented": true
+  },
+  {
+    "id": "image_002",
+    "type": "image",
+    "original_id": "image_002",
+    "source": "crawled_flickr",
+    "format": "png",
+    "width": 1024,
+    "height": 1024,
+    "file_size": 1800000,
+    "exif": {
+      "camera": "iPhone 14 Pro",
+      "aperture": "f/1.8",
+      "iso": 200
+    },
+    "is_augmented": false
+  },
+  {
+    "id": "image_003",
+    "type": "image",
+    "original_id": "image_003",
+    "source": "internal_dataset",
+    "format": "jpg",
+    "width": 800,
+    "height": 600,
+    "file_size": 450000,
+    "is_augmented": false
+  }
+]

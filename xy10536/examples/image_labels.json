@@ -1,0 +1,39 @@
+{
+  "image_001": {
+    "id": "image_001",
+    "label": "landscape",
+    "categories": ["nature", "scenery"],
+    "confidence": 0.98,
+    "annotated_by": "human"
+  },
+  "image_001_aug_001": {
+    "id": "image_001_aug_001",
+    "original_id": "image_001",
+    "label": "landscape",
+    "categories": ["nature", "scenery"],
+    "confidence": 0.98,
+    "annotated_by": "inherited"
+  },
+  "image_001_aug_002": {
+    "id": "image_001_aug_002",
+    "original_id": "image_001",
+    "label": "landscape",
+    "categories": ["nature", "scenery"],
+    "confidence": 0.98,
+    "annotated_by": "inherited"
+  },
+  "image_002": {
+    "id": "image_002",
+    "label": "portrait",
+    "categories": ["people", "face"],
+    "confidence": 0.95,
+    "annotated_by": "human"
+  },
+  "image_003": {
+    "id": "image_003",
+    "label": "product",
+    "categories": ["commercial", "object"],
+    "confidence": 0.89,
+    "annotated_by": "auto"
+  }
+}

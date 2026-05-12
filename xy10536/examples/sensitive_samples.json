@@ -1,0 +1,28 @@
+{
+  "discovered_at": "2024-06-01T14:30:00Z",
+  "discovered_by": "compliance_team",
+  "detection_method": "manual_review",
+  "samples": [
+    {
+      "id": "text_001",
+      "original_id": "text_001",
+      "reason": "包含用户隐私信息（身份证号）",
+      "severity": "high",
+      "include_augment": true
+    },
+    {
+      "id": "image_001",
+      "original_id": "image_001",
+      "reason": "EXIF 数据包含精确 GPS 坐标，可能泄露拍摄者位置",
+      "severity": "medium",
+      "include_augment": true
+    },
+    {
+      "id": "text_005",
+      "original_id": "text_005",
+      "reason": "包含不当言论",
+      "severity": "high",
+      "include_augment": false
+    }
+  ]
+}

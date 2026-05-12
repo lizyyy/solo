@@ -1,0 +1,111 @@
+{
+  "report_id": "bbfe3099-cdaa-486a-b8ab-4a5fb5a3aac3",
+  "generated_at": "2026-05-12T12:59:46.930678",
+  "generated_by": "system",
+  "type": "summary_report",
+  "recent_operations": [
+    {
+      "id": "bbfe3099-cdaa-486a-b8ab-4a5fb5a3aac3",
+      "type": "report",
+      "operator": "system",
+      "status": "running",
+      "created_at": "2026-05-12T12:59:46.930368"
+    },
+    {
+      "id": "c393ed9a-15a6-4cd1-ba9c-5ebe0eb8f451",
+      "type": "purge",
+      "check_operation_id": "690cf612-2436-4d5b-ba37-15b38b93e17a",
+      "dataset": "image_dataset",
+      "version": "v1.0.0",
+      "operator": "purger_001",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:41.494350",
+      "updated_at": "2026-05-12T12:59:41.497445"
+    },
+    {
+      "id": "92183fe5-cd4e-416b-ac4b-cac1173d9cf5",
+      "type": "purge",
+      "check_operation_id": "690cf612-2436-4d5b-ba37-15b38b93e17a",
+      "dataset": "text_dataset",
+      "version": "v1.0.0",
+      "operator": "purger_001",
+      "status": "running",
+      "created_at": "2026-05-12T12:59:33.399849"
+    },
+    {
+      "id": "1faa1de3-19e8-4ff8-8bc4-9455baea9401",
+      "type": "purge",
+      "check_operation_id": "690cf612-2436-4d5b-ba37-15b38b93e17a",
+      "dataset": "text_dataset",
+      "version": "v1.0.0",
+      "operator": "purger_001",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:27.593538",
+      "updated_at": "2026-05-12T12:59:27.596557"
+    },
+    {
+      "id": "690cf612-2436-4d5b-ba37-15b38b93e17a",
+      "type": "check",
+      "sensitive_operation_id": "61e138db-6def-468c-a451-c5ebe66b468c",
+      "operator": "demo_user",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:21.415020",
+      "updated_at": "2026-05-12T12:59:21.417665"
+    },
+    {
+      "id": "61e138db-6def-468c-a451-c5ebe66b468c",
+      "type": "import_sensitive",
+      "operator": "compliance_20240601",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:15.089702",
+      "updated_at": "2026-05-12T12:59:15.091375"
+    },
+    {
+      "id": "0d7a5eea-a9a9-43dd-b18a-04adcda017ef",
+      "type": "import_dataset",
+      "dataset": "image_dataset",
+      "version": "v1.0.0",
+      "operator": "demo_user",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:09.933058",
+      "updated_at": "2026-05-12T12:59:09.934941"
+    },
+    {
+      "id": "39d78599-0367-4f66-b203-1780a2e73569",
+      "type": "import_dataset",
+      "dataset": "text_dataset",
+      "version": "v1.0.0",
+      "operator": "demo_user",
+      "status": "completed",
+      "created_at": "2026-05-12T12:59:01.194131",
+      "updated_at": "2026-05-12T12:59:01.197605"
+    }
+  ],
+  "datasets": [
+    {
+      "name": "image_dataset",
+      "versions": [
+        {
+          "version": "v1.0.0",
+          "sample_count": 5,
+          "purged": false
+        },
+        {
+          "version": "v1.0.1",
+          "sample_count": 2,
+          "purged": true
+        }
+      ]
+    },
+    {
+      "name": "text_dataset",
+      "versions": [
+        {
+          "version": "v1.0.0",
+          "sample_count": 3,
+          "purged": true
+        }
+      ]
+    }
+  ]
+}

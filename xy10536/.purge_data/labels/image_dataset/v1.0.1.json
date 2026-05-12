@@ -1,0 +1,109 @@
+{
+  "version": "v1.0.1",
+  "sample_count": 2,
+  "samples": [
+    {
+      "id": "image_002",
+      "type": "image",
+      "original_id": "image_002",
+      "source": "crawled_flickr",
+      "format": "png",
+      "width": 1024,
+      "height": 1024,
+      "file_size": 1800000,
+      "exif": {
+        "camera": "iPhone 14 Pro",
+        "aperture": "f/1.8",
+        "iso": 200
+      },
+      "is_augmented": false
+    },
+    {
+      "id": "image_003",
+      "type": "image",
+      "original_id": "image_003",
+      "source": "internal_dataset",
+      "format": "jpg",
+      "width": 800,
+      "height": 600,
+      "file_size": 450000,
+      "is_augmented": false
+    }
+  ],
+  "labels": {
+    "image_001": {
+      "id": "image_001",
+      "label": "landscape",
+      "categories": [
+        "nature",
+        "scenery"
+      ],
+      "confidence": 0.98,
+      "annotated_by": "human"
+    },
+    "image_001_aug_001": {
+      "id": "image_001_aug_001",
+      "original_id": "image_001",
+      "label": "landscape",
+      "categories": [
+        "nature",
+        "scenery"
+      ],
+      "confidence": 0.98,
+      "annotated_by": "inherited"
+    },
+    "image_001_aug_002": {
+      "id": "image_001_aug_002",
+      "original_id": "image_001",
+      "label": "landscape",
+      "categories": [
+        "nature",
+        "scenery"
+      ],
+      "confidence": 0.98,
+      "annotated_by": "inherited"
+    },
+    "image_002": {
+      "id": "image_002",
+      "label": "portrait",
+      "categories": [
+        "people",
+        "face"
+      ],
+      "confidence": 0.95,
+      "annotated_by": "human"
+    },
+    "image_003": {
+      "id": "image_003",
+      "label": "product",
+      "categories": [
+        "commercial",
+        "object"
+      ],
+      "confidence": 0.89,
+      "annotated_by": "auto"
+    }
+  },
+  "imported_at": "2026-05-12T12:59:09.934435",
+  "imported_by": "demo_user",
+  "is_published": true,
+  "purged": true,
+  "purge_info": {
+    "operation_id": "c393ed9a-15a6-4cd1-ba9c-5ebe0eb8f451",
+    "check_operation_id": "690cf612-2436-4d5b-ba37-15b38b93e17a",
+    "sensitive_operation_id": "61e138db-6def-468c-a451-c5ebe66b468c",
+    "purged_at": "2026-05-12T12:59:41.496503",
+    "purged_by": "purger_001",
+    "reason": "剔除包含敏感GPS信息的样本",
+    "removed_count": 3,
+    "removed_samples": [
+      "image_001_aug_002",
+      "image_001",
+      "image_001_aug_001"
+    ],
+    "before_snapshot": "/Users/mac/pro/solo/workspaces/xy10536/.purge_data/snapshots/image_dataset/v1.0.1/before_20260512_125941.json",
+    "after_snapshot": "/Users/mac/pro/solo/workspaces/xy10536/.purge_data/snapshots/image_dataset/v1.0.1/after_20260512_125941.json",
+    "original_version": "v1.0.0",
+    "is_patch": true
+  }
+}
