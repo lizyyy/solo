@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "initializedAt": "2026-05-12T14:57:33.731Z",
+  "settings": {
+    "maxRetries": 3,
+    "temporaryFailureWaitDays": 1,
+    "mailboxFullWaitDays": 7,
+    "autoExportReports": true,
+    "historyRetentionDays": 90
+  },
+  "statistics": {
+    "totalEmails": 0,
+    "bounces": 0,
+    "permanentFailures": 0,
+    "temporaryFailures": 0,
+    "retriesAttempted": 0,
+    "retriesSuccessful": 0,
+    "unsubscribed": 0
+  }
+}

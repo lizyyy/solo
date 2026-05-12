@@ -1,0 +1,55 @@
+{
+  "count": 7,
+  "generatedAt": "2026-05-12T14:56:45.068Z",
+  "emails": [
+    {
+      "email": "john.doe@company.com",
+      "domain": "company.com",
+      "source": "enterprise_list",
+      "reason": "无退信记录，可以重试",
+      "waitDays": 1
+    },
+    {
+      "email": "jane.smith@company.com",
+      "domain": "company.com",
+      "source": "enterprise_list",
+      "reason": "无退信记录，可以重试",
+      "waitDays": 1
+    },
+    {
+      "email": "user123@gmail.com",
+      "domain": "gmail.com",
+      "source": "personal_list",
+      "reason": "无退信记录，可以重试",
+      "waitDays": 1
+    },
+    {
+      "email": "test.user@outlook.com",
+      "domain": "outlook.com",
+      "source": "personal_list",
+      "reason": "之前重试成功，可以继续尝试",
+      "waitDays": 1
+    },
+    {
+      "email": "busy.mailbox@techcorp.com",
+      "domain": "techcorp.com",
+      "source": "enterprise_list",
+      "reason": "邮箱已满，可等待后重试",
+      "waitDays": 1
+    },
+    {
+      "email": "server.down@financebank.com",
+      "domain": "financebank.com",
+      "source": "enterprise_list",
+      "reason": "临时失败，可以重试 (已重试2次)",
+      "waitDays": 1
+    },
+    {
+      "email": "policy.block@healthcare.org",
+      "domain": "healthcare.org",
+      "source": "enterprise_list",
+      "reason": "之前重试成功，可以继续尝试",
+      "waitDays": 1
+    }
+  ]
+}

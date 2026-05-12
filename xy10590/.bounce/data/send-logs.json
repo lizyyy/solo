@@ -1,0 +1,82 @@
+[
+  {
+    "id": "send-001",
+    "email": "john.doe@company.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:00:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "send-002",
+    "email": "jane.smith@company.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:01:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "send-003",
+    "email": "invalid.user@company.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:02:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "send-004",
+    "email": "user123@gmail.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:03:00Z",
+    "status": "sent",
+    "source": "personal_list"
+  },
+  {
+    "id": "send-005",
+    "email": "test.user@outlook.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:04:00Z",
+    "status": "sent",
+    "source": "personal_list"
+  },
+  {
+    "id": "send-006",
+    "email": "busy.mailbox@techcorp.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:05:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "send-007",
+    "email": "server.down@financebank.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:06:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "send-008",
+    "email": "unsubscribed.user@yahoo.com",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:07:00Z",
+    "status": "sent",
+    "source": "personal_list"
+  },
+  {
+    "id": "send-009",
+    "email": "unknown.bounce@example.org",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:08:00Z",
+    "status": "sent",
+    "source": "unknown_source"
+  },
+  {
+    "id": "send-010",
+    "email": "policy.block@healthcare.org",
+    "campaign": "summer_sale_2024",
+    "sentAt": "2024-06-01T10:09:00Z",
+    "status": "sent",
+    "source": "enterprise_list"
+  }
+]

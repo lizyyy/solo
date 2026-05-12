@@ -1,0 +1,74 @@
+[
+  {
+    "id": "bounce-001",
+    "email": "invalid.user@company.com",
+    "bounceCode": "550",
+    "message": "550 5.1.1 <invalid.user@company.com>: Recipient address rejected: User unknown in virtual mailbox table",
+    "timestamp": "2024-06-01T11:00:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "bounce-002",
+    "email": "busy.mailbox@techcorp.com",
+    "bounceCode": "552",
+    "message": "552 5.2.2 <busy.mailbox@techcorp.com>: Recipient address rejected: Mailbox full",
+    "timestamp": "2024-06-01T11:05:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "bounce-003",
+    "email": "server.down@financebank.com",
+    "bounceCode": "421",
+    "message": "421 4.3.2 Service not available, closing transmission channel",
+    "timestamp": "2024-06-01T11:10:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "bounce-004",
+    "email": "unknown.bounce@example.org",
+    "bounceCode": null,
+    "message": "Delivery failed - no bounce code available",
+    "timestamp": "2024-06-01T11:15:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "unknown_source"
+  },
+  {
+    "id": "bounce-005",
+    "email": "policy.block@healthcare.org",
+    "bounceCode": "450",
+    "message": "450 4.7.1 <policy.block@healthcare.org>: Recipient address rejected: Policy rejection - too many connections from your IP",
+    "timestamp": "2024-06-01T11:20:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "bounce-006",
+    "email": "test.user@outlook.com",
+    "bounceCode": "451",
+    "message": "451 4.7.0 Temporary server error. Please try again later.",
+    "timestamp": "2024-06-01T11:25:00Z",
+    "campaign": "summer_sale_2024",
+    "source": "personal_list"
+  },
+  {
+    "id": "bounce-007",
+    "email": "server.down@financebank.com",
+    "bounceCode": "421",
+    "message": "421 4.3.2 Service not available, closing transmission channel (2nd attempt)",
+    "timestamp": "2024-06-02T10:00:00Z",
+    "campaign": "summer_sale_2024_retry",
+    "source": "enterprise_list"
+  },
+  {
+    "id": "bounce-008",
+    "email": "server.down@financebank.com",
+    "bounceCode": "421",
+    "message": "421 4.3.2 Service not available, closing transmission channel (3rd attempt)",
+    "timestamp": "2024-06-03T10:00:00Z",
+    "campaign": "summer_sale_2024_retry_2",
+    "source": "enterprise_list"
+  }
+]

@@ -1,0 +1,8 @@
+email,domain,source,reason,wait_days
+"john.doe@company.com","company.com","enterprise_list","无退信记录，可以重试",1
+"jane.smith@company.com","company.com","enterprise_list","无退信记录，可以重试",1
+"user123@gmail.com","gmail.com","personal_list","无退信记录，可以重试",1
+"test.user@outlook.com","outlook.com","personal_list","之前重试成功，可以继续尝试",1
+"busy.mailbox@techcorp.com","techcorp.com","enterprise_list","邮箱已满，可等待后重试",1
+"server.down@financebank.com","financebank.com","enterprise_list","临时失败，可以重试 (已重试2次)",1
+"policy.block@healthcare.org","healthcare.org","enterprise_list","之前重试成功，可以继续尝试",1

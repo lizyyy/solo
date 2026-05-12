@@ -1,0 +1,45 @@
+[
+  {
+    "id": "source-001",
+    "name": "enterprise_list",
+    "description": "企业客户名单 - 2024年Q1获取",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "emails": [
+      "john.doe@company.com",
+      "jane.smith@company.com",
+      "invalid.user@company.com",
+      "busy.mailbox@techcorp.com",
+      "server.down@financebank.com",
+      "policy.block@healthcare.org"
+    ],
+    "totalEmails": 6,
+    "validEmails": 2,
+    "bounceCount": 4
+  },
+  {
+    "id": "source-002",
+    "name": "personal_list",
+    "description": "个人邮箱名单 - 网站注册获取",
+    "createdAt": "2024-03-20T00:00:00Z",
+    "emails": [
+      "user123@gmail.com",
+      "test.user@outlook.com",
+      "unsubscribed.user@yahoo.com"
+    ],
+    "totalEmails": 3,
+    "validEmails": 1,
+    "bounceCount": 1
+  },
+  {
+    "id": "source-003",
+    "name": "unknown_source",
+    "description": "来源不明的名单",
+    "createdAt": "2024-05-10T00:00:00Z",
+    "emails": [
+      "unknown.bounce@example.org"
+    ],
+    "totalEmails": 1,
+    "validEmails": 0,
+    "bounceCount": 1
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "retry-001",
+    "email": "test.user@outlook.com",
+    "originalBounceId": "bounce-006",
+    "attemptedAt": "2024-06-02T09:00:00Z",
+    "success": true,
+    "message": "Retry successful - email delivered",
+    "campaign": "summer_sale_2024_retry"
+  },
+  {
+    "id": "retry-002",
+    "email": "server.down@financebank.com",
+    "originalBounceId": "bounce-003",
+    "attemptedAt": "2024-06-02T09:30:00Z",
+    "success": false,
+    "message": "Retry failed - service still unavailable",
+    "campaign": "summer_sale_2024_retry"
+  },
+  {
+    "id": "retry-003",
+    "email": "server.down@financebank.com",
+    "originalBounceId": "bounce-007",
+    "attemptedAt": "2024-06-03T09:30:00Z",
+    "success": false,
+    "message": "Retry failed again - service still unavailable",
+    "campaign": "summer_sale_2024_retry_2"
+  },
+  {
+    "id": "retry-004",
+    "email": "policy.block@healthcare.org",
+    "originalBounceId": "bounce-005",
+    "attemptedAt": "2024-06-02T14:00:00Z",
+    "success": true,
+    "message": "Retry successful after rate limit period",
+    "campaign": "summer_sale_2024_retry"
+  }
+]

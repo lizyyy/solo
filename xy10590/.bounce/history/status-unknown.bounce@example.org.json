@@ -1,0 +1,37 @@
+[
+  {
+    "timestamp": "2026-05-12T14:56:58.234Z",
+    "action": "manual_correction",
+    "operator": "admin",
+    "before": {
+      "status": "needs_review"
+    },
+    "after": {
+      "status": "invalid"
+    },
+    "reason": "人工确认邮箱无效"
+  },
+  {
+    "timestamp": "2026-05-12T14:57:05.193Z",
+    "action": "status_changed",
+    "before": {
+      "status": "invalid"
+    },
+    "after": {
+      "status": "needs_review"
+    },
+    "reason": "缺少标准退信码"
+  },
+  {
+    "timestamp": "2026-05-12T14:57:39.826Z",
+    "action": "manual_correction",
+    "operator": "admin",
+    "before": {
+      "status": "needs_review"
+    },
+    "after": {
+      "status": "invalid"
+    },
+    "reason": "人工确认邮箱无效"
+  }
+]

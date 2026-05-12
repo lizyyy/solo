@@ -1,0 +1,356 @@
+[
+  {
+    "email": "john.doe@company.com",
+    "domain": "company.com",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "valid",
+    "sendCount": 1,
+    "bounceCount": 0,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": null,
+    "bounceHistory": [],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "无退信记录，可以重试"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "jane.smith@company.com",
+    "domain": "company.com",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "valid",
+    "sendCount": 1,
+    "bounceCount": 0,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": null,
+    "bounceHistory": [],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "无退信记录，可以重试"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "invalid.user@company.com",
+    "domain": "company.com",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "invalid",
+    "sendCount": 1,
+    "bounceCount": 1,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:00:00Z",
+      "bounceCode": "550",
+      "type": "permanent",
+      "category": "invalid_email",
+      "desc": "邮箱不存在或被拒绝",
+      "message": "550 5.1.1 <invalid.user@company.com>: Recipient address rejected: User unknown in virtual mailbox table"
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:00:00Z",
+        "bounceCode": "550",
+        "type": "permanent",
+        "category": "invalid_email",
+        "desc": "邮箱不存在或被拒绝",
+        "message": "550 5.1.1 <invalid.user@company.com>: Recipient address rejected: User unknown in virtual mailbox table"
+      }
+    ],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": false,
+      "reason": "邮箱无效，永久失败"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "user123@gmail.com",
+    "domain": "gmail.com",
+    "domainCategory": "personal",
+    "source": "personal_list",
+    "status": "valid",
+    "sendCount": 1,
+    "bounceCount": 0,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": null,
+    "bounceHistory": [],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "无退信记录，可以重试"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "test.user@outlook.com",
+    "domain": "outlook.com",
+    "domainCategory": "personal",
+    "source": "personal_list",
+    "status": "valid",
+    "sendCount": 1,
+    "bounceCount": 1,
+    "retryCount": 1,
+    "successfulRetries": 1,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:25:00Z",
+      "bounceCode": "451",
+      "type": "temporary",
+      "category": "processing_error",
+      "desc": "处理中出错",
+      "message": "451 4.7.0 Temporary server error. Please try again later."
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:25:00Z",
+        "bounceCode": "451",
+        "type": "temporary",
+        "category": "processing_error",
+        "desc": "处理中出错",
+        "message": "451 4.7.0 Temporary server error. Please try again later."
+      }
+    ],
+    "retryHistory": [
+      {
+        "id": "retry-001",
+        "email": "test.user@outlook.com",
+        "originalBounceId": "bounce-006",
+        "attemptedAt": "2024-06-02T09:00:00Z",
+        "success": true,
+        "message": "Retry successful - email delivered",
+        "campaign": "summer_sale_2024_retry"
+      }
+    ],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "之前重试成功，可以继续尝试"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "busy.mailbox@techcorp.com",
+    "domain": "techcorp.com",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "temporary_bounce",
+    "sendCount": 1,
+    "bounceCount": 1,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:05:00Z",
+      "bounceCode": "552",
+      "type": "permanent",
+      "category": "mailbox_full",
+      "desc": "邮箱空间已满",
+      "message": "552 5.2.2 <busy.mailbox@techcorp.com>: Recipient address rejected: Mailbox full"
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:05:00Z",
+        "bounceCode": "552",
+        "type": "permanent",
+        "category": "mailbox_full",
+        "desc": "邮箱空间已满",
+        "message": "552 5.2.2 <busy.mailbox@techcorp.com>: Recipient address rejected: Mailbox full"
+      }
+    ],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "邮箱已满，可等待后重试",
+      "waitDays": 7
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.871Z"
+  },
+  {
+    "email": "server.down@financebank.com",
+    "domain": "financebank.com",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "temporary_bounce",
+    "sendCount": 1,
+    "bounceCount": 3,
+    "retryCount": 2,
+    "successfulRetries": 0,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:10:00Z",
+      "bounceCode": "421",
+      "type": "temporary",
+      "category": "service_unavailable",
+      "desc": "服务不可用",
+      "message": "421 4.3.2 Service not available, closing transmission channel"
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:10:00Z",
+        "bounceCode": "421",
+        "type": "temporary",
+        "category": "service_unavailable",
+        "desc": "服务不可用",
+        "message": "421 4.3.2 Service not available, closing transmission channel"
+      },
+      {
+        "timestamp": "2024-06-02T10:00:00Z",
+        "bounceCode": "421",
+        "type": "temporary",
+        "category": "service_unavailable",
+        "desc": "服务不可用",
+        "message": "421 4.3.2 Service not available, closing transmission channel (2nd attempt)"
+      },
+      {
+        "timestamp": "2024-06-03T10:00:00Z",
+        "bounceCode": "421",
+        "type": "temporary",
+        "category": "service_unavailable",
+        "desc": "服务不可用",
+        "message": "421 4.3.2 Service not available, closing transmission channel (3rd attempt)"
+      }
+    ],
+    "retryHistory": [
+      {
+        "id": "retry-002",
+        "email": "server.down@financebank.com",
+        "originalBounceId": "bounce-003",
+        "attemptedAt": "2024-06-02T09:30:00Z",
+        "success": false,
+        "message": "Retry failed - service still unavailable",
+        "campaign": "summer_sale_2024_retry"
+      },
+      {
+        "id": "retry-003",
+        "email": "server.down@financebank.com",
+        "originalBounceId": "bounce-007",
+        "attemptedAt": "2024-06-03T09:30:00Z",
+        "success": false,
+        "message": "Retry failed again - service still unavailable",
+        "campaign": "summer_sale_2024_retry_2"
+      }
+    ],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "临时失败，可以重试 (已重试2次)",
+      "waitDays": 1
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.872Z"
+  },
+  {
+    "email": "unsubscribed.user@yahoo.com",
+    "domain": "yahoo.com",
+    "domainCategory": "personal",
+    "source": "personal_list",
+    "status": "unsubscribed",
+    "sendCount": 1,
+    "bounceCount": 0,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": null,
+    "bounceHistory": [],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": false,
+      "reason": "已退订，不能重试"
+    },
+    "isUnsubscribed": true,
+    "analyzedAt": "2026-05-12T14:57:39.872Z"
+  },
+  {
+    "email": "unknown.bounce@example.org",
+    "domain": "example.org",
+    "domainCategory": "other",
+    "source": "unknown_source",
+    "status": "invalid",
+    "sendCount": 1,
+    "bounceCount": 1,
+    "retryCount": 0,
+    "successfulRetries": 0,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:15:00Z",
+      "bounceCode": null,
+      "type": "unknown",
+      "category": "missing_code",
+      "desc": "缺少标准退信码",
+      "message": "Delivery failed - no bounce code available"
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:15:00Z",
+        "bounceCode": null,
+        "type": "unknown",
+        "category": "missing_code",
+        "desc": "缺少标准退信码",
+        "message": "Delivery failed - no bounce code available"
+      }
+    ],
+    "retryHistory": [],
+    "retryInfo": {
+      "shouldRetry": false,
+      "reason": "未知退信类型，建议人工审核"
+    },
+    "isUnsubscribed": false,
+    "manuallyUpdated": true,
+    "analyzedAt": "2026-05-12T14:57:39.872Z"
+  },
+  {
+    "email": "policy.block@healthcare.org",
+    "domain": "healthcare.org",
+    "domainCategory": "enterprise",
+    "source": "enterprise_list",
+    "status": "valid",
+    "sendCount": 1,
+    "bounceCount": 1,
+    "retryCount": 1,
+    "successfulRetries": 1,
+    "latestBounce": {
+      "timestamp": "2024-06-01T11:20:00Z",
+      "bounceCode": "450",
+      "type": "temporary",
+      "category": "mailbox_busy",
+      "desc": "邮箱不可用（可能是临时）",
+      "message": "450 4.7.1 <policy.block@healthcare.org>: Recipient address rejected: Policy rejection - too many connections from your IP"
+    },
+    "bounceHistory": [
+      {
+        "timestamp": "2024-06-01T11:20:00Z",
+        "bounceCode": "450",
+        "type": "temporary",
+        "category": "mailbox_busy",
+        "desc": "邮箱不可用（可能是临时）",
+        "message": "450 4.7.1 <policy.block@healthcare.org>: Recipient address rejected: Policy rejection - too many connections from your IP"
+      }
+    ],
+    "retryHistory": [
+      {
+        "id": "retry-004",
+        "email": "policy.block@healthcare.org",
+        "originalBounceId": "bounce-005",
+        "attemptedAt": "2024-06-02T14:00:00Z",
+        "success": true,
+        "message": "Retry successful after rate limit period",
+        "campaign": "summer_sale_2024_retry"
+      }
+    ],
+    "retryInfo": {
+      "shouldRetry": true,
+      "reason": "之前重试成功，可以继续尝试"
+    },
+    "isUnsubscribed": false,
+    "analyzedAt": "2026-05-12T14:57:39.872Z"
+  }
+]
