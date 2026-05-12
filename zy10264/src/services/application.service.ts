@@ -84,6 +84,10 @@ export const getApplicationMaterials = (applicationId: string) => {
     FROM materials m
     JOIN material_types mt ON m.type_id = mt.id
     WHERE m.application_id = ?
+    AND m.version = (
+      SELECT MAX(version) FROM materials 
+      WHERE application_id = m.application_id AND type_id = m.type_id
+    )
     ORDER BY mt.required DESC, mt.name
   `).all(applicationId);
 };
