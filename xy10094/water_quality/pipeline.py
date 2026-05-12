@@ -101,6 +101,8 @@ class QCPipeline:
             result.qc_result = qc_result
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            all_steps_succeeded = True
+            failed_steps = []
 
             if generate_html:
                 html_result = self._step_html_report(
@@ -113,18 +115,27 @@ class QCPipeline:
                     record,
                 )
                 result.html_report = html_result
+                if not html_result.success:
+                    all_steps_succeeded = False
+                    failed_steps.append(f"HTML报告生成: {getattr(html_result, 'message', getattr(html_result, 'error_message', '未知错误'))}")
 
             if generate_excel:
                 excel_result = self._step_export_excel(
                     qc_result, load_result, preprocess_result, timestamp, record
                 )
                 result.excel_report = excel_result
+                if not excel_result.success:
+                    all_steps_succeeded = False
+                    failed_steps.append(f"Excel导出: {getattr(excel_result, 'message', getattr(excel_result, 'error_message', '未知错误'))}")
 
             if generate_json:
                 json_result = self._step_export_json(
                     qc_result, load_result, preprocess_result, timestamp, record
                 )
                 result.json_export = json_result
+                if not json_result.success:
+                    all_steps_succeeded = False
+                    failed_steps.append(f"JSON导出: {getattr(json_result, 'message', getattr(json_result, 'error_message', '未知错误'))}")
 
             end_time = datetime.now()
             record.end_time = end_time.isoformat()
@@ -132,8 +143,12 @@ class QCPipeline:
 
             self._save_execution_record(record)
 
-            result.message = "质控流程完成"
-            result.success = True
+            if all_steps_succeeded:
+                result.message = "质控流程完成"
+                result.success = True
+            else:
+                result.message = f"质控流程部分失败: {'; '.join(failed_steps)}"
+                result.success = False
 
         except Exception as e:
             result.success = False

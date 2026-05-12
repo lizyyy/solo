@@ -78,10 +78,13 @@ class QCResult:
         return [f for f in self.failures if f.parameter == parameter]
 
     def to_summary_dict(self) -> Dict[str, Any]:
+        passed = sum(1 for c in self.checks if c.passed)
+        total = len(self.checks)
         return {
             "all_passed": self.all_passed(),
-            "total_checks": len(self.checks),
-            "passed_checks": sum(1 for c in self.checks if c.passed),
+            "total_checks": total,
+            "passed_checks": passed,
+            "failed_checks": total - passed,
             "total_failures": len(self.failures),
             "failures_by_type": self._count_failures_by_type(),
             "statistics": self.statistics,

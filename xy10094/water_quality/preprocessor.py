@@ -184,54 +184,81 @@ class DataPreprocessor:
         return issues, actions, result_df
 
     def _handle_duplicates(self, df: pd.DataFrame) -> Tuple[List[PreprocessIssue], List[Dict], pd.DataFrame]:
-        """处理重复值"""
+        """处理重复值 - 平行样（parallel）不应被合并，保留原始配对数据用于 RPD 检查"""
         issues: List[PreprocessIssue] = []
         actions: List[Dict] = []
         result_df = df.copy()
 
         if "sample_id" in result_df.columns and "parameter" in result_df.columns:
-            dup_keys = ["sample_id", "parameter"]
+            parallel_type_values = set()
+            for k, v in self.config.sample_type_map.items():
+                if v == "parallel":
+                    parallel_type_values.add(k)
+                    parallel_type_values.add(k.lower())
+            
+            parallel_mask = pd.Series(False, index=result_df.index)
             if "sample_type" in result_df.columns:
+                parallel_mask = result_df["sample_type"].apply(
+                    lambda x: x in parallel_type_values or (isinstance(x, str) and x.lower() in parallel_type_values)
+                )
+            
+            non_parallel_df = result_df[~parallel_mask].copy()
+            parallel_df = result_df[parallel_mask].copy()
+
+            dup_keys = ["sample_id", "parameter"]
+            if "sample_type" in non_parallel_df.columns:
                 dup_keys.append("sample_type")
             
-            dup_mask = result_df.duplicated(subset=dup_keys, keep=False)
+            dup_mask = non_parallel_df.duplicated(subset=dup_keys, keep=False)
             dup_count = dup_mask.sum()
 
             if dup_count > 0:
-                dup_groups = result_df[dup_mask].groupby(dup_keys).size()
+                dup_groups = non_parallel_df[dup_mask].groupby(dup_keys).size()
                 issues.append(PreprocessIssue(
                     type="duplicate_rows",
                     severity="warning",
-                    message=f"发现 {dup_count} 行重复数据（按 {dup_keys} 判断）",
-                    affected_rows=result_df.index[dup_mask].tolist()[:20],
+                    message=f"发现 {dup_count} 行重复数据（按 {dup_keys} 判断，平行样已排除）",
+                    affected_rows=non_parallel_df.index[dup_mask].tolist()[:20],
                     details={"duplicate_groups": {str(k): int(v) for k, v in dup_groups.items()}}
                 ))
 
-                if "value" in result_df.columns:
-                    aggregated = result_df.groupby(dup_keys, as_index=False).agg({
+                if "value" in non_parallel_df.columns:
+                    aggregated = non_parallel_df.groupby(dup_keys, as_index=False).agg({
                         "value": "mean",
                     })
                     
-                    other_cols = [c for c in result_df.columns if c not in dup_keys and c != "value"]
-                    first_vals = result_df.groupby(dup_keys, as_index=False)[other_cols].first()
+                    other_cols = [c for c in non_parallel_df.columns if c not in dup_keys and c != "value"]
+                    first_vals = non_parallel_df.groupby(dup_keys, as_index=False)[other_cols].first()
                     
                     merged = aggregated.merge(first_vals, on=dup_keys, how="left")
                     merged["_value_source"] = "mean_of_duplicates"
                     
-                    result_df = merged
+                    non_parallel_df = merged
                     
                     actions.append({
                         "action": "resolve_duplicates",
                         "method": "group_mean",
                         "keys": dup_keys,
-                        "original_duplicates": int(dup_count)
+                        "original_duplicates": int(dup_count),
+                        "note": "平行样未合并，保留用于RPD检查"
                     })
                     issues.append(PreprocessIssue(
                         type="duplicate_resolved",
                         severity="info",
-                        message=f"重复数据已合并，使用平均值",
-                        details={"method": "mean"}
+                        message=f"重复数据已合并（平行样除外），使用平均值",
+                        details={"method": "mean", "parallel_excluded": True}
                     ))
+            
+            if not parallel_df.empty:
+                result_df = pd.concat([non_parallel_df, parallel_df], ignore_index=True)
+                issues.append(PreprocessIssue(
+                    type="parallel_preserved",
+                    severity="info",
+                    message=f"保留了 {len(parallel_df)} 行平行样数据，用于 RPD 检查",
+                    details={"parallel_count": len(parallel_df)}
+                ))
+            else:
+                result_df = non_parallel_df
 
         return issues, actions, result_df
 

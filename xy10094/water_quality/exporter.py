@@ -5,7 +5,29 @@ from pathlib import Path
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 import json
+import numpy as np
 import pandas as pd
+
+
+def _safe_json(obj: Any) -> Any:
+    """numpy 类型安全的 JSON 序列化"""
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    elif isinstance(obj, (np.floating,)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: _safe_json(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [_safe_json(x) for x in obj]
+    else:
+        return obj
+
+
+def _safe_json_dumps(data: Any, **kwargs) -> str:
+    """numpy 类型安全的 json.dumps"""
+    return json.dumps(_safe_json(data), **kwargs)
 
 
 @dataclass
@@ -261,7 +283,7 @@ class Exporter:
                     "期望范围": str(f.expected_range) if f.expected_range else "",
                     "影响行号": str(f.affected_indices),
                     "时间": f.timestamp,
-                    "原始数据": json.dumps(f.raw_data, ensure_ascii=False),
+                    "原始数据": _safe_json_dumps(f.raw_data, ensure_ascii=False),
                 })
             df = pd.DataFrame(failures_data)
             df.to_excel(writer, sheet_name="失败详情", index=False)
@@ -276,7 +298,7 @@ class Exporter:
         rows = []
         for key, value in config.items():
             if isinstance(value, (dict, list)):
-                value_str = json.dumps(value, ensure_ascii=False, indent=2)
+                value_str = _safe_json_dumps(value, ensure_ascii=False, indent=2)
             else:
                 value_str = str(value)
             rows.append([key, value_str])
@@ -292,7 +314,7 @@ class Exporter:
                     "类型": issue.type,
                     "消息": issue.message,
                     "位置": issue.location,
-                    "详情": json.dumps(issue.details, ensure_ascii=False) if issue.details else "",
+                    "详情": _safe_json_dumps(issue.details, ensure_ascii=False) if issue.details else "",
                 })
             df = pd.DataFrame(data)
             df.to_excel(writer, sheet_name="加载问题", index=False)
@@ -304,7 +326,7 @@ class Exporter:
         rows.append(["预处理摘要", ""])
         for key, value in summary.items():
             if isinstance(value, dict):
-                rows.append([key, json.dumps(value, ensure_ascii=False)])
+                rows.append([key, _safe_json_dumps(value, ensure_ascii=False)])
             else:
                 rows.append([key, value])
         df_summary = pd.DataFrame(rows, columns=["项目", "值"])
@@ -319,7 +341,7 @@ class Exporter:
                     "消息": issue.message,
                     "影响行": str(issue.affected_rows),
                     "影响列": str(issue.affected_columns),
-                    "详情": json.dumps(issue.details, ensure_ascii=False) if issue.details else "",
+                    "详情": _safe_json_dumps(issue.details, ensure_ascii=False) if issue.details else "",
                 })
             df = pd.DataFrame(data)
             df.to_excel(writer, sheet_name="预处理问题", index=False)
