@@ -1,0 +1,614 @@
+{
+  "candidates": {
+    "cand_001": {
+      "id": "cand_001",
+      "name": "陈小明",
+      "position": "后端开发工程师",
+      "email": "chenxm@email.com",
+      "phone": "13800138001",
+      "department": "engineering",
+      "status": "active",
+      "notes": "3年经验，熟悉Python和Go",
+      "created_at": "2026-05-12T09:59:49.674791"
+    },
+    "cand_002": {
+      "id": "cand_002",
+      "name": "刘小花",
+      "position": "产品经理",
+      "email": "liuxh@email.com",
+      "phone": "13800138002",
+      "department": "product",
+      "status": "active",
+      "notes": "5年互联网产品经验",
+      "created_at": "2026-05-12T09:59:49.674793"
+    },
+    "cand_003": {
+      "id": "cand_003",
+      "name": "赵大伟",
+      "position": "销售经理",
+      "email": "zhaodw@email.com",
+      "phone": "13800138003",
+      "department": "sales",
+      "status": "active",
+      "notes": "B2B销售经验丰富",
+      "created_at": "2026-05-12T09:59:49.674794"
+    },
+    "cand_004": {
+      "id": "cand_004",
+      "name": "王技术",
+      "position": "前端开发工程师",
+      "email": "wangjs@email.com",
+      "phone": "13800138004",
+      "department": "engineering",
+      "status": "active",
+      "notes": "5年前端经验，React专家",
+      "created_at": "2026-05-12T09:59:49.674795"
+    },
+    "cand_005": {
+      "id": "cand_005",
+      "name": "李产品",
+      "position": "高级产品经理",
+      "email": "lipm@email.com",
+      "phone": "13800138005",
+      "department": "product",
+      "status": "active",
+      "notes": "曾主导过千万级用户产品",
+      "created_at": "2026-05-12T09:59:49.674795"
+    },
+    "cand_006": {
+      "id": "cand_006",
+      "name": "钱销售",
+      "position": "渠道销售",
+      "email": "qianxs@email.com",
+      "phone": "13800138006",
+      "department": "sales",
+      "status": "active",
+      "notes": "有丰富的渠道资源",
+      "created_at": "2026-05-12T09:59:49.674796"
+    },
+    "cand_007": {
+      "id": "cand_007",
+      "name": "孙架构",
+      "position": "系统架构师",
+      "email": "sunjg@email.com",
+      "phone": "13800138007",
+      "department": "engineering",
+      "status": "active",
+      "notes": "8年架构经验，大厂背景",
+      "created_at": "2026-05-12T09:59:49.674797"
+    },
+    "cand_008": {
+      "id": "cand_008",
+      "name": "周数据",
+      "position": "数据分析工程师",
+      "email": "zhousj@email.com",
+      "phone": "13800138008",
+      "department": "engineering",
+      "status": "active",
+      "notes": "熟悉Python和SQL，数据处理能力强",
+      "created_at": "2026-05-12T09:59:49.674798"
+    }
+  },
+  "interviewers": {
+    "intv_zhang": {
+      "id": "intv_zhang",
+      "name": "张工",
+      "email": "zhang@company.com",
+      "departments": [
+        "engineering"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-13T09:00:00",
+          "end": "2026-05-13T12:00:00"
+        },
+        {
+          "start": "2026-05-13T14:00:00",
+          "end": "2026-05-13T18:00:00"
+        },
+        {
+          "start": "2026-05-14T09:00:00",
+          "end": "2026-05-14T12:00:00"
+        },
+        {
+          "start": "2026-05-15T09:00:00",
+          "end": "2026-05-15T12:00:00"
+        },
+        {
+          "start": "2026-05-16T14:00:00",
+          "end": "2026-05-16T18:00:00"
+        }
+      ]
+    },
+    "intv_li": {
+      "id": "intv_li",
+      "name": "李工",
+      "email": "li@company.com",
+      "departments": [
+        "engineering"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-13T09:00:00",
+          "end": "2026-05-13T12:00:00"
+        },
+        {
+          "start": "2026-05-14T14:00:00",
+          "end": "2026-05-14T18:00:00"
+        },
+        {
+          "start": "2026-05-15T09:00:00",
+          "end": "2026-05-15T18:00:00"
+        },
+        {
+          "start": "2026-05-17T09:00:00",
+          "end": "2026-05-17T12:00:00"
+        }
+      ]
+    },
+    "intv_wang": {
+      "id": "intv_wang",
+      "name": "王经理",
+      "email": "wang@company.com",
+      "departments": [
+        "engineering",
+        "product"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-13T10:00:00",
+          "end": "2026-05-13T12:00:00"
+        },
+        {
+          "start": "2026-05-14T09:00:00",
+          "end": "2026-05-14T12:00:00"
+        },
+        {
+          "start": "2026-05-14T14:00:00",
+          "end": "2026-05-14T17:00:00"
+        },
+        {
+          "start": "2026-05-16T09:00:00",
+          "end": "2026-05-16T18:00:00"
+        }
+      ]
+    },
+    "intv_zhao": {
+      "id": "intv_zhao",
+      "name": "赵总监",
+      "email": "zhao@company.com",
+      "departments": [
+        "engineering"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-14T14:00:00",
+          "end": "2026-05-14T18:00:00"
+        },
+        {
+          "start": "2026-05-15T14:00:00",
+          "end": "2026-05-15T18:00:00"
+        },
+        {
+          "start": "2026-05-17T14:00:00",
+          "end": "2026-05-17T18:00:00"
+        }
+      ]
+    },
+    "intv_cai": {
+      "id": "intv_cai",
+      "name": "蔡产品",
+      "email": "cai@company.com",
+      "departments": [
+        "product"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-13T09:00:00",
+          "end": "2026-05-13T18:00:00"
+        },
+        {
+          "start": "2026-05-14T09:00:00",
+          "end": "2026-05-14T12:00:00"
+        },
+        {
+          "start": "2026-05-15T14:00:00",
+          "end": "2026-05-15T18:00:00"
+        },
+        {
+          "start": "2026-05-16T09:00:00",
+          "end": "2026-05-16T12:00:00"
+        }
+      ]
+    },
+    "intv_sun": {
+      "id": "intv_sun",
+      "name": "孙产品总监",
+      "email": "sun@company.com",
+      "departments": [
+        "product"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-14T14:00:00",
+          "end": "2026-05-14T18:00:00"
+        },
+        {
+          "start": "2026-05-15T09:00:00",
+          "end": "2026-05-15T18:00:00"
+        },
+        {
+          "start": "2026-05-17T09:00:00",
+          "end": "2026-05-17T18:00:00"
+        }
+      ]
+    },
+    "intv_zhou": {
+      "id": "intv_zhou",
+      "name": "周销售",
+      "email": "zhou@company.com",
+      "departments": [
+        "sales"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-13T09:00:00",
+          "end": "2026-05-13T12:00:00"
+        },
+        {
+          "start": "2026-05-13T14:00:00",
+          "end": "2026-05-13T18:00:00"
+        },
+        {
+          "start": "2026-05-14T09:00:00",
+          "end": "2026-05-14T18:00:00"
+        },
+        {
+          "start": "2026-05-15T14:00:00",
+          "end": "2026-05-15T18:00:00"
+        }
+      ]
+    },
+    "intv_wu": {
+      "id": "intv_wu",
+      "name": "吴销售总监",
+      "email": "wu@company.com",
+      "departments": [
+        "sales"
+      ],
+      "available_slots": [
+        {
+          "start": "2026-05-14T10:00:00",
+          "end": "2026-05-14T12:00:00"
+        },
+        {
+          "start": "2026-05-14T14:00:00",
+          "end": "2026-05-14T18:00:00"
+        },
+        {
+          "start": "2026-05-16T09:00:00",
+          "end": "2026-05-16T18:00:00"
+        }
+      ]
+    }
+  },
+  "rooms": {
+    "room_a": {
+      "id": "room_a",
+      "name": "会议室A",
+      "capacity": 6,
+      "building": "主楼",
+      "room_number": "301",
+      "equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统"
+      ]
+    },
+    "room_b": {
+      "id": "room_b",
+      "name": "会议室B",
+      "capacity": 4,
+      "building": "主楼",
+      "room_number": "302",
+      "equipment": [
+        "投影仪",
+        "白板"
+      ]
+    },
+    "room_c": {
+      "id": "room_c",
+      "name": "会议室C",
+      "capacity": 8,
+      "building": "西楼",
+      "room_number": "201",
+      "equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统",
+        "电视"
+      ]
+    },
+    "room_d": {
+      "id": "room_d",
+      "name": "小会议室D",
+      "capacity": 3,
+      "building": "西楼",
+      "room_number": "202",
+      "equipment": [
+        "白板"
+      ]
+    },
+    "room_e": {
+      "id": "room_e",
+      "name": "大会议室E",
+      "capacity": 12,
+      "building": "东楼",
+      "room_number": "101",
+      "equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统",
+        "电视",
+        "音响"
+      ]
+    }
+  },
+  "round_rules": {
+    "engineering_first": {
+      "round_type": "first",
+      "position_type": "engineering",
+      "duration_minutes": 45,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "投影仪",
+        "白板"
+      ]
+    },
+    "engineering_second": {
+      "round_type": "second",
+      "position_type": "engineering",
+      "duration_minutes": 60,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统"
+      ]
+    },
+    "engineering_final": {
+      "round_type": "final",
+      "position_type": "engineering",
+      "duration_minutes": 45,
+      "min_gap_hours": 24,
+      "required_interviewers": 3,
+      "required_equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统"
+      ]
+    },
+    "product_first": {
+      "round_type": "first",
+      "position_type": "product",
+      "duration_minutes": 45,
+      "min_gap_hours": 24,
+      "required_interviewers": 1,
+      "required_equipment": [
+        "投影仪",
+        "白板"
+      ]
+    },
+    "product_second": {
+      "round_type": "second",
+      "position_type": "product",
+      "duration_minutes": 60,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "投影仪",
+        "白板"
+      ]
+    },
+    "product_final": {
+      "round_type": "final",
+      "position_type": "product",
+      "duration_minutes": 45,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "投影仪",
+        "白板",
+        "视频会议系统"
+      ]
+    },
+    "sales_first": {
+      "round_type": "first",
+      "position_type": "sales",
+      "duration_minutes": 30,
+      "min_gap_hours": 24,
+      "required_interviewers": 1,
+      "required_equipment": [
+        "白板"
+      ]
+    },
+    "sales_second": {
+      "round_type": "second",
+      "position_type": "sales",
+      "duration_minutes": 45,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "白板"
+      ]
+    },
+    "sales_final": {
+      "round_type": "final",
+      "position_type": "sales",
+      "duration_minutes": 30,
+      "min_gap_hours": 24,
+      "required_interviewers": 2,
+      "required_equipment": [
+        "白板",
+        "视频会议系统"
+      ]
+    }
+  },
+  "interviews": {
+    "intv_001": {
+      "id": "intv_001",
+      "candidate_id": "cand_001",
+      "round_type": "first",
+      "slot": {
+        "start": "2026-05-13T09:00:00",
+        "end": "2026-05-13T09:45:00"
+      },
+      "interviewer_ids": [
+        "intv_zhang",
+        "intv_li"
+      ],
+      "room_id": "room_a",
+      "status": "confirmed",
+      "priority": 1,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-10T09:59:49.674733",
+      "updated_at": "2026-05-11T09:59:49.674733",
+      "notes": "候选人状态良好，已确认"
+    },
+    "intv_002": {
+      "id": "intv_002",
+      "candidate_id": "cand_002",
+      "round_type": "first",
+      "slot": {
+        "start": "2026-05-13T14:00:00",
+        "end": "2026-05-13T14:45:00"
+      },
+      "interviewer_ids": [
+        "intv_cai"
+      ],
+      "room_id": "room_b",
+      "status": "scheduled",
+      "priority": 0,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-11T09:59:49.674733",
+      "updated_at": "2026-05-11T09:59:49.674733",
+      "notes": "待双方确认"
+    },
+    "intv_003": {
+      "id": "intv_003",
+      "candidate_id": "cand_003",
+      "round_type": "first",
+      "slot": {
+        "start": "2026-05-14T10:00:00",
+        "end": "2026-05-14T10:30:00"
+      },
+      "interviewer_ids": [
+        "intv_zhou"
+      ],
+      "room_id": "room_d",
+      "status": "rescheduled",
+      "priority": 2,
+      "reschedule_count": 1,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-09T09:59:49.674733",
+      "updated_at": "2026-05-11T09:59:49.674733",
+      "notes": "面试官临时有会，改期一次"
+    },
+    "intv_004": {
+      "id": "intv_004",
+      "candidate_id": "cand_001",
+      "round_type": "second",
+      "slot": {
+        "start": "2026-05-15T14:00:00",
+        "end": "2026-05-15T15:00:00"
+      },
+      "interviewer_ids": [
+        "intv_wang",
+        "intv_li"
+      ],
+      "room_id": "room_c",
+      "status": "scheduled",
+      "priority": 1,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-11T09:59:49.674733",
+      "updated_at": "2026-05-12T09:59:49.674733",
+      "notes": "初试通过，安排复试"
+    },
+    "intv_005": {
+      "id": "intv_005",
+      "candidate_id": "cand_004",
+      "round_type": "first",
+      "slot": {
+        "start": "2026-05-17T14:00:00",
+        "end": "2026-05-17T14:45:00"
+      },
+      "interviewer_ids": [
+        "intv_zhang",
+        "intv_li"
+      ],
+      "room_id": "room_a",
+      "status": "candidate_no_show",
+      "priority": 3,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-08T09:59:49.674733",
+      "updated_at": "2026-05-11T09:59:49.674733",
+      "notes": "候选人未参加面试，电话无人接听"
+    },
+    "intv_006": {
+      "id": "intv_006",
+      "candidate_id": "cand_002",
+      "round_type": "second",
+      "slot": {
+        "start": "2026-05-16T10:00:00",
+        "end": "2026-05-16T10:45:00"
+      },
+      "interviewer_ids": [
+        "intv_cai",
+        "intv_wang"
+      ],
+      "room_id": "room_b",
+      "status": "scheduled",
+      "priority": 0,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_admin",
+      "created_at": "2026-05-12T04:59:49.674733",
+      "updated_at": "2026-05-12T04:59:49.674733",
+      "notes": ""
+    },
+    "intv_fb357f3c": {
+      "id": "intv_fb357f3c",
+      "candidate_id": "cand_007",
+      "round_type": "first",
+      "slot": {
+        "start": "2026-05-13T10:00:00",
+        "end": "2026-05-13T10:45:00"
+      },
+      "interviewer_ids": [
+        "intv_zhang",
+        "intv_li"
+      ],
+      "room_id": "room_a",
+      "status": "scheduled",
+      "priority": 0,
+      "reschedule_count": 0,
+      "reschedule_history": [],
+      "operator": "hr_demo",
+      "created_at": "2026-05-12T09:59:49.820520",
+      "updated_at": "2026-05-12T09:59:49.820521",
+      "notes": ""
+    }
+  },
+  "last_updated": "2026-05-12T09:59:49.820524"
+}
