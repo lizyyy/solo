@@ -1,0 +1,22 @@
+{
+  "name": "warehouse-stockout-split-api",
+  "version": "1.0.0",
+  "description": "仓配波次缺货拆单 API - 处理仓库拣货时缺货场景的拆单、换仓、状态回写",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "init-db": "node src/scripts/init-db.js",
+    "seed": "node src/scripts/seed-samples.js",
+    "demo": "sh scripts/demo.sh"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "moment": "^2.29.4",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
