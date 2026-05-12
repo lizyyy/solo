@@ -1,0 +1,3483 @@
+{
+  "batches": {
+    "BATCH_20260512215541_f67e72": {
+      "batch_id": "BATCH_20260512215541_f67e72",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "TEST_FARM_001",
+        "farm_name": "测试农场",
+        "region": "北京市大兴区",
+        "country": "中国"
+      },
+      "product_type": "西红柿",
+      "quantity": 1000,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:55:41.652512",
+      "status": "CREATED",
+      "inspection_report": null,
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [],
+      "boxes": [],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_fc4728": {
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "FARM_API_001",
+        "farm_name": "API测试农场",
+        "region": "上海市浦东新区",
+        "country": "中国"
+      },
+      "product_type": "黄瓜",
+      "quantity": 500,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.266461",
+      "status": "IN_WAREHOUSE",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_914ae7",
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "inspector_id": "INS_API_001",
+        "inspection_date": "2026-05-12 21:57:15.272783",
+        "expiry_date": "2026-06-11 21:57:15.272784",
+        "status": "PASSED",
+        "items": [
+          {
+            "name": "农药残留",
+            "result": "合格",
+            "value": "0.05mg/kg",
+            "limit": "0.1mg/kg"
+          },
+          {
+            "name": "重金属",
+            "result": "合格",
+            "value": "0.1mg/kg",
+            "limit": "0.5mg/kg"
+          }
+        ],
+        "remarks": "全部合格"
+      },
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_40f347",
+        "BOX_20260512215715_f035b3",
+        "BOX_20260512215715_326b8c",
+        "BOX_20260512215715_1257ea",
+        "BOX_20260512215715_e55cae",
+        "BOX_20260512215715_e81b9b",
+        "BOX_20260512215715_ab06f1",
+        "BOX_20260512215715_548b28",
+        "BOX_20260512215715_49026f",
+        "BOX_20260512215715_42fcfa"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_d89d76": {
+      "batch_id": "BATCH_20260512215715_d89d76",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "M1",
+        "farm_name": "混装农场1",
+        "region": "山东",
+        "country": "中国"
+      },
+      "product_type": "苹果",
+      "quantity": 400,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.294063",
+      "status": "MIXED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_00e121",
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.307120",
+        "expiry_date": "2026-06-11 21:57:15.307121",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [
+        "BATCH_20260512215715_7fa19a"
+      ],
+      "boxes": [
+        "BOX_20260512215715_cad8f8",
+        "BOX_20260512215715_4ff246",
+        "BOX_20260512215715_5b064a",
+        "BOX_20260512215715_ca84ef",
+        "BOX_20260512215715_945dea",
+        "BOX_20260512215715_f949d8",
+        "BOX_20260512215715_7fcdc4",
+        "BOX_20260512215715_fd3eb9"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_616145": {
+      "batch_id": "BATCH_20260512215715_616145",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "M2",
+        "farm_name": "混装农场2",
+        "region": "陕西",
+        "country": "中国"
+      },
+      "product_type": "苹果",
+      "quantity": 300,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.301531",
+      "status": "MIXED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_dfbdd2",
+        "batch_id": "BATCH_20260512215715_616145",
+        "inspector_id": "I2",
+        "inspection_date": "2026-05-12 21:57:15.312404",
+        "expiry_date": "2026-06-11 21:57:15.312405",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [
+        "BATCH_20260512215715_7fa19a"
+      ],
+      "boxes": [
+        "BOX_20260512215715_361390",
+        "BOX_20260512215715_f13670",
+        "BOX_20260512215715_4dac50",
+        "BOX_20260512215715_02c3c2",
+        "BOX_20260512215715_6b85a3",
+        "BOX_20260512215715_d13c12"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_7fa19a": {
+      "batch_id": "BATCH_20260512215715_7fa19a",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "M1",
+        "farm_name": "混装农场1",
+        "region": "山东",
+        "country": "中国"
+      },
+      "product_type": "混合苹果",
+      "quantity": 700,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.366391",
+      "status": "SORTED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_00e121",
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.307120",
+        "expiry_date": "2026-06-11 21:57:15.307121",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": true,
+      "source_batches": [
+        "BATCH_20260512215715_d89d76",
+        "BATCH_20260512215715_616145"
+      ],
+      "child_batches": [
+        "BATCH_20260512215715_cb6b05",
+        "BATCH_20260512215715_d48346",
+        "BATCH_20260512215715_6b0ca7"
+      ],
+      "boxes": [
+        "BOX_20260512215715_cad8f8",
+        "BOX_20260512215715_4ff246",
+        "BOX_20260512215715_5b064a",
+        "BOX_20260512215715_ca84ef",
+        "BOX_20260512215715_945dea",
+        "BOX_20260512215715_f949d8",
+        "BOX_20260512215715_7fcdc4",
+        "BOX_20260512215715_fd3eb9",
+        "BOX_20260512215715_361390",
+        "BOX_20260512215715_f13670",
+        "BOX_20260512215715_4dac50",
+        "BOX_20260512215715_02c3c2",
+        "BOX_20260512215715_6b85a3",
+        "BOX_20260512215715_d13c12"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_cb6b05": {
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "parent_batch_id": "BATCH_20260512215715_7fa19a",
+      "origin": {
+        "farm_id": "M1",
+        "farm_name": "混装农场1",
+        "region": "山东",
+        "country": "中国"
+      },
+      "product_type": "精品",
+      "quantity": 5,
+      "unit": "箱",
+      "arrival_date": "2026-05-12 21:57:15.408278",
+      "status": "SORTED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_00e121",
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.307120",
+        "expiry_date": "2026-06-11 21:57:15.307121",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [
+        "BATCH_20260512215715_7fa19a"
+      ],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_cad8f8",
+        "BOX_20260512215715_4ff246",
+        "BOX_20260512215715_5b064a",
+        "BOX_20260512215715_ca84ef",
+        "BOX_20260512215715_945dea"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_d48346": {
+      "batch_id": "BATCH_20260512215715_d48346",
+      "parent_batch_id": "BATCH_20260512215715_7fa19a",
+      "origin": {
+        "farm_id": "M1",
+        "farm_name": "混装农场1",
+        "region": "山东",
+        "country": "中国"
+      },
+      "product_type": "普通",
+      "quantity": 5,
+      "unit": "箱",
+      "arrival_date": "2026-05-12 21:57:15.421781",
+      "status": "SORTED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_00e121",
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.307120",
+        "expiry_date": "2026-06-11 21:57:15.307121",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [
+        "BATCH_20260512215715_7fa19a"
+      ],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_f949d8",
+        "BOX_20260512215715_7fcdc4",
+        "BOX_20260512215715_fd3eb9",
+        "BOX_20260512215715_361390",
+        "BOX_20260512215715_f13670"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_6b0ca7": {
+      "batch_id": "BATCH_20260512215715_6b0ca7",
+      "parent_batch_id": "BATCH_20260512215715_7fa19a",
+      "origin": {
+        "farm_id": "M1",
+        "farm_name": "混装农场1",
+        "region": "山东",
+        "country": "中国"
+      },
+      "product_type": "次级",
+      "quantity": 4,
+      "unit": "箱",
+      "arrival_date": "2026-05-12 21:57:15.430297",
+      "status": "SORTED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_00e121",
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.307120",
+        "expiry_date": "2026-06-11 21:57:15.307121",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [
+        "BATCH_20260512215715_7fa19a"
+      ],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_4dac50",
+        "BOX_20260512215715_02c3c2",
+        "BOX_20260512215715_6b85a3",
+        "BOX_20260512215715_d13c12"
+      ],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_7b7062": {
+      "batch_id": "BATCH_20260512215715_7b7062",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "R1",
+        "farm_name": "召回农场",
+        "region": "浙江",
+        "country": "中国"
+      },
+      "product_type": "草莓",
+      "quantity": 200,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.448410",
+      "status": "RECALLED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_6571a4",
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.458552",
+        "expiry_date": "2026-06-11 21:57:15.458555",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [
+        "BATCH_20260512215715_1a9da2",
+        "BATCH_20260512215715_db1b8b"
+      ],
+      "boxes": [
+        "BOX_20260512215715_43eff0",
+        "BOX_20260512215715_26d18c",
+        "BOX_20260512215715_cace8f",
+        "BOX_20260512215715_817e84",
+        "BOX_20260512215715_e553c7"
+      ],
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.717055",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.717042",
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_1a9da2": {
+      "batch_id": "BATCH_20260512215715_1a9da2",
+      "parent_batch_id": "BATCH_20260512215715_7b7062",
+      "origin": {
+        "farm_id": "R1",
+        "farm_name": "召回农场",
+        "region": "浙江",
+        "country": "中国"
+      },
+      "product_type": "商超",
+      "quantity": 3,
+      "unit": "箱",
+      "arrival_date": "2026-05-12 21:57:15.574376",
+      "status": "RECALLED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_6571a4",
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.458552",
+        "expiry_date": "2026-06-11 21:57:15.458555",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [
+        "BATCH_20260512215715_7b7062"
+      ],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_43eff0",
+        "BOX_20260512215715_26d18c",
+        "BOX_20260512215715_cace8f"
+      ],
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.738789",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.738781",
+      "outbound_at": "2026-05-12 21:57:15.685142"
+    },
+    "BATCH_20260512215715_db1b8b": {
+      "batch_id": "BATCH_20260512215715_db1b8b",
+      "parent_batch_id": "BATCH_20260512215715_7b7062",
+      "origin": {
+        "farm_id": "R1",
+        "farm_name": "召回农场",
+        "region": "浙江",
+        "country": "中国"
+      },
+      "product_type": "电商",
+      "quantity": 2,
+      "unit": "箱",
+      "arrival_date": "2026-05-12 21:57:15.654445",
+      "status": "RECALLED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_6571a4",
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.458552",
+        "expiry_date": "2026-06-11 21:57:15.458555",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [
+        "BATCH_20260512215715_7b7062"
+      ],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_817e84",
+        "BOX_20260512215715_e553c7"
+      ],
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.741663",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.741656",
+      "outbound_at": "2026-05-12 21:57:15.697924"
+    },
+    "BATCH_20260512215715_c825e3": {
+      "batch_id": "BATCH_20260512215715_c825e3",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "RULE_001",
+        "farm_name": "规则农场",
+        "region": "江苏",
+        "country": "中国"
+      },
+      "product_type": "白菜",
+      "quantity": 100,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.753904",
+      "status": "RECALLED",
+      "inspection_report": {
+        "report_id": "REP_20260512215715_24713a",
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "inspector_id": "I1",
+        "inspection_date": "2026-05-12 21:57:15.761338",
+        "expiry_date": "2026-06-11 21:57:15.761338",
+        "status": "PASSED",
+        "items": [
+          {}
+        ],
+        "remarks": null
+      },
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [],
+      "boxes": [
+        "BOX_20260512215715_134338",
+        "BOX_20260512215715_6875c7"
+      ],
+      "frozen": true,
+      "frozen_reason": "召回冻结: 测试召回",
+      "frozen_at": "2026-05-12 21:57:15.855365",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.855361",
+      "outbound_at": null
+    },
+    "BATCH_20260512215715_6d92bb": {
+      "batch_id": "BATCH_20260512215715_6d92bb",
+      "parent_batch_id": null,
+      "origin": {
+        "farm_id": "I1",
+        "farm_name": "幂等农场",
+        "region": "测试",
+        "country": "中国"
+      },
+      "product_type": "幂等测试",
+      "quantity": 100,
+      "unit": "公斤",
+      "arrival_date": "2026-05-12 21:57:15.830744",
+      "status": "CREATED",
+      "inspection_report": null,
+      "is_mixed": false,
+      "source_batches": [],
+      "child_batches": [],
+      "boxes": [],
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null
+    }
+  },
+  "boxes": {
+    "BOX_20260512215715_40f347": {
+      "box_id": "BOX_20260512215715_40f347",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_f035b3": {
+      "box_id": "BOX_20260512215715_f035b3",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_326b8c": {
+      "box_id": "BOX_20260512215715_326b8c",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_1257ea": {
+      "box_id": "BOX_20260512215715_1257ea",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_e55cae": {
+      "box_id": "BOX_20260512215715_e55cae",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_e81b9b": {
+      "box_id": "BOX_20260512215715_e81b9b",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_ab06f1": {
+      "box_id": "BOX_20260512215715_ab06f1",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_548b28": {
+      "box_id": "BOX_20260512215715_548b28",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_49026f": {
+      "box_id": "BOX_20260512215715_49026f",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_42fcfa": {
+      "box_id": "BOX_20260512215715_42fcfa",
+      "batch_id": "BATCH_20260512215715_fc4728",
+      "original_batch_id": "BATCH_20260512215715_fc4728",
+      "status": "IN_WAREHOUSE",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_cad8f8": {
+      "box_id": "BOX_20260512215715_cad8f8",
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_4ff246": {
+      "box_id": "BOX_20260512215715_4ff246",
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_5b064a": {
+      "box_id": "BOX_20260512215715_5b064a",
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_ca84ef": {
+      "box_id": "BOX_20260512215715_ca84ef",
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_945dea": {
+      "box_id": "BOX_20260512215715_945dea",
+      "batch_id": "BATCH_20260512215715_cb6b05",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_f949d8": {
+      "box_id": "BOX_20260512215715_f949d8",
+      "batch_id": "BATCH_20260512215715_d48346",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_7fcdc4": {
+      "box_id": "BOX_20260512215715_7fcdc4",
+      "batch_id": "BATCH_20260512215715_d48346",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_fd3eb9": {
+      "box_id": "BOX_20260512215715_fd3eb9",
+      "batch_id": "BATCH_20260512215715_d48346",
+      "original_batch_id": "BATCH_20260512215715_d89d76",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_361390": {
+      "box_id": "BOX_20260512215715_361390",
+      "batch_id": "BATCH_20260512215715_d48346",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_f13670": {
+      "box_id": "BOX_20260512215715_f13670",
+      "batch_id": "BATCH_20260512215715_d48346",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_4dac50": {
+      "box_id": "BOX_20260512215715_4dac50",
+      "batch_id": "BATCH_20260512215715_6b0ca7",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_02c3c2": {
+      "box_id": "BOX_20260512215715_02c3c2",
+      "batch_id": "BATCH_20260512215715_6b0ca7",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_6b85a3": {
+      "box_id": "BOX_20260512215715_6b85a3",
+      "batch_id": "BATCH_20260512215715_6b0ca7",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_d13c12": {
+      "box_id": "BOX_20260512215715_d13c12",
+      "batch_id": "BATCH_20260512215715_6b0ca7",
+      "original_batch_id": "BATCH_20260512215715_616145",
+      "status": "SORTED",
+      "frozen": false,
+      "frozen_reason": null,
+      "frozen_at": null,
+      "recalled": false,
+      "recalled_at": null,
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_43eff0": {
+      "box_id": "BOX_20260512215715_43eff0",
+      "batch_id": "BATCH_20260512215715_1a9da2",
+      "original_batch_id": "BATCH_20260512215715_7b7062",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.722644",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.722611",
+      "outbound_at": "2026-05-12 21:57:15.685151",
+      "destination": "北京华联超市"
+    },
+    "BOX_20260512215715_26d18c": {
+      "box_id": "BOX_20260512215715_26d18c",
+      "batch_id": "BATCH_20260512215715_1a9da2",
+      "original_batch_id": "BATCH_20260512215715_7b7062",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.725554",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.725546",
+      "outbound_at": "2026-05-12 21:57:15.687382",
+      "destination": "北京华联超市"
+    },
+    "BOX_20260512215715_cace8f": {
+      "box_id": "BOX_20260512215715_cace8f",
+      "batch_id": "BATCH_20260512215715_1a9da2",
+      "original_batch_id": "BATCH_20260512215715_7b7062",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.727802",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.727796",
+      "outbound_at": "2026-05-12 21:57:15.689356",
+      "destination": "北京华联超市"
+    },
+    "BOX_20260512215715_817e84": {
+      "box_id": "BOX_20260512215715_817e84",
+      "batch_id": "BATCH_20260512215715_db1b8b",
+      "original_batch_id": "BATCH_20260512215715_7b7062",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.730288",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.730280",
+      "outbound_at": "2026-05-12 21:57:15.697938",
+      "destination": "京东电商仓"
+    },
+    "BOX_20260512215715_e553c7": {
+      "box_id": "BOX_20260512215715_e553c7",
+      "batch_id": "BATCH_20260512215715_db1b8b",
+      "original_batch_id": "BATCH_20260512215715_7b7062",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 可能受污染，紧急召回",
+      "frozen_at": "2026-05-12 21:57:15.736316",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.736304",
+      "outbound_at": "2026-05-12 21:57:15.700961",
+      "destination": "京东电商仓"
+    },
+    "BOX_20260512215715_134338": {
+      "box_id": "BOX_20260512215715_134338",
+      "batch_id": "BATCH_20260512215715_c825e3",
+      "original_batch_id": "BATCH_20260512215715_c825e3",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 测试召回",
+      "frozen_at": "2026-05-12 21:57:15.858012",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.858004",
+      "outbound_at": null,
+      "destination": null
+    },
+    "BOX_20260512215715_6875c7": {
+      "box_id": "BOX_20260512215715_6875c7",
+      "batch_id": "BATCH_20260512215715_c825e3",
+      "original_batch_id": "BATCH_20260512215715_c825e3",
+      "status": "RECALLED",
+      "frozen": true,
+      "frozen_reason": "召回冻结: 测试召回",
+      "frozen_at": "2026-05-12 21:57:15.860671",
+      "recalled": true,
+      "recalled_at": "2026-05-12 21:57:15.860663",
+      "outbound_at": null,
+      "destination": null
+    }
+  },
+  "audit_logs": [
+    {
+      "log_id": "LOG_20260512215541_1d51b3",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215541_f67e72",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215541_f67e72",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "TEST_FARM_001",
+          "farm_name": "测试农场",
+          "region": "北京市大兴区",
+          "country": "中国"
+        },
+        "product_type": "西红柿",
+        "quantity": 1000,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:55:41.652512",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215541_f67e72",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "TEST_FARM_001",
+            "farm_name": "测试农场",
+            "region": "北京市大兴区",
+            "country": "中国"
+          },
+          "product_type": "西红柿",
+          "quantity": 1000,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:55:41.652512",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:55:41.653207",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_4fabe6",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_fc4728",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "FARM_API_001",
+          "farm_name": "API测试农场",
+          "region": "上海市浦东新区",
+          "country": "中国"
+        },
+        "product_type": "黄瓜",
+        "quantity": 500,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.266461",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_fc4728",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "FARM_API_001",
+            "farm_name": "API测试农场",
+            "region": "上海市浦东新区",
+            "country": "中国"
+          },
+          "product_type": "黄瓜",
+          "quantity": 500,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.266461",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.267857",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_5eaec0",
+      "operation": "INSPECTION",
+      "operator_id": "INS_API_001",
+      "operator_name": "inspector_INS_API_001",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_fc4728",
+      "action": "提交检测报告",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "FARM_API_001",
+          "farm_name": "API测试农场",
+          "region": "上海市浦东新区",
+          "country": "中国"
+        },
+        "product_type": "黄瓜",
+        "quantity": 500,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.266461",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "FARM_API_001",
+          "farm_name": "API测试农场",
+          "region": "上海市浦东新区",
+          "country": "中国"
+        },
+        "product_type": "黄瓜",
+        "quantity": 500,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.266461",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_914ae7",
+          "batch_id": "BATCH_20260512215715_fc4728",
+          "inspector_id": "INS_API_001",
+          "inspection_date": "2026-05-12 21:57:15.272783",
+          "expiry_date": "2026-06-11 21:57:15.272784",
+          "status": "PASSED",
+          "items": [
+            {
+              "name": "农药残留",
+              "result": "合格",
+              "value": "0.05mg/kg",
+              "limit": "0.1mg/kg"
+            },
+            {
+              "name": "重金属",
+              "result": "合格",
+              "value": "0.1mg/kg",
+              "limit": "0.5mg/kg"
+            }
+          ],
+          "remarks": "全部合格"
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "CREATED",
+          "after": "INSPECTION_PASSED"
+        },
+        "inspection_report": {
+          "before": null,
+          "after": {
+            "report_id": "REP_20260512215715_914ae7",
+            "batch_id": "BATCH_20260512215715_fc4728",
+            "inspector_id": "INS_API_001",
+            "inspection_date": "2026-05-12 21:57:15.272783",
+            "expiry_date": "2026-06-11 21:57:15.272784",
+            "status": "PASSED",
+            "items": [
+              {
+                "name": "农药残留",
+                "result": "合格",
+                "value": "0.05mg/kg",
+                "limit": "0.1mg/kg"
+              },
+              {
+                "name": "重金属",
+                "result": "合格",
+                "value": "0.1mg/kg",
+                "limit": "0.5mg/kg"
+              }
+            ],
+            "remarks": "全部合格"
+          }
+        }
+      },
+      "remarks": "全部合格",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.273281",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_4b2a33",
+      "operation": "WAREHOUSE_IN",
+      "operator_id": "WH_API_001",
+      "operator_name": "API仓库管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_fc4728",
+      "action": "入仓操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "FARM_API_001",
+          "farm_name": "API测试农场",
+          "region": "上海市浦东新区",
+          "country": "中国"
+        },
+        "product_type": "黄瓜",
+        "quantity": 500,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.266461",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_914ae7",
+          "batch_id": "BATCH_20260512215715_fc4728",
+          "inspector_id": "INS_API_001",
+          "inspection_date": "2026-05-12 21:57:15.272783",
+          "expiry_date": "2026-06-11 21:57:15.272784",
+          "status": "PASSED",
+          "items": [
+            {
+              "name": "农药残留",
+              "result": "合格",
+              "value": "0.05mg/kg",
+              "limit": "0.1mg/kg"
+            },
+            {
+              "name": "重金属",
+              "result": "合格",
+              "value": "0.1mg/kg",
+              "limit": "0.5mg/kg"
+            }
+          ],
+          "remarks": "全部合格"
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_fc4728",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "FARM_API_001",
+          "farm_name": "API测试农场",
+          "region": "上海市浦东新区",
+          "country": "中国"
+        },
+        "product_type": "黄瓜",
+        "quantity": 500,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.266461",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_914ae7",
+          "batch_id": "BATCH_20260512215715_fc4728",
+          "inspector_id": "INS_API_001",
+          "inspection_date": "2026-05-12 21:57:15.272783",
+          "expiry_date": "2026-06-11 21:57:15.272784",
+          "status": "PASSED",
+          "items": [
+            {
+              "name": "农药残留",
+              "result": "合格",
+              "value": "0.05mg/kg",
+              "limit": "0.1mg/kg"
+            },
+            {
+              "name": "重金属",
+              "result": "合格",
+              "value": "0.1mg/kg",
+              "limit": "0.5mg/kg"
+            }
+          ],
+          "remarks": "全部合格"
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_40f347",
+          "BOX_20260512215715_f035b3",
+          "BOX_20260512215715_326b8c",
+          "BOX_20260512215715_1257ea",
+          "BOX_20260512215715_e55cae",
+          "BOX_20260512215715_e81b9b",
+          "BOX_20260512215715_ab06f1",
+          "BOX_20260512215715_548b28",
+          "BOX_20260512215715_49026f",
+          "BOX_20260512215715_42fcfa"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "INSPECTION_PASSED",
+          "after": "IN_WAREHOUSE"
+        },
+        "boxes": {
+          "before": [],
+          "after": [
+            "BOX_20260512215715_40f347",
+            "BOX_20260512215715_f035b3",
+            "BOX_20260512215715_326b8c",
+            "BOX_20260512215715_1257ea",
+            "BOX_20260512215715_e55cae",
+            "BOX_20260512215715_e81b9b",
+            "BOX_20260512215715_ab06f1",
+            "BOX_20260512215715_548b28",
+            "BOX_20260512215715_49026f",
+            "BOX_20260512215715_42fcfa"
+          ]
+        }
+      },
+      "remarks": "生成 10 个箱子",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.290514",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_68817f",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_d89d76",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "M1",
+            "farm_name": "混装农场1",
+            "region": "山东",
+            "country": "中国"
+          },
+          "product_type": "苹果",
+          "quantity": 400,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.294063",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.295094",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_837493",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_616145",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_616145",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "M2",
+            "farm_name": "混装农场2",
+            "region": "陕西",
+            "country": "中国"
+          },
+          "product_type": "苹果",
+          "quantity": 300,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.301531",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.302863",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_73219a",
+      "operation": "INSPECTION",
+      "operator_id": "I1",
+      "operator_name": "inspector_I1",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_d89d76",
+      "action": "提交检测报告",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "CREATED",
+          "after": "INSPECTION_PASSED"
+        },
+        "inspection_report": {
+          "before": null,
+          "after": {
+            "report_id": "REP_20260512215715_00e121",
+            "batch_id": "BATCH_20260512215715_d89d76",
+            "inspector_id": "I1",
+            "inspection_date": "2026-05-12 21:57:15.307120",
+            "expiry_date": "2026-06-11 21:57:15.307121",
+            "status": "PASSED",
+            "items": [
+              {}
+            ],
+            "remarks": null
+          }
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.308393",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_21d00f",
+      "operation": "INSPECTION",
+      "operator_id": "I2",
+      "operator_name": "inspector_I2",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_616145",
+      "action": "提交检测报告",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_dfbdd2",
+          "batch_id": "BATCH_20260512215715_616145",
+          "inspector_id": "I2",
+          "inspection_date": "2026-05-12 21:57:15.312404",
+          "expiry_date": "2026-06-11 21:57:15.312405",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "CREATED",
+          "after": "INSPECTION_PASSED"
+        },
+        "inspection_report": {
+          "before": null,
+          "after": {
+            "report_id": "REP_20260512215715_dfbdd2",
+            "batch_id": "BATCH_20260512215715_616145",
+            "inspector_id": "I2",
+            "inspection_date": "2026-05-12 21:57:15.312404",
+            "expiry_date": "2026-06-11 21:57:15.312405",
+            "status": "PASSED",
+            "items": [
+              {}
+            ],
+            "remarks": null
+          }
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.315303",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_b22699",
+      "operation": "WAREHOUSE_IN",
+      "operator_id": "OP001",
+      "operator_name": "仓库管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_d89d76",
+      "action": "入仓操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "INSPECTION_PASSED",
+          "after": "IN_WAREHOUSE"
+        },
+        "boxes": {
+          "before": [],
+          "after": [
+            "BOX_20260512215715_cad8f8",
+            "BOX_20260512215715_4ff246",
+            "BOX_20260512215715_5b064a",
+            "BOX_20260512215715_ca84ef",
+            "BOX_20260512215715_945dea",
+            "BOX_20260512215715_f949d8",
+            "BOX_20260512215715_7fcdc4",
+            "BOX_20260512215715_fd3eb9"
+          ]
+        }
+      },
+      "remarks": "生成 8 个箱子",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.329632",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_1e8c21",
+      "operation": "WAREHOUSE_IN",
+      "operator_id": "OP001",
+      "operator_name": "仓库管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_616145",
+      "action": "入仓操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_dfbdd2",
+          "batch_id": "BATCH_20260512215715_616145",
+          "inspector_id": "I2",
+          "inspection_date": "2026-05-12 21:57:15.312404",
+          "expiry_date": "2026-06-11 21:57:15.312405",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_dfbdd2",
+          "batch_id": "BATCH_20260512215715_616145",
+          "inspector_id": "I2",
+          "inspection_date": "2026-05-12 21:57:15.312404",
+          "expiry_date": "2026-06-11 21:57:15.312405",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "INSPECTION_PASSED",
+          "after": "IN_WAREHOUSE"
+        },
+        "boxes": {
+          "before": [],
+          "after": [
+            "BOX_20260512215715_361390",
+            "BOX_20260512215715_f13670",
+            "BOX_20260512215715_4dac50",
+            "BOX_20260512215715_02c3c2",
+            "BOX_20260512215715_6b85a3",
+            "BOX_20260512215715_d13c12"
+          ]
+        }
+      },
+      "remarks": "生成 6 个箱子",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.358227",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_cf6ee6",
+      "operation": "MIX",
+      "operator_id": "MIX_001",
+      "operator_name": "混装员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_d89d76",
+      "action": "参与混装",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_d89d76",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 400,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.294063",
+        "status": "MIXED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [
+          "BATCH_20260512215715_7fa19a"
+        ],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "IN_WAREHOUSE",
+          "after": "MIXED"
+        },
+        "child_batches": {
+          "before": [],
+          "after": [
+            "BATCH_20260512215715_7fa19a"
+          ]
+        }
+      },
+      "remarks": "混装到新批次 BATCH_20260512215715_7fa19a",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.389317",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_1bab98",
+      "operation": "MIX",
+      "operator_id": "MIX_001",
+      "operator_name": "混装员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_616145",
+      "action": "参与混装",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_dfbdd2",
+          "batch_id": "BATCH_20260512215715_616145",
+          "inspector_id": "I2",
+          "inspection_date": "2026-05-12 21:57:15.312404",
+          "expiry_date": "2026-06-11 21:57:15.312405",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_616145",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M2",
+          "farm_name": "混装农场2",
+          "region": "陕西",
+          "country": "中国"
+        },
+        "product_type": "苹果",
+        "quantity": 300,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.301531",
+        "status": "MIXED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_dfbdd2",
+          "batch_id": "BATCH_20260512215715_616145",
+          "inspector_id": "I2",
+          "inspection_date": "2026-05-12 21:57:15.312404",
+          "expiry_date": "2026-06-11 21:57:15.312405",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [
+          "BATCH_20260512215715_7fa19a"
+        ],
+        "boxes": [
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "IN_WAREHOUSE",
+          "after": "MIXED"
+        },
+        "child_batches": {
+          "before": [],
+          "after": [
+            "BATCH_20260512215715_7fa19a"
+          ]
+        }
+      },
+      "remarks": "混装到新批次 BATCH_20260512215715_7fa19a",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.402528",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_9830ca",
+      "operation": "MIX_CREATE",
+      "operator_id": "MIX_001",
+      "operator_name": "混装员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7fa19a",
+      "action": "创建混装批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7fa19a",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "混合苹果",
+        "quantity": 700,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.366391",
+        "status": "MIXED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": true,
+        "source_batches": [
+          "BATCH_20260512215715_d89d76",
+          "BATCH_20260512215715_616145"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9",
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_7fa19a",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "M1",
+            "farm_name": "混装农场1",
+            "region": "山东",
+            "country": "中国"
+          },
+          "product_type": "混合苹果",
+          "quantity": 700,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.366391",
+          "status": "MIXED",
+          "inspection_report": {
+            "report_id": "REP_20260512215715_00e121",
+            "batch_id": "BATCH_20260512215715_d89d76",
+            "inspector_id": "I1",
+            "inspection_date": "2026-05-12 21:57:15.307120",
+            "expiry_date": "2026-06-11 21:57:15.307121",
+            "status": "PASSED",
+            "items": [
+              {}
+            ],
+            "remarks": null
+          },
+          "is_mixed": true,
+          "source_batches": [
+            "BATCH_20260512215715_d89d76",
+            "BATCH_20260512215715_616145"
+          ],
+          "child_batches": [],
+          "boxes": [
+            "BOX_20260512215715_cad8f8",
+            "BOX_20260512215715_4ff246",
+            "BOX_20260512215715_5b064a",
+            "BOX_20260512215715_ca84ef",
+            "BOX_20260512215715_945dea",
+            "BOX_20260512215715_f949d8",
+            "BOX_20260512215715_7fcdc4",
+            "BOX_20260512215715_fd3eb9",
+            "BOX_20260512215715_361390",
+            "BOX_20260512215715_f13670",
+            "BOX_20260512215715_4dac50",
+            "BOX_20260512215715_02c3c2",
+            "BOX_20260512215715_6b85a3",
+            "BOX_20260512215715_d13c12"
+          ],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": "来源批次: ['BATCH_20260512215715_d89d76', 'BATCH_20260512215715_616145']",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.405251",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_4caebb",
+      "operation": "SORT",
+      "operator_id": "SORT_001",
+      "operator_name": "分拣员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7fa19a",
+      "action": "分拣操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_7fa19a",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "混合苹果",
+        "quantity": 700,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.366391",
+        "status": "MIXED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": true,
+        "source_batches": [
+          "BATCH_20260512215715_d89d76",
+          "BATCH_20260512215715_616145"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9",
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7fa19a",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "M1",
+          "farm_name": "混装农场1",
+          "region": "山东",
+          "country": "中国"
+        },
+        "product_type": "混合苹果",
+        "quantity": 700,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.366391",
+        "status": "SORTED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_00e121",
+          "batch_id": "BATCH_20260512215715_d89d76",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.307120",
+          "expiry_date": "2026-06-11 21:57:15.307121",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": true,
+        "source_batches": [
+          "BATCH_20260512215715_d89d76",
+          "BATCH_20260512215715_616145"
+        ],
+        "child_batches": [
+          "BATCH_20260512215715_cb6b05",
+          "BATCH_20260512215715_d48346",
+          "BATCH_20260512215715_6b0ca7"
+        ],
+        "boxes": [
+          "BOX_20260512215715_cad8f8",
+          "BOX_20260512215715_4ff246",
+          "BOX_20260512215715_5b064a",
+          "BOX_20260512215715_ca84ef",
+          "BOX_20260512215715_945dea",
+          "BOX_20260512215715_f949d8",
+          "BOX_20260512215715_7fcdc4",
+          "BOX_20260512215715_fd3eb9",
+          "BOX_20260512215715_361390",
+          "BOX_20260512215715_f13670",
+          "BOX_20260512215715_4dac50",
+          "BOX_20260512215715_02c3c2",
+          "BOX_20260512215715_6b85a3",
+          "BOX_20260512215715_d13c12"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "MIXED",
+          "after": "SORTED"
+        },
+        "child_batches": {
+          "before": [],
+          "after": [
+            "BATCH_20260512215715_cb6b05",
+            "BATCH_20260512215715_d48346",
+            "BATCH_20260512215715_6b0ca7"
+          ]
+        }
+      },
+      "remarks": "生成 3 个子批次",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.443453",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_fa6351",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7b7062",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "R1",
+            "farm_name": "召回农场",
+            "region": "浙江",
+            "country": "中国"
+          },
+          "product_type": "草莓",
+          "quantity": 200,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.448410",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.451632",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_c8d1f5",
+      "operation": "INSPECTION",
+      "operator_id": "I1",
+      "operator_name": "inspector_I1",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7b7062",
+      "action": "提交检测报告",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "CREATED",
+          "after": "INSPECTION_PASSED"
+        },
+        "inspection_report": {
+          "before": null,
+          "after": {
+            "report_id": "REP_20260512215715_6571a4",
+            "batch_id": "BATCH_20260512215715_7b7062",
+            "inspector_id": "I1",
+            "inspection_date": "2026-05-12 21:57:15.458552",
+            "expiry_date": "2026-06-11 21:57:15.458555",
+            "status": "PASSED",
+            "items": [
+              {}
+            ],
+            "remarks": null
+          }
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.466939",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_5b60d6",
+      "operation": "WAREHOUSE_IN",
+      "operator_id": "OP001",
+      "operator_name": "仓库管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7b7062",
+      "action": "入仓操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_43eff0",
+          "BOX_20260512215715_26d18c",
+          "BOX_20260512215715_cace8f",
+          "BOX_20260512215715_817e84",
+          "BOX_20260512215715_e553c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "INSPECTION_PASSED",
+          "after": "IN_WAREHOUSE"
+        },
+        "boxes": {
+          "before": [],
+          "after": [
+            "BOX_20260512215715_43eff0",
+            "BOX_20260512215715_26d18c",
+            "BOX_20260512215715_cace8f",
+            "BOX_20260512215715_817e84",
+            "BOX_20260512215715_e553c7"
+          ]
+        }
+      },
+      "remarks": "生成 5 个箱子",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.559872",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_22bae1",
+      "operation": "SORT",
+      "operator_id": "OP001",
+      "operator_name": "分拣操作员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_7b7062",
+      "action": "分拣操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_43eff0",
+          "BOX_20260512215715_26d18c",
+          "BOX_20260512215715_cace8f",
+          "BOX_20260512215715_817e84",
+          "BOX_20260512215715_e553c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_7b7062",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "草莓",
+        "quantity": 200,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.448410",
+        "status": "SORTED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [
+          "BATCH_20260512215715_1a9da2",
+          "BATCH_20260512215715_db1b8b"
+        ],
+        "boxes": [
+          "BOX_20260512215715_43eff0",
+          "BOX_20260512215715_26d18c",
+          "BOX_20260512215715_cace8f",
+          "BOX_20260512215715_817e84",
+          "BOX_20260512215715_e553c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "IN_WAREHOUSE",
+          "after": "SORTED"
+        },
+        "child_batches": {
+          "before": [],
+          "after": [
+            "BATCH_20260512215715_1a9da2",
+            "BATCH_20260512215715_db1b8b"
+          ]
+        }
+      },
+      "remarks": "生成 2 个子批次",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.678682",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_ee5390",
+      "operation": "OUTBOUND",
+      "operator_id": "OUT_001",
+      "operator_name": "出库员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_1a9da2",
+      "action": "出库操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_1a9da2",
+        "parent_batch_id": "BATCH_20260512215715_7b7062",
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "商超",
+        "quantity": 3,
+        "unit": "箱",
+        "arrival_date": "2026-05-12 21:57:15.574376",
+        "status": "SORTED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [
+          "BATCH_20260512215715_7b7062"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_43eff0",
+          "BOX_20260512215715_26d18c",
+          "BOX_20260512215715_cace8f"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_1a9da2",
+        "parent_batch_id": "BATCH_20260512215715_7b7062",
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "商超",
+        "quantity": 3,
+        "unit": "箱",
+        "arrival_date": "2026-05-12 21:57:15.574376",
+        "status": "OUTBOUND",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [
+          "BATCH_20260512215715_7b7062"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_43eff0",
+          "BOX_20260512215715_26d18c",
+          "BOX_20260512215715_cace8f"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": "2026-05-12 21:57:15.685142"
+      },
+      "diff": {
+        "outbound_at": {
+          "before": null,
+          "after": "2026-05-12 21:57:15.685142"
+        },
+        "status": {
+          "before": "SORTED",
+          "after": "OUTBOUND"
+        }
+      },
+      "remarks": "目的地: 北京华联超市",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.693582",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_2bcbe6",
+      "operation": "OUTBOUND",
+      "operator_id": "OUT_001",
+      "operator_name": "出库员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_db1b8b",
+      "action": "出库操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_db1b8b",
+        "parent_batch_id": "BATCH_20260512215715_7b7062",
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "电商",
+        "quantity": 2,
+        "unit": "箱",
+        "arrival_date": "2026-05-12 21:57:15.654445",
+        "status": "SORTED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [
+          "BATCH_20260512215715_7b7062"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_817e84",
+          "BOX_20260512215715_e553c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_db1b8b",
+        "parent_batch_id": "BATCH_20260512215715_7b7062",
+        "origin": {
+          "farm_id": "R1",
+          "farm_name": "召回农场",
+          "region": "浙江",
+          "country": "中国"
+        },
+        "product_type": "电商",
+        "quantity": 2,
+        "unit": "箱",
+        "arrival_date": "2026-05-12 21:57:15.654445",
+        "status": "OUTBOUND",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_6571a4",
+          "batch_id": "BATCH_20260512215715_7b7062",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.458552",
+          "expiry_date": "2026-06-11 21:57:15.458555",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [
+          "BATCH_20260512215715_7b7062"
+        ],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_817e84",
+          "BOX_20260512215715_e553c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": "2026-05-12 21:57:15.697924"
+      },
+      "diff": {
+        "outbound_at": {
+          "before": null,
+          "after": "2026-05-12 21:57:15.697924"
+        },
+        "status": {
+          "before": "SORTED",
+          "after": "OUTBOUND"
+        }
+      },
+      "remarks": "目的地: 京东电商仓",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.705500",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_a272e3",
+      "operation": "RECALL",
+      "operator_id": "RCL_001",
+      "operator_name": "召回专员",
+      "entity_type": "RECALL",
+      "entity_id": "RCL_20260512215715_a940b0",
+      "action": "召回操作",
+      "before_state": null,
+      "after_state": null,
+      "diff": {},
+      "remarks": "原因: 可能受污染，紧急召回, 来源批次: ['BATCH_20260512215715_7b7062']",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.746116",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_b3aec3",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_c825e3",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "RULE_001",
+          "farm_name": "规则农场",
+          "region": "江苏",
+          "country": "中国"
+        },
+        "product_type": "白菜",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.753904",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_c825e3",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "RULE_001",
+            "farm_name": "规则农场",
+            "region": "江苏",
+            "country": "中国"
+          },
+          "product_type": "白菜",
+          "quantity": 100,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.753904",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.756274",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_151b79",
+      "operation": "INSPECTION",
+      "operator_id": "I1",
+      "operator_name": "inspector_I1",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_c825e3",
+      "action": "提交检测报告",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "RULE_001",
+          "farm_name": "规则农场",
+          "region": "江苏",
+          "country": "中国"
+        },
+        "product_type": "白菜",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.753904",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "RULE_001",
+          "farm_name": "规则农场",
+          "region": "江苏",
+          "country": "中国"
+        },
+        "product_type": "白菜",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.753904",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_24713a",
+          "batch_id": "BATCH_20260512215715_c825e3",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.761338",
+          "expiry_date": "2026-06-11 21:57:15.761338",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "CREATED",
+          "after": "INSPECTION_PASSED"
+        },
+        "inspection_report": {
+          "before": null,
+          "after": {
+            "report_id": "REP_20260512215715_24713a",
+            "batch_id": "BATCH_20260512215715_c825e3",
+            "inspector_id": "I1",
+            "inspection_date": "2026-05-12 21:57:15.761338",
+            "expiry_date": "2026-06-11 21:57:15.761338",
+            "status": "PASSED",
+            "items": [
+              {}
+            ],
+            "remarks": null
+          }
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.764949",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_589bc9",
+      "operation": "WAREHOUSE_IN",
+      "operator_id": "OP001",
+      "operator_name": "仓库管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_c825e3",
+      "action": "入仓操作",
+      "before_state": {
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "RULE_001",
+          "farm_name": "规则农场",
+          "region": "江苏",
+          "country": "中国"
+        },
+        "product_type": "白菜",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.753904",
+        "status": "INSPECTION_PASSED",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_24713a",
+          "batch_id": "BATCH_20260512215715_c825e3",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.761338",
+          "expiry_date": "2026-06-11 21:57:15.761338",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_c825e3",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "RULE_001",
+          "farm_name": "规则农场",
+          "region": "江苏",
+          "country": "中国"
+        },
+        "product_type": "白菜",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.753904",
+        "status": "IN_WAREHOUSE",
+        "inspection_report": {
+          "report_id": "REP_20260512215715_24713a",
+          "batch_id": "BATCH_20260512215715_c825e3",
+          "inspector_id": "I1",
+          "inspection_date": "2026-05-12 21:57:15.761338",
+          "expiry_date": "2026-06-11 21:57:15.761338",
+          "status": "PASSED",
+          "items": [
+            {}
+          ],
+          "remarks": null
+        },
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [
+          "BOX_20260512215715_134338",
+          "BOX_20260512215715_6875c7"
+        ],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "status": {
+          "before": "INSPECTION_PASSED",
+          "after": "IN_WAREHOUSE"
+        },
+        "boxes": {
+          "before": [],
+          "after": [
+            "BOX_20260512215715_134338",
+            "BOX_20260512215715_6875c7"
+          ]
+        }
+      },
+      "remarks": "生成 2 个箱子",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.822173",
+      "idempotency_key": null
+    },
+    {
+      "log_id": "LOG_20260512215715_51cfb5",
+      "operation": "CREATE",
+      "operator_id": "OP001",
+      "operator_name": "系统管理员",
+      "entity_type": "BATCH",
+      "entity_id": "BATCH_20260512215715_6d92bb",
+      "action": "创建批次",
+      "before_state": null,
+      "after_state": {
+        "batch_id": "BATCH_20260512215715_6d92bb",
+        "parent_batch_id": null,
+        "origin": {
+          "farm_id": "I1",
+          "farm_name": "幂等农场",
+          "region": "测试",
+          "country": "中国"
+        },
+        "product_type": "幂等测试",
+        "quantity": 100,
+        "unit": "公斤",
+        "arrival_date": "2026-05-12 21:57:15.830744",
+        "status": "CREATED",
+        "inspection_report": null,
+        "is_mixed": false,
+        "source_batches": [],
+        "child_batches": [],
+        "boxes": [],
+        "frozen": false,
+        "frozen_reason": null,
+        "frozen_at": null,
+        "recalled": false,
+        "recalled_at": null,
+        "outbound_at": null
+      },
+      "diff": {
+        "_created": {
+          "batch_id": "BATCH_20260512215715_6d92bb",
+          "parent_batch_id": null,
+          "origin": {
+            "farm_id": "I1",
+            "farm_name": "幂等农场",
+            "region": "测试",
+            "country": "中国"
+          },
+          "product_type": "幂等测试",
+          "quantity": 100,
+          "unit": "公斤",
+          "arrival_date": "2026-05-12 21:57:15.830744",
+          "status": "CREATED",
+          "inspection_report": null,
+          "is_mixed": false,
+          "source_batches": [],
+          "child_batches": [],
+          "boxes": [],
+          "frozen": false,
+          "frozen_reason": null,
+          "frozen_at": null,
+          "recalled": false,
+          "recalled_at": null,
+          "outbound_at": null
+        }
+      },
+      "remarks": null,
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.844947",
+      "idempotency_key": "IDEMP_TEST_001_4862945720280621016"
+    },
+    {
+      "log_id": "LOG_20260512215715_292892",
+      "operation": "RECALL",
+      "operator_id": "OP001",
+      "operator_name": "召回管理员",
+      "entity_type": "RECALL",
+      "entity_id": "RCL_20260512215715_492c4c",
+      "action": "召回操作",
+      "before_state": null,
+      "after_state": null,
+      "diff": {},
+      "remarks": "原因: 测试召回, 来源批次: ['BATCH_20260512215715_c825e3']",
+      "status": "SUCCESS",
+      "failure_reason": null,
+      "timestamp": "2026-05-12 21:57:15.868207",
+      "idempotency_key": null
+    }
+  ],
+  "recall_requests": {
+    "RCL_20260512215715_a940b0": {
+      "recall_id": "RCL_20260512215715_a940b0",
+      "reason": "可能受污染，紧急召回",
+      "source_batch_ids": [
+        "BATCH_20260512215715_7b7062"
+      ],
+      "requester_id": "RCL_001",
+      "created_at": "2026-05-12 21:57:15.716928",
+      "executed": true,
+      "executed_at": "2026-05-12 21:57:15.743969",
+      "affected_boxes": [
+        "BOX_20260512215715_26d18c",
+        "BOX_20260512215715_cace8f",
+        "BOX_20260512215715_817e84",
+        "BOX_20260512215715_e553c7",
+        "BOX_20260512215715_43eff0"
+      ],
+      "affected_batches": [
+        "BATCH_20260512215715_db1b8b",
+        "BATCH_20260512215715_7b7062",
+        "BATCH_20260512215715_1a9da2"
+      ]
+    },
+    "RCL_20260512215715_492c4c": {
+      "recall_id": "RCL_20260512215715_492c4c",
+      "reason": "测试召回",
+      "source_batch_ids": [
+        "BATCH_20260512215715_c825e3"
+      ],
+      "requester_id": "OP001",
+      "created_at": "2026-05-12 21:57:15.855328",
+      "executed": true,
+      "executed_at": "2026-05-12 21:57:15.863242",
+      "affected_boxes": [
+        "BOX_20260512215715_6875c7",
+        "BOX_20260512215715_134338"
+      ],
+      "affected_batches": [
+        "BATCH_20260512215715_c825e3"
+      ]
+    }
+  },
+  "freeze_requests": {},
+  "idempotency_keys": {
+    "IDEMP_TEST_001_4862945720280621016": {
+      "batch_id": "BATCH_20260512215715_6d92bb",
+      "status": "CREATED",
+      "message": "批次创建成功"
+    }
+  }
+}
