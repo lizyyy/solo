@@ -11,6 +11,7 @@ class ConstraintSolver:
         self.config = config
         self.logger = logger
         self.constraints_config = config['constraints']
+        self.tolerance = 1e-6
         
     def solve(self, ingredients: List[Ingredient]) -> RecipeResult:
         self.logger.info("开始配方优化求解...")
@@ -114,7 +115,17 @@ class ConstraintSolver:
         final_sodium = pulp.value(total_sodium)
         final_cost = pulp.value(total_cost)
         
+        self.logger.info(f"精确计算值 - 蛋白: {final_protein}g, 钠: {final_sodium}mg, 成本: ${final_cost}, 重量: {final_total_weight}g")
+        
         constraints = self._evaluate_constraints(final_protein, final_sodium, final_cost, final_total_weight)
+        
+        all_constraints_satisfied = all(c.is_satisfied for c in constraints)
+        
+        if not all_constraints_satisfied:
+            self.logger.warning("⚠️ 警告：PuLP报告最优解，但约束检查发现不满足约束的情况！")
+            violated = [c.name for c in constraints if not c.is_satisfied]
+            self.logger.warning(f"   不满足的约束: {', '.join(violated)}")
+            self.logger.warning("   这通常是浮点精度问题，已通过容差处理")
         
         return RecipeResult(
             ingredients=selected_ingredients,
@@ -124,53 +135,71 @@ class ConstraintSolver:
             total_cost=final_cost,
             total_weight=final_total_weight,
             constraints=constraints,
-            is_feasible=True,
+            is_feasible=all_constraints_satisfied,
             optimization_time=0.0
         )
+    
+    def _is_within_range(self, value: float, min_val: float, max_val: float) -> bool:
+        return (value >= min_val - self.tolerance) and (value <= max_val + self.tolerance)
     
     def _evaluate_constraints(self, protein: float, sodium: float, 
                              cost: float, weight: float) -> List[Constraint]:
         constraints = []
         
         target_protein = self.constraints_config['target_protein']
+        protein_satisfied = self._is_within_range(protein, target_protein['min'], target_protein['max'])
         constraints.append(Constraint(
             name="蛋白质",
             min_value=target_protein['min'],
             max_value=target_protein['max'],
             unit=target_protein['unit'],
             current_value=protein,
-            is_satisfied=target_protein['min'] <= protein <= target_protein['max']
+            is_satisfied=protein_satisfied
         ))
+        if not protein_satisfied:
+            self.logger.warning(f"⚠️ 蛋白质约束不满足: {protein:.6f}g 不在 [{target_protein['min']}, {target_protein['max']}]g 范围内")
         
         target_sodium = self.constraints_config['target_sodium']
+        sodium_satisfied = self._is_within_range(sodium, target_sodium['min'], target_sodium['max'])
         constraints.append(Constraint(
             name="钠含量",
             min_value=target_sodium['min'],
             max_value=target_sodium['max'],
             unit=target_sodium['unit'],
             current_value=sodium,
-            is_satisfied=target_sodium['min'] <= sodium <= target_sodium['max']
+            is_satisfied=sodium_satisfied
         ))
+        if not sodium_satisfied:
+            self.logger.warning(f"⚠️ 钠含量约束不满足: {sodium:.6f}mg 不在 [{target_sodium['min']}, {target_sodium['max']}]mg 范围内")
         
         target_cost = self.constraints_config['target_cost']
+        cost_satisfied = self._is_within_range(cost, target_cost['min'], target_cost['max'])
         constraints.append(Constraint(
             name="总成本",
             min_value=target_cost['min'],
             max_value=target_cost['max'],
             unit=target_cost['unit'],
             current_value=cost,
-            is_satisfied=target_cost['min'] <= cost <= target_cost['max']
+            is_satisfied=cost_satisfied
         ))
+        if not cost_satisfied:
+            self.logger.warning(f"⚠️ 成本约束不满足: ${cost:.6f} 不在 [${target_cost['min']}, ${target_cost['max']}] 范围内")
         
         target_weight = self.constraints_config['total_weight']
+        weight_satisfied = self._is_within_range(weight, target_weight['min'], target_weight['max'])
         constraints.append(Constraint(
             name="总重量",
             min_value=target_weight['min'],
             max_value=target_weight['max'],
             unit=target_weight['unit'],
             current_value=weight,
-            is_satisfied=target_weight['min'] <= weight <= target_weight['max']
+            is_satisfied=weight_satisfied
         ))
+        if not weight_satisfied:
+            self.logger.warning(f"⚠️ 重量约束不满足: {weight:.6f}g 不在 [{target_weight['min']}, {target_weight['max']}]g 范围内")
+        
+        all_satisfied = all(c.is_satisfied for c in constraints)
+        self.logger.info(f"约束检查结果: {'✅ 全部满足' if all_satisfied else '❌ 存在不满足约束'}")
         
         return constraints
     
