@@ -1,0 +1,21 @@
+{
+  "name": "points-expiration-api",
+  "version": "1.0.0",
+  "description": "会员积分过期 API - 可追溯的积分管理系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "PORT=3001 node src/index.js",
+    "dev": "PORT=3001 node src/index.js",
+    "demo": "bash demo.sh",
+    "demo-fail": "bash demo-fail.sh"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
