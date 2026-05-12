@@ -13,7 +13,7 @@ class DepositController {
   static async deduct(req, res) {
     try {
       const transaction = await DepositService.deductDeposit(req.body);
-      res.json({ success: true, data: transaction });
+      res.sendIdempotentResponse(200, { success: true, data: transaction });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }
@@ -22,7 +22,7 @@ class DepositController {
   static async refund(req, res) {
     try {
       const transaction = await DepositService.refundDeposit(req.body);
-      res.json({ success: true, data: transaction });
+      res.sendIdempotentResponse(200, { success: true, data: transaction });
     } catch (error) {
       res.status(400).json({ success: false, error: error.message });
     }

@@ -117,8 +117,8 @@ GET    /api/returns/:id         # 查询归还单
 
 ```
 POST   /api/deposits/pay        # 支付押金 (需要 X-Idempotency-Key)
-POST   /api/deposits/deduct     # 押金扣减
-POST   /api/deposits/refund     # 押金退款
+POST   /api/deposits/deduct     # 押金扣减 (需要 X-Idempotency-Key)
+POST   /api/deposits/refund     # 押金退款 (需要 X-Idempotency-Key)
 GET    /api/deposits/order/:orderId  # 查询押金交易记录
 ```
 

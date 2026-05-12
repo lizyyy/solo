@@ -276,37 +276,55 @@ async function completeFlowDemo() {
       console.log(`   - ${tx.transaction_type}: ${tx.amount}元, 余额: ${tx.balance}元`);
     });
 
-    await printStep(12, '幂等性测试 - 重复提交验证');
-    console.log('使用相同的幂等键重复提交...');
+    await printStep(12, '幂等性测试 - 押金扣减防重复提交');
+    console.log('测试押金扣减接口的幂等性 - 使用相同幂等键提交两次...');
     
-    const idempotentKey = generateIdempotencyKey();
+    result = await request('GET', `/deposits/order/${orderId}`);
+    const balanceBefore = result.response.data[result.response.data.length - 1].balance;
+    console.log('扣减前押金余额:', balanceBefore, '元');
     
-    const request1 = await request('POST', '/equipment', {
-      equipment_code: 'TEST-IDEMPOTENT',
-      name: '幂等测试设备',
-      category: '测试',
-      spec: '测试',
-      daily_rate: 100,
-      deposit_amount: 500,
-      warehouse: 'A仓'
+    const deductKey = requestCounter;
+    
+    console.log('\n第一次扣减 (幂等键:', deductKey, ')');
+    const deduct1 = await request('POST', '/deposits/deduct', {
+      order_id: orderId,
+      amount: 50,
+      operator: '财务小张',
+      reason: '测试重复扣减-1'
     }, true);
+    console.log('第一次扣减成功:', deduct1.response.success, '| 当前余额:', deduct1.response.data.balance, '元');
     
-    const originalKey = requestCounter;
-    requestCounter = originalKey - 1;
+    requestCounter = deductKey;
     
-    const request2 = await request('POST', '/equipment', {
-      equipment_code: 'TEST-IDEMPOTENT',
-      name: '幂等测试设备',
-      category: '测试',
-      spec: '测试',
-      daily_rate: 100,
-      deposit_amount: 500,
-      warehouse: 'A仓'
+    console.log('\n第二次扣减 (相同幂等键:', deductKey, ')');
+    const deduct2 = await request('POST', '/deposits/deduct', {
+      order_id: orderId,
+      amount: 50,
+      operator: '财务小张',
+      reason: '测试重复扣减-1'
     }, true);
-
-    console.log('第一次请求成功:', request1.response.success);
-    console.log('第二次请求成功:', request2.response.success);
-    console.log('✅ 幂等性生效 - 重复请求不会重复创建');
+    console.log('第二次扣减成功:', deduct2.response.success, '| 当前余额:', deduct2.response.data.balance, '元');
+    
+    result = await request('GET', `/deposits/order/${orderId}`);
+    const balanceAfter = result.response.data[result.response.data.length - 1].balance;
+    const actualDeducted = balanceBefore - balanceAfter;
+    
+    console.log('\n📊 测试结果:');
+    console.log('   扣减前余额:', balanceBefore, '元');
+    console.log('   扣减后余额:', balanceAfter, '元');
+    console.log('   实际扣减:', actualDeducted, '元');
+    console.log('   预期扣减: 50 元');
+    
+    if (actualDeducted === 50) {
+      console.log('✅ 幂等性生效 - 重复提交只扣了一遍!');
+    } else {
+      console.log('❌ 幂等性失效 - 扣了两遍:', actualDeducted, '元');
+    }
+    
+    console.log('\n押金交易明细:');
+    result.response.data.forEach((tx, i) => {
+      console.log(`   ${i + 1}. ${tx.transaction_type}: ${tx.amount}元, 余额: ${tx.balance}元`);
+    });
 
     await printStep(13, '流程总结');
     console.log('📋 完整流程已执行完毕:');
@@ -319,9 +337,9 @@ async function completeFlowDemo() {
     console.log('   ✅ 7. 换机流程 & 旧设备释放');
     console.log('   ✅ 8. 延期冲突检测');
     console.log('   ✅ 9. 设备归还');
-    console.log('   ✅ 10. 押金扣减');
+    console.log('   ✅ 10. 押金扣减 (损坏赔偿)');
     console.log('   ✅ 11. 账单查询');
-    console.log('   ✅ 12. 幂等性验证');
+    console.log('   ✅ 12. 幂等性验证 - 押金重复扣减测试');
     
     console.log('\n' + '#'.repeat(60));
     console.log('演示完成! 所有流程均已验证通过。');
