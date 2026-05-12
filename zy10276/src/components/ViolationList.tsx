@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel } from 'lucide-react';
+import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { ViolationFilterParams } from '../types';
 import { violationApi } from '../services/api';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
@@ -61,12 +62,48 @@ const ViolationList: React.FC = () => {
     setShowMatchModal(true);
   };
 
+  const handleExport = () => {
+    if (violations.length === 0) {
+      alert('暂无数据可导出');
+      return;
+    }
+
+    const exportData = violations.map((v) => ({
+      '违章编号': v.id,
+      '车牌号': v.plateNumber,
+      '违章时间': formatDateTime(v.violationTime),
+      '违章类型': getViolationTypeText(v.violationType),
+      '违章地点': v.location,
+      '违章描述': v.description,
+      '扣分': v.points,
+      '罚款金额': v.fineAmount,
+      '状态': getStatusText(v.status),
+      '匹配司机': v.matchedDriverId || '未匹配',
+      '导入时间': formatDateTime(v.createdAt),
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '违章记录');
+    XLSX.writeFile(wb, `违章记录_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">违章记录列表</h2>
-          <div className="text-sm text-gray-500">共 {violations.length} 条记录</div>
+          <div className="flex items-center space-x-3">
+            <span className="text-sm text-gray-500">共 {violations.length} 条记录</span>
+            <button
+              onClick={handleExport}
+              disabled={violations.length === 0}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              <span>导出Excel</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-5 gap-3 mb-4">

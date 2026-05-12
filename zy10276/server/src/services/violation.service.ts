@@ -256,8 +256,8 @@ export class ViolationService {
         throw new Error('未匹配司机，无法执行处罚');
       }
 
-      if (violation.status === 'appeal_approved') {
-        throw new Error('申诉通过的违章不能处罚');
+      if (violation.status !== 'confirmed' && violation.status !== 'appeal_rejected') {
+        throw new Error('仅已确认或申诉驳回的违章可以执行处罚');
       }
 
       const existingPenalty = PenaltyDAO.getByViolationId(violationId);
