@@ -198,9 +198,99 @@ def test_all_samples_fail():
         return False
 
 
+def test_empty_column_detection():
+    print("\n" + "=" * 60)
+    print("测试 5: 整列缺失检测（temperature/dissolved_oxygen 整列为空）")
+    print("=" * 60)
+
+    df = generate_normal_sample_data('SAMP-EMPTY-001', 'BATCH-001', seed=42)
+    df['temperature'] = np.nan
+    df['dissolved_oxygen'] = np.nan
+
+    print(f"temperature 列全部为空: {df['temperature'].isna().all()}")
+    print(f"dissolved_oxygen 列全部为空: {df['dissolved_oxygen'].isna().all()}")
+    print(f"temperature 列存在: {'temperature' in df.columns}")
+    print(f"dissolved_oxygen 列存在: {'dissolved_oxygen' in df.columns}")
+
+    preprocessor = DataPreprocessor()
+
+    try:
+        result = preprocessor.process_sample(df, 'SAMP-EMPTY-001')
+
+        if not result['success']:
+            print(f"✓ 正确检测到整列缺失")
+            print(f"  错误信息: {result['errors'][0]['message']}")
+
+            qc_engine = QualityControlEngine()
+            qc_results = qc_engine.analyze_batch({}, {'SAMP-EMPTY-001': result})
+
+            if 'SAMP-EMPTY-001' in qc_results['results']:
+                print("✓ 整列缺失样本已并入 qc_results")
+                print(f"  状态: {qc_results['results']['SAMP-EMPTY-001']['overall_status']}")
+                print(f"  需复检: {qc_results['results']['SAMP-EMPTY-001']['requires_recheck']}")
+                print(f"  复检原因: {qc_results['results']['SAMP-EMPTY-001'].get('recheck_reason', '')}")
+
+            if len(qc_results['summary']['recheck_samples']) > 0:
+                print("✓ 整列缺失样本在复检建议列表中")
+
+            return True
+        else:
+            print("✗ 应该检测到整列缺失但没有检测到")
+            print(f"  成功: {result['success']}")
+            print(f"  处理步骤: {result['processing_steps']}")
+            return False
+
+    except Exception as e:
+        print(f"✗ 发生错误: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
+def test_partial_missing_vs_full_empty():
+    print("\n" + "=" * 60)
+    print("测试 6: 部分缺失 vs 完全缺失的区别")
+    print("=" * 60)
+
+    df_partial = generate_normal_sample_data('SAMP-PARTIAL-001', 'BATCH-001', seed=42)
+    df_partial.loc[:20, 'temperature'] = np.nan
+
+    df_full_empty = generate_normal_sample_data('SAMP-EMPTY-002', 'BATCH-002', seed=43)
+    df_full_empty['temperature'] = np.nan
+
+    df = pd.concat([df_partial, df_full_empty], ignore_index=True)
+
+    print(f"SAMP-PARTIAL-001: temperature 前 21 个点缺失，其余有值")
+    print(f"SAMP-EMPTY-002: temperature 全部为空")
+
+    preprocessor = DataPreprocessor(missing_threshold=0.3)
+    preprocessing_result = preprocessor.process_all_samples(df)
+
+    print(f"\n预处理结果:")
+    print(f"  成功样本: {list(preprocessing_result['processed_samples'].keys())}")
+    print(f"  失败样本: {list(preprocessing_result['failed_samples'].keys())}")
+
+    partial_success = 'SAMP-PARTIAL-001' in preprocessing_result['processed_samples']
+    empty_failed = 'SAMP-EMPTY-002' in preprocessing_result['failed_samples']
+
+    if partial_success:
+        print("✓ 部分缺失的样本处理成功")
+    else:
+        print("✗ 部分缺失的样本应该成功但失败了")
+
+    if empty_failed:
+        print("✓ 完全缺失的样本标记为失败")
+        failed_result = preprocessing_result['failed_samples']['SAMP-EMPTY-002']
+        print(f"  错误信息: {failed_result['errors'][0]['message']}")
+    else:
+        print("✗ 完全缺失的样本应该失败但成功了")
+
+    return partial_success and empty_failed
+
+
 def test_full_flow():
     print("\n" + "=" * 60)
-    print("测试 5: 完整流程（正常+异常样本混合）")
+    print("测试 7: 完整流程（正常+异常样本混合）")
     print("=" * 60)
 
     normal_df = generate_normal_sample_data('SAMP-NORMAL-001', 'BATCH-001', seed=42)
@@ -254,6 +344,8 @@ def main():
         test_missing_required_columns,
         test_mixed_units,
         test_all_samples_fail,
+        test_empty_column_detection,
+        test_partial_missing_vs_full_empty,
         test_full_flow,
     ]
 

@@ -295,6 +295,21 @@ class DataPreprocessor:
             result["missing_report"] = missing_result["missing_report"]
             result["processing_steps"].append("缺失值处理完成")
 
+            curve_columns = ["pH", "temperature", "dissolved_oxygen"]
+            completely_empty_columns = []
+            for col in curve_columns:
+                if col in sample_df.columns and sample_df[col].isna().all():
+                    completely_empty_columns.append(col)
+
+            if completely_empty_columns:
+                raise MissingDataError(
+                    f"样本 {sample_id} 的曲线列完全为空: {completely_empty_columns}",
+                    sample_id=sample_id,
+                    missing_columns=completely_empty_columns,
+                )
+
+            result["processing_steps"].append("曲线列完整性验证完成")
+
             result["dataframe"] = sample_df
             result["success"] = True
             self._log(f"样本 {sample_id} 预处理完成", sample_id=sample_id)
