@@ -1,0 +1,34 @@
+[
+    {
+        "id": "PROMO_001",
+        "name": "五一劳动节水果试吃活动",
+        "store_id": "STORE_001",
+        "start_date": "2026-05-01",
+        "end_date": "2026-05-05",
+        "status": "active"
+    },
+    {
+        "id": "PROMO_002",
+        "name": "母亲节熟食推广活动",
+        "store_id": "STORE_001",
+        "start_date": "2026-05-08",
+        "end_date": "2026-05-12",
+        "status": "active"
+    },
+    {
+        "id": "PROMO_003",
+        "name": "乳品节买赠活动",
+        "store_id": "STORE_002",
+        "start_date": "2026-05-05",
+        "end_date": "2026-05-15",
+        "status": "active"
+    },
+    {
+        "id": "PROMO_004",
+        "name": "春节促销活动（已结束）",
+        "store_id": "STORE_001",
+        "start_date": "2026-01-20",
+        "end_date": "2026-01-30",
+        "status": "inactive"
+    }
+]

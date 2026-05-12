@@ -1,0 +1,92 @@
+[
+    {
+        "id": "BATCH_001",
+        "product_id": "PROD_001",
+        "store_id": "STORE_001",
+        "quantity": 50,
+        "unit_cost": 45.00,
+        "production_date": "2026-05-01",
+        "expiry_date": "2026-05-15"
+    },
+    {
+        "id": "BATCH_002",
+        "product_id": "PROD_002",
+        "store_id": "STORE_001",
+        "quantity": 30,
+        "unit_cost": 85.00,
+        "production_date": "2026-05-03",
+        "expiry_date": "2026-05-20"
+    },
+    {
+        "id": "BATCH_003",
+        "product_id": "PROD_003",
+        "store_id": "STORE_001",
+        "quantity": 100,
+        "unit_cost": 28.00,
+        "production_date": "2026-05-05",
+        "expiry_date": "2026-05-10"
+    },
+    {
+        "id": "BATCH_004",
+        "product_id": "PROD_004",
+        "store_id": "STORE_001",
+        "quantity": 20,
+        "unit_cost": 78.00,
+        "production_date": "2026-05-08",
+        "expiry_date": "2026-05-12"
+    },
+    {
+        "id": "BATCH_005",
+        "product_id": "PROD_005",
+        "store_id": "STORE_001",
+        "quantity": 50,
+        "unit_cost": 25.00,
+        "production_date": "2026-05-10",
+        "expiry_date": "2026-05-11"
+    },
+    {
+        "id": "BATCH_006",
+        "product_id": "PROD_006",
+        "store_id": "STORE_002",
+        "quantity": 15,
+        "unit_cost": 120.00,
+        "production_date": "2026-05-07",
+        "expiry_date": "2026-05-14"
+    },
+    {
+        "id": "BATCH_007",
+        "product_id": "PROD_007",
+        "store_id": "STORE_001",
+        "quantity": 40,
+        "unit_cost": 55.00,
+        "production_date": "2026-04-28",
+        "expiry_date": "2026-05-28"
+    },
+    {
+        "id": "BATCH_008",
+        "product_id": "PROD_008",
+        "store_id": "STORE_002",
+        "quantity": 200,
+        "unit_cost": 8.50,
+        "production_date": "2026-05-02",
+        "expiry_date": "2026-05-16"
+    },
+    {
+        "id": "BATCH_009",
+        "product_id": "PROD_009",
+        "store_id": "STORE_001",
+        "quantity": 30,
+        "unit_cost": 32.00,
+        "production_date": "2026-04-15",
+        "expiry_date": "2026-06-15"
+    },
+    {
+        "id": "BATCH_010",
+        "product_id": "PROD_001",
+        "store_id": "STORE_002",
+        "quantity": 40,
+        "unit_cost": 42.00,
+        "production_date": "2026-05-02",
+        "expiry_date": "2026-05-16"
+    }
+]

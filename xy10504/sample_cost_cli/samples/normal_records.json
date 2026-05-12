@@ -1,0 +1,107 @@
+[
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_001",
+        "quantity": 2.5,
+        "record_type": "sample",
+        "record_date": "2026-05-02",
+        "promotion_id": "PROMO_001",
+        "reason": "入口试吃展示"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_002",
+        "quantity": 1.2,
+        "record_type": "sample",
+        "record_date": "2026-05-03",
+        "promotion_id": "PROMO_001",
+        "reason": "会员试吃活动"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_003",
+        "quantity": 15,
+        "record_type": "promotion_gift",
+        "record_date": "2026-05-04",
+        "promotion_id": "PROMO_001",
+        "reason": "买满199赠送草莓一盒"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_004",
+        "quantity": 1.8,
+        "record_type": "sample",
+        "record_date": "2026-05-09",
+        "promotion_id": "PROMO_002",
+        "reason": "熟食区试吃"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_005",
+        "quantity": 5,
+        "record_type": "sample",
+        "record_date": "2026-05-10",
+        "promotion_id": "PROMO_002",
+        "reason": "周末人气活动"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_005",
+        "quantity": 3,
+        "record_type": "loss",
+        "record_date": "2026-05-11",
+        "reason": "当日未售完，临期报损"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_007",
+        "quantity": 2,
+        "record_type": "promotion_gift",
+        "record_date": "2026-05-08",
+        "promotion_id": "PROMO_002",
+        "reason": "满赠活动礼品"
+    },
+    {
+        "store_id": "STORE_002",
+        "batch_id": "BATCH_006",
+        "quantity": 0.8,
+        "record_type": "sample",
+        "record_date": "2026-05-10",
+        "promotion_id": "PROMO_003",
+        "reason": "三文鱼试吃推广"
+    },
+    {
+        "store_id": "STORE_002",
+        "batch_id": "BATCH_008",
+        "quantity": 30,
+        "record_type": "promotion_gift",
+        "record_date": "2026-05-12",
+        "promotion_id": "PROMO_003",
+        "reason": "买牛奶送酸奶"
+    },
+    {
+        "store_id": "STORE_002",
+        "batch_id": "BATCH_010",
+        "quantity": 3,
+        "record_type": "sample",
+        "record_date": "2026-05-10",
+        "promotion_id": "PROMO_003",
+        "reason": "新品葡萄试吃"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_003",
+        "quantity": 8,
+        "record_type": "loss",
+        "record_date": "2026-05-10",
+        "reason": "草莓临期，外观不佳报损"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_009",
+        "quantity": 5,
+        "record_type": "loss",
+        "record_date": "2026-05-11",
+        "reason": "库存盘点损耗"
+    }
+]

@@ -1,0 +1,46 @@
+[
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_001",
+        "quantity": 100,
+        "record_type": "sample",
+        "record_date": "2026-05-03",
+        "promotion_id": "PROMO_001",
+        "reason": "试吃数量超过批次余量"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_002",
+        "quantity": 2,
+        "record_type": "sample",
+        "record_date": "2026-05-08",
+        "promotion_id": "PROMO_001",
+        "reason": "活动已结束仍登记"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_003",
+        "quantity": 5,
+        "record_type": "sample",
+        "record_date": "2026-05-08",
+        "reason": "试吃记录未关联活动"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_004",
+        "quantity": 1,
+        "record_type": "invalid_type",
+        "record_date": "2026-05-09",
+        "promotion_id": "PROMO_002",
+        "reason": "无效的记录类型"
+    },
+    {
+        "store_id": "STORE_001",
+        "batch_id": "BATCH_001",
+        "quantity": 1,
+        "record_type": "loss",
+        "record_date": "2026-05-09",
+        "promotion_id": "PROMO_004",
+        "reason": "关联已结束的活动"
+    }
+]
