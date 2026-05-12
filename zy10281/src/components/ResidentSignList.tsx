@@ -30,13 +30,19 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
   const [signStatus, setSignStatus] = useState<SignStatus>('agree');
   const [objectionReason, setObjectionReason] = useState('');
 
-  const getResidentLatestSign = (residentId: string): SignRecord | undefined => {
+  const getResidentSignInCurrentVersion = (residentId: string): SignRecord | undefined => {
+    const allRecords = ElevatorSignStore.getSignRecords(buildingId, currentVersion.id);
+    return allRecords.find(r => r.residentId === residentId);
+  };
+
+  const getResidentLatestSignAnyVersion = (residentId: string): SignRecord | undefined => {
     return ElevatorSignStore.getResidentLatestSign(residentId, buildingId);
   };
 
   const filteredResidents = residents.filter(resident => {
     if (filter === 'all') return true;
-    const sign = getResidentLatestSign(resident.id);
+    const sign = getResidentSignInCurrentVersion(resident.id);
+    if (filter === 'pending') return !sign;
     return sign?.status === filter;
   });
 
@@ -81,12 +87,14 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
           </thead>
           <tbody>
             {filteredResidents.map(resident => {
-              const sign = getResidentLatestSign(resident.id);
-              const status = sign?.status || 'pending';
+              const currentSign = getResidentSignInCurrentVersion(resident.id);
+              const oldSign = !currentSign ? getResidentLatestSignAnyVersion(resident.id) : undefined;
+              const status = currentSign?.status || 'pending';
               const config = statusConfig[status];
+              const hasOldVersionSign = !!oldSign && !currentSign;
 
               return (
-                <tr key={resident.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <tr key={resident.id} className={`border-b border-gray-100 hover:bg-gray-50 ${hasOldVersionSign ? 'bg-yellow-50' : ''}`}>
                   <td className="py-3 px-4">
                     <span className="font-medium">{resident.unit} {resident.roomNumber}</span>
                   </td>
@@ -100,22 +108,31 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs ${config.bg} ${config.color}`}>
                       {config.label}
-                      {sign?.isWithdrawnButCounted && ' (仍计入)'}
-                      {sign?.isDuplicate && ' (重复)'}
+                      {currentSign?.isWithdrawnButCounted && ' (仍计入)'}
+                      {currentSign?.isDuplicate && ' (重复)'}
                     </span>
-                    {sign?.objectionReason && (
+                    {hasOldVersionSign && (
+                      <div className="mt-1 text-xs text-yellow-600 font-medium">
+                        ⚠️ 旧版本已签字，新版本待重签
+                      </div>
+                    )}
+                    {currentSign?.objectionReason && (
                       <div className="mt-1 text-xs text-orange-600">
-                        异议: {sign.objectionReason}
+                        异议: {currentSign.objectionReason}
                       </div>
                     )}
                   </td>
                   <td className="py-3 px-4">
-                    {sign ? (
-                      <span className="text-xs text-gray-500">
-                        v{sign.versionId === currentVersion.id ? currentVersion.versionNumber : '?'}
+                    {currentSign ? (
+                      <span className="text-xs text-green-600 font-medium">
+                        v{currentVersion.versionNumber}
+                      </span>
+                    ) : hasOldVersionSign ? (
+                      <span className="text-xs text-yellow-600">
+                        旧版已签
                       </span>
                     ) : (
-                      <span className="text-xs text-gray-400">-</span>
+                      <span className="text-xs text-gray-400">未签字</span>
                     )}
                   </td>
                   <td className="py-3 px-4">
@@ -126,11 +143,11 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
                       }}
                       className="text-blue-500 hover:text-blue-700 text-sm mr-3"
                     >
-                      签字
+                      {hasOldVersionSign ? '重签' : '签字'}
                     </button>
-                    {sign && sign.status !== 'withdrawn' && (
+                    {currentSign && currentSign.status !== 'withdrawn' && (
                       <button
-                        onClick={() => onWithdraw(sign.id)}
+                        onClick={() => onWithdraw(currentSign.id)}
                         className="text-orange-500 hover:text-orange-700 text-sm"
                       >
                         撤回

@@ -110,6 +110,32 @@ function App() {
     refreshData();
   };
 
+  const handleSaveSchemeWithNewVersion = (
+    versionName: string,
+    versionDesc: string,
+    changeLog: string,
+    scheme: Omit<CostScheme, 'id' | 'createdAt'>
+  ) => {
+    if (!selectedBuilding) return;
+    
+    const newVersion = ElevatorSignStore.createVersion(
+      selectedBuilding.id,
+      versionName,
+      versionDesc,
+      changeLog,
+      '当前用户'
+    );
+    
+    ElevatorSignStore.saveCostScheme({
+      ...scheme,
+      versionId: newVersion.id,
+    });
+    
+    const updated = ElevatorSignStore.getBuilding(selectedBuilding.id);
+    if (updated) setSelectedBuilding(updated);
+    refreshData();
+  };
+
   const handleAddComment = (content: string, commenter: string) => {
     if (!selectedBuilding) return;
     const currentVersion = versions.find(v => v.isEffective);
@@ -251,7 +277,9 @@ function App() {
                         schemes={costSchemes}
                         currentVersion={currentVersion}
                         buildingId={selectedBuilding.id}
+                        hasScheme={!!costSchemes.find(s => s.versionId === currentVersion.id)}
                         onSave={handleSaveScheme}
+                        onCreateNewVersion={handleSaveSchemeWithNewVersion}
                       />
                     )}
                     {activeTab === 'comments' && (

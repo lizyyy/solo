@@ -5,7 +5,9 @@ interface CostSchemeManagerProps {
   schemes: CostScheme[];
   currentVersion: BuildingVersion;
   buildingId: string;
+  hasScheme: boolean;
   onSave: (scheme: Omit<CostScheme, 'id' | 'createdAt'>) => void;
+  onCreateNewVersion: (name: string, description: string, changeLog: string, scheme: Omit<CostScheme, 'id' | 'createdAt'>) => void;
 }
 
 const allocationMethods = {
@@ -18,37 +20,91 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
   schemes,
   currentVersion,
   buildingId,
+  hasScheme,
   onSave,
+  onCreateNewVersion,
 }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [totalCost, setTotalCost] = useState(450000);
   const [allocationMethod, setAllocationMethod] = useState<'area' | 'floor' | 'equal'>('floor');
   const [paymentSchedule, setPaymentSchedule] = useState('');
+  const [versionName, setVersionName] = useState('');
+  const [versionDesc, setVersionDesc] = useState('');
 
   const currentScheme = schemes.find(s => s.versionId === currentVersion.id);
 
-  const handleSave = () => {
-    if (name.trim()) {
-      onSave({
-        buildingId,
-        versionId: currentVersion.id,
-        name,
-        description,
-        totalCost,
-        allocationMethod,
-        floorCoefficients: { 1: 0.5, 2: 0.7, 3: 0.9, 4: 1.1, 5: 1.3, 6: 1.5 },
-        paymentSchedule,
-        createdBy: '当前用户',
-      });
-      setShowCreateModal(false);
-      setName('');
-      setDescription('');
-      setTotalCost(450000);
-      setAllocationMethod('floor');
-      setPaymentSchedule('');
+  const handleEditClick = () => {
+    setShowCreateModal(true);
+    if (currentScheme) {
+      setName(currentScheme.name);
+      setDescription(currentScheme.description);
+      setTotalCost(currentScheme.totalCost);
+      setAllocationMethod(currentScheme.allocationMethod);
+      setPaymentSchedule(currentScheme.paymentSchedule);
     }
+  };
+
+  const handleSave = () => {
+    if (!name.trim()) return;
+    
+    const newScheme = {
+      buildingId,
+      versionId: currentVersion.id,
+      name,
+      description,
+      totalCost,
+      allocationMethod,
+      floorCoefficients: { 1: 0.5, 2: 0.7, 3: 0.9, 4: 1.1, 5: 1.3, 6: 1.5 },
+      paymentSchedule,
+      createdBy: '当前用户',
+    };
+
+    if (hasScheme) {
+      setShowCreateModal(false);
+      setShowConfirmModal(true);
+    } else {
+      onSave(newScheme);
+      setShowCreateModal(false);
+      resetForm();
+    }
+  };
+
+  const handleConfirmNewVersion = () => {
+    if (!versionName.trim()) return;
+    
+    const newScheme = {
+      buildingId,
+      versionId: '',
+      name,
+      description,
+      totalCost,
+      allocationMethod,
+      floorCoefficients: { 1: 0.5, 2: 0.7, 3: 0.9, 4: 1.1, 5: 1.3, 6: 1.5 },
+      paymentSchedule,
+      createdBy: '当前用户',
+    };
+
+    onCreateNewVersion(
+      versionName,
+      versionDesc,
+      `费用方案变更：${name} - ${description}`,
+      newScheme
+    );
+    setShowConfirmModal(false);
+    resetForm();
+  };
+
+  const resetForm = () => {
+    setName('');
+    setDescription('');
+    setTotalCost(450000);
+    setAllocationMethod('floor');
+    setPaymentSchedule('');
+    setVersionName('');
+    setVersionDesc('');
   };
 
   return (
@@ -56,10 +112,10 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">费用方案</h2>
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={handleEditClick}
           className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
         >
-          编辑方案
+          {hasScheme ? '变更方案' : '配置方案'}
         </button>
       </div>
 
@@ -114,7 +170,18 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
       {showCreateModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-screen overflow-y-auto">
-            <h3 className="text-lg font-bold mb-4">编辑费用方案</h3>
+            <h3 className="text-lg font-bold mb-4">
+              {hasScheme ? '变更费用方案' : '配置费用方案'}
+            </h3>
+            
+            {hasScheme && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="text-sm font-medium text-yellow-800">⚠️ 变更提示</div>
+                <div className="text-xs text-yellow-700 mt-1">
+                  费用方案变更将创建新版本，所有住户需要重新签字确认。
+                </div>
+              </div>
+            )}
             
             <div className="space-y-4">
               <div>
@@ -125,7 +192,6 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   placeholder="费用方案名称"
-                  defaultValue={currentScheme?.name}
                 />
               </div>
 
@@ -137,7 +203,6 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   placeholder="简要描述"
-                  defaultValue={currentScheme?.description}
                 />
               </div>
 
@@ -148,7 +213,6 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                   value={totalCost}
                   onChange={(e) => setTotalCost(Number(e.target.value))}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
-                  defaultValue={currentScheme?.totalCost}
                 />
               </div>
 
@@ -158,7 +222,6 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                   value={allocationMethod}
                   onChange={(e) => setAllocationMethod(e.target.value as 'area' | 'floor' | 'equal')}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
-                  defaultValue={currentScheme?.allocationMethod}
                 >
                   {Object.entries(allocationMethods).map(([value, label]) => (
                     <option key={value} value={value}>{label}</option>
@@ -174,14 +237,16 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   rows={2}
                   placeholder="例如: 首付30%，安装完成付50%，验收后付20%"
-                  defaultValue={currentScheme?.paymentSchedule}
                 />
               </div>
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
               <button
-                onClick={() => setShowCreateModal(false)}
+                onClick={() => {
+                  setShowCreateModal(false);
+                  resetForm();
+                }}
                 className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
               >
                 取消
@@ -190,7 +255,60 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                 onClick={handleSave}
                 className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
               >
-                保存
+                {hasScheme ? '确认变更' : '保存'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+            <h3 className="text-lg font-bold mb-2">创建新版本确认</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              费用方案变更后将创建新版本，原有签字记录保留但不计入新版本统计。
+              所有住户需要在新版本中重新签字确认。
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">新版本名称 <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={versionName}
+                  onChange={(e) => setVersionName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  placeholder="例如: 优化方案版"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">版本描述</label>
+                <input
+                  type="text"
+                  value={versionDesc}
+                  onChange={(e) => setVersionDesc(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                  placeholder="简要描述此版本变更"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowConfirmModal(false);
+                  setShowCreateModal(true);
+                }}
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                返回修改
+              </button>
+              <button
+                onClick={handleConfirmNewVersion}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+              >
+                创建新版本并重签
               </button>
             </div>
           </div>
