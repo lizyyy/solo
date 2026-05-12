@@ -1,0 +1,24 @@
+{
+  "name": "plant-rental-api",
+  "version": "1.0.0",
+  "description": "绿植租摆换盆记录 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "init-db": "node src/scripts/initData.js",
+    "demo": "node src/scripts/demoFlow.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
