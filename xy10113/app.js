@@ -16,6 +16,7 @@ class LabelReviewTool {
 
     init() {
         this.loadHistory();
+        this.loadCurrentProgress();
         this.bindEvents();
         this.renderHistory();
         this.initTabs();
@@ -306,41 +307,99 @@ class LabelReviewTool {
     }
 
     createReviewRecords() {
+        this.clearCurrentProgress();
+        
         const { labelBatch, materialBatch, labelMaterial, materialMaterial } = this.fieldMapping;
         
         this.reviewRecords = [];
 
-        const materialMap = new Map();
+        const materialByBatchMatMap = new Map();
+        const materialByBatchOnlyMap = new Map();
+        const materialByMaterialOnlyMap = new Map();
+        
         this.materialData.forEach(mat => {
-            const key = `${mat[materialBatch] || ''}-${mat[materialMaterial] || ''}`;
-            materialMap.set(key, mat);
+            const batchMatKey = `${mat[materialBatch] || ''}`;
+            const materialKey = `${mat[materialMaterial] || ''}`;
+            const fullKey = `${batchMatKey}-${materialKey}`;
+            
+            materialByBatchMatMap.set(fullKey, mat);
+            
+            if (batchMatKey && !materialByBatchOnlyMap.has(batchMatKey)) {
+                materialByBatchOnlyMap.set(batchMatKey, mat);
+            }
+            
+            if (materialKey && !materialByMaterialOnlyMap.has(materialKey)) {
+                materialByMaterialOnlyMap.set(materialKey, mat);
+            }
         });
 
         this.labelData.forEach((label, index) => {
             const labelBatchValue = label[labelBatch] || '';
             const labelMaterialValue = label[labelMaterial] || '';
-            const key = `${labelBatchValue}-${labelMaterialValue}`;
+            const fullKey = `${labelBatchValue}-${labelMaterialValue}`;
             
-            const matchedMaterial = materialMap.get(key);
-            
+            let matchedMaterial = null;
             const conflicts = [];
-            if (matchedMaterial) {
+            let matchReason = '';
+            
+            if (materialByBatchMatMap.has(fullKey)) {
+                matchedMaterial = materialByBatchMatMap.get(fullKey);
+                matchReason = 'batch-material';
+            } else if (labelBatchValue && materialByBatchOnlyMap.has(labelBatchValue)) {
+                matchedMaterial = materialByBatchOnlyMap.get(labelBatchValue);
+                matchReason = 'batch-only';
+                
                 if (labelMaterial && materialMaterial) {
-                    if (label[labelMaterial] !== matchedMaterial[materialMaterial]) {
+                    const matMaterialValue = matchedMaterial[materialMaterial] || '';
+                    if (labelMaterialValue && matMaterialValue && labelMaterialValue !== matMaterialValue) {
                         conflicts.push({
                             field: '物料号',
-                            labelValue: label[labelMaterial],
-                            materialValue: matchedMaterial[materialMaterial]
+                            labelValue: labelMaterialValue,
+                            materialValue: matMaterialValue
                         });
                     }
                 }
+            } else if (labelMaterialValue && materialByMaterialOnlyMap.has(labelMaterialValue)) {
+                matchedMaterial = materialByMaterialOnlyMap.get(labelMaterialValue);
+                matchReason = 'material-only';
+                
                 if (labelBatch && materialBatch) {
-                    if (label[labelBatch] !== matchedMaterial[materialBatch]) {
+                    const matBatchValue = matchedMaterial[materialBatch] || '';
+                    if (labelBatchValue && matBatchValue && labelBatchValue !== matBatchValue) {
                         conflicts.push({
                             field: '批次号',
-                            labelValue: label[labelBatch],
-                            materialValue: matchedMaterial[materialBatch]
+                            labelValue: labelBatchValue,
+                            materialValue: matBatchValue
                         });
+                    }
+                }
+            }
+
+            if (matchedMaterial) {
+                if (labelMaterial && materialMaterial) {
+                    const matMaterialValue = matchedMaterial[materialMaterial] || '';
+                    if (labelMaterialValue !== matMaterialValue) {
+                        const existing = conflicts.find(c => c.field === '物料号');
+                        if (!existing && matchReason === 'batch-material') {
+                            conflicts.push({
+                                field: '物料号',
+                                labelValue: labelMaterialValue,
+                                materialValue: matMaterialValue
+                            });
+                        }
+                    }
+                }
+                if (labelBatch && materialBatch) {
+                    const matBatchValue = matchedMaterial[materialBatch] || '';
+                    if (labelBatchValue !== matBatchValue) {
+                        const existing = conflicts.find(c => c.field === '批次号');
+                        if (!existing) {
+                            conflicts.push({
+                                field: '批次号',
+                                labelValue: labelBatchValue,
+                                materialValue: matBatchValue
+                            });
+                        }
                     }
                 }
             }
@@ -352,7 +411,8 @@ class LabelReviewTool {
                 status: 'pending',
                 conflicts: conflicts,
                 remark: '',
-                reviewedAt: null
+                reviewedAt: null,
+                matchReason: matchReason
             });
         });
 
@@ -365,6 +425,8 @@ class LabelReviewTool {
         if (withConflicts > 0) {
             this.showToast(`检测到 ${withConflicts} 条数据存在字段冲突`, 'warning');
         }
+        
+        this.saveCurrentProgress();
     }
 
     renderReviewList() {
@@ -523,6 +585,7 @@ class LabelReviewTool {
             }
         }
 
+        this.saveCurrentProgress();
         this.saveToHistoryIfNeeded();
         this.renderReviewList();
         this.showToast(`记录 #${id} 已${status === 'passed' ? '通过' : '标记为有问题'}`, 'success');
@@ -551,6 +614,7 @@ class LabelReviewTool {
                     record.reviewedAt = Date.now();
                 });
                 
+                this.saveCurrentProgress();
                 this.saveToHistoryIfNeeded();
                 this.renderReviewList();
                 this.showToast(`已批量处理 ${filtered.length} 条记录`, 'success');
@@ -619,6 +683,56 @@ class LabelReviewTool {
         }
     }
 
+    saveCurrentProgress() {
+        try {
+            const progressData = {
+                labelData: this.labelData,
+                materialData: this.materialData,
+                reviewRecords: this.reviewRecords,
+                fieldMapping: this.fieldMapping,
+                savedAt: Date.now()
+            };
+            localStorage.setItem('labelReviewCurrentProgress', JSON.stringify(progressData));
+        } catch (error) {
+            console.error('保存当前进度失败:', error);
+        }
+    }
+
+    loadCurrentProgress() {
+        try {
+            const saved = localStorage.getItem('labelReviewCurrentProgress');
+            if (saved) {
+                const progressData = JSON.parse(saved);
+                
+                if (progressData.reviewRecords && progressData.reviewRecords.length > 0) {
+                    this.showModal(
+                        '检测到未完成的复核任务',
+                        `检测到有未完成的复核任务（保存于 ${new Date(progressData.savedAt).toLocaleString('zh-CN')}），是否恢复？`,
+                        () => {
+                            this.labelData = progressData.labelData || [];
+                            this.materialData = progressData.materialData || [];
+                            this.reviewRecords = progressData.reviewRecords || [];
+                            this.fieldMapping = progressData.fieldMapping || this.fieldMapping;
+                            
+                            if (this.labelData.length > 0 && this.materialData.length > 0) {
+                                this.showDataPreview();
+                            }
+                            
+                            this.renderReviewList();
+                            this.showToast('已恢复上次的复核进度', 'success');
+                        }
+                    );
+                }
+            }
+        } catch (error) {
+            console.error('加载当前进度失败:', error);
+        }
+    }
+
+    clearCurrentProgress() {
+        localStorage.removeItem('labelReviewCurrentProgress');
+    }
+
     renderHistory() {
         const container = document.getElementById('historyList');
         
@@ -662,6 +776,8 @@ class LabelReviewTool {
             '加载历史任务',
             '加载历史任务将覆盖当前数据，确定要继续吗？',
             () => {
+                this.clearCurrentProgress();
+                
                 this.fieldMapping = { ...item.fieldMapping };
                 this.reviewRecords = item.records.map(r => ({ ...r }));
                 
