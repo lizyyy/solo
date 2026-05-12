@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Table, Button, Tag, Space, Card, Descriptions, Row, Col, message, Modal, Form, Input, Select } from 'antd';
+import { Table, Button, Tag, Space, Card, Descriptions, Row, Col, message, Modal, Form, Input } from 'antd';
 import { WarningOutlined, CheckCircleOutlined, EyeOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useStore } from '../store';
 import { AbnormalAlert } from '../types';
 
-const { Option } = Select;
 const { TextArea } = Input;
 
 const Alerts: React.FC = () => {
@@ -64,10 +63,7 @@ const Alerts: React.FC = () => {
     return followupTasks.find((t) => t.id === taskId);
   };
 
-  const getRelatedMember = (memberId?: string) => {
-    if (!memberId) return null;
-    return members.find((m) => m.id === memberId);
-  };
+
 
   const columns = [
     {
