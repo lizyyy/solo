@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-05-12T22:04:20.195923",
+  "waivers": [
+    {
+      "risk_hash": "71481a05d2818e2f51e2b1faf6af1f13",
+      "risk_type": "direct_column_drop",
+      "script_version": "20240101000004",
+      "reason": "该列已确认无人使用，可以安全删除",
+      "approved_by": "DBA张三",
+      "created_at": "2026-05-12T22:00:35.528596",
+      "expires_at": "2026-05-15T22:00:35.528596",
+      "is_active": true
+    }
+  ]
+}

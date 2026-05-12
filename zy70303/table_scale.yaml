@@ -1,0 +1,51 @@
+# 表规模配置文件
+# 用于配置各个表的规模信息，帮助识别大表操作风险
+
+# 默认大表阈值（行数）
+default_large_table_threshold: 100000
+
+# 显式标记为大表的列表（可选）
+large_tables:
+  - orders
+  - order_items
+  - user_logs
+
+# 详细表配置
+tables:
+  # 用户服务
+  users:
+    service: user_service
+    row_count: 50000
+    is_large: false
+  
+  user_profiles:
+    service: user_service
+    row_count: 50000
+    is_large: false
+  
+  user_logs:
+    service: user_service
+    row_count: 5000000
+    is_large: true
+  
+  # 订单服务
+  orders:
+    service: order_service
+    row_count: 2000000
+    is_large: true
+  
+  order_items:
+    service: order_service
+    row_count: 10000000
+    is_large: true
+  
+  # 商品服务
+  products:
+    service: product_service
+    row_count: 10000
+    is_large: false
+  
+  product_categories:
+    service: product_service
+    row_count: 1000
+    is_large: false

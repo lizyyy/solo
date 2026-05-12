@@ -1,0 +1,195 @@
+{
+  "generated_at": "2026-05-12T22:04:01.733087",
+  "summary": {
+    "total_risks": 5,
+    "blockers": 1,
+    "warnings": 3,
+    "waived": 1,
+    "expired_waivers": 0,
+    "can_proceed": false
+  },
+  "risks": {
+    "active": {
+      "blockers": [
+        {
+          "risk_type": "large_table_nonconcurrent_index",
+          "level": "blocker",
+          "description": "大表 order_items 使用非并发方式创建索引",
+          "script_version": "20240101000003",
+          "script_filename": "V20240101000003__create_order_items_index.sql",
+          "service": "order_service",
+          "table_name": "order_items",
+          "details": "大表创建索引应使用 CREATE INDEX CONCURRENTLY 以避免锁表",
+          "hash": "a3457460b980c34aff9dcf501cfbcb40"
+        }
+      ],
+      "warnings": [
+        {
+          "risk_type": "default_value_rewrite",
+          "level": "warning",
+          "description": "大表 orders 添加带默认值的列",
+          "script_version": "20240101000002",
+          "script_filename": "V20240101000002__add_order_status.sql",
+          "service": "order_service",
+          "table_name": "orders",
+          "details": "添加带默认值的列可能导致全表重写，建议先添加可空列，再回填数据，最后设置默认值",
+          "hash": "5fa8c0c7af086c1e82a8c43869b71fa4"
+        },
+        {
+          "risk_type": "large_table_alter",
+          "level": "warning",
+          "description": "大表 orders 的 ALTER 操作",
+          "script_version": "20240101000002",
+          "script_filename": "V20240101000002__add_order_status.sql",
+          "service": "order_service",
+          "table_name": "orders",
+          "details": "大表的 ALTER 操作可能导致长时间锁表或性能问题",
+          "hash": "ca2f579949793eb5bc24cf81acf2f771"
+        },
+        {
+          "risk_type": "no_rollback",
+          "level": "warning",
+          "description": "缺少回滚脚本",
+          "script_version": "20240101000004",
+          "script_filename": "V20240101000004__drop_user_old_column.sql",
+          "service": "user_service",
+          "table_name": null,
+          "details": "建议为每个迁移脚本提供对应的回滚脚本",
+          "hash": "c94e3b3d063b4b382857be83643e419e"
+        }
+      ]
+    },
+    "waived": [
+      {
+        "risk_type": "direct_column_drop",
+        "level": "warning",
+        "description": "直接删除表 users 的列",
+        "script_version": "20240101000004",
+        "script_filename": "V20240101000004__drop_user_old_column.sql",
+        "service": "user_service",
+        "table_name": "users",
+        "details": "删除列是不可逆操作，建议先将列标记为废弃，后续再删除",
+        "hash": "71481a05d2818e2f51e2b1faf6af1f13"
+      }
+    ]
+  },
+  "by_service": {
+    "order_service": {
+      "blockers": 1,
+      "warnings": 2,
+      "risks": [
+        {
+          "risk_type": "default_value_rewrite",
+          "level": "warning",
+          "description": "大表 orders 添加带默认值的列",
+          "script_version": "20240101000002",
+          "script_filename": "V20240101000002__add_order_status.sql",
+          "service": "order_service",
+          "table_name": "orders",
+          "details": "添加带默认值的列可能导致全表重写，建议先添加可空列，再回填数据，最后设置默认值",
+          "hash": "5fa8c0c7af086c1e82a8c43869b71fa4"
+        },
+        {
+          "risk_type": "large_table_alter",
+          "level": "warning",
+          "description": "大表 orders 的 ALTER 操作",
+          "script_version": "20240101000002",
+          "script_filename": "V20240101000002__add_order_status.sql",
+          "service": "order_service",
+          "table_name": "orders",
+          "details": "大表的 ALTER 操作可能导致长时间锁表或性能问题",
+          "hash": "ca2f579949793eb5bc24cf81acf2f771"
+        },
+        {
+          "risk_type": "large_table_nonconcurrent_index",
+          "level": "blocker",
+          "description": "大表 order_items 使用非并发方式创建索引",
+          "script_version": "20240101000003",
+          "script_filename": "V20240101000003__create_order_items_index.sql",
+          "service": "order_service",
+          "table_name": "order_items",
+          "details": "大表创建索引应使用 CREATE INDEX CONCURRENTLY 以避免锁表",
+          "hash": "a3457460b980c34aff9dcf501cfbcb40"
+        }
+      ]
+    },
+    "user_service": {
+      "blockers": 0,
+      "warnings": 1,
+      "risks": [
+        {
+          "risk_type": "no_rollback",
+          "level": "warning",
+          "description": "缺少回滚脚本",
+          "script_version": "20240101000004",
+          "script_filename": "V20240101000004__drop_user_old_column.sql",
+          "service": "user_service",
+          "table_name": null,
+          "details": "建议为每个迁移脚本提供对应的回滚脚本",
+          "hash": "c94e3b3d063b4b382857be83643e419e"
+        }
+      ]
+    }
+  },
+  "comparison": {
+    "fixed_risks": [],
+    "new_risks": [],
+    "unchanged_risks": [
+      {
+        "risk_type": "default_value_rewrite",
+        "level": "warning",
+        "description": "大表 orders 添加带默认值的列",
+        "script_version": "20240101000002",
+        "script_filename": "V20240101000002__add_order_status.sql",
+        "service": "order_service",
+        "table_name": "orders",
+        "details": "添加带默认值的列可能导致全表重写，建议先添加可空列，再回填数据，最后设置默认值",
+        "hash": "5fa8c0c7af086c1e82a8c43869b71fa4"
+      },
+      {
+        "risk_type": "large_table_alter",
+        "level": "warning",
+        "description": "大表 orders 的 ALTER 操作",
+        "script_version": "20240101000002",
+        "script_filename": "V20240101000002__add_order_status.sql",
+        "service": "order_service",
+        "table_name": "orders",
+        "details": "大表的 ALTER 操作可能导致长时间锁表或性能问题",
+        "hash": "ca2f579949793eb5bc24cf81acf2f771"
+      },
+      {
+        "risk_type": "large_table_nonconcurrent_index",
+        "level": "blocker",
+        "description": "大表 order_items 使用非并发方式创建索引",
+        "script_version": "20240101000003",
+        "script_filename": "V20240101000003__create_order_items_index.sql",
+        "service": "order_service",
+        "table_name": "order_items",
+        "details": "大表创建索引应使用 CREATE INDEX CONCURRENTLY 以避免锁表",
+        "hash": "a3457460b980c34aff9dcf501cfbcb40"
+      },
+      {
+        "risk_type": "no_rollback",
+        "level": "warning",
+        "description": "缺少回滚脚本",
+        "script_version": "20240101000004",
+        "script_filename": "V20240101000004__drop_user_old_column.sql",
+        "service": "user_service",
+        "table_name": null,
+        "details": "建议为每个迁移脚本提供对应的回滚脚本",
+        "hash": "c94e3b3d063b4b382857be83643e419e"
+      },
+      {
+        "risk_type": "direct_column_drop",
+        "level": "warning",
+        "description": "直接删除表 users 的列",
+        "script_version": "20240101000004",
+        "script_filename": "V20240101000004__drop_user_old_column.sql",
+        "service": "user_service",
+        "table_name": "users",
+        "details": "删除列是不可逆操作，建议先将列标记为废弃，后续再删除",
+        "hash": "71481a05d2818e2f51e2b1faf6af1f13"
+      }
+    ]
+  }
+}
