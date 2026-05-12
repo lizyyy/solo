@@ -1,0 +1,191 @@
+{
+  "batchId": "batch-demo-20260512221116",
+  "createdAt": "2026-05-12T14:11:16.605Z",
+  "inputPath": "/Users/lzy/pro/solo/workspaces/zy70308/data/members-part1.jsonl",
+  "files": [
+    {
+      "filename": "members-part1.jsonl",
+      "path": "/Users/lzy/pro/solo/workspaces/zy70308/data/members-part1.jsonl",
+      "totalLines": 20,
+      "processedLines": 20,
+      "status": "completed"
+    }
+  ],
+  "totalLines": 20,
+  "processedLines": 20,
+  "successCount": 17,
+  "failedCount": 3,
+  "skippedCount": 0,
+  "currentFileIndex": 1,
+  "currentLineNumber": 0,
+  "batchSize": 100,
+  "maxRetries": 3,
+  "retries": 0,
+  "failures": [
+    {
+      "type": "parse_error",
+      "valid": false,
+      "error": "缺少主键 userId",
+      "data": {
+        "name": "缺主键用户",
+        "points": 50,
+        "action": "积分调整"
+      },
+      "line": "{\"name\": \"缺主键用户\", \"points\": 50, \"action\": \"积分调整\"}",
+      "lineNumber": 4,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.640Z",
+      "retryCount": 0,
+      "originalData": "{\"name\": \"缺主键用户\", \"points\": 50, \"action\": \"积分调整\"}",
+      "repairedData": {
+        "userId": "U000",
+        "name": "修复后的缺主键用户",
+        "points": 50,
+        "action": "积分调整"
+      },
+      "repairedAt": "2026-05-12T14:11:32.776Z",
+      "processed": true,
+      "processedAt": "2026-05-12T14:11:32.789Z"
+    },
+    {
+      "type": "validation_error",
+      "error": "重复用户ID: U001",
+      "data": {
+        "userId": "U001",
+        "name": "重复用户",
+        "points": 500,
+        "action": "积分调整"
+      },
+      "line": "{\"userId\": \"U001\", \"name\": \"重复用户\", \"points\": 500, \"action\": \"积分调整\"}",
+      "lineNumber": 6,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.651Z",
+      "retryCount": 0,
+      "originalData": "{\"userId\": \"U001\", \"name\": \"重复用户\", \"points\": 500, \"action\": \"积分调整\"}"
+    },
+    {
+      "type": "validation_error",
+      "error": "积分必须是数字",
+      "data": {
+        "userId": "U005",
+        "name": "孙七",
+        "points": "错误格式",
+        "action": "积分调整"
+      },
+      "line": "{\"userId\": \"U005\", \"name\": \"孙七\", \"points\": \"错误格式\", \"action\": \"积分调整\"}",
+      "lineNumber": 7,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.651Z",
+      "retryCount": 0,
+      "originalData": "{\"userId\": \"U005\", \"name\": \"孙七\", \"points\": \"错误格式\", \"action\": \"积分调整\"}",
+      "repairedData": {
+        "userId": "U005",
+        "name": "孙七",
+        "points": 250,
+        "action": "积分调整"
+      },
+      "repairedAt": "2026-05-12T14:11:32.777Z",
+      "processed": true,
+      "processedAt": "2026-05-12T14:11:32.800Z"
+    },
+    {
+      "type": "parse_error",
+      "valid": false,
+      "error": "空行",
+      "line": "",
+      "lineNumber": 10,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.864Z",
+      "retryCount": 0,
+      "originalData": ""
+    },
+    {
+      "type": "parse_error",
+      "valid": false,
+      "error": "JSON 格式错误: Expected ':' after property name in JSON at position 10 (line 1 column 11)",
+      "line": "{\"这不是JSON\", \"invalid\": true}",
+      "lineNumber": 12,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.875Z",
+      "retryCount": 0,
+      "originalData": "{\"这不是JSON\", \"invalid\": true}"
+    },
+    {
+      "type": "processing_error",
+      "error": "模拟数据库连接超时",
+      "data": {
+        "userId": "U013",
+        "name": "孙十五",
+        "points": 660,
+        "action": "积分调整"
+      },
+      "line": "{\"userId\": \"U013\", \"name\": \"孙十五\", \"points\": 660, \"action\": \"积分调整\"}",
+      "lineNumber": 17,
+      "filename": "members-part1.jsonl",
+      "timestamp": "2026-05-12T14:11:16.920Z",
+      "retryCount": 1,
+      "originalData": "{\"userId\": \"U013\", \"name\": \"孙十五\", \"points\": 660, \"action\": \"积分调整\"}",
+      "repairedData": {
+        "userId": "U013",
+        "name": "孙十五",
+        "points": 660,
+        "action": "积分调整-重试"
+      },
+      "repairedAt": "2026-05-12T14:11:32.777Z",
+      "processed": true,
+      "processedAt": "2026-05-12T14:11:32.811Z"
+    }
+  ],
+  "processedUserIds": [
+    "U001",
+    "U002",
+    "U003",
+    "U004",
+    "U006",
+    "U007",
+    "U008",
+    "U009",
+    "U010",
+    "U011",
+    "U012",
+    "U014",
+    "U015",
+    "U016"
+  ],
+  "history": [
+    {
+      "action": "start",
+      "timestamp": "2026-05-12T14:11:16.606Z",
+      "message": "批次初始化完成"
+    },
+    {
+      "action": "interrupt",
+      "timestamp": "2026-05-12T14:11:16.663Z",
+      "processedThisRun": 8,
+      "successThisRun": 5,
+      "failedThisRun": 3,
+      "message": "处理被中断"
+    },
+    {
+      "action": "resume",
+      "timestamp": "2026-05-12T14:11:16.844Z",
+      "message": "从 8/20 恢复"
+    },
+    {
+      "action": "process",
+      "timestamp": "2026-05-12T14:11:16.952Z",
+      "processedThisRun": 12,
+      "successThisRun": 9,
+      "failedThisRun": 3,
+      "message": "本轮处理完成"
+    },
+    {
+      "action": "repair",
+      "timestamp": "2026-05-12T14:11:32.812Z",
+      "successCount": 3,
+      "failCount": 0,
+      "message": "重试 3 条修复记录，成功 3，失败 0"
+    }
+  ],
+  "status": "failed"
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 4,
+    "newData": {
+      "userId": "U000",
+      "name": "修复后的缺主键用户",
+      "points": 50,
+      "action": "积分调整"
+    }
+  },
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 7,
+    "newData": {
+      "userId": "U005",
+      "name": "孙七",
+      "points": 250,
+      "action": "积分调整"
+    }
+  },
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 11,
+    "newData": {
+      "userId": "U999",
+      "name": "修复的坏行",
+      "points": 100,
+      "action": "积分调整"
+    }
+  },
+  {
+    "filename": "orders-part1.jsonl",
+    "lineNumber": 4,
+    "newData": {
+      "userId": "O010",
+      "orderId": "ORD004",
+      "amount": 88.88,
+      "label": "缺userId订单-已修复"
+    }
+  },
+  {
+    "filename": "orders-part1.jsonl",
+    "lineNumber": 5,
+    "newData": {
+      "userId": "O004",
+      "orderId": "ORD005",
+      "amount": 123.45,
+      "label": "格式错误-已修复"
+    }
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 4,
+    "newData": {
+      "userId": "U000",
+      "name": "修复后的缺主键用户",
+      "points": 50,
+      "action": "积分调整"
+    }
+  },
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 7,
+    "newData": {
+      "userId": "U005",
+      "name": "孙七",
+      "points": 250,
+      "action": "积分调整"
+    }
+  },
+  {
+    "filename": "members-part1.jsonl",
+    "lineNumber": 17,
+    "newData": {
+      "userId": "U013",
+      "name": "孙十五",
+      "points": 660,
+      "action": "积分调整-重试"
+    }
+  }
+]

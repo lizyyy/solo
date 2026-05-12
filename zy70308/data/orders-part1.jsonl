@@ -1,0 +1,10 @@
+{"userId": "O001", "orderId": "ORD001", "amount": 99.99, "label": "新用户订单"}
+{"userId": "O002", "orderId": "ORD002", "amount": 199.50, "label": "VIP订单"}
+{"userId": "O003", "orderId": "ORD003", "amount": 50.00, "label": "普通订单"}
+{"orderId": "ORD004", "amount": 88.88, "label": "缺userId订单"}
+{"userId": "O004", "orderId": "ORD005", "amount": "not_a_number", "label": "格式错误"}
+{"userId": "O005", "orderId": "ORD006", "amount": 250.00, "label": "大额订单"}
+{"userId": "O006", "orderId": "ORD007", "amount": 350.00, "label": "促销订单"}
+{"userId": "O007", "orderId": "ORD008", "amount": 450.00, "label": "会员订单"}
+{"userId": "O008", "orderId": "ORD009", "amount": 550.00, "label": "复购订单"}
+{"userId": "O009", "orderId": "ORD010", "amount": 650.00, "label": "团购订单"}

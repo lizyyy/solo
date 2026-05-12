@@ -1,0 +1,20 @@
+{
+  "name": "batch-resume-cli",
+  "version": "1.0.0",
+  "description": "批处理断点续跑 CLI 工具",
+  "main": "cli.js",
+  "bin": {
+    "batch": "./cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "batch",
+    "resume",
+    "cli",
+    "retry"
+  ],
+  "author": "",
+  "license": "MIT"
+}
