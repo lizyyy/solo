@@ -47,7 +47,12 @@ class PlantRentalService {
     
     const plant = await Plant.getById(task.plant_id);
     if (plant && plant.status !== PLANT_STATUSES.HEALTHY) {
-      await Plant.updateStatus(plant.id, PLANT_STATUSES.HEALTHY);
+      const compensations = await Compensation.getByPlant(plant.id);
+      const hasPaidCompensation = compensations.some(c => c.status === COMPENSATION_STATUSES.PAID);
+      
+      if (!hasPaidCompensation) {
+        await Plant.updateStatus(plant.id, PLANT_STATUSES.HEALTHY);
+      }
     }
     
     await HistoryService.record('update', taskId, 'maintenance', 'complete', operatedBy, oldData, newTask);
@@ -272,12 +277,10 @@ class PlantRentalService {
     const compensations = await Compensation.getByPlant(plant.id);
     const hasPaidCompensation = compensations.some(c => c.status === COMPENSATION_STATUSES.PAID);
     
-    if (hasPaidCompensation && plant.status === PLANT_STATUSES.HEALTHY) {
-      reason = '植物已赔偿但现已恢复健康，恢复计租';
-    }
-    
-    if (hasPaidCompensation && plant.status !== PLANT_STATUSES.HEALTHY && plant.status !== PLANT_STATUSES.DEAD) {
-      reason = '植物已赔偿但未死亡，继续计租';
+    if (hasPaidCompensation) {
+      shouldRent = false;
+      reason = '植物已完成赔偿，不再计租金';
+      adjustedRent = 0;
     }
     
     return {
@@ -316,8 +319,8 @@ class PlantRentalService {
     const pendingCompensations = locationCompensations.filter(
       c => c.status === COMPENSATION_STATUSES.PENDING
     );
-    const approvedCompensations = locationCompensations.filter(
-      c => c.status === COMPENSATION_STATUSES.APPROVED
+    const billableCompensations = locationCompensations.filter(
+      c => c.status === COMPENSATION_STATUSES.APPROVED || c.status === COMPENSATION_STATUSES.PAID
     );
     
     if (pendingCompensations.length > 0) {
@@ -325,7 +328,7 @@ class PlantRentalService {
       throw new Error(`该点位存在 ${pendingCompensations.length} 个待审批的赔偿记录 (${pendingIds})，请先处理赔偿再生成账单`);
     }
     
-    const compensationAmount = approvedCompensations.reduce((sum, c) => sum + (c.amount || 0), 0);
+    const compensationAmount = billableCompensations.reduce((sum, c) => sum + (c.amount || 0), 0);
     
     const billDetails = {
       plants: rentalInfos,
@@ -339,7 +342,7 @@ class PlantRentalService {
         total_plants: plants.length,
         billable_plants: billablePlants.length,
         unbilled_plants: plants.length - billablePlants.length,
-        approved_compensations_count: approvedCompensations.length
+        billable_compensations_count: billableCompensations.length
       }
     };
     
