@@ -1,0 +1,16 @@
+{
+  "name": "pet-boarding-api",
+  "version": "1.0.0",
+  "description": "宠物寄养预约 API 系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "seed": "node src/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.10"
+  }
+}

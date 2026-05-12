@@ -1,0 +1,1098 @@
+{
+  "rooms": [
+    {
+      "id": "room-cat",
+      "name": "猫咪专属房",
+      "type": "cat",
+      "capacity": 4,
+      "base_rate": 80,
+      "features": "猫爬架、独立猫砂盆、通风系统"
+    },
+    {
+      "id": "room-deluxe",
+      "name": "豪华间（大犬）",
+      "type": "deluxe",
+      "capacity": 2,
+      "base_rate": 200,
+      "features": "独立空间、沙发床、每天2次遛狗"
+    },
+    {
+      "id": "room-standard",
+      "name": "标准间（单犬）",
+      "type": "standard",
+      "capacity": 3,
+      "base_rate": 120,
+      "features": "空调、定时遛狗、监控"
+    },
+    {
+      "id": "room-suite",
+      "name": "套房（多宠）",
+      "type": "suite",
+      "capacity": 1,
+      "base_rate": 350,
+      "features": "独立公寓、恒温系统、24h管家、视频监控"
+    }
+  ],
+  "room_inventory": [
+    {
+      "id": "c6d315e1-8f74-4f13-8c6c-bdd014876363",
+      "room_id": "room-standard",
+      "date": "2026-05-09",
+      "available": 3
+    },
+    {
+      "id": "99705c40-7433-44bb-93ce-e7f2e0ede354",
+      "room_id": "room-standard",
+      "date": "2026-05-10",
+      "available": 3
+    },
+    {
+      "id": "232f4a3d-0bd6-4289-b662-2faaa73c1bff",
+      "room_id": "room-standard",
+      "date": "2026-05-11",
+      "available": 3
+    },
+    {
+      "id": "7e8bc595-73f9-4216-abe9-03672883c95c",
+      "room_id": "room-standard",
+      "date": "2026-05-12",
+      "available": 3
+    },
+    {
+      "id": "4e30fcfc-6b34-4b9f-b8ab-1798db171226",
+      "room_id": "room-standard",
+      "date": "2026-05-13",
+      "available": 3
+    },
+    {
+      "id": "81aacd48-9cb6-4428-926b-efcf160b215e",
+      "room_id": "room-standard",
+      "date": "2026-05-14",
+      "available": 3
+    },
+    {
+      "id": "d5f12b63-2707-4deb-967c-35322a972126",
+      "room_id": "room-standard",
+      "date": "2026-05-15",
+      "available": 3
+    },
+    {
+      "id": "14104cb0-7ca5-4073-8787-d1899e7dec4e",
+      "room_id": "room-standard",
+      "date": "2026-05-16",
+      "available": 3
+    },
+    {
+      "id": "5e81a041-3a54-45c6-b916-24cce6b4f9f6",
+      "room_id": "room-standard",
+      "date": "2026-05-17",
+      "available": 3
+    },
+    {
+      "id": "ed6c2fea-9254-4a34-a021-1f84debb5ea1",
+      "room_id": "room-standard",
+      "date": "2026-05-18",
+      "available": 3
+    },
+    {
+      "id": "30a979df-7b57-4936-a6e3-25d956e8d062",
+      "room_id": "room-standard",
+      "date": "2026-05-19",
+      "available": 3
+    },
+    {
+      "id": "d9c1bd51-0fc1-4b06-8f6a-227b393ee397",
+      "room_id": "room-standard",
+      "date": "2026-05-20",
+      "available": 3
+    },
+    {
+      "id": "f353f175-114b-4fa1-894a-6b42a07780a0",
+      "room_id": "room-standard",
+      "date": "2026-05-21",
+      "available": 3
+    },
+    {
+      "id": "8cbc7a13-9705-4061-90fa-d7716c39de68",
+      "room_id": "room-standard",
+      "date": "2026-05-22",
+      "available": 3
+    },
+    {
+      "id": "7447fb5a-c19d-483c-a703-aace223c7050",
+      "room_id": "room-standard",
+      "date": "2026-05-23",
+      "available": 3
+    },
+    {
+      "id": "cd595777-16a9-4fe2-a17e-82a169f2627a",
+      "room_id": "room-standard",
+      "date": "2026-05-24",
+      "available": 3
+    },
+    {
+      "id": "3ecba543-2023-43ac-892a-748b66e4a059",
+      "room_id": "room-standard",
+      "date": "2026-05-25",
+      "available": 3
+    },
+    {
+      "id": "98d1d28c-fd1b-469f-be94-cc8c94b7f538",
+      "room_id": "room-standard",
+      "date": "2026-05-26",
+      "available": 3
+    },
+    {
+      "id": "9a9d463e-ae7e-4dcc-9ce6-7a07a77d36d0",
+      "room_id": "room-standard",
+      "date": "2026-05-27",
+      "available": 3
+    },
+    {
+      "id": "45cdca29-ff9b-4b63-a719-5e70e575b2be",
+      "room_id": "room-standard",
+      "date": "2026-05-28",
+      "available": 3
+    },
+    {
+      "id": "cd440128-5d06-45b5-b347-43b1cce1056b",
+      "room_id": "room-standard",
+      "date": "2026-05-29",
+      "available": 3
+    },
+    {
+      "id": "dd3c7178-be37-4e5d-887c-188e6d2bdd42",
+      "room_id": "room-standard",
+      "date": "2026-05-30",
+      "available": 3
+    },
+    {
+      "id": "3c0fbd31-f75d-4d51-8d21-d3bf52a2d3a1",
+      "room_id": "room-standard",
+      "date": "2026-05-31",
+      "available": 3
+    },
+    {
+      "id": "65430d47-8d87-4da2-851e-1288e06ffc23",
+      "room_id": "room-standard",
+      "date": "2026-06-01",
+      "available": 3
+    },
+    {
+      "id": "1d31730c-51cb-4c3c-bb23-219bc14101d9",
+      "room_id": "room-standard",
+      "date": "2026-06-02",
+      "available": 3
+    },
+    {
+      "id": "930a3587-c286-4b70-8104-c61cba627144",
+      "room_id": "room-standard",
+      "date": "2026-06-03",
+      "available": 3
+    },
+    {
+      "id": "714ffb5f-f8bc-44f5-a502-587697a82e7b",
+      "room_id": "room-standard",
+      "date": "2026-06-04",
+      "available": 3
+    },
+    {
+      "id": "a2f9660a-0cb2-48b7-bb54-e2f54abdb6a6",
+      "room_id": "room-standard",
+      "date": "2026-06-05",
+      "available": 3
+    },
+    {
+      "id": "d3ed5305-89da-4269-bc7f-f64829a895d8",
+      "room_id": "room-standard",
+      "date": "2026-06-06",
+      "available": 3
+    },
+    {
+      "id": "2c64eb92-4b67-47a8-be09-f0bb99d4e41b",
+      "room_id": "room-standard",
+      "date": "2026-06-07",
+      "available": 3
+    },
+    {
+      "id": "cddcfed7-8aca-4771-b37a-1d6052fb07ba",
+      "room_id": "room-standard",
+      "date": "2026-06-08",
+      "available": 3
+    },
+    {
+      "id": "ed27d058-815c-450e-aee8-ff2c4cfa7d64",
+      "room_id": "room-standard",
+      "date": "2026-06-09",
+      "available": 3
+    },
+    {
+      "id": "f2ac58d4-360b-4abe-b8e8-280571b07986",
+      "room_id": "room-standard",
+      "date": "2026-06-10",
+      "available": 3
+    },
+    {
+      "id": "d9a06c6a-15ed-41e8-82e5-56083ce2d936",
+      "room_id": "room-deluxe",
+      "date": "2026-05-09",
+      "available": 2
+    },
+    {
+      "id": "900fa8ee-27c5-439d-b62b-a7c0761a63e7",
+      "room_id": "room-deluxe",
+      "date": "2026-05-10",
+      "available": 2
+    },
+    {
+      "id": "1df51cb9-026c-4a8c-9802-dd332cedd887",
+      "room_id": "room-deluxe",
+      "date": "2026-05-11",
+      "available": 2
+    },
+    {
+      "id": "b1905119-9c8d-432b-93fc-c49dd95d46c1",
+      "room_id": "room-deluxe",
+      "date": "2026-05-12",
+      "available": 2
+    },
+    {
+      "id": "d1204c9c-6189-482c-af74-7ae670d0191b",
+      "room_id": "room-deluxe",
+      "date": "2026-05-13",
+      "available": 2
+    },
+    {
+      "id": "8a065464-1fd4-4822-8341-f5be95cf70d2",
+      "room_id": "room-deluxe",
+      "date": "2026-05-14",
+      "available": 2
+    },
+    {
+      "id": "c924a74c-7bc9-4e36-8d0c-e0949d9c36fd",
+      "room_id": "room-deluxe",
+      "date": "2026-05-15",
+      "available": 2
+    },
+    {
+      "id": "4c5ed795-e416-47ff-b24e-ec3c36c8dfbd",
+      "room_id": "room-deluxe",
+      "date": "2026-05-16",
+      "available": 2
+    },
+    {
+      "id": "38600404-c136-4d3b-b01c-2efe1e93bb73",
+      "room_id": "room-deluxe",
+      "date": "2026-05-17",
+      "available": 2
+    },
+    {
+      "id": "b89b3f04-cafb-4092-9df3-e2625fcbf8cf",
+      "room_id": "room-deluxe",
+      "date": "2026-05-18",
+      "available": 2
+    },
+    {
+      "id": "b5e7a582-73c2-45c0-a470-f7ab9d018fb1",
+      "room_id": "room-deluxe",
+      "date": "2026-05-19",
+      "available": 2
+    },
+    {
+      "id": "ee5cf964-d1f4-4a29-80d5-7886d4af4533",
+      "room_id": "room-deluxe",
+      "date": "2026-05-20",
+      "available": 2
+    },
+    {
+      "id": "9e0f209c-bf52-42c3-894f-60606316a24c",
+      "room_id": "room-deluxe",
+      "date": "2026-05-21",
+      "available": 2
+    },
+    {
+      "id": "e6a45045-b8b3-4e9d-9396-9284c65d2ec2",
+      "room_id": "room-deluxe",
+      "date": "2026-05-22",
+      "available": 2
+    },
+    {
+      "id": "66999ff7-ff00-49aa-bbe6-cd39656753b6",
+      "room_id": "room-deluxe",
+      "date": "2026-05-23",
+      "available": 2
+    },
+    {
+      "id": "a7d9b4fe-4bd0-4f97-97fe-bbb59bcf992c",
+      "room_id": "room-deluxe",
+      "date": "2026-05-24",
+      "available": 2
+    },
+    {
+      "id": "93d36c49-3192-4b56-a9d1-57529888dfb9",
+      "room_id": "room-deluxe",
+      "date": "2026-05-25",
+      "available": 2
+    },
+    {
+      "id": "bbecf810-beb7-41ed-94b1-21e936d6a4d3",
+      "room_id": "room-deluxe",
+      "date": "2026-05-26",
+      "available": 2
+    },
+    {
+      "id": "1eb1347c-8694-470c-b69c-d97ec177b857",
+      "room_id": "room-deluxe",
+      "date": "2026-05-27",
+      "available": 2
+    },
+    {
+      "id": "1d88e60c-ffa9-417a-881d-bbabe412fa38",
+      "room_id": "room-deluxe",
+      "date": "2026-05-28",
+      "available": 2
+    },
+    {
+      "id": "59f4730a-791f-437e-bdc2-9132bd0459b6",
+      "room_id": "room-deluxe",
+      "date": "2026-05-29",
+      "available": 2
+    },
+    {
+      "id": "d626d1ae-128a-4a80-b6d7-6166671bd00c",
+      "room_id": "room-deluxe",
+      "date": "2026-05-30",
+      "available": 2
+    },
+    {
+      "id": "be422ca5-6f61-4998-9932-aa1199034ce4",
+      "room_id": "room-deluxe",
+      "date": "2026-05-31",
+      "available": 2
+    },
+    {
+      "id": "16478d5f-2d88-447a-839f-6acae9773b7d",
+      "room_id": "room-deluxe",
+      "date": "2026-06-01",
+      "available": 2
+    },
+    {
+      "id": "d0a96417-bacc-4959-9ea6-75091885d79e",
+      "room_id": "room-deluxe",
+      "date": "2026-06-02",
+      "available": 2
+    },
+    {
+      "id": "a19ae60d-5de1-4c2b-a65b-1ac7fdca4d84",
+      "room_id": "room-deluxe",
+      "date": "2026-06-03",
+      "available": 2
+    },
+    {
+      "id": "6b3c1a77-41e5-4617-8003-56f0e97b56c0",
+      "room_id": "room-deluxe",
+      "date": "2026-06-04",
+      "available": 2
+    },
+    {
+      "id": "56972f04-9006-4723-a461-4530160f5d66",
+      "room_id": "room-deluxe",
+      "date": "2026-06-05",
+      "available": 2
+    },
+    {
+      "id": "cc40a62a-2028-4344-80f0-82773fdcb547",
+      "room_id": "room-deluxe",
+      "date": "2026-06-06",
+      "available": 2
+    },
+    {
+      "id": "d43303b8-9dba-431b-9bd7-3dcf80c36d45",
+      "room_id": "room-deluxe",
+      "date": "2026-06-07",
+      "available": 2
+    },
+    {
+      "id": "f79b60de-d5d1-4e90-987a-7ded91b17f03",
+      "room_id": "room-deluxe",
+      "date": "2026-06-08",
+      "available": 2
+    },
+    {
+      "id": "628a8ec8-5ad8-41aa-bda5-43b7868e3549",
+      "room_id": "room-deluxe",
+      "date": "2026-06-09",
+      "available": 2
+    },
+    {
+      "id": "5e003fcc-5141-4c56-b217-3a6568e09f75",
+      "room_id": "room-deluxe",
+      "date": "2026-06-10",
+      "available": 2
+    },
+    {
+      "id": "cd319b3c-83f0-4c25-ac52-47851270fb91",
+      "room_id": "room-suite",
+      "date": "2026-05-09",
+      "available": 1
+    },
+    {
+      "id": "e3e85fb3-e2e5-483a-a5ea-185d6cba6c1a",
+      "room_id": "room-suite",
+      "date": "2026-05-10",
+      "available": 1
+    },
+    {
+      "id": "09456bc6-2532-4bc2-a3b8-8118faf1f4b6",
+      "room_id": "room-suite",
+      "date": "2026-05-11",
+      "available": 1
+    },
+    {
+      "id": "9c5a56d7-a6db-410c-9cf1-d8f2c6313df2",
+      "room_id": "room-suite",
+      "date": "2026-05-12",
+      "available": 1
+    },
+    {
+      "id": "62ce29a7-656c-42de-a0d6-dce98c2b19d3",
+      "room_id": "room-suite",
+      "date": "2026-05-13",
+      "available": 1
+    },
+    {
+      "id": "21e35600-e660-43f0-92e5-e2dfe4557dd0",
+      "room_id": "room-suite",
+      "date": "2026-05-14",
+      "available": 1
+    },
+    {
+      "id": "cebf06fe-fa6d-48cb-acd3-e53ebf07ca02",
+      "room_id": "room-suite",
+      "date": "2026-05-15",
+      "available": 1
+    },
+    {
+      "id": "82d0c4fe-5bae-49bf-9c8e-5e6c16d771f6",
+      "room_id": "room-suite",
+      "date": "2026-05-16",
+      "available": 1
+    },
+    {
+      "id": "4f806185-50c0-4d00-ab9e-205a33db7191",
+      "room_id": "room-suite",
+      "date": "2026-05-17",
+      "available": 1
+    },
+    {
+      "id": "417640be-4aea-46a2-8c01-56c2e673d5fe",
+      "room_id": "room-suite",
+      "date": "2026-05-18",
+      "available": 1
+    },
+    {
+      "id": "cc6e4b5c-bd95-47ee-b46b-c8e8605a93bd",
+      "room_id": "room-suite",
+      "date": "2026-05-19",
+      "available": 1
+    },
+    {
+      "id": "5412f18e-1f93-4c3f-a42e-8b2e18b510d9",
+      "room_id": "room-suite",
+      "date": "2026-05-20",
+      "available": 1
+    },
+    {
+      "id": "08dd28a8-0c2b-4a18-8d71-15425267dd54",
+      "room_id": "room-suite",
+      "date": "2026-05-21",
+      "available": 1
+    },
+    {
+      "id": "9d065023-f6a6-4a35-9117-96b8e0d8b66a",
+      "room_id": "room-suite",
+      "date": "2026-05-22",
+      "available": 1
+    },
+    {
+      "id": "c356dd01-f2e2-4d9b-91d2-f7c3afbe9dd4",
+      "room_id": "room-suite",
+      "date": "2026-05-23",
+      "available": 1
+    },
+    {
+      "id": "493af3e0-1a12-4614-a255-078436044496",
+      "room_id": "room-suite",
+      "date": "2026-05-24",
+      "available": 1
+    },
+    {
+      "id": "6f7e7d5d-b1d8-41ba-9480-22f9ed28757a",
+      "room_id": "room-suite",
+      "date": "2026-05-25",
+      "available": 1
+    },
+    {
+      "id": "3190acf9-2221-432b-b1e5-1b18ae32de8b",
+      "room_id": "room-suite",
+      "date": "2026-05-26",
+      "available": 1
+    },
+    {
+      "id": "6e85bc7e-2d0b-4055-8b97-474ce341f9e9",
+      "room_id": "room-suite",
+      "date": "2026-05-27",
+      "available": 1
+    },
+    {
+      "id": "df787ad6-d1d3-4a1e-8dd5-3d597f8c7f63",
+      "room_id": "room-suite",
+      "date": "2026-05-28",
+      "available": 1
+    },
+    {
+      "id": "cbaf0685-7f4c-4bbc-883a-96278da7317e",
+      "room_id": "room-suite",
+      "date": "2026-05-29",
+      "available": 1
+    },
+    {
+      "id": "ce9e0308-fca8-4ea7-8ee1-268780e76204",
+      "room_id": "room-suite",
+      "date": "2026-05-30",
+      "available": 1
+    },
+    {
+      "id": "fa7b1b33-3c6f-4594-8d54-8c10048e4933",
+      "room_id": "room-suite",
+      "date": "2026-05-31",
+      "available": 1
+    },
+    {
+      "id": "7c58cdd9-5177-4f02-9734-2aa4b9678d70",
+      "room_id": "room-suite",
+      "date": "2026-06-01",
+      "available": 1
+    },
+    {
+      "id": "8ce05378-044a-4525-84fa-19fb7edba828",
+      "room_id": "room-suite",
+      "date": "2026-06-02",
+      "available": 1
+    },
+    {
+      "id": "bbaa81a1-95d1-4456-a447-960c439fa707",
+      "room_id": "room-suite",
+      "date": "2026-06-03",
+      "available": 1
+    },
+    {
+      "id": "7092d105-73a1-4c47-ae77-630af834f914",
+      "room_id": "room-suite",
+      "date": "2026-06-04",
+      "available": 1
+    },
+    {
+      "id": "ae7e6712-ea29-4e01-a0ec-5aafd2fea857",
+      "room_id": "room-suite",
+      "date": "2026-06-05",
+      "available": 1
+    },
+    {
+      "id": "e9347381-39a7-4b4a-a589-2e2b4e0f99e2",
+      "room_id": "room-suite",
+      "date": "2026-06-06",
+      "available": 1
+    },
+    {
+      "id": "73f028f1-d8dc-4675-a591-7815ce0373aa",
+      "room_id": "room-suite",
+      "date": "2026-06-07",
+      "available": 1
+    },
+    {
+      "id": "2c5b7941-644c-42ce-a1d3-2ff6430e8147",
+      "room_id": "room-suite",
+      "date": "2026-06-08",
+      "available": 1
+    },
+    {
+      "id": "60754fbf-cd16-49d8-95a0-c2a58b68ccc6",
+      "room_id": "room-suite",
+      "date": "2026-06-09",
+      "available": 1
+    },
+    {
+      "id": "8af51c9f-9359-4a83-90af-770f22bc2165",
+      "room_id": "room-suite",
+      "date": "2026-06-10",
+      "available": 1
+    },
+    {
+      "id": "be4208d0-a918-4f90-91ca-bfa979c32321",
+      "room_id": "room-cat",
+      "date": "2026-05-09",
+      "available": 4
+    },
+    {
+      "id": "5dfb195c-319a-49f4-921b-60836b81f29a",
+      "room_id": "room-cat",
+      "date": "2026-05-10",
+      "available": 4
+    },
+    {
+      "id": "b43b4db3-94d1-430b-b5d2-d5595e30475e",
+      "room_id": "room-cat",
+      "date": "2026-05-11",
+      "available": 4
+    },
+    {
+      "id": "b8f09e57-e470-49a8-9dc5-0061301b81ee",
+      "room_id": "room-cat",
+      "date": "2026-05-12",
+      "available": 4
+    },
+    {
+      "id": "80a59a76-942b-4b53-84a6-91e3421996b1",
+      "room_id": "room-cat",
+      "date": "2026-05-13",
+      "available": 4
+    },
+    {
+      "id": "2573275b-4120-4b47-8a94-17241838ba35",
+      "room_id": "room-cat",
+      "date": "2026-05-14",
+      "available": 4
+    },
+    {
+      "id": "bf047b5e-1770-4ae6-a11f-6feb5b900657",
+      "room_id": "room-cat",
+      "date": "2026-05-15",
+      "available": 4
+    },
+    {
+      "id": "9053f905-fcf8-4560-81e6-1b4440798249",
+      "room_id": "room-cat",
+      "date": "2026-05-16",
+      "available": 4
+    },
+    {
+      "id": "23788285-55dc-459e-8eef-1160ca88e7ed",
+      "room_id": "room-cat",
+      "date": "2026-05-17",
+      "available": 4
+    },
+    {
+      "id": "2b6c8e09-7d4a-4ea3-9406-6950c1f4f768",
+      "room_id": "room-cat",
+      "date": "2026-05-18",
+      "available": 4
+    },
+    {
+      "id": "586e5455-617b-4098-9806-6ed63ad835bb",
+      "room_id": "room-cat",
+      "date": "2026-05-19",
+      "available": 4
+    },
+    {
+      "id": "4674c0b8-5f87-47e7-8434-b4294e2df50f",
+      "room_id": "room-cat",
+      "date": "2026-05-20",
+      "available": 4
+    },
+    {
+      "id": "e75ce975-ce81-4b1f-a99f-e0912d9a0dd6",
+      "room_id": "room-cat",
+      "date": "2026-05-21",
+      "available": 4
+    },
+    {
+      "id": "fe330afe-b367-4cb0-8d54-dbce98aec076",
+      "room_id": "room-cat",
+      "date": "2026-05-22",
+      "available": 4
+    },
+    {
+      "id": "bf88df60-16fd-4158-acd1-8f22444316a5",
+      "room_id": "room-cat",
+      "date": "2026-05-23",
+      "available": 4
+    },
+    {
+      "id": "7cb9e1a1-31b1-4765-8ec1-f26a67b91c27",
+      "room_id": "room-cat",
+      "date": "2026-05-24",
+      "available": 4
+    },
+    {
+      "id": "71606b87-55af-4185-bb1f-63a0e6e478a6",
+      "room_id": "room-cat",
+      "date": "2026-05-25",
+      "available": 4
+    },
+    {
+      "id": "57e747d8-4505-49d3-972a-9105411ed36f",
+      "room_id": "room-cat",
+      "date": "2026-05-26",
+      "available": 4
+    },
+    {
+      "id": "3c4a825b-3fb1-4fad-b31f-e5683af13e9c",
+      "room_id": "room-cat",
+      "date": "2026-05-27",
+      "available": 4
+    },
+    {
+      "id": "553e380f-ee59-4cab-a9ba-627f8c393644",
+      "room_id": "room-cat",
+      "date": "2026-05-28",
+      "available": 4
+    },
+    {
+      "id": "3fd9e5ce-4d12-44ee-91c9-e6827b94d15f",
+      "room_id": "room-cat",
+      "date": "2026-05-29",
+      "available": 4
+    },
+    {
+      "id": "76624441-96a7-46e4-9f69-cd0442f51842",
+      "room_id": "room-cat",
+      "date": "2026-05-30",
+      "available": 4
+    },
+    {
+      "id": "c22204b2-7123-4dde-9ef2-38b24d144ebe",
+      "room_id": "room-cat",
+      "date": "2026-05-31",
+      "available": 4
+    },
+    {
+      "id": "5c7eb820-2203-4377-b90b-51bb24a2cb5c",
+      "room_id": "room-cat",
+      "date": "2026-06-01",
+      "available": 4
+    },
+    {
+      "id": "0b2b4d9e-f3a2-4f39-b1f9-243fbb633015",
+      "room_id": "room-cat",
+      "date": "2026-06-02",
+      "available": 4
+    },
+    {
+      "id": "23067d09-84ff-4cd4-ac5a-6c596b7aaec6",
+      "room_id": "room-cat",
+      "date": "2026-06-03",
+      "available": 4
+    },
+    {
+      "id": "03d1c94b-c8bc-40bb-9901-797023323809",
+      "room_id": "room-cat",
+      "date": "2026-06-04",
+      "available": 4
+    },
+    {
+      "id": "174e8a09-b7e2-4910-bb8c-5f33defa5a92",
+      "room_id": "room-cat",
+      "date": "2026-06-05",
+      "available": 4
+    },
+    {
+      "id": "4922cfcf-2199-49cb-aa5d-52ee65fe57ce",
+      "room_id": "room-cat",
+      "date": "2026-06-06",
+      "available": 4
+    },
+    {
+      "id": "f60743c9-ed2d-4c6b-85c6-a451d8081c8e",
+      "room_id": "room-cat",
+      "date": "2026-06-07",
+      "available": 4
+    },
+    {
+      "id": "9f8c6d4e-5c50-4951-8dfa-916138b8b789",
+      "room_id": "room-cat",
+      "date": "2026-06-08",
+      "available": 4
+    },
+    {
+      "id": "4d1af738-7e04-4ede-9874-cfc37e4179ef",
+      "room_id": "room-cat",
+      "date": "2026-06-09",
+      "available": 4
+    },
+    {
+      "id": "539312e0-a619-480f-b793-fff67f4ff9eb",
+      "room_id": "room-cat",
+      "date": "2026-06-10",
+      "available": 4
+    }
+  ],
+  "pets": [
+    {
+      "id": "pet-004",
+      "name": "豆豆",
+      "species": "dog",
+      "breed": "泰迪",
+      "age": 1,
+      "gender": "公",
+      "weight": 4.2,
+      "owner_name": "赵小芳",
+      "owner_phone": "13800138004",
+      "feeding_notes": "幼犬，需要每日3餐",
+      "allergies": "海鲜",
+      "medications": "无",
+      "special_needs": "需要额外关注"
+    },
+    {
+      "id": "pet-003",
+      "name": "喵喵",
+      "species": "cat",
+      "breed": "英短蓝猫",
+      "age": 4,
+      "gender": "公",
+      "weight": 5.5,
+      "owner_name": "王大伟",
+      "owner_phone": "13800138003",
+      "feeding_notes": "每日定时喂食，不能随便加餐",
+      "allergies": "无",
+      "medications": "无",
+      "special_needs": "需要每天清理猫砂盆"
+    },
+    {
+      "id": "pet-001",
+      "name": "旺财",
+      "species": "dog",
+      "breed": "金毛寻回犬",
+      "age": 3,
+      "gender": "公",
+      "weight": 28,
+      "owner_name": "张小明",
+      "owner_phone": "13800138001",
+      "feeding_notes": "每日两餐，早8点晚6点，需定量控制体重",
+      "allergies": "无",
+      "medications": "无",
+      "special_needs": "需要每天至少遛狗1小时"
+    },
+    {
+      "id": "pet-002",
+      "name": "小黄",
+      "species": "dog",
+      "breed": "柴犬",
+      "age": 2,
+      "gender": "母",
+      "weight": 12,
+      "owner_name": "李小红",
+      "owner_phone": "13800138002",
+      "feeding_notes": "只吃鸡肉味狗粮，不吃牛肉",
+      "allergies": "牛肉",
+      "medications": "无",
+      "special_needs": "性格独立，不喜欢和其他狗打架"
+    }
+  ],
+  "vaccine_records": [
+    {
+      "id": "54b7cbc2-6ee5-4f8f-ac43-4745af001c5b",
+      "pet_id": "pet-001",
+      "vaccine_type": "狂犬病",
+      "vaccine_name": "瑞比克",
+      "administered_date": "2025-11-12",
+      "expiry_date": "2026-11-12",
+      "vet_clinic": "关爱宠物医院"
+    },
+    {
+      "id": "73da22c3-4188-4b37-96af-ca1201ba8ba6",
+      "pet_id": "pet-001",
+      "vaccine_type": "犬瘟热",
+      "vaccine_name": "英特威",
+      "administered_date": "2025-09-12",
+      "expiry_date": "2026-09-12",
+      "vet_clinic": "关爱宠物医院"
+    },
+    {
+      "id": "f6718a10-da43-490f-915f-2b6fef07342f",
+      "pet_id": "pet-001",
+      "vaccine_type": "细小病毒",
+      "vaccine_name": "英特威",
+      "administered_date": "2025-09-12",
+      "expiry_date": "2026-09-12",
+      "vet_clinic": "关爱宠物医院"
+    },
+    {
+      "id": "2bdb86d3-9ea4-4309-8850-0eb02758d111",
+      "pet_id": "pet-002",
+      "vaccine_type": "狂犬病",
+      "vaccine_name": "瑞比克",
+      "administered_date": "2026-02-12",
+      "expiry_date": "2027-02-12",
+      "vet_clinic": "爱心宠物诊所"
+    },
+    {
+      "id": "367a7524-f130-43fe-a412-a69796d71fc7",
+      "pet_id": "pet-002",
+      "vaccine_type": "犬瘟热",
+      "vaccine_name": "英特威",
+      "administered_date": "2025-07-12",
+      "expiry_date": "2026-07-12",
+      "vet_clinic": "爱心宠物诊所"
+    },
+    {
+      "id": "4a71dc22-bb7c-4982-990c-4a07106deded",
+      "pet_id": "pet-002",
+      "vaccine_type": "细小病毒",
+      "vaccine_name": "英特威",
+      "administered_date": "2025-07-12",
+      "expiry_date": "2026-07-12",
+      "vet_clinic": "爱心宠物诊所"
+    },
+    {
+      "id": "f9ae2856-9432-4379-a338-29d7cedd5005",
+      "pet_id": "pet-003",
+      "vaccine_type": "狂犬病",
+      "vaccine_name": "瑞比克",
+      "administered_date": "2024-05-12",
+      "expiry_date": "2025-07-12",
+      "vet_clinic": "过期疫苗（演示用）"
+    },
+    {
+      "id": "4d725d2f-1f8f-438f-8848-363a5a4e5919",
+      "pet_id": "pet-003",
+      "vaccine_type": "猫瘟热",
+      "vaccine_name": "英特威猫三联",
+      "administered_date": "2024-05-12",
+      "expiry_date": "2025-07-12",
+      "vet_clinic": "过期疫苗（演示用）"
+    },
+    {
+      "id": "efda6013-8370-46e7-b86d-91d2cac8d558",
+      "pet_id": "pet-003",
+      "vaccine_type": "猫鼻支",
+      "vaccine_name": "英特威猫三联",
+      "administered_date": "2024-05-12",
+      "expiry_date": "2025-07-12",
+      "vet_clinic": "过期疫苗（演示用）"
+    },
+    {
+      "id": "d2bc4703-f411-43d9-89bb-ff8bd27e2b56",
+      "pet_id": "pet-004",
+      "vaccine_type": "狂犬病",
+      "vaccine_name": "瑞比克",
+      "administered_date": "2026-04-12",
+      "expiry_date": "2027-04-12",
+      "vet_clinic": "康宠宠物医院"
+    },
+    {
+      "id": "b9dbcabe-3671-4542-86ca-476c68af2cff",
+      "pet_id": "pet-004",
+      "vaccine_type": "犬瘟热",
+      "vaccine_name": "英特威",
+      "administered_date": "2026-03-12",
+      "expiry_date": "2027-03-12",
+      "vet_clinic": "康宠宠物医院"
+    },
+    {
+      "id": "6a1e2146-3f0b-4a0b-981d-97a1cb07a940",
+      "pet_id": "pet-004",
+      "vaccine_type": "细小病毒",
+      "vaccine_name": "英特威",
+      "administered_date": "2026-03-12",
+      "expiry_date": "2027-03-12",
+      "vet_clinic": "康宠宠物医院"
+    }
+  ],
+  "boarding_bookings": [
+    {
+      "id": "booking-demo-1",
+      "booking_no": "BK20260510001",
+      "pet_id": "pet-002",
+      "room_id": "room-standard",
+      "check_in_date": "2026-05-10",
+      "check_out_date": "2026-05-15",
+      "actual_check_in": "2026-05-10",
+      "status": "checked_in",
+      "total_amount": 600,
+      "paid_amount": 600
+    }
+  ],
+  "feeding_plans": [],
+  "transport_records": [],
+  "add_ons": [
+    {
+      "id": "addon-walk",
+      "name": "额外遛狗",
+      "category": "activity",
+      "description": "每次30分钟户外遛狗",
+      "price": 30,
+      "unit": "次"
+    },
+    {
+      "id": "addon-treat",
+      "name": "高级零食",
+      "category": "food",
+      "description": "精选进口零食",
+      "price": 25,
+      "unit": "份"
+    },
+    {
+      "id": "addon-bath",
+      "name": "洗澡服务",
+      "category": "grooming",
+      "description": "基础洗澡服务",
+      "price": 60,
+      "unit": "次"
+    },
+    {
+      "id": "addon-grooming",
+      "name": "美容造型",
+      "category": "grooming",
+      "description": "专业美容修剪",
+      "price": 120,
+      "unit": "次"
+    },
+    {
+      "id": "addon-tooth",
+      "name": "牙齿清洁",
+      "category": "grooming",
+      "description": "口腔清洁护理",
+      "price": 80,
+      "unit": "次"
+    },
+    {
+      "id": "addon-medicine",
+      "name": "喂药服务",
+      "category": "medical",
+      "description": "按医嘱喂药",
+      "price": 15,
+      "unit": "次"
+    },
+    {
+      "id": "addon-photo",
+      "name": "每日照片",
+      "category": "report",
+      "description": "每日宠物照片更新",
+      "price": 20,
+      "unit": "天"
+    },
+    {
+      "id": "addon-video",
+      "name": "视频通话",
+      "category": "report",
+      "description": "与宠物视频通话10分钟",
+      "price": 50,
+      "unit": "次"
+    }
+  ],
+  "booking_add_ons": [],
+  "feeding_records": [],
+  "care_logs": [],
+  "booking_histories": [],
+  "settlements": [],
+  "idempotency_records": [
+    {
+      "id": "2d872295-07a2-4e6d-84b8-348f01661da4",
+      "idempotency_key": "test-normal-1778579174",
+      "endpoint": "/api/bookings",
+      "request_body": "{\"pet_id\":\"pet-001\",\"room_id\":\"room-standard\",\"check_in_date\":\"2026-05-15\",\"check_out_date\":\"2026-05-20\"}",
+      "response_body": "{\"success\":false,\"error\":\"与现有预约时间重叠\",\"code\":\"DUPLICATE_BOOKING\",\"conflicts\":[{\"id\":\"booking-demo-1\",\"booking_no\":\"BK20260510001\",\"check_in_date\":\"2026-05-10\",\"check_out_date\":\"2026-05-15\",\"status\":\"checked_in\"}]}"
+    }
+  ]
+}
