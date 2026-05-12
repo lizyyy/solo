@@ -5,14 +5,54 @@ class InstrumentManager {
             HISTORY: 'calibration_history'
         };
         this.currentPreviewData = [];
+        this.isElectron = window.electronAPI && window.electronAPI.isElectron;
         this.init();
     }
 
-    init() {
+    async init() {
+        if (this.isElectron) {
+            this.appPaths = await window.electronAPI.getAppPaths();
+            this.setupElectronMenuHandlers();
+            document.getElementById('electron-only-section').style.display = 'block';
+        }
         this.bindEvents();
         this.renderDashboard();
         this.renderInstruments();
         this.renderHistory();
+    }
+
+    setupElectronMenuHandlers() {
+        if (!this.isElectron) return;
+        
+        window.electronAPI.onMenuImportData(() => {
+            this.switchTab('import');
+            this.showToast('请在下方选择要导入的台账数据文件', 'info');
+        });
+        
+        window.electronAPI.onMenuImportCertificate(() => {
+            this.switchTab('instruments');
+            this.showToast('请选择一台仪器后添加证书附件', 'info');
+        });
+        
+        window.electronAPI.onMenuExportJson(() => {
+            this.switchTab('export');
+            this.exportData('json');
+        });
+        
+        window.electronAPI.onMenuExportCsv(() => {
+            this.switchTab('export');
+            this.exportData('csv');
+        });
+        
+        window.electronAPI.onMenuExportExcel(() => {
+            this.switchTab('export');
+            this.exportData('excel');
+        });
+        
+        window.electronAPI.onMenuCheckAttachments(() => {
+            this.switchTab('export');
+            this.checkAllAttachments();
+        });
     }
 
     bindEvents() {
@@ -92,6 +132,13 @@ class InstrumentManager {
         });
         document.getElementById('export-csv-btn').addEventListener('click', () => {
             this.exportData('csv');
+        });
+        document.getElementById('export-excel-btn').addEventListener('click', () => {
+            this.exportData('excel');
+        });
+        
+        document.getElementById('check-all-attachments-btn').addEventListener('click', () => {
+            this.checkAllAttachments();
         });
 
         document.getElementById('export-all').addEventListener('change', (e) => {
@@ -438,7 +485,8 @@ class InstrumentManager {
             expireDate: this.formatDate(data.expireDate || data['到期日期'] || data['expireDate']),
             calibrationAgency: String(data.calibrationAgency || data['校准机构'] || data['calibrationAgency'] || '').trim(),
             certificateNumber: String(data.certificateNumber || data['证书编号'] || data['certificateNumber'] || '').trim(),
-            notes: String(data.notes || data['备注'] || data['notes'] || '').trim()
+            notes: String(data.notes || data['备注'] || data['notes'] || '').trim(),
+            attachments: data.attachments || []
         };
     }
 
@@ -481,6 +529,7 @@ class InstrumentManager {
             
             if (existingIndex >= 0) {
                 existingInstruments[existingIndex] = {
+                    ...existingInstruments[existingIndex],
                     ...item.data,
                     updatedAt: new Date().toISOString()
                 };
@@ -597,6 +646,12 @@ class InstrumentManager {
             ).join('');
         }
         
+        this.bindInstrumentCardEvents();
+    }
+
+    bindInstrumentCardEvents() {
+        const listContainer = document.getElementById('instrument-list');
+        
         listContainer.querySelectorAll('[data-action="view"]').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.showInstrumentDetail(btn.dataset.id);
@@ -620,11 +675,24 @@ class InstrumentManager {
                 this.showRenewModal(btn.dataset.id);
             });
         });
+        
+        listContainer.querySelectorAll('[data-action="add-attachment"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.addAttachment(btn.dataset.id);
+            });
+        });
+        
+        listContainer.querySelectorAll('[data-action="view-attachments"]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.showInstrumentDetail(btn.dataset.id);
+            });
+        });
     }
 
     renderInstrumentCard(instrument, simple = false) {
         const status = instrument.status;
         const daysLeft = instrument.daysLeft;
+        const attachmentCount = (instrument.attachments || []).length;
         
         let actions = '';
         if (!simple) {
@@ -633,17 +701,28 @@ class InstrumentManager {
                     <button class="btn-outline" data-action="view" data-id="${instrument.id}">查看详情</button>
                     <button class="btn-outline" data-action="edit" data-id="${instrument.id}">编辑</button>
                     <button class="btn-success" data-action="renew" data-id="${instrument.id}">更新校准</button>
+                    ${this.isElectron ? `
+                        <button class="btn-outline" data-action="add-attachment" data-id="${instrument.id}">
+                            📎 添加证书
+                        </button>
+                    ` : ''}
                     <button class="btn-danger" data-action="delete" data-id="${instrument.id}">删除</button>
                 </div>
             `;
         }
+        
+        const attachmentBadge = attachmentCount > 0 ? 
+            `<span class="attachment-badge" title="已绑定 ${attachmentCount} 个证书文件">
+                📎 ${attachmentCount}
+            </span>` : 
+            (this.isElectron ? '<span class="attachment-badge missing" title="未绑定证书文件">📎 无</span>' : '');
         
         return `
             <div class="instrument-card ${status}">
                 <div class="instrument-header">
                     <div>
                         <div class="instrument-id">编号: ${instrument.id}</div>
-                        <div class="instrument-name">${instrument.name}</div>
+                        <div class="instrument-name">${instrument.name} ${attachmentBadge}</div>
                         ${instrument.model ? `<div class="instrument-model">型号: ${instrument.model}</div>` : ''}
                     </div>
                     <span class="status-badge ${status}">${this.getStatusText(status)}</span>
@@ -707,7 +786,7 @@ class InstrumentManager {
         this.openModal();
     }
 
-    showInstrumentDetail(id) {
+    async showInstrumentDetail(id) {
         const instruments = this.getInstruments();
         const instrument = instruments.find(inst => inst.id === id);
         
@@ -717,6 +796,56 @@ class InstrumentManager {
         }
         
         const { status, daysLeft } = this.getInstrumentStatus(instrument);
+        
+        let attachmentsHtml = '';
+        if (instrument.attachments && instrument.attachments.length > 0) {
+            const attachmentList = [];
+            for (const attachment of instrument.attachments) {
+                let exists = true;
+                if (this.isElectron) {
+                    const result = await window.electronAPI.checkAttachmentExists(attachment.fileName);
+                    exists = result.exists;
+                }
+                
+                attachmentList.push(`
+                    <div class="attachment-item ${!exists ? 'missing' : ''}">
+                        <span class="attachment-icon">${this.getFileIcon(attachment.originalName)}</span>
+                        <div class="attachment-info">
+                            <div class="attachment-name">${attachment.originalName}</div>
+                            <div class="attachment-date">添加时间: ${this.formatDateTime(new Date(attachment.addedAt))}</div>
+                            ${!exists ? '<div class="attachment-missing">⚠️ 文件已缺失</div>' : ''}
+                        </div>
+                        ${this.isElectron && exists ? `
+                            <button class="btn-outline" onclick="instrumentManager.openAttachment('${attachment.fileName}')">打开</button>
+                            <button class="btn-outline" onclick="instrumentManager.removeAttachment('${id}', '${attachment.fileName}')">删除</button>
+                        ` : ''}
+                    </div>
+                `);
+            }
+            attachmentsHtml = `
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>证书附件 (${instrument.attachments.length})</label>
+                    <div class="attachment-list">
+                        ${attachmentList.join('')}
+                    </div>
+                    ${this.isElectron ? `
+                        <button class="btn-secondary" style="margin-top: 10px;" onclick="instrumentManager.addAttachment('${id}')">
+                            + 添加证书附件
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        } else if (this.isElectron) {
+            attachmentsHtml = `
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>证书附件</label>
+                    <p style="color: #6c757d; font-size: 14px;">暂无绑定的证书附件</p>
+                    <button class="btn-secondary" style="margin-top: 10px;" onclick="instrumentManager.addAttachment('${id}')">
+                        + 添加证书附件
+                    </button>
+                </div>
+            `;
+        }
         
         document.getElementById('modal-title').textContent = '仪器详情';
         document.getElementById('modal-body').innerHTML = `
@@ -766,11 +895,152 @@ class InstrumentManager {
                     <div style="padding: 10px; background: #f8f9fa; border-radius: 8px;">${instrument.notes}</div>
                 </div>
             ` : ''}
+            ${attachmentsHtml}
         `;
         document.getElementById('modal-footer').innerHTML = `
             <button class="btn-primary" onclick="instrumentManager.closeModal()">关闭</button>
         `;
         this.openModal();
+    }
+
+    getFileIcon(fileName) {
+        const ext = fileName.split('.').pop().toLowerCase();
+        const icons = {
+            'pdf': '📕',
+            'doc': '📘',
+            'docx': '📘',
+            'xls': '📗',
+            'xlsx': '📗',
+            'jpg': '🖼️',
+            'jpeg': '🖼️',
+            'png': '🖼️',
+            'gif': '🖼️',
+            'bmp': '🖼️',
+            'tif': '🖼️',
+            'tiff': '🖼️'
+        };
+        return icons[ext] || '📄';
+    }
+
+    async addAttachment(instrumentId) {
+        if (!this.isElectron) {
+            this.showToast('证书附件功能仅在桌面应用中可用', 'warning');
+            return;
+        }
+        
+        const instruments = this.getInstruments();
+        const instrument = instruments.find(inst => inst.id === instrumentId);
+        if (!instrument) {
+            this.showToast('仪器不存在', 'error');
+            return;
+        }
+        
+        const result = await window.electronAPI.openFileDialog({
+            title: '选择证书文件',
+            properties: ['openFile', 'multiSelections'],
+            filters: [
+                { name: '所有文件', extensions: ['*'] },
+                { name: 'PDF 文件', extensions: ['pdf'] },
+                { name: '图片文件', extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tif', 'tiff'] },
+                { name: 'Word 文档', extensions: ['doc', 'docx'] },
+                { name: 'Excel 文档', extensions: ['xls', 'xlsx'] }
+            ]
+        });
+        
+        if (result.canceled || result.filePaths.length === 0) {
+            return;
+        }
+        
+        let addedCount = 0;
+        let failedCount = 0;
+        
+        for (const filePath of result.filePaths) {
+            const copyResult = await window.electronAPI.copyAttachment(filePath, instrumentId);
+            
+            if (copyResult.success) {
+                if (!instrument.attachments) {
+                    instrument.attachments = [];
+                }
+                instrument.attachments.push({
+                    fileName: copyResult.fileName,
+                    originalName: copyResult.originalName,
+                    filePath: copyResult.filePath,
+                    addedAt: new Date().toISOString()
+                });
+                addedCount++;
+            } else {
+                failedCount++;
+                console.error('复制文件失败:', copyResult.error);
+            }
+        }
+        
+        instrument.updatedAt = new Date().toISOString();
+        this.saveInstruments(instruments);
+        
+        if (addedCount > 0) {
+            this.addHistory('添加证书', `为仪器「${instrument.name}」(${instrumentId}) 添加了 ${addedCount} 个证书附件`);
+        }
+        
+        this.renderDashboard();
+        this.renderInstruments();
+        
+        if (addedCount > 0 && failedCount === 0) {
+            this.showToast(`成功添加 ${addedCount} 个证书附件`, 'success');
+        } else if (addedCount > 0) {
+            this.showToast(`添加了 ${addedCount} 个证书，${failedCount} 个失败`, 'warning');
+        } else {
+            this.showToast('证书添加失败', 'error');
+        }
+        
+        this.closeModal();
+        this.showInstrumentDetail(instrumentId);
+    }
+
+    async openAttachment(fileName) {
+        if (!this.isElectron) return;
+        
+        const result = await window.electronAPI.openAttachment(fileName);
+        if (!result.success) {
+            this.showToast('无法打开文件: ' + result.error, 'error');
+        }
+    }
+
+    async removeAttachment(instrumentId, fileName) {
+        if (!this.isElectron) return;
+        
+        if (!confirm('确定要删除此证书附件吗？此操作不可撤销。')) {
+            return;
+        }
+        
+        const instruments = this.getInstruments();
+        const instrument = instruments.find(inst => inst.id === instrumentId);
+        
+        if (!instrument || !instrument.attachments) {
+            this.showToast('附件不存在', 'error');
+            return;
+        }
+        
+        const attachmentIndex = instrument.attachments.findIndex(a => a.fileName === fileName);
+        if (attachmentIndex < 0) {
+            this.showToast('附件不存在', 'error');
+            return;
+        }
+        
+        const attachment = instrument.attachments[attachmentIndex];
+        
+        await window.electronAPI.deleteAttachment(fileName);
+        instrument.attachments.splice(attachmentIndex, 1);
+        instrument.updatedAt = new Date().toISOString();
+        
+        this.saveInstruments(instruments);
+        this.addHistory('删除证书', `从仪器「${instrument.name}」(${instrumentId}) 删除了证书「${attachment.originalName}」`);
+        
+        this.renderDashboard();
+        this.renderInstruments();
+        this.showToast('证书附件已删除', 'success');
+        
+        this.closeModal();
+        this.showInstrumentDetail(instrumentId);
     }
 
     showRenewModal(id) {
@@ -814,6 +1084,12 @@ class InstrumentManager {
                 <label>备注</label>
                 <textarea id="renew-notes" placeholder="可选，填写备注信息"></textarea>
             </div>
+            ${this.isElectron ? `
+                <div class="form-group">
+                    <label>更新证书</label>
+                    <p style="color: #6c757d; font-size: 13px;">保存后可在仪器详情中添加新的证书附件</p>
+                </div>
+            ` : ''}
         `;
         document.getElementById('modal-footer').innerHTML = `
             <button class="btn-secondary" onclick="instrumentManager.closeModal()">取消</button>
@@ -937,6 +1213,7 @@ class InstrumentManager {
         } else {
             instruments.push({
                 ...instrumentData,
+                attachments: [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
@@ -955,7 +1232,6 @@ class InstrumentManager {
         const expireDate = document.getElementById('renew-expire-date').value;
         const agency = document.getElementById('renew-agency').value.trim();
         const certificate = document.getElementById('renew-certificate').value.trim();
-        const notes = document.getElementById('renew-notes').value.trim();
         
         if (!calibrationDate) {
             this.showToast('校准日期不能为空', 'error');
@@ -992,8 +1268,8 @@ class InstrumentManager {
         }
     }
 
-    deleteInstrument(id) {
-        if (!confirm('确定要删除该仪器吗？此操作不可撤销。')) {
+    async deleteInstrument(id) {
+        if (!confirm('确定要删除该仪器吗？此操作不可撤销。\n\n注意：绑定的证书附件也将被删除。')) {
             return;
         }
         
@@ -1002,6 +1278,13 @@ class InstrumentManager {
         
         if (index >= 0) {
             const deleted = instruments[index];
+            
+            if (this.isElectron && deleted.attachments) {
+                for (const attachment of deleted.attachments) {
+                    await window.electronAPI.deleteAttachment(attachment.fileName);
+                }
+            }
+            
             instruments.splice(index, 1);
             this.saveInstruments(instruments);
             this.addHistory('删除仪器', `删除了仪器「${deleted.name}」(${id})`);
@@ -1044,7 +1327,10 @@ class InstrumentManager {
             '删除仪器': '🗑️',
             '更新校准': '🔄',
             '导入数据': '📥',
-            '清空历史': '🧹'
+            '清空历史': '🧹',
+            '添加证书': '📎',
+            '删除证书': '🗑️',
+            '导出数据': '📤'
         };
         return icons[action] || '📋';
     }
@@ -1068,7 +1354,7 @@ class InstrumentManager {
         this.showToast('历史记录已清空', 'info');
     }
 
-    exportData(format) {
+    async exportData(format) {
         const instruments = this.getInstruments();
         
         if (instruments.length === 0) {
@@ -1105,6 +1391,11 @@ class InstrumentManager {
             return;
         }
         
+        if (format === 'excel') {
+            await this.exportExcel(filtered);
+            return;
+        }
+        
         let content, filename, mimeType;
         
         if (format === 'json') {
@@ -1117,6 +1408,7 @@ class InstrumentManager {
                 calibrationAgency: inst.calibrationAgency,
                 certificateNumber: inst.certificateNumber,
                 notes: inst.notes,
+                attachments: inst.attachments,
                 status: this.getStatusText(inst.status),
                 daysLeft: inst.daysLeft
             }));
@@ -1124,7 +1416,7 @@ class InstrumentManager {
             filename = `仪器校准清单_${this.getDateString()}.json`;
             mimeType = 'application/json';
         } else {
-            const headers = ['仪器编号', '仪器名称', '型号', '校准日期', '到期日期', '状态', '剩余天数', '校准机构', '证书编号', '备注'];
+            const headers = ['仪器编号', '仪器名称', '型号', '校准日期', '到期日期', '状态', '剩余天数', '校准机构', '证书编号', '附件数量', '备注'];
             const rows = filtered.map(inst => [
                 inst.id,
                 inst.name,
@@ -1135,6 +1427,7 @@ class InstrumentManager {
                 this.getDaysLeftText(inst.daysLeft),
                 inst.calibrationAgency,
                 inst.certificateNumber,
+                (inst.attachments || []).length,
                 inst.notes
             ]);
             
@@ -1148,6 +1441,37 @@ class InstrumentManager {
         this.downloadFile(content, filename, mimeType);
         this.addHistory('导出数据', `导出了 ${filtered.length} 条仪器数据为 ${format.toUpperCase()} 格式`);
         this.showToast(`成功导出 ${filtered.length} 条数据`, 'success');
+    }
+
+    async exportExcel(filtered) {
+        if (!this.isElectron) {
+            this.showToast('Excel 导出功能仅在桌面应用中可用，请使用 CSV 或 JSON 格式', 'warning');
+            return;
+        }
+        
+        const excelData = filtered.map(inst => ({
+            '仪器编号': inst.id,
+            '仪器名称': inst.name,
+            '型号': inst.model || '',
+            '校准日期': inst.calibrationDate,
+            '到期日期': inst.expireDate,
+            '状态': this.getStatusText(inst.status),
+            '剩余天数': this.getDaysLeftText(inst.daysLeft),
+            '校准机构': inst.calibrationAgency || '',
+            '证书编号': inst.certificateNumber || '',
+            '附件数量': (inst.attachments || []).length,
+            '备注': inst.notes || ''
+        }));
+        
+        const fileName = `仪器校准清单_${this.getDateString()}.xlsx`;
+        const result = await window.electronAPI.exportExcel(excelData, fileName);
+        
+        if (result.success) {
+            this.addHistory('导出数据', `导出了 ${filtered.length} 条仪器数据为 Excel 格式`);
+            this.showToast(`成功导出 ${filtered.length} 条数据到 Excel`, 'success');
+        } else if (!result.canceled) {
+            this.showToast('导出失败: ' + result.error, 'error');
+        }
     }
 
     escapeCSV(value) {
@@ -1221,6 +1545,82 @@ class InstrumentManager {
         
         this.downloadFile(content, filename, mimeType);
         this.showToast(`已下载 ${format.toUpperCase()} 模板`, 'success');
+    }
+
+    async checkAllAttachments() {
+        if (!this.isElectron) {
+            this.showToast('附件检查功能仅在桌面应用中可用', 'warning');
+            return;
+        }
+        
+        const instruments = this.getInstruments();
+        const resultContainer = document.getElementById('attachment-check-result');
+        
+        if (instruments.length === 0) {
+            resultContainer.innerHTML = '<p class="empty-state" style="padding: 20px;">暂无仪器数据</p>';
+            return;
+        }
+        
+        const totalAttachments = instruments.reduce((sum, inst) => sum + (inst.attachments || []).length, 0);
+        
+        if (totalAttachments === 0) {
+            resultContainer.innerHTML = '<p class="empty-state" style="padding: 20px;">暂无绑定的证书附件</p>';
+            return;
+        }
+        
+        this.showToast('正在检查附件完整性...', 'info');
+        
+        const results = await window.electronAPI.checkAllAttachments(instruments);
+        
+        const missingFiles = results.filter(r => !r.exists);
+        const existingFiles = results.filter(r => r.exists);
+        
+        let html = '';
+        
+        if (missingFiles.length > 0) {
+            html += `
+                <div class="preview-message error" style="margin-bottom: 15px;">
+                    ⚠️ 发现 ${missingFiles.length} 个缺失的证书文件！
+                </div>
+                <div style="background: #fff5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px; color: #721c24;">缺失文件列表：</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        ${missingFiles.map(f => `
+                            <li style="padding: 8px 0; border-bottom: 1px solid #f5c6cb;">
+                                <strong>${f.instrumentName}</strong> (${f.instrumentId}) - ${f.originalName}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+        
+        if (existingFiles.length > 0) {
+            html += `
+                <div class="preview-message info">
+                    ✅ ${existingFiles.length} 个证书文件完整可用
+                </div>
+            `;
+        }
+        
+        html += `
+            <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; font-size: 13px;">
+                <p><strong>总计：</strong>${totalAttachments} 个附件</p>
+                <p><strong>完整：</strong>${existingFiles.length} 个</p>
+                <p><strong>缺失：</strong>${missingFiles.length} 个</p>
+                <p style="margin-top: 10px; color: #6c757d;">
+                    💡 附件存储位置：${this.appPaths ? this.appPaths.attachments : '应用数据目录'}
+                </p>
+            </div>
+        `;
+        
+        resultContainer.innerHTML = html;
+        
+        if (missingFiles.length > 0) {
+            this.addHistory('检查附件', `检查发现 ${missingFiles.length} 个缺失的证书文件`);
+        } else {
+            this.addHistory('检查附件', '所有证书附件检查通过，全部完整可用');
+        }
     }
 
     openModal() {

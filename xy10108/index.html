@@ -159,7 +159,15 @@
                     <div class="export-actions">
                         <button class="btn-primary" id="export-json-btn">导出为 JSON</button>
                         <button class="btn-primary" id="export-csv-btn">导出为 CSV</button>
+                        <button class="btn-primary" id="export-excel-btn">导出为 Excel</button>
                     </div>
+                </div>
+                
+                <div class="export-section" id="electron-only-section" style="display: none;">
+                    <h3>附件管理</h3>
+                    <p>使用桌面应用时，您可以检查所有附件文件的完整性</p>
+                    <button class="btn-secondary" id="check-all-attachments-btn">检查附件完整性</button>
+                    <div id="attachment-check-result" style="margin-top: 15px;"></div>
                 </div>
             </div>
         </main>

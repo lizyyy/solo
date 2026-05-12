@@ -830,3 +830,76 @@ body {
         flex-wrap: wrap;
     }
 }
+
+.attachment-badge {
+    display: inline-block;
+    background: #e3f2fd;
+    color: #1976d2;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.attachment-badge.missing {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.attachment-item.missing {
+    background: #fff5f5;
+    border-color: #f5c6cb;
+}
+
+.attachment-icon {
+    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.attachment-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.attachment-name {
+    font-weight: 500;
+    color: #343a40;
+    word-break: break-all;
+}
+
+.attachment-date {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+.attachment-missing {
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 2px;
+    font-weight: 500;
+}
