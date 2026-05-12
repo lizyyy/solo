@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lock-leak-detector"
+version = "0.1.0"
+description = "分布式锁泄漏排查 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=10.0.0",
+    "python-dateutil>=2.8.0",
+    "tabulate>=0.8.0",
+]
+
+[project.scripts]
+lock-leak = "lock_leak_detector.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lock_leak_detector*"]

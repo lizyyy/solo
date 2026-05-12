@@ -1,0 +1,36 @@
+[
+  {
+    "task_name": "daily_etl_job",
+    "lock_key_pattern": "lock:etl:daily:*",
+    "max_execution_time": 3600,
+    "heartbeat_interval": 60,
+    "heartbeat_timeout": 300,
+    "allowed_holders": [
+      "etl-worker-01",
+      "etl-worker-02"
+    ],
+    "description": "每日 ETL 任务，预期执行1小时内完成"
+  },
+  {
+    "task_name": "long_report_job",
+    "lock_key_pattern": "lock:report:monthly:*",
+    "max_execution_time": 7200,
+    "heartbeat_interval": 120,
+    "heartbeat_timeout": 600,
+    "allowed_holders": [
+      "report-worker-01"
+    ],
+    "description": "月度报表任务，允许长时间运行"
+  },
+  {
+    "task_name": "quick_cleanup",
+    "lock_key_pattern": "lock:cleanup:*",
+    "max_execution_time": 300,
+    "heartbeat_interval": 30,
+    "heartbeat_timeout": 120,
+    "allowed_holders": [
+      "cleanup-worker-*"
+    ],
+    "description": "快速清理任务，5分钟内应完成"
+  }
+]

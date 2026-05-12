@@ -1,0 +1,69 @@
+[
+  {
+    "lock_key": "lock:etl:daily:20240115",
+    "lock_value": "uuid-001",
+    "holder_id": "etl-worker-01",
+    "holder_name": "ETL Worker Node 1",
+    "holder_ip": "192.168.1.10",
+    "holder_pid": 12345,
+    "acquired_at": "2026-05-12T22:33:00",
+    "expire_at": "2026-05-12T22:33:00",
+    "last_heartbeat_at": "2026-05-12T23:03:00",
+    "metadata": {
+      "task_version": "v2.1.0"
+    }
+  },
+  {
+    "lock_key": "lock:report:monthly:202401",
+    "lock_value": "uuid-002",
+    "holder_id": "report-worker-01",
+    "holder_name": "Report Worker Node 1",
+    "holder_ip": "192.168.1.20",
+    "holder_pid": 54321,
+    "acquired_at": "2026-05-12T11:03:00",
+    "expire_at": "2026-05-12T11:03:00",
+    "last_heartbeat_at": "2026-05-12T23:03:00",
+    "metadata": {
+      "retry_count": 0
+    }
+  },
+  {
+    "lock_key": "lock:etl:daily:20240114",
+    "lock_value": "uuid-003",
+    "holder_id": "etl-worker-02",
+    "holder_name": "ETL Worker Node 2",
+    "holder_ip": "192.168.1.11",
+    "holder_pid": 99999,
+    "acquired_at": "2026-05-11T21:03:00",
+    "expire_at": "2026-05-11T21:03:00",
+    "last_heartbeat_at": "2026-05-11T23:33:00",
+    "metadata": {
+      "task_version": "v2.1.0",
+      "crash_signal": "SIGKILL"
+    }
+  },
+  {
+    "lock_key": "lock:cleanup:temp_files",
+    "lock_value": "uuid-004",
+    "holder_id": "cleanup-worker-01",
+    "holder_name": "Cleanup Worker 1",
+    "holder_ip": "192.168.1.30",
+    "holder_pid": 88888,
+    "acquired_at": "2026-05-12T22:55:00",
+    "expire_at": "2026-05-12T22:55:00",
+    "last_heartbeat_at": "2026-05-12T23:00:00",
+    "metadata": {}
+  },
+  {
+    "lock_key": "lock:unknown:orphan_key",
+    "lock_value": "uuid-999",
+    "holder_id": "mystery-worker",
+    "holder_name": "Unknown Worker",
+    "holder_ip": "10.0.0.99",
+    "holder_pid": 77777,
+    "acquired_at": "2026-05-12T18:03:00",
+    "expire_at": "2026-05-12T18:03:00",
+    "last_heartbeat_at": null,
+    "metadata": {}
+  }
+]

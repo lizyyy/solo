@@ -1,0 +1,30 @@
+[
+  {
+    "holder_id": "etl-worker-01",
+    "timestamp": "2026-05-12T23:03:00",
+    "status": "alive",
+    "load": 0.8,
+    "memory_usage": 45
+  },
+  {
+    "holder_id": "report-worker-01",
+    "timestamp": "2026-05-12T23:03:00",
+    "status": "alive",
+    "load": 2.5,
+    "memory_usage": 78
+  },
+  {
+    "holder_id": "etl-worker-02",
+    "timestamp": "2026-05-11T23:33:00",
+    "status": "alive",
+    "load": 1.2,
+    "memory_usage": 55
+  },
+  {
+    "holder_id": "cleanup-worker-01",
+    "timestamp": "2026-05-12T23:00:00",
+    "status": "alive",
+    "load": 0.3,
+    "memory_usage": 20
+  }
+]

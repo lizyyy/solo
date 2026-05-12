@@ -1,0 +1,58 @@
+[
+  {
+    "lock_key": "lock:etl:daily:20240115",
+    "holder_id": "etl-worker-01",
+    "event": "task_started",
+    "timestamp": "2026-05-12T22:33:05",
+    "details": {
+      "batch_id": "batch-001"
+    }
+  },
+  {
+    "lock_key": "lock:etl:daily:20240115",
+    "holder_id": "etl-worker-01",
+    "event": "progress",
+    "timestamp": "2026-05-12T23:03:30",
+    "details": {
+      "stage": "extract",
+      "progress": 45
+    }
+  },
+  {
+    "lock_key": "lock:report:monthly:202401",
+    "holder_id": "report-worker-01",
+    "event": "task_started",
+    "timestamp": "2026-05-12T11:08:00",
+    "details": {
+      "report_type": "finance"
+    }
+  },
+  {
+    "lock_key": "lock:report:monthly:202401",
+    "holder_id": "report-worker-01",
+    "event": "progress",
+    "timestamp": "2026-05-12T23:03:00",
+    "details": {
+      "stage": "aggregation",
+      "progress": 80
+    }
+  },
+  {
+    "lock_key": "lock:etl:daily:20240114",
+    "holder_id": "etl-worker-02",
+    "event": "task_started",
+    "timestamp": "2026-05-11T21:08:00",
+    "details": {
+      "batch_id": "batch-000"
+    }
+  },
+  {
+    "lock_key": "lock:cleanup:temp_files",
+    "holder_id": "cleanup-worker-01",
+    "event": "task_started",
+    "timestamp": "2026-05-12T22:55:05",
+    "details": {
+      "target_dir": "/tmp/data"
+    }
+  }
+]
