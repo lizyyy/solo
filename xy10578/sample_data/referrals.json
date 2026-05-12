@@ -1,0 +1,36 @@
+[
+    {
+        "email": "zhangwei@techcorp.com",
+        "phone": "13800138001",
+        "name": "张伟",
+        "customer_type": "b2b",
+        "company_name": "科技创新有限公司",
+        "referrer_id": "ref_001",
+        "referrer_name": "孙总",
+        "referral_time": "2024-02-25 16:00:00",
+        "referral_channel": "微信推荐",
+        "external_id": "ref_ext_001"
+    },
+    {
+        "email": "zhoumei@greentech.cn",
+        "phone": "13300133007",
+        "name": "周梅",
+        "customer_type": "b2b",
+        "company_name": "绿色科技",
+        "referrer_id": "ref_002",
+        "referrer_name": "王经理",
+        "referral_time": "2024-03-10 11:30:00",
+        "referral_channel": "客户转介绍",
+        "external_id": "ref_ext_002"
+    },
+    {
+        "email": "wanghong@example.com",
+        "phone": "13700137003",
+        "name": "王红",
+        "customer_type": "individual",
+        "referrer_name": "朋友推荐",
+        "referral_time": "2024-03-18 15:45:00",
+        "referral_channel": "社交分享",
+        "external_id": "ref_ext_003"
+    }
+]

@@ -1,0 +1,31 @@
+[
+    {
+        "email": "spam@example.com",
+        "phone": "00000000000",
+        "name": "垃圾邮箱",
+        "customer_type": "individual",
+        "campaign_id": "camp_bad",
+        "campaign_name": "测试广告",
+        "channel": "未知",
+        "click_time": "2024-04-01 00:00:00",
+        "cost": 0,
+        "external_id": "bad_001"
+    },
+    {
+        "invalid_field": "缺少必要字段",
+        "external_id": "bad_002"
+    },
+    {
+        "email": "zhangwei@techcorp.com",
+        "phone": "13800138001",
+        "name": "张伟-重复",
+        "customer_type": "b2b",
+        "company_name": "科技创新有限公司",
+        "campaign_id": "camp_001",
+        "campaign_name": "Q1 SaaS 推广",
+        "channel": "百度搜索",
+        "click_time": "2024-01-15 10:30:00",
+        "cost": 58.50,
+        "external_id": "ad_ext_001"
+    }
+]
