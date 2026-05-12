@@ -1,0 +1,19 @@
+{
+  "name": "cs-scheduling-fairness",
+  "version": "1.0.0",
+  "description": "客服排班公平性 CLI - 兼顾夜班次数、技能组、请假、节假日和连续工作限制",
+  "main": "src/index.js",
+  "bin": {
+    "csp": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/",
+    "lint": "node -e \"console.log('No lint configured.')\""
+  },
+  "keywords": ["scheduling", "customer-service", "fairness", "cli"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
