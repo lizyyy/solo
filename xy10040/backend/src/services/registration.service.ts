@@ -11,6 +11,9 @@ import {
 import { eventService } from './event.service';
 import { eventLogService } from './event-log.service';
 import { lockService } from './lock.service';
+import { asyncTaskService } from './async-task.service';
+import { cacheService } from './cache.service';
+import { compensationService, Saga } from './compensation.service';
 import {
   ConcurrencyError,
   ConflictError,
@@ -38,7 +41,7 @@ export class RegistrationService {
     }
 
     const lockKey = `registration:${dto.eventId}:${dto.userId}`;
-    const eventLockKey = `event:${dto.eventId}:registrations`;
+    let createdRegistrationId: string | null = null;
 
     return lockService.executeWithLock(
       lockKey,
@@ -65,6 +68,8 @@ export class RegistrationService {
             await eventService.incrementCurrentParticipants(dto.eventId, client);
 
             const registrationId = uuidv4();
+            createdRegistrationId = registrationId;
+
             const insertResult = await client.query(
               `INSERT INTO registrations (
                 id, event_id, user_id, user_name, user_email,
@@ -101,15 +106,58 @@ export class RegistrationService {
           'SERIALIZABLE'
         );
 
+        const registration = this.mapRowToRegistration(result);
+
         logger.info('Registration created', {
           eventId: dto.eventId,
           userId: dto.userId,
+          registrationId: registration.id,
         });
 
-        return this.mapRowToRegistration(result);
+        cacheService.invalidateRegistrations(dto.eventId);
+        cacheService.invalidateEvent(dto.eventId);
+        logger.debug('Cache invalidated for event', { eventId: dto.eventId });
+
+        await asyncTaskService.enqueue('SEND_NOTIFICATION', {
+          to: dto.userEmail,
+          type: 'REGISTRATION_CONFIRMATION',
+          eventId: dto.eventId,
+          registrationId: registration.id,
+        });
+
+        await asyncTaskService.enqueue('SYNC_CACHE', {
+          eventId: dto.eventId,
+          registrationId: registration.id,
+        });
+
+        logger.info('Async tasks enqueued for registration', {
+          registrationId: registration.id,
+        });
+
+        return registration;
       },
       30000
-    );
+    ).catch(async (error) => {
+      if (createdRegistrationId) {
+        logger.warn('Registration creation failed, attempting compensation', {
+          registrationId: createdRegistrationId,
+          error: error.message,
+        });
+        try {
+          await compensationService.compensateRegistration(
+            createdRegistrationId,
+            dto.eventId,
+            context
+          );
+        } catch (compensationError) {
+          logger.error('Compensation failed', {
+            registrationId: createdRegistrationId,
+            error: (compensationError as Error).message,
+          });
+        }
+      }
+      throw error;
+    });
   }
 
   private async reactivateRegistration(

@@ -3,6 +3,18 @@ import { logger } from '../../utils/logger';
 
 const migrations = [
   {
+    version: 0,
+    name: 'create_migration_history_table',
+    up: `
+      CREATE TABLE IF NOT EXISTS migration_history (
+        id SERIAL PRIMARY KEY,
+        version INTEGER NOT NULL UNIQUE,
+        name VARCHAR(255) NOT NULL,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `,
+  },
+  {
     version: 1,
     name: 'create_events_table',
     up: `
@@ -18,7 +30,7 @@ const migrations = [
         version INTEGER NOT NULL DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        created_by UUID NOT NULL,
+        created_by VARCHAR(64) NOT NULL,
         CHECK (start_time < end_time),
         CHECK (current_participants <= max_participants)
       );
@@ -33,7 +45,7 @@ const migrations = [
       CREATE TABLE IF NOT EXISTS registrations (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-        user_id UUID NOT NULL,
+        user_id VARCHAR(64) NOT NULL,
         user_name VARCHAR(100) NOT NULL,
         user_email VARCHAR(255) NOT NULL,
         user_phone VARCHAR(20),
@@ -56,14 +68,14 @@ const migrations = [
       CREATE TABLE IF NOT EXISTS event_log (
         id BIGSERIAL PRIMARY KEY,
         aggregate_type VARCHAR(50) NOT NULL,
-        aggregate_id UUID NOT NULL,
+        aggregate_id VARCHAR(64) NOT NULL,
         event_type VARCHAR(100) NOT NULL,
         event_version INTEGER NOT NULL DEFAULT 1,
         payload JSONB NOT NULL,
         metadata JSONB NOT NULL DEFAULT '{}',
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        user_id UUID,
-        request_id UUID,
+        user_id VARCHAR(64),
+        request_id VARCHAR(64),
         ip_address VARCHAR(45)
       );
       CREATE INDEX IF NOT EXISTS idx_event_log_aggregate ON event_log(aggregate_type, aggregate_id);
@@ -76,8 +88,8 @@ const migrations = [
     name: 'create_idempotency_tokens_table',
     up: `
       CREATE TABLE IF NOT EXISTS idempotency_tokens (
-        token UUID PRIMARY KEY,
-        user_id UUID NOT NULL,
+        token VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
         request_path VARCHAR(255) NOT NULL,
         request_hash VARCHAR(64) NOT NULL,
         response_code INTEGER,
@@ -96,7 +108,7 @@ const migrations = [
     up: `
       CREATE TABLE IF NOT EXISTS distributed_locks (
         lock_key VARCHAR(255) PRIMARY KEY,
-        holder_id UUID NOT NULL,
+        holder_id VARCHAR(64) NOT NULL,
         acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         expires_at TIMESTAMP NOT NULL
       );
@@ -122,18 +134,6 @@ const migrations = [
       );
       CREATE INDEX IF NOT EXISTS idx_tasks_status ON async_tasks(status, priority DESC, created_at);
       CREATE INDEX IF NOT EXISTS idx_tasks_retry ON async_tasks(next_retry_at);
-    `,
-  },
-  {
-    version: 7,
-    name: 'create_migration_history_table',
-    up: `
-      CREATE TABLE IF NOT EXISTS migration_history (
-        id SERIAL PRIMARY KEY,
-        version INTEGER NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
     `,
   },
 ];

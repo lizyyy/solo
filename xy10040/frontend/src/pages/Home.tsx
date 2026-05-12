@@ -94,6 +94,12 @@ export function Home() {
           event={currentEvent}
           registrations={registrations}
           onBack={clearCurrentEvent}
+          onRegister={() => setShowRegistrationForm(true)}
+          onEdit={() => {
+            setEditingEvent(currentEvent);
+            setShowEventForm(true);
+          }}
+          onCancelEvent={() => handleCancelEvent(currentEvent)}
           onCancelRegistration={handleCancelRegistration}
           isLoading={isLoading}
         />

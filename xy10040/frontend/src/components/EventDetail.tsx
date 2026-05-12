@@ -2,18 +2,21 @@ import { useEffect, useState } from 'react';
 import { Event, Registration, EventLogEntry, ExportFormat } from '@/types';
 import { useAppStore } from '@/store/app';
 import { api } from '@/lib/api';
-import { ArrowLeft, Calendar, Users, Download, Trash2, FileSpreadsheet, FileText, File } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Download, Trash2, FileSpreadsheet, FileText, File, UserPlus, Edit } from 'lucide-react';
 import dayjs from 'dayjs';
 
 interface EventDetailProps {
   event: Event;
   registrations: Registration[];
   onBack: () => void;
+  onRegister: () => void;
+  onEdit: () => void;
+  onCancelEvent: () => void;
   onCancelRegistration: (registration: Registration) => void;
   isLoading: boolean;
 }
 
-export function EventDetail({ event, registrations, onBack, onCancelRegistration, isLoading }: EventDetailProps) {
+export function EventDetail({ event, registrations, onBack, onRegister, onEdit, onCancelEvent, onCancelRegistration, isLoading }: EventDetailProps) {
   const [logEntries, setLogEntries] = useState<EventLogEntry[]>([]);
   const [loadingLog, setLoadingLog] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -79,7 +82,7 @@ export function EventDetail({ event, registrations, onBack, onCancelRegistration
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <button
           onClick={onBack}
           className="btn-secondary flex items-center"
@@ -88,10 +91,42 @@ export function EventDetail({ event, registrations, onBack, onCancelRegistration
           返回列表
         </button>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {event.status === 'active' && (
+            <button
+              onClick={onRegister}
+              className="btn-success flex items-center"
+              disabled={isLoading || event.currentParticipants >= event.maxParticipants}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              我要报名
+            </button>
+          )}
+
+          {event.status !== 'cancelled' && event.status !== 'completed' && (
+            <>
+              <button
+                onClick={onEdit}
+                className="btn-primary flex items-center"
+                disabled={isLoading}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                编辑活动
+              </button>
+              <button
+                onClick={onCancelEvent}
+                className="btn-danger flex items-center"
+                disabled={isLoading}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                取消活动
+              </button>
+            </>
+          )}
+
           <div className="relative group">
             <button
-              className="btn-success flex items-center"
+              className="btn-secondary flex items-center"
               disabled={exporting}
             >
               <Download className="w-4 h-4 mr-2" />

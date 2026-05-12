@@ -33,7 +33,8 @@ interface AppState {
       endTime?: string;
       maxParticipants?: number;
       status?: 'draft' | 'active' | 'cancelled';
-    }
+    },
+    version?: number
   ) => Promise<Event | null>;
   fetchEventRegistrations: (eventId: string) => Promise<void>;
   createRegistration: (dto: {
@@ -106,17 +107,30 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  updateEvent: async (id, dto) => {
+  updateEvent: async (id, dto, providedVersion) => {
     set({ isLoading: true, error: null });
     try {
-      const currentEvent = get().currentEvent;
-      if (!currentEvent) {
-        throw new Error('No current event');
+      let version: number | undefined = providedVersion;
+      
+      if (!version) {
+        const currentEvent = get().currentEvent;
+        if (currentEvent && currentEvent.id === id) {
+          version = currentEvent.version;
+        } else {
+          const eventFromList = get().events.find((e) => e.id === id);
+          if (eventFromList) {
+            version = eventFromList.version;
+          }
+        }
       }
 
-      const updatedEvent = await api.updateEvent(id, dto, currentEvent.version);
+      if (!version) {
+        throw new Error('Cannot find event version');
+      }
+
+      const updatedEvent = await api.updateEvent(id, dto, version);
       set((state) => ({
-        currentEvent: updatedEvent,
+        currentEvent: state.currentEvent?.id === id ? updatedEvent : state.currentEvent,
         events: state.events.map((e) =>
           e.id === id ? updatedEvent : e
         ),

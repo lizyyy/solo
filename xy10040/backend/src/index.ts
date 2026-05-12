@@ -2,6 +2,7 @@ import app from './app';
 import { config } from './config';
 import { logger } from './utils/logger';
 import { runMigrations } from './database/migrations';
+import { asyncTaskService } from './services/async-task.service';
 
 const startServer = async () => {
   try {
@@ -9,13 +10,39 @@ const startServer = async () => {
 
     await runMigrations();
 
+    asyncTaskService.registerHandler({
+      taskType: 'SEND_NOTIFICATION',
+      handle: async (payload: Record<string, unknown>) => {
+        logger.info('Sending notification', {
+          to: payload.to,
+          type: payload.type,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        logger.info('Notification sent successfully', { to: payload.to });
+      },
+    });
+
+    asyncTaskService.registerHandler({
+      taskType: 'SYNC_CACHE',
+      handle: async (payload: Record<string, unknown>) => {
+        logger.info('Syncing cache', { eventId: payload.eventId });
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        logger.info('Cache synced', { eventId: payload.eventId });
+      },
+    });
+
+    asyncTaskService.start(1000);
+
     const server = app.listen(config.server.port, () => {
       logger.info(`Server is running on port ${config.server.port}`);
       logger.info(`Environment: ${config.server.env}`);
+      logger.info('Async task service started with handlers: SEND_NOTIFICATION, SYNC_CACHE');
     });
 
     const shutdown = async (signal: string) => {
       logger.info(`Received ${signal}, shutting down gracefully...`);
+      
+      asyncTaskService.stop();
       
       server.close(async () => {
         logger.info('HTTP server closed');

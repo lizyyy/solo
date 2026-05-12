@@ -9,7 +9,8 @@
     "dev": "ts-node-dev --respawn src/index.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
-    "migration:run": "ts-node src/database/migrations/index.ts"
+    "migration:run": "ts-node src/database/migrations/index.ts",
+    "verify": "ts-node src/scripts/verify-setup.ts"
   },
   "dependencies": {
     "express": "^4.18.2",
