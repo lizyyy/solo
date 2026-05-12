@@ -118,4 +118,22 @@ router.post('/:id/rollback-penalty', async (req, res) => {
   }
 });
 
+router.get('/:id/penalty', async (req, res) => {
+  try {
+    const penalty = PenaltyDAO.getByViolationId(req.params.id);
+    res.json({ success: true, data: penalty });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/:id/appeal', async (req, res) => {
+  try {
+    const appeal = AppealDAO.getByViolationId(req.params.id);
+    res.json({ success: true, data: appeal });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default router;

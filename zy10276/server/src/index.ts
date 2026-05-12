@@ -6,6 +6,7 @@ import vehicleRoutes from './routes/vehicles';
 import shiftRoutes from './routes/shifts';
 import violationRoutes from './routes/violations';
 import batchRoutes from './routes/batches';
+import historyRoutes from './routes/history';
 import db from './database/db';
 import DriverDAO from './dao/driver.dao';
 import VehicleDAO from './dao/vehicle.dao';
@@ -23,6 +24,7 @@ app.use('/api/vehicles', vehicleRoutes);
 app.use('/api/shifts', shiftRoutes);
 app.use('/api/violations', violationRoutes);
 app.use('/api/batches', batchRoutes);
+app.use('/api/history', historyRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: '车队违章申诉平台 API 服务运行正常' });

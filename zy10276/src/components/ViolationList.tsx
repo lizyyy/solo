@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel } from 'lucide-react';
 import { ViolationFilterParams } from '../types';
-import { violationApi, driverApi } from '../services/api';
+import { violationApi } from '../services/api';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
 import ViolationDetail from './ViolationDetail';
 import MatchShiftModal from './MatchShiftModal';
@@ -9,7 +9,6 @@ import AppealModal from './AppealModal';
 
 const ViolationList: React.FC = () => {
   const [violations, setViolations] = useState<any[]>([]);
-  const [drivers, setDrivers] = useState<any[]>([]);
   const [filters, setFilters] = useState<ViolationFilterParams>({});
   const [selectedViolation, setSelectedViolation] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
@@ -19,33 +18,18 @@ const ViolationList: React.FC = () => {
 
   useEffect(() => {
     loadData();
-    loadDrivers();
   }, [filters]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const response = await violationApi.filter(filters);
-      setViolations(response.data || []);
+      const data = await violationApi.filter(filters);
+      setViolations(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('加载违章记录失败:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadDrivers = async () => {
-    try {
-      const response = await driverApi.getAll();
-      setDrivers(response.data || []);
-    } catch (error) {
-      console.error('加载司机列表失败:', error);
-    }
-  };
-
-  const getDriverName = (driverId: string): string => {
-    const driver = drivers.find((d) => d.id === driverId);
-    return driver?.name || '-';
   };
 
   const handleConfirm = async (violation: any) => {
@@ -82,9 +66,7 @@ const ViolationList: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">违章记录列表</h2>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-500">共 {violations.length} 条记录</span>
-          </div>
+          <div className="text-sm text-gray-500">共 {violations.length} 条记录</div>
         </div>
 
         <div className="grid grid-cols-5 gap-3 mb-4">
@@ -178,14 +160,14 @@ const ViolationList: React.FC = () => {
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     {getViolationTypeText(violation.violationType)}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500 max-w-xs truncate">
+                  <td className="px-4 py-3 text-sm text-gray-500 max-w-xs truncate">
                     {violation.location}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                    {getDriverName(violation.matchedDriverId)}
+                    {violation.matchedDriverId || '-'}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                    <span className="text-red-600 font-medium">{violation.points}分</span>
+                    <span className="text-red-600 font-medium">{violation.points} 分</span>
                     <span className="mx-1">/</span>
                     <span className="text-orange-600">{formatMoney(violation.fineAmount)}</span>
                   </td>
@@ -206,7 +188,7 @@ const ViolationList: React.FC = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      
+
                       {violation.status === 'imported' && (
                         <button
                           onClick={() => handleMatchShift(violation)}
@@ -216,7 +198,7 @@ const ViolationList: React.FC = () => {
                           <Filter className="w-4 h-4" />
                         </button>
                       )}
-                      
+
                       {violation.status === 'pending_confirmation' && (
                         <>
                           <button
@@ -235,7 +217,7 @@ const ViolationList: React.FC = () => {
                           </button>
                         </>
                       )}
-                      
+
                       {(violation.status === 'confirmed' || violation.status === 'appeal_rejected') && (
                         <button
                           onClick={() => handlePenalize(violation)}

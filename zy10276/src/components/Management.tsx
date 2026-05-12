@@ -20,14 +20,14 @@ const Management: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [driversRes, vehiclesRes, shiftsRes] = await Promise.all([
+      const [driversData, vehiclesData, shiftsData] = await Promise.all([
         driverApi.getAll(),
         vehicleApi.getAll(),
         shiftApi.getAll(),
       ]);
-      setDrivers(driversRes.data || []);
-      setVehicles(vehiclesRes.data || []);
-      setShifts(shiftsRes.data || []);
+      setDrivers(Array.isArray(driversData) ? driversData : []);
+      setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
+      setShifts(Array.isArray(shiftsData) ? shiftsData : []);
     } catch (error) {
       console.error('加载数据失败:', error);
     }

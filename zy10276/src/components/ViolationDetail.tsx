@@ -25,23 +25,18 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
 
   const loadData = async () => {
     try {
-      const historyResponse = await historyApi.getByViolationId(violation.id);
-      setHistories(historyResponse.data || []);
+      const [historyData, penaltyData, appealData] = await Promise.allSettled([
+        historyApi.getByViolationId(violation.id).catch(() => []),
+        violationApi.getPenalty(violation.id).catch(() => null),
+        violationApi.getAppeal(violation.id).catch(() => null),
+      ]);
 
-      const penaltyResponse = await violationApi.getPenalty(violation.id);
-      setPenalty(penaltyResponse.data || null);
-
-      const appealResponse = await violationApi.getAppeal(violation.id);
-      setAppeal(appealResponse.data || null);
+      setHistories(historyData.status === 'fulfilled' && Array.isArray(historyData.value) ? historyData.value : []);
+      setPenalty(penaltyData.status === 'fulfilled' ? penaltyData.value : null);
+      setAppeal(appealData.status === 'fulfilled' ? appealData.value : null);
     } catch (error) {
       console.error('加载详情失败:', error);
     }
-  };
-
-  const handleRollbackSuccess = () => {
-    setShowRollback(false);
-    onRefresh();
-    loadData();
   };
 
   const handleReviewAppeal = async (approved: boolean) => {
@@ -72,7 +67,7 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">违章详情</h2>
-              <p className="text-sm text-gray-500">{violation.violationNumber || '-'}</p>
+              <p className="text-sm text-gray-500">{violation.violationNumber || violation.plateNumber}</p>
             </div>
           </div>
           <button
@@ -270,7 +265,11 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
         <RollbackModal
           penalty={penalty}
           onClose={() => setShowRollback(false)}
-          onSuccess={handleRollbackSuccess}
+          onSuccess={() => {
+            setShowRollback(false);
+            onRefresh();
+            loadData();
+          }}
         />
       )}
     </div>

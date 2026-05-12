@@ -108,7 +108,7 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
                   accept="image/*,.pdf,.doc,.docx"
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+                  <Upload className="w-12 h-12 mx-auto mb-2 text-gray-400" />
                   <p className="text-sm text-gray-600">点击或拖拽文件到此处上传</p>
                   <p className="text-xs text-gray-400 mt-1">支持图片、PDF、Word 文档</p>
                 </label>

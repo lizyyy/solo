@@ -2,7 +2,7 @@ import { ViolationFilterParams } from '../types';
 
 const API_BASE = 'http://localhost:3001/api';
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<{ data: T }> {
+async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
   try {
     const response = await fetch(url, {
@@ -14,11 +14,15 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     });
 
     if (!response.ok) {
-      throw new Error(`请求失败: ${response.status}`);
+      const errorData = await response.json().catch(() => ({ error: '请求失败' }));
+      throw new Error(errorData.error || `请求失败: ${response.status}`);
     }
 
-    const data = await response.json();
-    return { data };
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || result.message || '请求失败');
+    }
+    return result.data;
   } catch (error) {
     console.error('API 请求错误:', error);
     throw error;

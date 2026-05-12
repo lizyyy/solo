@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, RotateCcw, AlertTriangle } from 'lucide-react';
 import { violationApi } from '../services/api';
-import { formatMoney } from '../utils/format';
 
 interface RollbackModalProps {
   penalty: any;
@@ -20,7 +19,6 @@ const RollbackModal: React.FC<RollbackModalProps> = ({ penalty, onClose, onSucce
     }
 
     setSubmitting(true);
-
     try {
       await violationApi.rollbackPenalty(penalty.violationId, reason, '管理员');
       onSuccess();
@@ -71,7 +69,7 @@ const RollbackModal: React.FC<RollbackModalProps> = ({ penalty, onClose, onSucce
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <p className="text-xs text-gray-500">罚款金额</p>
-                <p className="text-lg font-bold text-orange-600">{formatMoney(penalty.fineAmount)}</p>
+                <p className="text-lg font-bold text-orange-600">¥{penalty.fineAmount}</p>
               </div>
             </div>
 

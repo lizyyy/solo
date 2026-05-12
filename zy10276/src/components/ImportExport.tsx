@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, Download, FileText, AlertCircle, Check } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { batchApi, violationApi } from '../services/api';
+import { batchApi } from '../services/api';
 import { formatDateTime } from '../utils/format';
 
 const ImportExport: React.FC = () => {
@@ -15,7 +15,6 @@ const ImportExport: React.FC = () => {
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (activeTab === 'batches') {
@@ -25,8 +24,8 @@ const ImportExport: React.FC = () => {
 
   const loadBatches = async () => {
     try {
-      const response = await batchApi.getAll();
-      setBatches(response.data || []);
+      const data = await batchApi.getAll();
+      setBatches(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('加载批次失败:', error);
     }
@@ -49,14 +48,13 @@ const ImportExport: React.FC = () => {
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-        const response = await batchApi.import(jsonData, file.name, '管理员');
-        const result = response.data;
+        const result = await batchApi.import(jsonData, file.name, '管理员');
 
         setImportResult({
-          success: result.successfulRecords,
-          duplicate: result.duplicateRecords,
-          total: result.totalRecords,
-          fileName: result.fileName,
+          success: result.successful || 0,
+          duplicate: result.duplicate || 0,
+          total: result.total || 0,
+          fileName: result.fileName || file.name,
         });
 
         loadBatches();
@@ -85,41 +83,11 @@ const ImportExport: React.FC = () => {
     setIsDragging(false);
   };
 
-  const handleExport = async () => {
-    try {
-      const response = await violationApi.getAll();
-      const violations = response.data || [];
-
-      const exportData = violations.map((v: any) => ({
-        '违章编号': v.violationNumber,
-        '车牌号': v.plateNumber,
-        '违章时间': v.violationTime,
-        '违章类型': v.violationType,
-        '违章地点': v.location,
-        '违章描述': v.description,
-        '扣分': v.points,
-        '罚款金额': v.fineAmount,
-        '状态': v.status,
-        '匹配司机': v.matchedDriverId || '',
-        '导入时间': v.importedAt,
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(exportData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, '违章记录');
-      XLSX.writeFile(wb, `违章记录_${new Date().toISOString().split('T')[0]}.xlsx`);
-    } catch (error) {
-      console.error('导出失败:', error);
-      alert('导出失败，请重试');
-    }
-  };
-
   const downloadTemplate = () => {
     const template = [
       {
-        '违章编号': 'VIO001',
         '车牌号': '京A12345',
-        '违章时间': '2024-01-15T08:30:00',
+        '违章时间': new Date().toISOString().split('T')[0] + 'T08:30:00',
         '违章类型': 'speeding',
         '违章地点': '北京市朝阳区建国路',
         '违章描述': '超速10%以上未达20%',
@@ -200,11 +168,11 @@ const ImportExport: React.FC = () => {
             }`}
           >
             <input
-              ref={fileInputRef}
               type="file"
               accept=".xlsx,.xls,.csv"
               onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
               className="hidden"
+              id="file-upload"
             />
             <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium text-gray-700 mb-2">
@@ -214,7 +182,7 @@ const ImportExport: React.FC = () => {
               支持 Excel (.xlsx, .xls) 和 CSV 格式
             </p>
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => document.getElementById('file-upload')?.click()}
               disabled={loading}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -229,7 +197,7 @@ const ImportExport: React.FC = () => {
                 <h4 className="font-medium text-yellow-800 mb-2">导入说明</h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li>• 请确保文件格式正确，建议先下载导入模板</li>
-                  <li>• 违章编号、车牌号、违章时间为必填字段</li>
+                  <li>• 车牌号、违章时间为必填字段</li>
                   <li>• 系统会自动检测重复数据并跳过</li>
                   <li>• 系统会自动根据违章时间匹配车辆班次和司机</li>
                   <li>• 违章类型可选：speeding（超速）、red_light（闯红灯）、wrong_parking（违停）、lane_violation（不按车道行驶）、overload（超载）、other（其他）</li>
@@ -250,35 +218,7 @@ const ImportExport: React.FC = () => {
       {activeTab === 'export' && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-6">导出违章数据</h2>
-
-          <div className="space-y-4">
-            <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-400 transition-colors cursor-pointer" onClick={handleExport}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-gray-900">导出全部违章记录</h3>
-                    <p className="text-sm text-gray-500">导出所有违章记录为 Excel 文件</p>
-                  </div>
-                </div>
-                <Download className="w-5 h-5 text-gray-400" />
-              </div>
-            </div>
-
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <h4 className="font-medium text-gray-700 mb-2">导出内容包含</h4>
-              <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                <div>• 违章编号和车牌号</div>
-                <div>• 违章时间和地点</div>
-                <div>• 违章类型和描述</div>
-                <div>• 扣分和罚款金额</div>
-                <div>• 当前处理状态</div>
-                <div>• 匹配的司机信息</div>
-              </div>
-            </div>
-          </div>
+          <p className="text-gray-600">导出功能请在违章列表页面操作</p>
         </div>
       )}
 

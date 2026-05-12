@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, AlertTriangle, User, Clock } from 'lucide-react';
+import { X, Check, AlertTriangle, Clock } from 'lucide-react';
 import { shiftApi, violationApi } from '../services/api';
 import { formatDateTime } from '../utils/format';
 
@@ -20,8 +20,8 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, plateNum
 
   const loadShifts = async () => {
     try {
-      const response = await shiftApi.getAll();
-      setShifts(response.data || []);
+      const data = await shiftApi.getAll();
+      setShifts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('加载班次失败:', error);
     }
@@ -63,7 +63,7 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, plateNum
 
         <div className="flex-1 overflow-y-auto p-6">
           <h3 className="text-sm font-medium text-gray-700 mb-3">可匹配的班次：</h3>
-          
+
           {shifts.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Clock className="w-12 h-12 mx-auto mb-2 text-gray-300" />
@@ -89,11 +89,8 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, plateNum
                     className="mr-4"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <User className="w-4 h-4 text-gray-500" />
-                      <span className="font-medium text-gray-900">
-                        {shift.driverId} {/* 实际项目中需要关联显示司机名 */}
-                      </span>
+                    <div className="font-medium text-gray-900">
+                      {shift.driverId || '未分配司机'}
                     </div>
                     <div className="mt-1 text-sm text-gray-500">
                       {formatDateTime(shift.startTime)} ~ {formatDateTime(shift.endTime)}
