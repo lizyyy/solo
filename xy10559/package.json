@@ -1,0 +1,14 @@
+{
+  "name": "parking-monthly-card-api",
+  "version": "1.0.0",
+  "description": "停车月卡续费 API - 处理车牌变更、暂停使用、欠费、共享车位和闸机同步",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
