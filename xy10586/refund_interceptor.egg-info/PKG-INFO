@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: refund-interceptor
+Version: 1.0.0
+Summary: 财务批量退款异常拦截 CLI 工具
+Author: Refund Interceptor Team
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=10.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

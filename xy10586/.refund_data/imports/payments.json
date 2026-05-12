@@ -1,0 +1,56 @@
+[
+  {
+    "order_id": "ORD-001",
+    "user_id": "USER-001",
+    "user_account": "alipay_001@example.com",
+    "amount": 1000.0,
+    "paid_at": "2026-04-12 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  },
+  {
+    "order_id": "ORD-002",
+    "user_id": "USER-002",
+    "user_account": "wechat_002",
+    "amount": 500.0,
+    "paid_at": "2026-04-22 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  },
+  {
+    "order_id": "ORD-003",
+    "user_id": "USER-003",
+    "user_account": "alipay_003@example.com",
+    "amount": 2000.0,
+    "paid_at": "2026-04-27 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  },
+  {
+    "order_id": "ORD-004",
+    "user_id": "USER-004",
+    "user_account": "blacklisted_user@example.com",
+    "amount": 800.0,
+    "paid_at": "2026-05-02 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  },
+  {
+    "order_id": "ORD-005",
+    "user_id": "USER-005",
+    "user_account": "wechat_005",
+    "amount": 300.0,
+    "paid_at": "2026-05-07 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  },
+  {
+    "order_id": "ORD-006",
+    "user_id": "USER-006",
+    "user_account": "alipay_006@example.com",
+    "amount": 1500.0,
+    "paid_at": "2026-03-28 18:48:41",
+    "currency": "CNY",
+    "status": "success"
+  }
+]

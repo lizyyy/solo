@@ -1,0 +1,57 @@
+[
+  {
+    "approval_id": "APR-001",
+    "order_id": "ORD-001",
+    "refund_request_id": "REQ-001",
+    "approver": "张经理",
+    "amount": 500.0,
+    "status": "approved",
+    "approved_at": "2026-05-11T18:48:41",
+    "expires_at": "2026-05-19T18:48:41",
+    "reason": "商品质量问题"
+  },
+  {
+    "approval_id": "APR-002",
+    "order_id": "ORD-002",
+    "refund_request_id": "REQ-002",
+    "approver": "张经理",
+    "amount": 500.0,
+    "status": "approved",
+    "approved_at": "2026-05-09T18:48:41",
+    "expires_at": "2026-05-19T18:48:41",
+    "reason": "用户申请退款"
+  },
+  {
+    "approval_id": "APR-003",
+    "order_id": "ORD-003",
+    "refund_request_id": "REQ-003",
+    "approver": "王主管",
+    "amount": 2500.0,
+    "status": "approved",
+    "approved_at": "2026-05-10T18:48:41",
+    "expires_at": "2026-05-19T18:48:41",
+    "reason": "活动补偿"
+  },
+  {
+    "approval_id": "APR-004",
+    "order_id": "ORD-004",
+    "refund_request_id": "REQ-004",
+    "approver": "张经理",
+    "amount": 800.0,
+    "status": "approved",
+    "approved_at": "2026-05-11T18:48:41",
+    "expires_at": "2026-05-19T18:48:41",
+    "reason": "商品损坏"
+  },
+  {
+    "approval_id": "APR-006",
+    "order_id": "ORD-006",
+    "refund_request_id": "REQ-006",
+    "approver": "张经理",
+    "amount": 300.0,
+    "status": "approved",
+    "approved_at": "2026-05-10T18:48:41",
+    "expires_at": "2026-05-11T18:48:41",
+    "reason": "重复订单"
+  }
+]

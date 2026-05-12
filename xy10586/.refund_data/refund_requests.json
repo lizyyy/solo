@@ -1,0 +1,323 @@
+[
+  {
+    "request_id": "REQ-001",
+    "order_id": "ORD-001",
+    "user_account": "alipay_001@example.com",
+    "amount": 500.0,
+    "reason": "商品质量问题，部分退款",
+    "requested_at": "2026-05-12T16:48:41",
+    "requested_by": "客服小王",
+    "status": "approved",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": true,
+        "message": "未发现重复退款",
+        "checked_at": "2026-05-12T18:48:41.594326",
+        "details": {}
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": true,
+        "message": "退款金额未超过实付金额",
+        "checked_at": "2026-05-12T18:48:41.594352",
+        "details": {}
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": true,
+        "message": "账户不在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594360",
+        "details": {}
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": true,
+        "message": "审批有效且未过期",
+        "checked_at": "2026-05-12T18:48:41.594372",
+        "details": {}
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": true,
+        "message": "部分退款累计 800.0 未超过实付金额 1000.0",
+        "checked_at": "2026-05-12T18:48:41.594388",
+        "details": {}
+      }
+    ],
+    "historical_checks": []
+  },
+  {
+    "request_id": "REQ-002",
+    "order_id": "ORD-002",
+    "user_account": "wechat_002",
+    "amount": 500.0,
+    "reason": "用户申请全额退款",
+    "requested_at": "2026-05-12T17:48:41",
+    "requested_by": "客服小李",
+    "status": "blocked",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": false,
+        "message": "检测到 1 个重复退款记录",
+        "checked_at": "2026-05-12T18:48:41.594449",
+        "details": {
+          "duplicates": [
+            {
+              "type": "historical_full_refund",
+              "refund_id": "REF-002",
+              "processed_at": "2026-05-07T18:48:41",
+              "amount": 500.0
+            }
+          ]
+        }
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": true,
+        "message": "退款金额未超过实付金额",
+        "checked_at": "2026-05-12T18:48:41.594459",
+        "details": {}
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": true,
+        "message": "账户不在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594463",
+        "details": {}
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": true,
+        "message": "审批有效且未过期",
+        "checked_at": "2026-05-12T18:48:41.594469",
+        "details": {}
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": false,
+        "message": "部分退款累计 1000.0 超过实付金额 500.0",
+        "checked_at": "2026-05-12T18:48:41.594476",
+        "details": {
+          "historical_total": 500.0,
+          "requested_amount": 500.0,
+          "new_total": 1000.0,
+          "paid_amount": 500.0,
+          "exceeded": 500.0
+        }
+      }
+    ],
+    "historical_checks": []
+  },
+  {
+    "request_id": "REQ-003",
+    "order_id": "ORD-003",
+    "user_account": "alipay_003@example.com",
+    "amount": 2500.0,
+    "reason": "活动补偿退款",
+    "requested_at": "2026-05-12T15:48:41",
+    "requested_by": "运营小张",
+    "status": "blocked",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": true,
+        "message": "未发现重复退款",
+        "checked_at": "2026-05-12T18:48:41.594514",
+        "details": {}
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": false,
+        "message": "退款金额 2500.0 超过实付金额 2000.0",
+        "checked_at": "2026-05-12T18:48:41.594522",
+        "details": {
+          "requested_amount": 2500.0,
+          "paid_amount": 2000.0
+        }
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": true,
+        "message": "账户不在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594529",
+        "details": {}
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": true,
+        "message": "审批有效且未过期",
+        "checked_at": "2026-05-12T18:48:41.594535",
+        "details": {}
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": false,
+        "message": "部分退款累计 2500.0 超过实付金额 2000.0",
+        "checked_at": "2026-05-12T18:48:41.594542",
+        "details": {
+          "historical_total": 0,
+          "requested_amount": 2500.0,
+          "new_total": 2500.0,
+          "paid_amount": 2000.0,
+          "exceeded": 500.0
+        }
+      }
+    ],
+    "historical_checks": []
+  },
+  {
+    "request_id": "REQ-004",
+    "order_id": "ORD-004",
+    "user_account": "blacklisted_user@example.com",
+    "amount": 800.0,
+    "reason": "商品损坏",
+    "requested_at": "2026-05-12T14:48:41",
+    "requested_by": "客服小王",
+    "status": "blocked",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": true,
+        "message": "未发现重复退款",
+        "checked_at": "2026-05-12T18:48:41.594566",
+        "details": {}
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": true,
+        "message": "退款金额未超过实付金额",
+        "checked_at": "2026-05-12T18:48:41.594572",
+        "details": {}
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": false,
+        "message": "账户 blacklisted_user@example.com 在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594577",
+        "details": {
+          "account": "blacklisted_user@example.com",
+          "reason": "历史多次恶意退款记录",
+          "added_at": "2026-03-13T18:48:41",
+          "added_by": "风控管理员"
+        }
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": true,
+        "message": "审批有效且未过期",
+        "checked_at": "2026-05-12T18:48:41.594592",
+        "details": {}
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": true,
+        "message": "部分退款累计 800.0 未超过实付金额 800.0",
+        "checked_at": "2026-05-12T18:48:41.594599",
+        "details": {}
+      }
+    ],
+    "historical_checks": []
+  },
+  {
+    "request_id": "REQ-005",
+    "order_id": "ORD-005",
+    "user_account": "wechat_005",
+    "amount": 300.0,
+    "reason": "未收到货",
+    "requested_at": "2026-05-12T13:48:41",
+    "requested_by": "客服小李",
+    "status": "review_required",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": true,
+        "message": "未发现重复退款",
+        "checked_at": "2026-05-12T18:48:41.594620",
+        "details": {}
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": true,
+        "message": "退款金额未超过实付金额",
+        "checked_at": "2026-05-12T18:48:41.594626",
+        "details": {}
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": true,
+        "message": "账户不在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594630",
+        "details": {}
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": false,
+        "message": "未找到退款申请 REQ-005 的审批记录",
+        "checked_at": "2026-05-12T18:48:41.594635",
+        "details": {}
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": true,
+        "message": "部分退款累计 300.0 未超过实付金额 300.0",
+        "checked_at": "2026-05-12T18:48:41.594641",
+        "details": {}
+      }
+    ],
+    "historical_checks": []
+  },
+  {
+    "request_id": "REQ-006",
+    "order_id": "ORD-006",
+    "user_account": "alipay_006@example.com",
+    "amount": 300.0,
+    "reason": "重复订单退款",
+    "requested_at": "2026-05-12T12:48:41",
+    "requested_by": "运营小张",
+    "status": "review_required",
+    "check_results": [
+      {
+        "rule_name": "duplicate_refund_check",
+        "passed": true,
+        "message": "未发现重复退款",
+        "checked_at": "2026-05-12T18:48:41.594665",
+        "details": {}
+      },
+      {
+        "rule_name": "amount_insufficient_check",
+        "passed": true,
+        "message": "退款金额未超过实付金额",
+        "checked_at": "2026-05-12T18:48:41.594671",
+        "details": {}
+      },
+      {
+        "rule_name": "blacklist_check",
+        "passed": true,
+        "message": "账户不在黑名单中",
+        "checked_at": "2026-05-12T18:48:41.594675",
+        "details": {}
+      },
+      {
+        "rule_name": "approval_expired_check",
+        "passed": false,
+        "message": "审批已于 2026-05-11 18:48:41 过期",
+        "checked_at": "2026-05-12T18:48:41.594692",
+        "details": {
+          "approval_id": "APR-006",
+          "expires_at": "2026-05-11T18:48:41",
+          "now": "2026-05-12T18:48:41.594679"
+        }
+      },
+      {
+        "rule_name": "partial_refund_exceeded_check",
+        "passed": true,
+        "message": "部分退款累计 1100.0 未超过实付金额 1500.0",
+        "checked_at": "2026-05-12T18:48:41.594706",
+        "details": {}
+      }
+    ],
+    "historical_checks": []
+  }
+]

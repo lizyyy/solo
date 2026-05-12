@@ -1,0 +1,56 @@
+[
+  {
+    "request_id": "REQ-001",
+    "order_id": "ORD-001",
+    "user_account": "alipay_001@example.com",
+    "amount": 500.0,
+    "reason": "商品质量问题，部分退款",
+    "requested_at": "2026-05-12 16:48:41",
+    "requested_by": "客服小王"
+  },
+  {
+    "request_id": "REQ-002",
+    "order_id": "ORD-002",
+    "user_account": "wechat_002",
+    "amount": 500.0,
+    "reason": "用户申请全额退款",
+    "requested_at": "2026-05-12 17:48:41",
+    "requested_by": "客服小李"
+  },
+  {
+    "request_id": "REQ-003",
+    "order_id": "ORD-003",
+    "user_account": "alipay_003@example.com",
+    "amount": 2500.0,
+    "reason": "活动补偿退款",
+    "requested_at": "2026-05-12 15:48:41",
+    "requested_by": "运营小张"
+  },
+  {
+    "request_id": "REQ-004",
+    "order_id": "ORD-004",
+    "user_account": "blacklisted_user@example.com",
+    "amount": 800.0,
+    "reason": "商品损坏",
+    "requested_at": "2026-05-12 14:48:41",
+    "requested_by": "客服小王"
+  },
+  {
+    "request_id": "REQ-005",
+    "order_id": "ORD-005",
+    "user_account": "wechat_005",
+    "amount": 300.0,
+    "reason": "未收到货",
+    "requested_at": "2026-05-12 13:48:41",
+    "requested_by": "客服小李"
+  },
+  {
+    "request_id": "REQ-006",
+    "order_id": "ORD-006",
+    "user_account": "alipay_006@example.com",
+    "amount": 300.0,
+    "reason": "重复订单退款",
+    "requested_at": "2026-05-12 12:48:41",
+    "requested_by": "运营小张"
+  }
+]
