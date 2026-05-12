@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+"""药品效期调拨 CLI 入口脚本"""
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from expiry_allocation_cli.cli import cli
+
+if __name__ == "__main__":
+    cli()
