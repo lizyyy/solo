@@ -106,6 +106,30 @@ export class WeightService {
       throw new Error('Actual weight must be greater than zero');
     }
 
+    const order = this.db.getOrder(data.orderId);
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    if (order.status === OrderStatus.OUTBOUND) {
+      throw new Error('Cannot replace item after order is outbound');
+    }
+
+    const orderItem = order.items.find(item => item.id === data.orderItemId);
+    if (!orderItem) {
+      throw new Error('Order item not found');
+    }
+
+    const newProduct = this.db.getProduct(data.newProductId);
+    if (!newProduct) {
+      throw new Error('New product not found');
+    }
+
+    const priceDifference = newProduct.unitPrice - orderItem.unitPrice;
+    if (priceDifference > 0) {
+      throw new Error(`Replacement product price is higher by ${priceDifference.toFixed(2)} yuan, need approval`);
+    }
+
     const weightRecord: WeightRecord = {
       id: uuidv4(),
       orderId: data.orderId,

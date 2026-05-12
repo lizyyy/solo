@@ -17,7 +17,7 @@ function printSubtitle(title: string) {
   console.log(`\n  --- ${title} ---`);
 }
 
-async function scenario1_NormalOutbound() {
+function scenario1_NormalOutbound() {
   printHeader('场景一: 正常出库流程');
   
   printSubtitle('1. 创建订单');
@@ -81,7 +81,7 @@ async function scenario1_NormalOutbound() {
   return order.id;
 }
 
-async function scenario2_WeightDifferenceRefund() {
+function scenario2_WeightDifferenceRefund() {
   printHeader('场景二: 重量差异退款流程');
   
   printSubtitle('1. 创建订单');
@@ -146,12 +146,13 @@ async function scenario2_WeightDifferenceRefund() {
   return order.id;
 }
 
-async function scenario3_ExceptionInterception() {
+function scenario3_ExceptionInterception() {
   printHeader('场景三: 异常拦截流程');
   
   printSubtitle('1. 创建订单');
+  const orderNo = `ORD-${Date.now()}`;
   const order = orderService.createOrder({
-    orderNo: `ORD-${Date.now()}`,
+    orderNo,
     customerId: 'CUST-003',
     customerName: '王五',
     items: [
@@ -160,10 +161,23 @@ async function scenario3_ExceptionInterception() {
     ]
   });
   console.log('  订单ID:', order.id);
+  console.log('  订单号:', order.orderNo);
 
-  printSubtitle('2. 异常测试 - 实际重量为0');
+  printSubtitle('2. 异常测试 - 重复订单号(幂等性)');
+  const orderDuplicate = orderService.createOrder({
+    orderNo,
+    customerId: 'CUST-OTHER',
+    customerName: '其他用户',
+    items: [
+      { productId: 'prod-001', expectedWeight: 1.0 }
+    ]
+  });
+  console.log('  重复订单号, 返回原订单, ID相同:', order.id === orderDuplicate.id ? '是' : '否');
+  console.log('  订单总数:', orderService.getAllOrders().length);
+
+  printSubtitle('3. 异常测试 - 实际重量为0');
   try {
-    await weightService.submitWeight({
+    weightService.submitWeight({
       requestId: uuidv4(),
       orderId: order.id,
       orderItemId: order.items[0].id,
@@ -177,7 +191,7 @@ async function scenario3_ExceptionInterception() {
     console.log('  ✅ 成功拦截:', error.message);
   }
 
-  printSubtitle('3. 异常测试 - 重复提交相同requestId');
+  printSubtitle('4. 异常测试 - 重复提交相同requestId');
   const requestId = uuidv4();
   const weight1 = weightService.submitWeight({
     requestId,
@@ -201,9 +215,11 @@ async function scenario3_ExceptionInterception() {
   });
   console.log('  第二次相同requestId, 返回缓存结果, ID相同:', weight1.id === weight2.id ? '是' : '否');
 
-  printSubtitle('4. 异常测试 - 替换商品价格更高');
+  printSubtitle('5. 异常测试 - 替换商品价格更高(校验失败不污染称重历史)');
+  const weightRecordsBefore = weightService.getWeightRecordsByOrderItem(order.items[1].id);
+  console.log('  替换前称重记录数:', weightRecordsBefore.length);
   try {
-    await weightService.replaceItemWithWeight({
+    weightService.replaceItemWithWeight({
       requestId: uuidv4(),
       orderId: order.id,
       orderItemId: order.items[1].id,
@@ -215,11 +231,13 @@ async function scenario3_ExceptionInterception() {
     });
     console.log('  ❌ 未拦截到替换高价商品的情况');
   } catch (error: any) {
+    const weightRecordsAfter = weightService.getWeightRecordsByOrderItem(order.items[1].id);
     console.log('  ✅ 成功拦截:', error.message);
+    console.log('  替换后称重记录数未增加:', weightRecordsBefore.length === weightRecordsAfter.length ? '是' : '否');
   }
 
-  printSubtitle('5. 先正常称重, 然后出库');
-  await weightService.submitWeight({
+  printSubtitle('6. 先正常称重, 然后出库');
+  weightService.submitWeight({
     requestId: uuidv4(),
     orderId: order.id,
     orderItemId: order.items[1].id,
@@ -232,9 +250,9 @@ async function scenario3_ExceptionInterception() {
   const outboundOrder = orderService.confirmOutbound(order.id);
   console.log('  订单出库成功, 状态:', outboundOrder.status);
 
-  printSubtitle('6. 异常测试 - 出库后修改重量');
+  printSubtitle('7. 异常测试 - 出库后修改重量');
   try {
-    await weightService.submitWeight({
+    weightService.submitWeight({
       requestId: uuidv4(),
       orderId: order.id,
       orderItemId: order.items[0].id,
@@ -252,7 +270,7 @@ async function scenario3_ExceptionInterception() {
   return order.id;
 }
 
-async function runAllTests() {
+function runAllTests() {
   console.log('\n' + '█'.repeat(60));
   console.log('█' + ' '.repeat(58) + '█');
   console.log('█         生鲜分拣称重差异 API - 业务场景测试             █');
@@ -260,9 +278,9 @@ async function runAllTests() {
   console.log('█'.repeat(60));
 
   try {
-    await scenario1_NormalOutbound();
-    await scenario2_WeightDifferenceRefund();
-    await scenario3_ExceptionInterception();
+    scenario1_NormalOutbound();
+    scenario2_WeightDifferenceRefund();
+    scenario3_ExceptionInterception();
     
     console.log('\n' + '='.repeat(60));
     console.log('  🎉 所有业务场景测试完成!');

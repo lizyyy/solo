@@ -14,6 +14,11 @@ export class OrderService {
       expectedWeight: number;
     }>;
   }): Order {
+    const existingOrder = this.db.getOrderByNo(data.orderNo);
+    if (existingOrder) {
+      return existingOrder;
+    }
+
     const orderItems: OrderItem[] = data.items.map(item => {
       const product = this.db.getProduct(item.productId);
       if (!product) {
