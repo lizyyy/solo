@@ -1,0 +1,205 @@
+{
+  "contents": [
+    {
+      "id": "demo-fail-001",
+      "title": "有问题的撤稿案例",
+      "type": "news",
+      "contentUrl": "https://example.com/news/problematic",
+      "version": 1,
+      "status": "partial",
+      "author": "测试用户",
+      "owner": "李经理",
+      "publishedAt": "2023-12-31T23:00:00+07:00",
+      "unpublishedAt": null,
+      "channels": [
+        {
+          "id": "b8f62efa-7dce-4259-8599-2a95cce65b0e",
+          "channelName": "官网频道",
+          "channelType": "official_website",
+          "url": "https://example.com/news/problematic",
+          "status": "unpublished",
+          "cacheStatus": "active",
+          "unpublishAttempts": 3,
+          "lastAttemptAt": null,
+          "verifiedAt": null,
+          "owner": "",
+          "errors": [
+            "缓存清理API超时"
+          ],
+          "notes": ""
+        },
+        {
+          "id": "0f0db134-f266-4d81-871c-798ca877fbfa",
+          "channelName": "合作媒体C",
+          "channelType": "cooperation",
+          "url": "https://partner-c.com/news/problem",
+          "status": "active",
+          "cacheStatus": "unknown",
+          "unpublishAttempts": 2,
+          "lastAttemptAt": null,
+          "verifiedAt": null,
+          "owner": "",
+          "errors": [
+            "合作方未响应撤稿请求"
+          ],
+          "notes": ""
+        }
+      ],
+      "referencePages": [
+        {
+          "id": "4ce0bd1f-fd48-4f35-a077-3f98c807041f",
+          "url": "https://example.com/archive",
+          "title": "新闻存档",
+          "status": "active",
+          "hasLink": true,
+          "verifiedAt": null,
+          "owner": "",
+          "notes": ""
+        }
+      ],
+      "metadata": {},
+      "createdAt": "2026-05-12T14:41:52+07:00",
+      "updatedAt": "2026-05-12T14:41:52+07:00"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "f10e4344-999a-4bfd-aa4a-f9fb632a58f0",
+      "contentId": "demo-fail-001",
+      "action": "update",
+      "operator": "运维-小王",
+      "timestamp": "2026-05-12T14:41:52+07:00",
+      "before": {
+        "id": "demo-fail-001",
+        "title": "有问题的撤稿案例",
+        "type": "news",
+        "contentUrl": "https://example.com/news/problematic",
+        "version": 1,
+        "status": "partial",
+        "author": "测试用户",
+        "owner": "",
+        "publishedAt": "2023-12-31T23:00:00+07:00",
+        "unpublishedAt": null,
+        "channels": [
+          {
+            "id": "b8f62efa-7dce-4259-8599-2a95cce65b0e",
+            "channelName": "官网频道",
+            "channelType": "official_website",
+            "url": "https://example.com/news/problematic",
+            "status": "unpublished",
+            "cacheStatus": "active",
+            "unpublishAttempts": 3,
+            "lastAttemptAt": null,
+            "verifiedAt": null,
+            "owner": "",
+            "errors": [
+              "缓存清理API超时"
+            ],
+            "notes": ""
+          },
+          {
+            "id": "0f0db134-f266-4d81-871c-798ca877fbfa",
+            "channelName": "合作媒体C",
+            "channelType": "cooperation",
+            "url": "https://partner-c.com/news/problem",
+            "status": "active",
+            "cacheStatus": "unknown",
+            "unpublishAttempts": 2,
+            "lastAttemptAt": null,
+            "verifiedAt": null,
+            "owner": "",
+            "errors": [
+              "合作方未响应撤稿请求"
+            ],
+            "notes": ""
+          }
+        ],
+        "referencePages": [
+          {
+            "id": "4ce0bd1f-fd48-4f35-a077-3f98c807041f",
+            "url": "https://example.com/archive",
+            "title": "新闻存档",
+            "status": "active",
+            "hasLink": true,
+            "verifiedAt": null,
+            "owner": "",
+            "notes": ""
+          }
+        ],
+        "metadata": {},
+        "createdAt": "2026-05-12T14:41:52+07:00",
+        "updatedAt": "2026-05-12T14:41:52+07:00"
+      },
+      "after": {
+        "id": "demo-fail-001",
+        "title": "有问题的撤稿案例",
+        "type": "news",
+        "contentUrl": "https://example.com/news/problematic",
+        "version": 1,
+        "status": "partial",
+        "author": "测试用户",
+        "owner": "李经理",
+        "publishedAt": "2023-12-31T23:00:00+07:00",
+        "unpublishedAt": null,
+        "channels": [
+          {
+            "id": "b8f62efa-7dce-4259-8599-2a95cce65b0e",
+            "channelName": "官网频道",
+            "channelType": "official_website",
+            "url": "https://example.com/news/problematic",
+            "status": "unpublished",
+            "cacheStatus": "active",
+            "unpublishAttempts": 3,
+            "lastAttemptAt": null,
+            "verifiedAt": null,
+            "owner": "",
+            "errors": [
+              "缓存清理API超时"
+            ],
+            "notes": ""
+          },
+          {
+            "id": "0f0db134-f266-4d81-871c-798ca877fbfa",
+            "channelName": "合作媒体C",
+            "channelType": "cooperation",
+            "url": "https://partner-c.com/news/problem",
+            "status": "active",
+            "cacheStatus": "unknown",
+            "unpublishAttempts": 2,
+            "lastAttemptAt": null,
+            "verifiedAt": null,
+            "owner": "",
+            "errors": [
+              "合作方未响应撤稿请求"
+            ],
+            "notes": ""
+          }
+        ],
+        "referencePages": [
+          {
+            "id": "4ce0bd1f-fd48-4f35-a077-3f98c807041f",
+            "url": "https://example.com/archive",
+            "title": "新闻存档",
+            "status": "active",
+            "hasLink": true,
+            "verifiedAt": null,
+            "owner": "",
+            "notes": ""
+          }
+        ],
+        "metadata": {},
+        "createdAt": "2026-05-12T14:41:52+07:00",
+        "updatedAt": "2026-05-12T14:41:52+07:00"
+      },
+      "reason": "紧急指定撤稿总负责人",
+      "diff": [
+        {
+          "field": "owner",
+          "before": "",
+          "after": "李经理"
+        }
+      ]
+    }
+  ],
+  "cacheConfigs": []
+}

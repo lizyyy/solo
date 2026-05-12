@@ -1,0 +1,49 @@
+{
+  "id": "sample-product-001",
+  "title": "新功能说明文档",
+  "type": "product",
+  "contentUrl": "https://example.com/products/new-features",
+  "version": 3,
+  "status": "active",
+  "author": "产品部-陈刚",
+  "owner": "产品经理-小张",
+  "publishedAt": "2024-01-10T10:00:00+08:00",
+  "channels": [
+    {
+      "channelName": "帮助中心",
+      "channelType": "official_website",
+      "url": "https://help.example.com/new-features",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "褚十二"
+    },
+    {
+      "channelName": "内部知识库",
+      "channelType": "intranet",
+      "url": "https://intranet.example.com/docs/new-features",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "卫十三"
+    }
+  ],
+  "referencePages": [
+    {
+      "url": "https://example.com/blog",
+      "title": "博客",
+      "status": "pending",
+      "hasLink": null,
+      "owner": "蒋十四"
+    },
+    {
+      "url": "https://example.com/changelog",
+      "title": "更新日志",
+      "status": "pending",
+      "hasLink": null,
+      "owner": "沈十五"
+    }
+  ],
+  "metadata": {
+    "productVersion": "3.0",
+    "department": "产品线A"
+  }
+}

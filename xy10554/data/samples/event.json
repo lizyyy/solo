@@ -1,0 +1,50 @@
+{
+  "id": "sample-event-001",
+  "title": "2024开发者大会活动页",
+  "type": "event",
+  "contentUrl": "https://example.com/events/dev-conference-2024",
+  "version": 1,
+  "status": "active",
+  "author": "市场部-王芳",
+  "owner": "李华",
+  "publishedAt": "2024-02-20T14:30:00+08:00",
+  "channels": [
+    {
+      "channelName": "活动专题页",
+      "channelType": "official_website",
+      "url": "https://example.com/events/dev-conference-2024",
+      "status": "active",
+      "cacheStatus": "active",
+      "owner": "周八"
+    },
+    {
+      "channelName": "APP推送",
+      "channelType": "app",
+      "url": "app://event/2024-conference",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "吴九"
+    },
+    {
+      "channelName": "合作平台B",
+      "channelType": "cooperation",
+      "url": "https://partner-b.com/events/dev-con",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "郑十"
+    }
+  ],
+  "referencePages": [
+    {
+      "url": "https://example.com/home",
+      "title": "首页Banner",
+      "status": "pending",
+      "hasLink": null,
+      "owner": "冯十一"
+    }
+  ],
+  "metadata": {
+    "eventDate": "2024-04-15",
+    "attendees": 500
+  }
+}

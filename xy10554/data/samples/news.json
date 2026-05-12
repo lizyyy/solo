@@ -1,0 +1,57 @@
+{
+  "id": "sample-news-001",
+  "title": "2024年新品发布会新闻稿",
+  "type": "news",
+  "contentUrl": "https://example.com/news/2024-launch",
+  "version": 1,
+  "status": "active",
+  "author": "品牌部-李明",
+  "owner": "张明",
+  "publishedAt": "2024-03-15T09:00:00+08:00",
+  "channels": [
+    {
+      "channelName": "官网首页",
+      "channelType": "official_website",
+      "url": "https://example.com/news/2024-launch",
+      "status": "active",
+      "cacheStatus": "active",
+      "owner": "张三"
+    },
+    {
+      "channelName": "官方公众号",
+      "channelType": "wechat",
+      "url": "https://mp.weixin.qq.com/s/sample-launch",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "李四"
+    },
+    {
+      "channelName": "合作媒体A",
+      "channelType": "cooperation",
+      "url": "https://partner-a.com/news/2024-launch",
+      "status": "active",
+      "cacheStatus": "unknown",
+      "owner": "王五"
+    }
+  ],
+  "referencePages": [
+    {
+      "url": "https://example.com/about",
+      "title": "关于我们",
+      "status": "pending",
+      "hasLink": null,
+      "owner": "赵六"
+    },
+    {
+      "url": "https://example.com/press",
+      "title": "新闻中心",
+      "status": "pending",
+      "hasLink": null,
+      "owner": "孙七"
+    }
+  ],
+  "metadata": {
+    "source": "品牌发布会",
+    "priority": "high"
+  }
+}

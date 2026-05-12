@@ -1,0 +1,29 @@
+{
+  "name": "content-unpublish-cli",
+  "version": "1.0.0",
+  "description": "内容发布撤稿CLI工具 - 追踪多渠道撤稿状态、缓存清理、引用页面和责任人",
+  "main": "src/cli.js",
+  "bin": {
+    "content-unpublish": "./src/cli.js"
+  },
+  "scripts": {
+    "cli": "node src/cli.js",
+    "demo": "node scripts/demo.js",
+    "demo-failure": "node scripts/demo-failure.js"
+  },
+  "keywords": [
+    "cli",
+    "content-management",
+    "unpublish",
+    "multi-channel"
+  ],
+  "author": "品牌部门",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
+  }
+}
