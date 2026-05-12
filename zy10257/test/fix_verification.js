@@ -127,25 +127,107 @@ async function testBatchReentry() {
   return delta === 100;
 }
 
+async function testBatchImportIdempotency() {
+  console.log('\n\n=== 测试3: 真实批次导入幂等性 (相同 batchId 重复导入) ===\n');
+  
+  const initialPoints = db.getPoints('member_001').balance;
+  console.log(`初始积分: ${initialPoints}`);
+  
+  const batchId = 'import-batch-2026-001';
+  const orderId = 'ORDER-001';
+  
+  const createEvent1 = {
+    id: 'event-unique-id-001',
+    eventType: 'points:earn',
+    storeId: 'store_a',
+    memberId: 'member_001',
+    entityType: 'points',
+    entityId: 'member_001',
+    timestamp: new Date(),
+    payload: { amount: 33, orderId }
+  };
+  
+  console.log(`\n第1次导入批次 (batchId: ${batchId}, event.id: ${createEvent1.id})`);
+  const batch1 = db.createOfflineBatch({
+    id: batchId,
+    storeId: 'store_a',
+    events: [createEvent1]
+  });
+  console.log(`  批次已存在: ${batch1._existing ? '是' : '否'}`);
+  console.log(`  批次已处理: ${batch1._processed ? '是' : '否'}`);
+  
+  const result1 = await syncEngine.processOfflineBatch(batch1.id);
+  console.log(`  处理结果: success=${result1.success}, status=${result1.status}`);
+  console.log(`  successCount: ${result1.successCount}`);
+  console.log(`  当前积分: ${db.getPoints('member_001').balance}`);
+  
+  const createEvent2 = {
+    id: 'event-unique-id-002',
+    eventType: 'points:earn',
+    storeId: 'store_a',
+    memberId: 'member_001',
+    entityType: 'points',
+    entityId: 'member_001',
+    timestamp: new Date(),
+    payload: { amount: 33, orderId }
+  };
+  
+  console.log(`\n第2次导入批次 (相同 batchId, 不同 event.id: ${createEvent2.id})`);
+  const batch2 = db.createOfflineBatch({
+    id: batchId,
+    storeId: 'store_a',
+    events: [createEvent2]
+  });
+  console.log(`  批次已存在: ${batch2._existing ? '是' : '否'}`);
+  console.log(`  批次已处理: ${batch2._processed ? '是' : '否'}`);
+  
+  if (batch2._processed) {
+    console.log(`  ✅ 检测到已完成批次，直接返回缓存结果`);
+  } else {
+    console.log(`  ❌ 未检测到批次已处理，可能存在问题`);
+    await syncEngine.processOfflineBatch(batch2.id);
+  }
+  
+  console.log(`  当前积分: ${db.getPoints('member_001').balance}`);
+  
+  const finalPoints = db.getPoints('member_001').balance;
+  const delta = finalPoints - initialPoints;
+  
+  console.log(`\n积分变化: ${initialPoints} → ${finalPoints} = +${delta}`);
+  console.log(`预期: +33, 实际: +${delta}`);
+  
+  if (delta === 33) {
+    console.log('✅ 真实批次导入幂等性生效！相同 batchId 重复导入，积分只增加一次');
+    console.log('   ✅ 即使 event.id 不同，同一业务批次也不会重复计算');
+  } else {
+    console.log('❌ 真实批次导入幂等性失败');
+  }
+  
+  return delta === 33;
+}
+
 async function runTests() {
   console.log('╔═══════════════════════════════════════════════════════╗');
-  console.log('║        跨店会员权益同步 - 第二轮修复验证             ║');
+  console.log('║        跨店会员权益同步 - 第三轮修复验证             ║');
   console.log('╚═══════════════════════════════════════════════════════╝\n');
   
   const test1Pass = await testImplicitIdempotency();
   const test2Pass = await testBatchReentry();
+  const test3Pass = await testBatchImportIdempotency();
   
   console.log('\n\n' + '='.repeat(60));
   console.log('测试结果汇总:');
-  console.log(`  测试1 (隐含幂等性): ${test1Pass ? '✅ 通过' : '❌ 失败'}`);
-  console.log(`  测试2 (批次重入保护): ${test2Pass ? '✅ 通过' : '❌ 失败'}`);
+  console.log(`  测试1 (event.id 隐含幂等性): ${test1Pass ? '✅ 通过' : '❌ 失败'}`);
+  console.log(`  测试2 (processOfflineBatch 重入保护): ${test2Pass ? '✅ 通过' : '❌ 失败'}`);
+  console.log(`  测试3 (真实批次导入幂等性): ${test3Pass ? '✅ 通过' : '❌ 失败'}`);
   console.log('='.repeat(60));
   
-  if (test1Pass && test2Pass) {
-    console.log('\n🎉 所有修复验证通过！');
+  if (test1Pass && test2Pass && test3Pass) {
+    console.log('\n🎉 所有第三轮修复验证通过！');
     console.log('   ✅ 相同 event.id 重复调用，积分只增加一次');
     console.log('   ✅ completed/partial 状态批次不会重复处理');
-    console.log('   ✅ 重复导入同批次不会把同一件事算两遍');
+    console.log('   ✅ 相同 batchId 重复导入（即使 event.id 不同），积分只增加一次');
+    console.log('   ✅ 重复导入不能把同一件事算两遍 - 原始目标达成！');
   } else {
     console.log('\n⚠️  部分修复需要调整');
   }

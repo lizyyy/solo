@@ -24,6 +24,22 @@ router.post('/batch', async (req, res) => {
     events
   });
 
+  if (batch._processed) {
+    return res.json({
+      success: true,
+      cached: true,
+      cachedBy: 'batchId',
+      batchId: batch.id,
+      status: batch.status,
+      totalCount: batch.totalCount,
+      successCount: batch.successCount,
+      failedCount: batch.failedCount,
+      failedEvents: batch.failedEvents,
+      results: [],
+      message: '批次已处理（幂等保护），请勿重复导入'
+    });
+  }
+
   const result = await syncEngine.processOfflineBatch(batch.id);
   res.json(result);
 });

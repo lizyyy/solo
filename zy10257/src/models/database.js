@@ -239,8 +239,26 @@ class Database {
   }
 
   createOfflineBatch(data) {
+    const batchId = data.id || uuidv4();
+    const existingBatch = this.offlineBatches.get(batchId);
+    
+    if (existingBatch) {
+      if (existingBatch.status === 'completed' || existingBatch.status === 'partial') {
+        return {
+          ...existingBatch,
+          _existing: true,
+          _processed: true
+        };
+      }
+      return {
+        ...existingBatch,
+        _existing: true,
+        _processed: false
+      };
+    }
+    
     const batch = {
-      id: data.id || uuidv4(),
+      id: batchId,
       storeId: data.storeId,
       events: data.events || [],
       status: 'pending',
@@ -252,7 +270,11 @@ class Database {
       syncedAt: null
     };
     this.offlineBatches.set(batch.id, batch);
-    return batch;
+    return {
+      ...batch,
+      _existing: false,
+      _processed: false
+    };
   }
 
   updateOfflineBatch(id, updates) {
