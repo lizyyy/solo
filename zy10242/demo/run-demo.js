@@ -22,7 +22,8 @@ async function uploadFile(endpoint, filePath, formData = {}) {
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'POST',
-    body: form
+    body: form,
+    headers: form.getHeaders()
   });
   return response.json();
 }

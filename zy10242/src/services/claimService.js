@@ -2,31 +2,59 @@ const db = require('../models/database');
 const { v4: uuidv4 } = require('uuid');
 
 class ClaimService {
+  async getClaimByIdempotencyKey(idempotencyKey) {
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM claims WHERE idempotency_key = ?', [idempotencyKey], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+  }
+
   async createClaim(data) {
     return new Promise((resolve, reject) => {
-      const now = new Date().toISOString();
-      const claimId = `CLM${Date.now()}`;
-      
-      db.run(`
-        INSERT INTO claims (claim_id, policy_number, customer_name, customer_id, accident_type, accident_date, deadline, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        claimId,
-        data.policy_number,
-        data.customer_name,
-        data.customer_id,
-        data.accident_type,
-        data.accident_date,
-        data.deadline || null,
-        now,
-        now
-      ], async (err) => {
-        if (err) return reject(err);
-        
-        await this.addAuditLog(claimId, null, '创建案件', 'create', data.operator || 'system', '案件创建成功');
-        
-        const claim = await this.getClaimById(claimId);
-        resolve(claim);
+      db.serialize(async () => {
+        try {
+          if (data.idempotency_key) {
+            const existingClaim = await this.getClaimByIdempotencyKey(data.idempotency_key);
+            if (existingClaim) {
+              await this.addAuditLog(
+                existingClaim.claim_id, null, '重复请求识别', 'idempotent', 
+                data.operator || 'system', '幂等键匹配，返回已有案件'
+              );
+              resolve(existingClaim);
+              return;
+            }
+          }
+
+          const now = new Date().toISOString();
+          const claimId = `CLM${Date.now()}`;
+          
+          db.run(`
+            INSERT INTO claims (claim_id, policy_number, customer_name, customer_id, accident_type, accident_date, deadline, idempotency_key, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `, [
+            claimId,
+            data.policy_number,
+            data.customer_name,
+            data.customer_id,
+            data.accident_type,
+            data.accident_date,
+            data.deadline || null,
+            data.idempotency_key || null,
+            now,
+            now
+          ], async (err) => {
+            if (err) return reject(err);
+            
+            await this.addAuditLog(claimId, null, '创建案件', 'create', data.operator || 'system', '案件创建成功');
+            
+            const claim = await this.getClaimById(claimId);
+            resolve(claim);
+          });
+        } catch (error) {
+          reject(error);
+        }
       });
     });
   }

@@ -22,6 +22,7 @@ db.serialize(() => {
       accident_date TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
       deadline TEXT,
+      idempotency_key TEXT UNIQUE,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     )
