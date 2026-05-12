@@ -25,14 +25,28 @@ class SyncEngine {
   async processEvent(eventData, options = {}) {
     const { idempotencyKey, forceApply = false, expectedVersion = null } = options;
 
+    const implicitIdempotencyKey = `event:${eventData.id}`;
+    
+    const cachedByEventId = this.checkIdempotency(implicitIdempotencyKey);
+    if (cachedByEventId) {
+      return {
+        success: true,
+        cached: true,
+        cachedBy: 'eventId',
+        result: cachedByEventId.result,
+        message: '事件已处理过（event.id 幂等），返回缓存结果'
+      };
+    }
+
     if (idempotencyKey) {
       const cached = this.checkIdempotency(idempotencyKey);
       if (cached) {
         return {
           success: true,
           cached: true,
+          cachedBy: 'idempotencyKey',
           result: cached.result,
-          message: '重复请求，返回缓存结果'
+          message: '重复请求（idempotencyKey 幂等），返回缓存结果'
         };
       }
     }
@@ -71,6 +85,8 @@ class SyncEngine {
           status: 'applied',
           conflictInfo: conflictCheck.hasConflict ? conflictCheck : null
         });
+        
+        db.markIdempotent(implicitIdempotencyKey, { event, ...result });
         
         if (idempotencyKey) {
           db.markIdempotent(idempotencyKey, { event, ...result });
@@ -167,7 +183,10 @@ class SyncEngine {
       }
     }
 
-    if (Math.abs(existing.timestamp - newEvent.timestamp) < 5000 && 
+    const raceConditionTypes = ['coupon:redeem', 'storedvalue:deduct', 'points:redeem'];
+    if (raceConditionTypes.includes(existing.eventType) && 
+        raceConditionTypes.includes(newEvent.eventType) &&
+        Math.abs(existing.timestamp - newEvent.timestamp) < 5000 && 
         existing.storeId !== newEvent.storeId) {
       return 'RACE_CONDITION';
     }
@@ -312,14 +331,22 @@ class SyncEngine {
   }
 
   async handlePointsEarn(eventData) {
-    const { memberId, payload } = eventData;
-    db.updatePoints(memberId, payload.amount);
-    
-    return {
-      success: true,
-      points: db.getPoints(memberId),
-      message: '积分增加成功'
-    };
+    try {
+      const { memberId, payload } = eventData;
+      db.updatePoints(memberId, payload.amount);
+      
+      return {
+        success: true,
+        points: db.getPoints(memberId),
+        message: '积分增加成功'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'HANDLE_ERROR',
+        message: error.message
+      };
+    }
   }
 
   async handlePointsRedeem(eventData, expectedVersion = null) {
@@ -362,6 +389,38 @@ class SyncEngine {
     const batch = db.getOfflineBatch(batchId);
     if (!batch) {
       return { success: false, error: 'BATCH_NOT_FOUND', message: '批次不存在' };
+    }
+
+    if (batch.status === 'completed') {
+      return {
+        success: true,
+        cached: true,
+        cachedBy: 'batchStatus',
+        batchId,
+        status: batch.status,
+        totalCount: batch.totalCount,
+        successCount: batch.successCount,
+        failedCount: batch.failedCount,
+        failedEvents: batch.failedEvents,
+        results: [],
+        message: '批次已完成（幂等保护），无需重复处理'
+      };
+    }
+
+    if (batch.status === 'partial') {
+      return {
+        success: true,
+        cached: true,
+        cachedBy: 'batchStatus',
+        batchId,
+        status: batch.status,
+        totalCount: batch.totalCount,
+        successCount: batch.successCount,
+        failedCount: batch.failedCount,
+        failedEvents: batch.failedEvents,
+        results: [],
+        message: '批次已部分完成（幂等保护），如需重试请先重置批次状态'
+      };
     }
 
     const sortedEvents = [...batch.events].sort((a, b) => {

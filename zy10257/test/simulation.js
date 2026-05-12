@@ -283,6 +283,121 @@ async function scenario5_outOfOrderEvents() {
   console.log(`   ✅ 乱序不影响最终结果的正确性`);
 }
 
+async function scenario6_implicitIdempotencyByEventId() {
+  printHeader('场景6: 隐含幂等性（event.id 作为幂等键）- 修复验证');
+  
+  const initialPoints = db.getPoints('member_001').balance;
+  console.log(`\n初始积分: ${initialPoints}分`);
+  
+  const eventId = uuidv4();
+  const eventData = {
+    id: eventId,
+    eventType: 'points:earn',
+    storeId: 'store_a',
+    memberId: 'member_001',
+    entityType: 'points',
+    entityId: 'member_001',
+    timestamp: new Date(),
+    payload: { amount: 77, orderId: 'TEST-IDEMP-001' }
+  };
+  
+  console.log(`\n--- 第1次调用 processEvent (event.id = ${eventId.substring(0, 8)}...) ---`);
+  const result1 = await syncEngine.processEvent(eventData);
+  console.log(`   结果: ${result1.success ? '✅ 成功' : '❌ 失败'}`);
+  console.log(`   是否缓存: ${result1.cached ? '是' : '否'}`);
+  console.log(`   当前积分: ${db.getPoints('member_001').balance}分`);
+  
+  console.log(`\n--- 第2次调用 processEvent (相同 event.id，无 idempotencyKey) ---`);
+  const result2 = await syncEngine.processEvent(eventData);
+  console.log(`   结果: ${result2.success ? '✅ 成功' : '❌ 失败'}`);
+  console.log(`   是否缓存: ${result2.cached ? '是' : '否'}`);
+  console.log(`   缓存方式: ${result2.cachedBy || 'N/A'}`);
+  console.log(`   当前积分: ${db.getPoints('member_001').balance}分`);
+  
+  const finalPoints = db.getPoints('member_001').balance;
+  
+  console.log(`\n📊 最终结果:`);
+  console.log(`   积分变化: ${initialPoints} → ${finalPoints}`);
+  console.log(`   增加: ${finalPoints - initialPoints}分 (预期: 77分)`);
+  
+  if (finalPoints - initialPoints === 77) {
+    console.log(`   ✅ 隐含幂等性生效！相同 event.id 调用两次，积分只增加一次`);
+    console.log(`   ✅ 无论是否显式传入 idempotencyKey，同一件事不会算两遍`);
+  } else {
+    console.log(`   ❌ 幂等性失败！积分增加了 ${finalPoints - initialPoints} 次`);
+  }
+}
+
+async function scenario7_batchReentryProtection() {
+  printHeader('场景7: 批次重入保护 - 修复验证');
+  
+  const initialPoints = db.getPoints('member_001').balance;
+  console.log(`\n初始积分: ${initialPoints}分`);
+  
+  const batchId = uuidv4();
+  const eventId = uuidv4();
+  console.log(`   事件ID: ${eventId.substring(0, 8)}... (确保唯一)`);
+  
+  const batchEvents = [
+    {
+      id: eventId,
+      eventType: 'points:earn',
+      storeId: 'store_b',
+      memberId: 'member_001',
+      entityType: 'points',
+      entityId: 'member_001',
+      timestamp: new Date(),
+      sequence: 1,
+      payload: { amount: 100, orderId: 'BATCH-TEST-001' }
+    }
+  ];
+  
+  console.log(`\n--- 创建批次: ${batchId.substring(0, 8)}... ---`);
+  db.createOfflineBatch({ id: batchId, storeId: 'store_b', events: batchEvents, totalCount: 1 });
+  const batchBefore = db.getOfflineBatch(batchId);
+  console.log(`   批次初始状态: ${batchBefore.status}`);
+  console.log(`   successCount: ${batchBefore.successCount}`);
+  
+  console.log(`\n--- 第1次调用 processOfflineBatch ---`);
+  const result1 = await syncEngine.processOfflineBatch(batchId);
+  console.log(`   结果: ${result1.success ? '✅ 成功' : '❌ 失败'}`);
+  console.log(`   批次状态: ${result1.status}`);
+  console.log(`   successCount: ${result1.successCount}`);
+  console.log(`   是否缓存: ${result1.cached ? '是' : '否'}`);
+  console.log(`   当前积分: ${db.getPoints('member_001').balance}分`);
+  
+  const batchAfter1 = db.getOfflineBatch(batchId);
+  console.log(`   数据库中批次状态: ${batchAfter1.status}`);
+  
+  console.log(`\n--- 第2次调用 processOfflineBatch (同批次，重复提交) ---`);
+  const result2 = await syncEngine.processOfflineBatch(batchId);
+  console.log(`   结果: ${result2.success ? '✅ 成功' : '❌ 失败'}`);
+  console.log(`   批次状态: ${result2.status}`);
+  console.log(`   是否缓存: ${result2.cached ? '是' : '否'}`);
+  console.log(`   缓存方式: ${result2.cachedBy || 'N/A'}`);
+  console.log(`   当前积分: ${db.getPoints('member_001').balance}分`);
+  
+  console.log(`\n--- 第3次调用 processOfflineBatch (再次重复) ---`);
+  const result3 = await syncEngine.processOfflineBatch(batchId);
+  console.log(`   结果: ${result3.success ? '✅ 成功' : '❌ 失败'}`);
+  console.log(`   是否缓存: ${result3.cached ? '是' : '否'}`);
+  console.log(`   当前积分: ${db.getPoints('member_001').balance}分`);
+  
+  const finalPoints = db.getPoints('member_001').balance;
+  
+  console.log(`\n📊 最终结果:`);
+  console.log(`   积分变化: ${initialPoints} → ${finalPoints}`);
+  console.log(`   增加: ${finalPoints - initialPoints}分 (预期: 100分)`);
+  
+  if (finalPoints - initialPoints === 100) {
+    console.log(`   ✅ 批次重入保护生效！调用3次，积分只增加1次`);
+    console.log(`   ✅ completed/partial 状态的批次不会重复处理`);
+    console.log(`   ✅ 重复导入同批次不会把同一件事算两遍`);
+  } else {
+    console.log(`   ❌ 批次重入保护失败！积分增加了 ${(finalPoints - initialPoints) / 100} 次`);
+  }
+}
+
 async function showFinalSummary() {
   printHeader('系统状态汇总');
   
@@ -323,6 +438,7 @@ async function runAllScenarios() {
   console.clear();
   console.log('╔══════════════════════════════════════════════════════════════╗');
   console.log('║           跨店会员权益同步系统 - 并发冲突场景演示           ║');
+  console.log('║                    (第二轮修复验证)                           ║');
   console.log('╚══════════════════════════════════════════════════════════════╝');
   console.log('\n初始化数据:');
   console.log('  🏪 A店 (store_a) - 北京市朝阳区');
@@ -336,6 +452,8 @@ async function runAllScenarios() {
   await scenario3_insufficientBalance();
   await scenario4_offlineBatchPartialFailure();
   await scenario5_outOfOrderEvents();
+  await scenario6_implicitIdempotencyByEventId();
+  await scenario7_batchReentryProtection();
   await showFinalSummary();
 }
 
