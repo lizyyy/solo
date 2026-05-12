@@ -129,7 +129,7 @@ async function runDemo() {
     log('5. 创建班次 - 夜班');
     const nightShift = await request('POST', '/shifts', {
       type: 'night',
-      date: '2024-01-15',
+      date: '2024-01-17',
       nurse_name: '李护士（夜班）'
     });
     log('夜班创建成功', nightShift.data.data);
@@ -137,7 +137,7 @@ async function runDemo() {
     log('6. 创建班次 - 白班');
     const morningShift = await request('POST', '/shifts', {
       type: 'morning',
-      date: '2024-01-15',
+      date: '2024-01-17',
       nurse_name: '王护士（白班）'
     });
     log('白班创建成功', morningShift.data.data);

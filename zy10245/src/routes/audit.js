@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../database');
+const { getDb } = require('../database');
 
 router.get('/operation-logs', (req, res) => {
   const { entity_type, status, limit = 50 } = req.query;
   let query = 'SELECT * FROM operation_logs WHERE 1=1';
   const params = [];
+  const db = getDb();
 
   if (entity_type) {
     query += ' AND entity_type = ?';
@@ -30,6 +31,7 @@ router.get('/blocked-operations', (req, res) => {
     WHERE status = 'blocked'
   `;
   const params = [];
+  const db = getDb();
 
   if (entity_type) {
     query += ' AND entity_type = ?';
@@ -53,6 +55,7 @@ router.get('/blocked-operations', (req, res) => {
 });
 
 router.get('/pending-items-summary', (req, res) => {
+  const db = getDb();
   const pendingItems = db.prepare(`
     SELECT ci.*, e.name as elder_name, e.risk_level, e.room_number
     FROM care_items ci
@@ -99,6 +102,7 @@ router.get('/handover-history', (req, res) => {
     WHERE sh.status = 'acknowledged'
   `;
   const params = [];
+  const db = getDb();
 
   if (start_date) {
     query += ' AND s1.date >= ?';
@@ -135,6 +139,7 @@ router.get('/risk-alerts-summary', (req, res) => {
     WHERE 1=1
   `;
   const params = [];
+  const db = getDb();
 
   if (shift_id) {
     query += ' AND ra.shift_id = ?';

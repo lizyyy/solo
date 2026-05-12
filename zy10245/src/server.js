@@ -1,6 +1,4 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
 
 const { initDatabase } = require('./database');
 const { generateRequestId, idempotencyCheck, errorHandler } = require('./middleware');
@@ -12,11 +10,6 @@ const auditRouter = require('./routes/audit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
 
 app.use(express.json());
 app.use(generateRequestId);

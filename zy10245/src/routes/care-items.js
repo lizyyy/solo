@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../database');
+const { getDb } = require('../database');
 const { v4: uuidv4 } = require('uuid');
 const { logOperation } = require('../middleware');
 
@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
   const { elder_id, status, type } = req.query;
   let query = 'SELECT * FROM care_items WHERE 1=1';
   const params = [];
+  const db = getDb();
 
   if (elder_id) {
     query += ' AND elder_id = ?';
@@ -28,6 +29,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+  const db = getDb();
   const item = db.prepare('SELECT * FROM care_items WHERE id = ?').get(req.params.id);
   if (!item) {
     return res.status(404).json({ success: false, error: '护理事项不存在' });
@@ -38,6 +40,7 @@ router.get('/:id', (req, res) => {
 router.post('/', logOperation('create', 'care_item'), (req, res) => {
   const { elder_id, type, title, description, scheduled_time, frequency, requires_acknowledgment, created_by } = req.body;
   const id = uuidv4();
+  const db = getDb();
 
   const elder = db.prepare('SELECT * FROM elders WHERE id = ?').get(elder_id);
   if (!elder) {
@@ -55,6 +58,7 @@ router.post('/', logOperation('create', 'care_item'), (req, res) => {
 
 router.post('/:id/complete', logOperation('complete', 'care_item'), (req, res) => {
   const { performed_by, notes, shift_id } = req.body;
+  const db = getDb();
   const item = db.prepare('SELECT * FROM care_items WHERE id = ?').get(req.params.id);
 
   if (!item) {
@@ -93,6 +97,7 @@ router.post('/:id/complete', logOperation('complete', 'care_item'), (req, res) =
 
 router.post('/:id/close-without-ack', logOperation('close_without_ack', 'care_item'), (req, res) => {
   const { performed_by, reason, shift_id } = req.body;
+  const db = getDb();
   const item = db.prepare('SELECT * FROM care_items WHERE id = ?').get(req.params.id);
 
   if (!item) {
@@ -124,6 +129,7 @@ router.post('/:id/close-without-ack', logOperation('close_without_ack', 'care_it
 
 router.post('/:id/cancel', logOperation('cancel', 'care_item'), (req, res) => {
   const { performed_by, reason, shift_id } = req.body;
+  const db = getDb();
   const item = db.prepare('SELECT * FROM care_items WHERE id = ?').get(req.params.id);
 
   if (!item) {
@@ -146,6 +152,7 @@ router.post('/:id/cancel', logOperation('cancel', 'care_item'), (req, res) => {
 });
 
 router.get('/:id/logs', (req, res) => {
+  const db = getDb();
   const logs = db.prepare(`
     SELECT * FROM care_item_logs 
     WHERE care_item_id = ? 

@@ -1,4 +1,4 @@
-const { db } = require('./database');
+const { getDb } = require('./database');
 const { v4: uuidv4 } = require('uuid');
 
 function generateRequestId(req, res, next) {
@@ -13,6 +13,7 @@ function idempotencyCheck(req, res, next) {
     return next();
   }
 
+  const db = getDb();
   const existingOp = db.prepare(`
     SELECT * FROM operation_logs 
     WHERE request_id = ? AND status = 'success'
@@ -38,6 +39,7 @@ function logOperation(operationType, entityType) {
       const status = res.statusCode < 400 ? 'success' : 
                      res.statusCode === 409 || res.statusCode === 403 ? 'blocked' : 'failed';
       
+      const db = getDb();
       db.prepare(`
         INSERT INTO operation_logs 
         (id, operation_type, entity_type, entity_id, request_id, performed_by, details, status, block_reason)

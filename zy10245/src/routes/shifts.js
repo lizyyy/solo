@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../database');
+const { getDb } = require('../database');
 const { v4: uuidv4 } = require('uuid');
 const { logOperation } = require('../middleware');
 
@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
   const { date, status, type } = req.query;
   let query = 'SELECT * FROM shifts WHERE 1=1';
   const params = [];
+  const db = getDb();
 
   if (date) {
     query += ' AND date = ?';
@@ -28,6 +29,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+  const db = getDb();
   const shift = db.prepare('SELECT * FROM shifts WHERE id = ?').get(req.params.id);
   if (!shift) {
     return res.status(404).json({ success: false, error: '班次不存在' });
@@ -38,6 +40,7 @@ router.get('/:id', (req, res) => {
 router.post('/', logOperation('create', 'shift'), (req, res) => {
   const { type, date, nurse_name } = req.body;
   const id = uuidv4();
+  const db = getDb();
 
   const existing = db.prepare('SELECT * FROM shifts WHERE type = ? AND date = ?').get(type, date);
   if (existing) {
@@ -59,6 +62,7 @@ router.post('/', logOperation('create', 'shift'), (req, res) => {
 });
 
 router.post('/:id/start', logOperation('start', 'shift'), (req, res) => {
+  const db = getDb();
   const shift = db.prepare('SELECT * FROM shifts WHERE id = ?').get(req.params.id);
   if (!shift) {
     return res.status(404).json({ success: false, error: '班次不存在' });
@@ -95,6 +99,7 @@ router.post('/:id/start', logOperation('start', 'shift'), (req, res) => {
 
 router.post('/:id/handover/submit', logOperation('handover_submit', 'shift'), (req, res) => {
   const { notes, next_shift_id, submitted_by } = req.body;
+  const db = getDb();
   const shift = db.prepare('SELECT * FROM shifts WHERE id = ?').get(req.params.id);
 
   if (!shift) {
@@ -160,6 +165,7 @@ router.post('/:id/handover/submit', logOperation('handover_submit', 'shift'), (r
 
 router.post('/:id/handover/acknowledge', logOperation('handover_acknowledge', 'shift'), (req, res) => {
   const { acknowledged_by, handover_id } = req.body;
+  const db = getDb();
 
   const handover = db.prepare('SELECT * FROM shift_handover WHERE id = ?').get(handover_id);
   if (!handover) {
@@ -173,8 +179,6 @@ router.post('/:id/handover/acknowledge', logOperation('handover_acknowledge', 's
       error: `交接状态为${handover.status}，无法确认`
     });
   }
-
-  const shift = db.prepare('SELECT * FROM shifts WHERE id = ?').get(handover.shift_id);
 
   db.prepare(`
     UPDATE shift_handover 
@@ -202,6 +206,7 @@ router.post('/:id/handover/acknowledge', logOperation('handover_acknowledge', 's
 
 router.post('/:id/handover/revoke', logOperation('handover_revoke', 'shift'), (req, res) => {
   const { revoked_by } = req.body;
+  const db = getDb();
 
   const shift = db.prepare('SELECT * FROM shifts WHERE id = ?').get(req.params.id);
   if (!shift) {
@@ -241,6 +246,7 @@ router.post('/:id/handover/revoke', logOperation('handover_revoke', 'shift'), (r
 });
 
 router.get('/:id/handover', (req, res) => {
+  const db = getDb();
   const handover = db.prepare(`
     SELECT sh.*, s1.nurse_name as outgoing_nurse, s2.nurse_name as incoming_nurse
     FROM shift_handover sh
@@ -260,6 +266,7 @@ router.get('/:id/handover', (req, res) => {
 
 router.get('/:id/risk-alerts', (req, res) => {
   const { acknowledged } = req.query;
+  const db = getDb();
   let query = 'SELECT * FROM risk_alerts WHERE shift_id = ?';
   const params = [req.params.id];
 
@@ -274,6 +281,7 @@ router.get('/:id/risk-alerts', (req, res) => {
 
 router.post('/risk-alerts/:id/acknowledge', logOperation('acknowledge_alert', 'risk_alert'), (req, res) => {
   const { acknowledged_by } = req.body;
+  const db = getDb();
 
   db.prepare(`
     UPDATE risk_alerts 

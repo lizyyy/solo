@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { db } = require('../database');
+const { getDb } = require('../database');
 const { v4: uuidv4 } = require('uuid');
 const { logOperation } = require('../middleware');
 
@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
   const { status, risk_level } = req.query;
   let query = 'SELECT * FROM elders WHERE 1=1';
   const params = [];
+  const db = getDb();
 
   if (status) {
     query += ' AND status = ?';
@@ -23,6 +24,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+  const db = getDb();
   const elder = db.prepare('SELECT * FROM elders WHERE id = ?').get(req.params.id);
   if (!elder) {
     return res.status(404).json({ success: false, error: '老人不存在' });
@@ -33,6 +35,7 @@ router.get('/:id', (req, res) => {
 router.post('/', logOperation('create', 'elder'), (req, res) => {
   const { name, room_number, bed_number, risk_level, medical_conditions, allergies } = req.body;
   const id = uuidv4();
+  const db = getDb();
 
   db.prepare(`
     INSERT INTO elders (id, name, room_number, bed_number, risk_level, medical_conditions, allergies)
@@ -51,6 +54,7 @@ router.post('/', logOperation('create', 'elder'), (req, res) => {
 });
 
 router.put('/:id', logOperation('update', 'elder'), (req, res) => {
+  const db = getDb();
   const elder = db.prepare('SELECT * FROM elders WHERE id = ?').get(req.params.id);
   if (!elder) {
     return res.status(404).json({ success: false, error: '老人不存在' });
@@ -82,6 +86,7 @@ router.put('/:id', logOperation('update', 'elder'), (req, res) => {
 });
 
 router.post('/:id/archive', logOperation('archive', 'elder'), (req, res) => {
+  const db = getDb();
   const elder = db.prepare('SELECT * FROM elders WHERE id = ?').get(req.params.id);
   if (!elder) {
     return res.status(404).json({ success: false, error: '老人不存在' });
@@ -108,6 +113,7 @@ router.post('/:id/archive', logOperation('archive', 'elder'), (req, res) => {
 });
 
 router.get('/:id/family-notes', (req, res) => {
+  const db = getDb();
   const notes = db.prepare(`
     SELECT * FROM family_notes 
     WHERE elder_id = ? 
@@ -120,6 +126,7 @@ router.get('/:id/family-notes', (req, res) => {
 router.post('/:id/family-notes', logOperation('create', 'family_note'), (req, res) => {
   const { author, content, is_important } = req.body;
   const id = uuidv4();
+  const db = getDb();
 
   db.prepare(`
     INSERT INTO family_notes (id, elder_id, author, content, is_important)

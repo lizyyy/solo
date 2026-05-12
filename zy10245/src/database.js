@@ -1,13 +1,26 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
+let db = null;
 const dbPath = path.join(__dirname, '..', 'data', 'nursing-home.db');
-const db = new Database(dbPath);
 
-db.pragma('foreign_keys = ON');
-db.pragma('journal_mode = WAL');
+function ensureDataDir() {
+  const dataDir = path.join(__dirname, '..', 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+}
 
 function initDatabase() {
+  ensureDataDir();
+  
+  if (!db) {
+    db = new Database(dbPath);
+    db.pragma('foreign_keys = ON');
+    db.pragma('journal_mode = WAL');
+  }
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS elders (
       id TEXT PRIMARY KEY,
@@ -117,4 +130,11 @@ function initDatabase() {
   `);
 }
 
-module.exports = { db, initDatabase };
+function getDb() {
+  if (!db) {
+    throw new Error('Database not initialized. Call initDatabase() first.');
+  }
+  return db;
+}
+
+module.exports = { getDb, initDatabase };
