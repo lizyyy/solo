@@ -1,0 +1,19 @@
+{
+  "name": "gas-inspection-platform",
+  "version": "1.0.0",
+  "description": "商户燃气安检整改台",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "start:backend": "npm run start --workspace=backend",
+    "seed": "npm run seed --workspace=backend",
+    "test": "npm run test --workspace=backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
