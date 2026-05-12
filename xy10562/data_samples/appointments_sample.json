@@ -1,0 +1,24 @@
+[
+  {
+    "id": "APPT_DEMO_001",
+    "patient_name": "测试患者一",
+    "patient_id": "TP001",
+    "department_id": "DEPT_INTERNAL",
+    "doctor_id": "DOC_ZHANG",
+    "appointment_date": "2026-05-12",
+    "appointment_time": "10:00",
+    "queue_number": "AD001",
+    "source_type": "booking"
+  },
+  {
+    "id": "APPT_DEMO_002",
+    "patient_name": "测试患者二",
+    "patient_id": "TP002",
+    "department_id": "DEPT_INTERNAL",
+    "doctor_id": "DOC_ZHANG",
+    "appointment_date": "2026-05-12",
+    "appointment_time": "10:20",
+    "queue_number": "AD002",
+    "source_type": "booking"
+  }
+]
