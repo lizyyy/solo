@@ -55,4 +55,27 @@ export const exportApi = {
   },
 };
 
+export const importApi = {
+  uploadCSV: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<{
+      success: boolean;
+      total: number;
+      success: number;
+      skipped: number;
+      failed: number;
+      messages: string[];
+    }>('/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  downloadTemplate: () => {
+    window.open('/api/import/template', '_blank');
+  },
+};
+
 export default api;

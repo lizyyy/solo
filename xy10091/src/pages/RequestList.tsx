@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Download, Plus, Eye, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Filter, Download, Plus, Upload, Eye, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import dayjs from 'dayjs';
 import { requestsApi, exportApi } from '../api';
 import { statusMap, type ReviewFilters, type ReviewStatus } from '../types';
 import StatusBadge from '../components/StatusBadge';
 import CreateModal from '../components/CreateModal';
+import ImportModal from '../components/ImportModal';
 
 function RequestList() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ function RequestList() {
   const [filters, setFilters] = useState<ReviewFilters>({});
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
@@ -55,6 +57,11 @@ function RequestList() {
     queryClient.invalidateQueries({ queryKey: ['report'] });
   };
 
+  const handleImported = () => {
+    queryClient.invalidateQueries({ queryKey: ['requests'] });
+    queryClient.invalidateQueries({ queryKey: ['report'] });
+  };
+
   const totalPages = data ? Math.ceil(data.total / pageSize) : 0;
 
   return (
@@ -64,10 +71,14 @@ function RequestList() {
           <h2 className="text-2xl font-bold text-gray-900">申请管理</h2>
           <p className="text-gray-500 text-sm mt-1">管理学员证书补发申请，进行审核和异常处理</p>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           <button onClick={handleExport} className="btn-secondary flex items-center space-x-2">
             <Download className="w-4 h-4" />
             <span>导出数据</span>
+          </button>
+          <button onClick={() => setShowImportModal(true)} className="btn-secondary flex items-center space-x-2">
+            <Upload className="w-4 h-4" />
+            <span>导入申请</span>
           </button>
           <button onClick={() => setShowCreateModal(true)} className="btn-primary flex items-center space-x-2">
             <Plus className="w-4 h-4" />
@@ -284,10 +295,17 @@ function RequestList() {
         </div>
       )}
 
-      {showCreateModal && (
-        <CreateModal
+      {showCreateModal && (<CreateModal
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onCreated={handleCreated}
+        />
+      )}
+      {showImportModal && (
+        <ImportModal
+          isOpen={showImportModal}
+          onClose={() => setShowImportModal(false)}
+          onSuccess={handleImported}
         />
       )}
     </div>

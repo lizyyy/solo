@@ -1,10 +1,23 @@
 import { Router, Request, Response } from 'express';
+import multer from 'multer';
 import { loadData, saveData, generateRequestNo, now, uuidv4 } from './database';
 import type { ReviewStatus, ReviewFilters, ReviewHistory } from './types';
 import { Parser } from 'json2csv';
 import dayjs from 'dayjs';
 
 const router = Router();
+
+const upload = multer({
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype === 'text/csv' || file.mimetype === 'application/vnd.ms-excel' || 
+        file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('只支持 CSV 文件'));
+    }
+  },
+});
 
 function rowToStudent(row: any): any {
   return {
@@ -604,6 +617,318 @@ router.get('/courses', (_req: Request, res: Response) => {
     console.error('Courses error:', error);
     res.status(500).json({ error: '获取课程列表失败' });
   }
+});
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  
+  result.push(current.trim());
+  return result;
+}
+
+function mapCsvRowToData(row: string[], headers: string[]): Record<string, string> {
+  const obj: Record<string, string> = {};
+  headers.forEach((header, index) => {
+    obj[header.trim()] = row[index] || '';
+  });
+  return obj;
+}
+
+function parseDate(value: string): string {
+  if (!value) return now();
+  const d = dayjs(value);
+  if (d.isValid()) return d.toISOString();
+  return now();
+}
+
+router.post('/import', upload.single('file'), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: '请上传文件' });
+    }
+
+    const content = req.file.buffer.toString('utf-8');
+    const lines = content.split(/\r?\n/).filter(line => line.trim());
+    
+    if (lines.length < 2) {
+      return res.status(400).json({ error: 'CSV 文件格式错误：至少需要表头和一行数据' });
+    }
+
+    const headers = parseCSVLine(lines[0]);
+    const requiredHeaders = [
+      '申请编号', '学员姓名', '手机号', '身份证号', '课程代码', '课程名称', 
+      '申请原因', '审核状态', '创建时间'
+    ];
+
+    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+    if (missingHeaders.length > 0) {
+      return res.status(400).json({ 
+        error: `CSV 文件缺少必需列：${missingHeaders.join('、')}`,
+        requiredHeaders
+      });
+    }
+
+    const db = loadData();
+    const results: {
+      success: number;
+      skipped: number;
+      failed: number;
+      messages: string[];
+    } = {
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      messages: []
+    };
+
+    const existingRequestNos = new Set(db.reissueRequests.map((r: any) => r.request_no));
+    const existingPhones = new Map(db.students.map((s: any) => [s.phone, s]));
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (!line.trim()) continue;
+
+      try {
+        const row = mapCsvRowToData(parseCSVLine(line), headers);
+        const requestNo = row['申请编号'];
+
+        if (!requestNo || existingRequestNos.has(requestNo)) {
+          results.skipped++;
+          results.messages.push(`第 ${i} 行跳过：申请编号 "${requestNo}" 已存在或为空`);
+          continue;
+        }
+
+        let studentId = '';
+        const phone = row['手机号'];
+        
+        if (phone && existingPhones.has(phone)) {
+          studentId = (existingPhones.get(phone) as any).id;
+        } else {
+          studentId = uuidv4();
+          const newStudent = {
+            id: studentId,
+            name: row['学员姓名'],
+            phone: phone,
+            id_card: row['身份证号'] || '',
+            email: row['邮箱'] || '',
+            created_at: now(),
+            updated_at: now(),
+          };
+          db.students.push(newStudent);
+          existingPhones.set(phone, newStudent);
+        }
+
+        const courseCode = row['课程代码'];
+        const courseName = row['课程名称'];
+
+        let courseRecordId = '';
+        let courseRecord = db.courseRecords.find(
+          (c: any) => c.student_id === studentId && c.course_code === courseCode
+        );
+        
+        if (!courseRecord) {
+          courseRecordId = uuidv4();
+          db.courseRecords.push({
+            id: courseRecordId,
+            student_id: studentId,
+            course_name: courseName,
+            course_code: courseCode,
+            enrollment_date: parseDate(row['入学时间'] || now()),
+            completion_date: parseDate(row['完课时间'] || now()),
+            completion_status: row['完课状态'] || 'completed',
+            score: parseInt(row['成绩']) || 0,
+            certificate_issued: (row['证书已发放']?.toLowerCase() === 'true' || row['证书已发放'] === '1'),
+            created_at: now(),
+            updated_at: now(),
+          });
+        } else {
+          courseRecordId = courseRecord.id;
+        }
+
+        let paymentRecordId = '';
+        let paymentRecord = db.paymentRecords.find(
+          (p: any) => p.student_id === studentId && p.course_code === courseCode
+        );
+        
+        if (!paymentRecord) {
+          paymentRecordId = uuidv4();
+          db.paymentRecords.push({
+            id: paymentRecordId,
+            student_id: studentId,
+            course_code: courseCode,
+            amount: parseFloat(row['课程费用']) || 0,
+            payment_date: parseDate(row['缴费时间'] || now()),
+            payment_status: row['缴费状态'] || 'paid',
+            payment_method: row['支付方式'] || '在线支付',
+            transaction_id: row['交易流水号'] || '',
+            reissue_fee: parseFloat(row['补发费用']) || 20,
+            reissue_fee_paid: (row['补发费用已缴']?.toLowerCase() === 'true' || row['补发费用已缴'] === '1'),
+            created_at: now(),
+            updated_at: now(),
+          });
+        } else {
+          paymentRecordId = paymentRecord.id;
+        }
+
+        let addressId = '';
+        let address = db.mailingAddresses.find((a: any) => a.student_id === studentId);
+        
+        if (!address && row['邮寄地址']) {
+          addressId = uuidv4();
+          db.mailingAddresses.push({
+            id: addressId,
+            student_id: studentId,
+            name: row['收件人姓名'] || row['学员姓名'],
+            phone: row['收件人手机号'] || phone,
+            province: row['省份'] || '',
+            city: row['城市'] || '',
+            district: row['区县'] || '',
+            address: row['邮寄地址'] || '',
+            postal_code: row['邮编'] || '',
+            is_default: true,
+            created_at: now(),
+            updated_at: now(),
+          });
+        } else if (address) {
+          addressId = address.id;
+        }
+
+        const statusMap: Record<string, string> = {
+          '待审核': 'pending',
+          '已通过': 'approved',
+          '已拒绝': 'rejected',
+          '异常': 'abnormal',
+          '已发货': 'shipped',
+          '已完成': 'completed',
+        };
+
+        const reviewStatus = statusMap[row['审核状态']] || 'pending';
+
+        const request = {
+          id: uuidv4(),
+          request_no: requestNo,
+          student_id: studentId,
+          course_code: courseCode,
+          course_name: courseName,
+          reason: row['申请原因'],
+          review_status: reviewStatus as ReviewStatus,
+          review_comment: row['审核意见'] || null,
+          reviewer_id: null,
+          reviewer_name: row['审核人'] || null,
+          reviewed_at: row['审核时间'] ? parseDate(row['审核时间']) : null,
+          created_at: parseDate(row['创建时间'] || now()),
+          updated_at: now(),
+          course_record_id: courseRecordId,
+          payment_record_id: paymentRecordId,
+          mailing_address_id: addressId || null,
+          tracking_number: row['快递单号'] || null,
+          shipped_at: row['发货时间'] ? parseDate(row['发货时间']) : null,
+          delivered_at: row['签收时间'] ? parseDate(row['签收时间']) : null,
+          abnormal_type: row['异常类型'] || null,
+          abnormal_reason: row['异常原因'] || null,
+        };
+
+        db.reissueRequests.push(request);
+        existingRequestNos.add(requestNo);
+        results.success++;
+
+        if (row['操作历史']) {
+          db.reviewHistory.push({
+            id: uuidv4(),
+            request_id: request.id,
+            action: 'import',
+            comment: '批量导入',
+            operator: '系统',
+            created_at: now(),
+          });
+        }
+
+      } catch (rowError: any) {
+        results.failed++;
+        results.messages.push(`第 ${i} 行错误：${rowError.message || '未知错误'}`);
+      }
+    }
+
+    saveData(db);
+
+    res.json({
+      success: true,
+      ...results,
+      total: results.success + results.skipped + results.failed,
+    });
+
+  } catch (error: any) {
+    console.error('Import error:', error);
+    res.status(500).json({ error: error.message || '导入失败' });
+  }
+});
+
+router.get('/import/template', (_req: Request, res: Response) => {
+  const headers = [
+    '申请编号', '学员姓名', '手机号', '身份证号', '邮箱', '课程代码', '课程名称',
+    '申请原因', '审核状态', '审核意见', '审核人', '审核时间',
+    '入学时间', '完课时间', '完课状态', '成绩', '证书已发放',
+    '课程费用', '缴费时间', '缴费状态', '支付方式', '交易流水号',
+    '补发费用', '补发费用已缴',
+    '收件人姓名', '收件人手机号', '省份', '城市', '区县', '邮寄地址', '邮编',
+    '快递单号', '发货时间', '签收时间',
+    '异常类型', '异常原因', '创建时间'
+  ];
+
+  const sampleRow = [
+    'CR202601010001', '示例学员', '13800000001', '110101199001011234', 'student@example.com',
+    'PY001', 'Python基础编程', '证书损坏需要重新打印', '待审核', '', '', '',
+    '2025-09-01', '2025-12-15', 'completed', '85', 'true',
+    '2999', '2025-09-01', 'paid', '支付宝', 'ALI123456789',
+    '20', 'true',
+    '示例学员', '13800000001', '北京市', '北京市', '朝阳区',
+    '建国路88号SOHO现代城A座1508室', '100022',
+    '', '', '',
+    '', '', '2026-01-01 10:00:00'
+  ];
+
+  const sampleRow2 = [
+    'CR202601010002', '测试学员', '13800000002', '110101199001012345', 'test@example.com',
+    'WEB001', 'Web前端开发', '证书丢失', '已通过', '审核通过，请尽快补发',
+    '张审核', '2026-01-02 14:30:00',
+    '2025-10-01', '2026-01-10', 'completed', '92', 'true',
+    '3999', '2025-10-01', 'paid', '微信支付', 'WX123456789',
+    '20', 'true',
+    '测试学员', '13800000002', '上海市', '上海市', '浦东新区',
+    '陆家嘴环路1000号恒生银行大厦2202室', '200120',
+    'SF1234567890', '2026-01-03', '',
+    '', '', '2026-01-01 11:00:00'
+  ];
+
+  const csvContent = [
+    headers.join(','),
+    sampleRow.join(','),
+    sampleRow2.join(',')
+  ].join('\n');
+
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="import_template.csv"');
+  res.send('\uFEFF' + csvContent);
 });
 
 export default router;
