@@ -92,8 +92,13 @@ function App() {
     refreshData();
   };
 
-  const handleWithdraw = (recordId: string) => {
-    ElevatorSignStore.withdrawSign(recordId, '当前用户');
+  const handleWithdraw = (recordId: string, stillCounted: boolean = false) => {
+    ElevatorSignStore.withdrawSign(recordId, '当前用户', stillCounted);
+    refreshData();
+  };
+
+  const handleUpdateObjection = (recordId: string, status: 'processing' | 'resolved' | 'rejected') => {
+    ElevatorSignStore.updateObjectionStatus(recordId, status, '当前用户');
     refreshData();
   };
 
@@ -264,6 +269,7 @@ function App() {
                         currentVersion={currentVersion}
                         onSign={handleSign}
                         onWithdraw={handleWithdraw}
+                        onUpdateObjection={handleUpdateObjection}
                       />
                     )}
                     {activeTab === 'versions' && (

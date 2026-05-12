@@ -109,7 +109,7 @@ export class ElevatorSignStore {
     return newRecord;
   }
 
-  static withdrawSign(recordId: string, handler: string): SignRecord | undefined {
+  static withdrawSign(recordId: string, handler: string, stillCounted: boolean = false): SignRecord | undefined {
     const data = localStorage.getItem(this.SIGN_RECORDS_KEY);
     const all: SignRecord[] = data ? JSON.parse(data) : [];
     const index = all.findIndex(r => r.id === recordId);
@@ -120,7 +120,7 @@ export class ElevatorSignStore {
       ...record,
       id: generateId(),
       status: 'withdrawn',
-      isWithdrawnButCounted: true,
+      isWithdrawnButCounted: stillCounted,
       handler,
       createdAt: now(),
       updatedAt: now(),
@@ -128,6 +128,30 @@ export class ElevatorSignStore {
     all.push(withdrawnRecord);
     localStorage.setItem(this.SIGN_RECORDS_KEY, JSON.stringify(all));
     return withdrawnRecord;
+  }
+
+  static updateObjectionStatus(
+    recordId: string,
+    status: 'processing' | 'resolved' | 'rejected',
+    handler: string
+  ): SignRecord | undefined {
+    const data = localStorage.getItem(this.SIGN_RECORDS_KEY);
+    const all: SignRecord[] = data ? JSON.parse(data) : [];
+    const record = all.find(r => r.id === recordId);
+    if (!record) return undefined;
+
+    const updatedRecord: SignRecord = {
+      ...record,
+      objectionStatus: status,
+      objectionHandler: handler,
+      objectionHandleDate: now(),
+      updatedAt: now(),
+    };
+    
+    const index = all.findIndex(r => r.id === recordId);
+    all[index] = updatedRecord;
+    localStorage.setItem(this.SIGN_RECORDS_KEY, JSON.stringify(all));
+    return updatedRecord;
   }
 
   static getVersions(buildingId: string): BuildingVersion[] {
@@ -251,7 +275,7 @@ export class ElevatorSignStore {
         }
         if (sign.objectionReason) {
           objectionCount++;
-          if (sign.objectionStatus !== 'resolved') {
+          if (sign.objectionStatus === 'pending') {
             unresolvedObjectionCount++;
           }
         }

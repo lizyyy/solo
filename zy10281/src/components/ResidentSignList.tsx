@@ -7,7 +7,8 @@ interface ResidentSignListProps {
   residents: Resident[];
   currentVersion: BuildingVersion;
   onSign: (residentId: string, status: SignStatus, objectionReason?: string) => void;
-  onWithdraw: (recordId: string) => void;
+  onWithdraw: (recordId: string, stillCounted?: boolean) => void;
+  onUpdateObjection: (recordId: string, status: 'processing' | 'resolved' | 'rejected') => void;
 }
 
 const statusConfig: Record<SignStatus, { label: string; color: string; bg: string }> = {
@@ -23,9 +24,12 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
   currentVersion,
   onSign,
   onWithdraw,
+  onUpdateObjection,
 }) => {
   const [filter, setFilter] = useState<'all' | SignStatus>('all');
   const [selectedResident, setSelectedResident] = useState<string | null>(null);
+  const [withdrawingSign, setWithdrawingSign] = useState<{ id: string; name: string } | null>(null);
+  const [handlingObjection, setHandlingObjection] = useState<{ id: string; name: string; reason: string } | null>(null);
   const [showSignModal, setShowSignModal] = useState(false);
   const [signStatus, setSignStatus] = useState<SignStatus>('agree');
   const [objectionReason, setObjectionReason] = useState('');
@@ -117,8 +121,39 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
                       </div>
                     )}
                     {currentSign?.objectionReason && (
-                      <div className="mt-1 text-xs text-orange-600">
-                        异议: {currentSign.objectionReason}
+                      <div className="mt-1">
+                        <div className="text-xs text-orange-600">
+                          异议: {currentSign.objectionReason}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs px-2 py-0.5 rounded ${
+                            currentSign.objectionStatus === 'pending' ? 'bg-red-100 text-red-700' :
+                            currentSign.objectionStatus === 'processing' ? 'bg-yellow-100 text-yellow-700' :
+                            currentSign.objectionStatus === 'resolved' ? 'bg-green-100 text-green-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {currentSign.objectionStatus === 'pending' ? '待处理' :
+                             currentSign.objectionStatus === 'processing' ? '处理中' :
+                             currentSign.objectionStatus === 'resolved' ? '已解决' : '已驳回'}
+                          </span>
+                          {currentSign.objectionStatus !== 'resolved' && (
+                            <button
+                              onClick={() => setHandlingObjection({
+                                id: currentSign.id,
+                                name: resident.name,
+                                reason: currentSign.objectionReason || ''
+                              })}
+                              className="text-xs text-blue-500 hover:text-blue-700"
+                            >
+                              处理
+                            </button>
+                          )}
+                        </div>
+                        {currentSign.objectionHandler && (
+                          <div className="text-xs text-gray-500 mt-1">
+                            处理人: {currentSign.objectionHandler}
+                          </div>
+                        )}
                       </div>
                     )}
                   </td>
@@ -147,7 +182,7 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
                     </button>
                     {currentSign && currentSign.status !== 'withdrawn' && (
                       <button
-                        onClick={() => onWithdraw(currentSign.id)}
+                        onClick={() => setWithdrawingSign({ id: currentSign.id, name: resident.name })}
                         className="text-orange-500 hover:text-orange-700 text-sm"
                       >
                         撤回
@@ -208,6 +243,128 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 确认签字
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {withdrawingSign && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold mb-2">撤回签字确认</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              正在撤回 <span className="font-medium">{withdrawingSign.name}</span> 的签字
+            </p>
+            
+            <div className="space-y-3 mb-6">
+              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="withdrawType"
+                    value="normal"
+                    defaultChecked
+                    className="mt-1"
+                  />
+                  <div>
+                    <div className="font-medium text-sm">普通撤回</div>
+                    <div className="text-xs text-gray-500">撤回后不计入同意数，需重新签字</div>
+                  </div>
+                </label>
+              </div>
+              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="withdrawType"
+                    value="stillCounted"
+                    className="mt-1"
+                  />
+                  <div>
+                    <div className="font-medium text-sm text-yellow-800">撤回但仍计入</div>
+                    <div className="text-xs text-yellow-600">
+                      特殊场景：住户已签字确认，撤回仅用于记录变更，同意继续计入统计
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setWithdrawingSign(null)}
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={() => {
+                  const checked = document.querySelector(
+                    'input[name="withdrawType"]:checked'
+                  ) as HTMLInputElement | null;
+                  const stillCounted = checked?.value === 'stillCounted';
+                  onWithdraw(withdrawingSign.id, stillCounted);
+                  setWithdrawingSign(null);
+                }}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              >
+                确认撤回
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {handlingObjection && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md">
+            <h3 className="text-lg font-bold mb-2">处理异议</h3>
+            <div className="mb-4 p-3 bg-orange-50 rounded-lg">
+              <div className="text-sm font-medium text-orange-800">
+                {handlingObjection.name} 的异议
+              </div>
+              <div className="text-sm text-orange-700 mt-1">
+                {handlingObjection.reason}
+              </div>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => {
+                  onUpdateObjection(handlingObjection.id, 'processing');
+                  setHandlingObjection(null);
+                }}
+                className="w-full px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 text-sm text-left"
+              >
+                标记为处理中 - 正在与住户沟通，尚未解决
+              </button>
+              <button
+                onClick={() => {
+                  onUpdateObjection(handlingObjection.id, 'resolved');
+                  setHandlingObjection(null);
+                }}
+                className="w-full px-4 py-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 text-sm text-left"
+              >
+                标记为已解决 - 异议已得到妥善处理
+              </button>
+              <button
+                onClick={() => {
+                  onUpdateObjection(handlingObjection.id, 'rejected');
+                  setHandlingObjection(null);
+                }}
+                className="w-full px-4 py-2 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 text-sm text-left"
+              >
+                标记为已驳回 - 异议不成立，不予采纳
+              </button>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setHandlingObjection(null)}
+                className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
+              >
+                取消
               </button>
             </div>
           </div>
