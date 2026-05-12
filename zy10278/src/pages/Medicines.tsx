@@ -147,7 +147,7 @@ const Medicines: React.FC = () => {
       title: '操作',
       key: 'action',
       width: 150,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: unknown, record: Medicine) => (
         <Space>
           <Button type="link" size="small" onClick={() => handleView(record)}>

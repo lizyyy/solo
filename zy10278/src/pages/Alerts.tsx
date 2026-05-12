@@ -8,7 +8,7 @@ import { AbnormalAlert } from '../types';
 const { TextArea } = Input;
 
 const Alerts: React.FC = () => {
-  const { abnormalAlerts, handleAbnormalAlert, members, followupTasks } = useStore();
+  const { abnormalAlerts, handleAbnormalAlert, followupTasks } = useStore();
   const [detailVisible, setDetailVisible] = useState(false);
   const [viewingAlert, setViewingAlert] = useState<AbnormalAlert | null>(null);
   const [handleModalVisible, setHandleModalVisible] = useState(false);
@@ -125,7 +125,7 @@ const Alerts: React.FC = () => {
       key: 'createdAt',
       width: 180,
       render: (time: string) => dayjs(time).format('YYYY-MM-DD HH:mm'),
-      sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
+      sorter: (a: AbnormalAlert, b: AbnormalAlert) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
     },
     {
       title: '处理时间',
@@ -138,7 +138,7 @@ const Alerts: React.FC = () => {
       title: '操作',
       key: 'action',
       width: 150,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: unknown, record: AbnormalAlert) => (
         <Space>
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => handleView(record)}>

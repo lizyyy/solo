@@ -3,10 +3,18 @@ import { Table, Button, Modal, Form, Input, Select, Space, Tag, Card, Descriptio
 import { PlusOutlined, EditOutlined, EyeOutlined, PhoneOutlined, WarningOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useStore } from '../store';
-import { FollowupTask, IndicatorRecord } from '../types';
+import { FollowupTask } from '../types';
 
 const { Option } = Select;
 const { TextArea } = Input;
+
+const typeNameMap: Record<string, string> = {
+  medicine: '用药回访',
+  indicator: '指标回访',
+  chronic: '慢病回访',
+  refill: '续方回访',
+  other: '其他',
+};
 
 const FollowupTasks: React.FC = () => {
   const {
@@ -27,6 +35,20 @@ const FollowupTasks: React.FC = () => {
   const [indicatorModalVisible, setIndicatorModalVisible] = useState(false);
   const [indicatorForm] = Form.useForm();
 
+  const handleMemberChange = (memberId: string) => {
+    const member = members.find((m) => m.id === memberId);
+    if (member) {
+      form.setFieldsValue({
+        memberName: member.name,
+        memberPhone: member.phone,
+      });
+    }
+  };
+
+  const handleTypeChange = (type: string) => {
+    form.setFieldValue('typeName', typeNameMap[type] || '');
+  };
+
   const handleAdd = () => {
     setEditingTask(null);
     form.resetFields();
@@ -42,7 +64,7 @@ const FollowupTasks: React.FC = () => {
     form.setFieldsValue({
       ...task,
       scheduledDate: dayjs(task.scheduledDate),
-      scheduledTime: task.scheduledTime ? dayjs(task.scheduledTime, 'HH:mm') : null,
+      scheduledTime: task.scheduledTime ? dayjs(task.scheduledTime, 'HH:mm') : undefined,
     });
     setModalVisible(true);
   };
@@ -77,7 +99,7 @@ const FollowupTasks: React.FC = () => {
           refillIntention: 'pending',
           completionStatus: 'none',
           hasAbnormalIndicator: false,
-          hasContraindicationReminder: false,
+          hasContraindicationReminder: taskData.hasContraindicationReminder || false,
           indicatorFollowed: false,
         });
         if (result.success) {
@@ -144,7 +166,7 @@ const FollowupTasks: React.FC = () => {
       dataIndex: 'memberName',
       key: 'memberName',
       width: 120,
-      fixed: 'left',
+      fixed: 'left' as const,
     },
     {
       title: '联系电话',
@@ -181,7 +203,7 @@ const FollowupTasks: React.FC = () => {
       dataIndex: 'scheduledDate',
       key: 'scheduledDate',
       width: 120,
-      sorter: (a, b) => dayjs(a.scheduledDate).unix() - dayjs(b.scheduledDate).unix(),
+      sorter: (a: FollowupTask, b: FollowupTask) => dayjs(a.scheduledDate).unix() - dayjs(b.scheduledDate).unix(),
     },
     {
       title: '时间',
@@ -257,7 +279,7 @@ const FollowupTasks: React.FC = () => {
       title: '操作',
       key: 'action',
       width: 180,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: unknown, record: FollowupTask) => (
         <Space>
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => handleView(record)}>
@@ -316,7 +338,7 @@ const FollowupTasks: React.FC = () => {
                 label="会员"
                 rules={[{ required: true, message: '请选择会员' }]}
               >
-                <Select placeholder="请选择会员" showSearch>
+                <Select placeholder="请选择会员" showSearch onChange={handleMemberChange}>
                   {members.map((member) => (
                     <Option key={member.id} value={member.id}>
                       {member.name} - {member.phone}
@@ -326,18 +348,10 @@ const FollowupTasks: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="memberName"
-                label="会员姓名"
-                hidden
-              >
+              <Form.Item name="memberName" hidden>
                 <Input />
               </Form.Item>
-              <Form.Item
-                name="memberPhone"
-                label="联系电话"
-                hidden
-              >
+              <Form.Item name="memberPhone" hidden>
                 <Input />
               </Form.Item>
             </Col>
@@ -349,7 +363,7 @@ const FollowupTasks: React.FC = () => {
                 label="回访类型"
                 rules={[{ required: true, message: '请选择回访类型' }]}
               >
-                <Select placeholder="请选择回访类型">
+                <Select placeholder="请选择回访类型" onChange={handleTypeChange}>
                   <Option value="medicine">用药回访</Option>
                   <Option value="indicator">指标回访</Option>
                   <Option value="chronic">慢病回访</Option>
@@ -359,11 +373,7 @@ const FollowupTasks: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="typeName"
-                label="类型名称"
-                hidden
-              >
+              <Form.Item name="typeName" hidden>
                 <Input />
               </Form.Item>
             </Col>
@@ -408,18 +418,12 @@ const FollowupTasks: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                name="scheduledTime"
-                label="回访时间"
-              >
+              <Form.Item name="scheduledTime" label="回访时间">
                 <TimePicker style={{ width: '100%' }} placeholder="请选择回访时间" format="HH:mm" />
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item
-            name="relatedMedicines"
-            label="相关药品"
-          >
+          <Form.Item name="relatedMedicines" label="相关药品">
             <Select mode="tags" placeholder="请选择或输入相关药品">
               {medicines.map((medicine) => (
                 <Option key={medicine.id} value={medicine.name}>
@@ -428,19 +432,12 @@ const FollowupTasks: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            name="content"
-            label="回访内容"
-          >
+          <Form.Item name="content" label="回访内容">
             <TextArea rows={3} placeholder="请输入回访内容" />
           </Form.Item>
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item
-                name="refillIntention"
-                label="续方意向"
-                initialValue="pending"
-              >
+              <Form.Item name="refillIntention" label="续方意向" initialValue="pending">
                 <Select placeholder="请选择续方意向">
                   <Option value="yes">需要</Option>
                   <Option value="no">不需要</Option>
@@ -449,11 +446,7 @@ const FollowupTasks: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
-                name="completionStatus"
-                label="完成情况"
-                initialValue="none"
-              >
+              <Form.Item name="completionStatus" label="完成情况" initialValue="none">
                 <Select placeholder="请选择完成情况">
                   <Option value="full">全部完成</Option>
                   <Option value="partial">部分完成</Option>
@@ -472,10 +465,7 @@ const FollowupTasks: React.FC = () => {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item
-            name="result"
-            label="回访结果"
-          >
+          <Form.Item name="result" label="回访结果">
             <TextArea rows={3} placeholder="请输入回访结果" />
           </Form.Item>
         </Form>
@@ -626,10 +616,13 @@ const FollowupTasks: React.FC = () => {
             label="指标类型"
             rules={[{ required: true, message: '请选择指标类型' }]}
           >
-            <Select placeholder="请选择指标类型" onChange={(value) => {
-              const option = indicatorTypeOptions.find((o) => o.value === value);
-              indicatorForm.setFieldValue('typeName', option?.label || '');
-            }}>
+            <Select
+              placeholder="请选择指标类型"
+              onChange={(value) => {
+                const option = indicatorTypeOptions.find((o) => o.value === value);
+                indicatorForm.setFieldValue('typeName', option?.label || '');
+              }}
+            >
               {indicatorTypeOptions.map((option) => (
                 <Option key={option.value} value={option.value}>
                   {option.label}
@@ -637,11 +630,7 @@ const FollowupTasks: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            name="typeName"
-            label="类型名称"
-            hidden
-          >
+          <Form.Item name="typeName" hidden>
             <Input />
           </Form.Item>
           <Row gutter={16}>
@@ -672,10 +661,7 @@ const FollowupTasks: React.FC = () => {
           >
             <Switch checkedChildren="异常" unCheckedChildren="正常" />
           </Form.Item>
-          <Form.Item
-            name="notes"
-            label="备注"
-          >
+          <Form.Item name="notes" label="备注">
             <TextArea rows={2} placeholder="请输入备注" />
           </Form.Item>
         </Form>

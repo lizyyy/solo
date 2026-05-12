@@ -140,7 +140,7 @@ const Members: React.FC = () => {
       title: '操作',
       key: 'action',
       width: 180,
-      fixed: 'right',
+      fixed: 'right' as const,
       render: (_: unknown, record: Member) => (
         <Space>
           <Button type="link" size="small" onClick={() => handleView(record)}>

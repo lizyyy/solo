@@ -15,7 +15,7 @@ import { useStore } from '../store';
 import { FollowupTask, Member } from '../types';
 
 const Dashboard: React.FC = () => {
-  const { getDashboardStats, getTodayPendingTasks, getHighRiskMembers, followupTasks, members, updateFollowupTask } = useStore();
+  const { getDashboardStats, getTodayPendingTasks, getHighRiskMembers, followupTasks, updateFollowupTask } = useStore();
   const stats = getDashboardStats();
   const todayPendingTasks = getTodayPendingTasks();
   const highRiskMembers = getHighRiskMembers();
