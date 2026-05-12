@@ -1,0 +1,22 @@
+{
+  "name": "logistics-compensation-api",
+  "version": "1.0.0",
+  "description": "物流异常赔付 API - 处理物流异常件的赔付计算和责任追踪",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node src/examples/run-demo.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "logistics",
+    "compensation",
+    "api",
+    "express"
+  ],
+  "author": "Trae",
+  "license": "MIT"
+}
