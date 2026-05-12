@@ -5,24 +5,50 @@ import sys
 import tempfile
 import pandas as pd
 import numpy as np
-
-os.environ.setdefault('MPLCONFIGDIR', tempfile.gettempdir())
-
-import matplotlib
-matplotlib.use('Agg')
-
-matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans', 'sans-serif']
-matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['axes.unicode_minus'] = False
-
-import matplotlib.pyplot as plt
-
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from .config import AnalysisConfig
 from .logger import AnalysisLogger
 from .consistency_analyzer import AnalysisResult
 from .quality_control import QCReport
+
+
+def _try_init_matplotlib() -> bool:
+    """尝试初始化 matplotlib，极端只读环境也不会在导入阶段崩溃。
+    
+    Returns:
+        bool: 是否成功初始化
+    """
+    try:
+        try:
+            temp_dir = tempfile.gettempdir()
+            os.environ.setdefault('MPLCONFIGDIR', temp_dir)
+        except (FileNotFoundError, PermissionError, OSError):
+            pass
+        
+        import matplotlib
+        matplotlib.use('Agg')
+        
+        matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans', 'sans-serif']
+        matplotlib.rcParams['font.family'] = 'sans-serif'
+        matplotlib.rcParams['axes.unicode_minus'] = False
+        
+        global plt
+        import matplotlib.pyplot as plt
+        return True
+    except Exception:
+        return False
+
+
+_matplotlib_available = None
+
+
+def matplotlib_available() -> bool:
+    """检查 matplotlib 是否可用。"""
+    global _matplotlib_available
+    if _matplotlib_available is None:
+        _matplotlib_available = _try_init_matplotlib()
+    return _matplotlib_available
 
 
 class ReportGenerator:
@@ -35,10 +61,16 @@ class ReportGenerator:
             log_file=config.log_file,
             log_level=config.log_level
         )
+        self.matplotlib_available = matplotlib_available()
+        if not self.matplotlib_available:
+            self.logger.warning("报告", "matplotlib 不可用，图表生成功能将被跳过")
         self._setup_plot_style()
     
     def _setup_plot_style(self) -> None:
         """设置绘图样式。"""
+        if not self.matplotlib_available:
+            return
+        
         try:
             plt.style.use('seaborn-v0_8-whitegrid')
         except:
@@ -57,6 +89,10 @@ class ReportGenerator:
                            analysis_result: AnalysisResult,
                            output_dir: str) -> Dict[str, str]:
         """生成所有图表。"""
+        if not self.matplotlib_available:
+            self.logger.warning("报告", "matplotlib 不可用，跳过图表生成")
+            return {}
+        
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
