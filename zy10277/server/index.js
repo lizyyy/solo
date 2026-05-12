@@ -40,11 +40,12 @@ app.get('/api/declarations/:id', async (req, res) => {
       return res.status(404).json({ error: '委托单不存在' });
     }
     
-    const [documents, payment, inspection, statusLogs] = await Promise.all([
+    const [documents, payment, inspection, statusLogs, versionHistory] = await Promise.all([
       db.getDocumentsByDeclarationId(req.params.id),
       db.getPaymentByDeclarationId(req.params.id),
       db.getInspectionByDeclarationId(req.params.id),
-      db.getStatusLogsByDeclarationId(req.params.id)
+      db.getStatusLogsByDeclarationId(req.params.id),
+      db.getAllDocumentVersionHistory(req.params.id)
     ]);
     
     res.json({
@@ -52,7 +53,8 @@ app.get('/api/declarations/:id', async (req, res) => {
       documents,
       payment,
       inspection,
-      statusLogs
+      statusLogs,
+      versionHistory
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -104,7 +106,7 @@ app.put('/api/declarations/:id', async (req, res) => {
 
 app.put('/api/declarations/:id/status', async (req, res) => {
   try {
-    const { status, reason, changed_by } = req.body;
+    const { status, reason, changed_by, request_id } = req.body;
     
     if (!status) {
       return res.status(400).json({ error: '状态为必填项' });
@@ -116,8 +118,13 @@ app.put('/api/declarations/:id/status', async (req, res) => {
       return res.status(400).json({ error: '无效的状态值' });
     }
     
-    const result = await db.updateDeclarationStatus(req.params.id, status, reason, changed_by);
-    res.json(result);
+    const result = await db.updateDeclarationStatus(req.params.id, status, reason, changed_by, request_id);
+    
+    if (result.duplicate) {
+      res.json({ ...result, message: '重复请求，状态已处理' });
+    } else {
+      res.json(result);
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -125,11 +132,14 @@ app.put('/api/declarations/:id/status', async (req, res) => {
 
 app.put('/api/declarations/:id/documents/:documentType', async (req, res) => {
   try {
-    const { received, missing_reason } = req.body;
+    const { received, missing_reason, overwrite_reason, changed_by, change_reason } = req.body;
     
     const result = await db.updateDocument(req.params.id, req.params.documentType, {
       received,
-      missing_reason
+      missing_reason,
+      overwrite_reason,
+      changed_by,
+      change_reason
     });
     
     res.json(result);
@@ -138,9 +148,18 @@ app.put('/api/declarations/:id/documents/:documentType', async (req, res) => {
   }
 });
 
+app.get('/api/declarations/:id/documents/:documentType/history', async (req, res) => {
+  try {
+    const history = await db.getDocumentVersionHistory(req.params.id, req.params.documentType);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/declarations/:id/payment', async (req, res) => {
   try {
-    const { amount, paid, payment_method, notes } = req.body;
+    const { amount, paid, payment_method, notes, changed_by } = req.body;
     
     if (amount !== undefined && (typeof amount !== 'number' || amount < 0)) {
       return res.status(400).json({ error: '金额必须为非负数' });
@@ -150,7 +169,8 @@ app.post('/api/declarations/:id/payment', async (req, res) => {
       amount,
       paid,
       payment_method,
-      notes
+      notes,
+      changed_by
     });
     
     res.json(result);
@@ -161,7 +181,7 @@ app.post('/api/declarations/:id/payment', async (req, res) => {
 
 app.post('/api/declarations/:id/inspection', async (req, res) => {
   try {
-    const { inspection_type, result: inspectionResult, returned, returned_reason, inspector, inspection_date, notes } = req.body;
+    const { inspection_type, result: inspectionResult, returned, returned_reason, inspector, inspection_date, notes, changed_by } = req.body;
     
     const result = await db.createOrUpdateInspection(req.params.id, {
       inspection_type,
@@ -170,7 +190,8 @@ app.post('/api/declarations/:id/inspection', async (req, res) => {
       returned_reason,
       inspector,
       inspection_date,
-      notes
+      notes,
+      changed_by
     });
     
     res.json(result);

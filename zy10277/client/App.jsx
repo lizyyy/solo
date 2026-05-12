@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import {
   Layout, Table, Button, Modal, Form, Input, Select, Space,
   Tag, Card, Row, Col, Checkbox, InputNumber, DatePicker,
-  message, Tabs, Descriptions, Timeline, Typography
+  message, Tabs, Descriptions, Timeline, Typography, Collapse, Divider
 } from 'antd';
-import { PlusOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, EyeOutlined, HistoryOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 
 const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
+const { Panel } = Collapse;
 
 const STATUS_OPTIONS = [
   { value: 'pending', label: '待处理', color: 'default' },
@@ -40,6 +41,10 @@ const getStatusTag = (status) => {
   return option ? <Tag color={option.color}>{option.label}</Tag> : status;
 };
 
+function generateRequestId() {
+  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
+
 function App() {
   const [declarations, setDeclarations] = useState([]);
   const [filters, setFilters] = useState({ customers: [], ports: [] });
@@ -50,6 +55,8 @@ function App() {
   const [detailData, setDetailData] = useState(null);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [overwriteModalVisible, setOverwriteModalVisible] = useState(false);
+  const [pendingDocumentUpdate, setPendingDocumentUpdate] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -111,16 +118,22 @@ function App() {
 
   const handleStatusChange = async (id, status, reason = '') => {
     try {
+      const requestId = generateRequestId();
       const res = await fetch(`/api/declarations/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, reason, changed_by: '当前用户' })
+        body: JSON.stringify({ status, reason, changed_by: '当前用户', request_id: requestId })
       });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error);
       }
-      message.success('状态更新成功');
+      const result = await res.json();
+      if (result.duplicate) {
+        message.info('重复请求，状态已处理');
+      } else {
+        message.success('状态更新成功');
+      }
       loadData();
       if (detailData) {
         loadDetail(id);
@@ -135,17 +148,51 @@ function App() {
       const res = await fetch(`/api/declarations/${declarationId}/documents/${documentType}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({ ...values, changed_by: '当前用户' })
       });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error);
       }
-      message.success('资料状态更新成功');
+      const result = await res.json();
+      message.success(result.changeReason || '资料状态更新成功');
       loadDetail(declarationId);
     } catch (error) {
       message.error(error.message);
     }
+  };
+
+  const handleDocumentCheckboxChange = (doc, checked) => {
+    const declarationId = detailData.declaration.id;
+    
+    if (doc.received && checked) {
+      setPendingDocumentUpdate({
+        declarationId,
+        documentType: doc.document_type,
+        received: true
+      });
+      setOverwriteModalVisible(true);
+    } else {
+      handleDocumentUpdate(declarationId, doc.document_type, {
+        received: checked,
+        missing_reason: doc.missing_reason || ''
+      });
+    }
+  };
+
+  const handleOverwriteConfirm = (overwriteReason) => {
+    if (pendingDocumentUpdate) {
+      handleDocumentUpdate(
+        pendingDocumentUpdate.declarationId,
+        pendingDocumentUpdate.documentType,
+        {
+          received: true,
+          overwrite_reason: overwriteReason
+        }
+      );
+    }
+    setOverwriteModalVisible(false);
+    setPendingDocumentUpdate(null);
   };
 
   const handlePaymentUpdate = async (declarationId, values) => {
@@ -153,7 +200,7 @@ function App() {
       const res = await fetch(`/api/declarations/${declarationId}/payment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({ ...values, changed_by: '当前用户' })
       });
       if (!res.ok) {
         const err = await res.json();
@@ -172,7 +219,7 @@ function App() {
       const res = await fetch(`/api/declarations/${declarationId}/inspection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({ ...values, changed_by: '当前用户' })
       });
       if (!res.ok) {
         const err = await res.json();
@@ -184,6 +231,11 @@ function App() {
     } catch (error) {
       message.error(error.message);
     }
+  };
+
+  const getDocumentVersionHistory = (documentType) => {
+    if (!detailData?.versionHistory) return [];
+    return detailData.versionHistory.filter(h => h.document_type === documentType);
   };
 
   const columns = [
@@ -355,6 +407,47 @@ function App() {
         </Form>
       </Modal>
 
+      <Modal
+        title="确认覆盖资料版本"
+        open={overwriteModalVisible}
+        onCancel={() => {
+          setOverwriteModalVisible(false);
+          setPendingDocumentUpdate(null);
+        }}
+        footer={null}
+        width={500}
+      >
+        <Form
+          layout="vertical"
+          onFinish={(values) => handleOverwriteConfirm(values.overwrite_reason)}
+        >
+          <Paragraph type="warning">
+            ⚠️ 当前资料已标记为已收到。再次标记将创建新的资料版本（版本号+1）。
+          </Paragraph>
+          <Form.Item
+            name="overwrite_reason"
+            label="覆盖原因"
+            rules={[{ required: true, message: '请输入覆盖原因' }]}
+          >
+            <TextArea
+              rows={3}
+              placeholder="请输入覆盖原因，例如：客户重新提交了盖章版本"
+            />
+          </Form.Item>
+          <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+            <Space>
+              <Button onClick={() => {
+                setOverwriteModalVisible(false);
+                setPendingDocumentUpdate(null);
+              }}>
+                取消
+              </Button>
+              <Button type="primary" htmlType="submit">确认覆盖并升级版本</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {detailData && (
         <Modal
           title={`委托详情 - ${detailData.declaration.bill_of_lading}`}
@@ -362,6 +455,7 @@ function App() {
           onCancel={() => setDetailVisible(false)}
           footer={null}
           width={1000}
+          style={{ top: 20 }}
         >
           <Tabs
             items={[
@@ -385,55 +479,88 @@ function App() {
                 label: '资料管理',
                 children: (
                   <Card title="资料清单" size="small">
-                    {detailData.documents.map(doc => (
-                      <Card
-                        key={doc.document_type}
-                        size="small"
-                        style={{ marginBottom: 8 }}
-                        title={
-                          <Space>
-                            <span>{DOCUMENT_TYPE_MAP[doc.document_type]}</span>
-                            {doc.received && <Tag color="green">已收到 (v{doc.version})</Tag>}
-                            {!doc.received && <Tag color="red">未收到</Tag>}
-                          </Space>
-                        }
-                        extra={
-                          <Space>
-                            <Checkbox
-                              checked={doc.received}
-                              onChange={(e) => handleDocumentUpdate(
-                                detailData.declaration.id,
-                                doc.document_type,
-                                { received: e.target.checked, missing_reason: doc.missing_reason }
+                    {detailData.documents.map(doc => {
+                      const history = getDocumentVersionHistory(doc.document_type);
+                      return (
+                        <Card
+                          key={doc.document_type}
+                          size="small"
+                          style={{ marginBottom: 16 }}
+                          title={
+                            <Space>
+                              <span>{DOCUMENT_TYPE_MAP[doc.document_type]}</span>
+                              {doc.received && (
+                                <Tag color="green">已收到 (v{doc.version})</Tag>
                               )}
-                            >
-                              已收到
-                            </Checkbox>
-                          </Space>
-                        }
-                      >
-                        <Input
-                          placeholder="缺件原因（如未盖章、信息不符等）"
-                          value={doc.missing_reason || ''}
-                          onChange={(e) => {
-                            if (e.target.value || doc.missing_reason) {
-                              handleDocumentUpdate(
-                                detailData.declaration.id,
-                                doc.document_type,
-                                { received: doc.received, missing_reason: e.target.value }
-                              );
-                            }
-                          }}
-                          onBlur={(e) => {
-                            handleDocumentUpdate(
-                              detailData.declaration.id,
-                              doc.document_type,
-                              { received: doc.received, missing_reason: e.target.value }
-                            );
-                          }}
-                        />
-                      </Card>
-                    ))}
+                              {!doc.received && <Tag color="red">未收到</Tag>}
+                              {history.length > 0 && (
+                                <Tag icon={<HistoryOutlined />} color="blue">
+                                  {history.length} 条历史记录
+                                </Tag>
+                              )}
+                            </Space>
+                          }
+                          extra={
+                            <Space>
+                              <Checkbox
+                                checked={doc.received}
+                                onChange={(e) => handleDocumentCheckboxChange(doc, e.target.checked)}
+                              >
+                                已收到
+                              </Checkbox>
+                            </Space>
+                          }
+                        >
+                          <Row gutter={16}>
+                            <Col span={12}>
+                              <Form.Item label="缺件原因" style={{ marginBottom: 0 }}>
+                                <Input
+                                  placeholder="缺件原因（如未盖章、信息不符等）"
+                                  value={doc.missing_reason || ''}
+                                  onBlur={(e) => {
+                                    handleDocumentUpdate(
+                                      detailData.declaration.id,
+                                      doc.document_type,
+                                      { received: doc.received, missing_reason: e.target.value }
+                                    );
+                                  }}
+                                />
+                              </Form.Item>
+                            </Col>
+                            {doc.overwrite_reason && (
+                              <Col span={12}>
+                                <Text type="secondary">上次覆盖原因：{doc.overwrite_reason}</Text>
+                              </Col>
+                            )}
+                          </Row>
+                          
+                          {history.length > 0 && (
+                            <Collapse ghost style={{ marginTop: 8 }}>
+                              <Panel header="版本历史" key="1">
+                                <Timeline>
+                                  {history.map((h, idx) => (
+                                    <Timeline.Item key={idx}>
+                                      <Space direction="vertical" size="small">
+                                        <Space>
+                                          <Text strong>v{h.version}</Text>
+                                          <Tag color={h.received ? 'green' : 'default'}>
+                                            {h.received ? '已收到' : '未收到'}
+                                          </Tag>
+                                          <Text type="secondary">{dayjs(h.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+                                        </Space>
+                                        {h.change_reason && <Text>{h.change_reason}</Text>}
+                                        {h.overwrite_reason && <Text type="warning">覆盖原因：{h.overwrite_reason}</Text>}
+                                        {h.changed_by && <Text type="secondary">操作人：{h.changed_by}</Text>}
+                                      </Space>
+                                    </Timeline.Item>
+                                  ))}
+                                </Timeline>
+                              </Panel>
+                            </Collapse>
+                          )}
+                        </Card>
+                      );
+                    })}
                   </Card>
                 )
               },
@@ -470,6 +597,16 @@ function App() {
                       <Form.Item name="notes" label="备注">
                         <TextArea rows={2} />
                       </Form.Item>
+                      {detailData.payment?.last_updated_at && (
+                        <Descriptions size="small" column={2} style={{ marginBottom: 16 }}>
+                          <Descriptions.Item label="最后更新人">
+                            {detailData.payment.last_updated_by || '-'}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="最后更新时间">
+                            {dayjs(detailData.payment.last_updated_at).format('YYYY-MM-DD HH:mm')}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      )}
                       <Form.Item style={{ marginBottom: 0 }}>
                         <Button type="primary" htmlType="submit">保存缴费信息</Button>
                       </Form.Item>
@@ -539,6 +676,16 @@ function App() {
                       <Form.Item name="notes" label="备注">
                         <TextArea rows={2} />
                       </Form.Item>
+                      {detailData.inspection?.last_updated_at && (
+                        <Descriptions size="small" column={2} style={{ marginBottom: 16 }}>
+                          <Descriptions.Item label="最后更新人">
+                            {detailData.inspection.last_updated_by || '-'}
+                          </Descriptions.Item>
+                          <Descriptions.Item label="最后更新时间">
+                            {dayjs(detailData.inspection.last_updated_at).format('YYYY-MM-DD HH:mm')}
+                          </Descriptions.Item>
+                        </Descriptions>
+                      )}
                       <Form.Item style={{ marginBottom: 0 }}>
                         <Button type="primary" htmlType="submit">保存查验信息</Button>
                       </Form.Item>
@@ -554,13 +701,19 @@ function App() {
                     <Timeline>
                       {detailData.statusLogs.map(log => (
                         <Timeline.Item key={log.id}>
-                          <Space>
-                            <Text strong>{dayjs(log.created_at).format('YYYY-MM-DD HH:mm')}</Text>
-                            {getStatusTag(log.status)}
-                            {log.reason && <Text type="secondary">({log.reason})</Text>}
+                          <Space direction="vertical" size="small">
+                            <Space>
+                              <Text strong>{dayjs(log.created_at).format('YYYY-MM-DD HH:mm')}</Text>
+                              {getStatusTag(log.status)}
+                              {log.changed_by && <Text type="secondary">操作人：{log.changed_by}</Text>}
+                            </Space>
+                            {log.reason && <Text type="secondary">变更原因：{log.reason}</Text>}
                           </Space>
                         </Timeline.Item>
                       ))}
+                      {detailData.statusLogs.length === 0 && (
+                        <Text type="secondary">暂无状态变更记录</Text>
+                      )}
                     </Timeline>
                   </Card>
                 )
