@@ -1,0 +1,33 @@
+{
+  "order_id": "ORD_TEST_001",
+  "user_id": "USER_TEST_001",
+  "total_amount": 599.0,
+  "paid_amount": 599.0,
+  "status": "已支付",
+  "created_at": "2026-05-12T09:00:00",
+  "updated_at": "2026-05-12T09:00:00",
+  "items": [
+    {
+      "sku": "PROD_TEST_001",
+      "name": "测试商品A",
+      "price": 599.0,
+      "quantity": 1,
+      "returned_quantity": 0
+    }
+  ],
+  "activity_id": "ACT_TEST_001",
+  "parent_order_id": null,
+  "split_order_ids": [],
+  "returned_amount": 0.0,
+  "reissued": false,
+  "reissue_count": 0,
+  "gift_status": "待判断",
+  "gift_sku": null,
+  "gift_qty": 0,
+  "gift_allocated_qty": 0,
+  "gift_shipped_qty": 0,
+  "gift_returned_qty": 0,
+  "gift_deducted": false,
+  "gift_deduct_amount": 0.0,
+  "remarks": ""
+}

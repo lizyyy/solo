@@ -1,0 +1,24 @@
+[
+  {
+    "shipment_id": "SHIP_6eb718da",
+    "order_id": "ORD_001_NORMAL",
+    "gift_sku": "GIFT_SK001",
+    "gift_qty": 1,
+    "shipped_at": "2026-05-12T14:45:31.261810",
+    "operator": "system",
+    "tracking_no": "SF1234567890",
+    "created_at": "2026-05-12T14:45:31.261833",
+    "updated_at": "2026-05-12T14:45:31.261836"
+  },
+  {
+    "shipment_id": "SHIP_92d1cdcc",
+    "order_id": "ORD_003_PARTIAL_RETURN",
+    "gift_sku": "GIFT_SK001",
+    "gift_qty": 1,
+    "shipped_at": "2026-05-12T14:45:32.622343",
+    "operator": "system",
+    "tracking_no": "SF9999999999",
+    "created_at": "2026-05-12T14:45:32.622371",
+    "updated_at": "2026-05-12T14:45:32.622375"
+  }
+]

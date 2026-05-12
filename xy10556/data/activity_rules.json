@@ -1,0 +1,18 @@
+[
+  {
+    "activity_id": "ACT_2026_SPRING",
+    "name": "2026春季满赠活动",
+    "start_time": "2026-05-05T14:45:29.310410",
+    "end_time": "2026-06-11T14:45:29.310410",
+    "threshold_amount": 500.0,
+    "gift_sku": "GIFT_SK001",
+    "gift_name": "精美保温杯",
+    "gift_qty_per_order": 1,
+    "is_active": true,
+    "description": "单笔订单满500元即送精美保温杯1个",
+    "return_deduct_rule": "amount_below_threshold",
+    "max_reissue_count": 1,
+    "created_at": "2026-05-12T14:45:29.310433",
+    "updated_at": "2026-05-12T14:45:29.310435"
+  }
+]

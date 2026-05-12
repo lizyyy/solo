@@ -1,0 +1,41 @@
+[
+  {
+    "operation_id": "INVOP_b563ed0d",
+    "sku": "GIFT_SK001",
+    "operation_type": "占用",
+    "qty_change": 1,
+    "before_qty": 100,
+    "after_qty": 99,
+    "order_id": "ORD_001_NORMAL",
+    "operator": "system",
+    "reason": "订单赠品分配",
+    "created_at": "2026-05-12T14:45:30.884851",
+    "updated_at": "2026-05-12T14:45:30.884875"
+  },
+  {
+    "operation_id": "INVOP_2a6513b2",
+    "sku": "GIFT_SK001",
+    "operation_type": "占用",
+    "qty_change": 1,
+    "before_qty": 99,
+    "after_qty": 98,
+    "order_id": "ORD_002_STOCK_SHORTAGE",
+    "operator": "system",
+    "reason": "订单赠品分配",
+    "created_at": "2026-05-12T14:45:30.890166",
+    "updated_at": "2026-05-12T14:45:30.890179"
+  },
+  {
+    "operation_id": "INVOP_de46732f",
+    "sku": "GIFT_SK001",
+    "operation_type": "占用",
+    "qty_change": 1,
+    "before_qty": 98,
+    "after_qty": 97,
+    "order_id": "ORD_003_PARTIAL_RETURN",
+    "operator": "system",
+    "reason": "订单赠品分配",
+    "created_at": "2026-05-12T14:45:30.894919",
+    "updated_at": "2026-05-12T14:45:30.894931"
+  }
+]

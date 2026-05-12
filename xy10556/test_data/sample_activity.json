@@ -1,0 +1,16 @@
+{
+  "activity_id": "ACT_TEST_001",
+  "name": "测试满赠活动",
+  "start_time": "2026-05-01T00:00:00",
+  "end_time": "2026-06-30T23:59:59",
+  "threshold_amount": 200.0,
+  "gift_sku": "GIFT_TEST_001",
+  "gift_name": "测试赠品",
+  "gift_qty_per_order": 1,
+  "is_active": true,
+  "description": "单笔订单满200元即送测试赠品1个",
+  "return_deduct_rule": "amount_below_threshold",
+  "max_reissue_count": 2,
+  "created_at": "2026-05-12T00:00:00",
+  "updated_at": "2026-05-12T00:00:00"
+}

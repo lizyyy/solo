@@ -1,0 +1,244 @@
+[
+  {
+    "order_id": "ORD_001_NORMAL",
+    "user_id": "USER_001",
+    "total_amount": 699.0,
+    "paid_amount": 699.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310447",
+    "updated_at": "2026-05-12T14:45:29.310448",
+    "items": [
+      {
+        "sku": "PROD_A001",
+        "name": "春季连衣裙",
+        "price": 699.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": null,
+    "split_order_ids": [],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "已发货",
+    "gift_sku": "GIFT_SK001",
+    "gift_qty": 1,
+    "gift_allocated_qty": 1,
+    "gift_shipped_qty": 1,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "实付金额 699.0 >= 门槛 500.0"
+  },
+  {
+    "order_id": "ORD_002_STOCK_SHORTAGE",
+    "user_id": "USER_002",
+    "total_amount": 888.0,
+    "paid_amount": 888.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310457",
+    "updated_at": "2026-05-12T14:45:29.310458",
+    "items": [
+      {
+        "sku": "PROD_A002",
+        "name": "真皮手提包",
+        "price": 888.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": null,
+    "split_order_ids": [],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 1,
+    "gift_status": "待补发",
+    "gift_sku": "GIFT_SK001",
+    "gift_qty": 1,
+    "gift_allocated_qty": 1,
+    "gift_shipped_qty": 0,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "实付金额 888.0 >= 门槛 500.0"
+  },
+  {
+    "order_id": "ORD_003_PARTIAL_RETURN",
+    "user_id": "USER_003",
+    "total_amount": 1200.0,
+    "paid_amount": 1200.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310466",
+    "updated_at": "2026-05-12T14:45:29.310468",
+    "items": [
+      {
+        "sku": "PROD_A003",
+        "name": "羊毛大衣",
+        "price": 1000.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      },
+      {
+        "sku": "PROD_A004",
+        "name": "配饰丝巾",
+        "price": 200.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": null,
+    "split_order_ids": [],
+    "returned_amount": 800.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "已扣费",
+    "gift_sku": "GIFT_SK001",
+    "gift_qty": 1,
+    "gift_allocated_qty": 1,
+    "gift_shipped_qty": 1,
+    "gift_returned_qty": 0,
+    "gift_deducted": true,
+    "gift_deduct_amount": 100.0,
+    "remarks": "退货后金额不足，已扣费 100.0 元"
+  },
+  {
+    "order_id": "ORD_004_SPLIT_A",
+    "user_id": "USER_004",
+    "total_amount": 300.0,
+    "paid_amount": 300.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310470",
+    "updated_at": "2026-05-12T14:45:29.310472",
+    "items": [
+      {
+        "sku": "PROD_A005",
+        "name": "牛仔裤",
+        "price": 300.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": "ORD_004_PARENT",
+    "split_order_ids": [
+      "ORD_004_SPLIT_B"
+    ],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "不符合条件",
+    "gift_sku": null,
+    "gift_qty": 0,
+    "gift_allocated_qty": 0,
+    "gift_shipped_qty": 0,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "实付金额 300.0 < 门槛 500.0"
+  },
+  {
+    "order_id": "ORD_004_SPLIT_B",
+    "user_id": "USER_004",
+    "total_amount": 400.0,
+    "paid_amount": 400.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310477",
+    "updated_at": "2026-05-12T14:45:29.310478",
+    "items": [
+      {
+        "sku": "PROD_A006",
+        "name": "运动鞋",
+        "price": 400.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": "ORD_004_PARENT",
+    "split_order_ids": [
+      "ORD_004_SPLIT_A"
+    ],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "不符合条件",
+    "gift_sku": null,
+    "gift_qty": 0,
+    "gift_allocated_qty": 0,
+    "gift_shipped_qty": 0,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "实付金额 400.0 < 门槛 500.0"
+  },
+  {
+    "order_id": "ORD_005_NO_ACTIVITY",
+    "user_id": "USER_005",
+    "total_amount": 1000.0,
+    "paid_amount": 1000.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310481",
+    "updated_at": "2026-05-12T14:45:29.310482",
+    "items": [
+      {
+        "sku": "PROD_A007",
+        "name": "数码产品",
+        "price": 1000.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": null,
+    "parent_order_id": null,
+    "split_order_ids": [],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "不符合条件",
+    "gift_sku": null,
+    "gift_qty": 0,
+    "gift_allocated_qty": 0,
+    "gift_shipped_qty": 0,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "无关联活动"
+  },
+  {
+    "order_id": "ORD_006_BELOW_THRESHOLD",
+    "user_id": "USER_006",
+    "total_amount": 399.0,
+    "paid_amount": 399.0,
+    "status": "已支付",
+    "created_at": "2026-05-12T14:45:29.310484",
+    "updated_at": "2026-05-12T14:45:29.310486",
+    "items": [
+      {
+        "sku": "PROD_A008",
+        "name": "T恤",
+        "price": 399.0,
+        "quantity": 1,
+        "returned_quantity": 0
+      }
+    ],
+    "activity_id": "ACT_2026_SPRING",
+    "parent_order_id": null,
+    "split_order_ids": [],
+    "returned_amount": 0.0,
+    "reissued": false,
+    "reissue_count": 0,
+    "gift_status": "不符合条件",
+    "gift_sku": null,
+    "gift_qty": 0,
+    "gift_allocated_qty": 0,
+    "gift_shipped_qty": 0,
+    "gift_returned_qty": 0,
+    "gift_deducted": false,
+    "gift_deduct_amount": 0.0,
+    "remarks": "实付金额 399.0 < 门槛 500.0"
+  }
+]
