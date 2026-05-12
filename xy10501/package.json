@@ -1,0 +1,15 @@
+{
+  "name": "supplier-qualification-inspection",
+  "version": "1.0.0",
+  "description": "供应商资质到期巡检 API 系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "demo": "node src/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
