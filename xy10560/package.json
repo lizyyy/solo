@@ -1,0 +1,34 @@
+{
+  "name": "cert-rotator-cli",
+  "version": "1.0.0",
+  "description": "批量证书换发 CLI 工具 - 管理内部服务证书临期换发",
+  "main": "dist/index.js",
+  "bin": {
+    "cert-rotator": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "certificate",
+    "ssl",
+    "tls",
+    "devops",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}

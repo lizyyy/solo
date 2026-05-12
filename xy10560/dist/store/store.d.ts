@@ -1,0 +1,32 @@
+import { Store, Certificate, Domain, ServiceDependency, MaintenanceWindow, ExecutionRecord, ActionType } from '../types';
+export declare class DataStore {
+    private storePath;
+    private cache;
+    constructor(storePath?: string);
+    getStorePath(): string;
+    private getStoreDir;
+    exists(): boolean;
+    initialize(): Store;
+    load(): Store;
+    save(store: Store): void;
+    addCertificate(cert: Omit<Certificate, 'id' | 'createdAt' | 'updatedAt'>): Certificate;
+    updateCertificate(id: string, updates: Partial<Certificate>): Certificate | null;
+    getCertificate(id: string): Certificate | undefined;
+    getCertificateBySerial(serial: string): Certificate | undefined;
+    getCertificates(): Certificate[];
+    addDomain(domain: Omit<Domain, 'id' | 'createdAt'>): Domain;
+    getDomains(): Domain[];
+    getDomainsByCertificate(certId: string): Domain[];
+    addDependency(dep: Omit<ServiceDependency, 'id' | 'createdAt' | 'updatedAt'>): ServiceDependency;
+    updateDependency(id: string, updates: Partial<ServiceDependency>): ServiceDependency | null;
+    getDependencies(): ServiceDependency[];
+    getDependenciesByService(serviceName: string, env?: string): ServiceDependency[];
+    getDependenciesByServiceNames(serviceNames: string[], env?: string): ServiceDependency[];
+    addWindow(window: Omit<MaintenanceWindow, 'id' | 'createdAt' | 'status'>): MaintenanceWindow;
+    getWindows(): MaintenanceWindow[];
+    getWindowsByCertificate(certId: string): MaintenanceWindow[];
+    addExecutionRecord(record: Omit<ExecutionRecord, 'id'>): ExecutionRecord;
+    getExecutionRecords(limit?: number, action?: ActionType): ExecutionRecord[];
+    getExecutionRecordsByIdempotencyKey(key: string): ExecutionRecord | undefined;
+    getExecutionRecordsByTarget(targetId: string): ExecutionRecord[];
+}

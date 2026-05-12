@@ -1,0 +1,515 @@
+{
+  "certificates": [
+    {
+      "name": "test-api-cert-01",
+      "serialNumber": "TEST-SERIAL-001",
+      "issuer": "Internal CA",
+      "subject": "CN=test-api.internal.com",
+      "notBefore": "2025-05-12T08:22:05.531Z",
+      "notAfter": "2026-05-15T08:22:05.531Z",
+      "domains": [
+        "test-api.internal.com",
+        "test-api-v2.internal.com"
+      ],
+      "environment": "test",
+      "rollbackPackageId": "ROLLBACK-TEST-001",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "efbdc01f-fcc2-4f1d-8993-37ab67c80c6c",
+      "createdAt": "2026-05-12T08:22:05.532Z",
+      "updatedAt": "2026-05-12T08:22:05.532Z"
+    },
+    {
+      "name": "test-web-cert-01",
+      "serialNumber": "TEST-SERIAL-002",
+      "issuer": "Internal CA",
+      "subject": "CN=test-web.internal.com",
+      "notBefore": "2025-07-16T08:22:05.531Z",
+      "notAfter": "2026-05-27T08:22:05.531Z",
+      "domains": [
+        "test-web.internal.com"
+      ],
+      "environment": "test",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "317f4804-a6a7-4b6a-8af1-8e50d6622812",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "preprod-gateway-cert-01",
+      "serialNumber": "PREPROD-SERIAL-001",
+      "issuer": "Internal CA",
+      "subject": "CN=preprod-gateway.internal.com",
+      "notBefore": "2025-05-17T08:22:05.531Z",
+      "notAfter": "2026-05-17T08:22:05.531Z",
+      "domains": [
+        "preprod-gateway.internal.com",
+        "preprod-api.internal.com"
+      ],
+      "environment": "preprod",
+      "rollbackPackageId": "ROLLBACK-PREPROD-001",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "7a58b6bd-f67b-4b98-9ce8-0539ba8fd636",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "preprod-auth-cert-01",
+      "serialNumber": "PREPROD-SERIAL-002",
+      "issuer": "Internal CA",
+      "subject": "CN=preprod-auth.internal.com",
+      "notBefore": "2025-10-24T08:22:05.531Z",
+      "notAfter": "2026-06-06T08:22:05.531Z",
+      "domains": [
+        "preprod-auth.internal.com"
+      ],
+      "environment": "preprod",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "73097815-27bc-400b-88b1-df646cc12a03",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "prod-api-cert-01",
+      "serialNumber": "PROD-SERIAL-001",
+      "issuer": "Internal CA",
+      "subject": "CN=api.example.com",
+      "notBefore": "2025-05-27T08:22:05.531Z",
+      "notAfter": "2026-05-14T08:22:05.531Z",
+      "domains": [
+        "api.example.com",
+        "api-v2.example.com",
+        "api-staging.example.com"
+      ],
+      "environment": "production",
+      "rollbackPackageId": "ROLLBACK-PROD-001",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "db8e71d8-4bcd-427c-ab74-a98583003482",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "prod-web-cert-01",
+      "serialNumber": "PROD-SERIAL-002",
+      "issuer": "Internal CA",
+      "subject": "CN=www.example.com",
+      "notBefore": "2025-11-13T08:22:05.531Z",
+      "notAfter": "2026-11-08T08:22:05.531Z",
+      "domains": [
+        "www.example.com",
+        "example.com"
+      ],
+      "environment": "production",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "00247db0-1d45-4abc-9167-2697a8eb6d6a",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "prod-payment-cert-01",
+      "serialNumber": "PROD-SERIAL-003",
+      "issuer": "Internal CA",
+      "subject": "CN=payment.example.com",
+      "notBefore": "2025-06-06T08:22:05.531Z",
+      "notAfter": "2026-05-22T08:22:05.531Z",
+      "domains": [
+        "payment.example.com"
+      ],
+      "environment": "production",
+      "rollbackPackageId": "ROLLBACK-PROD-003",
+      "status": "pending_import",
+      "hasRollbackPackage": false,
+      "id": "ae6e9100-138f-46b3-a869-4577ee074ba3",
+      "createdAt": "2026-05-12T08:22:05.533Z",
+      "updatedAt": "2026-05-12T08:22:05.533Z"
+    }
+  ],
+  "domains": [
+    {
+      "name": "test-api.internal.com",
+      "certificateId": "efbdc01f-fcc2-4f1d-8993-37ab67c80c6c",
+      "environment": "test",
+      "serviceNames": [
+        "test-api-service",
+        "test-gateway"
+      ],
+      "isPrimary": true,
+      "id": "14fdf71f-a560-42da-9db0-a2e4512778c3",
+      "createdAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "test-api-v2.internal.com",
+      "certificateId": "efbdc01f-fcc2-4f1d-8993-37ab67c80c6c",
+      "environment": "test",
+      "serviceNames": [
+        "test-api-service-v2"
+      ],
+      "isPrimary": false,
+      "id": "62f85e94-3c8c-44db-8dd2-e4c83499673a",
+      "createdAt": "2026-05-12T08:22:05.533Z"
+    },
+    {
+      "name": "test-web.internal.com",
+      "certificateId": "317f4804-a6a7-4b6a-8af1-8e50d6622812",
+      "environment": "test",
+      "serviceNames": [
+        "test-web-service"
+      ],
+      "isPrimary": true,
+      "id": "38571047-816a-40bd-a851-542cc60b7ee9",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "preprod-gateway.internal.com",
+      "certificateId": "7a58b6bd-f67b-4b98-9ce8-0539ba8fd636",
+      "environment": "preprod",
+      "serviceNames": [
+        "preprod-gateway",
+        "preprod-loadbalancer"
+      ],
+      "isPrimary": true,
+      "id": "df81423a-b184-4e35-b4e0-82c4cb1f83dd",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "preprod-api.internal.com",
+      "certificateId": "7a58b6bd-f67b-4b98-9ce8-0539ba8fd636",
+      "environment": "preprod",
+      "serviceNames": [
+        "preprod-api-service"
+      ],
+      "isPrimary": false,
+      "id": "d9c9ac02-1e94-4784-aeb5-435fac807c49",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "preprod-auth.internal.com",
+      "certificateId": "73097815-27bc-400b-88b1-df646cc12a03",
+      "environment": "preprod",
+      "serviceNames": [
+        "preprod-auth-service",
+        "preprod-sso"
+      ],
+      "isPrimary": true,
+      "id": "c4e7fcdf-b786-4bd9-867e-e1d8bdbc6070",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "api.example.com",
+      "certificateId": "db8e71d8-4bcd-427c-ab74-a98583003482",
+      "environment": "production",
+      "serviceNames": [
+        "prod-api-service",
+        "prod-gateway",
+        "prod-rate-limiter"
+      ],
+      "isPrimary": true,
+      "id": "8af5a9c2-3344-4740-ac87-6d24d4629035",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "api-v2.example.com",
+      "certificateId": "db8e71d8-4bcd-427c-ab74-a98583003482",
+      "environment": "production",
+      "serviceNames": [
+        "prod-api-service-v2"
+      ],
+      "isPrimary": false,
+      "id": "0d042944-ce17-4ae8-8159-d353404b3c39",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "api-staging.example.com",
+      "certificateId": "db8e71d8-4bcd-427c-ab74-a98583003482",
+      "environment": "production",
+      "serviceNames": [
+        "prod-api-staging"
+      ],
+      "isPrimary": false,
+      "id": "4a28d003-19ff-4481-a408-ada969f16e48",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "www.example.com",
+      "certificateId": "00247db0-1d45-4abc-9167-2697a8eb6d6a",
+      "environment": "production",
+      "serviceNames": [
+        "prod-web-service",
+        "prod-cdn"
+      ],
+      "isPrimary": true,
+      "id": "f9a9a70c-71bf-4ccb-b3dc-2fd2dc7e64fe",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "example.com",
+      "certificateId": "00247db0-1d45-4abc-9167-2697a8eb6d6a",
+      "environment": "production",
+      "serviceNames": [
+        "prod-web-service"
+      ],
+      "isPrimary": false,
+      "id": "2acdba6a-c274-4565-a574-f230df3caaed",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "name": "payment.example.com",
+      "certificateId": "ae6e9100-138f-46b3-a869-4577ee074ba3",
+      "environment": "production",
+      "serviceNames": [
+        "prod-payment-service",
+        "prod-transaction-processor"
+      ],
+      "isPrimary": true,
+      "id": "97f08826-692a-4b11-8fba-6960335e0996",
+      "createdAt": "2026-05-12T08:22:05.534Z"
+    }
+  ],
+  "dependencies": [
+    {
+      "serviceName": "test-api-service",
+      "dependsOn": [
+        "test-db",
+        "test-cache"
+      ],
+      "isCritical": false,
+      "environment": "test",
+      "status": "acknowledged",
+      "id": "8d989061-c432-4e1e-ba63-57e10e3f26cd",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "test-gateway",
+      "dependsOn": [
+        "test-api-service"
+      ],
+      "isCritical": false,
+      "environment": "test",
+      "status": "acknowledged",
+      "id": "d70d2f65-0069-4a31-8f0b-39dc75164069",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "preprod-gateway",
+      "dependsOn": [
+        "preprod-api-service",
+        "preprod-auth-service"
+      ],
+      "isCritical": true,
+      "environment": "preprod",
+      "status": "notified",
+      "lastNotifiedAt": "2026-05-11T08:22:05.531Z",
+      "acknowledgementDeadline": "2026-05-14T08:22:05.531Z",
+      "id": "6ce0ad8c-a36a-46a0-ad45-a7f7326f05f0",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "preprod-api-service",
+      "dependsOn": [
+        "preprod-db",
+        "preprod-cache"
+      ],
+      "isCritical": true,
+      "environment": "preprod",
+      "status": "pending_notification",
+      "id": "f7e00723-5d62-4645-b817-aaae235091aa",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "preprod-auth-service",
+      "dependsOn": [
+        "preprod-ldap"
+      ],
+      "isCritical": true,
+      "environment": "preprod",
+      "status": "acknowledged",
+      "id": "0b533394-ef1a-41c0-8877-a265799671ec",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "prod-gateway",
+      "dependsOn": [
+        "prod-api-service",
+        "prod-auth-service"
+      ],
+      "isCritical": true,
+      "environment": "production",
+      "status": "pending_notification",
+      "id": "651d7d01-b16a-4797-be7a-626f192f9f7e",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "prod-api-service",
+      "dependsOn": [
+        "prod-db",
+        "prod-cache",
+        "prod-search"
+      ],
+      "isCritical": true,
+      "environment": "production",
+      "status": "pending_notification",
+      "id": "ebec068c-7b0e-4619-90bc-797c6263ee90",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "prod-payment-service",
+      "dependsOn": [
+        "prod-db",
+        "prod-bank-gateway"
+      ],
+      "isCritical": true,
+      "environment": "production",
+      "status": "acknowledged",
+      "id": "08582933-c41d-4f3f-98ca-81c1127ac57d",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "prod-transaction-processor",
+      "dependsOn": [
+        "prod-payment-service",
+        "prod-queue"
+      ],
+      "isCritical": true,
+      "environment": "production",
+      "status": "pending_notification",
+      "id": "d054cf6b-4dd6-4394-a3bc-b85b03941d61",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    },
+    {
+      "serviceName": "prod-web-service",
+      "dependsOn": [
+        "prod-api-service",
+        "prod-cdn"
+      ],
+      "isCritical": true,
+      "environment": "production",
+      "status": "acknowledged",
+      "id": "ac7c1223-e707-45cf-a635-c585d433fb45",
+      "createdAt": "2026-05-12T08:22:05.534Z",
+      "updatedAt": "2026-05-12T08:22:05.534Z"
+    }
+  ],
+  "windows": [
+    {
+      "name": "test-weekly-maintenance",
+      "environment": "test",
+      "startTime": "2026-05-13T08:22:05.531Z",
+      "endTime": "2026-05-13T08:22:05.531Z",
+      "affectedServices": [
+        "test-api-service",
+        "test-gateway"
+      ],
+      "affectedCertificates": [],
+      "id": "f6cf3e23-15c8-4095-ba84-fa54ccf081a7",
+      "status": "scheduled",
+      "createdAt": "2026-05-12T08:22:05.535Z"
+    },
+    {
+      "name": "preprod-cert-rotation-2024",
+      "environment": "preprod",
+      "startTime": "2026-05-15T08:22:05.531Z",
+      "endTime": "2026-05-15T08:22:05.531Z",
+      "affectedServices": [
+        "preprod-gateway",
+        "preprod-api-service"
+      ],
+      "affectedCertificates": [],
+      "id": "de9848c0-c3b1-4723-bc96-5075c4cf3beb",
+      "status": "scheduled",
+      "createdAt": "2026-05-12T08:22:05.535Z"
+    },
+    {
+      "name": "prod-api-cert-rotation",
+      "environment": "production",
+      "startTime": "2026-05-13T08:22:05.531Z",
+      "endTime": "2026-05-13T08:22:05.531Z",
+      "affectedServices": [
+        "prod-api-service",
+        "prod-gateway"
+      ],
+      "affectedCertificates": [],
+      "id": "37681739-cbd0-4035-8d2e-1e26dd322180",
+      "status": "scheduled",
+      "createdAt": "2026-05-12T08:22:05.535Z"
+    }
+  ],
+  "executionRecords": [
+    {
+      "action": "import",
+      "targetType": "system",
+      "status": "success",
+      "startedAt": "2026-05-12T08:22:05.532Z",
+      "completedAt": "2026-05-12T08:22:05.535Z",
+      "durationMs": 3,
+      "operator": "admin",
+      "details": {
+        "before": {
+          "certCount": 0,
+          "domainCount": 0
+        },
+        "after": {
+          "certCount": 7,
+          "domainCount": 12
+        },
+        "changes": [
+          "导入 7 个证书",
+          "导入 12 个域名",
+          "导入 10 个依赖关系",
+          "导入 3 个维护窗口"
+        ]
+      },
+      "idempotencyKey": "dae48414fd755c0e0d1427703141a89d3715d7d136b17625816d51991638e49d",
+      "id": "55b7df2d-f1e3-40a8-be81-bf0f3cc318fe"
+    },
+    {
+      "action": "check",
+      "targetType": "system",
+      "status": "success",
+      "startedAt": "2026-05-12T08:22:15.780Z",
+      "completedAt": "2026-05-12T08:22:15.788Z",
+      "durationMs": 8,
+      "operator": "admin",
+      "details": {
+        "metadata": {
+          "checkedCount": 2,
+          "environment": "test"
+        }
+      },
+      "id": "19ade7dc-864c-4f4e-a697-e25460038ce7"
+    },
+    {
+      "action": "system_check",
+      "targetType": "system",
+      "status": "success",
+      "startedAt": "2026-05-12T08:22:22.763Z",
+      "completedAt": "2026-05-12T08:22:22.798Z",
+      "durationMs": 35,
+      "operator": "admin",
+      "details": {
+        "metadata": {
+          "immediateCount": 3,
+          "thisWeekCount": 3,
+          "needsCoordinationCount": 7,
+          "completedCount": 0
+        }
+      },
+      "id": "e93824c6-ec04-4ec1-8879-afa5358fa04b"
+    }
+  ],
+  "version": "1.0.0",
+  "lastUpdated": "2026-05-12T08:22:22.798Z"
+}
