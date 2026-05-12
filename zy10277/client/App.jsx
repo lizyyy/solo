@@ -202,20 +202,19 @@ function App() {
 
   const handleDocumentCheckboxChange = (doc, checked) => {
     const declarationId = detailData.declaration.id;
-    
-    if (doc.received && checked) {
-      setPendingDocumentUpdate({
-        declarationId,
-        documentType: doc.document_type,
-        received: true
-      });
-      setOverwriteModalVisible(true);
-    } else {
-      handleDocumentUpdate(declarationId, doc.document_type, {
-        received: checked,
-        missing_reason: doc.missing_reason || ''
-      });
-    }
+    handleDocumentUpdate(declarationId, doc.document_type, {
+      received: checked,
+      missing_reason: doc.missing_reason || ''
+    });
+  };
+
+  const handleUpdateVersionClick = (doc) => {
+    setPendingDocumentUpdate({
+      declarationId: detailData.declaration.id,
+      documentType: doc.document_type,
+      currentVersion: doc.version
+    });
+    setOverwriteModalVisible(true);
   };
 
   const handleOverwriteConfirm = (overwriteReason) => {
@@ -226,7 +225,7 @@ function App() {
         {
           received: true,
           overwrite_reason: overwriteReason,
-          force_record: true
+          force_new_version: true
         }
       );
     }
@@ -463,16 +462,32 @@ function App() {
           onFinish={(values) => handleOverwriteConfirm(values.overwrite_reason)}
         >
           <Paragraph type="warning">
-            ⚠️ 当前资料已标记为已收到。再次标记将创建新的资料版本（版本号+1）。
+            ⚠️ 此操作将创建资料的新版本。
           </Paragraph>
+          {pendingDocumentUpdate && (
+            <div style={{ 
+              padding: '12px', 
+              background: '#f5f5f5', 
+              borderRadius: '4px',
+              marginBottom: '16px' 
+            }}>
+              <Text strong>资料类型：</Text>
+              <Text>{DOCUMENT_TYPE_MAP[pendingDocumentUpdate.documentType]}</Text>
+              <br />
+              <Text strong>当前版本：</Text>
+              <Tag color="blue">v{pendingDocumentUpdate.currentVersion}</Tag>
+              <Text> → </Text>
+              <Tag color="green">v{pendingDocumentUpdate.currentVersion + 1}</Tag>
+            </div>
+          )}
           <Form.Item
             name="overwrite_reason"
-            label="覆盖原因"
-            rules={[{ required: true, message: '请输入覆盖原因' }]}
+            label="更新原因"
+            rules={[{ required: true, message: '请输入更新原因' }]}
           >
             <TextArea
               rows={3}
-              placeholder="请输入覆盖原因，例如：客户重新提交了盖章版本"
+              placeholder="请输入更新原因，例如：客户重新提交了盖章版本 / 内容有变更"
             />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
@@ -483,7 +498,7 @@ function App() {
               }}>
                 取消
               </Button>
-              <Button type="primary" htmlType="submit">确认覆盖并升级版本</Button>
+              <Button type="primary" htmlType="submit">确认更新版本</Button>
             </Space>
           </Form.Item>
         </Form>
@@ -551,6 +566,16 @@ function App() {
                               >
                                 已收到
                               </Checkbox>
+                              {doc.received && (
+                                <Button
+                                  size="small"
+                                  type="link"
+                                  icon={<HistoryOutlined />}
+                                  onClick={() => handleUpdateVersionClick(doc)}
+                                >
+                                  更新版本 (v{doc.version})
+                                </Button>
+                              )}
                             </Space>
                           }
                         >
@@ -591,8 +616,8 @@ function App() {
                                           </Tag>
                                           <Text type="secondary">{dayjs(h.created_at).format('YYYY-MM-DD HH:mm')}</Text>
                                         </Space>
-                                        {h.change_reason && <Text>{h.change_reason}</Text>}
-                                        {h.overwrite_reason && <Text type="warning">覆盖原因：{h.overwrite_reason}</Text>}
+                                        {h.change_reason && <Text>变更原因：{h.change_reason}</Text>}
+                                        {h.overwrite_reason && <Text type="warning">更新说明：{h.overwrite_reason}</Text>}
                                         {h.changed_by && <Text type="secondary">操作人：{h.changed_by}</Text>}
                                       </Space>
                                     </Timeline.Item>

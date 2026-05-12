@@ -417,14 +417,13 @@ function updateDocument(declarationId, documentType, data) {
     let newVersion = doc.version;
     let changeReason = data.change_reason || '';
     
-    if (!wasReceived && isNowReceived) {
+    if (data.force_new_version || data.force_record) {
+      newVersion = doc.version + 1;
+      changeReason = '更新资料版本';
+    } else if (!wasReceived && isNowReceived) {
       changeReason = '首次收到资料';
     } else if (wasReceived && !isNowReceived) {
-      newVersion = doc.version;
       changeReason = '资料退回/标记为未收到';
-    } else if (wasReceived && isNowReceived && (newOverwriteReason || doc.overwrite_reason !== newOverwriteReason)) {
-      newVersion = doc.version + 1;
-      changeReason = '补件版本被覆盖';
     } else if (doc.missing_reason !== newMissingReason) {
       changeReason = '更新缺件原因';
     }
