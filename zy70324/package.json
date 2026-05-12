@@ -1,0 +1,23 @@
+{
+  "name": "callback-health-checker",
+  "version": "1.0.0",
+  "description": "开放平台回调地址健康巡检API系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "lowdb": "^6.1.1",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.2",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0"
+  }
+}
