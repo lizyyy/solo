@@ -145,7 +145,31 @@ async function runDemo() {
     console.log(`✅ 拦截成功: ${error.message}`);
   }
 
-  printHeader('5. 场景四：取消订单并撤销门禁');
+  printHeader('5. 场景四：同一车牌防重复绑定拦截');
+
+  console.log('🚗 尝试使用同一车牌创建新订单（不同车位、不同时间段）...');
+  try {
+    const spot2 = await parkingSpotService.createParkingSpot({
+      spotNumber: 'A-002',
+      ownerId,
+      ownerName,
+      pricePerHour: 15
+    });
+
+    await orderService.createOrder({
+      spotId: spot2.id,
+      renterId: 'renter-004',
+      renterName: '租客孙七',
+      licensePlate: '京A12345',
+      startTime: endTime + 7200000,
+      endTime: endTime + 10800000
+    });
+    console.log('❌ 错误：应该拦截车牌重复绑定但没有拦截！');
+  } catch (error) {
+    console.log(`✅ 车牌重复绑定拦截成功: ${error.message}`);
+  }
+
+  printHeader('6. 场景五：取消订单并撤销门禁');
 
   console.log('📝 创建新订单用于测试取消...');
   const order2 = await orderService.createOrder({
@@ -178,7 +202,7 @@ async function runDemo() {
     console.log(`   授权状态已更新为: ${revokedAuth.status}`);
   }
 
-  printHeader('6. 数据汇总查询');
+  printHeader('7. 数据汇总查询');
 
   const stats = await queryService.getDashboardStats();
   console.log('📊 仪表盘统计:');
@@ -203,7 +227,7 @@ async function runDemo() {
     console.log(`   车牌 ${auth.license_plate} - 车位 ${auth.spot_number} - ${auth.renter_name}`);
   });
 
-  printHeader('7. 按车牌查询订单');
+  printHeader('8. 按车牌查询订单');
 
   const plateOrders = await queryService.searchOrdersByLicensePlate('京A12345');
   console.log(`🔍 车牌 京A12345 的订单记录: ${plateOrders.length} 条`);
@@ -217,6 +241,7 @@ async function runDemo() {
   console.log('   ✓ 未支付不能授权 - 已实现');
   console.log('   ✓ 取消后门禁自动撤销 - 已实现');
   console.log('   ✓ 重复支付拦截 - 已实现');
+  console.log('   ✓ 同一车牌防重复绑定 - 已实现（下单+授权双重校验）');
   console.log('   ✓ 车牌绑定订单查询 - 已实现');
   console.log('   ✓ 操作时间线记录 - 已实现');
   console.log('   ✓ 业主结算统计 - 已实现');

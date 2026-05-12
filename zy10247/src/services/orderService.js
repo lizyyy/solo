@@ -1,5 +1,5 @@
 const { db } = require('../database');
-const { generateId, now, logOperation, calculateHours, checkTimeConflict } = require('../utils');
+const { generateId, now, logOperation, calculateHours, checkTimeConflict, checkLicensePlateActiveOrders } = require('../utils');
 const { getParkingSpotById } = require('./parkingSpotService');
 
 async function createOrder(data) {
@@ -21,6 +21,11 @@ async function createOrder(data) {
   const conflicts = await checkTimeConflict(spotId, startTime, endTime);
   if (conflicts.length > 0) {
     throw new Error(`时间段冲突，与订单 ${conflicts[0].id} 重叠`);
+  }
+
+  const licensePlateActiveOrders = await checkLicensePlateActiveOrders(licensePlate);
+  if (licensePlateActiveOrders.length > 0) {
+    throw new Error(`车牌 ${licensePlate} 已有活跃订单，无法重复绑定`);
   }
 
   const hours = calculateHours(startTime, endTime);
@@ -117,6 +122,11 @@ async function authorizeOrder(orderId, operatorId, operatorName) {
   const conflicts = await checkTimeConflict(order.spot_id, order.start_time, order.end_time, orderId);
   if (conflicts.length > 0) {
     throw new Error(`授权失败，时间段与订单 ${conflicts[0].id} 冲突`);
+  }
+
+  const licensePlateAuths = await checkLicensePlateActiveOrders(order.license_plate, orderId);
+  if (licensePlateAuths.length > 0) {
+    throw new Error(`授权失败，车牌 ${order.license_plate} 已有活跃授权`);
   }
 
   const authId = generateId();
