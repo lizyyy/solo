@@ -264,7 +264,7 @@ class ReportGenerator:
                     "label": final_label,
                     "annotation_count": len(active_annotations),
                     "label_distribution": dict(label_counts),
-                    "metadata": json.loads(sample.metadata) if sample.metadata else {}
+                    "metadata": json.loads(sample.sample_metadata) if sample.sample_metadata else {}
                 })
         
         return training_data

@@ -45,7 +45,7 @@ class AnnotationResponse(AnnotationBase):
 class SampleBase(BaseModel):
     content: str
     external_id: Optional[str] = None
-    metadata: Optional[str] = None
+    sample_metadata: Optional[str] = None
 
 
 class SampleCreate(SampleBase):

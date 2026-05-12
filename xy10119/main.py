@@ -180,7 +180,7 @@ async def add_sample(
         project_id=project_id,
         content=sample_data.content,
         external_id=sample_data.external_id,
-        metadata=sample_data.metadata
+        sample_metadata=sample_data.sample_metadata
     )
     db.add(sample)
     db.flush()

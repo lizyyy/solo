@@ -28,7 +28,7 @@ class Sample(Base):
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     external_id = Column(String(255))
     content = Column(Text, nullable=False)
-    metadata = Column(Text)
+    sample_metadata = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     project = relationship("Project", back_populates="samples")

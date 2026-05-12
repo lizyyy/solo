@@ -35,7 +35,7 @@ class DataImporter:
             sample = SampleCreate(
                 content=str(item.get("content", item.get("text", ""))),
                 external_id=item.get("id") or item.get("external_id"),
-                metadata=json.dumps(item.get("metadata", {})) if item.get("metadata") else None,
+                sample_metadata=json.dumps(item.get("metadata", {})) if item.get("metadata") else None,
                 annotations=annotations_data
             )
             samples.append(sample)
@@ -139,7 +139,7 @@ class DataImporter:
                     project_id=project_id,
                     content=sample_data.content,
                     external_id=sample_data.external_id,
-                    metadata=sample_data.metadata
+                    sample_metadata=sample_data.sample_metadata
                 )
                 self.db.add(sample)
                 self.db.flush()
