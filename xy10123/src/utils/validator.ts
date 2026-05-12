@@ -12,17 +12,97 @@ import {
   getShortestPathForZone
 } from './';
 
+export interface BoundaryCheckResult {
+  isWithinBounds: boolean;
+  violations: string[];
+}
+
+export function checkRectWithinBounds(
+  position: { x: number; z: number },
+  dimension: { width: number; depth: number },
+  hallWidth: number,
+  hallDepth: number,
+  tolerance: number = 0
+): BoundaryCheckResult {
+  const violations: string[] = [];
+  
+  if (isNaN(position.x) || isNaN(position.z) || 
+      isNaN(dimension.width) || isNaN(dimension.depth)) {
+    return { isWithinBounds: false, violations: ['坐标或尺寸包含无效值'] };
+  }
+  
+  if (dimension.width <= 0 || dimension.depth <= 0) {
+    return { isWithinBounds: false, violations: ['尺寸必须大于0'] };
+  }
+  
+  if (position.x < -tolerance) {
+    violations.push(`左边界超出 ${(-position.x + tolerance).toFixed(2)} 米`);
+  }
+  if (position.z < -tolerance) {
+    violations.push(`前边界超出 ${(-position.z + tolerance).toFixed(2)} 米`);
+  }
+  if (position.x + dimension.width > hallWidth + tolerance) {
+    violations.push(`右边界超出 ${(position.x + dimension.width - hallWidth - tolerance).toFixed(2)} 米`);
+  }
+  if (position.z + dimension.depth > hallDepth + tolerance) {
+    violations.push(`后边界超出 ${(position.z + dimension.depth - hallDepth - tolerance).toFixed(2)} 米`);
+  }
+  
+  return {
+    isWithinBounds: violations.length === 0,
+    violations
+  };
+}
+
+export function checkPointWithinBounds(
+  position: { x: number; z: number },
+  hallWidth: number,
+  hallDepth: number,
+  tolerance: number = 0
+): BoundaryCheckResult {
+  const violations: string[] = [];
+  
+  if (isNaN(position.x) || isNaN(position.z)) {
+    return { isWithinBounds: false, violations: ['坐标包含无效值'] };
+  }
+  
+  if (position.x < -tolerance) {
+    violations.push(`X坐标越界 ${(-position.x + tolerance).toFixed(2)} 米`);
+  }
+  if (position.z < -tolerance) {
+    violations.push(`Z坐标越界 ${(-position.z + tolerance).toFixed(2)} 米`);
+  }
+  if (position.x > hallWidth + tolerance) {
+    violations.push(`X坐标越界 ${(position.x - hallWidth - tolerance).toFixed(2)} 米`);
+  }
+  if (position.z > hallDepth + tolerance) {
+    violations.push(`Z坐标越界 ${(position.z - hallDepth - tolerance).toFixed(2)} 米`);
+  }
+  
+  return {
+    isWithinBounds: violations.length === 0,
+    violations
+  };
+}
+
 export function validateProject(project: ProjectData): ValidationResult[] {
   const results: ValidationResult[] = [];
+  const hallWidth = project.exhibitionHall.width;
+  const hallDepth = project.exhibitionHall.depth;
   
-  results.push(...validateBooths(project.booths, project.config));
-  results.push(...validateExits(project.exits, project.booths, project.config));
-  results.push(...validateZones(project.zones, project.evacuationPaths, project.config));
+  results.push(...validateBooths(project.booths, project.config, hallWidth, hallDepth));
+  results.push(...validateExits(project.exits, project.booths, project.config, hallWidth, hallDepth));
+  results.push(...validateZones(project.zones, project.evacuationPaths, project.config, hallWidth, hallDepth));
   
   return results;
 }
 
-function validateBooths(booths: Booth[], config: SimulationConfig): ValidationResult[] {
+function validateBooths(
+  booths: Booth[], 
+  config: SimulationConfig,
+  hallWidth: number,
+  hallDepth: number
+): ValidationResult[] {
   const results: ValidationResult[] = [];
   
   if (booths.length === 0) {
@@ -52,6 +132,27 @@ function validateBooths(booths: Booth[], config: SimulationConfig): ValidationRe
   }
   
   for (const booth of booths) {
+    const boundaryCheck = checkRectWithinBounds(
+      booth.position,
+      booth.dimension,
+      hallWidth,
+      hallDepth
+    );
+    
+    if (!boundaryCheck.isWithinBounds) {
+      results.push({
+        status: 'error',
+        message: `展位「${booth.name}」超出展馆边界：${boundaryCheck.violations.join('；')}`,
+        boothId: booth.id,
+        details: {
+          boothName: booth.name,
+          position: `${booth.position.x.toFixed(2)}, ${booth.position.z.toFixed(2)}`,
+          dimension: `${booth.dimension.width} x ${booth.dimension.depth}`,
+          violations: boundaryCheck.violations.join(', ')
+        }
+      });
+    }
+    
     if (booth.dimension.width < 0.5 || booth.dimension.depth < 0.5) {
       results.push({
         status: 'warning',
@@ -79,6 +180,18 @@ function validateBooths(booths: Booth[], config: SimulationConfig): ValidationRe
         }
       });
     }
+    
+    if (booth.dimension.width <= 0 || booth.dimension.depth <= 0) {
+      results.push({
+        status: 'error',
+        message: `展位「${booth.name}」尺寸无效（宽度和深度必须大于0）`,
+        boothId: booth.id,
+        details: {
+          width: booth.dimension.width,
+          depth: booth.dimension.depth
+        }
+      });
+    }
   }
   
   return results;
@@ -87,7 +200,9 @@ function validateBooths(booths: Booth[], config: SimulationConfig): ValidationRe
 function validateExits(
   exits: Exit[],
   booths: Booth[],
-  config: SimulationConfig
+  config: SimulationConfig,
+  hallWidth: number,
+  hallDepth: number
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
   
@@ -97,6 +212,39 @@ function validateExits(
       message: '展馆未设置安全出口'
     });
     return results;
+  }
+  
+  for (const exit of exits) {
+    const boundaryCheck = checkPointWithinBounds(
+      exit.position,
+      hallWidth,
+      hallDepth,
+      0.5
+    );
+    
+    if (!boundaryCheck.isWithinBounds) {
+      results.push({
+        status: 'error',
+        message: `安全出口「${exit.name}」超出展馆边界：${boundaryCheck.violations.join('；')}`,
+        exitId: exit.id,
+        details: {
+          exitName: exit.name,
+          position: `${exit.position.x.toFixed(2)}, ${exit.position.z.toFixed(2)}`,
+          violations: boundaryCheck.violations.join(', ')
+        }
+      });
+    }
+    
+    if (exit.width <= 0) {
+      results.push({
+        status: 'error',
+        message: `安全出口「${exit.name}」宽度无效（必须大于0）`,
+        exitId: exit.id,
+        details: {
+          width: exit.width
+        }
+      });
+    }
   }
   
   if (config.checkExitAccessibility) {
@@ -137,7 +285,9 @@ function validateExits(
 function validateZones(
   zones: Zone[],
   paths: EvacuationPath[],
-  config: SimulationConfig
+  config: SimulationConfig,
+  hallWidth: number,
+  hallDepth: number
 ): ValidationResult[] {
   const results: ValidationResult[] = [];
   
@@ -147,6 +297,41 @@ function validateZones(
       message: '展馆未设置疏散区域'
     });
     return results;
+  }
+  
+  for (const zone of zones) {
+    const boundaryCheck = checkRectWithinBounds(
+      zone.position,
+      zone.dimension,
+      hallWidth,
+      hallDepth
+    );
+    
+    if (!boundaryCheck.isWithinBounds) {
+      results.push({
+        status: 'error',
+        message: `区域「${zone.name}」超出展馆边界：${boundaryCheck.violations.join('；')}`,
+        zoneId: zone.id,
+        details: {
+          zoneName: zone.name,
+          position: `${zone.position.x.toFixed(2)}, ${zone.position.z.toFixed(2)}`,
+          dimension: `${zone.dimension.width} x ${zone.dimension.depth}`,
+          violations: boundaryCheck.violations.join(', ')
+        }
+      });
+    }
+    
+    if (zone.dimension.width <= 0 || zone.dimension.depth <= 0) {
+      results.push({
+        status: 'error',
+        message: `区域「${zone.name}」尺寸无效（宽度和深度必须大于0）`,
+        zoneId: zone.id,
+        details: {
+          width: zone.dimension.width,
+          depth: zone.dimension.depth
+        }
+      });
+    }
   }
   
   for (const zone of zones) {

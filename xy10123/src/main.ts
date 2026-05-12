@@ -17,7 +17,9 @@ import {
   importProjectFromJson,
   generateReportData,
   downloadReportHTML,
-  downloadReportCSV
+  downloadReportCSV,
+  checkRectWithinBounds,
+  checkPointWithinBounds
 } from './utils';
 import { 
   createSampleProject, 
@@ -30,6 +32,7 @@ class App {
   private sceneManager: SceneManager;
   private project: ProjectData;
   private showAllPaths: boolean = false;
+  private isDragInvalidationPending: boolean = false;
 
   constructor() {
     const app = document.getElementById('app');
@@ -293,12 +296,15 @@ class App {
     const colors = BOOTH_COLORS;
     const colorIndex = this.project.booths.length % colors.length;
     
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+    
     const newBooth: Booth = {
       id: `booth_${Date.now()}`,
       name: `展位 ${this.project.booths.length + 1}`,
       position: { 
-        x: 5 + Math.random() * (this.project.exhibitionHall.width - 10), 
-        z: 5 + Math.random() * (this.project.exhibitionHall.depth - 10) 
+        x: Math.min(Math.max(5, hallWidth / 4), hallWidth - 10), 
+        z: Math.min(Math.max(5, hallDepth / 4), hallDepth - 10) 
       },
       dimension: { width: 4, depth: 3 },
       rotation: 0,
@@ -308,22 +314,27 @@ class App {
     this.project.booths.push(newBooth);
     this.sceneManager.addBooth(newBooth);
     this.updateZoneSelector();
+    this.invalidatePaths();
     this.showNotification('已添加展位');
   }
 
   private addExit(): void {
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+    
     const newExit: Exit = {
       id: `exit_${Date.now()}`,
       name: `出口 ${this.project.exits.length + 1}`,
       position: { 
-        x: this.project.exhibitionHall.width / 2, 
-        z: this.project.exhibitionHall.depth - 0.5 
+        x: hallWidth / 2, 
+        z: Math.min(Math.max(0.5, hallDepth - 0.5), hallDepth - 0.5) 
       },
       width: 2
     };
 
     this.project.exits.push(newExit);
     this.sceneManager.addExit(newExit);
+    this.invalidatePaths();
     this.showNotification('已添加安全出口');
   }
 
@@ -331,20 +342,27 @@ class App {
     const colors = ZONE_COLORS;
     const colorIndex = this.project.zones.length % colors.length;
     
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+    
+    const zoneWidth = 8;
+    const zoneDepth = 6;
+    
     const newZone: Zone = {
       id: `zone_${Date.now()}`,
       name: `区域 ${this.project.zones.length + 1}`,
       position: { 
-        x: 5 + Math.random() * (this.project.exhibitionHall.width - 20), 
-        z: 5 + Math.random() * (this.project.exhibitionHall.depth - 20) 
+        x: Math.min(Math.max(2, hallWidth / 3), hallWidth - zoneWidth - 2), 
+        z: Math.min(Math.max(2, hallDepth / 3), hallDepth - zoneDepth - 2) 
       },
-      dimension: { width: 8, depth: 6 },
+      dimension: { width: zoneWidth, depth: zoneDepth },
       color: colors[colorIndex]
     };
 
     this.project.zones.push(newZone);
     this.sceneManager.addZone(newZone);
     this.updateZoneSelector();
+    this.invalidatePaths();
     this.showNotification('已添加区域');
   }
 
@@ -417,13 +435,29 @@ class App {
   }
 
   private runValidation(): void {
-    if (this.project.evacuationPaths.length === 0) {
+    this.invalidatePaths();
+    
+    if (this.project.zones.length > 0 && this.project.exits.length > 0) {
       this.calculatePaths();
     }
 
     this.project.validationResults = validateProject(this.project);
     this.updateValidationUI();
     this.showNotification('验证完成');
+  }
+  
+  private invalidatePaths(): void {
+    this.project.evacuationPaths = [];
+    this.sceneManager.clearAllPaths();
+    this.showAllPaths = false;
+    
+    const select = document.getElementById('select-zone-path') as HTMLSelectElement;
+    if (select) select.value = '';
+    
+    const btn = document.getElementById('btn-toggle-paths');
+    if (btn) {
+      btn.textContent = '👁️ 显示所有路线';
+    }
   }
 
   private updateValidationUI(): void {
@@ -566,12 +600,25 @@ class App {
         zone.position.z = position.z - zone.dimension.depth / 2;
       }
     }
+    
+    if (!this.isDragInvalidationPending) {
+      this.isDragInvalidationPending = true;
+      this.invalidatePaths();
+      this.showNotification('正在移动对象，疏散路径已失效');
+      
+      setTimeout(() => {
+        this.isDragInvalidationPending = false;
+      }, 1000);
+    }
   }
 
   private showObjectPanel(data: ThreeDObjectData): void {
     const panel = document.getElementById('selected-object-panel');
     const form = document.getElementById('selected-object-form');
     if (!panel || !form) return;
+
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
 
     panel.classList.remove('hidden');
 
@@ -582,28 +629,29 @@ class App {
       if (booth) {
         html = `
           <div class="text-xs text-gray-500 mb-2">🏪 展位</div>
+          <div class="text-xs text-gray-400 mb-2">展馆范围: 0,0 → ${hallWidth.toFixed(1)},${hallDepth.toFixed(1)}</div>
           <div>
             <label class="label text-xs">名称</label>
             <input type="text" id="edit-name" class="input-field text-xs" value="${booth.name}" />
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="label text-xs">位置 X</label>
-              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${booth.position.x.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 X (0 ~ ${(hallWidth - 1).toFixed(1)})</label>
+              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${booth.position.x.toFixed(1)}" step="0.5" min="0" max="${(hallWidth - 1).toFixed(1)}" />
             </div>
             <div>
-              <label class="label text-xs">位置 Z</label>
-              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${booth.position.z.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 Z (0 ~ ${(hallDepth - 1).toFixed(1)})</label>
+              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${booth.position.z.toFixed(1)}" step="0.5" min="0" max="${(hallDepth - 1).toFixed(1)}" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="label text-xs">宽度</label>
-              <input type="number" id="edit-width" class="input-field text-xs" value="${booth.dimension.width}" min="1" max="30" />
+              <label class="label text-xs">宽度 (0.5 ~ 30)</label>
+              <input type="number" id="edit-width" class="input-field text-xs" value="${booth.dimension.width}" min="0.5" max="30" step="0.5" />
             </div>
             <div>
-              <label class="label text-xs">深度</label>
-              <input type="number" id="edit-depth" class="input-field text-xs" value="${booth.dimension.depth}" min="1" max="30" />
+              <label class="label text-xs">深度 (0.5 ~ 30)</label>
+              <input type="number" id="edit-depth" class="input-field text-xs" value="${booth.dimension.depth}" min="0.5" max="30" step="0.5" />
             </div>
           </div>
           <div>
@@ -621,23 +669,24 @@ class App {
       if (exit) {
         html = `
           <div class="text-xs text-gray-500 mb-2">🚪 安全出口</div>
+          <div class="text-xs text-gray-400 mb-2">展馆范围: 0,0 → ${hallWidth.toFixed(1)},${hallDepth.toFixed(1)}</div>
           <div>
             <label class="label text-xs">名称</label>
             <input type="text" id="edit-name" class="input-field text-xs" value="${exit.name}" />
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="label text-xs">位置 X</label>
-              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${exit.position.x.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 X (0 ~ ${hallWidth.toFixed(1)})</label>
+              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${exit.position.x.toFixed(1)}" step="0.5" min="0" max="${hallWidth.toFixed(1)}" />
             </div>
             <div>
-              <label class="label text-xs">位置 Z</label>
-              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${exit.position.z.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 Z (0 ~ ${hallDepth.toFixed(1)})</label>
+              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${exit.position.z.toFixed(1)}" step="0.5" min="0" max="${hallDepth.toFixed(1)}" />
             </div>
           </div>
           <div>
-            <label class="label text-xs">宽度</label>
-            <input type="number" id="edit-width" class="input-field text-xs" value="${exit.width}" min="1" max="10" />
+            <label class="label text-xs">宽度 (0.5 ~ 10)</label>
+            <input type="number" id="edit-width" class="input-field text-xs" value="${exit.width}" min="0.5" max="10" step="0.5" />
           </div>
           <div class="flex gap-2 mt-4">
             <button id="btn-apply-exit" class="btn btn-primary text-xs flex-1">应用</button>
@@ -650,28 +699,29 @@ class App {
       if (zone) {
         html = `
           <div class="text-xs text-gray-500 mb-2">🔲 疏散区域</div>
+          <div class="text-xs text-gray-400 mb-2">展馆范围: 0,0 → ${hallWidth.toFixed(1)},${hallDepth.toFixed(1)}</div>
           <div>
             <label class="label text-xs">名称</label>
             <input type="text" id="edit-name" class="input-field text-xs" value="${zone.name}" />
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="label text-xs">位置 X</label>
-              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${zone.position.x.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 X (0 ~ ${(hallWidth - 1).toFixed(1)})</label>
+              <input type="number" id="edit-pos-x" class="input-field text-xs" value="${zone.position.x.toFixed(1)}" step="0.5" min="0" max="${(hallWidth - 1).toFixed(1)}" />
             </div>
             <div>
-              <label class="label text-xs">位置 Z</label>
-              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${zone.position.z.toFixed(1)}" step="0.5" />
+              <label class="label text-xs">位置 Z (0 ~ ${(hallDepth - 1).toFixed(1)})</label>
+              <input type="number" id="edit-pos-z" class="input-field text-xs" value="${zone.position.z.toFixed(1)}" step="0.5" min="0" max="${(hallDepth - 1).toFixed(1)}" />
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="label text-xs">宽度</label>
-              <input type="number" id="edit-width" class="input-field text-xs" value="${zone.dimension.width}" min="2" max="40" />
+              <label class="label text-xs">宽度 (1 ~ 40)</label>
+              <input type="number" id="edit-width" class="input-field text-xs" value="${zone.dimension.width}" min="1" max="40" step="0.5" />
             </div>
             <div>
-              <label class="label text-xs">深度</label>
-              <input type="number" id="edit-depth" class="input-field text-xs" value="${zone.dimension.depth}" min="2" max="40" />
+              <label class="label text-xs">深度 (1 ~ 40)</label>
+              <input type="number" id="edit-depth" class="input-field text-xs" value="${zone.dimension.depth}" min="1" max="40" step="0.5" />
             </div>
           </div>
           <div class="flex gap-2 mt-4">
@@ -715,12 +765,29 @@ class App {
     const booth = this.project.booths.find(b => b.id === id);
     if (!booth) return;
 
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+
     const name = (document.getElementById('edit-name') as HTMLInputElement)?.value;
     const posX = parseFloat((document.getElementById('edit-pos-x') as HTMLInputElement)?.value);
     const posZ = parseFloat((document.getElementById('edit-pos-z') as HTMLInputElement)?.value);
     const width = parseFloat((document.getElementById('edit-width') as HTMLInputElement)?.value);
     const depth = parseFloat((document.getElementById('edit-depth') as HTMLInputElement)?.value);
     const color = (document.getElementById('edit-color') as HTMLInputElement)?.value;
+
+    const newPosition = {
+      x: !isNaN(posX) ? posX : booth.position.x,
+      z: !isNaN(posZ) ? posZ : booth.position.z
+    };
+    const newDimension = {
+      width: !isNaN(width) && width > 0 ? width : booth.dimension.width,
+      depth: !isNaN(depth) && depth > 0 ? depth : booth.dimension.depth
+    };
+
+    const boundaryCheck = checkRectWithinBounds(newPosition, newDimension, hallWidth, hallDepth);
+    if (!boundaryCheck.isWithinBounds) {
+      this.showNotification(`警告：${boundaryCheck.violations.join('；')}`);
+    }
 
     if (name) booth.name = name;
     if (!isNaN(posX)) booth.position.x = posX;
@@ -730,17 +797,31 @@ class App {
     if (color) booth.color = color;
 
     this.sceneManager.updateBooth(booth);
-    this.showNotification('展位已更新');
+    this.invalidatePaths();
+    this.showNotification('展位已更新（注意：疏散路径已失效，请重新验证）');
   }
 
   private applyExitChanges(id: string): void {
     const exit = this.project.exits.find(e => e.id === id);
     if (!exit) return;
 
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+
     const name = (document.getElementById('edit-name') as HTMLInputElement)?.value;
     const posX = parseFloat((document.getElementById('edit-pos-x') as HTMLInputElement)?.value);
     const posZ = parseFloat((document.getElementById('edit-pos-z') as HTMLInputElement)?.value);
     const width = parseFloat((document.getElementById('edit-width') as HTMLInputElement)?.value);
+
+    const newPosition = {
+      x: !isNaN(posX) ? posX : exit.position.x,
+      z: !isNaN(posZ) ? posZ : exit.position.z
+    };
+
+    const boundaryCheck = checkPointWithinBounds(newPosition, hallWidth, hallDepth, 0.5);
+    if (!boundaryCheck.isWithinBounds) {
+      this.showNotification(`警告：${boundaryCheck.violations.join('；')}`);
+    }
 
     if (name) exit.name = name;
     if (!isNaN(posX)) exit.position.x = posX;
@@ -748,18 +829,36 @@ class App {
     if (!isNaN(width) && width > 0) exit.width = width;
 
     this.sceneManager.updateExit(exit);
-    this.showNotification('出口已更新');
+    this.invalidatePaths();
+    this.showNotification('出口已更新（注意：疏散路径已失效，请重新验证）');
   }
 
   private applyZoneChanges(id: string): void {
     const zone = this.project.zones.find(z => z.id === id);
     if (!zone) return;
 
+    const hallWidth = this.project.exhibitionHall.width;
+    const hallDepth = this.project.exhibitionHall.depth;
+
     const name = (document.getElementById('edit-name') as HTMLInputElement)?.value;
     const posX = parseFloat((document.getElementById('edit-pos-x') as HTMLInputElement)?.value);
     const posZ = parseFloat((document.getElementById('edit-pos-z') as HTMLInputElement)?.value);
     const width = parseFloat((document.getElementById('edit-width') as HTMLInputElement)?.value);
     const depth = parseFloat((document.getElementById('edit-depth') as HTMLInputElement)?.value);
+
+    const newPosition = {
+      x: !isNaN(posX) ? posX : zone.position.x,
+      z: !isNaN(posZ) ? posZ : zone.position.z
+    };
+    const newDimension = {
+      width: !isNaN(width) && width > 0 ? width : zone.dimension.width,
+      depth: !isNaN(depth) && depth > 0 ? depth : zone.dimension.depth
+    };
+
+    const boundaryCheck = checkRectWithinBounds(newPosition, newDimension, hallWidth, hallDepth);
+    if (!boundaryCheck.isWithinBounds) {
+      this.showNotification(`警告：${boundaryCheck.violations.join('；')}`);
+    }
 
     if (name) zone.name = name;
     if (!isNaN(posX)) zone.position.x = posX;
@@ -769,13 +868,15 @@ class App {
 
     this.sceneManager.updateZone(zone);
     this.updateZoneSelector();
-    this.showNotification('区域已更新');
+    this.invalidatePaths();
+    this.showNotification('区域已更新（注意：疏散路径已失效，请重新验证）');
   }
 
   private deleteBooth(id: string): void {
     this.project.booths = this.project.booths.filter(b => b.id !== id);
     this.sceneManager.removeBooth(id);
     this.closeObjectPanel();
+    this.invalidatePaths();
     this.showNotification('展位已删除');
   }
 
@@ -783,6 +884,7 @@ class App {
     this.project.exits = this.project.exits.filter(e => e.id !== id);
     this.sceneManager.removeExit(id);
     this.closeObjectPanel();
+    this.invalidatePaths();
     this.showNotification('出口已删除');
   }
 
@@ -792,6 +894,7 @@ class App {
     this.sceneManager.clearEvacuationPath(id);
     this.updateZoneSelector();
     this.closeObjectPanel();
+    this.invalidatePaths();
     this.showNotification('区域已删除');
   }
 
