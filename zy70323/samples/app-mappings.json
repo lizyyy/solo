@@ -1,0 +1,42 @@
+[
+  {
+    "appId": "app-order",
+    "teamId": "team-order",
+    "teamName": "订单团队",
+    "businessLine": "交易业务线",
+    "effectiveFrom": "2026-01-01T00:00:00.000Z",
+    "effectiveTo": null
+  },
+  {
+    "appId": "app-user",
+    "teamId": "team-user",
+    "teamName": "用户团队",
+    "businessLine": "用户业务线",
+    "effectiveFrom": "2026-01-01T00:00:00.000Z",
+    "effectiveTo": null
+  },
+  {
+    "appId": "app-payment",
+    "teamId": "team-payment",
+    "teamName": "支付团队",
+    "businessLine": "交易业务线",
+    "effectiveFrom": "2026-01-01T00:00:00.000Z",
+    "effectiveTo": null
+  },
+  {
+    "appId": "app-platform",
+    "teamId": "team-platform",
+    "teamName": "平台团队",
+    "businessLine": "平台业务线",
+    "effectiveFrom": "2026-01-01T00:00:00.000Z",
+    "effectiveTo": null
+  },
+  {
+    "appId": "app-old-order",
+    "teamId": "team-order",
+    "teamName": "订单团队",
+    "businessLine": "交易业务线",
+    "effectiveFrom": "2026-01-01T00:00:00.000Z",
+    "effectiveTo": "2026-04-30T23:59:59.999Z"
+  }
+]

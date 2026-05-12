@@ -1,0 +1,42 @@
+{
+  "pools": [
+    {
+      "poolId": "pool-platform-shared",
+      "poolName": "平台共享资源池",
+      "description": "平台公共基础设施成本",
+      "allocationStrategy": "byCallVolume",
+      "defaultRatio": 0.2,
+      "allocations": [
+        {
+          "teamId": "team-order",
+          "ratio": 0.4,
+          "effectiveFrom": "2026-05-01T00:00:00.000Z",
+          "effectiveTo": null
+        },
+        {
+          "teamId": "team-user",
+          "ratio": 0.35,
+          "effectiveFrom": "2026-05-01T00:00:00.000Z",
+          "effectiveTo": null
+        },
+        {
+          "teamId": "team-payment",
+          "ratio": 0.25,
+          "effectiveFrom": "2026-05-01T00:00:00.000Z",
+          "effectiveTo": null
+        }
+      ]
+    }
+  ],
+  "unknownAppIdPolicy": {
+    "assignToDefaultTeam": false,
+    "defaultTeamId": null,
+    "markAsUnsettled": true,
+    "unsettledPoolId": "pool-unsettled"
+  },
+  "validationRules": {
+    "allowRatioOver100": false,
+    "allowMissingRatio": true,
+    "maxSettledDays": 30
+  }
+}

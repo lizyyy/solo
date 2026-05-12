@@ -1,0 +1,81 @@
+[
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": "2026-05-15T23:59:59.999Z",
+    "apiName": "order.realtimeQuery",
+    "description": "实时查询接口",
+    "costModel": {
+      "type": "perCall",
+      "costPerCall": 0.05
+    }
+  },
+  {
+    "version": 2,
+    "effectiveFrom": "2026-05-16T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "order.realtimeQuery",
+    "description": "实时查询接口-涨价后",
+    "costModel": {
+      "type": "perCall",
+      "costPerCall": 0.08
+    }
+  },
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "user.realtimeQuery",
+    "description": "用户实时查询",
+    "costModel": {
+      "type": "perCall",
+      "costPerCall": 0.03
+    }
+  },
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "order.batchExport",
+    "description": "订单批量导出",
+    "costModel": {
+      "type": "perDuration",
+      "costPerSecond": 0.1,
+      "minCost": 0.5
+    }
+  },
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "user.batchExport",
+    "description": "用户批量导出",
+    "costModel": {
+      "type": "perDuration",
+      "costPerSecond": 0.15,
+      "minCost": 1.0
+    }
+  },
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "sms.thirdPartySend",
+    "description": "第三方短信接口",
+    "costModel": {
+      "type": "flatRate",
+      "costPerCall": 0.5,
+      "providerCost": 0.4
+    }
+  },
+  {
+    "version": 1,
+    "effectiveFrom": "2026-05-01T00:00:00.000Z",
+    "effectiveTo": null,
+    "apiName": "platform.sharedResource",
+    "description": "平台共享资源",
+    "costModel": {
+      "type": "sharedPool"
+    }
+  }
+]

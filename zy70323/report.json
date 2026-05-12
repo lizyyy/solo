@@ -1,0 +1,486 @@
+{
+  "context": {
+    "periodStart": "2026-05-01T00:00:00.000Z",
+    "periodEnd": "2026-05-01T23:59:59.999Z",
+    "totalRawLogs": 16,
+    "deduplicatedLogs": 15,
+    "totalCalls": 15
+  },
+  "summary": {
+    "totalCost": 5.76,
+    "settledCost": 4.76,
+    "unsettledCost": 1,
+    "settlementRate": 82.64
+  },
+  "teamBills": [
+    {
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "totalAmount": 0.95,
+      "directCost": 0.6,
+      "sharedPoolCost": 0.3,
+      "manualAdjustment": 0.05,
+      "unsettledAmount": 0,
+      "chargeCount": 5,
+      "settlementStatus": "settled"
+    },
+    {
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "totalAmount": 1.96,
+      "directCost": 1.56,
+      "sharedPoolCost": 0.4,
+      "manualAdjustment": 0,
+      "unsettledAmount": 0,
+      "chargeCount": 5,
+      "settlementStatus": "settled"
+    },
+    {
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "totalAmount": 1.85,
+      "directCost": 1.05,
+      "sharedPoolCost": 0.3,
+      "manualAdjustment": 0.5,
+      "unsettledAmount": 0,
+      "chargeCount": 5,
+      "settlementStatus": "settled"
+    }
+  ],
+  "apiSummaries": [
+    {
+      "apiName": "order.realtimeQuery",
+      "totalCalls": 4,
+      "uniqueAppIds": [
+        "app-order",
+        "app-unknown-001",
+        "app-payment"
+      ],
+      "totalCost": 0.2,
+      "settledCost": 0.2,
+      "unsettledCost": 0,
+      "costRuleVersions": [
+        1
+      ]
+    },
+    {
+      "apiName": "user.realtimeQuery",
+      "totalCalls": 2,
+      "uniqueAppIds": [
+        "app-user"
+      ],
+      "totalCost": 0.06,
+      "settledCost": 0.06,
+      "unsettledCost": 0,
+      "costRuleVersions": [
+        1
+      ]
+    },
+    {
+      "apiName": "user.batchExport",
+      "totalCalls": 2,
+      "uniqueAppIds": [
+        "app-user",
+        "app-unknown-002"
+      ],
+      "totalCost": 2,
+      "settledCost": 1,
+      "unsettledCost": 1,
+      "costRuleVersions": [
+        1
+      ]
+    },
+    {
+      "apiName": "sms.thirdPartySend",
+      "totalCalls": 4,
+      "uniqueAppIds": [
+        "app-payment",
+        "app-user",
+        "app-unknown-003"
+      ],
+      "totalCost": 2,
+      "settledCost": 2,
+      "unsettledCost": 0,
+      "costRuleVersions": [
+        1
+      ]
+    },
+    {
+      "apiName": "order.batchExport",
+      "totalCalls": 1,
+      "uniqueAppIds": [
+        "app-order"
+      ],
+      "totalCost": 0.5,
+      "settledCost": 0.5,
+      "unsettledCost": 0,
+      "costRuleVersions": [
+        1
+      ]
+    }
+  ],
+  "businessLineSummaries": [
+    {
+      "businessLine": "交易业务线",
+      "teams": [
+        "订单团队",
+        "支付团队"
+      ],
+      "totalCost": 2.8,
+      "directCost": 1.65,
+      "sharedPoolCost": 0.6
+    },
+    {
+      "businessLine": "用户业务线",
+      "teams": [
+        "用户团队"
+      ],
+      "totalCost": 1.96,
+      "directCost": 1.56,
+      "sharedPoolCost": 0.4
+    }
+  ],
+  "charges": [
+    {
+      "id": "charge-req-001",
+      "requestId": "req-001",
+      "appId": "app-order",
+      "apiName": "order.realtimeQuery",
+      "timestamp": "2026-05-01T10:30:00.000Z",
+      "duration": 120,
+      "rawCost": 0.05,
+      "costRuleVersion": 1,
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-002",
+      "requestId": "req-002",
+      "appId": "app-order",
+      "apiName": "order.realtimeQuery",
+      "timestamp": "2026-05-01T10:31:00.000Z",
+      "duration": 150,
+      "rawCost": 0.05,
+      "costRuleVersion": 1,
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-003",
+      "requestId": "req-003",
+      "appId": "app-user",
+      "apiName": "user.realtimeQuery",
+      "timestamp": "2026-05-01T10:32:00.000Z",
+      "duration": 80,
+      "rawCost": 0.03,
+      "costRuleVersion": 1,
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-004",
+      "requestId": "req-004",
+      "appId": "app-user",
+      "apiName": "user.batchExport",
+      "timestamp": "2026-05-01T10:33:00.000Z",
+      "duration": 3000,
+      "rawCost": 1,
+      "costRuleVersion": 1,
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-005",
+      "requestId": "req-005",
+      "appId": "app-payment",
+      "apiName": "sms.thirdPartySend",
+      "timestamp": "2026-05-01T10:34:00.000Z",
+      "duration": 500,
+      "rawCost": 0.5,
+      "costRuleVersion": 1,
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-006",
+      "requestId": "req-006",
+      "appId": "app-payment",
+      "apiName": "sms.thirdPartySend",
+      "timestamp": "2026-05-01T10:35:00.000Z",
+      "duration": 600,
+      "rawCost": 0.5,
+      "costRuleVersion": 1,
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-007",
+      "requestId": "req-007",
+      "appId": "app-unknown-001",
+      "apiName": "order.realtimeQuery",
+      "timestamp": "2026-05-01T10:36:00.000Z",
+      "duration": 200,
+      "rawCost": 0.05,
+      "costRuleVersion": 1,
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "manual_adjustment",
+      "sharedPoolId": null,
+      "manualAdjId": "adj-1778599117614-q3dz0zxkd",
+      "notes": "人工归属: 未知 appId app-unknown-001 经核实属于订单团队"
+    },
+    {
+      "id": "charge-req-008",
+      "requestId": "req-008",
+      "appId": "app-unknown-002",
+      "apiName": "user.batchExport",
+      "timestamp": "2026-05-01T10:37:00.000Z",
+      "duration": 5000,
+      "rawCost": 1,
+      "costRuleVersion": 1,
+      "teamId": null,
+      "teamName": null,
+      "businessLine": null,
+      "allocationStatus": "unsettled",
+      "chargeSource": "unsettled",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": "未知 appId"
+    },
+    {
+      "id": "charge-req-011",
+      "requestId": "req-011",
+      "appId": "app-order",
+      "apiName": "order.batchExport",
+      "timestamp": "2026-05-01T10:40:00.000Z",
+      "duration": 4000,
+      "rawCost": 0.5,
+      "costRuleVersion": 1,
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-012",
+      "requestId": "req-012",
+      "appId": "app-payment",
+      "apiName": "order.realtimeQuery",
+      "timestamp": "2026-05-01T10:41:00.000Z",
+      "duration": 180,
+      "rawCost": 0.05,
+      "costRuleVersion": 1,
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-013",
+      "requestId": "req-013",
+      "appId": "app-user",
+      "apiName": "sms.thirdPartySend",
+      "timestamp": "2026-05-01T10:42:00.000Z",
+      "duration": 450,
+      "rawCost": 0.5,
+      "costRuleVersion": 1,
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-req-014",
+      "requestId": "req-014",
+      "appId": "app-unknown-003",
+      "apiName": "sms.thirdPartySend",
+      "timestamp": "2026-05-01T10:43:00.000Z",
+      "duration": 550,
+      "rawCost": 0.5,
+      "costRuleVersion": 1,
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "manual_adjustment",
+      "sharedPoolId": null,
+      "manualAdjId": "adj-1778599124603-d4fpjbots",
+      "notes": "人工归属: 未知 appId app-unknown-003 经核实属于支付团队"
+    },
+    {
+      "id": "charge-req-015",
+      "requestId": "req-015",
+      "appId": "app-user",
+      "apiName": "user.realtimeQuery",
+      "timestamp": "2026-05-01T10:44:00.000Z",
+      "duration": 90,
+      "rawCost": 0.03,
+      "costRuleVersion": 1,
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "direct",
+      "sharedPoolId": null,
+      "manualAdjId": null,
+      "notes": ""
+    },
+    {
+      "id": "charge-pool-pool-platform-shared-team-order",
+      "requestId": "pool-pool-platform-shared",
+      "appId": "pool-shared",
+      "apiName": "平台共享资源池",
+      "timestamp": "2026-05-01T00:00:00.000Z",
+      "duration": 0,
+      "rawCost": 0.3,
+      "costRuleVersion": 1,
+      "teamId": "team-order",
+      "teamName": "订单团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "shared_pool",
+      "sharedPoolId": "pool-platform-shared",
+      "manualAdjId": null,
+      "notes": "按调用量比例分配：总调用量 10，各团队调用量：team-order=3, team-user=4, team-payment=3"
+    },
+    {
+      "id": "charge-pool-pool-platform-shared-team-user",
+      "requestId": "pool-pool-platform-shared",
+      "appId": "pool-shared",
+      "apiName": "平台共享资源池",
+      "timestamp": "2026-05-01T00:00:00.000Z",
+      "duration": 0,
+      "rawCost": 0.4,
+      "costRuleVersion": 1,
+      "teamId": "team-user",
+      "teamName": "用户团队",
+      "businessLine": "用户业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "shared_pool",
+      "sharedPoolId": "pool-platform-shared",
+      "manualAdjId": null,
+      "notes": "按调用量比例分配：总调用量 10，各团队调用量：team-order=3, team-user=4, team-payment=3"
+    },
+    {
+      "id": "charge-pool-pool-platform-shared-team-payment",
+      "requestId": "pool-pool-platform-shared",
+      "appId": "pool-shared",
+      "apiName": "平台共享资源池",
+      "timestamp": "2026-05-01T00:00:00.000Z",
+      "duration": 0,
+      "rawCost": 0.3,
+      "costRuleVersion": 1,
+      "teamId": "team-payment",
+      "teamName": "支付团队",
+      "businessLine": "交易业务线",
+      "allocationStatus": "settled",
+      "chargeSource": "shared_pool",
+      "sharedPoolId": "pool-platform-shared",
+      "manualAdjId": null,
+      "notes": "按调用量比例分配：总调用量 10，各团队调用量：team-order=3, team-user=4, team-payment=3"
+    }
+  ],
+  "unsettledItems": [
+    {
+      "requestId": "req-008",
+      "appId": "app-unknown-002",
+      "apiName": "user.batchExport",
+      "cost": 1,
+      "reason": "未知 appId"
+    }
+  ],
+  "sharedPoolBreakdowns": [
+    {
+      "poolId": "pool-platform-shared",
+      "poolName": "平台共享资源池",
+      "totalCost": 1,
+      "allocations": [
+        {
+          "teamId": "team-order",
+          "teamName": "team-order",
+          "ratio": 0.3,
+          "amount": 0.3
+        },
+        {
+          "teamId": "team-user",
+          "teamName": "team-user",
+          "ratio": 0.4,
+          "amount": 0.4
+        },
+        {
+          "teamId": "team-payment",
+          "teamName": "team-payment",
+          "ratio": 0.3,
+          "amount": 0.3
+        }
+      ],
+      "explanation": "按调用量比例分配：总调用量 10，各团队调用量：team-order=3, team-user=4, team-payment=3"
+    }
+  ],
+  "issues": [
+    {
+      "type": "duplicate_log",
+      "severity": "warning",
+      "message": "发现 1 条重复日志（按 requestId 去重）",
+      "affectedCount": 1,
+      "details": {
+        "sampleRequestIds": [
+          "req-002"
+        ]
+      }
+    }
+  ]
+}

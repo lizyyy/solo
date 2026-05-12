@@ -1,0 +1,146 @@
+[
+  {
+    "timestamp": "2026-05-01T10:30:00.000Z",
+    "requestId": "req-001",
+    "appId": "app-order",
+    "apiName": "order.realtimeQuery",
+    "duration": 120,
+    "status": 200,
+    "responseSize": 2048
+  },
+  {
+    "timestamp": "2026-05-01T10:31:00.000Z",
+    "requestId": "req-002",
+    "appId": "app-order",
+    "apiName": "order.realtimeQuery",
+    "duration": 150,
+    "status": 200,
+    "responseSize": 3072
+  },
+  {
+    "timestamp": "2026-05-01T10:32:00.000Z",
+    "requestId": "req-003",
+    "appId": "app-user",
+    "apiName": "user.realtimeQuery",
+    "duration": 80,
+    "status": 200,
+    "responseSize": 1024
+  },
+  {
+    "timestamp": "2026-05-01T10:33:00.000Z",
+    "requestId": "req-004",
+    "appId": "app-user",
+    "apiName": "user.batchExport",
+    "duration": 3000,
+    "status": 200,
+    "responseSize": 1048576
+  },
+  {
+    "timestamp": "2026-05-01T10:34:00.000Z",
+    "requestId": "req-005",
+    "appId": "app-payment",
+    "apiName": "sms.thirdPartySend",
+    "duration": 500,
+    "status": 200,
+    "responseSize": 512
+  },
+  {
+    "timestamp": "2026-05-01T10:35:00.000Z",
+    "requestId": "req-006",
+    "appId": "app-payment",
+    "apiName": "sms.thirdPartySend",
+    "duration": 600,
+    "status": 200,
+    "responseSize": 512
+  },
+  {
+    "timestamp": "2026-05-01T10:36:00.000Z",
+    "requestId": "req-007",
+    "appId": "app-unknown-001",
+    "apiName": "order.realtimeQuery",
+    "duration": 200,
+    "status": 200,
+    "responseSize": 4096
+  },
+  {
+    "timestamp": "2026-05-01T10:37:00.000Z",
+    "requestId": "req-008",
+    "appId": "app-unknown-002",
+    "apiName": "user.batchExport",
+    "duration": 5000,
+    "status": 200,
+    "responseSize": 2097152
+  },
+  {
+    "timestamp": "2026-05-01T10:38:00.000Z",
+    "requestId": "req-009",
+    "appId": "app-platform",
+    "apiName": "platform.sharedResource",
+    "duration": 1000,
+    "status": 200,
+    "responseSize": 8192
+  },
+  {
+    "timestamp": "2026-05-01T10:39:00.000Z",
+    "requestId": "req-010",
+    "appId": "app-platform",
+    "apiName": "platform.sharedResource",
+    "duration": 1200,
+    "status": 200,
+    "responseSize": 16384
+  },
+  {
+    "timestamp": "2026-05-01T10:31:00.000Z",
+    "requestId": "req-002",
+    "appId": "app-order",
+    "apiName": "order.realtimeQuery",
+    "duration": 150,
+    "status": 200,
+    "responseSize": 3072
+  },
+  {
+    "timestamp": "2026-05-01T10:40:00.000Z",
+    "requestId": "req-011",
+    "appId": "app-order",
+    "apiName": "order.batchExport",
+    "duration": 4000,
+    "status": 200,
+    "responseSize": 524288
+  },
+  {
+    "timestamp": "2026-05-01T10:41:00.000Z",
+    "requestId": "req-012",
+    "appId": "app-payment",
+    "apiName": "order.realtimeQuery",
+    "duration": 180,
+    "status": 200,
+    "responseSize": 2560
+  },
+  {
+    "timestamp": "2026-05-01T10:42:00.000Z",
+    "requestId": "req-013",
+    "appId": "app-user",
+    "apiName": "sms.thirdPartySend",
+    "duration": 450,
+    "status": 200,
+    "responseSize": 512
+  },
+  {
+    "timestamp": "2026-05-01T10:43:00.000Z",
+    "requestId": "req-014",
+    "appId": "app-unknown-003",
+    "apiName": "sms.thirdPartySend",
+    "duration": 550,
+    "status": 200,
+    "responseSize": 512
+  },
+  {
+    "timestamp": "2026-05-01T10:44:00.000Z",
+    "requestId": "req-015",
+    "appId": "app-user",
+    "apiName": "user.realtimeQuery",
+    "duration": 90,
+    "status": 200,
+    "responseSize": 2048
+  }
+]

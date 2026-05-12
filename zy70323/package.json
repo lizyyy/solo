@@ -1,0 +1,25 @@
+{
+  "name": "api-cost-allocation-cli",
+  "version": "1.0.0",
+  "description": "API 调用成本分摊 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "api-cost": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "csv-writer": "^1.6.0",
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
