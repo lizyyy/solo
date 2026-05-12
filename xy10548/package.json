@@ -1,0 +1,26 @@
+{
+  "name": "warehouse-inventory-diff-cli",
+  "version": "1.0.0",
+  "description": "仓库盘点差异分析 CLI 工具 - 合并扫码、手工补录、冻结库位和复盘结果，解释差异来源",
+  "main": "bin/cli.js",
+  "bin": {
+    "inv-diff": "./bin/cli.js"
+  },
+  "scripts": {
+    "demo": "node bin/cli.js",
+    "test:sample": "node scripts/run-demo.js",
+    "test:sample-failure": "node scripts/run-demo-failure.js"
+  },
+  "keywords": [
+    "warehouse",
+    "inventory",
+    "audit",
+    "diff",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

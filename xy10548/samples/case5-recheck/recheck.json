@@ -1,0 +1,4 @@
+[
+  { "sku": "SKU009", "location": "E-01-01", "quantity": 135, "recheckTime": "2026-05-10T16:00:00Z", "operator": "manager03", "reason": "复盘确认：账面150，扫码140，残次品5，实际135，差异15为前期出库未入账" },
+  { "sku": "SKU010", "location": "E-01-02", "quantity": 100, "recheckTime": "2026-05-10T16:05:00Z", "operator": "manager03", "reason": "复盘确认：首次扫码遗漏5个，实际与账面一致" }
+]

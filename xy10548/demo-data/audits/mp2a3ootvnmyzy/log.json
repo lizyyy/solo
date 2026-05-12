@@ -1,0 +1,179 @@
+[
+  {
+    "id": "mp2a3oozu2t5xv",
+    "timestamp": "2026-05-12T06:57:48.995Z",
+    "action": "init",
+    "message": "初始化盘点任务: 2026年5月月度盘点-复盘演示",
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3oskyrnwr6",
+    "timestamp": "2026-05-12T06:57:49.124Z",
+    "action": "import",
+    "type": "book",
+    "message": "导入 book 数据",
+    "details": {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10548/samples/case5-recheck/book.json",
+      "existingCount": 0,
+      "addedCount": 2,
+      "duplicateCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3ovnmuwfj3",
+    "timestamp": "2026-05-12T06:57:49.235Z",
+    "action": "import",
+    "type": "freeze",
+    "message": "导入 freeze 数据",
+    "details": {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10548/samples/case5-recheck/freeze.json",
+      "existingCount": 0,
+      "addedCount": 2,
+      "duplicateCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3oyqwo5ps9",
+    "timestamp": "2026-05-12T06:57:49.346Z",
+    "action": "import",
+    "type": "scan",
+    "message": "导入 scan 数据",
+    "details": {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10548/samples/case5-recheck/scan.json",
+      "existingCount": 0,
+      "addedCount": 2,
+      "duplicateCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3p2mxw5ox5",
+    "timestamp": "2026-05-12T06:57:49.486Z",
+    "action": "import",
+    "type": "manual",
+    "message": "导入 manual 数据",
+    "details": {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10548/samples/case5-recheck/manual.json",
+      "existingCount": 0,
+      "addedCount": 1,
+      "duplicateCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3p8jxukmhs",
+    "timestamp": "2026-05-12T06:57:49.699Z",
+    "action": "check",
+    "message": "执行数据一致性检查",
+    "details": {
+      "issueCount": 0,
+      "errorCount": 0,
+      "warningCount": 0,
+      "summary": {
+        "totalItems": 2,
+        "consistent": 0,
+        "overstock": 0,
+        "understock": 2,
+        "issuesByCategory": {}
+      }
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3pb9dy6xfr",
+    "timestamp": "2026-05-12T06:57:49.797Z",
+    "action": "detail",
+    "message": "查看差异详情",
+    "details": {
+      "filter": {
+        "sku": "SKU009"
+      },
+      "resultCount": 1
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3pe6pl4hpc",
+    "timestamp": "2026-05-12T06:57:49.902Z",
+    "action": "report",
+    "message": "生成盘点报告",
+    "details": {
+      "summary": {
+        "totalItems": 2,
+        "consistent": 0,
+        "overstock": 0,
+        "understock": 2,
+        "issuesByCategory": {}
+      },
+      "closedCount": 0,
+      "errorCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3pg34v31jr",
+    "timestamp": "2026-05-12T06:57:49.971Z",
+    "action": "import",
+    "type": "recheck",
+    "message": "导入 recheck 数据",
+    "details": {
+      "filePath": "/Users/mac/pro/solo/workspaces/xy10548/samples/case5-recheck/recheck.json",
+      "existingCount": 0,
+      "addedCount": 2,
+      "duplicateCount": 0
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3piqrdo89q",
+    "timestamp": "2026-05-12T06:57:50.066Z",
+    "action": "check",
+    "message": "执行数据一致性检查",
+    "details": {
+      "issueCount": 0,
+      "errorCount": 0,
+      "warningCount": 0,
+      "summary": {
+        "totalItems": 2,
+        "consistent": 0,
+        "overstock": 0,
+        "understock": 2,
+        "issuesByCategory": {}
+      }
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3pl9wv5mgh",
+    "timestamp": "2026-05-12T06:57:50.157Z",
+    "action": "detail",
+    "message": "查看差异详情",
+    "details": {
+      "filter": {
+        "sku": "SKU010"
+      },
+      "resultCount": 1
+    },
+    "operator": "tuotuo"
+  },
+  {
+    "id": "mp2a3pngwz2or5",
+    "timestamp": "2026-05-12T06:57:50.236Z",
+    "action": "report",
+    "message": "生成盘点报告",
+    "details": {
+      "summary": {
+        "totalItems": 2,
+        "consistent": 0,
+        "overstock": 0,
+        "understock": 2,
+        "issuesByCategory": {}
+      },
+      "closedCount": 1,
+      "errorCount": 0
+    },
+    "operator": "tuotuo"
+  }
+]
