@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fafc;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-ready {
+  background-color: #10b981;
+}
+
+.status-pending {
+  background-color: #f59e0b;
+}
+
+.status-printed {
+  background-color: #3b82f6;
+}
+
+.status-reprinted {
+  background-color: #8b5cf6;
+}
+
+.status-active {
+  background-color: #10b981;
+}
+
+.status-used {
+  background-color: #6b7280;
+}
+
+.status-expired {
+  background-color: #ef4444;
+}
+
+.status-cancelled {
+  background-color: #9ca3af;
+}
+
+.status-approving {
+  background-color: #f59e0b;
+}
+
+.status-approved {
+  background-color: #10b981;
+}
+
+.status-rejected {
+  background-color: #ef4444;
+}
+
+.status-resolved {
+  background-color: #10b981;
+}
+
+.status-ignored {
+  background-color: #6b7280;
+}
