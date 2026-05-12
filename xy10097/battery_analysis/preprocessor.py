@@ -33,8 +33,7 @@ class DataPreprocessor:
         
         df = self._normalize_columns(df, column_mapping)
         
-        if 'battery_id' in df.columns:
-            df = self._assign_battery_ids(df)
+        df = self._assign_battery_ids(df)
         
         df = self._convert_units(df)
         df = self._convert_numeric_types(df)

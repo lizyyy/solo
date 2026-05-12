@@ -1,11 +1,22 @@
 """图表和表格报告生成模块。"""
 
+import os
+import sys
+import tempfile
 import pandas as pd
 import numpy as np
+
+os.environ.setdefault('MPLCONFIGDIR', tempfile.gettempdir())
+
 import matplotlib
 matplotlib.use('Agg')
+
+matplotlib.rcParams['font.sans-serif'] = ['DejaVu Sans', 'sans-serif']
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['axes.unicode_minus'] = False
+
 import matplotlib.pyplot as plt
-import matplotlib.font_manager as fm
+
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from .config import AnalysisConfig
@@ -28,18 +39,10 @@ class ReportGenerator:
     
     def _setup_plot_style(self) -> None:
         """设置绘图样式。"""
-        plt.style.use('seaborn-v0_8-whitegrid')
-        
-        font_names = ['Arial Unicode MS', 'SimHei', 'Heiti TC', 'PingFang SC', 
-                      'Microsoft YaHei', 'STHeiti', 'Noto Sans CJK SC']
-        
-        for font_name in font_names:
-            try:
-                plt.rcParams['font.sans-serif'] = [font_name]
-                plt.rcParams['axes.unicode_minus'] = False
-                break
-            except:
-                continue
+        try:
+            plt.style.use('seaborn-v0_8-whitegrid')
+        except:
+            pass
         
         plt.rcParams['figure.figsize'] = self.config.figure_size
         plt.rcParams['figure.dpi'] = self.config.plot_dpi
@@ -48,6 +51,7 @@ class ReportGenerator:
         plt.rcParams['axes.labelsize'] = 12
         plt.rcParams['xtick.labelsize'] = 10
         plt.rcParams['ytick.labelsize'] = 10
+        plt.rcParams['axes.unicode_minus'] = False
     
     def generate_all_plots(self, df: pd.DataFrame, 
                            analysis_result: AnalysisResult,
@@ -88,9 +92,9 @@ class ReportGenerator:
             ax.plot(group['cycle'], group['capacity'], 
                    label=str(battery_id), linewidth=1.5, alpha=0.8)
         
-        ax.set_xlabel('循环次数', fontsize=12)
-        ax.set_ylabel('容量 (mAh)', fontsize=12)
-        ax.set_title('电池容量衰减曲线', fontsize=14, fontweight='bold')
+        ax.set_xlabel('Cycle')
+        ax.set_ylabel('Capacity (mAh)')
+        ax.set_title('Battery Capacity Decay Curves', fontsize=14, fontweight='bold')
         ax.legend(loc='best', ncol=2, fontsize=8)
         ax.grid(True, alpha=0.3)
         
@@ -113,11 +117,11 @@ class ReportGenerator:
                     ax.plot(group['cycle'], retention, 
                            label=str(battery_id), linewidth=1.5, alpha=0.8)
         
-        ax.axhline(y=80, color='r', linestyle='--', alpha=0.7, label='80% 阈值')
+        ax.axhline(y=80, color='r', linestyle='--', alpha=0.7, label='80% Threshold')
         
-        ax.set_xlabel('循环次数', fontsize=12)
-        ax.set_ylabel('容量保持率 (%)', fontsize=12)
-        ax.set_title('电池容量保持率曲线', fontsize=14, fontweight='bold')
+        ax.set_xlabel('Cycle')
+        ax.set_ylabel('Capacity Retention (%)')
+        ax.set_title('Battery Capacity Retention Curves', fontsize=14, fontweight='bold')
         ax.legend(loc='best', ncol=2, fontsize=8)
         ax.grid(True, alpha=0.3)
         ax.set_ylim([60, 105])
@@ -142,24 +146,24 @@ class ReportGenerator:
         
         ax1 = axes[0]
         ax1.bar(range(len(battery_ids)), initial_caps, alpha=0.7, color='steelblue')
-        ax1.set_xlabel('电池编号', fontsize=11)
-        ax1.set_ylabel('初始容量 (mAh)', fontsize=11)
-        ax1.set_title('各电池初始容量对比', fontsize=13, fontweight='bold')
+        ax1.set_xlabel('Battery ID')
+        ax1.set_ylabel('Initial Capacity (mAh)')
+        ax1.set_title('Initial Capacity Comparison', fontsize=13, fontweight='bold')
         ax1.set_xticks(range(len(battery_ids)))
         ax1.set_xticklabels(battery_ids, rotation=45, ha='right', fontsize=8)
         
         mean_cap = np.mean(initial_caps)
         ax1.axhline(y=mean_cap, color='r', linestyle='--', 
-                   alpha=0.7, label=f'均值: {mean_cap:.1f} mAh')
+                   alpha=0.7, label=f'Mean: {mean_cap:.1f} mAh')
         ax1.legend(fontsize=9)
         ax1.grid(axis='y', alpha=0.3)
         
         ax2 = axes[1]
         n, bins, patches = ax2.hist(initial_caps, bins='auto', alpha=0.7, 
                                    color='steelblue', edgecolor='white')
-        ax2.set_xlabel('初始容量 (mAh)', fontsize=11)
-        ax2.set_ylabel('频数', fontsize=11)
-        ax2.set_title('初始容量分布', fontsize=13, fontweight='bold')
+        ax2.set_xlabel('Initial Capacity (mAh)')
+        ax2.set_ylabel('Frequency')
+        ax2.set_title('Initial Capacity Distribution', fontsize=13, fontweight='bold')
         ax2.axvline(x=mean_cap, color='r', linestyle='--', alpha=0.7)
         ax2.grid(axis='y', alpha=0.3)
         
@@ -185,22 +189,22 @@ class ReportGenerator:
         ax1 = axes[0]
         colors = ['red' if fr > np.mean(fade_rates) * 1.2 else 'steelblue' for fr in fade_rates]
         ax1.bar(range(len(battery_ids)), fade_rates, alpha=0.7, color=colors)
-        ax1.set_xlabel('电池编号', fontsize=11)
-        ax1.set_ylabel('衰减率 (%/循环)', fontsize=11)
-        ax1.set_title('各电池衰减率对比', fontsize=13, fontweight='bold')
+        ax1.set_xlabel('Battery ID')
+        ax1.set_ylabel('Fade Rate (%/cycle)')
+        ax1.set_title('Fade Rate Comparison', fontsize=13, fontweight='bold')
         ax1.set_xticks(range(len(battery_ids)))
         ax1.set_xticklabels(battery_ids, rotation=45, ha='right', fontsize=8)
         
         mean_fade = np.mean(fade_rates)
         ax1.axhline(y=mean_fade, color='r', linestyle='--', 
-                   alpha=0.7, label=f'均值: {mean_fade:.4f}')
+                   alpha=0.7, label=f'Mean: {mean_fade:.4f}')
         ax1.legend(fontsize=9)
         ax1.grid(axis='y', alpha=0.3)
         
         ax2 = axes[1]
         ax2.boxplot(fade_rates, vert=True, patch_artist=True)
-        ax2.set_ylabel('衰减率 (%/循环)', fontsize=11)
-        ax2.set_title('衰减率箱线图', fontsize=13, fontweight='bold')
+        ax2.set_ylabel('Fade Rate (%/cycle)')
+        ax2.set_title('Fade Rate Boxplot', fontsize=13, fontweight='bold')
         ax2.grid(axis='y', alpha=0.3)
         
         plt.tight_layout()
@@ -218,7 +222,7 @@ class ReportGenerator:
         if metrics is None:
             return ""
         
-        categories = ['初始容量CV', '衰减率CV', '综合CV']
+        categories = ['Initial Cap CV', 'Fade Rate CV', 'Overall CV']
         values = [
             min(metrics.cv_initial_capacity * 10, 100),
             min(metrics.cv_fade_rate * 10, 100),
@@ -244,9 +248,9 @@ class ReportGenerator:
         ax.set_xticks(angles[:-1])
         ax.set_xticklabels(categories, fontsize=11)
         ax.set_yticks([20, 50, 100])
-        ax.set_yticklabels(['优秀', '良好', '一般'], fontsize=9)
+        ax.set_yticklabels(['Excellent', 'Good', 'Average'], fontsize=9)
         ax.set_ylim([0, 120])
-        ax.set_title(f'一致性评估 (等级: {metrics.consistency_level})', 
+        ax.set_title(f'Consistency Assessment (Level: {metrics.consistency_level})', 
                     fontsize=14, fontweight='bold', pad=20)
         
         ax.grid(True)
@@ -279,9 +283,9 @@ class ReportGenerator:
         ax1 = axes[0, 0]
         ax1.scatter(df_metrics['初始容量'], df_metrics['衰减率'], 
                    alpha=0.7, s=100, edgecolors='white')
-        ax1.set_xlabel('初始容量 (mAh)', fontsize=11)
-        ax1.set_ylabel('衰减率 (%/循环)', fontsize=11)
-        ax1.set_title('初始容量 vs 衰减率', fontsize=12, fontweight='bold')
+        ax1.set_xlabel('Initial Capacity (mAh)')
+        ax1.set_ylabel('Fade Rate (%/cycle)')
+        ax1.set_title('Initial Capacity vs Fade Rate', fontsize=12, fontweight='bold')
         ax1.grid(True, alpha=0.3)
         
         for i, row in df_metrics.iterrows():
@@ -292,9 +296,9 @@ class ReportGenerator:
         ax2 = axes[0, 1]
         ax2.scatter(df_metrics['初始容量'], df_metrics['最大循环'],
                    alpha=0.7, s=100, edgecolors='white')
-        ax2.set_xlabel('初始容量 (mAh)', fontsize=11)
-        ax2.set_ylabel('最大循环次数', fontsize=11)
-        ax2.set_title('初始容量 vs 最大循环', fontsize=12, fontweight='bold')
+        ax2.set_xlabel('Initial Capacity (mAh)')
+        ax2.set_ylabel('Max Cycles')
+        ax2.set_title('Initial Capacity vs Max Cycles', fontsize=12, fontweight='bold')
         ax2.grid(True, alpha=0.3)
         
         for i, row in df_metrics.iterrows():
@@ -306,16 +310,16 @@ class ReportGenerator:
         df_sorted = df_metrics.sort_values('初始容量')
         ax3.barh(df_sorted['电池编号'], df_sorted['初始容量'], 
                 alpha=0.7, color='steelblue')
-        ax3.set_xlabel('初始容量 (mAh)', fontsize=11)
-        ax3.set_title('初始容量排名', fontsize=12, fontweight='bold')
+        ax3.set_xlabel('Initial Capacity (mAh)')
+        ax3.set_title('Initial Capacity Ranking', fontsize=12, fontweight='bold')
         ax3.grid(axis='x', alpha=0.3)
         
         ax4 = axes[1, 1]
         df_sorted_fade = df_metrics.sort_values('衰减率')
         ax4.barh(df_sorted_fade['电池编号'], df_sorted_fade['衰减率'],
                 alpha=0.7, color='orange')
-        ax4.set_xlabel('衰减率 (%/循环)', fontsize=11)
-        ax4.set_title('衰减率排名', fontsize=12, fontweight='bold')
+        ax4.set_xlabel('Fade Rate (%/cycle)')
+        ax4.set_title('Fade Rate Ranking', fontsize=12, fontweight='bold')
         ax4.grid(axis='x', alpha=0.3)
         
         plt.tight_layout()

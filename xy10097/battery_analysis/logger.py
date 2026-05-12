@@ -79,9 +79,14 @@ class AnalysisLogger:
             self.logger.addHandler(console_handler)
             
             if self.log_to_file:
-                file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
-                file_handler.setFormatter(formatter)
-                self.logger.addHandler(file_handler)
+                try:
+                    file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
+                    file_handler.setFormatter(formatter)
+                    self.logger.addHandler(file_handler)
+                except (PermissionError, OSError) as e:
+                    self.log_to_file = False
+                    print(f"警告: 无法创建日志文件 {self.log_file}: {e}")
+                    print("警告: 日志将仅输出到控制台")
     
     def log(self, step: str, message: str, status: str = "INFO", details: Optional[Dict] = None) -> None:
         """记录分析日志。"""
