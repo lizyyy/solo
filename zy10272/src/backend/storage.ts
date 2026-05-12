@@ -1,24 +1,32 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { Order } from '../types';
+import { Order, OrderFile } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const COUNTER_FILE = path.join(DATA_DIR, 'counter.json');
+const FILES_FILE = path.join(DATA_DIR, 'files.json');
 
 interface DataStore {
   orders: Order[];
+  files: Map<string, OrderFile>;
   orderCounter: number;
 }
 
 let inMemoryStore: DataStore = {
   orders: [],
+  files: new Map(),
   orderCounter: 0
 };
 
 function ensureDataDir(): void {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+  if (!fs.existsSync(UPLOADS_DIR)) {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   }
 }
 
@@ -42,6 +50,17 @@ export function loadData(): void {
   }
 
   try {
+    if (fs.existsSync(FILES_FILE)) {
+      const filesData = fs.readFileSync(FILES_FILE, 'utf-8');
+      const filesArray = JSON.parse(filesData);
+      inMemoryStore.files = new Map(filesArray.map((f: OrderFile) => [f.id, f]);
+    }
+  } catch (error) {
+    console.error('Error loading files:', error);
+    inMemoryStore.files = new Map();
+  }
+
+  try {
     if (fs.existsSync(COUNTER_FILE)) {
       const counterData = fs.readFileSync(COUNTER_FILE, 'utf-8');
       inMemoryStore.orderCounter = JSON.parse(counterData).counter || 0;
@@ -57,6 +76,8 @@ export function saveData(): void {
   
   try {
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(inMemoryStore.orders, null, 2));
+    const filesArray = Array.from(inMemoryStore.files.values());
+    fs.writeFileSync(FILES_FILE, JSON.stringify(filesArray, null, 2));
     fs.writeFileSync(COUNTER_FILE, JSON.stringify({ counter: inMemoryStore.orderCounter }, null, 2));
   } catch (error) {
     console.error('Error saving data:', error);

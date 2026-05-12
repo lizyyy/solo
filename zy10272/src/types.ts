@@ -18,6 +18,14 @@ export enum OrderStatus {
   REFUNDED = 'refunded'
 }
 
+export interface OrderFile {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  storedPath: string;
+}
+
 export interface Order {
   id: string;
   orderNumber: number;
@@ -32,6 +40,8 @@ export interface Order {
   prepaidAmount: number;
   balance: number;
   status: OrderStatus;
+  idempotencyKey?: string;
+  file?: OrderFile;
   createdAt: Date;
   updatedAt: Date;
   calledAt?: Date;
@@ -45,6 +55,8 @@ export interface CreateOrderRequest {
   pageCount: number;
   copies: number;
   prepaidAmount: number;
+  idempotencyKey?: string;
+  fileId?: string;
 }
 
 export interface UpdateOrderRequest {
