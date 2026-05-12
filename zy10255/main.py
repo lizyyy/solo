@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Boolean, ForeignKey, Text, func, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from datetime import datetime, date
@@ -135,6 +135,11 @@ class Bill(Base):
     room = relationship("Room", back_populates="bills")
     tenant = relationship("Tenant", back_populates="bills")
     items = relationship("BillItem", back_populates="bill")
+    
+    __table_args__ = (
+        UniqueConstraint('room_id', 'tenant_id', 'period_start', 'period_end', 'transfer_id', 
+                         name='_bill_unique_constraint'),
+    )
 
 class BillItem(Base):
     __tablename__ = "bill_items"
@@ -497,15 +502,15 @@ def get_tenant_balance(tenant_id: int, db: Session = Depends(get_db)):
     tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
     if not tenant:
         raise HTTPException(status_code=404, detail="租客不存在")
-    total_precharge = db.query(Precharge).filter(Precharge.tenant_id == tenant_id).with_entities(db.func.sum(Precharge.amount)).scalar() or 0
-    total_bill = db.query(Bill).filter(
+    total_precharge = db.query(func.sum(Precharge.amount)).filter(Precharge.tenant_id == tenant_id).scalar() or 0
+    total_bill = db.query(func.sum(Bill.total_amount)).filter(
         Bill.tenant_id == tenant_id,
         Bill.status.in_(["confirmed", "paid"])
-    ).with_entities(db.func.sum(Bill.total_amount)).scalar() or 0
-    total_paid = db.query(Bill).filter(
+    ).scalar() or 0
+    total_paid = db.query(func.sum(Bill.paid_amount)).filter(
         Bill.tenant_id == tenant_id,
         Bill.status == "paid"
-    ).with_entities(db.func.sum(Bill.paid_amount)).scalar() or 0
+    ).scalar() or 0
     balance = total_precharge - total_bill
     return {
         "tenant_id": tenant_id,
@@ -577,6 +582,23 @@ def generate_bill(
     tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
     if not room or not tenant:
         raise HTTPException(status_code=404, detail="房间或租客不存在")
+    
+    existing_bill = db.query(Bill).filter(
+        Bill.room_id == room_id,
+        Bill.tenant_id == tenant_id,
+        Bill.period_start == period_start,
+        Bill.period_end == period_end,
+        Bill.transfer_id == transfer_id
+    ).first()
+    if existing_bill:
+        return {
+            "bill_id": existing_bill.id,
+            "bill_no": existing_bill.bill_no,
+            "total_amount": existing_bill.total_amount,
+            "status": existing_bill.status,
+            "is_existing": True
+        }
+    
     bill_no = f"BILL-{datetime.now().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
     bill = Bill(
         bill_no=bill_no,
@@ -641,17 +663,17 @@ def confirm_bill(request: BillConfirmRequest, db: Session = Depends(get_db)):
     if not bill:
         raise HTTPException(status_code=404, detail="账单不存在")
     if bill.status == "confirmed":
-        return {"message": "已确认", "status": bill.status}
+        return {"message": "已确认", "status": bill.status, "bill_id": bill.id}
     if bill.status == "revoked":
         raise HTTPException(status_code=400, detail="已撤销的账单不能确认")
-    total_precharge = db.query(Precharge).filter(Precharge.tenant_id == bill.tenant_id).with_entities(db.func.sum(Precharge.amount)).scalar() or 0
-    total_confirmed_bill = db.query(Bill).filter(
+    total_precharge = db.query(func.sum(Precharge.amount)).filter(Precharge.tenant_id == bill.tenant_id).scalar() or 0
+    total_confirmed_bill = db.query(func.sum(Bill.total_amount)).filter(
         Bill.tenant_id == bill.tenant_id,
         Bill.status.in_(["confirmed", "paid"])
-    ).with_entities(db.func.sum(Bill.total_amount)).scalar() or 0
+    ).scalar() or 0
     balance = total_precharge - total_confirmed_bill
     if balance < bill.total_amount:
-        raise HTTPException(status_code=400, detail="预充值余额不足，请先充值")
+        raise HTTPException(status_code=400, detail=f"预充值余额不足，当前余额{balance}元，账单金额{bill.total_amount}元")
     history = BillHistory(
         bill_id=bill.id,
         action="confirm",
