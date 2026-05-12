@@ -88,7 +88,28 @@ def main():
         print(f"❌ 依赖清单有问题: {e}")
         return 1
 
-    print_step(6, "验证演示脚本")
+    print_step(6, "验证待复核交易接口字段")
+    
+    try:
+        import ast
+        
+        # 解析 services.py 检查 export_pending_review_transactions 返回的字段
+        with open('services.py', 'r') as f:
+            source = f.read()
+            
+        # 简单字符串检查确认字段存在
+        if '"transaction_id": tx.id' in source or "'transaction_id': tx.id" in source:
+            print("✅ 待复核交易接口包含 transaction_id 字段")
+            print("   (services.py:595 已添加 'transaction_id': tx.id)")
+        else:
+            print("❌ 待复核交易接口缺少 transaction_id 字段")
+            return 1
+            
+    except Exception as e:
+        print(f"❌ 字段验证失败: {e}")
+        return 1
+
+    print_step(7, "验证演示脚本")
     
     try:
         with open('demo_data.py', 'r') as f:
@@ -113,8 +134,10 @@ def main():
     print("\n修复的问题总结:")
     print("  1. database.py:113 - 修复了 __tablename__ 的拼写错误")
     print("     (原错误: __tablenameame__ -> 正确: __tablename__)")
-    print("  2. demo_data.py - 修复了日期格式化调用问题")
-    print("  3. requirements.txt - 添加了 requests 依赖")
+    print("  2. services.py:595 - 待复核交易接口添加了 transaction_id 字段")
+    print("     (demo_data.py 复核交易流程需要此字段)")
+    print("  3. demo_data.py - 修复了日期格式化调用问题")
+    print("  4. requirements.txt - 添加了 requests 依赖")
     print()
     
     return 0

@@ -592,6 +592,7 @@ class TransactionService:
         result = []
         for tx in transactions:
             result.append({
+                "transaction_id": tx.id,
                 "transaction_number": tx.transaction_number,
                 "account_number": tx.account.account_number,
                 "resident_name": tx.account.resident.name if tx.account.resident else None,
