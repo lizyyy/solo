@@ -56,6 +56,12 @@ export default function Return() {
       return
     }
 
+    const incompleteDamage = damageChecks.find(d => d.damaged && !d.description.trim())
+    if (incompleteDamage) {
+      setMessage({ type: 'error', text: '请填写所有破损托盘的破损描述' })
+      return
+    }
+
     const result = returnPallet(selectedOutbound, returnDate, damageChecks)
     if (result.success) {
       const damagedCount = damageChecks.filter(d => d.damaged).length

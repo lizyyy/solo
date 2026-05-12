@@ -3,7 +3,7 @@ import { usePalletStore } from '../store'
 import { CheckCircle, User, Package } from 'lucide-react'
 
 export default function Signature() {
-  const { signForDelivery, outboundRecords, pallets } = usePalletStore()
+  const { signForDelivery, outboundRecords } = usePalletStore()
   const [selectedOutbound, setSelectedOutbound] = useState('')
   const [signatureDate, setSignatureDate] = useState(new Date().toISOString().split('T')[0])
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)

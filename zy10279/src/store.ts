@@ -154,7 +154,7 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
   },
 
   signForDelivery: (outboundId: string, signDate: string) => {
-    const { outboundRecords, pallets, processRecords } = get()
+    const { outboundRecords } = get()
     const outbound = outboundRecords.find(o => o.id === outboundId)
     if (!outbound || outbound.status !== 'pending_signature') {
       return { success: false, message: '出库记录不存在或状态异常' }
@@ -193,7 +193,7 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
   },
 
   returnPallet: (outboundId: string, returnDate: string, damageCheck) => {
-    const { outboundRecords, pallets, damageRecords, customers, processRecords } = get()
+    const { outboundRecords, customers } = get()
     const outbound = outboundRecords.find(o => o.id === outboundId)
     if (!outbound || (outbound.status !== 'signed' && outbound.status !== 'overdue')) {
       return { success: false, message: '出库记录不存在或状态异常' }
@@ -203,7 +203,8 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
     const newDamages: DamageRecord[] = []
 
     for (const check of damageCheck) {
-      if (check.damaged && check.level && check.description) {
+      if (check.damaged && check.level) {
+        const description = check.description || '未填写破损描述'
         const deductionAmount = check.level === 'minor' ? 20 : check.level === 'medium' ? 50 : 100
         const damage: DamageRecord = {
           id: generateId(),
@@ -212,7 +213,7 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
           customerId: outbound.customerId,
           customerName: outbound.customerName,
           damageLevel: check.level as 'minor' | 'medium' | 'severe',
-          damageDescription: check.description,
+          damageDescription: description,
           deductionAmount,
           deducted: false,
           detectedDate: returnDate,
@@ -279,7 +280,7 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
   },
 
   processDamage: (damageId: string, deduct: boolean) => {
-    const { damageRecords, pallets, customers, settlementRecords, processRecords } = get()
+    const { damageRecords } = get()
     const damage = damageRecords.find(d => d.id === damageId)
     if (!damage || damage.deducted) {
       return { success: false, message: '破损记录不存在或已处理' }
@@ -349,7 +350,7 @@ export const usePalletStore = create<PalletStore>((set, get) => ({
   },
 
   addSettlement: (settlementData) => {
-    const { settlementRecords, customers } = get()
+    const { settlementRecords } = get()
 
     const duplicateCheck = settlementRecords.some(
       s => s.customerId === settlementData.customerId &&
