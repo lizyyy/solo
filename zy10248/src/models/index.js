@@ -21,6 +21,9 @@ DamageReport.belongsTo(MeetingRoom, { foreignKey: 'meetingRoomId' });
 Booking.hasMany(Inspection, { foreignKey: 'bookingId' });
 Inspection.belongsTo(Booking, { foreignKey: 'bookingId' });
 
+MeetingRoom.hasMany(Inspection, { foreignKey: 'meetingRoomId' });
+Inspection.belongsTo(MeetingRoom, { foreignKey: 'meetingRoomId' });
+
 Equipment.hasMany(DamageReport, { foreignKey: 'equipmentId' });
 DamageReport.belongsTo(Equipment, { foreignKey: 'equipmentId' });
 
