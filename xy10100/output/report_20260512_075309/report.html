@@ -1,0 +1,899 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCR Ct值质控报告</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 14px; }
+        
+        .status-badge { display: inline-block; padding: 8px 20px; border-radius: 25px; font-weight: bold; font-size: 16px; }
+        .status-pass { background: #4CAF50; }
+        .status-warn { background: #FF9800; }
+        .status-fail { background: #F44336; }
+        
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 20px; margin-bottom: 15px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .stat-card { background: #f8f9fa; border-radius: 8px; padding: 15px; text-align: center; }
+        .stat-value { font-size: 28px; font-weight: bold; color: #333; }
+        .stat-label { font-size: 14px; color: #666; margin-top: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        
+        .control-result { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; }
+        .control-pass { background: #E8F5E9; color: #2E7D32; }
+        .control-fail { background: #FFEBEE; color: #C62828; }
+        
+        .failure-item { border-left: 4px solid #F44336; padding: 15px; margin: 10px 0; background: #FFEBEE; border-radius: 4px; }
+        .failure-item.warning { border-left-color: #FF9800; background: #FFF3E0; }
+        .failure-sample { font-weight: bold; margin-bottom: 5px; }
+        .failure-reason { color: #666; font-size: 14px; }
+        .failure-details { font-family: monospace; font-size: 12px; color: #999; margin-top: 5px; }
+        
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 20px; }
+        .chart-container { background: #fafafa; border-radius: 8px; padding: 10px; }
+        .chart-container img { width: 100%; height: auto; display: block; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; background: #e0e0e0; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        .tab.active { background: #667eea; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .data-issue { padding: 10px; border-left: 3px solid #2196F3; background: #E3F2FD; margin: 5px 0; border-radius: 3px; }
+        .data-issue.error { border-left-color: #F44336; background: #FFEBEE; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 PCR Ct值质控报告</h1>
+            <div class="meta">
+                文件: sample_data_with_units.csv | 生成时间: 2026-05-12 07:53:10
+            </div>
+            <div style="margin-top: 15px;">
+                总体质控状态: 
+                <span class="status-badge status-fail">
+                    FAIL
+                </span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('summary')">摘要</button>
+            <button class="tab" onclick="showTab('controls')">对照检查</button>
+            <button class="tab" onclick="showTab('failures')">失败样本</button>
+            <button class="tab" onclick="showTab('charts')">图表分析</button>
+            <button class="tab" onclick="showTab('data')">详细数据</button>
+            <button class="tab" onclick="showTab('issues')">数据问题</button>
+        </div>
+        
+        <div id="summary" class="tab-content active">
+            <div class="card">
+                <h2>📊 质控统计</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #333;">22</div>
+                        <div class="stat-label">有效样本数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #4CAF50;">20</div>
+                        <div class="stat-label">通过样本</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #FF9800;">0</div>
+                        <div class="stat-label">警告样本</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: #F44336;">2</div>
+                        <div class="stat-label">失败样本</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 Ct值统计</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">24.061904761904763</div>
+                        <div class="stat-label">平均Ct值</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">23.8</div>
+                        <div class="stat-label">中位数Ct值</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">8.5</div>
+                        <div class="stat-label">最小Ct值</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">45.2</div>
+                        <div class="stat-label">最大Ct值</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🧬 对照状态</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: red;">
+                            2/4
+                        </div>
+                        <div class="stat-label">阳性对照</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: red;">
+                            2/3
+                        </div>
+                        <div class="stat-label">阴性对照</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" style="color: red;">
+                            2/3
+                        </div>
+                        <div class="stat-label">空白对照</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="controls" class="tab-content">
+            <div class="card">
+                <h2>🧬 对照检查详细结果</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>对照类型</th>
+                            <th>样本ID</th>
+                            <th>孔位</th>
+                            <th>Ct值</th>
+                            <th>期望值</th>
+                            <th>实际值</th>
+                            <th>状态</th>
+                            <th>说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>阳性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>20.5</td>
+                            <td>Ct值在[15, 30]范围内</td>
+                            <td>Ct值: 20.5</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>阳性对照正常</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阳性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>19.8</td>
+                            <td>Ct值在[15, 30]范围内</td>
+                            <td>Ct值: 19.8</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>阳性对照正常</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阳性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>8.2</td>
+                            <td>Ct值在[15, 30]范围内</td>
+                            <td>Ct值: 8.2</td>
+                            <td><span class="control-result control-fail">
+                                失败
+                            </span></td>
+                            <td>阳性对照Ct值过低 (8.2)，可能存在过度扩增</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阳性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>35.0</td>
+                            <td>Ct值在[15, 30]范围内</td>
+                            <td>Ct值: 35.0</td>
+                            <td><span class="control-result control-fail">
+                                失败
+                            </span></td>
+                            <td>阳性对照Ct值过高 (35.0)，可能存在扩增效率问题</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阴性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>nan</td>
+                            <td>无扩增或Ct值 >= 38</td>
+                            <td>Ct值: 未检出</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>阴性对照无扩增，正常</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阴性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>39.5</td>
+                            <td>无扩增或Ct值 >= 38</td>
+                            <td>Ct值: 39.5</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>阴性对照Ct值 (39.5) 大于阈值 38，可接受</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>阴性对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>25.0</td>
+                            <td>无扩增或Ct值 >= 38</td>
+                            <td>Ct值: 25.0</td>
+                            <td><span class="control-result control-fail">
+                                失败
+                            </span></td>
+                            <td>阴性对照Ct值 (25.0) 低于阈值 38，存在污染风险</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>空白对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>nan</td>
+                            <td>无扩增</td>
+                            <td>Ct值: 未检出</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>空白对照无扩增，正常</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>空白对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>nan</td>
+                            <td>无扩增</td>
+                            <td>Ct值: 未检出</td>
+                            <td><span class="control-result control-pass">
+                                通过
+                            </span></td>
+                            <td>空白对照无扩增，正常</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>空白对照</td>
+                            <td></td>
+                            <td></td>
+                            <td>28.0</td>
+                            <td>无扩增</td>
+                            <td>Ct值: 28.0</td>
+                            <td><span class="control-result control-fail">
+                                失败
+                            </span></td>
+                            <td>空白对照检测到扩增 (Ct=28.0)，存在严重污染</td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="failures" class="tab-content">
+            <div class="card">
+                <h2>❌ 失败样本列表</h2>
+                
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: S009 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: Ct值过低 (8.5)，低于最小值 10</div>
+                        <div class="failure-details">详情: {'ct_value': 8.5, 'min_threshold': 10}</div>
+                    </div>
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: S010 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: Ct值过高 (45.2)，高于最大值 40</div>
+                        <div class="failure-details">详情: {'ct_value': 45.2, 'max_threshold': 40}</div>
+                    </div>
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: PC3 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 阳性对照 PC3 Ct值过低 (8.2)，低于最小值 15</div>
+                        <div class="failure-details">详情: {'ct_value': 8.2, 'min_threshold': 15, 'max_threshold': 30}</div>
+                    </div>
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: PC4 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 阳性对照 PC4 Ct值过高 (35.0)，高于最大值 30</div>
+                        <div class="failure-details">详情: {'ct_value': 35.0, 'min_threshold': 15, 'max_threshold': 30}</div>
+                    </div>
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: NC3 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 阴性对照 NC3 Ct值 (25.0) 低于阈值 38，存在污染风险</div>
+                        <div class="failure-details">详情: {'ct_value': 25.0, 'threshold': 38}</div>
+                    </div>
+                    
+                    <div class="failure-item ">
+                        <div class="failure-sample">
+                            样本: Blank3 
+                            <span style="float: right; font-size: 12px;">
+                                错误
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 空白对照 Blank3 检测到扩增 (Ct=28.0)，存在严重污染</div>
+                        <div class="failure-details">详情: {'ct_value': 28.0, 'expected': '无扩增'}</div>
+                    </div>
+                    
+                    <div class="failure-item warning">
+                        <div class="failure-sample">
+                            样本: S009 
+                            <span style="float: right; font-size: 12px;">
+                                警告
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 低异常值Ct值: 8.5</div>
+                        <div class="failure-details">详情: {'ct_value': 8.5, 'lower_bound': 21.300000000000004, 'upper_bound': 26.1, 'method': 'IQR'}</div>
+                    </div>
+                    
+                    <div class="failure-item warning">
+                        <div class="failure-sample">
+                            样本: S010 
+                            <span style="float: right; font-size: 12px;">
+                                警告
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 高异常值Ct值: 45.2</div>
+                        <div class="failure-details">详情: {'ct_value': 45.2, 'lower_bound': 21.300000000000004, 'upper_bound': 26.1, 'method': 'IQR'}</div>
+                    </div>
+                    
+                    <div class="failure-item warning">
+                        <div class="failure-sample">
+                            样本: PLATE 
+                            <span style="float: right; font-size: 12px;">
+                                警告
+                            </span>
+                        </div>
+                        <div class="failure-reason">原因: 板位不完整，缺少 61 个孔位</div>
+                        <div class="failure-details">详情: {'missing_wells': ['B1', 'B2', 'C10', 'C11', 'C12', 'C5', 'C6', 'C7', 'C8', 'C9', 'D10', 'D11', 'D12', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'E10', 'E11', 'E12', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'F10', 'F11', 'F12', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'G1', 'G10', 'G11', 'G12', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8', 'G9', 'H1', 'H10', 'H11', 'H12', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9']}</div>
+                    </div>
+                    
+                
+            </div>
+        </div>
+        
+        <div id="charts" class="tab-content">
+            <div class="card">
+                <h2>📊 图表分析</h2>
+                <div class="charts-grid">
+                    
+                    <div class="chart-container">
+                        <img src="output/report_20260512_075309/charts/ct_distribution.png" alt="图表">
+                    </div>
+                    
+                    <div class="chart-container">
+                        <img src="output/report_20260512_075309/charts/status_distribution.png" alt="图表">
+                    </div>
+                    
+                    <div class="chart-container">
+                        <img src="output/report_20260512_075309/charts/plate_heatmap.png" alt="图表">
+                    </div>
+                    
+                    <div class="chart-container">
+                        <img src="output/report_20260512_075309/charts/control_results.png" alt="图表">
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div id="data" class="tab-content">
+            <div class="card">
+                <h2>📋 样本详细数据</h2>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>样本ID</th>
+                                <th>孔位</th>
+                                <th>类型</th>
+                                <th>Ct值</th>
+                                <th>QC状态</th>
+                                <th>失败原因</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td>S001</td>
+                                <td>A1</td>
+                                <td>样本</td>
+                                <td>22.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S002</td>
+                                <td>A2</td>
+                                <td>样本</td>
+                                <td>23.1</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S003</td>
+                                <td>A3</td>
+                                <td>样本</td>
+                                <td>24.2</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S004</td>
+                                <td>A4</td>
+                                <td>样本</td>
+                                <td>25.0</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S005</td>
+                                <td>A5</td>
+                                <td>样本</td>
+                                <td>23.8</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S006</td>
+                                <td>A6</td>
+                                <td>样本</td>
+                                <td>22.9</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S007</td>
+                                <td>A7</td>
+                                <td>样本</td>
+                                <td>24.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S008</td>
+                                <td>A8</td>
+                                <td>样本</td>
+                                <td>23.3</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S009</td>
+                                <td>A9</td>
+                                <td>样本</td>
+                                <td>8.5</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>Ct值过低 (8.5)，低于最小值 10; 低异常值Ct值: 8.5</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S010</td>
+                                <td>A10</td>
+                                <td>样本</td>
+                                <td>45.2</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>Ct值过高 (45.2)，高于最大值 40; 高异常值Ct值: 45.2</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S011</td>
+                                <td>A11</td>
+                                <td>样本</td>
+                                <td>未检出</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S012</td>
+                                <td>A12</td>
+                                <td>样本</td>
+                                <td>22.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S013</td>
+                                <td>B3</td>
+                                <td>样本</td>
+                                <td>23.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S014</td>
+                                <td>B4</td>
+                                <td>样本</td>
+                                <td>24.1</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S015</td>
+                                <td>B5</td>
+                                <td>样本</td>
+                                <td>23.9</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S016</td>
+                                <td>B6</td>
+                                <td>样本</td>
+                                <td>25.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S017</td>
+                                <td>B7</td>
+                                <td>样本</td>
+                                <td>24.8</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S018</td>
+                                <td>B8</td>
+                                <td>样本</td>
+                                <td>23.2</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S019</td>
+                                <td>B9</td>
+                                <td>样本</td>
+                                <td>24.0</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S020</td>
+                                <td>B10</td>
+                                <td>样本</td>
+                                <td>22.8</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S021</td>
+                                <td>B11</td>
+                                <td>样本</td>
+                                <td>23.7</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>S022</td>
+                                <td>B12</td>
+                                <td>样本</td>
+                                <td>24.3</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PC1</td>
+                                <td>C1</td>
+                                <td>阳性对照</td>
+                                <td>20.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PC2</td>
+                                <td>C2</td>
+                                <td>阳性对照</td>
+                                <td>19.8</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PC3</td>
+                                <td>C3</td>
+                                <td>阳性对照</td>
+                                <td>8.2</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>阳性对照 PC3 Ct值过低 (8.2)，低于最小值 15</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>PC4</td>
+                                <td>C4</td>
+                                <td>阳性对照</td>
+                                <td>35.0</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>阳性对照 PC4 Ct值过高 (35.0)，高于最大值 30</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NC1</td>
+                                <td>D1</td>
+                                <td>阴性对照</td>
+                                <td>未检出</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NC2</td>
+                                <td>D2</td>
+                                <td>阴性对照</td>
+                                <td>39.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>NC3</td>
+                                <td>D3</td>
+                                <td>阴性对照</td>
+                                <td>25.0</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>阴性对照 NC3 Ct值 (25.0) 低于阈值 38，存在污染风险</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>Blank1</td>
+                                <td>E1</td>
+                                <td>空白对照</td>
+                                <td>未检出</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>Blank2</td>
+                                <td>E2</td>
+                                <td>空白对照</td>
+                                <td>未检出</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>Blank3</td>
+                                <td>E3</td>
+                                <td>空白对照</td>
+                                <td>28.0</td>
+                                <td><span class="control-result control-fail">
+                                    失败
+                                </span></td>
+                                <td>空白对照 Blank3 检测到扩增 (Ct=28.0)，存在严重污染</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>STD1</td>
+                                <td>F1</td>
+                                <td>标准品</td>
+                                <td>15.0</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>STD2</td>
+                                <td>F2</td>
+                                <td>标准品</td>
+                                <td>18.5</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                            <tr>
+                                <td>STD3</td>
+                                <td>F3</td>
+                                <td>标准品</td>
+                                <td>22.0</td>
+                                <td><span class="control-result control-pass">
+                                    通过
+                                </span></td>
+                                <td>-</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="issues" class="tab-content">
+            <div class="card">
+                <h2>⚠️ 数据加载问题</h2>
+                
+                    
+                    <div class="data-issue ">
+                        <strong>missing_value</strong> (warning)
+                         - 样本: S011
+                         - 列: ct_value
+                        <br>
+                        Ct值缺失或无法解析
+                    </div>
+                    
+                    <div class="data-issue ">
+                        <strong>missing_value</strong> (warning)
+                         - 样本: NC1
+                         - 列: ct_value
+                        <br>
+                        Ct值缺失或无法解析
+                    </div>
+                    
+                    <div class="data-issue ">
+                        <strong>missing_value</strong> (warning)
+                         - 样本: Blank1
+                         - 列: ct_value
+                        <br>
+                        Ct值缺失或无法解析
+                    </div>
+                    
+                    <div class="data-issue ">
+                        <strong>missing_value</strong> (warning)
+                         - 样本: Blank2
+                         - 列: ct_value
+                        <br>
+                        Ct值缺失或无法解析
+                    </div>
+                    
+                
+            </div>
+            
+            
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

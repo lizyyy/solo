@@ -187,8 +187,9 @@ class QCValidator:
 
         return failures, []
 
-    def _check_positive_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List, List[ControlCheckResult]]:
+    def _check_positive_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List[QCFailure], List[ControlCheckResult]]:
         checks = []
+        failures = []
         pc_ct_min, pc_ct_max = config['positive_control_ct']['min'], config['positive_control_ct']['max']
         
         pcs = df[df['sample_type'] == SampleType.POSITIVE_CONTROL]
@@ -200,13 +201,45 @@ class QCValidator:
             
             if pd.isna(ct):
                 message = "阳性对照未检测到扩增"
+                failures.append(QCFailure(
+                    sample_id=row['sample_id'],
+                    rule_name="positive_control_valid",
+                    reason=f"阳性对照 {row['sample_id']} 未检测到扩增",
+                    details={
+                        "expected": f"Ct值在[{pc_ct_min}, {pc_ct_max}]范围内",
+                        "actual": "未检出"
+                    },
+                    severity="error"
+                ))
             elif pc_ct_min <= ct <= pc_ct_max:
                 passed = True
                 message = "阳性对照正常"
             elif ct < pc_ct_min:
                 message = f"阳性对照Ct值过低 ({ct})，可能存在过度扩增"
+                failures.append(QCFailure(
+                    sample_id=row['sample_id'],
+                    rule_name="positive_control_valid",
+                    reason=f"阳性对照 {row['sample_id']} Ct值过低 ({ct})，低于最小值 {pc_ct_min}",
+                    details={
+                        "ct_value": ct,
+                        "min_threshold": pc_ct_min,
+                        "max_threshold": pc_ct_max
+                    },
+                    severity="error"
+                ))
             else:
                 message = f"阳性对照Ct值过高 ({ct})，可能存在扩增效率问题"
+                failures.append(QCFailure(
+                    sample_id=row['sample_id'],
+                    rule_name="positive_control_valid",
+                    reason=f"阳性对照 {row['sample_id']} Ct值过高 ({ct})，高于最大值 {pc_ct_max}",
+                    details={
+                        "ct_value": ct,
+                        "min_threshold": pc_ct_min,
+                        "max_threshold": pc_ct_max
+                    },
+                    severity="error"
+                ))
             
             checks.append(ControlCheckResult(
                 control_type="positive_control",
@@ -218,10 +251,11 @@ class QCValidator:
                 threshold=f"{pc_ct_min}-{pc_ct_max}"
             ))
 
-        return [], checks
+        return failures, checks
 
-    def _check_negative_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List, List[ControlCheckResult]]:
+    def _check_negative_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List[QCFailure], List[ControlCheckResult]]:
         checks = []
+        failures = []
         nc_max = config['negative_control_ct_max']
         
         ncs = df[df['sample_type'] == SampleType.NEGATIVE_CONTROL]
@@ -239,6 +273,16 @@ class QCValidator:
                 message = f"阴性对照Ct值 ({ct}) 大于阈值 {nc_max}，可接受"
             else:
                 message = f"阴性对照Ct值 ({ct}) 低于阈值 {nc_max}，存在污染风险"
+                failures.append(QCFailure(
+                    sample_id=row['sample_id'],
+                    rule_name="negative_control_clean",
+                    reason=f"阴性对照 {row['sample_id']} Ct值 ({ct}) 低于阈值 {nc_max}，存在污染风险",
+                    details={
+                        "ct_value": ct,
+                        "threshold": nc_max
+                    },
+                    severity="error"
+                ))
             
             checks.append(ControlCheckResult(
                 control_type="negative_control",
@@ -250,10 +294,11 @@ class QCValidator:
                 threshold=f">={nc_max}"
             ))
 
-        return [], checks
+        return failures, checks
 
-    def _check_blank_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List, List[ControlCheckResult]]:
+    def _check_blank_controls(self, df: pd.DataFrame, config: Dict) -> Tuple[List[QCFailure], List[ControlCheckResult]]:
         checks = []
+        failures = []
         
         blanks = df[df['sample_type'] == SampleType.BLANK]
         
@@ -261,6 +306,18 @@ class QCValidator:
             ct = row['ct_value']
             passed = pd.isna(ct)
             message = "空白对照无扩增，正常" if passed else f"空白对照检测到扩增 (Ct={ct})，存在严重污染"
+            
+            if not passed:
+                failures.append(QCFailure(
+                    sample_id=row['sample_id'],
+                    rule_name="blank_control_clean",
+                    reason=f"空白对照 {row['sample_id']} 检测到扩增 (Ct={ct})，存在严重污染",
+                    details={
+                        "ct_value": ct,
+                        "expected": "无扩增"
+                    },
+                    severity="error"
+                ))
             
             checks.append(ControlCheckResult(
                 control_type="blank",
@@ -272,7 +329,7 @@ class QCValidator:
                 threshold="无"
             ))
 
-        return [], checks
+        return failures, checks
 
     def _check_replicate_consistency(self, df: pd.DataFrame, config: Dict) -> Tuple[List[QCFailure], List]:
         failures = []
@@ -389,15 +446,35 @@ class QCValidator:
                 continue
             
             mask = df['sample_id'] == failure.sample_id
-            df.loc[mask, 'qc_status'] = (
+            
+            current_status = df.loc[mask, 'qc_status'].iloc[0] if mask.any() else QCStatus.PASS.value
+            
+            new_status = (
                 QCStatus.FAIL.value if failure.severity == 'error' else QCStatus.WARN.value
             )
-            df.loc[mask, 'qc_fail_reasons'] = df.loc[mask, 'qc_fail_reasons'].apply(
-                lambda x: x + '; ' + failure.reason if x else failure.reason
-            )
-            df.loc[mask, 'qc_details'] = df.loc[mask, 'qc_details'].apply(
-                lambda x: x + '; ' + str(failure.details) if x else str(failure.details)
-            )
+            
+            status_priority = {
+                QCStatus.FAIL.value: 3,
+                QCStatus.WARN.value: 2,
+                QCStatus.PASS.value: 1,
+                QCStatus.UNKNOWN.value: 0
+            }
+            
+            if status_priority.get(new_status, 0) > status_priority.get(current_status, 0):
+                df.loc[mask, 'qc_status'] = new_status
+            
+            existing_reasons = df.loc[mask, 'qc_fail_reasons'].iloc[0] if mask.any() else ''
+            if failure.reason not in existing_reasons:
+                df.loc[mask, 'qc_fail_reasons'] = df.loc[mask, 'qc_fail_reasons'].apply(
+                    lambda x: x + '; ' + failure.reason if x else failure.reason
+                )
+            
+            existing_details = df.loc[mask, 'qc_details'].iloc[0] if mask.any() else ''
+            details_str = str(failure.details)
+            if details_str not in existing_details:
+                df.loc[mask, 'qc_details'] = df.loc[mask, 'qc_details'].apply(
+                    lambda x: x + '; ' + details_str if x else details_str
+                )
 
         return df
 

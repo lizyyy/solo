@@ -1,17 +1,17 @@
 {
   "metadata": {
-    "filename": "sample_data_with_issues.csv",
-    "filepath": "/Users/mac/pro/solo/workspaces/xy10100/examples/sample_data_with_issues.csv",
-    "file_size": 1399,
-    "load_time": "2026-05-09T18:12:56.502253"
+    "filename": "sample_data_with_units.csv",
+    "filepath": "/Users/mac/pro/solo/workspaces/xy10100/examples/sample_data_with_units.csv",
+    "file_size": 1880,
+    "load_time": "2026-05-12T07:53:09.649258"
   },
   "overall_status": "fail",
   "statistics": {
-    "total_samples": 34,
-    "valid_samples": 21,
-    "pass_samples": 19,
-    "warn_samples": 2,
-    "fail_samples": 0,
+    "total_samples": 35,
+    "valid_samples": 22,
+    "pass_samples": 20,
+    "warn_samples": 0,
+    "fail_samples": 2,
     "positive_controls": {
       "count": 4,
       "passed": 2
@@ -25,15 +25,15 @@
       "passed": 2
     },
     "ct_statistics": {
-      "mean": 24.14,
-      "median": 23.85,
-      "std": 6.073271900627154,
+      "mean": 24.061904761904763,
+      "median": 23.8,
+      "std": 5.9303015261010295,
       "min": 8.5,
       "max": 45.2,
-      "count": 20
+      "count": 21
     },
-    "total_failures": 5,
-    "error_failures": 2,
+    "total_failures": 9,
+    "error_failures": 6,
     "warning_failures": 3
   },
   "controls": [
@@ -140,14 +140,56 @@
       }
     },
     {
+      "sample_id": "PC3",
+      "rule": "positive_control_valid",
+      "reason": "阳性对照 PC3 Ct值过低 (8.2)，低于最小值 15",
+      "severity": "error",
+      "details": {
+        "ct_value": 8.2,
+        "min_threshold": 15,
+        "max_threshold": 30
+      }
+    },
+    {
+      "sample_id": "PC4",
+      "rule": "positive_control_valid",
+      "reason": "阳性对照 PC4 Ct值过高 (35.0)，高于最大值 30",
+      "severity": "error",
+      "details": {
+        "ct_value": 35.0,
+        "min_threshold": 15,
+        "max_threshold": 30
+      }
+    },
+    {
+      "sample_id": "NC3",
+      "rule": "negative_control_clean",
+      "reason": "阴性对照 NC3 Ct值 (25.0) 低于阈值 38，存在污染风险",
+      "severity": "error",
+      "details": {
+        "ct_value": 25.0,
+        "threshold": 38
+      }
+    },
+    {
+      "sample_id": "Blank3",
+      "rule": "blank_control_clean",
+      "reason": "空白对照 Blank3 检测到扩增 (Ct=28.0)，存在严重污染",
+      "severity": "error",
+      "details": {
+        "ct_value": 28.0,
+        "expected": "无扩增"
+      }
+    },
+    {
       "sample_id": "S009",
       "rule": "outlier_detection",
       "reason": "低异常值Ct值: 8.5",
       "severity": "warn",
       "details": {
         "ct_value": 8.5,
-        "lower_bound": 21.4125,
-        "upper_bound": 26.112500000000004,
+        "lower_bound": 21.300000000000004,
+        "upper_bound": 26.1,
         "method": "IQR"
       }
     },
@@ -158,19 +200,18 @@
       "severity": "warn",
       "details": {
         "ct_value": 45.2,
-        "lower_bound": 21.4125,
-        "upper_bound": 26.112500000000004,
+        "lower_bound": 21.300000000000004,
+        "upper_bound": 26.1,
         "method": "IQR"
       }
     },
     {
       "sample_id": "PLATE",
       "rule": "plate_integrity",
-      "reason": "板位不完整，缺少 62 个孔位",
+      "reason": "板位不完整，缺少 61 个孔位",
       "severity": "warn",
       "details": {
         "missing_wells": [
-          "A1",
           "B1",
           "B2",
           "C10",
@@ -238,27 +279,6 @@
   ],
   "data_issues": [
     {
-      "type": "duplicate",
-      "severity": "error",
-      "sample_id": "S001",
-      "column": "sample_id",
-      "message": "重复的样本ID: S001"
-    },
-    {
-      "type": "duplicate",
-      "severity": "error",
-      "sample_id": "S001",
-      "column": "sample_id",
-      "message": "重复的样本ID: S001"
-    },
-    {
-      "type": "duplicate",
-      "severity": "error",
-      "sample_id": "S001",
-      "column": "sample_id",
-      "message": "重复的样本ID: S001"
-    },
-    {
       "type": "missing_value",
       "severity": "warning",
       "sample_id": "S011",
@@ -288,12 +308,49 @@
     }
   ],
   "processing_log": [
-    "开始加载文件: sample_data_with_issues.csv",
-    "原始数据: 37 行, 5 列",
+    "开始加载文件: sample_data_with_units.csv",
+    "原始数据: 35 行, 7 列",
     "列名标准化完成",
-    "清洗后数据: 34 行有效, 3 行失败",
+    "检测到单位列: unit",
+    "检测到浓度列: concentration",
+    "浓度换算: 10000.0 copy/μl -> 1.00e+04 copy/μl",
+    "浓度换算: 5000000.0 copy/ml -> 5.00e+03 copy/μl",
+    "浓度换算: 1000.0 cfu/μl -> 1.00e+03 copy/μl",
+    "浓度换算: 2000000.0 cfu/ml -> 2.00e+03 copy/μl",
+    "浓度换算: 10000.0 copy/μl -> 1.00e+04 copy/μl",
+    "浓度换算: 5000.0 copy/μl -> 5.00e+03 copy/μl",
+    "浓度换算: 1000.0 拷贝/μl -> 1.00e+03 copy/μl",
+    "浓度换算: 5000.0 拷贝/ml -> 5.00e+00 copy/μl",
+    "浓度换算: 100000.0 copy/μl -> 1.00e+05 copy/μl",
+    "浓度换算: 10.0 copy/μl -> 1.00e+01 copy/μl",
+    "浓度换算: 0.0 copy/μl -> 0.00e+00 copy/μl",
+    "浓度换算: 8000.0 copy/μl -> 8.00e+03 copy/μl",
+    "浓度换算: 12000.0 copy/μl -> 1.20e+04 copy/μl",
+    "浓度换算: 6000.0 copy/μl -> 6.00e+03 copy/μl",
+    "浓度换算: 9000.0 copy/μl -> 9.00e+03 copy/μl",
+    "浓度换算: 3000.0 copy/μl -> 3.00e+03 copy/μl",
+    "浓度换算: 4000.0 copy/μl -> 4.00e+03 copy/μl",
+    "浓度换算: 15000.0 copy/μl -> 1.50e+04 copy/μl",
+    "浓度换算: 7000.0 copy/μl -> 7.00e+03 copy/μl",
+    "浓度换算: 11000.0 copy/μl -> 1.10e+04 copy/μl",
+    "浓度换算: 8500.0 copy/μl -> 8.50e+03 copy/μl",
+    "浓度换算: 6500.0 copy/μl -> 6.50e+03 copy/μl",
+    "浓度换算: 100000.0 copy/μl -> 1.00e+05 copy/μl",
+    "浓度换算: 100000.0 copy/μl -> 1.00e+05 copy/μl",
+    "浓度换算: 10000000.0 copy/μl -> 1.00e+07 copy/μl",
+    "浓度换算: 100.0 copy/μl -> 1.00e+02 copy/μl",
+    "浓度换算: 0.0 copy/μl -> 0.00e+00 copy/μl",
+    "浓度换算: 0.0 copy/μl -> 0.00e+00 copy/μl",
+    "浓度换算: 1000.0 copy/μl -> 1.00e+03 copy/μl",
+    "浓度换算: 0.0 copy/μl -> 0.00e+00 copy/μl",
+    "浓度换算: 0.0 copy/μl -> 0.00e+00 copy/μl",
+    "浓度换算: 100.0 copy/μl -> 1.00e+02 copy/μl",
+    "浓度换算: 100000.0 copy/μl -> 1.00e+05 copy/μl",
+    "浓度换算: 10000.0 copy/μl -> 1.00e+04 copy/μl",
+    "浓度换算: 1000.0 copy/μl -> 1.00e+03 copy/μl",
+    "清洗后数据: 35 行有效, 0 行失败",
     "开始QC验证流程",
-    "待验证样本数: 34",
+    "待验证样本数: 35",
     "执行规则: ct_range - 检查Ct值是否在合理范围内",
     "执行规则: positive_control_valid - 验证阳性对照Ct值",
     "执行规则: negative_control_clean - 验证阴性对照无扩增",
@@ -302,7 +359,7 @@
     "执行规则: outlier_detection - 检测异常值样本",
     "执行规则: plate_integrity - 检查板位完整性",
     "QC完成 - 总体状态: fail",
-    "失败样本数: 5",
+    "失败样本数: 9",
     "对照检查通过: 6/10"
   ]
 }

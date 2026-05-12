@@ -43,12 +43,30 @@ class DataLoader:
         "sample_type": ["sample_type", "type", "类型", "样品类型"],
     }
 
+    UNIT_COLUMNS = [
+        "unit", "units", "单位", "浓度单位", "浓度"
+    ]
+
+    CONCENTRATION_COLUMNS = [
+        "concentration", "conc", "浓度", "拷贝数", "copies", "copy_number"
+    ]
+
     UNIT_CONVERSIONS = {
         "copy/μl": 1.0,
         "copy/ml": 0.001,
         "cfu/μl": 1.0,
         "cfu/ml": 0.001,
+        "copies/μl": 1.0,
+        "copies/ml": 0.001,
+        "拷贝/μl": 1.0,
+        "拷贝/ml": 0.001,
+        "cfu": 1.0,
+        "copy": 1.0,
+        "copies": 1.0,
+        "拷贝": 1.0,
     }
+
+    TARGET_UNIT = "copy/μl"
 
     SAMPLE_TYPE_MAPPINGS = {
         SampleType.POSITIVE_CONTROL: [
@@ -136,6 +154,22 @@ class DataLoader:
         df = df.copy()
         issues_idx = []
         
+        df['original_ct_value'] = df['ct_value'].copy() if 'ct_value' in df.columns else None
+        df['original_unit'] = None
+        df['normalized_concentration'] = None
+        
+        unit_col = self._find_unit_column(df)
+        if unit_col:
+            self._log.append(f"检测到单位列: {unit_col}")
+            df['original_unit'] = df[unit_col].astype(str)
+            
+            conc_col = self._find_concentration_column(df)
+            if conc_col:
+                self._log.append(f"检测到浓度列: {conc_col}")
+                df['normalized_concentration'] = self._normalize_concentration(
+                    df[conc_col], df[unit_col], issues_idx
+                )
+        
         if 'sample_id' in df.columns:
             df['sample_id'] = df['sample_id'].astype(str)
             duplicates = df[df['sample_id'].duplicated(keep=False)]
@@ -174,6 +208,64 @@ class DataLoader:
         cleaned_data = df[~failed_mask].copy()
 
         return cleaned_data, failed_samples
+
+    def _find_unit_column(self, df: pd.DataFrame) -> Optional[str]:
+        for col in df.columns:
+            col_lower = str(col).lower()
+            if col_lower in [u.lower() for u in self.UNIT_COLUMNS]:
+                return col
+        return None
+
+    def _find_concentration_column(self, df: pd.DataFrame) -> Optional[str]:
+        for col in df.columns:
+            col_lower = str(col).lower()
+            if col_lower in [c.lower() for c in self.CONCENTRATION_COLUMNS]:
+                return col
+        return None
+
+    def _normalize_concentration(self, values: pd.Series, units: pd.Series, 
+                                 issues_idx: List[int]) -> pd.Series:
+        normalized = pd.Series([None] * len(values), index=values.index)
+        
+        for idx, (value, unit) in enumerate(zip(values, units)):
+            if pd.isna(value) or pd.isna(unit):
+                continue
+            
+            unit_str = str(unit).lower().strip()
+            
+            conversion_factor = None
+            for known_unit, factor in self.UNIT_CONVERSIONS.items():
+                if known_unit.lower() in unit_str:
+                    conversion_factor = factor
+                    break
+            
+            if conversion_factor is None:
+                self._add_issue(
+                    row_index=idx,
+                    issue_type="unknown_unit",
+                    column="unit",
+                    message=f"无法识别的单位: {unit}，跳过浓度换算",
+                    sample_id=values.index[idx] if hasattr(values.index, '__getitem__') else None,
+                    severity="warning"
+                )
+                continue
+            
+            try:
+                num_value = float(value)
+                normalized.iloc[idx] = num_value * conversion_factor
+                self._log.append(
+                    f"浓度换算: {num_value} {unit_str} -> {normalized.iloc[idx]:.2e} {self.TARGET_UNIT}"
+                )
+            except (ValueError, TypeError):
+                self._add_issue(
+                    row_index=idx,
+                    issue_type="invalid_concentration",
+                    column="concentration",
+                    message=f"无法解析浓度值: {value}",
+                    severity="warning"
+                )
+        
+        return normalized
 
     def _parse_ct_value(self, value) -> Optional[float]:
         if pd.isna(value):
