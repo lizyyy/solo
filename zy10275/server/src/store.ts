@@ -301,6 +301,13 @@ class DataStore {
     return Math.round(baseFee * discount * 100) / 100
   }
 
+  public calculateReferenceFeePerPerson(session: CourtSession): number {
+    const activePlayers = this.getActivePlayersCount(session)
+    const actualPlayerCount = Math.max(activePlayers, session.minPlayers, 1)
+    const baseFee = session.totalFee / actualPlayerCount
+    return Math.round(baseFee * 100) / 100
+  }
+
   private isPlayerInSession(session: CourtSession, memberId: string): boolean {
     return session.players.some(p => p.memberId === memberId && p.status !== PlayerStatus.CANCELLED) ||
            session.waitlist.some(p => p.memberId === memberId)

@@ -209,9 +209,9 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
             </div>
             <div className="stat-item">
               <div className="stat-value">
-                ¥{Math.round(session.totalFee / Math.max(activePlayers.length, 1) * 100) / 100}
+                ¥{session.referenceFeePerPerson ?? Math.round(session.totalFee / session.maxPlayers * 100) / 100}
               </div>
-              <div className="stat-label">人均费用</div>
+              <div className="stat-label">参考人均</div>
             </div>
           </div>
           {session.autoCancelIfNotEnough && (
@@ -255,7 +255,10 @@ const SessionDetail: React.FC<SessionDetailProps> = ({ showToast }) => {
                   {player.isMember && <span className="member-badge">会员</span>}
                 </div>
                 <div className="player-phone">{player.memberPhone}</div>
-                <div className="player-fee">费用: ¥{player.paidAmount}</div>
+                <div className="player-fee">
+                  已付: ¥{player.paidAmount}
+                  {player.isMember && <span style={{ fontSize: '12px', color: '#666' }}> (会员折扣)</span>}
+                </div>
                 {player.confirmedAt && (
                   <span className="confirmed-badge">✓ 已确认到场</span>
                 )}

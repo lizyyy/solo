@@ -5,7 +5,10 @@ import { CreateSessionRequest, AddPlayerRequest, ConfirmAttendanceRequest, Cance
 const router = Router()
 
 router.get('/sessions', (_req: Request, res: Response) => {
-  const sessions = store.getAllSessions()
+  const sessions = store.getAllSessions().map(session => ({
+    ...session,
+    referenceFeePerPerson: store.calculateReferenceFeePerPerson(session)
+  }))
   res.json(sessions)
 })
 
@@ -14,7 +17,11 @@ router.get('/sessions/:id', (req: Request, res: Response) => {
   if (!session) {
     return res.status(404).json({ error: '场次不存在' })
   }
-  res.json(session)
+  const referenceFeePerPerson = store.calculateReferenceFeePerPerson(session)
+  res.json({
+    ...session,
+    referenceFeePerPerson
+  })
 })
 
 router.post('/sessions', (req: Request<unknown, unknown, CreateSessionRequest>, res: Response) => {

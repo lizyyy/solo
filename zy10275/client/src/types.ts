@@ -51,6 +51,7 @@ export interface CourtSession {
   createdAt: string
   autoCancelIfNotEnough: boolean
   cancelThresholdMinutes: number
+  referenceFeePerPerson?: number
 }
 
 export interface CreateSessionRequest {
