@@ -1,20 +1,20 @@
 [
   {
-    "id": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "id": "9e362ac5-e853-4081-a747-547e4dfad06e",
     "bottleNo": "BOT-001",
-    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "taskId": "154dc895-9366-4266-a2cd-51cab8fa2f51",
     "status": "RETURNED",
     "currentHandler": "赵六",
-    "sampledAt": "2026-05-12T05:03:06.325Z",
-    "coldStoredAt": "2026-05-12T05:03:06.325Z",
-    "receivedAt": "2026-05-12T05:03:06.326Z",
+    "sampledAt": "2026-05-12T10:29:56.206Z",
+    "coldStoredAt": "2026-05-12T10:29:56.206Z",
+    "receivedAt": "2026-05-12T10:29:56.207Z",
     "rejectedAt": null,
     "rejectReason": null,
-    "createdAt": "2026-05-12T05:03:06.321Z",
-    "updatedAt": "2026-05-12T05:03:06.327Z"
+    "createdAt": "2026-05-12T10:29:56.202Z",
+    "updatedAt": "2026-05-12T10:29:56.208Z"
   },
   {
-    "id": "e0bc5c10-dc54-4990-b686-11c69c058a0c",
+    "id": "b6667108-f0ff-4bf4-95d0-88b69af2b8d5",
     "bottleNo": "BOT-002",
     "taskId": null,
     "status": "CREATED",
@@ -24,49 +24,49 @@
     "receivedAt": null,
     "rejectedAt": null,
     "rejectReason": null,
-    "createdAt": "2026-05-12T05:03:06.321Z",
-    "updatedAt": "2026-05-12T05:03:06.321Z"
+    "createdAt": "2026-05-12T10:29:56.202Z",
+    "updatedAt": "2026-05-12T10:29:56.202Z"
   },
   {
-    "id": "df45a84e-31ad-4d8a-b9d0-9c53f3e1e394",
+    "id": "7475dc90-fa84-483e-86f5-1ab96e534fd3",
     "bottleNo": "BOT-003",
-    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "taskId": "154dc895-9366-4266-a2cd-51cab8fa2f51",
     "status": "TRANSFERRED",
     "currentHandler": "张三",
-    "sampledAt": "2026-05-12T05:03:06.328Z",
+    "sampledAt": "2026-05-12T10:29:56.209Z",
     "coldStoredAt": null,
     "receivedAt": null,
     "rejectedAt": null,
     "rejectReason": null,
-    "createdAt": "2026-05-12T05:03:06.321Z",
-    "updatedAt": "2026-05-12T05:03:06.328Z"
+    "createdAt": "2026-05-12T10:29:56.202Z",
+    "updatedAt": "2026-05-12T10:29:56.209Z"
   },
   {
-    "id": "3117f0c7-4472-4408-86db-b89201159741",
+    "id": "4bc98c6c-18e6-4569-a326-196bdc954069",
     "bottleNo": "BOT-004",
-    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
-    "status": "REJECTED",
-    "currentHandler": "张三",
-    "sampledAt": "2026-05-12T05:03:06.329Z",
+    "taskId": null,
+    "status": "CREATED",
+    "currentHandler": null,
+    "sampledAt": null,
     "coldStoredAt": null,
-    "receivedAt": null,
-    "rejectedAt": "2026-05-12T05:03:06.330Z",
-    "rejectReason": "样品外观异常",
-    "createdAt": "2026-05-12T05:03:06.321Z",
-    "updatedAt": "2026-05-12T05:03:06.330Z"
-  },
-  {
-    "id": "7fdb6f69-7a2e-46a3-a2df-9434988ceca3",
-    "bottleNo": "BOT-005",
-    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
-    "status": "TRANSFERRED",
-    "currentHandler": "张三",
-    "sampledAt": "2026-05-11T04:03:06.330Z",
-    "coldStoredAt": "2026-05-11T04:03:06.330Z",
     "receivedAt": null,
     "rejectedAt": null,
     "rejectReason": null,
-    "createdAt": "2026-05-12T05:03:06.321Z",
-    "updatedAt": "2026-05-12T05:03:06.321Z"
+    "createdAt": "2026-05-12T10:29:56.202Z",
+    "updatedAt": "2026-05-12T10:29:56.202Z"
+  },
+  {
+    "id": "c7198a4b-4d1c-4a80-827c-8c559ba0e2b3",
+    "bottleNo": "BOT-005",
+    "taskId": "154dc895-9366-4266-a2cd-51cab8fa2f51",
+    "status": "BINDED",
+    "currentHandler": "张三",
+    "sampledAt": null,
+    "coldStoredAt": null,
+    "receivedAt": null,
+    "rejectedAt": null,
+    "rejectReason": null,
+    "createdAt": "2026-05-12T10:29:56.202Z",
+    "updatedAt": "2026-05-12T10:29:56.209Z"
   }
 ]

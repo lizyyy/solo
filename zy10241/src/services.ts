@@ -262,8 +262,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status === BottleStatus.REJECTED || bottle.status === BottleStatus.RETURNED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 已退样或已归还，不能重复退样`);
+    if (!validateTransition(bottle.status, BottleStatus.REJECTED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行退样操作，必须在采样后才能退样`);
     }
 
     const now = new Date().toISOString();
@@ -292,8 +292,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status !== BottleStatus.RECEIVED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已接收，不能检测`);
+    if (!validateTransition(bottle.status, BottleStatus.TESTED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行检测操作`);
     }
 
     const now = new Date().toISOString();
@@ -320,8 +320,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status !== BottleStatus.TESTED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已检测，不能归还`);
+    if (!validateTransition(bottle.status, BottleStatus.RETURNED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行归还操作`);
     }
 
     const now = new Date().toISOString();

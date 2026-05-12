@@ -193,13 +193,10 @@ async function runTest() {
     }
   }
 
-  printInfo('3.5 测试退样后再接收');
+  printInfo('3.5 测试未采样直接退样 - CREATED 状态退样 (应失败)');
   const bottle4 = bottles[3];
-  BottleService.bindToTask(bottle4.bottleNo, task1.id, '张三');
-  BottleService.sample(bottle4.bottleNo, '张三');
-  BottleService.reject(bottle4.bottleNo, '张三', '样品外观异常');
   try {
-    BottleService.receive(bottle4.bottleNo, '王五');
+    BottleService.reject(bottle4.bottleNo, '张三', '还没采样就想退样');
     printError('应该抛出错误但没有');
   } catch (e) {
     if (e instanceof BusinessError) {
@@ -207,7 +204,41 @@ async function runTest() {
     }
   }
 
-  printInfo('3.6 测试重复提交同一操作');
+  printInfo('3.6 测试已绑定但未采样直接退样 - BINDED 状态退样 (应失败)');
+  const bottle5 = bottles[4];
+  BottleService.bindToTask(bottle5.bottleNo, task1.id, '张三');
+  try {
+    BottleService.reject(bottle5.bottleNo, '张三', '绑定了还没采样就退样');
+    printError('应该抛出错误但没有');
+  } catch (e) {
+    if (e instanceof BusinessError) {
+      printSuccess(`正确拦截: ${e.message}`);
+    }
+  }
+
+  printInfo('3.8 测试采样后正常退样 (应成功)');
+  const bottle6 = bottles[2];
+  forceMockUnchilledBottle(bottle6.bottleNo, task1.id);
+  try {
+    const result = BottleService.reject(bottle6.bottleNo, '张三', '样品外观异常');
+    printSuccess(`退样成功: ${bottle6.bottleNo}，状态变为 ${result.status}`);
+  } catch (e) {
+    if (e instanceof BusinessError) {
+      printError(`不应该失败但失败了: ${e.message}`);
+    }
+  }
+
+  printInfo('3.9 测试退样后再接收 (应失败)');
+  try {
+    BottleService.receive(bottle6.bottleNo, '王五');
+    printError('应该抛出错误但没有');
+  } catch (e) {
+    if (e instanceof BusinessError) {
+      printSuccess(`正确拦截: ${e.message}`);
+    }
+  }
+
+  printInfo('3.9 测试重复提交同一操作');
   try {
     BottleService.sample(bottle1.bottleNo, '张三');
     printError('应该抛出错误但没有');
@@ -217,12 +248,12 @@ async function runTest() {
     }
   }
 
-  printInfo('3.7 测试送检超时 - 真实构造超时样本');
-  const bottle5 = bottles[4];
+  printInfo('3.10 测试送检超时 - 真实构造超时样本');
+  const bottle7 = bottles[3];
   printInfo(`任务时限: ${task1.deadlineHours} 小时，构造 ${task1.deadlineHours + 1} 小时前采样的样本`);
-  forceMockTimeoutBottle(bottle5.bottleNo, task1.id, task1.deadlineHours + 1);
+  forceMockTimeoutBottle(bottle7.bottleNo, task1.id, task1.deadlineHours + 1);
   try {
-    BottleService.receive(bottle5.bottleNo, '王五');
+    BottleService.receive(bottle7.bottleNo, '王五');
     printError('应该抛出超时错误但没有');
   } catch (e) {
     if (e instanceof BusinessError) {
@@ -246,6 +277,8 @@ async function runTest() {
   printInfo('✅ 状态跳跃校验: 已验证');
   printInfo('✅ 采样后未冷藏交接: 已验证');
   printInfo('✅ 采样后未冷藏接收: 已验证');
+  printInfo('✅ CREATED 状态直接退样: 已验证');
+  printInfo('✅ BINDED 状态未采样直接退样: 已验证');
   printInfo('✅ 退样后又被接收: 已验证');
   printInfo('✅ 重复提交同一操作: 已验证');
   printInfo('✅ 送检超时校验: 已真实验证');

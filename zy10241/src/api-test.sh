@@ -144,14 +144,37 @@ echo ""
 echo ""
 
 echo "=========================================="
-echo "📝 测试 5: 退样后接收校验 (应失败)"
+echo "📝 测试 5: CREATED 状态直接退样 (应失败)"
 echo "=========================================="
 echo ""
-echo "绑定 -> 采样 -> 退样..."
+echo "未绑定未采样，直接在 CREATED 状态退样 (应失败):"
+curl -s -X POST "$BASE_URL/api/bottles/BOT-003/reject" \
+  -H "Content-Type: application/json" \
+  -d "{\"handler\":\"张三\",\"reason\":\"还没采样就退样\"}"
+echo ""
+echo ""
+
+echo "=========================================="
+echo "📝 测试 6: BINDED 状态未采样直接退样 (应失败)"
+echo "=========================================="
+echo ""
+echo "先绑定..."
 curl -s -X POST "$BASE_URL/api/bottles/BOT-003/bind" \
   -H "Content-Type: application/json" \
   -d "{\"taskId\":\"$TASK_ID\",\"handler\":\"张三\"}"
 echo ""
+echo "未采样直接退样 (应失败):"
+curl -s -X POST "$BASE_URL/api/bottles/BOT-003/reject" \
+  -H "Content-Type: application/json" \
+  -d "{\"handler\":\"张三\",\"reason\":\"绑定了但没采样就退样\"}"
+echo ""
+echo ""
+
+echo "=========================================="
+echo "📝 测试 7: 退样后接收校验 (应失败)"
+echo "=========================================="
+echo ""
+echo "采样 -> 退样..."
 curl -s -X POST "$BASE_URL/api/bottles/BOT-003/sample" \
   -H "Content-Type: application/json" \
   -d "{\"handler\":\"张三\"}"
@@ -176,8 +199,10 @@ echo "   1. 正常流程流转 (绑定->采样->冷藏->交接->接收->检测->
 echo "   2. 状态跳跃校验 (未绑定不能采样)"
 echo "   3. 采样后未冷藏校验 (未冷藏不能交接)"
 echo "   4. 重复绑定校验 (已绑定不能再绑定)"
-echo "   5. 退样后接收校验 (已退样不能接收)"
-echo "   6. 完整轨迹查询"
+echo "   5. CREATED 状态直接退样 (应失败)"
+echo "   6. BINDED 状态未采样直接退样 (应失败)"
+echo "   7. 退样后接收校验 (已退样不能接收)"
+echo "   8. 完整轨迹查询"
 echo ""
 echo "💡 提示: 测试超时场景需要通过脚本修改 sampledAt 来模拟"
 echo "         运行 npm run test 可查看完整的业务规则验证（含超时校验）"
