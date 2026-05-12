@@ -120,9 +120,23 @@ async def import_products(
         if col not in df.columns:
             raise HTTPException(status_code=400, detail=f"缺少必要列: {col}")
 
-    df['product_id'] = df['product_id'].astype(str)
-    df['title'] = df['title'].astype(str).fillna('')
-    df['category'] = df['category'].astype(str) if 'category' in df.columns else None
+    df['product_id'] = df['product_id'].astype(str).str.strip()
+    df['title'] = df['title'].astype(str)
+    df.loc[df['title'].str.lower().isin(['nan', 'none', 'null', 'undefined', '']), 'title'] = ''
+    df['title'] = df['title'].str.strip()
+    
+    def _clean_category(val):
+        if pd.isna(val):
+            return None
+        val_str = str(val).strip().lower()
+        if val_str in ['', 'nan', 'none', 'null', 'undefined']:
+            return None
+        return str(val).strip()
+    
+    if 'category' in df.columns:
+        df['category'] = df['category'].apply(_clean_category)
+    else:
+        df['category'] = None
 
     classifier = CategoryClassifier(db)
     items = []

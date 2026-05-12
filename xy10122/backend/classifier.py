@@ -157,11 +157,25 @@ class CategoryClassifier:
             reason = f"匹配关键词: {', '.join(best_match['keywords'])}"
             return best_match["category"], reason
         elif original_category:
+            def _is_empty(val):
+                if val is None:
+                    return True
+                val_str = str(val).strip().lower()
+                return val_str in ['', 'nan', 'none', 'null', 'undefined']
+            
+            if _is_empty(original_category):
+                return None, "无匹配规则，原分类为空"
             return original_category, "无匹配规则，保留原分类"
         else:
             return None, "无匹配规则，未自动归类"
 
     def batch_classify(self, items: List[Dict]) -> List[Dict]:
+        def _is_empty(val):
+            if val is None:
+                return True
+            val_str = str(val).strip().lower()
+            return val_str in ['', 'nan', 'none', 'null', 'undefined']
+        
         results = []
         for item in items:
             title = item.get("title", "")
@@ -170,13 +184,23 @@ class CategoryClassifier:
 
             category, reason = self.classify(title, original_category)
 
+            if _is_empty(original_category):
+                if _is_empty(category):
+                    needs_review = True
+                else:
+                    needs_review = True
+            elif _is_empty(category):
+                needs_review = True
+            else:
+                needs_review = str(category).strip() != str(original_category).strip()
+
             results.append({
                 "product_id": product_id,
                 "title": title,
-                "original_category": original_category,
-                "predicted_category": category,
+                "original_category": original_category if not _is_empty(original_category) else None,
+                "predicted_category": category if not _is_empty(category) else None,
                 "reason": reason,
-                "needs_review": category != original_category if original_category and category else True
+                "needs_review": needs_review
             })
 
         return results
