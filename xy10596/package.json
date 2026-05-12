@@ -1,0 +1,34 @@
+{
+  "name": "survey-quota-cli",
+  "version": "1.0.0",
+  "description": "调查问卷配额管理 CLI 工具 - 控制地区、年龄、渠道配额，剔除重复和低质量答卷",
+  "main": "dist/index.js",
+  "bin": {
+    "sq": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "demo": "ts-node src/demo.ts",
+    "clean": "rm -rf dist .data"
+  },
+  "keywords": [
+    "survey",
+    "quota",
+    "market-research",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2"
+  }
+}

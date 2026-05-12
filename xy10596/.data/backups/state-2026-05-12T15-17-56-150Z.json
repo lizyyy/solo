@@ -1,0 +1,328 @@
+{
+  "config": {
+    "id": "project-sample-001",
+    "name": "新产品市场调研项目",
+    "createdAt": "2026-05-12T15:17:48.926Z",
+    "channels": [
+      {
+        "id": "channel-online",
+        "name": "线上广告",
+        "type": "online_ad",
+        "description": "抖音、微信朋友圈等线上广告投放渠道",
+        "enabled": true
+      },
+      {
+        "id": "channel-offline",
+        "name": "地推",
+        "type": "offline_promotion",
+        "description": "线下门店、商场等地推活动渠道",
+        "enabled": true
+      },
+      {
+        "id": "channel-member",
+        "name": "会员渠道",
+        "type": "member",
+        "description": "现有会员数据库定向邀请",
+        "enabled": true
+      }
+    ],
+    "quotaRules": [
+      {
+        "id": "quota-beijing",
+        "name": "北京配额",
+        "type": "city",
+        "limit": 100,
+        "criteria": {
+          "city": "北京"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-shanghai",
+        "name": "上海配额",
+        "type": "city",
+        "limit": 100,
+        "criteria": {
+          "city": "上海"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-guangzhou",
+        "name": "广州配额",
+        "type": "city",
+        "limit": 80,
+        "criteria": {
+          "city": "广州"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-shenzhen",
+        "name": "深圳配额",
+        "type": "city",
+        "limit": 80,
+        "criteria": {
+          "city": "深圳"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-age-18-25",
+        "name": "18-25岁配额",
+        "type": "age",
+        "limit": 120,
+        "criteria": {
+          "ageGroup": "18-25"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-26-35",
+        "name": "26-35岁配额",
+        "type": "age",
+        "limit": 150,
+        "criteria": {
+          "ageGroup": "26-35"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-36-45",
+        "name": "36-45岁配额",
+        "type": "age",
+        "limit": 100,
+        "criteria": {
+          "ageGroup": "36-45"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-46-55",
+        "name": "46-55岁配额",
+        "type": "age",
+        "limit": 90,
+        "criteria": {
+          "ageGroup": "46-55"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-channel-online",
+        "name": "线上广告配额",
+        "type": "channel",
+        "limit": 200,
+        "criteria": {
+          "channel": "线上广告"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-channel-offline",
+        "name": "地推配额",
+        "type": "channel",
+        "limit": 100,
+        "criteria": {
+          "channel": "地推"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-channel-member",
+        "name": "会员渠道配额",
+        "type": "channel",
+        "limit": 160,
+        "criteria": {
+          "channel": "会员渠道"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-beijing-26-35",
+        "name": "北京26-35岁组合配额",
+        "type": "combined",
+        "limit": 50,
+        "criteria": {
+          "city": "北京",
+          "ageGroup": "26-35"
+        },
+        "priority": 20
+      }
+    ],
+    "qualityRules": [
+      {
+        "id": "quality-duplicate-phone",
+        "name": "手机号去重",
+        "type": "duplicate_phone",
+        "enabled": true,
+        "config": {}
+      },
+      {
+        "id": "quality-min-duration",
+        "name": "最小答题时长",
+        "type": "min_duration",
+        "enabled": true,
+        "config": {
+          "minSeconds": 60
+        }
+      },
+      {
+        "id": "quality-all-same-options",
+        "name": "选项全一样检查",
+        "type": "all_same_options",
+        "enabled": true,
+        "config": {}
+      }
+    ]
+  },
+  "surveys": [],
+  "quotaUsage": [
+    {
+      "ruleId": "quota-beijing",
+      "ruleName": "北京配额",
+      "type": "city",
+      "criteria": {
+        "city": "北京"
+      },
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-shanghai",
+      "ruleName": "上海配额",
+      "type": "city",
+      "criteria": {
+        "city": "上海"
+      },
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-guangzhou",
+      "ruleName": "广州配额",
+      "type": "city",
+      "criteria": {
+        "city": "广州"
+      },
+      "limit": 80,
+      "used": 0,
+      "remaining": 80,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-shenzhen",
+      "ruleName": "深圳配额",
+      "type": "city",
+      "criteria": {
+        "city": "深圳"
+      },
+      "limit": 80,
+      "used": 0,
+      "remaining": 80,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-18-25",
+      "ruleName": "18-25岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "18-25"
+      },
+      "limit": 120,
+      "used": 0,
+      "remaining": 120,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-26-35",
+      "ruleName": "26-35岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "26-35"
+      },
+      "limit": 150,
+      "used": 0,
+      "remaining": 150,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-36-45",
+      "ruleName": "36-45岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "36-45"
+      },
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-46-55",
+      "ruleName": "46-55岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "46-55"
+      },
+      "limit": 90,
+      "used": 0,
+      "remaining": 90,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-online",
+      "ruleName": "线上广告配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "线上广告"
+      },
+      "limit": 200,
+      "used": 0,
+      "remaining": 200,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-offline",
+      "ruleName": "地推配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "地推"
+      },
+      "limit": 100,
+      "used": 0,
+      "remaining": 100,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-member",
+      "ruleName": "会员渠道配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "会员渠道"
+      },
+      "limit": 160,
+      "used": 0,
+      "remaining": 160,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-beijing-26-35",
+      "ruleName": "北京26-35岁组合配额",
+      "type": "combined",
+      "criteria": {
+        "city": "北京",
+        "ageGroup": "26-35"
+      },
+      "limit": 50,
+      "used": 0,
+      "remaining": 50,
+      "overQuota": 0
+    }
+  ],
+  "lastUpdatedAt": "2026-05-12T15:17:48.929Z",
+  "processVersion": 1
+}

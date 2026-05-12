@@ -1,0 +1,1745 @@
+{
+  "config": {
+    "id": "project-sample-001",
+    "name": "新产品市场调研项目",
+    "createdAt": "2026-05-12T15:17:48.926Z",
+    "channels": [
+      {
+        "id": "channel-online",
+        "name": "线上广告",
+        "type": "online_ad",
+        "description": "抖音、微信朋友圈等线上广告投放渠道",
+        "enabled": true
+      },
+      {
+        "id": "channel-offline",
+        "name": "地推",
+        "type": "offline_promotion",
+        "description": "线下门店、商场等地推活动渠道",
+        "enabled": true
+      },
+      {
+        "id": "channel-member",
+        "name": "会员渠道",
+        "type": "member",
+        "description": "现有会员数据库定向邀请",
+        "enabled": true
+      }
+    ],
+    "quotaRules": [
+      {
+        "id": "quota-beijing-26-35",
+        "name": "北京26-35岁组合配额",
+        "type": "combined",
+        "limit": 50,
+        "criteria": {
+          "city": "北京",
+          "ageGroup": "26-35"
+        },
+        "priority": 20
+      },
+      {
+        "id": "quota-channel-online",
+        "name": "线上广告配额",
+        "type": "channel",
+        "limit": 200,
+        "criteria": {
+          "channel": "线上广告"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-channel-offline",
+        "name": "地推配额",
+        "type": "channel",
+        "limit": 100,
+        "criteria": {
+          "channel": "地推"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-channel-member",
+        "name": "会员渠道配额",
+        "type": "channel",
+        "limit": 160,
+        "criteria": {
+          "channel": "会员渠道"
+        },
+        "priority": 15
+      },
+      {
+        "id": "quota-beijing",
+        "name": "北京配额",
+        "type": "city",
+        "limit": 100,
+        "criteria": {
+          "city": "北京"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-shanghai",
+        "name": "上海配额",
+        "type": "city",
+        "limit": 100,
+        "criteria": {
+          "city": "上海"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-guangzhou",
+        "name": "广州配额",
+        "type": "city",
+        "limit": 80,
+        "criteria": {
+          "city": "广州"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-shenzhen",
+        "name": "深圳配额",
+        "type": "city",
+        "limit": 80,
+        "criteria": {
+          "city": "深圳"
+        },
+        "priority": 10
+      },
+      {
+        "id": "quota-age-18-25",
+        "name": "18-25岁配额",
+        "type": "age",
+        "limit": 120,
+        "criteria": {
+          "ageGroup": "18-25"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-26-35",
+        "name": "26-35岁配额",
+        "type": "age",
+        "limit": 150,
+        "criteria": {
+          "ageGroup": "26-35"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-36-45",
+        "name": "36-45岁配额",
+        "type": "age",
+        "limit": 100,
+        "criteria": {
+          "ageGroup": "36-45"
+        },
+        "priority": 5
+      },
+      {
+        "id": "quota-age-46-55",
+        "name": "46-55岁配额",
+        "type": "age",
+        "limit": 90,
+        "criteria": {
+          "ageGroup": "46-55"
+        },
+        "priority": 5
+      }
+    ],
+    "qualityRules": [
+      {
+        "id": "quality-duplicate-phone",
+        "name": "手机号去重",
+        "type": "duplicate_phone",
+        "enabled": true,
+        "config": {}
+      },
+      {
+        "id": "quality-min-duration",
+        "name": "最小答题时长",
+        "type": "min_duration",
+        "enabled": true,
+        "config": {
+          "minSeconds": 60
+        }
+      },
+      {
+        "id": "quality-all-same-options",
+        "name": "选项全一样检查",
+        "type": "all_same_options",
+        "enabled": true,
+        "config": {}
+      }
+    ]
+  },
+  "surveys": [
+    {
+      "id": "dfaf7f1b-e71c-4a10-a619-7534132316e4",
+      "phone": "13810000001",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "18-25",
+      "duration": 119,
+      "answers": {
+        "q1": 4,
+        "q2": 4,
+        "q3": 3,
+        "q4": "一般",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-11T21:32:57.081Z",
+      "sourceId": "batch-1",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "85ac150b-af52-4d3a-8270-80d4a1f76a2f",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "4b033314-9b0b-496e-9d32-1175a374361c",
+          "timestamp": "2026-05-12T15:18:04.280Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "c1c12ed9-227d-4de5-9c64-5caa20e8ae99",
+          "timestamp": "2026-05-12T15:18:04.287Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.287Z"
+    },
+    {
+      "id": "b9d49031-6e26-458f-a2be-276a973dc592",
+      "phone": "13810000002",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "18-25",
+      "duration": 74,
+      "answers": {
+        "q1": 3,
+        "q2": 2,
+        "q3": 5,
+        "q4": "不满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-11T18:29:52.806Z",
+      "sourceId": "batch-2",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "01f930da-9947-4120-a4f7-7d2f07195bfb",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "50bbc932-a774-4885-8e5b-363d983d0f46",
+          "timestamp": "2026-05-12T15:18:04.287Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "b95e432c-07f3-41ca-9d63-2c88ddbf6923",
+          "timestamp": "2026-05-12T15:18:04.287Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.287Z"
+    },
+    {
+      "id": "bde89155-c1a8-4e93-92a3-a1473713abfc",
+      "phone": "13810000003",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "18-25",
+      "duration": 102,
+      "answers": {
+        "q1": 2,
+        "q2": 2,
+        "q3": 2,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-11T16:10:25.525Z",
+      "sourceId": "batch-3",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "257e9ae4-1285-4d5b-a81a-618166a851a1",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "fa8c9cdb-1da5-4d92-9cf1-c3054f6d5551",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "e00db9fd-0937-4382-8add-10e5371f8ad6",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "86e83cf4-d41f-4ce1-a87e-c2c3d069ddbc",
+      "phone": "13810000004",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "18-25",
+      "duration": 98,
+      "answers": {
+        "q1": 2,
+        "q2": 1,
+        "q3": 2,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T10:12:33.896Z",
+      "sourceId": "batch-4",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "1176a39a-3877-4ac0-82f4-aec7359de234",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "0e8a8e9b-c5b5-4f7f-bf59-9a15e06e13ec",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "de2bf2c7-efc1-4a05-8d38-6df91b1c5695",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "4c648719-3087-4788-959a-bbd517468953",
+      "phone": "13810000005",
+      "channel": "线上广告",
+      "city": "上海",
+      "ageGroup": "26-35",
+      "duration": 172,
+      "answers": {
+        "q1": 3,
+        "q2": 5,
+        "q3": 4,
+        "q4": "不满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T13:49:19.367Z",
+      "sourceId": "batch-5",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "75d670b7-89db-4b23-9836-cbd7c01badd2",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "9be125e3-91c5-4431-9963-3622f59d11b7",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "7d957328-0ddb-44f1-8c55-32e7eef1f2e9",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "129830d6-9db6-41c1-be1e-f7f981bafebb",
+      "phone": "13810000006",
+      "channel": "线上广告",
+      "city": "上海",
+      "ageGroup": "26-35",
+      "duration": 236,
+      "answers": {
+        "q1": 2,
+        "q2": 3,
+        "q3": 1,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T14:49:04.555Z",
+      "sourceId": "batch-6",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "e630a3a5-3f07-4292-826a-7dd471a18ce4",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "352d1000-30fa-4a77-9e18-ecb1ad901ae6",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "e4b8ae03-2c31-4440-b265-758c1451def9",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "85688339-84cc-4fff-bf8c-4dfdea07037a",
+      "phone": "13810000007",
+      "channel": "地推",
+      "city": "上海",
+      "ageGroup": "26-35",
+      "duration": 96,
+      "answers": {
+        "q1": 3,
+        "q2": 4,
+        "q3": 2,
+        "q4": "一般",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-11T20:45:09.669Z",
+      "sourceId": "batch-7",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "bfd528d8-89d2-412f-8398-dacc6c889537",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "6d6c1547-637b-479f-bb75-710f284e7a43",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "18fb7c8a-727a-43a0-bc1b-ef46e61b493e",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "087f688e-8f93-4f8f-9b59-bd9b5c0d0d4a",
+      "phone": "13810000008",
+      "channel": "地推",
+      "city": "上海",
+      "ageGroup": "26-35",
+      "duration": 82,
+      "answers": {
+        "q1": 2,
+        "q2": 5,
+        "q3": 5,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T13:53:23.568Z",
+      "sourceId": "batch-8",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "c79f3050-42d4-49f3-b434-5d13156c2144",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "9cf81bad-7e9f-4765-ae91-9f66004a8099",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "18874203-c739-4b4e-bdd4-0a2591f6b3a8",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "472fc4d9-d3c3-47b4-b44d-9759bb90684b",
+      "phone": "13810000009",
+      "channel": "地推",
+      "city": "上海",
+      "ageGroup": "26-35",
+      "duration": 130,
+      "answers": {
+        "q1": 4,
+        "q2": 1,
+        "q3": 1,
+        "q4": "一般",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T09:04:51.270Z",
+      "sourceId": "batch-9",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "70c31f5e-247d-4592-8fd5-81779fc72baf",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "6b7187e6-4b75-47f1-b84c-07ebcc6d2a71",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "dabc10d0-ce0d-4540-b9e7-f8cb98b35d5c",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "03e137f5-9a4b-4593-96fd-99ac50199f5b",
+      "phone": "13810000010",
+      "channel": "地推",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 148,
+      "answers": {
+        "q1": 4,
+        "q2": 4,
+        "q3": 1,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T05:25:47.417Z",
+      "sourceId": "batch-10",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "960b2b3a-f96a-434b-8fde-444a9a9b57c0",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "db32cf92-7985-4f0b-ab0a-8e9a2e73b779",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "23d4749f-22b9-4702-af8b-9245ca4ffed5",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "1c220cd7-21f8-4e18-9cf3-1f2895aefbd4",
+      "phone": "13810000011",
+      "channel": "地推",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 232,
+      "answers": {
+        "q1": 1,
+        "q2": 1,
+        "q3": 2,
+        "q4": "一般",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T14:36:23.596Z",
+      "sourceId": "batch-11",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "1c3cd3c8-965c-48f1-8bde-686ec495a5e7",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "87ed8196-d04f-4779-b82f-89d12bf75d6e",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "7f98320a-60dd-44a7-824d-043a2dbf13f9",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.288Z"
+    },
+    {
+      "id": "191ee7d7-66c4-4288-b4c0-e671bf6bbb4c",
+      "phone": "13810000012",
+      "channel": "地推",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 134,
+      "answers": {
+        "q1": 2,
+        "q2": 4,
+        "q3": 2,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-11T19:01:51.887Z",
+      "sourceId": "batch-12",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "e1a89c4d-d697-4d86-9891-69aa5827107a",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "01c5a2e8-69eb-48a3-b4fb-c087e43b4482",
+          "timestamp": "2026-05-12T15:18:04.288Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "10974fe2-302a-4eae-aad6-ab8aeb46fa19",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.289Z"
+    },
+    {
+      "id": "e53fbf75-4e7c-47ad-92da-c3cf8a8f0706",
+      "phone": "13810000013",
+      "channel": "地推",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 139,
+      "answers": {
+        "q1": 1,
+        "q2": 2,
+        "q3": 3,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-11T18:18:22.711Z",
+      "sourceId": "batch-13",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "013a7f5f-a89d-4d41-96d3-02ea1b004f52",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "5132d270-8182-4a12-9ba7-8122b13ea7d9",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "4fdb7f8d-e7b8-4ca3-8472-591735e0917c",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.289Z"
+    },
+    {
+      "id": "06b87341-a965-4aa5-9cad-c197c5bf29d5",
+      "phone": "13810000014",
+      "channel": "会员渠道",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 122,
+      "answers": {
+        "q1": 4,
+        "q2": 1,
+        "q3": 4,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-11T16:37:56.236Z",
+      "sourceId": "batch-14",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "9989fd92-7299-4eec-b39b-769790f09640",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "f6140284-ca40-46f1-9a87-86c9b7a37146",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "34f8cfcd-6ca0-4deb-ac73-41f76d4f0bd7",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.289Z"
+    },
+    {
+      "id": "cad5dc1c-d4f7-4149-aa5e-c6430cb07238",
+      "phone": "13810000015",
+      "channel": "会员渠道",
+      "city": "深圳",
+      "ageGroup": "46-55",
+      "duration": 124,
+      "answers": {
+        "q1": 4,
+        "q2": 4,
+        "q3": 5,
+        "q4": "不满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T02:08:36.922Z",
+      "sourceId": "batch-15",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "0611f2ff-4b95-4925-85dd-18f9e34a4cbf",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "d94c431a-95a0-4127-bfbc-2ce8b718e696",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "d00af7c9-1a1e-41a9-811f-cb41c323b628",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.289Z"
+    },
+    {
+      "id": "9df710f2-b6d9-4420-b033-43b3d04103c0",
+      "phone": "13810000016",
+      "channel": "会员渠道",
+      "city": "深圳",
+      "ageGroup": "46-55",
+      "duration": 184,
+      "answers": {
+        "q1": 1,
+        "q2": 1,
+        "q3": 1,
+        "q4": "不满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T12:51:47.546Z",
+      "sourceId": "batch-16",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "eeec2a66-132a-49ec-8563-d50d19062eea",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "d843b676-44ba-480a-a31c-41977c874618",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "e79fd2bc-eecb-456d-8299-8f8fff76703e",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.289Z"
+    },
+    {
+      "id": "6bda911c-4211-44a1-9722-4c61a096bdf1",
+      "phone": "13810000017",
+      "channel": "会员渠道",
+      "city": "深圳",
+      "ageGroup": "46-55",
+      "duration": 142,
+      "answers": {
+        "q1": 1,
+        "q2": 3,
+        "q3": 4,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T00:34:05.923Z",
+      "sourceId": "batch-17",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "3b7ddf92-51ce-4977-85cb-e555b53e3d6a",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "7e7d7843-7e62-40ee-a046-59249ada6baa",
+          "timestamp": "2026-05-12T15:18:04.289Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "2917ad99-3b99-45b1-a325-1935c3cddf3a",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "666f47ce-1e21-4a50-8a87-d75ccd6f38b0",
+      "phone": "13810000018",
+      "channel": "会员渠道",
+      "city": "深圳",
+      "ageGroup": "46-55",
+      "duration": 91,
+      "answers": {
+        "q1": 1,
+        "q2": 3,
+        "q3": 1,
+        "q4": "不满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-11T15:25:50.022Z",
+      "sourceId": "batch-18",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "f24f0ccd-ac16-48c5-9040-04ba7f991cb2",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "0ef9fe4d-335a-4322-8091-b1ded16d08a0",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "55c5ecea-a3bd-4f21-959c-5025834d38df",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "c6c7247c-cb9e-4ca7-8880-f48da34bfda6",
+      "phone": "13810000019",
+      "channel": "会员渠道",
+      "city": "深圳",
+      "ageGroup": "46-55",
+      "duration": 184,
+      "answers": {
+        "q1": 2,
+        "q2": 1,
+        "q3": 5,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T09:09:49.441Z",
+      "sourceId": "batch-19",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "3a636a68-b6b2-477e-9bc1-fad39f85bd4c",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "870a56d2-0d96-4453-89f9-b6eb699fa5f9",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "e882a855-9bb1-46b6-bdcf-498681a2fc6f",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "4fa0c212-95db-4d44-8917-9755543cb3ad",
+      "phone": "13810000020",
+      "channel": "会员渠道",
+      "city": "北京",
+      "ageGroup": "18-25",
+      "duration": 169,
+      "answers": {
+        "q1": 3,
+        "q2": 1,
+        "q3": 3,
+        "q4": "满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T10:14:13.366Z",
+      "sourceId": "batch-20",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "a8190cd1-6b56-49c8-a5cf-72bbd5f394e7",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "34736fe5-1b9f-4afd-a82f-e9a2bd599427",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "0d6b1e06-adde-4621-80b0-2c7a9e071d8f",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "5687983e-6256-4128-a920-2e2de098a485",
+      "phone": "13810000001",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 120,
+      "answers": {
+        "q1": 3,
+        "q2": 4,
+        "q3": 2,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "duplicate-test",
+      "status": "manually_reserved",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "449156c8-7ff8-4549-9957-2f6d2e58a19b",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "f2d80361-68b4-4fb4-8253-f42c7e16b97f",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "rejected",
+          "reason": "质量检查失败: duplicate_phone",
+          "details": {
+            "quality-duplicate-phone": {
+              "rule": "手机号去重",
+              "duplicateCount": 1,
+              "duplicateIds": [
+                "dfaf7f1b-e71c-4a10-a619-7534132316e4"
+              ]
+            }
+          }
+        },
+        {
+          "id": "a90e302e-89fa-406e-b0c7-e55265e3ff24",
+          "timestamp": "2026-05-12T15:22:47.154Z",
+          "action": "人工保留",
+          "actor": "张三",
+          "fromStatus": "rejected",
+          "toStatus": "manually_reserved",
+          "reason": "手机号重复但为测试数据，保留样本",
+          "details": {
+            "beforeStatus": "rejected",
+            "afterStatus": "manually_reserved"
+          }
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "369427ca-4db1-41ce-b597-0467ca771fe1",
+      "phone": "13899999901",
+      "channel": "地推",
+      "city": "上海",
+      "ageGroup": "18-25",
+      "duration": 15,
+      "answers": {
+        "q1": 1,
+        "q2": 2,
+        "q3": 3,
+        "q4": "不满意",
+        "q5": "否"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "too-fast-test",
+      "status": "manually_reserved",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "f0a8828e-12c2-4bd4-baf0-de28f4987574",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "5a22c122-a6d6-4cc7-bb0d-60bb9e90dbe8",
+          "timestamp": "2026-05-12T15:18:04.290Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "rejected",
+          "reason": "质量检查失败: too_fast",
+          "details": {
+            "quality-min-duration": {
+              "rule": "最小答题时长",
+              "expected": 60,
+              "actual": 15
+            }
+          }
+        },
+        {
+          "id": "0931e064-7d8a-466e-b1d4-4d7b0de2b611",
+          "timestamp": "2026-05-12T15:22:16.011Z",
+          "action": "人工保留",
+          "actor": "张三",
+          "fromStatus": "rejected",
+          "toStatus": "manually_reserved",
+          "reason": "用户特殊情况，答题虽快但回答真实",
+          "details": {
+            "beforeStatus": "rejected",
+            "afterStatus": "manually_reserved"
+          }
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.290Z"
+    },
+    {
+      "id": "01690d8c-c7ea-4440-b44f-455fa2ba36be",
+      "phone": "13899999902",
+      "channel": "会员渠道",
+      "city": "广州",
+      "ageGroup": "36-45",
+      "duration": 90,
+      "answers": {
+        "q1": 1,
+        "q2": 1,
+        "q3": 1,
+        "q4": 1,
+        "q5": 1
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "all-same-test",
+      "status": "rejected",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "1d4a8eb0-bb55-4250-9063-ff0b719dcff8",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "cba918cd-0445-4738-98e0-c439d30f2d39",
+          "timestamp": "2026-05-12T15:18:04.291Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "rejected",
+          "reason": "质量检查失败: all_same_options",
+          "details": {
+            "quality-all-same-options": {
+              "rule": "选项全一样检查",
+              "totalQuestions": 5,
+              "sameValue": "1"
+            }
+          }
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.291Z"
+    },
+    {
+      "id": "6219bde8-b045-4f0f-9b02-d37b444e6a2d",
+      "phone": "1380000100",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 166,
+      "answers": {
+        "q1": 1,
+        "q2": 5,
+        "q3": 2,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "beijing-over-quota-0",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "6bf85c45-f0f8-414a-9567-0e72804f2988",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "5846ab27-acfa-47c8-8823-5519d704ed52",
+          "timestamp": "2026-05-12T15:18:04.291Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "e4eb8120-9093-4fe5-b74c-5075dc57256a",
+          "timestamp": "2026-05-12T15:18:04.291Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.291Z"
+    },
+    {
+      "id": "b91db132-6e31-4dd6-8d4f-da1d6b9a6eb8",
+      "phone": "1380000101",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 106,
+      "answers": {
+        "q1": 4,
+        "q2": 5,
+        "q3": 3,
+        "q4": "一般",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "beijing-over-quota-1",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "3830b6b5-ee06-4206-b049-f831026b0ad9",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "ae4a7304-8dfc-4d3d-98fe-5054f3064aa9",
+          "timestamp": "2026-05-12T15:18:04.291Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "f743b639-3b74-4f1d-9b1c-313700a38c7e",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.298Z"
+    },
+    {
+      "id": "0e4a35fe-0be7-495f-acb2-b8f05ceda890",
+      "phone": "1380000102",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 83,
+      "answers": {
+        "q1": 5,
+        "q2": 3,
+        "q3": 3,
+        "q4": "一般",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "beijing-over-quota-2",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "60954023-2e38-449b-9a9a-4051bbfdd317",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "c4410148-0a29-4b9d-bb8e-1556cc91c309",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "21a86c13-4134-40e3-a5dc-29524afb3688",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.298Z"
+    },
+    {
+      "id": "5795535b-4f01-4e4b-91f8-9d8fcce77f4d",
+      "phone": "1380000103",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 83,
+      "answers": {
+        "q1": 1,
+        "q2": 2,
+        "q3": 1,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "beijing-over-quota-3",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "45abc6a8-c2a2-4cc0-81d8-66ebb47324ff",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "c1723ba7-31c2-4cd5-9625-394793f845e8",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "0f80de22-d88e-4d6d-84c2-d3bacc48afea",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.298Z"
+    },
+    {
+      "id": "ff930538-c823-4dbf-9ba9-a7d01f04a9c6",
+      "phone": "1380000104",
+      "channel": "线上广告",
+      "city": "北京",
+      "ageGroup": "26-35",
+      "duration": 90,
+      "answers": {
+        "q1": 1,
+        "q2": 1,
+        "q3": 3,
+        "q4": "满意",
+        "q5": "是"
+      },
+      "submittedAt": "2026-05-12T15:17:56.149Z",
+      "sourceId": "beijing-over-quota-4",
+      "status": "valid",
+      "rejectReasons": [],
+      "history": [
+        {
+          "id": "ae692a3e-312e-4ec8-a942-57b214f3849e",
+          "timestamp": "2026-05-12T15:17:56.150Z",
+          "action": "导入",
+          "actor": "system",
+          "toStatus": "pending",
+          "reason": "新问卷导入"
+        },
+        {
+          "id": "43f2d2ac-6c56-40f1-aa7f-084f3ffdf21e",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "质量检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "pending",
+          "reason": "质量检查通过，等待配额检查",
+          "details": {}
+        },
+        {
+          "id": "3a38dee3-b51b-49f6-a7fa-eaa062dffd9c",
+          "timestamp": "2026-05-12T15:18:04.298Z",
+          "action": "配额检查",
+          "actor": "system",
+          "fromStatus": "pending",
+          "toStatus": "valid",
+          "reason": "配额检查通过",
+          "details": {}
+        }
+      ],
+      "processedAt": "2026-05-12T15:18:04.298Z"
+    }
+  ],
+  "quotaUsage": [
+    {
+      "ruleId": "quota-beijing-26-35",
+      "ruleName": "北京26-35岁组合配额",
+      "type": "combined",
+      "criteria": {
+        "city": "北京",
+        "ageGroup": "26-35"
+      },
+      "limit": 50,
+      "used": 6,
+      "remaining": 44,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-online",
+      "ruleName": "线上广告配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "线上广告"
+      },
+      "limit": 200,
+      "used": 12,
+      "remaining": 188,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-offline",
+      "ruleName": "地推配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "地推"
+      },
+      "limit": 100,
+      "used": 8,
+      "remaining": 92,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-channel-member",
+      "ruleName": "会员渠道配额",
+      "type": "channel",
+      "criteria": {
+        "channel": "会员渠道"
+      },
+      "limit": 160,
+      "used": 7,
+      "remaining": 153,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-beijing",
+      "ruleName": "北京配额",
+      "type": "city",
+      "criteria": {
+        "city": "北京"
+      },
+      "limit": 100,
+      "used": 11,
+      "remaining": 89,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-shanghai",
+      "ruleName": "上海配额",
+      "type": "city",
+      "criteria": {
+        "city": "上海"
+      },
+      "limit": 100,
+      "used": 6,
+      "remaining": 94,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-guangzhou",
+      "ruleName": "广州配额",
+      "type": "city",
+      "criteria": {
+        "city": "广州"
+      },
+      "limit": 80,
+      "used": 5,
+      "remaining": 75,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-shenzhen",
+      "ruleName": "深圳配额",
+      "type": "city",
+      "criteria": {
+        "city": "深圳"
+      },
+      "limit": 80,
+      "used": 5,
+      "remaining": 75,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-18-25",
+      "ruleName": "18-25岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "18-25"
+      },
+      "limit": 120,
+      "used": 6,
+      "remaining": 114,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-26-35",
+      "ruleName": "26-35岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "26-35"
+      },
+      "limit": 150,
+      "used": 11,
+      "remaining": 139,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-36-45",
+      "ruleName": "36-45岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "36-45"
+      },
+      "limit": 100,
+      "used": 5,
+      "remaining": 95,
+      "overQuota": 0
+    },
+    {
+      "ruleId": "quota-age-46-55",
+      "ruleName": "46-55岁配额",
+      "type": "age",
+      "criteria": {
+        "ageGroup": "46-55"
+      },
+      "limit": 90,
+      "used": 5,
+      "remaining": 85,
+      "overQuota": 0
+    }
+  ],
+  "lastUpdatedAt": "2026-05-12T15:22:47.162Z",
+  "processVersion": 2
+}
