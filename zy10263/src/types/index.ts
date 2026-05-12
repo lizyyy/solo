@@ -21,6 +21,8 @@ export interface EmployeeSkill {
   id: string;
   employeeId: string;
   skillId: string;
+  skillName: string;
+  skillCode: string;
   level: 1 | 2 | 3 | 4 | 5;
   createdAt: string;
 }

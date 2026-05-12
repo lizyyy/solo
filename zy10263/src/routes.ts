@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import { runAsync, getAsync } from './database/connection';
 import * as employeeService from './services/employeeService';
 import * as lineService from './services/lineService';
 import * as lineSwapService from './services/lineSwapService';
@@ -36,6 +37,20 @@ const getOperator = (req: Request) => ({
   name: req.headers['x-operator-name'] as string || '系统用户'
 });
 
+router.post('/employees', async (req, res) => {
+  try {
+    const operator = getOperator(req);
+    const employee = await employeeService.createEmployee(
+      req.body,
+      operator.id,
+      operator.name
+    );
+    res.status(201).json({ success: true, data: employee });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
 router.get('/employees', async (req, res) => {
   try {
     const employees = await employeeService.getEmployees();
@@ -63,6 +78,36 @@ router.get('/employees/:id/skills', async (req, res) => {
   }
 });
 
+router.post('/employees/:id/skills', async (req, res) => {
+  try {
+    const operator = getOperator(req);
+    const skill = await employeeService.addEmployeeSkill(
+      req.params.id,
+      req.body.skillId,
+      req.body.level,
+      operator.id,
+      operator.name
+    );
+    res.status(201).json({ success: true, data: skill });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+router.post('/lines', async (req, res) => {
+  try {
+    const operator = getOperator(req);
+    const line = await lineService.createLine(
+      req.body,
+      operator.id,
+      operator.name
+    );
+    res.status(201).json({ success: true, data: line });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
 router.get('/lines', async (req, res) => {
   try {
     const lines = await lineService.getLines();
@@ -72,10 +117,46 @@ router.get('/lines', async (req, res) => {
   }
 });
 
+router.get('/lines/:id', async (req, res) => {
+  try {
+    const line = await lineService.getLineById(req.params.id);
+    res.json({ success: true, data: line });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+router.post('/skills', async (req, res) => {
+  try {
+    const { v4: uuidv4 } = await import('uuid');
+    const now = new Date().toISOString();
+    await runAsync(
+      'INSERT INTO skills (id, name, code, description, created_at) VALUES (?, ?, ?, ?, ?)',
+      [uuidv4(), req.body.name, req.body.code, req.body.description || '', now]
+    );
+    const skill = await getAsync(
+      'SELECT id, name, code, description, created_at as createdAt FROM skills WHERE code = ?',
+      [req.body.code]
+    );
+    res.status(201).json({ success: true, data: skill });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
 router.get('/skills', async (req, res) => {
   try {
     const skills = await lineService.getSkills();
     res.json({ success: true, data: skills });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+router.get('/skills/:id', async (req, res) => {
+  try {
+    const skill = await lineService.getSkillById(req.params.id);
+    res.json({ success: true, data: skill });
   } catch (error) {
     handleError(res, error);
   }

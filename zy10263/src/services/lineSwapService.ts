@@ -71,6 +71,7 @@ export const createSwapRequest = async (
     reason: string;
     startTime: string;
     endTime?: string;
+    allowSkillMismatch?: boolean;
   },
   operatorId: string,
   operatorName: string
@@ -109,6 +110,18 @@ export const createSwapRequest = async (
 
   const skillCheck = await checkSkillMatch(data.employeeId, data.toLineId);
 
+  if (!skillCheck.matched && !data.allowSkillMismatch) {
+    throw new ValidationError(
+      'SKILL_MISMATCH',
+      '员工技能不匹配目标产线要求，如需强制换线请设置 allowSkillMismatch=true',
+      {
+        employeeSkills: skillCheck.employeeSkills,
+        requiredSkill: skillCheck.requiredSkill,
+        hint: '可通过设置 allowSkillMismatch=true 强制提交（需管理员审批）'
+      }
+    );
+  }
+
   const now = new Date().toISOString();
   const id = uuidv4();
   const requestNo = generateRequestNo();
@@ -117,10 +130,12 @@ export const createSwapRequest = async (
     `INSERT INTO line_swap_requests 
      (id, request_no, employee_id, from_line_id, to_line_id, reason, requested_by, requested_at, 
       status, start_time, end_time, skill_match, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id, requestNo, data.employeeId, data.fromLineId, data.toLineId,
-      data.reason, operatorId, now, data.startTime,
+      data.reason, operatorId, now,
+      !skillCheck.matched ? 'pending_approval' : 'pending',
+      data.startTime,
       data.endTime || null, skillCheck.matched ? 1 : 0, now, now
     ]
   );
@@ -134,7 +149,7 @@ export const createSwapRequest = async (
     operatorName,
     null,
     request,
-    skillCheck.matched ? '创建换线申请' : '创建换线申请（技能不匹配）'
+    skillCheck.matched ? '创建换线申请' : '创建换线申请（技能不匹配，需额外审批）'
   );
 
   return request!;

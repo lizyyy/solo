@@ -99,7 +99,11 @@ export const calculatePerformance = async (
     await recordHistory('CREATE', 'performance', id, operatorId, operatorName, null, performance, '创建绩效数据');
   }
 
-  return getPerformanceById(id)!;
+  const result = await getPerformanceById(id);
+  if (!result) {
+    throw new Error('计算绩效失败');
+  }
+  return result;
 };
 
 export const getPerformanceById = async (id: string): Promise<Performance | undefined> => {

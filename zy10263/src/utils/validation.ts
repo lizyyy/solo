@@ -85,7 +85,7 @@ export const checkDuplicateRequest = async (
        AND (from_line_id = ? OR (from_line_id IS NULL AND ? IS NULL))
        AND to_line_id = ?
        AND DATE(start_time) = DATE(?)
-       AND status IN ('pending', 'approved')`,
+       AND status IN ('pending', 'pending_approval', 'approved')`,
     [employeeId, fromLineId, fromLineId, toLineId, startTime]
   );
 
