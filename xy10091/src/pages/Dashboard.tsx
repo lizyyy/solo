@@ -25,13 +25,6 @@ import {
 import { reportApi, exportApi } from '../api';
 import dayjs from 'dayjs';
 
-const STATUS_COLORS = {
-  pending: '#eab308',
-  approved: '#22c55e',
-  rejected: '#ef4444',
-  abnormal: '#f97316',
-};
-
 const PIE_COLORS = ['#eab308', '#22c55e', '#ef4444', '#f97316'];
 
 function Dashboard() {

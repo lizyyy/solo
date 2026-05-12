@@ -690,12 +690,12 @@ router.post('/import', upload.single('file'), async (req: Request, res: Response
 
     const db = loadData();
     const results: {
-      success: number;
+      successCount: number;
       skipped: number;
       failed: number;
       messages: string[];
     } = {
-      success: 0,
+      successCount: 0,
       skipped: 0,
       failed: 0,
       messages: []
@@ -850,7 +850,7 @@ router.post('/import', upload.single('file'), async (req: Request, res: Response
 
         db.reissueRequests.push(request);
         existingRequestNos.add(requestNo);
-        results.success++;
+        results.successCount++;
 
         if (row['操作历史']) {
           db.reviewHistory.push({
@@ -873,8 +873,11 @@ router.post('/import', upload.single('file'), async (req: Request, res: Response
 
     res.json({
       success: true,
-      ...results,
-      total: results.success + results.skipped + results.failed,
+      successCount: results.successCount,
+      skipped: results.skipped,
+      failed: results.failed,
+      messages: results.messages,
+      total: results.successCount + results.skipped + results.failed,
     });
 
   } catch (error: any) {

@@ -70,11 +70,11 @@ export default function ImportModal({ isOpen, onClose, onSuccess }: ImportModalP
 
     try {
       const response = await importApi.uploadCSV(file);
-      const data = response.data as any;
+      const data = response.data;
       setResult({
         success: data.success,
         total: data.total,
-        successCount: data.success,
+        successCount: data.successCount,
         skipped: data.skipped,
         failed: data.failed,
         messages: data.messages || [],

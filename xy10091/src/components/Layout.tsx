@@ -1,10 +1,9 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink } from 'react-router-dom';
 import { FileText, BarChart3, Settings, Award } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { reportApi } from '../api';
 
 function Layout() {
-  const location = useLocation();
   
   const { data: report } = useQuery({
     queryKey: ['report'],

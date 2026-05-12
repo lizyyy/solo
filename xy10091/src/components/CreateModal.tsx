@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { X, Search, User, BookOpen, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { requestsApi } from '../api';
 
 interface Props {
+  isOpen: boolean;
   onClose: () => void;
   onCreated: () => void;
 }

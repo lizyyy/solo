@@ -62,6 +62,24 @@
       "email": "liushi@example.com",
       "created_at": "2026-05-12T00:26:36.563Z",
       "updated_at": "2026-05-12T00:26:36.563Z"
+    },
+    {
+      "id": "6b55cd97-3624-4184-9b87-07a4d655cf6f",
+      "name": "测试导入1",
+      "phone": "13900000001",
+      "id_card": "110101199001010001",
+      "email": "test1@example.com",
+      "created_at": "2026-05-12T03:50:36.283Z",
+      "updated_at": "2026-05-12T03:50:36.284Z"
+    },
+    {
+      "id": "dc017efa-7c40-4138-9eda-6f4d470eb82d",
+      "name": "测试导入2",
+      "phone": "13900000002",
+      "id_card": "110101199001010002",
+      "email": "test2@example.com",
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
     }
   ],
   "courseRecords": [
@@ -155,6 +173,32 @@
       "certificate_issued": true,
       "created_at": "2026-05-12T00:26:36.563Z",
       "updated_at": "2026-05-12T00:26:36.563Z"
+    },
+    {
+      "id": "99147fac-a76b-4d3e-a675-8cf4a801cf6a",
+      "student_id": "6b55cd97-3624-4184-9b87-07a4d655cf6f",
+      "course_name": "Python基础编程",
+      "course_code": "PY001",
+      "enrollment_date": "2025-08-31T17:00:00.000Z",
+      "completion_date": "2025-12-14T17:00:00.000Z",
+      "completion_status": "completed",
+      "score": 85,
+      "certificate_issued": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
+    },
+    {
+      "id": "983e967d-683e-41de-b8f0-ce509f864238",
+      "student_id": "dc017efa-7c40-4138-9eda-6f4d470eb82d",
+      "course_name": "Web前端开发",
+      "course_code": "WEB001",
+      "enrollment_date": "2025-09-30T17:00:00.000Z",
+      "completion_date": "2026-01-09T17:00:00.000Z",
+      "completion_status": "completed",
+      "score": 92,
+      "certificate_issued": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
     }
   ],
   "paymentRecords": [
@@ -255,6 +299,34 @@
       "reissue_fee_paid": true,
       "created_at": "2026-05-12T00:26:36.563Z",
       "updated_at": "2026-05-12T00:26:36.563Z"
+    },
+    {
+      "id": "121163b5-184b-4256-998e-04073170c142",
+      "student_id": "6b55cd97-3624-4184-9b87-07a4d655cf6f",
+      "course_code": "PY001",
+      "amount": 2999,
+      "payment_date": "2025-08-31T17:00:00.000Z",
+      "payment_status": "paid",
+      "payment_method": "支付宝",
+      "transaction_id": "TEST123456789",
+      "reissue_fee": 20,
+      "reissue_fee_paid": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
+    },
+    {
+      "id": "e108f8e5-4120-435d-ae18-99d1369ac378",
+      "student_id": "dc017efa-7c40-4138-9eda-6f4d470eb82d",
+      "course_code": "WEB001",
+      "amount": 3999,
+      "payment_date": "2025-09-30T17:00:00.000Z",
+      "payment_status": "paid",
+      "payment_method": "微信支付",
+      "transaction_id": "TEST987654321",
+      "reissue_fee": 20,
+      "reissue_fee_paid": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
     }
   ],
   "mailingAddresses": [
@@ -355,6 +427,34 @@
       "is_default": true,
       "created_at": "2026-05-12T00:26:36.563Z",
       "updated_at": "2026-05-12T00:26:36.563Z"
+    },
+    {
+      "id": "eb194e70-0c2d-4c4b-9516-9b47a0721dba",
+      "student_id": "6b55cd97-3624-4184-9b87-07a4d655cf6f",
+      "name": "测试导入1",
+      "phone": "13900000001",
+      "province": "北京市",
+      "city": "北京市",
+      "district": "朝阳区",
+      "address": "测试地址1",
+      "postal_code": "100022",
+      "is_default": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
+    },
+    {
+      "id": "95bbe9af-4b7f-4546-aaad-d21f5188e423",
+      "student_id": "dc017efa-7c40-4138-9eda-6f4d470eb82d",
+      "name": "测试导入2",
+      "phone": "13900000002",
+      "province": "上海市",
+      "city": "上海市",
+      "district": "浦东新区",
+      "address": "测试地址2",
+      "postal_code": "200120",
+      "is_default": true,
+      "created_at": "2026-05-12T03:50:36.285Z",
+      "updated_at": "2026-05-12T03:50:36.285Z"
     }
   ],
   "reissueRequests": [
@@ -478,6 +578,52 @@
       "course_record_id": "9d81b065-3f49-43a0-9dfc-e086b6d3ddfc",
       "payment_record_id": "a4ca5cea-84c5-4c95-ae4c-6e7b5aafd00d",
       "mailing_address_id": "44eea038-5ce0-4447-94e0-7b9a3820a9a8",
+      "tracking_number": null,
+      "shipped_at": null,
+      "delivered_at": null,
+      "abnormal_type": null,
+      "abnormal_reason": null
+    },
+    {
+      "id": "7f671e89-d7bd-463a-87b5-51bb829409a3",
+      "request_no": "CR20260512TEST01",
+      "student_id": "6b55cd97-3624-4184-9b87-07a4d655cf6f",
+      "course_code": "PY001",
+      "course_name": "Python基础编程",
+      "reason": "测试导入功能",
+      "review_status": "pending",
+      "review_comment": null,
+      "reviewer_id": null,
+      "reviewer_name": null,
+      "reviewed_at": null,
+      "created_at": "2026-05-12T03:00:00.000Z",
+      "updated_at": "2026-05-12T03:50:36.285Z",
+      "course_record_id": "99147fac-a76b-4d3e-a675-8cf4a801cf6a",
+      "payment_record_id": "121163b5-184b-4256-998e-04073170c142",
+      "mailing_address_id": "eb194e70-0c2d-4c4b-9516-9b47a0721dba",
+      "tracking_number": null,
+      "shipped_at": null,
+      "delivered_at": null,
+      "abnormal_type": null,
+      "abnormal_reason": null
+    },
+    {
+      "id": "76b43538-2b91-47c0-bd34-7154df3793bd",
+      "request_no": "CR20260512TEST02",
+      "student_id": "dc017efa-7c40-4138-9eda-6f4d470eb82d",
+      "course_code": "WEB001",
+      "course_name": "Web前端开发",
+      "reason": "测试导入功能2",
+      "review_status": "approved",
+      "review_comment": "审核通过",
+      "reviewer_id": null,
+      "reviewer_name": "测试审核员",
+      "reviewed_at": "2026-05-12T04:00:00.000Z",
+      "created_at": "2026-05-12T04:00:00.000Z",
+      "updated_at": "2026-05-12T03:50:36.286Z",
+      "course_record_id": "983e967d-683e-41de-b8f0-ce509f864238",
+      "payment_record_id": "e108f8e5-4120-435d-ae18-99d1369ac378",
+      "mailing_address_id": "95bbe9af-4b7f-4546-aaad-d21f5188e423",
       "tracking_number": null,
       "shipped_at": null,
       "delivered_at": null,

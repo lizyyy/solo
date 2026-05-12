@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Download, Plus, Upload, Eye, Clock, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import dayjs from 'dayjs';
 import { requestsApi, exportApi } from '../api';
-import { statusMap, type ReviewFilters, type ReviewStatus } from '../types';
+import { type ReviewFilters, type ReviewStatus } from '../types';
 import StatusBadge from '../components/StatusBadge';
 import CreateModal from '../components/CreateModal';
 import ImportModal from '../components/ImportModal';

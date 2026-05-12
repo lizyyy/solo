@@ -62,7 +62,7 @@ export const importApi = {
     return api.post<{
       success: boolean;
       total: number;
-      success: number;
+      successCount: number;
       skipped: number;
       failed: number;
       messages: string[];

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, BookOpen, CreditCard, MapPin, AlertTriangle, CheckCircle, XCircle, Clock, Check, Truck, History, Send, MessageSquare } from 'lucide-react';
+import { ArrowLeft, User, BookOpen, CreditCard, MapPin, AlertTriangle, CheckCircle, XCircle, Clock, Check, Truck, History, MessageSquare } from 'lucide-react';
 import dayjs from 'dayjs';
 import { requestsApi } from '../api';
-import { statusMap, actionMap, type ReviewHistory } from '../types';
+import { actionMap, type ReviewHistory } from '../types';
 import StatusBadge from '../components/StatusBadge';
 import ReviewModal from '../components/ReviewModal';
 
