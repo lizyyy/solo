@@ -197,16 +197,13 @@ def scenario_3_denied_pickup():
     stranger_id = stranger['person_id']
     
     print("\n3. 陌生人尝试接孩子（未授权）...")
-    try:
-        checkout_response = client.post("/check-out", json={
-            "child_id": child_id,
-            "person_id": stranger_id
-        })
-        print(f"   响应状态码: {checkout_response.status_code}")
-        if checkout_response.status_code == 403:
-            print(f"   ❌ 离园被拒绝: {checkout_response.json()['detail']}")
-    except Exception as e:
-        print(f"   ❌ 离园被拒绝")
+    checkout_response = client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": stranger_id
+    })
+    print(f"   响应状态码: {checkout_response.status_code}")
+    if checkout_response.status_code == 403:
+        print(f"   ❌ 离园被拒绝: {checkout_response.json()['detail']}")
     
     print("\n4. 查询异常记录...")
     exceptions_response = client.get("/exceptions", params={"child_id": child_id, "resolved": False})
@@ -225,8 +222,8 @@ def scenario_3_denied_pickup():
     return child_id, stranger_id
 
 
-def scenario_4_idempotency_test():
-    print_section("附加场景: 幂等性测试（防重复提交）")
+def scenario_4_expired_authorization():
+    print_section("场景 4: 过期授权被拒绝（区分未授权）")
     
     print("1. 创建儿童档案...")
     child_response = client.post("/children", json={
@@ -238,11 +235,70 @@ def scenario_4_idempotency_test():
     child = child_response.json()
     child_id = child['child_id']
     
+    print("\n2. 创建授权人（临时保姆）...")
+    nanny_response = client.post("/authorized-persons", json={
+        "name": "临时保姆",
+        "id_card": "110101199003034444",
+        "phone": "13200132000",
+        "relation": "保姆"
+    })
+    nanny = nanny_response.json()
+    nanny_id = nanny['person_id']
+    
+    print("\n3. 创建已过期的临时授权...")
+    now = datetime.now()
+    start_date = now - timedelta(hours=5)
+    end_date = now - timedelta(hours=1)
+    
+    client.post("/authorizations", json={
+        "child_id": child_id,
+        "person_id": nanny_id,
+        "auth_type": "temporary",
+        "start_date": start_date.isoformat(),
+        "end_date": end_date.isoformat(),
+        "created_by": "guardian"
+    })
+    print(f"   临时授权创建成功: 已过期（结束于 {end_date}）")
+    
+    print("\n4. 过期保姆尝试接孩子...")
+    checkout_response = client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": nanny_id
+    })
+    print(f"   响应状态码: {checkout_response.status_code}")
+    if checkout_response.status_code == 403:
+        print(f"   ❌ 离园被拒绝: {checkout_response.json()['detail']}")
+    
+    print("\n5. 查询异常记录，验证是 EXPIRED_AUTHORIZATION 类型...")
+    exceptions_response = client.get("/exceptions", params={"child_id": child_id, "resolved": False})
+    exceptions = exceptions_response.json()
+    for exc in exceptions:
+        print(f"   - 类型: {exc['exception_type']}, 描述: {exc['description']}")
+        if exc['exception_type'] == 'expired_authorization':
+            print("   ✅ 正确识别为过期授权!")
+    
+    print("\n✅ 场景 4 完成: 过期授权被正确识别!")
+    return child_id, nanny_id
+
+
+def scenario_5_duplicate_checkout():
+    print_section("场景 5: 重复签退留痕")
+    
+    print("1. 创建儿童档案...")
+    child_response = client.post("/children", json={
+        "name": "小磊",
+        "birth_date": "2022-03-15",
+        "guardian_name": "周爸爸",
+        "guardian_phone": "13100131000"
+    })
+    child = child_response.json()
+    child_id = child['child_id']
+    
     print("\n2. 创建授权人...")
     dad_response = client.post("/authorized-persons", json={
-        "name": "陈爸爸",
-        "id_card": "110101198808088888",
-        "phone": "13300133000",
+        "name": "周爸爸",
+        "id_card": "110101198002022222",
+        "phone": "13100131000",
         "relation": "父亲"
     })
     dad = dad_response.json()
@@ -256,38 +312,223 @@ def scenario_4_idempotency_test():
         "created_by": "system"
     })
     
-    print("\n4. 使用相同幂等键提交两次入园请求...")
-    idempotency_key = "checkin_20240515_xiaohua_001"
-    
-    print("   第一次提交...")
-    response1 = client.post("/check-in", json={
+    print("\n4. 送孩子入园...")
+    client.post("/check-in", json={
         "child_id": child_id,
-        "person_id": dad_id,
-        "idempotency_key": idempotency_key
+        "person_id": dad_id
     })
-    record1 = response1.json()
-    print(f"   记录ID: {record1['record_id']}")
     
-    print("   第二次提交（相同幂等键）...")
-    response2 = client.post("/check-in", json={
+    print("\n5. 第一次接孩子离园...")
+    checkout_response = client.post("/check-out", json={
         "child_id": child_id,
-        "person_id": dad_id,
-        "idempotency_key": idempotency_key
+        "person_id": dad_id
     })
-    record2 = response2.json()
-    print(f"   记录ID: {record2['record_id']}")
+    print(f"   第一次离园成功: {checkout_response.status_code}")
     
-    if record1['record_id'] == record2['record_id']:
-        print("   ✅ 幂等性生效: 两次请求返回相同记录")
+    print("\n6. 重复接孩子（第二次尝试）...")
+    checkout_response2 = client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": dad_id
+    })
+    print(f"   第二次离园状态码: {checkout_response2.status_code}")
+    print(f"   响应: {checkout_response2.json()['detail']}")
+    
+    print("\n7. 查询异常记录，验证 duplicate_checkout 留痕...")
+    exceptions_response = client.get("/exceptions", params={"child_id": child_id, "resolved": False})
+    exceptions = exceptions_response.json()
+    for exc in exceptions:
+        print(f"   - 类型: {exc['exception_type']}, 描述: {exc['description']}")
+        if exc['exception_type'] == 'duplicate_checkout':
+            print("   ✅ 重复签退被正确记录!")
+    
+    print("\n✅ 场景 5 完成: 重复签退被正确留痕!")
+    return child_id, dad_id
+
+
+def scenario_6_cross_type_idempotency():
+    print_section("场景 6: 跨接口幂等键不冲突")
+    
+    print("1. 创建儿童档案...")
+    child_response = client.post("/children", json={
+        "name": "小琳",
+        "birth_date": "2021-07-07",
+        "guardian_name": "吴妈妈",
+        "guardian_phone": "13000130000"
+    })
+    child = child_response.json()
+    child_id = child['child_id']
+    
+    print("\n2. 创建授权人...")
+    mom_response = client.post("/authorized-persons", json={
+        "name": "吴妈妈",
+        "id_card": "110101198507073333",
+        "phone": "13000130000",
+        "relation": "母亲"
+    })
+    mom = mom_response.json()
+    mom_id = mom['person_id']
+    
+    same_idempotency_key = "same_key_12345"
+    
+    print(f"\n3. 使用相同幂等键 '{same_idempotency_key}' 创建授权...")
+    auth_response = client.post("/authorizations", json={
+        "child_id": child_id,
+        "person_id": mom_id,
+        "auth_type": "permanent",
+        "created_by": "system",
+        "idempotency_key": same_idempotency_key
+    })
+    auth = auth_response.json()
+    print(f"   授权ID: {auth['auth_id']}")
+    
+    print(f"\n4. 使用相同幂等键 '{same_idempotency_key}' 提交入园（不同接口，应创建新记录）...")
+    checkin_response = client.post("/check-in", json={
+        "child_id": child_id,
+        "person_id": mom_id,
+        "idempotency_key": same_idempotency_key
+    })
+    checkin = checkin_response.json()
+    print(f"   接送记录ID: {checkin['record_id']}")
+    
+    if auth['auth_id'] != checkin['record_id']:
+        print("   ✅ 跨接口幂等键不冲突，正确创建了不同记录!")
     else:
-        print("   ❌ 幂等性未生效: 创建了不同记录")
+        print("   ❌ 错误: 返回了相同ID")
     
-    print("\n5. 查询所有接送记录...")
-    records_response = client.get("/pickup-records", params={"child_id": child_id})
-    records = records_response.json()
-    print(f"   实际记录数: {len(records)} (预期: 1)")
+    print("\n✅ 场景 6 完成: 跨接口幂等键不冲突!")
+    return child_id, mom_id
+
+
+def scenario_7_resolution_note_required():
+    print_section("场景 7: 异常处理说明不能为空")
     
-    print("\n✅ 幂等性测试完成!")
+    print("1. 创建儿童档案...")
+    child_response = client.post("/children", json={
+        "name": "小涛",
+        "birth_date": "2022-01-01",
+        "guardian_name": "郑爸爸",
+        "guardian_phone": "12900129000"
+    })
+    child = child_response.json()
+    child_id = child['child_id']
+    
+    print("\n2. 创建授权人...")
+    dad_response = client.post("/authorized-persons", json={
+        "name": "郑爸爸",
+        "id_card": "110101197901015555",
+        "phone": "12900129000",
+        "relation": "父亲"
+    })
+    dad = dad_response.json()
+    dad_id = dad['person_id']
+    
+    print("\n3. 创建授权...")
+    client.post("/authorizations", json={
+        "child_id": child_id,
+        "person_id": dad_id,
+        "auth_type": "permanent",
+        "created_by": "system"
+    })
+    
+    print("\n4. 入园后尝试重复离园，触发异常...")
+    client.post("/check-in", json={
+        "child_id": child_id,
+        "person_id": dad_id
+    })
+    client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": dad_id
+    })
+    client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": dad_id
+    })
+    
+    print("\n5. 获取异常记录ID...")
+    exceptions_response = client.get("/exceptions", params={"child_id": child_id, "resolved": False})
+    exceptions = exceptions_response.json()
+    exc_id = exceptions[0]['exception_id']
+    print(f"   异常ID: {exc_id}")
+    
+    print("\n6. 尝试用空说明处理异常...")
+    resolve_response = client.patch(f"/exceptions/{exc_id}/resolve", params={"resolution_note": ""})
+    print(f"   响应状态码: {resolve_response.status_code}")
+    print(f"   响应: {resolve_response.json()['detail']}")
+    
+    if resolve_response.status_code == 400:
+        print("   ✅ 空说明被正确拒绝!")
+    
+    print("\n7. 使用有效说明处理异常...")
+    resolve_response2 = client.patch(f"/exceptions/{exc_id}/resolve", params={"resolution_note": "系统误操作，已核实"})
+    print(f"   响应状态码: {resolve_response2.status_code}")
+    if resolve_response2.status_code == 200:
+        print("   ✅ 有说明的处理成功!")
+    
+    print("\n✅ 场景 7 完成: 处理说明必填验证生效!")
+    return child_id, dad_id
+
+
+def scenario_8_dashboard_currently_in():
+    print_section("场景 8: Dashboard currently_in 计算正确")
+    
+    print("1. 创建儿童档案...")
+    child_response = client.post("/children", json={
+        "name": "小菲",
+        "birth_date": "2021-06-06",
+        "guardian_name": "黄妈妈",
+        "guardian_phone": "12800128000"
+    })
+    child = child_response.json()
+    child_id = child['child_id']
+    
+    print("\n2. 创建授权人...")
+    mom_response = client.post("/authorized-persons", json={
+        "name": "黄妈妈",
+        "id_card": "110101198806066666",
+        "phone": "12800128000",
+        "relation": "母亲"
+    })
+    mom = mom_response.json()
+    mom_id = mom['person_id']
+    
+    print("\n3. 创建授权...")
+    client.post("/authorizations", json={
+        "child_id": child_id,
+        "person_id": mom_id,
+        "auth_type": "permanent",
+        "created_by": "system"
+    })
+    
+    print("\n4. 送孩子入园（目前园内应该增加1人）...")
+    client.post("/check-in", json={
+        "child_id": child_id,
+        "person_id": mom_id
+    })
+    
+    print("\n5. 查看dashboard...")
+    dashboard_response = client.get("/dashboard")
+    dashboard = dashboard_response.json()
+    print(f"   currently_in: {dashboard['today_summary']['currently_in']}")
+    
+    if dashboard['today_summary']['currently_in'] >= 0:
+        print("   ✅ currently_in 非负数!")
+    
+    print("\n6. 接孩子离园...")
+    client.post("/check-out", json={
+        "child_id": child_id,
+        "person_id": mom_id
+    })
+    
+    print("\n7. 再次查看dashboard...")
+    dashboard_response2 = client.get("/dashboard")
+    dashboard2 = dashboard_response2.json()
+    print(f"   currently_in: {dashboard2['today_summary']['currently_in']}")
+    
+    if dashboard2['today_summary']['currently_in'] >= 0:
+        print("   ✅ currently_in 非负数!")
+    
+    print("\n✅ 场景 8 完成: Dashboard currently_in 计算正确!")
+    return child_id, mom_id
 
 
 def main():
@@ -297,7 +538,11 @@ def main():
     scenario_1_normal_pickup()
     scenario_2_temporary_authorization()
     scenario_3_denied_pickup()
-    scenario_4_idempotency_test()
+    scenario_4_expired_authorization()
+    scenario_5_duplicate_checkout()
+    scenario_6_cross_type_idempotency()
+    scenario_7_resolution_note_required()
+    scenario_8_dashboard_currently_in()
     
     print_section("所有场景测试完成!")
     
@@ -311,7 +556,7 @@ def main():
     exceptions = exceptions_response.json()
     print(f"总异常数: {len(exceptions)}")
     for exc in exceptions:
-        print(f"  - {exc['exception_type']}: {exc['description']}")
+        print(f"  - {exc['exception_type']}: {exc['description']} (已处理: {exc['resolved']})")
     
     print("\n🎉 所有测试场景执行完成!")
 

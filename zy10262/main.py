@@ -124,18 +124,18 @@ def get_db():
     return db
 
 
-def is_authorized(child_id: str, person_id: str, db: InMemoryDB) -> tuple[bool, Optional[str]]:
+def is_authorized(child_id: str, person_id: str, db: InMemoryDB) -> tuple[bool, Optional[str], Optional[ExceptionType]]:
     now = datetime.now()
     for auth in db.authorizations.values():
         if auth.child_id == child_id and auth.person_id == person_id and auth.is_active:
             if auth.auth_type == AuthorizationType.PERMANENT:
-                return True, None
+                return True, None, None
             if auth.start_date and auth.end_date:
                 if auth.start_date <= now <= auth.end_date:
-                    return True, None
+                    return True, None, None
                 else:
-                    return False, "授权已过期"
-    return False, "未找到有效授权"
+                    return False, "授权已过期", ExceptionType.EXPIRED_AUTHORIZATION
+    return False, "未找到有效授权", ExceptionType.UNAUTHORIZED_PICKUP
 
 
 def calculate_late_fee(check_out_time: datetime, standard_end_time: datetime = None) -> tuple[int, float]:
@@ -253,7 +253,7 @@ def list_authorized_persons(db: InMemoryDB = Depends(get_db)):
 @app.post("/authorizations", response_model=Authorization)
 def create_authorization(auth: AuthorizationCreate, db: InMemoryDB = Depends(get_db)):
     if auth.idempotency_key:
-        existing = db.check_idempotency(auth.idempotency_key)
+        existing = db.check_idempotency(f"auth:{auth.idempotency_key}")
         if existing:
             return db.authorizations[existing]
     
@@ -283,7 +283,7 @@ def create_authorization(auth: AuthorizationCreate, db: InMemoryDB = Depends(get
     db.authorizations[auth_id] = db_auth
     
     if auth.idempotency_key:
-        db.store_idempotency(auth.idempotency_key, auth_id)
+        db.store_idempotency(f"auth:{auth.idempotency_key}", auth_id)
     
     return db_auth
 
@@ -306,18 +306,18 @@ def get_authorization(auth_id: str, db: InMemoryDB = Depends(get_db)):
 @app.post("/check-in", response_model=PickupRecord)
 def check_in(request: CheckInRequest, db: InMemoryDB = Depends(get_db)):
     if request.idempotency_key:
-        existing = db.check_idempotency(request.idempotency_key)
+        existing = db.check_idempotency(f"checkin:{request.idempotency_key}")
         if existing:
             return db.pickup_records[existing]
     
-    is_auth, auth_msg = is_authorized(request.child_id, request.person_id, db)
+    is_auth, auth_msg, exc_type = is_authorized(request.child_id, request.person_id, db)
     if not is_auth:
         exception_id = f"exc_{uuid.uuid4().hex[:8]}"
         db.exceptions[exception_id] = ExceptionRecord(
             exception_id=exception_id,
             child_id=request.child_id,
             person_id=request.person_id,
-            exception_type=ExceptionType.UNAUTHORIZED_PICKUP,
+            exception_type=exc_type,
             description=f"入园被拒绝: {auth_msg}",
             reported_at=datetime.now()
         )
@@ -344,7 +344,7 @@ def check_in(request: CheckInRequest, db: InMemoryDB = Depends(get_db)):
     db.pickup_records[record_id] = db_record
     
     if request.idempotency_key:
-        db.store_idempotency(request.idempotency_key, record_id)
+        db.store_idempotency(f"checkin:{request.idempotency_key}", record_id)
     
     return db_record
 
@@ -352,18 +352,18 @@ def check_in(request: CheckInRequest, db: InMemoryDB = Depends(get_db)):
 @app.post("/check-out", response_model=PickupRecord)
 def check_out(request: CheckOutRequest, db: InMemoryDB = Depends(get_db)):
     if request.idempotency_key:
-        existing = db.check_idempotency(request.idempotency_key)
+        existing = db.check_idempotency(f"checkout:{request.idempotency_key}")
         if existing:
             return db.pickup_records[existing]
     
-    is_auth, auth_msg = is_authorized(request.child_id, request.person_id, db)
+    is_auth, auth_msg, exc_type = is_authorized(request.child_id, request.person_id, db)
     if not is_auth:
         exception_id = f"exc_{uuid.uuid4().hex[:8]}"
         db.exceptions[exception_id] = ExceptionRecord(
             exception_id=exception_id,
             child_id=request.child_id,
             person_id=request.person_id,
-            exception_type=ExceptionType.UNAUTHORIZED_PICKUP,
+            exception_type=exc_type,
             description=f"离园被拒绝: {auth_msg}",
             reported_at=datetime.now()
         )
@@ -377,6 +377,15 @@ def check_out(request: CheckOutRequest, db: InMemoryDB = Depends(get_db)):
             break
     
     if not active_record:
+        exception_id = f"exc_{uuid.uuid4().hex[:8]}"
+        db.exceptions[exception_id] = ExceptionRecord(
+            exception_id=exception_id,
+            child_id=request.child_id,
+            person_id=request.person_id,
+            exception_type=ExceptionType.DUPLICATE_CHECKOUT,
+            description="重复签退: 该儿童今日未入园或已离园",
+            reported_at=datetime.now()
+        )
         raise HTTPException(status_code=400, detail="该儿童今日未入园或已离园")
     
     check_out_time = request.check_out_time or datetime.now()
@@ -410,7 +419,7 @@ def check_out(request: CheckOutRequest, db: InMemoryDB = Depends(get_db)):
             )
     
     if request.idempotency_key:
-        db.store_idempotency(request.idempotency_key, active_record.record_id)
+        db.store_idempotency(f"checkout:{request.idempotency_key}", active_record.record_id)
     
     return active_record
 
@@ -449,7 +458,7 @@ def list_late_fees(child_id: Optional[str] = None, db: InMemoryDB = Depends(get_
 @app.post("/exceptions", response_model=ExceptionRecord)
 def report_exception(request: ExceptionReportRequest, db: InMemoryDB = Depends(get_db)):
     if request.idempotency_key:
-        existing = db.check_idempotency(request.idempotency_key)
+        existing = db.check_idempotency(f"exc:{request.idempotency_key}")
         if existing:
             return db.exceptions[existing]
     
@@ -467,7 +476,7 @@ def report_exception(request: ExceptionReportRequest, db: InMemoryDB = Depends(g
     db.exceptions[exception_id] = db_exception
     
     if request.idempotency_key:
-        db.store_idempotency(request.idempotency_key, exception_id)
+        db.store_idempotency(f"exc:{request.idempotency_key}", exception_id)
     
     return db_exception
 
@@ -488,6 +497,9 @@ def resolve_exception(exception_id: str, resolution_note: str, db: InMemoryDB = 
     if exception_id not in db.exceptions:
         raise HTTPException(status_code=404, detail="异常记录不存在")
     
+    if not resolution_note or not resolution_note.strip():
+        raise HTTPException(status_code=400, detail="处理说明不能为空")
+    
     exception = db.exceptions[exception_id]
     exception.resolved = True
     exception.resolved_at = datetime.now()
@@ -501,10 +513,17 @@ def get_dashboard(db: InMemoryDB = Depends(get_db)):
     today = date.today()
     now = datetime.now()
     
-    checked_in_today = sum(1 for r in db.pickup_records.values() 
-                          if r.date == today and r.status == PickupStatus.CHECKED_IN)
-    checked_out_today = sum(1 for r in db.pickup_records.values() 
-                           if r.date == today and r.status == PickupStatus.CHECKED_OUT)
+    checked_in_today = 0
+    checked_out_today = 0
+    currently_in = 0
+    
+    for record in db.pickup_records.values():
+        if record.date == today:
+            if record.status == PickupStatus.CHECKED_IN:
+                checked_in_today += 1
+                currently_in += 1
+            elif record.status == PickupStatus.CHECKED_OUT:
+                checked_out_today += 1
     
     active_authorizations = sum(1 for a in db.authorizations.values() if a.is_active)
     expired_authorizations = sum(1 for a in db.authorizations.values() 
@@ -520,7 +539,7 @@ def get_dashboard(db: InMemoryDB = Depends(get_db)):
             "date": today,
             "checked_in_count": checked_in_today,
             "checked_out_count": checked_out_today,
-            "currently_in": checked_in_today - checked_out_today
+            "currently_in": max(0, currently_in)
         },
         "authorization_summary": {
             "active_count": active_authorizations,
