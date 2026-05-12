@@ -1,0 +1,23 @@
+{
+  "id": "cb447bff-a1cd-488c-b078-545d01e78850",
+  "created_at": "2026-05-12T15:46:16.609437",
+  "updated_at": "2026-05-12T15:46:16.609455",
+  "dish_id": "10514e73-bd5f-4cc8-b050-7323ffb14b93",
+  "dish_name": "茶叶蛋",
+  "batch_id": "71ef24f3-b1bc-44cb-b8e7-caa105f361eb",
+  "batch_number": "BATCH-早03-20260512",
+  "sample_weight": 250.0,
+  "sample_box_code": "BOX-003",
+  "fridge_location_id": "d81fa1f3-5660-4ef0-9fe6-c95f5212b256",
+  "fridge_full_location": "留样冰箱A/冷藏区A/上层/右",
+  "sampling_time": "2026-05-12T07:46:16.601023",
+  "sampler": "李师傅",
+  "retention_period_hours": 48,
+  "scheduled_destruction_time": "2026-05-14T07:46:16.601023",
+  "is_destroyed": false,
+  "destruction_time": null,
+  "destroyer": null,
+  "destruction_reason": "正常到期销毁",
+  "status": "active",
+  "notes": null
+}
