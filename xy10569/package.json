@@ -1,0 +1,24 @@
+{
+  "name": "campus-library-api",
+  "version": "1.0.0",
+  "description": "校园借书逾期 API - 班级集体借书、逾期罚款、丢书赔偿、批量归还管理系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node tests/run-all.js",
+    "seed": "node scripts/seed.js",
+    "demo": "node scripts/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.0.0",
+    "dayjs": "^1.11.10",
+    "cors": "^2.8.5",
+    "express-validator": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
