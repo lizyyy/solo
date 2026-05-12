@@ -1,0 +1,445 @@
+{
+  "bom": {
+    "SMART-TV-001": {
+      "product_code": "SMART-TV-001",
+      "product_name": "智能电视55寸",
+      "components": {
+        "RES-001": {
+          "component_code": "RES-001",
+          "component_name": "10K电阻",
+          "quantity": 50.0,
+          "unit": "PCS"
+        },
+        "CAP-001": {
+          "component_code": "CAP-001",
+          "component_name": "100uF电容",
+          "quantity": 20.0,
+          "unit": "PCS"
+        },
+        "BOX-001": {
+          "component_code": "BOX-001",
+          "component_name": "包装箱",
+          "quantity": 1.0,
+          "unit": "PCS"
+        },
+        "FRAME-001": {
+          "component_code": "FRAME-001",
+          "component_name": "塑料边框",
+          "quantity": 4.0,
+          "unit": "PCS"
+        }
+      }
+    },
+    "ROUTER-001": {
+      "product_code": "ROUTER-001",
+      "product_name": "无线路由器",
+      "components": {
+        "RES-001": {
+          "component_code": "RES-001",
+          "component_name": "10K电阻",
+          "quantity": 30.0,
+          "unit": "PCS"
+        },
+        "PCB-001": {
+          "component_code": "PCB-001",
+          "component_name": "主电路板",
+          "quantity": 1.0,
+          "unit": "PCS"
+        }
+      }
+    }
+  },
+  "inventory": {
+    "RES-001": {
+      "material_code": "RES-001",
+      "material_name": "10K电阻",
+      "quantity": 1000.0,
+      "unit": "PCS",
+      "unit_cost": 0.05,
+      "location": "A-01-01",
+      "batch_no": ""
+    },
+    "RES-002": {
+      "material_code": "RES-002",
+      "material_name": "10K电阻(替代)",
+      "quantity": 500.0,
+      "unit": "PCS",
+      "unit_cost": 0.055,
+      "location": "A-01-02",
+      "batch_no": ""
+    },
+    "RES-003": {
+      "material_code": "RES-003",
+      "material_name": "10K电阻(高端)",
+      "quantity": 200.0,
+      "unit": "PCS",
+      "unit_cost": 0.12,
+      "location": "A-01-03",
+      "batch_no": ""
+    },
+    "CAP-001": {
+      "material_code": "CAP-001",
+      "material_name": "100uF电容",
+      "quantity": 0.0,
+      "unit": "PCS",
+      "unit_cost": 0.15,
+      "location": "A-02-01",
+      "batch_no": ""
+    },
+    "CAP-002": {
+      "material_code": "CAP-002",
+      "material_name": "100uF电容(替代)",
+      "quantity": 300.0,
+      "unit": "PCS",
+      "unit_cost": 0.16,
+      "location": "A-02-02",
+      "batch_no": ""
+    },
+    "CAP-003": {
+      "material_code": "CAP-003",
+      "material_name": "100uF电容(进口)",
+      "quantity": 100.0,
+      "unit": "PCS",
+      "unit_cost": 0.5,
+      "location": "A-02-03",
+      "batch_no": ""
+    },
+    "BOX-001": {
+      "material_code": "BOX-001",
+      "material_name": "标准包装箱",
+      "quantity": 0.0,
+      "unit": "PCS",
+      "unit_cost": 5.0,
+      "location": "B-01-01",
+      "batch_no": ""
+    },
+    "BOX-002": {
+      "material_code": "BOX-002",
+      "material_name": "简易包装箱",
+      "quantity": 200.0,
+      "unit": "PCS",
+      "unit_cost": 3.5,
+      "location": "B-01-02",
+      "batch_no": ""
+    },
+    "FRAME-001": {
+      "material_code": "FRAME-001",
+      "material_name": "ABS塑料边框",
+      "quantity": 50.0,
+      "unit": "PCS",
+      "unit_cost": 8.0,
+      "location": "C-01-01",
+      "batch_no": ""
+    },
+    "FRAME-002": {
+      "material_code": "FRAME-002",
+      "material_name": "PC塑料边框",
+      "quantity": 100.0,
+      "unit": "PCS",
+      "unit_cost": 8.5,
+      "location": "C-01-02",
+      "batch_no": ""
+    },
+    "PCB-001": {
+      "material_code": "PCB-001",
+      "material_name": "主电路板",
+      "quantity": 20.0,
+      "unit": "PCS",
+      "unit_cost": 25.0,
+      "location": "D-01-01",
+      "batch_no": ""
+    }
+  },
+  "substitute_relations": {
+    "RES-001": [
+      {
+        "original_material": "RES-001",
+        "substitute_material": "RES-002",
+        "substitute_name": "10K电阻(替代)",
+        "priority": 1,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      },
+      {
+        "original_material": "RES-001",
+        "substitute_material": "RES-003",
+        "substitute_name": "10K电阻(高端)",
+        "priority": 2,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      }
+    ],
+    "CAP-001": [
+      {
+        "original_material": "CAP-001",
+        "substitute_material": "CAP-002",
+        "substitute_name": "100uF电容(替代)",
+        "priority": 1,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      },
+      {
+        "original_material": "CAP-001",
+        "substitute_material": "CAP-003",
+        "substitute_name": "100uF电容(进口)",
+        "priority": 2,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      }
+    ],
+    "BOX-001": [
+      {
+        "original_material": "BOX-001",
+        "substitute_material": "BOX-002",
+        "substitute_name": "简易包装箱",
+        "priority": 1,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      }
+    ],
+    "FRAME-001": [
+      {
+        "original_material": "FRAME-001",
+        "substitute_material": "FRAME-002",
+        "substitute_name": "PC塑料边框",
+        "priority": 1,
+        "effectivity_date": null,
+        "expiry_date": null,
+        "created_at": "2026-05-12 13:00:19",
+        "active": true
+      }
+    ]
+  },
+  "customer_restrictions": {
+    "CUST-001_CAP-001": {
+      "customer_code": "CUST-001",
+      "customer_name": "苹果公司",
+      "material_code": "CAP-001",
+      "restriction_type": "FORBID_SUBSTITUTE",
+      "reason": "指定必须使用原厂电容",
+      "created_at": "2026-05-12 13:00:19"
+    },
+    "CUST-002_*": {
+      "customer_code": "CUST-002",
+      "customer_name": "华为技术",
+      "material_code": "*",
+      "restriction_type": "FORBID_SUBSTITUTE",
+      "reason": "所有物料禁止替代",
+      "created_at": "2026-05-12 13:00:19"
+    }
+  },
+  "applications": {
+    "APP-000001": {
+      "application_id": "APP-000001",
+      "product_code": "SMART-TV-001",
+      "component_code": "CAP-001",
+      "substitute_material": "CAP-002",
+      "customer_code": "CUST-001",
+      "quantity": 20.0,
+      "reason": "生产缺料",
+      "status": "CREATED",
+      "check_result": {
+        "product_code": "SMART-TV-001",
+        "component_code": "CAP-001",
+        "substitute_material": "CAP-002",
+        "customer_code": "CUST-001",
+        "checks": [
+          {
+            "name": "BOM检查",
+            "passed": true,
+            "message": "BOM验证通过"
+          },
+          {
+            "name": "替代关系检查",
+            "passed": true,
+            "message": "替代关系验证通过"
+          },
+          {
+            "name": "库存检查",
+            "passed": true,
+            "message": "库存充足：300.0 PCS"
+          },
+          {
+            "name": "客户限制检查",
+            "passed": false,
+            "message": "客户 CUST-001 禁止使用替代料：指定必须使用原厂电容"
+          },
+          {
+            "name": "成本检查",
+            "passed": true,
+            "message": "成本变化 ¥0.01 (6.7%) 在阈值内",
+            "original_cost": 0.15,
+            "substitute_cost": 0.16,
+            "cost_difference": 0.010000000000000009,
+            "cost_difference_percent": 6.666666666666673
+          }
+        ],
+        "can_substitute": false,
+        "needs_approval": false,
+        "approval_level": 0,
+        "original_cost": 0.15,
+        "substitute_cost": 0.16,
+        "cost_difference": 0.010000000000000009,
+        "cost_difference_percent": 6.666666666666673,
+        "reasons": [
+          "客户 CUST-001 禁止使用替代料：指定必须使用原厂电容"
+        ]
+      },
+      "created_at": "2026-05-12 13:00:21",
+      "created_by": "planner",
+      "approval_history": [],
+      "manual_corrections": []
+    },
+    "APP-000002": {
+      "application_id": "APP-000002",
+      "product_code": "SMART-TV-001",
+      "component_code": "CAP-001",
+      "substitute_material": "CAP-003",
+      "customer_code": null,
+      "quantity": 20.0,
+      "reason": "原厂电容缺货，使用进口替代",
+      "status": "PENDING_LEVEL1",
+      "check_result": {
+        "product_code": "SMART-TV-001",
+        "component_code": "CAP-001",
+        "substitute_material": "CAP-003",
+        "customer_code": null,
+        "checks": [
+          {
+            "name": "BOM检查",
+            "passed": true,
+            "message": "BOM验证通过"
+          },
+          {
+            "name": "替代关系检查",
+            "passed": true,
+            "message": "替代关系验证通过"
+          },
+          {
+            "name": "库存检查",
+            "passed": true,
+            "message": "库存充足：100.0 PCS"
+          },
+          {
+            "name": "客户限制检查",
+            "passed": true,
+            "message": "未指定客户，跳过客户限制检查"
+          },
+          {
+            "name": "成本检查",
+            "passed": false,
+            "message": "成本超阈值 30%，需要二级审批",
+            "approval_level": 2,
+            "original_cost": 0.15,
+            "substitute_cost": 0.5,
+            "cost_difference": 0.35,
+            "cost_difference_percent": 233.33333333333334
+          }
+        ],
+        "can_substitute": true,
+        "needs_approval": true,
+        "approval_level": 2,
+        "original_cost": 0.15,
+        "substitute_cost": 0.5,
+        "cost_difference": 0.35,
+        "cost_difference_percent": 233.33333333333334,
+        "reasons": [
+          "成本超阈值 30%，需要二级审批"
+        ]
+      },
+      "created_at": "2026-05-12 13:00:23",
+      "created_by": "planner",
+      "approval_history": [],
+      "manual_corrections": [],
+      "required_approval_level": 2
+    }
+  },
+  "approvals": {},
+  "next_id": 3,
+  "history": [
+    {
+      "id": "HIST-0001",
+      "action": "import_bom",
+      "details": {
+        "imported_count": 6,
+        "failed_count": 0,
+        "imported_items": [
+          "SMART-TV-001/RES-001",
+          "SMART-TV-001/CAP-001",
+          "SMART-TV-001/BOX-001",
+          "SMART-TV-001/FRAME-001",
+          "ROUTER-001/RES-001",
+          "ROUTER-001/PCB-001"
+        ]
+      },
+      "operator": "admin",
+      "timestamp": "2026-05-12 13:00:19"
+    },
+    {
+      "id": "HIST-0002",
+      "action": "import_inventory",
+      "details": {
+        "imported_count": 11,
+        "failed_count": 0
+      },
+      "operator": "admin",
+      "timestamp": "2026-05-12 13:00:19"
+    },
+    {
+      "id": "HIST-0003",
+      "action": "import_substitute_relations",
+      "details": {
+        "imported_count": 6,
+        "failed_count": 0
+      },
+      "operator": "admin",
+      "timestamp": "2026-05-12 13:00:19"
+    },
+    {
+      "id": "HIST-0004",
+      "action": "import_customer_restrictions",
+      "details": {
+        "imported_count": 2,
+        "failed_count": 0
+      },
+      "operator": "admin",
+      "timestamp": "2026-05-12 13:00:19"
+    },
+    {
+      "id": "HIST-0005",
+      "action": "create_application",
+      "details": {
+        "application_id": "APP-000001",
+        "status": "CREATED",
+        "can_substitute": false
+      },
+      "operator": "planner",
+      "timestamp": "2026-05-12 13:00:21"
+    },
+    {
+      "id": "HIST-0006",
+      "action": "create_application",
+      "details": {
+        "application_id": "APP-000002",
+        "status": "PENDING_LEVEL1",
+        "can_substitute": true
+      },
+      "operator": "planner",
+      "timestamp": "2026-05-12 13:00:23"
+    }
+  ],
+  "cost_threshold": 0.1,
+  "cost_level2_threshold": 0.3,
+  "initialized_at": "2026-05-12 13:00:18",
+  "last_modified_at": "2026-05-12 13:00:23"
+}
