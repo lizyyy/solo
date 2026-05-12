@@ -1,0 +1,58 @@
+[
+  {
+    "id": "hist_mp2ree3w_pmu1u4",
+    "assetId": "asset_mp2re9be_2vgqek",
+    "transactionType": "ACQUISITION",
+    "transactionId": "acq_mp2re9be_c5fsj8",
+    "fromStoreId": null,
+    "toStoreId": "store_001",
+    "amount": 8500,
+    "description": "购置资产：海尔立式冰柜，供应商：海尔",
+    "operator": "system",
+    "beforeState": "{\"status\":\"ACTIVE\",\"originalCost\":0,\"storeId\":\"store_001\"}",
+    "afterState": "{\"status\":\"ACTIVE\",\"originalCost\":8500,\"storeId\":\"store_001\"}",
+    "createdAt": "2026-05-12T15:02:01.964Z"
+  },
+  {
+    "id": "hist_mp2ree3x_63kxx2",
+    "assetId": "asset_mp2re9be_ty9gp3",
+    "transactionType": "ACQUISITION",
+    "transactionId": "acq_mp2re9be_tiqbae",
+    "fromStoreId": null,
+    "toStoreId": "store_001",
+    "amount": 6000,
+    "description": "购置资产：美的冰柜，供应商：美的",
+    "operator": "system",
+    "beforeState": "{\"status\":\"ACTIVE\",\"originalCost\":0,\"storeId\":\"store_001\"}",
+    "afterState": "{\"status\":\"ACTIVE\",\"originalCost\":6000,\"storeId\":\"store_001\"}",
+    "createdAt": "2026-05-12T15:02:01.965Z"
+  },
+  {
+    "id": "hist_mp2ree3x_jp9lro",
+    "assetId": "asset_mp2re9be_2vgqek",
+    "transactionType": "TRANSFER",
+    "transactionId": "trans_mp2re9be_q5wq2d",
+    "fromStoreId": "store_001",
+    "toStoreId": "store_999",
+    "amount": 0,
+    "description": "资产调拨：从 store_001 到 store_999，原因：报废后的调拨（这会失败）",
+    "operator": "system",
+    "beforeState": "{\"status\":\"ACTIVE\",\"storeId\":\"store_001\",\"accumulatedDepreciation\":0}",
+    "afterState": "{\"status\":\"ACTIVE\",\"storeId\":\"store_999\",\"accumulatedDepreciation\":0}",
+    "createdAt": "2026-05-12T15:02:01.965Z"
+  },
+  {
+    "id": "hist_mp2ree3x_y5zbd5",
+    "assetId": "asset_mp2re9be_2vgqek",
+    "transactionType": "SCRAP",
+    "transactionId": "scrap_mp2re9be_62xurl",
+    "fromStoreId": null,
+    "toStoreId": null,
+    "amount": 1000,
+    "description": "资产报废：测试报废，残值：1000",
+    "operator": "system",
+    "beforeState": "{\"status\":\"ACTIVE\",\"netBookValue\":8500}",
+    "afterState": "{\"status\":\"SCRAPPED\",\"netBookValue\":1000}",
+    "createdAt": "2026-05-12T15:02:01.965Z"
+  }
+]

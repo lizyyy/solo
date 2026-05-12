@@ -1,0 +1,40 @@
+[
+  {
+    "id": "asset_mp2re9be_2vgqek",
+    "code": "FRE-0001",
+    "name": "海尔立式冰柜",
+    "category": "FREEZER",
+    "description": "500升商用立式冰柜",
+    "currentStoreId": "store_999",
+    "status": "SCRAPPED",
+    "originalCost": 8500,
+    "accumulatedDepreciation": 0,
+    "netBookValue": 8500,
+    "usefulLifeMonths": 60,
+    "remainingLifeMonths": 60,
+    "residualValueRate": 0.05,
+    "acquisitionDate": "2024-01-15",
+    "lastDepreciationDate": null,
+    "createdAt": "2026-05-12T15:01:55.754Z",
+    "updatedAt": "2026-05-12T15:01:55.754Z"
+  },
+  {
+    "id": "asset_mp2re9be_ty9gp3",
+    "code": "FRE-0001",
+    "name": "美的冰柜",
+    "category": "FREEZER",
+    "description": "重复编号的冰柜",
+    "currentStoreId": "store_001",
+    "status": "ACTIVE",
+    "originalCost": 6000,
+    "accumulatedDepreciation": 0,
+    "netBookValue": 6000,
+    "usefulLifeMonths": 60,
+    "remainingLifeMonths": 60,
+    "residualValueRate": 0.05,
+    "acquisitionDate": "2024-02-10",
+    "lastDepreciationDate": null,
+    "createdAt": "2026-05-12T15:01:55.754Z",
+    "updatedAt": "2026-05-12T15:01:55.754Z"
+  }
+]

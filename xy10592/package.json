@@ -1,0 +1,32 @@
+{
+  "name": "store-depreciation-cli",
+  "version": "1.0.0",
+  "description": "连锁门店设备折旧 CLI - 管理资产购置、调拨、维修、报废和折旧计算",
+  "main": "dist/index.js",
+  "bin": {
+    "store-dep": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "keywords": [
+    "cli",
+    "depreciation",
+    "store",
+    "equipment",
+    "asset"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

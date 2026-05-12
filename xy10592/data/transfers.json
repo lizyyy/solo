@@ -1,0 +1,28 @@
+[
+  {
+    "id": "trans_mp2rd3oq_prsexo",
+    "assetId": "asset_mp2rd3op_3igwkp",
+    "fromStoreId": "store_001",
+    "toStoreId": "store_002",
+    "transferDate": "2024-03-01",
+    "reason": "望京店冰柜容量不足，从总部门店调拨",
+    "transferor": "张三",
+    "transferee": "李四",
+    "approvedBy": "王经理",
+    "createdBy": "admin",
+    "createdAt": "2026-05-12T15:01:01.802Z"
+  },
+  {
+    "id": "trans_mp2rd3oq_wi45pf",
+    "assetId": "asset_mp2rd3op_tiboxr",
+    "fromStoreId": "store_002",
+    "toStoreId": "store_003",
+    "transferDate": "2024-02-15",
+    "reason": "国贸店新增冰品业务，需要增加冰柜",
+    "transferor": "李四",
+    "transferee": "王五",
+    "approvedBy": "王经理",
+    "createdBy": "admin",
+    "createdAt": "2026-05-12T15:01:01.802Z"
+  }
+]

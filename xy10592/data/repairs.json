@@ -1,0 +1,28 @@
+[
+  {
+    "id": "rep_mp2rd3oq_uulcw7",
+    "assetId": "asset_mp2rd3op_sjo9mp",
+    "storeId": "store_001",
+    "repairDate": "2024-04-10",
+    "repairType": "CAPITALIZED",
+    "cost": 5000,
+    "description": "咖啡机核心部件损坏，更换压缩机和加热系统，延长使用寿命12个月",
+    "vendor": "星巴克授权维修中心",
+    "extendedLifeMonths": 12,
+    "createdBy": "maintenance",
+    "createdAt": "2026-05-12T15:01:01.802Z"
+  },
+  {
+    "id": "rep_mp2rd3oq_xmjr23",
+    "assetId": "asset_mp2rd3op_kmjhkg",
+    "storeId": "store_001",
+    "repairDate": "2024-03-20",
+    "repairType": "ROUTINE",
+    "cost": 800,
+    "description": "收银机触摸屏校准和清洁，费用化处理",
+    "vendor": "IBM售后",
+    "extendedLifeMonths": 0,
+    "createdBy": "maintenance",
+    "createdAt": "2026-05-12T15:01:01.802Z"
+  }
+]

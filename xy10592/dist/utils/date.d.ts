@@ -1,0 +1,13 @@
+export declare function getStartOfMonth(date: Date): Date;
+export declare function getEndOfMonth(date: Date): Date;
+export declare function getStartOfYear(date: Date): Date;
+export declare function getEndOfYear(date: Date): Date;
+export declare function formatDate(date: Date): string;
+export declare function formatDateTime(date: Date): string;
+export declare function parseDate(dateStr: string): Date;
+export declare function addMonths(date: Date, months: number): Date;
+export declare function diffInMonths(date1: Date, date2: Date): number;
+export declare function isSameMonth(date1: Date, date2: Date): boolean;
+export declare function isDateInRange(date: Date, start: Date, end: Date): boolean;
+export declare function getCurrentDate(): Date;
+export declare function getCurrentDateTime(): string;
