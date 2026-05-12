@@ -32,15 +32,27 @@
 npm install
 ```
 
+### 构建项目
+```bash
+npm run build
+```
+
 ### 初始化种子数据
 ```bash
 npm run seed
 ```
 
 ### 启动服务
+
+**开发模式** (ts-node 直接运行，不需要先构建)
 ```bash
-npm run dev      # 开发模式
-npm start        # 生产模式
+npm run dev
+```
+
+**生产模式** (运行编译后的 JS 产物，需要先执行 build)
+```bash
+npm run build
+npm start
 ```
 
 服务运行在: http://localhost:3000
@@ -51,26 +63,76 @@ npm start        # 生产模式
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | /api/contracts/:id | 查询合同详情 |
-| GET | /api/contracts/no/:contractNo | 按合同编号查询 |
-| GET | /api/contracts/:id/installments | 查询合同分期记录 |
-| GET | /api/contracts/:id/attendances | 查询消课记录 |
-| GET | /api/contracts/:id/schedules | 查询排课记录 |
+| **POST** | /api/contracts | 创建合同 |
+| **GET** | /api/contracts/:id | 查询合同详情 |
+| **GET** | /api/contracts/no/:contractNo | 按合同编号查询 |
+| **PUT** | /api/contracts/:id | 更新合同信息 |
+
+### 排课接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| **POST** | /api/contracts/:id/schedules | 创建排课 |
+| **GET** | /api/contracts/:id/schedules | 查询排课记录 |
+| **PUT** | /api/contracts/schedules/:scheduleId/status | 更新排课状态 |
+
+### 消课接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| **POST** | /api/contracts/:id/attendances | 签到消课 |
+| **GET** | /api/contracts/:id/attendances | 查询消课记录 |
+
+### 分期接口
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| **POST** | /api/contracts/:id/installments | 创建分期计划 |
+| **GET** | /api/contracts/:id/installments | 查询分期记录 |
+| **POST** | /api/contracts/installments/:installmentId/pay | 分期支付 |
 
 ### 退费接口
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | /api/refunds/calculate/:contractId | 退费试算 |
-| POST | /api/refunds | 提交退费申请 |
-| POST | /api/refunds/:id/approve | 审批退费 |
-| POST | /api/refunds/:id/cancel | 撤销退费 |
-| GET | /api/refunds/:id | 查询退费详情（含扣款项和审批历史）|
-| GET | /api/refunds/contract/:contractId | 查询合同的所有退费申请 |
+| **GET** | /api/refunds/calculate/:contractId | 退费试算 |
+| **POST** | /api/refunds | 提交退费申请 |
+| **POST** | /api/refunds/:id/approve | 审批退费 |
+| **POST** | /api/refunds/:id/cancel | 撤销退费 |
+| **GET** | /api/refunds/:id | 查询退费详情（含扣款项和审批历史）|
+| **GET** | /api/refunds/contract/:contractId | 查询合同的所有退费申请 |
 
 ### 健康检查
 ```
 GET /health
+```
+
+## 业务闭环流程示例
+
+```
+1. 创建合同
+   POST /api/contracts
+   
+2. 创建分期计划
+   POST /api/contracts/:id/installments
+   
+3. 支付分期
+   POST /api/contracts/installments/:installmentId/pay
+   
+4. 创建排课
+   POST /api/contracts/:id/schedules
+   
+5. 签到消课
+   POST /api/contracts/:id/attendances
+   
+6. 退费试算
+   GET /api/refunds/calculate/:contractId
+   
+7. 提交退费申请
+   POST /api/refunds
+   
+8. 审批退费
+   POST /api/refunds/:id/approve
 ```
 
 ## 退费试算示例
