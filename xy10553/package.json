@@ -1,0 +1,16 @@
+{
+  "name": "visitor-companion-api",
+  "version": "1.0.0",
+  "description": "机房访客陪同 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node scripts/seed.js",
+    "demo": "bash scripts/demo.sh"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  }
+}

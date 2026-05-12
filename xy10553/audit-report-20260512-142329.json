@@ -1,0 +1,240 @@
+{
+  "reportId": "b1ae7d40-ea4d-4fe1-942f-6a5f13881166",
+  "generatedAt": 1778570609241,
+  "period": {
+    "start": null,
+    "end": 1778570609241
+  },
+  "summary": {
+    "totalApplications": 8,
+    "byStatus": {
+      "CHECKED_OUT": 3,
+      "APPROVED": 1,
+      "APPROVAL_REJECTED": 1,
+      "TIMEOUT": 1,
+      "APPLIED": 1,
+      "DEVICE_LEFT_BEHIND": 1
+    },
+    "byExceptionType": {
+      "DEVICE_NOT_CHECKED_OUT": 2,
+      "VISIT_TIMEOUT": 1
+    },
+    "activeVisitors": 0,
+    "devicesLeftBehind": 2,
+    "timeoutCount": 1,
+    "approvalRate": 86
+  },
+  "companionRecords": [
+    {
+      "visitorId": "4de7a598-9280-48cc-8b9e-d33856abae17",
+      "visitorName": "失败演示访客",
+      "companionId": "COMP002",
+      "companionName": "李主管",
+      "entryTime": 1778570608955,
+      "exitTime": null,
+      "status": "CHECKED_OUT"
+    },
+    {
+      "visitorId": "4bf8d962-2e8b-43ee-a393-845b182c2d64",
+      "visitorName": "演示访客",
+      "companionId": "COMP001",
+      "companionName": "张工程师",
+      "entryTime": 1778570608402,
+      "exitTime": 1778570608598,
+      "status": "CHECKED_OUT"
+    },
+    {
+      "visitorId": "4b341049-f05a-4112-8cbd-d68a7e4d8d89",
+      "visitorName": "郑访客",
+      "companionId": "COMP002",
+      "companionName": "李主管",
+      "entryTime": 1778570542255,
+      "exitTime": null,
+      "status": "TIMEOUT"
+    },
+    {
+      "visitorId": "9997cfb1-68c9-4947-b6e5-29ca07502829",
+      "visitorName": "吴访客",
+      "companionId": "COMP001",
+      "companionName": "张工程师",
+      "entryTime": 1778570542254,
+      "exitTime": null,
+      "status": "DEVICE_LEFT_BEHIND"
+    },
+    {
+      "visitorId": "627cb253-bc05-47bf-83b0-9e026aec71a7",
+      "visitorName": "刘访客",
+      "companionId": "COMP001",
+      "companionName": "张工程师",
+      "entryTime": 1778570542253,
+      "exitTime": 1778570542355,
+      "status": "CHECKED_OUT"
+    }
+  ],
+  "deviceInventory": [
+    {
+      "visitorId": "4de7a598-9280-48cc-8b9e-d33856abae17",
+      "visitorName": "失败演示访客",
+      "deviceId": "1d7a4891-ae97-4580-a7af-dbfe84f3b324",
+      "type": "笔记本电脑",
+      "serialNumber": "SN-LAP-999",
+      "checkedIn": true,
+      "checkedOut": false,
+      "leftBehind": true
+    },
+    {
+      "visitorId": "4de7a598-9280-48cc-8b9e-d33856abae17",
+      "visitorName": "失败演示访客",
+      "deviceId": "52fecbd3-f18d-4a2f-87e4-71dafca6bc51",
+      "type": "U盘",
+      "serialNumber": "SN-USB-999",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "4bf8d962-2e8b-43ee-a393-845b182c2d64",
+      "visitorName": "演示访客",
+      "deviceId": "8502f182-d8dc-4d6f-a4ef-4e240fc64491",
+      "type": "笔记本电脑",
+      "serialNumber": "DEMO-LAP-001",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "4bf8d962-2e8b-43ee-a393-845b182c2d64",
+      "visitorName": "演示访客",
+      "deviceId": "d7c0ee66-1efa-466e-ba60-0168ff4f43f1",
+      "type": "移动硬盘",
+      "serialNumber": "DEMO-HDD-001",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "c7b8e87b-0012-4e19-833e-6b9c59538060",
+      "visitorName": "演示访客",
+      "deviceId": "e61021e8-5874-46b0-a94e-225b8c2dbbea",
+      "type": "笔记本电脑",
+      "serialNumber": "DEMO-LAP-001",
+      "checkedIn": false,
+      "checkedOut": false,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "c7b8e87b-0012-4e19-833e-6b9c59538060",
+      "visitorName": "演示访客",
+      "deviceId": "f338e963-12e3-496a-999a-b9d00fe4b9b4",
+      "type": "移动硬盘",
+      "serialNumber": "DEMO-HDD-001",
+      "checkedIn": false,
+      "checkedOut": false,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "4b341049-f05a-4112-8cbd-d68a7e4d8d89",
+      "visitorName": "郑访客",
+      "deviceId": "cf64dfff-ca73-432e-8d2a-fd386e640f3a",
+      "type": "审计笔记本",
+      "serialNumber": "SN-AUDIT-001",
+      "checkedIn": true,
+      "checkedOut": false,
+      "leftBehind": true
+    },
+    {
+      "visitorId": "bb5607fe-5268-4dc1-85da-36a9988f5613",
+      "visitorName": "周访客",
+      "deviceId": "4fa6a071-899c-447c-bf1d-9a02f71533e7",
+      "type": "服务器诊断工具",
+      "serialNumber": "SN-TOOL-001",
+      "checkedIn": false,
+      "checkedOut": false,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "9997cfb1-68c9-4947-b6e5-29ca07502829",
+      "visitorName": "吴访客",
+      "deviceId": "8496b807-d293-44c9-8e28-f40441b71e43",
+      "type": "便携服务器",
+      "serialNumber": "SN-SERVER-001",
+      "checkedIn": true,
+      "checkedOut": false,
+      "leftBehind": true
+    },
+    {
+      "visitorId": "9997cfb1-68c9-4947-b6e5-29ca07502829",
+      "visitorName": "吴访客",
+      "deviceId": "f69dff7d-8863-4946-bd8c-b2680b661f9e",
+      "type": "移动硬盘",
+      "serialNumber": "SN-HDD-001",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "627cb253-bc05-47bf-83b0-9e026aec71a7",
+      "visitorName": "刘访客",
+      "deviceId": "a3382c2b-e466-46e1-b43d-6eb7b2aca222",
+      "type": "笔记本电脑",
+      "serialNumber": "SN-LAPTOP-001",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    },
+    {
+      "visitorId": "627cb253-bc05-47bf-83b0-9e026aec71a7",
+      "visitorName": "刘访客",
+      "deviceId": "a8ed9bfc-83d1-4b43-83ef-6d3b0274df3a",
+      "type": "U盘",
+      "serialNumber": "SN-USB-001",
+      "checkedIn": true,
+      "checkedOut": true,
+      "leftBehind": false
+    }
+  ],
+  "exceptions": [
+    {
+      "visitorId": "4de7a598-9280-48cc-8b9e-d33856abae17",
+      "visitorName": "失败演示访客",
+      "status": "CHECKED_OUT",
+      "exceptions": [
+        {
+          "id": "d57ca846-8300-4ea1-b02f-6506a58c2591",
+          "type": "DEVICE_NOT_CHECKED_OUT",
+          "message": "设备未带出: SN-LAP-999",
+          "reportedAt": 1778570608976,
+          "reportedBy": "GUARD-TEST"
+        }
+      ]
+    },
+    {
+      "visitorId": "4b341049-f05a-4112-8cbd-d68a7e4d8d89",
+      "visitorName": "郑访客",
+      "status": "TIMEOUT",
+      "exceptions": [
+        {
+          "id": "fbd55ca2-1137-4588-af0d-54537676ca65",
+          "type": "VISIT_TIMEOUT",
+          "message": "访客超时未离场，预约离场时间: 2026-05-11T23:22:22.255Z",
+          "reportedAt": 1778570542255,
+          "reportedBy": "SYSTEM"
+        }
+      ]
+    },
+    {
+      "visitorId": "9997cfb1-68c9-4947-b6e5-29ca07502829",
+      "visitorName": "吴访客",
+      "status": "DEVICE_LEFT_BEHIND",
+      "exceptions": [
+        {
+          "id": "bb98b912-c20a-4761-a03e-12e173a2f1e6",
+          "type": "DEVICE_NOT_CHECKED_OUT",
+          "message": "设备未带出: SN-SERVER-001",
+          "reportedAt": 1778570542254,
+          "reportedBy": "GUARD002"
+        }
+      ]
+    }
+  ]
+}
