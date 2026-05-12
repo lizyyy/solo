@@ -1,0 +1,76 @@
+[
+  {
+    "id": "issue_001",
+    "inspectionId": "inspect_001",
+    "storeId": "store_001",
+    "category": "陈列",
+    "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+    "severity": "普通",
+    "status": "已闭环",
+    "dueDate": "2026-05-13T00:00:00.000Z",
+    "photoUrls": [
+      "https://example.com/photos/inspect_001_display_1.jpg",
+      "https://example.com/photos/inspect_001_display_2.jpg"
+    ],
+    "remark": "需要重新理货",
+    "createdAt": "2026-05-12T03:39:32.256Z",
+    "importedBy": "系统管理员",
+    "updatedAt": "2026-05-12T03:39:37.350Z",
+    "latestCorrectionId": "corr_mp230q0k_94w0l",
+    "latestReinspectionId": "reinspect_mp230t1b_a3pd3"
+  },
+  {
+    "id": "issue_002",
+    "inspectionId": "inspect_001",
+    "storeId": "store_001",
+    "category": "卫生",
+    "description": "冷柜底部有积冰和积水，影响制冷效果",
+    "severity": "严重",
+    "status": "已闭环",
+    "dueDate": "2026-05-12T00:00:00.000Z",
+    "photoUrls": [
+      "https://example.com/photos/inspect_001_clean_1.jpg"
+    ],
+    "remark": "需立即清理",
+    "createdAt": "2026-05-12T03:39:32.259Z",
+    "importedBy": "系统管理员",
+    "updatedAt": "2026-05-12T03:39:37.422Z",
+    "latestCorrectionId": "corr_mp230q41_ud5ex",
+    "latestReinspectionId": "reinspect_mp230t32_fqcqw"
+  },
+  {
+    "id": "issue_003",
+    "inspectionId": "inspect_002",
+    "storeId": "store_002",
+    "category": "价格牌",
+    "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+    "severity": "普通",
+    "status": "复查不通过",
+    "dueDate": "2026-05-14T00:00:00.000Z",
+    "photoUrls": [
+      "https://example.com/photos/inspect_002_price_1.jpg"
+    ],
+    "remark": "需更新价格标签",
+    "createdAt": "2026-05-12T03:39:32.261Z",
+    "importedBy": "系统管理员",
+    "updatedAt": "2026-05-12T03:39:37.473Z",
+    "latestCorrectionId": "corr_mp230sk2_9mxjt",
+    "latestReinspectionId": "reinspect_mp230t4r_aaupr"
+  },
+  {
+    "id": "issue_004",
+    "inspectionId": "inspect_002",
+    "storeId": "store_002",
+    "category": "安全隐患",
+    "description": "消防通道被杂物堵塞，影响紧急疏散",
+    "severity": "严重",
+    "status": "待整改",
+    "dueDate": "2026-05-12T00:00:00.000Z",
+    "photoUrls": [
+      "https://example.com/photos/inspect_002_safety_1.jpg"
+    ],
+    "remark": "必须立即整改",
+    "createdAt": "2026-05-12T03:39:32.265Z",
+    "importedBy": "系统管理员"
+  }
+]

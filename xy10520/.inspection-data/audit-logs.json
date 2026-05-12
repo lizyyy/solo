@@ -1,0 +1,567 @@
+[
+  {
+    "action": "IMPORT_STORE",
+    "operator": "系统管理员",
+    "targetId": "store_001",
+    "before": null,
+    "after": {
+      "id": "store_001",
+      "code": "SH001",
+      "name": "上海南京路店",
+      "manager": "李明",
+      "phone": "13800138001",
+      "address": "上海市黄浦区南京东路100号",
+      "region": "华东区",
+      "createdAt": "2026-05-12T03:39:31.233Z"
+    },
+    "details": "导入门店: 上海南京路店 (SH001)",
+    "timestamp": "2026-05-12T03:39:31.235Z"
+  },
+  {
+    "action": "IMPORT_STORE",
+    "operator": "系统管理员",
+    "targetId": "store_002",
+    "before": null,
+    "after": {
+      "id": "store_002",
+      "code": "BJ001",
+      "name": "北京王府井店",
+      "manager": "王芳",
+      "phone": "13800138002",
+      "address": "北京市东城区王府井大街50号",
+      "region": "华北区",
+      "createdAt": "2026-05-12T03:39:31.236Z"
+    },
+    "details": "导入门店: 北京王府井店 (BJ001)",
+    "timestamp": "2026-05-12T03:39:31.236Z"
+  },
+  {
+    "action": "IMPORT_STORE",
+    "operator": "系统管理员",
+    "targetId": "store_003",
+    "before": null,
+    "after": {
+      "id": "store_003",
+      "code": "GZ001",
+      "name": "广州天河城店",
+      "manager": "张伟",
+      "phone": "13800138003",
+      "address": "广州市天河区天河路208号",
+      "region": "华南区",
+      "createdAt": "2026-05-12T03:39:31.237Z"
+    },
+    "details": "导入门店: 广州天河城店 (GZ001)",
+    "timestamp": "2026-05-12T03:39:31.237Z"
+  },
+  {
+    "action": "IMPORT_INSPECTION",
+    "operator": "系统管理员",
+    "targetId": "inspect_001",
+    "before": null,
+    "after": {
+      "id": "inspect_001",
+      "storeId": "store_001",
+      "inspectionDate": "2026-05-10",
+      "inspector": "张督导",
+      "remark": "常规巡店",
+      "createdAt": "2026-05-12T03:39:31.737Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入巡店记录: 门店 store_001, 日期 2026-05-10",
+    "timestamp": "2026-05-12T03:39:31.739Z"
+  },
+  {
+    "action": "IMPORT_INSPECTION",
+    "operator": "系统管理员",
+    "targetId": "inspect_002",
+    "before": null,
+    "after": {
+      "id": "inspect_002",
+      "storeId": "store_002",
+      "inspectionDate": "2026-05-11",
+      "inspector": "李督导",
+      "remark": "月度检查",
+      "createdAt": "2026-05-12T03:39:31.741Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入巡店记录: 门店 store_002, 日期 2026-05-11",
+    "timestamp": "2026-05-12T03:39:31.742Z"
+  },
+  {
+    "action": "IMPORT_ISSUE",
+    "operator": "系统管理员",
+    "targetId": "issue_001",
+    "before": null,
+    "after": {
+      "id": "issue_001",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "陈列",
+      "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+      "severity": "普通",
+      "status": "待整改",
+      "dueDate": "2026-05-13T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_display_1.jpg",
+        "https://example.com/photos/inspect_001_display_2.jpg"
+      ],
+      "remark": "需要重新理货",
+      "createdAt": "2026-05-12T03:39:32.256Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入问题: 陈列 - 货架第三层商品陈列不整齐，部分商品正面未朝向顾客, 截止日期 2026-05-13",
+    "timestamp": "2026-05-12T03:39:32.257Z"
+  },
+  {
+    "action": "IMPORT_ISSUE",
+    "operator": "系统管理员",
+    "targetId": "issue_002",
+    "before": null,
+    "after": {
+      "id": "issue_002",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "卫生",
+      "description": "冷柜底部有积冰和积水，影响制冷效果",
+      "severity": "严重",
+      "status": "待整改",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_clean_1.jpg"
+      ],
+      "remark": "需立即清理",
+      "createdAt": "2026-05-12T03:39:32.259Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入问题: 卫生 - 冷柜底部有积冰和积水，影响制冷效果, 截止日期 2026-05-12",
+    "timestamp": "2026-05-12T03:39:32.259Z"
+  },
+  {
+    "action": "IMPORT_ISSUE",
+    "operator": "系统管理员",
+    "targetId": "issue_003",
+    "before": null,
+    "after": {
+      "id": "issue_003",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "价格牌",
+      "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+      "severity": "普通",
+      "status": "待整改",
+      "dueDate": "2026-05-14T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_price_1.jpg"
+      ],
+      "remark": "需更新价格标签",
+      "createdAt": "2026-05-12T03:39:32.261Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入问题: 价格牌 - 牛奶促销区价格牌与实际售价不符，相差5元, 截止日期 2026-05-14",
+    "timestamp": "2026-05-12T03:39:32.262Z"
+  },
+  {
+    "action": "IMPORT_ISSUE",
+    "operator": "系统管理员",
+    "targetId": "issue_004",
+    "before": null,
+    "after": {
+      "id": "issue_004",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "安全隐患",
+      "description": "消防通道被杂物堵塞，影响紧急疏散",
+      "severity": "严重",
+      "status": "待整改",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_safety_1.jpg"
+      ],
+      "remark": "必须立即整改",
+      "createdAt": "2026-05-12T03:39:32.265Z",
+      "importedBy": "系统管理员"
+    },
+    "details": "导入问题: 安全隐患 - 消防通道被杂物堵塞，影响紧急疏散, 截止日期 2026-05-12",
+    "timestamp": "2026-05-12T03:39:32.266Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "李明",
+    "targetId": "issue_001",
+    "before": {
+      "id": "issue_001",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "陈列",
+      "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+      "severity": "普通",
+      "status": "待整改",
+      "dueDate": "2026-05-13T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_display_1.jpg",
+        "https://example.com/photos/inspect_001_display_2.jpg"
+      ],
+      "remark": "需要重新理货",
+      "createdAt": "2026-05-12T03:39:32.256Z",
+      "importedBy": "系统管理员"
+    },
+    "after": {
+      "id": "issue_001",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "陈列",
+      "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+      "severity": "普通",
+      "status": "已提交整改",
+      "dueDate": "2026-05-13T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_display_1.jpg",
+        "https://example.com/photos/inspect_001_display_2.jpg"
+      ],
+      "remark": "需要重新理货",
+      "createdAt": "2026-05-12T03:39:32.256Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:33.467Z",
+      "latestCorrectionId": "corr_mp230q0k_94w0l"
+    },
+    "details": "更新问题状态: 待整改 -> 已提交整改",
+    "timestamp": "2026-05-12T03:39:33.469Z"
+  },
+  {
+    "action": "SUBMIT_CORRECTION",
+    "operator": "李明",
+    "targetId": "corr_mp230q0k_94w0l",
+    "before": null,
+    "after": {
+      "id": "corr_mp230q0k_94w0l",
+      "issueId": "issue_001",
+      "description": "已重新整理货架第三层商品，所有商品正面朝向顾客，陈列整齐",
+      "photoUrls": [
+        "https://example.com/photos/corr_001_1.jpg",
+        "https://example.com/photos/corr_001_2.jpg"
+      ],
+      "submittedBy": "李明（上海南京路店店长）",
+      "submittedAt": "2026-05-12T03:39:33.428Z",
+      "remark": ""
+    },
+    "details": "提交整改: 问题 issue_001, 提交人 李明（上海南京路店店长）, 照片数量 2",
+    "timestamp": "2026-05-12T03:39:33.477Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "李明",
+    "targetId": "issue_002",
+    "before": {
+      "id": "issue_002",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "卫生",
+      "description": "冷柜底部有积冰和积水，影响制冷效果",
+      "severity": "严重",
+      "status": "待整改",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_clean_1.jpg"
+      ],
+      "remark": "需立即清理",
+      "createdAt": "2026-05-12T03:39:32.259Z",
+      "importedBy": "系统管理员"
+    },
+    "after": {
+      "id": "issue_002",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "卫生",
+      "description": "冷柜底部有积冰和积水，影响制冷效果",
+      "severity": "严重",
+      "status": "已提交整改",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_clean_1.jpg"
+      ],
+      "remark": "需立即清理",
+      "createdAt": "2026-05-12T03:39:32.259Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:33.557Z",
+      "latestCorrectionId": "corr_mp230q41_ud5ex"
+    },
+    "details": "更新问题状态: 待整改 -> 已提交整改",
+    "timestamp": "2026-05-12T03:39:33.558Z"
+  },
+  {
+    "action": "SUBMIT_CORRECTION",
+    "operator": "李明",
+    "targetId": "corr_mp230q41_ud5ex",
+    "before": null,
+    "after": {
+      "id": "corr_mp230q41_ud5ex",
+      "issueId": "issue_002",
+      "description": "已断电清理冷柜底部积冰，并用干抹布擦干，冷柜已恢复正常工作",
+      "photoUrls": [
+        "https://example.com/photos/corr_002_1.jpg"
+      ],
+      "submittedBy": "李明（上海南京路店店长）",
+      "submittedAt": "2026-05-12T03:39:33.553Z",
+      "remark": ""
+    },
+    "details": "提交整改: 问题 issue_002, 提交人 李明（上海南京路店店长）, 照片数量 1",
+    "timestamp": "2026-05-12T03:39:33.559Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "王芳",
+    "targetId": "issue_003",
+    "before": {
+      "id": "issue_003",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "价格牌",
+      "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+      "severity": "普通",
+      "status": "待整改",
+      "dueDate": "2026-05-14T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_price_1.jpg"
+      ],
+      "remark": "需更新价格标签",
+      "createdAt": "2026-05-12T03:39:32.261Z",
+      "importedBy": "系统管理员"
+    },
+    "after": {
+      "id": "issue_003",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "价格牌",
+      "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+      "severity": "普通",
+      "status": "已提交整改",
+      "dueDate": "2026-05-14T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_price_1.jpg"
+      ],
+      "remark": "需更新价格标签",
+      "createdAt": "2026-05-12T03:39:32.261Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:36.729Z",
+      "latestCorrectionId": "corr_mp230sk2_9mxjt"
+    },
+    "details": "更新问题状态: 待整改 -> 已提交整改",
+    "timestamp": "2026-05-12T03:39:36.730Z"
+  },
+  {
+    "action": "SUBMIT_CORRECTION",
+    "operator": "王芳",
+    "targetId": "corr_mp230sk2_9mxjt",
+    "before": null,
+    "after": {
+      "id": "corr_mp230sk2_9mxjt",
+      "issueId": "issue_003",
+      "description": "已更新价格牌，现在与系统价格一致",
+      "photoUrls": [
+        "https://example.com/photos/corr_003_1.jpg"
+      ],
+      "submittedBy": "王芳（北京王府井店店长）",
+      "submittedAt": "2026-05-12T03:39:36.722Z",
+      "remark": ""
+    },
+    "details": "提交整改: 问题 issue_003, 提交人 王芳（北京王府井店店长）, 照片数量 1",
+    "timestamp": "2026-05-12T03:39:36.732Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "督导组",
+    "targetId": "issue_001",
+    "before": {
+      "id": "issue_001",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "陈列",
+      "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+      "severity": "普通",
+      "status": "已提交整改",
+      "dueDate": "2026-05-13T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_display_1.jpg",
+        "https://example.com/photos/inspect_001_display_2.jpg"
+      ],
+      "remark": "需要重新理货",
+      "createdAt": "2026-05-12T03:39:32.256Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:33.467Z",
+      "latestCorrectionId": "corr_mp230q0k_94w0l"
+    },
+    "after": {
+      "id": "issue_001",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "陈列",
+      "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+      "severity": "普通",
+      "status": "已闭环",
+      "dueDate": "2026-05-13T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_display_1.jpg",
+        "https://example.com/photos/inspect_001_display_2.jpg"
+      ],
+      "remark": "需要重新理货",
+      "createdAt": "2026-05-12T03:39:32.256Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:37.350Z",
+      "latestCorrectionId": "corr_mp230q0k_94w0l",
+      "latestReinspectionId": "reinspect_mp230t1b_a3pd3"
+    },
+    "details": "更新问题状态: 已提交整改 -> 已闭环",
+    "timestamp": "2026-05-12T03:39:37.352Z"
+  },
+  {
+    "action": "SUBMIT_REINSPECTION",
+    "operator": "督导组",
+    "targetId": "reinspect_mp230t1b_a3pd3",
+    "before": null,
+    "after": {
+      "id": "reinspect_mp230t1b_a3pd3",
+      "issueId": "issue_001",
+      "correctionId": "corr_mp230q0k_94w0l",
+      "inspector": "张督导",
+      "result": "通过",
+      "comment": "整改到位，货架陈列整齐",
+      "photoUrls": [
+        "https://example.com/photos/reinspect_001_1.jpg"
+      ],
+      "reinspectedAt": "2026-05-12T03:39:37.343Z",
+      "penaltyPoints": 0
+    },
+    "details": "提交复查: 问题 issue_001, 结果 通过",
+    "timestamp": "2026-05-12T03:39:37.353Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "督导组",
+    "targetId": "issue_002",
+    "before": {
+      "id": "issue_002",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "卫生",
+      "description": "冷柜底部有积冰和积水，影响制冷效果",
+      "severity": "严重",
+      "status": "已提交整改",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_clean_1.jpg"
+      ],
+      "remark": "需立即清理",
+      "createdAt": "2026-05-12T03:39:32.259Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:33.557Z",
+      "latestCorrectionId": "corr_mp230q41_ud5ex"
+    },
+    "after": {
+      "id": "issue_002",
+      "inspectionId": "inspect_001",
+      "storeId": "store_001",
+      "category": "卫生",
+      "description": "冷柜底部有积冰和积水，影响制冷效果",
+      "severity": "严重",
+      "status": "已闭环",
+      "dueDate": "2026-05-12T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_001_clean_1.jpg"
+      ],
+      "remark": "需立即清理",
+      "createdAt": "2026-05-12T03:39:32.259Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:37.422Z",
+      "latestCorrectionId": "corr_mp230q41_ud5ex",
+      "latestReinspectionId": "reinspect_mp230t32_fqcqw"
+    },
+    "details": "更新问题状态: 已提交整改 -> 已闭环",
+    "timestamp": "2026-05-12T03:39:37.425Z"
+  },
+  {
+    "action": "SUBMIT_REINSPECTION",
+    "operator": "督导组",
+    "targetId": "reinspect_mp230t32_fqcqw",
+    "before": null,
+    "after": {
+      "id": "reinspect_mp230t32_fqcqw",
+      "issueId": "issue_002",
+      "correctionId": "corr_mp230q41_ud5ex",
+      "inspector": "张督导",
+      "result": "通过",
+      "comment": "冷柜已清理干净，制冷正常",
+      "photoUrls": [
+        "https://example.com/photos/reinspect_002_1.jpg"
+      ],
+      "reinspectedAt": "2026-05-12T03:39:37.406Z",
+      "penaltyPoints": 0
+    },
+    "details": "提交复查: 问题 issue_002, 结果 通过",
+    "timestamp": "2026-05-12T03:39:37.445Z"
+  },
+  {
+    "action": "UPDATE_ISSUE_STATUS",
+    "operator": "督导组",
+    "targetId": "issue_003",
+    "before": {
+      "id": "issue_003",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "价格牌",
+      "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+      "severity": "普通",
+      "status": "已提交整改",
+      "dueDate": "2026-05-14T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_price_1.jpg"
+      ],
+      "remark": "需更新价格标签",
+      "createdAt": "2026-05-12T03:39:32.261Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:36.729Z",
+      "latestCorrectionId": "corr_mp230sk2_9mxjt"
+    },
+    "after": {
+      "id": "issue_003",
+      "inspectionId": "inspect_002",
+      "storeId": "store_002",
+      "category": "价格牌",
+      "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+      "severity": "普通",
+      "status": "复查不通过",
+      "dueDate": "2026-05-14T00:00:00.000Z",
+      "photoUrls": [
+        "https://example.com/photos/inspect_002_price_1.jpg"
+      ],
+      "remark": "需更新价格标签",
+      "createdAt": "2026-05-12T03:39:32.261Z",
+      "importedBy": "系统管理员",
+      "updatedAt": "2026-05-12T03:39:37.473Z",
+      "latestCorrectionId": "corr_mp230sk2_9mxjt",
+      "latestReinspectionId": "reinspect_mp230t4r_aaupr"
+    },
+    "details": "更新问题状态: 已提交整改 -> 复查不通过",
+    "timestamp": "2026-05-12T03:39:37.479Z"
+  },
+  {
+    "action": "SUBMIT_REINSPECTION",
+    "operator": "督导组",
+    "targetId": "reinspect_mp230t4r_aaupr",
+    "before": null,
+    "after": {
+      "id": "reinspect_mp230t4r_aaupr",
+      "issueId": "issue_003",
+      "correctionId": "corr_mp230sk2_9mxjt",
+      "inspector": "李督导",
+      "result": "不通过",
+      "comment": "价格牌只更新了一张，其他位置仍有错误",
+      "photoUrls": [
+        "https://example.com/photos/reinspect_003_fail.jpg"
+      ],
+      "reinspectedAt": "2026-05-12T03:39:37.467Z",
+      "penaltyPoints": 1
+    },
+    "details": "提交复查: 问题 issue_003, 结果 不通过, 扣 1 分",
+    "timestamp": "2026-05-12T03:39:37.481Z"
+  }
+]

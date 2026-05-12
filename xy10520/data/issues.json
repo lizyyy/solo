@@ -1,0 +1,51 @@
+[
+  {
+    "id": "issue_001",
+    "inspectionId": "inspect_001",
+    "category": "陈列",
+    "description": "货架第三层商品陈列不整齐，部分商品正面未朝向顾客",
+    "severity": "普通",
+    "dueDays": 3,
+    "photoUrls": [
+      "https://example.com/photos/inspect_001_display_1.jpg",
+      "https://example.com/photos/inspect_001_display_2.jpg"
+    ],
+    "remark": "需要重新理货"
+  },
+  {
+    "id": "issue_002",
+    "inspectionId": "inspect_001",
+    "category": "卫生",
+    "description": "冷柜底部有积冰和积水，影响制冷效果",
+    "severity": "严重",
+    "dueDays": 2,
+    "photoUrls": [
+      "https://example.com/photos/inspect_001_clean_1.jpg"
+    ],
+    "remark": "需立即清理"
+  },
+  {
+    "id": "issue_003",
+    "inspectionId": "inspect_002",
+    "category": "价格牌",
+    "description": "牛奶促销区价格牌与实际售价不符，相差5元",
+    "severity": "普通",
+    "dueDays": 3,
+    "photoUrls": [
+      "https://example.com/photos/inspect_002_price_1.jpg"
+    ],
+    "remark": "需更新价格标签"
+  },
+  {
+    "id": "issue_004",
+    "inspectionId": "inspect_002",
+    "category": "安全隐患",
+    "description": "消防通道被杂物堵塞，影响紧急疏散",
+    "severity": "严重",
+    "dueDays": 1,
+    "photoUrls": [
+      "https://example.com/photos/inspect_002_safety_1.jpg"
+    ],
+    "remark": "必须立即整改"
+  }
+]

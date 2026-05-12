@@ -1,0 +1,21 @@
+{
+  "name": "inspection-correction-cli",
+  "version": "1.0.0",
+  "description": "巡店问题整改CLI工具 - 追踪门店整改、复查、逾期和扣分",
+  "main": "src/index.js",
+  "bin": {
+    "inspect": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "demo": "node scripts/demo.js",
+    "generate-data": "node scripts/generate-data.js",
+    "lint": "node --check src/**/*.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {}
+}

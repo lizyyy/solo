@@ -1,0 +1,41 @@
+[
+  {
+    "id": "reinspect_mp230t1b_a3pd3",
+    "issueId": "issue_001",
+    "correctionId": "corr_mp230q0k_94w0l",
+    "inspector": "张督导",
+    "result": "通过",
+    "comment": "整改到位，货架陈列整齐",
+    "photoUrls": [
+      "https://example.com/photos/reinspect_001_1.jpg"
+    ],
+    "reinspectedAt": "2026-05-12T03:39:37.343Z",
+    "penaltyPoints": 0
+  },
+  {
+    "id": "reinspect_mp230t32_fqcqw",
+    "issueId": "issue_002",
+    "correctionId": "corr_mp230q41_ud5ex",
+    "inspector": "张督导",
+    "result": "通过",
+    "comment": "冷柜已清理干净，制冷正常",
+    "photoUrls": [
+      "https://example.com/photos/reinspect_002_1.jpg"
+    ],
+    "reinspectedAt": "2026-05-12T03:39:37.406Z",
+    "penaltyPoints": 0
+  },
+  {
+    "id": "reinspect_mp230t4r_aaupr",
+    "issueId": "issue_003",
+    "correctionId": "corr_mp230sk2_9mxjt",
+    "inspector": "李督导",
+    "result": "不通过",
+    "comment": "价格牌只更新了一张，其他位置仍有错误",
+    "photoUrls": [
+      "https://example.com/photos/reinspect_003_fail.jpg"
+    ],
+    "reinspectedAt": "2026-05-12T03:39:37.467Z",
+    "penaltyPoints": 1
+  }
+]
