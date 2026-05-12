@@ -1,0 +1,56 @@
+{
+  "sessionId": "3db84e61-1383-4883-a842-6174d8b1defb",
+  "fileName": "test_file.txt",
+  "fileSize": 10240,
+  "totalChunks": 4,
+  "chunkSize": 3072,
+  "fileHash": "116f24f4f8ab21947b7afa50648a84d1cce0614f8b305fe5f705da5becd60862",
+  "status": "completed",
+  "createdAt": 1778599073080,
+  "updatedAt": 1778599073134,
+  "chunks": {
+    "1": {
+      "chunkNumber": 1,
+      "size": 3072,
+      "hash": "e0a18a22f2199abf95bf2af1564f5c09c0585b2a4830bdcc81735896d27d0659",
+      "receivedAt": 1778599073097,
+      "status": "received"
+    },
+    "2": {
+      "chunkNumber": 2,
+      "size": 3072,
+      "hash": "c1cd651d5040a5cc20df2cf4886bf3ac4aa3962e572208dac6ab5a0900f45dfa",
+      "receivedAt": 1778599073114,
+      "status": "received"
+    },
+    "3": {
+      "chunkNumber": 3,
+      "size": 3072,
+      "hash": "a64c50c60a7b544f575ecfbffe39efac50ae72450670e3b9ffe45361320a314e",
+      "receivedAt": 1778599073117,
+      "status": "received"
+    },
+    "4": {
+      "chunkNumber": 4,
+      "size": 1024,
+      "hash": "d20a37357c9f23ba4314a8a1d079abcb5dbc659524b3389c05153da651969a62",
+      "receivedAt": 1778599073120,
+      "status": "received"
+    }
+  },
+  "errors": [
+    {
+      "time": 1778599073104,
+      "type": "CHUNK_HASH_MISMATCH",
+      "message": "分片 2 校验失败"
+    }
+  ],
+  "lastError": {
+    "time": 1778599073104,
+    "type": "CHUNK_HASH_MISMATCH",
+    "message": "分片 2 校验失败"
+  },
+  "finalFilePath": "/Users/lzy/pro/solo/workspaces/zy70325/uploads/completed/3db84e61-1383-4883-a842-6174d8b1defb_test_file.txt",
+  "finalFileHash": "116f24f4f8ab21947b7afa50648a84d1cce0614f8b305fe5f705da5becd60862",
+  "completedAt": 1778599073134
+}

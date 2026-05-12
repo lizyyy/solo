@@ -1,0 +1,23 @@
+{
+  "sessionId": "2db9678a-c9c3-41a0-ad75-a38657162aba",
+  "fileName": "test_file2.txt",
+  "fileSize": 10240,
+  "totalChunks": 4,
+  "chunkSize": 3072,
+  "fileHash": "116f24f4f8ab21947b7afa50648a84d1cce0614f8b305fe5f705da5becd60862",
+  "status": "cancelled",
+  "createdAt": 1778599073137,
+  "updatedAt": 1778599073142,
+  "chunks": {
+    "1": {
+      "chunkNumber": 1,
+      "size": 3072,
+      "hash": "e0a18a22f2199abf95bf2af1564f5c09c0585b2a4830bdcc81735896d27d0659",
+      "receivedAt": 1778599073139,
+      "status": "received"
+    }
+  },
+  "errors": [],
+  "lastError": null,
+  "cancelledAt": 1778599073142
+}
