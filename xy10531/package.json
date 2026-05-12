@@ -1,0 +1,26 @@
+{
+  "name": "cross-border-customs-api",
+  "version": "1.0.0",
+  "description": "跨境清关资料 API - 订单报关资料校验系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node scripts/seed.js",
+    "demo": "node scripts/demo.js",
+    "test": "node scripts/test-api.js"
+  },
+  "keywords": [
+    "customs",
+    "cross-border",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dayjs": "^1.11.20",
+    "express": "^4.22.2",
+    "uuid": "^9.0.1"
+  }
+}
