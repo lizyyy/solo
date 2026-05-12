@@ -1,7 +1,8 @@
 {
   "name": "airport-lounge-voucher-api",
   "version": "1.0.0",
-  "description": "机场贵宾厅券核销API系统",
+  "description": "机场贵宾厅券核销 API 系统",
+  "type": "module",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
