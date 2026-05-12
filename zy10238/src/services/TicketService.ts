@@ -64,7 +64,7 @@ class TicketService {
   }
 
   async createTicket(request: CreateTicketRequest): Promise<{ ticket: FaultTicket; isDuplicate: boolean; suggestion?: DecisionSuggestion }> {
-    const reportedAt = request.reportedAt || new Date();
+    const reportedAt = request.reportedAt ? new Date(request.reportedAt) : new Date();
     const duplicateTicket = await this.detectDuplicate(request.pileId, request.faultCode, reportedAt);
 
     if (duplicateTicket) {

@@ -13,11 +13,11 @@ router.get('/health', (req, res) => {
 });
 
 router.post('/tickets', ticketController.createTicket);
+router.get('/tickets/timeline', ticketController.getTicketTimeline);
 router.get('/tickets/:id', ticketController.getTicket);
 router.get('/tickets/:id/suggestion', ticketController.getDecisionSuggestion);
 router.put('/tickets/:id/status', ticketController.updateStatus);
 router.put('/tickets/:id/close', ticketController.closeTicket);
-router.get('/tickets/timeline', ticketController.getTicketTimeline);
 
 router.post('/remote-operations', remoteOperationController.createOperation);
 router.put('/remote-operations/:id', remoteOperationController.updateOperation);
