@@ -367,6 +367,160 @@ runner.test('车辆完成任务后返回消防站', (engine) => {
   assertEqual(vehicle.targetY, station.y, '目标位置应为消防站 y');
 });
 
+runner.test('核心修复验证 - 车辆到达后状态同步到警情', (engine) => {
+  engine.start();
+  const emergency = engine.emergencies[0];
+  const emergencyConfig = GameConfig.EMERGENCY_TYPES[emergency.type];
+  
+  const vehiclesNeeded = [];
+  let totalPersonnel = 0;
+  let totalWater = 0;
+  
+  for (const vehicle of engine.vehicles) {
+    if (vehicle.status !== 'available') continue;
+    
+    const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+    const station = engine.stations.find(s => s.id === vehicle.stationId);
+    
+    if (!station || station.personnel < 1) continue;
+    
+    const personnelToSend = Math.min(station.personnel, vehicleConfig.capacity);
+    engine.dispatch(vehicle.id, emergency.id, personnelToSend, false);
+    
+    vehiclesNeeded.push(vehicle);
+    totalPersonnel += personnelToSend;
+    totalWater += vehicleConfig.waterCapacity;
+    
+    vehicle.status = 'arrived';
+    vehicle.x = emergency.x;
+    vehicle.y = emergency.y;
+    
+    if (totalPersonnel >= emergencyConfig.personnelNeeded && totalWater >= emergencyConfig.waterNeeded) {
+      break;
+    }
+  }
+  
+  assertEqual(emergency.dispatchedVehicles.length, vehiclesNeeded.length, '应有已调度车辆');
+  
+  engine.updateEmergencies(0);
+  
+  assertTrue(emergency.personnelArrived > 0, '到达人员应大于 0');
+  assertTrue(emergency.waterProvided > 0, '到达水量应大于 0');
+  
+  if (totalPersonnel >= emergencyConfig.personnelNeeded && totalWater >= emergencyConfig.waterNeeded) {
+    assertEqual(emergency.personnelArrived, totalPersonnel, '到达人员应等于派遣人员');
+    assertEqual(emergency.waterProvided, totalWater, '到达水量应等于派遣水量');
+  }
+});
+
+runner.test('核心修复验证 - 车辆到达副本状态不同步不影响真实状态', (engine) => {
+  engine.start();
+  const emergency = engine.emergencies[0];
+  
+  const vehicle = engine.vehicles.find(v => v.status === 'available');
+  assertTrue(vehicle, '应有可用车辆');
+  
+  const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+  
+  engine.dispatch(vehicle.id, emergency.id, 1, false);
+  
+  assertEqual(emergency.dispatchedVehicles.length, 1, '应有 1 辆已调度车辆');
+  
+  vehicle.status = 'arrived';
+  
+  assertEqual(emergency.dispatchedVehicles[0].status, 'enroute', '副本状态仍为 enroute');
+  
+  engine.updateEmergencies(0);
+  
+  assertEqual(emergency.personnelArrived, 1, '应能检测到车辆已到达');
+});
+
+runner.test('核心修复验证 - 消防栓真正增加水量', (engine) => {
+  engine.start();
+  const emergency = engine.emergencies[0];
+  const vehicle = engine.vehicles.find(v => v.status === 'available');
+  assertTrue(vehicle, '应有可用车辆');
+  
+  const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+  
+  const nearestHydrant = engine.findNearestHydrant(emergency.x, emergency.y);
+  assertTrue(nearestHydrant, '附近应有消防栓');
+  
+  const expectedWater = vehicleConfig.waterCapacity + nearestHydrant.flowRate * 3;
+  
+  engine.dispatch(vehicle.id, emergency.id, 1, true);
+  
+  assertEqual(vehicle.water, expectedWater, '车辆水量应包含消防栓加成');
+  
+  const dv = emergency.dispatchedVehicles[0];
+  assertTrue(dv, '应有已调度车辆记录');
+  assertEqual(dv.water, expectedWater, '记录中的水量也应包含消防栓加成');
+});
+
+runner.test('核心修复验证 - 不使用消防栓水量保持基础值', (engine) => {
+  engine.start();
+  const emergency = engine.emergencies[0];
+  const vehicle = engine.vehicles.find(v => v.status === 'available');
+  assertTrue(vehicle, '应有可用车辆');
+  
+  const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+  
+  engine.dispatch(vehicle.id, emergency.id, 1, false);
+  
+  assertEqual(vehicle.water, vehicleConfig.waterCapacity, '不使用消防栓应保持基础水量');
+});
+
+runner.test('核心修复验证 - 满足条件后警情自动处置成功', (engine) => {
+  engine.start();
+  
+  const emergency = engine.emergencies[0];
+  const config = GameConfig.EMERGENCY_TYPES[emergency.type];
+  
+  let personnelSent = 0;
+  let waterSent = 0;
+  
+  for (const vehicle of engine.vehicles) {
+    if (vehicle.status !== 'available') continue;
+    
+    const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+    const station = engine.stations.find(s => s.id === vehicle.stationId);
+    
+    if (!station || station.personnel < 1) continue;
+    
+    const personnelToSend = Math.min(station.personnel, vehicleConfig.capacity);
+    
+    engine.dispatch(vehicle.id, emergency.id, personnelToSend, false);
+    
+    vehicle.status = 'arrived';
+    vehicle.x = emergency.x;
+    vehicle.y = emergency.y;
+    
+    personnelSent += personnelToSend;
+    waterSent += vehicleConfig.waterCapacity;
+    
+    if (personnelSent >= config.personnelNeeded && waterSent >= config.waterNeeded) {
+      break;
+    }
+  }
+  
+  assertTrue(
+    personnelSent >= config.personnelNeeded && waterSent >= config.waterNeeded,
+    '应能派遣足够的资源'
+  );
+  
+  const initialCompletedCount = engine.completedEmergencies.length;
+  engine.updateEmergencies(0);
+  
+  assertEqual(
+    engine.completedEmergencies.length,
+    initialCompletedCount + 1,
+    '满足条件后警情应自动处置成功'
+  );
+  
+  const completedEmergency = engine.completedEmergencies[engine.completedEmergencies.length - 1];
+  assertEqual(completedEmergency.id, emergency.id, '处置成功的应是目标警情');
+});
+
 if (require.main === module) {
   process.exit(runner.run() ? 0 : 1);
 }

@@ -133,12 +133,16 @@ class GameEngine {
     for (let i = this.emergencies.length - 1; i >= 0; i--) {
       const emergency = this.emergencies[i];
 
-      const arrivedPersonnel = emergency.dispatchedVehicles
-        .filter(v => v.status === 'arrived')
-        .reduce((sum, v) => sum + v.personnel, 0);
-      const arrivedWater = emergency.dispatchedVehicles
-        .filter(v => v.status === 'arrived')
-        .reduce((sum, v) => sum + v.water, 0);
+      let arrivedPersonnel = 0;
+      let arrivedWater = 0;
+
+      for (const dv of emergency.dispatchedVehicles) {
+        const realVehicle = this.vehicles.find(v => v.id === dv.id);
+        if (realVehicle && realVehicle.status === 'arrived') {
+          arrivedPersonnel += dv.personnel;
+          arrivedWater += dv.water;
+        }
+      }
 
       emergency.personnelArrived = arrivedPersonnel;
       emergency.waterProvided = arrivedWater;
@@ -278,7 +282,7 @@ class GameEngine {
 
     station.personnel -= personnelCount;
     vehicle.personnel = personnelCount;
-    vehicle.water = Math.min(effectiveWater, vehicleConfig.waterCapacity);
+    vehicle.water = effectiveWater;
     vehicle.status = 'enroute';
     vehicle.targetX = emergency.x;
     vehicle.targetY = emergency.y;
