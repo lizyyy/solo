@@ -1,0 +1,329 @@
+{
+  "releasePlanId": "release-success",
+  "releaseName": "成功通过样例",
+  "createdAt": "2026-05-12T05:38:17.986Z",
+  "updatedAt": "2026-05-12T05:38:29.866Z",
+  "services": [
+    {
+      "id": "svc-inventory",
+      "name": "库存服务",
+      "version": "2.3.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T13:00:00.000Z",
+      "windowEnd": "2026-05-13T14:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "库存扣减逻辑优化"
+    },
+    {
+      "id": "svc-payment",
+      "name": "支付服务",
+      "version": "1.8.2",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T14:00:00.000Z",
+      "windowEnd": "2026-05-13T15:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "修复支付回调超时问题"
+    },
+    {
+      "id": "svc-order",
+      "name": "订单服务",
+      "version": "3.1.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T15:00:00.000Z",
+      "windowEnd": "2026-05-13T16:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "订单状态流转重构"
+    },
+    {
+      "id": "svc-notification",
+      "name": "通知服务",
+      "version": "1.5.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T16:00:00.000Z",
+      "windowEnd": "2026-05-13T17:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "短信模板升级"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "396d4c06-b029-4e46-81e2-c9267ae31826",
+      "callerServiceId": "svc-order",
+      "calleeServiceId": "svc-inventory",
+      "dependencyType": "hard",
+      "windowAlignmentRequired": true,
+      "description": "订单创建时需要扣减库存"
+    },
+    {
+      "id": "6b529079-cd22-4905-9cab-17ec9c564ae4",
+      "callerServiceId": "svc-order",
+      "calleeServiceId": "svc-payment",
+      "dependencyType": "hard",
+      "windowAlignmentRequired": true,
+      "description": "订单支付依赖支付服务"
+    },
+    {
+      "id": "25b008db-fd51-45fe-a0c5-893efbd198a8",
+      "callerServiceId": "svc-notification",
+      "calleeServiceId": "svc-order",
+      "dependencyType": "soft",
+      "windowAlignmentRequired": true,
+      "description": "通知服务消费订单事件"
+    }
+  ],
+  "migrations": [
+    {
+      "id": "49254d3f-3d75-4529-b068-c49604ab7821",
+      "serviceId": "svc-order",
+      "scriptName": "V3_1_0__add_order_status_history.sql",
+      "version": "3.1.0",
+      "hasRollback": true,
+      "rollbackScript": "U3_1_0__drop_order_status_history.sql",
+      "migrationType": "schema",
+      "preDeploy": true,
+      "postDeploy": false,
+      "executed": true,
+      "executedAt": "2026-05-12T05:38:17.986Z"
+    },
+    {
+      "id": "d317e6b9-ed01-4a55-8847-c5dead96743e",
+      "serviceId": "svc-inventory",
+      "scriptName": "V2_3_0__add_deduct_log_table.sql",
+      "version": "2.3.0",
+      "hasRollback": true,
+      "rollbackScript": "U2_3_0__drop_deduct_log_table.sql",
+      "migrationType": "schema",
+      "preDeploy": true,
+      "postDeploy": false,
+      "executed": true,
+      "executedAt": "2026-05-12T05:38:17.986Z"
+    },
+    {
+      "id": "088f456e-a437-463e-8142-14103a30948a",
+      "serviceId": "svc-payment",
+      "scriptName": "V1_8_2__fix_callback_timeout.sql",
+      "version": "1.8.2",
+      "hasRollback": true,
+      "rollbackScript": "U1_8_2__revert_callback_timeout.sql",
+      "migrationType": "both",
+      "preDeploy": false,
+      "postDeploy": true,
+      "executed": false
+    }
+  ],
+  "switches": [
+    {
+      "id": "a6838d4b-5457-4373-ba34-4525fac38206",
+      "serviceId": "svc-order",
+      "key": "order.new.status.flow.enabled",
+      "targetValue": "true",
+      "currentValue": "false",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "启用新的订单状态流转"
+    },
+    {
+      "id": "d356f5b2-7cbc-4831-8a5b-950fa0e62323",
+      "serviceId": "svc-payment",
+      "key": "payment.callback.timeout.seconds",
+      "targetValue": "30",
+      "currentValue": "15",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "支付回调超时时间"
+    },
+    {
+      "id": "7eeba14c-bcfb-40ac-81d6-252e6aa6ac98",
+      "serviceId": "svc-notification",
+      "key": "sms.template.version",
+      "targetValue": "v2",
+      "currentValue": "v1",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "短信模板版本"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "9319157b-fb89-4d7b-8fc0-c00df068c1c7",
+      "serviceId": "svc-order",
+      "name": "张三",
+      "role": "订单服务负责人",
+      "phone": "13800138001",
+      "email": "zhangsan@example.com",
+      "isPrimary": true,
+      "available": true
+    },
+    {
+      "id": "e62d5fa6-67ef-47ae-bfb8-0ff6f739baf2",
+      "serviceId": "svc-payment",
+      "name": "李四",
+      "role": "支付服务负责人",
+      "phone": "13800138002",
+      "email": "lisi@example.com",
+      "isPrimary": true,
+      "available": true
+    },
+    {
+      "id": "f27a6a3b-e486-49dd-a8a2-45d01e81423e",
+      "serviceId": "svc-inventory",
+      "name": "赵六",
+      "role": "库存服务负责人",
+      "phone": "13800138004",
+      "email": "zhaoliu@example.com",
+      "isPrimary": true,
+      "available": true
+    },
+    {
+      "id": "8a32d810-ab13-41fc-944f-b1ceea80df76",
+      "serviceId": "svc-notification",
+      "name": "钱七",
+      "role": "通知服务负责人",
+      "phone": "13800138005",
+      "email": "qianqi@example.com",
+      "isPrimary": true,
+      "available": true
+    }
+  ],
+  "waivers": [],
+  "checkHistory": [
+    {
+      "id": "f87373c4-ba58-443e-a6cc-bac404693b8f",
+      "timestamp": "2026-05-12T05:38:29.865Z",
+      "results": [
+        {
+          "id": "7642b120-35be-4dce-a41d-cf5549fcd021",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 库存服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 库存服务 结束时间"
+        },
+        {
+          "id": "6fef59c3-864e-4bb1-be9e-cd703eb3ac90",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 支付服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 支付服务 结束时间"
+        },
+        {
+          "id": "49d7894a-b8b4-4f99-826a-592b2b516d0f",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "依赖窗口对齐：通知服务 → 订单服务 (弱依赖)",
+          "detail": "通知服务 计划窗口晚于 订单服务 结束时间"
+        },
+        {
+          "id": "8256c1ab-7864-4733-a9b3-bba6894f2d56",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V3_1_0__add_order_status_history.sql (版本: 3.1.0)\n回滚脚本: U3_1_0__drop_order_status_history.sql"
+        },
+        {
+          "id": "ec87ba79-4e44-4604-9904-8988d00381cf",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-inventory",
+          "status": "passed",
+          "message": "库存服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V2_3_0__add_deduct_log_table.sql (版本: 2.3.0)\n回滚脚本: U2_3_0__drop_deduct_log_table.sql"
+        },
+        {
+          "id": "b3817e14-c12e-4970-9648-953b9dc94aeb",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-payment",
+          "status": "passed",
+          "message": "支付服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V1_8_2__fix_callback_timeout.sql (版本: 1.8.2)\n回滚脚本: U1_8_2__revert_callback_timeout.sql"
+        },
+        {
+          "id": "5f503268-7420-43c2-b4e0-0d8f2ae1f9cd",
+          "checkType": "migration-presence",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 无数据库迁移",
+          "detail": "该服务本次发布不涉及数据库变更"
+        },
+        {
+          "id": "c777cce5-66ca-41f6-b174-1d7f60793651",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 配置开关已预置",
+          "detail": "开关: order.new.status.flow.enabled\n目标值: true\n当前值: false"
+        },
+        {
+          "id": "b5cd61d4-69ce-423f-a0b4-5f85f172b44e",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-payment",
+          "status": "passed",
+          "message": "支付服务 配置开关已预置",
+          "detail": "开关: payment.callback.timeout.seconds\n目标值: 30\n当前值: 15"
+        },
+        {
+          "id": "1d96e705-2095-4f2b-aaba-45351211ebd3",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 配置开关已预置",
+          "detail": "开关: sms.template.version\n目标值: v2\n当前值: v1"
+        },
+        {
+          "id": "70b0eb6c-8dbc-4cee-a59c-624e4802baa3",
+          "checkType": "contact-availability",
+          "serviceId": "svc-inventory",
+          "status": "passed",
+          "message": "库存服务 回滚联系人检查通过",
+          "detail": "主要联系人: 赵六 (13800138004)\n总联系人: 1 人"
+        },
+        {
+          "id": "5bab4e18-e34e-4814-8b52-39a8f49ff1db",
+          "checkType": "contact-availability",
+          "serviceId": "svc-payment",
+          "status": "passed",
+          "message": "支付服务 回滚联系人检查通过",
+          "detail": "主要联系人: 李四 (13800138002)\n总联系人: 1 人"
+        },
+        {
+          "id": "d3228d21-c643-4301-83fe-7d010641f3df",
+          "checkType": "contact-availability",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 回滚联系人检查通过",
+          "detail": "主要联系人: 张三 (13800138001)\n总联系人: 1 人"
+        },
+        {
+          "id": "06e0056a-8059-452a-be3c-c1a287068595",
+          "checkType": "contact-availability",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 回滚联系人检查通过",
+          "detail": "主要联系人: 钱七 (13800138005)\n总联系人: 1 人"
+        }
+      ],
+      "summary": {
+        "total": 14,
+        "blocking": 0,
+        "warning": 0,
+        "passed": 14,
+        "waived": 0,
+        "canRelease": true,
+        "recommendedOrder": [
+          "库存服务",
+          "支付服务",
+          "订单服务",
+          "通知服务"
+        ]
+      },
+      "executedBy": "李四"
+    }
+  ],
+  "corrections": []
+}

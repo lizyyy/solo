@@ -1,0 +1,63 @@
+{
+  "services": [
+    {
+      "id": "svc-gateway",
+      "name": "网关服务",
+      "version": "2.0.0",
+      "plannedTime": "2026-05-13T19:00:00.000Z",
+      "windowStart": "2026-05-13T19:00:00.000Z",
+      "windowEnd": "2026-05-13T19:30:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "网关路由配置更新"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "dep-gateway-order",
+      "callerServiceId": "svc-gateway",
+      "calleeServiceId": "svc-order",
+      "dependencyType": "hard",
+      "windowAlignmentRequired": true,
+      "description": "网关转发订单请求"
+    }
+  ],
+  "migrations": [
+    {
+      "id": "migration-gateway-1",
+      "serviceId": "svc-gateway",
+      "scriptName": "V2_0_0__add_route_config.sql",
+      "version": "2.0.0",
+      "hasRollback": true,
+      "rollbackScript": "U2_0_0__drop_route_config.sql",
+      "migrationType": "data",
+      "preDeploy": false,
+      "postDeploy": true,
+      "executed": false
+    }
+  ],
+  "switches": [
+    {
+      "id": "switch-gateway-1",
+      "serviceId": "svc-gateway",
+      "key": "gateway.routing.new.enabled",
+      "targetValue": "true",
+      "currentValue": "false",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "启用新路由规则"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "contact-gateway-1",
+      "serviceId": "svc-gateway",
+      "name": "孙八",
+      "role": "网关服务负责人",
+      "phone": "13800138006",
+      "email": "sunba@example.com",
+      "isPrimary": true,
+      "available": true
+    }
+  ]
+}

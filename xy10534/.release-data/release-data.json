@@ -1,0 +1,531 @@
+{
+  "releasePlanId": "release-2026-05",
+  "releaseName": "5月电商核心业务发版",
+  "createdAt": "2026-05-12T05:36:52.064Z",
+  "updatedAt": "2026-05-12T05:40:18.427Z",
+  "services": [
+    {
+      "id": "svc-inventory",
+      "name": "库存服务",
+      "version": "2.3.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T13:00:00.000Z",
+      "windowEnd": "2026-05-13T14:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "库存扣减逻辑优化"
+    },
+    {
+      "id": "svc-payment",
+      "name": "支付服务",
+      "version": "1.8.2",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T14:00:00.000Z",
+      "windowEnd": "2026-05-13T15:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "修复支付回调超时问题"
+    },
+    {
+      "id": "svc-order",
+      "name": "订单服务",
+      "version": "3.1.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T15:00:00.000Z",
+      "windowEnd": "2026-05-13T16:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "订单状态流转重构"
+    },
+    {
+      "id": "svc-notification",
+      "name": "通知服务",
+      "version": "1.5.0",
+      "plannedTime": "2026-05-12T17:00:00.000Z",
+      "windowStart": "2026-05-13T16:00:00.000Z",
+      "windowEnd": "2026-05-13T17:00:00.000Z",
+      "status": "planned",
+      "environment": "production",
+      "notes": "短信模板升级"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "7e83e556-f1df-42dd-9f3a-634308b4456d",
+      "callerServiceId": "svc-order",
+      "calleeServiceId": "svc-inventory",
+      "dependencyType": "hard",
+      "windowAlignmentRequired": true,
+      "description": "订单创建时需要扣减库存"
+    },
+    {
+      "id": "fe578294-b37a-44de-a813-a8818b24c449",
+      "callerServiceId": "svc-order",
+      "calleeServiceId": "svc-payment",
+      "dependencyType": "hard",
+      "windowAlignmentRequired": true,
+      "description": "订单支付依赖支付服务"
+    },
+    {
+      "id": "5c9338ae-04f0-4173-940b-000b014badb6",
+      "callerServiceId": "svc-notification",
+      "calleeServiceId": "svc-order",
+      "dependencyType": "soft",
+      "windowAlignmentRequired": true,
+      "description": "通知服务消费订单事件"
+    }
+  ],
+  "migrations": [
+    {
+      "id": "70d0a0ba-64bf-48ca-9f83-9fe8973dedcb",
+      "serviceId": "svc-order",
+      "scriptName": "V3_1_0__add_order_status_history.sql",
+      "version": "3.1.0",
+      "hasRollback": true,
+      "rollbackScript": "U3_1_0__drop_order_status_history.sql",
+      "migrationType": "schema",
+      "preDeploy": true,
+      "postDeploy": false,
+      "executed": false
+    },
+    {
+      "id": "5a195b3f-b004-4589-8463-0725dc125e14",
+      "serviceId": "svc-inventory",
+      "scriptName": "V2_3_0__add_deduct_log_table.sql",
+      "version": "2.3.0",
+      "hasRollback": false,
+      "migrationType": "schema",
+      "preDeploy": true,
+      "postDeploy": false,
+      "executed": false
+    },
+    {
+      "id": "e8846393-59a1-4246-b51d-48f537419bc1",
+      "serviceId": "svc-payment",
+      "scriptName": "V1_8_2__fix_callback_timeout.sql",
+      "version": "1.8.2",
+      "hasRollback": true,
+      "rollbackScript": "U1_8_2__revert_callback_timeout.sql",
+      "migrationType": "both",
+      "preDeploy": true,
+      "postDeploy": false,
+      "executed": true,
+      "executedAt": "2026-05-12T05:36:52.069Z"
+    }
+  ],
+  "switches": [
+    {
+      "id": "b62d9a4f-968c-4dab-ae73-ef62fbf0f5ee",
+      "serviceId": "svc-order",
+      "key": "order.new.status.flow.enabled",
+      "targetValue": "true",
+      "currentValue": "false",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "启用新的订单状态流转"
+    },
+    {
+      "id": "62e7bdc9-7b54-463c-91ee-d26102a9898d",
+      "serviceId": "svc-payment",
+      "key": "payment.callback.timeout.seconds",
+      "targetValue": "30",
+      "currentValue": "15",
+      "preConfigured": false,
+      "switchOrder": 1,
+      "description": "支付回调超时时间"
+    },
+    {
+      "id": "9d8f7faf-99d1-4689-90ca-de0327adc5a0",
+      "serviceId": "svc-notification",
+      "key": "sms.template.version",
+      "targetValue": "v2",
+      "currentValue": "v1",
+      "preConfigured": true,
+      "switchOrder": 1,
+      "description": "短信模板版本"
+    }
+  ],
+  "contacts": [
+    {
+      "id": "b16914b4-439d-4dd1-9467-263c08b92814",
+      "serviceId": "svc-order",
+      "name": "张三",
+      "role": "订单服务负责人",
+      "phone": "13800138001",
+      "email": "zhangsan@example.com",
+      "isPrimary": true,
+      "available": true
+    },
+    {
+      "id": "5360815d-d5d2-49f7-ace8-0996840e32d9",
+      "serviceId": "svc-payment",
+      "name": "李四",
+      "role": "支付服务负责人",
+      "phone": "13800138002",
+      "email": "lisi@example.com",
+      "isPrimary": true,
+      "available": false
+    },
+    {
+      "id": "b476862f-afbf-48fb-aa6a-9245c3c34c23",
+      "serviceId": "svc-payment",
+      "name": "王五",
+      "role": "支付服务开发",
+      "phone": "13800138003",
+      "email": "wangwu@example.com",
+      "isPrimary": false,
+      "available": true
+    },
+    {
+      "id": "6ba67c54-01d1-494f-8b52-a31cccdd2462",
+      "serviceId": "svc-inventory",
+      "name": "赵六",
+      "role": "库存服务负责人",
+      "phone": "13800138004",
+      "email": "zhaoliu@example.com",
+      "isPrimary": true,
+      "available": true
+    }
+  ],
+  "waivers": [
+    {
+      "id": "a6e56aac-0d23-4f86-a1cd-dad7dfe7abae",
+      "relatedCheckId": "dependency-window-alignment",
+      "serviceId": "svc-notification",
+      "reason": "通知服务为弱依赖，可独立发布",
+      "approvedBy": "技术总监",
+      "approvedAt": "2026-05-12T05:36:52.069Z",
+      "expiresAt": "2026-05-19T05:36:52.069Z",
+      "isActive": true
+    }
+  ],
+  "checkHistory": [
+    {
+      "id": "bbeaa2a8-945e-486f-a62d-2454afe39688",
+      "timestamp": "2026-05-12T05:37:39.501Z",
+      "results": [
+        {
+          "id": "5038ca2d-b05a-4cba-929f-a33539dd0a15",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 库存服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 库存服务 结束时间"
+        },
+        {
+          "id": "53c367cb-3059-424c-88a7-49bcc8d28119",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 支付服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 支付服务 结束时间"
+        },
+        {
+          "id": "1d00d53b-c621-4f29-96fe-bcf5e5ff123d",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "依赖窗口对齐：通知服务 → 订单服务 (弱依赖)",
+          "detail": "通知服务 计划窗口晚于 订单服务 结束时间"
+        },
+        {
+          "id": "cb85b33f-6548-4334-b8fa-a9a759ff9a98",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V3_1_0__add_order_status_history.sql (版本: 3.1.0)\n回滚脚本: U3_1_0__drop_order_status_history.sql"
+        },
+        {
+          "id": "90fd5627-e6bd-4613-8d96-2910170e40de",
+          "checkType": "migration-execution",
+          "serviceId": "svc-order",
+          "status": "blocking",
+          "message": "订单服务 前置数据库迁移脚本未执行",
+          "detail": "脚本: V3_1_0__add_order_status_history.sql\n类型: 前置迁移\n状态: 未执行",
+          "action": "请先执行前置数据库迁移脚本"
+        },
+        {
+          "id": "197a6873-37a1-4458-93bc-69cd55a9c808",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-inventory",
+          "status": "blocking",
+          "message": "库存服务 数据库迁移脚本缺少回滚脚本",
+          "detail": "脚本: V2_3_0__add_deduct_log_table.sql (版本: 2.3.0)\n类型: schema\n状态: 未提供回滚脚本",
+          "action": "必须提供回滚脚本后才能继续发布"
+        },
+        {
+          "id": "dda33bfb-ce5a-45e7-99f2-c090cb55c20d",
+          "checkType": "migration-execution",
+          "serviceId": "svc-inventory",
+          "status": "blocking",
+          "message": "库存服务 前置数据库迁移脚本未执行",
+          "detail": "脚本: V2_3_0__add_deduct_log_table.sql\n类型: 前置迁移\n状态: 未执行",
+          "action": "请先执行前置数据库迁移脚本"
+        },
+        {
+          "id": "ddb975b5-93e2-44c1-99cf-f5eb62145016",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-payment",
+          "status": "passed",
+          "message": "支付服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V1_8_2__fix_callback_timeout.sql (版本: 1.8.2)\n回滚脚本: U1_8_2__revert_callback_timeout.sql"
+        },
+        {
+          "id": "bb191218-79ac-4237-a21e-f65701b46652",
+          "checkType": "migration-presence",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 无数据库迁移",
+          "detail": "该服务本次发布不涉及数据库变更"
+        },
+        {
+          "id": "d106c68a-72cd-4d3b-b3d4-9d47e6ec5a66",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 配置开关已预置",
+          "detail": "开关: order.new.status.flow.enabled\n目标值: true\n当前值: false"
+        },
+        {
+          "id": "4168166a-88bf-491c-854a-4ab33767fd2e",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-payment",
+          "status": "blocking",
+          "message": "支付服务 配置开关未预置",
+          "detail": "开关: payment.callback.timeout.seconds\n目标值: 30\n当前值: 15\n预置状态: 否",
+          "action": "请先在配置中心预置目标配置值"
+        },
+        {
+          "id": "2507f69c-333b-4708-bb17-28df2fa188b1",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 配置开关已预置",
+          "detail": "开关: sms.template.version\n目标值: v2\n当前值: v1"
+        },
+        {
+          "id": "3948ca4c-5eae-4bbf-8b70-2899ef85558c",
+          "checkType": "contact-availability",
+          "serviceId": "svc-inventory",
+          "status": "passed",
+          "message": "库存服务 回滚联系人检查通过",
+          "detail": "主要联系人: 赵六 (13800138004)\n总联系人: 1 人"
+        },
+        {
+          "id": "b9e2faed-6157-4c87-8916-68403ece891f",
+          "checkType": "contact-availability",
+          "serviceId": "svc-payment",
+          "status": "blocking",
+          "message": "支付服务 主要回滚联系人不可用",
+          "detail": "主要联系人: 李四\n状态: 全部不可用",
+          "action": "请联系主要联系人确认可用性，或调整主要联系人"
+        },
+        {
+          "id": "ba3a7871-aac9-41f4-958b-daa994acea6e",
+          "checkType": "contact-availability",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 回滚联系人检查通过",
+          "detail": "主要联系人: 张三 (13800138001)\n总联系人: 1 人"
+        },
+        {
+          "id": "3c13937f-3c43-4f70-98d4-540acd8efeea",
+          "checkType": "contact-presence",
+          "serviceId": "svc-notification",
+          "status": "blocking",
+          "message": "通知服务 缺少回滚联系人",
+          "detail": "该服务未配置任何回滚联系人",
+          "action": "必须配置至少一名回滚联系人"
+        },
+        {
+          "id": "9054a25b-c6f6-4d8c-a0b8-4d8ff36a6600",
+          "checkType": "waiver-expiration",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "豁免有效",
+          "detail": "豁免原因: 通知服务为弱依赖，可独立发布\n审批人: 技术总监\n到期时间: 2026-05-19T05:36:52.069Z"
+        }
+      ],
+      "summary": {
+        "total": 17,
+        "blocking": 6,
+        "warning": 0,
+        "passed": 11,
+        "waived": 0,
+        "canRelease": false,
+        "recommendedOrder": [
+          "库存服务",
+          "支付服务",
+          "订单服务",
+          "通知服务"
+        ]
+      },
+      "executedBy": "张三"
+    },
+    {
+      "id": "98881c02-6c47-4eb7-acdd-cb31ea1c19dc",
+      "timestamp": "2026-05-12T05:40:18.426Z",
+      "results": [
+        {
+          "id": "5ebf5c7f-f69c-4c03-8a28-827c4821adbf",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 库存服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 库存服务 结束时间"
+        },
+        {
+          "id": "589d547f-db4d-4ddb-9130-a6b22f3c8e14",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "依赖窗口对齐：订单服务 → 支付服务 (强依赖)",
+          "detail": "订单服务 计划窗口晚于 支付服务 结束时间"
+        },
+        {
+          "id": "0182f16a-86f4-4862-8b9a-ccb0cf7f37c7",
+          "checkType": "dependency-window-alignment",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "依赖窗口对齐：通知服务 → 订单服务 (弱依赖)",
+          "detail": "通知服务 计划窗口晚于 订单服务 结束时间"
+        },
+        {
+          "id": "80d73c24-d151-459b-b49f-af16873d0590",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V3_1_0__add_order_status_history.sql (版本: 3.1.0)\n回滚脚本: U3_1_0__drop_order_status_history.sql"
+        },
+        {
+          "id": "fc7a7a21-4fdb-4df4-850b-3f77a8ba40ca",
+          "checkType": "migration-execution",
+          "serviceId": "svc-order",
+          "status": "blocking",
+          "message": "订单服务 前置数据库迁移脚本未执行",
+          "detail": "脚本: V3_1_0__add_order_status_history.sql\n类型: 前置迁移\n状态: 未执行",
+          "action": "请先执行前置数据库迁移脚本"
+        },
+        {
+          "id": "5ec7437a-3e8e-490c-9c36-4d0591d92343",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-inventory",
+          "status": "blocking",
+          "message": "库存服务 数据库迁移脚本缺少回滚脚本",
+          "detail": "脚本: V2_3_0__add_deduct_log_table.sql (版本: 2.3.0)\n类型: schema\n状态: 未提供回滚脚本",
+          "action": "必须提供回滚脚本后才能继续发布"
+        },
+        {
+          "id": "01da0cd1-d54d-41df-bd7c-f4e2a86bdd9c",
+          "checkType": "migration-execution",
+          "serviceId": "svc-inventory",
+          "status": "blocking",
+          "message": "库存服务 前置数据库迁移脚本未执行",
+          "detail": "脚本: V2_3_0__add_deduct_log_table.sql\n类型: 前置迁移\n状态: 未执行",
+          "action": "请先执行前置数据库迁移脚本"
+        },
+        {
+          "id": "6f657797-556f-4b74-a15b-186fa96ee715",
+          "checkType": "migration-rollback",
+          "serviceId": "svc-payment",
+          "status": "passed",
+          "message": "支付服务 数据库迁移脚本回滚检查通过",
+          "detail": "脚本: V1_8_2__fix_callback_timeout.sql (版本: 1.8.2)\n回滚脚本: U1_8_2__revert_callback_timeout.sql"
+        },
+        {
+          "id": "2462a707-9063-4359-9de1-489bc39774c9",
+          "checkType": "migration-presence",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 无数据库迁移",
+          "detail": "该服务本次发布不涉及数据库变更"
+        },
+        {
+          "id": "710f1b67-e294-459f-a9a9-e6dc0b5c429b",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 配置开关已预置",
+          "detail": "开关: order.new.status.flow.enabled\n目标值: true\n当前值: false"
+        },
+        {
+          "id": "fe028b76-ae00-4975-b4e0-cc3376c54194",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-payment",
+          "status": "blocking",
+          "message": "支付服务 配置开关未预置",
+          "detail": "开关: payment.callback.timeout.seconds\n目标值: 30\n当前值: 15\n预置状态: 否",
+          "action": "请先在配置中心预置目标配置值"
+        },
+        {
+          "id": "4042de98-0291-456b-8278-bc36940b137e",
+          "checkType": "switch-preconfigured",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "通知服务 配置开关已预置",
+          "detail": "开关: sms.template.version\n目标值: v2\n当前值: v1"
+        },
+        {
+          "id": "8b9ace8c-b9f7-4316-a010-6a19d926d465",
+          "checkType": "contact-availability",
+          "serviceId": "svc-inventory",
+          "status": "passed",
+          "message": "库存服务 回滚联系人检查通过",
+          "detail": "主要联系人: 赵六 (13800138004)\n总联系人: 1 人"
+        },
+        {
+          "id": "bf10863a-0f2b-4703-a32d-cf19c5e7826d",
+          "checkType": "contact-availability",
+          "serviceId": "svc-payment",
+          "status": "blocking",
+          "message": "支付服务 主要回滚联系人不可用",
+          "detail": "主要联系人: 李四\n状态: 全部不可用",
+          "action": "请联系主要联系人确认可用性，或调整主要联系人"
+        },
+        {
+          "id": "1fe4f3da-c04d-4ba0-8a02-3f248e30e95a",
+          "checkType": "contact-availability",
+          "serviceId": "svc-order",
+          "status": "passed",
+          "message": "订单服务 回滚联系人检查通过",
+          "detail": "主要联系人: 张三 (13800138001)\n总联系人: 1 人"
+        },
+        {
+          "id": "3c15dabe-0a49-4cdb-bf2f-42a9a5592a7f",
+          "checkType": "contact-presence",
+          "serviceId": "svc-notification",
+          "status": "blocking",
+          "message": "通知服务 缺少回滚联系人",
+          "detail": "该服务未配置任何回滚联系人",
+          "action": "必须配置至少一名回滚联系人"
+        },
+        {
+          "id": "f1882d92-325f-4ba8-a051-805ccfe73047",
+          "checkType": "waiver-expiration",
+          "serviceId": "svc-notification",
+          "status": "passed",
+          "message": "豁免有效",
+          "detail": "豁免原因: 通知服务为弱依赖，可独立发布\n审批人: 技术总监\n到期时间: 2026-05-19T05:36:52.069Z"
+        }
+      ],
+      "summary": {
+        "total": 17,
+        "blocking": 6,
+        "warning": 0,
+        "passed": 11,
+        "waived": 0,
+        "canRelease": false,
+        "recommendedOrder": [
+          "库存服务",
+          "支付服务",
+          "订单服务",
+          "通知服务"
+        ]
+      },
+      "executedBy": "李四"
+    }
+  ],
+  "corrections": []
+}
