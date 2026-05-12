@@ -34,13 +34,25 @@ echo ""
 echo "2. 创建备件库存"
 echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/spare-parts/" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "part_code=SP-LED-001&name=LED灯泡&quantity=2&unit=个&threshold=5" | python3 -m json.tool
+  -H "Content-Type: application/json" \
+  -d '{
+    "part_code": "SP-LED-001",
+    "name": "LED灯泡",
+    "quantity": 2,
+    "unit": "个",
+    "threshold": 5
+  }' | python3 -m json.tool
 echo ""
 
 curl -s -X POST "$BASE_URL/spare-parts/" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "part_code=SP-CABLE-001&name=电缆线&quantity=10&unit=米&threshold=5" | python3 -m json.tool
+  -H "Content-Type: application/json" \
+  -d '{
+    "part_code": "SP-CABLE-001",
+    "name": "电缆线",
+    "quantity": 10,
+    "unit": "米",
+    "threshold": 5
+  }' | python3 -m json.tool
 echo ""
 echo "✓ 创建了2种备件 (LED灯泡库存只有2个，用于演示备件不足场景)"
 echo ""
@@ -96,7 +108,7 @@ echo "$REPORT3" | python3 -m json.tool
 REPORT3_ID=$(echo "$REPORT3" | python3 -c "import sys, json; print(json.load(sys.stdin)['id'])")
 echo ""
 echo "✓ 创建报修单 #3，ID: $REPORT3_ID"
-echo "ℹ️  注意: 通过经纬度自动匹配到附近灯杆 LP-001/LP-002"
+echo "ℹ️  注意: 通过经纬度自动匹配到附近灯杆"
 echo ""
 
 echo "6. 查看所有报修单列表 (显示未关闭原因)"
