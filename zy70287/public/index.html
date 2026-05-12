@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>农田灌溉轮灌可视化系统</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>农田灌溉轮灌可视化系统</h1>
+    </header>
+
+    <div class="main-content">
+      <div class="sidebar">
+        <div class="panel">
+          <h3>参数配置</h3>
+          <div class="form-group">
+            <label>地块数量</label>
+            <input type="number" id="plotCount" value="8" min="1" max="20">
+          </div>
+          <div class="form-group">
+            <label>渠系数量</label>
+            <input type="number" id="canalCount" value="3" min="1" max="5">
+          </div>
+          <div class="form-group">
+            <label>总可用水量</label>
+            <input type="number" id="totalWater" value="200" min="50" max="500">
+          </div>
+          <button id="generateBtn" class="btn">生成样例数据</button>
+          <button id="runBtn" class="btn btn-primary">运行轮灌算法</button>
+          <button id="resetBtn" class="btn">重置</button>
+        </div>
+
+        <div class="panel">
+          <h3>操作</h3>
+          <button id="exportBtn" class="btn">导出结果</button>
+          <button id="consistencyBtn" class="btn">检查一致性</button>
+          <button id="viewScheduleBtn" class="btn">查看轮灌计划</button>
+        </div>
+
+        <div class="panel">
+          <h3>图例</h3>
+          <div class="legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background: #90EE90;"></span>
+              <span>空闲</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #FFA500;"></span>
+              <span>需水</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #4169E1;"></span>
+              <span>灌溉中</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #00CED1;"></span>
+              <span>已灌溉</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #FF6347;"></span>
+              <span>缺水</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main-area">
+        <div class="map-container">
+          <h3>农田地图</h3>
+          <div id="map"></div>
+        </div>
+
+        <div class="stats-container">
+          <h3>统计指标</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="totalDemand">0</div>
+              <div class="stat-label">总需水量 (m³)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="totalAvailable">0</div>
+              <div class="stat-label">总可用水量 (m³)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="totalShortage">0</div>
+              <div class="stat-label">总缺水量 (m³)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="irrigatedCount">0</div>
+              <div class="stat-label">已灌溉地块数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="shortageCount">0</div>
+              <div class="stat-label">缺水地块数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="efficiency">0%</div>
+              <div class="stat-label">灌溉效率</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="canal-stats">
+          <h3>渠系状态</h3>
+          <div id="canalList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">详情</h3>
+          <span id="closeModal">&times;</span>
+        </div>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/models.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,415 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: #2d3748;
+  font-size: 28px;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.panel h3 {
+  color: #2d3748;
+  margin-bottom: 15px;
+  font-size: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 4px;
+  background: #e2e8f0;
+  color: #2d3748;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: #cbd5e0;
+}
+
+.btn-primary {
+  background: #4299e1;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3182ce;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #4a5568;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e0;
+}
+
+.main-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.map-container, .stats-container, .canal-stats {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.map-container h3, .stats-container h3, .canal-stats h3 {
+  color: #2d3748;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+#map {
+  width: 100%;
+  height: 400px;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: #f7fafc;
+}
+
+.plot {
+  position: absolute;
+  border: 2px solid rgba(0,0,0,0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2d3748;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.plot:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.plot-order {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.canal {
+  position: absolute;
+  background: #4299e1;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.canal.horizontal {
+  height: 8px;
+}
+
+.canal.vertical {
+  width: 8px;
+}
+
+.canal-label {
+  position: absolute;
+  font-size: 11px;
+  color: #2d3748;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.stat-card {
+  background: #f7fafc;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2d3748;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #718096;
+}
+
+#canalList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.canal-item {
+  background: #f7fafc;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.canal-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.canal-name {
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.canal-utilization {
+  font-size: 12px;
+  color: #718096;
+}
+
+.canal-progress {
+  width: 100%;
+  height: 10px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.canal-progress-bar {
+  height: 100%;
+  background: #4299e1;
+  transition: width 0.3s;
+}
+
+.canal-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #4a5568;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2d3748;
+}
+
+#closeModal {
+  font-size: 24px;
+  cursor: pointer;
+  color: #718096;
+}
+
+#closeModal:hover {
+  color: #2d3748;
+}
+
+#modalBody {
+  padding: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.plot-detail, .schedule-item, .consistency-result {
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.plot-detail h4, .schedule-item h4 {
+  margin-bottom: 10px;
+  color: #2d3748;
+}
+
+.plot-detail p, .schedule-item p {
+  margin: 5px 0;
+  color: #4a5568;
+  font-size: 14px;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.schedule-table th, .schedule-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.schedule-table th {
+  background: #e2e8f0;
+  font-weight: bold;
+  color: #2d3748;
+}
+
+.schedule-table tr:hover {
+  background: #f7fafc;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-IRRIGATED {
+  background: #00CED1;
+  color: white;
+}
+
+.status-WATER_SHORTAGE {
+  background: #FF6347;
+  color: white;
+}
+
+.status-NEEDS_WATER {
+  background: #FFA500;
+  color: white;
+}
+
+.consistency-result {
+  border-left: 4px solid #48bb78;
+}
+
+.consistency-result.inconsistent {
+  border-left-color: #f56565;
+}
+
+.consistency-result h4 {
+  margin-bottom: 10px;
+  color: #2d3748;
+}
+
+.consistency-result p {
+  color: #4a5568;
+}
