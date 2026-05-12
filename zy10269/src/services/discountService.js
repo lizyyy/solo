@@ -153,9 +153,12 @@ async function handleComplaintUpheld(complaint, deduction) {
 }
 
 async function handleReviewPass(review) {
+  const { Inspection } = require('../models');
+  const inspection = await Inspection.findByPk(review.inspectionId);
+  
   return await createDiscountAdjustment(
     review.stallId,
-    moment(review.reviewedAt).format('YYYY-MM'),
+    inspection.month,
     'review_pass',
     review.id,
     `整改复核通过，返还分数 (+${review.pointsReturned}分)`,
