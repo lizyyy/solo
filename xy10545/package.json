@@ -1,0 +1,21 @@
+{
+  "name": "customer-service-bot-escalation-api",
+  "version": "1.0.0",
+  "description": "客服机器人转人工 API - 处理机器人会话转人工时的意图、情绪、排队优先级和处理结果",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node src/seed.js",
+    "demo": "node src/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
