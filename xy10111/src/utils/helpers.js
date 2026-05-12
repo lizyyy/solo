@@ -148,8 +148,16 @@ export const exportToExcel = async (data, fileName, sheetName = 'Sheet1') => {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-  const buffer = Buffer.from(excelBuffer);
+  const excelArray = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  const uint8Array = new Uint8Array(excelArray);
+  
+  let binary = '';
+  const bytes = new Uint8Array(uint8Array);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64Data = btoa(binary);
   
   const filePath = await saveFileDialog({
     title: '保存 Excel 文件',
@@ -159,8 +167,11 @@ export const exportToExcel = async (data, fileName, sheetName = 'Sheet1') => {
   
   if (!filePath) return null;
   
-  const fs = require('fs');
-  fs.writeFileSync(filePath, buffer);
+  const result = await electronAPI.writeBinaryFile(filePath, base64Data);
+  if (!result.success) {
+    console.error('写入 Excel 文件失败:', result.error);
+    return null;
+  }
   return filePath;
 };
 
@@ -176,8 +187,11 @@ export const exportToCSV = async (data, fileName) => {
   
   if (!filePath) return null;
   
-  const fs = require('fs');
-  fs.writeFileSync(filePath, '\ufeff' + csvContent, 'utf-8');
+  const result = await electronAPI.writeFile(filePath, '\ufeff' + csvContent);
+  if (!result.success) {
+    console.error('写入 CSV 文件失败:', result.error);
+    return null;
+  }
   return filePath;
 };
 

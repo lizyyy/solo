@@ -149,3 +149,17 @@ ipcMain.handle('write-file', async (event, filePath, content) => {
     return { success: false, error: e.message };
   }
 });
+
+ipcMain.handle('write-binary-file', async (event, filePath, base64Data) => {
+  try {
+    const destDir = path.dirname(filePath);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+});

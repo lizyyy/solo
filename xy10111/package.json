@@ -4,9 +4,9 @@
   "description": "会议纪要附件分发桌面台",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\" \"wait-on http://localhost:5173 && npm run dev:electron\"",
+    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:electron\"",
     "dev:renderer": "vite",
-    "dev:electron": "electron .",
+    "dev:electron": "cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .",
     "build": "vite build && electron-builder",
     "preview": "vite preview"
   },
@@ -19,9 +19,9 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.1",
-    "vite": "^5.0.0",
-    "wait-on": "^7.2.0"
+    "vite": "^5.0.0"
   }
 }
