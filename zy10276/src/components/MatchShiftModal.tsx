@@ -1,49 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, AlertTriangle, User, Clock } from 'lucide-react';
-import { Shift, ViolationRecord } from '../types';
-import { getShifts, getVehicles, getViolations, matchShift, getDriverName } from '../services/violationService';
+import { shiftApi, violationApi } from '../services/api';
 import { formatDateTime } from '../utils/format';
 
 interface MatchShiftModalProps {
   violationId: string;
+  plateNumber: string;
   onClose: () => void;
 }
 
-const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, onClose }) => {
-  const [violation, setViolation] = useState<ViolationRecord | null>(null);
-  const [shifts, setShifts] = useState<Shift[]>([]);
+const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, plateNumber, onClose }) => {
+  const [shifts, setShifts] = useState<any[]>([]);
   const [selectedShift, setSelectedShift] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, [violationId]);
+    loadShifts();
+  }, []);
 
-  const loadData = () => {
-    const violations = getViolations();
-    const v = violations.find((v) => v.id === violationId);
-    setViolation(v || null);
-
-    if (v) {
-      const vehicles = getVehicles();
-      const vehicle = vehicles.find((veh) => veh.plateNumber === v.plateNumber);
-      if (vehicle) {
-        const allShifts = getShifts();
-        const vehicleShifts = allShifts.filter((s) => s.vehicleId === vehicle.id);
-        setShifts(vehicleShifts);
-      }
+  const loadShifts = async () => {
+    try {
+      const response = await shiftApi.getAll();
+      setShifts(response.data || []);
+    } catch (error) {
+      console.error('加载班次失败:', error);
     }
   };
 
-  const handleMatch = () => {
+  const handleMatch = async () => {
     if (!selectedShift) {
       alert('请选择要匹配的班次');
       return;
     }
-    matchShift(violationId, selectedShift, '张三', 'admin');
-    onClose();
+    setLoading(true);
+    try {
+      await violationApi.matchShift(violationId, selectedShift);
+      onClose();
+    } catch (error: any) {
+      alert(error.message || '匹配失败');
+    } finally {
+      setLoading(false);
+    }
   };
-
-  if (!violation) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -55,30 +53,21 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, onClose 
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">匹配班次</h2>
-              <p className="text-sm text-gray-500">{violation.plateNumber} - {formatDateTime(violation.violationTime)}</p>
+              <p className="text-sm text-gray-500">{plateNumber}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-700">
-              违章信息：{violation.location} - {violation.description}
-            </p>
-          </div>
-
           <h3 className="text-sm font-medium text-gray-700 mb-3">可匹配的班次：</h3>
           
           {shifts.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Clock className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-              <p>该车暂无班次记录</p>
+              <p>暂无班次记录</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -100,20 +89,18 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, onClose 
                     className="mr-4"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium text-gray-900">
-                          {getDriverName(shift.driverId)}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {shift.notes || '常规班次'}
+                    <div className="flex items-center space-x-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <span className="font-medium text-gray-900">
+                        {shift.driverId} {/* 实际项目中需要关联显示司机名 */}
                       </span>
                     </div>
                     <div className="mt-1 text-sm text-gray-500">
                       {formatDateTime(shift.startTime)} ~ {formatDateTime(shift.endTime)}
                     </div>
+                    {shift.notes && (
+                      <div className="mt-1 text-xs text-gray-400">{shift.notes}</div>
+                    )}
                   </div>
                   {selectedShift === shift.id && (
                     <Check className="w-5 h-5 text-blue-500 ml-2" />
@@ -133,9 +120,15 @@ const MatchShiftModal: React.FC<MatchShiftModalProps> = ({ violationId, onClose 
           </button>
           <button
             onClick={handleMatch}
-            disabled={shifts.length === 0}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={loading || shifts.length === 0}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
+            {loading && (
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
             确认匹配
           </button>
         </div>

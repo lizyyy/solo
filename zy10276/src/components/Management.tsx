@@ -1,114 +1,106 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Car, Clock, Plus, X, Pencil, Trash2 } from 'lucide-react';
-import { Driver, Vehicle, Shift } from '../types';
-import { getDrivers, saveDrivers, getVehicles, saveVehicles, getShifts, saveShifts, generateId } from '../store/storage';
+import { driverApi, vehicleApi, shiftApi } from '../services/api';
 import { formatDateTime } from '../utils/format';
 
 type TabType = 'drivers' | 'vehicles' | 'shifts';
 
 const Management: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('drivers');
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [shifts, setShifts] = useState<Shift[]>([]);
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [shifts, setShifts] = useState<any[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    setDrivers(getDrivers());
-    setVehicles(getVehicles());
-    setShifts(getShifts());
-  };
-
-  const handleSaveDriver = (data: Partial<Driver>) => {
-    if (editingItem) {
-      const updated = drivers.map((d) =>
-        d.id === editingItem.id ? { ...d, ...data } : d
-      );
-      saveDrivers(updated);
-      setDrivers(updated);
-    } else {
-      const newDriver: Driver = {
-        id: generateId(),
-        name: data.name || '',
-        licenseNumber: data.licenseNumber || '',
-        phone: data.phone || '',
-        totalPoints: 12,
-        remainingPoints: 12,
-      };
-      const updated = [newDriver, ...drivers];
-      saveDrivers(updated);
-      setDrivers(updated);
+  const loadData = async () => {
+    try {
+      const [driversRes, vehiclesRes, shiftsRes] = await Promise.all([
+        driverApi.getAll(),
+        vehicleApi.getAll(),
+        shiftApi.getAll(),
+      ]);
+      setDrivers(driversRes.data || []);
+      setVehicles(vehiclesRes.data || []);
+      setShifts(shiftsRes.data || []);
+    } catch (error) {
+      console.error('加载数据失败:', error);
     }
-    setShowAddModal(false);
-    setEditingItem(null);
   };
 
-  const handleSaveVehicle = (data: Partial<Vehicle>) => {
-    if (editingItem) {
-      const updated = vehicles.map((v) =>
-        v.id === editingItem.id ? { ...v, ...data } : v
-      );
-      saveVehicles(updated);
-      setVehicles(updated);
-    } else {
-      const newVehicle: Vehicle = {
-        id: generateId(),
-        plateNumber: data.plateNumber || '',
-        vehicleType: data.vehicleType || '',
-        brand: data.brand || '',
-      };
-      const updated = [newVehicle, ...vehicles];
-      saveVehicles(updated);
-      setVehicles(updated);
+  const handleSaveDriver = async (data: any) => {
+    setLoading(true);
+    try {
+      if (editingItem) {
+        await driverApi.update(editingItem.id, data);
+      } else {
+        await driverApi.create(data);
+      }
+      loadData();
+      setShowAddModal(false);
+      setEditingItem(null);
+    } catch (error: any) {
+      alert(error.message || '保存失败');
+    } finally {
+      setLoading(false);
     }
-    setShowAddModal(false);
-    setEditingItem(null);
   };
 
-  const handleSaveShift = (data: Partial<Shift>) => {
-    if (editingItem) {
-      const updated = shifts.map((s) =>
-        s.id === editingItem.id ? { ...s, ...data } : s
-      );
-      saveShifts(updated);
-      setShifts(updated);
-    } else {
-      const newShift: Shift = {
-        id: generateId(),
-        vehicleId: data.vehicleId || '',
-        driverId: data.driverId || '',
-        startTime: data.startTime || '',
-        endTime: data.endTime || '',
-        notes: data.notes || '',
-      };
-      const updated = [newShift, ...shifts];
-      saveShifts(updated);
-      setShifts(updated);
+  const handleSaveVehicle = async (data: any) => {
+    setLoading(true);
+    try {
+      if (editingItem) {
+        await vehicleApi.update(editingItem.id, data);
+      } else {
+        await vehicleApi.create(data);
+      }
+      loadData();
+      setShowAddModal(false);
+      setEditingItem(null);
+    } catch (error: any) {
+      alert(error.message || '保存失败');
+    } finally {
+      setLoading(false);
     }
-    setShowAddModal(false);
-    setEditingItem(null);
   };
 
-  const handleDelete = (id: string) => {
+  const handleSaveShift = async (data: any) => {
+    setLoading(true);
+    try {
+      if (editingItem) {
+        await shiftApi.update(editingItem.id, data);
+      } else {
+        await shiftApi.create(data);
+      }
+      loadData();
+      setShowAddModal(false);
+      setEditingItem(null);
+    } catch (error: any) {
+      alert(error.message || '保存失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
     if (!confirm('确定要删除吗？')) return;
 
-    if (activeTab === 'drivers') {
-      const updated = drivers.filter((d) => d.id !== id);
-      saveDrivers(updated);
-      setDrivers(updated);
-    } else if (activeTab === 'vehicles') {
-      const updated = vehicles.filter((v) => v.id !== id);
-      saveVehicles(updated);
-      setVehicles(updated);
-    } else {
-      const updated = shifts.filter((s) => s.id !== id);
-      saveShifts(updated);
-      setShifts(updated);
+    try {
+      if (activeTab === 'drivers') {
+        await driverApi.delete(id);
+      } else if (activeTab === 'vehicles') {
+        await vehicleApi.delete(id);
+      } else {
+        await shiftApi.delete(id);
+      }
+      loadData();
+    } catch (error: any) {
+      alert(error.message || '删除失败');
     }
   };
 
@@ -117,13 +109,13 @@ const Management: React.FC = () => {
       editingItem || {}
     );
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
       if (activeTab === 'drivers') {
-        handleSaveDriver(formData);
+        await handleSaveDriver(formData);
       } else if (activeTab === 'vehicles') {
-        handleSaveVehicle(formData);
+        await handleSaveVehicle(formData);
       } else {
-        handleSaveShift(formData);
+        await handleSaveShift(formData);
       }
     };
 
@@ -290,9 +282,10 @@ const Management: React.FC = () => {
             </button>
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              保存
+              {loading ? '保存中...' : '保存'}
             </button>
           </div>
         </div>
@@ -372,21 +365,21 @@ const Management: React.FC = () => {
                       <td className="px-4 py-3 whitespace-nowrap">
                         <div className="flex items-center space-x-2">
                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-medium text-blue-600">{driver.name[0]}</span>
+                            <span className="text-sm font-medium text-blue-600">{driver.name?.[0] || ''}</span>
                           </div>
                           <span className="font-medium text-gray-900">{driver.name}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{driver.licenseNumber}</td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{driver.phone}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{driver.totalPoints}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{driver.totalPoints || 12}</td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          driver.remainingPoints >= 9 ? 'bg-green-100 text-green-800' :
-                          driver.remainingPoints >= 6 ? 'bg-yellow-100 text-yellow-800' :
+                          (driver.remainingPoints || 12) >= 9 ? 'bg-green-100 text-green-800' :
+                          (driver.remainingPoints || 12) >= 6 ? 'bg-yellow-100 text-yellow-800' :
                           'bg-red-100 text-red-800'
                         }`}>
-                          {driver.remainingPoints}
+                          {driver.remainingPoints || 12}
                         </span>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-right">

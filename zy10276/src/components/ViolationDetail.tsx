@@ -1,42 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import { X, Clock, AlertCircle, RotateCcw, FileText } from 'lucide-react';
-import { ViolationRecord, Penalty, ProcessingHistory } from '../types';
-import { getDriverName, getPenalties, getAppealByViolationId } from '../services/violationService';
-import { getHistory } from '../store/storage';
+import { X, Clock, AlertCircle, RotateCcw, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { violationApi, historyApi } from '../services/api';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
 import Timeline from './Timeline';
 import RollbackModal from './RollbackModal';
 
 interface ViolationDetailProps {
-  violation: ViolationRecord;
+  violation: any;
   onClose: () => void;
   onRefresh: () => void;
 }
 
 const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, onRefresh }) => {
-  const [histories, setHistories] = useState<ProcessingHistory[]>([]);
-  const [penalty, setPenalty] = useState<Penalty | null>(null);
+  const [histories, setHistories] = useState<any[]>([]);
+  const [penalty, setPenalty] = useState<any | null>(null);
   const [appeal, setAppeal] = useState<any>(null);
   const [showRollback, setShowRollback] = useState(false);
+  const [reviewNotes, setReviewNotes] = useState('');
+  const [reviewing, setReviewing] = useState(false);
 
   useEffect(() => {
     loadData();
   }, [violation.id]);
 
-  const loadData = () => {
-    const allHistories = getHistory();
-    setHistories(allHistories.filter((h) => h.violationId === violation.id));
+  const loadData = async () => {
+    try {
+      const historyResponse = await historyApi.getByViolationId(violation.id);
+      setHistories(historyResponse.data || []);
 
-    const allPenalties = getPenalties();
-    setPenalty(allPenalties.find((p) => p.violationId === violation.id) || null);
+      const penaltyResponse = await violationApi.getPenalty(violation.id);
+      setPenalty(penaltyResponse.data || null);
 
-    setAppeal(getAppealByViolationId(violation.id));
+      const appealResponse = await violationApi.getAppeal(violation.id);
+      setAppeal(appealResponse.data || null);
+    } catch (error) {
+      console.error('加载详情失败:', error);
+    }
   };
 
   const handleRollbackSuccess = () => {
     setShowRollback(false);
     onRefresh();
     loadData();
+  };
+
+  const handleReviewAppeal = async (approved: boolean) => {
+    if (!reviewNotes.trim()) {
+      alert('请填写审核意见');
+      return;
+    }
+
+    setReviewing(true);
+    try {
+      await violationApi.reviewAppeal(violation.id, approved, reviewNotes, '管理员');
+      onRefresh();
+      loadData();
+    } catch (error: any) {
+      alert(error.message || '审核失败');
+    } finally {
+      setReviewing(false);
+    }
   };
 
   return (
@@ -49,7 +72,7 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">违章详情</h2>
-              <p className="text-sm text-gray-500">{violation.violationNumber}</p>
+              <p className="text-sm text-gray-500">{violation.violationNumber || '-'}</p>
             </div>
           </div>
           <button
@@ -104,7 +127,7 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
                   <div>
                     <dt className="text-xs text-gray-500">匹配司机</dt>
                     <dd className="text-sm font-medium text-gray-900">
-                      {violation.matchedDriverId ? getDriverName(violation.matchedDriverId) : '未匹配'}
+                      {violation.matchedDriverId || '未匹配'}
                     </dd>
                   </div>
                 </dl>
@@ -152,7 +175,7 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
                   {penalty.isRolledBack && (
                     <div className="mt-3 pt-3 border-t border-red-200">
                       <div className="text-xs text-gray-500">回滚时间</div>
-                      <div className="text-sm text-gray-900">{formatDateTime(penalty.rolledBackAt!)}</div>
+                      <div className="text-sm text-gray-900">{formatDateTime(penalty.rolledBackAt)}</div>
                       <div className="text-xs text-gray-500 mt-2">回滚原因</div>
                       <div className="text-sm text-gray-700">{penalty.rollbackReason}</div>
                     </div>
@@ -186,6 +209,39 @@ const ViolationDetail: React.FC<ViolationDetailProps> = ({ violation, onClose, o
                       </div>
                     )}
                   </dl>
+
+                  {appeal.status === 'pending' && (
+                    <div className="mt-4 pt-4 border-t border-orange-200">
+                      <div className="mb-3">
+                        <label className="block text-xs text-gray-500 mb-1">审核意见</label>
+                        <textarea
+                          value={reviewNotes}
+                          onChange={(e) => setReviewNotes(e.target.value)}
+                          placeholder="请填写审核意见..."
+                          rows={2}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                      </div>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleReviewAppeal(true)}
+                          disabled={reviewing || !reviewNotes.trim()}
+                          className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          通过申诉
+                        </button>
+                        <button
+                          onClick={() => handleReviewAppeal(false)}
+                          disabled={reviewing || !reviewNotes.trim()}
+                          className="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          驳回申诉
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

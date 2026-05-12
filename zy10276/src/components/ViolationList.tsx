@@ -1,57 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Eye, CheckCircle, AlertTriangle, Gavel } from 'lucide-react';
-import { ViolationRecord, ViolationFilterParams } from '../types';
-import { filterViolations, getDriverName, applyPenalty, confirmViolation } from '../services/violationService';
+import { ViolationFilterParams } from '../types';
+import { violationApi, driverApi } from '../services/api';
 import { formatDateTime, getStatusText, getViolationTypeText, formatMoney } from '../utils/format';
 import ViolationDetail from './ViolationDetail';
 import MatchShiftModal from './MatchShiftModal';
 import AppealModal from './AppealModal';
 
 const ViolationList: React.FC = () => {
-  const [violations, setViolations] = useState<ViolationRecord[]>([]);
+  const [violations, setViolations] = useState<any[]>([]);
+  const [drivers, setDrivers] = useState<any[]>([]);
   const [filters, setFilters] = useState<ViolationFilterParams>({});
-  const [selectedViolation, setSelectedViolation] = useState<ViolationRecord | null>(null);
+  const [selectedViolation, setSelectedViolation] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showMatchModal, setShowMatchModal] = useState(false);
   const [showAppealModal, setShowAppealModal] = useState(false);
-  const [matchViolationId, setMatchViolationId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadViolations();
+    loadData();
+    loadDrivers();
   }, [filters]);
 
-  const loadViolations = () => {
-    const data = filterViolations(filters);
-    setViolations(data);
-  };
-
-  const handleConfirm = (violation: ViolationRecord) => {
-    if (violation.matchedDriverId) {
-      confirmViolation(violation.id, violation.matchedDriverId, '张三', 'admin');
-      loadViolations();
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const response = await violationApi.filter(filters);
+      setViolations(response.data || []);
+    } catch (error) {
+      console.error('加载违章记录失败:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePenalize = (violation: ViolationRecord) => {
+  const loadDrivers = async () => {
     try {
-      applyPenalty(violation.id, '张三', 'admin');
-      loadViolations();
+      const response = await driverApi.getAll();
+      setDrivers(response.data || []);
+    } catch (error) {
+      console.error('加载司机列表失败:', error);
+    }
+  };
+
+  const getDriverName = (driverId: string): string => {
+    const driver = drivers.find((d) => d.id === driverId);
+    return driver?.name || '-';
+  };
+
+  const handleConfirm = async (violation: any) => {
+    if (!violation.matchedDriverId) return;
+    try {
+      await violationApi.confirm(violation.id, violation.matchedDriverId);
+      loadData();
     } catch (error: any) {
       alert(error.message);
     }
   };
 
-  const handleMatchShift = (violationId: string) => {
-    setMatchViolationId(violationId);
-    setShowMatchModal(true);
+  const handlePenalize = async (violation: any) => {
+    try {
+      await violationApi.applyPenalty(violation.id);
+      loadData();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
-  const handleAppeal = (violation: ViolationRecord) => {
+  const handleAppeal = (violation: any) => {
     setSelectedViolation(violation);
     setShowAppealModal(true);
   };
 
-
+  const handleMatchShift = (violation: any) => {
+    setSelectedViolation(violation);
+    setShowMatchModal(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -130,7 +154,13 @@ const ViolationList: React.FC = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {violations.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
+                  加载中...
+                </td>
+              </tr>
+            ) : violations.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
                   暂无违章记录
@@ -152,7 +182,7 @@ const ViolationList: React.FC = () => {
                     {violation.location}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                    {violation.matchedDriverId ? getDriverName(violation.matchedDriverId) : '-'}
+                    {getDriverName(violation.matchedDriverId)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     <span className="text-red-600 font-medium">{violation.points}分</span>
@@ -179,7 +209,7 @@ const ViolationList: React.FC = () => {
                       
                       {violation.status === 'imported' && (
                         <button
-                          onClick={() => handleMatchShift(violation.id)}
+                          onClick={() => handleMatchShift(violation)}
                           className="text-yellow-600 hover:text-yellow-900 p-1"
                           title="匹配班次"
                         >
@@ -231,17 +261,18 @@ const ViolationList: React.FC = () => {
             setShowDetail(false);
             setSelectedViolation(null);
           }}
-          onRefresh={loadViolations}
+          onRefresh={loadData}
         />
       )}
 
-      {showMatchModal && matchViolationId && (
+      {showMatchModal && selectedViolation && (
         <MatchShiftModal
-          violationId={matchViolationId}
+          violationId={selectedViolation.id}
+          plateNumber={selectedViolation.plateNumber}
           onClose={() => {
             setShowMatchModal(false);
-            setMatchViolationId(null);
-            loadViolations();
+            setSelectedViolation(null);
+            loadData();
           }}
         />
       )}
@@ -252,7 +283,7 @@ const ViolationList: React.FC = () => {
           onClose={() => {
             setShowAppealModal(false);
             setSelectedViolation(null);
-            loadViolations();
+            loadData();
           }}
         />
       )}

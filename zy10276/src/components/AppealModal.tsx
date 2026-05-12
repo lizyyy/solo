@@ -1,61 +1,45 @@
 import React, { useState } from 'react';
 import { X, AlertCircle, Upload, FileText } from 'lucide-react';
-import { ViolationRecord } from '../types';
-import { submitAppeal } from '../services/violationService';
-import { formatDateTime } from '../utils/format';
+import { violationApi } from '../services/api';
 
 interface AppealModalProps {
-  violation: ViolationRecord;
+  violation: any;
   onClose: () => void;
-}
-
-interface UploadedFile {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
 }
 
 const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
   const [reason, setReason] = useState('');
-  const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFiles = e.target.files;
-    if (uploadedFiles) {
-      const newFiles: UploadedFile[] = Array.from(uploadedFiles).map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      }));
-      setFiles([...files, ...newFiles]);
+    if (e.target.files) {
+      setFiles([...files, ...Array.from(e.target.files)]);
     }
   };
 
-  const removeFile = (id: string) => {
-    setFiles(files.filter((f) => f.id !== id));
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!reason.trim()) {
       alert('请填写申诉原因');
       return;
     }
 
-    setSubmitting(true);
+    if (!violation.matchedDriverId) {
+      alert('请先匹配司机');
+      return;
+    }
 
+    setSubmitting(true);
     try {
-      submitAppeal(
-        violation.id,
-        violation.matchedDriverId || '',
-        reason,
-        files
-      );
+      const materials = files.map(f => ({ name: f.name, type: f.type, size: f.size }));
+      await violationApi.submitAppeal(violation.id, violation.matchedDriverId, reason, materials);
       onClose();
-    } catch (error) {
-      alert('申诉提交失败，请重试');
+    } catch (error: any) {
+      alert(error.message || '申诉提交失败');
     } finally {
       setSubmitting(false);
     }
@@ -77,13 +61,10 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">提交申诉</h2>
-              <p className="text-sm text-gray-500">{violation.plateNumber} - {formatDateTime(violation.violationTime)}</p>
+              <p className="text-sm text-gray-500">{violation.plateNumber}</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -92,9 +73,7 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-2">违章信息</h3>
-              <p className="text-sm text-gray-600">
-                {violation.location} - {violation.description}
-              </p>
+              <p className="text-sm text-gray-600">{violation.location} - {violation.description}</p>
               <p className="text-sm text-gray-600 mt-1">
                 扣分：<span className="text-red-600 font-medium">{violation.points} 分</span>
                 <span className="mx-2">/</span>
@@ -131,17 +110,14 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
                 <label htmlFor="file-upload" className="cursor-pointer">
                   <Upload className="w-10 h-10 mx-auto mb-2 text-gray-400" />
                   <p className="text-sm text-gray-600">点击或拖拽文件到此处上传</p>
-                  <p className="text-xs text-gray-400 mt-1">支持图片、PDF、Word 文档，单个文件不超过 10MB</p>
+                  <p className="text-xs text-gray-400 mt-1">支持图片、PDF、Word 文档</p>
                 </label>
               </div>
 
               {files.length > 0 && (
                 <div className="mt-4 space-y-2">
-                  {files.map((file) => (
-                    <div
-                      key={file.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                    >
+                  {files.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-gray-400" />
                         <div>
@@ -150,7 +126,7 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
                         </div>
                       </div>
                       <button
-                        onClick={() => removeFile(file.id)}
+                        onClick={() => removeFile(index)}
                         className="text-red-500 hover:text-red-700 p-1"
                       >
                         <X className="w-4 h-4" />
@@ -159,16 +135,6 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
                   ))}
                 </div>
               )}
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-yellow-800 mb-2">温馨提示</h4>
-              <ul className="text-xs text-yellow-700 space-y-1">
-                <li>• 请确保提交的证明材料真实有效</li>
-                <li>• 申诉审核通常需要 1-3 个工作日</li>
-                <li>• 申诉通过后，已扣分数将回退，罚款将退还</li>
-                <li>• 申诉期间不影响违章记录的正常流程</li>
-              </ul>
             </div>
           </div>
         </div>
@@ -185,17 +151,13 @@ const AppealModal: React.FC<AppealModalProps> = ({ violation, onClose }) => {
             disabled={submitting || !reason.trim()}
             className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
-            {submitting ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                提交中...
-              </>
-            ) : (
-              '提交申诉'
+            {submitting && (
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
             )}
+            提交申诉
           </button>
         </div>
       </div>

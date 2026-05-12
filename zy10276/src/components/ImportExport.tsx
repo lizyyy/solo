@@ -1,13 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Download, FileText, AlertCircle, Check } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { ImportBatch, ViolationRecord } from '../types';
-import { importViolations, getBatches } from '../services/violationService';
+import { batchApi, violationApi } from '../services/api';
 import { formatDateTime } from '../utils/format';
 
 const ImportExport: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'import' | 'export' | 'batches'>('import');
-  const [batches, setBatches] = useState<ImportBatch[]>([]);
+  const [batches, setBatches] = useState<any[]>([]);
   const [importResult, setImportResult] = useState<{
     success: number;
     duplicate: number;
@@ -15,38 +14,57 @@ const ImportExport: React.FC = () => {
     fileName: string;
   } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
-    loadBatches();
-  }, []);
+  useEffect(() => {
+    if (activeTab === 'batches') {
+      loadBatches();
+    }
+  }, [activeTab]);
 
-  const loadBatches = () => {
-    setBatches(getBatches());
+  const loadBatches = async () => {
+    try {
+      const response = await batchApi.getAll();
+      setBatches(response.data || []);
+    } catch (error) {
+      console.error('加载批次失败:', error);
+    }
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls') && !file.name.endsWith('.csv')) {
       alert('请上传 Excel 或 CSV 文件');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = e.target?.result;
-      const workbook = XLSX.read(data, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(sheet);
+    setLoading(true);
 
-      const result = importViolations(jsonData, file.name, '张三');
-      setImportResult({
-        success: result.batch.successfulRecords,
-        duplicate: result.batch.duplicateRecords,
-        total: result.batch.totalRecords,
-        fileName: result.batch.fileName,
-      });
-      loadBatches();
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = e.target?.result;
+        const workbook = XLSX.read(data, { type: 'binary' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+
+        const response = await batchApi.import(jsonData, file.name, '管理员');
+        const result = response.data;
+
+        setImportResult({
+          success: result.successfulRecords,
+          duplicate: result.duplicateRecords,
+          total: result.totalRecords,
+          fileName: result.fileName,
+        });
+
+        loadBatches();
+      } catch (error: any) {
+        alert(error.message || '导入失败');
+      } finally {
+        setLoading(false);
+      }
     };
     reader.readAsBinaryString(file);
   };
@@ -67,26 +85,33 @@ const ImportExport: React.FC = () => {
     setIsDragging(false);
   };
 
-  const handleExport = () => {
-    const violations = JSON.parse(localStorage.getItem('violation_records') || '[]');
-    const exportData = violations.map((v: ViolationRecord) => ({
-      '违章编号': v.violationNumber,
-      '车牌号': v.plateNumber,
-      '违章时间': v.violationTime,
-      '违章类型': v.violationType,
-      '违章地点': v.location,
-      '违章描述': v.description,
-      '扣分': v.points,
-      '罚款金额': v.fineAmount,
-      '状态': v.status,
-      '匹配司机': v.matchedDriverId || '',
-      '导入时间': v.importedAt,
-    }));
+  const handleExport = async () => {
+    try {
+      const response = await violationApi.getAll();
+      const violations = response.data || [];
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, '违章记录');
-    XLSX.writeFile(wb, `违章记录_${new Date().toISOString().split('T')[0]}.xlsx`);
+      const exportData = violations.map((v: any) => ({
+        '违章编号': v.violationNumber,
+        '车牌号': v.plateNumber,
+        '违章时间': v.violationTime,
+        '违章类型': v.violationType,
+        '违章地点': v.location,
+        '违章描述': v.description,
+        '扣分': v.points,
+        '罚款金额': v.fineAmount,
+        '状态': v.status,
+        '匹配司机': v.matchedDriverId || '',
+        '导入时间': v.importedAt,
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '违章记录');
+      XLSX.writeFile(wb, `违章记录_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } catch (error) {
+      console.error('导出失败:', error);
+      alert('导出失败，请重试');
+    }
   };
 
   const downloadTemplate = () => {
@@ -183,14 +208,15 @@ const ImportExport: React.FC = () => {
             />
             <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium text-gray-700 mb-2">
-              拖拽文件到此处或点击上传
+              {loading ? '正在导入...' : '拖拽文件到此处或点击上传'}
             </p>
             <p className="text-sm text-gray-500 mb-4">
               支持 Excel (.xlsx, .xls) 和 CSV 格式
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               选择文件
             </button>
