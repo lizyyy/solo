@@ -2,6 +2,152 @@ let currentInvoices = [];
 let selectedInvoiceId = null;
 let currentFilters = { status: '', keyword: '' };
 
+const isElectron = !!window.api;
+
+const webAPI = {
+  async importFiles() {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.accept = '.jpg,.jpeg,.png,.pdf,.tiff,.gif,.bmp';
+      
+      input.onchange = async (e) => {
+        if (!e.target.files || e.target.files.length === 0) {
+          resolve({ success: false, canceled: true });
+          return;
+        }
+
+        const formData = new FormData();
+        for (const file of e.target.files) {
+          formData.append('files', file);
+        }
+
+        try {
+          const response = await fetch('/api/import', {
+            method: 'POST',
+            body: formData
+          });
+          const result = await response.json();
+          resolve(result);
+        } catch (err) {
+          resolve({ success: false, error: err.message });
+        }
+      };
+
+      input.oncancel = () => {
+        resolve({ success: false, canceled: true });
+      };
+
+      input.click();
+    });
+  },
+
+  async getInvoices(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.status) params.append('status', filters.status);
+    if (filters.keyword) params.append('keyword', filters.keyword);
+    
+    const response = await fetch(`/api/invoices?${params}`);
+    return await response.json();
+  },
+
+  async getInvoice(id) {
+    const response = await fetch(`/api/invoices/${id}`);
+    return await response.json();
+  },
+
+  async saveInvoice(id, data) {
+    const response = await fetch(`/api/invoices/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    return await response.json();
+  },
+
+  async reviewInvoice(id, reviewer = '系统') {
+    const response = await fetch(`/api/invoices/${id}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewer })
+    });
+    return await response.json();
+  },
+
+  async unreviewInvoice(id) {
+    const response = await fetch(`/api/invoices/${id}/unreview`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return await response.json();
+  },
+
+  async deleteInvoice(id) {
+    const response = await fetch(`/api/invoices/${id}`, {
+      method: 'DELETE'
+    });
+    return await response.json();
+  },
+
+  async getOperationsLog(limit = 100) {
+    const response = await fetch(`/api/operations?limit=${limit}`);
+    return await response.json();
+  },
+
+  async exportExcel(filters = {}) {
+    const response = await fetch('/api/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(filters)
+    });
+
+    if (!response.ok) {
+      return { success: false, error: '导出失败' };
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `票据清单_${new Date().toISOString().split('T')[0]}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  },
+
+  async getStats() {
+    const response = await fetch('/api/stats');
+    return await response.json();
+  },
+
+  async getFilePreview(filePath) {
+    const invoiceId = selectedInvoiceId;
+    if (!invoiceId) {
+      return { success: false, error: '未选择票据' };
+    }
+
+    const response = await fetch(`/api/preview/${invoiceId}`);
+    return await response.json();
+  },
+
+  async openFile(filePath) {
+    return { success: false, error: 'Web版本不支持直接打开文件，请在浏览器中查看' };
+  },
+
+  async showFileInFolder(filePath) {
+    return { success: false, error: 'Web版本不支持在文件夹中显示' };
+  },
+
+  onMenuImportFiles(callback) {},
+  onMenuExport(callback) {}
+};
+
+const api = isElectron ? window.api : webAPI;
+
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
 });
@@ -11,9 +157,12 @@ function initializeApp() {
   loadInvoices();
   loadStats();
   
-  if (window.api) {
-    window.api.onMenuImportFiles(() => handleImportFiles());
-    window.api.onMenuExport(() => handleExportExcel());
+  api.onMenuImportFiles(() => handleImportFiles());
+  api.onMenuExport(() => handleExportExcel());
+
+  if (!isElectron) {
+    document.getElementById('btn-open-file').style.display = 'none';
+    document.getElementById('btn-show-in-folder').style.display = 'none';
   }
 }
 
@@ -67,7 +216,7 @@ function switchTab(tabName) {
 
 async function loadInvoices() {
   try {
-    const result = await window.api.getInvoices(currentFilters);
+    const result = await api.getInvoices(currentFilters);
     if (result.success) {
       currentInvoices = result.data;
       renderInvoiceList();
@@ -80,7 +229,7 @@ async function loadInvoices() {
 
 async function loadStats() {
   try {
-    const result = await window.api.getStats();
+    const result = await api.getStats();
     if (result.success) {
       document.getElementById('stat-total').textContent = result.data.total;
       document.getElementById('stat-pending').textContent = result.data.pending;
@@ -151,7 +300,7 @@ async function selectInvoice(id) {
   renderInvoiceList();
 
   try {
-    const result = await window.api.getInvoice(id);
+    const result = await api.getInvoice(id);
     if (result.success) {
       showInvoiceDetail(result.data);
     }
@@ -211,7 +360,7 @@ async function loadFilePreview(filePath) {
   const previewContainer = document.getElementById('preview-container');
   
   try {
-    const result = await window.api.getFilePreview(filePath);
+    const result = await api.getFilePreview(filePath);
     
     if (!result.success) {
       previewContainer.innerHTML = `
@@ -224,13 +373,16 @@ async function loadFilePreview(filePath) {
     }
 
     if (result.type === 'image') {
-      previewContainer.innerHTML = `<img src="${result.dataUrl}" alt="图片预览">`;
+      const url = result.dataUrl || result.url;
+      previewContainer.innerHTML = `<img src="${url}" alt="图片预览">`;
     } else if (result.type === 'pdf') {
       previewContainer.innerHTML = `
         <div class="preview-placeholder">
           <div class="preview-icon">📄</div>
           <p>PDF 文件</p>
-          <p style="font-size: 12px; margin-top: 8px;">${result.message}</p>
+          <p style="font-size: 12px; margin-top: 8px;">
+            ${isElectron ? result.message : `<a href="${result.url}" target="_blank">点击在新标签页查看</a>`}
+          </p>
         </div>
       `;
     } else {
@@ -253,28 +405,28 @@ async function loadFilePreview(filePath) {
 
 async function handleImportFiles() {
   try {
-    const result = await window.api.importFiles();
+    const result = await api.importFiles();
     
     if (result.canceled) {
       return;
     }
 
     if (!result.success) {
-      showToast('导入失败', 'error');
+      showToast(result.message || '导入失败', 'error');
       return;
     }
 
     const { imported, duplicates, errors } = result;
 
-    if (imported.length > 0) {
+    if (imported && imported.length > 0) {
       showToast(`成功导入 ${imported.length} 个文件`, 'success');
     }
 
-    if (duplicates.length > 0) {
+    if (duplicates && duplicates.length > 0) {
       showImportWarnings(duplicates);
     }
 
-    if (errors.length > 0) {
+    if (errors && errors.length > 0) {
       showImportErrors(errors);
     }
 
@@ -336,7 +488,7 @@ async function handleSaveInvoice() {
   };
 
   try {
-    const result = await window.api.saveInvoice(selectedInvoiceId, data);
+    const result = await api.saveInvoice(selectedInvoiceId, data);
     
     if (result.success) {
       showToast('保存成功', 'success');
@@ -344,7 +496,7 @@ async function handleSaveInvoice() {
       await loadStats();
       
       if (selectedInvoiceId) {
-        const detailResult = await window.api.getInvoice(selectedInvoiceId);
+        const detailResult = await api.getInvoice(selectedInvoiceId);
         if (detailResult.success) {
           showInvoiceDetail(detailResult.data);
         }
@@ -409,10 +561,10 @@ async function handleReviewInvoice() {
 
   showModal({
     title: '确认复核',
-    body: '<p>确定要将此票据标记为"已复核"吗？</p><p>复核后项目号和审批单号将与已锁定，不能被其他票据使用。</p>',
+    body: '<p>确定要将此票据标记为"已复核"吗？</p><p>复核后项目号和审批单号将锁定，不能被其他票据使用。</p>',
     onConfirm: async () => {
       try {
-        const result = await window.api.reviewInvoice(selectedInvoiceId, '当前用户');
+        const result = await api.reviewInvoice(selectedInvoiceId, '当前用户');
         
         if (result.success) {
           showToast('复核成功', 'success');
@@ -420,7 +572,7 @@ async function handleReviewInvoice() {
           await loadStats();
           
           if (selectedInvoiceId) {
-            const detailResult = await window.api.getInvoice(selectedInvoiceId);
+            const detailResult = await api.getInvoice(selectedInvoiceId);
             if (detailResult.success) {
               showInvoiceDetail(detailResult.data);
             }
@@ -467,7 +619,7 @@ async function handleUnreviewInvoice() {
     body: '<p>确定要取消此票据的复核状态吗？</p><p>取消后项目号和审批单号将释放，可以被其他票据使用。</p>',
     onConfirm: async () => {
       try {
-        const result = await window.api.unreviewInvoice(selectedInvoiceId);
+        const result = await api.unreviewInvoice(selectedInvoiceId);
         
         if (result.success) {
           showToast('已取消复核', 'success');
@@ -475,7 +627,7 @@ async function handleUnreviewInvoice() {
           await loadStats();
           
           if (selectedInvoiceId) {
-            const detailResult = await window.api.getInvoice(selectedInvoiceId);
+            const detailResult = await api.getInvoice(selectedInvoiceId);
             if (detailResult.success) {
               showInvoiceDetail(detailResult.data);
             }
@@ -502,7 +654,7 @@ async function handleDeleteInvoice() {
     body: '<p>确定要删除此票据吗？</p><p><strong>注意：</strong>此操作将同时删除该票据的所有操作记录，且无法恢复。</p>',
     onConfirm: async () => {
       try {
-        const result = await window.api.deleteInvoice(selectedInvoiceId);
+        const result = await api.deleteInvoice(selectedInvoiceId);
         
         if (result.success) {
           showToast('删除成功', 'success');
@@ -526,7 +678,7 @@ async function quickReview(id) {
   event.stopPropagation();
   
   try {
-    const result = await window.api.reviewInvoice(id, '当前用户');
+    const result = await api.reviewInvoice(id, '当前用户');
     
     if (result.success) {
       showToast('复核成功', 'success');
@@ -534,7 +686,7 @@ async function quickReview(id) {
       await loadStats();
       
       if (selectedInvoiceId === id) {
-        const detailResult = await window.api.getInvoice(id);
+        const detailResult = await api.getInvoice(id);
         if (detailResult.success) {
           showInvoiceDetail(detailResult.data);
         }
@@ -551,7 +703,7 @@ async function quickUnreview(id) {
   event.stopPropagation();
   
   try {
-    const result = await window.api.unreviewInvoice(id);
+    const result = await api.unreviewInvoice(id);
     
     if (result.success) {
       showToast('已取消复核', 'success');
@@ -559,7 +711,7 @@ async function quickUnreview(id) {
       await loadStats();
       
       if (selectedInvoiceId === id) {
-        const detailResult = await window.api.getInvoice(id);
+        const detailResult = await api.getInvoice(id);
         if (detailResult.success) {
           showInvoiceDetail(detailResult.data);
         }
@@ -580,7 +732,7 @@ async function quickDelete(id) {
     body: '<p>确定要删除此票据吗？</p><p><strong>注意：</strong>此操作无法恢复。</p>',
     onConfirm: async () => {
       try {
-        const result = await window.api.deleteInvoice(id);
+        const result = await api.deleteInvoice(id);
         
         if (result.success) {
           showToast('删除成功', 'success');
@@ -607,7 +759,7 @@ async function handleOpenFile() {
   const invoice = currentInvoices.find(i => i.id === selectedInvoiceId);
   if (!invoice) return;
 
-  const result = await window.api.openFile(invoice.original_path);
+  const result = await api.openFile(invoice.original_path);
   if (!result.success) {
     showToast(result.error, 'error');
   }
@@ -619,7 +771,7 @@ async function handleShowInFolder() {
   const invoice = currentInvoices.find(i => i.id === selectedInvoiceId);
   if (!invoice) return;
 
-  const result = await window.api.showFileInFolder(invoice.original_path);
+  const result = await api.showFileInFolder(invoice.original_path);
   if (!result.success) {
     showToast(result.error, 'error');
   }
@@ -662,16 +814,16 @@ async function handleExportExcel() {
       });
 
       try {
-        const result = await window.api.exportExcel(filters);
+        const result = await api.exportExcel(filters);
         
         if (result.canceled) {
           return;
         }
 
         if (result.success) {
-          showToast(`已导出 ${result.count} 条记录到 ${result.filePath}`, 'success');
+          showToast('导出成功', 'success');
         } else {
-          showToast('导出失败', 'error');
+          showToast(result.error || '导出失败', 'error');
         }
       } catch (err) {
         showToast('导出失败: ' + err.message, 'error');
@@ -683,7 +835,7 @@ async function handleExportExcel() {
 
 async function loadHistory() {
   try {
-    const result = await window.api.getOperationsLog(200);
+    const result = await api.getOperationsLog(200);
     if (result.success) {
       renderHistory(result.data);
     }
@@ -724,8 +876,8 @@ function renderHistory(logs) {
           details = `文件: ${parsed.filename}`;
         } else if (log.operation === 'UPDATE') {
           const fields = [];
-          if (parsed.project_no !== undefined) fields.push(`项目号`);
-          if (parsed.approval_no !== undefined) fields.push(`审批单号`);
+          if (parsed.project_no !== undefined) fields.push('项目号');
+          if (parsed.approval_no !== undefined) fields.push('审批单号');
           details = `更新了: ${fields.join(', ') || '票据信息'}`;
         } else if (parsed.reviewed_by) {
           details = `复核人: ${parsed.reviewed_by}`;
