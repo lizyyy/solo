@@ -1,0 +1,23 @@
+[project]
+name = "presale-version-cli"
+version = "1.0.0"
+description = "售前方案版本管理 CLI - 核对客户需求、报价、附件版本和评审意见"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "openpyxl>=3.1.0",
+    "python-dateutil>=2.8.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+presale = "presale_version_cli.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["presale_version_cli*"]

@@ -1,0 +1,26 @@
+技术架构 v1.0.0
+================
+
+系统整体架构：
+
+前端层：
+- Web 管理端：React + Ant Design
+- 用户端：H5 嵌入页面
+
+业务服务层：
+- 对话管理服务：Python (FastAPI)
+- 知识库服务：Python (Django)
+- 用户认证服务：Node.js (Express)
+
+数据存储：
+- MySQL：结构化数据存储
+- Redis：缓存和会话管理
+- Elasticsearch：全文搜索
+
+部署环境：
+- 容器化：Docker + Kubernetes
+- 云服务商：阿里云 ECS
+
+服务数量：5个微服务
+数据库实例：2个（主从）
+缓存节点：3个（集群模式）

@@ -1,0 +1,28 @@
+{
+  "project_id": "1f2833ce-d401-4c54-b98e-2470a28d2fa3",
+  "project_name": "测试项目",
+  "created_at": "2026-05-12T14:46:53.196209",
+  "updated_at": "2026-05-12T14:46:53.196432",
+  "documents": [],
+  "review_items": [],
+  "check_results": [],
+  "audit_logs": [
+    {
+      "id": "be7bb25c-61b3-4d31-8f52-48f262550e84",
+      "action": "INIT",
+      "actor": "tuotuo",
+      "timestamp": "2026-05-12T14:46:53.196428",
+      "before": null,
+      "after": null,
+      "description": "初始化项目: 测试项目, 版本: v1.0.0"
+    }
+  ],
+  "current_version": "v1.0.0",
+  "version_history": [
+    {
+      "version": "v1.0.0",
+      "timestamp": "2026-05-12T14:46:53.196209",
+      "description": "初始化项目"
+    }
+  ]
+}
