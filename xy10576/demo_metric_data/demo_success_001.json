@@ -1,0 +1,706 @@
+{
+  "project_id": "demo_success_001",
+  "name": "2026Q1 指标口径优化项目",
+  "description": "优化三个核心指标口径：GMV(排除测试订单)、活跃用户(修正定义)、退款率(重命名)",
+  "metrics": {
+    "gmv_v1": {
+      "metric_id": "gmv_v1",
+      "name": "总GMV",
+      "type": "counter",
+      "sql": "SELECT SUM(amount) FROM orders WHERE status = 'completed' AND is_test = false",
+      "aggregation": "sum",
+      "time_window": "daily",
+      "filters": {
+        "status": "completed",
+        "is_test": false
+      },
+      "business_owner": "wang_fan@example.com",
+      "tech_owner": "zhang_wei@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2025-11-13T17:17:22.167587"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.167591"
+      }
+    },
+    "dau_v2": {
+      "metric_id": "dau_v2",
+      "name": "日活跃用户(修正版)",
+      "type": "counter",
+      "sql": "SELECT COUNT(DISTINCT user_id) FROM user_activity WHERE activity_date = CURDATE() AND duration >= 30",
+      "aggregation": "count_distinct",
+      "time_window": "daily",
+      "filters": {
+        "activity_date": "today",
+        "min_duration": 30
+      },
+      "business_owner": "li_na@example.com",
+      "tech_owner": "chen_hong@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2025-05-12T17:17:22.167613"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.167615"
+      }
+    },
+    "refund_rate": {
+      "metric_id": "refund_rate",
+      "name": "退款率",
+      "type": "ratio",
+      "sql": "SELECT SUM(refund_amount) / SUM(total_amount) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+      "aggregation": "ratio",
+      "time_window": "weekly",
+      "filters": {
+        "time_window": "7_days"
+      },
+      "business_owner": "zhao_qiang@example.com",
+      "tech_owner": "sun_ming@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-02-11T17:17:22.167638"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.167639"
+      }
+    }
+  },
+  "old_metrics": {
+    "gmv_v1": {
+      "metric_id": "gmv_v1",
+      "name": "总GMV",
+      "type": "counter",
+      "sql": "SELECT SUM(amount) FROM orders WHERE status = 'completed'",
+      "aggregation": "sum",
+      "time_window": "daily",
+      "filters": {
+        "status": "completed"
+      },
+      "business_owner": "wang_fan@example.com",
+      "tech_owner": "zhang_wei@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2025-11-13T17:17:22.167492"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2025-11-13T17:17:22.167511"
+      }
+    },
+    "dau_v1": {
+      "metric_id": "dau_v1",
+      "name": "日活跃用户",
+      "type": "counter",
+      "sql": "SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE session_start >= DATE_SUB(NOW(), INTERVAL 1 DAY)",
+      "aggregation": "count_distinct",
+      "time_window": "daily",
+      "filters": {
+        "time_window": "1_day"
+      },
+      "business_owner": "li_na@example.com",
+      "tech_owner": "chen_hong@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2025-05-12T17:17:22.167603"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2025-05-12T17:17:22.167605"
+      }
+    },
+    "refund_ratio_old": {
+      "metric_id": "refund_ratio_old",
+      "name": "退款比率",
+      "type": "ratio",
+      "sql": "SELECT SUM(refund_amount) / SUM(total_amount) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+      "aggregation": "ratio",
+      "time_window": "weekly",
+      "filters": {
+        "time_window": "7_days"
+      },
+      "business_owner": "zhao_qiang@example.com",
+      "tech_owner": "sun_ming@example.com",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-02-11T17:17:22.167628"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-02-11T17:17:22.167631"
+      }
+    }
+  },
+  "dashboards": {
+    "dash_sales_001": {
+      "dashboard_id": "dash_sales_001",
+      "name": "销售业绩总览",
+      "owner": "wang_fan@example.com",
+      "metrics": [
+        "gmv_v1",
+        "refund_ratio_old"
+      ],
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-03-13T17:17:22.167645"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.167647"
+      }
+    },
+    "dash_user_002": {
+      "dashboard_id": "dash_user_002",
+      "name": "用户活跃度分析",
+      "owner": "li_na@example.com",
+      "metrics": [
+        "dau_v1"
+      ],
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-01-12T17:17:22.167658"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-02T17:17:22.167659"
+      }
+    },
+    "dash_ops_003": {
+      "dashboard_id": "dash_ops_003",
+      "name": "运营综合监控",
+      "owner": "yang_jie@example.com",
+      "metrics": [
+        "gmv_v1",
+        "dau_v1",
+        "refund_ratio_old"
+      ],
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-03-28T17:17:22.167676"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-07T17:17:22.167678"
+      }
+    },
+    "dash_unknown": {
+      "dashboard_id": "dash_unknown",
+      "name": "未指派看板",
+      "owner": null,
+      "metrics": [
+        "gmv_v1"
+      ],
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.167684"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.167685"
+      }
+    }
+  },
+  "backfill_tasks": {
+    "bf_gmv_202601": {
+      "task_id": "bf_gmv_202601",
+      "metric_id": "gmv_v1",
+      "start_date": {
+        "__type__": "datetime",
+        "value": "2025-01-01T00:00:00"
+      },
+      "end_date": {
+        "__type__": "datetime",
+        "value": "2025-12-31T00:00:00"
+      },
+      "status": "succeeded",
+      "retry_count": 0,
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.167693"
+      },
+      "completed_at": null,
+      "error_message": null
+    },
+    "bf_dau_202601": {
+      "task_id": "bf_dau_202601",
+      "metric_id": "dau_v2",
+      "start_date": {
+        "__type__": "datetime",
+        "value": "2025-06-01T00:00:00"
+      },
+      "end_date": {
+        "__type__": "datetime",
+        "value": "2025-12-31T00:00:00"
+      },
+      "status": "succeeded",
+      "retry_count": 0,
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T15:17:22.167711"
+      },
+      "completed_at": null,
+      "error_message": null
+    },
+    "bf_dau_202512": {
+      "task_id": "bf_dau_202512",
+      "metric_id": "dau_v2",
+      "start_date": {
+        "__type__": "datetime",
+        "value": "2025-01-01T00:00:00"
+      },
+      "end_date": {
+        "__type__": "datetime",
+        "value": "2025-05-31T00:00:00"
+      },
+      "status": "succeeded",
+      "retry_count": 2,
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-10T17:17:22.168211"
+      },
+      "completed_at": {
+        "__type__": "datetime",
+        "value": "2026-05-11T17:17:22.168214"
+      },
+      "error_message": null
+    }
+  },
+  "metric_changes": {
+    "chg_gmv_c32d80": {
+      "change_id": "chg_gmv_c32d80",
+      "old_metric": {
+        "metric_id": "gmv_v1",
+        "name": "总GMV",
+        "type": "counter",
+        "sql": "SELECT SUM(amount) FROM orders WHERE status = 'completed'",
+        "aggregation": "sum",
+        "time_window": "daily",
+        "filters": {
+          "status": "completed"
+        },
+        "business_owner": "wang_fan@example.com",
+        "tech_owner": "zhang_wei@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2025-11-13T17:17:22.167492"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2025-11-13T17:17:22.167511"
+        }
+      },
+      "new_metric": {
+        "metric_id": "gmv_v1",
+        "name": "总GMV",
+        "type": "counter",
+        "sql": "SELECT SUM(amount) FROM orders WHERE status = 'completed' AND is_test = false",
+        "aggregation": "sum",
+        "time_window": "daily",
+        "filters": {
+          "status": "completed",
+          "is_test": false
+        },
+        "business_owner": "wang_fan@example.com",
+        "tech_owner": "zhang_wei@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2025-11-13T17:17:22.167587"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-05-12T17:17:22.167591"
+        }
+      },
+      "renamed_from": null,
+      "affected_dashboards": [
+        "dash_sales_001",
+        "dash_ops_003",
+        "dash_unknown"
+      ],
+      "backfill_tasks": [
+        "bf_gmv_202601"
+      ],
+      "status": "completed",
+      "owner_missing": false,
+      "backfill_incomplete": true,
+      "history": [
+        {
+          "record_id": "rec_568e807a",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.175529"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_gmv_c32d80",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "pending"
+          },
+          "after": {
+            "status": "needs_backfill"
+          },
+          "operator": "demo_engineer",
+          "reason": "rule check"
+        },
+        {
+          "record_id": "rec_3ba6ea41",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.211848"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_gmv_c32d80",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "needs_backfill"
+          },
+          "after": {
+            "status": "completed"
+          },
+          "operator": "demo_engineer",
+          "reason": "回填任务全部成功，历史数据已刷新"
+        }
+      ],
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T16:17:22.168277"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T16:17:22.168280"
+      }
+    },
+    "chg_dau_84f6d3": {
+      "change_id": "chg_dau_84f6d3",
+      "old_metric": {
+        "metric_id": "dau_v1",
+        "name": "日活跃用户",
+        "type": "counter",
+        "sql": "SELECT COUNT(DISTINCT user_id) FROM user_sessions WHERE session_start >= DATE_SUB(NOW(), INTERVAL 1 DAY)",
+        "aggregation": "count_distinct",
+        "time_window": "daily",
+        "filters": {
+          "time_window": "1_day"
+        },
+        "business_owner": "li_na@example.com",
+        "tech_owner": "chen_hong@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2025-05-12T17:17:22.167603"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2025-05-12T17:17:22.167605"
+        }
+      },
+      "new_metric": {
+        "metric_id": "dau_v2",
+        "name": "日活跃用户(修正版)",
+        "type": "counter",
+        "sql": "SELECT COUNT(DISTINCT user_id) FROM user_activity WHERE activity_date = CURDATE() AND duration >= 30",
+        "aggregation": "count_distinct",
+        "time_window": "daily",
+        "filters": {
+          "activity_date": "today",
+          "min_duration": 30
+        },
+        "business_owner": "li_na@example.com",
+        "tech_owner": "chen_hong@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2025-05-12T17:17:22.167613"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-05-12T17:17:22.167615"
+        }
+      },
+      "renamed_from": "dau_v1",
+      "affected_dashboards": [
+        "dash_user_002",
+        "dash_ops_003"
+      ],
+      "backfill_tasks": [
+        "bf_dau_202601",
+        "bf_dau_202512"
+      ],
+      "status": "completed",
+      "owner_missing": false,
+      "backfill_incomplete": true,
+      "history": [
+        {
+          "record_id": "rec_63fd184b",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.175984"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_dau_84f6d3",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "pending"
+          },
+          "after": {
+            "status": "needs_backfill"
+          },
+          "operator": "demo_engineer",
+          "reason": "rule check"
+        },
+        {
+          "record_id": "rec_99d8c761",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.211937"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_dau_84f6d3",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "needs_backfill"
+          },
+          "after": {
+            "status": "completed"
+          },
+          "operator": "demo_engineer",
+          "reason": "回填任务全部成功，历史数据已刷新"
+        }
+      ],
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T15:17:22.168319"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T15:17:22.168321"
+      }
+    },
+    "chg_refund_63fbe8": {
+      "change_id": "chg_refund_63fbe8",
+      "old_metric": {
+        "metric_id": "refund_ratio_old",
+        "name": "退款比率",
+        "type": "ratio",
+        "sql": "SELECT SUM(refund_amount) / SUM(total_amount) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+        "aggregation": "ratio",
+        "time_window": "weekly",
+        "filters": {
+          "time_window": "7_days"
+        },
+        "business_owner": "zhao_qiang@example.com",
+        "tech_owner": "sun_ming@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2026-02-11T17:17:22.167628"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-02-11T17:17:22.167631"
+        }
+      },
+      "new_metric": {
+        "metric_id": "refund_rate",
+        "name": "退款率",
+        "type": "ratio",
+        "sql": "SELECT SUM(refund_amount) / SUM(total_amount) FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+        "aggregation": "ratio",
+        "time_window": "weekly",
+        "filters": {
+          "time_window": "7_days"
+        },
+        "business_owner": "zhao_qiang@example.com",
+        "tech_owner": "sun_ming@example.com",
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2026-02-11T17:17:22.167638"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-05-12T17:17:22.167639"
+        }
+      },
+      "renamed_from": "refund_ratio_old",
+      "affected_dashboards": [
+        "dash_sales_001",
+        "dash_ops_003"
+      ],
+      "backfill_tasks": [],
+      "status": "completed",
+      "owner_missing": false,
+      "backfill_incomplete": false,
+      "history": [
+        {
+          "record_id": "rec_e43211a2",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.176577"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_refund_63fbe8",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "pending"
+          },
+          "after": {
+            "status": "internal_only"
+          },
+          "operator": "demo_engineer",
+          "reason": "rule check"
+        },
+        {
+          "record_id": "rec_efd504e2",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.212244"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_refund_63fbe8",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "internal_only"
+          },
+          "after": {
+            "status": "completed"
+          },
+          "operator": "demo_engineer",
+          "reason": "仅重命名，无需业务确认"
+        }
+      ],
+      "created_by": "demo_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T16:47:22.168340"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T16:47:22.168343"
+      }
+    }
+  },
+  "history": [
+    {
+      "record_id": "rec_568e807a",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.175529"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_gmv_c32d80",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "pending"
+      },
+      "after": {
+        "status": "needs_backfill"
+      },
+      "operator": "demo_engineer",
+      "reason": "rule check"
+    },
+    {
+      "record_id": "rec_63fd184b",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.175984"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_dau_84f6d3",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "pending"
+      },
+      "after": {
+        "status": "needs_backfill"
+      },
+      "operator": "demo_engineer",
+      "reason": "rule check"
+    },
+    {
+      "record_id": "rec_e43211a2",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.176577"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_refund_63fbe8",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "pending"
+      },
+      "after": {
+        "status": "internal_only"
+      },
+      "operator": "demo_engineer",
+      "reason": "rule check"
+    },
+    {
+      "record_id": "rec_3ba6ea41",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.211848"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_gmv_c32d80",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "needs_backfill"
+      },
+      "after": {
+        "status": "completed"
+      },
+      "operator": "demo_engineer",
+      "reason": "回填任务全部成功，历史数据已刷新"
+    },
+    {
+      "record_id": "rec_99d8c761",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.211937"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_dau_84f6d3",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "needs_backfill"
+      },
+      "after": {
+        "status": "completed"
+      },
+      "operator": "demo_engineer",
+      "reason": "回填任务全部成功，历史数据已刷新"
+    },
+    {
+      "record_id": "rec_efd504e2",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.212244"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_refund_63fbe8",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "internal_only"
+      },
+      "after": {
+        "status": "completed"
+      },
+      "operator": "demo_engineer",
+      "reason": "仅重命名，无需业务确认"
+    }
+  ],
+  "created_by": "demo_engineer",
+  "created_at": {
+    "__type__": "datetime",
+    "value": "2026-05-12T17:17:22.165705"
+  },
+  "updated_at": {
+    "__type__": "datetime",
+    "value": "2026-05-12T17:17:22.219597"
+  }
+}

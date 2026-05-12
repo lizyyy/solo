@@ -1,0 +1,203 @@
+{
+  "project_id": "demo_fail_001",
+  "name": "失败场景示例项目",
+  "description": "演示负责人缺失、回填失败等问题",
+  "metrics": {
+    "test_metric_new": {
+      "metric_id": "test_metric_new",
+      "name": "测试指标(新)",
+      "type": "gauge",
+      "sql": "SELECT AVG(value) FROM test_table WHERE is_valid = true",
+      "aggregation": "avg",
+      "time_window": "hourly",
+      "filters": {
+        "is_valid": true
+      },
+      "business_owner": null,
+      "tech_owner": null,
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.224136"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.224138"
+      }
+    }
+  },
+  "old_metrics": {
+    "test_metric_old": {
+      "metric_id": "test_metric_old",
+      "name": "测试指标",
+      "type": "gauge",
+      "sql": "SELECT value FROM test_table",
+      "aggregation": "avg",
+      "time_window": "hourly",
+      "filters": {},
+      "business_owner": null,
+      "tech_owner": null,
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.224084"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-04-12T17:17:22.224101"
+      }
+    }
+  },
+  "dashboards": {
+    "dash_incomplete": {
+      "dashboard_id": "dash_incomplete",
+      "name": "不完整看板",
+      "owner": null,
+      "metrics": [
+        "test_metric_old"
+      ],
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-04-22T17:17:22.224147"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-04-22T17:17:22.224149"
+      }
+    }
+  },
+  "backfill_tasks": {
+    "bf_test_fail": {
+      "task_id": "bf_test_fail",
+      "metric_id": "test_metric_new",
+      "start_date": {
+        "__type__": "datetime",
+        "value": "2025-12-01T00:00:00"
+      },
+      "end_date": {
+        "__type__": "datetime",
+        "value": "2025-12-31T00:00:00"
+      },
+      "status": "failed",
+      "retry_count": 3,
+      "created_by": "junior_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T12:17:22.224165"
+      },
+      "completed_at": null,
+      "error_message": "分区不存在: partition '2025-12-01' not found"
+    }
+  },
+  "metric_changes": {
+    "chg_fail_26171f": {
+      "change_id": "chg_fail_26171f",
+      "old_metric": {
+        "metric_id": "test_metric_old",
+        "name": "测试指标",
+        "type": "gauge",
+        "sql": "SELECT value FROM test_table",
+        "aggregation": "avg",
+        "time_window": "hourly",
+        "filters": {},
+        "business_owner": null,
+        "tech_owner": null,
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2026-04-12T17:17:22.224084"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-04-12T17:17:22.224101"
+        }
+      },
+      "new_metric": {
+        "metric_id": "test_metric_new",
+        "name": "测试指标(新)",
+        "type": "gauge",
+        "sql": "SELECT AVG(value) FROM test_table WHERE is_valid = true",
+        "aggregation": "avg",
+        "time_window": "hourly",
+        "filters": {
+          "is_valid": true
+        },
+        "business_owner": null,
+        "tech_owner": null,
+        "created_at": {
+          "__type__": "datetime",
+          "value": "2026-04-12T17:17:22.224136"
+        },
+        "updated_at": {
+          "__type__": "datetime",
+          "value": "2026-05-12T17:17:22.224138"
+        }
+      },
+      "renamed_from": "test_metric_old",
+      "affected_dashboards": [
+        "dash_incomplete"
+      ],
+      "backfill_tasks": [
+        "bf_test_fail"
+      ],
+      "status": "needs_backfill",
+      "owner_missing": true,
+      "backfill_incomplete": true,
+      "history": [
+        {
+          "record_id": "rec_65c05e9d",
+          "timestamp": {
+            "__type__": "datetime",
+            "value": "2026-05-12T17:17:22.310751"
+          },
+          "change_type": "status_update",
+          "entity_id": "chg_fail_26171f",
+          "entity_type": "metric_change",
+          "before": {
+            "status": "pending"
+          },
+          "after": {
+            "status": "needs_backfill"
+          },
+          "operator": "junior_engineer",
+          "reason": "rule check"
+        }
+      ],
+      "created_by": "junior_engineer",
+      "created_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T14:17:22.224225"
+      },
+      "updated_at": {
+        "__type__": "datetime",
+        "value": "2026-05-12T14:17:22.224228"
+      }
+    }
+  },
+  "history": [
+    {
+      "record_id": "rec_65c05e9d",
+      "timestamp": {
+        "__type__": "datetime",
+        "value": "2026-05-12T17:17:22.310751"
+      },
+      "change_type": "status_update",
+      "entity_id": "chg_fail_26171f",
+      "entity_type": "metric_change",
+      "before": {
+        "status": "pending"
+      },
+      "after": {
+        "status": "needs_backfill"
+      },
+      "operator": "junior_engineer",
+      "reason": "rule check"
+    }
+  ],
+  "created_by": "junior_engineer",
+  "created_at": {
+    "__type__": "datetime",
+    "value": "2026-05-12T17:17:22.223889"
+  },
+  "updated_at": {
+    "__type__": "datetime",
+    "value": "2026-05-12T17:17:22.370519"
+  }
+}
