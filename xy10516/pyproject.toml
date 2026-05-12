@@ -1,0 +1,17 @@
+[project]
+name = "campus-dorm-repair"
+version = "1.0.0"
+description = "校园宿舍维修管理 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+dorm-repair = "dorm_repair.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dorm_repair*"]
