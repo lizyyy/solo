@@ -275,8 +275,11 @@ export class PrescriptionService {
       return { success: false, message: '处方已被驳回，无法支付，请重新开方' };
     }
 
-    if (consultation.status !== ConsultationStatus.PRESCRIBED &&
-        consultation.status !== ConsultationStatus.PHARMACIST_APPROVED) {
+    if (consultation.status === ConsultationStatus.PRESCRIBED) {
+      return { success: false, message: '处方尚未经药师审核，请先审核再支付' };
+    }
+
+    if (consultation.status !== ConsultationStatus.PHARMACIST_APPROVED) {
       return { success: false, message: '当前状态不允许支付' };
     }
 
@@ -321,8 +324,11 @@ export class PrescriptionService {
       return { success: false, message: '问诊单不存在' };
     }
 
-    if (consultation.status !== ConsultationStatus.PAID &&
-        consultation.status !== ConsultationStatus.PHARMACIST_APPROVED) {
+    if (consultation.status === ConsultationStatus.PHARMACIST_APPROVED) {
+      return { success: false, message: '处方尚未支付，请先支付再发货' };
+    }
+
+    if (consultation.status !== ConsultationStatus.PAID) {
       return { success: false, message: '当前状态不允许发货' };
     }
 

@@ -54,6 +54,17 @@ async function testNormalFlow() {
 
   const prescriptionId = prescriptionResult.data?.id;
 
+  // 2a. 测试未审核先支付（应失败）
+  console.log('2a. 测试未审核先支付（开方后直接支付，应失败）...');
+  const payBeforeReviewFail = await prescriptionService.confirmPayment({
+    consultationId,
+    amount: 68.50,
+    paymentNo: `PAY_BEFORE_REVIEW${Date.now()}`,
+    idempotentKey: `pay_before_review_${Date.now()}`
+  });
+  console.log('   结果:', payBeforeReviewFail.message);
+  console.log();
+
   // 3. 药师审核通过
   console.log('3. 药师审核通过...');
   const reviewResult = await prescriptionService.pharmacistReview({
@@ -65,6 +76,19 @@ async function testNormalFlow() {
   });
   console.log('   处方状态:', reviewResult.data?.status);
   console.log('   审核药师:', reviewResult.data?.pharmacist_name);
+  console.log();
+
+  // 3a. 测试未支付先配送（应失败）
+  console.log('3a. 测试未支付先配送（审核后直接发货，应失败）...');
+  const shipBeforePayFail = await prescriptionService.ship({
+    consultationId,
+    logisticsNo: `SF_BEFORE_PAY${Date.now()}`,
+    logisticsCompany: '顺丰速运',
+    operatorId: 'O001',
+    operatorName: '库管员',
+    idempotentKey: `ship_before_pay_${Date.now()}`
+  });
+  console.log('   结果:', shipBeforePayFail.message);
   console.log();
 
   // 4. 支付确认

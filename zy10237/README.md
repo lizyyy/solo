@@ -4,14 +4,16 @@
 
 ## 业务流程
 
+**严格流转顺序：问诊 → 开方 → 药师审核 → 支付 → 配送**
+
 ```
 患者
   ↓
 问诊建单 (CREATED)
   ↓
-医生开方 (PRESCRIBED)
+医生开方 (PRESCRIBED)  ←── 【禁止】未审核直接支付
   ↓
-药师审核 ── 审核通过 (PHARMACIST_APPROVED)
+药师审核 ── 审核通过 (PHARMACIST_APPROVED)  ←── 【禁止】未支付直接发货
   │              ↓
   │         支付确认 (PAID)
   │              ↓
