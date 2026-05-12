@@ -59,12 +59,12 @@
     <el-dialog v-model="createDialogVisible" title="创建送洗批次" width="80%">
       <el-row :gutter="20" class="mb-4">
         <el-col :span="8">
-          <el-select v-model="createFilterRoom" placeholder="按房源筛选" clearable style="width: 100%">
+          <el-select v-model="createFilterRoom" placeholder="按房源筛选" clearable style="width: 100%" @change="onFilterChange" @clear="onFilterChange">
             <el-option v-for="room in rooms" :key="room.id" :label="room.name" :value="room.id" />
           </el-select>
         </el-col>
         <el-col :span="8">
-          <el-select v-model="createFilterType" placeholder="按类型筛选" clearable style="width: 100%">
+          <el-select v-model="createFilterType" placeholder="按类型筛选" clearable style="width: 100%" @change="onFilterChange" @clear="onFilterChange">
             <el-option v-for="type in linenTypes" :key="type" :label="type" :value="type" />
           </el-select>
         </el-col>
@@ -217,6 +217,11 @@ export default {
       selectedLinens.value = selection;
     };
 
+    const onFilterChange = async () => {
+      selectedLinens.value = [];
+      await fetchAvailableLinens();
+    };
+
     const createBatch = async () => {
       if (selectedLinens.value.length === 0) {
         ElMessage.warning('请选择要送洗的布草');
@@ -315,6 +320,7 @@ export default {
       formatDate,
       openCreateDialog,
       handleSelectionChange,
+      onFilterChange,
       createBatch,
       viewDetail,
       openReceiveDialog,

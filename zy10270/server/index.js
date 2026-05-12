@@ -236,9 +236,16 @@ app.post('/api/batches/:id/receive', async (req, res) => {
     }
 
     const allItems = await allQuery('SELECT * FROM batch_items WHERE batch_id = ?', [batchId]);
+    const batchLinenIds = allItems.map(item => item.linen_id);
     
     if (received_items.length > allItems.length) {
       return res.status(400).json({ error: '回库数量不能超过送洗数量' });
+    }
+
+    for (const itemId of received_items) {
+      if (!batchLinenIds.includes(itemId)) {
+        return res.status(400).json({ error: `布草 ${itemId} 不属于该批次` });
+      }
     }
 
     for (const itemId of received_items) {
