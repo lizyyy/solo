@@ -238,7 +238,7 @@ async function runTest() {
     }
   }
 
-  printInfo('3.9 测试重复提交同一操作');
+  printInfo('3.10 测试重复提交同一操作');
   try {
     BottleService.sample(bottle1.bottleNo, '张三');
     printError('应该抛出错误但没有');
@@ -248,8 +248,9 @@ async function runTest() {
     }
   }
 
-  printInfo('3.10 测试送检超时 - 真实构造超时样本');
-  const bottle7 = bottles[3];
+  printInfo('3.11 测试送检超时 - 真实构造超时样本');
+  const bottle7 = bottles[1];
+  BottleService.bindToTask(bottle7.bottleNo, task1.id, '张三');
   printInfo(`任务时限: ${task1.deadlineHours} 小时，构造 ${task1.deadlineHours + 1} 小时前采样的样本`);
   forceMockTimeoutBottle(bottle7.bottleNo, task1.id, task1.deadlineHours + 1);
   try {
