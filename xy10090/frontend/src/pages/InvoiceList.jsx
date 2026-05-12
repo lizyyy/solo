@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { invoices, STATUS_MAP, EXCEPTION_TYPE_MAP, ACTION_MAP } from '../api';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { invoices, importExport, STATUS_MAP, EXCEPTION_TYPE_MAP, ACTION_MAP } from '../api';
 import dayjs from 'dayjs';
 
 function InvoiceList() {
@@ -16,6 +16,8 @@ function InvoiceList() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [detailModal, setDetailModal] = useState(null);
   const [editModal, setEditModal] = useState(null);
+  const [createModal, setCreateModal] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [message, setMessage] = useState(null);
 
   const loadInvoices = useCallback(async () => {
@@ -88,6 +90,68 @@ function InvoiceList() {
     setEditModal({ ...invoice });
   };
 
+  const openCreate = () => {
+    setCreateModal({
+      invoice_number: '',
+      invoice_date: dayjs().format('YYYY-MM-DD'),
+      vendor_name: '',
+      vendor_tax_number: '',
+      amount: '',
+      tax_amount: '',
+      tax_number: '',
+      approval_amount: '',
+      approver_name: '',
+      approval_date: '',
+      approval_comments: '',
+      image_path: ''
+    });
+  };
+
+  const handleSaveCreate = async () => {
+    try {
+      const data = { ...createModal };
+      if (!data.invoice_number) {
+        showMessage('error', '票据号必填');
+        return;
+      }
+      if (!data.amount) {
+        showMessage('error', '金额必填');
+        return;
+      }
+      data.amount = parseFloat(data.amount) || 0;
+      if (data.tax_amount) data.tax_amount = parseFloat(data.tax_amount) || 0;
+      if (data.approval_amount) data.approval_amount = parseFloat(data.approval_amount) || null;
+
+      await invoices.create(data);
+      showMessage('success', '票据创建成功');
+      setCreateModal(null);
+      loadInvoices();
+    } catch (err) {
+      showMessage('error', '创建失败: ' + err.message);
+    }
+  };
+
+  const handleImageUpload = async (file, forEdit = false) => {
+    try {
+      setUploadingImage(true);
+      const res = await importExport.uploadImage(file);
+      if (res.success) {
+        if (forEdit) {
+          setEditModal((prev) => ({ ...prev, image_path: res.data.path }));
+        } else {
+          setCreateModal((prev) => ({ ...prev, image_path: res.data.path }));
+        }
+        showMessage('success', '图片上传成功');
+      } else {
+        showMessage('error', res.error || '上传失败');
+      }
+    } catch (err) {
+      showMessage('error', '上传失败: ' + err.message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleReview = async (id, action, comments = '') => {
     try {
       await invoices.review(id, { action, comments, operator: '当前用户' });
@@ -157,6 +221,9 @@ function InvoiceList() {
       <div className="page-header">
         <h1 className="page-title">票据管理</h1>
         <div style={{ display: 'flex', gap: '8px' }}>
+          <button className="btn btn-primary" onClick={openCreate}>
+            ➕ 新增票据
+          </button>
           <button className="btn btn-secondary" onClick={loadInvoices}>
             🔄 刷新
           </button>
@@ -434,9 +501,24 @@ function InvoiceList() {
       {editModal && (
         <InvoiceEditModal
           invoice={editModal}
+          mode="edit"
+          uploading={uploadingImage}
           onClose={() => setEditModal(null)}
           onChange={(data) => setEditModal({ ...editModal, ...data })}
           onSave={handleSaveEdit}
+          onImageUpload={(file) => handleImageUpload(file, true)}
+        />
+      )}
+
+      {createModal && (
+        <InvoiceEditModal
+          invoice={createModal}
+          mode="create"
+          uploading={uploadingImage}
+          onClose={() => setCreateModal(null)}
+          onChange={(data) => setCreateModal({ ...createModal, ...data })}
+          onSave={handleSaveCreate}
+          onImageUpload={(file) => handleImageUpload(file, false)}
         />
       )}
     </div>
@@ -589,6 +671,35 @@ function InvoiceDetailModal({ invoice, history, exceptions, onClose, onReview, o
                 </div>
               )}
 
+              {invoice.image_path && (
+                <div style={{ marginTop: '16px' }}>
+                  <div className="detail-label" style={{ marginBottom: '8px' }}>
+                    票据影像
+                  </div>
+                  <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                    <a
+                      href={invoice.image_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <img
+                        src={invoice.image_path}
+                        alt="票据影像"
+                        style={{
+                          maxWidth: '100%',
+                          maxHeight: '300px',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      />
+                    </a>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                      点击图片查看原图
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="detail-grid" style={{ marginTop: '12px' }}>
                 <div className="detail-item">
                   <div className="detail-label">创建时间</div>
@@ -679,18 +790,83 @@ function InvoiceDetailModal({ invoice, history, exceptions, onClose, onReview, o
   );
 }
 
-function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
+function InvoiceEditModal({ invoice, mode, uploading, onClose, onChange, onSave, onImageUpload }) {
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onImageUpload(file);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div className="modal-title">编辑票据</div>
+          <div className="modal-title">
+            {mode === 'create' ? '新增票据' : '编辑票据'}
+          </div>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
         </div>
 
         <div className="modal-body">
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label className="form-label">票据影像（图片上传）</label>
+            <div
+              style={{
+                border: '2px dashed #d1d5db',
+                borderRadius: '8px',
+                padding: '20px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                background: '#f9fafb'
+              }}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {invoice.image_path ? (
+                <div>
+                  <img
+                    src={invoice.image_path}
+                    alt="票据影像"
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '150px',
+                      borderRadius: '4px',
+                      marginBottom: '8px'
+                    }}
+                  />
+                  <div style={{ fontSize: '13px', color: '#6b7280' }}>
+                    点击更换图片
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div style={{ fontSize: '36px', marginBottom: '8px' }}>
+                    📷
+                  </div>
+                  <div style={{ fontSize: '14px', marginBottom: '4px' }}>
+                    {uploading ? '上传中...' : '点击或拖拽上传票据照片'}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                    支持 JPG、PNG、PDF 格式
+                  </div>
+                </div>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+              disabled={uploading}
+            />
+          </div>
+
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">票据号 *</label>
@@ -733,7 +909,7 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
                 className="form-input"
                 value={invoice.amount || ''}
                 onChange={(e) =>
-                  onChange({ amount: parseFloat(e.target.value) || 0 })
+                  onChange({ amount: e.target.value ? parseFloat(e.target.value) : '' })
                 }
               />
             </div>
@@ -745,7 +921,7 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
                 className="form-input"
                 value={invoice.tax_amount || ''}
                 onChange={(e) =>
-                  onChange({ tax_amount: parseFloat(e.target.value) || 0 })
+                  onChange({ tax_amount: e.target.value ? parseFloat(e.target.value) : '' })
                 }
               />
             </div>
@@ -755,6 +931,7 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
                 className="form-input"
                 value={invoice.tax_number || ''}
                 onChange={(e) => onChange({ tax_number: e.target.value })}
+                placeholder="15-20位字母数字"
               />
             </div>
             <div className="form-group">
@@ -768,7 +945,7 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
                   onChange({
                     approval_amount: e.target.value
                       ? parseFloat(e.target.value)
-                      : null
+                      : ''
                   })
                 }
               />
@@ -779,6 +956,7 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
                 className="form-input"
                 value={invoice.approver_name || ''}
                 onChange={(e) => onChange({ approver_name: e.target.value })}
+                placeholder="如果为空会标记为异常"
               />
             </div>
             <div className="form-group">
@@ -800,14 +978,21 @@ function InvoiceEditModal({ invoice, onClose, onChange, onSave }) {
               onChange={(e) => onChange({ approval_comments: e.target.value })}
             />
           </div>
+
+          <div
+            className="alert alert-info"
+            style={{ marginTop: '16px', marginBottom: 0, fontSize: '12px' }}
+          >
+            💡 提示：如果审批金额与票据金额不一致、税号格式无效、或审批人为空，系统会自动标记为异常票据。
+          </div>
         </div>
 
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>
             取消
           </button>
-          <button className="btn btn-primary" onClick={onSave}>
-            保存
+          <button className="btn btn-primary" onClick={onSave} disabled={uploading}>
+            {mode === 'create' ? '创建票据' : '保存修改'}
           </button>
         </div>
       </div>

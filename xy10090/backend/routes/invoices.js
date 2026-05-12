@@ -226,16 +226,17 @@ router.post('/', async (req, res) => {
     const id = uuidv4();
     const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
-    const exceptionCount = detectExceptions({
+    const invoiceData = {
       amount,
       approval_amount,
       tax_number,
       vendor_tax_number,
       approver_name
-    });
+    };
+    const exceptions = detectExceptions(invoiceData);
 
     const status =
-      exceptionCount > 0
+      exceptions.length > 0
         ? INVOICE_STATUSES.EXCEPTION
         : INVOICE_STATUSES.PENDING;
 
@@ -263,9 +264,11 @@ router.post('/', async (req, res) => {
         status,
         now,
         now,
-        exceptionCount
+        exceptions.length
       ]
     );
+
+    await writeExceptions(id, exceptions);
 
     await addHistory(id, 'create', null, req.body, 'uploader', '票据上传');
 
@@ -277,31 +280,80 @@ router.post('/', async (req, res) => {
 });
 
 function detectExceptions(invoice) {
-  let count = 0;
+  const exceptions = [];
 
   if (invoice.approval_amount && invoice.amount !== invoice.approval_amount) {
-    count++;
+    exceptions.push({
+      type: EXCEPTION_TYPES.AMOUNT_MISMATCH,
+      field: 'amount',
+      expected_value: invoice.approval_amount?.toString(),
+      actual_value: invoice.amount?.toString(),
+      description: `票据金额(¥${invoice.amount})与审批金额(¥${invoice.approval_amount})不一致`
+    });
   }
 
   if (invoice.tax_number && !isValidTaxNumber(invoice.tax_number)) {
-    count++;
+    exceptions.push({
+      type: EXCEPTION_TYPES.TAX_NUMBER_INVALID,
+      field: 'tax_number',
+      expected_value: '15-20位字母数字',
+      actual_value: invoice.tax_number,
+      description: `税号格式无效: ${invoice.tax_number}`
+    });
   }
 
   if (invoice.vendor_tax_number && !isValidTaxNumber(invoice.vendor_tax_number)) {
-    count++;
+    exceptions.push({
+      type: EXCEPTION_TYPES.TAX_NUMBER_INVALID,
+      field: 'vendor_tax_number',
+      expected_value: '15-20位字母数字',
+      actual_value: invoice.vendor_tax_number,
+      description: `供应商税号格式无效: ${invoice.vendor_tax_number}`
+    });
   }
 
   if (!invoice.approver_name) {
-    count++;
+    exceptions.push({
+      type: EXCEPTION_TYPES.APPROVAL_MISSING,
+      field: 'approver_name',
+      expected_value: '审批人姓名',
+      actual_value: '(空)',
+      description: '审批人信息缺失'
+    });
   }
 
-  return count;
+  return exceptions;
 }
 
 function isValidTaxNumber(tax) {
   if (!tax) return false;
   const valid = /^[0-9A-Z]{15,20}$/i;
   return valid.test(tax);
+}
+
+async function writeExceptions(invoiceId, exceptions) {
+  await db.run('DELETE FROM exceptions WHERE invoice_id = ?', [invoiceId]);
+
+  const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+  for (const ex of exceptions) {
+    await db.run(
+      `INSERT INTO exceptions (
+        id, invoice_id, type, field, expected_value, actual_value,
+        description, status, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        uuidv4(),
+        invoiceId,
+        ex.type,
+        ex.field,
+        ex.expected_value || null,
+        ex.actual_value || null,
+        ex.description,
+        'open',
+        now
+      ]
+    );
+  }
 }
 
 router.put('/:id', async (req, res) => {
@@ -351,19 +403,31 @@ router.put('/:id', async (req, res) => {
     );
 
     const updated = { ...existing, ...updates };
-    const exceptionCount = detectExceptions(updated);
+    const exceptions = detectExceptions(updated);
+
+    await writeExceptions(req.params.id, exceptions);
 
     await db.run(`UPDATE invoices SET exception_count = ? WHERE id = ?`, [
-      exceptionCount,
+      exceptions.length,
       req.params.id
     ]);
 
     if (
       existing.status === INVOICE_STATUSES.EXCEPTION &&
-      exceptionCount === 0
+      exceptions.length === 0
     ) {
       await db.run(`UPDATE invoices SET status = ? WHERE id = ?`, [
         INVOICE_STATUSES.PENDING,
+        req.params.id
+      ]);
+    }
+
+    if (
+      existing.status !== INVOICE_STATUSES.EXCEPTION &&
+      exceptions.length > 0
+    ) {
+      await db.run(`UPDATE invoices SET status = ? WHERE id = ?`, [
+        INVOICE_STATUSES.EXCEPTION,
         req.params.id
       ]);
     }

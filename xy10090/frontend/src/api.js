@@ -76,6 +76,14 @@ export const importExport = {
       body: formData
     }).then((r) => r.json());
   },
+  uploadImage: (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return fetch(`${API_BASE}/import-export/upload/image`, {
+      method: 'POST',
+      body: formData
+    }).then((r) => r.json());
+  },
   exportCSV: (params = {}) => {
     const searchParams = new URLSearchParams(params);
     return `/api/import-export/export/csv?${searchParams.toString()}`;
