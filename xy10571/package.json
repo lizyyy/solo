@@ -1,0 +1,24 @@
+{
+  "name": "engineering-change-notification-api",
+  "version": "1.0.0",
+  "description": "工程变更通知 API 系统 - 处理制造工程变更后的物料、在制单、采购单和客户订单通知",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "init-data": "node scripts/init-samples.js",
+    "demo-normal": "node scripts/demo-normal-change.js",
+    "demo-urgent": "node scripts/demo-urgent-freeze.js",
+    "demo-purchase": "node scripts/demo-purchase-confirm.js",
+    "demo-customer": "node scripts/demo-customer-trace.js",
+    "demo-duplicate": "node scripts/demo-duplicate-notification.js",
+    "demo-failure": "node scripts/demo-failure-path.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
