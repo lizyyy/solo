@@ -1,0 +1,754 @@
+{
+  "contracts": [
+    {
+      "contractNo": "HT-2026-001",
+      "name": "智能客服系统开发项目",
+      "client": "科技股份有限公司",
+      "startDate": "2026-01-01",
+      "endDate": "2026-12-31",
+      "totalAmount": 1000000,
+      "status": "active",
+      "id": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "createdAt": "2026-05-12T02:19:00.117Z",
+      "updatedAt": "2026-05-12T02:19:00.117Z"
+    },
+    {
+      "contractNo": "HT-2026-002",
+      "name": "数据中台建设项目",
+      "client": "金融服务集团",
+      "startDate": "2026-02-01",
+      "endDate": "2026-11-30",
+      "totalAmount": 800000,
+      "status": "active",
+      "id": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "createdAt": "2026-05-12T02:19:00.117Z",
+      "updatedAt": "2026-05-12T02:19:00.117Z"
+    },
+    {
+      "contractNo": "HT-2026-003",
+      "name": "移动端APP升级项目",
+      "client": "电子商务平台",
+      "startDate": "2026-03-01",
+      "endDate": "2026-09-30",
+      "totalAmount": 500000,
+      "status": "active",
+      "id": "d6a59635-270f-47e2-a41d-250339302acd",
+      "createdAt": "2026-05-12T02:19:00.118Z",
+      "updatedAt": "2026-05-12T02:19:00.118Z"
+    }
+  ],
+  "milestones": [
+    {
+      "contractId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "milestoneNo": "MS-001-01",
+      "name": "需求分析与设计",
+      "amount": 200000,
+      "expectedDeliveryDate": "2026-02-28",
+      "description": "完成需求调研、原型设计和技术方案",
+      "status": "paid",
+      "id": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "createdAt": "2026-05-12T02:19:00.118Z",
+      "updatedAt": "2026-05-12T02:19:00.139Z"
+    },
+    {
+      "contractId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "milestoneNo": "MS-001-02",
+      "name": "核心功能开发",
+      "amount": 400000,
+      "expectedDeliveryDate": "2026-06-30",
+      "description": "完成核心功能模块开发",
+      "status": "partially_paid",
+      "id": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "createdAt": "2026-05-12T02:19:00.118Z",
+      "updatedAt": "2026-05-12T02:19:00.139Z"
+    },
+    {
+      "contractId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "milestoneNo": "MS-001-03",
+      "name": "系统测试与上线",
+      "amount": 400000,
+      "expectedDeliveryDate": "2026-11-30",
+      "description": "完成测试、部署和上线",
+      "status": "not_started",
+      "id": "339d2bee-17d5-4378-a776-ca9cf1ef8548",
+      "createdAt": "2026-05-12T02:19:00.118Z",
+      "updatedAt": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "contractId": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "milestoneNo": "MS-002-01",
+      "name": "数据仓库搭建",
+      "amount": 300000,
+      "expectedDeliveryDate": "2026-04-30",
+      "description": "搭建数据仓库基础设施",
+      "status": "paid",
+      "id": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "createdAt": "2026-05-12T02:19:00.119Z",
+      "updatedAt": "2026-05-12T02:19:00.139Z"
+    },
+    {
+      "contractId": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "milestoneNo": "MS-002-02",
+      "name": "数据治理平台",
+      "amount": 300000,
+      "expectedDeliveryDate": "2026-07-31",
+      "description": "实现数据质量监控和治理",
+      "status": "overdue",
+      "id": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "createdAt": "2026-05-12T02:19:00.119Z",
+      "updatedAt": "2026-05-12T02:19:00.132Z"
+    },
+    {
+      "contractId": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "milestoneNo": "MS-002-03",
+      "name": "数据应用开发",
+      "amount": 200000,
+      "expectedDeliveryDate": "2026-10-31",
+      "description": "开发数据应用和报表",
+      "status": "not_started",
+      "id": "7aea2c1b-a947-48df-839e-9857cdca23b7",
+      "createdAt": "2026-05-12T02:19:00.119Z",
+      "updatedAt": "2026-05-12T02:19:00.119Z"
+    },
+    {
+      "contractId": "d6a59635-270f-47e2-a41d-250339302acd",
+      "milestoneNo": "MS-003-01",
+      "name": "UI界面重构",
+      "amount": 150000,
+      "expectedDeliveryDate": "2026-04-30",
+      "description": "完成移动端UI界面重构",
+      "status": "overdue",
+      "id": "f986e9eb-0bc4-4aac-86b8-61b28262b969",
+      "createdAt": "2026-05-12T02:19:00.120Z",
+      "updatedAt": "2026-05-12T02:19:00.132Z"
+    },
+    {
+      "contractId": "d6a59635-270f-47e2-a41d-250339302acd",
+      "milestoneNo": "MS-003-02",
+      "name": "性能优化",
+      "amount": 150000,
+      "expectedDeliveryDate": "2026-06-30",
+      "description": "完成应用性能优化",
+      "status": "not_started",
+      "id": "e0efd4a5-a54e-4f69-aff9-266094e61563",
+      "createdAt": "2026-05-12T02:19:00.120Z",
+      "updatedAt": "2026-05-12T02:19:00.120Z"
+    },
+    {
+      "contractId": "d6a59635-270f-47e2-a41d-250339302acd",
+      "milestoneNo": "MS-003-03",
+      "name": "新功能开发",
+      "amount": 200000,
+      "expectedDeliveryDate": "2026-08-31",
+      "description": "开发新功能模块",
+      "status": "not_started",
+      "id": "634ec312-7922-4bb8-983e-b33ff9bb41cc",
+      "createdAt": "2026-05-12T02:19:00.120Z",
+      "updatedAt": "2026-05-12T02:19:00.120Z"
+    }
+  ],
+  "deliveryProofs": [
+    {
+      "milestoneId": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "proofNo": "DP-001-01",
+      "deliveryDate": "2026-02-25",
+      "description": "需求规格说明书、技术方案文档",
+      "status": "approved",
+      "id": "082d20ff-07cb-4e55-95ac-6e4af3768843",
+      "createdAt": "2026-05-12T02:19:00.123Z",
+      "updatedAt": "2026-05-12T02:19:00.123Z"
+    },
+    {
+      "milestoneId": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "proofNo": "DP-001-02",
+      "deliveryDate": "2026-06-20",
+      "description": "核心功能代码、单元测试报告",
+      "status": "approved",
+      "id": "13ee9c4d-6ede-4d11-8a10-7b7d6199878a",
+      "createdAt": "2026-05-12T02:19:00.125Z",
+      "updatedAt": "2026-05-12T02:19:00.125Z"
+    },
+    {
+      "milestoneId": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "proofNo": "DP-002-01",
+      "deliveryDate": "2026-04-20",
+      "description": "数据仓库部署文档、初始化脚本",
+      "status": "approved",
+      "id": "82a97ed3-dbcb-45b2-a8d0-0df52e450570",
+      "createdAt": "2026-05-12T02:19:00.125Z",
+      "updatedAt": "2026-05-12T02:19:00.125Z"
+    },
+    {
+      "milestoneId": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "proofNo": "DP-002-02",
+      "deliveryDate": "2026-07-15",
+      "description": "数据治理平台代码、配置文档",
+      "status": "approved",
+      "id": "e3f5762e-1ae6-4cb7-819f-ec1d60a0cf45",
+      "createdAt": "2026-05-12T02:19:00.125Z",
+      "updatedAt": "2026-05-12T02:19:00.125Z"
+    },
+    {
+      "milestoneId": "f986e9eb-0bc4-4aac-86b8-61b28262b969",
+      "proofNo": "DP-003-01",
+      "deliveryDate": "2026-04-15",
+      "description": "UI设计稿、前端代码",
+      "status": "approved",
+      "id": "f1ede0a0-ee98-4a52-abfc-6a9d84fcedfa",
+      "createdAt": "2026-05-12T02:19:00.126Z",
+      "updatedAt": "2026-05-12T02:19:00.126Z"
+    }
+  ],
+  "acceptanceForms": [
+    {
+      "milestoneId": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "formNo": "AC-001-01",
+      "acceptanceDate": "2026-03-05",
+      "acceptedAmount": 200000,
+      "description": "需求分析阶段验收",
+      "status": "signed",
+      "id": "da496433-2899-4463-9c0a-1db2e51b6e61",
+      "createdAt": "2026-05-12T02:19:00.128Z",
+      "updatedAt": "2026-05-12T02:19:00.128Z"
+    },
+    {
+      "milestoneId": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "formNo": "AC-001-02",
+      "acceptanceDate": "2026-07-10",
+      "acceptedAmount": 350000,
+      "description": "核心功能开发部分验收（客户提出性能优化需求）",
+      "status": "signed",
+      "id": "5d1c54c8-1573-42e8-ab41-cae9b7588bca",
+      "createdAt": "2026-05-12T02:19:00.129Z",
+      "updatedAt": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "milestoneId": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "formNo": "AC-002-01",
+      "acceptanceDate": "2026-04-25",
+      "acceptedAmount": 300000,
+      "description": "数据仓库验收",
+      "status": "signed",
+      "id": "c84442a8-9f97-4b1a-b42b-05d2d95f1b87",
+      "createdAt": "2026-05-12T02:19:00.129Z",
+      "updatedAt": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "milestoneId": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "formNo": "AC-002-02",
+      "acceptanceDate": "2026-01-10",
+      "acceptedAmount": 300000,
+      "description": "数据治理平台验收",
+      "status": "signed",
+      "id": "08537134-89af-4a64-945e-113c5db42884",
+      "createdAt": "2026-05-12T02:19:00.129Z",
+      "updatedAt": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "milestoneId": "f986e9eb-0bc4-4aac-86b8-61b28262b969",
+      "formNo": "AC-003-01",
+      "acceptanceDate": "2026-04-10",
+      "acceptedAmount": 150000,
+      "description": "UI界面验收",
+      "status": "signed",
+      "id": "4142d914-62de-4c21-a3b4-9523fc211125",
+      "createdAt": "2026-05-12T02:19:00.130Z",
+      "updatedAt": "2026-05-12T02:19:00.130Z"
+    }
+  ],
+  "invoices": [
+    {
+      "milestoneId": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "invoiceNo": "INV-2026-0001",
+      "invoiceDate": "2026-03-10",
+      "amount": 200000,
+      "taxRate": 0.06,
+      "status": "issued",
+      "id": "8284e754-e266-4d2b-a138-03b3fc8ca8a6",
+      "createdAt": "2026-05-12T02:19:00.132Z",
+      "updatedAt": "2026-05-12T02:19:00.132Z"
+    },
+    {
+      "milestoneId": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "invoiceNo": "INV-2026-0002",
+      "invoiceDate": "2026-07-15",
+      "amount": 350000,
+      "taxRate": 0.06,
+      "status": "issued",
+      "id": "624220be-9331-47bf-995c-848c62df04fa",
+      "createdAt": "2026-05-12T02:19:00.133Z",
+      "updatedAt": "2026-05-12T02:19:00.133Z"
+    },
+    {
+      "milestoneId": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "invoiceNo": "INV-2026-0003",
+      "invoiceDate": "2026-04-28",
+      "amount": 300000,
+      "taxRate": 0.06,
+      "status": "issued",
+      "id": "e7be8e02-8493-4c84-bf51-c1926f20ddda",
+      "createdAt": "2026-05-12T02:19:00.133Z",
+      "updatedAt": "2026-05-12T02:19:00.133Z"
+    },
+    {
+      "milestoneId": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "invoiceNo": "INV-2026-0005",
+      "invoiceDate": "2026-07-20",
+      "amount": 350000,
+      "taxRate": 0.06,
+      "status": "issued",
+      "id": "95c6b927-8660-4277-8a1d-2beb7492bf87",
+      "createdAt": "2026-05-12T02:19:00.134Z",
+      "updatedAt": "2026-05-12T02:19:00.134Z"
+    }
+  ],
+  "paymentRecords": [
+    {
+      "invoiceId": "8284e754-e266-4d2b-a138-03b3fc8ca8a6",
+      "milestoneId": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "contractId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "paymentNo": "PAY-2026-0001",
+      "paymentDate": "2026-03-25",
+      "amount": 200000,
+      "payer": "科技股份有限公司",
+      "remark": "第一期付款",
+      "status": "matched",
+      "id": "b5c48265-d204-404a-adeb-9b12ca2c0577",
+      "createdAt": "2026-05-12T02:19:00.136Z",
+      "updatedAt": "2026-05-12T02:19:00.136Z"
+    },
+    {
+      "invoiceId": "624220be-9331-47bf-995c-848c62df04fa",
+      "milestoneId": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "contractId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "paymentNo": "PAY-2026-0002",
+      "paymentDate": "2026-08-05",
+      "amount": 350000,
+      "payer": "科技股份有限公司",
+      "remark": "第二期部分付款",
+      "status": "matched",
+      "id": "ad31a52d-850d-46e7-b06a-4946b48b9399",
+      "createdAt": "2026-05-12T02:19:00.136Z",
+      "updatedAt": "2026-05-12T02:19:00.136Z"
+    },
+    {
+      "invoiceId": "e7be8e02-8493-4c84-bf51-c1926f20ddda",
+      "milestoneId": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "contractId": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "paymentNo": "PAY-2026-0003",
+      "paymentDate": "2026-05-10",
+      "amount": 300000,
+      "payer": "金融服务集团",
+      "remark": "数据仓库阶段付款",
+      "status": "matched",
+      "id": "cf83cea8-f7ea-49d4-b4a3-024c98c9821e",
+      "createdAt": "2026-05-12T02:19:00.137Z",
+      "updatedAt": "2026-05-12T02:19:00.137Z"
+    },
+    {
+      "paymentNo": "PAY-2026-0004",
+      "paymentDate": "2026-04-20",
+      "amount": 150000,
+      "payer": "电子商务平台",
+      "remark": "UI界面款项",
+      "status": "unmatched",
+      "id": "6a584810-439a-4829-815c-51be095e56d0",
+      "createdAt": "2026-05-12T02:19:00.137Z",
+      "updatedAt": "2026-05-12T02:19:00.137Z"
+    }
+  ],
+  "operations": [
+    {
+      "entityType": "contract",
+      "entityId": "70df5b3a-78a8-4a46-b269-8d969fb99c1b",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入合同 HT-2026-001",
+      "success": true,
+      "id": "29cd4a23-7db0-464b-ade1-6dd2b22d2596",
+      "timestamp": "2026-05-12T02:19:00.117Z"
+    },
+    {
+      "entityType": "contract",
+      "entityId": "43174eaf-e605-4167-a02b-37d504dd60d1",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入合同 HT-2026-002",
+      "success": true,
+      "id": "1f6f8cf9-0fb3-4931-bc05-3d18113504b5",
+      "timestamp": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "entityType": "contract",
+      "entityId": "d6a59635-270f-47e2-a41d-250339302acd",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入合同 HT-2026-003",
+      "success": true,
+      "id": "97a78d58-11dd-4421-a186-bbc38cf90189",
+      "timestamp": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "2a6fcfbb-d509-4798-9097-4d3fb1c4d683",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-001-01",
+      "success": true,
+      "id": "84e213e2-462c-4dea-9fc0-f46c10618221",
+      "timestamp": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "fcb87846-8b23-4eb9-9963-018bfb4c8464",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-001-02",
+      "success": true,
+      "id": "02ac6327-1723-4ca9-884e-1321105873c1",
+      "timestamp": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "339d2bee-17d5-4378-a776-ca9cf1ef8548",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-001-03",
+      "success": true,
+      "id": "a672007f-3eaf-4ffa-a008-73a3e5c0c30b",
+      "timestamp": "2026-05-12T02:19:00.118Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "7d1450b8-39a2-4089-bf07-b8bb94086478",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-002-01",
+      "success": true,
+      "id": "679a4b95-540a-40ce-bb47-3bed5368ca4e",
+      "timestamp": "2026-05-12T02:19:00.119Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-002-02",
+      "success": true,
+      "id": "d019fcfa-d628-43d6-b9b0-5fcc00fad2ff",
+      "timestamp": "2026-05-12T02:19:00.119Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "7aea2c1b-a947-48df-839e-9857cdca23b7",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-002-03",
+      "success": true,
+      "id": "744cd958-ad46-435f-a598-b8471811103f",
+      "timestamp": "2026-05-12T02:19:00.119Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "f986e9eb-0bc4-4aac-86b8-61b28262b969",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-003-01",
+      "success": true,
+      "id": "a560bdf7-8d50-4c4f-adb5-3c9385633563",
+      "timestamp": "2026-05-12T02:19:00.120Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "e0efd4a5-a54e-4f69-aff9-266094e61563",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-003-02",
+      "success": true,
+      "id": "940bd880-0cff-499e-8ac2-ee3b12f42f47",
+      "timestamp": "2026-05-12T02:19:00.120Z"
+    },
+    {
+      "entityType": "milestone",
+      "entityId": "634ec312-7922-4bb8-983e-b33ff9bb41cc",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入里程碑 MS-003-03",
+      "success": true,
+      "id": "fe745939-ca61-4212-9020-3df16944afc5",
+      "timestamp": "2026-05-12T02:19:00.121Z"
+    },
+    {
+      "entityType": "deliveryProof",
+      "entityId": "082d20ff-07cb-4e55-95ac-6e4af3768843",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入交付证明 DP-001-01",
+      "success": true,
+      "id": "8c1545ad-70cd-4dae-9b98-8fbfa1be09a8",
+      "timestamp": "2026-05-12T02:19:00.124Z"
+    },
+    {
+      "entityType": "deliveryProof",
+      "entityId": "13ee9c4d-6ede-4d11-8a10-7b7d6199878a",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入交付证明 DP-001-02",
+      "success": true,
+      "id": "7ce1682b-8f73-4db9-ae6a-1612613eb72b",
+      "timestamp": "2026-05-12T02:19:00.125Z"
+    },
+    {
+      "entityType": "deliveryProof",
+      "entityId": "82a97ed3-dbcb-45b2-a8d0-0df52e450570",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入交付证明 DP-002-01",
+      "success": true,
+      "id": "bd2e08fe-f55d-44f9-b6c5-390286c7f44f",
+      "timestamp": "2026-05-12T02:19:00.125Z"
+    },
+    {
+      "entityType": "deliveryProof",
+      "entityId": "e3f5762e-1ae6-4cb7-819f-ec1d60a0cf45",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入交付证明 DP-002-02",
+      "success": true,
+      "id": "7d74ba83-b8b4-4fd4-8ac8-6dc983e84996",
+      "timestamp": "2026-05-12T02:19:00.126Z"
+    },
+    {
+      "entityType": "deliveryProof",
+      "entityId": "f1ede0a0-ee98-4a52-abfc-6a9d84fcedfa",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入交付证明 DP-003-01",
+      "success": true,
+      "id": "f4678d6a-e458-43c7-9347-c7bb89513662",
+      "timestamp": "2026-05-12T02:19:00.126Z"
+    },
+    {
+      "entityType": "acceptanceForm",
+      "entityId": "da496433-2899-4463-9c0a-1db2e51b6e61",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入验收单 AC-001-01",
+      "success": true,
+      "id": "5e533335-4b25-4029-99d9-6d1d90b39aff",
+      "timestamp": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "entityType": "acceptanceForm",
+      "entityId": "5d1c54c8-1573-42e8-ab41-cae9b7588bca",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入验收单 AC-001-02",
+      "success": true,
+      "id": "5ebdec45-59e4-46a0-a125-63ce9038860f",
+      "timestamp": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "entityType": "acceptanceForm",
+      "entityId": "c84442a8-9f97-4b1a-b42b-05d2d95f1b87",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入验收单 AC-002-01",
+      "success": true,
+      "id": "a60da582-0a50-4e82-9a7b-4eeb30fecec2",
+      "timestamp": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "entityType": "acceptanceForm",
+      "entityId": "08537134-89af-4a64-945e-113c5db42884",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入验收单 AC-002-02",
+      "success": true,
+      "id": "8745cb1a-e271-453c-8925-2af898daabf1",
+      "timestamp": "2026-05-12T02:19:00.129Z"
+    },
+    {
+      "entityType": "acceptanceForm",
+      "entityId": "4142d914-62de-4c21-a3b4-9523fc211125",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入验收单 AC-003-01",
+      "success": true,
+      "id": "b6022038-4161-42cf-810f-ba405c677102",
+      "timestamp": "2026-05-12T02:19:00.130Z"
+    },
+    {
+      "entityType": "invoice",
+      "entityId": "8284e754-e266-4d2b-a138-03b3fc8ca8a6",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入发票 INV-2026-0001",
+      "success": true,
+      "id": "73b5fccf-77d8-4d18-9a97-be2bf83e20b1",
+      "timestamp": "2026-05-12T02:19:00.132Z"
+    },
+    {
+      "entityType": "invoice",
+      "entityId": "624220be-9331-47bf-995c-848c62df04fa",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入发票 INV-2026-0002",
+      "success": true,
+      "id": "d87802ea-006d-41df-96e0-708a0a34d1ac",
+      "timestamp": "2026-05-12T02:19:00.133Z"
+    },
+    {
+      "entityType": "invoice",
+      "entityId": "e7be8e02-8493-4c84-bf51-c1926f20ddda",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入发票 INV-2026-0003",
+      "success": true,
+      "id": "e69d763e-18e8-4746-a5fc-b9e5a0864587",
+      "timestamp": "2026-05-12T02:19:00.133Z"
+    },
+    {
+      "entityType": "invoice",
+      "entityId": "95c6b927-8660-4277-8a1d-2beb7492bf87",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入发票 INV-2026-0005",
+      "success": true,
+      "id": "46e808f3-e70b-4911-b5b2-b9e55b6fefef",
+      "timestamp": "2026-05-12T02:19:00.134Z"
+    },
+    {
+      "entityType": "paymentRecord",
+      "entityId": "b5c48265-d204-404a-adeb-9b12ca2c0577",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入收款流水 PAY-2026-0001 - 已匹配",
+      "success": true,
+      "id": "746b544d-af88-43af-8a19-6ddf63450bc1",
+      "timestamp": "2026-05-12T02:19:00.136Z"
+    },
+    {
+      "entityType": "paymentRecord",
+      "entityId": "ad31a52d-850d-46e7-b06a-4946b48b9399",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入收款流水 PAY-2026-0002 - 已匹配",
+      "success": true,
+      "id": "74414908-793c-42ef-bc9f-9653e947c7e0",
+      "timestamp": "2026-05-12T02:19:00.136Z"
+    },
+    {
+      "entityType": "paymentRecord",
+      "entityId": "cf83cea8-f7ea-49d4-b4a3-024c98c9821e",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入收款流水 PAY-2026-0003 - 已匹配",
+      "success": true,
+      "id": "2ab7c403-4f58-4b1a-a577-7497ee694213",
+      "timestamp": "2026-05-12T02:19:00.137Z"
+    },
+    {
+      "entityType": "paymentRecord",
+      "entityId": "6a584810-439a-4829-815c-51be095e56d0",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入收款流水 PAY-2026-0004 - 待匹配",
+      "success": true,
+      "id": "3fde976b-5b50-4d9e-9c47-d722f0d2491a",
+      "timestamp": "2026-05-12T02:19:00.138Z"
+    },
+    {
+      "entityType": "paymentRecord",
+      "entityId": "b5c48265-d204-404a-adeb-9b12ca2c0577",
+      "operation": "import",
+      "operator": "demo",
+      "description": "导入收款流水 PAY-2026-0001 - 已存在，跳过",
+      "success": true,
+      "id": "e9ed0273-94d6-4d26-8b56-060225ee4730",
+      "timestamp": "2026-05-12T02:19:00.138Z"
+    }
+  ],
+  "issues": [
+    {
+      "id": "2fc9bf86-9962-4769-8fc1-4cefd313adcb",
+      "type": "warning",
+      "entityType": "acceptanceForm",
+      "entityId": "5d1c54c8-1573-42e8-ab41-cae9b7588bca",
+      "code": "AC004",
+      "message": "里程碑 MS-001-02 部分验收: 350000/400000",
+      "severity": "medium",
+      "suggestion": "确认是否为部分验收，后续需要补充验收",
+      "createdAt": "2026-05-12T02:19:00.195Z"
+    },
+    {
+      "id": "e36438ef-f111-4dea-afa0-7c69ff1b85aa",
+      "type": "error",
+      "entityType": "acceptanceForm",
+      "entityId": "08537134-89af-4a64-945e-113c5db42884",
+      "code": "AC002",
+      "message": "验收单 AC-002-02 验收日期早于交付日期",
+      "severity": "critical",
+      "suggestion": "检查验收日期是否正确，验收日期应晚于或等于交付日期",
+      "createdAt": "2026-05-12T02:19:00.195Z"
+    },
+    {
+      "id": "24c9b42c-0f6d-4d4a-a161-1f9679951bb5",
+      "type": "error",
+      "entityType": "invoice",
+      "entityId": "95c6b927-8660-4277-8a1d-2beb7492bf87",
+      "code": "INV001",
+      "message": "里程碑 MS-002-02 开票金额 350000 超过里程碑金额 300000",
+      "severity": "critical",
+      "suggestion": "检查发票是否重复录入或金额是否正确",
+      "createdAt": "2026-05-12T02:19:00.196Z"
+    },
+    {
+      "id": "a18d148f-ed83-47d6-bace-bbc60909c422",
+      "type": "error",
+      "entityType": "milestone",
+      "entityId": "48891a70-7cdf-4542-95dd-98354294cf43",
+      "code": "PY002",
+      "message": "里程碑 MS-002-02 已超期未收 (应收: 300000, 已收: 0)",
+      "severity": "high",
+      "suggestion": "跟进客户付款",
+      "createdAt": "2026-05-12T02:19:00.196Z"
+    },
+    {
+      "id": "19a5cf8b-85ce-4861-959a-522ec461f195",
+      "type": "error",
+      "entityType": "acceptanceForm",
+      "entityId": "4142d914-62de-4c21-a3b4-9523fc211125",
+      "code": "AC002",
+      "message": "验收单 AC-003-01 验收日期早于交付日期",
+      "severity": "critical",
+      "suggestion": "检查验收日期是否正确，验收日期应晚于或等于交付日期",
+      "createdAt": "2026-05-12T02:19:00.197Z"
+    },
+    {
+      "id": "12621952-be4a-48af-bde4-c23198011afd",
+      "type": "error",
+      "entityType": "milestone",
+      "entityId": "f986e9eb-0bc4-4aac-86b8-61b28262b969",
+      "code": "PY002",
+      "message": "里程碑 MS-003-01 已超期未收 (应收: 150000, 已收: 0)",
+      "severity": "high",
+      "suggestion": "跟进客户付款",
+      "createdAt": "2026-05-12T02:19:00.197Z"
+    },
+    {
+      "id": "422f5e4f-6138-403a-8b1c-87ef0938cfc1",
+      "type": "warning",
+      "entityType": "paymentRecord",
+      "entityId": "6a584810-439a-4829-815c-51be095e56d0",
+      "code": "PY001",
+      "message": "收款流水 PAY-2026-0004 未匹配到任何发票或里程碑",
+      "severity": "high",
+      "suggestion": "手动匹配该收款到对应的发票或里程碑",
+      "createdAt": "2026-05-12T02:19:00.198Z"
+    }
+  ],
+  "initializedAt": "2026-05-12T02:19:00.116Z",
+  "lastUpdatedAt": "2026-05-12T02:19:00.198Z",
+  "version": "1.0.0"
+}
