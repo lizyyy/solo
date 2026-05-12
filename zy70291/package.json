@@ -1,0 +1,15 @@
+{
+  "name": "tower-crane-schedule-api",
+  "version": "1.0.0",
+  "description": "工地塔吊吊次排程 API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1"
+  }
+}
