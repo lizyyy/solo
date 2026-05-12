@@ -199,6 +199,14 @@ router.post('/entries', async (req, res) => {
   try {
     const { person_id, entry_date, position, approver, remarks } = req.body;
     
+    const existingEntry = await runQuery(
+      'SELECT * FROM entries WHERE person_id = ? AND entry_date = ?',
+      [person_id, entry_date]
+    );
+    if (existingEntry.length > 0) {
+      return res.status(400).json({ error: '该人员当日已有入场记录，请勿重复提交' });
+    }
+    
     const hasTraining = await checkPersonTraining(person_id);
     
     const id = await runInsert(
@@ -233,6 +241,14 @@ router.post('/exits', async (req, res) => {
   try {
     const { person_id, exit_date, exit_reason, badge_returned, approver, remarks } = req.body;
     
+    const existingExit = await runQuery(
+      'SELECT * FROM exits WHERE person_id = ? AND exit_date = ?',
+      [person_id, exit_date]
+    );
+    if (existingExit.length > 0) {
+      return res.status(400).json({ error: '该人员当日已有离场记录，请勿重复提交' });
+    }
+    
     const hasBadge = !(await checkPersonBadgeReturned(person_id));
     const actualBadgeReturned = badge_returned || !hasBadge;
     
@@ -255,18 +271,25 @@ router.post('/settlements', async (req, res) => {
   try {
     const { person_id, settlement_date, settlement_amount, attachment, approver, remarks } = req.body;
     
+    const existingSettlement = await runQuery(
+      'SELECT * FROM settlements WHERE person_id = ? AND settlement_date = ?',
+      [person_id, settlement_date]
+    );
+    if (existingSettlement.length > 0) {
+      return res.status(400).json({ error: '该人员当日已有结算记录，请勿重复提交' });
+    }
+    
     const badgeReturned = await checkPersonBadgeReturned(person_id);
+    if (!badgeReturned) {
+      return res.status(400).json({ error: '该人员工牌未回收，无法进行结算' });
+    }
     
     const id = await runInsert(
       'INSERT INTO settlements (person_id, settlement_date, settlement_amount, attachment, approver, remarks) VALUES (?, ?, ?, ?, ?, ?)',
       [person_id, settlement_date, settlement_amount, attachment, approver, remarks]
     );
     
-    if (!badgeReturned) {
-      res.json({ id, message: '结算登记成功（注意：工牌未回收）', warning: '工牌未回收' });
-    } else {
-      res.json({ id, message: '结算登记成功' });
-    }
+    res.json({ id, message: '结算登记成功' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

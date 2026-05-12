@@ -30,10 +30,13 @@ function App() {
   const [selectedKey, setSelectedKey] = useState('dashboard');
   const [selectedPerson, setSelectedPerson] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
+  const [selectedProject, setSelectedProject] = useState('');
 
   const loadDashboard = async () => {
     try {
-      const res = await axios.get('/api/dashboard');
+      const res = await axios.get('/api/dashboard', {
+        params: { project: selectedProject || undefined }
+      });
       setDashboardData(res.data);
     } catch (err) {
       message.error('加载看板数据失败');
@@ -44,7 +47,7 @@ function App() {
     if (selectedKey === 'dashboard') {
       loadDashboard();
     }
-  }, [selectedKey]);
+  }, [selectedKey, selectedProject]);
 
   const handleSelectPerson = (person) => {
     setSelectedPerson(person);
@@ -66,7 +69,14 @@ function App() {
   const renderContent = () => {
     switch (selectedKey) {
       case 'dashboard':
-        return <Dashboard data={dashboardData} onSelectPerson={handleSelectPerson} />;
+        return (
+          <Dashboard 
+            data={dashboardData} 
+            onSelectPerson={handleSelectPerson}
+            selectedProject={selectedProject}
+            onProjectChange={setSelectedProject}
+          />
+        );
       case 'persons':
         return <Persons onSelectPerson={handleSelectPerson} />;
       case 'personDetail':
@@ -86,7 +96,14 @@ function App() {
       case 'export':
         return <Export projects={dashboardData?.projects || []} />;
       default:
-        return <Dashboard data={dashboardData} />;
+        return (
+          <Dashboard 
+            data={dashboardData} 
+            onSelectPerson={handleSelectPerson}
+            selectedProject={selectedProject}
+            onProjectChange={setSelectedProject}
+          />
+        );
     }
   };
 

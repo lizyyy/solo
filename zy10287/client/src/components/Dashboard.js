@@ -1,11 +1,10 @@
 import React from 'react';
 import { Row, Col, Card, Statistic, Table, Tag, Button, Space, Select } from 'antd';
 import { UserOutlined, WarningOutlined, SafetyCertificateOutlined, EnterOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 
 const { Option } = Select;
 
-function Dashboard({ data, onSelectPerson }) {
+function Dashboard({ data, onSelectPerson, selectedProject, onProjectChange }) {
   if (!data) return <div>加载中...</div>;
 
   const noTrainingColumns = [
@@ -88,7 +87,12 @@ function Dashboard({ data, onSelectPerson }) {
 
       <Space style={{ marginBottom: 16, display: 'flex' }}>
         <span>项目筛选：</span>
-        <Select style={{ width: 200 }} placeholder="选择项目">
+        <Select 
+          style={{ width: 200 }} 
+          placeholder="选择项目"
+          value={selectedProject || undefined}
+          onChange={onProjectChange}
+        >
           <Option value="">全部</Option>
           {data.projects.map(project => (
             <Option key={project} value={project}>{project}</Option>
