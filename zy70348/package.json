@@ -1,0 +1,14 @@
+{
+  "name": "archive-retention-api",
+  "version": "1.0.0",
+  "description": "归档任务保留策略 API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
