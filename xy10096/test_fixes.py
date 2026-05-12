@@ -95,28 +95,78 @@ def test_missing_required_columns():
 
 def test_mixed_units():
     print("\n" + "=" * 60)
-    print("测试 3: 混合单位处理（temperature_unit 混合值）")
+    print("测试 3: 混合单位处理（temperature_unit 混合值，逐点转换）")
     print("=" * 60)
 
     df = generate_normal_sample_data('SAMP-MIXED-001', 'BATCH-001', seed=42)
+
+    original_temp = df['temperature'].copy()
+
+    fahrenheit_values = (original_temp.iloc[50:] * 9 / 5) + 32
+    df.loc[df.index[50:], 'temperature'] = fahrenheit_values
+
     units = ['°C'] * 50 + ['°F'] * 47
     df['temperature_unit'] = units
 
     print(f"温度单位值分布: {df['temperature_unit'].value_counts().to_dict()}")
+    print(f"原始温度范围 (全部 °C): {original_temp.min():.2f} ~ {original_temp.max():.2f} °C")
+    print(f"混合后温度范围: {df['temperature'].min():.2f} ~ {df['temperature'].max():.2f}")
+    print(f"  (前50个点是 °C，后47个点是 °F 表示的相同温度值)")
 
     preprocessor = DataPreprocessor()
 
     try:
         result = preprocessor.process_sample(df, 'SAMP-MIXED-001')
 
-        if result['success']:
-            print("✓ 混合单位处理成功（使用多数单位）")
-            print(f"  处理步骤: {result['processing_steps']}")
-            return True
-        else:
-            print(f"处理结果: success={result['success']}")
-            print(f"  错误: {result.get('errors', [])}")
-            return True
+        if not result['success']:
+            print(f"✗ 预处理失败: {result['errors']}")
+            return False
+
+        processed_df = result['dataframe']
+        processed_temp = processed_df['temperature']
+
+        print(f"\n处理后温度范围: {processed_temp.min():.2f} ~ {processed_temp.max():.2f} °C")
+
+        temp_max = processed_temp.max()
+        if temp_max > 50:
+            print(f"✗ 转换失败，最高温度 {temp_max:.2f} °C 超过正常值")
+            print(f"  说明 °F 数据点没有被正确转换")
+            return False
+
+        first_50_original = original_temp.iloc[:50].reset_index(drop=True)
+        first_50_processed = processed_temp.iloc[:50].reset_index(drop=True)
+        diff_c = (first_50_processed - first_50_original).abs().max()
+
+        print(f"\n前50个点 (原始 °C):")
+        print(f"  原始范围: {first_50_original.min():.2f} ~ {first_50_original.max():.2f}")
+        print(f"  处理后范围: {first_50_processed.min():.2f} ~ {first_50_processed.max():.2f}")
+        print(f"  最大差值: {diff_c:.4f}")
+
+        if diff_c > 0.1:
+            print(f"✗ °C 数据点被错误转换了")
+            return False
+
+        print(f"\n后47个点 (原始 °F 应转换为 °C):")
+        last_47_original_fahrenheit = df['temperature'].iloc[50:].reset_index(drop=True)
+        last_47_processed = processed_temp.iloc[50:].reset_index(drop=True)
+        last_47_expected = original_temp.iloc[50:].reset_index(drop=True)
+        diff_f_converted = (last_47_processed - last_47_expected).abs().max()
+
+        print(f"  混合数据值范围: {last_47_original_fahrenheit.min():.2f} ~ {last_47_original_fahrenheit.max():.2f}")
+        print(f"  处理后范围: {last_47_processed.min():.2f} ~ {last_47_processed.max():.2f}")
+        print(f"  期望范围: {last_47_expected.min():.2f} ~ {last_47_expected.max():.2f}")
+        print(f"  与期望值最大差值: {diff_f_converted:.4f}")
+
+        if diff_f_converted > 0.5:
+            print(f"✗ °F 数据点没有被正确转换为 °C")
+            return False
+
+        print(f"\n✓ 混合单位逐点转换正确")
+        print(f"  前50个 °C 点保持不变")
+        print(f"  后47个 °F 点正确转换为 °C")
+        print(f"  处理步骤: {result['processing_steps']}")
+
+        return True
 
     except Exception as e:
         print(f"✗ 发生错误: {e}")

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Callable
 from datetime import datetime
 from .exceptions import (
     MissingDataError,
@@ -113,39 +113,78 @@ class DataPreprocessor:
         self._log("列验证通过")
         return []
 
-    def _get_unit_from_column(
+    def _get_unit_info_from_column(
         self,
         df: pd.DataFrame,
         param: str,
-    ) -> Optional[str]:
+    ) -> Dict[str, Any]:
         unit_col = f"{param}_unit"
+
         if unit_col not in df.columns:
-            return None
+            return {"has_column": False, "units": None, "is_mixed": False}
 
         unit_series = df[unit_col]
         if unit_series.empty:
-            return None
+            return {"has_column": False, "units": None, "is_mixed": False}
 
         if pd.api.types.is_numeric_dtype(unit_series):
-            return None
+            return {"has_column": False, "units": None, "is_mixed": False}
 
         valid_units = unit_series.dropna()
         if valid_units.empty:
-            return None
+            return {"has_column": False, "units": None, "is_mixed": False}
 
         unique_units = valid_units.unique()
         if len(unique_units) == 0:
-            return None
+            return {"has_column": True, "units": None, "is_mixed": False}
 
-        if len(unique_units) > 1:
-            self._log(
-                f"发现混合单位 {param}: {list(unique_units)}，使用多数单位",
-                level="warning",
-            )
-            unit_counts = valid_units.value_counts()
-            return str(unit_counts.index[0])
+        if len(unique_units) == 1:
+            return {
+                "has_column": True,
+                "units": str(unique_units[0]),
+                "is_mixed": False,
+            }
+        else:
+            return {
+                "has_column": True,
+                "units": [str(u) for u in unique_units],
+                "is_mixed": True,
+                "unit_series": unit_series,
+            }
 
-        return str(unique_units[0])
+    def _convert_with_mixed_units(
+        self,
+        df: pd.DataFrame,
+        param: str,
+        param_conversions: Dict[str, Callable],
+        unit_series: pd.Series,
+    ) -> pd.Series:
+        standard_unit = list(param_conversions.keys())[0]
+        converted_values = []
+
+        for idx, (value, unit) in enumerate(zip(df[param], unit_series)):
+            if pd.isna(value):
+                converted_values.append(value)
+                continue
+
+            if pd.isna(unit):
+                unit = standard_unit
+
+            unit_str = str(unit).strip()
+            if unit_str not in param_conversions:
+                self._log(
+                    f"位置 {idx} 的单位 '{unit_str}' 不支持，使用标准单位 {standard_unit}",
+                    level="warning",
+                )
+                converted_values.append(value)
+                continue
+
+            if unit_str == standard_unit:
+                converted_values.append(value)
+            else:
+                converted_values.append(param_conversions[unit_str](value))
+
+        return pd.Series(converted_values, index=df.index)
 
     def convert_units(
         self,
@@ -161,11 +200,31 @@ class DataPreprocessor:
             if param not in df.columns:
                 continue
 
-            unit = unit_info.get(param)
-            if unit is None:
-                unit = self._get_unit_from_column(df, param)
-            if unit is None:
+            standard_unit = list(param_conversions.keys())[0]
+
+            unit_info_from_param = unit_info.get(param)
+            column_unit_info = self._get_unit_info_from_column(df, param)
+
+            if unit_info_from_param is not None:
+                unit = unit_info_from_param
+                is_mixed = False
+            elif column_unit_info["has_column"] and column_unit_info["is_mixed"]:
+                self._log(
+                    f"发现混合单位 {param}: {column_unit_info['units']}，将逐点转换",
+                    level="warning",
+                )
+                unit_series = column_unit_info["unit_series"]
+                df[param] = self._convert_with_mixed_units(
+                    df, param, param_conversions, unit_series
+                )
+                conversions_applied.append(f"{param}: 混合单位逐点转换")
+                continue
+            elif column_unit_info["has_column"] and column_unit_info["units"] is not None:
+                unit = column_unit_info["units"]
+                is_mixed = False
+            else:
                 unit = self._detect_unit(df[param], param)
+                is_mixed = False
 
             if not isinstance(unit, str) or unit not in param_conversions:
                 raise UnitConversionError(
@@ -174,9 +233,9 @@ class DataPreprocessor:
                     unit=str(unit),
                 )
 
-            if param in UNIT_CONVERSIONS and unit != list(UNIT_CONVERSIONS[param].keys())[0]:
+            if unit != standard_unit:
                 df[param] = param_conversions[unit](df[param])
-                conversions_applied.append(f"{param}: {unit} -> 标准单位")
+                conversions_applied.append(f"{param}: {unit} -> {standard_unit}")
 
         if conversions_applied:
             self._log(f"单位转换完成: {conversions_applied}")
