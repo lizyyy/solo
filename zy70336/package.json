@@ -1,0 +1,17 @@
+{
+  "name": "shadow-traffic-api",
+  "version": "1.0.0",
+  "description": "影子流量对比 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
