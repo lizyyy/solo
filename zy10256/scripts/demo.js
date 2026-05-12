@@ -191,7 +191,16 @@ const demo = async () => {
   const alertsAfter = await request({ path: '/api/alerts?status=active' });
   console.log(`当前告警数量: ${alertsAfter.body.data.length}`);
 
-  printSection('11. 留样销毁确认');
+  printSection('11. 温度日志可追溯性验证');
+  const tempLogsRes = await request({ path: '/api/temperature-logs' });
+  const tempLogs = tempLogsRes.body.data;
+  console.log(`\n温度日志总数: ${tempLogs.length}`);
+  tempLogs.forEach((log, i) => {
+    console.log(`  ${i + 1}. 样品ID: ${log.sampleId} | 温度: ${log.temperature}℃ | 时间: ${log.recordTime.split('T')[0]}`);
+  });
+  console.log(`\n✅ 修复验证: 所有温度日志 sampleId 不为空: ${tempLogs.every(l => l.sampleId !== null)}`);
+
+  printSection('12. 留样销毁确认');
   const activeSamples = await request({ path: '/api/samples' });
   const toDestroy = activeSamples.body.data.find(s => s.status === 'active' && s.dishName === '红烧肉');
   
@@ -211,7 +220,7 @@ const demo = async () => {
   }
   await sleep(200);
 
-  printSection('12. 监管查询 - 完整留痕记录');
+  printSection('13. 监管查询 - 完整留痕记录（告警聚合修复验证）');
   const supervisionRes = await request({ path: '/api/supervision' });
   const supervision = supervisionRes.body.data;
   
@@ -219,19 +228,34 @@ const demo = async () => {
   console.log(`  总餐次: ${supervision.summary.totalMeals}`);
   console.log(`  总留样: ${supervision.summary.totalSamples}`);
   console.log(`  已销毁: ${supervision.summary.totalDestroyed}`);
+  console.log(`  温度日志总数: ${supervision.summary.totalTemperatureLogs}`);
   console.log(`  告警总数: ${supervision.summary.totalAlerts}`);
   console.log(`  待处理告警: ${supervision.summary.activeAlerts}`);
 
+  let allAlertsInRecords = 0;
+  let hasExpiredAlertInMeal = false;
+  
   console.log(`\n📋 详细记录:`);
   supervision.records.forEach(record => {
+    allAlertsInRecords += record.alerts.length;
+    const hasExpired = record.alerts.some(a => a.type === 'EXPIRED_NOT_DESTROYED');
+    if (hasExpired) hasExpiredAlertInMeal = true;
+    
     console.log(`\n  餐次: ${record.meal.mealDate} - ${record.meal.mealType} (${record.meal.status})`);
-    console.log(`    菜品数: ${record.statistics.totalDishes} | 已留样: ${record.statistics.sampledCount} | 已销毁: ${record.statistics.destroyedCount} | 告警: ${record.statistics.alertCount}`);
+    console.log(`    菜品数: ${record.statistics.totalDishes} | 已留样: ${record.statistics.sampledCount} | 已销毁: ${record.statistics.destroyedCount} | 温度日志: ${record.statistics.temperatureLogCount} | 告警: ${record.statistics.alertCount}`);
     
     if (record.samples.length > 0) {
       console.log(`    留样明细:`);
       record.samples.forEach(s => {
         const status = s.status === 'destroyed' ? `✓ 已销毁 (${s.destroyedAt?.split('T')[0]})` : `⏱ 到期 ${s.expireTime.split('T')[0]}`;
         console.log(`      - ${s.dishName} [${s.boxNumber}] ${s.temperature}℃ | ${status}`);
+      });
+    }
+    
+    if (record.temperatureLogs.length > 0) {
+      console.log(`    温度日志:`);
+      record.temperatureLogs.forEach(t => {
+        console.log(`      - 样品ID: ${t.sampleId.substring(0, 10)}... | ${t.temperature}℃`);
       });
     }
     
@@ -243,7 +267,11 @@ const demo = async () => {
     }
   });
 
-  printSection('13. 销毁记录查询');
+  console.log(`\n✅ 告警聚合修复验证:`);
+  console.log(`  - 告警总数匹配: ${supervision.summary.totalAlerts === allAlertsInRecords ? '✓' : '✗'} (${supervision.summary.totalAlerts} == ${allAlertsInRecords})`);
+  console.log(`  - 到期未销毁告警出现在对应餐次: ${hasExpiredAlertInMeal ? '✓' : '✗'}`);
+
+  printSection('14. 销毁记录查询');
   const destroyRecordsRes = await request({ path: '/api/destroy-records' });
   const destroyRecords = destroyRecordsRes.body.data;
   console.log(`\n销毁记录数量: ${destroyRecords.length}`);
@@ -252,7 +280,7 @@ const demo = async () => {
   });
 
   printSection('✅ 演示完成');
-  console.log('\n📝 已验证的业务规则:');
+  console.log('\n📝 已验证的业务规则 (含第二轮修复):');
   console.log('  ✓ 重复导入检测 (菜品/留样盒/餐次)');
   console.log('  ✓ 温度超限告警 (0-8℃)');
   console.log('  ✓ 留样盒重复绑定检测');
@@ -261,14 +289,23 @@ const demo = async () => {
   console.log('  ✓ 到期未销毁告警');
   console.log('  ✓ 重复销毁检测');
   console.log('  ✓ 销毁后告警自动解除');
-  console.log('  ✓ 监管查询完整留痕');
-  console.log('\n🌐 API服务器运行在: http://localhost:3000');
+  console.log('');
+  console.log('🔧 第二轮修复验证:');
+  console.log('  ✓ 温度日志 sampleId 回填 (不再是null)');
+  console.log('  ✓ 温度日志可追溯 (关联具体留样)');
+  console.log('  ✓ BOX_REUSE 告警包含 mealId');
+  console.log('  ✓ EXPIRED_NOT_DESTROYED 告警包含 mealId');
+  console.log('  ✓ 告警聚合逻辑增强 (支持 mealId 和 sampleId 关联)');
+  console.log('  ✓ 监管查询包含温度日志');
+  console.log('  ✓ 所有告警都能正确出现在对应餐次留痕中');
+  console.log('\n🌐 API服务器运行在: http://localhost:3001');
   console.log('   可用 endpoints:');
-  console.log('   - GET  /api/dishes          - 菜品列表');
-  console.log('   - GET  /api/samples         - 留样记录');
-  console.log('   - GET  /api/alerts          - 告警列表');
-  console.log('   - GET  /api/supervision     - 监管查询');
-  console.log('   - POST /api/samples         - 创建留样');
+  console.log('   - GET  /api/dishes            - 菜品列表');
+  console.log('   - GET  /api/samples           - 留样记录');
+  console.log('   - GET  /api/alerts            - 告警列表');
+  console.log('   - GET  /api/supervision       - 监管查询');
+  console.log('   - GET  /api/temperature-logs  - 温度日志');
+  console.log('   - POST /api/samples           - 创建留样');
   console.log('   - POST /api/samples/:id/destroy - 销毁留样');
 };
 

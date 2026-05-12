@@ -113,6 +113,10 @@ app.get('/api/destroy-records', (req, res) => {
   res.json(result);
 });
 
+app.get('/api/temperature-logs', (req, res) => {
+  res.json({ success: true, data: Storage.getAll('temperatureLogs') });
+});
+
 app.post('/api/reset', (req, res) => {
   Storage.reset();
   res.json({ success: true, message: '数据已重置' });

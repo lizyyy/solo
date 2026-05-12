@@ -111,6 +111,7 @@ class FoodSampleService {
         type: 'BOX_REUSE',
         level: 'medium',
         message: `留样盒${box.boxNumber}被重复绑定，当前留样菜品：${activeSamples[0].dishName}`,
+        mealId,
         boxId,
         existingSampleId: activeSamples[0].id
       });
@@ -135,13 +136,6 @@ class FoodSampleService {
       });
     }
 
-    Storage.create('temperatureLogs', {
-      sampleId: null,
-      temperature,
-      recordTime: sampleTime || getCurrentTime().toISOString(),
-      recordedBy: responsiblePersonId
-    });
-
     const expireTime = new Date(sampleTime || getCurrentTime());
     expireTime.setHours(expireTime.getHours() + SAMPLE_SAVE_HOURS);
 
@@ -156,6 +150,13 @@ class FoodSampleService {
       temperature,
       expireTime: expireTime.toISOString(),
       status: 'active'
+    });
+
+    Storage.create('temperatureLogs', {
+      sampleId: sample.id,
+      temperature,
+      recordTime: sample.sampleTime,
+      recordedBy: responsiblePersonId
     });
 
     Storage.update('sampleBoxes', boxId, { status: 'in_use', currentSampleId: sample.id });
@@ -179,6 +180,7 @@ class FoodSampleService {
           type: 'EXPIRED_NOT_DESTROYED',
           level: 'high',
           message: `留样到期未销毁：菜品${sample.dishName}（留样盒${sample.boxNumber}）已到期`,
+          mealId: sample.mealId,
           sampleId: sample.id,
           expireTime: sample.expireTime
         });
@@ -245,10 +247,18 @@ class FoodSampleService {
     const samples = Storage.find('samples', s => true);
     const destroyRecords = Storage.find('destroyRecords', d => true);
     const alerts = Storage.find('alerts', a => true);
+    const temperatureLogs = Storage.find('temperatureLogs', t => true);
 
     const result = meals.map(meal => {
       const mealSamples = samples.filter(s => s.mealId === meal.id);
-      const mealAlerts = alerts.filter(a => a.mealId === meal.id);
+      const mealSampleIds = new Set(mealSamples.map(s => s.id));
+      
+      const mealAlerts = alerts.filter(a => {
+        if (a.mealId === meal.id) return true;
+        if (a.sampleId && mealSampleIds.has(a.sampleId)) return true;
+        return false;
+      });
+      
       const destroyedSamples = mealSamples.filter(s => s.status === 'destroyed');
 
       return {
@@ -271,11 +281,13 @@ class FoodSampleService {
           destroyedAt: s.destroyedAt
         })),
         destroyRecords: destroyRecords.filter(d => mealSamples.some(s => s.id === d.sampleId)),
+        temperatureLogs: temperatureLogs.filter(t => mealSampleIds.has(t.sampleId)),
         alerts: mealAlerts,
         statistics: {
           totalDishes: meal.dishIds.length,
           sampledCount: mealSamples.length,
           destroyedCount: destroyedSamples.length,
+          temperatureLogCount: temperatureLogs.filter(t => mealSampleIds.has(t.sampleId)).length,
           alertCount: mealAlerts.length
         }
       };
@@ -290,6 +302,7 @@ class FoodSampleService {
           totalMeals: meals.length,
           totalSamples: samples.length,
           totalDestroyed: destroyRecords.length,
+          totalTemperatureLogs: temperatureLogs.length,
           totalAlerts: alerts.length,
           activeAlerts: alerts.filter(a => a.status === 'active').length
         }
