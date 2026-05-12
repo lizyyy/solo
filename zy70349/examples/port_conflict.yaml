@@ -1,0 +1,72 @@
+version: 1
+project_name: my-web-service
+description: |
+  场景 3: 端口冲突
+  Web 服务端口被占用（使用模拟机制）
+
+database:
+  type: mysql
+  host: localhost
+  port: 3306
+  user: root
+  password: password123
+  database: app_db
+  min_version: "5.7.0"
+  schema_version: 17
+  expected_schema_version: 17
+  simulated_version: "8.0.28"
+  simulated_connect: true
+
+cache:
+  type: redis
+  host: localhost
+  port: 6379
+  password: redis_password
+  simulated_connect: true
+
+queue:
+  type: rabbitmq
+  host: localhost
+  port: 5672
+  user: guest
+  password: guest
+  topics:
+    - user.events
+    - order.events
+    - payment.events
+    - notification.events
+  required_topics:
+    - user.events
+    - order.events
+    - payment.events
+  simulated_connect: true
+
+ports:
+  - port: 8080
+    name: Web 服务端口
+  - port: 8081
+    name: 管理 API 端口
+  - port: 9090
+    name: Metrics 端口
+
+simulated_ports_occupied:
+  8080: true
+
+version_requirements:
+  python: "3.8.0"
+
+required_configs:
+  - path: database.host
+    name: 数据库地址
+  - path: database.user
+    name: 数据库用户名
+  - path: database.database
+    name: 数据库名称
+  - path: cache.host
+    name: 缓存地址
+
+required_env_vars:
+  - name: DEP_CHECK_DEMO_OK
+    description: 示例环境变量
+
+config_files: []
