@@ -35,6 +35,10 @@ class ForbearanceService {
       throw new Error(`不符合宽限条件: ${eligibility.reasons.join(', ')}`);
     }
 
+    if (requestedDays > eligibility.maxDays) {
+      throw new Error(`申请宽限天数(${requestedDays}天)超过最大允许天数(${eligibility.maxDays}天)`);
+    }
+
     const applicationNo = `FBA${moment().format('YYYYMMDDHHmmss')}${Math.floor(Math.random() * 1000)}`;
 
     const application = await ForbearanceApplication.create({
@@ -77,6 +81,14 @@ class ForbearanceService {
 
       if (application.status !== 'pending') {
         throw new Error('申请已处理，不可重复审批');
+      }
+
+      const eligibility = await ContractService.calculateForbearanceEligibility(
+        application.contractId,
+        application.installmentId
+      );
+      if (approvedDays > eligibility.maxDays) {
+        throw new Error(`审批宽限天数(${approvedDays}天)超过最大允许天数(${eligibility.maxDays}天)`);
       }
 
       const installment = application.installment;

@@ -11,6 +11,7 @@ class ContractService {
       interestRate,
       term,
       startDate,
+      maxForbearanceTimes,
     } = contractData;
 
     const monthlyRate = interestRate / 100 / 12;
@@ -29,6 +30,7 @@ class ContractService {
         totalAmount,
         term,
         startDate,
+        maxForbearanceTimes,
       }, { transaction });
 
       const installments = [];
@@ -142,8 +144,8 @@ class ContractService {
 
     if (contract.isInCollection) {
       if (contract.collectionFreezeUntil && moment(contract.collectionFreezeUntil).isAfter(today)) {
-        result.eligible = false;
-        result.reasons.push('催收已冻结，不可宽限');
+        result.reasons.push('催收已冻结，宽限需特别审批');
+        result.requiresSpecialApproval = true;
       } else {
         result.reasons.push('合同在催收中，宽限需特别审批');
         result.requiresSpecialApproval = true;
