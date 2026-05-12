@@ -21,7 +21,7 @@ db.serialize(() => {
     db.run(`
     CREATE TABLE IF NOT EXISTS visits (
       id TEXT PRIMARY KEY,
-      order_id TEXT NOT NULL,
+      order_id TEXT NOT NULL UNIQUE,
       visitor_name TEXT NOT NULL,
       visit_date TEXT NOT NULL,
       satisfaction INTEGER,

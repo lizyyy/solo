@@ -110,13 +110,18 @@ app.post('/api/orders/:id/visit', async (req, res) => {
             return res.status(400).json({ error: '工单已关闭，无法回访' });
         }
         
+        const existingVisit = await dbGet('SELECT id FROM visits WHERE order_id = ?', [orderId]);
+        if (existingVisit) {
+            return res.status(400).json({ error: '该工单已完成回访，不可重复提交' });
+        }
+        
         const visitId = generateId();
         const now = getNow();
         
         await dbRun(`
             INSERT INTO visits (id, order_id, visitor_name, visit_date, satisfaction, feedback, issues, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `, [visitId, orderId, visitor_name, now, satisfaction, feedback, issues ? JSON.stringify(issues) : null]);
+        `, [visitId, orderId, visitor_name, now, satisfaction, feedback || null, issues ? (Array.isArray(issues) ? issues.join(',') : issues) : null, now]);
         
         let newStatus = 'visited';
         if (issues && issues.length > 0) {
@@ -127,6 +132,9 @@ app.post('/api/orders/:id/visit', async (req, res) => {
         
         res.json({ id: visitId, message: '回访记录成功' });
     } catch (err) {
+        if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: '该工单已完成回访，不可重复提交' });
+        }
         res.status(500).json({ error: err.message });
     }
 });
