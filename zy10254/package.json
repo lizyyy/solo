@@ -1,0 +1,23 @@
+{
+  "name": "vehicle-rescue-dispatch",
+  "version": "1.0.0",
+  "description": "车辆救援派单 API 系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "demo": "node demo/flow.js",
+    "demo:repeat": "node demo/repeat-cases.js",
+    "demo:reassign": "node demo/reassign.js",
+    "demo:cancel": "node demo/cancel-rollback.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "better-sqlite3": "^9.2.2",
+    "uuid": "^9.0.1",
+    "body-parser": "^1.20.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
