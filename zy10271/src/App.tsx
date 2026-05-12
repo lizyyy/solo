@@ -7,16 +7,17 @@ import { sampleOrders } from './data/sampleOrders'
 import { Plus, Eye, ClipboardList } from 'lucide-react'
 
 const DashboardContent: React.FC = () => {
-  const { orders, getFilteredOrders, importOrders } = useOrderContext()
+  const { orders, getFilteredOrders, importOrders, loading } = useOrderContext()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    if (!initialized && orders.length === 0) {
-      importOrders(sampleOrders)
-      setInitialized(true)
+    if (!initialized && orders.length === 0 && !loading) {
+      importOrders(sampleOrders).then(() => {
+        setInitialized(true)
+      })
     }
-  }, [initialized, orders.length, importOrders])
+  }, [initialized, orders.length, importOrders, loading])
 
   const filteredOrders = getFilteredOrders()
 

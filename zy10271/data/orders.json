@@ -1,0 +1,209 @@
+{
+  "orders": [
+    {
+      "orderNo": "ORD-2024-001",
+      "customerName": "张三",
+      "phone": "13800138001",
+      "leftEye": {
+        "sphere": -2.5,
+        "cylinder": -0.5,
+        "axis": 90
+      },
+      "rightEye": {
+        "sphere": -2.75,
+        "cylinder": -0.75,
+        "axis": 85
+      },
+      "lens": {
+        "brand": "依视路",
+        "refractiveIndex": "1.60",
+        "coating": "防蓝光",
+        "type": "single-vision"
+      },
+      "frame": "雷朋 RB3025",
+      "id": "aeff1d05-f9e7-41c4-81fd-671e3749506c",
+      "createdAt": "2026-05-12T17:57:11.286Z",
+      "status": "pending",
+      "reworkCount": 0,
+      "history": [
+        {
+          "id": "8290d1c8-59cb-498e-af79-0b3f3cde67cb",
+          "status": "pending",
+          "timestamp": "2026-05-12T17:57:11.287Z",
+          "operator": "system",
+          "remarks": "订单创建"
+        }
+      ]
+    },
+    {
+      "orderNo": "ORD-2024-002",
+      "customerName": "李四",
+      "phone": "13800138002",
+      "leftEye": {
+        "sphere": -4,
+        "cylinder": 0,
+        "axis": 0
+      },
+      "rightEye": {
+        "sphere": -3.75,
+        "cylinder": -0.25,
+        "axis": 180
+      },
+      "lens": {
+        "brand": "蔡司",
+        "refractiveIndex": "1.67",
+        "coating": "钻立方",
+        "type": "single-vision"
+      },
+      "frame": "Oakley Holbrook",
+      "id": "4072856b-54c6-4568-9099-92d7b41a0bd7",
+      "createdAt": "2026-05-12T17:57:11.313Z",
+      "status": "quality-check",
+      "reworkCount": 0,
+      "history": [
+        {
+          "id": "68ebc6a4-8927-43f8-a67c-22292ddb4b32",
+          "status": "pending",
+          "timestamp": "2026-05-12T17:57:11.313Z",
+          "operator": "system",
+          "remarks": "订单创建"
+        },
+        {
+          "id": "a4e882f4-ff14-4b6d-94e7-380ed5c91b66",
+          "status": "measuring",
+          "timestamp": "2026-05-12T17:58:14.887Z",
+          "operator": "李师傅"
+        },
+        {
+          "id": "5ca22dc1-64aa-4ec9-883a-82954f7f46ac",
+          "status": "cutting",
+          "timestamp": "2026-05-12T17:58:16.083Z",
+          "operator": "李师傅"
+        },
+        {
+          "id": "28d427a1-38fb-4b92-b964-0122557af0cf",
+          "status": "polishing",
+          "timestamp": "2026-05-12T17:58:16.883Z",
+          "operator": "李师傅"
+        },
+        {
+          "id": "8697750c-9483-4bdb-89de-b3264a742c0c",
+          "status": "edging",
+          "timestamp": "2026-05-12T17:58:17.750Z",
+          "operator": "李师傅"
+        },
+        {
+          "id": "43d6d6a6-b85c-4581-89ae-23e95e74fdc8",
+          "status": "quality-check",
+          "timestamp": "2026-05-12T17:58:18.409Z",
+          "operator": "李师傅"
+        }
+      ]
+    },
+    {
+      "orderNo": "ORD-2024-003",
+      "customerName": "王五",
+      "phone": "13800138003",
+      "leftEye": {
+        "sphere": 1.5,
+        "cylinder": -0.5,
+        "axis": 75
+      },
+      "rightEye": {
+        "sphere": 1.75,
+        "cylinder": -0.5,
+        "axis": 80
+      },
+      "lens": {
+        "brand": "豪雅",
+        "refractiveIndex": "1.56",
+        "coating": "UV400",
+        "type": "single-vision"
+      },
+      "frame": "精工 H0101",
+      "id": "68bf7466-737e-480a-8dc1-8dd08d2799df",
+      "createdAt": "2026-05-12T17:57:11.327Z",
+      "status": "pending",
+      "reworkCount": 0,
+      "history": [
+        {
+          "id": "94d867b6-5461-44a7-a68b-96b4b611dd52",
+          "status": "pending",
+          "timestamp": "2026-05-12T17:57:11.327Z",
+          "operator": "system",
+          "remarks": "订单创建"
+        }
+      ]
+    },
+    {
+      "orderNo": "ORD-2024-004",
+      "customerName": "赵六",
+      "phone": "13800138004",
+      "leftEye": {
+        "sphere": -6,
+        "cylinder": -1,
+        "axis": 100
+      },
+      "rightEye": {
+        "sphere": -5.75,
+        "cylinder": -1.25,
+        "axis": 95
+      },
+      "lens": {
+        "brand": "明月",
+        "refractiveIndex": "1.74",
+        "coating": "防蓝光",
+        "type": "single-vision"
+      },
+      "frame": "暴龙 BL301",
+      "id": "336ba47a-48b8-4203-b17e-8d442339cc0a",
+      "createdAt": "2026-05-12T17:57:11.344Z",
+      "status": "pending",
+      "reworkCount": 0,
+      "history": [
+        {
+          "id": "ae105bdf-8555-4038-8823-cc9bf85ef999",
+          "status": "pending",
+          "timestamp": "2026-05-12T17:57:11.344Z",
+          "operator": "system",
+          "remarks": "订单创建"
+        }
+      ]
+    },
+    {
+      "orderNo": "ORD-2024-005",
+      "customerName": "孙七",
+      "phone": "13800138005",
+      "leftEye": {
+        "sphere": -3.25,
+        "cylinder": -0.75,
+        "axis": 170
+      },
+      "rightEye": {
+        "sphere": -3.5,
+        "cylinder": -0.5,
+        "axis": 165
+      },
+      "lens": {
+        "brand": "凯米",
+        "refractiveIndex": "1.60",
+        "coating": "绿膜",
+        "type": "single-vision"
+      },
+      "frame": "",
+      "id": "1360d82a-c284-4412-8992-79fb56b49146",
+      "createdAt": "2026-05-12T17:57:11.356Z",
+      "status": "pending",
+      "reworkCount": 0,
+      "history": [
+        {
+          "id": "93707636-e48a-451d-8022-a8d2868b0832",
+          "status": "pending",
+          "timestamp": "2026-05-12T17:57:11.356Z",
+          "operator": "system",
+          "remarks": "订单创建"
+        }
+      ]
+    }
+  ]
+}
