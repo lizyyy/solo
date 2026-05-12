@@ -310,7 +310,9 @@ export class GameEngine {
         isWorking: ws.isWorking,
         progress: ws.progress,
         hasProduct: ws.hasProduct,
-        progressPercent: ws.isWorking ? (ws.progress / ws.cycleTime) * 100 : 0
+        progressPercent: ws.isWorking ? (ws.progress / ws.cycleTime) * 100 : 0,
+        canDecreaseCycleTime: ws.canDecreaseCycleTime(),
+        canIncreaseCycleTime: ws.canIncreaseCycleTime()
       })),
       buffers: Object.entries(this.buffers).map(([id, buf]) => ({
         id: id,
@@ -360,7 +362,9 @@ export class GameEngine {
         isWorking: ws.isWorking,
         progress: ws.progress,
         hasProduct: ws.hasProduct,
-        progressPercent: ws.isWorking ? (ws.progress / ws.cycleTime) * 100 : 0
+        progressPercent: ws.isWorking ? (ws.progress / ws.cycleTime) * 100 : 0,
+        canDecreaseCycleTime: ws.cycleTime > ws.minCycleTime,
+        canIncreaseCycleTime: ws.cycleTime < ws.maxCycleTime
       })),
       buffers: Object.entries(entry.buffers).map(([id, buf]) => ({
         id: id,
