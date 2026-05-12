@@ -1,0 +1,67 @@
+[
+  {
+    "resource_id": "oss-log-bucket",
+    "resource_type": "oss",
+    "provider": "aliyun",
+    "tags": {
+      "project": "ecommerce",
+      "env": "prod",
+      "owner": "zhangwei"
+    },
+    "status": "active",
+    "created_at": "2026-05-12T12:28:23.872641",
+    "updated_at": "2026-05-12T12:28:23.872656"
+  },
+  {
+    "resource_id": "ecs-staging-01",
+    "resource_type": "ecs",
+    "provider": "aliyun",
+    "tags": {
+      "project": "ecommerce",
+      "env": "staging",
+      "owner": "lisi"
+    },
+    "status": "active",
+    "created_at": "2026-05-12T12:28:23.873155",
+    "updated_at": "2026-05-12T12:28:23.873158"
+  },
+  {
+    "resource_id": "redis-cache-prod",
+    "resource_type": "redis",
+    "provider": "aliyun",
+    "tags": {
+      "project": "payment",
+      "env": "prod",
+      "owner": "zhaoming"
+    },
+    "status": "active",
+    "created_at": "2026-05-12T12:28:23.873419",
+    "updated_at": "2026-05-12T12:28:23.873421"
+  },
+  {
+    "resource_id": "rds-archive",
+    "resource_type": "rds",
+    "provider": "aliyun",
+    "tags": {
+      "project": "payment",
+      "env": "archive",
+      "owner": "wanghong"
+    },
+    "status": "active",
+    "created_at": "2026-05-12T12:28:23.873647",
+    "updated_at": "2026-05-12T12:28:23.873648"
+  },
+  {
+    "resource_id": "ec2-monitoring",
+    "resource_type": "ec2",
+    "provider": "aws",
+    "tags": {
+      "project": "monitor",
+      "env": "prod",
+      "owner": "chenjian"
+    },
+    "status": "active",
+    "created_at": "2026-05-12T12:28:23.874367",
+    "updated_at": "2026-05-12T12:28:23.874371"
+  }
+]

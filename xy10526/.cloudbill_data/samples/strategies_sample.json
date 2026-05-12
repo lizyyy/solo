@@ -1,0 +1,26 @@
+[
+  {
+    "strategy_id": "strat_oss_logs",
+    "name": "OSS日志存储规则",
+    "description": "所有OSS日志存储默认归属于电商项目",
+    "resource_type_pattern": "oss",
+    "tag_rules": {
+      "project": "ecommerce",
+      "env": "prod",
+      "owner": "zhangwei"
+    },
+    "priority": 10
+  },
+  {
+    "strategy_id": "strat_shared_nas",
+    "name": "共享NAS规则",
+    "description": "NAS共享存储默认挂公共成本",
+    "resource_type_pattern": "nas",
+    "tag_rules": {
+      "project": "common",
+      "env": "shared",
+      "owner": "common"
+    },
+    "priority": 5
+  }
+]

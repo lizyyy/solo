@@ -1,0 +1,162 @@
+[
+  {
+    "record_id": "hist_bf2ba85938ad",
+    "bill_id": "bill_004",
+    "action": "auto_fix",
+    "before": {
+      "project": null,
+      "env": null,
+      "owner": null
+    },
+    "after": {
+      "project": "ecommerce",
+      "env": "prod",
+      "owner": "zhangwei"
+    },
+    "changes": {
+      "project": {
+        "before": null,
+        "after": "ecommerce"
+      },
+      "env": {
+        "before": null,
+        "after": "prod"
+      },
+      "owner": {
+        "before": null,
+        "after": "zhangwei"
+      }
+    },
+    "reason": "自动修复来源: resource:oss-log-bucket",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.272217"
+  },
+  {
+    "record_id": "hist_916ddfa47d50",
+    "bill_id": "bill_005",
+    "action": "auto_fix",
+    "before": {
+      "project": "ecommerce",
+      "env": "staging",
+      "owner": null
+    },
+    "after": {
+      "project": "ecommerce",
+      "env": "staging",
+      "owner": "lisi"
+    },
+    "changes": {
+      "owner": {
+        "before": null,
+        "after": "lisi"
+      }
+    },
+    "reason": "自动修复来源: resource:ecs-staging-01",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.273029"
+  },
+  {
+    "record_id": "hist_6e30462a55cb",
+    "bill_id": "bill_006",
+    "action": "auto_fix",
+    "before": {
+      "project": null,
+      "env": "prod",
+      "owner": "zhaoming"
+    },
+    "after": {
+      "project": "payment",
+      "env": "prod",
+      "owner": "zhaoming"
+    },
+    "changes": {
+      "project": {
+        "before": null,
+        "after": "payment"
+      }
+    },
+    "reason": "自动修复来源: resource:redis-cache-prod",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.273845"
+  },
+  {
+    "record_id": "hist_39bcaa1d1dd5",
+    "bill_id": "bill_009",
+    "action": "auto_fix",
+    "before": {
+      "project": null,
+      "env": null,
+      "owner": null
+    },
+    "after": {
+      "project": "common",
+      "env": "shared",
+      "owner": "common"
+    },
+    "changes": {
+      "project": {
+        "before": null,
+        "after": "common"
+      },
+      "env": {
+        "before": null,
+        "after": "shared"
+      },
+      "owner": {
+        "before": null,
+        "after": "common"
+      }
+    },
+    "reason": "自动修复来源: strategy:strat_shared_nas",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.277896"
+  },
+  {
+    "record_id": "hist_19aa5c627ab8",
+    "bill_id": "bill_010",
+    "action": "auto_fix",
+    "before": {
+      "project": "payment",
+      "env": "archive",
+      "owner": null
+    },
+    "after": {
+      "project": "payment",
+      "env": "archive",
+      "owner": "wanghong"
+    },
+    "changes": {
+      "owner": {
+        "before": null,
+        "after": "wanghong"
+      }
+    },
+    "reason": "自动修复来源: resource:rds-archive",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.283262"
+  },
+  {
+    "record_id": "hist_6ff80a0eb934",
+    "bill_id": "bill_011",
+    "action": "auto_fix",
+    "before": {
+      "project": "monitor",
+      "env": "prod",
+      "owner": null
+    },
+    "after": {
+      "project": "monitor",
+      "env": "prod",
+      "owner": "chenjian"
+    },
+    "changes": {
+      "owner": {
+        "before": null,
+        "after": "chenjian"
+      }
+    },
+    "reason": "自动修复来源: resource:ec2-monitoring",
+    "operator": "cli_user",
+    "created_at": "2026-05-12T12:28:24.284636"
+  }
+]

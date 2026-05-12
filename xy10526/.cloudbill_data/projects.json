@@ -1,0 +1,42 @@
+[
+  {
+    "project_id": "proj_ecommerce",
+    "name": "电商平台",
+    "code": "ecommerce",
+    "status": "active",
+    "description": "核心电商交易系统",
+    "created_at": "2026-05-12T12:28:23.860493"
+  },
+  {
+    "project_id": "proj_payment",
+    "name": "支付系统",
+    "code": "payment",
+    "status": "active",
+    "description": "支付网关和结算系统",
+    "created_at": "2026-05-12T12:28:23.861094"
+  },
+  {
+    "project_id": "proj_monitor",
+    "name": "监控平台",
+    "code": "monitor",
+    "status": "active",
+    "description": "统一监控告警系统",
+    "created_at": "2026-05-12T12:28:23.861592"
+  },
+  {
+    "project_id": "proj_common",
+    "name": "公共成本",
+    "code": "common",
+    "status": "active",
+    "description": "无法直接分摊的公共资源",
+    "created_at": "2026-05-12T12:28:23.861847"
+  },
+  {
+    "project_id": "proj_legacy",
+    "name": "遗留系统",
+    "code": "legacy",
+    "status": "inactive",
+    "description": "已下线的遗留系统",
+    "created_at": "2026-05-12T12:28:23.862065"
+  }
+]

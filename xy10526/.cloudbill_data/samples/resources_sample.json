@@ -1,0 +1,42 @@
+[
+  {
+    "resource_id": "oss-log-bucket",
+    "resource_type": "oss",
+    "provider": "aliyun",
+    "project": "ecommerce",
+    "env": "prod",
+    "owner": "zhangwei"
+  },
+  {
+    "resource_id": "ecs-staging-01",
+    "resource_type": "ecs",
+    "provider": "aliyun",
+    "project": "ecommerce",
+    "env": "staging",
+    "owner": "lisi"
+  },
+  {
+    "resource_id": "redis-cache-prod",
+    "resource_type": "redis",
+    "provider": "aliyun",
+    "project": "payment",
+    "env": "prod",
+    "owner": "zhaoming"
+  },
+  {
+    "resource_id": "rds-archive",
+    "resource_type": "rds",
+    "provider": "aliyun",
+    "project": "payment",
+    "env": "archive",
+    "owner": "wanghong"
+  },
+  {
+    "resource_id": "ec2-monitoring",
+    "resource_type": "ec2",
+    "provider": "aws",
+    "project": "monitor",
+    "env": "prod",
+    "owner": "chenjian"
+  }
+]

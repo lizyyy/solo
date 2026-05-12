@@ -1,0 +1,67 @@
+[
+  {
+    "batch_id": "batch_proj_678f8eb52d56",
+    "import_type": "project",
+    "file_name": "/Users/mac/pro/solo/workspaces/xy10526/.cloudbill_data/samples/projects_sample.json",
+    "record_count": 5,
+    "success_count": 5,
+    "fail_count": 0,
+    "status": "completed",
+    "errors": [],
+    "created_at": "2026-05-12T12:28:23.859720",
+    "completed_at": "2026-05-12T12:28:23.862263",
+    "operator": "cli_user"
+  },
+  {
+    "batch_id": "batch_own_4f8126a879be",
+    "import_type": "owner",
+    "file_name": "/Users/mac/pro/solo/workspaces/xy10526/.cloudbill_data/samples/owners_sample.json",
+    "record_count": 6,
+    "success_count": 6,
+    "fail_count": 0,
+    "status": "completed",
+    "errors": [],
+    "created_at": "2026-05-12T12:28:23.863279",
+    "completed_at": "2026-05-12T12:28:23.868601",
+    "operator": "cli_user"
+  },
+  {
+    "batch_id": "batch_strat_f87e4ef8fbd5",
+    "import_type": "strategy",
+    "file_name": "/Users/mac/pro/solo/workspaces/xy10526/.cloudbill_data/samples/strategies_sample.json",
+    "record_count": 2,
+    "success_count": 2,
+    "fail_count": 0,
+    "status": "completed",
+    "errors": [],
+    "created_at": "2026-05-12T12:28:23.869279",
+    "completed_at": "2026-05-12T12:28:23.871214",
+    "operator": "cli_user"
+  },
+  {
+    "batch_id": "batch_res_54ae12c8204f",
+    "import_type": "resource",
+    "file_name": "/Users/mac/pro/solo/workspaces/xy10526/.cloudbill_data/samples/resources_sample.json",
+    "record_count": 5,
+    "success_count": 5,
+    "fail_count": 0,
+    "status": "completed",
+    "errors": [],
+    "created_at": "2026-05-12T12:28:23.871693",
+    "completed_at": "2026-05-12T12:28:23.879248",
+    "operator": "cli_user"
+  },
+  {
+    "batch_id": "batch_bill_55ea9459d62e",
+    "import_type": "bill",
+    "file_name": "/Users/mac/pro/solo/workspaces/xy10526/.cloudbill_data/samples/bills_sample.json",
+    "record_count": 12,
+    "success_count": 12,
+    "fail_count": 0,
+    "status": "completed",
+    "errors": [],
+    "created_at": "2026-05-12T12:28:23.883715",
+    "completed_at": "2026-05-12T12:28:23.906525",
+    "operator": "cli_user"
+  }
+]
