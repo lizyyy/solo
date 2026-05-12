@@ -30,6 +30,97 @@ def main():
     print("🏟️  赛事志愿者岗位调剂 API - 请假替补流程演示")
     print("="*60)
     
+    print("\n" + "="*60)
+    print("  🎯 最小复现场景：关键岗容量=1，A请假，B是合格替补")
+    print("="*60)
+    
+    print("\n📝 步骤1: 创建志愿者")
+    print("-" * 40)
+    
+    volunteers_data = [
+        ("志愿者A", "13800138001", ["急救"], True),   # 在岗，即将请假
+        ("志愿者B", "13800138002", ["急救"], True),   # 合格，空闲！应该被推荐
+        ("志愿者C", "13800138003", ["沟通"], False),  # 未培训
+        ("志愿者D", "13800138004", ["引导"], True),   # 技能不匹配
+    ]
+    
+    volunteer_ids = []
+    for name, phone, skills, trained in volunteers_data:
+        result = create_volunteer(VolunteerCreate(
+            name=name,
+            phone=phone,
+            skills=skills,
+            is_trained=trained
+        ))
+        volunteer_ids.append(result["data"]["volunteer_id"])
+        print(f"  ✅ 创建志愿者: {name} {'(已培训)' if trained else '(未培训)'} 技能:{skills}")
+    
+    print("\n🏢 步骤2: 创建关键岗位（容量=1）")
+    print("-" * 40)
+    
+    pos_result = create_position(PositionCreate(
+        name="医疗急救站",
+        description="赛事现场医疗保障",
+        is_critical=True,
+        max_capacity=1,
+        required_skills=["急救"]
+    ))
+    position_id = pos_result["data"]["position_id"]
+    print(f"  ✅ 创建岗位: 医疗急救站 (关键岗) 上限:1人")
+    
+    print("\n👥 步骤3: 分配志愿者A到岗位")
+    print("-" * 40)
+    
+    result = create_assignment(AssignmentCreate(
+        volunteer_id=volunteer_ids[0],
+        position_id=position_id
+    ))
+    print(f"  ✅ 分配: 志愿者A → 医疗急救站")
+    
+    print(f"\n  📊 当前岗位人数: 1/1")
+    
+    print("\n🤒 步骤4: 志愿者A临时请假 - 核心测试！")
+    print("-" * 40)
+    print("  🔍 关键点：此时岗位看起来是满的(1/1)，")
+    print("           但因为A要请假，应该虚拟释放名额后计算替补！")
+    
+    leave_result = create_leave_request(LeaveRequestCreate(
+        volunteer_id=volunteer_ids[0],
+        position_id=position_id,
+        reason="突发感冒发烧"
+    ))
+    
+    print(f"\n  📋 请假提交后返回的替补推荐:")
+    print(f"     substitute_count: {leave_result['substitute_count']}")
+    print(f"\n  完整替补列表详情:")
+    
+    eligible_count = 0
+    for sub in leave_result["substitutes"]:
+        if sub["not_substitute_reason"] is None:
+            status = "✅ 合格替补"
+            eligible_count += 1
+        else:
+            status = f"❌ {sub['not_substitute_reason']}"
+        print(f"    - {sub['name']}: {'已培训' if sub['is_trained'] else '未培训'}, 匹配技能{sub['match_skill_count']}个 | {status}")
+    
+    if eligible_count > 0:
+        print(f"\n  ✅ SUCCESS: 找到 {eligible_count} 个合格替补！")
+        print(f"     志愿者B被正确识别为合格替补，问题已修复！")
+    else:
+        print(f"\n  ❌ FAILED: 未找到合格替补！")
+        print(f"     志愿者B应该是合格替补但未被识别")
+    
+    print("\n" + "="*60)
+    print("  🎯 完整流程演示")
+    print("="*60)
+    
+    db.volunteers.clear()
+    db.positions.clear()
+    db.assignments.clear()
+    db.leave_requests.clear()
+    db.history.clear()
+    db.check_ins.clear()
+    
     print("\n📝 步骤1: 创建志愿者")
     print("-" * 40)
     
@@ -51,8 +142,6 @@ def main():
         ))
         volunteer_ids.append(result["data"]["volunteer_id"])
         print(f"  ✅ 创建志愿者: {name} {'(已培训)' if trained else '(未培训)'}")
-    
-    pretty_print("志愿者列表", {"volunteers": list(db.volunteers.values())})
     
     print("\n🏢 步骤2: 创建岗位")
     print("-" * 40)
@@ -77,8 +166,6 @@ def main():
     medical_pos_id = position_ids[0]
     guide_pos_id = position_ids[1]
     
-    pretty_print("岗位列表", {"positions": list(db.positions.values())})
-    
     print("\n👥 步骤3: 分配志愿者到岗位")
     print("-" * 40)
     
@@ -95,10 +182,9 @@ def main():
         ))
         print(f"  ✅ 分配: {desc}")
     
-    pretty_print("当前岗位分配情况", {
-        "医疗急救站": len([a for a in db.assignments.values() if a["position_id"] == medical_pos_id and a["status"] == "active"]),
-        "观众引导": len([a for a in db.assignments.values() if a["position_id"] == guide_pos_id and a["status"] == "active"])
-    })
+    print(f"\n  📊 当前岗位分配:")
+    print(f"     医疗急救站: {len([a for a in db.assignments.values() if a['position_id'] == medical_pos_id and a['status'] == 'active'])}/2")
+    print(f"     观众引导: {len([a for a in db.assignments.values() if a['position_id'] == guide_pos_id and a['status'] == 'active'])}/3")
     
     print("\n❌ 步骤4: 演示边界情况处理")
     print("-" * 40)
@@ -140,16 +226,13 @@ def main():
         reason="突发感冒发烧"
     ))
     
-    pretty_print("请假申请提交结果", leave_result)
-    
-    print("\n  📋 替补推荐说明:")
+    print(f"\n  📋 替补推荐列表 (含原因说明):")
     for sub in leave_result["substitutes"]:
-        print(f"    - {sub['name']}: {'已培训' if sub['is_trained'] else '未培训'}, 匹配技能{sub['match_skill_count']}个")
-    
-    print("\n  ❌ 说明为什么其他人不能替补:")
-    print(f"    - 王五(未培训): 医疗急救站是关键岗位，未培训人员不能调剂")
-    print(f"    - 李四: 已在医疗急救站岗位，不能重复分配")
-    print(f"    - 钱七: 已在观众引导岗位，不能同时在两个岗位")
+        if sub["not_substitute_reason"] is None:
+            status = "✅ 合格替补"
+        else:
+            status = f"❌ {sub['not_substitute_reason']}"
+        print(f"    - {sub['name']}: {'已培训' if sub['is_trained'] else '未培训'}, 匹配技能{sub['match_skill_count']}个 | {status}")
     
     print("\n✅ 步骤6: 批准请假并调剂赵六到医疗急救站")
     print("-" * 40)
@@ -158,7 +241,7 @@ def main():
     substitute_id = volunteer_ids[3]
     
     approve_result = approve_leave_and_reassign(leave_id, substitute_id)
-    pretty_print("请假批准和调剂结果", approve_result)
+    print(f"  ✅ 请假已批准，赵六已调剂到医疗急救站")
     
     print("\n✅ 步骤7: 签到演示 - 已请假的张三不能签到")
     print("-" * 40)
@@ -181,20 +264,26 @@ def main():
     print("-" * 40)
     
     roster_result = get_position_roster(medical_pos_id)
-    pretty_print("签到名单", roster_result)
+    print(f"  📊 签到名单: 总人数{roster_result['total_count']}, 已签到{roster_result['checked_in_count']}")
+    for r in roster_result["roster"]:
+        status = "✅ 已签到" if r["has_checked_in"] else "⏳ 未签到"
+        print(f"    - {r['name']}: {'已培训' if r['is_trained'] else '未培训'} | {status}")
     
     print("\n📜 步骤9: 查看操作历史记录")
     print("-" * 40)
     
     history_result = get_history()
     print(f"  共记录 {len(history_result['data'])} 条操作历史")
-    for h in history_result["data"]:
-        print(f"  - {h['timestamp'][:19]} | {h['action']:15} | {h['entity_type']:10} | {h['entity_id'][:8]}...")
     
     print("\n" + "="*60)
     print("🎉 演示完成！")
     print("="*60)
-    print("\n📌 核心特性总结:")
+    print("\n📌 修复的核心问题:")
+    print("  ✅ 请假申请时，虚拟释放请假人名额来计算替补")
+    print("  ✅ 即使岗位满员，也能正确找出合格替补")
+    print("  ✅ 替补列表中包含每个人不能/能成为替补的原因")
+    print("  ✅ 替补按优先级排序（合格在前，然后按培训状态和技能匹配度）")
+    print("\n📌 其他核心特性:")
     print("  ✅ 关键岗位只允许已培训人员")
     print("  ✅ 同一人不能同时在两个岗位")
     print("  ✅ 岗位有人数上限，防止超员")
@@ -202,7 +291,6 @@ def main():
     print("  ✅ 重复操作有幂等性保护")
     print("  ✅ 所有操作都有历史记录")
     print("  ✅ 失败时返回清晰的原因")
-    print("  ✅ 请假时自动推荐合适替补")
 
 if __name__ == "__main__":
     main()

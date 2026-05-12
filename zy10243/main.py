@@ -82,7 +82,7 @@ def get_position_volunteers(position_id: str) -> List[Dict]:
     return [a for a in db.assignments.values() 
             if a["position_id"] == position_id and a["status"] == "active"]
 
-def can_assign_to_position(volunteer_id: str, position_id: str) -> tuple[bool, str]:
+def can_assign_to_position(volunteer_id: str, position_id: str, exclude_volunteer_id: Optional[str] = None) -> tuple[bool, str]:
     volunteer = get_volunteer_or_404(volunteer_id)
     position = get_position_or_404(position_id)
     
@@ -94,8 +94,12 @@ def can_assign_to_position(volunteer_id: str, position_id: str) -> tuple[bool, s
         return False, f"志愿者已分配到岗位: {current_assignments[0]['position_id']}"
     
     position_volunteers = get_position_volunteers(position_id)
-    if len(position_volunteers) >= position["max_capacity"]:
-        return False, f"岗位已满员 (当前: {len(position_volunteers)}/上限: {position['max_capacity']})"
+    current_count = len(position_volunteers)
+    if exclude_volunteer_id and exclude_volunteer_id in [v["volunteer_id"] for v in position_volunteers]:
+        current_count -= 1
+    
+    if current_count >= position["max_capacity"]:
+        return False, f"岗位已满员 (当前: {current_count}/上限: {position['max_capacity']})"
     
     return True, "可以分配"
 
@@ -107,7 +111,7 @@ def find_substitutes(position_id: str, exclude_volunteer_id: str) -> List[Dict]:
         if vid == exclude_volunteer_id:
             continue
         
-        can_assign, reason = can_assign_to_position(vid, position_id)
+        can_assign, reason = can_assign_to_position(vid, position_id, exclude_volunteer_id)
         if can_assign:
             match_skills = len(set(volunteer["skills"]) & set(position["required_skills"]))
             candidates.append({
@@ -115,10 +119,27 @@ def find_substitutes(position_id: str, exclude_volunteer_id: str) -> List[Dict]:
                 "name": volunteer["name"],
                 "is_trained": volunteer["is_trained"],
                 "skills": volunteer["skills"],
-                "match_skill_count": match_skills
+                "match_skill_count": match_skills,
+                "not_substitute_reason": None
+            })
+        else:
+            if position["is_critical"] and not volunteer["is_trained"]:
+                not_substitute_reason = "未培训，不满足关键岗位要求"
+            elif get_volunteer_assignments(vid):
+                not_substitute_reason = "已分配到其他岗位"
+            else:
+                not_substitute_reason = reason
+            candidates.append({
+                "volunteer_id": vid,
+                "name": volunteer["name"],
+                "is_trained": volunteer["is_trained"],
+                "skills": volunteer["skills"],
+                "match_skill_count": len(set(volunteer["skills"]) & set(position["required_skills"])),
+                "not_substitute_reason": not_substitute_reason
             })
     
-    candidates.sort(key=lambda x: (-x["is_trained"], -x["match_skill_count"]))
+    candidates.sort(key=lambda x: (0 if x["not_substitute_reason"] is None else 1, 
+                                   -x["is_trained"], -x["match_skill_count"]))
     return candidates
 
 # API 接口
