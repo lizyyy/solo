@@ -1,0 +1,21 @@
+{
+  "name": "customer-success-renewal-api",
+  "version": "1.0.0",
+  "description": "SaaS 客户续约流程自动化 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node scripts/seed.js",
+    "demo:healthy": "node scripts/demo-healthy-renewal.js",
+    "demo:risk": "node scripts/demo-risk-customer.js",
+    "demo:discount": "node scripts/demo-discount-approval.js",
+    "demo:repeat": "node scripts/demo-repeat-quote.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0",
+    "dayjs": "^1.11.10"
+  }
+}

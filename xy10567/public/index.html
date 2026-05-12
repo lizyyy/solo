@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>客户成功续约看板</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 24px 32px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+
+    .header .subtitle {
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .stat-trend {
+      font-size: 12px;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .trend-good { background: #d1fae5; color: #065f46; }
+    .trend-warning { background: #fef3c7; color: #92400e; }
+    .trend-danger { background: #fee2e2; color: #991b1b; }
+    .trend-info { background: #dbeafe; color: #1e40af; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .card-full {
+      grid-column: 1 / -1;
+    }
+
+    .card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-header h2 {
+      font-size: 18px;
+      color: #1a1a2e;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 24px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .risk-item {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border-left: 4px solid;
+    }
+
+    .risk-critical { background: #fef2f2; border-color: #ef4444; }
+    .risk-high { background: #fff7ed; border-color: #f97316; }
+    .risk-medium { background: #fefce8; border-color: #eab308; }
+    .risk-low { background: #f0fdf4; border-color: #22c55e; }
+
+    .risk-title {
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+
+    .risk-desc {
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .risk-action {
+      font-size: 12px;
+      color: #667eea;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #eef2ff;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .workflow-item {
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background: #f9fafb;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .workflow-item:hover {
+      background: #f3f4f6;
+    }
+
+    .workflow-item.selected {
+      background: #eef2ff;
+      border: 2px solid #667eea;
+    }
+
+    .workflow-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .workflow-name {
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-created { background: #e5e7eb; color: #374151; }
+    .status-data_aggregated { background: #dbeafe; color: #1e40af; }
+    .status-health_checked { background: #dbeafe; color: #1e40af; }
+    .status-tickets_checked { background: #dbeafe; color: #1e40af; }
+    .status-quote_prepared { background: #dbeafe; color: #1e40af; }
+    .status-discount_approved { background: #dbeafe; color: #1e40af; }
+    .status-ready_for_csm { background: #fef3c7; color: #92400e; }
+    .status-customer_accepted { background: #d1fae5; color: #065f46; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-at_risk { background: #fee2e2; color: #991b1b; }
+    .status-blocked { background: #fecaca; color: #991b1b; }
+    .status-failed { background: #fecaca; color: #991b1b; }
+
+    .workflow-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .workflow-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .detail-section {
+      margin-bottom: 24px;
+    }
+
+    .detail-section h3 {
+      font-size: 16px;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .detail-label {
+      color: #6b7280;
+    }
+
+    .detail-value {
+      color: #1a1a2e;
+      font-weight: 500;
+    }
+
+    .health-bar {
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .health-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .health-excellent { background: #22c55e; }
+    .health-good { background: #84cc16; }
+    .health-fair { background: #eab308; }
+    .health-poor { background: #f97316; }
+    .health-critical { background: #ef4444; }
+
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -22px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      background: #667eea;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #667eea;
+    }
+
+    .timeline-action {
+      font-weight: 600;
+      color: #1a1a2e;
+      font-size: 14px;
+    }
+
+    .timeline-meta {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .timeline-reason {
+      font-size: 13px;
+      color: #4b5563;
+      margin-top: 4px;
+      padding: 8px 12px;
+      background: #f9fafb;
+      border-radius: 6px;
+    }
+
+    .quote-history {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .quote-version {
+      min-width: 200px;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+      border-radius: 12px;
+      border: 1px solid #667eea30;
+    }
+
+    .quote-version.current {
+      border: 2px solid #667eea;
+      background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+    }
+
+    .quote-version-number {
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .quote-total {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .quote-discount {
+      font-size: 12px;
+      color: #ef4444;
+      margin-top: 4px;
+    }
+
+    .quote-meta {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab.active {
+      background: white;
+      color: #667eea;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .communication-card {
+      background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .communication-title {
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .talking-point {
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 3px solid;
+    }
+
+    .talking-positive { border-color: #22c55e; }
+    .talking-logistics { border-color: #3b82f6; }
+    .talking-proposal { border-color: #8b5cf6; }
+
+    .point-main {
+      font-weight: 500;
+      color: #1a1a2e;
+      font-size: 14px;
+    }
+
+    .point-detail {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .objection-item {
+      padding: 16px;
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .objection-title {
+      font-weight: 600;
+      color: #ef4444;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .objection-response {
+      font-size: 13px;
+      color: #4b5563;
+      line-height: 1.6;
+    }
+
+    .closing {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+      color: #6b7280;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-size: 20px;
+      color: #1a1a2e;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>客户成功续约看板</h1>
+        <div class="subtitle">实时监控续约流程、风险预警和报价状态</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="refreshData()">
+          🔄 刷新数据
+        </button>
+        <button class="btn btn-primary" onclick="openCreateWorkflow()">
+          ➕ 新建续约流程
+        </button>
+      </div>
+    </div>
+
+    <div id="loading" class="loading" style="display:none;">
+      加载中...
+    </div>
+
+    <div id="dashboard-content" style="display:none;">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">0</div>
+          <div class="stat-label">总流程数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-success">0%</div>
+          <div class="stat-label">续约成功率</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-risk">0</div>
+          <div class="stat-label">风险客户</div>
+          <div class="stat-trend trend-danger" id="risk-trend">需要关注</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-blocked">0</div>
+          <div class="stat-label">阻塞流程</div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2>🔔 风险预警</h2>
+          </div>
+          <div class="card-body" id="risk-alerts">
+            <div class="empty-state">
+              <h3>暂无风险预警</h3>
+              <p>所有续约流程状态良好</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>📋 续约流程列表</h2>
+          </div>
+          <div class="card-body" id="workflow-list">
+            <div class="empty-state">
+              <h3>暂无续约流程</h3>
+              <p>点击右上角创建新的续约流程</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-full" id="detail-card" style="display:none;">
+          <div class="card-header">
+            <h2 id="detail-title">流程详情</h2>
+            <button class="btn btn-secondary" onclick="closeDetail()">关闭</button>
+          </div>
+          <div class="card-body">
+            <div class="tabs">
+              <button class="tab active" onclick="switchTab('summary')">📊 总览</button>
+              <button class="tab" onclick="switchTab('risks')">⚠️ 风险分析</button>
+              <button class="tab" onclick="switchTab('quotes')">💰 报价历史</button>
+              <button class="tab" onclick="switchTab('timeline')">📝 历史记录</button>
+              <button class="tab" onclick="switchTab('communication')">💬 沟通报告</button>
+            </div>
+
+            <div class="tab-content active" id="tab-summary">
+              <div class="main-grid">
+                <div>
+                  <div class="detail-section">
+                    <h3>👤 客户信息</h3>
+                    <div id="customer-info"></div>
+                  </div>
+                  <div class="detail-section">
+                    <h3>❤️ 健康分</h3>
+                    <div id="health-info"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="detail-section">
+                    <h3>📊 使用量</h3>
+                    <div id="usage-info"></div>
+                  </div>
+                  <div class="detail-section">
+                    <h3>🎫 工单状态</h3>
+                    <div id="ticket-info"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tab-content" id="tab-risks">
+              <div id="risk-detail"></div>
+            </div>
+
+            <div class="tab-content" id="tab-quotes">
+              <div id="quotes-detail"></div>
+            </div>
+
+            <div class="tab-content" id="tab-timeline">
+              <div id="timeline-detail"></div>
+            </div>
+
+            <div class="tab-content" id="tab-communication">
+              <div id="communication-detail"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="createModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>创建续约流程</h2>
+        <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+      </div>
+      <div class="form-group">
+        <label>选择客户</label>
+        <select id="customer-select"></select>
+      </div>
+      <div class="form-group">
+        <label>请求 ID（可选，用于幂等）</label>
+        <input type="text" id="request-id" placeholder="如: req-2024-001">
+      </div>
+      <div class="form-group">
+        <label>操作者</label>
+        <input type="text" id="operator" placeholder="如: csm_zhang">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+        <button class="btn btn-primary" onclick="createWorkflow()">创建流程</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentWorkflowId = null;
+    let customers = [];
+    let workflows = [];
+
+    const STATUS_MAP = {
+      'created': '已创建',
+      'data_aggregated': '数据汇总',
+      'health_checked': '健康检查',
+      'tickets_checked': '工单检查',
+      'quote_prepared': '报价准备',
+      'discount_approved': '折扣审批',
+      'ready_for_csm': '等待跟进',
+      'customer_accepted': '客户接受',
+      'completed': '已完成',
+      'at_risk': '风险中',
+      'blocked': '阻塞中',
+      'failed': '已失败'
+    };
+
+    const HEALTH_CLASS_MAP = {
+      'excellent': 'health-excellent',
+      'good': 'health-good',
+      'fair': 'health-fair',
+      'poor': 'health-poor',
+      'critical': 'health-critical'
+    };
+
+    async function refreshData() {
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('dashboard-content').style.display = 'none';
+
+      try {
+        const [summaryRes, customersRes] = await Promise.all([
+          fetch('/api/dashboard/summary'),
+          fetch('/api/dashboard/customers')
+        ]);
+
+        const summary = await summaryRes.json();
+        const customersData = await customersRes.json();
+
+        if (summary.success) {
+          updateSummary(summary.data);
+        }
+
+        if (customersData.success) {
+          customers = customersData.data;
+          updateCustomerSelect();
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('dashboard-content').style.display = 'block';
+      } catch (error) {
+        console.error('加载数据失败:', error);
+        document.getElementById('loading').style.display = 'none';
+      }
+    }
+
+    function updateSummary(data) {
+      document.getElementById('stat-total').textContent = data.summary.totalWorkflows;
+      document.getElementById('stat-success').textContent = data.summary.successRate + '%';
+      document.getElementById('stat-risk').textContent = data.summary.atRiskCount;
+      document.getElementById('stat-blocked').textContent = data.summary.blockedCount;
+
+      updateRiskAlerts(data.atRiskWorkflows);
+      updateWorkflowList(data.recentWorkflows);
+    }
+
+    function updateRiskAlerts(risks) {
+      const container = document.getElementById('risk-alerts');
+      
+      if (!risks || risks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>✅ 暂无风险预警</h3>
+            <p>所有续约流程状态良好</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = risks.map(workflow => {
+        const level = workflow.status === 'at_risk' ? 'risk-critical' : 'risk-high';
+        const riskFlags = workflow.riskFlags || [];
+        const mainRisk = riskFlags[0] || { message: '需要关注' };
+
+        return `
+          <div class="risk-item ${level}" onclick="selectWorkflow('${workflow.workflowId}')">
+            <div class="risk-title">${workflow.customerName}</div>
+            <div class="risk-desc">${mainRisk.message}</div>
+            ${riskFlags.length > 1 ? `<div class="risk-desc" style="margin-top:4px;">另有 ${riskFlags.length - 1} 个其他风险</div>` : ''}
+            <div class="risk-action">点击查看详情 →</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateWorkflowList(workflowsList) {
+      const container = document.getElementById('workflow-list');
+      workflows = workflowsList;
+
+      if (!workflowsList || workflowsList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>暂无续约流程</h3>
+            <p>点击右上角创建新的续约流程</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = workflowsList.map(workflow => {
+        const selectedClass = workflow.workflowId === currentWorkflowId ? 'selected' : '';
+        const statusClass = `status-${workflow.status}`;
+        const statusText = STATUS_MAP[workflow.status] || workflow.status;
+
+        return `
+          <div class="workflow-item ${selectedClass}" onclick="selectWorkflow('${workflow.workflowId}')">
+            <div class="workflow-header">
+              <span class="workflow-name">${workflow.customerName}</span>
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+            <div class="workflow-meta">
+              <span>⚠️ ${workflow.riskFlags || 0} 个风险</span>
+              <span>🕐 ${new Date(workflow.updatedAt).toLocaleString('zh-CN')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateCustomerSelect() {
+      const select = document.getElementById('customer-select');
+      
+      if (!customers || customers.length === 0) {
+        select.innerHTML = '<option value="">请先运行造数脚本</option>';
+        return;
+      }
+
+      select.innerHTML = customers.map(c => 
+        `<option value="${c.id}">${c.name} (${c.tier})</option>`
+      ).join('');
+    }
+
+    async function selectWorkflow(workflowId) {
+      currentWorkflowId = workflowId;
+      
+      try {
+        const [workflowRes, reportRes, commRes] = await Promise.all([
+          fetch(`/api/renewal/${workflowId}`),
+          fetch(`/api/renewal/${workflowId}/report`),
+          fetch(`/api/renewal/${workflowId}/report?type=communication`)
+        ]);
+
+        const workflowData = await workflowRes.json();
+        const reportData = await reportRes.json();
+        const commData = await commRes.json();
+
+        if (workflowData.success && reportData.success && commData.success) {
+          document.getElementById('detail-card').style.display = 'block';
+          document.getElementById('detail-title').textContent = 
+            `${reportData.data.customer.name} - ${STATUS_MAP[reportData.data.workflow.status] || reportData.data.workflow.status}`;
+          
+          renderSummary(reportData.data);
+          renderRisks(reportData.data);
+          renderQuotes(reportData.data);
+          renderTimeline(workflowData.data.history);
+          renderCommunication(commData.data);
+          updateWorkflowList(workflows);
+        }
+      } catch (error) {
+        console.error('加载流程详情失败:', error);
+      }
+    }
+
+    function renderSummary(data) {
+      const customer = data.customer;
+      const health = data.healthAssessment;
+      const usage = data.usageMetrics;
+      const tickets = data.tickets;
+
+      document.getElementById('customer-info').innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">客户名称</span>
+          <span class="detail-value">${customer.name}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">行业</span>
+          <span class="detail-value">${customer.industry || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">客户级别</span>
+          <span class="detail-value">${customer.tier}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">当前合同到期</span>
+          <span class="detail-value">${customer.currentContract?.endDate || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">年合同价值</span>
+          <span class="detail-value">¥${(customer.currentContract?.annualValue || 0).toLocaleString()}</span>
+        </div>
+      `;
+
+      const healthClass = health ? HEALTH_CLASS_MAP[health.level] : 'health-poor';
+      const healthScore = health?.score || 0;
+      document.getElementById('health-info').innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">健康分</span>
+          <span class="detail-value" style="font-size: 24px; font-weight: 700;">${healthScore} 分</span>
+        </div>
+        <div class="health-bar">
+          <div class="health-fill ${healthClass}" style="width: ${healthScore}%;"></div>
+        </div>
+        <div class="detail-item" style="margin-top: 8px;">
+          <span class="detail-label">等级</span>
+          <span class="detail-value">${health?.level || '未知'}</span>
+        </div>
+        ${health?.risks?.length > 0 ? `
+          <div class="detail-item">
+            <span class="detail-label">风险因素</span>
+            <span class="detail-value" style="color: #ef4444;">${health.risks.join('、')}</span>
+          </div>
+        ` : ''}
+      `;
+
+      const usageHtml = usage.length > 0 ? usage.map(u => `
+        <div class="detail-item">
+          <span class="detail-label">${u.productId}</span>
+          <span class="detail-value" style="color: ${u.trend === 'growing' ? '#22c55e' : u.trend === 'declining' ? '#ef4444' : '#6b7280'}">
+            ${u.trend === 'growing' ? '📈' : u.trend === 'declining' ? '📉' : '➡️'} ${u.change}%
+          </span>
+        </div>
+      `).join('') : '<div class="detail-item"><span class="detail-label">暂无数据</span></div>';
+      
+      document.getElementById('usage-info').innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">产品数量</span>
+          <span class="detail-value">${usage.length}</span>
+        </div>
+        ${usageHtml}
+      `;
+
+      document.getElementById('ticket-info').innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">未结工单</span>
+          <span class="detail-value">${tickets.openCount} 个</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">关键工单</span>
+          <span class="detail-value" style="color: ${tickets.criticalCount > 0 ? '#ef4444' : '#22c55e'};">
+            ${tickets.criticalCount} 个
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">SLA 超时</span>
+          <span class="detail-value" style="color: ${tickets.slaBreached > 0 ? '#ef4444' : '#22c55e'};">
+            ${tickets.slaBreached} 个
+          </span>
+        </div>
+      `;
+    }
+
+    function renderRisks(data) {
+      const risks = data.riskAnalysis.reasons;
+      const container = document.getElementById('risk-detail');
+
+      if (!risks || risks.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>✅ 无风险</h3>
+            <p>该客户续约流程无风险，可以正常推进</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="communication-card">
+          <div class="communication-title" style="color: ${data.riskAnalysis.canMarkGreen ? '#22c55e' : '#ef4444'};">
+            ${data.riskAnalysis.canMarkGreen ? '✅ 可以标绿推进' : '⛔ 不可标绿'}
+          </div>
+        </div>
+        ${risks.map(r => {
+          const levelClass = r.severity === 'critical' ? 'risk-critical' : 
+                           r.severity === 'high' ? 'risk-high' : 
+                           r.severity === 'medium' ? 'risk-medium' : 'risk-low';
+          return `
+            <div class="risk-item ${levelClass}">
+              <div class="risk-title">${r.message}</div>
+              <div class="risk-action">建议: ${r.action}</div>
+            </div>
+          `;
+        }).join('')}
+      `;
+    }
+
+    function renderQuotes(data) {
+      const quotes = data.quotes.history;
+      const container = document.getElementById('quotes-detail');
+
+      if (!quotes || quotes.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>暂无报价</h3>
+            <p>该流程尚未生成报价</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="margin-bottom: 16px;">
+          <strong>当前最新版本:</strong> v${data.quotes.latestVersion}
+        </div>
+        <div class="quote-history">
+          ${quotes.map((q, idx) => {
+            const isCurrent = idx === 0;
+            return `
+              <div class="quote-version ${isCurrent ? 'current' : ''}">
+                <div class="quote-version-number">
+                  v${q.version} ${isCurrent ? '(当前)' : ''}
+                </div>
+                <div class="quote-total">¥${q.finalTotal.toLocaleString()}</div>
+                ${q.discountPercent > 0 ? `
+                  <div class="quote-discount">-${q.discountPercent}% 折扣 (¥${q.discountAmount.toLocaleString()})</div>
+                ` : ''}
+                <div class="quote-meta">
+                  状态: ${q.status} | ${new Date(q.createdAt).toLocaleDateString('zh-CN')}
+                  ${q.approvalRequired ? ' | 需审批' : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderTimeline(history) {
+      const container = document.getElementById('timeline-detail');
+
+      if (!history || history.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>暂无历史记录</h3>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="timeline">
+          ${history.map(h => `
+            <div class="timeline-item">
+              <div class="timeline-action">${translateAction(h.action)}</div>
+              <div class="timeline-meta">
+                ${h.operator} | ${new Date(h.timestamp).toLocaleString('zh-CN')}
+              </div>
+              ${h.reason ? `<div class="timeline-reason">${h.reason}</div>` : ''}
+              ${h.changes && Object.keys(h.changes).length > 0 ? `
+                <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                  变更: ${JSON.stringify(h.changes)}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderCommunication(data) {
+      const comm = data.communication;
+      const container = document.getElementById('communication-detail');
+
+      container.innerHTML = `
+        <div class="communication-card">
+          <div class="communication-title">🎯 沟通要点</div>
+          ${comm.talkingPoints.map(p => `
+            <div class="talking-point talking-${p.category}">
+              <div class="point-main">${p.point}</div>
+              <div class="point-detail">${p.detail}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="communication-card">
+          <div class="communication-title">❓ 常见异议应对</div>
+          ${comm.objectionResponses.map(o => `
+            <div class="objection-item">
+              <div class="objection-title">💬 "${o.objection}"</div>
+              <div class="objection-response">${o.response}</div>
+              ${o.alternatives ? `
+                <div style="margin-top: 8px; font-size: 12px; color: #6b7280;">
+                  💡 备选方案: ${o.alternatives}
+                </div>
+              ` : ''}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="communication-card">
+          <div class="communication-title">📋 建议行动</div>
+          ${comm.recommendedActions.map(a => `
+            <div style="padding: 12px; background: white; border-radius: 8px; margin-bottom: 8px;">
+              <div style="font-weight: 600; color: #1a1a2e;">
+                ${a.priority === 'urgent' ? '🔴 紧急' : a.priority === 'high' ? '🟡 高' : '🟢 中'}
+                : ${a.action}
+              </div>
+              <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                ${a.recommendation}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="closing">
+          <strong>💡 总结建议:</strong><br>
+          ${comm.closingSuggestion}
+        </div>
+      `;
+    }
+
+    function translateAction(action) {
+      const map = {
+        'create': '创建流程',
+        'aggregate_data': '汇总数据',
+        'health_check': '健康检查通过',
+        'health_check_failed': '健康检查发现风险',
+        'ticket_check': '工单检查通过',
+        'ticket_check_blocked': '工单检查阻塞',
+        'prepare_quote': '准备报价',
+        'discount_approved': '折扣审批通过',
+        'discount_rejected': '折扣审批被拒',
+        'ready_for_csm': '就绪等待跟进',
+        'customer_accept': '客户接受',
+        'complete': '完成流程',
+        'manual_correction': '人工修正',
+        'exception': '异常处理',
+        'fail': '流程失败',
+        'new_version': '创建新版本',
+        'approve': '审批通过'
+      };
+      return map[action] || action;
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function closeDetail() {
+      currentWorkflowId = null;
+      document.getElementById('detail-card').style.display = 'none';
+      updateWorkflowList(workflows);
+    }
+
+    function openCreateWorkflow() {
+      document.getElementById('createModal').classList.add('active');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    async function createWorkflow() {
+      const customerId = document.getElementById('customer-select').value;
+      const requestId = document.getElementById('request-id').value;
+      const operator = document.getElementById('operator').value;
+
+      if (!customerId) {
+        alert('请选择客户');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/renewal/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerId, requestId, operator: operator || 'demo_user' })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message);
+          closeModal('createModal');
+          refreshData();
+        } else {
+          alert('创建失败: ' + result.error);
+        }
+      } catch (error) {
+        console.error('创建流程失败:', error);
+        alert('创建失败，请检查控制台');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      refreshData();
+    });
+  </script>
+</body>
+</html>
