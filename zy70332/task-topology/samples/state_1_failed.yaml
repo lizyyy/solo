@@ -1,0 +1,55 @@
+statuses:
+  - task_id: order_raw_sync
+    status: failed
+    start_time: "2026-05-12T02:00:00"
+    end_time: "2026-05-12T02:15:30"
+    reason: "订单系统 API 超时，重试 3 次后仍失败"
+  
+  - task_id: order_clean
+    status: blocked
+    start_time: "2026-05-12T03:00:00"
+    end_time: "2026-05-12T03:00:01"
+    reason: "上游依赖 order_raw_sync 失败"
+  
+  - task_id: order_enrich
+    status: pending
+    reason: "等待上游完成"
+  
+  - task_id: user_activity_raw
+    status: success
+    start_time: "2026-05-12T01:00:00"
+    end_time: "2026-05-12T01:30:00"
+  
+  - task_id: user_activity_agg
+    status: success
+    start_time: "2026-05-12T02:00:00"
+    end_time: "2026-05-12T02:20:00"
+  
+  - task_id: user_activity_feature
+    status: success
+    start_time: "2026-05-12T02:30:00"
+    end_time: "2026-05-12T02:45:00"
+  
+  - task_id: user_behavior_extract
+    status: pending
+    reason: "等待 order_enrich"
+  
+  - task_id: user_profile_final
+    status: pending
+    reason: "等待上游特征"
+  
+  - task_id: sales_daily_agg
+    status: pending
+    reason: "等待 order_enrich"
+  
+  - task_id: order_detail_report
+    status: pending
+    reason: "等待 order_enrich"
+  
+  - task_id: user_segment_report
+    status: pending
+    reason: "等待 user_profile_final"
+  
+  - task_id: retention_report
+    status: pending
+    reason: "等待上游完成"

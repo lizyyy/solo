@@ -1,0 +1,84 @@
+tasks:
+  order_raw_sync:
+    name: 订单原始数据同步
+    dependencies: []
+    description: 从订单系统同步原始订单数据到数据湖
+    group: order_sync
+    category: source
+  
+  order_clean:
+    name: 订单数据清洗
+    dependencies: [order_raw_sync]
+    description: 清洗订单原始数据，去重、规范化
+    group: order_sync
+    category: transform
+  
+  order_enrich:
+    name: 订单数据宽表
+    dependencies: [order_clean]
+    description: 关联商品、用户信息生成订单宽表
+    group: order_sync
+    category: transform
+  
+  user_behavior_extract:
+    name: 用户行为特征提取
+    dependencies: [order_enrich]
+    description: 从订单数据提取用户购买行为特征
+    group: user_profile
+    category: feature
+  
+  user_activity_raw:
+    name: 用户活动日志同步
+    dependencies: []
+    description: 从埋点系统同步用户活动日志
+    group: user_profile
+    category: source
+  
+  user_activity_agg:
+    name: 用户活动聚合
+    dependencies: [user_activity_raw]
+    description: 按日聚合用户活动数据
+    group: user_profile
+    category: transform
+  
+  user_activity_feature:
+    name: 用户活动特征
+    dependencies: [user_activity_agg]
+    description: 提取用户活动浏览、点击等特征
+    group: user_profile
+    category: feature
+  
+  user_profile_final:
+    name: 用户画像最终表
+    dependencies: [user_behavior_extract, user_activity_feature]
+    description: 整合所有特征生成用户画像
+    group: user_profile
+    category: feature
+  
+  sales_daily_agg:
+    name: 销售日报聚合
+    dependencies: [order_enrich]
+    description: 按日、按商品维度聚合销售额
+    group: report
+    category: report
+  
+  order_detail_report:
+    name: 订单明细报表
+    dependencies: [order_enrich]
+    description: 导出订单明细供运营查看
+    group: report
+    category: report
+  
+  user_segment_report:
+    name: 用户分层报表
+    dependencies: [user_profile_final]
+    description: 基于画像生成用户分层分析报告
+    group: report
+    category: report
+  
+  retention_report:
+    name: 用户留存报表
+    dependencies: [user_profile_final, order_enrich]
+    description: 计算用户留存率和生命周期分析
+    group: report
+    category: report
