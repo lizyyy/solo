@@ -1,0 +1,22 @@
+{
+  "name": "seal-application-risk-api",
+  "version": "1.0.0",
+  "description": "用章申请风险 API - 合同用章前风险核对系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "seed": "node scripts/seed.js",
+    "demo": "node scripts/demo.js",
+    "demo-failure": "node scripts/demo-failure.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1",
+    "moment": "^2.29.4"
+  },
+  "keywords": ["seal", "contract", "risk", "api"],
+  "author": "",
+  "license": "MIT"
+}
