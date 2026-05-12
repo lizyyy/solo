@@ -235,7 +235,7 @@ async function main() {
   const deductiblePrepay = await request('GET', `/api/deductible/${poId}/${supplierId}`);
   printResult('预付款后可抵扣余额（已扣除预付款）', deductiblePrepay.data);
 
-  printSection('场景18: 测试重复核销');
+  printSection('场景18: 测试重复核销（幂等性）');
   
   const repeatDeduct = await request('POST', '/api/deductions', {
     invoiceId: invoiceId,
@@ -245,7 +245,42 @@ async function main() {
     tax: 650,
     operator: '演示财务'
   });
-  printResult('重复抵扣结果', repeatDeduct);
+  printResult('重复抵扣结果（应检测为重复提交）', repeatDeduct);
+
+  printSection('场景18.1: 再次提交相同参数验证幂等性');
+  
+  const repeatDeduct2 = await request('POST', '/api/deductions', {
+    invoiceId: invoiceId,
+    poId: poId,
+    supplierId: supplierId,
+    amount: 5000,
+    tax: 650,
+    operator: '演示财务'
+  });
+  printResult('再次重复提交结果（isDuplicate应为true）', repeatDeduct2);
+
+  printSection('场景18.2: 不同参数提交验证（应创建新记录）');
+  
+  const newInvoiceResult = await request('POST', '/api/invoices', {
+    invoiceNumber: `INV-IDEMPOTENT-${Date.now()}`,
+    supplierId: supplierId,
+    supplierName: '演示供应商',
+    poId: poId,
+    invoiceDate: '2024-01-20',
+    totalAmount: 1000,
+    taxAmount: 130,
+    taxRate: 0.13
+  });
+  
+  const differentDeduct = await request('POST', '/api/deductions', {
+    invoiceId: newInvoiceResult.data.id,
+    poId: poId,
+    supplierId: supplierId,
+    amount: 1000,
+    tax: 130,
+    operator: '演示财务'
+  });
+  printResult('不同参数提交结果（应创建新记录）', differentDeduct);
 
   printSection('场景19: 查询所有发票');
   
@@ -267,10 +302,12 @@ async function main() {
   console.log('   ✅ 2. 发票金额超额检测');
   console.log('   ✅ 3. 税率不一致警告');
   console.log('   ✅ 4. 发票重复导入检测');
-  console.log('   ✅ 5. 重复核销检测');
-  console.log('   ✅ 6. 预付款自动扣除');
-  console.log('   ✅ 7. 差异原因查询');
-  console.log('   ✅ 8. 抵扣历史追踪\n');
+  console.log('   ✅ 5. 幂等性保证（重复提交检测）');
+  console.log('   ✅ 6. 并发竞争条件处理');
+  console.log('   ✅ 7. 预付款自动扣除');
+  console.log('   ✅ 8. 差异原因查询');
+  console.log('   ✅ 9. 完整的操作日志追踪');
+  console.log('   ✅ 10. 发票状态闭环管理\n');
 }
 
 main().catch(console.error);

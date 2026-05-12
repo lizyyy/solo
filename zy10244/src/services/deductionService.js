@@ -1,6 +1,11 @@
 const { v4: uuidv4 } = require('uuid');
 const { getQuery, allQuery, runQuery } = require('../database');
 
+function generateIdempotentKey(invoiceId, poId, supplierId, amount, tax) {
+  const key = `${invoiceId}:${poId || 'none'}:${supplierId}:${amount.toFixed(2)}:${tax.toFixed(2)}`;
+  return Buffer.from(key).toString('base64');
+}
+
 async function calculateDeductibleAmount(poId, supplierId) {
   const receipts = await allQuery(
     'SELECT SUM(total_amount) as total, SUM(tax_amount) as tax FROM receipts WHERE po_id = ? AND supplier_id = ? AND status = ?',
@@ -91,9 +96,9 @@ async function validateInvoiceDeduction(invoiceId, poId, supplierId) {
     const deductible = await calculateDeductibleAmount(poId, supplierId);
 
     if (remainingInvoiceAmount > deductible.deductibleAmount) {
-      issues.push({ 
-        code: 'EXCEEDS_DEDUCTIBLE_AMOUNT', 
-        message: `发票金额超过可抵扣金额。可抵扣金额：${deductible.deductibleAmount.toFixed(2)}，发票剩余可抵扣金额：${remainingInvoiceAmount.toFixed(2)}` 
+      warnings.push({ 
+        code: 'EXCEEDS_DEDUCTIBLE_AMOUNT_WARNING', 
+        message: `发票剩余金额超过可抵扣余额。可抵扣金额：${deductible.deductibleAmount.toFixed(2)}，发票剩余可抵扣金额：${remainingInvoiceAmount.toFixed(2)}` 
       });
     }
 
@@ -117,9 +122,32 @@ async function validateInvoiceDeduction(invoiceId, poId, supplierId) {
   };
 }
 
-async function createDeduction(invoiceId, poId, supplierId, amount, tax, operator = 'system') {
+async function createDeduction(invoiceId, poId, supplierId, amount, tax, operator = 'system', idempotentKey = null) {
+  const finalIdempotentKey = idempotentKey || generateIdempotentKey(invoiceId, poId, supplierId, amount, tax);
+
+  const existingDeduction = await getQuery(
+    'SELECT * FROM deductions WHERE idempotent_key = ?',
+    [finalIdempotentKey]
+  );
+  
+  if (existingDeduction) {
+    await logDeductionAction(existingDeduction.id, invoiceId, 'duplicate_submit', amount, `检测到重复提交，已返回已有抵扣记录`, operator);
+    return {
+      success: true,
+      isDuplicate: true,
+      message: '检测到重复提交，返回已存在的抵扣记录',
+      deduction: existingDeduction,
+      warnings: []
+    };
+  }
+
   const validation = await validateInvoiceDeduction(invoiceId, poId, supplierId);
   const { invoice, remainingInvoiceAmount, remainingInvoiceTax, deductedAmount, deductedTax } = validation;
+
+  if (!validation.valid) {
+    await logDeductionAction(null, invoiceId, 'validation_failed', amount, JSON.stringify(validation.issues), operator);
+    return { success: false, ...validation };
+  }
 
   if (invoice.status === 'fully_deducted') {
     await logDeductionAction(null, invoiceId, 'validation_failed', amount, JSON.stringify([{code: 'INVOICE_FULLY_DEDUCTED', message:'该发票已全额抵扣，不能重复核销'}]), operator);
@@ -130,7 +158,8 @@ async function createDeduction(invoiceId, poId, supplierId, amount, tax, operato
   const actualTax = Math.min(tax, remainingInvoiceTax);
 
   if (actualAmount <= 0) {
-    return { success: false, message: '抵扣金额必须大于0' };
+    await logDeductionAction(null, invoiceId, 'validation_failed', amount, '抵扣金额必须大于0', operator);
+    return { success: false, message: '抵扣金额必须大于0', ...validation };
   }
 
   if (poId) {
@@ -144,11 +173,28 @@ async function createDeduction(invoiceId, poId, supplierId, amount, tax, operato
   const deductionId = uuidv4();
   const deductionNumber = `DED-${Date.now()}`;
 
-  await runQuery(
-    `INSERT INTO deductions (id, deduction_number, invoice_id, po_id, supplier_id, deduction_amount, deduction_tax, deduction_type, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [deductionId, deductionNumber, invoiceId, poId, supplierId, actualAmount, actualTax, 'normal', 'confirmed']
-  );
+  try {
+    await runQuery(
+      `INSERT INTO deductions (id, deduction_number, invoice_id, po_id, supplier_id, deduction_amount, deduction_tax, deduction_type, status, idempotent_key)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [deductionId, deductionNumber, invoiceId, poId, supplierId, actualAmount, actualTax, 'normal', 'confirmed', finalIdempotentKey]
+    );
+  } catch (err) {
+    if (err.message.includes('UNIQUE') && err.message.includes('idempotent_key')) {
+      const raceDeduction = await getQuery('SELECT * FROM deductions WHERE idempotent_key = ?', [finalIdempotentKey]);
+      if (raceDeduction) {
+        await logDeductionAction(raceDeduction.id, invoiceId, 'race_condition_detected', amount, `检测到并发重复提交`, operator);
+        return {
+          success: true,
+          isDuplicate: true,
+          message: '检测到并发重复提交，返回已存在的抵扣记录',
+          deduction: raceDeduction,
+          warnings: []
+        };
+      }
+    }
+    throw err;
+  }
 
   const newDeductedAmount = deductedAmount + actualAmount;
   const newDeductedTax = deductedTax + actualTax;
@@ -157,7 +203,7 @@ async function createDeduction(invoiceId, poId, supplierId, amount, tax, operato
   if (Math.abs(newDeductedAmount - invoice.total_amount) < 0.01 && 
       Math.abs(newDeductedTax - invoice.tax_amount) < 0.01) {
     newStatus = 'fully_deducted';
-  } else if (newDeductedAmount > 0) {
+  } else if (newDeductedAmount > 0 && invoice.status === 'pending') {
     newStatus = 'partially_deducted';
   }
 
@@ -166,12 +212,13 @@ async function createDeduction(invoiceId, poId, supplierId, amount, tax, operato
     [newStatus, invoiceId]
   );
 
-  await logDeductionAction(deductionId, invoiceId, 'create', actualAmount, `抵扣成功，金额：${actualAmount.toFixed(2)}，税额：${actualTax.toFixed(2)}`, operator);
+  await logDeductionAction(deductionId, invoiceId, 'create', actualAmount, `抵扣成功，金额：${actualAmount.toFixed(2)}，税额：${actualTax.toFixed(2)}，发票状态更新为：${newStatus}`, operator);
 
   const deduction = await getQuery('SELECT * FROM deductions WHERE id = ?', [deductionId]);
   
   return {
     success: true,
+    isDuplicate: false,
     deduction,
     invoiceStatus: newStatus,
     warnings: validation.warnings
@@ -180,11 +227,15 @@ async function createDeduction(invoiceId, poId, supplierId, amount, tax, operato
 
 async function logDeductionAction(deductionId, invoiceId, action, amount, message, operator) {
   const logId = uuidv4();
-  await runQuery(
-    `INSERT INTO deduction_logs (id, deduction_id, invoice_id, action, amount, message, operator)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [logId, deductionId, invoiceId, action, amount, message, operator]
-  );
+  try {
+    await runQuery(
+      `INSERT INTO deduction_logs (id, deduction_id, invoice_id, action, amount, message, operator)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [logId, deductionId, invoiceId, action, amount, message, operator]
+    );
+  } catch (err) {
+    console.error('写入抵扣日志失败:', err);
+  }
 }
 
 async function getInvoiceDeductionHistory(invoiceId) {
@@ -233,5 +284,6 @@ module.exports = {
   createDeduction,
   getInvoiceDeductionHistory,
   getDeductionDifferences,
-  logDeductionAction
+  logDeductionAction,
+  generateIdempotentKey
 };

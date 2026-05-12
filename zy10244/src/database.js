@@ -128,6 +128,7 @@ function initDatabase() {
         deduction_tax REAL NOT NULL,
         deduction_type TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'confirmed',
+        idempotent_key TEXT UNIQUE,
         deducted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (invoice_id) REFERENCES invoices(id),

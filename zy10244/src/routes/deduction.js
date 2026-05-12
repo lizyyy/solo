@@ -157,9 +157,9 @@ router.post('/prepayments', async (req, res) => {
 
 router.post('/deductions', async (req, res) => {
   try {
-    const { invoiceId, poId, supplierId, amount, tax, operator } = req.body;
+    const { invoiceId, poId, supplierId, amount, tax, operator, idempotentKey } = req.body;
     
-    const result = await deductionService.createDeduction(invoiceId, poId, supplierId, amount, tax, operator);
+    const result = await deductionService.createDeduction(invoiceId, poId, supplierId, amount, tax, operator, idempotentKey);
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
