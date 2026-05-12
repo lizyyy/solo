@@ -319,16 +319,39 @@ export class ImportExportService {
           continue;
         }
 
-        await Registration.create({
-          activityId: row.activityId,
-          name: row.name?.trim(),
-          email: row.email?.trim(),
-          phone: row.phone?.trim() || null,
-          company: row.company?.trim() || null,
-          notes: row.notes?.trim() || null,
-          status: RegistrationStatus.PENDING,
-          registrationTime: new Date(),
-          createdBy: userId
+        await retry(async () => {
+          const t = await sequelize.transaction();
+          try {
+            const registration = await Registration.create(
+              {
+                activityId: row.activityId,
+                name: row.name?.trim(),
+                email: row.email?.trim(),
+                phone: row.phone?.trim() || null,
+                company: row.company?.trim() || null,
+                notes: row.notes?.trim() || null,
+                status: RegistrationStatus.PENDING,
+                registrationTime: new Date(),
+                createdBy: userId
+              },
+              { transaction: t }
+            );
+
+            await StatusHistory.create(
+              {
+                registrationId: registration.id,
+                newStatus: RegistrationStatus.PENDING,
+                changedBy: userId,
+                reason: '重试导入'
+              },
+              { transaction: t }
+            );
+
+            await t.commit();
+          } catch (error) {
+            await t.rollback();
+            throw error;
+          }
         });
 
         success++;

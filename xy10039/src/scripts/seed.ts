@@ -219,6 +219,8 @@ async function seed(): Promise<void> {
   }
 
   logger.info('创建导入批次记录...');
+  const techSummitActivity = activities[0];
+
   await ImportBatch.create({
     id: uuidv4(),
     fileName: 'tech_summit_import_01.csv',
@@ -231,12 +233,19 @@ async function seed(): Promise<void> {
       {
         row: 45,
         error: '邮箱格式无效',
-        data: { name: '测试用户', email: 'invalid-email' }
+        data: {
+          name: '测试用户',
+          email: 'invalid-email',
+          activityId: techSummitActivity.id
+        }
       },
       {
         row: 78,
         error: '缺少姓名字段',
-        data: { email: 'missing@example.com' }
+        data: {
+          email: 'missing@example.com',
+          activityId: techSummitActivity.id
+        }
       }
     ])
   });
