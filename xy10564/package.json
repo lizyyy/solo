@@ -1,0 +1,35 @@
+{
+  "name": "social-security-cli",
+  "version": "1.0.0",
+  "description": "社保基数申报 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "ssc": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [
+    "social-security",
+    "social-security-declaration",
+    "salary-declaration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "dayjs": "^1.11.10",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.4",
+    "ts-node": "^10.9.2",
+    "@types/uuid": "^9.0.7"
+  }
+}

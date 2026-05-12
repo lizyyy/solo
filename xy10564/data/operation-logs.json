@@ -1,0 +1,50 @@
+[
+  {
+    "command": "init",
+    "operator": "HR-USER",
+    "parameters": {
+      "name": "Social Security Declaration",
+      "year": 2025,
+      "month": 7,
+      "withSample": true
+    },
+    "status": "success",
+    "message": "初始化项目并生成样例数据",
+    "id": "fa16ee66-85e8-4fd1-aef8-766617c87e4a",
+    "timestamp": "2026-05-12T08:43:47.845Z"
+  },
+  {
+    "command": "check",
+    "operator": "HR-USER",
+    "parameters": {
+      "dataDir": "/Users/mac/pro/solo/workspaces/xy10564/data"
+    },
+    "status": "success",
+    "message": "检查完成 - 2信息/0警告/0错误",
+    "id": "7d80d4af-c763-46dd-9968-d93dd411d494",
+    "timestamp": "2026-05-12T08:44:44.683Z"
+  },
+  {
+    "command": "report",
+    "operator": "HR-USER",
+    "parameters": {
+      "dataDir": "/Users/mac/pro/solo/workspaces/xy10564/data"
+    },
+    "status": "success",
+    "message": "生成报告 - 4正常/2警告/0错误",
+    "id": "6cf975b4-3557-46df-bf53-a6a7b097f9b4",
+    "timestamp": "2026-05-12T08:45:03.776Z"
+  },
+  {
+    "command": "detail",
+    "operator": "HR-USER",
+    "parameters": {
+      "employee": "孙八",
+      "dataDir": "/Users/mac/pro/solo/workspaces/xy10564/data"
+    },
+    "status": "success",
+    "message": "查看员工 孙八 详情",
+    "id": "b167d40e-f281-46be-85d0-9ec842239321",
+    "timestamp": "2026-05-12T08:45:15.762Z"
+  }
+]

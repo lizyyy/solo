@@ -1,0 +1,33 @@
+import { Employee, SalaryDetail, EmploymentRecord, CityRule, HistoricalDeclaration, ManualCorrection, OperationLog, ProjectConfig } from '../types';
+export declare class StorageService {
+    private dataDir;
+    constructor(dataDir: string);
+    init(projectConfig: ProjectConfig): void;
+    exists(): boolean;
+    getConfig(): ProjectConfig;
+    updateConfig(partial: Partial<ProjectConfig>): ProjectConfig;
+    getEmployees(): Employee[];
+    saveEmployees(employees: Employee[]): void;
+    addEmployee(employee: Omit<Employee, 'id' | 'createdAt' | 'updatedAt'>): Employee;
+    getSalaries(): SalaryDetail[];
+    saveSalaries(salaries: SalaryDetail[]): void;
+    addSalary(salary: Omit<SalaryDetail, 'id' | 'createdAt'>): SalaryDetail;
+    getEmploymentRecords(): EmploymentRecord[];
+    saveEmploymentRecords(records: EmploymentRecord[]): void;
+    addEmploymentRecord(record: Omit<EmploymentRecord, 'id' | 'createdAt'>): EmploymentRecord;
+    getCityRules(): CityRule[];
+    saveCityRules(rules: CityRule[]): void;
+    addCityRule(rule: CityRule): void;
+    getHistoricalDeclarations(): HistoricalDeclaration[];
+    saveHistoricalDeclarations(declarations: HistoricalDeclaration[]): void;
+    addHistoricalDeclaration(declaration: Omit<HistoricalDeclaration, 'id' | 'createdAt' | 'updatedAt'>): HistoricalDeclaration;
+    getManualCorrections(): ManualCorrection[];
+    saveManualCorrections(corrections: ManualCorrection[]): void;
+    addManualCorrection(correction: Omit<ManualCorrection, 'id' | 'createdAt'>): ManualCorrection;
+    getOperationLogs(): OperationLog[];
+    saveOperationLogs(logs: OperationLog[]): void;
+    addOperationLog(log: Omit<OperationLog, 'id' | 'timestamp'>): OperationLog;
+    private readFile;
+    private writeFile;
+    getDataDir(): string;
+}

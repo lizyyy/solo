@@ -1,0 +1,74 @@
+[
+  {
+    "employeeNo": "EMP001",
+    "name": "张三",
+    "department": "技术部",
+    "city": "北京",
+    "isProbation": false,
+    "probationSalary": 15000,
+    "regularSalary": 25000,
+    "id": "c20bbb31-3ebc-4060-80ba-513e03c078e7",
+    "createdAt": "2026-05-12T08:43:46.757Z",
+    "updatedAt": "2026-05-12T08:43:46.758Z"
+  },
+  {
+    "employeeNo": "EMP002",
+    "name": "李四",
+    "department": "产品部",
+    "city": "上海",
+    "isProbation": true,
+    "probationSalary": 10000,
+    "regularSalary": 18000,
+    "id": "2e1f3387-fdb5-4a8c-b862-37f449a10b75",
+    "createdAt": "2026-05-12T08:43:46.761Z",
+    "updatedAt": "2026-05-12T08:43:46.761Z"
+  },
+  {
+    "employeeNo": "EMP003",
+    "name": "王五",
+    "department": "市场部",
+    "city": "成都",
+    "isProbation": false,
+    "probationSalary": 8000,
+    "regularSalary": 35000,
+    "id": "872f346d-d7cb-413c-bcc6-34c1c10c8970",
+    "createdAt": "2026-05-12T08:43:46.761Z",
+    "updatedAt": "2026-05-12T08:43:46.761Z"
+  },
+  {
+    "employeeNo": "EMP004",
+    "name": "赵六",
+    "department": "财务部",
+    "city": "北京",
+    "isProbation": false,
+    "probationSalary": 0,
+    "regularSalary": 5000,
+    "id": "5bcb7d7c-761c-4085-9231-c12ffe282569",
+    "createdAt": "2026-05-12T08:43:46.762Z",
+    "updatedAt": "2026-05-12T08:43:46.762Z"
+  },
+  {
+    "employeeNo": "EMP005",
+    "name": "钱七",
+    "department": "人事部",
+    "city": "北京",
+    "isProbation": false,
+    "probationSalary": 0,
+    "regularSalary": 12000,
+    "id": "7b33588b-f01b-46a2-9370-8318672c88cb",
+    "createdAt": "2026-05-12T08:43:46.870Z",
+    "updatedAt": "2026-05-12T08:43:46.870Z"
+  },
+  {
+    "employeeNo": "EMP006",
+    "name": "孙八",
+    "department": "技术部",
+    "city": "上海",
+    "isProbation": false,
+    "probationSalary": 0,
+    "regularSalary": 15000,
+    "id": "0d88481b-197c-44b9-9500-c7a5b8767a8f",
+    "createdAt": "2026-05-12T08:43:46.873Z",
+    "updatedAt": "2026-05-12T08:43:46.873Z"
+  }
+]

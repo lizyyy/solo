@@ -1,0 +1,76 @@
+[
+  {
+    "employeeId": "c20bbb31-3ebc-4060-80ba-513e03c078e7",
+    "type": "hire",
+    "date": "2023-03-15",
+    "operator": "HR-SYSTEM",
+    "reason": "新员工入职",
+    "id": "146ba90c-a557-4ce8-90de-19e228d1136f",
+    "createdAt": "2026-05-12T08:43:47.513Z"
+  },
+  {
+    "employeeId": "2e1f3387-fdb5-4a8c-b862-37f449a10b75",
+    "type": "hire",
+    "date": "2025-07-01",
+    "operator": "HR-小张",
+    "reason": "新员工入职",
+    "id": "29ee49b1-9b9d-4cc5-a9ab-4f3c05be8091",
+    "createdAt": "2026-05-12T08:43:47.561Z"
+  },
+  {
+    "employeeId": "872f346d-d7cb-413c-bcc6-34c1c10c8970",
+    "type": "hire",
+    "date": "2022-05-20",
+    "operator": "HR-SYSTEM",
+    "reason": "新员工入职",
+    "id": "75778986-6655-4d0e-9e80-3756fb32cb0c",
+    "createdAt": "2026-05-12T08:43:47.664Z"
+  },
+  {
+    "employeeId": "5bcb7d7c-761c-4085-9231-c12ffe282569",
+    "type": "hire",
+    "date": "2020-01-10",
+    "operator": "HR-SYSTEM",
+    "reason": "新员工入职",
+    "id": "1ae7a2c9-3925-490c-a0ee-3bcf6612277e",
+    "createdAt": "2026-05-12T08:43:47.665Z"
+  },
+  {
+    "employeeId": "5bcb7d7c-761c-4085-9231-c12ffe282569",
+    "type": "resign",
+    "date": "2025-03-31",
+    "operator": "HR-小李",
+    "reason": "个人原因离职",
+    "id": "1f5893b4-85b6-4140-8c9e-834aea0415de",
+    "createdAt": "2026-05-12T08:43:47.670Z"
+  },
+  {
+    "employeeId": "7b33588b-f01b-46a2-9370-8318672c88cb",
+    "type": "hire",
+    "date": "2024-02-28",
+    "operator": "HR-SYSTEM",
+    "reason": "新员工入职",
+    "id": "646acc6b-955b-4be2-bdcc-7be92e013d45",
+    "createdAt": "2026-05-12T08:43:47.672Z"
+  },
+  {
+    "employeeId": "0d88481b-197c-44b9-9500-c7a5b8767a8f",
+    "type": "hire",
+    "date": "2021-08-15",
+    "operator": "HR-SYSTEM",
+    "reason": "新员工入职",
+    "id": "79fce58f-48e1-43da-9253-8206ebf69775",
+    "createdAt": "2026-05-12T08:43:47.674Z"
+  },
+  {
+    "employeeId": "0d88481b-197c-44b9-9500-c7a5b8767a8f",
+    "type": "transfer",
+    "date": "2025-05-01",
+    "fromCity": "北京",
+    "toCity": "上海",
+    "operator": "HR-小王",
+    "reason": "跨城市调动",
+    "id": "99b7628f-cfdd-4163-9851-46022464a48f",
+    "createdAt": "2026-05-12T08:43:47.676Z"
+  }
+]
