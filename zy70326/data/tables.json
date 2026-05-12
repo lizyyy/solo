@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dw.user_profile.user_level",
+    "database": "dw",
+    "table_name": "user_profile",
+    "field_name": "user_level",
+    "description": "用户等级（V1-V5）"
+  },
+  {
+    "id": "dw.user_profile.user_id",
+    "database": "dw",
+    "table_name": "user_profile",
+    "field_name": "user_id",
+    "description": "用户ID"
+  },
+  {
+    "id": "dw.user_profile.register_date",
+    "database": "dw",
+    "table_name": "user_profile",
+    "field_name": "register_date",
+    "description": "注册日期"
+  },
+  {
+    "id": "dw.orders.order_amount",
+    "database": "dw",
+    "table_name": "orders",
+    "field_name": "order_amount",
+    "description": "订单金额"
+  },
+  {
+    "id": "dw.orders.order_id",
+    "database": "dw",
+    "table_name": "orders",
+    "field_name": "order_id",
+    "description": "订单ID"
+  },
+  {
+    "id": "dw.orders.user_id",
+    "database": "dw",
+    "table_name": "orders",
+    "field_name": "user_id",
+    "description": "下单用户ID"
+  },
+  {
+    "id": "dw.orders.order_date",
+    "database": "dw",
+    "table_name": "orders",
+    "field_name": "order_date",
+    "description": "下单日期"
+  },
+  {
+    "id": "dws.user_daily_agg.total_spend",
+    "database": "dws",
+    "table_name": "user_daily_agg",
+    "field_name": "total_spend",
+    "description": "用户当日累计消费"
+  },
+  {
+    "id": "dws.user_daily_agg.user_id",
+    "database": "dws",
+    "table_name": "user_daily_agg",
+    "field_name": "user_id",
+    "description": "用户ID"
+  },
+  {
+    "id": "dws.user_daily_agg.dt",
+    "database": "dws",
+    "table_name": "user_daily_agg",
+    "field_name": "dt",
+    "description": "日期分区"
+  },
+  {
+    "id": "dws.user_level_stats.level_cnt",
+    "database": "dws",
+    "table_name": "user_level_stats",
+    "field_name": "level_cnt",
+    "description": "各等级用户数"
+  },
+  {
+    "id": "dws.user_level_stats.user_level",
+    "database": "dws",
+    "table_name": "user_level_stats",
+    "field_name": "user_level",
+    "description": "用户等级"
+  }
+]

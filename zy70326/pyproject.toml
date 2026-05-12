@@ -1,0 +1,21 @@
+[project]
+name = "field-lineage-cli"
+version = "0.1.0"
+description = "字段血缘影响分析 CLI 工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    "sqlglot>=20.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+lineage = "field_lineage.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["field_lineage*"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

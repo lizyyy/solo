@@ -1,0 +1,56 @@
+[
+  {
+    "id": "task_001",
+    "name": "用户日消费聚合",
+    "sql": "INSERT INTO dws.user_daily_agg\nSELECT \n    o.user_id,\n    o.order_date as dt,\n    SUM(o.order_amount) as total_spend\nFROM dw.orders o\nWHERE o.order_date = '${dt}'\nGROUP BY o.user_id, o.order_date",
+    "owner": "zhangsan",
+    "target_table": "dws.user_daily_agg",
+    "target_fields": ["user_id", "dt", "total_spend"],
+    "created_at": "2024-01-15T10:00:00Z"
+  },
+  {
+    "id": "task_002",
+    "name": "用户等级分布统计",
+    "sql": "INSERT INTO dws.user_level_stats\nSELECT \n    up.user_level,\n    COUNT(1) as level_cnt\nFROM dw.user_profile up\nGROUP BY up.user_level",
+    "owner": "lisi",
+    "target_table": "dws.user_level_stats",
+    "target_fields": ["user_level", "level_cnt"],
+    "created_at": "2024-02-20T14:30:00Z"
+  },
+  {
+    "id": "task_003",
+    "name": "高价值用户标签",
+    "sql": "INSERT INTO dws.high_value_users\nSELECT \n    up.user_id,\n    up.user_level,\n    uda.total_spend,\n    CASE WHEN up.user_level >= 'V4' THEN 1 ELSE 0 END as is_high_value\nFROM dw.user_profile up\nJOIN dws.user_daily_agg uda ON up.user_id = uda.user_id\nWHERE uda.dt = '${dt}'",
+    "owner": "wangwu",
+    "target_table": "dws.high_value_users",
+    "target_fields": ["user_id", "user_level", "total_spend", "is_high_value"],
+    "created_at": "2024-03-10T09:15:00Z"
+  },
+  {
+    "id": "task_004",
+    "name": "订单日报表",
+    "sql": "INSERT INTO ads.order_daily_report\nSELECT \n    o.order_date,\n    COUNT(o.order_id) as order_cnt,\n    SUM(o.order_amount) as total_amount,\n    AVG(o.order_amount) as avg_amount\nFROM dw.orders o\nWHERE o.order_date = '${dt}'\nGROUP BY o.order_date",
+    "owner": "zhangsan",
+    "target_table": "ads.order_daily_report",
+    "target_fields": ["order_date", "order_cnt", "total_amount", "avg_amount"],
+    "created_at": "2024-01-20T11:00:00Z"
+  },
+  {
+    "id": "task_005",
+    "name": "解析失败测试任务",
+    "sql": "SELECT INVALID SYNTAX HERE",
+    "owner": "unknown_user",
+    "target_table": "test.invalid",
+    "target_fields": [],
+    "created_at": "2024-04-01T00:00:00Z"
+  },
+  {
+    "id": "task_006",
+    "name": "无负责人任务",
+    "sql": "SELECT user_level FROM dw.user_profile",
+    "owner": "",
+    "target_table": "test.no_owner",
+    "target_fields": ["user_level"],
+    "created_at": "2024-04-15T00:00:00Z"
+  }
+]

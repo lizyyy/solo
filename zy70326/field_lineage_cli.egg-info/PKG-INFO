@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: field-lineage-cli
+Version: 0.1.0
+Summary: 字段血缘影响分析 CLI 工具
+Requires-Python: >=3.9
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: sqlglot>=20.0.0
+Requires-Dist: pyyaml>=6.0

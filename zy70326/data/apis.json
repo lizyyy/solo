@@ -1,0 +1,32 @@
+[
+  {
+    "id": "api_001",
+    "name": "用户等级查询接口",
+    "field_mappings": {
+      "level": "dw.user_profile.user_level",
+      "user_id": "dw.user_profile.user_id"
+    },
+    "owner": "lisi",
+    "path": "/api/v1/user/level"
+  },
+  {
+    "id": "api_002",
+    "name": "订单统计接口",
+    "field_mappings": {
+      "total_amount": "ads.order_daily_report.total_amount",
+      "order_cnt": "ads.order_daily_report.order_cnt"
+    },
+    "owner": "zhangsan",
+    "path": "/api/v1/order/stats"
+  },
+  {
+    "id": "api_003",
+    "name": "高价值用户接口",
+    "field_mappings": {
+      "is_high_value": "dws.high_value_users.is_high_value",
+      "total_spend": "dws.high_value_users.total_spend"
+    },
+    "owner": "wangwu",
+    "path": "/api/v1/user/high-value"
+  }
+]

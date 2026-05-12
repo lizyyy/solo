@@ -1,0 +1,40 @@
+[
+  {
+    "id": "report_001",
+    "name": "用户等级分布仪表盘",
+    "fields": ["dws.user_level_stats.user_level", "dws.user_level_stats.level_cnt"],
+    "derived_fields": {
+      "level_ratio": "level_cnt / total_users"
+    },
+    "owner": "lisi",
+    "dashboard": "用户运营看板"
+  },
+  {
+    "id": "report_002",
+    "name": "订单金额趋势图",
+    "fields": ["ads.order_daily_report.order_date", "ads.order_daily_report.total_amount"],
+    "derived_fields": {
+      "mom_growth": "(total_amount - last_week_amount) / last_week_amount"
+    },
+    "owner": "zhangsan",
+    "dashboard": "经营分析看板"
+  },
+  {
+    "id": "report_003",
+    "name": "高价值用户分析",
+    "fields": ["dws.high_value_users.user_level", "dws.high_value_users.total_spend"],
+    "derived_fields": {
+      "avg_spend_per_user": "SUM(total_spend) / COUNT(DISTINCT user_id)"
+    },
+    "owner": "wangwu",
+    "dashboard": "用户价值分析"
+  },
+  {
+    "id": "report_004",
+    "name": "无负责人报表",
+    "fields": ["dw.user_profile.user_level"],
+    "derived_fields": {},
+    "owner": "",
+    "dashboard": "临时看板"
+  }
+]
