@@ -1,0 +1,153 @@
+[
+  {
+    "doc_id": "doc_policy_001",
+    "title": "员工入职指南",
+    "path": "/policies/employee-onboarding.md",
+    "file_type": "markdown",
+    "content_hash": "07d11b5219667d8e0e52b918ca1873dcf8a844e457009e35e830fd2944090df6",
+    "owner_id": "owner_hr_001",
+    "visibility": "internal",
+    "tags": [
+      "hr",
+      "onboarding"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_policy_002",
+    "title": "考勤管理制度",
+    "path": "/policies/attendance-policy.md",
+    "file_type": "markdown",
+    "content_hash": "750fa78e370a9af27081e454ce34c48c6c8a4a744cc3d5981e6a9504d5bbfca4",
+    "owner_id": "owner_hr_001",
+    "visibility": "internal",
+    "tags": [
+      "hr",
+      "attendance"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_policy_003",
+    "title": "劳动合同模板",
+    "path": "/policies/contract-template.md",
+    "file_type": "markdown",
+    "content_hash": "eed04b778d4ac7aa0cf6dccab9f230f705778ba08550fd419fc76318b43bc488",
+    "owner_id": "owner_legal_001",
+    "visibility": "confidential",
+    "tags": [
+      "legal",
+      "contract"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_policy_004",
+    "title": "考勤管理制度 (副本)",
+    "path": "/policies/attendance-policy (copy).md",
+    "file_type": "markdown",
+    "content_hash": "750fa78e370a9af27081e454ce34c48c6c8a4a744cc3d5981e6a9504d5bbfca4",
+    "owner_id": "owner_hr_001",
+    "visibility": "internal",
+    "tags": [
+      "hr",
+      "attendance",
+      "duplicate"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_tech_001",
+    "title": "代码审查规范",
+    "path": "/tech/code-review-spec.md",
+    "file_type": "markdown",
+    "content_hash": "dbd367f72e8fbdd275956d93379cdae03e1b1193d6bdaf91b7acd99710120bbd",
+    "owner_id": "owner_eng_001",
+    "visibility": "internal",
+    "tags": [
+      "engineering",
+      "code-review"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_tech_002",
+    "title": "微服务架构设计",
+    "path": "/tech/microservice-architecture.md",
+    "file_type": "markdown",
+    "content_hash": "911b9d0597721ef1119bb37c26b17d43326c49f1071b8c60344b1b6b5b78e3c1",
+    "owner_id": "owner_eng_002",
+    "visibility": "internal",
+    "tags": [
+      "engineering",
+      "architecture"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_tech_003",
+    "title": "API 开发指南",
+    "path": "/tech/api-dev-guide.md",
+    "file_type": "markdown",
+    "content_hash": "330f06a1afc5e214710b52ec9f645d68691872c97e3393ffff4d283bf9ebcf0b",
+    "owner_id": "owner_eng_001",
+    "visibility": "internal",
+    "tags": [
+      "engineering",
+      "api"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_tech_004",
+    "title": "API 开发指南 v2",
+    "path": "/tech/api-dev-guide-v2.md",
+    "file_type": "markdown",
+    "content_hash": "8db47a39aa9a8b9aeca7255d1da07454b4efb8ab5f40d99f6031672d4565c91f",
+    "owner_id": "owner_eng_001",
+    "visibility": "internal",
+    "tags": [
+      "engineering",
+      "api"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_train_001",
+    "title": "新员工培训手册",
+    "path": "/training/new-employee-manual.md",
+    "file_type": "markdown",
+    "content_hash": "08e699bfd8eaa8a7a09c6e0cc1d05305c05e3a615a9a9648c17e3120681f0601",
+    "owner_id": "owner_train_001",
+    "visibility": "internal",
+    "tags": [
+      "training",
+      "onboarding"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  },
+  {
+    "doc_id": "doc_train_002",
+    "title": "技术培训课程大纲",
+    "path": "/training/tech-curriculum.md",
+    "file_type": "markdown",
+    "content_hash": "026fc4abbb02d908f0f7a4e5fe0b00013f8cd2b434dd81d8be2dc895273ac796",
+    "owner_id": "owner_train_001",
+    "visibility": "internal",
+    "tags": [
+      "training",
+      "tech"
+    ],
+    "last_modified": null,
+    "extracted_at": null
+  }
+]

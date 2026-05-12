@@ -1,0 +1,60 @@
+[
+  {
+    "owner_id": "owner_hr_001",
+    "name": "张明",
+    "email": "zhangming@company.com",
+    "department": "人力资源部",
+    "roles": [
+      "hr",
+      "internal"
+    ],
+    "is_active": true,
+    "last_active": null
+  },
+  {
+    "owner_id": "owner_eng_001",
+    "name": "李华",
+    "email": "lihua@company.com",
+    "department": "技术部",
+    "roles": [
+      "engineering",
+      "tech-lead"
+    ],
+    "is_active": true,
+    "last_active": null
+  },
+  {
+    "owner_id": "owner_eng_002",
+    "name": "王芳",
+    "email": "wangfang@company.com",
+    "department": "技术部",
+    "roles": [
+      "engineering"
+    ],
+    "is_active": false,
+    "last_active": null
+  },
+  {
+    "owner_id": "owner_legal_001",
+    "name": "赵强",
+    "email": "zhaoqiang@company.com",
+    "department": "法务部",
+    "roles": [
+      "legal",
+      "procurement"
+    ],
+    "is_active": true,
+    "last_active": null
+  },
+  {
+    "owner_id": "owner_train_001",
+    "name": "陈静",
+    "email": "chenjing@company.com",
+    "department": "培训部",
+    "roles": [
+      "training"
+    ],
+    "is_active": true,
+    "last_active": null
+  }
+]

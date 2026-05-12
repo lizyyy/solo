@@ -1,0 +1,222 @@
+[
+  {
+    "link_id": "link_3b54ab1d2628",
+    "source_doc_id": "doc_policy_001",
+    "target_url": "https://old-kb.example.com/guide/onboarding",
+    "link_text": "旧版入职流程",
+    "link_type": "inline",
+    "line_number": 15,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_600a3a4d56ee",
+    "source_doc_id": "doc_policy_001",
+    "target_url": "https://old-kb.example.com/policies/code-review",
+    "link_text": "代码审查规范",
+    "link_type": "inline",
+    "line_number": 22,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_c3db7107d26c",
+    "source_doc_id": "doc_policy_001",
+    "target_url": "doc_policy_002",
+    "link_text": "考勤管理制度",
+    "link_type": "inline",
+    "line_number": 30,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_ce252d99cae5",
+    "source_doc_id": "doc_policy_001",
+    "target_url": "https://kb.example.com/executive/board-report-2024",
+    "link_text": "董事会年度报告",
+    "link_type": "inline",
+    "line_number": 45,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_4c341767de0f",
+    "source_doc_id": "doc_policy_002",
+    "target_url": "https://old-kb.example.com/deleted-page",
+    "link_text": "旧系统登录页面",
+    "link_type": "inline",
+    "line_number": 18,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_a18941f5a545",
+    "source_doc_id": "doc_policy_002",
+    "target_url": "https://github.com/company/hr-policies",
+    "link_text": "GitHub 仓库",
+    "link_type": "inline",
+    "line_number": 25,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_5bad847a2221",
+    "source_doc_id": "doc_policy_003",
+    "target_url": "https://kb.example.com/legal/contract-templates",
+    "link_text": "法务模板库",
+    "link_type": "inline",
+    "line_number": 10,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_54712e4ed4ff",
+    "source_doc_id": "doc_policy_003",
+    "target_url": "/attachments/contract-annex.pdf",
+    "link_text": "合同附件",
+    "link_type": "inline",
+    "line_number": 35,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_3fd0811ec14d",
+    "source_doc_id": "doc_tech_001",
+    "target_url": "https://kb.example.com/legacy/old-process",
+    "link_text": "遗留流程文档",
+    "link_type": "inline",
+    "line_number": 20,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_d10ce2f3a522",
+    "source_doc_id": "doc_tech_001",
+    "target_url": "https://docs.python.org/3/",
+    "link_text": "Python 官方文档",
+    "link_type": "inline",
+    "line_number": 35,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_3ad87297965d",
+    "source_doc_id": "doc_tech_001",
+    "target_url": "https://stackoverflow.com/questions/tagged/python",
+    "link_text": "Python 标签",
+    "link_type": "inline",
+    "line_number": 40,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_8c212adcfaed",
+    "source_doc_id": "doc_tech_002",
+    "target_url": "https://old-kb.example.com/archived/2020-report",
+    "link_text": "2020 架构报告",
+    "link_type": "inline",
+    "line_number": 15,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_7aa385a34024",
+    "source_doc_id": "doc_tech_002",
+    "target_url": "https://kb.example.com/finance/salary-ranges",
+    "link_text": "技术等级薪资范围",
+    "link_type": "inline",
+    "line_number": 50,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_d386dcc21bbb",
+    "source_doc_id": "doc_tech_003",
+    "target_url": "doc_tech_001",
+    "link_text": "代码审查规范",
+    "link_type": "inline",
+    "line_number": 25,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_0dd8377185c4",
+    "source_doc_id": "doc_tech_003",
+    "target_url": "doc_tech_001",
+    "link_text": "代码审查规范",
+    "link_type": "inline",
+    "line_number": 40,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_cbbc9c16ce66",
+    "source_doc_id": "doc_tech_003",
+    "target_url": "doc_tech_001",
+    "link_text": "代码审查规范",
+    "link_type": "inline",
+    "line_number": 55,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_073e8b8a6df7",
+    "source_doc_id": "doc_tech_003",
+    "target_url": "doc_tech_001",
+    "link_text": "代码审查规范",
+    "link_type": "inline",
+    "line_number": 70,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_fdcf12763b2e",
+    "source_doc_id": "doc_train_001",
+    "target_url": "doc_policy_001",
+    "link_text": "员工入职指南",
+    "link_type": "inline",
+    "line_number": 10,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_1a95b9656232",
+    "source_doc_id": "doc_train_001",
+    "target_url": "https://old-kb.example.com/archived/2020-report",
+    "link_text": "2020 培训材料",
+    "link_type": "inline",
+    "line_number": 25,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_5f97f4688115",
+    "source_doc_id": "doc_train_001",
+    "target_url": "https://developer.mozilla.org/",
+    "link_text": "MDN Web 文档",
+    "link_type": "inline",
+    "line_number": 45,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_cec741d99f11",
+    "source_doc_id": "doc_train_002",
+    "target_url": "doc_tech_003",
+    "link_text": "API 开发指南",
+    "link_type": "inline",
+    "line_number": 30,
+    "extracted_at": null,
+    "occurrences": []
+  },
+  {
+    "link_id": "link_fb300c8fdaab",
+    "source_doc_id": "doc_train_002",
+    "target_url": "doc_tech_002",
+    "link_text": "微服务架构设计",
+    "link_type": "inline",
+    "line_number": 45,
+    "extracted_at": null,
+    "occurrences": []
+  }
+]
