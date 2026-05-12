@@ -1,0 +1,446 @@
+{
+  "dishes": [
+    {
+      "id": "mp23wsdfdqx77thy8g7",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "红烧肉",
+      "category": "热菜",
+      "description": "带皮五花肉烧制",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdfb130pcgein",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "清炒时蔬",
+      "category": "素菜",
+      "description": "时令蔬菜",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdfpzfsvj972",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "西红柿鸡蛋汤",
+      "category": "汤类",
+      "description": "经典汤品",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdfi9mid24lgm",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "清蒸鱼",
+      "category": "热菜",
+      "description": "鲜活草鱼",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdfz38c92qz33",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "宫保鸡丁",
+      "category": "热菜",
+      "description": "川菜经典",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdf55xh1uo6mvu",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "米饭",
+      "category": "主食",
+      "description": "东北大米",
+      "isActive": true
+    },
+    {
+      "id": "mp23wt3enuozdb9h1i",
+      "createdAt": "2026-05-12T04:04:30.410Z",
+      "name": "昨日凉菜",
+      "category": "凉菜",
+      "description": "已过期留样专用",
+      "isActive": true
+    }
+  ],
+  "meals": [
+    {
+      "id": "mp23wsdk7eumhna4wlk",
+      "createdAt": "2026-05-12T04:04:29.480Z",
+      "mealType": "lunch",
+      "mealDate": "2026-05-12",
+      "dishIds": [
+        "mp23wsdfdqx77thy8g7",
+        "mp23wsdfb130pcgein",
+        "mp23wsdfpzfsvj972",
+        "mp23wsdfi9mid24lgm"
+      ],
+      "status": "opened",
+      "openedAt": "2026-05-12T04:04:30.205Z",
+      "openedBy": "mp23wsde8umn04421up",
+      "updatedAt": "2026-05-12T04:04:30.205Z"
+    },
+    {
+      "id": "mp23wsdk32dlofs1buy",
+      "createdAt": "2026-05-12T04:04:29.480Z",
+      "mealType": "dinner",
+      "mealDate": "2026-05-12",
+      "dishIds": [
+        "mp23wsdfpzfsvj972",
+        "mp23wsdfi9mid24lgm",
+        "mp23wsdfz38c92qz33",
+        "mp23wsdf55xh1uo6mvu"
+      ],
+      "status": "prepared",
+      "openedAt": null
+    },
+    {
+      "id": "mp23wt3fkw7tcthxkfm",
+      "createdAt": "2026-05-12T04:04:30.411Z",
+      "mealType": "lunch",
+      "mealDate": "2026-05-11",
+      "dishIds": [
+        "mp23wt3enuozdb9h1i"
+      ],
+      "status": "prepared",
+      "openedAt": null
+    }
+  ],
+  "sampleBoxes": [
+    {
+      "id": "mp23wsdg5hgyg02k51n",
+      "createdAt": "2026-05-12T04:04:29.476Z",
+      "boxNumber": "BOX-001",
+      "location": "冷藏柜A-1",
+      "capacity": "500g",
+      "status": "available",
+      "currentSampleId": null,
+      "updatedAt": "2026-05-12T04:04:30.619Z"
+    },
+    {
+      "id": "mp23wsdhnyrc1vybywj",
+      "createdAt": "2026-05-12T04:04:29.477Z",
+      "boxNumber": "BOX-002",
+      "location": "冷藏柜A-1",
+      "capacity": "500g",
+      "status": "in_use",
+      "currentSampleId": "mp23wsrtqi53c7m46m",
+      "updatedAt": "2026-05-12T04:04:29.993Z"
+    },
+    {
+      "id": "mp23wsdhipvy1otrudl",
+      "createdAt": "2026-05-12T04:04:29.477Z",
+      "boxNumber": "BOX-003",
+      "location": "冷藏柜A-1",
+      "capacity": "500g",
+      "status": "in_use",
+      "currentSampleId": "mp23wsxmh8q9j1fzca6",
+      "updatedAt": "2026-05-12T04:04:30.202Z"
+    },
+    {
+      "id": "mp23wsdhqgb3qbyiobe",
+      "createdAt": "2026-05-12T04:04:29.477Z",
+      "boxNumber": "BOX-004",
+      "location": "冷藏柜A-1",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdhyyfl1dotgi",
+      "createdAt": "2026-05-12T04:04:29.477Z",
+      "boxNumber": "BOX-005",
+      "location": "冷藏柜A-1",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdhvfwdnfbhsjl",
+      "createdAt": "2026-05-12T04:04:29.477Z",
+      "boxNumber": "BOX-006",
+      "location": "冷藏柜A-2",
+      "capacity": "500g",
+      "status": "in_use",
+      "currentSampleId": "mp23wt3g64yakx86xn3",
+      "updatedAt": "2026-05-12T04:04:30.412Z"
+    },
+    {
+      "id": "mp23wsdif6m1gijyfc",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-007",
+      "location": "冷藏柜A-2",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdinzqbd44awg",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-008",
+      "location": "冷藏柜A-2",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdidfd59sowno",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-009",
+      "location": "冷藏柜A-2",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsditfwsbw40gf",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-010",
+      "location": "冷藏柜A-2",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdisa6354fvgyo",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-011",
+      "location": "冷藏柜A-3",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdilbcws5sp0l",
+      "createdAt": "2026-05-12T04:04:29.478Z",
+      "boxNumber": "BOX-012",
+      "location": "冷藏柜A-3",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdjj6s8b1nafj",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-013",
+      "location": "冷藏柜A-3",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdjydugdmjdze8",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-014",
+      "location": "冷藏柜A-3",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdj0wxkmtvav27r",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-015",
+      "location": "冷藏柜A-3",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdjrl16sbrn36n",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-016",
+      "location": "冷藏柜A-4",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdjnbha67sl3n",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-017",
+      "location": "冷藏柜A-4",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdj4ypx3bhcalw",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-018",
+      "location": "冷藏柜A-4",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdjlmpmou0oyxb",
+      "createdAt": "2026-05-12T04:04:29.479Z",
+      "boxNumber": "BOX-019",
+      "location": "冷藏柜A-4",
+      "capacity": "500g",
+      "status": "available"
+    },
+    {
+      "id": "mp23wsdkk8h5h5ixcnh",
+      "createdAt": "2026-05-12T04:04:29.480Z",
+      "boxNumber": "BOX-020",
+      "location": "冷藏柜A-4",
+      "capacity": "500g",
+      "status": "available"
+    }
+  ],
+  "responsiblePersons": [
+    {
+      "id": "mp23wsde8umn04421up",
+      "createdAt": "2026-05-12T04:04:29.474Z",
+      "name": "张三",
+      "employeeId": "EMP001",
+      "phone": "13800138001",
+      "role": "后厨管理员",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdft0p0g0xjmdn",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "李四",
+      "employeeId": "EMP002",
+      "phone": "13800138002",
+      "role": "厨师长",
+      "isActive": true
+    },
+    {
+      "id": "mp23wsdfb8t79uf646f",
+      "createdAt": "2026-05-12T04:04:29.475Z",
+      "name": "王五",
+      "employeeId": "EMP003",
+      "phone": "13800138003",
+      "role": "质检员",
+      "isActive": true
+    }
+  ],
+  "samples": [
+    {
+      "id": "mp23wsrphio93l6djv5",
+      "createdAt": "2026-05-12T04:04:29.989Z",
+      "mealId": "mp23wsdk7eumhna4wlk",
+      "dishId": "mp23wsdfdqx77thy8g7",
+      "dishName": "红烧肉",
+      "boxId": "mp23wsdg5hgyg02k51n",
+      "boxNumber": "BOX-001",
+      "responsiblePersonId": "mp23wsde8umn04421up",
+      "sampleTime": "2026-05-12T04:04:29.989Z",
+      "temperature": 5,
+      "expireTime": "2026-05-14T04:04:29.989Z",
+      "status": "destroyed",
+      "destroyedAt": "2026-05-12T04:04:30.618Z",
+      "updatedAt": "2026-05-12T04:04:30.619Z"
+    },
+    {
+      "id": "mp23wsrtqi53c7m46m",
+      "createdAt": "2026-05-12T04:04:29.993Z",
+      "mealId": "mp23wsdk7eumhna4wlk",
+      "dishId": "mp23wsdfb130pcgein",
+      "dishName": "清炒时蔬",
+      "boxId": "mp23wsdhnyrc1vybywj",
+      "boxNumber": "BOX-002",
+      "responsiblePersonId": "mp23wsde8umn04421up",
+      "sampleTime": "2026-05-12T04:04:29.992Z",
+      "temperature": 10,
+      "expireTime": "2026-05-14T04:04:29.992Z",
+      "status": "active"
+    },
+    {
+      "id": "mp23wsxmh8q9j1fzca6",
+      "createdAt": "2026-05-12T04:04:30.202Z",
+      "mealId": "mp23wsdk7eumhna4wlk",
+      "dishId": "mp23wsdfpzfsvj972",
+      "dishName": "西红柿鸡蛋汤",
+      "boxId": "mp23wsdhipvy1otrudl",
+      "boxNumber": "BOX-003",
+      "responsiblePersonId": "mp23wsde8umn04421up",
+      "sampleTime": "2026-05-12T04:04:30.202Z",
+      "temperature": 4,
+      "expireTime": "2026-05-14T04:04:30.202Z",
+      "status": "active"
+    },
+    {
+      "id": "mp23wt3g64yakx86xn3",
+      "createdAt": "2026-05-12T04:04:30.412Z",
+      "mealId": "mp23wt3fkw7tcthxkfm",
+      "dishId": "mp23wt3enuozdb9h1i",
+      "dishName": "昨日凉菜",
+      "boxId": "mp23wsdhvfwdnfbhsjl",
+      "boxNumber": "BOX-006",
+      "responsiblePersonId": "mp23wsde8umn04421up",
+      "sampleTime": "2026-05-10T02:04:30.409Z",
+      "temperature": 4,
+      "expireTime": "2026-05-12T02:04:30.412Z",
+      "status": "active"
+    }
+  ],
+  "destroyRecords": [
+    {
+      "id": "mp23wt96aaetx2ulq1v",
+      "createdAt": "2026-05-12T04:04:30.618Z",
+      "sampleId": "mp23wsrphio93l6djv5",
+      "dishName": "红烧肉",
+      "boxNumber": "BOX-001",
+      "destroyTime": "2026-05-12T04:04:30.618Z",
+      "operatorId": "mp23wsde8umn04421up",
+      "destroyMethod": "incineration"
+    }
+  ],
+  "temperatureLogs": [
+    {
+      "id": "mp23wsrp3zzfk7qpop9",
+      "createdAt": "2026-05-12T04:04:29.989Z",
+      "sampleId": null,
+      "temperature": 5,
+      "recordTime": "2026-05-12T04:04:29.989Z",
+      "recordedBy": "mp23wsde8umn04421up"
+    },
+    {
+      "id": "mp23wsrs26007hx3jyj",
+      "createdAt": "2026-05-12T04:04:29.992Z",
+      "sampleId": null,
+      "temperature": 10,
+      "recordTime": "2026-05-12T04:04:29.992Z",
+      "recordedBy": "mp23wsde8umn04421up"
+    },
+    {
+      "id": "mp23wsxmwl1fpe348wi",
+      "createdAt": "2026-05-12T04:04:30.202Z",
+      "sampleId": null,
+      "temperature": 4,
+      "recordTime": "2026-05-12T04:04:30.202Z",
+      "recordedBy": "mp23wsde8umn04421up"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "mp23wsrsinlf2fu2eg",
+      "createdAt": "2026-05-12T04:04:29.992Z",
+      "type": "TEMPERATURE_EXCEED",
+      "level": "high",
+      "message": "留样温度超限：菜品清炒时蔬温度10℃，正常范围0-8℃",
+      "dishId": "mp23wsdfb130pcgein",
+      "mealId": "mp23wsdk7eumhna4wlk",
+      "temperature": 10,
+      "status": "active"
+    },
+    {
+      "id": "mp23wsxieti409fq4nn",
+      "createdAt": "2026-05-12T04:04:30.197Z",
+      "type": "BOX_REUSE",
+      "level": "medium",
+      "message": "留样盒BOX-001被重复绑定，当前留样菜品：红烧肉",
+      "boxId": "mp23wsdg5hgyg02k51n",
+      "existingSampleId": "mp23wsrphio93l6djv5",
+      "status": "active"
+    },
+    {
+      "id": "mp23wsxo594q7aql72v",
+      "createdAt": "2026-05-12T04:04:30.204Z",
+      "type": "UNSAMPLED_OPEN",
+      "level": "high",
+      "message": "未留样就开餐：餐次2026-05-12-lunch有1道菜品未留样",
+      "mealId": "mp23wsdk7eumhna4wlk",
+      "missingDishIds": [
+        "mp23wsdfi9mid24lgm"
+      ],
+      "operatorId": "mp23wsde8umn04421up",
+      "status": "active"
+    },
+    {
+      "id": "mp23wt3hqxca7r9uw1",
+      "createdAt": "2026-05-12T04:04:30.413Z",
+      "type": "EXPIRED_NOT_DESTROYED",
+      "level": "high",
+      "message": "留样到期未销毁：菜品昨日凉菜（留样盒BOX-006）已到期",
+      "sampleId": "mp23wt3g64yakx86xn3",
+      "expireTime": "2026-05-12T02:04:30.412Z",
+      "status": "active"
+    }
+  ]
+}
