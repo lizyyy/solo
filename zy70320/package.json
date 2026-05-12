@@ -1,0 +1,14 @@
+{
+  "name": "queue-backlog-diagnostic-api",
+  "version": "1.0.0",
+  "description": "队列积压根因诊断API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+}
