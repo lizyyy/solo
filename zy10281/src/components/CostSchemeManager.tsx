@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { CostScheme, BuildingVersion } from '../types';
+import type { CostScheme, BuildingVersion } from '../types';
 
 interface CostSchemeManagerProps {
   schemes: CostScheme[];
   currentVersion: BuildingVersion;
+  buildingId: string;
   onSave: (scheme: Omit<CostScheme, 'id' | 'createdAt'>) => void;
 }
 
@@ -16,6 +17,7 @@ const allocationMethods = {
 export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
   schemes,
   currentVersion,
+  buildingId,
   onSave,
 }) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -30,7 +32,7 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
   const handleSave = () => {
     if (name.trim()) {
       onSave({
-        buildingId: currentScheme?.buildingId || '',
+        buildingId,
         versionId: currentVersion.id,
         name,
         description,
@@ -154,7 +156,7 @@ export const CostSchemeManager: React.FC<CostSchemeManagerProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">分摊方式</label>
                 <select
                   value={allocationMethod}
-                  onChange={(e) => setAllocationMethod(e.target.value as any)}
+                  onChange={(e) => setAllocationMethod(e.target.value as 'area' | 'floor' | 'equal')}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   defaultValue={currentScheme?.allocationMethod}
                 >

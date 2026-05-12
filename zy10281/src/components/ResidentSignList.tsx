@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Resident, SignRecord, SignStatus, BuildingVersion } from '../types';
+import type { Resident, SignRecord, SignStatus, BuildingVersion } from '../types';
 import { ElevatorSignStore } from '../store';
 
 interface ResidentSignListProps {
@@ -55,10 +55,10 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
         <h2 className="text-xl font-bold text-gray-800">住户签字管理</h2>
         <div className="flex items-center gap-2">
           <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as any)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-          >
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value as 'all' | SignStatus)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                >
             <option value="all">全部</option>
             <option value="agree">同意</option>
             <option value="disagree">不同意</option>

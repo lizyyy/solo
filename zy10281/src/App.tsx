@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Building, Resident, SignRecord, CostScheme, PublicityComment, BuildingVersion, SignStatus, BusinessPhase } from './types';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import type { Building, Resident, CostScheme, PublicityComment, BuildingVersion, SignStatus, BusinessPhase } from './types';
 import { ElevatorSignStore } from './store';
 import { StatsPanel } from './components/StatsPanel';
 import { BuildingList } from './components/BuildingList';
@@ -10,6 +10,7 @@ import { PublicityComments } from './components/PublicityComments';
 import { PhaseNavigator } from './components/PhaseNavigator';
 
 function App() {
+  const initialized = useRef(false);
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null);
   const [residents, setResidents] = useState<Resident[]>([]);
@@ -21,12 +22,7 @@ function App() {
   const [showAddBuilding, setShowAddBuilding] = useState(false);
   const [newBuilding, setNewBuilding] = useState({ name: '', address: '', units: '1单元,2单元' });
 
-  useEffect(() => {
-    ElevatorSignStore.initializeDemoData();
-    refreshData();
-  }, []);
-
-  const refreshData = (buildingId?: string) => {
+  const refreshData = useCallback((buildingId?: string) => {
     setBuildings(ElevatorSignStore.getAllBuildings());
     
     if (buildingId) {
@@ -42,7 +38,15 @@ function App() {
       setComments(ElevatorSignStore.getComments(selectedBuilding.id));
       setStats(ElevatorSignStore.getProgressStats(selectedBuilding.id));
     }
-  };
+  }, [selectedBuilding]);
+
+  useEffect(() => {
+    if (!initialized.current) {
+      ElevatorSignStore.initializeDemoData();
+      setBuildings(ElevatorSignStore.getAllBuildings());
+      initialized.current = true;
+    }
+  }, []);
 
   const handleSelectBuilding = (building: Building) => {
     setSelectedBuilding(building);
@@ -82,6 +86,8 @@ function App() {
       objectionReason,
       objectionStatus: objectionReason ? 'pending' : undefined,
       handler: '当前用户',
+      isDuplicate: false,
+      isWithdrawnButCounted: false,
     });
     refreshData();
   };
@@ -211,7 +217,7 @@ function App() {
                     ].map(tab => (
                       <button
                         key={tab.key}
-                        onClick={() => setActiveTab(tab.key as any)}
+                        onClick={() => setActiveTab(tab.key as 'signs' | 'versions' | 'scheme' | 'comments')}
                         className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                           activeTab === tab.key
                             ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
@@ -236,7 +242,6 @@ function App() {
                     )}
                     {activeTab === 'versions' && (
                       <VersionHistory
-                        buildingId={selectedBuilding.id}
                         versions={versions}
                         onCreateVersion={handleCreateVersion}
                       />
@@ -245,6 +250,7 @@ function App() {
                       <CostSchemeManager
                         schemes={costSchemes}
                         currentVersion={currentVersion}
+                        buildingId={selectedBuilding.id}
                         onSave={handleSaveScheme}
                       />
                     )}

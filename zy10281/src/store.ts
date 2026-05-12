@@ -1,4 +1,4 @@
-import { Building, Resident, SignRecord, CostScheme, PublicityComment, BuildingVersion, ProgressStats, SignStatus, BusinessPhase, ObjectionStatus } from './types';
+import type { Building, Resident, SignRecord, CostScheme, PublicityComment, BuildingVersion, ProgressStats, SignStatus, BusinessPhase } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 const now = () => new Date().toISOString();
@@ -224,7 +224,8 @@ export class ElevatorSignStore {
   static getProgressStats(buildingId: string): ProgressStats {
     const residents = this.getResidents(buildingId);
     const building = this.getBuilding(buildingId);
-    const signRecords = this.getSignRecords(buildingId);
+    const currentVersionId = building?.currentEffectiveVersionId || '';
+    const signRecords = this.getSignRecords(buildingId, currentVersionId);
     
     const latestSigns = new Map<string, SignRecord>();
     signRecords.forEach(record => {

@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { BuildingVersion } from '../types';
-import { ElevatorSignStore } from '../store';
+import type { BuildingVersion } from '../types';
 
 interface VersionHistoryProps {
-  buildingId: string;
   versions: BuildingVersion[];
   onCreateVersion: (name: string, description: string, changeLog: string) => void;
 }
 
 export const VersionHistory: React.FC<VersionHistoryProps> = ({
-  buildingId,
   versions,
   onCreateVersion,
 }) => {

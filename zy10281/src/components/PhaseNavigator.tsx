@@ -1,5 +1,5 @@
 import React from 'react';
-import { BusinessPhase } from '../types';
+import type { BusinessPhase } from '../types';
 import { ElevatorSignStore } from '../store';
 
 interface PhaseNavigatorProps {
@@ -42,8 +42,6 @@ export const PhaseNavigator: React.FC<PhaseNavigatorProps> = ({
           {phases.map((phase, index) => {
             const isCompleted = index < currentIndex;
             const isCurrent = index === currentIndex;
-            const isPending = index > currentIndex;
-
             return (
               <div key={phase.key} className="flex flex-col items-center">
                 <div

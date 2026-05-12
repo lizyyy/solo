@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProgressStats, BusinessPhase } from '../types';
+import type { ProgressStats, BusinessPhase } from '../types';
 
 interface StatsPanelProps {
   stats: ProgressStats;

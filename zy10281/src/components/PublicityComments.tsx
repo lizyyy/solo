@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PublicityComment } from '../types';
+import type { PublicityComment } from '../types';
 
 interface PublicityCommentsProps {
   comments: PublicityComment[];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building } from '../types';
+import type { Building } from '../types';
 import { ElevatorSignStore } from '../store';
 
 interface BuildingListProps {
