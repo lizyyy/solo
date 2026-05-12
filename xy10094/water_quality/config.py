@@ -38,11 +38,11 @@ class QCConfig:
         "sample": "sample",
     })
     unit_conversion: Dict[str, Dict[str, float]] = field(default_factory=lambda: {
-        "mg/L": {"g/L": 1000.0, "ug/L": 0.001},
-        "g/L": {"mg/L": 0.001, "ug/L": 1e-6},
-        "ug/L": {"mg/L": 1000.0, "g/L": 1e6},
-        "mg/kg": {"g/kg": 1000.0},
-        "g/kg": {"mg/kg": 0.001},
+        "mg/L": {"g/L": 0.001, "ug/L": 1000.0},
+        "g/L": {"mg/L": 1000.0, "ug/L": 1e6},
+        "ug/L": {"mg/L": 0.001, "g/L": 1e-6},
+        "mg/kg": {"g/kg": 0.001},
+        "g/kg": {"mg/kg": 1000.0},
     })
     target_units: Dict[str, str] = field(default_factory=lambda: {
         "pH": "",
