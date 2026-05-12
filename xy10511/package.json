@@ -1,0 +1,20 @@
+{
+  "name": "property-maintenance-api",
+  "version": "1.0.0",
+  "description": "物业设备保修管理系统 API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "demo": "node scripts/demo.js",
+    "demo-failure": "node scripts/demo-failure.js",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1",
+    "moment": "^2.30.1",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
