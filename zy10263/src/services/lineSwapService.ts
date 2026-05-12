@@ -165,11 +165,11 @@ export const approveSwapRequest = async (
     throw new ValidationError('REQUEST_NOT_FOUND', '换线申请不存在');
   }
 
-  if (before.status !== 'pending') {
+  if (!['pending', 'pending_approval'].includes(before.status)) {
     throw new ValidationError(
       'INVALID_STATUS',
       '只有待审批的申请可以审批',
-      { currentStatus: before.status }
+      { currentStatus: before.status, allowedStatuses: ['pending', 'pending_approval'] }
     );
   }
 

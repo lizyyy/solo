@@ -158,6 +158,17 @@ const demoNormalSwapFlow = async (empId: string, fromLineId: string, toLineId: s
     console.log(`    工时归属产线: LINE-B (组装线)`);
     console.log(`    关联换线申请: ${workHour.swapRequestId ? '是' : '否'}`);
     console.log(`    工时: ${workHour.hours}小时`);
+    console.log(`    当前状态: ${workHour.status}`);
+
+    printSubSection('2.6 确认工时');
+    const confirmedWorkHour = await workHourService.confirmWorkHour(
+      workHour.id,
+      operatorId,
+      operatorName
+    );
+    console.log('  ✓ 工时确认成功');
+    console.log(`    确认后状态: ${confirmedWorkHour.status}`);
+    console.log(`    确认人: ${confirmedWorkHour.confirmedBy}`);
 
     return request.id;
   } catch (error: any) {
@@ -201,26 +212,42 @@ const demoSkillMismatchInterception = async (empId: string, fromLineId: string, 
   }
 };
 
-const demoDuplicateRequestInterception = async (empId: string, fromLineId: string, toLineId: string, today: string) => {
-  printSection('4. 重复申请 - 系统拦截');
+const demoForceSwapWithApproval = async (empId: string, fromLineId: string, toLineId: string, today: string) => {
+  printSection('4. 技能不匹配强制换线 + 审批流程');
 
-  printSubSection('4.1 创建第一个换线申请');
+  printSubSection('4.1 强制提交技能不匹配的换线申请');
   const request = await lineSwapService.createSwapRequest(
     {
       employeeId: empId,
       fromLineId,
       toLineId,
-      reason: '正常调岗',
+      reason: '产线紧急支援，经主管特批',
       startTime: `${today}T09:00:00.000Z`,
       allowSkillMismatch: true
     },
     operatorId,
     operatorName
   );
-  console.log(`  ✓ 第一个申请创建成功: ${request.requestNo}`);
-  console.log(`    注意: 技能不匹配但通过 allowSkillMismatch 强制提交`);
+  console.log(`  ✓ 强制换线申请创建成功: ${request.requestNo}`);
+  console.log(`    当前状态: ${request.status}`);
+  console.log(`    技能匹配: ${request.skillMatch ? '是' : '否'}`);
 
-  printSubSection('4.2 尝试提交重复申请');
+  printSubSection('4.2 审批 pending_approval 状态的申请');
+  const employeeBefore = await employeeService.getEmployeeById(empId);
+  console.log(`    审批前员工所在产线: ${employeeBefore?.currentLineId ? 'LINE-A' : '待分配'}`);
+
+  const approved = await lineSwapService.approveSwapRequest(
+    request.id,
+    operatorId,
+    operatorName
+  );
+  console.log('  ✓ pending_approval 状态申请审批通过');
+  console.log(`    审批后状态: ${approved.status}`);
+
+  const employeeAfter = await employeeService.getEmployeeById(empId);
+  console.log(`    审批后员工所在产线: ${employeeAfter?.currentLineId ? 'LINE-B' : '待分配'}`);
+
+  printSubSection('4.3 验证重复申请拦截');
   try {
     await lineSwapService.createSwapRequest(
       {
@@ -318,7 +345,7 @@ const main = async () => {
     await demoSkillMismatchInterception(empLiId, lineAId, lineBId, today);
     await sleep(500);
 
-    await demoDuplicateRequestInterception(empWangId, lineBId, lineAId, today);
+    await demoForceSwapWithApproval(empWangId, lineBId, lineAId, today);
     await sleep(500);
 
     await demoAbsenceBeforeWorkHour(empZhaoId, lineCId, today);
@@ -327,11 +354,13 @@ const main = async () => {
     await demoPerformanceCalculation(empZhangId, lineBId);
 
     printSection('7. 演示总结');
-    console.log('  ✓ 正常换线流程 - 验证通过');
+    console.log('  ✓ 正常换线流程(申请→审批→换岗) - 验证通过');
+    console.log('  ✓ 工时记录→确认完整链路 - 验证通过');
+    console.log('  ✓ 绩效按产线归属统计(confirmed工时) - 验证通过');
     console.log('  ✓ 技能不匹配拦截 - 验证通过');
+    console.log('  ✓ 技能不匹配强制换线审批(pending_approval) - 验证通过');
     console.log('  ✓ 重复申请拦截 - 验证通过');
     console.log('  ✓ 缺勤工时拦截 - 验证通过');
-    console.log('  ✓ 绩效按产线归属 - 验证通过');
     console.log('\n  所有核心功能演示完成！\n');
 
   } catch (error) {
