@@ -1,0 +1,24 @@
+{
+  "name": "concurrent-inventory-api",
+  "version": "1.0.0",
+  "description": "并发库存扣减 API 系统",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "test": "node scripts/concurrent-test.js",
+    "load-test": "node scripts/load-test.js"
+  },
+  "keywords": [
+    "inventory",
+    "concurrent",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "sqlite3": "^5.1.6",
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
