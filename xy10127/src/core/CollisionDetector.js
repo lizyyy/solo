@@ -13,8 +13,8 @@ class CollisionDetector {
     };
     
     for (let i = 0; i < elements.length; i++) {
+      const el1 = elements[i];
       for (let j = i + 1; j < elements.length; j++) {
-        const el1 = elements[i];
         const el2 = elements[j];
         
         const distance = this.calculateDistance(el1, el2);

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>舞台灯位碰撞检查器</title>
-  <script type="module" crossorigin src="/assets/index-BPSrZmF9.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-U1TGmtAZ.css">
+  <script type="module" crossorigin src="/assets/index-Bc2BjUUO.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DWtapU-Z.css">
 </head>
 <body>
   <div id="app">
@@ -14,6 +14,8 @@
       <div class="header-actions">
         <button id="saveBtn" class="btn btn-primary">保存方案</button>
         <button id="loadBtn" class="btn btn-secondary">加载方案</button>
+        <button id="compareBtn" class="btn btn-secondary">方案对比</button>
+        <button id="screenshotBtn" class="btn btn-secondary">截图</button>
         <button id="exportBtn" class="btn btn-success">导出报告</button>
         <button id="resetBtn" class="btn btn-danger">重置场景</button>
       </div>
@@ -37,6 +39,44 @@
           <h3>碰撞检测</h3>
           <div id="collisionList" class="collision-list">
             <p class="hint">暂无碰撞信息</p>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h3>遮挡检测</h3>
+          <div class="controls">
+            <div class="control-item">
+              <label>观察摄像机</label>
+              <select id="observerCamera">
+                <option value="">请选择</option>
+              </select>
+            </div>
+            <div class="control-item">
+              <label>观察目标</label>
+              <select id="observerTarget">
+                <option value="">请选择</option>
+              </select>
+            </div>
+            <button id="checkBlockingBtn" class="btn btn-small btn-primary">检测遮挡</button>
+          </div>
+          <div id="blockingResult" class="blocking-result" style="margin-top: 10px;">
+            <p class="hint">选择摄像机和目标后点击检测</p>
+          </div>
+        </div>
+        
+        <div class="panel">
+          <h3>回放控制</h3>
+          <div class="playback-controls">
+            <button id="recordBtn" class="btn btn-small btn-primary">开始录制</button>
+            <button id="stopRecordBtn" class="btn btn-small btn-danger" disabled>停止录制</button>
+            <button id="playBtn" class="btn btn-small btn-secondary" disabled>播放</button>
+            <button id="pauseBtn" class="btn btn-small btn-secondary" disabled>暂停</button>
+          </div>
+          <div class="playback-info" style="margin-top: 10px;">
+            <div class="control-item">
+              <label>录制时长</label>
+              <span id="recordDuration">0s</span>
+            </div>
           </div>
         </div>
         

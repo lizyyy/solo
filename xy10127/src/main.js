@@ -56,6 +56,8 @@ const initialElements = [
   })
 ];
 
+sceneManager.init();
+
 sceneManager.addElements(initialElements);
 
 uiHandler.init({
@@ -64,8 +66,6 @@ uiHandler.init({
   reportGenerator,
   stageSize
 });
-
-sceneManager.init();
 
 function animate() {
   requestAnimationFrame(animate);
