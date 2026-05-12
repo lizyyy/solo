@@ -1,0 +1,51 @@
+[
+  {
+    "word": "赌博",
+    "category": "违规内容",
+    "level": "high",
+    "replacement": "***",
+    "description": "赌博相关词汇"
+  },
+  {
+    "word": "色情",
+    "category": "违规内容",
+    "level": "high",
+    "replacement": "***",
+    "description": "色情相关词汇"
+  },
+  {
+    "word": "暴力",
+    "category": "违规内容",
+    "level": "high",
+    "replacement": "***",
+    "description": "暴力相关词汇"
+  },
+  {
+    "word": "fake",
+    "category": "违规内容",
+    "level": "high",
+    "replacement": "***",
+    "description": "造假相关词汇"
+  },
+  {
+    "word": "违禁",
+    "category": "违规内容",
+    "level": "medium",
+    "replacement": "**",
+    "description": "违禁品相关"
+  },
+  {
+    "word": "抽烟",
+    "category": "不良行为",
+    "level": "medium",
+    "replacement": "吸烟",
+    "description": "不良行为描述"
+  },
+  {
+    "word": "喝酒",
+    "category": "不良行为",
+    "level": "low",
+    "replacement": "饮酒",
+    "description": "口语化表达"
+  }
+]
