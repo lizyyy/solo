@@ -1,0 +1,31 @@
+[
+  {
+    "license_id": "LIC-63732CE7",
+    "customer_id": "CUST002",
+    "customer_name": "客户B贸易公司",
+    "revoked_at": "2026-05-12T22:28:26.931212",
+    "reason": "客户B违约，终止合作",
+    "original_license": {
+      "license_id": "LIC-63732CE7",
+      "customer_id": "CUST002",
+      "customer_name": "客户B贸易公司",
+      "license_type": "standard",
+      "features": [
+        "基础功能",
+        "报表导出"
+      ],
+      "max_machines": 2,
+      "valid_from": "2026-05-12T22:28:26.057604",
+      "valid_until": "2026-08-10T22:28:26.057604",
+      "issued_at": "2026-05-12T22:28:26.057604",
+      "status": "revoked",
+      "activated_machine_fingerprint": "cad8d13aece51423398f3130ab84cddd50f5d3db6c0536d5236c47c33b74ca81",
+      "activated_at": "2026-05-12T22:28:26.453241",
+      "renewal_history": [],
+      "version": 1,
+      "activated_machine_id": "machine-B1",
+      "revoked_at": "2026-05-12T22:28:26.931212",
+      "revocation_reason": "客户B违约，终止合作"
+    }
+  }
+]

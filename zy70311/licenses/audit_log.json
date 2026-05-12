@@ -1,0 +1,89 @@
+[
+  {
+    "timestamp": "2026-05-12T22:28:25.885735",
+    "action": "issue",
+    "details": {
+      "license_id": "LIC-42AA2A60",
+      "customer_id": "CUST001",
+      "customer_name": "客户A科技有限公司"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:25.995342",
+    "action": "issue",
+    "details": {
+      "license_id": "LIC-49FC3A84",
+      "customer_id": "CUST001",
+      "customer_name": "客户A科技有限公司"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.105761",
+    "action": "issue",
+    "details": {
+      "license_id": "LIC-63732CE7",
+      "customer_id": "CUST002",
+      "customer_name": "客户B贸易公司"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.277550",
+    "action": "activate",
+    "details": {
+      "license_id": "LIC-42AA2A60",
+      "machine_id": "machine-A1",
+      "machine_fingerprint": "f92efa87e2503dc8e6e3c85129e8bc327853cf09a839c2bfe26533a8ae9f522f"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.387928",
+    "action": "activate",
+    "details": {
+      "license_id": "LIC-49FC3A84",
+      "machine_id": "machine-A2",
+      "machine_fingerprint": "4e43554426ba4a8779a7abf097847aebaaab0ab07a484e474f5bc874edcd553f"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.499346",
+    "action": "activate",
+    "details": {
+      "license_id": "LIC-63732CE7",
+      "machine_id": "machine-B1",
+      "machine_fingerprint": "cad8d13aece51423398f3130ab84cddd50f5d3db6c0536d5236c47c33b74ca81"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.802946",
+    "action": "renew",
+    "details": {
+      "license_id": "LIC-42AA2A60",
+      "additional_days": 365,
+      "new_valid_until": "2028-05-11T22:28:25.799833"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:26.931567",
+    "action": "revoke",
+    "details": {
+      "license_id": "LIC-63732CE7",
+      "reason": "客户B违约，终止合作"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:27.250661",
+    "action": "issue",
+    "details": {
+      "license_id": "LIC-2AD60CFE",
+      "customer_id": "CUST001",
+      "customer_name": "客户A科技有限公司"
+    }
+  },
+  {
+    "timestamp": "2026-05-12T22:28:27.658143",
+    "action": "export_audit_report",
+    "details": {
+      "report_file": "final_audit_report.json"
+    }
+  }
+]

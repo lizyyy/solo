@@ -1,0 +1,31 @@
+{
+  "data": {
+    "license_id": "LIC-42AA2A60",
+    "customer_id": "CUST001",
+    "customer_name": "客户A科技有限公司",
+    "license_type": "standard",
+    "features": [
+      "基础功能",
+      "高级分析",
+      "报表导出",
+      "API接口"
+    ],
+    "max_machines": 2,
+    "valid_from": "2026-05-12T22:28:25.799833",
+    "valid_until": "2028-05-11T22:28:25.799833",
+    "issued_at": "2026-05-12T22:28:25.799833",
+    "status": "valid",
+    "activated_machine_fingerprint": "f92efa87e2503dc8e6e3c85129e8bc327853cf09a839c2bfe26533a8ae9f522f",
+    "activated_at": "2026-05-12T22:28:26.231531",
+    "renewal_history": [
+      {
+        "renewed_at": "2026-05-12T22:28:26.757000",
+        "previous_valid_until": "2027-05-12T22:28:25.799833",
+        "additional_days": 365
+      }
+    ],
+    "version": 2,
+    "activated_machine_id": "machine-A1"
+  },
+  "signature": "A2ZawR5EptPZlQ6EDzf1f4qYC1xNvCvURXgMUwZ3iliM6X049Zep04uuEW0+xUYI1+9cqJ8npnbO4yPyxoyt9amoD5Hrp1Y9qdjg92PLSsOAb3oR8ppIRDE+2MaVy46GFogLlj+0QXtrJLiJrdg5EFS1LKa5ZLWZiAI4LV4cHF5Noa2lMRcVebSonavhk1GRWSLrZoBhZYlOd6tbhR+/W+6XbLQWYTjikOOZS76Dvlnr+tvN6CZteqG0vkd4JZDnG7Wvs6lXhr8mjYrplhqLsp8OuuK7LCkl1cITeiL6S4gT97w/6N3vCm7sTChpKEER4NiKKKiMEpe7Gd+KRv158w=="
+}
