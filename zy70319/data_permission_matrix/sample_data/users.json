@@ -1,0 +1,52 @@
+[
+  {
+    "user_id": "U001",
+    "username": "zhangsan",
+    "full_name": "张三",
+    "email": "zhangsan@example.com",
+    "department_id": "D002",
+    "role_ids": ["R001"],
+    "is_active": true,
+    "is_employee": true
+  },
+  {
+    "user_id": "U002",
+    "username": "lisi",
+    "full_name": "李四",
+    "email": "lisi@example.com",
+    "department_id": "D002",
+    "role_ids": ["R002"],
+    "is_active": true,
+    "is_employee": true
+  },
+  {
+    "user_id": "U003",
+    "username": "wangwu",
+    "full_name": "王五",
+    "email": "wangwu@example.com",
+    "department_id": "D003",
+    "role_ids": ["R003"],
+    "is_active": true,
+    "is_employee": true
+  },
+  {
+    "user_id": "U004",
+    "username": "zhaoliu",
+    "full_name": "赵六",
+    "email": "zhaoliu@example.com",
+    "department_id": "D004",
+    "role_ids": ["R004"],
+    "is_active": true,
+    "is_employee": false
+  },
+  {
+    "user_id": "U005",
+    "username": "qianqi",
+    "full_name": "钱七",
+    "email": "qianqi@example.com",
+    "department_id": "D002",
+    "role_ids": ["R001"],
+    "is_active": false,
+    "is_employee": true
+  }
+]

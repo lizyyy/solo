@@ -1,0 +1,100 @@
+[
+  {
+    "auth_id": "TA001",
+    "user_id": "U002",
+    "object_type": "customer",
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "email",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "all"
+      }
+    ],
+    "start_time": "2026-05-01T00:00:00",
+    "end_time": "2026-06-01T00:00:00",
+    "reason": "季度销售数据核对",
+    "granted_by": "销售总监"
+  },
+  {
+    "auth_id": "TA002",
+    "user_id": "U003",
+    "object_type": "customer",
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      }
+    ],
+    "data_scopes": [],
+    "start_time": "2026-04-01T00:00:00",
+    "end_time": "2026-05-01T00:00:00",
+    "reason": "历史数据迁移",
+    "granted_by": "财务总监"
+  },
+  {
+    "auth_id": "TA003",
+    "user_id": "U004",
+    "object_type": "order",
+    "field_permissions": [
+      {
+        "object_type": "order",
+        "field_name": "discount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "order",
+        "scope_type": "all"
+      }
+    ],
+    "start_time": "2026-05-01T00:00:00",
+    "end_time": "2026-05-15T00:00:00",
+    "reason": "年度审计",
+    "granted_by": "内审总监"
+  },
+  {
+    "auth_id": "TA004",
+    "user_id": "U004",
+    "object_type": "order",
+    "field_permissions": [
+      {
+        "object_type": "order",
+        "field_name": "discount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "order",
+        "scope_type": "all"
+      }
+    ],
+    "start_time": "2026-05-01T00:00:00",
+    "end_time": "2026-05-15T00:00:00",
+    "reason": "年度审计(重复导入)",
+    "granted_by": "内审总监"
+  }
+]

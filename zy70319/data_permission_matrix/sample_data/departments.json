@@ -1,0 +1,73 @@
+[
+  {
+    "dept_id": "D001",
+    "dept_name": "总公司",
+    "parent_dept_id": null,
+    "field_permissions": [],
+    "data_scopes": []
+  },
+  {
+    "dept_id": "D002",
+    "dept_name": "销售部",
+    "parent_dept_id": "D001",
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "department"
+      }
+    ]
+  },
+  {
+    "dept_id": "D002-1",
+    "dept_name": "华东销售组",
+    "parent_dept_id": "D002",
+    "field_permissions": [],
+    "data_scopes": []
+  },
+  {
+    "dept_id": "D002-2",
+    "dept_name": "华南销售组",
+    "parent_dept_id": "D002",
+    "field_permissions": [],
+    "data_scopes": []
+  },
+  {
+    "dept_id": "D003",
+    "dept_name": "财务部",
+    "parent_dept_id": "D001",
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "deny",
+        "can_read": false,
+        "can_write": false
+      }
+    ],
+    "data_scopes": []
+  },
+  {
+    "dept_id": "D004",
+    "dept_name": "外部审计部",
+    "parent_dept_id": "D001",
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "deny",
+        "can_read": false,
+        "can_write": false
+      }
+    ],
+    "data_scopes": []
+  }
+]

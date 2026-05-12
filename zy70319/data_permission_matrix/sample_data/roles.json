@@ -1,0 +1,274 @@
+[
+  {
+    "role_id": "R001",
+    "role_name": "销售代表",
+    "description": "销售部门普通销售角色",
+    "priority": 1,
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "customer_name",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "customer_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "email",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "order_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "order",
+        "field_name": "amount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "self"
+      },
+      {
+        "object_type": "order",
+        "scope_type": "self"
+      }
+    ]
+  },
+  {
+    "role_id": "R002",
+    "role_name": "销售经理",
+    "description": "销售部门经理角色",
+    "priority": 2,
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "customer_name",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "customer_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "email",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "customer",
+        "field_name": "credit_limit",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "order_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "amount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "discount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "department_and_sub"
+      },
+      {
+        "object_type": "order",
+        "scope_type": "department_and_sub"
+      }
+    ]
+  },
+  {
+    "role_id": "R003",
+    "role_name": "财务会计",
+    "description": "财务部门会计角色",
+    "priority": 3,
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "customer_name",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "customer_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "deny",
+        "can_read": false,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "credit_limit",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "order_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "order",
+        "field_name": "amount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "order",
+        "field_name": "payment_status",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "invoice",
+        "field_name": "invoice_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      },
+      {
+        "object_type": "invoice",
+        "field_name": "amount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": true
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "all"
+      },
+      {
+        "object_type": "order",
+        "scope_type": "all"
+      },
+      {
+        "object_type": "invoice",
+        "scope_type": "all"
+      }
+    ]
+  },
+  {
+    "role_id": "R004",
+    "role_name": "外包审计",
+    "description": "外包审计人员角色",
+    "priority": 4,
+    "field_permissions": [
+      {
+        "object_type": "customer",
+        "field_name": "customer_name",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "customer_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "customer",
+        "field_name": "phone",
+        "permission_type": "deny",
+        "can_read": false,
+        "can_write": false
+      },
+      {
+        "object_type": "order",
+        "field_name": "order_id",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      },
+      {
+        "object_type": "order",
+        "field_name": "amount",
+        "permission_type": "allow",
+        "can_read": true,
+        "can_write": false
+      }
+    ],
+    "data_scopes": [
+      {
+        "object_type": "customer",
+        "scope_type": "all"
+      },
+      {
+        "object_type": "order",
+        "scope_type": "all"
+      }
+    ]
+  }
+]
