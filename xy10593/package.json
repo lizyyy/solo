@@ -1,0 +1,19 @@
+{
+  "name": "sales-booking-api",
+  "version": "1.0.0",
+  "description": "售楼认购锁房API - 房源、定金、改名、退定、佣金状态一致管理",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "seed": "node src/seed.js",
+    "demo": "node scripts/demo.js",
+    "test": "node scripts/test-api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "uuid": "^9.0.1",
+    "dayjs": "^1.11.10"
+  }
+}
