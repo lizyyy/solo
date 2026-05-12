@@ -428,7 +428,81 @@ class MemberRecordApp {
           this.switchTab('review');
         });
       } else {
-        this.showModal('导入失败', `<p style="color:#dc3545">${result.message}</p>`);
+        let content = `<p style="color:#dc3545">${result.message}</p>`;
+        
+        if (result.errors && result.errors.length > 0) {
+          const fieldConflicts = result.errors.filter(e => e.type === 'field_conflict');
+          const amountErrors = result.errors.filter(e => e.type === 'invalid_amount');
+          const missingFields = result.errors.filter(e => e.type === 'missing_field');
+          const otherErrors = result.errors.filter(e => 
+            e.type !== 'field_conflict' && e.type !== 'invalid_amount' && e.type !== 'missing_field'
+          );
+          
+          if (fieldConflicts.length > 0) {
+            content += `<div class="error-list"><h4>🚨 字段冲突（${fieldConflicts.length} 个）：</h4>`;
+            fieldConflicts.forEach(err => {
+              if (err.row) {
+                content += `
+                  <div class="error-item">
+                    <div class="error-row">第 ${err.row} 行</div>
+                    <div class="error-message">${err.message}</div>
+                  </div>
+                `;
+              } else {
+                content += `
+                  <div class="error-item">
+                    <div class="error-message">${err.message}</div>
+                  </div>
+                `;
+              }
+            });
+            content += '</div>';
+          }
+          
+          if (amountErrors.length > 0) {
+            content += `<div class="error-list"><h4>💰 金额格式错误（${amountErrors.length} 条）：</h4>`;
+            amountErrors.slice(0, 10).forEach(err => {
+              content += `
+                <div class="error-item">
+                  <div class="error-row">第 ${err.row} 行</div>
+                  <div class="error-message">${err.message}${err.value ? ` (原始值: "${err.value}")` : ''}</div>
+                </div>
+              `;
+            });
+            if (amountErrors.length > 10) {
+              content += `<p style="color:#721c24;margin-top:0.5rem">...还有 ${amountErrors.length - 10} 条错误未显示</p>`;
+            }
+            content += '</div>';
+          }
+          
+          if (missingFields.length > 0) {
+            content += `<div class="error-list"><h4>📋 缺少必要字段（${missingFields.length} 条）：</h4>`;
+            missingFields.forEach(err => {
+              content += `
+                <div class="error-item">
+                  <div class="error-row">第 ${err.row} 行</div>
+                  <div class="error-message">${err.message}</div>
+                </div>
+              `;
+            });
+            content += '</div>';
+          }
+          
+          if (otherErrors.length > 0) {
+            content += `<div class="error-list"><h4>⚠️ 其他错误（${otherErrors.length} 条）：</h4>`;
+            otherErrors.forEach(err => {
+              content += `
+                <div class="error-item">
+                  <div class="error-row">${err.row ? `第 ${err.row} 行` : ''}</div>
+                  <div class="error-message">${err.message}</div>
+                </div>
+              `;
+            });
+            content += '</div>';
+          }
+        }
+        
+        this.showModal('导入失败', content);
       }
     } catch (error) {
       console.error('上传失败:', error);

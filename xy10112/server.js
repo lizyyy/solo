@@ -7,7 +7,7 @@ const dataStore = require('./utils/dataStore');
 const fileParser = require('./utils/fileParser');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3001;
 
 app.use(express.static('public'));
 app.use(express.json());
@@ -76,6 +76,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     
     let status = 400;
     let message = '导入失败';
+    let errors = null;
     
     if (error.type === 'file_missing') {
       message = error.message;
@@ -85,11 +86,19 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       message = error.message;
     } else if (error.type === 'unsupported_format') {
       message = error.message;
+    } else if (error.type === 'validation_error') {
+      message = error.message;
+      errors = error.errors;
     } else if (error.message) {
       message = error.message;
     }
     
-    res.status(status).json({ success: false, message, type: error.type });
+    const response = { success: false, message, type: error.type };
+    if (errors) {
+      response.errors = errors;
+    }
+    
+    res.status(status).json(response);
   }
 });
 

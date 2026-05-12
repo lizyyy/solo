@@ -24,42 +24,185 @@ const FIELD_ALIASES = {
   '注释': 'note'
 };
 
-function normalizeFields(row) {
+function getFieldName(header) {
+  const trimmed = header.trim();
+  if (FIELD_ALIASES[trimmed]) {
+    return FIELD_ALIASES[trimmed];
+  }
+  if (FIELD_ALIASES[trimmed.replace(/\s/g, '')]) {
+    return FIELD_ALIASES[trimmed.replace(/\s/g, '')];
+  }
+  const lower = trimmed.toLowerCase();
+  if (REQUIRED_FIELDS.includes(lower)) {
+    return lower;
+  }
+  return lower;
+}
+
+function detectHeaderConflicts(headers) {
+  const fieldMap = {};
+  const conflicts = [];
+  
+  headers.forEach((header, index) => {
+    const fieldName = getFieldName(header);
+    if (REQUIRED_FIELDS.includes(fieldName) || fieldName === 'note') {
+      if (!fieldMap[fieldName]) {
+        fieldMap[fieldName] = { originalHeaders: [header], indices: [index] };
+      } else {
+        fieldMap[fieldName].originalHeaders.push(header);
+        fieldMap[fieldName].indices.push(index);
+        conflicts.push({
+          fieldName,
+          originalHeaders: fieldMap[fieldName].originalHeaders
+        });
+      }
+    }
+  });
+  
+  return { fieldMap, conflicts };
+}
+
+function normalizeFields(row, fieldMap, rowIndex) {
   const normalized = {};
+  const conflicts = [];
+  
   for (const [key, value] of Object.entries(row)) {
-    const lowerKey = key.trim().toLowerCase();
-    const aliasKey = key.trim();
+    const fieldName = getFieldName(key);
+    const trimmedValue = value === undefined || value === null ? '' : String(value).trim();
     
-    if (FIELD_ALIASES[aliasKey]) {
-      normalized[FIELD_ALIASES[aliasKey]] = value;
-    } else if (REQUIRED_FIELDS.includes(lowerKey)) {
-      normalized[lowerKey] = value;
-    } else if (FIELD_ALIASES[aliasKey.replace(/\s/g, '')]) {
-      normalized[FIELD_ALIASES[aliasKey.replace(/\s/g, '')]] = value;
+    if (REQUIRED_FIELDS.includes(fieldName) || fieldName === 'note') {
+      if (normalized[fieldName] === undefined) {
+        normalized[fieldName] = trimmedValue;
+      } else {
+        const existingValue = normalized[fieldName];
+        if (existingValue !== '' && trimmedValue !== '' && existingValue !== trimmedValue) {
+          conflicts.push({
+            fieldName,
+            value1: existingValue,
+            value2: trimmedValue,
+            row: rowIndex + 2
+          });
+        }
+      }
     } else {
-      normalized[lowerKey] = value;
+      normalized[fieldName] = trimmedValue;
     }
   }
-  return normalized;
+  
+  return { normalized, conflicts };
+}
+
+function parseAmount(value) {
+  if (value === undefined || value === null) {
+    return { valid: false, error: '金额为空' };
+  }
+  
+  const str = String(value).trim();
+  
+  if (str === '') {
+    return { valid: false, error: '金额为空' };
+  }
+  
+  const cleanStr = str
+    .replace(/[¥￥,]/g, '')
+    .replace(/\s/g, '');
+  
+  if (cleanStr === '') {
+    return { valid: false, error: `无法解析的金额格式: "${str}"` };
+  }
+  
+  const amount = parseFloat(cleanStr);
+  
+  if (isNaN(amount) || !isFinite(amount)) {
+    return { valid: false, error: `无法解析的金额格式: "${str}"` };
+  }
+  
+  if (amount < 0) {
+    return { valid: false, error: `金额不能为负数: ${amount}` };
+  }
+  
+  return { valid: true, amount };
+}
+
+function validateRow(normalized, rowIndex) {
+  const errors = [];
+  
+  const missingFields = REQUIRED_FIELDS.filter(f => 
+    normalized[f] === undefined || normalized[f] === ''
+  );
+  
+  if (missingFields.length > 0) {
+    errors.push({
+      type: 'missing_field',
+      message: `缺少必要字段: ${missingFields.join(', ')}`,
+      row: rowIndex + 2
+    });
+  }
+  
+  if (normalized.amount !== undefined && normalized.amount !== '') {
+    const amountResult = parseAmount(normalized.amount);
+    if (!amountResult.valid) {
+      errors.push({
+        type: 'invalid_amount',
+        message: amountResult.error,
+        row: rowIndex + 2,
+        value: normalized.amount
+      });
+    } else {
+      normalized.amount = amountResult.amount;
+    }
+  }
+  
+  return errors;
+}
+
+function collectConflictDetails(headerConflicts) {
+  const details = [];
+  headerConflicts.conflicts.forEach(conflict => {
+    details.push(
+      `字段 "${conflict.fieldName}" 存在多个同义列名: ${conflict.originalHeaders.map(h => `"${h}"`).join(', ')}`
+    );
+  });
+  return details;
 }
 
 function parseCSV(filePath) {
   return new Promise((resolve, reject) => {
     const results = [];
     const errors = [];
+    let fieldMap = {};
+    let headerConflicts = null;
+    let headerProcessed = false;
     
     if (!fs.existsSync(filePath)) {
       return reject({ type: 'file_missing', message: '文件不存在' });
     }
     
+    let originalHeaders = [];
+    
     fs.createReadStream(filePath, { encoding: 'utf8' })
-      .pipe(csv())
+      .pipe(csv({
+        mapHeaders: ({ header, index }) => {
+          originalHeaders.push(header);
+          return header;
+        }
+      }))
       .on('headers', (headers) => {
-        const normalizedHeaders = headers.map(h => {
-          const trimmed = h.trim();
-          return FIELD_ALIASES[trimmed] || FIELD_ALIASES[trimmed.replace(/\s/g, '')] || trimmed.toLowerCase();
-        });
+        headerProcessed = true;
+        originalHeaders = headers;
+        headerConflicts = detectHeaderConflicts(headers);
+        fieldMap = headerConflicts.fieldMap;
         
+        if (headerConflicts.conflicts.length > 0) {
+          const conflictDetails = collectConflictDetails(headerConflicts);
+          errors.push({
+            type: 'field_conflict',
+            message: `检测到字段冲突！以下同义字段同时存在，可能导致数据不一致：\n${conflictDetails.join('\n')}`,
+            conflicts: headerConflicts.conflicts
+          });
+        }
+        
+        const normalizedHeaders = headers.map(h => getFieldName(h));
         const missingFields = REQUIRED_FIELDS.filter(f => !normalizedHeaders.includes(f));
         if (missingFields.length > 0) {
           errors.push({
@@ -69,12 +212,35 @@ function parseCSV(filePath) {
         }
       })
       .on('data', (data) => {
-        const normalized = normalizeFields(data);
+        const rowIndex = results.length;
+        const { normalized, conflicts } = normalizeFields(data, fieldMap, rowIndex);
+        
+        if (conflicts.length > 0) {
+          conflicts.forEach(conflict => {
+            errors.push({
+              type: 'field_conflict',
+              message: `第 ${conflict.row} 行字段 "${conflict.fieldName}" 值冲突: "${conflict.value1}" vs "${conflict.value2}"`,
+              row: conflict.row,
+              fieldName: conflict.fieldName,
+              value1: conflict.value1,
+              value2: conflict.value2
+            });
+          });
+        }
+        
+        const validationErrors = validateRow(normalized, rowIndex);
+        errors.push(...validationErrors);
+        
         results.push(normalized);
       })
       .on('end', () => {
         if (errors.length > 0) {
-          reject(errors[0]);
+          reject({
+            type: 'validation_error',
+            message: '文件解析过程中发现错误',
+            errors,
+            data: results
+          });
         } else {
           resolve(results);
         }
@@ -87,6 +253,8 @@ function parseCSV(filePath) {
 
 function parseExcel(filePath) {
   return new Promise((resolve, reject) => {
+    const errors = [];
+    
     if (!fs.existsSync(filePath)) {
       return reject({ type: 'file_missing', message: '文件不存在' });
     }
@@ -100,22 +268,62 @@ function parseExcel(filePath) {
       if (data.length > 0) {
         const firstRow = data[0];
         const headers = Object.keys(firstRow);
-        const normalizedHeaders = headers.map(h => {
-          const trimmed = h.trim();
-          return FIELD_ALIASES[trimmed] || FIELD_ALIASES[trimmed.replace(/\s/g, '')] || trimmed.toLowerCase();
-        });
+        const headerConflicts = detectHeaderConflicts(headers);
+        const fieldMap = headerConflicts.fieldMap;
         
+        if (headerConflicts.conflicts.length > 0) {
+          const conflictDetails = collectConflictDetails(headerConflicts);
+          errors.push({
+            type: 'field_conflict',
+            message: `检测到字段冲突！以下同义字段同时存在，可能导致数据不一致：\n${conflictDetails.join('\n')}`,
+            conflicts: headerConflicts.conflicts
+          });
+        }
+        
+        const normalizedHeaders = headers.map(h => getFieldName(h));
         const missingFields = REQUIRED_FIELDS.filter(f => !normalizedHeaders.includes(f));
         if (missingFields.length > 0) {
-          return reject({
+          errors.push({
             type: 'field_missing',
             message: `Excel文件缺少必要字段: ${missingFields.join(', ')}。请确保包含以下字段: phone/手机号、name/姓名、amount/金额、date/日期`
           });
         }
+        
+        const results = data.map((row, rowIndex) => {
+          const { normalized, conflicts } = normalizeFields(row, fieldMap, rowIndex);
+          
+          if (conflicts.length > 0) {
+            conflicts.forEach(conflict => {
+              errors.push({
+                type: 'field_conflict',
+                message: `第 ${conflict.row} 行字段 "${conflict.fieldName}" 值冲突: "${conflict.value1}" vs "${conflict.value2}"`,
+                row: conflict.row,
+                fieldName: conflict.fieldName,
+                value1: conflict.value1,
+                value2: conflict.value2
+              });
+            });
+          }
+          
+          const validationErrors = validateRow(normalized, rowIndex);
+          errors.push(...validationErrors);
+          
+          return normalized;
+        });
+        
+        if (errors.length > 0) {
+          reject({
+            type: 'validation_error',
+            message: '文件解析过程中发现错误',
+            errors,
+            data: results
+          });
+        } else {
+          resolve(results);
+        }
+      } else {
+        resolve([]);
       }
-      
-      const results = data.map(row => normalizeFields(row));
-      resolve(results);
     } catch (err) {
       reject({ type: 'parse_error', message: `Excel解析错误: ${err.message}` });
     }
@@ -195,5 +403,8 @@ module.exports = {
   parseFile,
   exportToExcel,
   exportToCSV,
+  parseAmount,
+  getFieldName,
+  detectHeaderConflicts,
   REQUIRED_FIELDS
 };
