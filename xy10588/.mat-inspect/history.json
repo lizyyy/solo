@@ -1,0 +1,902 @@
+[
+  {
+    "id": "HIST-1778587237455-8bx6",
+    "timestamp": "2026-05-12T12:00:37.455Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.455Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "质检-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237458-urkl",
+    "timestamp": "2026-05-12T12:00:37.458Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-002",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"1#楼箍筋用\"}}",
+    "operator": "质检-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237458-w6tj",
+    "timestamp": "2026-05-12T12:00:37.458Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "质检-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237458-iq6z",
+    "timestamp": "2026-05-12T12:00:37.458Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "质检-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237458-hh8t",
+    "timestamp": "2026-05-12T12:00:37.458Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "质检-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237573-vbvu",
+    "timestamp": "2026-05-12T12:00:37.573Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "f3d24f64-ae75-4a27-b02d-837ae420e727",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"f3d24f64-ae75-4a27-b02d-837ae420e727\",\"sampleNo\":\"SMP-STEEL-001\",\"batchNo\":\"STEEL-2024-001\",\"sampler\":\"赵六\",\"witness\":\"监理-王工\",\"samplingDate\":\"2024-05-11\",\"samplingLocation\":\"钢筋堆场A区\",\"samplingQuantity\":\"5根\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-11\",\"remark\":\"按GB/T 2975标准取样\",\"createdAt\":\"2026-05-12T12:00:37.572Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237573-x8j2",
+    "timestamp": "2026-05-12T12:00:37.573Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.455Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.573Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237576-prc4",
+    "timestamp": "2026-05-12T12:00:37.576Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "abfa0dd3-664f-43ca-9783-2e28821ce1f3",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"abfa0dd3-664f-43ca-9783-2e28821ce1f3\",\"sampleNo\":\"SMP-STEEL-002\",\"batchNo\":\"STEEL-2024-002\",\"sampler\":\"赵六\",\"witness\":\"监理-王工\",\"samplingDate\":\"2024-05-11\",\"samplingLocation\":\"钢筋堆场B区\",\"samplingQuantity\":\"5根\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-11\",\"remark\":\"按GB/T 2975标准取样\",\"createdAt\":\"2026-05-12T12:00:37.576Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237576-i894",
+    "timestamp": "2026-05-12T12:00:37.576Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-002",
+    "changes": "{\"before\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"1#楼箍筋用\"},\"after\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.576Z\",\"remark\":\"1#楼箍筋用\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237576-7dwr",
+    "timestamp": "2026-05-12T12:00:37.576Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "b7fb9241-3b0c-4194-9278-42c1b6989123",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b7fb9241-3b0c-4194-9278-42c1b6989123\",\"sampleNo\":\"SMP-CEMENT-001\",\"batchNo\":\"CEMENT-2024-001\",\"sampler\":\"孙七\",\"witness\":\"监理-李工\",\"samplingDate\":\"2024-05-09\",\"samplingLocation\":\"水泥仓1号\",\"samplingQuantity\":\"12kg\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-09\",\"remark\":\"按GB 12573标准取样，20个点混合样\",\"createdAt\":\"2026-05-12T12:00:37.576Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237576-w40l",
+    "timestamp": "2026-05-12T12:00:37.576Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.576Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237577-ohx2",
+    "timestamp": "2026-05-12T12:00:37.577Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "14a27047-5194-43fc-8840-8e40cf7ddce4",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"14a27047-5194-43fc-8840-8e40cf7ddce4\",\"sampleNo\":\"SMP-WP-001\",\"batchNo\":\"WATERPROOF-2024-001\",\"sampler\":\"周八\",\"witness\":\"监理-王工\",\"samplingDate\":\"2024-05-13\",\"samplingLocation\":\"防水材料库房\",\"samplingQuantity\":\"3卷\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-13\",\"remark\":\"随机抽取3卷\",\"createdAt\":\"2026-05-12T12:00:37.576Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237577-x4sx",
+    "timestamp": "2026-05-12T12:00:37.577Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.577Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237577-tk9f",
+    "timestamp": "2026-05-12T12:00:37.577Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "e7869fbb-1bb2-4439-aef8-2b548318d042",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"e7869fbb-1bb2-4439-aef8-2b548318d042\",\"sampleNo\":\"SMP-WP-002\",\"batchNo\":\"WATERPROOF-2024-002\",\"sampler\":\"周八\",\"witness\":\"监理-王工\",\"samplingDate\":\"2024-05-16\",\"samplingLocation\":\"防水材料库房\",\"samplingQuantity\":\"5kg\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-16\",\"remark\":\"随机抽取3桶混合样\",\"createdAt\":\"2026-05-12T12:00:37.577Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237577-7wbd",
+    "timestamp": "2026-05-12T12:00:37.577Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.458Z\",\"remark\":\"屋面防水\"},\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.577Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237612-3xkl",
+    "timestamp": "2026-05-12T12:00:37.612Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "2cc97a15-3881-4170-afc9-1bdb58e13ee1",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"2cc97a15-3881-4170-afc9-1bdb58e13ee1\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.612Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237613-v7vz",
+    "timestamp": "2026-05-12T12:00:37.613Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.573Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.613Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237615-chfm",
+    "timestamp": "2026-05-12T12:00:37.615Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "f0f39db3-a962-49da-b326-da52379ac1b3",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"f0f39db3-a962-49da-b326-da52379ac1b3\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.615Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237616-0fkl",
+    "timestamp": "2026-05-12T12:00:37.616Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.613Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.615Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237616-ipe9",
+    "timestamp": "2026-05-12T12:00:37.616Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "b813b9af-824f-4053-8cfa-d03558ad3cea",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b813b9af-824f-4053-8cfa-d03558ad3cea\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"断后伸长率\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥16%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237616-jkg1",
+    "timestamp": "2026-05-12T12:00:37.616Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.615Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.616Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237616-2lii",
+    "timestamp": "2026-05-12T12:00:37.616Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "85e4f754-aecb-471b-a91b-5beefbc6c530",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"85e4f754-aecb-471b-a91b-5beefbc6c530\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"冷弯性能\",\"testStandard\":\"GB/T 232-2010\",\"requiredValue\":\"180°无裂纹\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237617-23gj",
+    "timestamp": "2026-05-12T12:00:37.617Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.616Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.616Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237617-84x8",
+    "timestamp": "2026-05-12T12:00:37.617Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "f61850db-c8e4-4f72-bfa3-825001bd715e",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"f61850db-c8e4-4f72-bfa3-825001bd715e\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥300MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237617-yu7i",
+    "timestamp": "2026-05-12T12:00:37.617Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-002",
+    "changes": "{\"before\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.576Z\",\"remark\":\"1#楼箍筋用\"},\"after\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.617Z\",\"remark\":\"1#楼箍筋用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237618-fq9u",
+    "timestamp": "2026-05-12T12:00:37.618Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "e83dc693-1d8a-40c7-b2ff-454948b8cfa7",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"e83dc693-1d8a-40c7-b2ff-454948b8cfa7\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥420MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237619-wyhy",
+    "timestamp": "2026-05-12T12:00:37.619Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-002",
+    "changes": "{\"before\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.617Z\",\"remark\":\"1#楼箍筋用\"},\"after\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.618Z\",\"remark\":\"1#楼箍筋用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237619-b8lv",
+    "timestamp": "2026-05-12T12:00:37.619Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "6fff1f02-1e95-4146-bf7c-6cdb6364a815",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"6fff1f02-1e95-4146-bf7c-6cdb6364a815\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"安定性\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"合格\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237619-0ghq",
+    "timestamp": "2026-05-12T12:00:37.619Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.576Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.619Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237620-zn0r",
+    "timestamp": "2026-05-12T12:00:37.620Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "ff32227f-6049-45c5-aa60-965b453dc7dd",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"ff32227f-6049-45c5-aa60-965b453dc7dd\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"凝结时间\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"初凝≥45min，终凝≤600min\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237620-44h7",
+    "timestamp": "2026-05-12T12:00:37.620Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.619Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.620Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237620-fjil",
+    "timestamp": "2026-05-12T12:00:37.620Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "0adfb814-ca75-4ffd-9ae1-42c66297cb82",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"0adfb814-ca75-4ffd-9ae1-42c66297cb82\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"3天抗压强度\",\"testStandard\":\"GB/T 17671-1999\",\"requiredValue\":\"≥22.0MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.620Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237621-3suy",
+    "timestamp": "2026-05-12T12:00:37.621Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.620Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.620Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237621-4xzy",
+    "timestamp": "2026-05-12T12:00:37.621Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "b3e7cdc5-12bc-4800-b9de-f261fd17975f",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b3e7cdc5-12bc-4800-b9de-f261fd17975f\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"28天抗压强度\",\"testStandard\":\"GB/T 17671-1999\",\"requiredValue\":\"≥42.5MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-06-06\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.621Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237621-kafd",
+    "timestamp": "2026-05-12T12:00:37.621Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.620Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.621Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237622-d8pw",
+    "timestamp": "2026-05-12T12:00:37.622Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "22fbff3f-096c-4ef8-9b40-764de6aeb207",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"22fbff3f-096c-4ef8-9b40-764de6aeb207\",\"batchNo\":\"WATERPROOF-2024-001\",\"testItem\":\"可溶物含量\",\"testStandard\":\"GB 18242-2008\",\"requiredValue\":\"≥2900g/m²\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-16\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.622Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237622-orq6",
+    "timestamp": "2026-05-12T12:00:37.622Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.577Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.622Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237622-2y7m",
+    "timestamp": "2026-05-12T12:00:37.622Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "6aafbccf-1ee8-4872-85a0-809e61954256",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"6aafbccf-1ee8-4872-85a0-809e61954256\",\"batchNo\":\"WATERPROOF-2024-001\",\"testItem\":\"拉力\",\"testStandard\":\"GB/T 328.8-2007\",\"requiredValue\":\"≥800N/50mm\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-16\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.622Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237623-bkh7",
+    "timestamp": "2026-05-12T12:00:37.623Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.622Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.623Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237623-scph",
+    "timestamp": "2026-05-12T12:00:37.623Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "b97fb2d8-4e3a-4d85-82f4-3c6c16974c2a",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b97fb2d8-4e3a-4d85-82f4-3c6c16974c2a\",\"batchNo\":\"WATERPROOF-2024-001\",\"testItem\":\"断裂延伸率\",\"testStandard\":\"GB/T 328.8-2007\",\"requiredValue\":\"≥40%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-16\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.623Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237623-1v23",
+    "timestamp": "2026-05-12T12:00:37.623Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.623Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.623Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237624-ds2t",
+    "timestamp": "2026-05-12T12:00:37.624Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "2ee6d998-9089-454b-9b16-e002a9043037",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"2ee6d998-9089-454b-9b16-e002a9043037\",\"batchNo\":\"WATERPROOF-2024-001\",\"testItem\":\"低温柔性\",\"testStandard\":\"GB/T 328.14-2007\",\"requiredValue\":\"-25°C无裂纹\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-16\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.623Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237624-322i",
+    "timestamp": "2026-05-12T12:00:37.624Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.623Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.624Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237624-31ky",
+    "timestamp": "2026-05-12T12:00:37.624Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "394da64e-c730-40d9-8ebc-90f57e37563c",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"394da64e-c730-40d9-8ebc-90f57e37563c\",\"batchNo\":\"WATERPROOF-2024-001\",\"testItem\":\"不透水性\",\"testStandard\":\"GB/T 328.10-2007\",\"requiredValue\":\"0.3MPa 30min不透水\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-16\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.624Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237625-er52",
+    "timestamp": "2026-05-12T12:00:37.625Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-001",
+    "changes": "{\"before\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.624Z\",\"remark\":\"地下室底板防水\"},\"after\":{\"id\":\"361f32c2-b710-43d9-864d-86bee4bbdd5b\",\"batchNo\":\"WATERPROOF-2024-001\",\"materialType\":\"防水材料\",\"materialName\":\"弹性体改性沥青防水卷材\",\"specification\":\"SBS II型 PY PE PE 4mm\",\"quantity\":5000,\"unit\":\"m²\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240506-03\",\"productionDate\":\"2024-05-06\",\"arrivalDate\":\"2024-05-12\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.624Z\",\"remark\":\"地下室底板防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237625-raw3",
+    "timestamp": "2026-05-12T12:00:37.625Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "384c5f49-dbf9-421c-9054-2f4f949a4562",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"384c5f49-dbf9-421c-9054-2f4f949a4562\",\"batchNo\":\"WATERPROOF-2024-002\",\"testItem\":\"拉伸强度\",\"testStandard\":\"GB/T 19250-2013\",\"requiredValue\":\"≥2.0MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-19\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.625Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237625-adlq",
+    "timestamp": "2026-05-12T12:00:37.625Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.577Z\",\"remark\":\"屋面防水\"},\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.625Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237626-c5x3",
+    "timestamp": "2026-05-12T12:00:37.626Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "37ef2e25-138b-4a4f-8b9e-6f0e1fd6d6ac",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"37ef2e25-138b-4a4f-8b9e-6f0e1fd6d6ac\",\"batchNo\":\"WATERPROOF-2024-002\",\"testItem\":\"断裂延伸率\",\"testStandard\":\"GB/T 19250-2013\",\"requiredValue\":\"≥550%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-19\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.626Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237626-b415",
+    "timestamp": "2026-05-12T12:00:37.626Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.625Z\",\"remark\":\"屋面防水\"},\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.626Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237626-w9ti",
+    "timestamp": "2026-05-12T12:00:37.626Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "b7037f93-02eb-45dd-b2bd-d54c769a32cd",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b7037f93-02eb-45dd-b2bd-d54c769a32cd\",\"batchNo\":\"WATERPROOF-2024-002\",\"testItem\":\"低温弯折性\",\"testStandard\":\"GB/T 19250-2013\",\"requiredValue\":\"-35°C无裂纹\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-19\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.626Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237627-uaqq",
+    "timestamp": "2026-05-12T12:00:37.627Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.626Z\",\"remark\":\"屋面防水\"},\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.627Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237627-suzr",
+    "timestamp": "2026-05-12T12:00:37.627Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "2d4e703b-3180-403c-97d8-0c96ae2eb617",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"2d4e703b-3180-403c-97d8-0c96ae2eb617\",\"batchNo\":\"WATERPROOF-2024-002\",\"testItem\":\"固体含量\",\"testStandard\":\"GB/T 19250-2013\",\"requiredValue\":\"≥85%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-19\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.627Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237628-jyoj",
+    "timestamp": "2026-05-12T12:00:37.628Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "WATERPROOF-2024-002",
+    "changes": "{\"before\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.627Z\",\"remark\":\"屋面防水\"},\"after\":{\"id\":\"806c8eea-e28b-43e4-a90e-dbf23fb6a4d4\",\"batchNo\":\"WATERPROOF-2024-002\",\"materialType\":\"防水材料\",\"materialName\":\"聚氨酯防水涂料\",\"specification\":\"单组分 I型\",\"quantity\":5000,\"unit\":\"kg\",\"supplier\":\"东方雨虹防水技术股份有限公司\",\"productionBatch\":\"DFYH20240508-07\",\"productionDate\":\"2024-05-08\",\"arrivalDate\":\"2024-05-15\",\"location\":\"防水材料库房\",\"inspector\":\"王五\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.627Z\",\"remark\":\"屋面防水\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237719-pvou",
+    "timestamp": "2026-05-12T12:00:37.719Z",
+    "action": "CREATE",
+    "entityType": "REPORT",
+    "entityId": "RPT-STEEL-2024-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"388f0cc4-0a08-4164-b984-3640f45c7f96\",\"reportNo\":\"RPT-STEEL-2024-001\",\"batchNo\":\"STEEL-2024-001\",\"reportDate\":\"2024-05-13\",\"receivedAt\":\"2026-05-12T12:00:37.718Z\",\"lab\":\"市建设工程质量检测中心\",\"inspector\":\"刘检测师\",\"conclusion\":\"所检项目符合GB 1499.2-2018标准要求\",\"isQualified\":true,\"filePath\":\"/reports/RPT-STEEL-2024-001.pdf\",\"remark\":\"第1组试样\",\"isReinspection\":false,\"createdAt\":\"2026-05-12T12:00:37.719Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237720-3q0m",
+    "timestamp": "2026-05-12T12:00:37.720Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "2cc97a15-3881-4170-afc9-1bdb58e13ee1",
+    "changes": "{\"before\":{\"id\":\"2cc97a15-3881-4170-afc9-1bdb58e13ee1\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.612Z\"},\"after\":{\"id\":\"2cc97a15-3881-4170-afc9-1bdb58e13ee1\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"435MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.612Z\",\"reportNo\":\"RPT-STEEL-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237720-aq3y",
+    "timestamp": "2026-05-12T12:00:37.720Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "f0f39db3-a962-49da-b326-da52379ac1b3",
+    "changes": "{\"before\":{\"id\":\"f0f39db3-a962-49da-b326-da52379ac1b3\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.615Z\"},\"after\":{\"id\":\"f0f39db3-a962-49da-b326-da52379ac1b3\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"580MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.615Z\",\"reportNo\":\"RPT-STEEL-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237720-lw5s",
+    "timestamp": "2026-05-12T12:00:37.720Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "b813b9af-824f-4053-8cfa-d03558ad3cea",
+    "changes": "{\"before\":{\"id\":\"b813b9af-824f-4053-8cfa-d03558ad3cea\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"断后伸长率\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥16%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\"},\"after\":{\"id\":\"b813b9af-824f-4053-8cfa-d03558ad3cea\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"断后伸长率\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥16%\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"18.5%\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\",\"reportNo\":\"RPT-STEEL-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237721-i8ap",
+    "timestamp": "2026-05-12T12:00:37.721Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "85e4f754-aecb-471b-a91b-5beefbc6c530",
+    "changes": "{\"before\":{\"id\":\"85e4f754-aecb-471b-a91b-5beefbc6c530\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"冷弯性能\",\"testStandard\":\"GB/T 232-2010\",\"requiredValue\":\"180°无裂纹\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\"},\"after\":{\"id\":\"85e4f754-aecb-471b-a91b-5beefbc6c530\",\"batchNo\":\"STEEL-2024-001\",\"testItem\":\"冷弯性能\",\"testStandard\":\"GB/T 232-2010\",\"requiredValue\":\"180°无裂纹\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"180°无裂纹\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.616Z\",\"reportNo\":\"RPT-STEEL-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237721-ne2g",
+    "timestamp": "2026-05-12T12:00:37.721Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-001",
+    "changes": "{\"before\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.616Z\",\"remark\":\"1#楼主体结构用\"},\"after\":{\"id\":\"5048d977-83bc-4c7f-b247-51e62ab9b4a6\",\"batchNo\":\"STEEL-2024-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ25mm\",\"quantity\":60,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240501-08\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场A区\",\"inspector\":\"张三\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:37.455Z\",\"updatedAt\":\"2026-05-12T12:00:37.721Z\",\"remark\":\"1#楼主体结构用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237724-t6iw",
+    "timestamp": "2026-05-12T12:00:37.724Z",
+    "action": "CREATE",
+    "entityType": "REPORT",
+    "entityId": "RPT-STEEL-2024-002",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"b48555cf-c5f8-4697-9805-20ae04c6e8d6\",\"reportNo\":\"RPT-STEEL-2024-002\",\"batchNo\":\"STEEL-2024-002\",\"reportDate\":\"2024-05-13\",\"receivedAt\":\"2026-05-12T12:00:37.724Z\",\"lab\":\"市建设工程质量检测中心\",\"inspector\":\"刘检测师\",\"conclusion\":\"所检项目符合GB 1499.1-2017标准要求\",\"isQualified\":true,\"filePath\":\"/reports/RPT-STEEL-2024-002.pdf\",\"remark\":\"第1组试样\",\"isReinspection\":false,\"createdAt\":\"2026-05-12T12:00:37.724Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237725-kctv",
+    "timestamp": "2026-05-12T12:00:37.725Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "f61850db-c8e4-4f72-bfa3-825001bd715e",
+    "changes": "{\"before\":{\"id\":\"f61850db-c8e4-4f72-bfa3-825001bd715e\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥300MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\"},\"after\":{\"id\":\"f61850db-c8e4-4f72-bfa3-825001bd715e\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥300MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"320MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\",\"reportNo\":\"RPT-STEEL-2024-002\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237725-kmzx",
+    "timestamp": "2026-05-12T12:00:37.725Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "e83dc693-1d8a-40c7-b2ff-454948b8cfa7",
+    "changes": "{\"before\":{\"id\":\"e83dc693-1d8a-40c7-b2ff-454948b8cfa7\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥420MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\"},\"after\":{\"id\":\"e83dc693-1d8a-40c7-b2ff-454948b8cfa7\",\"batchNo\":\"STEEL-2024-002\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥420MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"445MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.617Z\",\"reportNo\":\"RPT-STEEL-2024-002\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237725-ppbc",
+    "timestamp": "2026-05-12T12:00:37.725Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-2024-002",
+    "changes": "{\"before\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.618Z\",\"remark\":\"1#楼箍筋用\"},\"after\":{\"id\":\"ff6efc65-820f-4a81-9b03-712c15efea0c\",\"batchNo\":\"STEEL-2024-002\",\"materialType\":\"钢筋\",\"materialName\":\"热轧光圆钢筋\",\"specification\":\"HPB300 Φ8mm\",\"quantity\":30,\"unit\":\"t\",\"supplier\":\"鞍钢股份有限公司\",\"productionBatch\":\"20240502-15\",\"productionDate\":\"2024-05-02\",\"arrivalDate\":\"2024-05-10\",\"location\":\"钢筋堆场B区\",\"inspector\":\"张三\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.725Z\",\"remark\":\"1#楼箍筋用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237726-3ern",
+    "timestamp": "2026-05-12T12:00:37.726Z",
+    "action": "CREATE",
+    "entityType": "REPORT",
+    "entityId": "RPT-CEMENT-2024-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"a85d0ad2-cfa2-433f-bb15-b7f2a9168ca7\",\"reportNo\":\"RPT-CEMENT-2024-001\",\"batchNo\":\"CEMENT-2024-001\",\"reportDate\":\"2024-05-11\",\"receivedAt\":\"2026-05-12T12:00:37.726Z\",\"lab\":\"市建设工程质量检测中心\",\"inspector\":\"陈检测师\",\"conclusion\":\"3天强度及安定性、凝结时间符合GB 175-2007标准要求\",\"isQualified\":true,\"filePath\":\"/reports/RPT-CEMENT-2024-001.pdf\",\"remark\":\"3天报告，28天报告待补\",\"isReinspection\":false,\"createdAt\":\"2026-05-12T12:00:37.726Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237726-c27p",
+    "timestamp": "2026-05-12T12:00:37.726Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "6fff1f02-1e95-4146-bf7c-6cdb6364a815",
+    "changes": "{\"before\":{\"id\":\"6fff1f02-1e95-4146-bf7c-6cdb6364a815\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"安定性\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"合格\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\"},\"after\":{\"id\":\"6fff1f02-1e95-4146-bf7c-6cdb6364a815\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"安定性\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"合格\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":\"合格\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\",\"reportNo\":\"RPT-CEMENT-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237727-5eqb",
+    "timestamp": "2026-05-12T12:00:37.727Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "ff32227f-6049-45c5-aa60-965b453dc7dd",
+    "changes": "{\"before\":{\"id\":\"ff32227f-6049-45c5-aa60-965b453dc7dd\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"凝结时间\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"初凝≥45min，终凝≤600min\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\"},\"after\":{\"id\":\"ff32227f-6049-45c5-aa60-965b453dc7dd\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"凝结时间\",\"testStandard\":\"GB/T 1346-2011\",\"requiredValue\":\"初凝≥45min，终凝≤600min\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":\"初凝135min，终凝320min\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.619Z\",\"reportNo\":\"RPT-CEMENT-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237727-o1bc",
+    "timestamp": "2026-05-12T12:00:37.727Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "0adfb814-ca75-4ffd-9ae1-42c66297cb82",
+    "changes": "{\"before\":{\"id\":\"0adfb814-ca75-4ffd-9ae1-42c66297cb82\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"3天抗压强度\",\"testStandard\":\"GB/T 17671-1999\",\"requiredValue\":\"≥22.0MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.620Z\"},\"after\":{\"id\":\"0adfb814-ca75-4ffd-9ae1-42c66297cb82\",\"batchNo\":\"CEMENT-2024-001\",\"testItem\":\"3天抗压强度\",\"testStandard\":\"GB/T 17671-1999\",\"requiredValue\":\"≥22.0MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-12\",\"result\":\"25.8MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:37.620Z\",\"reportNo\":\"RPT-CEMENT-2024-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237727-nn7r",
+    "timestamp": "2026-05-12T12:00:37.727Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "CEMENT-2024-001",
+    "changes": "{\"before\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.621Z\",\"remark\":\"基础垫层用\"},\"after\":{\"id\":\"3ae9406d-f9ad-42fd-9715-225b35248d10\",\"batchNo\":\"CEMENT-2024-001\",\"materialType\":\"水泥\",\"materialName\":\"普通硅酸盐水泥\",\"specification\":\"P.O 42.5R\",\"quantity\":200,\"unit\":\"t\",\"supplier\":\"海螺水泥股份有限公司\",\"productionBatch\":\"2024-0505-012\",\"productionDate\":\"2024-05-05\",\"arrivalDate\":\"2024-05-08\",\"location\":\"水泥仓1号\",\"inspector\":\"李四\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:37.458Z\",\"updatedAt\":\"2026-05-12T12:00:37.727Z\",\"remark\":\"基础垫层用\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237892-0ugm",
+    "timestamp": "2026-05-12T12:00:37.892Z",
+    "action": "CREATE",
+    "entityType": "USAGE",
+    "entityId": "353036f9-e8ef-4d6a-a20d-0c541ab22a12",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"353036f9-e8ef-4d6a-a20d-0c541ab22a12\",\"batchNo\":\"STEEL-2024-001\",\"usageDate\":\"2024-05-15\",\"usedQuantity\":20,\"usedLocation\":\"1#楼基础底板钢筋\",\"user\":\"钢筋班组-王班长\",\"remark\":\"基础底板底层钢筋\",\"isViolation\":false,\"createdAt\":\"2026-05-12T12:00:37.891Z\"}}",
+    "operator": "钢筋班组-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587237895-y72u",
+    "timestamp": "2026-05-12T12:00:37.895Z",
+    "action": "CREATE",
+    "entityType": "USAGE",
+    "entityId": "adc82ae8-bc5f-4197-ac71-e9c1c6190749",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"adc82ae8-bc5f-4197-ac71-e9c1c6190749\",\"batchNo\":\"STEEL-2024-002\",\"usageDate\":\"2024-05-16\",\"usedQuantity\":5,\"usedLocation\":\"1#楼基础底板箍筋\",\"user\":\"钢筋班组-王班长\",\"remark\":\"底板箍筋制作\",\"isViolation\":false,\"createdAt\":\"2026-05-12T12:00:37.895Z\"}}",
+    "operator": "钢筋班组-王",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244173-mcbe",
+    "timestamp": "2026-05-12T12:00:44.173Z",
+    "action": "CREATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.172Z\",\"remark\":\"用于演示不合格流程\"}}",
+    "operator": "质检-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244231-hn6e",
+    "timestamp": "2026-05-12T12:00:44.231Z",
+    "action": "CREATE",
+    "entityType": "SAMPLE",
+    "entityId": "97c18ad4-9508-476a-8522-1de376563222",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"97c18ad4-9508-476a-8522-1de376563222\",\"sampleNo\":\"SMP-BAD-001\",\"batchNo\":\"STEEL-BAD-001\",\"sampler\":\"赵六\",\"witness\":\"监理-王工\",\"samplingDate\":\"2024-05-11\",\"samplingLocation\":\"问题材料区\",\"samplingQuantity\":\"5根\",\"deliveryToLab\":true,\"deliveryDate\":\"2024-05-11\",\"remark\":\"送检检测\",\"createdAt\":\"2026-05-12T12:00:44.230Z\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244232-xy5n",
+    "timestamp": "2026-05-12T12:00:44.232Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已进场\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.172Z\",\"remark\":\"用于演示不合格流程\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.232Z\",\"remark\":\"用于演示不合格流程\"}}",
+    "operator": "取样员-赵",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244295-b15k",
+    "timestamp": "2026-05-12T12:00:44.295Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "060ce581-1156-4583-b44f-d3ee07811ab3",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"060ce581-1156-4583-b44f-d3ee07811ab3\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.294Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244296-owm2",
+    "timestamp": "2026-05-12T12:00:44.296Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已取样\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.232Z\",\"remark\":\"用于演示不合格流程\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.295Z\",\"remark\":\"用于演示不合格流程\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244300-ag3q",
+    "timestamp": "2026-05-12T12:00:44.300Z",
+    "action": "CREATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "c6d16f1b-6312-479c-8fd3-4d4cfffa5674",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"c6d16f1b-6312-479c-8fd3-4d4cfffa5674\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.300Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244301-fiih",
+    "timestamp": "2026-05-12T12:00:44.301Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.295Z\",\"remark\":\"用于演示不合格流程\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.301Z\",\"remark\":\"用于演示不合格流程\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244436-vkvm",
+    "timestamp": "2026-05-12T12:00:44.436Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"待报告\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.301Z\",\"remark\":\"用于演示不合格流程\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"违规使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.435Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\"}}",
+    "operator": "施工员-张",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244438-thgp",
+    "timestamp": "2026-05-12T12:00:44.438Z",
+    "action": "CREATE",
+    "entityType": "USAGE",
+    "entityId": "7c3b81e8-bd75-4fd9-9f6e-79ba5f563f0f",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"7c3b81e8-bd75-4fd9-9f6e-79ba5f563f0f\",\"batchNo\":\"STEEL-BAD-001\",\"usageDate\":\"2024-05-12\",\"usedQuantity\":10,\"usedLocation\":\"演示违规使用\",\"user\":\"施工员-张\",\"remark\":\"\",\"isViolation\":true,\"createdAt\":\"2026-05-12T12:00:44.434Z\"}}",
+    "operator": "施工员-张",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244589-cqc7",
+    "timestamp": "2026-05-12T12:00:44.589Z",
+    "action": "CREATE",
+    "entityType": "REPORT",
+    "entityId": "RPT-BAD-001",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"af115d8c-abc5-4089-944b-18488d4d4012\",\"reportNo\":\"RPT-BAD-001\",\"batchNo\":\"STEEL-BAD-001\",\"reportDate\":\"2024-05-13\",\"receivedAt\":\"2026-05-12T12:00:44.588Z\",\"lab\":\"市建设工程质量检测中心\",\"inspector\":\"刘检测师\",\"conclusion\":\"屈服强度和抗拉强度均不符合标准要求\",\"isQualified\":false,\"filePath\":\"/reports/RPT-BAD-001.pdf\",\"remark\":\"不合格，需复检\",\"isReinspection\":false,\"createdAt\":\"2026-05-12T12:00:44.589Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244590-o1jw",
+    "timestamp": "2026-05-12T12:00:44.590Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "060ce581-1156-4583-b44f-d3ee07811ab3",
+    "changes": "{\"before\":{\"id\":\"060ce581-1156-4583-b44f-d3ee07811ab3\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.294Z\"},\"after\":{\"id\":\"060ce581-1156-4583-b44f-d3ee07811ab3\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"380MPa\",\"isQualified\":false,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.294Z\",\"reportNo\":\"RPT-BAD-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244591-u5e5",
+    "timestamp": "2026-05-12T12:00:44.591Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "c6d16f1b-6312-479c-8fd3-4d4cfffa5674",
+    "changes": "{\"before\":{\"id\":\"c6d16f1b-6312-479c-8fd3-4d4cfffa5674\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":null,\"isQualified\":null,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.300Z\"},\"after\":{\"id\":\"c6d16f1b-6312-479c-8fd3-4d4cfffa5674\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"520MPa\",\"isQualified\":false,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.300Z\",\"reportNo\":\"RPT-BAD-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244592-94xw",
+    "timestamp": "2026-05-12T12:00:44.592Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"违规使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.435Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已冻结\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.591Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":\"不合格报告：RPT-BAD-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244794-upxc",
+    "timestamp": "2026-05-12T12:00:44.794Z",
+    "action": "CREATE",
+    "entityType": "REPORT",
+    "entityId": "RPT-BAD-001-R1",
+    "changes": "{\"before\":null,\"after\":{\"id\":\"731e87c5-18bc-4f60-a2c2-20d6824408b7\",\"reportNo\":\"RPT-BAD-001-R1\",\"batchNo\":\"STEEL-BAD-001\",\"reportDate\":\"2024-05-18\",\"receivedAt\":\"2026-05-12T12:00:44.793Z\",\"lab\":\"市建设工程质量检测中心\",\"inspector\":\"刘检测师\",\"conclusion\":\"复检合格，符合GB 1499.2-2018标准要求\",\"isQualified\":true,\"filePath\":\"/reports/RPT-BAD-001-R1.pdf\",\"remark\":\"复检报告，双倍取样\",\"isReinspection\":true,\"relatedReportNo\":\"RPT-BAD-001\",\"createdAt\":\"2026-05-12T12:00:44.794Z\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244795-jsz5",
+    "timestamp": "2026-05-12T12:00:44.795Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "060ce581-1156-4583-b44f-d3ee07811ab3",
+    "changes": "{\"before\":{\"id\":\"060ce581-1156-4583-b44f-d3ee07811ab3\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"380MPa\",\"isQualified\":false,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.294Z\",\"reportNo\":\"RPT-BAD-001\"},\"after\":{\"id\":\"060ce581-1156-4583-b44f-d3ee07811ab3\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"屈服强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥400MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"425MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.294Z\",\"reportNo\":\"RPT-BAD-001-R1\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244796-6e91",
+    "timestamp": "2026-05-12T12:00:44.796Z",
+    "action": "UPDATE",
+    "entityType": "TEST_ITEM",
+    "entityId": "c6d16f1b-6312-479c-8fd3-4d4cfffa5674",
+    "changes": "{\"before\":{\"id\":\"c6d16f1b-6312-479c-8fd3-4d4cfffa5674\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"520MPa\",\"isQualified\":false,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.300Z\",\"reportNo\":\"RPT-BAD-001\"},\"after\":{\"id\":\"c6d16f1b-6312-479c-8fd3-4d4cfffa5674\",\"batchNo\":\"STEEL-BAD-001\",\"testItem\":\"抗拉强度\",\"testStandard\":\"GB/T 228.1-2010\",\"requiredValue\":\"≥540MPa\",\"lab\":\"市建设工程质量检测中心\",\"expectedDate\":\"2024-05-14\",\"result\":\"560MPa\",\"isQualified\":true,\"remark\":\"\",\"createdAt\":\"2026-05-12T12:00:44.300Z\",\"reportNo\":\"RPT-BAD-001-R1\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244797-i7dy",
+    "timestamp": "2026-05-12T12:00:44.797Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"已冻结\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.591Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":\"不合格报告：RPT-BAD-001\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.796Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":\"不合格报告：RPT-BAD-001\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244797-ekux",
+    "timestamp": "2026-05-12T12:00:44.797Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.796Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":\"不合格报告：RPT-BAD-001\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.797Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":null,\"unfreezeReason\":\"复检合格：RPT-BAD-001-R1\"}}",
+    "operator": "资料员-李",
+    "reason": ""
+  },
+  {
+    "id": "HIST-1778587244939-bfhl",
+    "timestamp": "2026-05-12T12:00:44.939Z",
+    "action": "CORRECT",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.797Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":null,\"unfreezeReason\":\"复检合格：RPT-BAD-001-R1\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.797Z\",\"remark\":\"复检合格，恢复使用\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":null,\"unfreezeReason\":\"复检合格：RPT-BAD-001-R1\"}}",
+    "operator": "质检主管-王",
+    "reason": "复检通过，更新批次备注"
+  },
+  {
+    "id": "HIST-1778587244942-00gr",
+    "timestamp": "2026-05-12T12:00:44.942Z",
+    "action": "UPDATE",
+    "entityType": "BATCH",
+    "entityId": "STEEL-BAD-001",
+    "changes": "{\"before\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.797Z\",\"remark\":\"用于演示不合格流程\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":null,\"unfreezeReason\":\"复检合格：RPT-BAD-001-R1\"},\"after\":{\"id\":\"3902bfe7-60b6-48ff-ae2a-4ca7397ded3c\",\"batchNo\":\"STEEL-BAD-001\",\"materialType\":\"钢筋\",\"materialName\":\"热轧带肋钢筋\",\"specification\":\"HRB400E Φ20mm\",\"quantity\":40,\"unit\":\"t\",\"supplier\":\"某钢厂\",\"productionBatch\":\"BAD-2024-001\",\"productionDate\":\"2024-05-01\",\"arrivalDate\":\"2024-05-10\",\"location\":\"问题材料区\",\"inspector\":\"质检-李\",\"status\":\"可使用\",\"createdAt\":\"2026-05-12T12:00:44.171Z\",\"updatedAt\":\"2026-05-12T12:00:44.941Z\",\"remark\":\"复检合格，恢复使用\",\"violationReason\":\"违规使用：10 t 于 2024-05-12\",\"freezeReason\":null,\"unfreezeReason\":\"复检合格：RPT-BAD-001-R1\"}}",
+    "operator": "质检主管-王",
+    "reason": ""
+  }
+]

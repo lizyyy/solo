@@ -1,0 +1,19 @@
+[
+  {
+    "reportNo": "RPT-BAD-001-R1",
+    "batchNo": "STEEL-BAD-001",
+    "reportDate": "2024-05-18",
+    "lab": "市建设工程质量检测中心",
+    "inspector": "刘检测师",
+    "conclusion": "复检合格，符合GB 1499.2-2018标准要求",
+    "isQualified": true,
+    "filePath": "/reports/RPT-BAD-001-R1.pdf",
+    "remark": "复检报告，双倍取样",
+    "isReinspection": true,
+    "relatedReportNo": "RPT-BAD-001",
+    "testResults": [
+      { "testItem": "屈服强度", "actualValue": "425MPa", "isQualified": true },
+      { "testItem": "抗拉强度", "actualValue": "560MPa", "isQualified": true }
+    ]
+  }
+]

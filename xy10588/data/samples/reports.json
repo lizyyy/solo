@@ -1,0 +1,50 @@
+[
+  {
+    "reportNo": "RPT-STEEL-2024-001",
+    "batchNo": "STEEL-2024-001",
+    "reportDate": "2024-05-13",
+    "lab": "市建设工程质量检测中心",
+    "inspector": "刘检测师",
+    "conclusion": "所检项目符合GB 1499.2-2018标准要求",
+    "isQualified": true,
+    "filePath": "/reports/RPT-STEEL-2024-001.pdf",
+    "remark": "第1组试样",
+    "testResults": [
+      { "testItem": "屈服强度", "actualValue": "435MPa", "isQualified": true },
+      { "testItem": "抗拉强度", "actualValue": "580MPa", "isQualified": true },
+      { "testItem": "断后伸长率", "actualValue": "18.5%", "isQualified": true },
+      { "testItem": "冷弯性能", "actualValue": "180°无裂纹", "isQualified": true }
+    ]
+  },
+  {
+    "reportNo": "RPT-STEEL-2024-002",
+    "batchNo": "STEEL-2024-002",
+    "reportDate": "2024-05-13",
+    "lab": "市建设工程质量检测中心",
+    "inspector": "刘检测师",
+    "conclusion": "所检项目符合GB 1499.1-2017标准要求",
+    "isQualified": true,
+    "filePath": "/reports/RPT-STEEL-2024-002.pdf",
+    "remark": "第1组试样",
+    "testResults": [
+      { "testItem": "屈服强度", "actualValue": "320MPa", "isQualified": true },
+      { "testItem": "抗拉强度", "actualValue": "445MPa", "isQualified": true }
+    ]
+  },
+  {
+    "reportNo": "RPT-CEMENT-2024-001",
+    "batchNo": "CEMENT-2024-001",
+    "reportDate": "2024-05-11",
+    "lab": "市建设工程质量检测中心",
+    "inspector": "陈检测师",
+    "conclusion": "3天强度及安定性、凝结时间符合GB 175-2007标准要求",
+    "isQualified": true,
+    "filePath": "/reports/RPT-CEMENT-2024-001.pdf",
+    "remark": "3天报告，28天报告待补",
+    "testResults": [
+      { "testItem": "安定性", "actualValue": "合格", "isQualified": true },
+      { "testItem": "凝结时间", "actualValue": "初凝135min，终凝320min", "isQualified": true },
+      { "testItem": "3天抗压强度", "actualValue": "25.8MPa", "isQualified": true }
+    ]
+  }
+]

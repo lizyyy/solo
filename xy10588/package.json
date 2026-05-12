@@ -1,0 +1,28 @@
+{
+  "name": "material-inspection-cli",
+  "version": "1.0.0",
+  "description": "工程材料送检批次管理 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "mat-inspect": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "demo": "./scripts/demo.sh",
+    "demo-failure": "./scripts/demo-failure.sh"
+  },
+  "keywords": [
+    "material",
+    "inspection",
+    "construction",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1"
+  }
+}

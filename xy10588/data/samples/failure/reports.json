@@ -1,0 +1,17 @@
+[
+  {
+    "reportNo": "RPT-BAD-001",
+    "batchNo": "STEEL-BAD-001",
+    "reportDate": "2024-05-13",
+    "lab": "市建设工程质量检测中心",
+    "inspector": "刘检测师",
+    "conclusion": "屈服强度和抗拉强度均不符合标准要求",
+    "isQualified": false,
+    "filePath": "/reports/RPT-BAD-001.pdf",
+    "remark": "不合格，需复检",
+    "testResults": [
+      { "testItem": "屈服强度", "actualValue": "380MPa", "isQualified": false },
+      { "testItem": "抗拉强度", "actualValue": "520MPa", "isQualified": false }
+    ]
+  }
+]

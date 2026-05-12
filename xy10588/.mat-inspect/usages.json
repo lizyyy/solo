@@ -1,0 +1,35 @@
+[
+  {
+    "id": "353036f9-e8ef-4d6a-a20d-0c541ab22a12",
+    "batchNo": "STEEL-2024-001",
+    "usageDate": "2024-05-15",
+    "usedQuantity": 20,
+    "usedLocation": "1#楼基础底板钢筋",
+    "user": "钢筋班组-王班长",
+    "remark": "基础底板底层钢筋",
+    "isViolation": false,
+    "createdAt": "2026-05-12T12:00:37.891Z"
+  },
+  {
+    "id": "adc82ae8-bc5f-4197-ac71-e9c1c6190749",
+    "batchNo": "STEEL-2024-002",
+    "usageDate": "2024-05-16",
+    "usedQuantity": 5,
+    "usedLocation": "1#楼基础底板箍筋",
+    "user": "钢筋班组-王班长",
+    "remark": "底板箍筋制作",
+    "isViolation": false,
+    "createdAt": "2026-05-12T12:00:37.895Z"
+  },
+  {
+    "id": "7c3b81e8-bd75-4fd9-9f6e-79ba5f563f0f",
+    "batchNo": "STEEL-BAD-001",
+    "usageDate": "2024-05-12",
+    "usedQuantity": 10,
+    "usedLocation": "演示违规使用",
+    "user": "施工员-张",
+    "remark": "",
+    "isViolation": true,
+    "createdAt": "2026-05-12T12:00:44.434Z"
+  }
+]
