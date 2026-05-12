@@ -44,81 +44,35 @@ app.get('/api/cards/:id', (req, res) => {
   res.json({ code: 0, data: card })
 })
 
-app.get('/api/anomalies', (req, res) => {
-  const { status, type, plateNumber, page = 1, pageSize = 20 } = req.query
-  let anomalies = store.getAnomalies()
-
-  if (status) {
-    anomalies = anomalies.filter(a => a.status === status)
+app.post('/api/cards', (req, res) => {
+  try {
+    const newCard = store.createCard(req.body)
+    res.json({ code: 0, data: newCard })
+  } catch (e: any) {
+    res.json({ code: 400, message: e.message })
   }
-  if (type) {
-    anomalies = anomalies.filter(a => a.type === type)
-  }
-  if (plateNumber) {
-    anomalies = anomalies.filter(a => a.plateNumber?.includes(plateNumber as string))
-  }
-
-  anomalies.sort((a, b) => {
-    if (a.status !== b.status) {
-      return a.status === AnomalyStatus.OPEN ? -1 : 1
-    }
-    const priorityOrder = { high: 0, medium: 1, low: 2 }
-    return priorityOrder[a.priority] - priorityOrder[b.priority]
-  })
-
-  const total = anomalies.length
-  const start = (Number(page) - 1) * Number(pageSize)
-  const end = start + Number(pageSize)
-  const list = anomalies.slice(start, end)
-
-  res.json({ code: 0, data: { list, total, page: Number(page), pageSize: Number(pageSize) } })
 })
 
-app.get('/api/anomalies/:id', (req, res) => {
-  const anomaly = store.getAnomalyById(req.params.id)
-  if (!anomaly) {
-    return res.json({ code: 404, message: '异常不存在' })
+app.put('/api/cards/:id', (req, res) => {
+  const updated = store.updateCard(req.params.id, req.body)
+  if (!updated) {
+    return res.json({ code: 404, message: '卡片不存在' })
   }
-  res.json({ code: 0, data: anomaly })
+  res.json({ code: 0, data: updated })
 })
 
-app.post('/api/anomalies/:id/process', (req, res) => {
-  const { action, operator, resolution, cardUpdates } = req.body
-  const anomaly = store.getAnomalyById(req.params.id)
-
-  if (!anomaly) {
-    return res.json({ code: 404, message: '异常不存在' })
+app.delete('/api/cards/:id', (req, res) => {
+  const success = store.deleteCard(req.params.id)
+  if (!success) {
+    return res.json({ code: 404, message: '卡片不存在' })
   }
+  res.json({ code: 0, message: '删除成功' })
+})
 
-  const updates: any = { status: AnomalyStatus.PROCESSING }
-
-  if (action === 'resolve') {
-    updates.status = AnomalyStatus.RESOLVED
-    updates.resolution = resolution
-    updates.resolvedAt = dayjs().toISOString()
-  } else if (action === 'ignore') {
-    updates.status = AnomalyStatus.IGNORED
-    updates.resolution = resolution
-    updates.resolvedAt = dayjs().toISOString()
-  } else if (action === 'assign') {
-    updates.assignee = operator
-  }
-
-  const updatedAnomaly = store.updateAnomaly(req.params.id, updates)
-
-  if (cardUpdates && anomaly.cardId) {
-    store.updateCard(anomaly.cardId, cardUpdates)
-  }
-
-  store.addProcessHistory({
-    anomalyId: req.params.id,
-    cardId: anomaly.cardId,
-    action: action,
-    operator: operator || '系统',
-    result: resolution || '处理中'
-  })
-
-  res.json({ code: 0, data: updatedAnomaly })
+app.post('/api/cards/import', (req, res) => {
+  const { cards, operator } = req.body
+  const results = store.importCards(cards, operator || '系统')
+  res.json({ code: 0, data: results })
 })
 
 app.post('/api/cards/:id/sync', async (req, res) => {
@@ -190,8 +144,85 @@ app.post('/api/cards/:id/sync', async (req, res) => {
 })
 
 app.get('/api/cards/:id/sync-logs', (req, res) => {
-  const logs = store.getSyncLogs().filter(l => l.cardId === req.params.id)
+  const logs = store.getSyncLogsByCardId(req.params.id)
   res.json({ code: 0, data: logs })
+})
+
+app.get('/api/anomalies', (req, res) => {
+  const { status, type, plateNumber, page = 1, pageSize = 20 } = req.query
+  let anomalies = store.getAnomalies()
+
+  if (status) {
+    anomalies = anomalies.filter(a => a.status === status)
+  }
+  if (type) {
+    anomalies = anomalies.filter(a => a.type === type)
+  }
+  if (plateNumber) {
+    anomalies = anomalies.filter(a => a.plateNumber?.includes(plateNumber as string))
+  }
+
+  anomalies.sort((a, b) => {
+    if (a.status !== b.status) {
+      return a.status === AnomalyStatus.OPEN ? -1 : 1
+    }
+    const priorityOrder = { high: 0, medium: 1, low: 2 } as any
+    return priorityOrder[a.priority] - priorityOrder[b.priority]
+  })
+
+  const total = anomalies.length
+  const start = (Number(page) - 1) * Number(pageSize)
+  const end = start + Number(pageSize)
+  const list = anomalies.slice(start, end)
+
+  res.json({ code: 0, data: { list, total, page: Number(page), pageSize: Number(pageSize) } })
+})
+
+app.get('/api/anomalies/:id', (req, res) => {
+  const anomaly = store.getAnomalyById(req.params.id)
+  if (!anomaly) {
+    return res.json({ code: 404, message: '异常不存在' })
+  }
+  res.json({ code: 0, data: anomaly })
+})
+
+app.post('/api/anomalies/:id/process', (req, res) => {
+  const { action, operator, resolution, cardUpdates } = req.body
+  const anomaly = store.getAnomalyById(req.params.id)
+
+  if (!anomaly) {
+    return res.json({ code: 404, message: '异常不存在' })
+  }
+
+  const updates: any = { status: AnomalyStatus.PROCESSING }
+
+  if (action === 'resolve') {
+    updates.status = AnomalyStatus.RESOLVED
+    updates.resolution = resolution
+    updates.resolvedAt = dayjs().toISOString()
+  } else if (action === 'ignore') {
+    updates.status = AnomalyStatus.IGNORED
+    updates.resolution = resolution
+    updates.resolvedAt = dayjs().toISOString()
+  } else if (action === 'assign') {
+    updates.assignee = operator
+  }
+
+  const updatedAnomaly = store.updateAnomaly(req.params.id, updates)
+
+  if (cardUpdates && anomaly.cardId) {
+    store.updateCard(anomaly.cardId, cardUpdates)
+  }
+
+  store.addProcessHistory({
+    anomalyId: req.params.id,
+    cardId: anomaly.cardId,
+    action: action,
+    operator: operator || '系统',
+    result: resolution || '处理中'
+  })
+
+  res.json({ code: 0, data: updatedAnomaly })
 })
 
 app.get('/api/anomalies/:id/history', (req, res) => {
@@ -203,8 +234,50 @@ app.get('/api/blacklist', (req, res) => {
   res.json({ code: 0, data: store.getBlacklistRecords() })
 })
 
+app.post('/api/blacklist', (req, res) => {
+  try {
+    const record = store.createBlacklist(req.body)
+    res.json({ code: 0, data: record })
+  } catch (e: any) {
+    res.json({ code: 400, message: e.message })
+  }
+})
+
+app.put('/api/blacklist/:id', (req, res) => {
+  const updated = store.updateBlacklist(req.params.id, req.body)
+  if (!updated) {
+    return res.json({ code: 404, message: '记录不存在' })
+  }
+  res.json({ code: 0, data: updated })
+})
+
+app.delete('/api/blacklist/:id', (req, res) => {
+  const success = store.deleteBlacklist(req.params.id)
+  if (!success) {
+    return res.json({ code: 404, message: '记录不存在' })
+  }
+  res.json({ code: 0, message: '删除成功' })
+})
+
 app.get('/api/refunds', (req, res) => {
   res.json({ code: 0, data: store.getRefundRecords() })
+})
+
+app.post('/api/refunds', (req, res) => {
+  try {
+    const refund = store.createRefund(req.body)
+    res.json({ code: 0, data: refund })
+  } catch (e: any) {
+    res.json({ code: 400, message: e.message })
+  }
+})
+
+app.put('/api/refunds/:id', (req, res) => {
+  const updated = store.updateRefund(req.params.id, req.body)
+  if (!updated) {
+    return res.json({ code: 404, message: '记录不存在' })
+  }
+  res.json({ code: 0, data: updated })
 })
 
 app.get('/api/health', (req, res) => {

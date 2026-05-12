@@ -20,9 +20,18 @@ class DataStore {
   private anomalies: Anomaly[] = []
   private processHistories: ProcessHistory[] = []
   private syncLogs: SyncLog[] = []
+  private idempotencyKeys: Map<string, string> = new Map()
 
   constructor() {
     this.initializeSampleData()
+  }
+
+  checkIdempotency(key: string): boolean {
+    if (this.idempotencyKeys.has(key)) {
+      return false
+    }
+    this.idempotencyKeys.set(key, dayjs().toISOString())
+    return true
   }
 
   private initializeSampleData() {
@@ -71,6 +80,20 @@ class DataStore {
         syncAttempts: 1,
         createdAt: now.subtract(30, 'day').toISOString(),
         updatedAt: now.subtract(15, 'day').toISOString()
+      },
+      {
+        id: uuidv4(),
+        cardNo: 'MC008',
+        plateNumber: '京G55555',
+        ownerName: '吴九',
+        ownerPhone: '13800138007',
+        startDate: now.subtract(20, 'day').format('YYYY-MM-DD'),
+        endDate: now.add(10, 'day').format('YYYY-MM-DD'),
+        status: CardStatus.REFUNDED,
+        syncStatus: SyncStatus.PENDING,
+        syncAttempts: 0,
+        createdAt: now.subtract(20, 'day').toISOString(),
+        updatedAt: now.subtract(3, 'day').toISOString()
       },
       {
         id: uuidv4(),
@@ -165,6 +188,16 @@ class DataStore {
         refundReason: '用户提前退卡',
         operator: '客服小王',
         synced: true
+      },
+      {
+        id: uuidv4(),
+        cardId: this.monthlyCards[3].id,
+        plateNumber: '京G55555',
+        refundAmount: 450,
+        refundDate: now.subtract(3, 'day').format('YYYY-MM-DD'),
+        refundReason: '用户搬家',
+        operator: '客服小李',
+        synced: false
       }
     ]
 
@@ -196,12 +229,15 @@ class DataStore {
     const now = dayjs()
     const newAnomalies: Anomaly[] = []
 
-    const existingPlateNumbers = new Set(
-      this.anomalies.filter(a => a.status !== AnomalyStatus.RESOLVED).map(a => a.plateNumber)
+    const existingAnomalies = new Map(
+      this.anomalies
+        .filter(a => a.status !== AnomalyStatus.RESOLVED && a.status !== AnomalyStatus.IGNORED)
+        .map(a => [`${a.type}-${a.plateNumber}`, a])
     )
 
     for (const card of this.monthlyCards) {
-      if (card.syncStatus === SyncStatus.PENDING && !existingPlateNumbers.has(card.plateNumber)) {
+      const pendingKey = `${AnomalyType.PLATE_NOT_SYNCED}-${card.plateNumber}`
+      if (card.syncStatus === SyncStatus.PENDING && !existingAnomalies.has(pendingKey)) {
         newAnomalies.push({
           id: uuidv4(),
           type: AnomalyType.PLATE_NOT_SYNCED,
@@ -215,7 +251,8 @@ class DataStore {
         })
       }
 
-      if (card.syncStatus === SyncStatus.FAILED && !existingPlateNumbers.has(card.plateNumber)) {
+      const failedKey = `${AnomalyType.SYNC_FAILED}-${card.plateNumber}`
+      if (card.syncStatus === SyncStatus.FAILED && !existingAnomalies.has(failedKey)) {
         newAnomalies.push({
           id: uuidv4(),
           type: AnomalyType.SYNC_FAILED,
@@ -229,9 +266,10 @@ class DataStore {
         })
       }
 
+      const refundKey = `${AnomalyType.REFUND_STILL_ACTIVE}-${card.plateNumber}`
       if (card.status === CardStatus.REFUNDED) {
         const refund = this.refundRecords.find(r => r.cardId === card.id)
-        if (refund && !refund.synced && !existingPlateNumbers.has(card.plateNumber)) {
+        if (refund && !refund.synced && !existingAnomalies.has(refundKey)) {
           newAnomalies.push({
             id: uuidv4(),
             type: AnomalyType.REFUND_STILL_ACTIVE,
@@ -258,7 +296,8 @@ class DataStore {
     }
 
     for (const [plate, cards] of plateGroups) {
-      if (cards.length > 1 && !existingPlateNumbers.has(plate)) {
+      const multiKey = `${AnomalyType.MULTIPLE_CARDS_SAME_PLATE}-${plate}`
+      if (cards.length > 1 && !existingAnomalies.has(multiKey)) {
         newAnomalies.push({
           id: uuidv4(),
           type: AnomalyType.MULTIPLE_CARDS_SAME_PLATE,
@@ -273,7 +312,8 @@ class DataStore {
     }
 
     for (const bl of this.blacklistRecords) {
-      if (bl.endTime && dayjs(bl.endTime).isBefore(now) && bl.isActive && !existingPlateNumbers.has(bl.plateNumber)) {
+      const expiredKey = `${AnomalyType.BLACKLIST_EXPIRED}-${bl.plateNumber}`
+      if (bl.endTime && dayjs(bl.endTime).isBefore(now) && bl.isActive && !existingAnomalies.has(expiredKey)) {
         newAnomalies.push({
           id: uuidv4(),
           type: AnomalyType.BLACKLIST_EXPIRED,
@@ -293,17 +333,120 @@ class DataStore {
   getMonthlyCards() { return [...this.monthlyCards] }
   getMonthlyCardById(id: string) { return this.monthlyCards.find(c => c.id === id) }
   getBlacklistRecords() { return [...this.blacklistRecords] }
+  getBlacklistByPlate(plateNumber: string) { return this.blacklistRecords.find(b => b.plateNumber === plateNumber) }
   getRefundRecords() { return [...this.refundRecords] }
   getAnomalies() { return [...this.anomalies] }
   getAnomalyById(id: string) { return this.anomalies.find(a => a.id === id) }
   getProcessHistories() { return [...this.processHistories] }
   getSyncLogs() { return [...this.syncLogs] }
+  getSyncLogsByCardId(cardId: string) { return this.syncLogs.filter(l => l.cardId === cardId) }
+
+  createCard(cardData: Omit<MonthlyCard, 'id' | 'createdAt' | 'updatedAt' | 'syncAttempts' | 'syncStatus'>) {
+    const exists = this.monthlyCards.some(c => c.cardNo === cardData.cardNo)
+    if (exists) {
+      throw new Error('卡号已存在')
+    }
+
+    const newCard: MonthlyCard = {
+      id: uuidv4(),
+      ...cardData,
+      syncStatus: SyncStatus.PENDING,
+      syncAttempts: 0,
+      createdAt: dayjs().toISOString(),
+      updatedAt: dayjs().toISOString()
+    }
+    this.monthlyCards.push(newCard)
+    this.detectAnomalies()
+    return newCard
+  }
 
   updateCard(cardId: string, updates: Partial<MonthlyCard>) {
     const index = this.monthlyCards.findIndex(c => c.id === cardId)
     if (index === -1) return null
+    if (updates.plateNumber && updates.plateNumber !== this.monthlyCards[index].plateNumber) {
+      updates.syncStatus = SyncStatus.PENDING
+      updates.syncAttempts = 0
+    }
     this.monthlyCards[index] = { ...this.monthlyCards[index], ...updates, updatedAt: dayjs().toISOString() }
+    this.detectAnomalies()
     return this.monthlyCards[index]
+  }
+
+  deleteCard(cardId: string) {
+    const index = this.monthlyCards.findIndex(c => c.id === cardId)
+    if (index === -1) return false
+    this.monthlyCards.splice(index, 1)
+    return true
+  }
+
+  createBlacklist(record: Omit<BlacklistRecord, 'id' | 'createdAt'>) {
+    const existing = this.blacklistRecords.find(b => b.plateNumber === record.plateNumber && b.isActive)
+    if (existing) {
+      throw new Error('该车牌已有生效的黑名单')
+    }
+
+    const newRecord: BlacklistRecord = {
+      id: uuidv4(),
+      ...record,
+      createdAt: dayjs().toISOString()
+    }
+    this.blacklistRecords.push(newRecord)
+
+    const card = this.monthlyCards.find(c => c.plateNumber === record.plateNumber && c.status === CardStatus.ACTIVE)
+    if (card) {
+      this.updateCard(card.id, { status: CardStatus.BLACKLISTED })
+    }
+
+    this.detectAnomalies()
+    return newRecord
+  }
+
+  updateBlacklist(id: string, updates: Partial<BlacklistRecord>) {
+    const index = this.blacklistRecords.findIndex(b => b.id === id)
+    if (index === -1) return null
+    this.blacklistRecords[index] = { ...this.blacklistRecords[index], ...updates }
+    this.detectAnomalies()
+    return this.blacklistRecords[index]
+  }
+
+  deleteBlacklist(id: string) {
+    const index = this.blacklistRecords.findIndex(b => b.id === id)
+    if (index === -1) return false
+    const record = this.blacklistRecords[index]
+    this.blacklistRecords.splice(index, 1)
+
+    const card = this.monthlyCards.find(c => c.plateNumber === record.plateNumber && c.status === CardStatus.BLACKLISTED)
+    if (card) {
+      this.updateCard(card.id, { status: CardStatus.ACTIVE })
+    }
+
+    this.detectAnomalies()
+    return true
+  }
+
+  createRefund(refundData: Omit<RefundRecord, 'id'>) {
+    const existing = this.refundRecords.find(r => r.cardId === refundData.cardId)
+    if (existing) {
+      throw new Error('该月卡已申请退款')
+    }
+
+    const newRefund: RefundRecord = {
+      id: uuidv4(),
+      ...refundData
+    }
+    this.refundRecords.push(newRefund)
+
+    this.updateCard(refundData.cardId, { status: CardStatus.REFUNDED, syncStatus: SyncStatus.PENDING })
+    this.detectAnomalies()
+    return newRefund
+  }
+
+  updateRefund(id: string, updates: Partial<RefundRecord>) {
+    const index = this.refundRecords.findIndex(r => r.id === id)
+    if (index === -1) return null
+    this.refundRecords[index] = { ...this.refundRecords[index], ...updates }
+    this.detectAnomalies()
+    return this.refundRecords[index]
   }
 
   updateAnomaly(anomalyId: string, updates: Partial<Anomaly>) {
@@ -314,6 +457,11 @@ class DataStore {
   }
 
   addProcessHistory(history: Omit<ProcessHistory, 'id' | 'createdAt'>) {
+    const idempotencyKey = `${history.anomalyId}-${history.action}-${history.operator}`
+    if (!this.checkIdempotency(idempotencyKey)) {
+      return null
+    }
+
     const newHistory: ProcessHistory = {
       id: uuidv4(),
       ...history,
@@ -324,6 +472,11 @@ class DataStore {
   }
 
   addSyncLog(log: Omit<SyncLog, 'id' | 'createdAt'>) {
+    const idempotencyKey = `sync-${log.cardId}-${log.retryCount}-${log.status}`
+    if (!this.checkIdempotency(idempotencyKey)) {
+      return null
+    }
+
     const newLog: SyncLog = {
       id: uuidv4(),
       ...log,
@@ -345,6 +498,34 @@ class DataStore {
       blacklistedCount: this.blacklistRecords.filter(b => b.isActive).length,
       refundedCount: this.refundRecords.length
     }
+  }
+
+  importCards(cards: any[], operator: string) {
+    const results: { success: any[]; failed: any[] } = { success: [], failed: [] }
+    
+    for (const card of cards) {
+      try {
+        const existing = this.monthlyCards.find(c => c.cardNo === card.cardNo)
+        if (existing) {
+          results.failed.push({ ...card, reason: '卡号已存在，跳过' })
+          continue
+        }
+        
+        const newCard = this.createCard(card)
+        results.success.push(newCard)
+      } catch (e: any) {
+        results.failed.push({ ...card, reason: e.message })
+      }
+    }
+
+    this.addProcessHistory({
+      anomalyId: '',
+      action: 'import',
+      operator,
+      result: `批量导入完成：成功 ${results.success.length} 条，失败 ${results.failed.length} 条`
+    })
+
+    return results
   }
 }
 

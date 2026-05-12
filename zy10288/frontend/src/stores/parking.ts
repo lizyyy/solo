@@ -6,6 +6,8 @@ export const useParkingStore = defineStore('parking', () => {
   const statistics = ref<any>({})
   const cards = ref<any[]>([])
   const anomalies = ref<any[]>([])
+  const blacklist = ref<any[]>([])
+  const refunds = ref<any[]>([])
   const selectedCard = ref<any>(null)
   const selectedAnomaly = ref<any>(null)
   const syncLogs = ref<any[]>([])
@@ -51,6 +53,28 @@ export const useParkingStore = defineStore('parking', () => {
     }
   }
 
+  async function fetchBlacklist() {
+    try {
+      const res = await api.getBlacklist()
+      blacklist.value = res.data.data
+      return res.data.data
+    } catch (e) {
+      console.error('获取黑名单失败', e)
+      return []
+    }
+  }
+
+  async function fetchRefunds() {
+    try {
+      const res = await api.getRefunds()
+      refunds.value = res.data.data
+      return res.data.data
+    } catch (e) {
+      console.error('获取退款记录失败', e)
+      return []
+    }
+  }
+
   async function fetchCardDetail(id: string) {
     try {
       const res = await api.getCardById(id)
@@ -84,6 +108,39 @@ export const useParkingStore = defineStore('parking', () => {
     }
   }
 
+  async function doCreateCard(data: any) {
+    loading.value = true
+    try {
+      const res = await api.createCard(data)
+      await Promise.all([fetchStatistics(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function doUpdateCard(id: string, data: any) {
+    loading.value = true
+    try {
+      const res = await api.updateCard(id, data)
+      await Promise.all([fetchStatistics(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function doDeleteCard(id: string) {
+    loading.value = true
+    try {
+      const res = await api.deleteCard(id)
+      await Promise.all([fetchStatistics(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function doSyncCard(id: string, simulateSuccess = true) {
     loading.value = true
     try {
@@ -106,10 +163,56 @@ export const useParkingStore = defineStore('parking', () => {
     }
   }
 
+  async function doCreateBlacklist(data: any) {
+    loading.value = true
+    try {
+      const res = await api.createBlacklist(data)
+      await Promise.all([fetchStatistics(), fetchBlacklist(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function doDeleteBlacklist(id: string) {
+    loading.value = true
+    try {
+      const res = await api.deleteBlacklist(id)
+      await Promise.all([fetchStatistics(), fetchBlacklist(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function doCreateRefund(data: any) {
+    loading.value = true
+    try {
+      const res = await api.createRefund(data)
+      await Promise.all([fetchStatistics(), fetchRefunds(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function doImportCards(data: any) {
+    loading.value = true
+    try {
+      const res = await api.importCards(data)
+      await Promise.all([fetchStatistics(), fetchCards(), fetchAnomalies()])
+      return res.data
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     statistics,
     cards,
     anomalies,
+    blacklist,
+    refunds,
     selectedCard,
     selectedAnomaly,
     syncLogs,
@@ -120,10 +223,19 @@ export const useParkingStore = defineStore('parking', () => {
     fetchStatistics,
     fetchCards,
     fetchAnomalies,
+    fetchBlacklist,
+    fetchRefunds,
     fetchCardDetail,
     fetchCardSyncLogs,
     fetchAnomalyHistory,
+    doCreateCard,
+    doUpdateCard,
+    doDeleteCard,
     doSyncCard,
-    doProcessAnomaly
+    doProcessAnomaly,
+    doCreateBlacklist,
+    doDeleteBlacklist,
+    doCreateRefund,
+    doImportCards
   }
 })
