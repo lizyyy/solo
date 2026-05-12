@@ -11,6 +11,7 @@ interface RegistrationFormProps {
 
 export function RegistrationForm({ eventId, onSubmit, onCancel, isLoading }: RegistrationFormProps) {
   const [formData, setFormData] = useState({
+    userId: '',
     userName: '',
     userEmail: '',
     userPhone: '',
@@ -21,6 +22,10 @@ export function RegistrationForm({ eventId, onSubmit, onCancel, isLoading }: Reg
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
+
+    if (!formData.userId.trim()) {
+      newErrors.userId = '请输入用户标识';
+    }
 
     if (!formData.userName.trim()) {
       newErrors.userName = '请输入姓名';
@@ -42,7 +47,7 @@ export function RegistrationForm({ eventId, onSubmit, onCancel, isLoading }: Reg
 
     await onSubmit({
       eventId,
-      userId: '',
+      userId: formData.userId.trim(),
       userName: formData.userName,
       userEmail: formData.userEmail,
       userPhone: formData.userPhone || undefined,
@@ -64,6 +69,21 @@ export function RegistrationForm({ eventId, onSubmit, onCancel, isLoading }: Reg
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="label-field">用户标识 *</label>
+            <input
+              type="text"
+              value={formData.userId}
+              onChange={(e) => setFormData({ ...formData, userId: e.target.value })}
+              className={`input-field ${errors.userId ? 'border-red-500' : ''}`}
+              placeholder="如：user-001、alice、bob 等"
+            />
+            {errors.userId && <p className="text-red-500 text-sm mt-1">{errors.userId}</p>}
+            <p className="text-gray-500 text-xs mt-1">
+              用于区分不同用户，同一用户标识不能重复报名同一活动
+            </p>
+          </div>
+
           <div>
             <label className="label-field">姓名 *</label>
             <input
