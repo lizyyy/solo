@@ -96,12 +96,15 @@ router.get('/:id', async (req, res, next) => {
     const booking = await Booking.findOne({
       where: { id: req.params.id, isDeleted: false },
       include: [
-        { model: MeetingRoom, attributes: ['id', 'name', 'location'] },
         { 
-          model: Equipment, 
-          where: { isDeleted: false }, 
-          required: false,
-          attributes: ['id', 'name', 'type', 'status']
+          model: MeetingRoom, 
+          attributes: ['id', 'name', 'location'],
+          include: [{
+            model: Equipment,
+            where: { isDeleted: false },
+            required: false,
+            attributes: ['id', 'name', 'type', 'status']
+          }]
         },
         { model: Inspection, required: false }
       ]
