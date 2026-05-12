@@ -1,0 +1,57 @@
+[
+  {
+    "id": "SV-001",
+    "phone": "13900139001",
+    "name": "陈经理",
+    "type": "after_sales",
+    "region": "北京",
+    "timezone": "Asia/Shanghai",
+    "ticket_id": "TK-2026-001",
+    "issue": "系统登录异常",
+    "priority": "高"
+  },
+  {
+    "id": "SV-002",
+    "phone": "13900139002",
+    "name": "林主管",
+    "type": "after_sales",
+    "region": "上海",
+    "timezone": "Asia/Shanghai",
+    "ticket_id": "TK-2026-002",
+    "issue": "数据导出问题",
+    "priority": "中"
+  },
+  {
+    "id": "SV-003",
+    "phone": "13900139003",
+    "name": "黄经理",
+    "type": "after_sales",
+    "region": "广州",
+    "timezone": "Asia/Shanghai",
+    "ticket_id": "TK-2026-003",
+    "issue": "接口调用失败",
+    "priority": "高"
+  },
+  {
+    "id": "SV-004",
+    "phone": "13900139004",
+    "name": "吴主管",
+    "type": "after_sales",
+    "region": "深圳",
+    "timezone": "Asia/Shanghai",
+    "ticket_id": "TK-2026-004",
+    "issue": "权限配置问题",
+    "priority": "低"
+  },
+  {
+    "id": "SV-005",
+    "phone": "13900139999",
+    "name": "周经理(黑名单)",
+    "type": "after_sales",
+    "region": "杭州",
+    "timezone": "Asia/Shanghai",
+    "ticket_id": "TK-2026-005",
+    "issue": "账单疑问",
+    "priority": "中"
+  }
+]

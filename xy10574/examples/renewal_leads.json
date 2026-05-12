@@ -1,0 +1,62 @@
+[
+  {
+    "id": "RN-001",
+    "phone": "14000140001",
+    "name": "科技公司A",
+    "type": "renewal",
+    "region": "北京",
+    "timezone": "Asia/Shanghai",
+    "contract_id": "CT-2025-001",
+    "expire_date": "2026-06-01",
+    "current_plan": "企业版",
+    "annual_fee": 50000
+  },
+  {
+    "id": "RN-002",
+    "phone": "14000140002",
+    "name": "电商公司B",
+    "type": "renewal",
+    "region": "上海",
+    "timezone": "Asia/Shanghai",
+    "contract_id": "CT-2025-002",
+    "expire_date": "2026-07-15",
+    "current_plan": "专业版",
+    "annual_fee": 30000
+  },
+  {
+    "id": "RN-003",
+    "phone": "14000140003",
+    "name": "金融公司C",
+    "type": "renewal",
+    "region": "广州",
+    "timezone": "Asia/Shanghai",
+    "contract_id": "CT-2025-003",
+    "expire_date": "2026-05-20",
+    "current_plan": "旗舰版",
+    "annual_fee": 100000
+  },
+  {
+    "id": "RN-004",
+    "phone": "14000140004",
+    "name": "教育公司D",
+    "type": "renewal",
+    "region": "深圳",
+    "timezone": "Asia/Shanghai",
+    "contract_id": "CT-2025-004",
+    "expire_date": "2026-08-30",
+    "current_plan": "专业版",
+    "annual_fee": 35000
+  },
+  {
+    "id": "RN-005",
+    "phone": "14000140999",
+    "name": "公司E(拒呼)",
+    "type": "renewal",
+    "region": "杭州",
+    "timezone": "Asia/Shanghai",
+    "contract_id": "CT-2025-005",
+    "expire_date": "2026-05-31",
+    "current_plan": "企业版",
+    "annual_fee": 60000
+  }
+]

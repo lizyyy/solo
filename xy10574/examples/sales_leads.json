@@ -1,0 +1,112 @@
+[
+  {
+    "id": "SL-001",
+    "phone": "13800138001",
+    "name": "张三",
+    "type": "sales",
+    "region": "北京",
+    "timezone": "Asia/Shanghai",
+    "product": "企业版CRM",
+    "budget": "5-10万",
+    "source": "官网表单"
+  },
+  {
+    "id": "SL-002",
+    "phone": "13800138002",
+    "name": "李四",
+    "type": "sales",
+    "region": "上海",
+    "timezone": "Asia/Shanghai",
+    "product": "营销自动化",
+    "budget": "3-5万",
+    "source": "会议名单"
+  },
+  {
+    "id": "SL-003",
+    "phone": "13800138003",
+    "name": "王五",
+    "type": "sales",
+    "region": "广州",
+    "timezone": "Asia/Shanghai",
+    "product": "客户服务系统",
+    "budget": "10-20万",
+    "source": "电话咨询"
+  },
+  {
+    "id": "SL-004",
+    "phone": "13800138004",
+    "name": "赵六",
+    "type": "sales",
+    "region": "深圳",
+    "timezone": "Asia/Shanghai",
+    "product": "数据分析平台",
+    "budget": "20万以上",
+    "source": "合作伙伴推荐"
+  },
+  {
+    "id": "SL-005",
+    "phone": "13800138001",
+    "name": "张三(重复)",
+    "type": "sales",
+    "region": "北京",
+    "timezone": "Asia/Shanghai",
+    "product": "销售管理系统",
+    "budget": "5-10万",
+    "source": "下载资料"
+  },
+  {
+    "id": "SL-006",
+    "phone": "13800138999",
+    "name": "钱七(黑名单)",
+    "type": "sales",
+    "region": "杭州",
+    "timezone": "Asia/Shanghai",
+    "product": "呼叫中心",
+    "budget": "3-5万",
+    "source": "展会名单"
+  },
+  {
+    "id": "SL-007",
+    "phone": "13800138005",
+    "name": "孙八",
+    "type": "sales",
+    "region": "成都",
+    "timezone": "Asia/Shanghai",
+    "product": "企业微信集成",
+    "budget": "2-3万",
+    "source": "百度推广"
+  },
+  {
+    "id": "SL-008",
+    "phone": "13800138998",
+    "name": "周九(预约回拨)",
+    "type": "sales",
+    "region": "武汉",
+    "timezone": "Asia/Shanghai",
+    "product": "SCRM系统",
+    "budget": "8-15万",
+    "source": "电话咨询"
+  },
+  {
+    "id": "SL-009",
+    "phone": "12345",
+    "name": "吴十(号码错误)",
+    "type": "sales",
+    "region": "南京",
+    "timezone": "Asia/Shanghai",
+    "product": "工单系统",
+    "budget": "1-2万",
+    "source": "网络搜集"
+  },
+  {
+    "id": "SL-010",
+    "phone": "13800138997",
+    "name": "郑十一(拒呼)",
+    "type": "sales",
+    "region": "西安",
+    "timezone": "Asia/Shanghai",
+    "product": "知识库系统",
+    "budget": "5-10万",
+    "source": "老客户推荐"
+  }
+]

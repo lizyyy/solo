@@ -1,0 +1,387 @@
+{
+  "report_time": "2026-05-12T16:47:00.913528",
+  "summary": {
+    "total": 20,
+    "by_status": {
+      "imported": 0,
+      "pending": 0,
+      "callable": 14,
+      "deferred": 0,
+      "blocked": 5,
+      "connected": 0,
+      "rejected": 0,
+      "manual_released": 1
+    },
+    "by_block_reason": {
+      "duplicate": 1,
+      "blacklist": 2,
+      "user_rejected": 2
+    },
+    "by_type": {
+      "sales": 10,
+      "after_sales": 5,
+      "renewal": 5
+    },
+    "check_sessions": [
+      {
+        "id": "219a10c7-65ae-4a1a-acd2-1b99a458c25a",
+        "check_time": "2026-05-12T16:46:04.558329",
+        "total_leads": 20,
+        "callable_count": 14,
+        "deferred_count": 0,
+        "blocked_count": 6
+      }
+    ],
+    "import_sessions": [
+      {
+        "id": "ef3b751c-f2b1-4f13-a7ff-2602a832b988",
+        "file_name": "compliance_rules.json",
+        "file_type": "compliance_rules",
+        "imported_at": "2026-05-12T16:45:59.769580",
+        "record_count": 1,
+        "status": "completed"
+      },
+      {
+        "id": "158b4f62-3fcb-4884-ad08-a3e8df24cd42",
+        "file_name": "timezone_rules.json",
+        "file_type": "timezone_rules",
+        "imported_at": "2026-05-12T16:45:59.767082",
+        "record_count": 9,
+        "status": "completed"
+      },
+      {
+        "id": "edd89ca6-b791-4cb8-8a15-c1dc4ec6f03a",
+        "file_name": "callback_schedule.json",
+        "file_type": "callback",
+        "imported_at": "2026-05-12T16:45:59.761406",
+        "record_count": 1,
+        "status": "completed"
+      },
+      {
+        "id": "284ec413-fe1c-4175-916a-7b9cfe701d01",
+        "file_name": "call_history.json",
+        "file_type": "call_history",
+        "imported_at": "2026-05-12T16:45:59.759519",
+        "record_count": 3,
+        "status": "completed"
+      },
+      {
+        "id": "cb47d946-3b85-4416-a9b5-deaa081268d9",
+        "file_name": "blacklist.json",
+        "file_type": "blacklist",
+        "imported_at": "2026-05-12T16:45:59.756581",
+        "record_count": 2,
+        "status": "completed"
+      },
+      {
+        "id": "733fba5a-c906-442b-8e10-258e98b51bb9",
+        "file_name": "renewal_leads.json",
+        "file_type": "leads",
+        "imported_at": "2026-05-12T16:45:59.752107",
+        "record_count": 5,
+        "status": "completed"
+      },
+      {
+        "id": "73d93a99-4548-4f37-8d52-8ef0d866f271",
+        "file_name": "service_leads.json",
+        "file_type": "leads",
+        "imported_at": "2026-05-12T16:45:59.745338",
+        "record_count": 5,
+        "status": "completed"
+      },
+      {
+        "id": "45532a16-0247-4619-9888-a7a3c9f935f1",
+        "file_name": "sales_leads.json",
+        "file_type": "leads",
+        "imported_at": "2026-05-12T16:45:59.734021",
+        "record_count": 10,
+        "status": "completed"
+      }
+    ]
+  },
+  "callable_leads": [
+    {
+      "lead_id": "SL-001",
+      "phone": "13800138001",
+      "name": "张三",
+      "type": "sales",
+      "region": "北京",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "企业版CRM",
+        "budget": "5-10万",
+        "source": "官网表单"
+      }
+    },
+    {
+      "lead_id": "SL-002",
+      "phone": "13800138002",
+      "name": "李四",
+      "type": "sales",
+      "region": "上海",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "营销自动化",
+        "budget": "3-5万",
+        "source": "会议名单"
+      }
+    },
+    {
+      "lead_id": "SL-003",
+      "phone": "13800138003",
+      "name": "王五",
+      "type": "sales",
+      "region": "广州",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "客户服务系统",
+        "budget": "10-20万",
+        "source": "电话咨询"
+      }
+    },
+    {
+      "lead_id": "SL-004",
+      "phone": "13800138004",
+      "name": "赵六",
+      "type": "sales",
+      "region": "深圳",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "数据分析平台",
+        "budget": "20万以上",
+        "source": "合作伙伴推荐"
+      }
+    },
+    {
+      "lead_id": "SL-007",
+      "phone": "13800138005",
+      "name": "孙八",
+      "type": "sales",
+      "region": "成都",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "企业微信集成",
+        "budget": "2-3万",
+        "source": "百度推广"
+      }
+    },
+    {
+      "lead_id": "SL-008",
+      "phone": "13800138998",
+      "name": "周九(预约回拨)",
+      "type": "sales",
+      "region": "武汉",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "product": "SCRM系统",
+        "budget": "8-15万",
+        "source": "电话咨询"
+      }
+    },
+    {
+      "lead_id": "SV-001",
+      "phone": "13900139001",
+      "name": "陈经理",
+      "type": "after_sales",
+      "region": "北京",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "ticket_id": "TK-2026-001",
+        "issue": "系统登录异常",
+        "priority": "高"
+      }
+    },
+    {
+      "lead_id": "SV-002",
+      "phone": "13900139002",
+      "name": "林主管",
+      "type": "after_sales",
+      "region": "上海",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "ticket_id": "TK-2026-002",
+        "issue": "数据导出问题",
+        "priority": "中"
+      }
+    },
+    {
+      "lead_id": "SV-003",
+      "phone": "13900139003",
+      "name": "黄经理",
+      "type": "after_sales",
+      "region": "广州",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "ticket_id": "TK-2026-003",
+        "issue": "接口调用失败",
+        "priority": "高"
+      }
+    },
+    {
+      "lead_id": "SV-004",
+      "phone": "13900139004",
+      "name": "吴主管",
+      "type": "after_sales",
+      "region": "深圳",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "ticket_id": "TK-2026-004",
+        "issue": "权限配置问题",
+        "priority": "低"
+      }
+    },
+    {
+      "lead_id": "RN-001",
+      "phone": "14000140001",
+      "name": "科技公司A",
+      "type": "renewal",
+      "region": "北京",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "contract_id": "CT-2025-001",
+        "expire_date": "2026-06-01",
+        "current_plan": "企业版",
+        "annual_fee": 50000
+      }
+    },
+    {
+      "lead_id": "RN-002",
+      "phone": "14000140002",
+      "name": "电商公司B",
+      "type": "renewal",
+      "region": "上海",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "contract_id": "CT-2025-002",
+        "expire_date": "2026-07-15",
+        "current_plan": "专业版",
+        "annual_fee": 30000
+      }
+    },
+    {
+      "lead_id": "RN-003",
+      "phone": "14000140003",
+      "name": "金融公司C",
+      "type": "renewal",
+      "region": "广州",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "contract_id": "CT-2025-003",
+        "expire_date": "2026-05-20",
+        "current_plan": "旗舰版",
+        "annual_fee": 100000
+      }
+    },
+    {
+      "lead_id": "RN-004",
+      "phone": "14000140004",
+      "name": "教育公司D",
+      "type": "renewal",
+      "region": "深圳",
+      "status": "callable",
+      "manual_release_reason": null,
+      "extra_data": {
+        "contract_id": "CT-2025-004",
+        "expire_date": "2026-08-30",
+        "current_plan": "专业版",
+        "annual_fee": 35000
+      }
+    },
+    {
+      "lead_id": "SL-009",
+      "phone": "12345",
+      "name": "吴十(号码错误)",
+      "type": "sales",
+      "region": "南京",
+      "status": "manual_released",
+      "manual_release_reason": "号码格式问题已核实，可以联系",
+      "extra_data": {
+        "product": "工单系统",
+        "budget": "1-2万",
+        "source": "网络搜集"
+      }
+    }
+  ],
+  "deferred_leads": [],
+  "blocked_leads": [
+    {
+      "lead_id": "SL-005",
+      "phone": "13800138001",
+      "name": "张三(重复)",
+      "type": "sales",
+      "region": "北京",
+      "block_reason": "duplicate",
+      "extra_data": {
+        "product": "销售管理系统",
+        "budget": "5-10万",
+        "source": "下载资料"
+      }
+    },
+    {
+      "lead_id": "SL-006",
+      "phone": "13800138999",
+      "name": "钱七(黑名单)",
+      "type": "sales",
+      "region": "杭州",
+      "block_reason": "blacklist",
+      "extra_data": {
+        "product": "呼叫中心",
+        "budget": "3-5万",
+        "source": "展会名单"
+      }
+    },
+    {
+      "lead_id": "SL-010",
+      "phone": "13800138997",
+      "name": "郑十一(拒呼)",
+      "type": "sales",
+      "region": "西安",
+      "block_reason": "user_rejected",
+      "extra_data": {
+        "product": "知识库系统",
+        "budget": "5-10万",
+        "source": "老客户推荐"
+      }
+    },
+    {
+      "lead_id": "SV-005",
+      "phone": "13900139999",
+      "name": "周经理(黑名单)",
+      "type": "after_sales",
+      "region": "杭州",
+      "block_reason": "blacklist",
+      "extra_data": {
+        "ticket_id": "TK-2026-005",
+        "issue": "账单疑问",
+        "priority": "中"
+      }
+    },
+    {
+      "lead_id": "RN-005",
+      "phone": "14000140999",
+      "name": "公司E(拒呼)",
+      "type": "renewal",
+      "region": "杭州",
+      "block_reason": "user_rejected",
+      "extra_data": {
+        "contract_id": "CT-2025-005",
+        "expire_date": "2026-05-31",
+        "current_plan": "企业版",
+        "annual_fee": 60000
+      }
+    }
+  ]
+}
