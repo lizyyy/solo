@@ -84,6 +84,62 @@ export class Renderer {
     this.ctx.stroke();
   }
 
+  drawBoundary(boundary) {
+    if (!boundary) return;
+
+    const { minX, maxX, minY, maxY } = boundary;
+
+    const corners = [
+      this.worldToScreen(minX, maxY),
+      this.worldToScreen(maxX, maxY),
+      this.worldToScreen(maxX, minY),
+      this.worldToScreen(minX, minY)
+    ];
+
+    this.ctx.save();
+
+    this.ctx.fillStyle = 'rgba(76, 175, 80, 0.05)';
+    this.ctx.beginPath();
+    this.ctx.moveTo(corners[0].x, corners[0].y);
+    for (let i = 1; i < corners.length; i++) {
+      this.ctx.lineTo(corners[i].x, corners[i].y);
+    }
+    this.ctx.closePath();
+    this.ctx.fill();
+
+    this.ctx.strokeStyle = '#4caf50';
+    this.ctx.lineWidth = 3;
+    this.ctx.setLineDash([8, 4]);
+    this.ctx.beginPath();
+    this.ctx.moveTo(corners[0].x, corners[0].y);
+    for (let i = 1; i < corners.length; i++) {
+      this.ctx.lineTo(corners[i].x, corners[i].y);
+    }
+    this.ctx.closePath();
+    this.ctx.stroke();
+
+    this.ctx.setLineDash([]);
+    this.ctx.fillStyle = '#4caf50';
+    this.ctx.font = '11px Arial';
+    this.ctx.textAlign = 'center';
+
+    const labelTop = this.worldToScreen((minX + maxX) / 2, maxY);
+    this.ctx.fillText(`边界 Y: ${maxY}m`, labelTop.x, labelTop.y - 10);
+
+    const labelBottom = this.worldToScreen((minX + maxX) / 2, minY);
+    this.ctx.fillText(`边界 Y: ${minY}m`, labelBottom.x, labelBottom.y + 15);
+
+    this.ctx.textAlign = 'left';
+    const labelLeft = this.worldToScreen(minX, (minY + maxY) / 2);
+    this.ctx.fillText(`X: ${minX}m`, labelLeft.x + 5, labelLeft.y);
+
+    this.ctx.textAlign = 'right';
+    const labelRight = this.worldToScreen(maxX, (minY + maxY) / 2);
+    this.ctx.fillText(`X: ${maxX}m`, labelRight.x - 5, labelRight.y);
+
+    this.ctx.restore();
+  }
+
   drawParkingSpot(spot, selected = false, hasAnomaly = false) {
     const corners = getRotatedRectangleCorners(
       spot.x, spot.y, spot.width, spot.length, spot.angle
@@ -286,9 +342,10 @@ export class Renderer {
     this.ctx.fillRect(0, 0, width, height);
   }
 
-  render(objects, selectedId = null, anomalousIds = new Set()) {
+  render(objects, selectedId = null, anomalousIds = new Set(), boundary = null) {
     this.clear();
     this.drawGrid();
+    this.drawBoundary(boundary);
     this.drawObjects(objects, selectedId, anomalousIds);
   }
 }

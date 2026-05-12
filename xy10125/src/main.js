@@ -19,6 +19,8 @@ class ParkingPlanner {
     this.playbackSpeed = 1;
     this.playbackIndex = 0;
     this.snapshots = [];
+    this.boundary = null;
+    this.defaultBoundary = { minX: -30, maxX: 30, minY: -30, maxY: 30 };
 
     this.init();
   }
@@ -86,7 +88,7 @@ class ParkingPlanner {
     });
 
     document.getElementById('btn-save').addEventListener('click', () => {
-      savePlan(this.objects);
+      savePlan(this.objects, this.boundary);
     });
 
     document.getElementById('btn-load').addEventListener('click', () => {
@@ -111,7 +113,7 @@ class ParkingPlanner {
 
     document.getElementById('btn-export').addEventListener('click', () => {
       const anomalies = this.detectAnomalies();
-      const html = generateReport(this.objects, anomalies);
+      const html = generateReport(this.objects, anomalies, this.boundary);
       downloadReport(html);
     });
 
@@ -122,6 +124,8 @@ class ParkingPlanner {
         this.selectedId = null;
         this.history = [];
         this.historyIndex = -1;
+        this.boundary = null;
+        document.getElementById('boundary-enabled').checked = false;
         this.saveSnapshot();
         this.render();
       }
@@ -155,6 +159,44 @@ class ParkingPlanner {
           this.saveSnapshot();
           this.render();
         }
+      }
+    });
+
+    document.getElementById('boundary-enabled').addEventListener('change', (e) => {
+      if (e.target.checked) {
+        this.boundary = this.getBoundaryFromInputs();
+      } else {
+        this.boundary = null;
+      }
+      this.saveSnapshot();
+      this.render();
+    });
+
+    const boundaryInputs = ['boundary-min-x', 'boundary-max-x', 'boundary-min-y', 'boundary-max-y'];
+    boundaryInputs.forEach(id => {
+      document.getElementById(id).addEventListener('input', (e) => {
+        const checked = document.getElementById('boundary-enabled').checked;
+        if (checked) {
+          const newBoundary = this.getBoundaryFromInputs();
+          if (newBoundary.minX < newBoundary.maxX && newBoundary.minY < newBoundary.maxY) {
+            this.boundary = newBoundary;
+            this.saveSnapshot();
+            this.render();
+          }
+        }
+      });
+    });
+
+    document.getElementById('btn-reset-boundary').addEventListener('click', () => {
+      document.getElementById('boundary-min-x').value = this.defaultBoundary.minX;
+      document.getElementById('boundary-max-x').value = this.defaultBoundary.maxX;
+      document.getElementById('boundary-min-y').value = this.defaultBoundary.minY;
+      document.getElementById('boundary-max-y').value = this.defaultBoundary.maxY;
+      const checked = document.getElementById('boundary-enabled').checked;
+      if (checked) {
+        this.boundary = { ...this.defaultBoundary };
+        this.saveSnapshot();
+        this.render();
       }
     });
   }
@@ -208,7 +250,7 @@ class ParkingPlanner {
     }
 
     if (this.currentTool !== 'select') {
-      this.renderer.render(this.objects, this.selectedId, this.getAnomalousIds());
+      this.renderer.render(this.objects, this.selectedId, this.getAnomalousIds(), this.boundary);
       this.renderer.drawPreview(this.currentTool, worldPos, this.getSettings());
     }
   }
@@ -290,7 +332,16 @@ class ParkingPlanner {
   }
 
   detectAnomalies() {
-    return detectAllAnomalies(this.objects);
+    return detectAllAnomalies(this.objects, this.boundary);
+  }
+
+  getBoundaryFromInputs() {
+    return {
+      minX: parseFloat(document.getElementById('boundary-min-x').value) || this.defaultBoundary.minX,
+      maxX: parseFloat(document.getElementById('boundary-max-x').value) || this.defaultBoundary.maxX,
+      minY: parseFloat(document.getElementById('boundary-min-y').value) || this.defaultBoundary.minY,
+      maxY: parseFloat(document.getElementById('boundary-max-y').value) || this.defaultBoundary.maxY
+    };
   }
 
   getAnomalousIds() {
@@ -358,14 +409,29 @@ class ParkingPlanner {
   }
 
   saveSnapshot() {
-    this.snapshots.push(this.objects.map(o => o.toJSON()));
+    this.snapshots.push({
+      objects: this.objects.map(o => o.toJSON()),
+      boundary: this.boundary ? { ...this.boundary } : null
+    });
     this.playbackIndex = this.snapshots.length - 1;
   }
 
   restoreSnapshot(data) {
     resetIdCounter();
-    this.objects = data.map(d => createFromJSON(d));
+    this.objects = data.objects.map(d => createFromJSON(d));
     this.selectedId = null;
+
+    this.boundary = data.boundary ? { ...data.boundary } : null;
+    if (this.boundary) {
+      document.getElementById('boundary-enabled').checked = true;
+      document.getElementById('boundary-min-x').value = this.boundary.minX;
+      document.getElementById('boundary-max-x').value = this.boundary.maxX;
+      document.getElementById('boundary-min-y').value = this.boundary.minY;
+      document.getElementById('boundary-max-y').value = this.boundary.maxY;
+    } else {
+      document.getElementById('boundary-enabled').checked = false;
+    }
+
     this.render();
   }
 
@@ -394,13 +460,25 @@ class ParkingPlanner {
     resetIdCounter();
     this.objects = data.objects.map(d => createFromJSON(d)).filter(Boolean);
     this.selectedId = null;
+    this.boundary = data.boundary || null;
+
+    if (this.boundary) {
+      document.getElementById('boundary-enabled').checked = true;
+      document.getElementById('boundary-min-x').value = this.boundary.minX;
+      document.getElementById('boundary-max-x').value = this.boundary.maxX;
+      document.getElementById('boundary-min-y').value = this.boundary.minY;
+      document.getElementById('boundary-max-y').value = this.boundary.maxY;
+    } else {
+      document.getElementById('boundary-enabled').checked = false;
+    }
+
     this.snapshots = [];
     this.saveSnapshot();
     this.render();
   }
 
   render() {
-    this.renderer.render(this.objects, this.selectedId, this.getAnomalousIds());
+    this.renderer.render(this.objects, this.selectedId, this.getAnomalousIds(), this.boundary);
     this.updateStats();
   }
 

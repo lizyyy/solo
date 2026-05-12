@@ -1,4 +1,4 @@
-export function generateReport(objects, anomalies) {
+export function generateReport(objects, anomalies, boundary = null) {
   const parkingSpots = objects.filter(o => o.type === 'parking');
   const fireLanes = objects.filter(o => o.type === 'fireLane');
   const turningAreas = objects.filter(o => o.type === 'turningRadius');
@@ -60,8 +60,36 @@ export function generateReport(objects, anomalies) {
       <div class="label">异常数量</div>
       <div class="value" style="color: ${anomalies.length > 0 ? '#f44336' : '#4caf50'}">${anomalies.length}</div>
     </div>
+    <div class="summary-card">
+      <div class="label">边界校验</div>
+      <div class="value" style="color: ${boundary ? '#4caf50' : '#9e9e9e'}">${boundary ? '已启用' : '未启用'}</div>
+    </div>
   </div>
-  
+`;
+
+  if (boundary) {
+    html += `
+  <h2>边界信息</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>参数</th>
+        <th>值 (米)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>左边界 X</td><td>${boundary.minX.toFixed(2)}</td></tr>
+      <tr><td>右边界 X</td><td>${boundary.maxX.toFixed(2)}</td></tr>
+      <tr><td>下边界 Y</td><td>${boundary.minY.toFixed(2)}</td></tr>
+      <tr><td>上边界 Y</td><td>${boundary.maxY.toFixed(2)}</td></tr>
+      <tr><td>边界宽度</td><td>${(boundary.maxX - boundary.minX).toFixed(2)} m</td></tr>
+      <tr><td>边界高度</td><td>${(boundary.maxY - boundary.minY).toFixed(2)} m</td></tr>
+    </tbody>
+  </table>
+`;
+  }
+
+  html += `
   <h2>面积统计</h2>
   <div class="summary">
     <div class="summary-card">
@@ -233,11 +261,12 @@ export function downloadReport(html, filename = 'parking-report.html') {
   URL.revokeObjectURL(url);
 }
 
-export function savePlan(objects, filename = 'parking-plan.json') {
+export function savePlan(objects, boundary = null, filename = 'parking-plan.json') {
   const data = {
-    version: '1.0',
+    version: '1.1',
     createdAt: new Date().toISOString(),
-    objects: objects.map(o => o.toJSON())
+    objects: objects.map(o => o.toJSON()),
+    boundary: boundary
   };
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });

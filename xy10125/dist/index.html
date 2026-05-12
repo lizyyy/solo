@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>停车场泊位拖拽规划器</title>
-  <script type="module" crossorigin src="/assets/index-C9S1qB6F.js"></script>
+  <script type="module" crossorigin src="/assets/index-BlpC1NXP.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-C50-dcR8.css">
 </head>
 <body>
@@ -46,6 +46,32 @@
             <label>角度 (°)</label>
             <input type="number" id="spot-angle" value="0" min="0" max="360" step="1">
           </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>边界设置</h3>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="boundary-enabled"> 启用边界校验
+            </label>
+          </div>
+          <div class="form-group">
+            <label>左边界 X (米)</label>
+            <input type="number" id="boundary-min-x" value="-30" step="1">
+          </div>
+          <div class="form-group">
+            <label>右边界 X (米)</label>
+            <input type="number" id="boundary-max-x" value="30" step="1">
+          </div>
+          <div class="form-group">
+            <label>下边界 Y (米)</label>
+            <input type="number" id="boundary-min-y" value="-30" step="1">
+          </div>
+          <div class="form-group">
+            <label>上边界 Y (米)</label>
+            <input type="number" id="boundary-max-y" value="30" step="1">
+          </div>
+          <button id="btn-reset-boundary" style="width:100%;padding:8px;margin-top:5px;">重置默认边界</button>
         </div>
 
         <div class="sidebar-section">
