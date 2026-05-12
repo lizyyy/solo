@@ -1,0 +1,80 @@
+export enum MerchantStatus {
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  FROZEN = 'FROZEN',
+  CLOSED = 'CLOSED',
+}
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  REFUNDED = 'REFUNDED',
+  PARTIAL_REFUNDED = 'PARTIAL_REFUNDED',
+}
+
+export enum RefundStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum PenaltyType {
+  PERFORMANCE = 'PERFORMANCE',
+  COMPLAINT = 'COMPLAINT',
+  FRAUD = 'FRAUD',
+  OTHER = 'OTHER',
+}
+
+export enum PenaltyStatus {
+  PENDING = 'PENDING',
+  APPEALING = 'APPEALING',
+  CONFIRMED = 'CONFIRMED',
+  CANCELLED = 'CANCELLED',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum AppealStatus {
+  PENDING = 'PENDING',
+  REVIEWING = 'REVIEWING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  CLOSED = 'CLOSED',
+}
+
+export enum SettlementStatus {
+  PENDING = 'PENDING',
+  CALCULATED = 'CALCULATED',
+  FROZEN = 'FROZEN',
+  CONFIRMED = 'CONFIRMED',
+  PAYING = 'PAYING',
+  PAID = 'PAID',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  MANUAL_ADJUSTED = 'MANUAL_ADJUSTED',
+}
+
+export enum SettlementItemType {
+  ORDER = 'ORDER',
+  REFUND = 'REFUND',
+  SERVICE_FEE = 'SERVICE_FEE',
+  PENALTY = 'PENALTY',
+  CARRY_OVER = 'CARRY_OVER',
+  MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT',
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  REVERSED = 'REVERSED',
+}
+
+export enum AdjustmentType {
+  INCREASE = 'INCREASE',
+  DECREASE = 'DECREASE',
+}

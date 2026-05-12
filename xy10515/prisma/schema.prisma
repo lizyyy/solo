@@ -1,0 +1,376 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Merchant {
+  id             String   @id @default(uuid())
+  merchantNo     String   @unique
+  name           String
+  phone          String?
+  status         MerchantStatus @default(ACTIVE)
+  contactName    String?
+  bankAccount    String?
+  bankName       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  orders         Order[]
+  refunds        Refund[]
+  penalties      Penalty[]
+  appeals        Appeal[]
+  settlements    Settlement[]
+  settlementItems SettlementItem[]
+  statusHistory  MerchantStatusHistory[]
+}
+
+model MerchantStatusHistory {
+  id             String   @id @default(uuid())
+  merchantId     String
+  oldStatus      MerchantStatus
+  newStatus      MerchantStatus
+  reason         String?
+  operator       String?
+  createdAt      DateTime @default(now())
+
+  merchant       Merchant @relation(fields: [merchantId], references: [id])
+
+  @@index([merchantId])
+}
+
+enum MerchantStatus {
+  ACTIVE
+  SUSPENDED
+  FROZEN
+  CLOSED
+}
+
+model Order {
+  id              String    @id @default(uuid())
+  orderNo         String    @unique
+  merchantId      String
+  merchantOrderNo String?
+  amount          Decimal   @db.Decimal(12, 2)
+  serviceFee      Decimal   @db.Decimal(12, 2) @default(0)
+  platformFee     Decimal   @db.Decimal(12, 2) @default(0)
+  payTime         DateTime
+  status          OrderStatus @default(COMPLETED)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  refunds         Refund[]
+  settlementItems SettlementItem[]
+
+  @@index([merchantId])
+  @@index([payTime])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  PARTIAL_REFUNDED
+}
+
+model Refund {
+  id              String    @id @default(uuid())
+  refundNo        String    @unique
+  orderId         String
+  merchantId      String
+  amount          Decimal   @db.Decimal(12, 2)
+  refundFee       Decimal   @db.Decimal(12, 2) @default(0)
+  reason          String?
+  status          RefundStatus @default(COMPLETED)
+  applyTime       DateTime
+  completeTime    DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  order           Order     @relation(fields: [orderId], references: [id])
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  settlementItems SettlementItem[]
+
+  @@index([merchantId])
+  @@index([applyTime])
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+model Penalty {
+  id              String    @id @default(uuid())
+  penaltyNo       String    @unique
+  merchantId      String
+  orderId         String?
+  amount          Decimal   @db.Decimal(12, 2)
+  type            PenaltyType
+  reason          String
+  status          PenaltyStatus @default(PENDING)
+  applyTime       DateTime
+  effectiveTime   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  order           Order?    @relation(fields: [orderId], references: [id])
+  appeal          Appeal?
+  settlementItems SettlementItem[]
+  statusHistory   PenaltyStatusHistory[]
+
+  @@index([merchantId])
+  @@index([applyTime])
+}
+
+enum PenaltyType {
+  PERFORMANCE
+  COMPLAINT
+  FRAUD
+  OTHER
+}
+
+enum PenaltyStatus {
+  PENDING
+  APPEALING
+  CONFIRMED
+  CANCELLED
+  SUSPENDED
+}
+
+model PenaltyStatusHistory {
+  id             String        @id @default(uuid())
+  penaltyId      String
+  oldStatus      PenaltyStatus
+  newStatus      PenaltyStatus
+  reason         String?
+  operator       String?
+  createdAt      DateTime      @default(now())
+
+  penalty        Penalty       @relation(fields: [penaltyId], references: [id])
+
+  @@index([penaltyId])
+}
+
+model Appeal {
+  id              String        @id @default(uuid())
+  appealNo        String        @unique
+  penaltyId       String        @unique
+  merchantId      String
+  reason          String
+  evidence        String?
+  status          AppealStatus  @default(PENDING)
+  applyTime       DateTime
+  reviewTime      DateTime?
+  reviewResult    String?
+  operator        String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  penalty         Penalty       @relation(fields: [penaltyId], references: [id])
+  merchant        Merchant      @relation(fields: [merchantId], references: [id])
+  statusHistory   AppealStatusHistory[]
+
+  @@index([merchantId])
+  @@index([applyTime])
+}
+
+enum AppealStatus {
+  PENDING
+  REVIEWING
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
+model AppealStatusHistory {
+  id             String        @id @default(uuid())
+  appealId       String
+  oldStatus      AppealStatus
+  newStatus      AppealStatus
+  reason         String?
+  operator       String?
+  createdAt      DateTime      @default(now())
+
+  appeal         Appeal        @relation(fields: [appealId], references: [id])
+
+  @@index([appealId])
+}
+
+model Settlement {
+  id                 String               @id @default(uuid())
+  settlementNo       String               @unique
+  merchantId         String
+  period             String
+  settlementDate     DateTime
+  status             SettlementStatus     @default(PENDING)
+  orderAmount        Decimal              @db.Decimal(12, 2) @default(0)
+  refundAmount       Decimal              @db.Decimal(12, 2) @default(0)
+  serviceFee         Decimal              @db.Decimal(12, 2) @default(0)
+  penaltyAmount      Decimal              @db.Decimal(12, 2) @default(0)
+  previousCarryOver  Decimal              @db.Decimal(12, 2) @default(0)
+  totalAmount        Decimal              @db.Decimal(12, 2) @default(0)
+  frozenAmount       Decimal              @db.Decimal(12, 2) @default(0)
+  payableAmount      Decimal              @db.Decimal(12, 2) @default(0)
+  actualPaidAmount   Decimal              @db.Decimal(12, 2) @default(0)
+  nextCarryOver      Decimal              @db.Decimal(12, 2) @default(0)
+  operator           String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  merchant           Merchant             @relation(fields: [merchantId], references: [id])
+  items              SettlementItem[]
+  payments           PaymentRecord[]
+  statusHistory      SettlementStatusHistory[]
+  manualAdjustments  ManualAdjustment[]
+
+  @@index([merchantId])
+  @@index([period])
+  @@index([settlementDate])
+}
+
+enum SettlementStatus {
+  PENDING
+  CALCULATED
+  FROZEN
+  CONFIRMED
+  PAYING
+  PAID
+  FAILED
+  CANCELLED
+  MANUAL_ADJUSTED
+}
+
+model SettlementItem {
+  id             String        @id @default(uuid())
+  settlementId   String
+  merchantId     String
+  itemType       SettlementItemType
+  itemNo         String
+  relatedNo      String?
+  amount         Decimal       @db.Decimal(12, 2)
+  description    String?
+  createdAt      DateTime      @default(now())
+
+  settlement     Settlement    @relation(fields: [settlementId], references: [id])
+  merchant       Merchant      @relation(fields: [merchantId], references: [id])
+  order          Order?        @relation(fields: [itemNo], references: [orderNo])
+  refund         Refund?       @relation(fields: [itemNo], references: [refundNo])
+  penalty        Penalty?      @relation(fields: [itemNo], references: [penaltyNo])
+
+  @@index([settlementId])
+  @@index([merchantId])
+}
+
+enum SettlementItemType {
+  ORDER
+  REFUND
+  SERVICE_FEE
+  PENALTY
+  CARRY_OVER
+  MANUAL_ADJUSTMENT
+}
+
+model SettlementStatusHistory {
+  id             String           @id @default(uuid())
+  settlementId   String
+  oldStatus      SettlementStatus
+  newStatus      SettlementStatus
+  reason         String?
+  operator       String?
+  createdAt      DateTime         @default(now())
+
+  settlement     Settlement       @relation(fields: [settlementId], references: [id])
+
+  @@index([settlementId])
+}
+
+model PaymentRecord {
+  id             String         @id @default(uuid())
+  paymentNo      String         @unique
+  settlementId   String
+  merchantId     String
+  amount         Decimal        @db.Decimal(12, 2)
+  status         PaymentStatus  @default(PENDING)
+  bankAccount    String?
+  bankName       String?
+  payTime        DateTime?
+  failReason     String?
+  operator       String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  settlement     Settlement     @relation(fields: [settlementId], references: [id])
+  statusHistory  PaymentStatusHistory[]
+
+  @@index([settlementId])
+  @@index([merchantId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+model PaymentStatusHistory {
+  id             String        @id @default(uuid())
+  paymentId      String
+  oldStatus      PaymentStatus
+  newStatus      PaymentStatus
+  reason         String?
+  operator       String?
+  createdAt      DateTime      @default(now())
+
+  payment        PaymentRecord @relation(fields: [paymentId], references: [id])
+
+  @@index([paymentId])
+}
+
+model ManualAdjustment {
+  id             String         @id @default(uuid())
+  adjustmentNo   String         @unique
+  settlementId   String
+  merchantId     String
+  adjustmentType AdjustmentType
+  amount         Decimal        @db.Decimal(12, 2)
+  reason         String
+  beforeAmount   Decimal        @db.Decimal(12, 2)
+  afterAmount    Decimal        @db.Decimal(12, 2)
+  operator       String
+  createdAt      DateTime       @default(now())
+
+  settlement     Settlement     @relation(fields: [settlementId], references: [id])
+
+  @@index([settlementId])
+  @@index([merchantId])
+}
+
+enum AdjustmentType {
+  INCREASE
+  DECREASE
+}
+
+model IdempotencyRecord {
+  id             String    @id @default(uuid())
+  idempotencyKey String    @unique
+  operationType  String
+  resourceId     String
+  response       String?
+  createdAt      DateTime  @default(now())
+  expiresAt      DateTime
+
+  @@index([idempotencyKey])
+}
