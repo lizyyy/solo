@@ -252,6 +252,14 @@ export async function updateConstructionNode(
     };
   }
 
+  if (order.status === OrderStatus.CONSTRUCTION_FAILED) {
+    return {
+      success: false,
+      code: 'CONSTRUCTION_ALREADY_FAILED',
+      message: '施工已失败，不能继续更新施工节点'
+    };
+  }
+
   const progress = await db.get<ConstructionProgress>(
     'SELECT * FROM construction_progress WHERE order_id = ? AND node = ?',
     [orderId, node]
@@ -271,6 +279,32 @@ export async function updateConstructionNode(
       code: 'NODE_ALREADY_COMPLETED',
       message: '该节点已完成，不能重复操作'
     };
+  }
+
+  const nodes = Object.values(ConstructionNode);
+  const currentIndex = nodes.indexOf(node);
+  
+  if (currentIndex > 0) {
+    const prevNodes = nodes.slice(0, currentIndex);
+    const placeholders = prevNodes.map(() => '?').join(', ');
+    const prevProgress = await db.all(
+      `SELECT * FROM construction_progress WHERE order_id = ? AND node IN (${placeholders})`,
+      [orderId, ...prevNodes]
+    );
+    
+    const allPrevCompleted = prevProgress.every(p => p.status === 'COMPLETED');
+    if (!allPrevCompleted) {
+      const incomplete = prevNodes.filter(n => {
+        const nodeProgress = prevProgress.find(p => p.node === n);
+        return !nodeProgress || nodeProgress.status !== 'COMPLETED';
+      });
+      return {
+        success: false,
+        code: 'PREV_NODE_NOT_COMPLETED',
+        message: '前置施工节点未完成，不能完成当前节点',
+        errorDetails: `需要先完成: ${incomplete.join(', ')}`
+      };
+    }
   }
 
   const beforeState = JSON.stringify({ status: order.status, nodeStatus: progress.status });
@@ -308,9 +342,6 @@ export async function updateConstructionNode(
     [new Date().toISOString(), remark || '节点完成', orderId, node]
   );
 
-  const nodes = Object.values(ConstructionNode);
-  const currentIndex = nodes.indexOf(node);
-  
   if (currentIndex < nodes.length - 1) {
     const nextNode = nodes[currentIndex + 1];
     await db.run(
@@ -384,6 +415,30 @@ export async function confirmActivation(
       success: false,
       code: 'CONSTRUCTION_FAILED',
       message: '施工失败的订单不能开通'
+    };
+  }
+
+  if (!order.device_id) {
+    return {
+      success: false,
+      code: 'DEVICE_NOT_BOUND',
+      message: '设备未绑定，不能开通'
+    };
+  }
+
+  const allProgress = await db.all(
+    'SELECT * FROM construction_progress WHERE order_id = ?',
+    [orderId]
+  );
+  
+  const allNodesCompleted = allProgress.every(p => p.status === 'COMPLETED');
+  if (!allNodesCompleted) {
+    const incompleteNodes = allProgress.filter(p => p.status !== 'COMPLETED').map(p => p.node);
+    return {
+      success: false,
+      code: 'NODES_NOT_COMPLETED',
+      message: '施工节点未全部完成，不能开通',
+      errorDetails: `未完成节点: ${incompleteNodes.join(', ')}`
     };
   }
 
