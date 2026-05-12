@@ -1,0 +1,56 @@
+[
+    {
+        "rule_id": "REFUND_001",
+        "name": "退款承诺",
+        "category": "退款承诺",
+        "keywords": ["全额退款", "直接退款", "马上退款", "立即退款", "给你退款", "可以退款", "肯定退款", "保证退款"],
+        "severity": "high",
+        "description": "客服承诺退款，需检查是否符合退款政策",
+        "is_active": true
+    },
+    {
+        "rule_id": "COMPENSATE_001",
+        "name": "赔付承诺",
+        "category": "违规保证",
+        "keywords": ["赔偿", "赔付", "补偿", "给你钱", "给你赔偿", "给你赔付", "现金补偿", "优惠券补偿"],
+        "severity": "high",
+        "description": "客服承诺额外赔付，违反政策",
+        "is_active": true
+    },
+    {
+        "rule_id": "GUARANTEE_001",
+        "name": "绝对保证",
+        "category": "违规保证",
+        "keywords": ["绝对", "100%", "肯定", "一定", "保证", "完全没问题", "绝对不会", "肯定不会"],
+        "severity": "medium",
+        "description": "使用绝对化词语，可能构成违规承诺",
+        "is_active": true
+    },
+    {
+        "rule_id": "ATTITUDE_001",
+        "name": "负面情绪词",
+        "category": "情绪安抚",
+        "keywords": ["生气", "投诉", "不满", "愤怒", "发火", "骗人", "骗子", "欺诈"],
+        "severity": "low",
+        "description": "用户表达负面情绪，需关注客服是否有效安抚",
+        "is_active": true
+    },
+    {
+        "rule_id": "UNRESOLVED_001",
+        "name": "未闭环信号",
+        "category": "未闭环",
+        "keywords": ["转人工", "请稍候", "稍后联系", "请等待", "我们会联系", "后续跟进", "后续处理"],
+        "severity": "medium",
+        "description": "会话中出现转人工或后续处理，但可能未闭环",
+        "is_active": true
+    },
+    {
+        "rule_id": "EXPIRED_001",
+        "name": "过期承诺",
+        "category": "违规保证",
+        "keywords": ["永不", "永久", "终身", "长期有效", "无限期"],
+        "severity": "medium",
+        "description": "承诺过期或超出服务期限",
+        "is_active": true
+    }
+]

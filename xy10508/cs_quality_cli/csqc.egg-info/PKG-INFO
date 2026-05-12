@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: csqc
+Version: 1.0.0
+Summary: 客服敏感话术抽检 CLI
+Requires-Python: >=3.7
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=10.0.0
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

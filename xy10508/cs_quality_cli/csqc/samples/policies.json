@@ -1,0 +1,36 @@
+[
+    {
+        "policy_id": "POLICY_001",
+        "name": "7天无理由退款",
+        "conditions": [
+            "商品未使用",
+            "包装完好",
+            "在签收后7天内",
+            "非特殊商品（内衣、定制等）"
+        ],
+        "max_amount": null,
+        "is_active": true
+    },
+    {
+        "policy_id": "POLICY_002",
+        "name": "质量问题退款",
+        "conditions": [
+            "存在质量问题",
+            "提供照片证明",
+            "在签收后30天内"
+        ],
+        "max_amount": null,
+        "is_active": true
+    },
+    {
+        "policy_id": "POLICY_003",
+        "name": "补偿规则",
+        "conditions": [
+            "物流延误超过48小时",
+            "由商家责任导致",
+            "补偿金额不超过订单金额的30%"
+        ],
+        "max_amount": 100.0,
+        "is_active": true
+    }
+]
