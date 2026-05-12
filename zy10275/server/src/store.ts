@@ -334,8 +334,9 @@ class DataStore {
     }
 
     let wasWaitlisted = false
+    const activePlayers = this.getActivePlayersCount(session)
 
-    if (session.players.length >= session.maxPlayers) {
+    if (activePlayers >= session.maxPlayers) {
       player.status = PlayerStatus.WAITLIST
       session.waitlist.push(player)
       wasWaitlisted = true
@@ -404,9 +405,6 @@ class DataStore {
 
     if (isFromWaitlist) {
       session.waitlist.splice(playerIndex, 1)
-    } else {
-      session.players = session.players.filter(p => p.id !== playerId)
-      session.players.push(player)
     }
 
     this.updateSessionStatus(session)
