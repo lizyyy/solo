@@ -1,0 +1,7 @@
+客户编号,客户名称,联系电话,电子邮箱,客户等级,客户来源,省份,城市,详细地址,备注
+C001,张三,13800138001,zhangsan@example.com,gold,online,北京市,北京市,朝阳区建国路88号,VIP客户
+C002,,13800138002,lisi@example.com,silver,offline,上海市,上海市,浦东新区陆家嘴,缺少客户名称
+C003,王五,13800138003,wangwu@example.com,INVALID_ENUM,referral,广东省,广州市,天河区珠江新城,等级不合法
+C001,赵六,13800138004,zhaoliu@example.com,platinum,advertisement,浙江省,杭州市,西湖区文三路,与第1行重复
+C005,钱七,13800138005,invalid-email,normal,online,江苏省,南京市,鼓楼区中山路,邮箱格式错误
+C006,孙八,13800138006,sunba@example.com,normal,online,,,缺少省份城市
