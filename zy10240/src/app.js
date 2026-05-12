@@ -11,6 +11,7 @@ const plantRoutes = require('./routes/plantRoutes');
 const maintenanceRoutes = require('./routes/maintenanceRoutes');
 const repottingRoutes = require('./routes/repottingRoutes');
 const compensationRoutes = require('./routes/compensationRoutes');
+const witheringRoutes = require('./routes/witheringRoutes');
 const renewalRoutes = require('./routes/renewalRoutes');
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/plants', plantRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/repotting', repottingRoutes);
 app.use('/api/compensations', compensationRoutes);
+app.use('/api/withering', witheringRoutes);
 app.use('/api/renewal', renewalRoutes);
 
 app.get('/api/health', (req, res) => {
@@ -57,6 +59,7 @@ app.listen(PORT, async () => {
   console.log('  POST /api/maintenance - 创建养护任务');
   console.log('  POST /api/repotting - 创建换盆记录');
   console.log('  POST /api/compensations - 创建赔偿记录');
+  console.log('  POST /api/withering - 创建枯萎处理');
   console.log('  POST /api/renewal/contracts - 创建续租合同');
   console.log('  POST /api/renewal/contracts/:id/generate-bill - 生成续租账单');
 });

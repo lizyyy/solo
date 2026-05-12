@@ -199,8 +199,24 @@ class PlantRentalService {
     return result;
   }
 
+  static async checkUnfinishedMaintenance(locationId) {
+    const maintenanceTasks = await MaintenanceTask.getAll();
+    const unfinishedTasks = maintenanceTasks.filter(
+      t => t.location_id === locationId && 
+           t.status !== MAINTENANCE_STATUSES.COMPLETED && 
+           t.status !== MAINTENANCE_STATUSES.CANCELLED
+    );
+    return unfinishedTasks;
+  }
+
   static async createRenewalContract(data, requestId, operatedBy) {
     const result = await DeduplicationService.ensureUnique(requestId, 'renewal', async () => {
+      const unfinishedTasks = await this.checkUnfinishedMaintenance(data.location_id);
+      if (unfinishedTasks.length > 0) {
+        const taskIds = unfinishedTasks.map(t => t.id).join(', ');
+        throw new Error(`该点位存在 ${unfinishedTasks.length} 个未完成的养护任务 (${taskIds})，请先完成养护再办理续租`);
+      }
+      
       const contract = await RenewalContract.create(data, requestId);
       await HistoryService.record('create', contract.id, 'renewal', 'create', operatedBy, null, contract, requestId);
       return contract;
@@ -213,6 +229,12 @@ class PlantRentalService {
     if (!contract) throw new Error('续租合同不存在');
     
     StateMachineService.validateRenewalTransition(contract.status, RENEWAL_STATUSES.CONFIRMED);
+    
+    const unfinishedTasks = await this.checkUnfinishedMaintenance(contract.location_id);
+    if (unfinishedTasks.length > 0) {
+      const taskIds = unfinishedTasks.map(t => t.id).join(', ');
+      throw new Error(`该点位存在 ${unfinishedTasks.length} 个未完成的养护任务 (${taskIds})，请先完成养护再确认续租`);
+    }
     
     const oldData = { ...contract };
     await RenewalContract.confirm(contractId);
@@ -236,6 +258,41 @@ class PlantRentalService {
     return newContract;
   }
 
+  static async calculatePlantRentalInfo(plant, contractStartDate) {
+    let shouldRent = true;
+    let reason = '';
+    let adjustedRent = plant.monthly_rent || 0;
+    
+    if (plant.status === PLANT_STATUSES.DEAD) {
+      shouldRent = false;
+      reason = '植物已死亡，不计租金';
+      adjustedRent = 0;
+    }
+    
+    const compensations = await Compensation.getByPlant(plant.id);
+    const hasPaidCompensation = compensations.some(c => c.status === COMPENSATION_STATUSES.PAID);
+    
+    if (hasPaidCompensation && plant.status === PLANT_STATUSES.HEALTHY) {
+      reason = '植物已赔偿但现已恢复健康，恢复计租';
+    }
+    
+    if (hasPaidCompensation && plant.status !== PLANT_STATUSES.HEALTHY && plant.status !== PLANT_STATUSES.DEAD) {
+      reason = '植物已赔偿但未死亡，继续计租';
+    }
+    
+    return {
+      plant_id: plant.id,
+      name: plant.name,
+      species: plant.species,
+      pot_number: plant.pot_number,
+      status: plant.status,
+      monthly_rent: plant.monthly_rent,
+      adjusted_rent: adjustedRent,
+      should_rent: shouldRent,
+      reason: reason
+    };
+  }
+
   static async generateRenewalBill(contractId, operatedBy) {
     const contract = await RenewalContract.getById(contractId);
     if (!contract) throw new Error('续租合同不存在');
@@ -243,27 +300,55 @@ class PlantRentalService {
     StateMachineService.validateRenewalTransition(contract.status, RENEWAL_STATUSES.BILLED);
     
     const plants = await Plant.getByLocation(contract.location_id);
-    const plantDetails = JSON.stringify(plants.map(p => ({
-      id: p.id,
-      name: p.name,
-      pot_number: p.pot_number,
-      monthly_rent: p.monthly_rent
-    })));
     
-    const rentalAmount = plants.reduce((sum, p) => sum + (p.monthly_rent || 0), 0);
-    
-    const compensations = await Compensation.getAll();
-    const locationCompensations = compensations.filter(
-      c => c.location_id === contract.location_id && c.status === COMPENSATION_STATUSES.APPROVED
+    const rentalInfos = await Promise.all(
+      plants.map(p => this.calculatePlantRentalInfo(p, contract.start_date))
     );
-    const compensationAmount = locationCompensations.reduce((sum, c) => sum + (c.amount || 0), 0);
+    
+    const billablePlants = rentalInfos.filter(info => info.should_rent);
+    const rentalAmount = billablePlants.reduce((sum, info) => sum + info.adjusted_rent, 0);
+    
+    const allCompensations = await Compensation.getAll();
+    const locationCompensations = allCompensations.filter(
+      c => c.location_id === contract.location_id
+    );
+    
+    const pendingCompensations = locationCompensations.filter(
+      c => c.status === COMPENSATION_STATUSES.PENDING
+    );
+    const approvedCompensations = locationCompensations.filter(
+      c => c.status === COMPENSATION_STATUSES.APPROVED
+    );
+    
+    if (pendingCompensations.length > 0) {
+      const pendingIds = pendingCompensations.map(c => c.id).join(', ');
+      throw new Error(`该点位存在 ${pendingCompensations.length} 个待审批的赔偿记录 (${pendingIds})，请先处理赔偿再生成账单`);
+    }
+    
+    const compensationAmount = approvedCompensations.reduce((sum, c) => sum + (c.amount || 0), 0);
+    
+    const billDetails = {
+      plants: rentalInfos,
+      compensations: locationCompensations.map(c => ({
+        id: c.id,
+        amount: c.amount,
+        reason: c.reason,
+        status: c.status
+      })),
+      summary: {
+        total_plants: plants.length,
+        billable_plants: billablePlants.length,
+        unbilled_plants: plants.length - billablePlants.length,
+        approved_compensations_count: approvedCompensations.length
+      }
+    };
     
     const billData = {
       renewal_contract_id: contractId,
       customer_id: contract.customer_id,
       bill_date: new Date().toISOString().split('T')[0],
       due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      plant_details: plantDetails,
+      plant_details: JSON.stringify(billDetails),
       rental_amount: rentalAmount,
       compensation_amount: compensationAmount,
       total_amount: rentalAmount + compensationAmount,
