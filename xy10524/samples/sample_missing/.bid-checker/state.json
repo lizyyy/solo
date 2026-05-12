@@ -1,0 +1,188 @@
+{
+  "initialized": true,
+  "last_check": "2026-05-12T10:51:14.043482",
+  "status": "blocked",
+  "materials": [
+    {
+      "id": "mat_15_2043",
+      "name": "投标报价单_v2.0.xlsx",
+      "type": "quotation",
+      "path": "投标报价单_v2.0.xlsx",
+      "version": "2.0",
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    },
+    {
+      "id": "mat_15_8525",
+      "name": "报价汇总表_v2.0.xlsx",
+      "type": "quotation",
+      "path": "报价汇总表_v2.0.xlsx",
+      "version": "2.0",
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    },
+    {
+      "id": "mat_8_1813",
+      "name": "营业执照.pdf",
+      "type": "qualification",
+      "path": "营业执照.pdf",
+      "version": null,
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    },
+    {
+      "id": "mat_13_4480",
+      "name": "资质证书_2024.pdf",
+      "type": "qualification",
+      "path": "资质证书_2024.pdf",
+      "version": null,
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    },
+    {
+      "id": "mat_9_5789",
+      "name": "技术方案.docx",
+      "type": "other",
+      "path": "技术方案.docx",
+      "version": null,
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    },
+    {
+      "id": "mat_17_2847",
+      "name": "version_info.json",
+      "type": "other",
+      "path": "version_info.json",
+      "version": null,
+      "is_current": true,
+      "has_seal": false,
+      "amount": null,
+      "amount_source": null
+    }
+  ],
+  "versions": [
+    {
+      "version": "1.0",
+      "date": "2024-11-15",
+      "author": "王五",
+      "changes": [
+        "初稿"
+      ]
+    }
+  ],
+  "check_results": [
+    {
+      "rule_id": "REQUIRED_PRESENT",
+      "status": "passed",
+      "message": "必需材料齐全: 投标报价单",
+      "details": {
+        "requirement": "投标报价单"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_PRESENT",
+      "status": "passed",
+      "message": "必需材料齐全: 报价汇总表",
+      "details": {
+        "requirement": "报价汇总表"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_PRESENT",
+      "status": "passed",
+      "message": "必需材料齐全: 营业执照",
+      "details": {
+        "requirement": "营业执照"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_PRESENT",
+      "status": "passed",
+      "message": "必需材料齐全: 资质证书",
+      "details": {
+        "requirement": "资质证书"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_MISSING",
+      "status": "blocked",
+      "message": "缺少必需材料: 授权委托书",
+      "details": {
+        "requirement": "授权委托书",
+        "type": "authorization"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_MISSING",
+      "status": "blocked",
+      "message": "缺少必需材料: 盖章页/骑缝章",
+      "details": {
+        "requirement": "盖章页/骑缝章",
+        "type": "seal_page"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "REQUIRED_MISSING",
+      "status": "blocked",
+      "message": "缺少必需材料: 版本说明",
+      "details": {
+        "requirement": "版本说明",
+        "type": "version_doc"
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "NO_OLD_VERSIONS",
+      "status": "passed",
+      "message": "未检测到旧版本文件",
+      "details": null,
+      "material_id": null
+    },
+    {
+      "rule_id": "SEAL_MISSING",
+      "status": "blocked",
+      "message": "缺少盖章页文件",
+      "details": {
+        "required": true
+      },
+      "material_id": null
+    },
+    {
+      "rule_id": "INSUFFICIENT_QUOTATIONS",
+      "status": "warning",
+      "message": "报价文件数量不足，无法验证一致性（找到 0 个）",
+      "details": null,
+      "material_id": null
+    },
+    {
+      "rule_id": "VERSION_DOC_MISSING",
+      "status": "warning",
+      "message": "缺少版本说明文档",
+      "details": null,
+      "material_id": null
+    },
+    {
+      "rule_id": "VERSION_INFO_PRESENT",
+      "status": "passed",
+      "message": "已导入 1 条版本记录",
+      "details": null,
+      "material_id": null
+    }
+  ]
+}

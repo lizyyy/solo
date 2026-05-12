@@ -1,0 +1,61 @@
+{
+  "project_name": "演示项目",
+  "requirements": [
+    {
+      "name": "投标报价单",
+      "type": "quotation",
+      "required": true,
+      "pattern": "*报价*",
+      "description": "包含详细报价金额的文件"
+    },
+    {
+      "name": "报价汇总表",
+      "type": "quotation",
+      "required": true,
+      "pattern": "*汇总*",
+      "description": "报价金额汇总表"
+    },
+    {
+      "name": "营业执照",
+      "type": "qualification",
+      "required": true,
+      "pattern": "*营业执照*",
+      "description": "企业营业执照副本"
+    },
+    {
+      "name": "资质证书",
+      "type": "qualification",
+      "required": true,
+      "pattern": "*资质*",
+      "description": "相关资质证明文件"
+    },
+    {
+      "name": "授权委托书",
+      "type": "authorization",
+      "required": true,
+      "pattern": "*授权*",
+      "description": "法人授权委托书"
+    },
+    {
+      "name": "盖章页/骑缝章",
+      "type": "seal_page",
+      "required": true,
+      "pattern": "*盖章*",
+      "description": "需要盖章的文件页面"
+    },
+    {
+      "name": "版本说明",
+      "type": "version_doc",
+      "required": true,
+      "pattern": "*版本*",
+      "description": "版本变更说明文档"
+    }
+  ],
+  "rules": {
+    "must_have_seal": true,
+    "check_version_consistency": true,
+    "check_amount_consistency": true,
+    "required_materials_cannot_waive": true
+  },
+  "operators": []
+}

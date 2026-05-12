@@ -1,0 +1,44 @@
+[
+  {
+    "id": "hist_20260512105110",
+    "timestamp": "2026-05-12T10:51:10.612988",
+    "operator": "system",
+    "action": "init",
+    "before": null,
+    "after": {
+      "initialized": true,
+      "project_name": "缺件项目"
+    },
+    "comment": "初始化项目"
+  },
+  {
+    "id": "hist_20260512105111",
+    "timestamp": "2026-05-12T10:51:11.586951",
+    "operator": "王五",
+    "action": "import_versions",
+    "before": {
+      "materials_count": 0,
+      "versions_count": 0
+    },
+    "after": {
+      "materials_count": 0,
+      "versions_count": 1
+    },
+    "comment": "从 version_info.json 导入数据"
+  },
+  {
+    "id": "hist_20260512105114",
+    "timestamp": "2026-05-12T10:51:14.044655",
+    "operator": "赵六",
+    "action": "check",
+    "before": {
+      "last_check": "2026-05-12T10:51:14.043482"
+    },
+    "after": {
+      "last_check": "2026-05-12T10:51:14.043482",
+      "status": "blocked",
+      "results_count": 12
+    },
+    "comment": "执行完整性检查"
+  }
+]

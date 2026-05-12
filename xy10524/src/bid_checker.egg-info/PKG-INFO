@@ -1,0 +1,363 @@
+Metadata-Version: 2.4
+Name: bid-checker
+Version: 0.1.0
+Summary: 投标文件完整性检查CLI工具
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: click>=8.0.0
+Requires-Dist: rich>=12.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: openpyxl>=3.1.0
+Requires-Dist: python-dateutil>=2.8.0
+
+# 投标文件完整性检查 CLI
+
+一款专为商务投标场景设计的文件完整性检查工具，帮助团队在投标前系统性地验证报价、资质、授权书、盖章页和版本是否齐全一致。
+
+## 功能特性
+
+- **五大核心检查**：报价一致性、资质完整性、授权书、盖章页、版本控制
+- **完整命令体系**：init/import/check/detail/report/samples
+- **状态追踪**：实时显示检查状态变化（通过/警告/失败/阻断）
+- **历史记录**：所有操作留痕，支持幂等执行
+- **人工修正留痕**：记录前后差异和操作者
+- **可视化报告**：清晰展示可提交/需补件/阻断风险/负责人修正清单
+
+## 安装
+
+```bash
+# 进入项目目录
+cd /path/to/project
+
+# 创建虚拟环境（可选）
+python3 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+# 或 .venv\Scripts\activate  # Windows
+
+# 安装项目
+pip install -e .
+```
+
+## 快速开始
+
+### 1. 生成演示样例
+
+```bash
+bid-checker samples
+```
+
+这会在当前目录下创建 `samples/` 文件夹，包含4个测试场景：
+- `sample_passing` - 通过检查的完整项目
+- `sample_missing` - 缺少材料的项目（缺少授权书和盖章页）
+- `sample_old_version` - 包含旧版本文件的项目
+- `sample_amount_mismatch` - 报价金额不一致的项目
+
+### 2. 主演示路径（通过检查）
+
+```bash
+# 进入通过检查的样例目录
+cd samples/sample_passing
+
+# 1. 初始化项目
+bid-checker init -n "XX项目投标文件"
+
+# 2. 导入版本说明
+bid-checker import versions version_info.json -o "张三"
+
+# 3. 执行完整性检查
+bid-checker check -o "李四"
+
+# 4. 查看详细信息
+bid-checker detail
+
+# 5. 生成报告
+bid-checker report -o report.txt
+```
+
+### 3. 失败路径演示（缺少材料）
+
+```bash
+cd ../sample_missing
+
+# 初始化
+bid-checker init -n "问题项目"
+
+# 导入版本
+bid-checker import versions version_info.json -o "王五"
+
+# 执行检查（会失败）
+bid-checker check -o "赵六"
+
+# 查看详细问题
+bid-checker detail
+
+# 生成报告查看修正清单
+bid-checker report -o issues_report.txt
+```
+
+## 命令详解
+
+### bid-checker init
+初始化投标项目目录
+
+```bash
+bid-checker init -n "项目名称" -p "/path/to/project"
+```
+
+**参数：**
+- `-n, --name`: 项目名称（默认：投标项目）
+- `-p, --path`: 项目目录路径（默认：当前目录）
+
+**状态变化：**
+- 首次执行：创建 `.bid-checker/` 目录，初始化配置和状态文件
+- 重复执行：幂等操作，提示已初始化并跳过
+
+### bid-checker import
+导入材料清单或版本说明
+
+```bash
+# 导入版本说明
+bid-checker import versions version_info.json -o "操作者"
+
+# 导入材料清单
+bid-checker import materials materials.json -o "操作者"
+
+# 全部导入
+bid-checker import all data.json -o "操作者"
+```
+
+**参数：**
+- `import_type`: materials | versions | all
+- `file_path`: JSON文件路径
+- `-o, --operator`: 操作者姓名（默认：anonymous）
+- `-p, --path`: 项目目录路径
+
+**历史记录：**
+- 记录导入前后的数量变化
+- 记录操作者和导入类型
+
+### bid-checker check
+执行文件完整性检查
+
+```bash
+bid-checker check -o "操作者"
+```
+
+**参数：**
+- `-o, --operator`: 操作者姓名
+- `-f, --force`: 强制重新检查
+- `-p, --path`: 项目目录路径
+
+**检查规则：**
+1. **必需材料检查**（阻断级别）
+   - 投标报价单
+   - 报价汇总表
+   - 营业执照
+   - 资质证书
+   - 授权委托书
+   - 盖章页
+   - 版本说明
+
+2. **版本检查**（警告级别）
+   - 检测文件名包含"旧版"或"old"的文件
+   - 提取版本号（v1.0, 版本2.0, 1.0版, _20240101_）
+
+3. **盖章检查**（阻断/警告级别）
+   - 检测盖章页文件
+   - 确认是否已盖章（文件名包含"已盖章"）
+
+4. **金额一致性检查**（失败级别）
+   - 解析Excel中的报价金额
+   - 比对报价单和汇总表金额是否一致
+
+**退出码：**
+- `0`: 通过或有警告（可继续）
+- `1`: 有阻断或失败（需要修正）
+
+### bid-checker detail
+查看详细信息
+
+```bash
+# 查看全部
+bid-checker detail
+
+# 只看材料清单
+bid-checker detail -t materials
+
+# 只看版本历史
+bid-checker detail -t versions
+
+# 只看操作历史
+bid-checker detail -t history
+```
+
+### bid-checker report
+生成检查报告
+
+```bash
+# 输出到终端
+bid-checker report
+
+# 保存为文本文件
+bid-checker report -o report.txt
+
+# 保存为JSON
+bid-checker report -o report.json -f json
+```
+
+**报告内容：**
+- 检查统计（通过/警告/失败/阻断数量）
+- 结论（可提交/需修正）
+- 需补件清单（阻断风险）
+- 金额不一致清单（失败风险）
+- 旧版本文件清单（警告）
+- 盖章问题清单
+- 负责人修正清单（按严重程度排序）
+
+### bid-checker samples
+生成演示样例数据
+
+```bash
+bid-checker samples -o my_samples
+```
+
+## 数据格式
+
+### 版本说明文件 (version_info.json)
+
+```json
+{
+  "versions": [
+    {
+      "version": "2.0",
+      "date": "2024-12-01",
+      "author": "张三",
+      "changes": [
+        "更新报价金额",
+        "补充资质证书"
+      ]
+    },
+    {
+      "version": "1.0",
+      "date": "2024-11-15",
+      "author": "李四",
+      "changes": [
+        "初稿完成"
+      ]
+    }
+  ]
+}
+```
+
+### 材料清单文件 (materials.json)
+
+```json
+{
+  "materials": [
+    {
+      "id": "mat_1",
+      "name": "投标报价单_v2.0.xlsx",
+      "type": "quotation",
+      "path": "投标报价单_v2.0.xlsx",
+      "version": "2.0",
+      "is_current": true,
+      "has_seal": false,
+      "amount": 500000.00,
+      "amount_source": "投标报价单_v2.0.xlsx:Sheet1"
+    }
+  ]
+}
+```
+
+## 项目结构
+
+```
+.
+├── pyproject.toml          # 项目配置
+├── src/
+│   └── bid_checker/
+│       ├── __init__.py
+│       ├── cli.py          # CLI命令入口
+│       ├── models.py       # 数据模型定义
+│       ├── config.py       # 配置管理
+│       ├── checker.py      # 核心检查逻辑
+│       └── samples.py      # 样例数据生成器
+└── README.md
+```
+
+## 状态文件说明
+
+项目初始化后会在目录下创建 `.bid-checker/` 文件夹：
+
+```
+.bid-checker/
+├── config.json     # 项目配置（必需材料列表、检查规则）
+├── state.json      # 当前状态（材料、检查结果、版本）
+└── history.json    # 操作历史记录
+```
+
+## 幂等性保证
+
+- **init**: 已初始化时跳过，不覆盖现有配置
+- **import**: 覆盖式导入，记录前后差异
+- **check**: 可重复执行，每次重新扫描目录并更新状态
+- **report**: 基于当前状态生成，不修改任何数据
+
+## 常见问题
+
+**Q: 如何处理相似文件名但版本旧的情况？**
+A: 系统会检测文件名包含"旧版"或"old"的文件，并标记为警告。建议在文件名中包含版本号（如 _v2.0）便于管理。
+
+**Q: 金额不一致检查的原理是什么？**
+A: 系统会解析Excel文件，查找包含"合计"、"总计"、"报价"等关键词的单元格，并提取其中的金额进行比对。
+
+**Q: 盖章页如何确认？**
+A: 目前基于文件名判断（包含"已盖章"字样）。实际使用时建议商务人员在盖章后更新文件名，或通过人工确认后在系统中标记。
+
+## 演示脚本
+
+```bash
+#!/bin/bash
+# 完整演示脚本
+
+echo "=== 生成样例数据 ==="
+bid-checker samples
+
+echo ""
+echo "=== 场景1: 通过检查的项目 ==="
+cd samples/sample_passing
+bid-checker init -n "完整项目"
+bid-checker import versions version_info.json -o "张三"
+bid-checker check -o "李四"
+bid-checker report -o ../../report_passing.txt
+
+echo ""
+echo "=== 场景2: 缺少材料的项目 ==="
+cd ../sample_missing
+bid-checker init -n "缺件项目"
+bid-checker import versions version_info.json -o "王五"
+bid-checker check -o "赵六" || true  # 允许失败继续
+bid-checker report -o ../../report_missing.txt
+
+echo ""
+echo "=== 场景3: 包含旧版本的项目 ==="
+cd ../sample_old_version
+bid-checker init -n "旧版项目"
+bid-checker import versions version_info.json -o "钱七"
+bid-checker check -o "孙八" || true
+bid-checker report -o ../../report_old_version.txt
+
+echo ""
+echo "=== 场景4: 金额不一致的项目 ==="
+cd ../sample_amount_mismatch
+bid-checker init -n "金额错误项目"
+bid-checker import versions version_info.json -o "周九"
+bid-checker check -o "吴十" || true
+bid-checker report -o ../../report_amount_mismatch.txt
+
+cd ../../
+echo ""
+echo "=== 演示完成 ==="
+echo "报告已生成在当前目录:"
+ls -la report_*.txt
+```
