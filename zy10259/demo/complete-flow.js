@@ -257,7 +257,7 @@ async function completeFlowDemo() {
       amount: 100,
       operator: '财务小张',
       reason: '设备外壳轻微损坏赔偿'
-    });
+    }, true);
     console.log('✅ 押金扣减完成');
     console.log('   扣减金额:', result.response.data.amount, '元');
     console.log('   剩余押金:', result.response.data.balance, '元');

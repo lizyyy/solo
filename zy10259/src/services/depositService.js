@@ -180,7 +180,7 @@ class DepositService {
 
   static async getTransactionsByOrderId(orderId) {
     return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM deposit_transactions WHERE order_id = ? ORDER BY created_at', [orderId], (err, rows) => {
+      db.all('SELECT * FROM deposit_transactions WHERE order_id = ? ORDER BY transaction_date', [orderId], (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
