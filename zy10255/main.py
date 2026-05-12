@@ -613,6 +613,13 @@ def generate_bill(
     db.flush()
     total_amount = 0
     transfer = db.query(TenantTransfer).filter(TenantTransfer.id == transfer_id).first() if transfer_id else None
+    
+    is_old_tenant = False
+    is_new_tenant = False
+    if transfer and transfer.is_confirmed:
+        is_old_tenant = (tenant_id == transfer.old_tenant_id)
+        is_new_tenant = (tenant_id == transfer.new_tenant_id)
+    
     for meter_type in [MeterType.WATER, MeterType.ELECTRICITY]:
         readings = db.query(MeterReading).filter(
             MeterReading.room_id == room_id,
@@ -628,22 +635,44 @@ def generate_bill(
             prev_reading = readings[0]
         if prev_reading:
             current_reading = readings[-1]
-            usage = current_reading.reading_value - prev_reading.reading_value
+            total_usage = current_reading.reading_value - prev_reading.reading_value
             unit_price = get_price_at_date(db, meter_type, period_end)
             days_in_period = calculate_days_between(period_start, period_end)
+            
             split_ratio = 1.0
-            if transfer and transfer.is_confirmed:
-                transfer_date = transfer.transfer_date
-                days_before = calculate_days_between(period_start, transfer_date)
-                split_ratio = days_before / days_in_period if days_in_period > 0 else 1.0
-            amount = usage * unit_price * split_ratio
+            actual_usage = total_usage
+            
+            if transfer and transfer.is_confirmed and (is_old_tenant or is_new_tenant):
+                transfer_reading = None
+                if meter_type == "water":
+                    transfer_reading = transfer.water_reading
+                elif meter_type == "electricity":
+                    transfer_reading = transfer.electricity_reading
+                
+                if transfer_reading is not None and transfer_reading > 0:
+                    if is_old_tenant:
+                        actual_usage = transfer_reading - prev_reading.reading_value
+                        split_ratio = actual_usage / total_usage if total_usage > 0 else 0
+                    elif is_new_tenant:
+                        actual_usage = current_reading.reading_value - transfer_reading
+                        split_ratio = actual_usage / total_usage if total_usage > 0 else 0
+                else:
+                    days_before = calculate_days_between(period_start, transfer.transfer_date)
+                    if is_old_tenant:
+                        split_ratio = days_before / days_in_period if days_in_period > 0 else 1.0
+                    elif is_new_tenant:
+                        split_ratio = (days_in_period - days_before) / days_in_period if days_in_period > 0 else 0
+                    actual_usage = total_usage * split_ratio
+            
+            amount = actual_usage * unit_price
+            
             bill_item = BillItem(
                 bill_id=bill.id,
                 meter_type=meter_type,
                 reading_id=current_reading.id,
                 previous_reading=prev_reading.reading_value,
                 current_reading=current_reading.reading_value,
-                usage=usage,
+                usage=actual_usage,
                 unit_price=unit_price,
                 amount=amount,
                 days_in_period=days_in_period,
@@ -764,6 +793,13 @@ def regenerate_bill(bill_id: int, db: Session = Depends(get_db)):
     db.query(BillItem).filter(BillItem.bill_id == bill_id).delete()
     total_amount = 0
     transfer = db.query(TenantTransfer).filter(TenantTransfer.id == bill.transfer_id).first() if bill.transfer_id else None
+    
+    is_old_tenant = False
+    is_new_tenant = False
+    if transfer and transfer.is_confirmed:
+        is_old_tenant = (bill.tenant_id == transfer.old_tenant_id)
+        is_new_tenant = (bill.tenant_id == transfer.new_tenant_id)
+    
     for meter_type in [MeterType.WATER, MeterType.ELECTRICITY]:
         readings = db.query(MeterReading).filter(
             MeterReading.room_id == bill.room_id,
@@ -779,22 +815,44 @@ def regenerate_bill(bill_id: int, db: Session = Depends(get_db)):
             prev_reading = readings[0]
         if prev_reading:
             current_reading = readings[-1]
-            usage = current_reading.reading_value - prev_reading.reading_value
+            total_usage = current_reading.reading_value - prev_reading.reading_value
             unit_price = get_price_at_date(db, meter_type, bill.period_end)
             days_in_period = calculate_days_between(bill.period_start, bill.period_end)
+            
             split_ratio = 1.0
-            if transfer and transfer.is_confirmed:
-                transfer_date = transfer.transfer_date
-                days_before = calculate_days_between(bill.period_start, transfer_date)
-                split_ratio = days_before / days_in_period if days_in_period > 0 else 1.0
-            amount = usage * unit_price * split_ratio
+            actual_usage = total_usage
+            
+            if transfer and transfer.is_confirmed and (is_old_tenant or is_new_tenant):
+                transfer_reading = None
+                if meter_type == "water":
+                    transfer_reading = transfer.water_reading
+                elif meter_type == "electricity":
+                    transfer_reading = transfer.electricity_reading
+                
+                if transfer_reading is not None and transfer_reading > 0:
+                    if is_old_tenant:
+                        actual_usage = transfer_reading - prev_reading.reading_value
+                        split_ratio = actual_usage / total_usage if total_usage > 0 else 0
+                    elif is_new_tenant:
+                        actual_usage = current_reading.reading_value - transfer_reading
+                        split_ratio = actual_usage / total_usage if total_usage > 0 else 0
+                else:
+                    days_before = calculate_days_between(bill.period_start, transfer.transfer_date)
+                    if is_old_tenant:
+                        split_ratio = days_before / days_in_period if days_in_period > 0 else 1.0
+                    elif is_new_tenant:
+                        split_ratio = (days_in_period - days_before) / days_in_period if days_in_period > 0 else 0
+                    actual_usage = total_usage * split_ratio
+            
+            amount = actual_usage * unit_price
+            
             bill_item = BillItem(
                 bill_id=bill.id,
                 meter_type=meter_type,
                 reading_id=current_reading.id,
                 previous_reading=prev_reading.reading_value,
                 current_reading=current_reading.reading_value,
-                usage=usage,
+                usage=actual_usage,
                 unit_price=unit_price,
                 amount=amount,
                 days_in_period=days_in_period,
