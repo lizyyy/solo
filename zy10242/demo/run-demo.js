@@ -10,7 +10,11 @@ async function request(endpoint, options = {}) {
     headers: { 'Content-Type': 'application/json', ...options.headers },
     ...options
   });
-  return response.json();
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || `HTTP ${response.status}`);
+  }
+  return result;
 }
 
 async function uploadFile(endpoint, filePath, formData = {}) {
@@ -26,7 +30,13 @@ async function uploadFile(endpoint, filePath, formData = {}) {
       if (err) return reject(err);
       let data = '';
       res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve(JSON.parse(data)));
+      res.on('end', () => {
+        const result = JSON.parse(data);
+        if (!result.success) {
+          return reject(new Error(result.error || 'Upload failed'));
+        }
+        resolve(result);
+      });
     });
   });
 }
@@ -215,7 +225,21 @@ async function runDemo() {
     );
     printResult('事故证明上传成功:', uploadResult2.data);
 
-    printSeparator('16. 审核事故证明材料 - 通过（所有必填材料审核通过后案件应自动变为completed）');
+    printSeparator('16. 创建缺件提醒（事故证明待审核，此时仍为缺件，测试重复提醒计数累加）');
+    const reminder1 = await request(`/claims/${claimId}/reminders/missing`, {
+      method: 'POST',
+      body: JSON.stringify({ operator: '系统' })
+    });
+    printResult('第一次提醒:', reminder1.data);
+
+    printSeparator('17. 再次创建相同提醒（测试计数累加，reminder_count 应变为 2）');
+    const reminder2 = await request(`/claims/${claimId}/reminders/missing`, {
+      method: 'POST',
+      body: JSON.stringify({ operator: '系统' })
+    });
+    printResult('第二次提醒:', reminder2.data);
+
+    printSeparator('18. 审核事故证明材料 - 通过（所有必填材料审核通过后案件应自动变为completed）');
     const auditResult2 = await request(`/materials/${accidentProofMaterialId}/audit`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -226,12 +250,12 @@ async function runDemo() {
     });
     printResult('事故证明审核通过:', auditResult2.data);
 
-    printSeparator('17. 查看案件状态（应自动变为completed）');
+    printSeparator('19. 查看案件状态（应自动变为completed）');
     const claimDetail = await request(`/claims/${claimId}`);
     printResult('案件状态:', claimDetail.data);
     printResult('案件完成校验结果:', claimDetail.data.status === 'completed' ? '✅ 案件自动完成 - 所有材料审核通过' : '❌ 案件状态不正确');
 
-    printSeparator('18. 测试边界情况 - 已完成案件重新上传材料（应失败）');
+    printSeparator('20. 测试边界情况 - 已完成案件重新上传材料（应失败）');
     try {
       const reuploadAfterComplete = await uploadFile(
         `/materials/${idCardMaterialId}/reupload`,
@@ -243,25 +267,26 @@ async function runDemo() {
       printResult('已完成案件重新上传被正确阻止:', e.message);
     }
 
-    printSeparator('19. 创建缺件提醒（测试重复提醒计数累加）');
-    const reminder1 = await request(`/claims/${claimId}/reminders/missing`, {
-      method: 'POST',
-      body: JSON.stringify({ operator: '系统' })
-    });
-    printResult('第一次提醒:', reminder1.data);
+    printSeparator('21. 测试边界情况 - 已完成案件创建缺件提醒（应失败，没有缺失材料）');
+    try {
+      const reminderAfterComplete = await request(`/claims/${claimId}/reminders/missing`, {
+        method: 'POST',
+        body: JSON.stringify({ operator: '系统' })
+      });
+      printResult('提醒结果:', reminderAfterComplete);
+    } catch (e) {
+      printResult('已完成案件缺件提醒被正确阻止:', e.message);
+    }
 
-    printSeparator('20. 再次创建相同提醒（测试计数累加）');
-    const reminder2 = await request(`/claims/${claimId}/reminders/missing`, {
-      method: 'POST',
-      body: JSON.stringify({ operator: '系统' })
-    });
-    printResult('第二次提醒:', reminder2.data);
+    printSeparator('22. 查询所有提醒记录（验证提醒链路和计数累加）');
+    const reminders = await request(`/claims/${claimId}/reminders`);
+    printResult('提醒记录列表（应包含 reminder_count = 2 的记录）:', reminders.data);
 
-    printSeparator('21. 查询审核日志（完整操作记录）');
+    printSeparator('23. 查询审核日志（完整操作记录，应包含提醒创建和重复计数记录）');
     const auditLogs = await request(`/claims/${claimId}/audit-logs`);
     printResult('审核日志列表:', auditLogs.data);
 
-    printSeparator('22. 测试边界情况 - 必填材料删除（应失败）');
+    printSeparator('24. 测试边界情况 - 必填材料删除（应失败，案件已完成）');
     try {
       const deleteResult = await request(`/materials/${idCardMaterialId}`, {
         method: 'DELETE',
