@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Layout, Table, Button, Modal, Form, Input, Select, Space,
   Tag, Card, Row, Col, Checkbox, InputNumber, DatePicker,
   message, Tabs, Descriptions, Timeline, Typography, Collapse, Divider
 } from 'antd';
-import { PlusOutlined, EyeOutlined, HistoryOutlined } from '@ant-design/icons';
+import { PlusOutlined, EyeOutlined, HistoryOutlined, LoadingOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import _ from 'lodash';
 
@@ -57,6 +57,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [overwriteModalVisible, setOverwriteModalVisible] = useState(false);
   const [pendingDocumentUpdate, setPendingDocumentUpdate] = useState(null);
+  const [statusUpdatingIds, setStatusUpdatingIds] = useState(new Set());
+  const [detailTabKey, setDetailTabKey] = useState('1');
+  
+  const lastStatusRequestRef = useRef({});
 
   useEffect(() => {
     loadData();
@@ -117,6 +121,23 @@ function App() {
   };
 
   const handleStatusChange = async (id, status, reason = '') => {
+    const requestKey = `${id}_${status}`;
+    const lastRequest = lastStatusRequestRef.current[requestKey];
+    
+    if (lastRequest && Date.now() - lastRequest < 2000) {
+      message.info('操作过于频繁，请稍后再试');
+      return;
+    }
+    
+    if (statusUpdatingIds.has(id)) {
+      message.info('状态更新中，请稍候...');
+      return;
+    }
+    
+    lastStatusRequestRef.current[requestKey] = Date.now();
+    
+    setStatusUpdatingIds(prev => new Set(prev).add(id));
+    
     try {
       const requestId = generateRequestId();
       const res = await fetch(`/api/declarations/${id}/status`, {
@@ -129,38 +150,55 @@ function App() {
         throw new Error(err.error);
       }
       const result = await res.json();
-      if (result.duplicate) {
+      
+      if (result.duplicate || result.skipped) {
         message.info('重复请求，状态已处理');
       } else {
         message.success('状态更新成功');
       }
+      
       loadData();
       if (detailData) {
         loadDetail(id);
       }
     } catch (error) {
       message.error(error.message);
+    } finally {
+      setStatusUpdatingIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
-  const handleDocumentUpdate = async (declarationId, documentType, values) => {
-    try {
-      const res = await fetch(`/api/declarations/${declarationId}/documents/${documentType}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, changed_by: '当前用户' })
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error);
+  const handleDocumentUpdate = useCallback(
+    _.debounce(async (declarationId, documentType, values) => {
+      try {
+        const res = await fetch(`/api/declarations/${declarationId}/documents/${documentType}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...values, changed_by: '当前用户' })
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error);
+        }
+        const result = await res.json();
+        
+        if (result.skipped || result.duplicate) {
+          console.log(result.message || '内容无变化，已跳过');
+        } else {
+          message.success(result.changeReason || '资料状态更新成功');
+        }
+        
+        loadDetail(declarationId);
+      } catch (error) {
+        message.error(error.message);
       }
-      const result = await res.json();
-      message.success(result.changeReason || '资料状态更新成功');
-      loadDetail(declarationId);
-    } catch (error) {
-      message.error(error.message);
-    }
-  };
+    }, 500, { leading: false, trailing: true }),
+    []
+  );
 
   const handleDocumentCheckboxChange = (doc, checked) => {
     const declarationId = detailData.declaration.id;
@@ -187,7 +225,8 @@ function App() {
         pendingDocumentUpdate.documentType,
         {
           received: true,
-          overwrite_reason: overwriteReason
+          overwrite_reason: overwriteReason,
+          force_record: true
         }
       );
     }
@@ -265,7 +304,7 @@ function App() {
     {
       title: '操作',
       key: 'action',
-      width: 200,
+      width: 220,
       render: (_, record) => (
         <Space>
           <Button
@@ -284,6 +323,8 @@ function App() {
             style={{ width: 120 }}
             onChange={(value) => handleStatusChange(record.id, value)}
             value={undefined}
+            disabled={statusUpdatingIds.has(record.id)}
+            suffixIcon={statusUpdatingIds.has(record.id) ? <LoadingOutlined /> : undefined}
           >
             {STATUS_OPTIONS.map(opt => (
               <Option key={opt.value} value={opt.value}>{opt.label}</Option>
@@ -458,6 +499,8 @@ function App() {
           style={{ top: 20 }}
         >
           <Tabs
+            activeKey={detailTabKey}
+            onChange={setDetailTabKey}
             items={[
               {
                 key: '1',

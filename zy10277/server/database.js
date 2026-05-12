@@ -57,6 +57,7 @@ function initDatabase() {
       changed_by TEXT,
       change_reason TEXT,
       overwrite_reason TEXT,
+      content_hash TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (document_id) REFERENCES documents(id),
       FOREIGN KEY (declaration_id) REFERENCES declarations(id)
@@ -117,6 +118,17 @@ function migrateExistingData() {
           });
         }
       });
+    }
+  });
+  
+  db.all("PRAGMA table_info(document_version_history)", (err, columns) => {
+    if (columns && columns.length > 0) {
+      const hasContentHash = columns.some(c => c.name === 'content_hash');
+      if (!hasContentHash) {
+        db.run("ALTER TABLE document_version_history ADD COLUMN content_hash TEXT", (err) => {
+          if (!err) console.log('Added content_hash column to document_version_history table');
+        });
+      }
     }
   });
 }
@@ -202,6 +214,10 @@ function createDeclaration(data) {
   });
 }
 
+function calculateDocumentHash(received, missing_reason, overwrite_reason) {
+  return `${received ? 1 : 0}|${missing_reason || ''}|${overwrite_reason || ''}`;
+}
+
 function updateDeclarationStatus(id, status, reason, changedBy, requestId = null) {
   return new Promise(async (resolve, reject) => {
     const declaration = await getDeclarationById(id);
@@ -219,16 +235,27 @@ function updateDeclarationStatus(id, status, reason, changedBy, requestId = null
     db.serialize(() => {
       db.run('BEGIN TRANSACTION');
 
-      db.run(
-        `UPDATE declarations SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-        [status, id],
-        (err) => {
+      db.get(
+        `SELECT id FROM status_logs 
+         WHERE declaration_id = ? AND status = ?
+         ORDER BY created_at DESC LIMIT 1`,
+        [id, status],
+        (err, recentLog) => {
           if (err) {
             db.run('ROLLBACK');
             reject(err);
             return;
           }
-          
+
+          const shouldUpdateStatus = declaration.status !== status;
+          const shouldInsertLog = declaration.status !== status || !recentLog;
+
+          if (!shouldUpdateStatus && !shouldInsertLog) {
+            db.run('COMMIT');
+            resolve({ id, status, duplicate: true, skipped: true });
+            return;
+          }
+
           if (requestId) {
             db.get(
               'SELECT id FROM status_logs WHERE declaration_id = ? AND request_id = ?',
@@ -246,31 +273,55 @@ function updateDeclarationStatus(id, status, reason, changedBy, requestId = null
                   return;
                 }
                 
-                insertStatusLog();
+                doUpdate();
               }
             );
           } else {
-            insertStatusLog();
+            doUpdate();
+          }
+
+          function doUpdate() {
+            if (shouldUpdateStatus) {
+              db.run(
+                `UPDATE declarations SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+                [status, id],
+                (err) => {
+                  if (err) {
+                    db.run('ROLLBACK');
+                    reject(err);
+                    return;
+                  }
+                  insertStatusLog();
+                }
+              );
+            } else {
+              insertStatusLog();
+            }
+          }
+
+          function insertStatusLog() {
+            if (shouldInsertLog) {
+              db.run(
+                `INSERT INTO status_logs (declaration_id, status, changed_by, reason, request_id)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [id, status, changedBy || '', reason || '', requestId],
+                (err) => {
+                  if (err) {
+                    db.run('ROLLBACK');
+                    reject(err);
+                    return;
+                  }
+                  db.run('COMMIT');
+                  resolve({ id, status });
+                }
+              );
+            } else {
+              db.run('COMMIT');
+              resolve({ id, status, skipped: true });
+            }
           }
         }
       );
-
-      function insertStatusLog() {
-        db.run(
-          `INSERT INTO status_logs (declaration_id, status, changed_by, reason, request_id)
-           VALUES (?, ?, ?, ?, ?)`,
-          [id, status, changedBy || '', reason || '', requestId],
-          (err) => {
-            if (err) {
-              db.run('ROLLBACK');
-              reject(err);
-              return;
-            }
-            db.run('COMMIT');
-            resolve({ id, status });
-          }
-        );
-      }
     });
   });
 }
@@ -345,18 +396,37 @@ function updateDocument(declarationId, documentType, data) {
 
     const wasReceived = doc.received;
     const isNowReceived = data.received;
+    const newMissingReason = data.missing_reason || '';
+    const newOverwriteReason = data.overwrite_reason || '';
+    
+    const oldHash = calculateDocumentHash(doc.received, doc.missing_reason, doc.overwrite_reason);
+    const newHash = calculateDocumentHash(isNowReceived, newMissingReason, newOverwriteReason);
+    
+    if (oldHash === newHash && !data.change_reason) {
+      resolve({ 
+        declarationId, 
+        documentType, 
+        received: doc.received, 
+        version: doc.version,
+        skipped: true,
+        message: '内容无变化，跳过保存' 
+      });
+      return;
+    }
     
     let newVersion = doc.version;
-    let changeReason = '';
+    let changeReason = data.change_reason || '';
     
     if (!wasReceived && isNowReceived) {
       changeReason = '首次收到资料';
     } else if (wasReceived && !isNowReceived) {
       newVersion = doc.version;
       changeReason = '资料退回/标记为未收到';
-    } else if (wasReceived && isNowReceived && data.overwrite_reason) {
+    } else if (wasReceived && isNowReceived && (newOverwriteReason || doc.overwrite_reason !== newOverwriteReason)) {
       newVersion = doc.version + 1;
       changeReason = '补件版本被覆盖';
+    } else if (doc.missing_reason !== newMissingReason) {
+      changeReason = '更新缺件原因';
     }
 
     db.serialize(() => {
@@ -373,8 +443,8 @@ function updateDocument(declarationId, documentType, data) {
         [
           isNowReceived ? 1 : 0, 
           isNowReceived ? 1 : 0, 
-          data.missing_reason || '', 
-          data.overwrite_reason || '',
+          newMissingReason, 
+          newOverwriteReason,
           newVersion, 
           declarationId, 
           documentType
@@ -386,34 +456,62 @@ function updateDocument(declarationId, documentType, data) {
             return;
           }
 
-          db.run(
-            `INSERT INTO document_version_history 
-             (document_id, declaration_id, document_type, version, received, changed_by, change_reason, overwrite_reason)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-              doc.id,
-              declarationId,
-              documentType,
-              newVersion,
-              isNowReceived ? 1 : 0,
-              data.changed_by || '',
-              changeReason || (data.change_reason || ''),
-              data.overwrite_reason || ''
-            ],
-            (err) => {
+          db.get(
+            `SELECT id FROM document_version_history 
+             WHERE document_id = ? AND content_hash = ?
+             ORDER BY created_at DESC LIMIT 1`,
+            [doc.id, newHash],
+            (err, existingHistory) => {
               if (err) {
                 db.run('ROLLBACK');
                 reject(err);
                 return;
               }
-              db.run('COMMIT');
-              resolve({ 
-                declarationId, 
-                documentType, 
-                received: isNowReceived, 
-                version: newVersion,
-                changeReason 
-              });
+
+              if (existingHistory && !data.force_record) {
+                db.run('COMMIT');
+                resolve({ 
+                  declarationId, 
+                  documentType, 
+                  received: isNowReceived, 
+                  version: newVersion,
+                  duplicate: true,
+                  message: '相同内容的历史记录已存在，跳过'
+                });
+                return;
+              }
+
+              db.run(
+                `INSERT INTO document_version_history 
+                 (document_id, declaration_id, document_type, version, received, changed_by, change_reason, overwrite_reason, content_hash)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  doc.id,
+                  declarationId,
+                  documentType,
+                  newVersion,
+                  isNowReceived ? 1 : 0,
+                  data.changed_by || '',
+                  changeReason,
+                  newOverwriteReason,
+                  newHash
+                ],
+                (err) => {
+                  if (err) {
+                    db.run('ROLLBACK');
+                    reject(err);
+                    return;
+                  }
+                  db.run('COMMIT');
+                  resolve({ 
+                    declarationId, 
+                    documentType, 
+                    received: isNowReceived, 
+                    version: newVersion,
+                    changeReason 
+                  });
+                }
+              );
             }
           );
         }
