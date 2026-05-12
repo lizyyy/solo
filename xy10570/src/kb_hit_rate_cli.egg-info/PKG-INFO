@@ -1,0 +1,10 @@
+Metadata-Version: 2.4
+Name: kb-hit-rate-cli
+Version: 1.0.0
+Summary: 客服知识库命中率统计CLI工具
+Requires-Python: >=3.9
+Requires-Dist: click>=8.1.0
+Requires-Dist: sqlalchemy>=2.0.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: python-dateutil>=2.8.0

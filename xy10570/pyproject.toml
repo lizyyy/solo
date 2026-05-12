@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kb-hit-rate-cli"
+version = "1.0.0"
+description = "客服知识库命中率统计CLI工具"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.1.0",
+    "sqlalchemy>=2.0.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+kbhr = "kb_hit_rate.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
