@@ -113,6 +113,40 @@ class DataPreprocessor:
         self._log("列验证通过")
         return []
 
+    def _get_unit_from_column(
+        self,
+        df: pd.DataFrame,
+        param: str,
+    ) -> Optional[str]:
+        unit_col = f"{param}_unit"
+        if unit_col not in df.columns:
+            return None
+
+        unit_series = df[unit_col]
+        if unit_series.empty:
+            return None
+
+        if pd.api.types.is_numeric_dtype(unit_series):
+            return None
+
+        valid_units = unit_series.dropna()
+        if valid_units.empty:
+            return None
+
+        unique_units = valid_units.unique()
+        if len(unique_units) == 0:
+            return None
+
+        if len(unique_units) > 1:
+            self._log(
+                f"发现混合单位 {param}: {list(unique_units)}，使用多数单位",
+                level="warning",
+            )
+            unit_counts = valid_units.value_counts()
+            return str(unit_counts.index[0])
+
+        return str(unique_units[0])
+
     def convert_units(
         self,
         df: pd.DataFrame,
@@ -127,15 +161,17 @@ class DataPreprocessor:
             if param not in df.columns:
                 continue
 
-            unit = unit_info.get(param) or df.get(f"{param}_unit", None)
+            unit = unit_info.get(param)
+            if unit is None:
+                unit = self._get_unit_from_column(df, param)
             if unit is None:
                 unit = self._detect_unit(df[param], param)
 
-            if unit not in param_conversions:
+            if not isinstance(unit, str) or unit not in param_conversions:
                 raise UnitConversionError(
                     f"参数 {param} 不支持的单位: {unit}",
                     parameter=param,
-                    unit=unit,
+                    unit=str(unit),
                 )
 
             if param in UNIT_CONVERSIONS and unit != list(UNIT_CONVERSIONS[param].keys())[0]:
@@ -234,6 +270,19 @@ class DataPreprocessor:
                 raise MissingDataError(f"样本 {sample_id} 无数据记录", sample_id=sample_id)
 
             result["processing_steps"].append("数据筛选完成")
+
+            missing_cols = [
+                col for col in self.required_columns
+                if col != "sample_id" and col not in sample_df.columns
+            ]
+            if missing_cols:
+                raise MissingDataError(
+                    f"样本 {sample_id} 缺少必需列: {missing_cols}",
+                    sample_id=sample_id,
+                    missing_columns=missing_cols,
+                )
+
+            result["processing_steps"].append("必需列验证完成")
 
             sample_df = self.handle_duplicates(sample_df)
             result["processing_steps"].append("重复值处理完成")

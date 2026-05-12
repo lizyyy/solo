@@ -544,6 +544,7 @@ class QualityControlEngine:
     def analyze_batch(
         self,
         processed_samples: Dict[str, Any],
+        failed_samples: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         results = {}
         summary = {
@@ -585,6 +586,42 @@ class QualityControlEngine:
                     "reason": qc_result.get("recheck_reason", ""),
                     "status": qc_result["overall_status"],
                 })
+
+        if failed_samples:
+            for sample_id, sample_data in failed_samples.items():
+                summary["total_samples"] += 1
+                summary["fail_count"] += 1
+                summary["requires_recheck_count"] += 1
+
+                error_messages = []
+                for error in sample_data.get("errors", []):
+                    error_messages.append(error.get("message", "未知错误"))
+
+                error_detail = "; ".join(error_messages) if error_messages else "预处理失败"
+
+                summary["failed_samples"].append({
+                    "sample_id": sample_id,
+                    "reason": "预处理失败",
+                    "errors": sample_data.get("errors", []),
+                    "error_detail": error_detail,
+                })
+
+                summary["recheck_samples"].append({
+                    "sample_id": sample_id,
+                    "reason": f"预处理失败: {error_detail}",
+                    "status": "PREPROCESSING_FAILED",
+                })
+
+                results[sample_id] = {
+                    "sample_id": sample_id,
+                    "overall_status": "PREPROCESSING_FAILED",
+                    "rules_applied": [],
+                    "parameters": {},
+                    "requires_recheck": True,
+                    "recheck_reason": f"预处理失败: {error_detail}",
+                    "preprocessing_errors": sample_data.get("errors", []),
+                    "preprocessing_failed": True,
+                }
 
         summary["pass_rate"] = (
             summary["pass_count"] / summary["total_samples"]

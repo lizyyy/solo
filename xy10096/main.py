@@ -70,7 +70,10 @@ def run_fermentation_qc(
         print("-" * 40)
 
     qc_engine = QualityControlEngine()
-    qc_results = qc_engine.analyze_batch(preprocessing_result['processed_samples'])
+    qc_results = qc_engine.analyze_batch(
+        preprocessing_result['processed_samples'],
+        preprocessing_result['failed_samples'],
+    )
     summary = qc_results['summary']
 
     if verbose:
@@ -89,39 +92,70 @@ def run_fermentation_qc(
         print("-" * 40)
 
     visualizer = Visualizer()
-
-    first_sample_id = list(qc_results['results'].keys())[0]
-    first_sample_data = preprocessing_result['processed_samples'][first_sample_id]['dataframe']
-    first_qc_result = qc_results['results'].get(first_sample_id)
-    visualizer.save_sample_plot(
-        first_sample_data,
-        first_sample_id,
-        os.path.join(output_dir, "overview.png"),
-        first_qc_result,
-    )
-
-    fig = visualizer.plot_quality_distribution(summary)
-    fig.savefig(os.path.join(output_dir, "quality_distribution.png"), bbox_inches='tight')
     import matplotlib.pyplot as plt
-    plt.close(fig)
 
-    fig = visualizer.plot_parameter_statistics(preprocessing_result['processed_samples'])
-    fig.savefig(os.path.join(output_dir, "parameter_statistics.png"), bbox_inches='tight')
-    plt.close(fig)
+    has_success_samples = len(preprocessing_result['processed_samples']) > 0
 
-    fig = visualizer.plot_recheck_recommendations(summary)
-    fig.savefig(os.path.join(output_dir, "recheck_recommendations.png"), bbox_inches='tight')
-    plt.close(fig)
-
-    if generate_pdf:
-        pdf_path = os.path.join(output_dir, "qc_report.pdf")
-        visualizer.export_pdf_report(
-            preprocessing_result['processed_samples'],
-            qc_results,
-            pdf_path,
+    if has_success_samples:
+        first_sample_id = list(preprocessing_result['processed_samples'].keys())[0]
+        first_sample_data = preprocessing_result['processed_samples'][first_sample_id]['dataframe']
+        first_qc_result = qc_results['results'].get(first_sample_id)
+        visualizer.save_sample_plot(
+            first_sample_data,
+            first_sample_id,
+            os.path.join(output_dir, "overview.png"),
+            first_qc_result,
         )
         if verbose:
-            print(f"   ✓ PDF报告: {pdf_path}")
+            print(f"   ✓ 样本曲线图: overview.png")
+
+    try:
+        fig = visualizer.plot_quality_distribution(summary)
+        fig.savefig(os.path.join(output_dir, "quality_distribution.png"), bbox_inches='tight')
+        plt.close(fig)
+        if verbose:
+            print(f"   ✓ 质量分布图: quality_distribution.png")
+    except Exception as e:
+        if verbose:
+            print(f"   ⚠️  质量分布图生成失败: {e}")
+
+    if has_success_samples:
+        try:
+            fig = visualizer.plot_parameter_statistics(preprocessing_result['processed_samples'])
+            fig.savefig(os.path.join(output_dir, "parameter_statistics.png"), bbox_inches='tight')
+            plt.close(fig)
+            if verbose:
+                print(f"   ✓ 参数统计图: parameter_statistics.png")
+        except Exception as e:
+            if verbose:
+                print(f"   ⚠️  参数统计图生成失败: {e}")
+
+    try:
+        fig = visualizer.plot_recheck_recommendations(summary)
+        fig.savefig(os.path.join(output_dir, "recheck_recommendations.png"), bbox_inches='tight')
+        plt.close(fig)
+        if verbose:
+            print(f"   ✓ 复检建议图: recheck_recommendations.png")
+    except Exception as e:
+        if verbose:
+            print(f"   ⚠️  复检建议图生成失败: {e}")
+
+    if generate_pdf and has_success_samples:
+        try:
+            pdf_path = os.path.join(output_dir, "qc_report.pdf")
+            visualizer.export_pdf_report(
+                preprocessing_result['processed_samples'],
+                qc_results,
+                pdf_path,
+            )
+            if verbose:
+                print(f"   ✓ PDF报告: {pdf_path}")
+        except Exception as e:
+            if verbose:
+                print(f"   ⚠️  PDF报告生成失败: {e}")
+    elif generate_pdf and not has_success_samples:
+        if verbose:
+            print(f"   ⚠️  无成功预处理样本，跳过PDF报告生成")
 
     if verbose:
         print("\n📄 步骤 4: 导出数据报告")
