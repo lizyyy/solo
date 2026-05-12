@@ -7,13 +7,13 @@ import { logger } from '../utils/logger';
 
 export interface IdempotencyRecord {
   token: string;
-  userId: string;
-  requestPath: string;
-  requestHash: string;
-  responseCode?: number;
-  responseBody?: unknown;
-  createdAt: Date;
-  expiresAt: Date;
+  user_id: string;
+  request_path: string;
+  request_hash: string;
+  response_code?: number;
+  response_body?: unknown;
+  created_at: Date;
+  expires_at: Date;
   status: 'processing' | 'completed' | 'failed';
 }
 
@@ -47,9 +47,9 @@ export class IdempotencyService {
         [token, userId, requestPath, requestHash, expiresAt]
       );
 
-      const existing = result.rows[0];
+      const existing = result.rows[0] as unknown as IdempotencyRecord | undefined;
 
-      if (existing && existing.token !== token) {
+      if (!existing) {
         return { isDuplicate: false };
       }
 
@@ -59,7 +59,7 @@ export class IdempotencyService {
         );
       }
 
-      if (existing.status === 'completed' && existing.response_code !== null) {
+      if (existing.status === 'completed' && existing.response_code !== undefined) {
         return {
           isDuplicate: true,
           cachedResponse: {

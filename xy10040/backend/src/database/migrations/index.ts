@@ -3,18 +3,6 @@ import { logger } from '../../utils/logger';
 
 const migrations = [
   {
-    version: 0,
-    name: 'create_migration_history_table',
-    up: `
-      CREATE TABLE IF NOT EXISTS migration_history (
-        id SERIAL PRIMARY KEY,
-        version INTEGER NOT NULL UNIQUE,
-        name VARCHAR(255) NOT NULL,
-        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `,
-  },
-  {
     version: 1,
     name: 'create_events_table',
     up: `
@@ -138,12 +126,27 @@ const migrations = [
   },
 ];
 
+async function ensureMigrationHistoryTable(): Promise<void> {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS migration_history (
+      id SERIAL PRIMARY KEY,
+      version INTEGER NOT NULL UNIQUE,
+      name VARCHAR(255) NOT NULL,
+      applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+}
+
 async function getLatestVersion(): Promise<number> {
   try {
     const result = await db.query(
       "SELECT version FROM migration_history ORDER BY version DESC LIMIT 1"
     );
-    return result.rows.length > 0 ? result.rows[0].version : 0;
+    if (result.rows.length === 0) {
+      return 0;
+    }
+    const row = result.rows[0] as Record<string, unknown>;
+    return row.version as number;
   } catch {
     return 0;
   }
@@ -162,6 +165,9 @@ async function runMigration(version: number, name: string, up: string): Promise<
 
 export async function runMigrations(): Promise<void> {
   logger.info('Starting database migrations...');
+
+  await ensureMigrationHistoryTable();
+  logger.info('migration_history table ensured');
 
   const latestVersion = await getLatestVersion();
   const pendingMigrations = migrations.filter((m) => m.version > latestVersion);

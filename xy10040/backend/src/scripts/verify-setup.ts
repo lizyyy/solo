@@ -13,7 +13,8 @@ async function verifySetup() {
 
     logger.info('2. Testing database connection...');
     const result = await db.query('SELECT NOW() as time');
-    logger.info(`✓ Database connected, server time: ${result.rows[0].time}`);
+    const firstRow = result.rows[0] as Record<string, unknown>;
+    logger.info(`✓ Database connected, server time: ${firstRow.time}`);
 
     logger.info('3. Testing table creation...');
     const tablesResult = await db.query(`
@@ -22,7 +23,7 @@ async function verifySetup() {
       WHERE table_schema = 'public'
       ORDER BY table_name
     `);
-    const tables = tablesResult.rows.map((r: { table_name: string }) => r.table_name);
+    const tables = tablesResult.rows.map((r: unknown) => (r as Record<string, string>).table_name);
     
     const expectedTables = [
       'async_tasks',

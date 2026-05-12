@@ -8,7 +8,7 @@ const router = Router();
 
 const createRegistrationSchema = Joi.object({
   eventId: Joi.string().uuid().required(),
-  userId: Joi.string().uuid().required(),
+  userId: Joi.string().min(1).max(64).required(),
   userName: Joi.string().min(1).max(100).required(),
   userEmail: Joi.string().email().max(255).required(),
   userPhone: Joi.string().max(20).optional(),
@@ -78,9 +78,10 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         error: { message: 'Registration not found', code: 'NOT_FOUND' },
       });
     }
-    res.json(registration);
+    return res.json(registration);
   } catch (error) {
     next(error);
+    return;
   }
 });
 

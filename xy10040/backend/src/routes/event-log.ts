@@ -47,9 +47,10 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 router.get('/request/:requestId', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const entries = await eventLogService.getByRequestId(req.params.requestId);
-    res.json({ entries });
+    return res.json({ entries });
   } catch (error) {
     next(error);
+    return;
   }
 });
 
@@ -74,13 +75,14 @@ router.get('/replay/:aggregateType/:aggregateId', async (req: Request, res: Resp
       toTime
     );
 
-    res.json({
+    return res.json({
       events,
       eventCount: events.length,
       toTime: toTime?.toISOString(),
     });
   } catch (error) {
     next(error);
+    return;
   }
 });
 
@@ -105,9 +107,10 @@ router.get('/aggregate/:aggregateType/:aggregateId', async (req: Request, res: R
       fromTime
     );
 
-    res.json({ entries });
+    return res.json({ entries });
   } catch (error) {
     next(error);
+    return;
   }
 });
 

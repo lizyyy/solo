@@ -52,9 +52,10 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
         error: { message: 'Event not found', code: 'NOT_FOUND' },
       });
     }
-    res.json(event);
+    return res.json(event);
   } catch (error) {
     next(error);
+    return;
   }
 });
 

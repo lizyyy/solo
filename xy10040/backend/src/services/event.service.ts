@@ -181,7 +181,7 @@ export class EventService {
       return null;
     }
 
-    return this.mapRowToEvent(result.rows[0]);
+    return this.mapRowToEvent(result.rows[0] as Record<string, unknown>);
   }
 
   async findAll(
@@ -231,10 +231,11 @@ export class EventService {
       [...params, pageSize, offset]
     );
 
-    const total = parseInt(countResult.rows[0].total, 10);
+    const totalRow = countResult.rows[0] as Record<string, unknown>;
+    const total = parseInt(totalRow.total as string, 10);
 
     return {
-      items: result.rows.map((row) => this.mapRowToEvent(row)),
+      items: result.rows.map((row) => this.mapRowToEvent(row as Record<string, unknown>)),
       total,
       page,
       pageSize,
@@ -252,7 +253,7 @@ export class EventService {
       throw new NotFoundError(`Event not found: ${eventId}`);
     }
 
-    return result.rows[0].version;
+    return (result.rows[0] as Record<string, unknown>).version as number;
   }
 
   async incrementCurrentParticipants(

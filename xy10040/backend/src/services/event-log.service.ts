@@ -39,7 +39,7 @@ export class EventLogService {
       ? await client.query(query, params)
       : await db.query(query, params);
 
-    const row = result.rows[0];
+    const row = result.rows[0] as Record<string, unknown>;
     return this.mapRowToEntry(row);
   }
 
@@ -62,7 +62,7 @@ export class EventLogService {
     query += ' ORDER BY timestamp ASC';
 
     const result = await db.query(query, params);
-    return result.rows.map((row) => this.mapRowToEntry(row));
+    return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
   }
 
   async getByRequestId(requestId: string): Promise<EventLogEntry[]> {
@@ -70,7 +70,7 @@ export class EventLogService {
       `SELECT * FROM event_log WHERE request_id = $1 ORDER BY timestamp ASC`,
       [requestId]
     );
-    return result.rows.map((row) => this.mapRowToEntry(row));
+    return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
   }
 
   async getByUser(
@@ -85,7 +85,7 @@ export class EventLogService {
        LIMIT $2 OFFSET $3`,
       [userId, limit, offset]
     );
-    return result.rows.map((row) => this.mapRowToEntry(row));
+    return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
   }
 
   async query(
@@ -145,9 +145,10 @@ export class EventLogService {
       [...params, limit, offset]
     );
 
+    const totalRow = countResult.rows[0] as Record<string, unknown>;
     return {
-      entries: result.rows.map((row) => this.mapRowToEntry(row)),
-      total: parseInt(countResult.rows[0].total, 10),
+      entries: result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>)),
+      total: parseInt(totalRow.total as string, 10),
     };
   }
 
@@ -172,7 +173,7 @@ export class EventLogService {
     logger.info('Replaying events', { aggregateType, aggregateId, toTime });
 
     const result = await db.query(query, params);
-    return result.rows.map((row) => this.mapRowToEntry(row));
+    return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
   }
 
   private mapRowToEntry(row: Record<string, unknown>): EventLogEntry {

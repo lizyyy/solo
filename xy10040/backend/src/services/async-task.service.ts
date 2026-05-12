@@ -66,7 +66,7 @@ export class AsyncTaskService {
       return null;
     }
 
-    return this.mapRowToTask(result.rows[0]);
+    return this.mapRowToTask(result.rows[0] as Record<string, unknown>);
   }
 
   private async acquireNextTask(): Promise<AsyncTask | null> {
@@ -90,7 +90,7 @@ export class AsyncTaskService {
         return null;
       }
 
-      const task = this.mapRowToTask(result.rows[0]);
+      const task = this.mapRowToTask(result.rows[0] as Record<string, unknown>);
 
       await client.query(
         `UPDATE async_tasks 

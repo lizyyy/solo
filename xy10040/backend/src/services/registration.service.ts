@@ -13,7 +13,7 @@ import { eventLogService } from './event-log.service';
 import { lockService } from './lock.service';
 import { asyncTaskService } from './async-task.service';
 import { cacheService } from './cache.service';
-import { compensationService, Saga } from './compensation.service';
+import { compensationService } from './compensation.service';
 import {
   ConcurrencyError,
   ConflictError,
@@ -281,7 +281,7 @@ export class RegistrationService {
       return null;
     }
 
-    return this.mapRowToRegistration(result.rows[0]);
+    return this.mapRowToRegistration(result.rows[0] as Record<string, unknown>);
   }
 
   async findByEvent(
@@ -328,10 +328,11 @@ export class RegistrationService {
       [...params, pageSize, offset]
     );
 
-    const total = parseInt(countResult.rows[0].total, 10);
+    const totalRow = countResult.rows[0] as Record<string, unknown>;
+    const total = parseInt(totalRow.total as string, 10);
 
     return {
-      items: result.rows.map((row) => this.mapRowToRegistration(row)),
+      items: result.rows.map((row) => this.mapRowToRegistration(row as Record<string, unknown>)),
       total,
       page,
       pageSize,
@@ -377,14 +378,15 @@ export class RegistrationService {
       [...params, pageSize, offset]
     );
 
-    const total = parseInt(countResult.rows[0].total, 10);
+    const totalRow2 = countResult.rows[0] as Record<string, unknown>;
+    const total2 = parseInt(totalRow2.total as string, 10);
 
     return {
-      items: result.rows.map((row) => this.mapRowToRegistration(row)),
-      total,
+      items: result.rows.map((row) => this.mapRowToRegistration(row as Record<string, unknown>)),
+      total: total2,
       page,
       pageSize,
-      hasMore: offset + result.rows.length < total,
+      hasMore: offset + result.rows.length < total2,
     };
   }
 
@@ -402,10 +404,11 @@ export class RegistrationService {
       return { registered: false };
     }
 
+    const row = result.rows[0] as Record<string, unknown>;
     return {
       registered: true,
-      status: result.rows[0].status,
-      version: result.rows[0].version,
+      status: row.status as string,
+      version: row.version as number,
     };
   }
 

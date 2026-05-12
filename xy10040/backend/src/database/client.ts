@@ -1,4 +1,4 @@
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { config } from '../config';
 import { logger } from '../utils/logger';
 
@@ -26,7 +26,7 @@ pool.on('connect', () => {
 export const db = {
   pool,
 
-  async query<T = unknown>(
+  async query<T extends QueryResultRow = Record<string, unknown>>(
     text: string,
     params?: unknown[]
   ): Promise<QueryResult<T>> {
