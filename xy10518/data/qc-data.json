@@ -1,0 +1,551 @@
+{
+  "batches": {
+    "B202605120001": {
+      "id": "9ca467ba-d477-4405-8bdd-fcc4f103fa36",
+      "batchNumber": "B202605120001",
+      "productCode": "PCB-001",
+      "productName": "主板A型号",
+      "quantity": 1000,
+      "productionDate": "2026-05-10",
+      "productionLine": "A线-3号",
+      "status": "CLOSED",
+      "currentRisk": "NONE",
+      "inspections": [
+        {
+          "id": "a1ccd5f5-4bb6-4aa3-afc7-c81ff83b577a",
+          "batchId": "9ca467ba-d477-4405-8bdd-fcc4f103fa36",
+          "sampleCount": 50,
+          "inspectedCount": 50,
+          "defectCount": 0,
+          "defects": [
+            {
+              "level": "NONE",
+              "count": 0
+            }
+          ],
+          "result": "PASS",
+          "inspector": "张质检",
+          "timestamp": "2026-05-12T03:03:08.425Z",
+          "notes": "外观检查和功能测试全部通过"
+        }
+      ],
+      "concessionRequests": [],
+      "history": [
+        {
+          "id": "4fa9c9ad-cd15-49bc-82bc-097e2596d3b9",
+          "batchId": "9ca467ba-d477-4405-8bdd-fcc4f103fa36",
+          "actionType": "INITIAL_INSPECT",
+          "previousStatus": "CREATED",
+          "newStatus": "PASSED",
+          "actor": "张质检",
+          "timestamp": "2026-05-12T03:03:08.425Z",
+          "reason": "初检完成: 通过",
+          "inspectionId": "a1ccd5f5-4bb6-4aa3-afc7-c81ff83b577a"
+        },
+        {
+          "id": "223e8f71-0116-48b5-975d-70aed36610a7",
+          "batchId": "9ca467ba-d477-4405-8bdd-fcc4f103fa36",
+          "actionType": "CLOSE_BATCH",
+          "previousStatus": "PASSED",
+          "newStatus": "CLOSED",
+          "actor": "李主管",
+          "timestamp": "2026-05-12T03:03:08.425Z",
+          "reason": "一次通过流程完成"
+        }
+      ],
+      "createdAt": "2026-05-12T03:03:08.423Z",
+      "updatedAt": "2026-05-12T03:03:08.425Z",
+      "closedAt": "2026-05-12T03:03:08.425Z"
+    },
+    "B202605120002": {
+      "id": "4c85f19d-555f-4002-a643-cf94e48aba71",
+      "batchNumber": "B202605120002",
+      "productCode": "PCB-002",
+      "productName": "主板B型号",
+      "quantity": 500,
+      "productionDate": "2026-05-11",
+      "productionLine": "A线-2号",
+      "status": "CLOSED",
+      "currentRisk": "NONE",
+      "inspections": [
+        {
+          "id": "bda71bbb-fdc2-41cb-a0d8-da2fe5e30dc5",
+          "batchId": "4c85f19d-555f-4002-a643-cf94e48aba71",
+          "sampleCount": 30,
+          "inspectedCount": 30,
+          "defectCount": 2,
+          "defects": [
+            {
+              "level": "MINOR",
+              "count": 2,
+              "description": "轻微划痕"
+            }
+          ],
+          "result": "FAIL",
+          "inspector": "张质检",
+          "timestamp": "2026-05-12T03:03:08.426Z",
+          "notes": "发现2处轻微划痕，建议复检"
+        },
+        {
+          "id": "e10648d1-31c4-49cf-807d-94fc3058e090",
+          "batchId": "4c85f19d-555f-4002-a643-cf94e48aba71",
+          "sampleCount": 60,
+          "inspectedCount": 60,
+          "defectCount": 0,
+          "defects": [
+            {
+              "level": "NONE",
+              "count": 0
+            }
+          ],
+          "result": "PASS",
+          "inspector": "王质检",
+          "timestamp": "2026-05-12T03:03:08.426Z",
+          "notes": "加倍抽样复检，全部合格"
+        }
+      ],
+      "concessionRequests": [],
+      "history": [
+        {
+          "id": "fa7659c4-d0af-4fff-b4ad-954b5f1c8027",
+          "batchId": "4c85f19d-555f-4002-a643-cf94e48aba71",
+          "actionType": "INITIAL_INSPECT",
+          "previousStatus": "CREATED",
+          "newStatus": "PENDING_REINSPECTION",
+          "actor": "张质检",
+          "timestamp": "2026-05-12T03:03:08.426Z",
+          "reason": "初检不合格，需要复检",
+          "inspectionId": "bda71bbb-fdc2-41cb-a0d8-da2fe5e30dc5"
+        },
+        {
+          "id": "1d1a68d6-f400-4a56-b8e9-c79905295c0e",
+          "batchId": "4c85f19d-555f-4002-a643-cf94e48aba71",
+          "actionType": "REINSPECT",
+          "previousStatus": "PENDING_REINSPECTION",
+          "newStatus": "PASSED",
+          "actor": "王质检",
+          "timestamp": "2026-05-12T03:03:08.426Z",
+          "reason": "复检通过",
+          "inspectionId": "e10648d1-31c4-49cf-807d-94fc3058e090"
+        },
+        {
+          "id": "fbeb9379-3c1b-43a8-aad2-a36f0c2969d5",
+          "batchId": "4c85f19d-555f-4002-a643-cf94e48aba71",
+          "actionType": "CLOSE_BATCH",
+          "previousStatus": "PASSED",
+          "newStatus": "CLOSED",
+          "actor": "李主管",
+          "timestamp": "2026-05-12T03:03:08.428Z",
+          "reason": "复检通过流程完成"
+        }
+      ],
+      "createdAt": "2026-05-12T03:03:08.426Z",
+      "updatedAt": "2026-05-12T03:03:08.428Z",
+      "closedAt": "2026-05-12T03:03:08.428Z"
+    },
+    "B202605120003": {
+      "id": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+      "batchNumber": "B202605120003",
+      "productCode": "MOD-001",
+      "productName": "电源模块",
+      "quantity": "250",
+      "productionDate": "2026-05-10",
+      "productionLine": "B线-1号",
+      "status": "CLOSED",
+      "currentRisk": "CRITICAL",
+      "inspections": [
+        {
+          "id": "7a8dd223-6a76-4a8e-8db9-42844f3a2aaf",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "sampleCount": 20,
+          "inspectedCount": 20,
+          "defectCount": 3,
+          "defects": [
+            {
+              "level": "CRITICAL",
+              "count": 1,
+              "description": "焊点虚焊"
+            },
+            {
+              "level": "MINOR",
+              "count": 2,
+              "description": "丝印偏移"
+            }
+          ],
+          "result": "FAIL",
+          "inspector": "张质检",
+          "timestamp": "2026-05-12T03:03:08.430Z",
+          "notes": "发现严重缺陷，需质量经理审批"
+        }
+      ],
+      "concessionRequests": [
+        {
+          "id": "3d7a11f1-902b-4d43-80e0-02eefc3c24bf",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "reason": "客户紧急订单",
+          "justification": "该批次为ABC公司紧急订单，经技术评估，虚焊位置不影响核心功能，可后续批次整改",
+          "riskLevel": "MEDIUM",
+          "requestedBy": "李主管",
+          "requestedAt": "2026-05-12T03:03:08.431Z",
+          "approvalStatus": "APPROVED",
+          "approvedBy": "赵质量经理",
+          "approvedAt": "2026-05-12T03:03:08.431Z",
+          "approvalNotes": "同意放行，但需追踪客户反馈，后续批次必须整改"
+        }
+      ],
+      "history": [
+        {
+          "id": "b8e04cd8-7d43-4567-adb6-c8226c82864b",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "actionType": "INITIAL_INSPECT",
+          "previousStatus": "CREATED",
+          "newStatus": "PENDING_CONCESSION",
+          "actor": "张质检",
+          "timestamp": "2026-05-12T03:03:08.430Z",
+          "reason": "检测到严重缺陷，需要让步放行审批",
+          "inspectionId": "7a8dd223-6a76-4a8e-8db9-42844f3a2aaf"
+        },
+        {
+          "id": "63d31fce-5e98-4449-bc3e-eb725e0275d7",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "actionType": "REQUEST_CONCESSION",
+          "previousStatus": "PENDING_CONCESSION",
+          "newStatus": "PENDING_CONCESSION",
+          "actor": "李主管",
+          "timestamp": "2026-05-12T03:03:08.431Z",
+          "reason": "申请让步放行: 客户紧急订单",
+          "concessionId": "3d7a11f1-902b-4d43-80e0-02eefc3c24bf"
+        },
+        {
+          "id": "b6f65b60-e5da-4fb4-b0b6-3389a999b535",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "actionType": "APPROVE_CONCESSION",
+          "previousStatus": "PENDING_CONCESSION",
+          "newStatus": "CONCESSION_APPROVED",
+          "actor": "赵质量经理",
+          "timestamp": "2026-05-12T03:03:08.431Z",
+          "reason": "让步放行已批准: 同意放行，但需追踪客户反馈，后续批次必须整改",
+          "concessionId": "3d7a11f1-902b-4d43-80e0-02eefc3c24bf"
+        },
+        {
+          "id": "f279a404-630e-49ca-8ce7-1cb5943f33b4",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "actionType": "CLOSE_BATCH",
+          "previousStatus": "CONCESSION_APPROVED",
+          "newStatus": "CLOSED",
+          "actor": "赵质量经理",
+          "timestamp": "2026-05-12T03:03:08.432Z",
+          "reason": "让步放行流程完成"
+        },
+        {
+          "id": "ccf4c404-2a5b-439e-be81-f69a2ccd10fa",
+          "batchId": "c1cec0f2-827f-4baa-8ae0-0588b97e4eeb",
+          "actionType": "MANUAL_CORRECTION",
+          "previousStatus": "CLOSED",
+          "newStatus": "CLOSED",
+          "actor": "系统管理员",
+          "timestamp": "2026-05-12T03:04:23.650Z",
+          "reason": "实际入库数量修正",
+          "differences": [
+            {
+              "field": "quantity",
+              "oldValue": "200",
+              "newValue": "250"
+            }
+          ]
+        }
+      ],
+      "createdAt": "2026-05-12T03:03:08.429Z",
+      "updatedAt": "2026-05-12T03:04:23.654Z",
+      "closedAt": "2026-05-12T03:03:08.432Z"
+    },
+    "B202605120004": {
+      "id": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+      "batchNumber": "B202605120004",
+      "productCode": "CASE-001",
+      "productName": "塑料外壳",
+      "quantity": 3000,
+      "productionDate": "2026-05-09",
+      "productionLine": "C线-1号",
+      "status": "CLOSED",
+      "currentRisk": "HIGH",
+      "inspections": [
+        {
+          "id": "4f622e4a-a97a-4696-ad58-dba06318adbf",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "sampleCount": 100,
+          "inspectedCount": 100,
+          "defectCount": 5,
+          "defects": [
+            {
+              "level": "MAJOR",
+              "count": 5,
+              "description": "尺寸超差"
+            }
+          ],
+          "result": "FAIL",
+          "inspector": "王质检",
+          "timestamp": "2026-05-12T03:03:08.433Z",
+          "notes": "5件产品尺寸超出公差范围"
+        },
+        {
+          "id": "c567aaa3-079e-468d-8055-5725ebce6664",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "sampleCount": 200,
+          "inspectedCount": 200,
+          "defectCount": 11,
+          "defects": [
+            {
+              "level": "MAJOR",
+              "count": 8,
+              "description": "尺寸超差"
+            },
+            {
+              "level": "MINOR",
+              "count": 3,
+              "description": "表面毛刺"
+            }
+          ],
+          "result": "FAIL",
+          "inspector": "张质检",
+          "timestamp": "2026-05-12T03:03:08.434Z",
+          "notes": "复检仍发现批量性尺寸问题，建议返工"
+        }
+      ],
+      "concessionRequests": [],
+      "history": [
+        {
+          "id": "cd926387-8257-481a-88a4-13b66244503e",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "actionType": "INITIAL_INSPECT",
+          "previousStatus": "CREATED",
+          "newStatus": "PENDING_REINSPECTION",
+          "actor": "王质检",
+          "timestamp": "2026-05-12T03:03:08.433Z",
+          "reason": "初检不合格，需要复检",
+          "inspectionId": "4f622e4a-a97a-4696-ad58-dba06318adbf"
+        },
+        {
+          "id": "d05bc1ec-4571-411b-a4d6-7852d9bca66d",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "actionType": "REINSPECT",
+          "previousStatus": "PENDING_REINSPECTION",
+          "newStatus": "REINSPECTION",
+          "actor": "张质检",
+          "timestamp": "2026-05-12T03:03:08.434Z",
+          "reason": "复检不合格，需审批让步放行或返工",
+          "inspectionId": "c567aaa3-079e-468d-8055-5725ebce6664"
+        },
+        {
+          "id": "9c7020f7-0235-411d-828e-b211c384ef33",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "actionType": "APPROVE_REWORK",
+          "previousStatus": "REINSPECTION",
+          "newStatus": "REWORK",
+          "actor": "赵质量经理",
+          "timestamp": "2026-05-12T03:03:08.435Z",
+          "reason": "批量性尺寸超差，需返工调整模具参数后重新生产"
+        },
+        {
+          "id": "3ccf9d24-bba9-4710-8108-908b2d67710b",
+          "batchId": "ddd48370-7b39-4ce6-8786-f27f36e10419",
+          "actionType": "CLOSE_BATCH",
+          "previousStatus": "REWORK",
+          "newStatus": "CLOSED",
+          "actor": "赵质量经理",
+          "timestamp": "2026-05-12T03:03:08.435Z",
+          "reason": "整批返工流程完成"
+        }
+      ],
+      "createdAt": "2026-05-12T03:03:08.432Z",
+      "updatedAt": "2026-05-12T03:03:08.435Z",
+      "closedAt": "2026-05-12T03:03:08.435Z"
+    },
+    "FAIL001": {
+      "id": "36456a2f-1cc4-458c-8ce0-b27eeb0cc343",
+      "batchNumber": "FAIL001",
+      "productCode": "TEST",
+      "productName": "失败测试",
+      "quantity": 1000,
+      "productionDate": "2026-05-12",
+      "productionLine": "A线-1号",
+      "status": "PENDING_REINSPECTION",
+      "currentRisk": "MEDIUM",
+      "inspections": [
+        {
+          "id": "a2ca2dfc-7bc2-40cf-b36b-8455d1b9820d",
+          "batchId": "36456a2f-1cc4-458c-8ce0-b27eeb0cc343",
+          "sampleCount": 50,
+          "inspectedCount": 50,
+          "defectCount": 1,
+          "defects": [
+            {
+              "level": "MAJOR",
+              "count": 1
+            }
+          ],
+          "result": "FAIL",
+          "inspector": "质检员A",
+          "timestamp": "2026-05-12T03:03:54.520Z"
+        }
+      ],
+      "concessionRequests": [],
+      "history": [
+        {
+          "id": "dc15258d-75b2-431c-b7d1-e1e5cc5acf66",
+          "batchId": "36456a2f-1cc4-458c-8ce0-b27eeb0cc343",
+          "actionType": "INITIAL_INSPECT",
+          "previousStatus": "CREATED",
+          "newStatus": "PENDING_REINSPECTION",
+          "actor": "质检员A",
+          "timestamp": "2026-05-12T03:03:54.521Z",
+          "reason": "初检不合格，需要复检",
+          "inspectionId": "a2ca2dfc-7bc2-40cf-b36b-8455d1b9820d"
+        }
+      ],
+      "createdAt": "2026-05-12T03:03:42.188Z",
+      "updatedAt": "2026-05-12T03:03:54.521Z"
+    }
+  },
+  "samplingSheets": {
+    "B202605120001-S001": {
+      "id": "1afe2bf0-23c3-4ed3-ae43-c32354db03b9",
+      "batchNumber": "B202605120001",
+      "sheetNumber": "B202605120001-S001",
+      "sampleCount": 50,
+      "inspectedCount": 50,
+      "defectCount": 0,
+      "defects": [
+        {
+          "level": "NONE",
+          "count": 0
+        }
+      ],
+      "result": "PASS",
+      "inspector": "张质检",
+      "inspectionDate": "2026-05-12T03:03:08.425Z",
+      "notes": "外观检查和功能测试全部通过"
+    },
+    "B202605120002-S001": {
+      "id": "b9fcbd8e-df53-4a6e-933d-4bafabfb40f1",
+      "batchNumber": "B202605120002",
+      "sheetNumber": "B202605120002-S001",
+      "sampleCount": 30,
+      "inspectedCount": 30,
+      "defectCount": 2,
+      "defects": [
+        {
+          "level": "MINOR",
+          "count": 2,
+          "description": "轻微划痕"
+        }
+      ],
+      "result": "FAIL",
+      "inspector": "张质检",
+      "inspectionDate": "2026-05-12T03:03:08.426Z",
+      "notes": "发现2处轻微划痕，建议复检"
+    },
+    "B202605120002-S002": {
+      "id": "c14921b9-af87-46d3-892a-04fe327b3f06",
+      "batchNumber": "B202605120002",
+      "sheetNumber": "B202605120002-S002",
+      "sampleCount": 60,
+      "inspectedCount": 60,
+      "defectCount": 0,
+      "defects": [
+        {
+          "level": "NONE",
+          "count": 0
+        }
+      ],
+      "result": "PASS",
+      "inspector": "王质检",
+      "inspectionDate": "2026-05-12T03:03:08.426Z",
+      "notes": "加倍抽样复检，全部合格"
+    },
+    "B202605120003-S001": {
+      "id": "acbb6a5d-0355-424f-8022-7330084db2a8",
+      "batchNumber": "B202605120003",
+      "sheetNumber": "B202605120003-S001",
+      "sampleCount": 20,
+      "inspectedCount": 20,
+      "defectCount": 3,
+      "defects": [
+        {
+          "level": "CRITICAL",
+          "count": 1,
+          "description": "焊点虚焊"
+        },
+        {
+          "level": "MINOR",
+          "count": 2,
+          "description": "丝印偏移"
+        }
+      ],
+      "result": "FAIL",
+      "inspector": "张质检",
+      "inspectionDate": "2026-05-12T03:03:08.430Z",
+      "notes": "发现严重缺陷，需质量经理审批"
+    },
+    "B202605120004-S001": {
+      "id": "af4f49e6-ef78-4830-9144-fecbd6609986",
+      "batchNumber": "B202605120004",
+      "sheetNumber": "B202605120004-S001",
+      "sampleCount": 100,
+      "inspectedCount": 100,
+      "defectCount": 5,
+      "defects": [
+        {
+          "level": "MAJOR",
+          "count": 5,
+          "description": "尺寸超差"
+        }
+      ],
+      "result": "FAIL",
+      "inspector": "王质检",
+      "inspectionDate": "2026-05-12T03:03:08.433Z",
+      "notes": "5件产品尺寸超出公差范围"
+    },
+    "B202605120004-S002": {
+      "id": "2601410c-7841-4ca8-b4d7-bf88aa1d7021",
+      "batchNumber": "B202605120004",
+      "sheetNumber": "B202605120004-S002",
+      "sampleCount": 200,
+      "inspectedCount": 200,
+      "defectCount": 11,
+      "defects": [
+        {
+          "level": "MAJOR",
+          "count": 8,
+          "description": "尺寸超差"
+        },
+        {
+          "level": "MINOR",
+          "count": 3,
+          "description": "表面毛刺"
+        }
+      ],
+      "result": "FAIL",
+      "inspector": "张质检",
+      "inspectionDate": "2026-05-12T03:03:08.434Z",
+      "notes": "复检仍发现批量性尺寸问题，建议返工"
+    },
+    "FAIL001-S001": {
+      "id": "4b26a667-32fa-4b0a-adbc-9825502611a6",
+      "batchNumber": "FAIL001",
+      "sheetNumber": "FAIL001-S001",
+      "sampleCount": 50,
+      "inspectedCount": 50,
+      "defectCount": 1,
+      "defects": [
+        {
+          "level": "MAJOR",
+          "count": 1
+        }
+      ],
+      "result": "FAIL",
+      "inspector": "质检员A",
+      "inspectionDate": "2026-05-12T03:03:54.521Z"
+    }
+  }
+}

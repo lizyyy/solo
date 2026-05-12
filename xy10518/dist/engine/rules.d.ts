@@ -1,0 +1,13 @@
+import { Defect, DefectLevel, InspectionResult, InspectionRecord, Batch, ValidationResult } from '../types';
+export declare function calculateDefectScore(defects: Defect[]): number;
+export declare function hasCriticalDefect(defects: Defect[]): boolean;
+export declare function getTotalDefectCount(defects: Defect[]): number;
+export declare function evaluateInspection(defects: Defect[], sampleCount: number, isReinspection?: boolean): InspectionResult;
+export declare function requiresReinspection(inspection: InspectionRecord, previousInspections: InspectionRecord[]): boolean;
+export declare function requiresConcession(inspection: InspectionRecord): boolean;
+export declare function validateReinspectionSampleCount(initialSampleCount: number, reinspectionSampleCount: number): ValidationResult;
+export declare function calculateRiskLevel(defects: Defect[]): 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export declare function isApprovedAndLocked(batch: Batch): boolean;
+export declare function validateModificationAfterApproval(batch: Batch, actor: string): ValidationResult;
+export declare function getDefectLevelLabel(level: DefectLevel): string;
+export declare function formatDefects(defects: Defect[]): string;

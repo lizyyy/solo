@@ -1,0 +1,12 @@
+import { DataStore, Batch, SamplingSheet } from '../types';
+export declare function loadStore(): DataStore;
+export declare function saveStore(store: DataStore): void;
+export declare function initStore(): DataStore;
+export declare function saveBatch(batch: Batch): void;
+export declare function getBatch(batchNumber: string): Batch | undefined;
+export declare function getAllBatches(): Batch[];
+export declare function saveSamplingSheet(sheet: SamplingSheet): void;
+export declare function getSamplingSheet(sheetNumber: string): SamplingSheet | undefined;
+export declare function getAllSamplingSheets(): SamplingSheet[];
+export declare function getStorePath(): string;
+export declare function storeExists(): boolean;

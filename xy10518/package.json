@@ -1,0 +1,30 @@
+{
+  "name": "qc-sampling-cli",
+  "version": "1.0.0",
+  "description": "质检抽样复判 CLI - 生产质检抽样复判/让步放行历史追踪工具",
+  "main": "dist/index.js",
+  "bin": {
+    "qc": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli.ts",
+    "dev": "ts-node src/cli.ts",
+    "clean": "rm -rf dist && rm -rf data"
+  },
+  "keywords": ["quality-control", "sampling", "inspection", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.2",
+    "ts-node": "^10.9.1"
+  }
+}
