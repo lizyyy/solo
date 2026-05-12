@@ -32,6 +32,10 @@
             <el-icon><Close /></el-icon>
             已拦截: {{ stats.blocked }}
           </el-tag>
+          <el-tag type="info" class="stat-tag" v-if="stats.merged > 0">
+            <el-icon><Link /></el-icon>
+            已合并: {{ stats.merged }}
+          </el-tag>
         </div>
       </el-header>
       <el-main>
@@ -44,6 +48,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { Link } from '@element-plus/icons-vue'
 
 const stats = ref({
   pending: 0,
@@ -52,7 +57,8 @@ const stats = ref({
   reviewing: 0,
   completed: 0,
   rework: 0,
-  blocked: 0
+  blocked: 0,
+  merged: 0
 })
 
 const fetchStats = async () => {

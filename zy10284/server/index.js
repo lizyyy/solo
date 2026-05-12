@@ -9,6 +9,60 @@ const PORT = 3003;
 app.use(cors());
 app.use(express.json());
 
+const getOrderById = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT * FROM repair_orders WHERE id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row);
+    });
+  });
+};
+
+const hasAuditRecord = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) as count FROM audits WHERE order_id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row.count > 0);
+    });
+  });
+};
+
+const hasAssignmentRecord = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) as count FROM assignments WHERE order_id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row.count > 0);
+    });
+  });
+};
+
+const hasCompletionRecord = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) as count FROM completions WHERE order_id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row.count > 0);
+    });
+  });
+};
+
+const hasReviewRecord = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) as count FROM reviews WHERE order_id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row.count > 0);
+    });
+  });
+};
+
+const hasReworkRecord = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.get('SELECT COUNT(*) as count FROM reworks WHERE order_id = ?', [orderId], (err, row) => {
+      if (err) reject(err);
+      else resolve(row.count > 0);
+    });
+  });
+};
+
 const generateOrderNo = () => {
   const date = new Date();
   const prefix = `WX${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
@@ -36,25 +90,55 @@ app.get('/api/dorms/buildings', (req, res) => {
 app.post('/api/repair-orders', async (req, res) => {
   const { dorm_id, student_name, student_phone, repair_type, description, images } = req.body;
   
-  db.get(`
-    SELECT ro.id FROM repair_orders ro
-    JOIN dorms d ON ro.dorm_id = d.id
-    WHERE ro.dorm_id = ? AND ro.repair_type = ? AND ro.status != 'completed'
-    ORDER BY ro.submit_time DESC LIMIT 1
-  `, [dorm_id, repair_type], async (err, existingOrder) => {
-    if (existingOrder) {
-      return res.status(400).json({ error: '该宿舍已有同类报修正在处理中，请勿重复提交', existingOrderId: existingOrder.id });
-    }
-    
-    const order_no = await generateOrderNo();
-    db.run(`
-      INSERT INTO repair_orders (order_no, dorm_id, student_name, student_phone, repair_type, description, images)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [order_no, dorm_id, student_name, student_phone, repair_type, description, images], function(err) {
-      if (err) res.status(500).json({ error: err.message });
-      else res.json({ id: this.lastID, order_no });
+  try {
+    const existingOrder = await new Promise((resolve, reject) => {
+      db.get(`
+        SELECT ro.id, ro.order_no FROM repair_orders ro
+        WHERE ro.dorm_id = ? AND ro.repair_type = ? AND ro.status != 'completed' AND ro.status != 'merged'
+        ORDER BY ro.submit_time DESC LIMIT 1
+      `, [dorm_id, repair_type], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
     });
-  });
+
+    const order_no = await generateOrderNo();
+    
+    db.run(`
+      INSERT INTO repair_orders (order_no, dorm_id, student_name, student_phone, repair_type, description, images, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [order_no, dorm_id, student_name, student_phone, repair_type, description, images, 'pending'], function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      
+      const newOrderId = this.lastID;
+      
+      if (existingOrder) {
+        db.run(`
+          INSERT INTO merged_orders (main_order_id, merged_order_id, merge_reason)
+          VALUES (?, ?, ?)
+        `, [existingOrder.id, newOrderId, '同房间同类报修自动合并'], (mergeErr) => {
+          if (mergeErr) console.error('合并记录创建失败:', mergeErr);
+        });
+        
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['merged', newOrderId], (updateErr) => {
+          if (updateErr) console.error('更新合并状态失败:', updateErr);
+        });
+        
+        return res.json({ 
+          id: newOrderId, 
+          order_no, 
+          merged: true, 
+          merged_to: existingOrder.id,
+          merged_to_order_no: existingOrder.order_no,
+          message: '该宿舍已有同类报修在处理中，已自动合并到现有工单'
+        });
+      }
+      
+      res.json({ id: newOrderId, order_no, merged: false });
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/repair-orders', (req, res) => {
@@ -63,12 +147,18 @@ app.get('/api/repair-orders', (req, res) => {
     SELECT ro.*, d.building, d.room_number,
            a.audit_result, a.audit_remark,
            ass.worker,
-           r.rating, r.need_rework
+           r.rating, r.need_rework,
+           mo_main.order_no as merged_to_order_no,
+           GROUP_CONCAT(mo_merged.order_no) as merged_orders
     FROM repair_orders ro
     JOIN dorms d ON ro.dorm_id = d.id
     LEFT JOIN audits a ON ro.id = a.order_id
     LEFT JOIN assignments ass ON ro.id = ass.order_id
     LEFT JOIN reviews r ON ro.id = r.order_id
+    LEFT JOIN merged_orders mo ON ro.id = mo.merged_order_id
+    LEFT JOIN repair_orders mo_main ON mo.main_order_id = mo_main.id
+    LEFT JOIN merged_orders mo_inv ON ro.id = mo_inv.main_order_id
+    LEFT JOIN repair_orders mo_merged ON mo_inv.merged_order_id = mo_merged.id
     WHERE 1=1
   `;
   const params = [];
@@ -90,7 +180,7 @@ app.get('/api/repair-orders', (req, res) => {
     params.push(endDate + ' 23:59:59');
   }
   
-  sql += ' ORDER BY ro.submit_time DESC';
+  sql += ' GROUP BY ro.id ORDER BY ro.submit_time DESC';
   
   db.all(sql, params, (err, rows) => {
     if (err) res.status(500).json({ error: err.message });
@@ -98,126 +188,245 @@ app.get('/api/repair-orders', (req, res) => {
   });
 });
 
-app.get('/api/repair-orders/:id', (req, res) => {
-  db.get(`
-    SELECT ro.*, d.building, d.room_number,
-           a.auditor, a.audit_result, a.audit_remark, a.audit_time,
-           ass.worker, ass.worker_phone, ass.assign_remark, ass.assign_time,
-           c.complete_remark, c.complete_time,
-           r.rating, r.review_content, r.need_rework, r.review_time
-    FROM repair_orders ro
-    JOIN dorms d ON ro.dorm_id = d.id
-    LEFT JOIN audits a ON ro.id = a.order_id
-    LEFT JOIN assignments ass ON ro.id = ass.order_id
-    LEFT JOIN completions c ON ro.id = c.order_id
-    LEFT JOIN reviews r ON ro.id = r.order_id
-    WHERE ro.id = ?
-  `, [req.params.id], (err, row) => {
-    if (err) res.status(500).json({ error: err.message });
-    else {
-      db.all('SELECT * FROM materials WHERE order_id = ?', [req.params.id], (matErr, materials) => {
-        if (!matErr && row) row.materials = materials;
-        res.json(row);
+app.get('/api/repair-orders/:id', async (req, res) => {
+  const orderId = req.params.id;
+  
+  try {
+    const row = await new Promise((resolve, reject) => {
+      db.get(`
+        SELECT ro.*, d.building, d.room_number,
+               a.auditor, a.audit_result, a.audit_remark, a.audit_time,
+               ass.worker, ass.worker_phone, ass.assign_remark, ass.assign_time,
+               c.complete_remark, c.complete_time,
+               r.rating, r.review_content, r.need_rework, r.review_time,
+               mo_main.order_no as merged_to_order_no, mo_main.id as merged_to_id
+        FROM repair_orders ro
+        JOIN dorms d ON ro.dorm_id = d.id
+        LEFT JOIN audits a ON ro.id = a.order_id
+        LEFT JOIN assignments ass ON ro.id = ass.order_id
+        LEFT JOIN completions c ON ro.id = c.order_id
+        LEFT JOIN reviews r ON ro.id = r.order_id
+        LEFT JOIN merged_orders mo ON ro.id = mo.merged_order_id
+        LEFT JOIN repair_orders mo_main ON mo.main_order_id = mo_main.id
+        WHERE ro.id = ?
+      `, [orderId], (err, result) => {
+        if (err) reject(err);
+        else resolve(result);
       });
-    }
-  });
+    });
+
+    if (!row) return res.status(404).json({ error: '报修单不存在' });
+
+    const materials = await new Promise((resolve, reject) => {
+      db.all('SELECT * FROM materials WHERE order_id = ?', [orderId], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+    row.materials = materials;
+
+    const mergedOrders = await new Promise((resolve, reject) => {
+      db.all(`
+        SELECT ro.id, ro.order_no, ro.student_name, ro.submit_time, mo.merge_time
+        FROM merged_orders mo
+        JOIN repair_orders ro ON mo.merged_order_id = ro.id
+        WHERE mo.main_order_id = ?
+      `, [orderId], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+    row.merged_orders = mergedOrders;
+
+    res.json(row);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/audit', (req, res) => {
+app.post('/api/repair-orders/:id/audit', async (req, res) => {
   const { auditor, audit_result, audit_remark } = req.body;
   const orderId = req.params.id;
   
-  db.run('INSERT INTO audits (order_id, auditor, audit_result, audit_remark) VALUES (?, ?, ?, ?)',
-    [orderId, auditor, audit_result, audit_remark], (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      const newStatus = audit_result === 'pass' ? 'assigned' : 'blocked';
-      db.run('UPDATE repair_orders SET status = ? WHERE id = ?', [newStatus, orderId], (updateErr) => {
-        if (updateErr) res.status(500).json({ error: updateErr.message });
-        else res.json({ success: true });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'pending') {
+      return res.status(400).json({ error: '当前状态不允许审核，只有待审核状态可以操作' });
+    }
+    
+    const hasAudited = await hasAuditRecord(orderId);
+    if (hasAudited) {
+      return res.status(400).json({ error: '该报修单已审核，请勿重复提交' });
+    }
+    
+    db.run('INSERT INTO audits (order_id, auditor, audit_result, audit_remark) VALUES (?, ?, ?, ?)',
+      [orderId, auditor, audit_result, audit_remark], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        const newStatus = audit_result === 'pass' ? 'assigned' : 'blocked';
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', [newStatus, orderId], (updateErr) => {
+          if (updateErr) res.status(500).json({ error: updateErr.message });
+          else res.json({ success: true, new_status: newStatus });
+        });
       });
-    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/assign', (req, res) => {
+app.post('/api/repair-orders/:id/assign', async (req, res) => {
   const { worker, worker_phone, assign_remark } = req.body;
   const orderId = req.params.id;
   
-  db.run('INSERT INTO assignments (order_id, worker, worker_phone, assign_remark) VALUES (?, ?, ?, ?)',
-    [orderId, worker, worker_phone, assign_remark], (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['processing', orderId], (updateErr) => {
-        if (updateErr) res.status(500).json({ error: updateErr.message });
-        else res.json({ success: true });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'assigned') {
+      return res.status(400).json({ error: '当前状态不允许派工，只有待派工状态可以操作' });
+    }
+    
+    const hasAssigned = await hasAssignmentRecord(orderId);
+    if (hasAssigned) {
+      return res.status(400).json({ error: '该报修单已派工，请勿重复提交' });
+    }
+    
+    db.run('INSERT INTO assignments (order_id, worker, worker_phone, assign_remark) VALUES (?, ?, ?, ?)',
+      [orderId, worker, worker_phone, assign_remark], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['processing', orderId], (updateErr) => {
+          if (updateErr) res.status(500).json({ error: updateErr.message });
+          else res.json({ success: true, new_status: 'processing' });
+        });
       });
-    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/materials', (req, res) => {
+app.post('/api/repair-orders/:id/materials', async (req, res) => {
   const { materials } = req.body;
   const orderId = req.params.id;
   const materialLimit = { '水管': 2, '水龙头': 1, '灯泡': 5, '门锁': 1 };
   
-  const stmt = db.prepare('INSERT INTO materials (order_id, material_name, quantity, unit, is_over_limit) VALUES (?, ?, ?, ?, ?)');
-  
-  materials.forEach(mat => {
-    const limit = materialLimit[mat.material_name] || 10;
-    const isOverLimit = mat.quantity > limit ? 1 : 0;
-    stmt.run(orderId, mat.material_name, mat.quantity, mat.unit || '个', isOverLimit);
-  });
-  
-  stmt.finalize((err) => {
-    if (err) res.status(500).json({ error: err.message });
-    else res.json({ success: true });
-  });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'processing') {
+      return res.status(400).json({ error: '当前状态不允许记录材料，只有维修中状态可以操作' });
+    }
+    
+    const stmt = db.prepare('INSERT INTO materials (order_id, material_name, quantity, unit, is_over_limit) VALUES (?, ?, ?, ?, ?)');
+    
+    const results = [];
+    materials.forEach(mat => {
+      const limit = materialLimit[mat.material_name] || 10;
+      const isOverLimit = mat.quantity > limit ? 1 : 0;
+      stmt.run(orderId, mat.material_name, mat.quantity, mat.unit || '个', isOverLimit);
+      results.push({ name: mat.material_name, over_limit: isOverLimit });
+    });
+    
+    stmt.finalize((err) => {
+      if (err) res.status(500).json({ error: err.message });
+      else res.json({ success: true, materials: results });
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/complete', (req, res) => {
+app.post('/api/repair-orders/:id/complete', async (req, res) => {
   const { complete_remark } = req.body;
   const orderId = req.params.id;
   
-  db.run('INSERT INTO completions (order_id, complete_remark) VALUES (?, ?)',
-    [orderId, complete_remark], (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['reviewing', orderId], (updateErr) => {
-        if (updateErr) res.status(500).json({ error: updateErr.message });
-        else res.json({ success: true });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'processing') {
+      return res.status(400).json({ error: '当前状态不允许完工，只有维修中状态可以操作' });
+    }
+    
+    const hasCompleted = await hasCompletionRecord(orderId);
+    if (hasCompleted) {
+      return res.status(400).json({ error: '该报修单已完工，请勿重复提交' });
+    }
+    
+    db.run('INSERT INTO completions (order_id, complete_remark) VALUES (?, ?)',
+      [orderId, complete_remark], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['reviewing', orderId], (updateErr) => {
+          if (updateErr) res.status(500).json({ error: updateErr.message });
+          else res.json({ success: true, new_status: 'reviewing' });
+        });
       });
-    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/review', (req, res) => {
+app.post('/api/repair-orders/:id/review', async (req, res) => {
   const { rating, review_content } = req.body;
   const orderId = req.params.id;
   const need_rework = rating <= 2 ? 1 : 0;
   
-  db.run('INSERT INTO reviews (order_id, rating, review_content, need_rework) VALUES (?, ?, ?, ?)',
-    [orderId, rating, review_content, need_rework], (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      const newStatus = need_rework ? 'rework' : 'completed';
-      db.run('UPDATE repair_orders SET status = ? WHERE id = ?', [newStatus, orderId], (updateErr) => {
-        if (updateErr) res.status(500).json({ error: updateErr.message });
-        else res.json({ success: true, need_rework });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'reviewing') {
+      return res.status(400).json({ error: '当前状态不允许回访，只有待回访状态可以操作' });
+    }
+    
+    const hasReviewed = await hasReviewRecord(orderId);
+    if (hasReviewed) {
+      return res.status(400).json({ error: '该报修单已回访，请勿重复提交' });
+    }
+    
+    db.run('INSERT INTO reviews (order_id, rating, review_content, need_rework) VALUES (?, ?, ?, ?)',
+      [orderId, rating, review_content, need_rework], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        const newStatus = need_rework ? 'rework' : 'completed';
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', [newStatus, orderId], (updateErr) => {
+          if (updateErr) res.status(500).json({ error: updateErr.message });
+          else res.json({ success: true, need_rework: need_rework === 1, new_status: newStatus });
+        });
       });
-    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-app.post('/api/repair-orders/:id/rework', (req, res) => {
+app.post('/api/repair-orders/:id/rework', async (req, res) => {
   const { rework_reason, rework_worker } = req.body;
   const orderId = req.params.id;
   
-  db.run('INSERT INTO reworks (order_id, rework_reason, rework_worker) VALUES (?, ?, ?)',
-    [orderId, rework_reason, rework_worker], (err) => {
-      if (err) return res.status(500).json({ error: err.message });
-      
-      db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['processing', orderId], (updateErr) => {
-        if (updateErr) res.status(500).json({ error: updateErr.message });
-        else res.json({ success: true });
+  try {
+    const order = await getOrderById(orderId);
+    if (!order) return res.status(404).json({ error: '报修单不存在' });
+    
+    if (order.status !== 'rework') {
+      return res.status(400).json({ error: '当前状态不允许返工，只有待返工状态可以操作' });
+    }
+    
+    db.run('INSERT INTO reworks (order_id, rework_reason, rework_worker) VALUES (?, ?, ?)',
+      [orderId, rework_reason, rework_worker], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['processing', orderId], (updateErr) => {
+          if (updateErr) res.status(500).json({ error: updateErr.message });
+          else res.json({ success: true, new_status: 'processing' });
+        });
       });
-    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/export/weekly', async (req, res) => {
@@ -269,7 +478,8 @@ app.get('/api/export/weekly', async (req, res) => {
       reviewing: '待回访',
       completed: '已完成',
       rework: '待返工',
-      blocked: '已拦截'
+      blocked: '已拦截',
+      merged: '已合并'
     };
     
     rows.forEach(row => {
@@ -299,7 +509,8 @@ app.get('/api/stats', (req, res) => {
         reviewing: 0,
         completed: 0,
         rework: 0,
-        blocked: 0
+        blocked: 0,
+        merged: 0
       };
       rows.forEach(r => {
         stats[r.status] = r.count;

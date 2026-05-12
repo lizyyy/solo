@@ -11,6 +11,7 @@
             <el-option label="已完成" value="completed" />
             <el-option label="待返工" value="rework" />
             <el-option label="已拦截" value="blocked" />
+            <el-option label="已合并" value="merged" />
           </el-select>
         </el-form-item>
         <el-form-item label="楼栋">
@@ -43,11 +44,19 @@
         <el-table-column prop="room_number" label="房间" width="100" />
         <el-table-column prop="student_name" label="报修人" width="100" />
         <el-table-column prop="repair_type" label="维修类型" width="120" />
-        <el-table-column label="状态" width="120">
+        <el-table-column label="状态" width="140">
           <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">
-              {{ getStatusText(row.status) }}
-            </el-tag>
+            <div>
+              <el-tag :type="getStatusType(row.status)">
+                {{ getStatusText(row.status) }}
+              </el-tag>
+              <el-tag v-if="row.merged_to_order_no" type="info" size="small" class="merge-tag">
+                合并至: {{ row.merged_to_order_no }}
+              </el-tag>
+              <el-tag v-if="row.merged_orders" type="success" size="small" class="merge-tag">
+                含合并工单
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="worker" label="维修工人" width="120" />
@@ -324,7 +333,8 @@ const getStatusType = (status) => {
     reviewing: 'info',
     completed: 'success',
     rework: 'danger',
-    blocked: 'danger'
+    blocked: 'danger',
+    merged: 'info'
   }
   return map[status] || ''
 }
@@ -337,15 +347,20 @@ const getStatusText = (status) => {
     reviewing: '待回访',
     completed: '已完成',
     rework: '待返工',
-    blocked: '已拦截'
+    blocked: '已拦截',
+    merged: '已合并'
   }
   return map[status] || status
 }
 
 const createOrder = async () => {
   try {
-    await axios.post('/api/repair-orders', newOrder.value)
-    ElMessage.success('报修提交成功')
+    const res = await axios.post('/api/repair-orders', newOrder.value)
+    if (res.data.merged) {
+      ElMessage.warning(`报修已自动合并至工单 ${res.data.merged_to_order_no}`)
+    } else {
+      ElMessage.success('报修提交成功')
+    }
     showCreateDialog.value = false
     newOrder.value = { dorm_id: '', student_name: '', student_phone: '', repair_type: '', description: '' }
     fetchOrders()
@@ -507,5 +522,9 @@ onMounted(() => {
 
 .add-material-btn {
   margin-top: 15px;
+}
+
+.merge-tag {
+  margin-top: 4px;
 }
 </style>

@@ -19,7 +19,18 @@
         <el-descriptions-item label="维修类型">{{ order.repair_type }}</el-descriptions-item>
         <el-descriptions-item label="提交时间" :span="2">{{ order.submit_time }}</el-descriptions-item>
         <el-descriptions-item label="问题描述" :span="2">{{ order.description }}</el-descriptions-item>
+        <el-descriptions-item label="合并至" v-if="order.merged_to_order_no">
+          <el-tag type="info">{{ order.merged_to_order_no }}</el-tag>
+        </el-descriptions-item>
       </el-descriptions>
+
+      <el-divider content-position="left" v-if="order.merged_orders && order.merged_orders.length">合并工单</el-divider>
+      <el-table :data="order.merged_orders || []" stripe style="width: 100%" v-if="order.merged_orders && order.merged_orders.length">
+        <el-table-column prop="order_no" label="报修单号" />
+        <el-table-column prop="student_name" label="报修人" />
+        <el-table-column prop="submit_time" label="提交时间" />
+        <el-table-column prop="merge_time" label="合并时间" />
+      </el-table>
 
       <el-divider content-position="left">审核信息</el-divider>
       <el-descriptions :column="2" border v-if="order.audit_result">
@@ -262,7 +273,8 @@ const getStatusType = (status) => {
     reviewing: 'info',
     completed: 'success',
     rework: 'danger',
-    blocked: 'danger'
+    blocked: 'danger',
+    merged: 'info'
   }
   return map[status] || ''
 }
@@ -275,7 +287,8 @@ const getStatusText = (status) => {
     reviewing: '待回访',
     completed: '已完成',
     rework: '待返工',
-    blocked: '已拦截'
+    blocked: '已拦截',
+    merged: '已合并'
   }
   return map[status] || status
 }
