@@ -1,0 +1,16 @@
+[project]
+name = "meeting-ai"
+version = "1.0.0"
+description = "会议纪要行动项 CLI - 管理会议纪要中的行动项、负责人、截止日期和依赖关系"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+meeting-ai = "meeting_ai.cli:cli"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
