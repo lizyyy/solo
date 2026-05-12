@@ -1,0 +1,13 @@
+{
+  "approval_id": "APPR-2024-001",
+  "tenant_id": "tenant001",
+  "data_type": "orders",
+  "approved_fields": [
+    "id_card",
+    "bank_card"
+  ],
+  "approved_by": "sec_officer_zhang",
+  "approved_at": "2026-05-12T21:56:37.191761",
+  "expires_at": "2026-05-19T21:56:37.191761",
+  "reason": "客户投诉排查，需查看银行卡号核实退款"
+}

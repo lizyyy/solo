@@ -1,0 +1,55 @@
+{
+  "task_id": "task_a9c8d460914b410a",
+  "tenant_id": "tenant001",
+  "data_type": "users",
+  "export_time": "2026-05-12T21:59:35.740577",
+  "summary": {
+    "total_records": 3,
+    "exported_records": 3,
+    "masked_field_count": 15,
+    "rejected_records": 0
+  },
+  "masked_fields": [
+    {
+      "field_name": "username",
+      "mask_count": 3,
+      "mask_strategy": "partial",
+      "data_category": null
+    },
+    {
+      "field_name": "real_name",
+      "mask_count": 3,
+      "mask_strategy": "partial",
+      "data_category": null
+    },
+    {
+      "field_name": "mobile",
+      "mask_count": 3,
+      "mask_strategy": "partial",
+      "data_category": "phone"
+    },
+    {
+      "field_name": "email",
+      "mask_count": 3,
+      "mask_strategy": "partial",
+      "data_category": "email"
+    },
+    {
+      "field_name": "description",
+      "mask_count": 3,
+      "mask_strategy": "partial",
+      "data_category": "sensitive_text"
+    }
+  ],
+  "rejected_rows": [],
+  "approval_exceptions": [
+    {
+      "field": "identity_card",
+      "reason": "身份证号（需审批）",
+      "approval_id": "APPR-USERS-001",
+      "approved_by": "sec_officer_wang"
+    }
+  ],
+  "strategy_comparison": null,
+  "strategy_version": "v1.0.0"
+}

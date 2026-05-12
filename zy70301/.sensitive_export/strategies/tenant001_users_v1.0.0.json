@@ -1,0 +1,73 @@
+{
+  "version": "v1.0.0",
+  "tenant_id": "tenant001",
+  "data_type": "users",
+  "fields": [
+    {
+      "name": "user_id",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "用户ID"
+    },
+    {
+      "name": "username",
+      "mask_type": "partial",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "用户名"
+    },
+    {
+      "name": "real_name",
+      "mask_type": "partial",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "真实姓名"
+    },
+    {
+      "name": "mobile",
+      "mask_type": "partial",
+      "data_category": "phone",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "手机号"
+    },
+    {
+      "name": "email",
+      "mask_type": "partial",
+      "data_category": "email",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "邮箱"
+    },
+    {
+      "name": "identity_card",
+      "mask_type": "full",
+      "data_category": "id_card",
+      "allow_approval": true,
+      "approval_required": true,
+      "description": "身份证号（需审批）"
+    },
+    {
+      "name": "register_time",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "注册时间"
+    },
+    {
+      "name": "description",
+      "mask_type": "partial",
+      "data_category": "sensitive_text",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "用户描述"
+    }
+  ],
+  "created_at": "2026-05-12T21:58:39.544821",
+  "updated_at": "2026-05-12T21:58:39.544824"
+}

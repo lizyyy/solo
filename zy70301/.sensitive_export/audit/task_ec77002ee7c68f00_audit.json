@@ -1,0 +1,55 @@
+{
+  "task_id": "task_ec77002ee7c68f00",
+  "tenant_id": "tenant001",
+  "data_type": "orders",
+  "export_time": "2026-05-12T21:56:37.200808",
+  "summary": {
+    "total_records": 5,
+    "exported_records": 5,
+    "masked_field_count": 19,
+    "rejected_records": 0
+  },
+  "masked_fields": [
+    {
+      "field_name": "customer_name",
+      "mask_count": 5,
+      "mask_strategy": "partial",
+      "data_category": null
+    },
+    {
+      "field_name": "phone",
+      "mask_count": 5,
+      "mask_strategy": "partial",
+      "data_category": "phone"
+    },
+    {
+      "field_name": "email",
+      "mask_count": 5,
+      "mask_strategy": "partial",
+      "data_category": "email"
+    },
+    {
+      "field_name": "remark",
+      "mask_count": 4,
+      "mask_strategy": "partial",
+      "data_category": "sensitive_text"
+    }
+  ],
+  "rejected_rows": [],
+  "approval_exceptions": [
+    {
+      "field": "id_card",
+      "reason": "身份证号（需审批）",
+      "approval_id": "APPR-2024-001",
+      "approved_by": "sec_officer_zhang"
+    },
+    {
+      "field": "bank_card",
+      "reason": "银行卡号（需审批）",
+      "approval_id": "APPR-2024-001",
+      "approved_by": "sec_officer_zhang"
+    }
+  ],
+  "strategy_comparison": null,
+  "strategy_version": "v1.0.0"
+}

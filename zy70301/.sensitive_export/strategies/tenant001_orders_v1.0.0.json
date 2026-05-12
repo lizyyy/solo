@@ -1,0 +1,89 @@
+{
+  "version": "v1.0.0",
+  "tenant_id": "tenant001",
+  "data_type": "orders",
+  "fields": [
+    {
+      "name": "order_id",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "订单号"
+    },
+    {
+      "name": "customer_name",
+      "mask_type": "partial",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "客户姓名"
+    },
+    {
+      "name": "phone",
+      "mask_type": "partial",
+      "data_category": "phone",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "联系电话"
+    },
+    {
+      "name": "email",
+      "mask_type": "partial",
+      "data_category": "email",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "电子邮箱"
+    },
+    {
+      "name": "id_card",
+      "mask_type": "full",
+      "data_category": "id_card",
+      "allow_approval": true,
+      "approval_required": true,
+      "description": "身份证号（需审批）"
+    },
+    {
+      "name": "bank_card",
+      "mask_type": "full",
+      "data_category": "bank_card",
+      "allow_approval": true,
+      "approval_required": true,
+      "description": "银行卡号（需审批）"
+    },
+    {
+      "name": "order_amount",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "订单金额"
+    },
+    {
+      "name": "order_date",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "下单日期"
+    },
+    {
+      "name": "remark",
+      "mask_type": "partial",
+      "data_category": "sensitive_text",
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "备注（含敏感文本）"
+    },
+    {
+      "name": "status",
+      "mask_type": "none",
+      "data_category": null,
+      "allow_approval": false,
+      "approval_required": false,
+      "description": "订单状态"
+    }
+  ],
+  "created_at": "2026-05-12T21:56:37.189911",
+  "updated_at": "2026-05-12T21:56:37.189917"
+}

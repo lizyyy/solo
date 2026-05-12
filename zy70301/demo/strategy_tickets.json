@@ -1,0 +1,45 @@
+{
+  "version": "v1.0.0",
+  "tenant_id": "tenant001",
+  "data_type": "tickets",
+  "fields": [
+    {
+      "name": "ticket_id",
+      "mask_type": "none",
+      "description": "工单ID"
+    },
+    {
+      "name": "user_phone",
+      "mask_type": "partial",
+      "data_category": "phone",
+      "description": "用户电话"
+    },
+    {
+      "name": "user_email",
+      "mask_type": "partial",
+      "data_category": "email",
+      "description": "用户邮箱"
+    },
+    {
+      "name": "subject",
+      "mask_type": "none",
+      "description": "工单标题"
+    },
+    {
+      "name": "content",
+      "mask_type": "partial",
+      "data_category": "sensitive_text",
+      "description": "工单内容（可能包含敏感信息）"
+    },
+    {
+      "name": "create_time",
+      "mask_type": "none",
+      "description": "创建时间"
+    },
+    {
+      "name": "status",
+      "mask_type": "none",
+      "description": "工单状态"
+    }
+  ]
+}

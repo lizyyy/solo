@@ -1,0 +1,53 @@
+{
+  "version": "v1.0.0",
+  "tenant_id": "tenant001",
+  "data_type": "users",
+  "fields": [
+    {
+      "name": "user_id",
+      "mask_type": "none",
+      "description": "用户ID"
+    },
+    {
+      "name": "username",
+      "mask_type": "partial",
+      "description": "用户名"
+    },
+    {
+      "name": "real_name",
+      "mask_type": "partial",
+      "description": "真实姓名"
+    },
+    {
+      "name": "mobile",
+      "mask_type": "partial",
+      "data_category": "phone",
+      "description": "手机号"
+    },
+    {
+      "name": "email",
+      "mask_type": "partial",
+      "data_category": "email",
+      "description": "邮箱"
+    },
+    {
+      "name": "identity_card",
+      "mask_type": "full",
+      "data_category": "id_card",
+      "approval_required": true,
+      "allow_approval": true,
+      "description": "身份证号（需审批）"
+    },
+    {
+      "name": "register_time",
+      "mask_type": "none",
+      "description": "注册时间"
+    },
+    {
+      "name": "description",
+      "mask_type": "partial",
+      "data_category": "sensitive_text",
+      "description": "用户描述"
+    }
+  ]
+}
