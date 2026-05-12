@@ -1,0 +1,15 @@
+{
+  "name": "live-gift-settlement-api",
+  "version": "1.0.0",
+  "description": "直播礼物分账 API - 主播、公会、平台分账系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node tests/run-samples.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
