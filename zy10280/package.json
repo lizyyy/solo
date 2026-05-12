@@ -1,0 +1,20 @@
+{
+  "name": "agricultural-sample-inspection",
+  "version": "1.0.0",
+  "description": "农产品留样送检台 - 市场抽检农残检测管理系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "keywords": ["agriculture", "inspection", "food-safety"],
+  "author": "",
+  "license": "MIT"
+}

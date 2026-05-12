@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农产品留样送检台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #2c5f2d 0%, #4a7c4e 100%); color: white; padding: 20px 30px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { margin-top: 5px; opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 8px; padding: 15px 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-card.warning { border-left: 4px solid #ff6b6b; }
+        .stat-card.info { border-left: 4px solid #4ecdc4; }
+        .stat-value { font-size: 28px; font-weight: 700; color: #2c5f2d; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
+        .warning .stat-value { color: #ff6b6b; }
+        
+        .filter-bar { background: white; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .filter-group { display: flex; gap: 8px; align-items: center; }
+        .filter-group label { font-size: 14px; color: #555; font-weight: 500; }
+        .filter-bar input, .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 120px; }
+        .filter-bar input:focus, .filter-bar select:focus { outline: none; border-color: #4a7c4e; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #2c5f2d; color: white; }
+        .btn-primary:hover { background: #1f4720; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-outline { background: white; border: 1px solid #ddd; color: #555; }
+        .btn-outline:hover { border-color: #2c5f2d; color: #2c5f2d; }
+        
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; font-size: 13px; color: #555; }
+        tr:hover { background: #f8f9fa; }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-已创建 { background: #e3f2fd; color: #1976d2; }
+        .status-已留样 { background: #fff3cd; color: #856404; }
+        .status-已送检 { background: #d1ecf1; color: #0c5460; }
+        .status-检测正常 { background: #d4edda; color: #155724; }
+        .status-检测异常 { background: #f8d7da; color: #721c24; }
+        .status-已下架 { background: #f5c6cb; color: #721c24; }
+        .status-复检中 { background: #ffeaa7; color: #856404; }
+        .status-复检通过 { background: #c3e6cb; color: #155724; }
+        .status-复检未通过 { background: #f5c6cb; color: #721c24; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #333; border-bottom: 2px solid #2c5f2d; padding-bottom: 8px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .detail-item { display: flex; font-size: 14px; }
+        .detail-label { color: #666; width: 90px; flex-shrink: 0; }
+        .detail-value { color: #333; font-weight: 500; }
+        
+        .action-area { background: #f8f9fa; border-radius: 8px; padding: 15px; margin-top: 15px; }
+        .action-area h4 { font-size: 14px; margin-bottom: 10px; color: #555; }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        .logs-list { max-height: 200px; overflow-y: auto; }
+        .log-item { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 13px; }
+        .log-time { color: #999; }
+        .log-op { font-weight: 500; color: #2c5f2d; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+        .link { color: #2c5f2d; cursor: pointer; text-decoration: underline; }
+        .abnormal-row { background: #fff5f5; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌱 农产品留样送检台</h1>
+        <p>市场农残检测管理 - 实时追踪留样、送检、检测结果与复检流程</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card info">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">总批次数</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value" id="not-sampled">0</div>
+                <div class="stat-label">未留样批次</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value" id="not-taken-off">0</div>
+                <div class="stat-label">异常未下架</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value" id="not-restored">0</div>
+                <div class="stat-label">复检通过未恢复</div>
+            </div>
+        </div>
+        
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>状态:</label>
+                <select id="filter-status">
+                    <option value="">全部</option>
+                    <option value="已创建">已创建</option>
+                    <option value="已留样">已留样</option>
+                    <option value="已送检">已送检</option>
+                    <option value="检测正常">检测正常</option>
+                    <option value="检测异常">检测异常</option>
+                    <option value="已下架">已下架</option>
+                    <option value="复检中">复检中</option>
+                    <option value="复检通过">复检通过</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>风险:</label>
+                <select id="filter-abnormal">
+                    <option value="">全部</option>
+                    <option value="1">仅异常</option>
+                    <option value="0">仅正常</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>摊位:</label>
+                <input type="text" id="filter-stall" placeholder="摊位号">
+            </div>
+            <div class="filter-group">
+                <label>日期:</label>
+                <input type="date" id="filter-start">
+                <span>-</span>
+                <input type="date" id="filter-end">
+            </div>
+            <div class="filter-group">
+                <input type="text" id="search-keyword" placeholder="搜索批次号/摊主/商品">
+            </div>
+            <div class="filter-group" style="margin-left: auto;">
+                <button class="btn btn-outline" onclick="loadBatches()">🔍 筛选</button>
+                <button class="btn btn-secondary" onclick="resetFilter()">重置</button>
+                <button class="btn btn-success" onclick="exportData()">📊 导出</button>
+                <button class="btn btn-primary" onclick="showCreateModal()">+ 新增批次</button>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>摊主</th>
+                        <th>摊位</th>
+                        <th>商品</th>
+                        <th>产地</th>
+                        <th>到货日期</th>
+                        <th>状态</th>
+                        <th>检测结果</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="batches-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="modal" id="create-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增批次</h3>
+                <button class="close-btn" onclick="closeModal('create-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>批次号 *</label>
+                        <input type="text" id="create-batch-no" placeholder="如: NC20260510001">
+                    </div>
+                    <div class="form-group">
+                        <label>摊主姓名 *</label>
+                        <input type="text" id="create-vendor" placeholder="如: 张三">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>摊位号 *</label>
+                        <input type="text" id="create-stall" placeholder="如: A-01">
+                    </div>
+                    <div class="form-group">
+                        <label>商品名称 *</label>
+                        <input type="text" id="create-product" placeholder="如: 生菜">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>产地</label>
+                        <input type="text" id="create-origin" placeholder="如: 山东寿光">
+                    </div>
+                    <div class="form-group">
+                        <label>到货日期 *</label>
+                        <input type="date" id="create-arrival">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>数量</label>
+                        <input type="number" id="create-quantity" placeholder="如: 50">
+                    </div>
+                    <div class="form-group">
+                        <label>单位</label>
+                        <input type="text" id="create-unit" placeholder="如: kg">
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="createBatch()">创建批次</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="detail-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>批次详情</h3>
+                <button class="close-btn" onclick="closeModal('detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detail-content">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentBatchId = null;
+        
+        async function loadStats() {
+            const res = await fetch('/api/batches/stats');
+            const stats = await res.json();
+            document.getElementById('total-count').textContent = stats.total;
+            document.getElementById('not-sampled').textContent = stats.not_sampled;
+            document.getElementById('not-taken-off').textContent = stats.not_taken_off;
+            document.getElementById('not-restored').textContent = stats.not_restored;
+        }
+        
+        async function loadBatches() {
+            const params = new URLSearchParams({
+                status: document.getElementById('filter-status').value,
+                is_abnormal: document.getElementById('filter-abnormal').value,
+                stall_no: document.getElementById('filter-stall').value,
+                start_date: document.getElementById('filter-start').value,
+                end_date: document.getElementById('filter-end').value,
+                keyword: document.getElementById('search-keyword').value
+            });
+            const res = await fetch(`/api/batches?${params}`);
+            const batches = await res.json();
+            renderBatches(batches);
+        }
+        
+        function renderBatches(batches) {
+            const tbody = document.getElementById('batches-table');
+            if (batches.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = batches.map(b => `
+                <tr class="${b.is_abnormal ? 'abnormal-row' : ''}">
+                    <td><span class="link" onclick="showDetail(${b.id})">${b.batch_no}</span></td>
+                    <td>${b.vendor_name}</td>
+                    <td>${b.stall_no}</td>
+                    <td>${b.product_name}</td>
+                    <td>${b.origin || '-'}</td>
+                    <td>${b.arrival_date}</td>
+                    <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+                    <td>${b.is_abnormal ? '⚠️ 异常' : (b.result_summary || '待检测')}</td>
+                    <td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="showDetail(${b.id})">查看</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        function resetFilter() {
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-abnormal').value = '';
+            document.getElementById('filter-stall').value = '';
+            document.getElementById('filter-start').value = '';
+            document.getElementById('filter-end').value = '';
+            document.getElementById('search-keyword').value = '';
+            loadBatches();
+        }
+        
+        function exportData() {
+            const params = new URLSearchParams({
+                status: document.getElementById('filter-status').value,
+                is_abnormal: document.getElementById('filter-abnormal').value,
+                keyword: document.getElementById('search-keyword').value
+            });
+            window.open(`/api/export/batches?${params}`);
+        }
+        
+        function showCreateModal() {
+            document.getElementById('create-modal').classList.add('show');
+            document.getElementById('create-arrival').valueAsDate = new Date();
+        }
+        
+        async function createBatch() {
+            const data = {
+                batch_no: document.getElementById('create-batch-no').value,
+                vendor_name: document.getElementById('create-vendor').value,
+                stall_no: document.getElementById('create-stall').value,
+                product_name: document.getElementById('create-product').value,
+                origin: document.getElementById('create-origin').value,
+                quantity: document.getElementById('create-quantity').value,
+                unit: document.getElementById('create-unit').value,
+                arrival_date: document.getElementById('create-arrival').value
+            };
+            const res = await fetch('/api/batches', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            if (res.ok) {
+                alert('创建成功');
+                closeModal('create-modal');
+                loadBatches();
+                loadStats();
+            } else {
+                alert(result.error);
+            }
+        }
+        
+        async function showDetail(id) {
+            currentBatchId = id;
+            const [batchRes, logsRes] = await Promise.all([
+                fetch(`/api/batches/${id}`),
+                fetch(`/api/batches/${id}/logs`)
+            ]);
+            const batch = await batchRes.json();
+            const logs = await logsRes.json();
+            renderDetail(batch, logs);
+            document.getElementById('detail-modal').classList.add('show');
+        }
+        
+        function renderDetail(batch, logs) {
+            const content = document.getElementById('detail-content');
+            const actions = getAvailableActions(batch);
+            
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h4>📋 基本信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">批次号:</span><span class="detail-value">${batch.batch_no}</span></div>
+                        <div class="detail-item"><span class="detail-label">当前状态:</span><span class="status-badge status-${batch.status}">${batch.status}</span></div>
+                        <div class="detail-item"><span class="detail-label">摊主:</span><span class="detail-value">${batch.vendor_name}</span></div>
+                        <div class="detail-item"><span class="detail-label">摊位:</span><span class="detail-value">${batch.stall_no}</span></div>
+                        <div class="detail-item"><span class="detail-label">商品:</span><span class="detail-value">${batch.product_name}</span></div>
+                        <div class="detail-item"><span class="detail-label">产地:</span><span class="detail-value">${batch.origin || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">数量:</span><span class="detail-value">${batch.quantity ? batch.quantity + (batch.unit || '') : '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">到货日期:</span><span class="detail-value">${batch.arrival_date}</span></div>
+                    </div>
+                </div>
+                
+                ${batch.sample_time ? `
+                <div class="detail-section">
+                    <h4>🧪 留样信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">留样时间:</span><span class="detail-value">${batch.sample_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">留样人:</span><span class="detail-value">${batch.sample_operator || '-'}</span></div>
+                    </div>
+                </div>` : ''}
+                
+                ${batch.inspection_time ? `
+                <div class="detail-section">
+                    <h4>🔬 送检信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">送检时间:</span><span class="detail-value">${batch.inspection_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">检测机构:</span><span class="detail-value">${batch.inspection_agency || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">检测单号:</span><span class="detail-value">${batch.inspection_no || '-'}</span></div>
+                    </div>
+                </div>` : ''}
+                
+                ${batch.result_time ? `
+                <div class="detail-section">
+                    <h4>📊 检测结果 ${batch.is_abnormal ? '⚠️ 异常' : '✅ 正常'}</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">检测时间:</span><span class="detail-value">${batch.result_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">检测项目:</span><span class="detail-value">${batch.result_items || '-'}</span></div>
+                        <div class="detail-item" style="grid-column: span 2;"><span class="detail-label">结果摘要:</span><span class="detail-value">${batch.result_summary || '-'}</span></div>
+                    </div>
+                </div>` : ''}
+                
+                ${batch.take_off_time ? `
+                <div class="detail-section">
+                    <h4>🛑 下架记录</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">下架时间:</span><span class="detail-value">${batch.take_off_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">操作人:</span><span class="detail-value">${batch.take_off_operator || '-'}</span></div>
+                    </div>
+                </div>` : ''}
+                
+                ${batch.reinspection_time ? `
+                <div class="detail-section">
+                    <h4>🔄 复检信息</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">复检申请时间:</span><span class="detail-value">${batch.reinspection_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">复检机构:</span><span class="detail-value">${batch.reinspection_agency || '-'}</span></div>
+                        <div class="detail-item"><span class="detail-label">申请人:</span><span class="detail-value">${batch.reinspection_operator || '-'}</span></div>
+                        ${batch.reinspection_no ? `<div class="detail-item"><span class="detail-label">复检单号:</span><span class="detail-value">${batch.reinspection_no}</span></div>` : ''}
+                        ${batch.reinspection_result_time ? `<div class="detail-item"><span class="detail-label">复检结果时间:</span><span class="detail-value">${batch.reinspection_result_time}</span></div>` : ''}
+                        ${batch.reinspection_result_summary ? `<div class="detail-item" style="grid-column: span 2;"><span class="detail-label">复检结果:</span><span class="detail-value">${batch.reinspection_pass ? '✅ 通过 - ' : '❌ 未通过 - '}${batch.reinspection_result_summary}</span></div>` : ''}
+                    </div>
+                </div>` : ''}
+                
+                ${batch.restore_time ? `
+                <div class="detail-section">
+                    <h4>✅ 恢复上架</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item"><span class="detail-label">恢复时间:</span><span class="detail-value">${batch.restore_time}</span></div>
+                        <div class="detail-item"><span class="detail-label">操作人:</span><span class="detail-value">${batch.restore_operator || '-'}</span></div>
+                    </div>
+                </div>` : ''}
+                
+                <div class="action-area">
+                    <h4>⚡ 可执行操作</h4>
+                    <div class="action-buttons">
+                        ${actions.sample ? '<button class="btn btn-primary" onclick="showActionModal(\'sample\')">📥 登记留样</button>' : ''}
+                        ${actions.inspect ? '<button class="btn btn-primary" onclick="showActionModal(\'inspect\')">🚚 登记送检</button>' : ''}
+                        ${actions.result ? '<button class="btn btn-warning" onclick="showActionModal(\'result\')">📝 录入结果</button>' : ''}
+                        ${actions.takeoff ? '<button class="btn btn-danger" onclick="showActionModal(\'takeoff\')">🛑 立即下架</button>' : ''}
+                        ${actions.reinspect ? '<button class="btn btn-primary" onclick="showActionModal(\'reinspect\')">🔄 申请复检</button>' : ''}
+                        ${actions.reinspectResult ? '<button class="btn btn-warning" onclick="showActionModal(\'reinspectResult\')">📝 录入复检结果</button>' : ''}
+                        ${actions.restore ? '<button class="btn btn-success" onclick="showActionModal(\'restore\')">✅ 恢复上架</button>' : ''}
+                        ${!actions.sample && !actions.inspect && !actions.result && !actions.takeoff && !actions.reinspect && !actions.reinspectResult && !actions.restore ? '<span style="color: #999; font-size: 14px;">暂无可执行操作</span>' : ''}
+                    </div>
+                </div>
+                
+                <div class="detail-section" style="margin-top: 20px;">
+                    <h4>📜 操作日志</h4>
+                    <div class="logs-list">
+                        ${logs.length ? logs.map(l => `
+                            <div class="log-item">
+                                <span class="log-time">${l.created_at}</span>
+                                <span class="log-op">${l.operation}</span>
+                                <span>- ${l.operator || '系统'} ${l.remark}</span>
+                            </div>
+                        `).join('') : '<div style="color: #999; font-size: 13px;">暂无日志</div>'}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getAvailableActions(batch) {
+            const status = batch.status;
+            return {
+                sample: status === '已创建',
+                inspect: status === '已留样',
+                result: status === '已送检',
+                takeoff: status === '检测异常',
+                reinspect: status === '已下架' && !batch.reinspection_time,
+                reinspectResult: status === '复检中' && !batch.reinspection_no,
+                restore: status === '复检通过' && !batch.restore_time
+            };
+        }
+        
+        function showActionModal(action) {
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'action-modal';
+            
+            let formHtml = '';
+            let title = '';
+            
+            switch(action) {
+                case 'sample':
+                    title = '登记留样';
+                    formHtml = `
+                        <div class="form-group"><label>留样时间</label><input type="datetime-local" id="action-time"></div>
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                    `;
+                    break;
+                case 'inspect':
+                    title = '登记送检';
+                    formHtml = `
+                        <div class="form-group"><label>送检时间</label><input type="datetime-local" id="action-time"></div>
+                        <div class="form-group"><label>检测机构</label><input type="text" id="action-agency" placeholder="如: 市农检中心"></div>
+                        <div class="form-group"><label>检测单号</label><input type="text" id="action-no" placeholder="检测机构单号"></div>
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                    `;
+                    break;
+                case 'result':
+                    title = '录入检测结果';
+                    formHtml = `
+                        <div class="form-group"><label>检测时间</label><input type="datetime-local" id="action-time"></div>
+                        <div class="form-group"><label>检测项目</label><textarea id="action-items" placeholder="多个项目用逗号分隔，如: 毒死蜱:0.01mg/kg"></textarea></div>
+                        <div class="form-group"><label>结果摘要</label><textarea id="action-summary" placeholder="如: 检测合格"></textarea></div>
+                        <div class="form-group">
+                            <label>是否异常</label>
+                            <select id="action-abnormal">
+                                <option value="0">正常</option>
+                                <option value="1">异常（农残超标）</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                    `;
+                    break;
+                case 'takeoff':
+                    title = '确认下架';
+                    formHtml = `
+                        <div class="form-group"><label>下架时间</label><input type="datetime-local" id="action-time"></div>
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                        <p style="color: #dc3545; font-size: 13px; margin-top: 10px;">⚠️ 确认该批次商品农残超标，立即下架处理</p>
+                    `;
+                    break;
+                case 'reinspect':
+                    title = '申请复检';
+                    formHtml = `
+                        <div class="form-group"><label>申请时间</label><input type="datetime-local" id="action-time"></div>
+                        <div class="form-group"><label>复检机构</label><input type="text" id="action-agency" placeholder="如: 省农检中心"></div>
+                        <div class="form-group"><label>申请人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                    `;
+                    break;
+                case 'reinspectResult':
+                    title = '录入复检结果';
+                    formHtml = `
+                        <div class="form-group"><label>复检单号</label><input type="text" id="action-no" placeholder="复检机构单号"></div>
+                        <div class="form-group"><label>结果摘要</label><textarea id="action-summary" placeholder="复检结果说明"></textarea></div>
+                        <div class="form-group">
+                            <label>复检是否通过</label>
+                            <select id="action-pass">
+                                <option value="1">通过</option>
+                                <option value="0">未通过</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                    `;
+                    break;
+                case 'restore':
+                    title = '恢复上架';
+                    formHtml = `
+                        <div class="form-group"><label>操作人</label><input type="text" id="action-operator" placeholder="姓名"></div>
+                        <p style="color: #28a745; font-size: 13px; margin-top: 10px;">✅ 复检通过，确认恢复上架销售</p>
+                    `;
+                    break;
+            }
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>${title}</h3>
+                        <button class="close-btn" onclick="closeModal('action-modal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        ${formHtml}
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="executeAction('${action}')">确认执行</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const timeInput = document.getElementById('action-time');
+            if (timeInput) {
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                timeInput.value = now.toISOString().slice(0, 16);
+            }
+        }
+        
+        async function executeAction(action) {
+            const operator = document.getElementById('action-operator')?.value || '管理员';
+            const time = document.getElementById('action-time')?.value;
+            let url = '', data = {};
+            
+            switch(action) {
+                case 'sample':
+                    url = `/api/batches/${currentBatchId}/sample`;
+                    data = { sample_operator: operator, sample_time: time };
+                    break;
+                case 'inspect':
+                    url = `/api/batches/${currentBatchId}/inspect`;
+                    data = { inspection_agency: document.getElementById('action-agency').value, inspection_no: document.getElementById('action-no').value, inspection_time: time, operator };
+                    break;
+                case 'result':
+                    url = `/api/batches/${currentBatchId}/result`;
+                    data = { result_items: document.getElementById('action-items').value, result_summary: document.getElementById('action-summary').value, is_abnormal: document.getElementById('action-abnormal').value === '1', result_time: time, operator };
+                    break;
+                case 'takeoff':
+                    url = `/api/batches/${currentBatchId}/takeoff`;
+                    data = { take_off_operator: operator, take_off_time: time };
+                    break;
+                case 'reinspect':
+                    url = `/api/batches/${currentBatchId}/reinspect`;
+                    data = { reinspection_operator: operator, reinspection_agency: document.getElementById('action-agency').value, reinspection_time: time };
+                    break;
+                case 'reinspectResult':
+                    url = `/api/batches/${currentBatchId}/reinspect-result`;
+                    data = { reinspection_no: document.getElementById('action-no').value, reinspection_result_summary: document.getElementById('action-summary').value, reinspection_pass: document.getElementById('action-pass').value === '1', operator };
+                    break;
+                case 'restore':
+                    url = `/api/batches/${currentBatchId}/restore`;
+                    data = { restore_operator: operator };
+                    break;
+            }
+            
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) {
+                alert('操作成功');
+                closeModal('action-modal');
+                showDetail(currentBatchId);
+                loadBatches();
+                loadStats();
+            } else {
+                const result = await res.json();
+                alert(result.error);
+            }
+        }
+        
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('show');
+            if (id === 'action-modal') {
+                document.getElementById(id)?.remove();
+            }
+        }
+        
+        loadStats();
+        loadBatches();
+    </script>
+</body>
+</html>
