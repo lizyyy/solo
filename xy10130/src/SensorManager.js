@@ -32,19 +32,19 @@ export class SensorManager {
     this.updateHeatmap();
   }
   
-  addSensor(x, z, y = null) {
+  addSensor(x, z, y = null, options = {}) {
     const sensorY = y ?? this.config.height;
     
     const clampedX = clamp(x, 0.5, this.roomConfig.width - 0.5);
     const clampedZ = clamp(z, 0.5, this.roomConfig.depth - 0.5);
     
     const sensor = {
-      id: generateId(),
-      name: `传感器 ${this.sensors.length + 1}`,
+      id: options.id || generateId(),
+      name: options.name || `传感器 ${this.sensors.length + 1}`,
       x: formatNumber(clampedX),
       y: formatNumber(sensorY),
       z: formatNumber(clampedZ),
-      radius: this.config.radius,
+      radius: options.radius || this.config.radius,
       anomalies: []
     };
     
@@ -539,13 +539,11 @@ export class SensorManager {
     
     if (data.sensors) {
       for (const sensorData of data.sensors) {
-        const sensor = this.addSensor(sensorData.x, sensorData.z, sensorData.y);
-        if (sensorData.name) {
-          sensor.name = sensorData.name;
-        }
-        if (sensorData.id) {
-          sensor.id = sensorData.id;
-        }
+        this.addSensor(sensorData.x, sensorData.z, sensorData.y, {
+          id: sensorData.id,
+          name: sensorData.name,
+          radius: sensorData.radius
+        });
       }
     }
   }
