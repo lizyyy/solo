@@ -1,0 +1,22 @@
+{
+  "anomaly_id": "d93dca14ec81",
+  "emp_id": "EMP003",
+  "month": "2024-03",
+  "rule_code": "DEDUCTION_CALCULATION",
+  "rule_name": "社保公积金计算异常",
+  "severity": "warning",
+  "status": "pending",
+  "message": "社保公积金扣款 1050 与预期 2250.00 差异较大",
+  "detail": {
+    "base_salary": 10000,
+    "si_rate": 0.105,
+    "hf_rate": 0.12,
+    "expected": 2250.0,
+    "actual": 1050,
+    "difference": 1200.0
+  },
+  "created_at": "2026-05-12 16:29:13",
+  "resolved_at": null,
+  "resolved_by": null,
+  "resolution_detail": null
+}

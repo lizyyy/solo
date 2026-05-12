@@ -1,0 +1,10 @@
+{
+  "response_id": "BANK002",
+  "emp_id": "EMP002",
+  "month": "2024-03",
+  "status": "failed",
+  "error_code": "ACCOUNT_INVALID",
+  "error_message": "账号不存在或已销户",
+  "retry_count": 3,
+  "last_attempt": "2024-03-25 10:15:00"
+}

@@ -1,0 +1,25 @@
+{
+  "anomaly_id": "0c259fd412a0",
+  "emp_id": "EMP002",
+  "month": "2024-03",
+  "rule_code": "TAX_NEGATIVE",
+  "rule_name": "个税为负",
+  "severity": "blocker",
+  "status": "resolved",
+  "message": "个税金额为负: -50",
+  "detail": {
+    "tax_amount": -50,
+    "taxable_income": 4000,
+    "cumulative_tax": 120
+  },
+  "created_at": "2026-05-12 16:29:13",
+  "resolved_at": "2026-05-12 16:29:51",
+  "resolved_by": "薪酬主管",
+  "resolution_detail": {
+    "operation": "manual_fix",
+    "reason": "本月累计扣除超出，个税确认为0",
+    "operator": "薪酬主管",
+    "before_value": "-50",
+    "after_value": "0"
+  }
+}
