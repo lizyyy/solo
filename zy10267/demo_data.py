@@ -190,7 +190,8 @@ def demo():
     history_data = history_response.json()
     print("余额变更历史:")
     for record in history_data['data']:
-        print(f"  {record['date'].strftime('%Y-%m-%d %H:%M:%S')} | {record['type']:12} | {record['amount']:+6d} | {record['balance_after']:4d} | {record['description']}")
+        date_str = record['date']
+        print(f"  {date_str} | {record['type']:12} | {record['amount']:+6d} | {record['balance_after']:4d} | {record['description']}")
 
     print_section("14. 查看待复核的交易记录（家庭合并需要人工复核）")
 

@@ -110,7 +110,7 @@ class ServiceRecord(Base):
 
 
 class InventoryItem(Base):
-    __tablenameame__ = "inventory_items"
+    __tablename__ = "inventory_items"
 
     id = Column(Integer, primary_key=True, index=True)
     item_code = Column(String, unique=True, index=True, nullable=False)
