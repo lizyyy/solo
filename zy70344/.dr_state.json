@@ -1,0 +1,324 @@
+{
+  "run_id": "95d97253",
+  "plan_name": "Q2容灾切换演练计划",
+  "started_at": "2026-05-13T00:45:02.487767",
+  "current_status": "rolled_back",
+  "steps": [
+    {
+      "id": "2526f1b5",
+      "name": "全局主站健康检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "primary_health_global",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:02.488036",
+      "completed_at": "2026-05-13T00:45:02.873748",
+      "duration_seconds": 0.385712,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "78953819",
+      "name": "全局备站健康检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "secondary_health_global",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:02.876290",
+      "completed_at": "2026-05-13T00:45:03.116547",
+      "duration_seconds": 0.240257,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "34f56b92",
+      "name": "网络连接性检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "network_connectivity",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:03.117649",
+      "completed_at": "2026-05-13T00:45:03.280546",
+      "duration_seconds": 0.162897,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "cd5f698c",
+      "name": "数据库复制检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "database_replication",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:03.281140",
+      "completed_at": "2026-05-13T00:45:03.747251",
+      "duration_seconds": 0.466111,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "3c170813",
+      "name": "磁盘空间检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "disk_space",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:03.748337",
+      "completed_at": "2026-05-13T00:45:03.940371",
+      "duration_seconds": 0.192034,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "73019076",
+      "name": "服务配置检查",
+      "step_type": "precheck",
+      "service_id": null,
+      "rule_id": "service_config",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:03.943222",
+      "completed_at": "2026-05-13T00:45:04.231217",
+      "duration_seconds": 0.287995,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "8fa8a49d",
+      "name": "切换服务: 支付服务",
+      "step_type": "switch",
+      "service_id": "payment",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:04.232450",
+      "completed_at": "2026-05-13T00:45:05.663259",
+      "duration_seconds": 1.430809,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "primary",
+        "to_status": "secondary",
+        "endpoint": "https://payment-dr.example.com/api"
+      }
+    },
+    {
+      "id": "3d9c2045",
+      "name": "切换服务: 搜索服务",
+      "step_type": "switch",
+      "service_id": "search",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:05.663794",
+      "completed_at": "2026-05-13T00:45:07.541732",
+      "duration_seconds": 1.877938,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "primary",
+        "to_status": "secondary",
+        "endpoint": "https://search-dr.example.com/api"
+      }
+    },
+    {
+      "id": "24061be5",
+      "name": "切换服务: 报表服务",
+      "step_type": "switch",
+      "service_id": "report",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:07.542655",
+      "completed_at": "2026-05-13T00:45:09.108645",
+      "duration_seconds": 1.56599,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "primary",
+        "to_status": "secondary",
+        "endpoint": "https://report-dr.example.com/api"
+      }
+    },
+    {
+      "id": "7db9ca45",
+      "name": "支付服务端点可访问",
+      "step_type": "verify",
+      "service_id": "payment",
+      "rule_id": "endpoint_reachable_payment",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:09.118391",
+      "completed_at": "2026-05-13T00:45:09.697868",
+      "duration_seconds": 0.579477,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "b0dbe188",
+      "name": "支付服务数据库可写",
+      "step_type": "verify",
+      "service_id": "payment",
+      "rule_id": "database_writable_payment",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:09.698503",
+      "completed_at": "2026-05-13T00:45:10.152124",
+      "duration_seconds": 0.453621,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "b857aea7",
+      "name": "支付服务流量重定向",
+      "step_type": "verify",
+      "service_id": "payment",
+      "rule_id": "traffic_redirected_payment",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:10.153416",
+      "completed_at": "2026-05-13T00:45:10.665526",
+      "duration_seconds": 0.51211,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "abe91097",
+      "name": "搜索服务端点可访问",
+      "step_type": "verify",
+      "service_id": "search",
+      "rule_id": "endpoint_reachable_search",
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:10.666348",
+      "completed_at": "2026-05-13T00:45:11.457089",
+      "duration_seconds": 0.790741,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {}
+    },
+    {
+      "id": "8b23877a",
+      "name": "搜索服务数据一致性",
+      "step_type": "verify",
+      "service_id": "search",
+      "rule_id": "data_consistency_search",
+      "status": "failed",
+      "started_at": "2026-05-13T00:45:11.460947",
+      "completed_at": "2026-05-13T00:45:11.713469",
+      "duration_seconds": 0.252522,
+      "error_message": "模拟验证失败场景",
+      "skip_reason": null,
+      "details": {
+        "error_type": "simulated_failure",
+        "service": "搜索服务"
+      }
+    },
+    {
+      "id": "2be83454",
+      "name": "切换服务: 支付服务",
+      "step_type": "switch",
+      "service_id": "payment",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:11.715021",
+      "completed_at": "2026-05-13T00:45:13.072986",
+      "duration_seconds": 1.357965,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "secondary",
+        "to_status": "primary",
+        "endpoint": "https://payment-primary.example.com/api"
+      }
+    },
+    {
+      "id": "5aca3d11",
+      "name": "切换服务: 搜索服务",
+      "step_type": "switch",
+      "service_id": "search",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:13.076043",
+      "completed_at": "2026-05-13T00:45:14.926663",
+      "duration_seconds": 1.85062,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "secondary",
+        "to_status": "primary",
+        "endpoint": "https://search-primary.example.com/api"
+      }
+    },
+    {
+      "id": "907d32bd",
+      "name": "切换服务: 报表服务",
+      "step_type": "switch",
+      "service_id": "report",
+      "rule_id": null,
+      "status": "passed",
+      "started_at": "2026-05-13T00:45:14.927498",
+      "completed_at": "2026-05-13T00:45:16.616618",
+      "duration_seconds": 1.68912,
+      "error_message": null,
+      "skip_reason": null,
+      "details": {
+        "from_status": "secondary",
+        "to_status": "primary",
+        "endpoint": "https://report-primary.example.com/api"
+      }
+    }
+  ],
+  "services": [
+    {
+      "id": "payment",
+      "name": "支付服务",
+      "primary_endpoint": "https://payment-primary.example.com/api",
+      "secondary_endpoint": "https://payment-dr.example.com/api",
+      "status": "primary",
+      "health_check_url": "https://payment-primary.example.com/health",
+      "database": "payment_db"
+    },
+    {
+      "id": "search",
+      "name": "搜索服务",
+      "primary_endpoint": "https://search-primary.example.com/api",
+      "secondary_endpoint": "https://search-dr.example.com/api",
+      "status": "primary",
+      "health_check_url": "https://search-primary.example.com/health",
+      "database": "search_db"
+    },
+    {
+      "id": "report",
+      "name": "报表服务",
+      "primary_endpoint": "https://report-primary.example.com/api",
+      "secondary_endpoint": "https://report-dr.example.com/api",
+      "status": "primary",
+      "health_check_url": "https://report-primary.example.com/health",
+      "database": "report_db"
+    }
+  ],
+  "sync_statuses": [
+    {
+      "service_id": "payment",
+      "lag_seconds": 63.48,
+      "is_synced": false,
+      "last_sync_time": "2026-05-13T00:45:11.714566"
+    },
+    {
+      "service_id": "search",
+      "lag_seconds": 243.38,
+      "is_synced": false,
+      "last_sync_time": "2026-05-13T00:45:11.714580"
+    },
+    {
+      "service_id": "report",
+      "lag_seconds": 101.87,
+      "is_synced": false,
+      "last_sync_time": "2026-05-13T00:45:11.714587"
+    }
+  ],
+  "human_interventions": [],
+  "completed_at": "2026-05-13T00:45:16.617921"
+}

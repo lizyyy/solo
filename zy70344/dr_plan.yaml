@@ -1,0 +1,113 @@
+name: "Q2容灾切换演练计划"
+version: "2.0"
+description: "季度容灾演练计划 - 包含支付、搜索、报表三个核心服务"
+
+require_sync_before_rollback: true
+
+services:
+  - id: payment
+    name: "支付服务"
+    primary_endpoint: "https://payment-primary.example.com/api"
+    secondary_endpoint: "https://payment-dr.example.com/api"
+    health_check_url: "https://payment-primary.example.com/health"
+    database: "payment_db"
+
+  - id: search
+    name: "搜索服务"
+    primary_endpoint: "https://search-primary.example.com/api"
+    secondary_endpoint: "https://search-dr.example.com/api"
+    health_check_url: "https://search-primary.example.com/health"
+    database: "search_db"
+
+  - id: report
+    name: "报表服务"
+    primary_endpoint: "https://report-primary.example.com/api"
+    secondary_endpoint: "https://report-dr.example.com/api"
+    health_check_url: "https://report-primary.example.com/health"
+    database: "report_db"
+
+precheck_rules:
+  - id: primary_health_global
+    name: "全局主站健康检查"
+    description: "检查所有主站服务健康状态"
+    is_blocking: true
+
+  - id: secondary_health_global
+    name: "全局备站健康检查"
+    description: "检查所有备站服务健康状态"
+    is_blocking: true
+
+  - id: network_connectivity
+    name: "网络连接性检查"
+    description: "检查主备站点间网络连通性"
+    is_blocking: true
+
+  - id: database_replication
+    name: "数据库复制检查"
+    description: "检查数据库主从复制状态"
+    is_blocking: true
+
+  - id: disk_space
+    name: "磁盘空间检查"
+    description: "检查备站磁盘空间充足"
+    is_blocking: false
+
+  - id: service_config
+    name: "服务配置检查"
+    description: "检查服务配置一致性"
+    is_blocking: true
+
+verify_rules:
+  - id: endpoint_reachable_payment
+    name: "支付服务端点可访问"
+    service_id: payment
+    description: "验证支付服务备站端点可访问"
+    is_blocking: true
+
+  - id: database_writable_payment
+    name: "支付服务数据库可写"
+    service_id: payment
+    description: "验证支付服务数据库可写入"
+    is_blocking: true
+
+  - id: traffic_redirected_payment
+    name: "支付服务流量重定向"
+    service_id: payment
+    description: "验证流量已重定向到备站"
+    is_blocking: true
+
+  - id: endpoint_reachable_search
+    name: "搜索服务端点可访问"
+    service_id: search
+    description: "验证搜索服务备站端点可访问"
+    is_blocking: true
+
+  - id: data_consistency_search
+    name: "搜索服务数据一致性"
+    service_id: search
+    description: "验证搜索服务数据一致性"
+    is_blocking: true
+
+  - id: service_logs_clean_search
+    name: "搜索服务日志检查"
+    service_id: search
+    description: "验证搜索服务日志无异常"
+    is_blocking: false
+
+  - id: endpoint_reachable_report
+    name: "报表服务端点可访问"
+    service_id: report
+    description: "验证报表服务备站端点可访问"
+    is_blocking: true
+
+  - id: database_writable_report
+    name: "报表服务数据库可写"
+    service_id: report
+    description: "验证报表服务数据库可写入"
+    is_blocking: true
+
+  - id: traffic_redirected_report
+    name: "报表服务流量重定向"
+    service_id: report
+    description: "验证流量已重定向到备站"
+    is_blocking: true
