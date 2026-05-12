@@ -107,21 +107,32 @@ class FoodSampleService {
 
     const activeSamples = Storage.find('samples', s => s.boxId === boxId && s.status === 'active');
     if (activeSamples.length > 0) {
-      this.createAlert({
-        type: 'BOX_REUSE',
-        level: 'medium',
-        message: `留样盒${box.boxNumber}被重复绑定，当前留样菜品：${activeSamples[0].dishName}`,
-        mealId,
-        boxId,
-        existingSampleId: activeSamples[0].id
-      });
+      const existingSample = activeSamples[0];
+      const existingAlerts = Storage.find('alerts', a => 
+        a.type === 'BOX_REUSE' && 
+        a.mealId === mealId && 
+        a.boxId === boxId && 
+        a.existingSampleId === existingSample.id && 
+        a.status === 'active'
+      );
+      
+      if (existingAlerts.length === 0) {
+        this.createAlert({
+          type: 'BOX_REUSE',
+          level: 'medium',
+          message: `留样盒${box.boxNumber}被重复绑定，当前留样菜品：${existingSample.dishName}`,
+          mealId,
+          boxId,
+          existingSampleId: existingSample.id
+        });
+      }
       return { success: false, error: '留样盒正在使用中，不能重复绑定', code: 'BOX_IN_USE' };
     }
 
-    const existingSample = Storage.find('samples', s => 
+    const duplicateDishSamples = Storage.find('samples', s => 
       s.mealId === mealId && s.dishId === dishId && s.status !== 'cancelled'
     );
-    if (existingSample.length > 0) {
+    if (duplicateDishSamples.length > 0) {
       return { success: false, error: '该菜品此餐次已留样', code: 'DUPLICATE_SAMPLE' };
     }
 

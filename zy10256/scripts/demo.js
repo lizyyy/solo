@@ -99,25 +99,39 @@ const demo = async () => {
   printResult('温度超限留样结果', sampleBadTemp.body);
   await sleep(200);
 
-  printSection('5. 异常场景2: 同一留样盒重复绑定');
-  const duplicateBox = await request({ path: '/api/samples', method: 'POST' }, {
-    mealId: lunch.id,
-    dishId: dishes[2].id,
-    boxId: boxes[0].id,
-    responsiblePersonId: operator.id,
-    temperature: 4
-  });
-  printResult('重复绑定结果', duplicateBox.body);
+  printSection('5. 异常场景2: 同一留样盒重复绑定 (重复提交防重验证)');
+  
+  const alertsBefore = await request({ path: '/api/alerts?status=active' });
+  const boxReuseCountBefore = alertsBefore.body.data.filter(a => a.type === 'BOX_REUSE').length;
+  console.log(`\n重复绑定前 BOX_REUSE 告警数量: ${boxReuseCountBefore}`);
+  
+  for (let i = 1; i <= 3; i++) {
+    console.log(`\n第 ${i} 次尝试重复绑定留样盒 BOX-001...`);
+    const duplicateBox = await request({ path: '/api/samples', method: 'POST' }, {
+      mealId: lunch.id,
+      dishId: dishes[2].id,
+      boxId: boxes[0].id,
+      responsiblePersonId: operator.id,
+      temperature: 4
+    });
+    console.log(`  结果: ${duplicateBox.body.success ? '成功' : '失败'} - ${duplicateBox.body.error}`);
+  }
+  
+  const alertsAfter = await request({ path: '/api/alerts?status=active' });
+  const boxReuseCountAfter = alertsAfter.body.data.filter(a => a.type === 'BOX_REUSE').length;
+  console.log(`\n✅ 防重验证: 重复绑定后 BOX_REUSE 告警数量: ${boxReuseCountAfter}`);
+  console.log(`   告警数量未增加: ${boxReuseCountBefore === boxReuseCountAfter ? '✓' : '✗'} (${boxReuseCountBefore} -> ${boxReuseCountAfter})`);
+  console.log(`   同一件事没有被重复计数: ${boxReuseCountAfter === 1 ? '✓' : '✗'}`);
 
   printSection('6. 异常场景3: 同一菜品同餐次重复留样');
-  const duplicateSample = await request({ path: '/api/samples', method: 'POST' }, {
+  const duplicateDishSample = await request({ path: '/api/samples', method: 'POST' }, {
     mealId: lunch.id,
     dishId: dishes[0].id,
     boxId: boxes[2].id,
     responsiblePersonId: operator.id,
     temperature: 4
   });
-  printResult('重复留样结果', duplicateSample.body);
+  printResult('重复留样结果', duplicateDishSample.body);
 
   printSection('7. 继续留样其他菜品');
   await request({ path: '/api/samples', method: 'POST' }, {
@@ -129,8 +143,8 @@ const demo = async () => {
   });
 
   printSection('8. 异常场景4: 未留样就开餐 (故意少留一道菜)');
-  const samplesBefore = await request({ path: '/api/samples' });
-  console.log(`当前已留样数量: ${samplesBefore.body.data.filter(s => s.mealId === lunch.id).length}`);
+  const samplesBeforeOpen = await request({ path: '/api/samples' });
+  console.log(`当前已留样数量: ${samplesBeforeOpen.body.data.filter(s => s.mealId === lunch.id).length}`);
   console.log(`午餐菜品数量: ${lunch.dishIds.length}`);
   
   const openResult = await request({ path: `/api/meals/${lunch.id}/open`, method: 'POST' }, {
@@ -188,8 +202,8 @@ const demo = async () => {
   await request({ path: '/api/samples/check-expired' });
   await sleep(200);
   
-  const alertsAfter = await request({ path: '/api/alerts?status=active' });
-  console.log(`当前告警数量: ${alertsAfter.body.data.length}`);
+  const alertsAfterExpired = await request({ path: '/api/alerts?status=active' });
+  console.log(`当前告警数量: ${alertsAfterExpired.body.data.length}`);
 
   printSection('11. 温度日志可追溯性验证');
   const tempLogsRes = await request({ path: '/api/temperature-logs' });
@@ -280,7 +294,7 @@ const demo = async () => {
   });
 
   printSection('✅ 演示完成');
-  console.log('\n📝 已验证的业务规则 (含第二轮修复):');
+  console.log('\n📝 已验证的业务规则 (含第三轮修复):');
   console.log('  ✓ 重复导入检测 (菜品/留样盒/餐次)');
   console.log('  ✓ 温度超限告警 (0-8℃)');
   console.log('  ✓ 留样盒重复绑定检测');
@@ -298,6 +312,11 @@ const demo = async () => {
   console.log('  ✓ 告警聚合逻辑增强 (支持 mealId 和 sampleId 关联)');
   console.log('  ✓ 监管查询包含温度日志');
   console.log('  ✓ 所有告警都能正确出现在对应餐次留痕中');
+  console.log('');
+  console.log('🔧 第三轮修复验证:');
+  console.log('  ✓ BOX_REUSE 告警防重 (同一mealId/boxId/existingSampleId 不重复创建)');
+  console.log('  ✓ 重复提交同一件事不会被重复计数');
+  console.log('  ✓ 监管查询告警计数准确');
   console.log('\n🌐 API服务器运行在: http://localhost:3001');
   console.log('   可用 endpoints:');
   console.log('   - GET  /api/dishes            - 菜品列表');
