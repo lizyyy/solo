@@ -58,6 +58,10 @@ function printError(message) {
   console.log(`❌ ${message}`);
 }
 
+function getFutureTime(seconds = 5) {
+  return new Date(Date.now() + seconds * 1000).toISOString();
+}
+
 async function runTestFlow() {
   console.log('📚 图书馆研讨间预约API - 完整流程测试');
   console.log('='.repeat(60));
@@ -73,23 +77,22 @@ async function runTestFlow() {
   const roomsRes = await request('GET', '/rooms');
   const studentsRes = await request('GET', '/students');
   
-  const room1 = roomsRes.data.data[0];
-  const room2 = roomsRes.data.data[1];
+  const rooms = roomsRes.data.data;
   const student1 = studentsRes.data.data[0];
   const student2 = studentsRes.data.data[1];
   
-  printResult(`房间1: ${room1.name} (ID: ${room1.id})`);
-  printResult(`房间2: ${room2.name} (ID: ${room2.id})`);
+  rooms.forEach((room, i) => {
+    printResult(`房间${i + 1}: ${room.name} (ID: ${room.id})`);
+  });
   printResult(`学生1: ${student1.name} (ID: ${student1.id})`);
   printResult(`学生2: ${student2.name} (ID: ${student2.id})`);
 
   printStep(2, '创建预约 - 人数不足的情况');
-  const now = new Date();
-  const startTime1 = new Date(now.getTime() + 2 * 60 * 1000).toISOString();
-  const endTime1 = new Date(now.getTime() + 3 * 60 * 60 * 1000).toISOString();
+  const startTime1 = getFutureTime(120);
+  const endTime1 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
 
   const bookingRes1 = await request('POST', '/bookings', {
-    roomId: room1.id,
+    roomId: rooms[0].id,
     bookerId: student1.id,
     startTime: startTime1,
     endTime: endTime1,
@@ -125,7 +128,7 @@ async function runTestFlow() {
     });
     printResult(`提前签到结果: ${earlyCheckinRes.data.error || '成功'}`);
 
-    printStep(5, '取消预约演示（预约开始前40分钟，满足提前30分钟要求）');
+    printStep(5, '取消预约演示（预约开始前2分钟，满足30秒提前要求）');
     const cancelRes = await request('POST', `/bookings/${booking1.id}/cancel`, {
       cancelledBy: student1.id
     });
@@ -136,12 +139,12 @@ async function runTestFlow() {
     }
   }
 
-  printStep(6, '创建新预约（使用房间2，避免重叠）- 用于演示爽约');
-  const startTime2 = new Date(now.getTime() + 3 * 1000).toISOString();
-  const endTime2 = new Date(now.getTime() + 1 * 60 * 60 * 1000).toISOString();
+  printStep(6, '创建新预约（使用房间2）- 用于演示爽约');
+  const startTime2 = getFutureTime(3);
+  const endTime2 = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
   const bookingRes2 = await request('POST', '/bookings', {
-    roomId: room2.id,
+    roomId: rooms[1].id,
     bookerId: student1.id,
     startTime: startTime2,
     endTime: endTime2,
@@ -182,19 +185,21 @@ async function runTestFlow() {
   printResult(`${student1.name} 的信誉分状态:`, creditRes1.data.data);
   printResult(`${student2.name} 的信誉分状态:`, creditRes2.data.data);
 
-  printStep(11, '再次预约 - 信誉分不足被拒绝演示');
-  console.log('  模拟连续爽约，直到信誉分归零...');
+  printStep(11, '连续爽约 - 直到触发黑名单');
+  console.log('  模拟连续爽约，直到被列入黑名单...');
   
   let currentCredit = creditRes1.data.data.creditScore;
   let bookingCount = 1;
   let roomIndex = 2;
+  let isBlocked = false;
   
-  while (currentCredit > 0 && roomIndex < roomsRes.data.data.length) {
-    const room = roomsRes.data.data[roomIndex];
-    const futureStart = new Date(now.getTime() + 3 * 1000).toISOString();
-    const futureEnd = new Date(now.getTime() + 1 * 60 * 60 * 1000).toISOString();
+  while (roomIndex < rooms.length && !isBlocked) {
+    const room = rooms[roomIndex];
+    const futureStart = getFutureTime(3);
+    const futureEnd = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     
-    console.log(`  第${bookingCount}次爽约测试，使用房间: ${room.name}`);
+    console.log(`\n  第${bookingCount}次爽约测试，使用房间: ${room.name}`);
+    console.log(`  预约开始时间: ${futureStart}`);
     
     const tempBookingRes = await request('POST', '/bookings', {
       roomId: room.id,
@@ -206,16 +211,32 @@ async function runTestFlow() {
     });
     
     if (tempBookingRes.status === 201) {
-      await sleep(2000);
+      printResult(`  预约创建成功，等待爽约时间...`);
+      await sleep(15000);
+      
       const noShowResult = await request('POST', `/bookings/${tempBookingRes.data.data.id}/no-show`);
       if (noShowResult.status === 200) {
         bookingCount++;
+        printResult(`  爽约处理成功`);
+      } else {
+        printError(`  爽约处理失败: ${noShowResult.data.error}`);
       }
+      
       const updatedCredit = await request('GET', `/students/${student1.id}/credit`);
       currentCredit = updatedCredit.data.data.creditScore;
-      console.log(`  当前信誉分: ${currentCredit}, 黑名单状态: ${updatedCredit.data.data.isBlacklisted}`);
+      isBlocked = updatedCredit.data.data.isBlacklisted;
+      printResult(`  当前信誉分: ${currentCredit}, 黑名单状态: ${isBlocked}`);
+      
+      if (isBlocked) {
+        printResult(`  ✅ 已触发黑名单！`);
+      }
     } else {
-      console.log(`  预约被拒绝，停止测试: ${tempBookingRes.data.error}`);
+      printError(`  预约被拒绝: ${tempBookingRes.data.error}`);
+      const updatedCredit = await request('GET', `/students/${student1.id}/credit`);
+      isBlocked = updatedCredit.data.data.isBlacklisted;
+      if (isBlocked) {
+        printResult(`  ✅ 预约被拒绝是因为已被列入黑名单（预期行为）`);
+      }
       break;
     }
     roomIndex++;
@@ -225,12 +246,12 @@ async function runTestFlow() {
   const finalCreditRes = await request('GET', `/students/${student1.id}/credit`);
   printResult(`最终信誉分状态:`, finalCreditRes.data.data);
 
-  printStep(13, '尝试再次预约（信誉分不足或黑名单，应该被拒绝）');
-  const futureStart2 = new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString();
-  const futureEnd2 = new Date(now.getTime() + 3 * 60 * 60 * 1000).toISOString();
+  printStep(13, '尝试再次预约（黑名单状态，应该被拒绝）');
+  const futureStart2 = getFutureTime(120);
+  const futureEnd2 = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
   
   const restrictedBookingRes = await request('POST', '/bookings', {
-    roomId: room1.id,
+    roomId: rooms[0].id,
     bookerId: student1.id,
     startTime: futureStart2,
     endTime: futureEnd2,
@@ -241,6 +262,8 @@ async function runTestFlow() {
   printResult(`预约结果: ${restrictedBookingRes.data.error || '成功（未被限制）'}`);
   if (restrictedBookingRes.status !== 201) {
     printResult('✅ 预期结果：预约被成功拒绝！');
+  } else {
+    printError('❌ 意外结果：预约未被拒绝');
   }
 
   console.log(`\n${'='.repeat(60)}`);
@@ -249,8 +272,8 @@ async function runTestFlow() {
   console.log('\n📋 总结:');
   console.log('  1. 人数不足时预约处于 pending 状态');
   console.log('  2. 成员足够后自动确认');
-  console.log('  3. 只能在预约开始后15分钟内签到');
-  console.log('  4. 取消需提前30分钟');
+  console.log('  3. 只能在预约开始后5秒内签到');
+  console.log('  4. 取消需提前30秒');
   console.log('  5. 爽约扣除20分信誉分');
   console.log('  6. 信誉分0或黑名单无法预约');
   console.log('  7. 重复操作不会重复计算');
