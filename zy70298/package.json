@@ -1,0 +1,17 @@
+{
+  "name": "nursing-home-medication-api",
+  "version": "1.0.0",
+  "description": "养老院药盒分发核验API - 医嘱、剂量和服药回执必须匹配",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "demo": "node scripts/demo.js",
+    "test": "node scripts/test-api.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.1.2",
+    "uuid": "^9.0.1"
+  }
+}
