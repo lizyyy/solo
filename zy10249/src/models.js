@@ -120,12 +120,23 @@ class IdempotencyManager {
     return args.join('|');
   }
 
-  checkAndSet(key, result) {
+  check(key) {
     if (this.requestCache.has(key)) {
-      return { exists: true, data: this.requestCache.get(key) };
+      const data = this.requestCache.get(key);
+      if (data.result.success) {
+        return { exists: true, success: true, data };
+      }
+      this.requestCache.delete(key);
     }
-    this.requestCache.set(key, { result, timestamp: new Date() });
     return { exists: false };
+  }
+
+  setSuccess(key, result) {
+    this.requestCache.set(key, { result, timestamp: new Date() });
+  }
+
+  delete(key) {
+    this.requestCache.delete(key);
   }
 
   get(key) {

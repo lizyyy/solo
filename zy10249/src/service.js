@@ -12,7 +12,7 @@ class SterilizationService {
     const { packageId, name, items, operator, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('create', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -25,7 +25,7 @@ class SterilizationService {
     packages.set(packageId, pkg);
     
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
@@ -33,7 +33,7 @@ class SterilizationService {
     const { operator, patientId, surgeryId, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('use', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -42,7 +42,7 @@ class SterilizationService {
     pkg.transitionTo(PACKAGE_STATES.IN_USE, operator, '使用发放', { patientId, surgeryId });
     
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
@@ -50,7 +50,7 @@ class SterilizationService {
     const { operator, condition, notes, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('recycle', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -59,7 +59,7 @@ class SterilizationService {
     pkg.transitionTo(PACKAGE_STATES.RECYCLED, operator, '回收登记', { condition, notes });
     
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
@@ -67,7 +67,7 @@ class SterilizationService {
     const { operator, method, temperature, duration, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('clean', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -82,7 +82,7 @@ class SterilizationService {
     pkg.transitionTo(PACKAGE_STATES.CLEANED, operator, '清洗完成', { method, temperature, duration });
     
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
@@ -90,7 +90,7 @@ class SterilizationService {
     const { operator, method, temperature, duration, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('disinfect', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -100,7 +100,7 @@ class SterilizationService {
     pkg.transitionTo(PACKAGE_STATES.DISINFECTED, operator, '消毒完成', { method, temperature, duration });
     
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
@@ -108,7 +108,7 @@ class SterilizationService {
     const { operator, batchNo, method, temperature, duration, pressure, result, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('sterilize', packageId, batchNo, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -148,7 +148,7 @@ class SterilizationService {
     }
 
     const response = { success: true, data: this._packageToDTO(pkg), batch: this._batchToDTO(batch) };
-    idempotencyManager.checkAndSet(idempotentKey, response);
+    idempotencyManager.setSuccess(idempotentKey, response);
     return response;
   }
 
@@ -156,7 +156,7 @@ class SterilizationService {
     const { operator, department, receiver, requestId } = data;
     
     const idempotentKey = idempotencyManager.generateKey('distribute', packageId, requestId || '');
-    const cacheCheck = idempotencyManager.checkAndSet(idempotentKey, { success: true });
+    const cacheCheck = idempotencyManager.check(idempotentKey);
     if (cacheCheck.exists) {
       return { ...cacheCheck.data.result, idempotent: true };
     }
@@ -183,7 +183,7 @@ class SterilizationService {
     pkg.currentBatchNo = null;
 
     const result = { success: true, data: this._packageToDTO(pkg) };
-    idempotencyManager.checkAndSet(idempotentKey, result);
+    idempotencyManager.setSuccess(idempotentKey, result);
     return result;
   }
 
