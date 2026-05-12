@@ -28,29 +28,64 @@
 └── tsconfig.json
 ```
 
-## 快速开始
+## 快速开始 & 验证流程
 
-### 1. 安装依赖
+### 方式一：运行完整业务规则测试（推荐）
 
 ```bash
+# 1. 安装依赖
 npm install
-```
 
-### 2. 运行流程测试
-
-```bash
+# 2. 运行完整流程测试（包含所有业务规则验证）
 npm run test
 ```
 
-此命令将运行完整的业务流程测试，验证所有业务规则。
+此测试将真实验证以下场景：
+- ✅ **瓶号重复绑定** - 尝试重复绑定任务
+- ✅ **状态顺序校验** - 跳过绑定直接采样应失败
+- ✅ **采样后未冷藏交接** - 未冷藏直接交接应失败
+- ✅ **采样后未冷藏接收** - 未冷藏直接接收应失败
+- ✅ **退样后又被接收** - 退样后尝试接收应失败
+- ✅ **重复提交操作** - 同一状态重复提交应失败
+- ✅ **送检超时校验** - 构造超时样本，验证接收应失败
+- ✅ **完整轨迹查询** - 查看瓶子所有流转历史
 
-### 3. 启动 API 服务
+### 方式二：API 接口调用验证
 
 ```bash
+# 1. 启动 API 服务
 npm run dev
+
+# 2. 新开终端，运行 API 测试脚本
+bash src/api-test.sh
 ```
 
-服务将在 `http://localhost:3000` 启动。
+API 测试脚本将通过 curl 真实调用所有接口验证：
+- 完整正常流程流转
+- 状态跳跃校验
+- 采样后未冷藏校验
+- 重复绑定校验
+- 退样后接收校验
+- 完整轨迹查询
+
+### 手动 API 调用示例
+
+服务启动后（http://localhost:3000），可以手动执行：
+
+```bash
+# 1. 重置数据
+curl -X POST http://localhost:3000/api/seed
+
+# 2. 获取任务ID
+TASK_ID=$(curl -s http://localhost:3000/api/tasks | grep -o '"id":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+# 3. 绑定任务
+curl -X POST http://localhost:3000/api/bottles/BOT-001/bind \
+  -H "Content-Type: application/json" \
+  -d "{\"taskId\":\"$TASK_ID\",\"handler\":\"张三\"}"
+
+# 4. 后续按顺序调用: sample -> cold-store -> transfer -> receive -> test -> return
+```
 
 ## API 接口
 

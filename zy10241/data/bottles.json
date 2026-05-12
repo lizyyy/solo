@@ -1,0 +1,72 @@
+[
+  {
+    "id": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "status": "RETURNED",
+    "currentHandler": "赵六",
+    "sampledAt": "2026-05-12T05:03:06.325Z",
+    "coldStoredAt": "2026-05-12T05:03:06.325Z",
+    "receivedAt": "2026-05-12T05:03:06.326Z",
+    "rejectedAt": null,
+    "rejectReason": null,
+    "createdAt": "2026-05-12T05:03:06.321Z",
+    "updatedAt": "2026-05-12T05:03:06.327Z"
+  },
+  {
+    "id": "e0bc5c10-dc54-4990-b686-11c69c058a0c",
+    "bottleNo": "BOT-002",
+    "taskId": null,
+    "status": "CREATED",
+    "currentHandler": null,
+    "sampledAt": null,
+    "coldStoredAt": null,
+    "receivedAt": null,
+    "rejectedAt": null,
+    "rejectReason": null,
+    "createdAt": "2026-05-12T05:03:06.321Z",
+    "updatedAt": "2026-05-12T05:03:06.321Z"
+  },
+  {
+    "id": "df45a84e-31ad-4d8a-b9d0-9c53f3e1e394",
+    "bottleNo": "BOT-003",
+    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "status": "TRANSFERRED",
+    "currentHandler": "张三",
+    "sampledAt": "2026-05-12T05:03:06.328Z",
+    "coldStoredAt": null,
+    "receivedAt": null,
+    "rejectedAt": null,
+    "rejectReason": null,
+    "createdAt": "2026-05-12T05:03:06.321Z",
+    "updatedAt": "2026-05-12T05:03:06.328Z"
+  },
+  {
+    "id": "3117f0c7-4472-4408-86db-b89201159741",
+    "bottleNo": "BOT-004",
+    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "status": "REJECTED",
+    "currentHandler": "张三",
+    "sampledAt": "2026-05-12T05:03:06.329Z",
+    "coldStoredAt": null,
+    "receivedAt": null,
+    "rejectedAt": "2026-05-12T05:03:06.330Z",
+    "rejectReason": "样品外观异常",
+    "createdAt": "2026-05-12T05:03:06.321Z",
+    "updatedAt": "2026-05-12T05:03:06.330Z"
+  },
+  {
+    "id": "7fdb6f69-7a2e-46a3-a2df-9434988ceca3",
+    "bottleNo": "BOT-005",
+    "taskId": "4abe5a7d-094e-4dec-b410-67aa97f93efe",
+    "status": "TRANSFERRED",
+    "currentHandler": "张三",
+    "sampledAt": "2026-05-11T04:03:06.330Z",
+    "coldStoredAt": "2026-05-11T04:03:06.330Z",
+    "receivedAt": null,
+    "rejectedAt": null,
+    "rejectReason": null,
+    "createdAt": "2026-05-12T05:03:06.321Z",
+    "updatedAt": "2026-05-12T05:03:06.321Z"
+  }
+]

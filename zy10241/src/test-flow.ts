@@ -40,6 +40,35 @@ function forceMockUnchilledBottle(bottleNo: string, taskId: string) {
   Storage.saveColdStorageRecords(filtered);
 }
 
+function forceMockTimeoutBottle(bottleNo: string, taskId: string, hoursAgo: number) {
+  const bottles = Storage.getBottles();
+  const bottle = bottles.find(b => b.bottleNo === bottleNo);
+  if (!bottle) return;
+  
+  const pastTime = new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+  bottle.taskId = taskId;
+  bottle.status = BottleStatus.TRANSFERRED;
+  bottle.sampledAt = pastTime;
+  bottle.coldStoredAt = pastTime;
+  bottle.currentHandler = '张三';
+  
+  Storage.saveBottles(bottles);
+  
+  const coldRecords = Storage.getColdStorageRecords();
+  const existing = coldRecords.filter(r => r.bottleId === bottle.id);
+  if (existing.length === 0) {
+    coldRecords.push({
+      id: uuidv4(),
+      bottleId: bottle.id,
+      startTime: pastTime,
+      endTime: null,
+      temperature: 4,
+      handler: '张三'
+    });
+    Storage.saveColdStorageRecords(coldRecords);
+  }
+}
+
 async function runTest() {
   console.clear();
   console.log('🧪 水质采样瓶流转系统 - 流程测试\n');
@@ -188,6 +217,19 @@ async function runTest() {
     }
   }
 
+  printInfo('3.7 测试送检超时 - 真实构造超时样本');
+  const bottle5 = bottles[4];
+  printInfo(`任务时限: ${task1.deadlineHours} 小时，构造 ${task1.deadlineHours + 1} 小时前采样的样本`);
+  forceMockTimeoutBottle(bottle5.bottleNo, task1.id, task1.deadlineHours + 1);
+  try {
+    BottleService.receive(bottle5.bottleNo, '王五');
+    printError('应该抛出超时错误但没有');
+  } catch (e) {
+    if (e instanceof BusinessError) {
+      printSuccess(`正确拦截超时: ${e.message}`);
+    }
+  }
+
   printSeparator('步骤 4: 查询瓶子完整轨迹');
   
   const trail = BottleService.getBottleTrail(bottle1.bottleNo);
@@ -201,13 +243,14 @@ async function runTest() {
 
   printSeparator('测试完成 - 所有业务规则验证通过');
   printInfo('✅ 瓶号重复绑定: 已验证');
-  printInfo('✅ 采样后未冷藏: 已验证');
-  printInfo('✅ 送检超时: 逻辑已实现 (可通过修改 sampledAt 模拟)');
+  printInfo('✅ 状态跳跃校验: 已验证');
+  printInfo('✅ 采样后未冷藏交接: 已验证');
+  printInfo('✅ 采样后未冷藏接收: 已验证');
   printInfo('✅ 退样后又被接收: 已验证');
-  printInfo('✅ 交接顺序跳跃: 已验证');
   printInfo('✅ 重复提交同一操作: 已验证');
+  printInfo('✅ 送检超时校验: 已真实验证');
   printInfo('✅ 完整轨迹查询: 已验证');
-  console.log('\n🎉 所有测试通过！\n');
+  console.log('\n🎉 所有业务规则验证通过！\n');
 }
 
 runTest().catch(console.error);

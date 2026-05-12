@@ -1,0 +1,134 @@
+[
+  {
+    "id": "4ceb8851-90ed-4410-ac8e-7335c2a00e5f",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "CREATED",
+    "toStatus": "BINDED",
+    "handler": "张三",
+    "remark": "绑定任务: TASK-2024-001",
+    "operationTime": "2026-05-12T05:03:06.325Z",
+    "isColdStored": false
+  },
+  {
+    "id": "44efeb81-30a0-48a1-9df9-1157d4b89531",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "BINDED",
+    "toStatus": "SAMPLED",
+    "handler": "张三",
+    "remark": "完成采样",
+    "operationTime": "2026-05-12T05:03:06.325Z",
+    "isColdStored": false
+  },
+  {
+    "id": "27f4bb64-1170-4154-b784-aed621538837",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "SAMPLED",
+    "toStatus": "COLD_STORED",
+    "handler": "张三",
+    "remark": "开始冷藏，温度: 4°C",
+    "operationTime": "2026-05-12T05:03:06.325Z",
+    "isColdStored": true
+  },
+  {
+    "id": "5050ef0f-5010-4dca-b712-413b7890798e",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "COLD_STORED",
+    "toStatus": "TRANSFERRED",
+    "handler": "李四",
+    "remark": "完成交接送检",
+    "operationTime": "2026-05-12T05:03:06.326Z",
+    "isColdStored": true
+  },
+  {
+    "id": "fb56b58f-da1a-4500-8f92-a33bda230124",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "TRANSFERRED",
+    "toStatus": "RECEIVED",
+    "handler": "王五",
+    "remark": "实验室接收",
+    "operationTime": "2026-05-12T05:03:06.326Z",
+    "isColdStored": true
+  },
+  {
+    "id": "fbd000a9-8c65-4df9-8750-391b999a29e1",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "RECEIVED",
+    "toStatus": "TESTED",
+    "handler": "赵六",
+    "remark": "完成检测",
+    "operationTime": "2026-05-12T05:03:06.327Z",
+    "isColdStored": true
+  },
+  {
+    "id": "2e0e9d8b-173f-44c0-9bc4-cd692eb93a71",
+    "bottleId": "e122947b-1789-4333-8de3-b114122cf5a0",
+    "bottleNo": "BOT-001",
+    "fromStatus": "TESTED",
+    "toStatus": "RETURNED",
+    "handler": "赵六",
+    "remark": "归还采样瓶",
+    "operationTime": "2026-05-12T05:03:06.327Z",
+    "isColdStored": false
+  },
+  {
+    "id": "b4fe11a9-adfd-4ef0-b15d-eb46635da65d",
+    "bottleId": "df45a84e-31ad-4d8a-b9d0-9c53f3e1e394",
+    "bottleNo": "BOT-003",
+    "fromStatus": "CREATED",
+    "toStatus": "BINDED",
+    "handler": "张三",
+    "remark": "绑定任务: TASK-2024-001",
+    "operationTime": "2026-05-12T05:03:06.328Z",
+    "isColdStored": false
+  },
+  {
+    "id": "7cc54c90-cc7c-41b0-928d-ff563f2eda28",
+    "bottleId": "df45a84e-31ad-4d8a-b9d0-9c53f3e1e394",
+    "bottleNo": "BOT-003",
+    "fromStatus": "BINDED",
+    "toStatus": "SAMPLED",
+    "handler": "张三",
+    "remark": "完成采样",
+    "operationTime": "2026-05-12T05:03:06.328Z",
+    "isColdStored": false
+  },
+  {
+    "id": "3a0fd495-e32e-4b78-a64e-d855dde53a7c",
+    "bottleId": "3117f0c7-4472-4408-86db-b89201159741",
+    "bottleNo": "BOT-004",
+    "fromStatus": "CREATED",
+    "toStatus": "BINDED",
+    "handler": "张三",
+    "remark": "绑定任务: TASK-2024-001",
+    "operationTime": "2026-05-12T05:03:06.329Z",
+    "isColdStored": false
+  },
+  {
+    "id": "16292c58-85c1-42e7-b415-3d845b4aba7e",
+    "bottleId": "3117f0c7-4472-4408-86db-b89201159741",
+    "bottleNo": "BOT-004",
+    "fromStatus": "BINDED",
+    "toStatus": "SAMPLED",
+    "handler": "张三",
+    "remark": "完成采样",
+    "operationTime": "2026-05-12T05:03:06.329Z",
+    "isColdStored": false
+  },
+  {
+    "id": "ab0aadc3-7fa0-43ae-bf9c-d281a7a9b7d3",
+    "bottleId": "3117f0c7-4472-4408-86db-b89201159741",
+    "bottleNo": "BOT-004",
+    "fromStatus": "SAMPLED",
+    "toStatus": "REJECTED",
+    "handler": "张三",
+    "remark": "退样原因: 样品外观异常",
+    "operationTime": "2026-05-12T05:03:06.330Z",
+    "isColdStored": false
+  }
+]
