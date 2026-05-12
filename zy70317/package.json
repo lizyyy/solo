@@ -1,0 +1,17 @@
+{
+  "name": "accounting-compensation",
+  "version": "1.0.0",
+  "description": "账务流水补偿系统",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "init-db": "node scripts/init-db.js",
+    "seed-data": "node scripts/seed-data.js",
+    "test-demo": "node scripts/test-demo.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1"
+  }
+}
