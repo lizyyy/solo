@@ -1,0 +1,62 @@
+.ant-layout-sider {
+  background: #001529 !important;
+}
+
+.ant-menu-dark {
+  background: #001529 !important;
+}
+
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-statistic-title {
+  color: #666;
+  font-size: 14px;
+}
+
+.ant-statistic-content {
+  font-weight: 600;
+}
+
+.timeline-node-content {
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.status-tag {
+  font-weight: 500;
+}
+
+.table-container {
+  margin-top: 16px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.anomaly-card {
+  border-left: 4px solid;
+}
+
+.anomaly-card.high {
+  border-left-color: #ff4d4f;
+}
+
+.anomaly-card.medium {
+  border-left-color: #faad14;
+}
+
+.anomaly-card.low {
+  border-left-color: #52c41a;
+}
