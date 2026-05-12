@@ -88,12 +88,12 @@ const confirmResponsibility = async (req, res, next) => {
       });
     }
 
-    if (exception.status === 'closed') {
+    if (exception.status === 'closed' || exception.status === 'compensated') {
       return res.status(409).json({
         success: false,
         error: {
-          code: 'EXCEPTION_ALREADY_CLOSED',
-          message: '该异常已关闭，不能重复确认责任'
+          code: 'EXCEPTION_ALREADY_FINALIZED',
+          message: '该异常已赔付或关闭，不能重复确认责任'
         }
       });
     }

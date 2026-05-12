@@ -88,6 +88,17 @@ async function testAPI() {
       console.log(`   重复赔付拦截: ${error.response.data.error.message}`);
     }
 
+    console.log('\n8b. 测试赔付后不能重新确认责任');
+    try {
+      await axios.post(`${BASE_URL}/exceptions/confirm-responsibility`, {
+        exception_id: exceptionId,
+        responsible_party: 'station',
+        operator: '测试员'
+      });
+    } catch (error) {
+      console.log(`   责任回退拦截: ${error.response.data.error.message}`);
+    }
+
     console.log('\n9. 测试关闭异常');
     const closeRes = await axios.post(`${BASE_URL}/exceptions/close`, {
       exception_id: exceptionId,
