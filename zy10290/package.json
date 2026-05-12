@@ -1,0 +1,13 @@
+{
+  "name": "flash-sale-order-platform",
+  "version": "1.0.0",
+  "description": "社群秒杀补单台",
+  "scripts": {
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["flash-sale", "order", "inventory"],
+  "author": "",
+  "license": "MIT"
+}
