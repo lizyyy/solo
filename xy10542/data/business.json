@@ -1,0 +1,68 @@
+{
+  "BUS-001": {
+    "id": "708101cc-7a4f-429d-9b34-c9abca764fd3",
+    "name": "用户注册",
+    "code": "BUS-001",
+    "department": "产品部",
+    "risk_level": "high",
+    "tags": [
+      "注册",
+      "用户"
+    ]
+  },
+  "BUS-002": {
+    "id": "63231bd6-ba96-4884-952f-1b72c7cf85e9",
+    "name": "数据共享平台",
+    "code": "BUS-002",
+    "department": "技术部",
+    "risk_level": "high",
+    "tags": [
+      "数据",
+      "共享"
+    ]
+  },
+  "BUS-003": {
+    "id": "434d8df0-3eac-4a9c-aebe-f830d03bdb7d",
+    "name": "推荐算法",
+    "code": "BUS-003",
+    "department": "算法部",
+    "risk_level": "medium",
+    "tags": [
+      "算法",
+      "推荐"
+    ]
+  },
+  "BUS-005": {
+    "id": "2b933eb3-2039-4e46-ab97-ea7136a649da",
+    "name": "财务报表系统",
+    "code": "BUS-005",
+    "department": "财务部",
+    "risk_level": "high",
+    "tags": [
+      "财务",
+      "报表"
+    ]
+  },
+  "BUS-006": {
+    "id": "9ac28e73-5455-4529-9a7d-dfc45a76dd74",
+    "name": "客服热线",
+    "code": "BUS-006",
+    "department": "客服部",
+    "risk_level": "medium",
+    "tags": [
+      "客服",
+      "热线"
+    ]
+  },
+  "BUS-007": {
+    "id": "f5ce5b1a-0128-4d3f-b040-bd8f30f586e9",
+    "name": "内部审计",
+    "code": "BUS-007",
+    "department": "审计部",
+    "risk_level": "high",
+    "tags": [
+      "审计",
+      "内控"
+    ]
+  }
+}

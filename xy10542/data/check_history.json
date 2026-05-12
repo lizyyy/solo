@@ -1,0 +1,52 @@
+{
+  "checks": {
+    "4ae16de5": {
+      "id": "4ae16de5",
+      "timestamp": "2026-05-12T13:26:17.816658",
+      "result": {
+        "check_id": "4ae16de5",
+        "old_version": "v1",
+        "new_version": "v2",
+        "timestamp": "2026-05-12T13:26:17.816586",
+        "change_stats": {
+          "modified": 4,
+          "unchanged": 1,
+          "removed": 2,
+          "renumbered": 1,
+          "added": 3
+        },
+        "impact_count": 8,
+        "task_count": 8,
+        "risk_stats": {
+          "medium": 3,
+          "low": 1,
+          "high": 4
+        }
+      }
+    },
+    "4689e360": {
+      "id": "4689e360",
+      "timestamp": "2026-05-12T13:26:54.454159",
+      "result": {
+        "check_id": "4689e360",
+        "old_version": "v1",
+        "new_version": "v2",
+        "timestamp": "2026-05-12T13:26:54.453632",
+        "change_stats": {
+          "modified": 4,
+          "unchanged": 1,
+          "renumbered": 1,
+          "removed": 2,
+          "added": 3
+        },
+        "impact_count": 8,
+        "task_count": 8,
+        "risk_stats": {
+          "medium": 3,
+          "low": 1,
+          "high": 4
+        }
+      }
+    }
+  }
+}

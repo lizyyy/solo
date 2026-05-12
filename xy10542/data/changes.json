@@ -1,0 +1,267 @@
+{
+  "v1::v2": [
+    {
+      "old_article": {
+        "id": "a25d1374-d6cb-4cb7-b085-01d770e56c53",
+        "number": "FIN-001",
+        "title": "财务报告披露要求",
+        "content": "企业应当按照国家统一的会计制度的规定，编制并对外提供财务会计报告。",
+        "version": "v1",
+        "tags": [
+          "财务",
+          "报告",
+          "披露"
+        ]
+      },
+      "new_article": {
+        "id": "597c14ca-3c62-4ad6-bee8-277f78b1a5eb",
+        "number": "FIN-001",
+        "title": "财务报告披露要求",
+        "content": "企业应当按照国家统一的会计制度的规定，编制并对外提供财务会计报告。财务会计报告应当由单位负责人和主管会计工作的负责人、会计机构负责人（会计主管人员）签名并盖章。",
+        "version": "v2",
+        "tags": [
+          "财务",
+          "报告",
+          "披露",
+          "签名"
+        ]
+      },
+      "change_type": "modified",
+      "similarity": 0.6412213740458015,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "1dd9c788-ab35-415e-b35a-a8b0773740bd",
+        "number": "PRIV-001",
+        "title": "个人信息收集原则",
+        "content": "企业应当遵循合法、正当、必要原则收集个人信息，不得过度收集。收集个人信息应当取得个人同意。",
+        "version": "v1",
+        "tags": [
+          "隐私",
+          "收集",
+          "同意"
+        ]
+      },
+      "new_article": {
+        "id": "59e2affe-e23f-4783-96ae-a952adf9baa2",
+        "number": "PRIV-001",
+        "title": "个人信息收集原则",
+        "content": "企业应当遵循合法、正当、必要和诚信原则收集个人信息，不得以误导、欺诈、胁迫等方式处理个人信息。收集个人信息应当取得个人同意，且同意应当是自愿、明确、具体。",
+        "version": "v2",
+        "tags": [
+          "隐私",
+          "收集",
+          "同意",
+          "诚信"
+        ]
+      },
+      "change_type": "modified",
+      "similarity": 0.7142857142857143,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "2007ac7f-ad39-4c4e-9df5-15bdcf519705",
+        "number": "CS-001",
+        "title": "客服人员着装规范",
+        "content": "客服人员应当统一着装，佩戴工牌，保持仪表整洁。",
+        "version": "v1",
+        "tags": [
+          "客服",
+          "着装"
+        ]
+      },
+      "new_article": {
+        "id": "1fc5d6a6-9696-4994-96ad-3f36e74863ae",
+        "number": "CS-001",
+        "title": "客服人员着装规范",
+        "content": "客服人员应当统一着装，佩戴工牌，保持仪表整洁。",
+        "version": "v2",
+        "tags": [
+          "客服",
+          "着装"
+        ]
+      },
+      "change_type": "unchanged",
+      "similarity": 1.0,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "f61ccf92-9d9f-4c72-8933-92992e6cbaba",
+        "number": "FIN-002",
+        "title": "内部控制制度",
+        "content": "企业应当建立健全内部控制制度，保证会计资料真实、完整。",
+        "version": "v1",
+        "tags": [
+          "财务",
+          "内控"
+        ]
+      },
+      "new_article": {
+        "id": "2cda240b-fd5c-4a2e-b50f-2d6b167cce6b",
+        "number": "FIN-002",
+        "title": "内部控制制度",
+        "content": "企业应当建立健全内部控制制度，保证会计资料真实、完整。企业负责人对本单位的内部控制的有效性负责。",
+        "version": "v2",
+        "tags": [
+          "财务",
+          "内控",
+          "负责人"
+        ]
+      },
+      "change_type": "modified",
+      "similarity": 0.7640449438202247,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "13a11ef1-9030-49bb-b5c8-1557fef7d4b3",
+        "number": "PRIV-003",
+        "title": "个人信息共享要求",
+        "content": "向第三方共享个人信息的，应当向个人告知接收方的名称或者姓名、联系方式、处理目的、处理方式和个人信息的种类，并取得个人的单独同意。",
+        "version": "v1",
+        "tags": [
+          "隐私",
+          "共享",
+          "第三方"
+        ]
+      },
+      "new_article": {
+        "id": "8b3826da-c29a-48bf-8738-1cb39e960ac6",
+        "number": "PRIV-003",
+        "title": "个人信息共享要求",
+        "content": "向第三方共享个人信息的，应当向个人告知接收方的名称或者姓名、联系方式、处理目的、处理方式和个人信息的种类，并取得个人的单独同意。涉及敏感个人信息的，还应当取得个人的书面同意。",
+        "version": "v2",
+        "tags": [
+          "隐私",
+          "共享",
+          "第三方",
+          "敏感信息"
+        ]
+      },
+      "change_type": "modified",
+      "similarity": 0.863905325443787,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "c09e1726-b305-4682-9108-2e40ececc157",
+        "number": "PRIV-002",
+        "title": "个人信息存储期限",
+        "content": "个人信息的存储期限不应超过实现处理目的所必要的最短时间。",
+        "version": "v1",
+        "tags": [
+          "隐私",
+          "存储"
+        ]
+      },
+      "new_article": {
+        "id": "34a7da24-9aad-436f-882f-c5a29f45f6e6",
+        "number": "PRIV-004",
+        "title": "个人信息存储期限",
+        "content": "个人信息的存储期限不应超过实现处理目的所必要的最短时间。期限届满后应当及时删除或匿名化处理。",
+        "version": "v2",
+        "tags": [
+          "隐私",
+          "存储",
+          "删除"
+        ]
+      },
+      "change_type": "renumbered",
+      "similarity": 0.8043478260869565,
+      "matched_articles": [
+        "PRIV-004"
+      ]
+    },
+    {
+      "old_article": {
+        "id": "1c099cc8-2078-4125-a1df-2c1f1a94863c",
+        "number": "CS-003",
+        "title": "客户信息保密",
+        "content": "客服人员应当对客户信息予以保密，不得泄露。",
+        "version": "v1",
+        "tags": [
+          "客服",
+          "保密"
+        ]
+      },
+      "new_article": null,
+      "change_type": "removed",
+      "similarity": 0.0,
+      "matched_articles": []
+    },
+    {
+      "old_article": {
+        "id": "51cfc0bf-56fe-4f6d-9ba1-f9dc09215530",
+        "number": "CS-002",
+        "title": "投诉处理时限",
+        "content": "对于客户投诉，应当在7个工作日内予以答复。",
+        "version": "v1",
+        "tags": [
+          "客服",
+          "投诉",
+          "时限"
+        ]
+      },
+      "new_article": null,
+      "change_type": "removed",
+      "similarity": 0.0,
+      "matched_articles": []
+    },
+    {
+      "old_article": null,
+      "new_article": {
+        "id": "9f4aa1c4-5c0e-4d72-b5bb-8f59ea373ed3",
+        "number": "FIN-003",
+        "title": "内部审计要求",
+        "content": "企业应当设立内部审计机构或者配备内部审计人员，开展内部审计工作。",
+        "version": "v2",
+        "tags": [
+          "财务",
+          "审计"
+        ]
+      },
+      "change_type": "added",
+      "similarity": 0.0,
+      "matched_articles": []
+    },
+    {
+      "old_article": null,
+      "new_article": {
+        "id": "552fcdaa-e205-44df-8839-2144493a6853",
+        "number": "CS-004",
+        "title": "投诉处理时限",
+        "content": "对于客户投诉，应当在3个工作日内予以答复，复杂投诉可以延长至7个工作日，但最长不超过15个工作日。",
+        "version": "v2",
+        "tags": [
+          "客服",
+          "投诉",
+          "时限"
+        ]
+      },
+      "change_type": "added",
+      "similarity": 0.0,
+      "matched_articles": []
+    },
+    {
+      "old_article": null,
+      "new_article": {
+        "id": "0913a328-df14-4963-aa22-b4edc835ebc2",
+        "number": "PRIV-005",
+        "title": "自动化决策",
+        "content": "利用个人信息进行自动化决策，应当公开自动化决策的规则，不得对个人在交易价格等交易条件上实行不合理的差别待遇。",
+        "version": "v2",
+        "tags": [
+          "隐私",
+          "自动化决策",
+          "算法"
+        ]
+      },
+      "change_type": "added",
+      "similarity": 0.0,
+      "matched_articles": []
+    }
+  ]
+}

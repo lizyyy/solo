@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "reg-compliance-cli"
+version = "1.0.0"
+description = "法规条款变更分析 CLI 工具 - 帮助合规团队比较法规版本、标记影响业务、追踪整改状态"
+authors = ["Compliance Team"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+click = "^8.1.0"
+rich = "^13.0.0"
+pyyaml = "^6.0"
+
+[tool.poetry.scripts]
+reg-compliance = "reg_compliance.cli:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

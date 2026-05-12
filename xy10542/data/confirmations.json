@@ -1,0 +1,57 @@
+{
+  "PRIV-001::BUS-001": [
+    {
+      "id": "5d426103-f359-490f-8916-e229f2fd2911",
+      "article_number": "PRIV-001",
+      "business_code": "BUS-001",
+      "operator": "合规员A",
+      "action": "影响确认",
+      "timestamp": "2026-05-12T13:26:28.120412",
+      "before_state": {
+        "confirmed": false
+      },
+      "after_state": {
+        "confirmed": true
+      },
+      "comment": "已确认用户注册流程受影响"
+    },
+    {
+      "id": "d3576a8f-c165-4219-95e0-554b1ff57bf1",
+      "article_number": "PRIV-001",
+      "business_code": "BUS-001",
+      "operator": "合规员A",
+      "action": "状态变更: in_progress -> in_progress",
+      "timestamp": "2026-05-12T13:26:28.122878",
+      "before_state": {
+        "status": "pending",
+        "responsible": "张三",
+        "deadline": "2026-06-11T13:26:17.792057"
+      },
+      "after_state": {
+        "status": "in_progress",
+        "responsible": "张三",
+        "deadline": "2026-06-11T13:26:17.792057"
+      },
+      "comment": "已确认影响，开始整改"
+    },
+    {
+      "id": "aa57aebc-300b-4c4d-ade3-58dbaf3c5dd2",
+      "article_number": "PRIV-001",
+      "business_code": "BUS-001",
+      "operator": "合规员A",
+      "action": "状态变更: completed -> completed",
+      "timestamp": "2026-05-12T13:27:45.875054",
+      "before_state": {
+        "status": "pending",
+        "responsible": "张三",
+        "deadline": "2026-06-11T13:26:54.442059"
+      },
+      "after_state": {
+        "status": "completed",
+        "responsible": "张三",
+        "deadline": "2026-06-11T13:26:54.442059"
+      },
+      "comment": ""
+    }
+  ]
+}
