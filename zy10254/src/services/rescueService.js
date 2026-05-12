@@ -141,7 +141,7 @@ function createRescueOrder(data) {
   };
 }
 
-function matchTechnician(orderId) {
+function matchTechnician(orderId, excludeTechnicianId = null) {
   const order = db.prepare('SELECT * FROM rescue_orders WHERE orderId = ?').get(orderId);
   
   if (!order) {
@@ -158,13 +158,21 @@ function matchTechnician(orderId) {
 
   const skills = [order.breakdownType];
   
-  const availableTechnicians = db.prepare(`
+  let sql = `
     SELECT * FROM technicians
     WHERE status = 'available'
       AND currentOrderId IS NULL
-    ORDER BY rating DESC
-    LIMIT 5
-  `).all();
+  `;
+  const params = [];
+  
+  if (excludeTechnicianId) {
+    sql += ` AND technicianId != ?`;
+    params.push(excludeTechnicianId);
+  }
+  
+  sql += ` ORDER BY rating DESC LIMIT 5`;
+  
+  const availableTechnicians = db.prepare(sql).all(...params);
 
   const qualifiedTechnicians = availableTechnicians.filter(tech => {
     const techSkills = JSON.parse(tech.skills);
@@ -189,6 +197,30 @@ function matchTechnician(orderId) {
     WHERE technicianId = ?
   `).run(orderId, selectedTech.technicianId);
 
+  let preDeductInfo = null;
+  if (order.membershipId) {
+    const membership = db.prepare('SELECT * FROM memberships WHERE membershipId = ?').get(order.membershipId);
+    if (membership && membership.isActive && membership.remainingTimes > 0) {
+      db.prepare(`
+        UPDATE memberships
+        SET remainingTimes = remainingTimes - 1
+        WHERE membershipId = ?
+      `).run(order.membershipId);
+
+      const recordId = uuidv4();
+      db.prepare(`
+        INSERT INTO fee_records (recordId, orderId, membershipId, type, amount, timesUsed, description)
+        VALUES (?, ?, ?, 'pre_deduct', ?, 1, '匹配技师-权益预扣')
+      `).run(recordId, orderId, order.membershipId, order.estimatedCost);
+
+      preDeductInfo = {
+        usedMembership: true,
+        timesUsed: 1,
+        remainingTimes: membership.remainingTimes - 1
+      };
+    }
+  }
+
   logStatusChange(orderId, STATUS.CREATED, STATUS.MATCHED);
 
   return {
@@ -199,7 +231,8 @@ function matchTechnician(orderId) {
       phone: selectedTech.phone,
       rating: selectedTech.rating
     },
-    status: STATUS.MATCHED
+    status: STATUS.MATCHED,
+    preDeductInfo
   };
 }
 
@@ -307,26 +340,20 @@ function completeRescue(orderId, technicianId, actualCost, remark = '') {
   let settlement = null;
   if (order.membershipId) {
     const membership = db.prepare('SELECT * FROM memberships WHERE membershipId = ?').get(order.membershipId);
-    if (membership && membership.isActive && membership.remainingTimes > 0) {
-      db.prepare(`
-        UPDATE memberships
-        SET remainingTimes = remainingTimes - 1
-        WHERE membershipId = ?
-      `).run(order.membershipId);
+    
+    db.prepare(`
+      UPDATE fee_records
+      SET type = 'deduct', amount = ?, description = '救援服务费用结算'
+      WHERE orderId = ? AND type = 'pre_deduct'
+    `).run(actualCost, orderId);
 
-      const recordId = uuidv4();
-      db.prepare(`
-        INSERT INTO fee_records (recordId, orderId, membershipId, type, amount, timesUsed, description)
-        VALUES (?, ?, ?, 'deduct', ?, 1, '救援服务费用结算')
-      `).run(recordId, orderId, order.membershipId, actualCost);
-
-      settlement = {
-        usedMembership: true,
-        timesUsed: 1,
-        remainingTimes: membership.remainingTimes - 1,
-        cost: actualCost
-      };
-    }
+    settlement = {
+      usedMembership: true,
+      timesUsed: 1,
+      remainingTimes: membership.remainingTimes,
+      cost: actualCost,
+      note: '已从预扣转为正式结算'
+    };
   }
 
   db.prepare(`

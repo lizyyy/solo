@@ -36,12 +36,12 @@ function cancelRescueOrder(orderId, reason, operatorId = null) {
     `).run(order.technicianId);
   }
 
-  if (order.membershipId && order.status !== STATUS.CREATED) {
+  if (order.membershipId) {
     const membership = db.prepare('SELECT * FROM memberships WHERE membershipId = ?').get(order.membershipId);
     
     const feeRecords = db.prepare(`
       SELECT * FROM fee_records
-      WHERE orderId = ? AND type = 'deduct'
+      WHERE orderId = ? AND type IN ('pre_deduct', 'deduct')
     `).all(orderId);
 
     if (feeRecords.length > 0) {
@@ -63,7 +63,8 @@ function cancelRescueOrder(orderId, reason, operatorId = null) {
       rollbackInfo = {
         timesRollback: totalTimesRollback,
         amountRollback: totalAmountRollback,
-        remainingTimes: membership.remainingTimes + totalTimesRollback
+        remainingTimes: membership.remainingTimes + totalTimesRollback,
+        rollbackFrom: feeRecords.map(r => r.type).join(', ')
       };
     }
   }
@@ -126,7 +127,7 @@ function reassignTechnician(orderId, reason, operatorId = null) {
 
   let newMatch = null;
   try {
-    newMatch = matchTechnician(orderId);
+    newMatch = matchTechnician(orderId, previousTechnicianId);
   } catch (e) {
     return {
       orderId,
@@ -144,7 +145,8 @@ function reassignTechnician(orderId, reason, operatorId = null) {
     previousTechnicianId,
     newTechnician: newMatch.technician,
     reassignCount: order.reassignCount + 1,
-    reason
+    reason,
+    preDeductInfo: newMatch.preDeductInfo
   };
 }
 
