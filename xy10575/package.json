@@ -1,0 +1,35 @@
+{
+  "name": "production-equipment-inspection-api",
+  "version": "1.0.0",
+  "description": "生产设备点检 API - 围绕生产设备点检按班次、项目、异常、停机和维修闭环管理",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest --runInBand",
+    "demo": "ts-node src/demo/index.ts",
+    "demo-fail": "ts-node src/demo/failDemo.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "cors": "^2.8.5",
+    "moment": "^2.29.4",
+    "json2csv": "^6.0.0-alpha.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.0",
+    "@types/uuid": "^9.0.2",
+    "@types/cors": "^2.8.13",
+    "@types/json2csv": "^5.0.3",
+    "@types/jest": "^29.5.3",
+    "typescript": "^5.1.6",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1"
+  }
+}
