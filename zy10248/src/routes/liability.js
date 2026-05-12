@@ -1,6 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const { Parser } = require('json2csv');
+const { Op } = require('sequelize');
 const { LiabilityConfirmation, Compensation, DamageReport, Booking, Equipment, MeetingRoom } = require('../models');
 const { AppError } = require('../middleware/errorHandler');
 const { recordCreate, recordUpdate } = require('../utils/historyService');
@@ -136,7 +137,7 @@ router.post('/confirmations', async (req, res, next) => {
     const existingConfirmation = await LiabilityConfirmation.findOne({
       where: { 
         damageReportId: value.damageReportId,
-        status: { $in: ['pending', 'confirmed'] }
+        status: { [Op.in]: ['pending', 'confirmed'] }
       }
     });
 
@@ -398,7 +399,8 @@ router.get('/compensations/export', async (req, res, next) => {
     const csv = json2csvParser.parse(exportData);
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename=待处理赔付列表_${moment().format('YYYYMMDD')}.csv`);
+    const filename = encodeURIComponent(`待处理赔付列表_${moment().format('YYYYMMDD')}.csv`);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
     res.send('\uFEFF' + csv);
   } catch (error) {
     next(error);
@@ -457,7 +459,7 @@ router.post('/compensations', async (req, res, next) => {
     const existingCompensation = await Compensation.findOne({
       where: { 
         liabilityConfirmationId: value.liabilityConfirmationId,
-        status: { $in: ['pending', 'paid'] }
+        status: { [Op.in]: ['pending', 'paid'] }
       }
     });
 
