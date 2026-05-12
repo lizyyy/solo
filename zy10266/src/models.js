@@ -8,7 +8,7 @@ const BOOKING_STATUS = {
   NO_SHOW: 'no_show'
 };
 
-const CANCELLATION_DEADLINE_MINUTES = 30;
+const CANCELLATION_DEADLINE_MINUTES = 0.5;
 const MIN_REQUIRED_MEMBERS = 2;
 const MAX_NO_SHOWS = 3;
 const CREDIT_SCORE_PENALTY = 20;
@@ -118,7 +118,7 @@ class Booking {
     const now = new Date();
     const start = new Date(this.startTime);
     const gracePeriod = new Date(start);
-    gracePeriod.setMinutes(gracePeriod.getMinutes() + 15);
+    gracePeriod.setSeconds(gracePeriod.getSeconds() + 5);
     return now >= start && now <= gracePeriod;
   }
 
@@ -130,7 +130,7 @@ class Booking {
     }
     const now = new Date();
     const gracePeriod = new Date(this.startTime);
-    gracePeriod.setMinutes(gracePeriod.getMinutes() + 15);
+    gracePeriod.setSeconds(gracePeriod.getSeconds() + 10);
     return now > gracePeriod;
   }
 }

@@ -203,7 +203,7 @@ function checkIn(req, res) {
   }
 
   const { CheckInRecord } = require('../models');
-  const checkInRecord = new CheckInRecord(booking.id, studentId);
+  const checkInRecord = new CheckInRecord(null, booking.id, studentId);
   storage.addCheckInRecord(checkInRecord);
 
   if (!booking.checkInTime) {
