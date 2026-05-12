@@ -1,0 +1,26 @@
+{
+  "project_name": "fail-demo",
+  "created_at": "2026-05-12T21:52:37.910943",
+  "updated_at": "2026-05-12T21:52:37.910951",
+  "subtitle_offset": 0.0,
+  "timeline_segments": [],
+  "subtitles": [],
+  "products": [],
+  "violations": [],
+  "slices": [],
+  "import_records": [
+    {
+      "id": "c2869e57-c1c3-4ac9-9735-6c7f6de3430a",
+      "data_type": "products",
+      "file_path": "products_bad.json",
+      "status": "failed",
+      "record_count": 0,
+      "error_message": "__init__() missing 1 required positional argument: 'product_id'",
+      "created_at": "2026-05-12T21:53:26.904391",
+      "completed_at": "2026-05-12T21:53:26.904822"
+    }
+  ],
+  "audit_logs": [],
+  "processed_products": [],
+  "exported_slices": []
+}

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "live-replay-slicer"
+version = "1.0.0"
+description = "直播回放切片工具 - 按话题、违规片段、商品讲解和字幕时间轴切片归档"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "jsonlines>=4.0.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.scripts]
+liveslice = "liveslicer.cli:cli"
+
+[tool.setuptools.packages.find]
+include = ["liveslicer*"]

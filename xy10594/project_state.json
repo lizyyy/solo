@@ -1,0 +1,739 @@
+{
+  "project_name": "demo-beauty",
+  "created_at": "2026-05-12T21:51:46.175128",
+  "updated_at": "2026-05-12T21:52:11.522944",
+  "subtitle_offset": 2.5,
+  "timeline_segments": [
+    {
+      "start_time": 0.0,
+      "end_time": 180.0,
+      "title": "开场欢迎与品牌介绍",
+      "description": "主播介绍直播间和品牌背景"
+    },
+    {
+      "start_time": 180.0,
+      "end_time": 600.0,
+      "title": "护肤流程演示",
+      "description": "完整的护肤步骤演示"
+    },
+    {
+      "start_time": 600.0,
+      "end_time": 900.0,
+      "title": "彩妆教程",
+      "description": "日常妆容教程"
+    },
+    {
+      "start_time": 900.0,
+      "end_time": 1200.0,
+      "title": "限时抢购环节",
+      "description": "多款产品限时特惠"
+    },
+    {
+      "start_time": 1200.0,
+      "end_time": 1500.0,
+      "title": "用户问答",
+      "description": "解答粉丝问题"
+    }
+  ],
+  "subtitles": [
+    {
+      "id": "sub-001",
+      "start_time": 5.0,
+      "end_time": 8.0,
+      "text": "欢迎大家来到我的直播间"
+    },
+    {
+      "id": "sub-002",
+      "start_time": 10.0,
+      "end_time": 14.0,
+      "text": "今天给大家带来我们家的明星产品"
+    },
+    {
+      "id": "sub-003",
+      "start_time": 185.0,
+      "end_time": 190.0,
+      "text": "首先我们来做洁面，这款洗面奶非常温和"
+    },
+    {
+      "id": "sub-004",
+      "start_time": 195.0,
+      "end_time": 200.0,
+      "text": "大家可以看到它的泡沫非常细腻"
+    },
+    {
+      "id": "sub-005",
+      "start_time": 210.0,
+      "end_time": 215.0,
+      "text": "接下来是爽肤水，轻轻拍打吸收"
+    },
+    {
+      "id": "sub-006",
+      "start_time": 250.0,
+      "end_time": 255.0,
+      "text": "这款精华液含有玻尿酸成分"
+    },
+    {
+      "id": "sub-007",
+      "start_time": 320.0,
+      "end_time": 325.0,
+      "text": "保湿效果非常好，适合秋冬季节"
+    },
+    {
+      "id": "sub-008",
+      "start_time": 620.0,
+      "end_time": 625.0,
+      "text": "现在我们来画底妆，先涂隔离"
+    },
+    {
+      "id": "sub-009",
+      "start_time": 650.0,
+      "end_time": 655.0,
+      "text": "这款粉底液的遮瑕力中等偏上"
+    },
+    {
+      "id": "sub-010",
+      "start_time": 700.0,
+      "end_time": 705.0,
+      "text": "绝对保证正品，大家可以放心购买"
+    },
+    {
+      "id": "sub-011",
+      "start_time": 920.0,
+      "end_time": 925.0,
+      "text": "现在是限时抢购环节，价格非常优惠"
+    },
+    {
+      "id": "sub-012",
+      "start_time": 950.0,
+      "end_time": 955.0,
+      "text": "买一送一，只限今天直播间"
+    },
+    {
+      "id": "sub-013",
+      "start_time": 980.0,
+      "end_time": 985.0,
+      "text": "最后五分钟，倒计时开始"
+    },
+    {
+      "id": "sub-014",
+      "start_time": 1250.0,
+      "end_time": 1255.0,
+      "text": "敏感肌可以使用这款产品吗"
+    },
+    {
+      "id": "sub-015",
+      "start_time": 1260.0,
+      "end_time": 1265.0,
+      "text": "敏感肌也是可以的，我们的成分很温和"
+    }
+  ],
+  "products": [
+    {
+      "product_id": "BEAUTY-001",
+      "name": "氨基酸洁面乳",
+      "link_time": 180.0,
+      "unlink_time": 300.0,
+      "category": "洁面"
+    },
+    {
+      "product_id": "BEAUTY-002",
+      "name": "玻尿酸精华液",
+      "link_time": 240.0,
+      "unlink_time": 400.0,
+      "category": "精华"
+    },
+    {
+      "product_id": "BEAUTY-003",
+      "name": "保湿爽肤水",
+      "link_time": 380.0,
+      "unlink_time": 500.0,
+      "category": "护肤水"
+    },
+    {
+      "product_id": "BEAUTY-004",
+      "name": "持久粉底液",
+      "link_time": 600.0,
+      "unlink_time": 750.0,
+      "category": "底妆"
+    },
+    {
+      "product_id": "BEAUTY-005",
+      "name": "隔离霜",
+      "link_time": 620.0,
+      "unlink_time": 680.0,
+      "category": "底妆"
+    },
+    {
+      "product_id": "BEAUTY-006",
+      "name": "丝绒口红",
+      "link_time": 800.0,
+      "unlink_time": 900.0,
+      "category": "唇部"
+    }
+  ],
+  "violations": [
+    {
+      "id": "VIO-001",
+      "start_time": 700.0,
+      "end_time": 710.0,
+      "level": "warning",
+      "reason": "提及绝对化用语:绝对保证"
+    },
+    {
+      "id": "VIO-002",
+      "start_time": 980.0,
+      "end_time": 990.0,
+      "level": "info",
+      "reason": "使用倒计时话术诱导下单"
+    }
+  ],
+  "slices": [
+    {
+      "slice_id": "topic-30c51c527b9b",
+      "slice_type": "topic",
+      "start_time": 2.5,
+      "end_time": 182.5,
+      "duration": 180.0,
+      "status": "ready",
+      "title": "话题片段: 开场欢迎与品牌介绍",
+      "description": "主播介绍直播间和品牌背景",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-001",
+        "sub-002",
+        "sub-003",
+        "sub-004",
+        "sub-005",
+        "sub-006",
+        "sub-007",
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420789",
+      "updated_at": "2026-05-12T21:51:52.420914"
+    },
+    {
+      "slice_id": "topic-1dd0be7890cc",
+      "slice_type": "topic",
+      "start_time": 182.5,
+      "end_time": 602.5,
+      "duration": 420.0,
+      "status": "review_needed",
+      "title": "话题片段: 护肤流程演示",
+      "description": "完整的护肤步骤演示",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-003",
+        "sub-004",
+        "sub-005",
+        "sub-006",
+        "sub-007",
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420804",
+      "updated_at": "2026-05-12T21:51:52.420914"
+    },
+    {
+      "slice_id": "topic-5f06670a45f0",
+      "slice_type": "topic",
+      "start_time": 602.5,
+      "end_time": 902.5,
+      "duration": 300.0,
+      "status": "review_needed",
+      "title": "话题片段: 彩妆教程",
+      "description": "日常妆容教程",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "violation-VIO-001-f0046d7a",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093",
+        "product-BEAUTY-006-e6c72aca"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420809",
+      "updated_at": "2026-05-12T21:51:52.420915"
+    },
+    {
+      "slice_id": "topic-7df8c9c922c5",
+      "slice_type": "topic",
+      "start_time": 902.5,
+      "end_time": 1202.5,
+      "duration": 300.0,
+      "status": "review_needed",
+      "title": "话题片段: 限时抢购环节",
+      "description": "多款产品限时特惠",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "violation-VIO-001-f0046d7a",
+        "violation-VIO-002-a1eb3989",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093",
+        "product-BEAUTY-006-e6c72aca"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420814",
+      "updated_at": "2026-05-12T21:51:52.420915"
+    },
+    {
+      "slice_id": "topic-edebcc75a64e",
+      "slice_type": "topic",
+      "start_time": 1202.5,
+      "end_time": 1502.5,
+      "duration": 300.0,
+      "status": "review_needed",
+      "title": "话题片段: 用户问答",
+      "description": "解答粉丝问题",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "topic-7df8c9c922c5",
+        "violation-VIO-001-f0046d7a",
+        "violation-VIO-002-a1eb3989",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093",
+        "product-BEAUTY-006-e6c72aca"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420819",
+      "updated_at": "2026-05-12T21:51:52.420915"
+    },
+    {
+      "slice_id": "violation-VIO-001-f0046d7a",
+      "slice_type": "violation",
+      "start_time": 702.5,
+      "end_time": 712.5,
+      "duration": 10.0,
+      "status": "review_needed",
+      "title": "违规片段: 提及绝对化用语:绝对保证",
+      "description": "违规级别: warning",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": "VIO-001",
+      "violation_reason": "提及绝对化用语:绝对保证",
+      "subtitle_ids": [
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420824",
+      "updated_at": "2026-05-12T21:51:52.420916"
+    },
+    {
+      "slice_id": "violation-VIO-002-a1eb3989",
+      "slice_type": "violation",
+      "start_time": 982.5,
+      "end_time": 992.5,
+      "duration": 10.0,
+      "status": "review_needed",
+      "title": "违规片段: 使用倒计时话术诱导下单",
+      "description": "违规级别: info",
+      "product_id": null,
+      "product_name": null,
+      "violation_id": "VIO-002",
+      "violation_reason": "使用倒计时话术诱导下单",
+      "subtitle_ids": [
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "topic-7df8c9c922c5",
+        "violation-VIO-001-f0046d7a",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093",
+        "product-BEAUTY-006-e6c72aca"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420829",
+      "updated_at": "2026-05-12T21:51:52.420916"
+    },
+    {
+      "slice_id": "product-BEAUTY-001-2439e28d",
+      "slice_type": "product",
+      "start_time": 182.5,
+      "end_time": 302.5,
+      "duration": 120.0,
+      "status": "review_needed",
+      "title": "商品讲解: 氨基酸洁面乳",
+      "description": "商品编号: BEAUTY-001",
+      "product_id": "BEAUTY-001",
+      "product_name": "氨基酸洁面乳",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-003",
+        "sub-004",
+        "sub-005",
+        "sub-006",
+        "sub-007",
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "product-BEAUTY-002-386c0b82"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420835",
+      "updated_at": "2026-05-12T21:51:52.420916"
+    },
+    {
+      "slice_id": "product-BEAUTY-002-386c0b82",
+      "slice_type": "product",
+      "start_time": 242.5,
+      "end_time": 402.5,
+      "duration": 160.0,
+      "status": "review_needed",
+      "title": "商品讲解: 玻尿酸精华液",
+      "description": "商品编号: BEAUTY-002",
+      "product_id": "BEAUTY-002",
+      "product_name": "玻尿酸精华液",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-006",
+        "sub-007",
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-003-49b8d140"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420840",
+      "updated_at": "2026-05-12T21:51:52.420917"
+    },
+    {
+      "slice_id": "product-BEAUTY-003-49b8d140",
+      "slice_type": "product",
+      "start_time": 382.5,
+      "end_time": 502.5,
+      "duration": 120.0,
+      "status": "review_needed",
+      "title": "商品讲解: 保湿爽肤水",
+      "description": "商品编号: BEAUTY-003",
+      "product_id": "BEAUTY-003",
+      "product_name": "保湿爽肤水",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420845",
+      "updated_at": "2026-05-12T21:51:52.420917"
+    },
+    {
+      "slice_id": "product-BEAUTY-004-ccc24da6",
+      "slice_type": "product",
+      "start_time": 602.5,
+      "end_time": 752.5,
+      "duration": 150.0,
+      "status": "review_needed",
+      "title": "商品讲解: 持久粉底液",
+      "description": "商品编号: BEAUTY-004",
+      "product_id": "BEAUTY-004",
+      "product_name": "持久粉底液",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "violation-VIO-001-f0046d7a",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-005-903e7093"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420849",
+      "updated_at": "2026-05-12T21:51:52.420917"
+    },
+    {
+      "slice_id": "product-BEAUTY-005-903e7093",
+      "slice_type": "product",
+      "start_time": 622.5,
+      "end_time": 682.5,
+      "duration": 60.0,
+      "status": "review_needed",
+      "title": "商品讲解: 隔离霜",
+      "description": "商品编号: BEAUTY-005",
+      "product_id": "BEAUTY-005",
+      "product_name": "隔离霜",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-008",
+        "sub-009",
+        "sub-010",
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6"
+      ],
+      "export_path": null,
+      "export_time": null,
+      "created_at": "2026-05-12T21:51:52.420854",
+      "updated_at": "2026-05-12T21:51:52.420918"
+    },
+    {
+      "slice_id": "product-BEAUTY-006-e6c72aca",
+      "slice_type": "product",
+      "start_time": 850.0,
+      "end_time": 950.0,
+      "duration": 100.0,
+      "status": "exported",
+      "title": "商品讲解: 丝绒口红",
+      "description": "商品编号: BEAUTY-006",
+      "product_id": "BEAUTY-006",
+      "product_name": "丝绒口红",
+      "violation_id": null,
+      "violation_reason": null,
+      "subtitle_ids": [
+        "sub-011",
+        "sub-012",
+        "sub-013",
+        "sub-014",
+        "sub-015"
+      ],
+      "overlapping_slices": [
+        "topic-30c51c527b9b",
+        "topic-1dd0be7890cc",
+        "topic-5f06670a45f0",
+        "violation-VIO-001-f0046d7a",
+        "product-BEAUTY-001-2439e28d",
+        "product-BEAUTY-002-386c0b82",
+        "product-BEAUTY-003-49b8d140",
+        "product-BEAUTY-004-ccc24da6",
+        "product-BEAUTY-005-903e7093"
+      ],
+      "export_path": "slices/product_product-BEAUTY-006-e6c72aca.json",
+      "export_time": "2026-05-12T21:52:11.522942",
+      "created_at": "2026-05-12T21:51:52.420860",
+      "updated_at": "2026-05-12T21:52:11.522943"
+    }
+  ],
+  "import_records": [],
+  "audit_logs": [
+    {
+      "id": "05c60a2e-a926-4daf-a9ec-47205c5dcfba",
+      "action": "create",
+      "entity_type": "project",
+      "entity_id": "demo-beauty",
+      "before": null,
+      "after": {
+        "project_name": "demo-beauty",
+        "subtitle_offset": 0.0
+      },
+      "operator": "system",
+      "reason": "初始化项目",
+      "timestamp": "2026-05-12T21:51:46.175476"
+    },
+    {
+      "id": "76ae0e65-bfe4-4ca1-bdee-fffc6c203e14",
+      "action": "correct",
+      "entity_type": "slice",
+      "entity_id": "product-BEAUTY-006-e6c72aca",
+      "before": {
+        "start_time": 802.5,
+        "end_time": 902.5,
+        "duration": 100.0,
+        "title": "商品讲解: 丝绒口红",
+        "status": "review_needed"
+      },
+      "after": {
+        "start_time": 850.0,
+        "end_time": 950.0,
+        "duration": 100.0,
+        "title": "商品讲解: 丝绒口红",
+        "status": "ready"
+      },
+      "operator": "张运营",
+      "reason": "调整讲解时间，避免与违规片段重叠",
+      "timestamp": "2026-05-12T21:52:10.412624"
+    },
+    {
+      "id": "3e31f017-7d65-4df1-b5df-00ab07e8f61b",
+      "action": "update",
+      "entity_type": "slice",
+      "entity_id": "product-BEAUTY-006-e6c72aca",
+      "before": {
+        "status": "READY",
+        "export_path": null
+      },
+      "after": {
+        "status": "EXPORTED",
+        "export_path": "slices/product_product-BEAUTY-006-e6c72aca.json"
+      },
+      "operator": "cli",
+      "reason": "导出切片",
+      "timestamp": "2026-05-12T21:52:11.522964"
+    }
+  ],
+  "processed_products": [
+    "BEAUTY-003",
+    "BEAUTY-006",
+    "BEAUTY-005",
+    "BEAUTY-004",
+    "BEAUTY-001",
+    "BEAUTY-002"
+  ],
+  "exported_slices": [
+    "product-BEAUTY-006-e6c72aca"
+  ]
+}

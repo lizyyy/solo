@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: live-replay-slicer
+Version: 1.0.0
+Summary: 直播回放切片工具 - 按话题、违规片段、商品讲解和字幕时间轴切片归档
+Requires-Python: >=3.8
+Requires-Dist: click>=8.1.0
+Requires-Dist: rich>=13.0.0
+Requires-Dist: jsonlines>=4.0.0
+Requires-Dist: python-dateutil>=2.8.0
