@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rain-garden-cli"
+version = "0.1.0"
+description = "社区雨水花园养护 CLI 工具"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0",
+    "pandas>=1.3",
+    "openpyxl>=3.0",
+]
+
+[project.scripts]
+rain-garden = "rain_garden_cli.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["rain_garden_cli*"]

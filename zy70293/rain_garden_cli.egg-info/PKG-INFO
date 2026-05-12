@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: rain-garden-cli
+Version: 0.1.0
+Summary: 社区雨水花园养护 CLI 工具
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0
+Requires-Dist: pandas>=1.3
+Requires-Dist: openpyxl>=3.0
