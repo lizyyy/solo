@@ -107,7 +107,17 @@ exports.createDeduction = async (req, res) => {
 
     if (inspection.isLocked) {
       await transaction.rollback();
-      return res.status(400).json({ error: '该检查记录已锁定，无法修改' });
+      return res.status(400).json({ error: `该检查记录所属月份 ${inspection.month} 已锁定，无法扣分` });
+    }
+
+    const { MonthlyDiscount } = require('../models');
+    const monthlyDiscount = await MonthlyDiscount.findOne({
+      where: { stallId: inspection.stallId, month: inspection.month }
+    });
+
+    if (monthlyDiscount && monthlyDiscount.isLocked) {
+      await transaction.rollback();
+      return res.status(400).json({ error: `该摊位 ${inspection.month} 的优惠数据已锁定，无法扣分` });
     }
 
     const existingDeduction = await Deduction.findOne({

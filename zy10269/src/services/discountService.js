@@ -129,6 +129,14 @@ async function recalculateMonthlyDiscount(stallId, month, operator = 'system') {
 }
 
 async function handleDeductionCreated(deduction) {
+  const monthlyDiscount = await MonthlyDiscount.findOne({
+    where: { stallId: deduction.stallId, month: deduction.month }
+  });
+
+  if (monthlyDiscount && monthlyDiscount.isLocked) {
+    throw new Error(`该摊位 ${deduction.month} 的优惠数据已锁定，无法扣分`);
+  }
+
   return await createDiscountAdjustment(
     deduction.stallId,
     deduction.month,
@@ -141,6 +149,14 @@ async function handleDeductionCreated(deduction) {
 }
 
 async function handleComplaintUpheld(complaint, deduction) {
+  const monthlyDiscount = await MonthlyDiscount.findOne({
+    where: { stallId: complaint.stallId, month: deduction.month }
+  });
+
+  if (monthlyDiscount && monthlyDiscount.isLocked) {
+    throw new Error(`该摊位 ${deduction.month} 的优惠数据已锁定，无法撤销扣分`);
+  }
+
   return await createDiscountAdjustment(
     complaint.stallId,
     deduction.month,
@@ -156,6 +172,14 @@ async function handleReviewPass(review) {
   const { Inspection } = require('../models');
   const inspection = await Inspection.findByPk(review.inspectionId);
   
+  const monthlyDiscount = await MonthlyDiscount.findOne({
+    where: { stallId: review.stallId, month: inspection.month }
+  });
+
+  if (monthlyDiscount && monthlyDiscount.isLocked) {
+    throw new Error(`该摊位 ${inspection.month} 的优惠数据已锁定，无法返还分数`);
+  }
+
   return await createDiscountAdjustment(
     review.stallId,
     inspection.month,

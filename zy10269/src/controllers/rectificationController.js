@@ -149,6 +149,23 @@ exports.createReview = async (req, res) => {
       return res.status(400).json({ error: '该整改已复核，请勿重复复核' });
     }
 
+    const inspection = await Inspection.findByPk(rectification.inspectionId);
+
+    if (inspection.isLocked) {
+      await transaction.rollback();
+      return res.status(400).json({ error: `该检查记录所属月份 ${inspection.month} 已锁定，无法进行复核` });
+    }
+
+    const { MonthlyDiscount } = require('../models');
+    const monthlyDiscount = await MonthlyDiscount.findOne({
+      where: { stallId: rectification.stallId, month: inspection.month }
+    });
+
+    if (monthlyDiscount && monthlyDiscount.isLocked) {
+      await transaction.rollback();
+      return res.status(400).json({ error: `该摊位 ${inspection.month} 的优惠数据已锁定，无法进行复核` });
+    }
+
     const review = await Review.create({
       ...value,
       reviewNo: generateNo('REV'),
@@ -160,7 +177,6 @@ exports.createReview = async (req, res) => {
 
     await rectification.update({ status: 'reviewed' }, { transaction });
 
-    const inspection = await Inspection.findByPk(rectification.inspectionId);
     await inspection.update({ status: 'reviewed' }, { transaction });
 
     if (value.result === 'pass' && value.pointsReturned > 0) {
