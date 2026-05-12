@@ -5,6 +5,19 @@ const path = require('path');
 const fs = require('fs');
 
 class MaterialService {
+  async getLatestMaterialByCode(claimId, materialCode) {
+    return new Promise((resolve, reject) => {
+      db.get(`
+        SELECT * FROM materials 
+        WHERE claim_id = ? AND material_code = ?
+        ORDER BY version DESC LIMIT 1
+      `, [claimId, materialCode], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+  }
+
   async addMaterial(claimId, data, operator) {
     return new Promise((resolve, reject) => {
       db.serialize(async () => {
@@ -14,6 +27,24 @@ class MaterialService {
           
           if (claim.status === 'completed') {
             throw new Error('案件已完成，无法添加新材料');
+          }
+
+          const existingMaterial = await this.getLatestMaterialByCode(claimId, data.material_code);
+          
+          if (existingMaterial) {
+            const isSameDefinition = 
+              existingMaterial.material_name === data.material_name &&
+              existingMaterial.description === (data.description || '') &&
+              existingMaterial.is_required === (data.is_required ? 1 : 0);
+            
+            if (isSameDefinition && !data.force_new_version) {
+              await claimService.addAuditLog(
+                claimId, existingMaterial.material_id, '重复提交识别', 'material_duplicate',
+                operator, '材料定义相同，返回已有材料'
+              );
+              resolve(existingMaterial);
+              return;
+            }
           }
 
           const now = new Date().toISOString();
@@ -41,7 +72,7 @@ class MaterialService {
               
               await claimService.addAuditLog(
                 claimId, materialId, '添加材料', 'material_add',
-                operator, `添加材料: ${data.material_name}`
+                operator, `添加材料: ${data.material_name}, 版本: v${version}`
               );
               
               const material = await this.getMaterialById(materialId);
@@ -151,6 +182,11 @@ class MaterialService {
           
           if (claim.status === 'completed') {
             throw new Error('案件已完成，无法重新上传材料');
+          }
+
+          const latestMaterial = await this.getLatestMaterialByCode(oldMaterial.claim_id, oldMaterial.material_code);
+          if (latestMaterial && latestMaterial.status === 'approved') {
+            throw new Error('该材料最新版本已审核通过，如需修改请先驳回');
           }
 
           const now = new Date().toISOString();
