@@ -46,9 +46,7 @@ function GroupsPage({ data, refreshData }) {
     );
 
     const usedInDispatches = dispatches.filter(d => {
-      const meeting = meetings.find(m => m.id === d.meetingId);
-      const meetingGroups = meeting?.groups || [];
-      return meetingGroups.some(g => g.name === group.name);
+      return d.groups?.some(g => g.name === group.name);
     });
 
     let warningMessage = `确定要删除小组「${group.name}」吗？`;

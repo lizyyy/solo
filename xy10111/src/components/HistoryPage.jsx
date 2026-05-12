@@ -43,7 +43,8 @@ function HistoryPage({ data, refreshData }) {
   const meetingOptions = [...new Set(dispatches.map(d => d.meetingId))]
     .map(id => {
       const meeting = meetings.find(m => m.id === id);
-      return { id, title: meeting?.title || d?.meetingTitle || '未知会议' };
+      const dispatchForMeeting = dispatches.find(d => d.meetingId === id);
+      return { id, title: meeting?.title || dispatchForMeeting?.meetingTitle || '未知会议' };
     });
 
   const handleUpdateStatus = async (dispatch, newStatus) => {
