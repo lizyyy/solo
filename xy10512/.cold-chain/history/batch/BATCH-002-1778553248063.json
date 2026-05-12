@@ -1,0 +1,20 @@
+{
+  "id": "BATCH-002",
+  "type": "batch",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:08.063Z",
+  "data": {
+    "id": "BATCH-002",
+    "productName": "冰淇淋",
+    "quantity": 200,
+    "unit": "箱",
+    "warehouseId": "WH-01",
+    "inTime": "2026-05-11T02:34:00.000Z",
+    "outTime": null,
+    "requiredTemperature": -22,
+    "supplier": "供应商B",
+    "createdAt": "2026-05-12T02:34:08.063Z",
+    "updatedAt": "2026-05-12T02:34:08.063Z"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "c71e48a4-2572-4c61-934e-c4afcc2ffa1a",
+  "type": "assessments",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:22.913Z",
+  "data": {
+    "alertId": "ALERT-NORMAL",
+    "temperatureId": "TEMP-NORMAL",
+    "status": "LOW",
+    "severity": "INFO",
+    "reason": "无温度违规记录",
+    "details": {
+      "violations": 0
+    },
+    "checkedAt": "2026-05-12T02:34:22.913Z",
+    "checkCount": 1,
+    "id": "c71e48a4-2572-4c61-934e-c4afcc2ffa1a",
+    "createdAt": "2026-05-12T02:34:22.913Z",
+    "updatedAt": "2026-05-12T02:34:22.913Z"
+  }
+}

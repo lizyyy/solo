@@ -1,0 +1,41 @@
+{
+  "id": "TEMP-GAP",
+  "type": "temperature",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:08.066Z",
+  "data": {
+    "id": "TEMP-GAP",
+    "warehouseId": "WH-01",
+    "sensorId": "SENSOR-02",
+    "description": "断点样例 - 存在超过30分钟的数据缺口",
+    "startTime": "2026-05-11T18:34:00.000Z",
+    "endTime": "2026-05-11T19:34:00.000Z",
+    "readings": [
+      {
+        "timestamp": "2026-05-11T18:34:00.000Z",
+        "temperature": -18
+      },
+      {
+        "timestamp": "2026-05-11T20:04:00.000Z",
+        "temperature": -17.5
+      },
+      {
+        "timestamp": "2026-05-11T20:09:00.000Z",
+        "temperature": -18.2
+      }
+    ],
+    "hasDuplicate": false,
+    "hasBreakpoint": true,
+    "breakpoints": [
+      {
+        "index": 1,
+        "from": "2026-05-11T18:34:00.000Z",
+        "to": "2026-05-11T20:04:00.000Z",
+        "gapMinutes": 90
+      }
+    ],
+    "createdAt": "2026-05-12T02:34:08.066Z",
+    "updatedAt": "2026-05-12T02:34:08.066Z"
+  }
+}

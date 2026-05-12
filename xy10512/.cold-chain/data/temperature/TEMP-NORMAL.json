@@ -1,0 +1,63 @@
+{
+  "id": "TEMP-NORMAL",
+  "warehouseId": "WH-01",
+  "sensorId": "SENSOR-01",
+  "description": "正常波动样例 - 轻微波动在阈值内",
+  "startTime": "2026-05-12T01:34:00.000Z",
+  "endTime": "2026-05-12T02:34:00.000Z",
+  "readings": [
+    {
+      "timestamp": "2026-05-12T01:34:00.000Z",
+      "temperature": -17.8
+    },
+    {
+      "timestamp": "2026-05-12T01:39:00.000Z",
+      "temperature": -19.4
+    },
+    {
+      "timestamp": "2026-05-12T01:44:00.000Z",
+      "temperature": -19.4
+    },
+    {
+      "timestamp": "2026-05-12T01:49:00.000Z",
+      "temperature": -17.2
+    },
+    {
+      "timestamp": "2026-05-12T01:54:00.000Z",
+      "temperature": -17.3
+    },
+    {
+      "timestamp": "2026-05-12T01:59:00.000Z",
+      "temperature": -17.1
+    },
+    {
+      "timestamp": "2026-05-12T02:04:00.000Z",
+      "temperature": -17.7
+    },
+    {
+      "timestamp": "2026-05-12T02:09:00.000Z",
+      "temperature": -18.7
+    },
+    {
+      "timestamp": "2026-05-12T02:14:00.000Z",
+      "temperature": -17.8
+    },
+    {
+      "timestamp": "2026-05-12T02:19:00.000Z",
+      "temperature": -19.1
+    },
+    {
+      "timestamp": "2026-05-12T02:24:00.000Z",
+      "temperature": -17.6
+    },
+    {
+      "timestamp": "2026-05-12T02:29:00.000Z",
+      "temperature": -17.2
+    }
+  ],
+  "hasDuplicate": false,
+  "hasBreakpoint": false,
+  "breakpoints": null,
+  "createdAt": "2026-05-12T02:34:08.064Z",
+  "updatedAt": "2026-05-12T02:34:08.064Z"
+}

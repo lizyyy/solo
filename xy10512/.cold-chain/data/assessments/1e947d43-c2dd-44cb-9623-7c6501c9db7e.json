@@ -1,0 +1,15 @@
+{
+  "alertId": "ALERT-GAP",
+  "temperatureId": "TEMP-GAP",
+  "status": "LOW",
+  "severity": "INFO",
+  "reason": "无温度违规记录",
+  "details": {
+    "violations": 0
+  },
+  "checkedAt": "2026-05-12T02:35:10.882Z",
+  "checkCount": 2,
+  "id": "1e947d43-c2dd-44cb-9623-7c6501c9db7e",
+  "createdAt": "2026-05-12T02:34:22.910Z",
+  "updatedAt": "2026-05-12T02:35:10.882Z"
+}

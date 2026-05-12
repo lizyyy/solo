@@ -1,0 +1,54 @@
+{
+  "id": "TEMP-DOOR",
+  "warehouseId": "WH-01",
+  "sensorId": "SENSOR-01",
+  "description": "开门升温样例 - 与 DOOR-001 记录匹配",
+  "startTime": "2026-05-11T14:44:00.000Z",
+  "endTime": "2026-05-11T16:04:00.000Z",
+  "readings": [
+    {
+      "timestamp": "2026-05-11T14:44:00.000Z",
+      "temperature": -18
+    },
+    {
+      "timestamp": "2026-05-11T14:49:00.000Z",
+      "temperature": -14.7
+    },
+    {
+      "timestamp": "2026-05-11T14:54:00.000Z",
+      "temperature": -11.3
+    },
+    {
+      "timestamp": "2026-05-11T14:59:00.000Z",
+      "temperature": -8
+    },
+    {
+      "timestamp": "2026-05-11T16:24:00.000Z",
+      "temperature": -7.9
+    },
+    {
+      "timestamp": "2026-05-11T16:29:00.000Z",
+      "temperature": -11
+    },
+    {
+      "timestamp": "2026-05-11T16:34:00.000Z",
+      "temperature": -13.8
+    },
+    {
+      "timestamp": "2026-05-11T16:39:00.000Z",
+      "temperature": -17
+    }
+  ],
+  "hasDuplicate": false,
+  "hasBreakpoint": true,
+  "breakpoints": [
+    {
+      "index": 4,
+      "from": "2026-05-11T14:59:00.000Z",
+      "to": "2026-05-11T16:24:00.000Z",
+      "gapMinutes": 85
+    }
+  ],
+  "createdAt": "2026-05-12T02:34:08.064Z",
+  "updatedAt": "2026-05-12T02:34:08.064Z"
+}

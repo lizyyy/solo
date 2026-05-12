@@ -1,0 +1,75 @@
+{
+  "id": "TEMP-REAL",
+  "warehouseId": "WH-01",
+  "sensorId": "SENSOR-01",
+  "description": "真正超温样例 - 长时间超温无保护因素",
+  "startTime": "2026-05-11T23:34:00.000Z",
+  "endTime": "2026-05-12T01:34:00.000Z",
+  "readings": [
+    {
+      "timestamp": "2026-05-11T23:34:00.000Z",
+      "temperature": -17.9
+    },
+    {
+      "timestamp": "2026-05-11T23:44:00.000Z",
+      "temperature": -15.6
+    },
+    {
+      "timestamp": "2026-05-11T23:54:00.000Z",
+      "temperature": -13.7
+    },
+    {
+      "timestamp": "2026-05-12T00:04:00.000Z",
+      "temperature": -11.6
+    },
+    {
+      "timestamp": "2026-05-12T00:14:00.000Z",
+      "temperature": -9.1
+    },
+    {
+      "timestamp": "2026-05-12T00:24:00.000Z",
+      "temperature": -7
+    },
+    {
+      "timestamp": "2026-05-12T00:44:00.000Z",
+      "temperature": -6.2
+    },
+    {
+      "timestamp": "2026-05-12T00:54:00.000Z",
+      "temperature": -6.5
+    },
+    {
+      "timestamp": "2026-05-12T01:04:00.000Z",
+      "temperature": -5.3
+    },
+    {
+      "timestamp": "2026-05-12T01:14:00.000Z",
+      "temperature": -6.7
+    },
+    {
+      "timestamp": "2026-05-12T01:24:00.000Z",
+      "temperature": -5.1
+    },
+    {
+      "timestamp": "2026-05-12T01:34:00.000Z",
+      "temperature": -6
+    },
+    {
+      "timestamp": "2026-05-12T02:04:00.000Z",
+      "temperature": -6
+    },
+    {
+      "timestamp": "2026-05-12T02:14:00.000Z",
+      "temperature": -8.9
+    },
+    {
+      "timestamp": "2026-05-12T02:24:00.000Z",
+      "temperature": -11.8
+    }
+  ],
+  "hasDuplicate": true,
+  "hasBreakpoint": false,
+  "breakpoints": null,
+  "createdAt": "2026-05-12T02:34:08.065Z",
+  "updatedAt": "2026-05-12T02:34:08.065Z"
+}

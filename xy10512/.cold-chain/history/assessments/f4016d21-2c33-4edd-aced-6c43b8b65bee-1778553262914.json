@@ -1,0 +1,45 @@
+{
+  "id": "f4016d21-2c33-4edd-aced-6c43b8b65bee",
+  "type": "assessments",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:22.914Z",
+  "data": {
+    "alertId": "ALERT-REAL",
+    "temperatureId": "TEMP-REAL",
+    "status": "PENDING",
+    "severity": "MEDIUM",
+    "duration": "MEDIUM",
+    "violations": 10,
+    "mitigations": [],
+    "recommendation": "需人工复检",
+    "affectedBatches": [
+      {
+        "id": "BATCH-001",
+        "productName": "速冻水饺",
+        "quantity": 500,
+        "inTime": "2026-05-10T02:34:00.000Z",
+        "outTime": null,
+        "requiredTemp": -18
+      },
+      {
+        "id": "BATCH-002",
+        "productName": "冰淇淋",
+        "quantity": 200,
+        "inTime": "2026-05-11T02:34:00.000Z",
+        "outTime": null,
+        "requiredTemp": -22
+      }
+    ],
+    "details": {
+      "hasMaintenanceContext": false,
+      "hasDoorContext": false,
+      "durationType": "MEDIUM"
+    },
+    "checkedAt": "2026-05-12T02:34:22.914Z",
+    "checkCount": 1,
+    "id": "f4016d21-2c33-4edd-aced-6c43b8b65bee",
+    "createdAt": "2026-05-12T02:34:22.914Z",
+    "updatedAt": "2026-05-12T02:34:22.914Z"
+  }
+}

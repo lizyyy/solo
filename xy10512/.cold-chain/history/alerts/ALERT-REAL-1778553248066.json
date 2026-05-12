@@ -1,0 +1,18 @@
+{
+  "id": "ALERT-REAL",
+  "type": "alerts",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:08.066Z",
+  "data": {
+    "id": "ALERT-REAL",
+    "temperatureId": "TEMP-REAL",
+    "warehouseId": "WH-01",
+    "type": "TEMPERATURE",
+    "triggeredAt": "2026-05-12T00:34:00.000Z",
+    "originalMessage": "温度持续高于阈值超过2小时",
+    "status": "PENDING",
+    "createdAt": "2026-05-12T02:34:08.066Z",
+    "updatedAt": "2026-05-12T02:34:08.066Z"
+  }
+}

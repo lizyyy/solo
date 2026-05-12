@@ -1,0 +1,51 @@
+{
+  "id": "TEMP-MAINT",
+  "warehouseId": "WH-01",
+  "sensorId": "SENSOR-01",
+  "description": "维护窗口样例 - 与 MAINT-001 记录匹配",
+  "startTime": "2026-05-11T20:09:00.000Z",
+  "endTime": "2026-05-11T20:39:00.000Z",
+  "readings": [
+    {
+      "timestamp": "2026-05-11T20:09:00.000Z",
+      "temperature": -17.9
+    },
+    {
+      "timestamp": "2026-05-11T20:14:00.000Z",
+      "temperature": -11.6
+    },
+    {
+      "timestamp": "2026-05-11T20:19:00.000Z",
+      "temperature": -5.1
+    },
+    {
+      "timestamp": "2026-05-11T20:24:00.000Z",
+      "temperature": -5.5
+    },
+    {
+      "timestamp": "2026-05-11T20:29:00.000Z",
+      "temperature": -5.9
+    },
+    {
+      "timestamp": "2026-05-11T20:34:00.000Z",
+      "temperature": -5.4
+    },
+    {
+      "timestamp": "2026-05-11T20:34:00.000Z",
+      "temperature": -5
+    },
+    {
+      "timestamp": "2026-05-11T20:39:00.000Z",
+      "temperature": -11.3
+    },
+    {
+      "timestamp": "2026-05-11T20:44:00.000Z",
+      "temperature": -18.2
+    }
+  ],
+  "hasDuplicate": false,
+  "hasBreakpoint": false,
+  "breakpoints": null,
+  "createdAt": "2026-05-12T02:34:08.065Z",
+  "updatedAt": "2026-05-12T02:34:08.065Z"
+}

@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "initializedAt": "2026-05-12T02:34:03.303Z",
+  "rules": {
+    "overTemperatureThreshold": -10,
+    "underTemperatureThreshold": -25,
+    "shortDurationMinutes": 15,
+    "longDurationMinutes": 120,
+    "maintenanceBufferMinutes": 10
+  },
+  "operators": [
+    "system",
+    "admin"
+  ]
+}

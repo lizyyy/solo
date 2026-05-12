@@ -1,0 +1,25 @@
+{
+  "name": "cold-chain-alert-cli",
+  "version": "1.0.0",
+  "description": "冷库温控告警归档 CLI - 处理温度告警、开门记录、设备维护和商品批次的风险评估",
+  "main": "src/index.js",
+  "bin": {
+    "cold-chain": "./bin/cold-chain.js"
+  },
+  "scripts": {
+    "start": "node bin/cold-chain.js",
+    "test": "jest"
+  },
+  "keywords": ["cold-chain", "temperature", "alert", "warehouse"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

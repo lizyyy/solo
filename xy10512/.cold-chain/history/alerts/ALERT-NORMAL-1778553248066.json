@@ -1,0 +1,18 @@
+{
+  "id": "ALERT-NORMAL",
+  "type": "alerts",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:08.066Z",
+  "data": {
+    "id": "ALERT-NORMAL",
+    "temperatureId": "TEMP-NORMAL",
+    "warehouseId": "WH-01",
+    "type": "TEMPERATURE",
+    "triggeredAt": "2026-05-12T02:34:00.000Z",
+    "originalMessage": "温度监测报告",
+    "status": "PENDING",
+    "createdAt": "2026-05-12T02:34:08.066Z",
+    "updatedAt": "2026-05-12T02:34:08.066Z"
+  }
+}

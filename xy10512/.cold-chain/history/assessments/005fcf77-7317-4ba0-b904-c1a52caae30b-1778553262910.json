@@ -1,0 +1,55 @@
+{
+  "id": "005fcf77-7317-4ba0-b904-c1a52caae30b",
+  "type": "assessments",
+  "changeType": "create",
+  "operator": "system",
+  "timestamp": "2026-05-12T02:34:22.910Z",
+  "data": {
+    "alertId": "ALERT-DOOR",
+    "temperatureId": "TEMP-DOOR",
+    "status": "PENDING",
+    "severity": "MEDIUM",
+    "duration": "MEDIUM",
+    "violations": 2,
+    "mitigations": [
+      "开门升温期间 - 需确认"
+    ],
+    "recommendation": "需人工复检",
+    "affectedBatches": [
+      {
+        "id": "BATCH-001",
+        "productName": "速冻水饺",
+        "quantity": 500,
+        "inTime": "2026-05-10T02:34:00.000Z",
+        "outTime": null,
+        "requiredTemp": -18
+      },
+      {
+        "id": "BATCH-002",
+        "productName": "冰淇淋",
+        "quantity": 200,
+        "inTime": "2026-05-11T02:34:00.000Z",
+        "outTime": null,
+        "requiredTemp": -22
+      },
+      {
+        "id": "BATCH-003",
+        "productName": "冷冻海鲜",
+        "quantity": 800,
+        "inTime": "2026-05-09T02:34:00.000Z",
+        "outTime": "2026-05-11T20:34:00.000Z",
+        "requiredTemp": -20
+      }
+    ],
+    "details": {
+      "hasMaintenanceContext": false,
+      "hasDoorContext": true,
+      "durationType": "MEDIUM"
+    },
+    "checkedAt": "2026-05-12T02:34:22.909Z",
+    "checkCount": 1,
+    "id": "005fcf77-7317-4ba0-b904-c1a52caae30b",
+    "createdAt": "2026-05-12T02:34:22.909Z",
+    "updatedAt": "2026-05-12T02:34:22.909Z"
+  }
+}
