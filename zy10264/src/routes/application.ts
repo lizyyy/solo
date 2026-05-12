@@ -23,6 +23,12 @@ router.get('/', (req: Request, res: Response) => {
   res.json(applicationService.listApplications(filters));
 });
 
+router.get('/supplement-requests', (req: Request, res: Response) => {
+  const applicationId = req.query.application_id as string;
+  const requests = materialService.getSupplementRequests(applicationId);
+  res.json(requests);
+});
+
 router.get('/:id', (req: Request, res: Response) => {
   const app = applicationService.getApplication(req.params.id);
   if (!app) return res.status(404).json({ error: '申请不存在' });
@@ -131,12 +137,6 @@ router.post('/materials/:id/review', (req: Request, res: Response) => {
 router.get('/:id/materials/:type_id/versions', (req: Request, res: Response) => {
   const versions = materialService.getMaterialVersions(req.params.id, req.params.type_id);
   res.json(versions);
-});
-
-router.get('/supplement-requests', (req: Request, res: Response) => {
-  const applicationId = req.query.application_id as string;
-  const requests = materialService.getSupplementRequests(applicationId);
-  res.json(requests);
 });
 
 export default router;

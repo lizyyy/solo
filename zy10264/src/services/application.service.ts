@@ -43,7 +43,7 @@ export const createApplication = (touristId: string, countryId: string): Applica
   const existing = db.prepare(`
     SELECT id FROM applications 
     WHERE tourist_id = ? AND country_id = ? AND status NOT IN ('CLOSED', 'APPROVED')
-  `).get() as Application | undefined;
+  `).get(touristId, countryId) as Application | undefined;
 
   if (existing) {
     throw new Error('该游客已有进行中的签证申请');
@@ -60,7 +60,7 @@ export const createApplication = (touristId: string, countryId: string): Applica
 
   const materialTypes = db.prepare(`
     SELECT id FROM material_types WHERE country_id = ?
-  `).all() as { id: string }[];
+  `).all(countryId) as { id: string }[];
 
   const materialStmt = db.prepare(`
     INSERT INTO materials (id, application_id, type_id, version, status)
