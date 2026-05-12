@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: slo-calc
+Version: 1.0.0
+Summary: 本地 SLO 计算 CLI 工具
+Requires-Python: >=3.9
+Requires-Dist: click>=8.1.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: rich>=13.0.0
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

@@ -1,0 +1,67 @@
+metadata:
+  service_name: "商品服务"
+  environment: "生产"
+
+log_format:
+  timestamp_field: "timestamp"
+  timestamp_format: "%Y-%m-%d %H:%M:%S"
+  path_field: "path"
+  method_field: "method"
+  status_field: "status"
+  duration_field: "duration_ms"
+  duration_unit: "ms"
+  business_code_field: "business_code"
+  trace_id_field: "trace_id"
+
+endpoint_groups:
+  - name: "商品查询"
+    patterns:
+      - "^/api/products/\\d+$"
+      - "^/api/products$"
+      - "^/api/products/search$"
+    description: "商品查询相关接口"
+
+  - name: "商品操作"
+    patterns:
+      - "^/api/products/\\d+/update$"
+      - "^/api/products/create$"
+      - "^/api/products/\\d+/delete$"
+    description: "商品创建/更新/删除接口"
+
+  - name: "订单服务"
+    patterns:
+      - "^/api/orders.*"
+    description: "订单相关接口"
+
+rules:
+  - name: "核心接口可用性"
+    group_pattern: "^/api/.*"
+    type: "availability"
+    target: 99.9
+    unit: "%"
+    window_days: 28
+    description: "所有 API 接口可用性 99.9%"
+    http_5xx_considered_error: true
+    http_4xx_considered_error: false
+    business_error_codes: ["SYSTEM_ERROR", "TIMEOUT"]
+    exclude_health_checks: true
+
+  - name: "错误率控制"
+    group_pattern: "^/api/.*"
+    type: "error_rate"
+    target: 1.0
+    unit: "%"
+    window_days: 28
+    description: "总体错误率不超过 1%"
+    http_5xx_considered_error: true
+    business_error_codes: ["SYSTEM_ERROR", "TIMEOUT"]
+
+  - name: "P95 延迟"
+    group_pattern: "^/api/products/\\d+$"
+    type: "latency"
+    target: 95.0
+    unit: "%"
+    window_days: 28
+    quantile: 0.95
+    latency_threshold_ms: 500
+    description: "商品详情 P95 延迟不超过 500ms（达标率 95%）"
