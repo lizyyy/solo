@@ -1,0 +1,27 @@
+{
+  "name": "construction-hazard-cli",
+  "version": "1.0.0",
+  "description": "施工隐患闭环管理 CLI 工具",
+  "main": "src/index.js",
+  "bin": {
+    "hazard": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node test/run-tests.js"
+  },
+  "keywords": [
+    "construction",
+    "safety",
+    "hazard",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "uuid": "^9.0.1",
+    "cli-table3": "^0.6.3"
+  }
+}

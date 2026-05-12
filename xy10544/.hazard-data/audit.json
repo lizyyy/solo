@@ -1,0 +1,65 @@
+[
+  {
+    "id": "ad-0001",
+    "action": "create",
+    "entityType": "hazard",
+    "entityId": "hz-0001",
+    "details": {
+      "id": "hz-0001",
+      "type": "临边防护",
+      "location": "1号楼3层东单元",
+      "description": "临边防护栏杆缺失，缺口约2米，无警示标识",
+      "level": "major",
+      "discoverer": "安全员-刘",
+      "discoveryDate": "2026-05-05T06:55:38.744Z",
+      "discoveryImages": [
+        "IMG_20260505_083001.jpg",
+        "IMG_20260505_083015.jpg"
+      ],
+      "status": "closed",
+      "responsibleTeamId": "team-001",
+      "rectifyDeadline": "2026-05-10T06:55:38.744Z",
+      "rectificationCount": 1,
+      "reviewFailCount": 0,
+      "createdAt": "2026-05-05T06:55:38.744Z",
+      "updatedAt": "2026-05-11T06:55:38.744Z"
+    },
+    "createdAt": "2026-05-05T06:55:38.744Z"
+  },
+  {
+    "id": "ad-0002",
+    "action": "rectify",
+    "entityType": "hazard",
+    "entityId": "hz-0001",
+    "details": {
+      "rectificationId": "rt-0001",
+      "rectifier": "张工（土建一班）",
+      "imageCount": 2
+    },
+    "createdAt": "2026-05-06T06:55:38.744Z"
+  },
+  {
+    "id": "ad-0003",
+    "action": "review",
+    "entityType": "hazard",
+    "entityId": "hz-0001",
+    "details": {
+      "reviewId": "rv-0001",
+      "result": "passed",
+      "reviewer": "安全员-刘",
+      "isReopened": false
+    },
+    "createdAt": "2026-05-07T06:55:38.744Z"
+  },
+  {
+    "id": "ad-0004",
+    "action": "status_change",
+    "entityType": "hazard",
+    "entityId": "hz-0001",
+    "details": {
+      "oldStatus": "pending_review",
+      "newStatus": "closed"
+    },
+    "createdAt": "2026-05-07T06:55:38.744Z"
+  }
+]

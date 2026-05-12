@@ -1,0 +1,22 @@
+[
+  {
+    "id": "fn-0001",
+    "hazardId": "hz-0002",
+    "teamId": "team-002",
+    "amount": 15000,
+    "reason": "特大用电安全隐患整改复查不通过，累计复查失败1次",
+    "operator": "安全主管-王",
+    "paid": false,
+    "createdAt": "2026-05-10T06:55:38.744Z"
+  },
+  {
+    "id": "fn-0002",
+    "hazardId": "hz-0005",
+    "teamId": "team-001",
+    "amount": 3000,
+    "reason": "重大临边防护隐患整改复查不通过，累计复查失败1次",
+    "operator": "安全主管-王",
+    "paid": false,
+    "createdAt": "2026-05-11T18:55:38.744Z"
+  }
+]

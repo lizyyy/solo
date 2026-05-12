@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rv-0001",
+    "hazardId": "hz-0001",
+    "result": "passed",
+    "reviewer": "安全员-刘",
+    "comment": "临边防护已按要求整改，防护栏杆安装牢固，警示标识齐全",
+    "images": [
+      "IMG_20260507_093001.jpg"
+    ],
+    "reviewDate": "2026-05-07T06:55:38.744Z",
+    "createdAt": "2026-05-07T06:55:38.744Z"
+  },
+  {
+    "id": "rv-0002",
+    "hazardId": "hz-0002",
+    "result": "failed",
+    "reviewer": "安全员-刘",
+    "comment": "整改不彻底：部分线路仍有裸线外露，漏电保护器未接地",
+    "images": [
+      "IMG_20260509_103001.jpg"
+    ],
+    "reviewDate": "2026-05-09T06:55:38.744Z",
+    "createdAt": "2026-05-09T06:55:38.744Z"
+  },
+  {
+    "id": "rv-0003",
+    "hazardId": "hz-0005",
+    "result": "failed",
+    "reviewer": "安全员-陈",
+    "comment": "防护门未加锁，无法防止意外打开",
+    "images": [
+      "IMG_20260511_113001.jpg"
+    ],
+    "reviewDate": "2026-05-11T06:55:38.744Z",
+    "createdAt": "2026-05-11T06:55:38.744Z"
+  }
+]

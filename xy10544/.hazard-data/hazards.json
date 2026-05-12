@@ -1,0 +1,100 @@
+[
+  {
+    "id": "hz-0001",
+    "type": "临边防护",
+    "location": "1号楼3层东单元",
+    "description": "临边防护栏杆缺失，缺口约2米，无警示标识",
+    "level": "major",
+    "discoverer": "安全员-刘",
+    "discoveryDate": "2026-05-05T06:55:38.744Z",
+    "discoveryImages": [
+      "IMG_20260505_083001.jpg",
+      "IMG_20260505_083015.jpg"
+    ],
+    "status": "closed",
+    "responsibleTeamId": "team-001",
+    "rectifyDeadline": "2026-05-10T06:55:38.744Z",
+    "rectificationCount": 1,
+    "reviewFailCount": 0,
+    "createdAt": "2026-05-05T06:55:38.744Z",
+    "updatedAt": "2026-05-11T06:55:38.744Z"
+  },
+  {
+    "id": "hz-0002",
+    "type": "用电安全",
+    "location": "2号楼地下车库",
+    "description": "临时用电线路乱拉乱接，无漏电保护器，裸线外露",
+    "level": "critical",
+    "discoverer": "安全员-刘",
+    "discoveryDate": "2026-05-07T06:55:38.744Z",
+    "discoveryImages": [
+      "IMG_20260507_142033.jpg",
+      "IMG_20260507_142045.jpg"
+    ],
+    "status": "pending_review",
+    "responsibleTeamId": "team-002",
+    "rectifyDeadline": "2026-05-17T06:55:38.744Z",
+    "rectificationCount": 2,
+    "reviewFailCount": 1,
+    "createdAt": "2026-05-07T06:55:38.744Z",
+    "updatedAt": "2026-05-11T06:55:38.744Z"
+  },
+  {
+    "id": "hz-0003",
+    "type": "材料堆放",
+    "location": "3号楼南侧材料堆场",
+    "description": "模板堆放过高（超过2.5米），无防倾倒措施",
+    "level": "general",
+    "discoverer": "安全员-陈",
+    "discoveryDate": "2026-05-09T06:55:38.744Z",
+    "discoveryImages": [
+      "IMG_20260509_101522.jpg"
+    ],
+    "status": "rectifying",
+    "responsibleTeamId": "team-004",
+    "rectifyDeadline": "2026-05-12T18:55:38.744Z",
+    "rectificationCount": 0,
+    "reviewFailCount": 0,
+    "createdAt": "2026-05-09T06:55:38.744Z",
+    "updatedAt": "2026-05-10T06:55:38.744Z"
+  },
+  {
+    "id": "hz-0004",
+    "type": "消防通道",
+    "location": "生活区宿舍楼东侧",
+    "description": "消防通道被材料和工具堵塞，通道宽度不足1米",
+    "level": "general",
+    "discoverer": "安全员-陈",
+    "discoveryDate": "2026-05-11T06:55:38.744Z",
+    "discoveryImages": [
+      "IMG_20260511_164011.jpg",
+      "IMG_20260511_164023.jpg"
+    ],
+    "status": "discovered",
+    "responsibleTeamId": "team-003",
+    "rectifyDeadline": "2026-05-14T06:55:38.744Z",
+    "rectificationCount": 0,
+    "reviewFailCount": 0,
+    "createdAt": "2026-05-11T06:55:38.744Z",
+    "updatedAt": "2026-05-11T06:55:38.744Z"
+  },
+  {
+    "id": "hz-0005",
+    "type": "临边防护",
+    "location": "1号楼5层西单元",
+    "description": "电梯井口防护门未关闭，无警示标识",
+    "level": "major",
+    "discoverer": "安全员-刘",
+    "discoveryDate": "2026-05-10T06:55:38.744Z",
+    "discoveryImages": [
+      "IMG_20260510_092517.jpg"
+    ],
+    "status": "reopened",
+    "responsibleTeamId": "team-001",
+    "rectifyDeadline": "2026-05-11T18:55:38.744Z",
+    "rectificationCount": 1,
+    "reviewFailCount": 1,
+    "createdAt": "2026-05-10T06:55:38.744Z",
+    "updatedAt": "2026-05-11T18:55:38.744Z"
+  }
+]
