@@ -1,0 +1,23 @@
+{
+  "name": "charity-donation-invoice-api",
+  "version": "1.0.0",
+  "description": "公益捐赠票据 API 系统",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "demo": "node examples/demo.js",
+    "failure": "node examples/failure.js",
+    "seed": "node examples/seed.js"
+  },
+  "keywords": ["charity", "donation", "invoice", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "uuid": "^9.0.1",
+    "moment": "^2.30.1",
+    "cors": "^2.8.5"
+  }
+}
