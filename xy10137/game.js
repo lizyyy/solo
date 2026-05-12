@@ -9,12 +9,12 @@ const GameState = {
 const GameConfig = {
   BASE_TEMPERATURE: 2,
   MAX_TEMPERATURE: 10,
-  TEMPERATURE_RISE: 0.1,
+  TEMPERATURE_RISE: 0.07,
   BASE_DELIVERY_TIME: 30,
   MAX_DELIVERY_TIME: 60,
   INITIAL_VEHICLES: 3,
   INITIAL_CRATES: 5,
-  CRATE_TIME_LIMIT: 40,
+  CRATE_TIME_LIMIT: 90,
   SCORE_PER_DELIVERY: 100,
   SCORE_BONUS_FAST: 50,
   SCORE_BONUS_COLD: 50
@@ -66,8 +66,8 @@ class ColdChainGame {
         id: i,
         name: `车辆 ${i + 1}`,
         assignedCrateId: null,
-        coolingPower: 0.08 + Math.random() * 0.04,
-        speed: 0.8 + Math.random() * 0.4
+        coolingPower: 0.04 + Math.random() * 0.03,
+        speed: 1.7 + Math.random() * 1.0
       });
     }
 
