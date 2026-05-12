@@ -1,0 +1,16 @@
+{
+  "name": "scenic-ferry-api",
+  "version": "1.0.0",
+  "description": "景区船票联程 API - 处理班次、天气停航、改签和部分退款",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "init-data": "node scripts/init-data.js",
+    "demo": "node scripts/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
