@@ -1,0 +1,7 @@
+{
+  "port": 3001,
+  "appName": "设备租赁押金管理系统",
+  "defaultCurrency": "CNY",
+  "idempotencyExpiryHours": 24,
+  "auditLogRetentionDays": 365
+}
