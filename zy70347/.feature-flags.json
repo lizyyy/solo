@@ -1,0 +1,417 @@
+{
+  "flags": {
+    "payment-new-flow": {
+      "id": "payment-new-flow",
+      "name": "支付新流程",
+      "description": "新的支付流程，支持分账和多种支付方式",
+      "globallyDisabled": false,
+      "rules": [
+        {
+          "id": "payment-test-env",
+          "name": "测试环境全量",
+          "description": "测试环境所有用户都使用新支付流程",
+          "enabled": true,
+          "environment": "test",
+          "percentage": 100
+        },
+        {
+          "id": "payment-staging-env",
+          "name": "预发环境灰度50%",
+          "description": "预发环境先给50%用户灰度",
+          "enabled": true,
+          "environment": "staging",
+          "percentage": 50
+        },
+        {
+          "id": "payment-prod-whitelist",
+          "name": "生产环境白名单",
+          "description": "生产环境只对白名单用户开放",
+          "enabled": true,
+          "environment": "production",
+          "whitelist": [
+            "user-001",
+            "user-002",
+            "admin@example.com"
+          ]
+        },
+        {
+          "id": "payment-prod-vip",
+          "name": "生产环境VIP用户",
+          "description": "VIP用户可以使用新支付流程",
+          "enabled": true,
+          "environment": "production",
+          "attributes": {
+            "isVip": {
+              "eq": true
+            }
+          },
+          "percentage": 100
+        }
+      ],
+      "createdAt": 1715558400000,
+      "updatedAt": 1715558400000
+    },
+    "search-experiment": {
+      "id": "search-experiment",
+      "name": "搜索实验",
+      "description": "新的搜索算法A/B实验",
+      "globallyDisabled": false,
+      "rules": [
+        {
+          "id": "search-test-all",
+          "name": "测试环境全量",
+          "enabled": true,
+          "environment": "test",
+          "percentage": 100
+        },
+        {
+          "id": "search-staging-30",
+          "name": "预发环境30%灰度",
+          "enabled": true,
+          "environment": "staging",
+          "percentage": 30
+        },
+        {
+          "id": "search-prod-10",
+          "name": "生产环境10%灰度",
+          "enabled": true,
+          "environment": "production",
+          "percentage": 10,
+          "attributes": {
+            "country": {
+              "eq": "CN"
+            }
+          }
+        }
+      ],
+      "createdAt": 1715472000000,
+      "updatedAt": 1715472000000
+    },
+    "member-benefits": {
+      "id": "member-benefits",
+      "name": "会员权益",
+      "description": "会员专属权益和特权",
+      "globallyDisabled": false,
+      "rules": [
+        {
+          "id": "member-test-all",
+          "name": "测试环境所有会员",
+          "enabled": true,
+          "environment": "test",
+          "attributes": {
+            "isVip": {
+              "eq": true
+            }
+          },
+          "percentage": 100
+        },
+        {
+          "id": "member-staging-new",
+          "name": "预发环境新会员",
+          "enabled": true,
+          "environment": "staging",
+          "attributes": {
+            "email": {
+              "contains": "@example.com"
+            }
+          },
+          "percentage": 100
+        },
+        {
+          "id": "member-prod-vip",
+          "name": "生产环境VIP会员",
+          "enabled": true,
+          "environment": "production",
+          "attributes": {
+            "isVip": {
+              "eq": true
+            }
+          },
+          "percentage": 100
+        }
+      ],
+      "createdAt": 1715385600000,
+      "updatedAt": 1715385600000
+    }
+  },
+  "versions": {
+    "payment-new-flow": [
+      {
+        "version": 1,
+        "flag": {
+          "id": "payment-new-flow",
+          "name": "支付新流程",
+          "description": "新的支付流程，支持分账和多种支付方式",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "payment-test-env",
+              "name": "测试环境全量",
+              "description": "测试环境所有用户都使用新支付流程",
+              "enabled": true,
+              "environment": "test",
+              "percentage": 100
+            },
+            {
+              "id": "payment-prod-whitelist",
+              "name": "生产环境白名单",
+              "description": "生产环境只对白名单用户开放",
+              "enabled": true,
+              "environment": "production",
+              "whitelist": [
+                "user-001",
+                "user-002"
+              ]
+            }
+          ],
+          "createdAt": 1715558400000,
+          "updatedAt": 1715558400000
+        },
+        "timestamp": 1715558400000,
+        "action": "create"
+      },
+      {
+        "version": 2,
+        "flag": {
+          "id": "payment-new-flow",
+          "name": "支付新流程",
+          "description": "新的支付流程，支持分账和多种支付方式",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "payment-test-env",
+              "name": "测试环境全量",
+              "description": "测试环境所有用户都使用新支付流程",
+              "enabled": true,
+              "environment": "test",
+              "percentage": 100
+            },
+            {
+              "id": "payment-staging-env",
+              "name": "预发环境灰度50%",
+              "description": "预发环境先给50%用户灰度",
+              "enabled": true,
+              "environment": "staging",
+              "percentage": 50
+            },
+            {
+              "id": "payment-prod-whitelist",
+              "name": "生产环境白名单",
+              "description": "生产环境只对白名单用户开放",
+              "enabled": true,
+              "environment": "production",
+              "whitelist": [
+                "user-001",
+                "user-002",
+                "admin@example.com"
+              ]
+            },
+            {
+              "id": "payment-prod-vip",
+              "name": "生产环境VIP用户",
+              "description": "VIP用户可以使用新支付流程",
+              "enabled": true,
+              "environment": "production",
+              "attributes": {
+                "isVip": {
+                  "eq": true
+                }
+              },
+              "percentage": 100
+            }
+          ],
+          "createdAt": 1715558400000,
+          "updatedAt": 1715644800000
+        },
+        "timestamp": 1715644800000,
+        "action": "update",
+        "previousVersion": 1
+      }
+    ],
+    "search-experiment": [
+      {
+        "version": 1,
+        "flag": {
+          "id": "search-experiment",
+          "name": "搜索实验",
+          "description": "新的搜索算法A/B实验",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "search-test-all",
+              "name": "测试环境全量",
+              "enabled": true,
+              "environment": "test",
+              "percentage": 100
+            },
+            {
+              "id": "search-prod-10",
+              "name": "生产环境10%灰度",
+              "enabled": true,
+              "environment": "production",
+              "percentage": 10,
+              "attributes": {
+                "country": {
+                  "eq": "CN"
+                }
+              }
+            }
+          ],
+          "createdAt": 1715472000000,
+          "updatedAt": 1715472000000
+        },
+        "timestamp": 1715472000000,
+        "action": "create"
+      },
+      {
+        "version": 2,
+        "flag": {
+          "id": "search-experiment",
+          "name": "搜索实验",
+          "description": "新的搜索算法A/B实验",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "search-test-all",
+              "name": "测试环境全量",
+              "enabled": true,
+              "environment": "test",
+              "percentage": 100
+            },
+            {
+              "id": "search-staging-30",
+              "name": "预发环境30%灰度",
+              "enabled": true,
+              "environment": "staging",
+              "percentage": 30
+            },
+            {
+              "id": "search-prod-10",
+              "name": "生产环境10%灰度",
+              "enabled": true,
+              "environment": "production",
+              "percentage": 10,
+              "attributes": {
+                "country": {
+                  "eq": "CN"
+                }
+              }
+            }
+          ],
+          "createdAt": 1715472000000,
+          "updatedAt": 1715558400000
+        },
+        "timestamp": 1715558400000,
+        "action": "update",
+        "previousVersion": 1
+      }
+    ],
+    "member-benefits": [
+      {
+        "version": 1,
+        "flag": {
+          "id": "member-benefits",
+          "name": "会员权益",
+          "description": "会员专属权益和特权",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "member-test-all",
+              "name": "测试环境所有会员",
+              "enabled": true,
+              "environment": "test",
+              "attributes": {
+                "isVip": {
+                  "eq": true
+                }
+              },
+              "percentage": 100
+            },
+            {
+              "id": "member-prod-vip",
+              "name": "生产环境VIP会员",
+              "enabled": true,
+              "environment": "production",
+              "attributes": {
+                "isVip": {
+                  "eq": true
+                }
+              },
+              "percentage": 100
+            }
+          ],
+          "createdAt": 1715385600000,
+          "updatedAt": 1715385600000
+        },
+        "timestamp": 1715385600000,
+        "action": "create"
+      },
+      {
+        "version": 2,
+        "flag": {
+          "id": "member-benefits",
+          "name": "会员权益",
+          "description": "会员专属权益和特权",
+          "globallyDisabled": false,
+          "rules": [
+            {
+              "id": "member-test-all",
+              "name": "测试环境所有会员",
+              "enabled": true,
+              "environment": "test",
+              "attributes": {
+                "isVip": {
+                  "eq": true
+                }
+              },
+              "percentage": 100
+            },
+            {
+              "id": "member-staging-new",
+              "name": "预发环境新会员",
+              "enabled": true,
+              "environment": "staging",
+              "attributes": {
+                "email": {
+                  "contains": "@example.com"
+                }
+              },
+              "percentage": 100
+            },
+            {
+              "id": "member-prod-vip",
+              "name": "生产环境VIP会员",
+              "enabled": true,
+              "environment": "production",
+              "attributes": {
+                "isVip": {
+                  "eq": true
+                }
+              },
+              "percentage": 100
+            }
+          ],
+          "createdAt": 1715385600000,
+          "updatedAt": 1715472000000
+        },
+        "timestamp": 1715472000000,
+        "action": "update",
+        "previousVersion": 1
+      }
+    ]
+  },
+  "envOverrides": {
+    "test": {
+      "search-experiment": {
+        "enabled": true,
+        "percentage": 100
+      }
+    },
+    "staging": {
+      "member-benefits": {
+        "enabled": true,
+        "percentage": 75
+      }
+    }
+  }
+}
