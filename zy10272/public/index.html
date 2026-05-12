@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园打印店预付队列台</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 校园打印店预付队列台</h1>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <div class="form-card">
+                    <h2>📝 新建订单</h2>
+                    <form id="orderForm">
+                        <div class="form-group">
+                            <label>客户姓名</label>
+                            <input type="text" id="customerName" required placeholder="请输入姓名">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>纸张类型</label>
+                                <select id="paperType">
+                                    <option value="A4">A4</option>
+                                    <option value="A3">A3</option>
+                                    <option value="B5">B5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>打印方式</label>
+                                <select id="printSide">
+                                    <option value="single">单面</option>
+                                    <option value="double">双面</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>原始页数</label>
+                                <input type="number" id="pageCount" min="1" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label>打印份数</label>
+                                <input type="number" id="copies" min="1" value="1">
+                            </div>
+                        </div>
+
+                        <div class="price-preview">
+                            <span>预计金额: <strong id="previewAmount">¥0.00</strong></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>预付金额 (元)</label>
+                            <input type="number" id="prepaidAmount" min="0" step="0.01" value="0">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">创建订单</button>
+                    </form>
+                </div>
+
+                <div class="queue-actions">
+                    <button id="callNextBtn" class="btn btn-call-next">📢 叫下一号</button>
+                </div>
+            </aside>
+
+            <main class="content">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="queue">排队中</button>
+                    <button class="tab-btn" data-tab="called">已叫号</button>
+                    <button class="tab-btn" data-tab="history">历史订单</button>
+                </div>
+
+                <div id="queueTab" class="tab-content active">
+                    <div class="stats">
+                        <div class="stat-card paid">
+                            <span class="stat-label">已付款</span>
+                            <span class="stat-value" id="paidCount">0</span>
+                        </div>
+                        <div class="stat-card needs-topup">
+                            <span class="stat-label">需补差</span>
+                            <span class="stat-value" id="needsTopupCount">0</span>
+                        </div>
+                    </div>
+                    <div id="queueList" class="order-list"></div>
+                </div>
+
+                <div id="calledTab" class="tab-content">
+                    <div id="calledList" class="order-list"></div>
+                </div>
+
+                <div id="historyTab" class="tab-content">
+                    <div id="historyList" class="order-list"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
