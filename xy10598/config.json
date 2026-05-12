@@ -1,0 +1,20 @@
+{
+  "appName": "commission-review-cli",
+  "version": "1.0.0",
+  "database": {
+    "fileName": "commission-review.db",
+    "backupDir": "backups"
+  },
+  "commission": {
+    "defaultRate": 0.02,
+    "baseRatio": 0.5
+  },
+  "import": {
+    "dataDir": "imports",
+    "archiveDir": "archives",
+    "logDir": "import-logs"
+  },
+  "reports": {
+    "outputDir": "reports"
+  }
+}

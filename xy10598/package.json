@@ -1,0 +1,34 @@
+{
+  "name": "commission-review-cli",
+  "version": "1.0.0",
+  "description": "门店导购提成复核 CLI - 结合销售、退货、多人协作、活动扣减和跨店调拨进行提成计算与复核",
+  "main": "src/index.js",
+  "bin": {
+    "commission-review": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "demo": "node src/demo.js",
+    "cli": "node src/cli.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "commission",
+    "sales",
+    "retail",
+    "cli",
+    "review"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "chalk": "^4.1.2",
+    "commander": "^12.0.0",
+    "csv-parser": "^3.0.0",
+    "fs-extra": "^11.2.0",
+    "moment": "^2.30.1",
+    "table": "^6.8.1"
+  },
+  "devDependencies": {}
+}

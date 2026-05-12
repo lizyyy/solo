@@ -1,0 +1,5 @@
+promotion_code,promotion_name,start_date,end_date,discount_type,discount_value,commission_multiplier,applies_to_category,applies_to_sku,is_active
+PROMO001,春季新品促销,2026-03-01,2026-03-31,percentage,10,0.8,服饰,,1
+PROMO002,鞋包满减活动,2026-03-15,2026-03-31,fixed,200,0.7,鞋包,,1
+PROMO003,会员专享折扣,2026-03-01,2026-03-31,percentage,15,0.9,,,1
+PROMO004,配件套餐,2026-03-20,2026-04-10,fixed,100,0.85,配件,,1
