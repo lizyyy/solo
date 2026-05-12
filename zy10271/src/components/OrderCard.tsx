@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Order, OrderStatus } from '../types'
+import { Order } from '../types'
 import { STATUS_LABELS, STATUS_COLORS, getNextStatus, formatDate } from '../utils/statusUtils'
 import { useOrderContext } from '../store/OrderContext'
-import { Eye, Clock, RotateCcw, Check, ChevronRight, History, X } from 'lucide-react'
+import { Eye, Clock, RotateCcw, Check, ChevronRight, History } from 'lucide-react'
 
 interface OrderCardProps {
   order: Order
@@ -11,8 +11,7 @@ interface OrderCardProps {
 export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
   const { updateOrderStatus, canPickup } = useOrderContext()
   const [showHistory, setShowHistory] = useState(false)
-  const [showQualityCheck, setShowQualityCheck] = useState(false)
-  const [operator, setOperator] = useState('李师傅')
+  const operator = '李师傅'
 
   const nextStatus = getNextStatus(order.status)
   const canAdvance = nextStatus && order.status !== 'picked-up' && order.status !== 'rework'

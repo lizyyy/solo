@@ -38,9 +38,39 @@ const createHistoryEntry = (status: OrderStatus, operator: string, remarks?: str
   remarks
 })
 
+const STORAGE_KEY = 'glasses-workshop-orders'
+
+const loadOrdersFromStorage = (): Order[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (e) {
+    console.error('Failed to load orders from localStorage:', e)
+  }
+  return []
+}
+
+const saveOrdersToStorage = (orders: Order[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
+  } catch (e) {
+    console.error('Failed to save orders to localStorage:', e)
+  }
+}
+
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrdersState] = useState<Order[]>(loadOrdersFromStorage)
   const [filters, setFiltersState] = useState<FilterOptions>({})
+
+  const setOrders = useCallback((updater: React.SetStateAction<Order[]>) => {
+    setOrdersState(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : updater
+      saveOrdersToStorage(next)
+      return next
+    })
+  }, [])
 
   const validateEyeParams = useCallback((left: any, right: any) => {
     const errors: string[] = []
@@ -136,7 +166,10 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             ...o,
             status: newStatus,
             history: [...o.history, createHistoryEntry(newStatus, operator, remarks)],
-            pickedUpAt: newStatus === 'picked-up' ? new Date().toISOString() : o.pickedUpAt
+            pickedUpAt: newStatus === 'picked-up' ? new Date().toISOString() : o.pickedUpAt,
+            qualityCheck: newStatus === 'ready' 
+              ? { passed: true, inspector: operator, checkedAt: new Date().toISOString(), remarks } 
+              : o.qualityCheck
           }
         : o
     ))
