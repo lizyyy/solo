@@ -47,6 +47,7 @@ class BatchReviewRequest(BaseModel):
 
 
 class RollbackRequest(BaseModel):
+    correction_id: Optional[int] = None
     reason: Optional[str] = "误判回滚"
     operator: Optional[str] = "系统"
 
@@ -395,29 +396,57 @@ def rollback_product(
     if not product:
         raise HTTPException(status_code=404, detail="商品不存在")
 
-    corrections = db.query(Correction).filter(
-        Correction.product_id == product_id,
-        Correction.is_rolled_back == 0
-    ).order_by(Correction.created_at.desc()).all()
+    all_corrections = db.query(Correction).filter(
+        Correction.product_id == product_id
+    ).order_by(Correction.created_at.asc()).all()
 
-    if not corrections:
+    if not all_corrections:
         raise HTTPException(status_code=400, detail="无可回滚的记录")
 
-    current_category = product.current_category
-
-    corrections[0].is_rolled_back = 1
-
-    if len(corrections) > 1:
-        prev_category = corrections[1].old_category or corrections[1].new_category
-        product.current_category = prev_category
+    target_correction = None
+    if request.correction_id:
+        for c in all_corrections:
+            if c.id == request.correction_id:
+                target_correction = c
+                break
+        if not target_correction:
+            raise HTTPException(status_code=404, detail="指定的修正记录不存在")
+        if target_correction.is_rolled_back:
+            raise HTTPException(status_code=400, detail="该记录已被回滚")
+        if target_correction.source == "rollback":
+            raise HTTPException(status_code=400, detail="回滚记录本身不能被回滚")
     else:
-        product.current_category = product.original_category
+        for c in reversed(all_corrections):
+            if not c.is_rolled_back and c.source != "rollback":
+                target_correction = c
+                break
+        if not target_correction:
+            raise HTTPException(status_code=400, detail="无可回滚的记录")
+
+    current_category = product.current_category
+    target_idx = all_corrections.index(target_correction)
+
+    category_before_target = product.original_category
+    for i in range(target_idx):
+        c = all_corrections[i]
+        if not c.is_rolled_back and c.source != "rollback":
+            if c.new_category:
+                category_before_target = c.new_category
+
+    target_correction.is_rolled_back = 1
+
+    for j in range(target_idx + 1, len(all_corrections)):
+        c = all_corrections[j]
+        if not c.is_rolled_back:
+            c.is_rolled_back = 1
+
+    product.current_category = category_before_target
 
     rollback_correction = Correction(
         product_id=product.id,
         old_category=current_category,
-        new_category=product.current_category,
-        reason=request.reason,
+        new_category=category_before_target,
+        reason=f"{request.reason}（回滚记录 #{target_correction.id}）",
         source="rollback",
         operator=request.operator
     )
@@ -427,9 +456,10 @@ def rollback_product(
     db.commit()
 
     return {
-        "message": "回滚成功",
+        "message": f"已回滚修正记录 #{target_correction.id}",
+        "rolled_back_correction_id": target_correction.id,
         "old_category": current_category,
-        "new_category": product.current_category
+        "new_category": category_before_target
     }
 
 

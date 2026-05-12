@@ -792,17 +792,25 @@
         }
         
         async function rollbackCorrection(productId, correctionId) {
-            if (!confirm('确定要回滚此操作吗？')) return;
+            if (!confirm('确定要回滚此操作吗？\n\n注意：回滚后，该记录及之后的所有修正都将失效，类目将恢复到该记录之前的状态。')) return;
             
             const res = await fetch(`/api/products/${productId}/rollback`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason: '误判回滚', operator: '系统管理员' })
+                body: JSON.stringify({ 
+                    correction_id: correctionId,
+                    reason: '误判回滚', 
+                    operator: '系统管理员' 
+                })
             });
             
             const data = await res.json();
-            showToast(data.message, 'success');
-            openHistoryModal(productId);
+            if (res.ok) {
+                showToast(data.message, 'success');
+                openHistoryModal(productId);
+            } else {
+                showToast(data.detail || '回滚失败', 'error');
+            }
         }
         
         function openRuleModal() {
