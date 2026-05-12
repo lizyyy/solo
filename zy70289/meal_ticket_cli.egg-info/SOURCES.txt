@@ -1,0 +1,13 @@
+pyproject.toml
+meal_ticket/__init__.py
+meal_ticket/cli.py
+meal_ticket/models.py
+meal_ticket/service.py
+meal_ticket/storage.py
+meal_ticket_cli.egg-info/PKG-INFO
+meal_ticket_cli.egg-info/SOURCES.txt
+meal_ticket_cli.egg-info/dependency_links.txt
+meal_ticket_cli.egg-info/entry_points.txt
+meal_ticket_cli.egg-info/requires.txt
+meal_ticket_cli.egg-info/top_level.txt
+tests/test_core.py

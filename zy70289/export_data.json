@@ -1,0 +1,368 @@
+{
+  "volunteers": [
+    {
+      "id": "VOL0001",
+      "name": "志愿者1",
+      "phone": "13810000000",
+      "position": "签到组",
+      "shift": "早班",
+      "created_at": "2026-05-12T19:21:44.326375"
+    },
+    {
+      "id": "VOL0002",
+      "name": "志愿者2",
+      "phone": "13810000001",
+      "position": "安保组",
+      "shift": "中班",
+      "created_at": "2026-05-12T19:21:44.326383"
+    },
+    {
+      "id": "VOL0003",
+      "name": "志愿者3",
+      "phone": "13810000002",
+      "position": "引导组",
+      "shift": "晚班",
+      "created_at": "2026-05-12T19:21:44.326386"
+    },
+    {
+      "id": "VOL0004",
+      "name": "志愿者4",
+      "phone": "13810000003",
+      "position": "服务组",
+      "shift": "夜班",
+      "created_at": "2026-05-12T19:21:44.326389"
+    },
+    {
+      "id": "VOL0005",
+      "name": "志愿者5",
+      "phone": "13810000004",
+      "position": "技术组",
+      "shift": "早班",
+      "created_at": "2026-05-12T19:21:44.326392"
+    },
+    {
+      "id": "VOL0006",
+      "name": "志愿者6",
+      "phone": "13810000005",
+      "position": "医疗组",
+      "shift": "中班",
+      "created_at": "2026-05-12T19:21:44.326395"
+    },
+    {
+      "id": "VOL0007",
+      "name": "志愿者7",
+      "phone": "13810000006",
+      "position": "签到组",
+      "shift": "晚班",
+      "created_at": "2026-05-12T19:21:44.326397"
+    },
+    {
+      "id": "VOL0008",
+      "name": "志愿者8",
+      "phone": "13810000007",
+      "position": "安保组",
+      "shift": "夜班",
+      "created_at": "2026-05-12T19:21:44.326400"
+    },
+    {
+      "id": "VOL0009",
+      "name": "志愿者9",
+      "phone": "13810000008",
+      "position": "引导组",
+      "shift": "早班",
+      "created_at": "2026-05-12T19:21:44.326402"
+    },
+    {
+      "id": "VOL0010",
+      "name": "志愿者10",
+      "phone": "13810000009",
+      "position": "服务组",
+      "shift": "中班",
+      "created_at": "2026-05-12T19:21:44.326406"
+    },
+    {
+      "id": "VOL0011",
+      "name": "志愿者11",
+      "phone": "13810000010",
+      "position": "技术组",
+      "shift": "晚班",
+      "created_at": "2026-05-12T19:21:44.326409"
+    },
+    {
+      "id": "VOL0012",
+      "name": "志愿者12",
+      "phone": "13810000011",
+      "position": "医疗组",
+      "shift": "夜班",
+      "created_at": "2026-05-12T19:21:44.326412"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "TKT000001",
+      "volunteer_id": "VOL0001",
+      "meal_type": "午餐",
+      "shift": "早班",
+      "position": "签到组",
+      "status": "已使用",
+      "created_at": "2026-05-12T19:21:44.326415",
+      "used_at": "2026-05-12T19:21:49.197564"
+    },
+    {
+      "id": "TKT000002",
+      "volunteer_id": "VOL0001",
+      "meal_type": "晚餐",
+      "shift": "早班",
+      "position": "签到组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326416",
+      "used_at": null
+    },
+    {
+      "id": "TKT000003",
+      "volunteer_id": "VOL0002",
+      "meal_type": "午餐",
+      "shift": "中班",
+      "position": "安保组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326418",
+      "used_at": null
+    },
+    {
+      "id": "TKT000004",
+      "volunteer_id": "VOL0002",
+      "meal_type": "晚餐",
+      "shift": "中班",
+      "position": "安保组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326419",
+      "used_at": null
+    },
+    {
+      "id": "TKT000005",
+      "volunteer_id": "VOL0003",
+      "meal_type": "午餐",
+      "shift": "晚班",
+      "position": "引导组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326420",
+      "used_at": null
+    },
+    {
+      "id": "TKT000006",
+      "volunteer_id": "VOL0003",
+      "meal_type": "晚餐",
+      "shift": "晚班",
+      "position": "引导组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326421",
+      "used_at": null
+    },
+    {
+      "id": "TKT000007",
+      "volunteer_id": "VOL0004",
+      "meal_type": "午餐",
+      "shift": "夜班",
+      "position": "服务组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326422",
+      "used_at": null
+    },
+    {
+      "id": "TKT000008",
+      "volunteer_id": "VOL0004",
+      "meal_type": "晚餐",
+      "shift": "夜班",
+      "position": "服务组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326423",
+      "used_at": null
+    },
+    {
+      "id": "TKT000009",
+      "volunteer_id": "VOL0005",
+      "meal_type": "午餐",
+      "shift": "早班",
+      "position": "技术组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326425",
+      "used_at": null
+    },
+    {
+      "id": "TKT000010",
+      "volunteer_id": "VOL0005",
+      "meal_type": "晚餐",
+      "shift": "早班",
+      "position": "技术组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326426",
+      "used_at": null
+    },
+    {
+      "id": "TKT000011",
+      "volunteer_id": "VOL0006",
+      "meal_type": "午餐",
+      "shift": "中班",
+      "position": "医疗组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326427",
+      "used_at": null
+    },
+    {
+      "id": "TKT000012",
+      "volunteer_id": "VOL0006",
+      "meal_type": "晚餐",
+      "shift": "中班",
+      "position": "医疗组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326428",
+      "used_at": null
+    },
+    {
+      "id": "TKT000013",
+      "volunteer_id": "VOL0007",
+      "meal_type": "午餐",
+      "shift": "晚班",
+      "position": "签到组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326429",
+      "used_at": null
+    },
+    {
+      "id": "TKT000014",
+      "volunteer_id": "VOL0007",
+      "meal_type": "晚餐",
+      "shift": "晚班",
+      "position": "签到组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326430",
+      "used_at": null
+    },
+    {
+      "id": "TKT000015",
+      "volunteer_id": "VOL0008",
+      "meal_type": "午餐",
+      "shift": "夜班",
+      "position": "安保组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326432",
+      "used_at": null
+    },
+    {
+      "id": "TKT000016",
+      "volunteer_id": "VOL0008",
+      "meal_type": "晚餐",
+      "shift": "夜班",
+      "position": "安保组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326433",
+      "used_at": null
+    },
+    {
+      "id": "TKT000017",
+      "volunteer_id": "VOL0009",
+      "meal_type": "午餐",
+      "shift": "早班",
+      "position": "引导组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326434",
+      "used_at": null
+    },
+    {
+      "id": "TKT000018",
+      "volunteer_id": "VOL0009",
+      "meal_type": "晚餐",
+      "shift": "早班",
+      "position": "引导组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326435",
+      "used_at": null
+    },
+    {
+      "id": "TKT000019",
+      "volunteer_id": "VOL0010",
+      "meal_type": "午餐",
+      "shift": "中班",
+      "position": "服务组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326436",
+      "used_at": null
+    },
+    {
+      "id": "TKT000020",
+      "volunteer_id": "VOL0010",
+      "meal_type": "晚餐",
+      "shift": "中班",
+      "position": "服务组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326437",
+      "used_at": null
+    },
+    {
+      "id": "TKT000021",
+      "volunteer_id": "VOL0011",
+      "meal_type": "午餐",
+      "shift": "晚班",
+      "position": "技术组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326438",
+      "used_at": null
+    },
+    {
+      "id": "TKT000022",
+      "volunteer_id": "VOL0011",
+      "meal_type": "晚餐",
+      "shift": "晚班",
+      "position": "技术组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326439",
+      "used_at": null
+    },
+    {
+      "id": "TKT000023",
+      "volunteer_id": "VOL0012",
+      "meal_type": "午餐",
+      "shift": "夜班",
+      "position": "医疗组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326441",
+      "used_at": null
+    },
+    {
+      "id": "TKT000024",
+      "volunteer_id": "VOL0012",
+      "meal_type": "晚餐",
+      "shift": "夜班",
+      "position": "医疗组",
+      "status": "未使用",
+      "created_at": "2026-05-12T19:21:44.326442",
+      "used_at": null
+    }
+  ],
+  "validations": [
+    {
+      "id": "93b4f640-e04c-4f86-b39b-a402150a07c9",
+      "ticket_id": "TKT000001",
+      "volunteer_id": "VOL0001",
+      "volunteer_name": "志愿者1",
+      "position": "签到组",
+      "shift": "早班",
+      "meal_type": "午餐",
+      "validation_time": "2026-05-12T19:21:49.197578",
+      "validation_status": "正常",
+      "details": "核销成功"
+    },
+    {
+      "id": "eccb788c-7ef7-4d0d-8b0d-4a8dfc9d5157",
+      "ticket_id": "TKT000001",
+      "volunteer_id": "VOL0001",
+      "volunteer_name": "志愿者1",
+      "position": "签到组",
+      "shift": "早班",
+      "meal_type": "午餐",
+      "validation_time": "2026-05-12T19:21:52.622145",
+      "validation_status": "重复核销",
+      "details": "餐券已在 2026-05-12T19:21:49.197564 核销过"
+    }
+  ]
+}
