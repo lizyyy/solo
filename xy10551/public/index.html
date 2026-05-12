@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区活动报名系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin-bottom: 16px; color: #4a5568; border-left: 4px solid #667eea; padding-left: 12px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .stat-value { font-size: 32px; font-weight: bold; color: #667eea; }
+    .stat-label { font-size: 14px; color: #718096; margin-top: 4px; }
+    .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+    tr:hover { background: #f7fafc; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-active { background: #c6f6d5; color: #22543d; }
+    .badge-draft { background: #e2e8f0; color: #4a5568; }
+    .badge-confirmed { background: #bee3f8; color: #2a4365; }
+    .badge-checked-in { background: #c6f6d5; color: #22543d; }
+    .badge-cancelled { background: #fed7d7; color: #742a2a; }
+    .badge-waiting { background: #feebc8; color: #744210; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    button { padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a67d8; }
+    .btn-success { background: #48bb78; color: white; }
+    .btn-danger { background: #f56565; color: white; }
+    .btn-secondary { background: #edf2f7; color: #4a5568; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 0; }
+    .tab { padding: 12px 24px; border: none; background: none; cursor: pointer; font-size: 16px; color: #718096; border-bottom: 3px solid transparent; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .detail-panel { background: #f7fafc; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .audit-log { max-height: 400px; overflow-y: auto; }
+    .audit-item { padding: 12px; border-left: 3px solid #667eea; background: #f7fafc; margin-bottom: 8px; border-radius: 4px; }
+    .audit-time { font-size: 12px; color: #718096; }
+    .audit-action { font-weight: 600; color: #4a5568; }
+    .audit-diff { font-family: monospace; font-size: 12px; background: #edf2f7; padding: 8px; border-radius: 4px; margin-top: 8px; }
+    .tree { line-height: 1.8; }
+    .tree-item { display: flex; align-items: center; gap: 8px; padding: 8px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px; }
+    .tree-badge { width: 8px; height: 8px; border-radius: 50%; background: #667eea; }
+    .tree-relation { font-size: 12px; color: #718096; background: #e2e8f0; padding: 2px 8px; border-radius: 4px; }
+    .loading { text-align: center; padding: 40px; color: #718096; }
+    .empty { text-align: center; padding: 40px; color: #718096; background: #f7fafc; border-radius: 8px; }
+    .refresh-btn { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: #667eea; color: white; font-size: 24px; box-shadow: 0 4px 16px rgba(102,126,234,0.4); }
+    .toast { position: fixed; top: 24px; right: 24px; padding: 16px 24px; border-radius: 8px; color: white; font-weight: 500; z-index: 1000; animation: slideIn 0.3s ease; }
+    .toast-success { background: #48bb78; }
+    .toast-error { background: #f56565; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏘️ 社区活动报名系统</h1>
+      <p>活动名单 · 候补队列 · 家庭关系 · 活动复盘</p>
+    </header>
+
+    <div id="stats" class="stats"></div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('activities')">活动列表</button>
+      <button class="tab" onclick="switchTab('detail')">活动详情</button>
+      <button class="tab" onclick="switchTab('residents')">居民档案</button>
+      <button class="tab" onclick="switchTab('family')">家庭关系</button>
+      <button class="tab" onclick="switchTab('audit')">操作日志</button>
+    </div>
+
+    <div id="tab-activities" class="tab-content active"></div>
+    <div id="tab-detail" class="tab-content"></div>
+    <div id="tab-residents" class="tab-content"></div>
+    <div id="tab-family" class="tab-content"></div>
+    <div id="tab-audit" class="tab-content"></div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadAllData()" title="刷新数据">🔄</button>
+
+  <script>
+    let currentActivityId = null;
+    let currentResidentId = null;
+
+    const API_BASE = '/api';
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    async function fetchAPI(url) {
+      const res = await fetch(API_BASE + url);
+      return res.json();
+    }
+
+    async function postAPI(url, data) {
+      const res = await fetch(API_BASE + url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return res.json();
+    }
+
+    function getStatusBadge(status) {
+      const map = {
+        active: '<span class="badge badge-active">开放报名</span>',
+        draft: '<span class="badge badge-draft">草稿</span>',
+        in_progress: '<span class="badge badge-active">进行中</span>',
+        completed: '<span class="badge badge-draft">已完成</span>',
+        cancelled: '<span class="badge badge-cancelled">已取消</span>',
+        confirmed: '<span class="badge badge-confirmed">已确认</span>',
+        checked_in: '<span class="badge badge-checked-in">已签到</span>',
+        waiting: '<span class="badge badge-waiting">候补中</span>'
+      };
+      return map[status] || status;
+    }
+
+    async function loadAllData() {
+      await Promise.all([
+        loadOverview(),
+        loadActivities(),
+        loadResidents(),
+        loadAuditLog()
+      ]);
+      if (currentActivityId) {
+        loadActivityDetail(currentActivityId);
+      }
+      if (currentResidentId) {
+        loadFamilyDetail(currentResidentId);
+      }
+    }
+
+    async function loadAuditLog() {
+      const data = await fetchAPI('/overview');
+      if (!data.success) return;
+
+      let html = '<div class="section"><h2>全局操作日志</h2><div class="audit-log">';
+      
+      const activities = data.data.activities;
+      let allLogs = [];
+      
+      for (const act of activities) {
+        const report = await fetchAPI(`/activities/${act.id}/audit-log`);
+        if (report.success && report.data) {
+          report.data.forEach(log => log.activityName = act.name);
+          allLogs = allLogs.concat(report.data || []);
+        }
+      }
+      
+      allLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      
+      if (allLogs.length === 0) {
+        html += '<div class="empty">暂无操作记录</div>';
+      } else {
+        allLogs.slice(0, 50).forEach(log => {
+          const before = log.before_data ? JSON.parse(log.before_data) : null;
+          const after = log.after_data ? JSON.parse(log.after_data) : null;
+          const hasDiff = before || after;
+          html += `
+            <div class="audit-item">
+              <div class="audit-time">${log.created_at} | ${log.activityName || '系统'}</div>
+              <div class="audit-action">${log.entity_type} / ${log.action}</div>
+              <div>操作者: ${log.operator} | 原因: ${log.reason || '无'}</div>
+              ${hasDiff ? `<div class="audit-diff">变更: ${JSON.stringify({ before, after })}</div>` : ''}
+            </div>
+          `;
+        });
+      }
+      
+      html += '</div></div>';
+      document.getElementById('tab-audit').innerHTML = html;
+    }
+
+    async function loadOverview() {
+      const data = await fetchAPI('/overview');
+      if (!data.success) return;
+      
+      const stats = data.data;
+      document.getElementById('stats').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${stats.totalResidents}</div>
+          <div class="stat-label">居民档案数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.totalActivities}</div>
+          <div class="stat-label">活动总数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.activities.filter(a => a.status === 'active').length}</div>
+          <div class="stat-label">开放报名中</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${stats.activities.reduce((sum, a) => sum + a.waitlistCount, 0)}</div>
+          <div class="stat-label">候补总人数</div>
+        </div>
+      `;
+    }
+
+    async function loadActivities() {
+      const data = await fetchAPI('/activities');
+      if (!data.success) return;
+
+      const overview = await fetchAPI('/overview');
+      const activityStats = {};
+      if (overview.success) {
+        overview.data.activities.forEach(a => activityStats[a.id] = a);
+      }
+
+      let html = '<div class="section"><h2>活动列表</h2><table>';
+      html += '<thead><tr><th>活动名称</th><th>时间</th><th>状态</th><th>名额</th><th>已报名</th><th>剩余</th><th>候补</th><th>操作</th></tr></thead><tbody>';
+      
+      for (const act of data.data) {
+        const stats = activityStats[act.id] || {};
+        html += `
+          <tr>
+            <td><strong>${act.name}</strong><br><small>${act.location || ''}</small></td>
+            <td>${act.start_time}</td>
+            <td>${getStatusBadge(act.status)}</td>
+            <td>${act.max_participants}人</td>
+            <td>${stats.confirmed_participants || 0}人</td>
+            <td>${stats.availableSpots || act.max_participants}人</td>
+            <td>${stats.waitlistCount || 0}人</td>
+            <td class="actions">
+              <button class="btn-primary" onclick="viewActivity('${act.id}')">查看详情</button>
+            </td>
+          </tr>
+        `;
+      }
+      
+      html += '</tbody></table></div>';
+      document.getElementById('tab-activities').innerHTML = html;
+    }
+
+    async function loadActivityDetail(activityId) {
+      currentActivityId = activityId;
+      const report = await fetchAPI(`/activities/${activityId}/report`);
+      if (!report.success) return;
+
+      const act = report.activity;
+      const summary = report.summary;
+
+      let html = `
+        <div class="section">
+          <h2>${act.name}</h2>
+          <div class="stats">
+            <div class="stat-card">
+              <div class="stat-value">${summary.maxParticipants}</div>
+              <div class="stat-label">总名额</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${summary.registeredParticipants}</div>
+              <div class="stat-label">已报名</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${summary.availableSpots}</div>
+              <div class="stat-label">剩余名额</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${summary.checkInRate}%</div>
+              <div class="stat-label">签到率</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${summary.checkedInParticipants}</div>
+              <div class="stat-label">已签到</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${summary.waitlistCount}</div>
+              <div class="stat-label">候补人数</div>
+            </div>
+          </div>
+          
+          <div class="detail-panel">
+            <strong>活动信息</strong><br>
+            时间: ${act.start_time} ~ ${act.end_time || '待定'}<br>
+            地点: ${act.location || '待定'}<br>
+            年龄限制: ${act.min_age || '不限'} ~ ${act.max_age || '不限'} 岁<br>
+            每户限: ${act.max_per_family || '不限'} 人<br>
+            状态: ${getStatusBadge(act.status)}
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>报名名单</h2>
+          ${report.registrations.length === 0 ? '<div class="empty">暂无报名记录</div>' : `
+          <table>
+            <thead><tr><th>居民</th><th>人数</th><th>状态</th><th>签到时间</th><th>操作</th></tr></thead>
+            <tbody>
+              ${report.registrations.map(reg => `
+                <tr>
+                  <td>${reg.resident_name}</td>
+                  <td>${reg.participant_count}人</td>
+                  <td>${getStatusBadge(reg.status)}</td>
+                  <td>${reg.check_in_time || '-'}</td>
+                  <td class="actions">
+                    ${reg.status === 'confirmed' ? `
+                      <button class="btn-success" onclick="checkIn('${reg.id}')">签到</button>
+                      <button class="btn-danger" onclick="cancelRegistration('${reg.id}')">取消</button>
+                    ` : ''}
+                    ${reg.status === 'checked_in' ? '<span class="badge badge-checked-in">已签到</span>' : ''}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+
+        <div class="section">
+          <h2>候补队列</h2>
+          ${report.waitlist.length === 0 ? '<div class="empty">暂无候补人员</div>' : `
+          <table>
+            <thead><tr><th>位置</th><th>居民</th><th>人数</th><th>状态</th><th>加入时间</th><th>操作</th></tr></thead>
+            <tbody>
+              ${report.waitlist.map(w => `
+                <tr>
+                  <td>#${w.position}</td>
+                  <td>${w.resident_name}</td>
+                  <td>${w.participant_count}人</td>
+                  <td>${getStatusBadge(w.status)}</td>
+                  <td>${w.created_at}</td>
+                  <td>
+                    <button class="btn-danger" onclick="cancelWaitlist('${w.id}')">取消候补</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+
+        <div class="section">
+          <h2>操作历史（审计日志）</h2>
+          <div class="audit-log">
+            ${report.auditLogs.length === 0 ? '<div class="empty">暂无操作记录</div>' :
+              report.auditLogs.map(log => {
+                const before = log.before_data ? JSON.parse(log.before_data) : null;
+                const after = log.after_data ? JSON.parse(log.after_data) : null;
+                const hasDiff = before || after;
+                return `
+                  <div class="audit-item">
+                    <div class="audit-time">${log.created_at}</div>
+                    <div class="audit-action">${log.entity_type} / ${log.action}</div>
+                    <div>操作者: ${log.operator} | 原因: ${log.reason || '无'}</div>
+                    ${hasDiff ? `<div class="audit-diff">变更: ${JSON.stringify({ before, after })}</div>` : ''}
+                  </div>
+                `;
+              }).join('')
+            }
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>导出报告</h2>
+          <div class="actions">
+            <a href="${API_BASE}/activities/${activityId}/report?export=json" class="btn-primary" style="display:inline-block;text-decoration:none;">导出 JSON 报告</a>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('tab-detail').innerHTML = html;
+    }
+
+    async function viewActivity(activityId) {
+      switchTab('detail');
+      await loadActivityDetail(activityId);
+    }
+
+    async function checkIn(registrationId) {
+      const res = await postAPI(`/activities/registrations/${registrationId}/checkin`, {
+        operator: '前台工作人员'
+      });
+      showToast(res.message || res.error, res.success ? 'success' : 'error');
+      if (res.success) loadActivityDetail(currentActivityId);
+    }
+
+    async function cancelRegistration(registrationId) {
+      if (!confirm('确定要取消此报名吗？')) return;
+      const res = await postAPI(`/activities/registrations/${registrationId}/cancel`, {
+        operator: '前台工作人员',
+        reason: '用户申请取消'
+      });
+      showToast(res.message || res.error, res.success ? 'success' : 'error');
+      if (res.success) {
+        if (res.promoted && res.promoted.length > 0) {
+          showToast(`候补递补成功：${res.promoted.length} 位候补人员已递补`, 'success');
+        }
+        loadActivityDetail(currentActivityId);
+      }
+    }
+
+    async function cancelWaitlist(waitlistId) {
+      if (!confirm('确定要取消候补吗？')) return;
+      const res = await postAPI(`/activities/waitlist/${waitlistId}/cancel`, {
+        operator: '前台工作人员',
+        reason: '用户申请取消候补'
+      });
+      showToast(res.message || res.error, res.success ? 'success' : 'error');
+      if (res.success) loadActivityDetail(currentActivityId);
+    }
+
+    async function loadResidents() {
+      const data = await fetchAPI('/residents');
+      if (!data.success) return;
+
+      let html = '<div class="section"><h2>居民档案</h2><table>';
+      html += '<thead><tr><th>姓名</th><th>性别</th><th>出生日期</th><th>电话</th><th>地址</th><th>操作</th></tr></thead><tbody>';
+      
+      for (const r of data.data) {
+        html += `
+          <tr>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.gender || '-'}</td>
+            <td>${r.birth_date}</td>
+            <td>${r.phone || '-'}</td>
+            <td>${r.address || '-'}</td>
+            <td>
+              <button class="btn-primary" onclick="viewFamily('${r.id}')">查看家庭</button>
+            </td>
+          </tr>
+        `;
+      }
+      
+      html += '</tbody></table></div>';
+      document.getElementById('tab-residents').innerHTML = html;
+    }
+
+    async function viewFamily(residentId) {
+      currentResidentId = residentId;
+      switchTab('family');
+      await loadFamilyDetail(residentId);
+    }
+
+    async function loadFamilyDetail(residentId) {
+      const report = await fetchAPI(`/residents/${residentId}/report`);
+      if (!report.success) return;
+
+      const resident = report.resident;
+      const family = report.familyMembers;
+
+      let html = `
+        <div class="section">
+          <h2>家庭关系树</h2>
+          <div class="tree">
+            <div class="tree-item">
+              <div class="tree-badge"></div>
+              <strong>${resident.name}</strong>
+              <span class="tree-relation">户主</span>
+              <span>${resident.age}岁</span>
+              <span>${resident.phone || '无电话'}</span>
+            </div>
+            ${family.map(m => `
+              <div class="tree-item" style="margin-left: 32px;">
+                <div class="tree-badge" style="background: #764ba2;"></div>
+                <strong>${m.name}</strong>
+                <span class="tree-relation">${m.relation}</span>
+                <span>${m.age}岁</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="detail-panel">
+            家庭总人数: ${1 + family.length} 人<br>
+            户主: ${resident.name} (${resident.age}岁)<br>
+            家庭成员: ${family.length} 人
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>报名记录</h2>
+          ${report.registrations.length === 0 ? '<div class="empty">暂无报名记录</div>' : `
+          <table>
+            <thead><tr><th>活动</th><th>人数</th><th>状态</th><th>报名时间</th></tr></thead>
+            <tbody>
+              ${report.registrations.map(reg => `
+                <tr>
+                  <td>${reg.activity_name}</td>
+                  <td>${reg.participant_count}人</td>
+                  <td>${getStatusBadge(reg.status)}</td>
+                  <td>${reg.created_at}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+
+        <div class="section">
+          <h2>候补记录</h2>
+          ${report.waitlist.length === 0 ? '<div class="empty">暂无候补记录</div>' : `
+          <table>
+            <thead><tr><th>活动</th><th>位置</th><th>人数</th><th>状态</th></tr></thead>
+            <tbody>
+              ${report.waitlist.map(w => `
+                <tr>
+                  <td>${w.activity_name}</td>
+                  <td>#${w.position}</td>
+                  <td>${w.participant_count}人</td>
+                  <td>${getStatusBadge(w.status)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          `}
+        </div>
+      `;
+
+      document.getElementById('tab-family').innerHTML = html;
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    loadAllData();
+    setInterval(loadAllData, 30000);
+  </script>
+</body>
+</html>
