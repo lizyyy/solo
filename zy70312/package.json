@@ -1,0 +1,21 @@
+{
+  "name": "api-error-budget-dashboard",
+  "version": "1.0.0",
+  "description": "API错误预算看板 - 用于SRE监控错误预算消耗和发布决策",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "install:all": "npm install",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "start": "npm run start -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
