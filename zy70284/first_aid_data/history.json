@@ -1,0 +1,46 @@
+[
+  {
+    "id": "b585f41e",
+    "entity_type": "system",
+    "entity_id": "init",
+    "action": "create",
+    "before": null,
+    "after": null,
+    "timestamp": "2026-05-12T08:00:56.601479",
+    "description": "初始化样例数据"
+  },
+  {
+    "id": "dfcba89e",
+    "entity_type": "certificate",
+    "entity_id": "f2be88ec",
+    "action": "update",
+    "before": {
+      "id": "f2be88ec",
+      "personnel_id": "5f846170",
+      "personnel_name": "张三",
+      "certificate_type": "急救员初级证书",
+      "certificate_number": "FA2024001",
+      "issue_date": "2025-05-12",
+      "expiry_date": "2027-05-12",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600524",
+      "updated_at": "2026-05-12T08:00:56.600524"
+    },
+    "after": {
+      "id": "f2be88ec",
+      "personnel_id": "5f846170",
+      "personnel_name": "张三",
+      "certificate_type": "急救员初级证书",
+      "certificate_number": "FA999999",
+      "issue_date": "2025-05-12",
+      "expiry_date": "2027-05-12",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600524",
+      "updated_at": "2026-05-12T08:00:57.165360"
+    },
+    "timestamp": "2026-05-12T08:00:57.165498",
+    "description": "更新证书: 张三 - 急救员初级证书"
+  }
+]

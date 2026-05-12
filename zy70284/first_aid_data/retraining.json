@@ -1,0 +1,54 @@
+[
+  {
+    "id": "8388cf57",
+    "certificate_id": "f2be88ec",
+    "personnel_id": "5f846170",
+    "personnel_name": "张三",
+    "planned_date": "2027-03-08",
+    "completed_date": null,
+    "trainer": "王讲师",
+    "status": "pending",
+    "notes": "复训时间已协调",
+    "created_at": "2026-05-12T08:00:56.600985",
+    "updated_at": "2026-05-12T08:00:56.600985"
+  },
+  {
+    "id": "f88cf370",
+    "certificate_id": "3802d1d9",
+    "personnel_id": "559edc9e",
+    "personnel_name": "李四",
+    "planned_date": "2026-04-27",
+    "completed_date": null,
+    "trainer": null,
+    "status": "pending",
+    "notes": "未完成复训，已过期",
+    "created_at": "2026-05-12T08:00:56.601097",
+    "updated_at": "2026-05-12T08:00:56.601097"
+  },
+  {
+    "id": "cc0049ef",
+    "certificate_id": "a62e797b",
+    "personnel_id": "7ec14d26",
+    "personnel_name": "王五",
+    "planned_date": "2026-05-19",
+    "completed_date": null,
+    "trainer": "李讲师",
+    "status": "pending",
+    "notes": "即将到期，需紧急复训",
+    "created_at": "2026-05-12T08:00:56.601226",
+    "updated_at": "2026-05-12T08:00:56.601226"
+  },
+  {
+    "id": "fa187b73",
+    "certificate_id": "6021f54b",
+    "personnel_id": "925a55bf",
+    "personnel_name": "赵六",
+    "planned_date": "2026-11-08",
+    "completed_date": null,
+    "trainer": null,
+    "status": "pending",
+    "notes": "尚未安排",
+    "created_at": "2026-05-12T08:00:56.601348",
+    "updated_at": "2026-05-12T08:00:56.601348"
+  }
+]

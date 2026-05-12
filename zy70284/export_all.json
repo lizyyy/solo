@@ -1,0 +1,163 @@
+{
+  "personnel": [
+    {
+      "id": "5f846170",
+      "name": "张三",
+      "employee_id": "E001",
+      "department": "生产部",
+      "phone": "13800138001",
+      "email": "zhangsan@company.com",
+      "created_at": "2026-05-12T08:00:56.599876",
+      "updated_at": "2026-05-12T08:00:56.599876"
+    },
+    {
+      "id": "559edc9e",
+      "name": "李四",
+      "employee_id": "E002",
+      "department": "研发部",
+      "phone": "13800138002",
+      "email": "lisi@company.com",
+      "created_at": "2026-05-12T08:00:56.600035",
+      "updated_at": "2026-05-12T08:00:56.600035"
+    },
+    {
+      "id": "7ec14d26",
+      "name": "王五",
+      "employee_id": "E003",
+      "department": "行政部",
+      "phone": "13800138003",
+      "email": "wangwu@company.com",
+      "created_at": "2026-05-12T08:00:56.600177",
+      "updated_at": "2026-05-12T08:00:56.600177"
+    },
+    {
+      "id": "925a55bf",
+      "name": "赵六",
+      "employee_id": "E004",
+      "department": "生产部",
+      "phone": "13800138004",
+      "email": "zhaoliu@company.com",
+      "created_at": "2026-05-12T08:00:56.600290",
+      "updated_at": "2026-05-12T08:00:56.600290"
+    },
+    {
+      "id": "6f9636de",
+      "name": "钱七",
+      "employee_id": "E005",
+      "department": "销售部",
+      "phone": "13800138005",
+      "email": "qianqi@company.com",
+      "created_at": "2026-05-12T08:00:56.600398",
+      "updated_at": "2026-05-12T08:00:56.600398"
+    }
+  ],
+  "certificates": [
+    {
+      "id": "f2be88ec",
+      "personnel_id": "5f846170",
+      "personnel_name": "张三",
+      "certificate_type": "急救员初级证书",
+      "certificate_number": "FA999999",
+      "issue_date": "2025-05-12",
+      "expiry_date": "2027-05-12",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600524",
+      "updated_at": "2026-05-12T08:00:57.165360"
+    },
+    {
+      "id": "3802d1d9",
+      "personnel_id": "559edc9e",
+      "personnel_name": "李四",
+      "certificate_type": "急救员初级证书",
+      "certificate_number": "FA2022001",
+      "issue_date": "2024-05-12",
+      "expiry_date": "2026-04-12",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600655",
+      "updated_at": "2026-05-12T08:00:56.600655"
+    },
+    {
+      "id": "a62e797b",
+      "personnel_id": "7ec14d26",
+      "personnel_name": "王五",
+      "certificate_type": "急救员高级证书",
+      "certificate_number": "FA2024002",
+      "issue_date": "2025-11-13",
+      "expiry_date": "2026-05-27",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600762",
+      "updated_at": "2026-05-12T08:00:56.600762"
+    },
+    {
+      "id": "6021f54b",
+      "personnel_id": "925a55bf",
+      "personnel_name": "赵六",
+      "certificate_type": "急救员初级证书",
+      "certificate_number": "FA2023005",
+      "issue_date": "2024-12-28",
+      "expiry_date": "2026-12-28",
+      "issuer": "急救培训中心",
+      "status": "valid",
+      "created_at": "2026-05-12T08:00:56.600860",
+      "updated_at": "2026-05-12T08:00:56.600860"
+    }
+  ],
+  "retraining": [
+    {
+      "id": "8388cf57",
+      "certificate_id": "f2be88ec",
+      "personnel_id": "5f846170",
+      "personnel_name": "张三",
+      "planned_date": "2027-03-08",
+      "completed_date": null,
+      "trainer": "王讲师",
+      "status": "pending",
+      "notes": "复训时间已协调",
+      "created_at": "2026-05-12T08:00:56.600985",
+      "updated_at": "2026-05-12T08:00:56.600985"
+    },
+    {
+      "id": "f88cf370",
+      "certificate_id": "3802d1d9",
+      "personnel_id": "559edc9e",
+      "personnel_name": "李四",
+      "planned_date": "2026-04-27",
+      "completed_date": null,
+      "trainer": null,
+      "status": "pending",
+      "notes": "未完成复训，已过期",
+      "created_at": "2026-05-12T08:00:56.601097",
+      "updated_at": "2026-05-12T08:00:56.601097"
+    },
+    {
+      "id": "cc0049ef",
+      "certificate_id": "a62e797b",
+      "personnel_id": "7ec14d26",
+      "personnel_name": "王五",
+      "planned_date": "2026-05-19",
+      "completed_date": null,
+      "trainer": "李讲师",
+      "status": "pending",
+      "notes": "即将到期，需紧急复训",
+      "created_at": "2026-05-12T08:00:56.601226",
+      "updated_at": "2026-05-12T08:00:56.601226"
+    },
+    {
+      "id": "fa187b73",
+      "certificate_id": "6021f54b",
+      "personnel_id": "925a55bf",
+      "personnel_name": "赵六",
+      "planned_date": "2026-11-08",
+      "completed_date": null,
+      "trainer": null,
+      "status": "pending",
+      "notes": "尚未安排",
+      "created_at": "2026-05-12T08:00:56.601348",
+      "updated_at": "2026-05-12T08:00:56.601348"
+    }
+  ],
+  "exported_at": "2026-05-12T08:00:57.406755"
+}
