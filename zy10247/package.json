@@ -1,0 +1,16 @@
+{
+  "name": "community-parking-api",
+  "version": "1.0.0",
+  "description": "社区车位短租 API",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js",
+    "demo": "node demo/run-demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1"
+  }
+}
