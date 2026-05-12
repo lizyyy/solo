@@ -1,0 +1,24 @@
+{
+  "name": "outdoor-sign-inspection",
+  "version": "1.0.0",
+  "description": "户外广告牌巡检 CLI - 管理广告牌档案、导入巡检记录、评估风险",
+  "main": "index.js",
+  "bin": {
+    "os-inspect": "./index.js"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "billboard",
+    "inspection",
+    "cli",
+    "risk-assessment"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parse": "^5.5.0",
+    "csv-stringify": "^6.4.0"
+  }
+}

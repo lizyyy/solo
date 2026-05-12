@@ -1,0 +1,50 @@
+[
+  {
+    "signId": "S001",
+    "date": "2026-05-10",
+    "inspector": "张三",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "notes": "轻微锈蚀，建议下次巡检时重点关注"
+  },
+  {
+    "signId": "S002",
+    "date": "2026-05-11",
+    "inspector": "李四",
+    "rustLevel": "moderate",
+    "lightingStatus": "partial",
+    "notes": "结构中度锈蚀，照明系统部分灯具不亮"
+  },
+  {
+    "signId": "S003",
+    "date": "2026-05-08",
+    "inspector": "王五",
+    "rustLevel": "none",
+    "lightingStatus": "working",
+    "notes": "状态良好，无明显问题"
+  },
+  {
+    "signId": "S004",
+    "date": "2026-05-09",
+    "inspector": "赵六",
+    "rustLevel": "severe",
+    "lightingStatus": "failed",
+    "notes": "严重锈蚀，结构有安全隐患，照明完全失效"
+  },
+  {
+    "signId": "S005",
+    "date": "2026-05-12",
+    "inspector": "钱七",
+    "rustLevel": "none",
+    "lightingStatus": "working",
+    "notes": "正常"
+  },
+  {
+    "signId": "S001",
+    "date": "2026-05-10",
+    "inspector": "张三",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "notes": "轻微锈蚀，建议下次巡检时重点关注"
+  }
+]

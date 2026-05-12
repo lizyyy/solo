@@ -1,0 +1,38 @@
+[
+  {
+    "type": "signs",
+    "filePath": "./samples/signs.json",
+    "total": 6,
+    "valid": 6,
+    "errors": 0,
+    "timestamp": "2026-05-12T12:55:26.160Z"
+  },
+  {
+    "type": "inspections",
+    "filePath": "./samples/inspections.json",
+    "total": 6,
+    "valid": 6,
+    "errors": 0,
+    "processed": {
+      "success": 5,
+      "duplicates": 1,
+      "conflicts": 0,
+      "missingSigns": 0
+    },
+    "timestamp": "2026-05-12T12:55:26.227Z"
+  },
+  {
+    "type": "inspections",
+    "filePath": "./samples/inspections-edge-cases.json",
+    "total": 7,
+    "valid": 4,
+    "errors": 3,
+    "processed": {
+      "success": 1,
+      "duplicates": 0,
+      "conflicts": 2,
+      "missingSigns": 1
+    },
+    "timestamp": "2026-05-12T12:55:44.353Z"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "signId": "S001",
+    "date": "2026-05-10",
+    "inspector": "张三",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "notes": "重复记录测试"
+  },
+  {
+    "signId": "S002",
+    "date": "2026-05-11",
+    "inspector": "王二",
+    "rustLevel": "severe",
+    "lightingStatus": "failed",
+    "notes": "状态冲突测试 - 与现有记录不同"
+  },
+  {
+    "signId": "INVALID001",
+    "date": "2026-05-10",
+    "inspector": "测试员",
+    "rustLevel": "moderate",
+    "lightingStatus": "partial",
+    "notes": "来源记录缺失测试 - 广告牌不存在"
+  },
+  {
+    "signId": "",
+    "date": "2026-05-10",
+    "inspector": "测试员",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "notes": "无效数据测试 - 缺少ID"
+  },
+  {
+    "signId": "S003",
+    "date": "invalid-date",
+    "inspector": "测试员",
+    "rustLevel": "none",
+    "lightingStatus": "working",
+    "notes": "无效数据测试 - 日期格式错误"
+  },
+  {
+    "signId": "S003",
+    "date": "2026-05-13",
+    "inspector": "测试员",
+    "rustLevel": "unknown",
+    "lightingStatus": "working",
+    "notes": "无效数据测试 - 锈蚀程度无效"
+  },
+  {
+    "signId": "S006",
+    "date": "2026-05-12",
+    "inspector": "周八",
+    "rustLevel": "moderate",
+    "lightingStatus": "failed",
+    "notes": "新记录 - S006首次巡检"
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "S001",
+    "location": "北京市朝阳区建国路88号",
+    "owner": "北京广告传媒有限公司",
+    "contractStartDate": "2023-01-01",
+    "contractEndDate": "2026-06-01",
+    "size": "18m x 6m",
+    "type": "单立柱",
+    "initialRustLevel": "minor",
+    "initialLighting": "working"
+  },
+  {
+    "id": "S002",
+    "location": "上海市浦东新区世纪大道100号",
+    "owner": "上海户外广告集团",
+    "contractStartDate": "2022-06-01",
+    "contractEndDate": "2026-05-20",
+    "size": "20m x 7m",
+    "type": "楼顶大牌",
+    "initialRustLevel": "moderate",
+    "initialLighting": "partial"
+  },
+  {
+    "id": "S003",
+    "location": "广州市天河区珠江新城",
+    "owner": "广州传媒股份有限公司",
+    "contractStartDate": "2024-01-01",
+    "contractEndDate": "2027-01-01",
+    "size": "15m x 5m",
+    "type": "墙体广告",
+    "initialRustLevel": "none",
+    "initialLighting": "working"
+  },
+  {
+    "id": "S004",
+    "location": "深圳市南山区科技园",
+    "owner": "深圳广告发展公司",
+    "contractStartDate": "2021-01-01",
+    "contractEndDate": "2025-12-31",
+    "size": "22m x 8m",
+    "type": "单立柱",
+    "initialRustLevel": "severe",
+    "initialLighting": "failed"
+  },
+  {
+    "id": "S005",
+    "location": "杭州市西湖区文三路",
+    "owner": "杭州新媒体集团",
+    "contractStartDate": "2023-06-01",
+    "contractEndDate": "2026-05-15",
+    "size": "12m x 4m",
+    "type": "公交站亭",
+    "initialRustLevel": "none",
+    "initialLighting": "working"
+  },
+  {
+    "id": "S006",
+    "location": "成都市锦江区春熙路",
+    "owner": "成都城市广告公司",
+    "contractStartDate": "2022-01-01",
+    "contractEndDate": "2026-08-01",
+    "size": "16m x 5m",
+    "type": "LED大屏",
+    "initialRustLevel": "minor",
+    "initialLighting": "working"
+  }
+]

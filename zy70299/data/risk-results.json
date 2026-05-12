@@ -1,0 +1,211 @@
+[
+  {
+    "signId": "S004",
+    "location": "深圳市南山区科技园",
+    "owner": "深圳广告发展公司",
+    "rustLevel": "severe",
+    "lightingStatus": "failed",
+    "contractEndDate": "2025-12-31",
+    "daysUntilContractEnd": -132,
+    "rustScore": 5,
+    "lightingScore": 4,
+    "contractScore": 5,
+    "riskScore": 14,
+    "riskLevel": "high",
+    "riskFactors": [
+      {
+        "type": "rust",
+        "severity": "critical",
+        "description": "结构严重锈蚀，需紧急处理"
+      },
+      {
+        "type": "lighting",
+        "severity": "critical",
+        "description": "照明系统完全故障"
+      },
+      {
+        "type": "contract",
+        "severity": "critical",
+        "description": "合同即将到期（-132天）"
+      }
+    ],
+    "needsReview": true,
+    "reviewReasons": [
+      "结构严重锈蚀，需紧急处理",
+      "照明系统完全故障",
+      "合同即将到期（-132天）",
+      "合同已过期 132 天，需要立即处理"
+    ],
+    "inspectionDate": "2026-05-09",
+    "inspector": "赵六",
+    "recommendations": [
+      "立即安排结构检测和锈蚀修复，必要时暂停使用",
+      "立即修复照明系统，确保夜间安全",
+      "立即处理合同续约或拆除事宜"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  },
+  {
+    "signId": "S002",
+    "location": "上海市浦东新区世纪大道100号",
+    "owner": "上海户外广告集团",
+    "rustLevel": "moderate",
+    "lightingStatus": "partial",
+    "contractEndDate": "2026-05-20",
+    "daysUntilContractEnd": 8,
+    "rustScore": 3,
+    "lightingScore": 2,
+    "contractScore": 3,
+    "riskScore": 8,
+    "riskLevel": "high",
+    "riskFactors": [
+      {
+        "type": "rust",
+        "severity": "high",
+        "description": "结构中度锈蚀，需要维修"
+      },
+      {
+        "type": "lighting",
+        "severity": "high",
+        "description": "照明系统部分故障"
+      },
+      {
+        "type": "contract",
+        "severity": "high",
+        "description": "合同即将到期（8天）"
+      }
+    ],
+    "needsReview": true,
+    "reviewReasons": [
+      "存在多个高风险因素（3个），需要综合评估",
+      "合同将在 8 天后到期，需要及时处理续约"
+    ],
+    "inspectionDate": "2026-05-11",
+    "inspector": "李四",
+    "recommendations": [
+      "近期安排锈蚀处理和防腐维护",
+      "检查并修复故障灯具",
+      "紧急联系业主确认合同续约"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  },
+  {
+    "signId": "S005",
+    "location": "杭州市西湖区文三路",
+    "owner": "杭州新媒体集团",
+    "rustLevel": "none",
+    "lightingStatus": "working",
+    "contractEndDate": "2026-05-15",
+    "daysUntilContractEnd": 3,
+    "rustScore": 0,
+    "lightingScore": 0,
+    "contractScore": 4,
+    "riskScore": 4,
+    "riskLevel": "medium",
+    "riskFactors": [
+      {
+        "type": "contract",
+        "severity": "critical",
+        "description": "合同即将到期（3天）"
+      }
+    ],
+    "needsReview": true,
+    "reviewReasons": [
+      "合同即将到期（3天）",
+      "合同将在 3 天后到期，需要及时处理续约"
+    ],
+    "inspectionDate": "2026-05-12",
+    "inspector": "钱七",
+    "recommendations": [
+      "紧急联系业主确认合同续约"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  },
+  {
+    "signId": "S001",
+    "location": "北京市朝阳区建国路88号",
+    "owner": "北京广告传媒有限公司",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "contractEndDate": "2026-06-01",
+    "daysUntilContractEnd": 20,
+    "rustScore": 1,
+    "lightingScore": 0,
+    "contractScore": 2,
+    "riskScore": 3,
+    "riskLevel": "medium",
+    "riskFactors": [
+      {
+        "type": "rust",
+        "severity": "low",
+        "description": "存在轻微锈蚀，建议关注"
+      },
+      {
+        "type": "contract",
+        "severity": "high",
+        "description": "合同即将到期（20天）"
+      }
+    ],
+    "needsReview": false,
+    "reviewReasons": [],
+    "inspectionDate": "2026-05-10",
+    "inspector": "张三",
+    "recommendations": [
+      "下次巡检时重点关注锈蚀进展",
+      "开始合同续约谈判"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  },
+  {
+    "signId": "S006",
+    "location": "成都市锦江区春熙路",
+    "owner": "成都城市广告公司",
+    "rustLevel": "minor",
+    "lightingStatus": "working",
+    "contractEndDate": "2026-08-01",
+    "daysUntilContractEnd": 81,
+    "rustScore": 1,
+    "lightingScore": 0,
+    "contractScore": 0,
+    "riskScore": 1,
+    "riskLevel": "low",
+    "riskFactors": [
+      {
+        "type": "rust",
+        "severity": "low",
+        "description": "存在轻微锈蚀，建议关注"
+      }
+    ],
+    "needsReview": true,
+    "reviewReasons": [
+      "暂无巡检记录，需要确认状态"
+    ],
+    "recommendations": [
+      "下次巡检时重点关注锈蚀进展"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  },
+  {
+    "signId": "S003",
+    "location": "广州市天河区珠江新城",
+    "owner": "广州传媒股份有限公司",
+    "rustLevel": "none",
+    "lightingStatus": "working",
+    "contractEndDate": "2027-01-01",
+    "daysUntilContractEnd": 234,
+    "rustScore": 0,
+    "lightingScore": 0,
+    "contractScore": 0,
+    "riskScore": 0,
+    "riskLevel": "low",
+    "riskFactors": [],
+    "needsReview": false,
+    "reviewReasons": [],
+    "inspectionDate": "2026-05-08",
+    "inspector": "王五",
+    "recommendations": [
+      "定期巡检，保持当前维护状态"
+    ],
+    "assessedAt": "2026-05-12T12:55:30.061Z"
+  }
+]
