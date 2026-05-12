@@ -19,7 +19,10 @@ function Dashboard() {
   const [filters, setFilters] = useState({ status: '', customer_id: '', delivery_date: '' })
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showDetailModal, setShowDetailModal] = useState(false)
+  const [showDispatchModal, setShowDispatchModal] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
+  const [dispatchingOrder, setDispatchingOrder] = useState(null)
+  const [selectedCooler, setSelectedCooler] = useState('')
   const [newOrder, setNewOrder] = useState({
     customer_id: '',
     ice_spec_id: '',
@@ -105,12 +108,21 @@ function Dashboard() {
     }
   }
 
-  const handleDispatchOrder = async (id) => {
-    const coolerId = prompt('请输入保温箱ID:')
-    if (!coolerId) return
+  const handleDispatchOrder = (order) => {
+    setDispatchingOrder(order)
+    setSelectedCooler('')
+    setShowDispatchModal(true)
+  }
+
+  const confirmDispatchOrder = async () => {
+    if (!selectedCooler) {
+      setAlert({ type: 'error', message: '请选择保温箱' })
+      return
+    }
     try {
-      await ordersAPI.dispatchOrder(id, coolerId)
+      await ordersAPI.dispatchOrder(dispatchingOrder.id, selectedCooler)
       loadData()
+      setShowDispatchModal(false)
       setAlert({ type: 'success', message: '订单已安排配送' })
     } catch (error) {
       setAlert({ type: 'error', message: '操作失败' })
@@ -261,7 +273,7 @@ function Dashboard() {
                       </button>
                     )}
                     {order.status === 'confirmed' && (
-                      <button className="btn btn-sm btn-warning" onClick={() => handleDispatchOrder(order.id)}>
+                      <button className="btn btn-sm btn-warning" onClick={() => handleDispatchOrder(order)}>
                         配送
                       </button>
                     )}
@@ -410,6 +422,57 @@ function Dashboard() {
 
             <div className="modal-footer">
               <button className="btn btn-default" onClick={() => setShowDetailModal(false)}>关闭</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDispatchModal && dispatchingOrder && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: '400px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">安排配送 - {dispatchingOrder.order_no}</h3>
+              <button className="modal-close" onClick={() => setShowDispatchModal(false)}>×</button>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">客户</label>
+              <p>{dispatchingOrder.customer_name}</p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">配送时段</label>
+              <p>{dispatchingOrder.delivery_date} {dispatchingOrder.start_time}-{dispatchingOrder.end_time}</p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">选择保温箱 *</label>
+              <select 
+                className="form-select" 
+                value={selectedCooler} 
+                onChange={(e) => setSelectedCooler(e.target.value)}
+              >
+                <option value="">请选择可用保温箱</option>
+                {coolers.map(c => (
+                  <option key={c.id} value={c.serial_number}>{c.serial_number}</option>
+                ))}
+              </select>
+              {coolers.length === 0 && (
+                <p style={{ color: '#f5222d', fontSize: '12px', marginTop: '8px' }}>
+                  暂无可用保温箱，请先归还已使用的保温箱
+                </p>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn btn-default" onClick={() => setShowDispatchModal(false)}>取消</button>
+              <button 
+                className="btn btn-primary" 
+                onClick={confirmDispatchOrder}
+                disabled={!selectedCooler || coolers.length === 0}
+              >
+                确认配送
+              </button>
             </div>
           </div>
         </div>

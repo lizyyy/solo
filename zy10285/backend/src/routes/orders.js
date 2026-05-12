@@ -3,82 +3,64 @@ const router = express.Router();
 const orderService = require('../services/orderService');
 
 router.get('/', (req, res) => {
-  try {
-    const orders = orderService.getOrders(req.query);
+  orderService.getOrders(req.query, (err, orders) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data: orders });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.get('/:id', (req, res) => {
-  try {
-    const order = orderService.getOrderDetail(req.params.id);
-    if (!order) {
-      return res.status(404).json({ success: false, message: '订单不存在' });
-    }
+  orderService.getOrderDetail(req.params.id, (err, order) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
+    if (!order) return res.status(404).json({ success: false, message: '订单不存在' });
     res.json({ success: true, data: order });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/', (req, res) => {
-  try {
-    const result = orderService.createOrder(req.body);
+  orderService.createOrder(req.body, (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/:id/confirm', (req, res) => {
-  try {
-    const result = orderService.confirmOrder(req.params.id, req.body.operator);
+  orderService.confirmOrder(req.params.id, (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/:id/dispatch', (req, res) => {
-  try {
-    const result = orderService.dispatchOrder(req.params.id, req.body.cooler_id, req.body.operator);
+  orderService.dispatchOrder(req.params.id, req.body.cooler_id, (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/:id/sign', (req, res) => {
-  try {
-    const result = orderService.signOrder(req.params.id, req.body.signed_by, req.body.operator);
+  orderService.signOrder(req.params.id, req.body.signed_by, (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/:id/refund', (req, res) => {
-  try {
-    const result = orderService.refundOrder(req.params.id, req.body.reason, req.body.operator);
+  orderService.refundOrder(req.params.id, req.body.reason, (err, result) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/check-capacity', (req, res) => {
-  try {
-    const result = orderService.checkCapacity(
-      req.body.delivery_slot_id,
-      req.body.quantity,
-      req.body.ice_spec_id
-    );
-    res.json({ success: true, data: result });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  orderService.checkCapacity(
+    req.body.delivery_slot_id,
+    req.body.quantity,
+    req.body.ice_spec_id,
+    (err, result) => {
+      if (err) return res.status(500).json({ success: false, message: err.message });
+      res.json({ success: true, data: result });
+    });
 });
 
 module.exports = router;

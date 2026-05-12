@@ -1,9 +1,7 @@
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const dbPath = path.join(__dirname, '../../data/ice-delivery.db');
-const db = new Database(dbPath);
-
-db.pragma('foreign_keys = ON');
+const db = new sqlite3.Database(dbPath);
 
 module.exports = db;

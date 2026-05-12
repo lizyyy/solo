@@ -1,10 +1,11 @@
 const db = require('../db');
+const dayjs = require('dayjs');
 
-function getIceSpecs() {
-  return db.prepare('SELECT * FROM ice_specs WHERE is_active = 1 ORDER BY created_at DESC').all();
+function getIceSpecs(callback) {
+  db.all('SELECT * FROM ice_specs WHERE is_active = 1 ORDER BY created_at DESC', callback);
 }
 
-function getDeliverySlots(date) {
+function getDeliverySlots(date, callback) {
   let sql = 'SELECT * FROM delivery_slots WHERE is_active = 1';
   const params = [];
   
@@ -15,10 +16,10 @@ function getDeliverySlots(date) {
   
   sql += ' ORDER BY date, start_time';
   
-  return db.prepare(sql).all(...params);
+  db.all(sql, params, callback);
 }
 
-function getCoolers(status) {
+function getCoolers(status, callback) {
   let sql = 'SELECT c.*, cust.name as customer_name FROM coolers c LEFT JOIN customers cust ON c.customer_id = cust.id WHERE 1=1';
   const params = [];
   
@@ -29,39 +30,37 @@ function getCoolers(status) {
   
   sql += ' ORDER BY c.serial_number';
   
-  return db.prepare(sql).all(...params);
+  db.all(sql, params, callback);
 }
 
-function returnCooler(coolerId, notes = '') {
-  const dayjs = require('dayjs');
+function returnCooler(coolerId, notes, callback) {
   const now = dayjs().format();
   
-  db.prepare(`
+  db.run(`
     UPDATE coolers 
     SET status = 'available', customer_id = NULL, assigned_at = NULL, last_returned_at = ?, notes = ?, updated_at = ?
     WHERE id = ?
-  `).run(now, notes, now, coolerId);
-  
-  return true;
+  `, [now, notes, now, coolerId], callback);
 }
 
-function getCapacityAlerts() {
-  const slots = db.prepare(`
+function getCapacityAlerts(callback) {
+  db.all(`
     SELECT *, 
       (current_load / max_capacity) as utilization_rate
     FROM delivery_slots 
     WHERE is_active = 1
     ORDER BY date, start_time
-  `).all();
-  
-  return slots.map(slot => ({
-    ...slot,
-    alertLevel: slot.current_load > slot.max_capacity ? 'critical' : 
-                slot.current_load > slot.max_capacity * 0.9 ? 'warning' : 'normal'
-  }));
+  `, (err, slots) => {
+    if (err) return callback(err);
+    callback(null, slots.map(slot => ({
+      ...slot,
+      alertLevel: slot.current_load > slot.max_capacity ? 'critical' : 
+                  slot.current_load > slot.max_capacity * 0.9 ? 'warning' : 'normal'
+    })));
+  });
 }
 
-function exportOrders(filters = {}) {
+function exportOrders(filters, callback) {
   let sql = `
     SELECT 
       o.order_no,
@@ -104,7 +103,7 @@ function exportOrders(filters = {}) {
   
   sql += ' ORDER BY o.created_at DESC';
   
-  return db.prepare(sql).all(...params);
+  db.all(sql, params, callback);
 }
 
 module.exports = {

@@ -3,57 +3,45 @@ const router = express.Router();
 const commonService = require('../services/commonService');
 
 router.get('/ice-specs', (req, res) => {
-  try {
-    const data = commonService.getIceSpecs();
+  commonService.getIceSpecs((err, data) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.get('/delivery-slots', (req, res) => {
-  try {
-    const data = commonService.getDeliverySlots(req.query.date);
+  commonService.getDeliverySlots(req.query.date, (err, data) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.get('/coolers', (req, res) => {
-  try {
-    const data = commonService.getCoolers(req.query.status);
+  commonService.getCoolers(req.query.status, (err, data) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.post('/coolers/:id/return', (req, res) => {
-  try {
-    commonService.returnCooler(req.params.id, req.body.notes);
+  commonService.returnCooler(req.params.id, req.body.notes || '', (err) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.get('/capacity-alerts', (req, res) => {
-  try {
-    const data = commonService.getCapacityAlerts();
+  commonService.getCapacityAlerts((err, data) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 router.get('/export-orders', (req, res) => {
-  try {
-    const data = commonService.exportOrders(req.query);
+  commonService.exportOrders(req.query, (err, data) => {
+    if (err) return res.status(500).json({ success: false, message: err.message });
     res.json({ success: true, data });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+  });
 });
 
 module.exports = router;
