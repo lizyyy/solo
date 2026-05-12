@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>广告素材版本投放管理系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    
+    h1 { font-size: 28px; margin-bottom: 20px; color: #2c3e50; display: flex; align-items: center; gap: 10px; }
+    h2 { font-size: 18px; margin-bottom: 15px; color: #34495e; padding-bottom: 10px; border-bottom: 2px solid #3498db; }
+    
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+    .status-draft { background: #ecf0f1; color: #7f8c8d; }
+    .status-pending_review { background: #fff3cd; color: #856404; }
+    .status-approved { background: #d4edda; color: #155724; }
+    .status-running { background: #28a745; color: white; }
+    .status-paused { background: #fff3cd; color: #856404; }
+    .status-stopped { background: #f8d7da; color: #721c24; }
+    .status-rejected { background: #f8d7da; color: #721c24; }
+    
+    .review-pending { background: #fff3cd; color: #856404; }
+    .review-approved { background: #d4edda; color: #155724; }
+    .review-rejected { background: #f8d7da; color: #721c24; }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    .card h3 { font-size: 14px; color: #7f8c8d; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .value { font-size: 36px; font-weight: 700; color: #2c3e50; }
+    .card .trend { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+    
+    .table-container { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 30px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+    th { background: #f8f9fa; color: #495057; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+    tr:hover { background: #f8f9fa; }
+    
+    .tree-node { margin-left: 20px; padding: 8px; border-left: 2px solid #e0e0e0; }
+    .tree-node.root { margin-left: 0; border-left: none; }
+    .tree-content { background: #f8f9fa; padding: 10px 15px; border-radius: 6px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .tree-content.current { background: #e8f5e9; border: 2px solid #4caf50; }
+    .version-tag { background: #3498db; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    
+    .progress-bar { height: 8px; background: #ecf0f1; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); transition: width 0.3s ease; }
+    .progress-fill.warning { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+    .progress-fill.danger { background: linear-gradient(90deg, #fd7e14, #dc3545); }
+    
+    .campaign-selector { margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+    select, button { padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    button { background: #3498db; color: white; border: none; }
+    button:hover { background: #2980b9; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0; }
+    .tab { padding: 10px 20px; cursor: pointer; border-bottom: 3px solid transparent; color: #7f8c8d; font-weight: 500; }
+    .tab.active { border-bottom-color: #3498db; color: #2c3e50; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .history-item { padding: 15px; border-left: 3px solid #3498db; background: #f8f9fa; margin-bottom: 10px; border-radius: 0 6px 6px 0; }
+    .history-item.rollback { border-left-color: #e74c3c; }
+    .history-item .time { color: #7f8c8d; font-size: 12px; margin-top: 5px; }
+    .history-item .meta { font-size: 12px; color: #95a5a6; margin-top: 5px; }
+    
+    .diff { background: #fff3cd; padding: 2px 6px; border-radius: 3px; margin: 0 3px; }
+    
+    .refresh-btn { background: #6c757d; font-size: 12px; padding: 6px 12px; }
+    .refresh-btn:hover { background: #5a6268; }
+    
+    .loading { text-align: center; padding: 40px; color: #7f8c8d; }
+    .empty-state { text-align: center; padding: 40px; color: #7f8c8d; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 广告素材版本投放管理系统</h1>
+    
+    <div class="campaign-selector">
+      <label for="campaignSelect">选择活动:</label>
+      <select id="campaignSelect" onchange="loadCampaignData()">
+        <option value="">-- 请选择活动 --</option>
+      </select>
+      <button class="refresh-btn" onclick="loadCampaignData()">🔄 刷新数据</button>
+      <button onclick="exportReport()">📊 导出报告</button>
+    </div>
+    
+    <div id="overview" class="grid"></div>
+    
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('dashboard')">📊 总览</div>
+      <div class="tab" onclick="switchTab('versions')">🌳 版本树</div>
+      <div class="tab" onclick="switchTab('channels')">📱 渠道状态</div>
+      <div class="tab" onclick="switchTab('budget')">💰 预算消耗</div>
+      <div class="tab" onclick="switchTab('rollback')">🔄 回滚历史</div>
+      <div class="tab" onclick="switchTab('performance')">📈 效果数据</div>
+    </div>
+    
+    <div id="dashboard" class="tab-content active">
+      <div class="table-container">
+        <h2>各渠道投放状态</h2>
+        <div id="channelStatusTable"></div>
+      </div>
+    </div>
+    
+    <div id="versions" class="tab-content">
+      <div class="table-container">
+        <h2>素材版本树</h2>
+        <div id="versionTree"></div>
+      </div>
+    </div>
+    
+    <div id="channels" class="tab-content">
+      <div class="table-container">
+        <h2>渠道详细状态</h2>
+        <div id="channelDetailTable"></div>
+      </div>
+    </div>
+    
+    <div id="budget" class="tab-content">
+      <div class="table-container">
+        <h2>预算消耗详情</h2>
+        <div id="budgetTable"></div>
+      </div>
+    </div>
+    
+    <div id="rollback" class="tab-content">
+      <div class="table-container">
+        <h2>回滚历史记录</h2>
+        <div id="rollbackHistory"></div>
+      </div>
+    </div>
+    
+    <div id="performance" class="tab-content">
+      <div class="table-container">
+        <h2>效果数据汇总</h2>
+        <div id="performanceTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentCampaignId = null;
+    
+    async function fetchJSON(url) {
+      const res = await fetch(url);
+      return res.json();
+    }
+    
+    async function loadCampaigns() {
+      const data = await fetchJSON('/api/campaigns');
+      const select = document.getElementById('campaignSelect');
+      select.innerHTML = '<option value="">-- 请选择活动 --</option>';
+      if (data.data && data.data.length > 0) {
+        data.data.forEach(c => {
+          const option = document.createElement('option');
+          option.value = c.id;
+          option.textContent = c.name;
+          select.appendChild(option);
+        });
+        if (data.data.length > 0) {
+          select.value = data.data[0].id;
+          currentCampaignId = data.data[0].id;
+          loadCampaignData();
+        }
+      }
+    }
+    
+    async function loadCampaignData() {
+      const select = document.getElementById('campaignSelect');
+      currentCampaignId = select.value;
+      if (!currentCampaignId) return;
+      
+      await Promise.all([
+        loadOverview(),
+        loadDashboard(),
+        loadVersionTree(),
+        loadChannelDetails(),
+        loadBudgetTable(),
+        loadRollbackHistory(),
+        loadPerformanceTable()
+      ]);
+    }
+    
+    async function loadOverview() {
+      const data = await fetchJSON('/api/reports/campaign/' + currentCampaignId + '/dashboard');
+      const overview = document.getElementById('overview');
+      const s = data.data.summary;
+      
+      overview.innerHTML = `
+        <div class="card">
+          <h3>素材版本数</h3>
+          <div class="value">${s.total_materials}</div>
+          <div class="trend">历史版本追溯完整</div>
+        </div>
+        <div class="card">
+          <h3>投放渠道数</h3>
+          <div class="value">${s.total_channels}</div>
+          <div class="trend">覆盖多渠道管理</div>
+        </div>
+        <div class="card">
+          <h3>总预算</h3>
+          <div class="value">¥${s.total_budget.toLocaleString()}</div>
+          <div class="trend">已消耗: ¥${s.total_spent.toLocaleString()}</div>
+        </div>
+        <div class="card">
+          <h3>剩余预算</h3>
+          <div class="value" style="color: ${s.remaining_budget > 0 ? '#28a745' : '#dc3545'}">¥${s.remaining_budget.toLocaleString()}</div>
+          <div class="trend">使用率: ${s.total_budget > 0 ? ((s.total_spent/s.total_budget)*100).toFixed(1) : 0}%</div>
+        </div>
+        <div class="card">
+          <h3>投放中</h3>
+          <div class="value" style="color: #28a745">${s.by_status['running'] || 0}</div>
+          <div class="trend">正常投放的渠道</div>
+        </div>
+        <div class="card">
+          <h3>已暂停</h3>
+          <div class="value" style="color: #ffc107">${s.by_status['paused'] || 0}</div>
+          <div class="trend">可随时恢复投放</div>
+        </div>
+      `;
+    }
+    
+    async function loadDashboard() {
+      const data = await fetchJSON('/api/reports/campaign/' + currentCampaignId + '/dashboard');
+      const channels = data.data.channel_statuses;
+      
+      let html = '<table><thead><tr><th>版本</th><th>素材</th><th>渠道</th><th>状态</th><th>审核</th><th>预算</th><th>已消耗</th></tr></thead><tbody>';
+      
+      if (channels.length === 0) {
+        html += '<tr><td colspan="7" class="empty-state">暂无渠道投放数据</td></tr>';
+      } else {
+        channels.forEach(c => {
+          html += `
+            <tr>
+              <td><span class="version-tag">${c.material_version}</span></td>
+              <td>${c.material_title}</td>
+              <td>${c.channel_name}</td>
+              <td><span class="status-badge status-${c.status}">${getStatusText(c.status)}</span></td>
+              <td><span class="status-badge review-${c.review_status}">${getReviewText(c.review_status)}</span></td>
+              <td>¥${c.budget.toLocaleString()}</td>
+              <td>
+                ¥${c.spent.toLocaleString()}
+                <div class="progress-bar">
+                  <div class="progress-fill ${getProgressClass(c.spent, c.budget)}" style="width: ${Math.min((c.spent/c.budget)*100, 100)}%"></div>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+      }
+      
+      html += '</tbody></table>';
+      document.getElementById('channelStatusTable').innerHTML = html;
+    }
+    
+    async function loadVersionTree() {
+      const data = await fetchJSON('/api/reports/campaign/' + currentCampaignId + '/dashboard');
+      const tree = data.data.version_tree;
+      
+      let html = renderTree(tree, true);
+      document.getElementById('versionTree').innerHTML = html || '<div class="empty-state">暂无版本数据</div>';
+    }
+    
+    function renderTree(nodes, isRoot = false) {
+      if (!nodes || nodes.length === 0) return '';
+      
+      let html = '';
+      nodes.forEach(node => {
+        const hasChildren = node.children && node.children.length > 0;
+        html += `
+          <div class="tree-node ${isRoot ? 'root' : ''}">
+            <div class="tree-content">
+              <div>
+                <strong><span class="version-tag">v${node.version}</span> ${node.title}</strong>
+                <div style="color:#7f8c8d;font-size:12px;margin-top:5px">创建者: ${node.creator} | ${node.created_at}</div>
+              </div>
+              <div>
+                ${hasChildren ? `<span style="color:#3498db">📦 子版本: ${node.children.length}</span>` : ''}
+              </div>
+            </div>
+            ${hasChildren ? renderTree(node.children) : ''}
+          </div>
+        `;
+      });
+      return html;
+    }
+    
+    async function loadChannelDetails() {
+      const data = await fetchJSON('/api/reports/campaign/' + currentCampaignId + '/dashboard');
+      const channels = data.data.channel_statuses;
+      
+      let html = '<table><thead><tr><th>渠道</th><th>当前版本</th><th>素材标题</th><th>状态</th><th>审核状态</th><th>更新时间</th></tr></thead><tbody>';
+      
+      if (channels.length === 0) {
+        html += '<tr><td colspan="6" class="empty-state">暂无数据</td></tr>';
+      } else {
+        channels.forEach(c => {
+          html += `
+            <tr>
+              <td>${c.channel_name} (${c.channel_code})</td>
+              <td><span class="version-tag">v${c.material_version}</span></td>
+              <td>${c.material_title}</td>
+              <td><span class="status-badge status-${c.status}">${getDetailedStatus(c.status, c.review_status)}</span></td>
+              <td><span class="status-badge review-${c.review_status}">${getReviewText(c.review_status)}</span></td>
+              <td>${c.updated_at}</td>
+            </tr>
+          `;
+        });
+      }
+      
+      html += '</tbody></table>';
+      document.getElementById('channelDetailTable').innerHTML = html;
+    }
+    
+    async function loadBudgetTable() {
+      const data = await fetchJSON('/api/reports/campaign/' + currentCampaignId + '/dashboard');
+      const channels = data.data.channel_statuses;
+      
+      let html = '<table><thead><tr><th>渠道</th><th>版本</th><th>总预算</th><th>已消耗</th><th>剩余</th><th>使用率</th><th>状态</th></tr></thead><tbody>';
+      
+      if (channels.length === 0) {
+        html += '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+      } else {
+        channels.forEach(c => {
+          const remaining = c.budget - c.spent;
+          const percent = c.budget > 0 ? ((c.spent / c.budget) * 100).toFixed(1) : 0;
+          
+          html += `
+            <tr>
+              <td>${c.channel_name}</td>
+              <td><span class="version-tag">v${c.material_version}</span></td>
+              <td>¥${c.budget.toLocaleString()}</td>
+              <td style="color:#dc3545">¥${c.spent.toLocaleString()}</td>
+              <td style="color:${remaining > 0 ? '#28a745' : '#dc3545'}">¥${remaining.toLocaleString()}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="progress-bar" style="flex:1;min-width:100px">
+                    <div class="progress-fill ${getProgressClass(c.spent, c.budget)}" style="width:${Math.min(percent, 100)}%"></div>
+                  </div>
+                  <span>${percent}%</span>
+                </div>
+              </td>
+              <td><span class="status-badge status-${c.status}">${getStatusText(c.status)}</span></td>
+            </tr>
+          `;
+        });
+      }
+      
+      html += '</tbody></table>';
+      document.getElementById('budgetTable').innerHTML = html;
+    }
+    
+    async function loadRollbackHistory() {
+      const data = await fetchJSON('/api/reports/rollback-history/' + currentCampaignId);
+      const records = data.data.records;
+      
+      if (!records || records.length === 0) {
+        document.getElementById('rollbackHistory').innerHTML = '<div class="empty-state">暂无回滚记录</div>';
+        return;
+      }
+      
+      let html = '';
+      records.forEach(r => {
+        html += `
+          <div class="history-item rollback">
+            <strong>🔄 版本回滚</strong>
+            <div style="margin-top:8px;color:#7f8c8d">
+              <span class="diff">v${r.from_version}</span> ${r.from_title}
+              <span style="margin:0 10px">→</span>
+              <span class="diff">v${r.to_version}</span> ${r.to_title}
+            </div>
+            <div style="margin-top:8px">
+              <span style="color:#7f8c8d">渠道: </span>${r.channel_name}
+              <span style="margin:0 15px;color:#7f8c8d">|</span>
+              <span style="color:#7f8c8d">操作人: </span>${r.operator}
+            </div>
+            ${r.reason ? `<div style="margin-top:5px;color:#7f8c8d">原因: ${r.reason}</div>` : ''}
+            <div class="time">${r.created_at}</div>
+          </div>
+        `;
+      });
+      
+      document.getElementById('rollbackHistory').innerHTML = html;
+    }
+    
+    async function loadPerformanceTable() {
+      const data = await fetchJSON('/api/reports/performance/' + currentCampaignId);
+      const summary = data.data.summary;
+      const records = data.data.records;
+      
+      let html = `
+        <div style="margin-bottom:20px;padding:15px;background:#e8f5e9;border-radius:6px">
+          <strong>📊 汇总数据</strong>
+          <div style="margin-top:10px;display:flex;gap:30px;flex-wrap:wrap">
+            <div><span style="color:#7f8c8d">总曝光:</span> <strong>${summary.total_impressions.toLocaleString()}</strong></div>
+            <div><span style="color:#7f8c8d">总点击:</span> <strong>${summary.total_clicks.toLocaleString()}</strong></div>
+            <div><span style="color:#7f8c8d">总转化:</span> <strong>${summary.total_conversions.toLocaleString()}</strong></div>
+            <div><span style="color:#7f8c8d">总消耗:</span> <strong style="color:#dc3545">¥${summary.total_cost.toLocaleString()}</strong></div>
+            <div><span style="color:#7f8c8d">点击率:</span> <strong style="color:#3498db">${summary.ctr}</strong></div>
+            <div><span style="color:#7f8c8d">转化率:</span> <strong style="color:#28a745">${summary.cvr}</strong></div>
+          </div>
+        </div>
+        <table><thead><tr><th>日期</th><th>渠道</th><th>版本</th><th>曝光</th><th>点击</th><th>转化</th><th>消耗</th><th>状态</th></tr></thead><tbody>
+      `;
+      
+      if (!records || records.length === 0) {
+        html += '<tr><td colspan="8" class="empty-state">暂无效果数据</td></tr>';
+      } else {
+        records.forEach(r => {
+          html += `
+            <tr>
+              <td>${r.record_date}</td>
+              <td>${r.channel_name}</td>
+              <td><span class="version-tag">v${r.material_version}</span></td>
+              <td>${r.impressions.toLocaleString()}</td>
+              <td>${r.clicks.toLocaleString()}</td>
+              <td>${r.conversions.toLocaleString()}</td>
+              <td style="color:#dc3545">¥${r.cost.toLocaleString()}</td>
+              <td><span class="status-badge status-${r.status}">${getStatusText(r.status)}</span></td>
+            </tr>
+          `;
+        });
+      }
+      
+      html += '</tbody></table>';
+      document.getElementById('performanceTable').innerHTML = html;
+    }
+    
+    async function exportReport() {
+      if (!currentCampaignId) return;
+      window.location.href = '/api/reports/export/' + currentCampaignId;
+    }
+    
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+    
+    function getStatusText(status) {
+      const map = {
+        'draft': '草稿',
+        'pending_review': '审核中',
+        'approved': '已通过',
+        'running': '投放中',
+        'paused': '已暂停',
+        'stopped': '已停止',
+        'rejected': '已驳回'
+      };
+      return map[status] || status;
+    }
+    
+    function getReviewText(status) {
+      const map = {
+        'pending': '待审核',
+        'approved': '已通过',
+        'rejected': '已驳回'
+      };
+      return map[status] || status;
+    }
+    
+    function getDetailedStatus(status, review) {
+      if (status === 'running') return '正常投放';
+      if (status === 'paused') return '已暂停';
+      if (status === 'stopped') return '已停止';
+      if (review === 'pending') return '等待审核';
+      if (review === 'rejected') return '审核不通过';
+      return getStatusText(status);
+    }
+    
+    function getProgressClass(spent, budget) {
+      if (budget <= 0) return 'danger';
+      const percent = (spent / budget) * 100;
+      if (percent >= 90) return 'danger';
+      if (percent >= 70) return 'warning';
+      return '';
+    }
+    
+    loadCampaigns();
+  </script>
+</body>
+</html>
