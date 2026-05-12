@@ -1,0 +1,15 @@
+{
+  "name": "community-group-purchase-shortage-api",
+  "version": "1.0.0",
+  "description": "社区团购缺斤赔付 API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "demo": "node src/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
