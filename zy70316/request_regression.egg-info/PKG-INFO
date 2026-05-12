@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: request-regression
+Version: 0.1.0
+Summary: 请求录制回归测试 CLI 工具
+Author: Order Service Team
+Requires-Python: >=3.8
+Requires-Dist: click>=8.0.0
+Requires-Dist: requests>=2.25.0
+Requires-Dist: PyYAML>=6.0
+Requires-Dist: deepdiff>=5.8.0
+Requires-Dist: colorama>=0.4.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

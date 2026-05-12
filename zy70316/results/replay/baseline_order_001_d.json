@@ -1,0 +1,38 @@
+{
+  "sample_id": "order_001_d",
+  "source": "baseline",
+  "status_code": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "code": 0,
+    "message": "success",
+    "data": {
+      "total": 3,
+      "orders": [
+        {
+          "order_id": "O001",
+          "status": "paid",
+          "amount": 299.0,
+          "created_at": "2024-05-10T09:00:00Z"
+        },
+        {
+          "order_id": "O002",
+          "status": "shipped",
+          "amount": 599.0,
+          "created_at": "2024-05-11T14:20:00Z"
+        },
+        {
+          "order_id": "O003",
+          "status": "completed",
+          "amount": 129.0,
+          "created_at": "2024-05-12T08:15:00Z"
+        }
+      ]
+    }
+  },
+  "response_time_ms": 0.013113021850585938,
+  "side_effects": {},
+  "error": null
+}

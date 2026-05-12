@@ -1,0 +1,23 @@
+{
+  "sample_id": "member_001_d",
+  "source": "baseline",
+  "status_code": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "code": 0,
+    "message": "success",
+    "data": {
+      "user_id": "U10001",
+      "username": "***",
+      "phone": "***",
+      "level": "gold",
+      "points": 1580,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  },
+  "response_time_ms": 0.008821487426757812,
+  "side_effects": {},
+  "error": null
+}

@@ -1,0 +1,23 @@
+{
+  "sample_id": "member_001_d",
+  "sample_group": "member",
+  "diffs": [
+    {
+      "path": "body.data.member_since",
+      "diff_type": "new_field",
+      "old_value": null,
+      "new_value": "2024-01-15",
+      "ignored": false
+    },
+    {
+      "path": "body.data.vip_expire_at",
+      "diff_type": "new_field",
+      "old_value": null,
+      "new_value": "2025-01-15",
+      "ignored": false
+    }
+  ],
+  "severity_score": 10.0,
+  "approved": true,
+  "approval_record": "developer_a@2026-05-12T22:44:01.873936 - 新增会员字段是预期的功能增强"
+}

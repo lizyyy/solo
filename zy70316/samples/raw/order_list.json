@@ -1,0 +1,18 @@
+{
+  "id": "order_001",
+  "group": "order",
+  "method": "POST",
+  "url": "/api/v1/order/list",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+  },
+  "body": {
+    "user_id": "U10001",
+    "status": "all",
+    "page": 1,
+    "page_size": 10
+  },
+  "timestamp": "2024-05-12T10:01:00Z",
+  "side_effects": {}
+}

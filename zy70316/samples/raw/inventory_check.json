@@ -1,0 +1,16 @@
+{
+  "id": "inventory_001",
+  "group": "inventory",
+  "method": "POST",
+  "url": "/api/v1/inventory/check",
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Warehouse": "WH-A"
+  },
+  "body": {
+    "sku": "SKU001",
+    "quantity": 1
+  },
+  "timestamp": "2024-05-12T10:02:00Z",
+  "side_effects": {}
+}

@@ -1,0 +1,16 @@
+{
+  "sample_id": "inventory_001_d",
+  "sample_group": "inventory",
+  "diffs": [
+    {
+      "path": "body.data.warehouse",
+      "diff_type": "missing_field",
+      "old_value": "WH-A",
+      "new_value": null,
+      "ignored": false
+    }
+  ],
+  "severity_score": 20.0,
+  "approved": false,
+  "approval_record": null
+}

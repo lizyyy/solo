@@ -1,0 +1,51 @@
+approvals_dir: results/approvals
+baseline_service: baseline
+comparison_dir: results/comparison
+desensitization_rules:
+- field: Authorization
+  pattern: null
+  replacement: '***'
+- field: phone
+  pattern: \d{7}(\d{4})
+  replacement: '****$1'
+- field: password
+  pattern: null
+  replacement: '***'
+- field: email
+  pattern: null
+  replacement: '***@***'
+groups:
+- member
+- order
+- inventory
+ignore_rules:
+- path: body.data.created_at
+  reason: 动态时间戳
+- path: body.data.updated_at
+  reason: 动态时间戳
+- path: body.data.timestamp
+  reason: 动态时间戳
+input_dir: samples/raw
+output_dir: samples/processed
+replay_results_dir: results/replay
+reports_dir: results/reports
+required_headers:
+- Content-Type
+services:
+- headers: {}
+  module: request_regression.builtin_handlers
+  name: baseline
+  processor: baseline_handler
+  type: builtin
+  url: null
+- headers: {}
+  module: request_regression.builtin_handlers
+  name: target
+  processor: target_handler
+  type: builtin
+  url: null
+target_service: target
+thresholds:
+  max_response_time_diff_ms: 1000
+  max_severity_score: 80.0
+  max_total_diffs: 100

@@ -1,0 +1,17 @@
+{
+  "id": "member_001_d",
+  "group": "member",
+  "method": "GET",
+  "url": "/api/v1/member/profile",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "***",
+    "X-User-Id": "U10001"
+  },
+  "body": null,
+  "timestamp": "2024-05-12T10:00:00+00:00",
+  "status": "valid",
+  "original_id": "member_001",
+  "desensitized": true,
+  "side_effects": {}
+}

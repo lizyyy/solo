@@ -1,0 +1,14 @@
+{
+  "id": "member_001",
+  "group": "member",
+  "method": "GET",
+  "url": "/api/v1/member/profile",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+    "X-User-Id": "U10001"
+  },
+  "body": null,
+  "timestamp": "2024-05-12T10:00:00Z",
+  "side_effects": {}
+}

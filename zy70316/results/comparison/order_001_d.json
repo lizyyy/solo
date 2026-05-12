@@ -1,0 +1,65 @@
+{
+  "sample_id": "order_001_d",
+  "sample_group": "order",
+  "diffs": [
+    {
+      "path": "body.data.orders[1].order_id",
+      "diff_type": "value_changed",
+      "old_value": "O002",
+      "new_value": "O003",
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[1].status",
+      "diff_type": "value_changed",
+      "old_value": "shipped",
+      "new_value": "completed",
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[1].amount",
+      "diff_type": "value_changed",
+      "old_value": 599.0,
+      "new_value": 129.0,
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[1].created_at",
+      "diff_type": "value_changed",
+      "old_value": "2024-05-11T14:20:00Z",
+      "new_value": "2024-05-12T08:15:00Z",
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[2].order_id",
+      "diff_type": "value_changed",
+      "old_value": "O003",
+      "new_value": "O002",
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[2].status",
+      "diff_type": "value_changed",
+      "old_value": "completed",
+      "new_value": "shipped",
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[2].amount",
+      "diff_type": "value_changed",
+      "old_value": 129.0,
+      "new_value": 599.0,
+      "ignored": false
+    },
+    {
+      "path": "body.data.orders[2].created_at",
+      "diff_type": "value_changed",
+      "old_value": "2024-05-12T08:15:00Z",
+      "new_value": "2024-05-11T14:20:00Z",
+      "ignored": false
+    }
+  ],
+  "severity_score": 80.0,
+  "approved": false,
+  "approval_record": null
+}

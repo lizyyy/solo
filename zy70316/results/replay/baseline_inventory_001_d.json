@@ -1,0 +1,22 @@
+{
+  "sample_id": "inventory_001_d",
+  "source": "baseline",
+  "status_code": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "code": 0,
+    "message": "success",
+    "data": {
+      "sku": "SKU001",
+      "available": true,
+      "stock": 150,
+      "reserved": 25,
+      "warehouse": "WH-A"
+    }
+  },
+  "response_time_ms": 0.48828125,
+  "side_effects": {},
+  "error": null
+}

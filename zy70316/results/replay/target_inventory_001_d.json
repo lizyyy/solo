@@ -1,0 +1,21 @@
+{
+  "sample_id": "inventory_001_d",
+  "source": "target",
+  "status_code": 200,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "code": 0,
+    "message": "success",
+    "data": {
+      "sku": "SKU001",
+      "available": true,
+      "stock": 150,
+      "reserved": 25
+    }
+  },
+  "response_time_ms": 0.007867813110351562,
+  "side_effects": {},
+  "error": null
+}
