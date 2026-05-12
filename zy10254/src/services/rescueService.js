@@ -141,7 +141,7 @@ function createRescueOrder(data) {
   };
 }
 
-function matchTechnician(orderId, excludeTechnicianId = null) {
+function matchTechnician(orderId, excludeTechnicianId = null, skipPreDeduct = false) {
   const order = db.prepare('SELECT * FROM rescue_orders WHERE orderId = ?').get(orderId);
   
   if (!order) {
@@ -198,25 +198,39 @@ function matchTechnician(orderId, excludeTechnicianId = null) {
   `).run(orderId, selectedTech.technicianId);
 
   let preDeductInfo = null;
-  if (order.membershipId) {
-    const membership = db.prepare('SELECT * FROM memberships WHERE membershipId = ?').get(order.membershipId);
-    if (membership && membership.isActive && membership.remainingTimes > 0) {
-      db.prepare(`
-        UPDATE memberships
-        SET remainingTimes = remainingTimes - 1
-        WHERE membershipId = ?
-      `).run(order.membershipId);
+  if (order.membershipId && !skipPreDeduct) {
+    const existingPreDeduct = db.prepare(`
+      SELECT * FROM fee_records
+      WHERE orderId = ? AND type IN ('pre_deduct', 'deduct')
+    `).all(orderId);
+    
+    if (existingPreDeduct.length === 0) {
+      const membership = db.prepare('SELECT * FROM memberships WHERE membershipId = ?').get(order.membershipId);
+      if (membership && membership.isActive && membership.remainingTimes > 0) {
+        db.prepare(`
+          UPDATE memberships
+          SET remainingTimes = remainingTimes - 1
+          WHERE membershipId = ?
+        `).run(order.membershipId);
 
-      const recordId = uuidv4();
-      db.prepare(`
-        INSERT INTO fee_records (recordId, orderId, membershipId, type, amount, timesUsed, description)
-        VALUES (?, ?, ?, 'pre_deduct', ?, 1, '匹配技师-权益预扣')
-      `).run(recordId, orderId, order.membershipId, order.estimatedCost);
+        const recordId = uuidv4();
+        db.prepare(`
+          INSERT INTO fee_records (recordId, orderId, membershipId, type, amount, timesUsed, description)
+          VALUES (?, ?, ?, 'pre_deduct', ?, 1, '匹配技师-权益预扣')
+        `).run(recordId, orderId, order.membershipId, order.estimatedCost);
 
+        preDeductInfo = {
+          usedMembership: true,
+          timesUsed: 1,
+          remainingTimes: membership.remainingTimes - 1,
+          note: '首次匹配预扣权益'
+        };
+      }
+    } else {
       preDeductInfo = {
         usedMembership: true,
-        timesUsed: 1,
-        remainingTimes: membership.remainingTimes - 1
+        timesUsed: 0,
+        note: '重派技师，不重复预扣，沿用首次预扣的权益'
       };
     }
   }

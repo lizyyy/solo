@@ -89,7 +89,7 @@ async function runRepeatDemo() {
     printResult('第二次创建工单（系统自动识别为重复）', order2);
 
     printStep('1-3', '查看该车辆所有工单');
-    const allOrders = await request('GET', '/rescue/vehicle/京B66666');
+    const allOrders = await request('GET', '/rescue/vehicle/' + encodeURIComponent('京B66666'));
     printResult('该车辆所有工单（可见重复标记和关联关系）', 
       allOrders.map(o => ({
         orderId: o.orderId.substring(0, 8) + '...',
