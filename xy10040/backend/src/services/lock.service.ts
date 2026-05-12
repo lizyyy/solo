@@ -97,11 +97,9 @@ export class DistributedLockService {
 
   async release(lock: Lock): Promise<boolean> {
     try {
-      return await this.releaseWithClient(
-        (await db.getClient()) as unknown as DatabaseClient,
-        lock.key,
-        lock.holderId
-      );
+      return await db.transaction(async (client) => {
+        return this.releaseWithClient(client, lock.key, lock.holderId);
+      });
     } catch (error) {
       logger.error('Lock release error', {
         key: lock.key,

@@ -39,7 +39,7 @@ export enum EventType {
 }
 
 export interface EventLogEntry {
-  id: bigint;
+  id: string;
   aggregateType: 'event' | 'registration';
   aggregateId: string;
   eventType: EventType;

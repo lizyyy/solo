@@ -176,9 +176,26 @@ export class EventLogService {
     return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
   }
 
+  async getByEvent(eventId: string): Promise<EventLogEntry[]> {
+    const query = `
+      SELECT * FROM event_log
+      WHERE (
+        (aggregate_type = 'event' AND aggregate_id = $1)
+        OR 
+        (aggregate_type = 'registration' AND payload->>'eventId' = $1)
+      )
+      ORDER BY timestamp ASC
+    `;
+
+    logger.info('Getting event logs with related registration logs', { eventId });
+
+    const result = await db.query(query, [eventId]);
+    return result.rows.map((row) => this.mapRowToEntry(row as Record<string, unknown>));
+  }
+
   private mapRowToEntry(row: Record<string, unknown>): EventLogEntry {
     return {
-      id: BigInt(row.id as string),
+      id: String(row.id),
       aggregateType: row.aggregate_type as 'event' | 'registration',
       aggregateId: row.aggregate_id as string,
       eventType: row.event_type as EventType,

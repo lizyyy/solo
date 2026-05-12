@@ -114,4 +114,15 @@ router.get('/aggregate/:aggregateType/:aggregateId', async (req: Request, res: R
   }
 });
 
+router.get('/event/:eventId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { eventId } = req.params;
+    const entries = await eventLogService.getByEvent(eventId);
+    return res.json({ entries });
+  } catch (error) {
+    next(error);
+    return;
+  }
+});
+
 export default router;

@@ -187,6 +187,11 @@ class ApiClient {
     return response.data;
   }
 
+  async getEventLogByEvent(eventId: string): Promise<{ entries: EventLogEntry[] }> {
+    const response = await this.client.get(`/event-log/event/${eventId}`);
+    return response.data;
+  }
+
   async replayEvents(
     aggregateType: 'event' | 'registration',
     aggregateId: string,

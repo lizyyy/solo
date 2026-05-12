@@ -163,11 +163,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const idempotencyToken = api.generateIdempotencyToken();
-      const currentUserId = get().currentUserId;
+      const userIdToUse = dto.userId || get().currentUserId;
       const registration = await api.createRegistration(
         {
           ...dto,
-          userId: currentUserId,
+          userId: userIdToUse,
         },
         idempotencyToken
       );

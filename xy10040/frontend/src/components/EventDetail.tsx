@@ -30,11 +30,8 @@ export function EventDetail({ event, registrations, onBack, onRegister, onEdit, 
   const loadEventLog = async () => {
     setLoadingLog(true);
     try {
-      const { entries } = await api.getEventLogByAggregate('event', event.id);
-      const regLogs = await api.getEventLogByAggregate('registration', event.id);
-      setLogEntries([...entries, ...regLogs].sort((a, b) => 
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-      ));
+      const { entries } = await api.getEventLogByEvent(event.id);
+      setLogEntries(entries);
     } catch (error) {
       console.error('Failed to load event log:', error);
     } finally {
