@@ -208,11 +208,14 @@ def generate_report_no(db: Session) -> str:
 
 def find_nearby_pole(db: Session, lat: float, lon: float, threshold_meters: int = 50) -> Optional[LampPole]:
     poles = db.query(LampPole).all()
+    nearest_pole = None
+    min_distance = float('inf')
     for pole in poles:
         distance = geodesic((lat, lon), (pole.latitude, pole.longitude)).meters
-        if distance <= threshold_meters:
-            return pole
-    return None
+        if distance <= threshold_meters and distance < min_distance:
+            min_distance = distance
+            nearest_pole = pole
+    return nearest_pole
 
 def find_duplicate_reports(db: Session, lamp_pole_id: int, new_report_id: int) -> List[Report]:
     active_reports = db.query(Report).filter(
