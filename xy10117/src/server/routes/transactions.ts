@@ -137,6 +137,64 @@ router.get('/statistics', (_req: Request, res: Response) => {
   }
 });
 
+router.get('/export', (req: Request, res: Response) => {
+  try {
+    const filters = {
+      start_date: (req.query.start_date as string) || undefined,
+      end_date: (req.query.end_date as string) || undefined,
+      status: (req.query.status as string) || undefined,
+    };
+
+    const format = (req.query.format as string) || 'json';
+    const data = getAllTransactionsForExport(filters);
+
+    if (format === 'csv') {
+      const headers = [
+        '交易ID', '金额', '商户', '品类', '国家', '用户ID', '交易时间',
+        '风险评分', '是否异常', '是否已复核', '复核结论', '复核意见', '复核人', '复核时间', '导入时间'
+      ];
+
+      const csvRows = [
+        headers.join(','),
+        ...data.map((row: any) => [
+          `"${row.transaction_id || ''}"`,
+          row.amount || 0,
+          `"${(row.merchant || '').replace(/"/g, '""')}"`,
+          `"${(row.category || '').replace(/"/g, '""')}"`,
+          `"${(row.country || '').replace(/"/g, '""')}"`,
+          `"${row.user_id || ''}"`,
+          `"${row.transaction_time || ''}"`,
+          (row.risk_score || 0).toFixed(1),
+          row.is_anomaly ? '是' : '否',
+          row.reviewed ? '是' : '否',
+          row.review_decision === 'confirmed' ? '确认异常' : row.review_decision === 'rejected' ? '误判' : '',
+          `"${(row.review_comment || '').replace(/"/g, '""')}"`,
+          `"${row.reviewer || ''}"`,
+          `"${row.reviewed_at || ''}"`,
+          `"${row.created_at || ''}"`,
+        ].join(','))
+      ];
+
+      const csv = '\ufeff' + csvRows.join('\n');
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(`异常交易报告_${Date.now()}.csv`)}`
+      );
+      res.send(csv);
+    } else {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(`异常交易报告_${Date.now()}.json`)}`
+      );
+      res.json(data);
+    }
+  } catch (err) {
+    res.status(500).json({ error: '导出失败: ' + (err as Error).message });
+  }
+});
+
 router.get('/:transactionId', (req: Request, res: Response) => {
   try {
     const tx = getTransaction(req.params.transactionId);
@@ -188,58 +246,6 @@ router.get('/history/:transactionId', (req: Request, res: Response) => {
     res.json(history);
   } catch (err) {
     res.status(500).json({ error: '查询历史记录失败: ' + (err as Error).message });
-  }
-});
-
-router.get('/export', (req: Request, res: Response) => {
-  try {
-    const filters = {
-      start_date: (req.query.start_date as string) || undefined,
-      end_date: (req.query.end_date as string) || undefined,
-      status: (req.query.status as string) || undefined,
-    };
-
-    const format = (req.query.format as string) || 'json';
-    const data = getAllTransactionsForExport(filters);
-
-    if (format === 'csv') {
-      const headers = [
-        '交易ID', '金额', '商户', '品类', '国家', '用户ID', '交易时间',
-        '风险评分', '是否异常', '是否已复核', '复核结论', '复核意见', '复核人', '复核时间', '导入时间'
-      ];
-
-      const csvRows = [
-        headers.join(','),
-        ...data.map((row: any) => [
-          `"${row.transaction_id || ''}"`,
-          row.amount || 0,
-          `"${(row.merchant || '').replace(/"/g, '""')}"`,
-          `"${(row.category || '').replace(/"/g, '""')}"`,
-          `"${(row.country || '').replace(/"/g, '""')}"`,
-          `"${row.user_id || ''}"`,
-          `"${row.transaction_time || ''}"`,
-          (row.risk_score || 0).toFixed(1),
-          row.is_anomaly ? '是' : '否',
-          row.reviewed ? '是' : '否',
-          row.review_decision === 'confirmed' ? '确认异常' : row.review_decision === 'rejected' ? '误判' : '',
-          `"${(row.review_comment || '').replace(/"/g, '""')}"`,
-          `"${row.reviewer || ''}"`,
-          `"${row.reviewed_at || ''}"`,
-          `"${row.created_at || ''}"`,
-        ].join(','))
-      ];
-
-      const csv = '\ufeff' + csvRows.join('\n');
-      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="异常交易报告_${Date.now()}.csv"`);
-      res.send(csv);
-    } else {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="异常交易报告_${Date.now()}.json"`);
-      res.json(data);
-    }
-  } catch (err) {
-    res.status(500).json({ error: '导出失败: ' + (err as Error).message });
   }
 });
 
