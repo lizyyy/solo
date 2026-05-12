@@ -231,20 +231,19 @@ async function queryRepeatFaults() {
 async function queryTicketDetail(ticketId: string) {
   printSection(`工单完整链路 - ${ticketId.substring(0, 8)}...`);
 
-  const ticket = await FaultTicket.findByPk(ticketId, {
-    include: [
-      { model: OperationHistory, as: 'histories', order: [['operatedAt', 'ASC']] },
-      { model: RemoteOperation, as: 'remoteOperations', order: [['requestedAt', 'ASC']] },
-      { model: MaintenanceRecord, as: 'maintenanceRecords', order: [['createdAt', 'ASC']] },
-    ],
-  });
-
+  const ticket = await FaultTicket.findByPk(ticketId);
   if (!ticket) {
     console.log('    工单不存在');
     return;
   }
 
-  const data = ticket.toJSON();
+  const [histories, remoteOperations, maintenanceRecords] = await Promise.all([
+    OperationHistory.findAll({ where: { ticketId }, order: [['operatedAt', 'ASC']] }),
+    RemoteOperation.findAll({ where: { ticketId }, order: [['requestedAt', 'ASC']] }),
+    MaintenanceRecord.findAll({ where: { ticketId }, order: [['createdAt', 'ASC']] }),
+  ]);
+
+  const data = ticket.toJSON() as any;
   
   const statusIcons: Record<string, string> = {
     [TicketStatus.NEW]: '🆕',
@@ -272,20 +271,20 @@ async function queryTicketDetail(ticketId: string) {
 
   console.log('\n    📜 完整时间线:');
   const allEvents = [
-    ...(data.histories || []).map((h: any) => ({
+    ...histories.map((h: any) => ({
       time: new Date(h.operatedAt),
       type: 'history',
-      data: h,
+      data: h.toJSON(),
     })),
-    ...(data.remoteOperations || []).map((r: any) => ({
+    ...remoteOperations.map((r: any) => ({
       time: new Date(r.requestedAt),
       type: 'remote',
-      data: r,
+      data: r.toJSON(),
     })),
-    ...(data.maintenanceRecords || []).map((m: any) => ({
+    ...maintenanceRecords.map((m: any) => ({
       time: new Date(m.createdAt),
       type: 'maintenance',
-      data: m,
+      data: m.toJSON(),
     })),
   ].sort((a, b) => a.time.getTime() - b.time.getTime());
 

@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
 import { MaintenanceRecord, MaintenanceStatus, FaultTicket, TicketStatus, FailureReason } from '../models';
 import ticketService from './TicketService';
 import { OperationType } from '../models/OperationHistory';
@@ -60,7 +61,7 @@ class MaintenanceService {
     const activeMaintenance = await MaintenanceRecord.findOne({
       where: {
         ticketId: request.ticketId,
-        status: { in: [MaintenanceStatus.PENDING, MaintenanceStatus.DISPATCHED, MaintenanceStatus.IN_PROGRESS] },
+        status: { [Op.in]: [MaintenanceStatus.PENDING, MaintenanceStatus.DISPATCHED, MaintenanceStatus.IN_PROGRESS] },
       },
     });
 

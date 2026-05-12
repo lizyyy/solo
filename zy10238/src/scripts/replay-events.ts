@@ -28,6 +28,12 @@ async function replayEvents() {
   console.log('📋 测试场景: 通信故障 → 决策建议 → 远程重启失败2次 → 自动升级派单 → 用户退款 → 维修完成 → 同桩重复故障检测\n');
 
   try {
+    // 重放前清空数据库
+    logStep(0, '清空数据库，准备测试环境');
+    await initDB({ force: true });
+    logStep(0, '清空数据库，准备测试环境', '✓');
+    await delay(100);
+
     // 步骤1: 创建订单
     logStep(1, '创建用户充电订单');
     await OrderInfo.create({
@@ -67,24 +73,24 @@ async function replayEvents() {
       console.log('\n       📊 系统决策建议:');
       logSuggestion(faultData.data.suggestion);
     }
-    await delay(500);
+    await delay(300);
 
-    // 步骤3: 重复故障上报（去重测试）
-    logStep(3, '重复故障上报 - 测试去重机制');
+    // 步骤3: 重复故障上报（去重测试）- 使用完全相同的故障码和充电桩
+    logStep(3, '重复故障上报 - 测试去重机制（同桩同故障码E202）');
     const duplicateResponse = await fetch(`${baseUrl}/tickets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         stationId,
         pileId,
-        faultCode: 'E201',
-        faultMessage: '通信模块异常，设备离线',
+        faultCode: 'E202',
+        faultMessage: '连接超时，设备离线',
         faultLevel: 'high',
         orderId: orderCode,
       }),
     });
     const duplicateData = await duplicateResponse.json();
-    logStep(3, '重复故障上报 - 测试去重机制', duplicateData.data.isDuplicate ? '✓' : '✗', 
+    logStep(3, '重复故障上报 - 测试去重机制（同桩同故障码E202）', duplicateData.data.isDuplicate ? '✓' : '✗', 
       duplicateData.data.isDuplicate ? '成功去重，复用已有工单' : '未去重，创建了新工单');
     await delay(300);
 
@@ -212,6 +218,11 @@ async function replayEvents() {
       }),
     });
     const maintenanceData = await maintenanceResponse.json();
+    
+    if (!maintenanceData.success) {
+      throw new Error(`派单失败: ${maintenanceData.error}`);
+    }
+    
     const maintenanceId = maintenanceData.data.maintenance.id;
     logStep(10, '派维修人员上门维修', '✓', `维修单ID: ${maintenanceId.substring(0, 8)}...，维修人员: 王师傅`);
     await delay(300);

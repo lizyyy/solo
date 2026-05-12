@@ -13,8 +13,8 @@ OperationHistory.belongsTo(FaultTicket, { foreignKey: 'ticketId' });
 RemoteOperation.belongsTo(FaultTicket, { foreignKey: 'ticketId' });
 MaintenanceRecord.belongsTo(FaultTicket, { foreignKey: 'ticketId' });
 
-const initDB = async () => {
-  await sequelize.sync({ force: true });
+const initDB = async (options?: { force?: boolean; alter?: boolean }) => {
+  await sequelize.sync({ alter: true, ...options });
 };
 
 export {
