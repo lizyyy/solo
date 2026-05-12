@@ -77,24 +77,44 @@ class Exporter:
         """导出到 Excel。"""
         try:
             with pd.ExcelWriter(output_path, engine='xlsxwriter') as writer:
+                workbook = writer.book
+                
+                header_format = workbook.add_format({
+                    'bold': True,
+                    'bg_color': '#4472C4',
+                    'font_color': 'white',
+                    'border': 1,
+                    'align': 'center',
+                    'valign': 'vcenter'
+                })
+                
                 summary = self._create_summary_df(analysis_result, qc_report)
                 summary.to_excel(writer, sheet_name='汇总', index=False)
+                self._format_worksheet(writer.sheets['汇总'], summary, header_format)
                 
                 battery_metrics = self._battery_metrics_to_df(analysis_result)
                 battery_metrics.to_excel(writer, sheet_name='电池指标', index=False)
+                self._format_worksheet(writer.sheets['电池指标'], battery_metrics, header_format)
                 
                 if not analysis_result.capacity_retention_summary.empty:
                     analysis_result.capacity_retention_summary.to_excel(
                         writer, sheet_name='容量保持率', index=False
                     )
+                    self._format_worksheet(
+                        writer.sheets['容量保持率'], 
+                        analysis_result.capacity_retention_summary, 
+                        header_format
+                    )
                 
                 qc_issues = self._qc_issues_to_df(qc_report)
                 if not qc_issues.empty:
                     qc_issues.to_excel(writer, sheet_name='质控问题', index=False)
+                    self._format_worksheet(writer.sheets['质控问题'], qc_issues, header_format)
                 
                 failed_samples = self._failed_samples_to_df()
                 if not failed_samples.empty:
                     failed_samples.to_excel(writer, sheet_name='失败样本', index=False)
+                    self._format_worksheet(writer.sheets['失败样本'], failed_samples, header_format)
                 
                 if not df.empty:
                     df_export = df.copy()
@@ -102,35 +122,19 @@ class Exporter:
                         if df_export[col].dtype == 'object':
                             df_export[col] = df_export[col].astype(str)
                     df_export.to_excel(writer, sheet_name='原始数据', index=False)
-                
-                self._format_excel(writer)
+                    self._format_worksheet(writer.sheets['原始数据'], df_export, header_format)
             
             self.logger.info("导出", f"Excel 文件已导出: {output_path}")
         except Exception as e:
             self.logger.error("导出", f"导出 Excel 失败: {str(e)}")
     
-    def _format_excel(self, writer: pd.ExcelWriter) -> None:
-        """格式化 Excel 文件。"""
-        workbook = writer.book
+    def _format_worksheet(self, worksheet, df: pd.DataFrame, header_format) -> None:
+        """格式化单个工作表。"""
+        for col_num, col_name in enumerate(df.columns.values):
+            worksheet.write(0, col_num, col_name, header_format)
         
-        header_format = workbook.add_format({
-            'bold': True,
-            'bg_color': '#4472C4',
-            'font_color': 'white',
-            'border': 1,
-            'align': 'center',
-            'valign': 'vcenter'
-        })
-        
-        for sheet_name in writer.sheets:
-            worksheet = writer.sheets[sheet_name]
-            df = pd.read_excel(writer, sheet_name=sheet_name)
-            
-            for col_num, value in enumerate(df.columns.values):
-                worksheet.write(0, col_num, value, header_format)
-            
-            worksheet.set_column('A:Z', 15)
-            worksheet.freeze_panes(1, 0)
+        worksheet.set_column('A:Z', 15)
+        worksheet.freeze_panes(1, 0)
     
     def _create_summary_df(self,
                           analysis_result: AnalysisResult,

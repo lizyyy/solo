@@ -46,10 +46,14 @@ class DataPreprocessor:
         return df
     
     def _normalize_columns(self, df: pd.DataFrame, column_mapping: Dict[str, str]) -> pd.DataFrame:
-        """标准化列名。"""
+        """标准化列名（列在读取阶段已标准化，这里主要做补充处理）。"""
+        df = df.copy()
+        
+        current_cols = set(df.columns)
         rename_map = {}
+        
         for std_name, actual_name in column_mapping.items():
-            if actual_name in df.columns:
+            if actual_name in current_cols and std_name not in current_cols:
                 rename_map[actual_name] = std_name
         
         if rename_map:
@@ -62,13 +66,15 @@ class DataPreprocessor:
         """分配电池ID。"""
         if 'battery_id' not in df.columns:
             if '_battery_id' in df.columns:
-                df['battery_id'] = df['_battery_id']
+                df['battery_id'] = df['_battery_id'].astype(str)
             elif '_sheet' in df.columns:
-                df['battery_id'] = df['_sheet']
+                df['battery_id'] = df['_sheet'].astype(str)
             else:
                 df['battery_id'] = 'Battery_001'
+        else:
+            df['battery_id'] = df['battery_id'].astype(str)
         
-        df['battery_id'] = df['battery_id'].astype(str).str.strip()
+        df['battery_id'] = df['battery_id'].str.strip()
         
         unique_ids = df['battery_id'].nunique()
         self.logger.info("预处理", f"检测到 {unique_ids} 个电池样本")
@@ -80,26 +86,19 @@ class DataPreprocessor:
         if 'capacity' not in df.columns:
             return df
         
-        original_dtype = df['capacity'].dtype
-        
-        if df['capacity'].dtype == object:
-            df = self._parse_capacity_with_units(df)
-        
-        if df['capacity'].dtype in [np.float64, np.int64, float, int]:
-            detected_unit = self._detect_unit(df['capacity'])
-            if detected_unit != 'mAh':
-                df = self._apply_unit_conversion(df, detected_unit)
+        df = self._parse_and_convert_capacity(df)
         
         return df
     
-    def _parse_capacity_with_units(self, df: pd.DataFrame) -> pd.DataFrame:
-        """解析带单位的容量值。"""
-        battery_units = {}
-        battery_values = {}
+    def _parse_and_convert_capacity(self, df: pd.DataFrame) -> pd.DataFrame:
+        """解析带单位的容量值并转换到mAh。"""
+        from collections import Counter
         
         for battery_id, group in df.groupby('battery_id'):
-            units = []
-            values = []
+            has_explicit_unit = False
+            dominant_unit = None
+            values_to_convert = []
+            raw_values = []
             
             for idx, val in group['capacity'].items():
                 if pd.isna(val):
@@ -111,12 +110,29 @@ class DataPreprocessor:
                 if match:
                     num = float(match.group(1))
                     unit = match.group(2).lower()
-                    values.append((idx, num))
-                    units.append(unit)
+                    
+                    if unit in ['ah', 'amh']:
+                        unit = 'ah'
+                    elif unit in ['mah', 'ma']:
+                        unit = 'mah'
+                    
+                    if unit in ['ah', 'mah']:
+                        has_explicit_unit = True
+                        values_to_convert.append((idx, num, unit))
+                        raw_values.append(num)
+                        if dominant_unit is None:
+                            dominant_unit = unit
+                        elif dominant_unit != unit:
+                            self.logger.log_sample_failure(
+                                battery_id,
+                                ErrorType.UNIT_INCONSISTENCY,
+                                f"检测到单位不一致: 同时存在 {dominant_unit} 和 {unit}"
+                            )
                 else:
                     try:
                         num = float(val_str)
-                        values.append((idx, num))
+                        values_to_convert.append((idx, num, None))
+                        raw_values.append(num)
                     except ValueError:
                         self.logger.log_sample_failure(
                             battery_id,
@@ -124,53 +140,51 @@ class DataPreprocessor:
                             f"无法解析容量值: {val_str}"
                         )
             
-            if units:
-                from collections import Counter
-                unit_counts = Counter(units)
-                dominant_unit = unit_counts.most_common(1)[0][0]
-                battery_units[battery_id] = dominant_unit
+            if not raw_values:
+                continue
+            
+            if not has_explicit_unit:
+                dominant_unit = self._detect_unit_by_median(raw_values)
+                self.logger.info(
+                    "单位转换",
+                    f"电池 {battery_id}: 未检测到显式单位，按中位数推断为 {dominant_unit}"
+                )
+            
+            conversion_factor = 1000.0 if dominant_unit == 'ah' else 1.0
+            
+            for idx, num, unit in values_to_convert:
+                if unit is None:
+                    unit = dominant_unit
                 
-                for idx, val in values:
-                    df.loc[idx, 'capacity'] = val
-        
-        self.logger.info(
-            "单位转换",
-            f"检测到的单位分布",
-            battery_units
-        )
+                factor = 1000.0 if unit == 'ah' else 1.0
+                converted = num * factor
+                df.loc[idx, 'capacity'] = converted
+            
+            if dominant_unit:
+                self.logger.info(
+                    "单位转换",
+                    f"电池 {battery_id}: 单位={dominant_unit}, 转换因子=x{conversion_factor}"
+                )
         
         return df
     
-    def _detect_unit(self, series: pd.Series) -> str:
-        """基于数值范围检测单位。"""
-        valid_values = series.dropna()
-        if len(valid_values) == 0:
-            return 'mAh'
+    def _detect_unit_by_median(self, values: List[float]) -> str:
+        """基于数值中位数检测单位。"""
+        if not values:
+            return 'mah'
         
-        median_val = valid_values.median()
+        median_val = np.median(values)
         
         if median_val < 10:
-            return 'Ah'
-        elif median_val >= 10:
-            return 'mAh'
-        
-        return 'mAh'
-    
-    def _apply_unit_conversion(self, df: pd.DataFrame, detected_unit: str) -> pd.DataFrame:
-        """应用单位转换。"""
-        if detected_unit == 'Ah':
-            df['capacity'] = df['capacity'] * 1000.0
-            self.logger.info(
-                "单位转换",
-                f"将容量从 Ah 转换为 mAh (乘以 1000)"
-            )
-        elif detected_unit not in ['mAh', 'mah']:
+            return 'ah'
+        elif median_val >= 100:
+            return 'mah'
+        else:
             self.logger.warning(
                 "单位转换",
-                f"未知单位: {detected_unit}，保持原值"
+                f"中位数 {median_val:.2f} 处于模糊区间 (<100)，按 mAh 处理"
             )
-        
-        return df
+            return 'mah'
     
     def _convert_numeric_types(self, df: pd.DataFrame) -> pd.DataFrame:
         """转换数值类型。"""

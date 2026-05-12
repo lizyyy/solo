@@ -155,6 +155,17 @@ class DataReader:
             df = self.read_file(str(file_path))
             if df is not None and len(df) > 0:
                 df['_source_file'] = file_path.name
+                
+                per_file_mapping = self.detect_columns(df)
+                if per_file_mapping:
+                    rename_map = {v: k for k, v in per_file_mapping.items() if k != v}
+                    if rename_map:
+                        df = df.rename(columns=rename_map)
+                        self.logger.info(
+                            "读取",
+                            f"文件 {file_path.name} 列标准化: {rename_map}"
+                        )
+                
                 all_dfs.append(df)
         
         if all_dfs:

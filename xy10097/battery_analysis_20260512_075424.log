@@ -1,0 +1,54 @@
+2026-05-12 07:54:24 - INFO - [主流程] 开始加载数据: sample_data
+2026-05-12 07:54:24 - INFO - [读取] 发现 4 个文件
+2026-05-12 07:54:24 - INFO -   详情: {"files": ["battery_data_3.json", "battery_data_1.csv", "battery_data_4_with_unit.csv", "battery_data_2.xlsx"]}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 JSON: battery_data_3.json
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 100, "columns": 3}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_1.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 1801, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_4_with_unit.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 80, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 Excel: battery_data_2.xlsx
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 796, "columns": 4, "sheets": 1}
+2026-05-12 07:54:24 - INFO - [读取] 合并完成，共 2777 行数据
+2026-05-12 07:54:24 - INFO -   详情: {"files": 4}
+2026-05-12 07:54:24 - INFO - [列检测] 检测到的列映射
+2026-05-12 07:54:24 - INFO -   详情: {"capacity": "容量", "cycle": "循环次数", "battery_id": "电池编号", "batch": "批次"}
+2026-05-12 07:54:24 - INFO - [主流程] 检测到的列: {'capacity': '容量', 'cycle': '循环次数', 'battery_id': '电池编号', 'batch': '批次'}
+2026-05-12 07:54:24 - INFO - [预处理] 开始预处理，原始数据: 2777 行
+2026-05-12 07:54:24 - INFO - [预处理] 列名标准化: {'容量': 'capacity', '循环次数': 'cycle', '电池编号': 'battery_id', '批次': 'batch'}
+2026-05-12 07:54:24 - INFO - [主流程] 开始加载数据: sample_data
+2026-05-12 07:54:24 - INFO - [读取] 发现 4 个文件
+2026-05-12 07:54:24 - INFO -   详情: {"files": ["battery_data_3.json", "battery_data_1.csv", "battery_data_4_with_unit.csv", "battery_data_2.xlsx"]}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 JSON: battery_data_3.json
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 100, "columns": 3}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_1.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 1801, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_4_with_unit.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 80, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 Excel: battery_data_2.xlsx
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 796, "columns": 4, "sheets": 1}
+2026-05-12 07:54:24 - INFO - [读取] 合并完成，共 2777 行数据
+2026-05-12 07:54:24 - INFO -   详情: {"files": 4}
+2026-05-12 07:54:24 - INFO - [列检测] 检测到的列映射
+2026-05-12 07:54:24 - INFO -   详情: {"capacity": "容量", "cycle": "循环次数", "battery_id": "电池编号", "batch": "批次"}
+2026-05-12 07:54:24 - INFO - [主流程] 检测到的列: {'capacity': '容量', 'cycle': '循环次数', 'battery_id': '电池编号', 'batch': '批次'}
+2026-05-12 07:54:24 - INFO - [预处理] 开始预处理，原始数据: 2777 行
+2026-05-12 07:54:24 - INFO - [预处理] 列名标准化: {'容量': 'capacity', '循环次数': 'cycle', '电池编号': 'battery_id', '批次': 'batch'}
+2026-05-12 07:54:24 - INFO - [主流程] 开始加载数据: sample_data
+2026-05-12 07:54:24 - INFO - [读取] 发现 4 个文件
+2026-05-12 07:54:24 - INFO -   详情: {"files": ["battery_data_3.json", "battery_data_1.csv", "battery_data_4_with_unit.csv", "battery_data_2.xlsx"]}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 JSON: battery_data_3.json
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 100, "columns": 3}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_1.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 1801, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 CSV: battery_data_4_with_unit.csv
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 80, "columns": 4, "encoding": "utf-8", "sep": "','"}
+2026-05-12 07:54:24 - INFO - [读取] 成功读取 Excel: battery_data_2.xlsx
+2026-05-12 07:54:24 - INFO -   详情: {"rows": 796, "columns": 4, "sheets": 1}
+2026-05-12 07:54:24 - INFO - [读取] 合并完成，共 2777 行数据
+2026-05-12 07:54:24 - INFO -   详情: {"files": 4}
+2026-05-12 07:54:24 - INFO - [列检测] 检测到的列映射
+2026-05-12 07:54:24 - INFO -   详情: {"capacity": "容量", "cycle": "循环次数", "battery_id": "电池编号", "batch": "批次"}
+2026-05-12 07:54:24 - INFO - [主流程] 检测到的列: {'capacity': '容量', 'cycle': '循环次数', 'battery_id': '电池编号', 'batch': '批次'}
+2026-05-12 07:54:24 - INFO - [预处理] 开始预处理，原始数据: 2777 行
+2026-05-12 07:54:24 - INFO - [预处理] 列名标准化: {'容量': 'capacity', '循环次数': 'cycle', '电池编号': 'battery_id', '批次': 'batch'}
