@@ -140,7 +140,7 @@ class CollisionDetector {
     const targetPos = targetElement.mesh.position.clone();
     
     const direction = targetPos.clone().sub(cameraPos);
-    const distance = direction.length();
+    const totalDistance = direction.length();
     direction.normalize();
     
     for (const element of allElements) {
@@ -148,29 +148,7 @@ class CollisionDetector {
       
       const box = this.getBoundingBox(element);
       
-      const halfWidth = (box.max.x - box.min.x) / 2;
-      const halfHeight = (box.max.y - box.min.y) / 2;
-      const halfDepth = (box.max.z - box.min.z) / 2;
-      
-      const center = {
-        x: (box.min.x + box.max.x) / 2,
-        y: (box.min.y + box.max.y) / 2,
-        z: (box.min.z + box.max.z) / 2
-      };
-      
-      const toCenter = {
-        x: center.x - cameraPos.x,
-        y: center.y - cameraPos.y,
-        z: center.z - cameraPos.z
-      };
-      
-      const tMin = (toCenter.x - halfWidth) / direction.x;
-      const tMax = (toCenter.x + halfWidth) / direction.x;
-      
-      const t1 = Math.min(tMin, tMax);
-      const t2 = Math.max(tMin, tMax);
-      
-      if (t1 > 0 && t1 < distance && t2 > t1) {
+      if (this.intersectRayAABB(cameraPos, direction, box, totalDistance)) {
         return {
           blocker: element.name,
           message: `${camera.name} 的视角被 ${element.name} 遮挡`
@@ -179,6 +157,77 @@ class CollisionDetector {
     }
     
     return null;
+  }
+
+  intersectRayAABB(origin, direction, box, maxDistance) {
+    let tMin = 0;
+    let tMax = maxDistance;
+    
+    const dirX = direction.x;
+    const dirY = direction.y;
+    const dirZ = direction.z;
+    
+    if (Math.abs(dirX) < 0.0001) {
+      if (origin.x < box.min.x || origin.x > box.max.x) {
+        return false;
+      }
+    } else {
+      let tx1 = (box.min.x - origin.x) / dirX;
+      let tx2 = (box.max.x - origin.x) / dirX;
+      
+      if (tx1 > tx2) {
+        const temp = tx1;
+        tx1 = tx2;
+        tx2 = temp;
+      }
+      
+      tMin = Math.max(tMin, tx1);
+      tMax = Math.min(tMax, tx2);
+      
+      if (tMin > tMax) return false;
+    }
+    
+    if (Math.abs(dirY) < 0.0001) {
+      if (origin.y < box.min.y || origin.y > box.max.y) {
+        return false;
+      }
+    } else {
+      let ty1 = (box.min.y - origin.y) / dirY;
+      let ty2 = (box.max.y - origin.y) / dirY;
+      
+      if (ty1 > ty2) {
+        const temp = ty1;
+        ty1 = ty2;
+        ty2 = temp;
+      }
+      
+      tMin = Math.max(tMin, ty1);
+      tMax = Math.min(tMax, ty2);
+      
+      if (tMin > tMax) return false;
+    }
+    
+    if (Math.abs(dirZ) < 0.0001) {
+      if (origin.z < box.min.z || origin.z > box.max.z) {
+        return false;
+      }
+    } else {
+      let tz1 = (box.min.z - origin.z) / dirZ;
+      let tz2 = (box.max.z - origin.z) / dirZ;
+      
+      if (tz1 > tz2) {
+        const temp = tz1;
+        tz1 = tz2;
+        tz2 = temp;
+      }
+      
+      tMin = Math.max(tMin, tz1);
+      tMax = Math.min(tMax, tz2);
+      
+      if (tMin > tMax) return false;
+    }
+    
+    return tMin <= tMax && tMin < maxDistance && tMax > 0;
   }
 }
 
