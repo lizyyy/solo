@@ -1,0 +1,650 @@
+{
+  "initialized": true,
+  "companyHeaders": [
+    {
+      "id": "comp-001",
+      "name": "创新科技（北京）有限公司",
+      "taxId": "91110108MA00C1234X",
+      "groupId": "group-cxkj",
+      "companyType": "parent",
+      "allowedDepartments": [
+        "dept-001",
+        "dept-002",
+        "dept-003"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "comp-002",
+      "name": "创新科技（上海）有限公司",
+      "taxId": "91310115MA1234567X",
+      "groupId": "group-cxkj",
+      "companyType": "subsidiary",
+      "allowedDepartments": [
+        "dept-004"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "comp-003",
+      "name": "远景贸易有限公司",
+      "taxId": "91110105MA00B7654X",
+      "groupId": "group-yjmy",
+      "companyType": "parent",
+      "allowedDepartments": [
+        "dept-005"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "comp-004",
+      "name": "创新科技北京有限公司",
+      "taxId": "91110108MA00C1234X",
+      "groupId": "group-cxkj",
+      "companyType": "parent",
+      "allowedDepartments": [
+        "dept-001"
+      ],
+      "status": "inactive"
+    }
+  ],
+  "employees": [
+    {
+      "id": "emp-001",
+      "name": "张三",
+      "employeeId": "R001",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "email": "zhangsan@example.com"
+    },
+    {
+      "id": "emp-002",
+      "name": "李四",
+      "employeeId": "S001",
+      "departmentId": "dept-002",
+      "departmentName": "销售部",
+      "email": "lisi@example.com"
+    },
+    {
+      "id": "emp-003",
+      "name": "王五",
+      "employeeId": "F001",
+      "departmentId": "dept-003",
+      "departmentName": "财务部",
+      "email": "wangwu@example.com"
+    },
+    {
+      "id": "emp-004",
+      "name": "赵六",
+      "employeeId": "M001",
+      "departmentId": "dept-004",
+      "departmentName": "上海分公司-市场部",
+      "email": "zhaoliu@example.com"
+    }
+  ],
+  "departments": [
+    {
+      "id": "dept-001",
+      "name": "研发中心",
+      "manager": "张经理",
+      "allowedCompanyHeaders": [
+        "comp-001"
+      ]
+    },
+    {
+      "id": "dept-002",
+      "name": "销售部",
+      "manager": "李经理",
+      "allowedCompanyHeaders": [
+        "comp-001"
+      ]
+    },
+    {
+      "id": "dept-003",
+      "name": "财务部",
+      "manager": "王经理",
+      "allowedCompanyHeaders": [
+        "comp-001"
+      ]
+    },
+    {
+      "id": "dept-004",
+      "name": "上海分公司-市场部",
+      "manager": "赵经理",
+      "allowedCompanyHeaders": [
+        "comp-002"
+      ]
+    },
+    {
+      "id": "dept-005",
+      "name": "贸易事业部",
+      "manager": "刘经理",
+      "allowedCompanyHeaders": [
+        "comp-003"
+      ]
+    }
+  ],
+  "invoices": [
+    {
+      "id": "2856794a-ba95-43b4-ab97-9b9e838b8ed4",
+      "invoiceNumber": "20241201001",
+      "invoiceCode": "011002400311",
+      "headerName": "创新科技（北京）有限公司",
+      "taxId": "91110108MA00C1234X",
+      "amount": 500,
+      "taxAmount": 30,
+      "totalAmount": 530,
+      "invoiceDate": "2026-05-12",
+      "sellerName": "全聚德烤鸭店",
+      "sellerTaxId": "91110101MA00ABC12X",
+      "invoiceType": "food",
+      "items": [
+        {
+          "name": "餐饮服务费",
+          "quantity": 1,
+          "unitPrice": 500,
+          "amount": 500
+        }
+      ],
+      "submitterId": "emp-001",
+      "submitterName": "张三",
+      "status": "pending",
+      "createdAt": "2026-05-12T06:54:05.537Z",
+      "updatedAt": "2026-05-12T06:54:05.537Z"
+    },
+    {
+      "id": "ffbad0dd-d351-479d-9039-1de052fa3b17",
+      "invoiceNumber": "20241201002",
+      "invoiceCode": "011002400311",
+      "headerName": "创新科技北京有限公司",
+      "taxId": "91110108MA00C1234X",
+      "amount": 2500,
+      "taxAmount": 75,
+      "totalAmount": 2575,
+      "invoiceDate": "2026-05-12",
+      "sellerName": "中国国际航空股份有限公司",
+      "sellerTaxId": "91110000MA00DEF34X",
+      "invoiceType": "travel",
+      "items": [
+        {
+          "name": "北京-上海 经济舱",
+          "quantity": 1,
+          "unitPrice": 2500,
+          "amount": 2500
+        }
+      ],
+      "submitterId": "emp-001",
+      "submitterName": "张三",
+      "status": "pending",
+      "createdAt": "2026-05-12T06:54:05.537Z",
+      "updatedAt": "2026-05-12T06:54:05.537Z"
+    },
+    {
+      "id": "5048dc26-f8b6-4439-a86a-51d1e45f3a09",
+      "invoiceNumber": "20241201003",
+      "invoiceCode": "011002400311",
+      "headerName": "创新科技（北京）有限公司",
+      "taxId": "91110108MA00C1235X",
+      "amount": 8000,
+      "taxAmount": 1040,
+      "totalAmount": 9040,
+      "invoiceDate": "2026-05-12",
+      "sellerName": "京东自营",
+      "sellerTaxId": "91110108MA00XYZ98X",
+      "invoiceType": "purchase",
+      "items": [
+        {
+          "name": "MacBook Pro",
+          "quantity": 1,
+          "unitPrice": 8000,
+          "amount": 8000
+        }
+      ],
+      "submitterId": "emp-002",
+      "submitterName": "李四",
+      "status": "pending",
+      "createdAt": "2026-05-12T06:54:05.537Z",
+      "updatedAt": "2026-05-12T06:54:05.537Z"
+    },
+    {
+      "id": "8fef92a1-c2ab-48a0-8290-23b48f580270",
+      "invoiceNumber": "20241201004",
+      "invoiceCode": "011002400311",
+      "headerName": "远景贸易有限公司",
+      "taxId": "91110105MA00B7654X",
+      "amount": 1800,
+      "taxAmount": 108,
+      "totalAmount": 1908,
+      "invoiceDate": "2026-05-12",
+      "sellerName": "上海希尔顿酒店",
+      "sellerTaxId": "91310115MA00HIL12X",
+      "invoiceType": "travel",
+      "items": [
+        {
+          "name": "住宿费",
+          "quantity": 2,
+          "unitPrice": 900,
+          "amount": 1800
+        }
+      ],
+      "submitterId": "emp-001",
+      "submitterName": "张三",
+      "status": "pending",
+      "createdAt": "2026-05-12T06:54:05.537Z",
+      "updatedAt": "2026-05-12T06:54:05.537Z"
+    },
+    {
+      "id": "6aeb89c2-7a26-46ca-8422-5fa14104b710",
+      "invoiceNumber": "20241201005",
+      "invoiceCode": "011002400311",
+      "headerName": "创新科技（北京）有限公司",
+      "taxId": "91110108MA00C1234X",
+      "amount": 10000,
+      "taxAmount": 1300,
+      "totalAmount": 11300,
+      "invoiceDate": "2026-05-12",
+      "sellerName": "联想集团供应商",
+      "sellerTaxId": "91110108MA00LXQ45X",
+      "invoiceType": "purchase",
+      "items": [
+        {
+          "name": "服务器设备",
+          "quantity": 1,
+          "unitPrice": 10000,
+          "amount": 10000
+        }
+      ],
+      "submitterId": "emp-001",
+      "submitterName": "张三",
+      "status": "pending",
+      "createdAt": "2026-05-12T06:54:05.537Z",
+      "updatedAt": "2026-05-12T06:54:05.537Z"
+    }
+  ],
+  "reimbursements": [
+    {
+      "id": "61779624-606a-47e0-8f4d-85f6641f6e45",
+      "formNumber": "BX-2024-001",
+      "applicantId": "emp-001",
+      "applicantName": "张三",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 530,
+      "invoiceIds": [
+        "2856794a-ba95-43b4-ab97-9b9e838b8ed4"
+      ],
+      "description": "部门聚餐餐饮费用",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    },
+    {
+      "id": "e7fa6788-16d3-4970-b317-f11d46113da4",
+      "formNumber": "BX-2024-002",
+      "applicantId": "emp-001",
+      "applicantName": "张三",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 2575,
+      "invoiceIds": [
+        "ffbad0dd-d351-479d-9039-1de052fa3b17"
+      ],
+      "description": "上海出差机票费用",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    },
+    {
+      "id": "0e3c5acb-6585-49c4-890c-6eb05008787e",
+      "formNumber": "BX-2024-003",
+      "applicantId": "emp-002",
+      "applicantName": "李四",
+      "departmentId": "dept-002",
+      "departmentName": "销售部",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 9040,
+      "invoiceIds": [
+        "5048dc26-f8b6-4439-a86a-51d1e45f3a09"
+      ],
+      "description": "采购办公电脑设备",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    },
+    {
+      "id": "658f7495-89a4-46c6-bd6c-b05ca9ce9e99",
+      "formNumber": "BX-2024-004",
+      "applicantId": "emp-001",
+      "applicantName": "张三",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 300,
+      "invoiceIds": [
+        "2856794a-ba95-43b4-ab97-9b9e838b8ed4"
+      ],
+      "description": "部分报销-餐饮费用拆分",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    },
+    {
+      "id": "da1c0574-3bab-4e96-9b88-545bfddf58cd",
+      "formNumber": "BX-2024-005",
+      "applicantId": "emp-001",
+      "applicantName": "张三",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 5000,
+      "invoiceIds": [
+        "6aeb89c2-7a26-46ca-8422-5fa14104b710"
+      ],
+      "description": "服务器采购预付款",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    },
+    {
+      "id": "72e87b87-da71-4101-b414-06f2a5ad9771",
+      "formNumber": "BX-2024-006",
+      "applicantId": "emp-001",
+      "applicantName": "张三",
+      "departmentId": "dept-001",
+      "departmentName": "研发中心",
+      "expectedHeaderName": "创新科技（北京）有限公司",
+      "expectedTaxId": "91110108MA00C1234X",
+      "totalAmount": 5000,
+      "invoiceIds": [
+        "6aeb89c2-7a26-46ca-8422-5fa14104b710"
+      ],
+      "description": "服务器采购尾款",
+      "status": "submitted",
+      "createdAt": "2026-05-12T06:54:05.538Z",
+      "updatedAt": "2026-05-12T06:54:05.538Z"
+    }
+  ],
+  "auditRecords": [
+    {
+      "id": "32a1ce33-299c-43dd-8aae-81c3274b3d49",
+      "targetType": "invoice",
+      "targetId": "2856794a-ba95-43b4-ab97-9b9e838b8ed4",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: correction_suggested",
+      "timestamp": "2026-05-12T06:54:14.665Z"
+    },
+    {
+      "id": "8642331f-f61c-4323-a68e-b11d84fe5251",
+      "targetType": "invoice",
+      "targetId": "ffbad0dd-d351-479d-9039-1de052fa3b17",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: correction_suggested",
+      "timestamp": "2026-05-12T06:54:14.666Z"
+    },
+    {
+      "id": "531aecd4-924e-47b9-8a3f-a7fb9560fd31",
+      "targetType": "invoice",
+      "targetId": "5048dc26-f8b6-4439-a86a-51d1e45f3a09",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: needs_reissue",
+      "timestamp": "2026-05-12T06:54:14.667Z"
+    },
+    {
+      "id": "3a122364-8ed4-4e25-bf55-94211e529c5a",
+      "targetType": "invoice",
+      "targetId": "8fef92a1-c2ab-48a0-8290-23b48f580270",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: needs_reissue",
+      "timestamp": "2026-05-12T06:54:14.668Z"
+    },
+    {
+      "id": "c28032b4-114e-48d8-9fd4-012f8cd77745",
+      "targetType": "invoice",
+      "targetId": "6aeb89c2-7a26-46ca-8422-5fa14104b710",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: manual_review",
+      "timestamp": "2026-05-12T06:54:14.668Z"
+    },
+    {
+      "id": "dd4fc5a9-007c-4102-b661-e99fcc5184e2",
+      "targetType": "invoice",
+      "targetId": "2856794a-ba95-43b4-ab97-9b9e838b8ed4",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: correction_suggested",
+      "timestamp": "2026-05-12T06:54:32.667Z"
+    },
+    {
+      "id": "d9f52195-ccf6-437b-b9ac-ba2483f833d9",
+      "targetType": "invoice",
+      "targetId": "ffbad0dd-d351-479d-9039-1de052fa3b17",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: correction_suggested",
+      "timestamp": "2026-05-12T06:54:32.668Z"
+    },
+    {
+      "id": "fb3af18f-fe5b-4ea9-a415-b5872fd997d8",
+      "targetType": "invoice",
+      "targetId": "5048dc26-f8b6-4439-a86a-51d1e45f3a09",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: needs_reissue",
+      "timestamp": "2026-05-12T06:54:32.668Z"
+    },
+    {
+      "id": "b155c43c-aa55-45fb-8e30-2b847afd518f",
+      "targetType": "invoice",
+      "targetId": "8fef92a1-c2ab-48a0-8290-23b48f580270",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: needs_reissue",
+      "timestamp": "2026-05-12T06:54:32.669Z"
+    },
+    {
+      "id": "4af7d093-26d7-472d-9442-8d542069f206",
+      "targetType": "invoice",
+      "targetId": "6aeb89c2-7a26-46ca-8422-5fa14104b710",
+      "action": "CHECK_PERFORMED",
+      "operatorId": "system",
+      "operatorName": "系统自动",
+      "reason": "执行发票审核检查，结果: manual_review",
+      "timestamp": "2026-05-12T06:54:32.669Z"
+    }
+  ],
+  "checkReports": [
+    {
+      "invoiceId": "2856794a-ba95-43b4-ab97-9b9e838b8ed4",
+      "invoiceNumber": "20241201001",
+      "reimbursementId": "61779624-606a-47e0-8f4d-85f6641f6e45",
+      "reimbursementNumber": "BX-2024-001",
+      "result": "correction_suggested",
+      "issues": [
+        {
+          "id": "44e79872-c760-4ad3-82bf-adf36131009c",
+          "type": "amount_split",
+          "severity": "warning",
+          "title": "金额拆分报销风险",
+          "description": "发票金额 ¥530.00 已被拆分到 2 个报销单中，累计金额可能超过发票总额",
+          "suggestion": "金额拆分报销需核实业务真实性，请确认拆分是否合理",
+          "affectedFields": [
+            "totalAmount"
+          ],
+          "relatedEntities": [
+            {
+              "type": "reimbursement",
+              "id": "658f7495-89a4-46c6-bd6c-b05ca9ce9e99",
+              "name": "报销单: BX-2024-004"
+            }
+          ]
+        }
+      ],
+      "passCount": 3,
+      "warnCount": 1,
+      "errorCount": 0,
+      "checkedAt": "2026-05-12T06:54:32.666Z"
+    },
+    {
+      "invoiceId": "ffbad0dd-d351-479d-9039-1de052fa3b17",
+      "invoiceNumber": "20241201002",
+      "reimbursementId": "e7fa6788-16d3-4970-b317-f11d46113da4",
+      "reimbursementNumber": "BX-2024-002",
+      "result": "correction_suggested",
+      "issues": [
+        {
+          "id": "d013c01d-b9ca-45b2-8319-08ecb3454751",
+          "type": "similar_header",
+          "severity": "warning",
+          "title": "抬头近似但可能主体不同",
+          "description": "发票抬头\"创新科技北京有限公司\"与预期抬头\"创新科技（北京）有限公司\"近似但存在差异",
+          "suggestion": "可能是开票错误，建议核实是否应为以下公司：创新科技（北京）有限公司、创新科技（上海）有限公司",
+          "affectedFields": [
+            "headerName"
+          ],
+          "relatedEntities": [
+            {
+              "type": "company",
+              "id": "comp-001",
+              "name": "创新科技（北京）有限公司"
+            },
+            {
+              "type": "company",
+              "id": "comp-002",
+              "name": "创新科技（上海）有限公司"
+            }
+          ]
+        }
+      ],
+      "passCount": 3,
+      "warnCount": 1,
+      "errorCount": 0,
+      "checkedAt": "2026-05-12T06:54:32.667Z"
+    },
+    {
+      "invoiceId": "5048dc26-f8b6-4439-a86a-51d1e45f3a09",
+      "invoiceNumber": "20241201003",
+      "reimbursementId": "0e3c5acb-6585-49c4-890c-6eb05008787e",
+      "reimbursementNumber": "BX-2024-003",
+      "result": "needs_reissue",
+      "issues": [
+        {
+          "id": "9466c266-4fc8-4e88-a5f1-5650eb138a45",
+          "type": "tax_id_mismatch",
+          "severity": "error",
+          "title": "税号不匹配",
+          "description": "发票税号\"91110108MA00C1235X\"与预期税号\"91110108MA00C1234X\"不一致",
+          "suggestion": "税号错误，需重新开具正确税号的发票",
+          "affectedFields": [
+            "taxId"
+          ]
+        }
+      ],
+      "passCount": 3,
+      "warnCount": 0,
+      "errorCount": 1,
+      "checkedAt": "2026-05-12T06:54:32.668Z"
+    },
+    {
+      "invoiceId": "8fef92a1-c2ab-48a0-8290-23b48f580270",
+      "invoiceNumber": "20241201004",
+      "result": "needs_reissue",
+      "issues": [
+        {
+          "id": "9af037ba-46b8-406d-85f2-c85a64cf914f",
+          "type": "header_mismatch",
+          "severity": "error",
+          "title": "抬头不匹配",
+          "description": "发票抬头\"远景贸易有限公司\"与预期抬头\"创新科技（北京）有限公司\"不一致",
+          "suggestion": "发票抬头错误，需重新开具正确抬头的发票",
+          "affectedFields": [
+            "headerName"
+          ]
+        },
+        {
+          "id": "fdaa5181-2299-4674-a22a-03c8bf8d99ec",
+          "type": "tax_id_mismatch",
+          "severity": "error",
+          "title": "税号不匹配",
+          "description": "发票税号\"91110105MA00B7654X\"与预期税号\"91110108MA00C1234X\"不一致",
+          "suggestion": "税号错误，需重新开具正确税号的发票",
+          "affectedFields": [
+            "taxId"
+          ]
+        },
+        {
+          "id": "09aebd09-1d39-46f6-87bf-0b41c84bd835",
+          "type": "cross_company_header",
+          "severity": "error",
+          "title": "跨集团公司抬头",
+          "description": "发票抬头\"远景贸易有限公司\"属于\"group-yjmy\"集团，而报销所属部门应使用\"创新科技（北京）有限公司\"（group-cxkj集团）",
+          "suggestion": "跨集团报销需要特殊审批流程，建议使用正确集团公司的发票",
+          "affectedFields": [
+            "headerName"
+          ],
+          "relatedEntities": [
+            {
+              "type": "company",
+              "id": "comp-001",
+              "name": "创新科技（北京）有限公司"
+            },
+            {
+              "type": "company",
+              "id": "comp-003",
+              "name": "远景贸易有限公司"
+            }
+          ]
+        }
+      ],
+      "passCount": 1,
+      "warnCount": 0,
+      "errorCount": 3,
+      "checkedAt": "2026-05-12T06:54:32.668Z"
+    },
+    {
+      "invoiceId": "6aeb89c2-7a26-46ca-8422-5fa14104b710",
+      "invoiceNumber": "20241201005",
+      "reimbursementId": "da1c0574-3bab-4e96-9b88-545bfddf58cd",
+      "reimbursementNumber": "BX-2024-005",
+      "result": "manual_review",
+      "issues": [
+        {
+          "id": "ca07c18f-7648-4005-b46c-fd6635cad403",
+          "type": "amount_mismatch",
+          "severity": "error",
+          "title": "发票金额大于报销金额",
+          "description": "发票金额 ¥11300.00 大于报销单申请金额 ¥5000.00",
+          "suggestion": "请确认报销金额是否正确，发票金额不应大于报销金额",
+          "affectedFields": [
+            "totalAmount"
+          ]
+        }
+      ],
+      "passCount": 3,
+      "warnCount": 0,
+      "errorCount": 1,
+      "checkedAt": "2026-05-12T06:54:32.669Z"
+    }
+  ],
+  "corrections": []
+}
