@@ -83,8 +83,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 已绑定到任务，不能重复绑定`);
     }
 
-    if (bottle.status !== BottleStatus.CREATED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是初始状态，不能绑定任务`);
+    if (!validateTransition(bottle.status, BottleStatus.BINDED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行绑定操作`);
     }
 
     const task = Storage.getTasks().find(t => t.id === taskId);
@@ -117,8 +117,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status !== BottleStatus.BINDED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已绑定，不能采样`);
+    if (!validateTransition(bottle.status, BottleStatus.SAMPLED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行采样操作`);
     }
 
     const now = new Date().toISOString();
@@ -146,8 +146,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status !== BottleStatus.SAMPLED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已采样，不能冷藏`);
+    if (!validateTransition(bottle.status, BottleStatus.COLD_STORED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行冷藏操作`);
     }
 
     const now = new Date().toISOString();
@@ -188,8 +188,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status !== BottleStatus.COLD_STORED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已冷藏，不能交接`);
+    if (!validateTransition(bottle.status, BottleStatus.TRANSFERRED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行交接操作`);
     }
 
     const now = new Date().toISOString();
@@ -216,12 +216,8 @@ export class BottleService {
       throw new BusinessError(`采样瓶 ${bottleNo} 不存在`);
     }
 
-    if (bottle.status === BottleStatus.REJECTED || bottle.status === BottleStatus.RETURNED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 已退样或已归还，不能接收`);
-    }
-
-    if (bottle.status !== BottleStatus.TRANSFERRED) {
-      throw new BusinessError(`采样瓶 ${bottleNo} 状态不是已交接，不能接收`);
+    if (!validateTransition(bottle.status, BottleStatus.RECEIVED)) {
+      throw new BusinessError(`采样瓶 ${bottleNo} 当前状态 ${bottle.status} 不能执行接收操作`);
     }
 
     const now = new Date().toISOString();
