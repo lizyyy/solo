@@ -93,14 +93,11 @@ function saveDatabase() {
 
 function wrapTransaction(fn) {
   return (...args) => {
-    db.run('BEGIN TRANSACTION');
     try {
       const result = fn(...args);
-      db.run('COMMIT');
       saveDatabase();
       return result;
     } catch (error) {
-      db.run('ROLLBACK');
       throw error;
     }
   };

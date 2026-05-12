@@ -12,6 +12,22 @@ const VALIDATION_STATUS = {
   REVIEWED_INVALID: 'reviewed_invalid'
 };
 
+function getNGrams(str, n = 2) {
+  const grams = new Set();
+  const normalized = str.toLowerCase().trim();
+  
+  if (normalized.length < n) {
+    if (normalized.length > 0) grams.add(normalized);
+    return grams;
+  }
+  
+  for (let i = 0; i <= normalized.length - n; i++) {
+    grams.add(normalized.substring(i, i + n));
+  }
+  
+  return grams;
+}
+
 function calculateTextSimilarity(str1, str2) {
   const s1 = str1.toLowerCase().trim();
   const s2 = str2.toLowerCase().trim();
@@ -19,17 +35,19 @@ function calculateTextSimilarity(str1, str2) {
   if (s1 === s2) return 1.0;
   if (s1.length === 0 || s2.length === 0) return 0;
   
-  const tokens1 = new Set(s1.split(/\s+/).filter(t => t.length > 1));
-  const tokens2 = new Set(s2.split(/\s+/).filter(t => t.length > 1));
+  const grams1 = getNGrams(s1, 2);
+  const grams2 = getNGrams(s2, 2);
   
-  if (tokens1.size === 0 || tokens2.size === 0) return 0;
+  if (grams1.size === 0 || grams2.size === 0) return 0;
   
   let intersection = 0;
-  tokens1.forEach(token => {
-    if (tokens2.has(token)) intersection++;
+  grams1.forEach(gram => {
+    if (grams2.has(gram)) intersection++;
   });
   
-  const union = tokens1.size + tokens2.size - intersection;
+  const union = grams1.size + grams2.size - intersection;
+  if (union === 0) return 0;
+  
   return intersection / union;
 }
 
@@ -60,124 +78,131 @@ function extractCitationsFromAnswer(answer) {
   return citations;
 }
 
+const SIMILARITY_THRESHOLDS = {
+  CONTENT_MISMATCH: 0.4,
+  PARTIAL_MATCH: 0.55
+};
+
 function validateCitation(citation, qaRecordId) {
-  const results = [];
-  
-  if (!citation.knowledge_base_id || !citation.cited_text) {
+  const hasKbId = !!citation.knowledge_base_id;
+  const hasDocId = !!citation.document_id;
+  const hasCitedText = !!citation.cited_text;
+
+  if (!hasCitedText || (!hasKbId && !hasDocId)) {
     return [{
       id: uuidv4(),
       qa_record_id: qaRecordId,
       citation_id: citation.id,
       status: VALIDATION_STATUS.MISSING_REFERENCE,
       score: 0,
-      reason: '引用缺少必要信息：知识库ID或引用文本为空'
+      reason: '引用缺少必要信息：需要提供引用文本，以及知识库ID或文档ID'
     }];
   }
-  
-  const kbEntry = db.prepare(`
-    SELECT * FROM knowledge_base WHERE id = ?
-  `).get(citation.knowledge_base_id);
-  
-  if (!kbEntry) {
-    if (citation.document_id) {
-      const docEntries = db.prepare(`
-        SELECT * FROM knowledge_base WHERE document_id = ?
-      `).all(citation.document_id);
+
+  if (hasKbId) {
+    const kbEntry = db.prepare(`
+      SELECT * FROM knowledge_base WHERE id = ?
+    `).get(citation.knowledge_base_id);
+
+    if (kbEntry) {
+      const similarity = calculateTextSimilarity(citation.cited_text, kbEntry.content);
       
-      if (docEntries.length === 0) {
+      if (similarity < SIMILARITY_THRESHOLDS.CONTENT_MISMATCH) {
         return [{
           id: uuidv4(),
           qa_record_id: qaRecordId,
           citation_id: citation.id,
-          status: VALIDATION_STATUS.WRONG_DOCUMENT,
-          score: 0,
-          reason: `文档ID "${citation.document_id}" 在知识库中不存在`
+          status: VALIDATION_STATUS.CONTENT_MISMATCH,
+          score: similarity,
+          reason: `引用文本与知识库条目 "${kbEntry.title}" 内容匹配度过低 (${(similarity * 100).toFixed(1)}%)`
+        }];
+      } else if (similarity < SIMILARITY_THRESHOLDS.PARTIAL_MATCH) {
+        return [{
+          id: uuidv4(),
+          qa_record_id: qaRecordId,
+          citation_id: citation.id,
+          status: VALIDATION_STATUS.PARTIAL_MATCH,
+          score: similarity,
+          reason: `引用文本与知识库条目 "${kbEntry.title}" 部分匹配 (${(similarity * 100).toFixed(1)}%)，建议人工复核`
         }];
       } else {
-        let bestMatch = null;
-        let bestScore = 0;
-        
-        docEntries.forEach(entry => {
-          const score = calculateTextSimilarity(citation.cited_text, entry.content);
-          if (score > bestScore) {
-            bestScore = score;
-            bestMatch = entry;
-          }
-        });
-        
-        if (bestScore < 0.3) {
-          return [{
-            id: uuidv4(),
-            qa_record_id: qaRecordId,
-            citation_id: citation.id,
-            status: VALIDATION_STATUS.CONTENT_MISMATCH,
-            score: bestScore,
-            reason: `引用文本与文档 "${citation.document_id}" 中内容匹配度过低 (${(bestScore * 100).toFixed(1)}%)`
-          }];
-        } else if (bestScore < 0.6) {
-          return [{
-            id: uuidv4(),
-            qa_record_id: qaRecordId,
-            citation_id: citation.id,
-            status: VALIDATION_STATUS.PARTIAL_MATCH,
-            score: bestScore,
-            reason: `引用文本与文档 "${citation.document_id}" 部分匹配 (${(bestScore * 100).toFixed(1)}%)，建议人工复核`
-          }];
-        } else {
-          return [{
-            id: uuidv4(),
-            qa_record_id: qaRecordId,
-            citation_id: citation.id,
-            status: VALIDATION_STATUS.VALID,
-            score: bestScore,
-            reason: `引用有效，匹配度 ${(bestScore * 100).toFixed(1)}%`
-          }];
-        }
+        return [{
+          id: uuidv4(),
+          qa_record_id: qaRecordId,
+          citation_id: citation.id,
+          status: VALIDATION_STATUS.VALID,
+          score: similarity,
+          reason: `引用有效，与 "${kbEntry.title}" 匹配度 ${(similarity * 100).toFixed(1)}%`
+        }];
       }
+    }
+  }
+
+  if (hasDocId) {
+    const docEntries = db.prepare(`
+      SELECT * FROM knowledge_base WHERE document_id = ?
+    `).all(citation.document_id);
+
+    if (docEntries.length === 0) {
+      return [{
+        id: uuidv4(),
+        qa_record_id: qaRecordId,
+        citation_id: citation.id,
+        status: VALIDATION_STATUS.WRONG_DOCUMENT,
+        score: 0,
+        reason: `文档ID "${citation.document_id}" 在知识库中不存在`
+      }];
+    }
+
+    let bestMatch = null;
+    let bestScore = 0;
+    
+    docEntries.forEach(entry => {
+      const score = calculateTextSimilarity(citation.cited_text, entry.content);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = entry;
+      }
+    });
+
+    if (bestScore < SIMILARITY_THRESHOLDS.CONTENT_MISMATCH) {
+      return [{
+        id: uuidv4(),
+        qa_record_id: qaRecordId,
+        citation_id: citation.id,
+        status: VALIDATION_STATUS.CONTENT_MISMATCH,
+        score: bestScore,
+        reason: `引用文本与文档 "${citation.document_id}" 中内容匹配度过低 (${(bestScore * 100).toFixed(1)}%)`
+      }];
+    } else if (bestScore < SIMILARITY_THRESHOLDS.PARTIAL_MATCH) {
+      return [{
+        id: uuidv4(),
+        qa_record_id: qaRecordId,
+        citation_id: citation.id,
+        status: VALIDATION_STATUS.PARTIAL_MATCH,
+        score: bestScore,
+        reason: `引用文本与文档 "${citation.document_id}"（${bestMatch.title}）部分匹配 (${(bestScore * 100).toFixed(1)}%)，建议人工复核`
+      }];
     } else {
       return [{
         id: uuidv4(),
         qa_record_id: qaRecordId,
         citation_id: citation.id,
-        status: VALIDATION_STATUS.MISSING_REFERENCE,
-        score: 0,
-        reason: '引用的知识库条目不存在，且未提供文档ID'
+        status: VALIDATION_STATUS.VALID,
+        score: bestScore,
+        reason: `引用有效，与文档 "${citation.document_id}"（${bestMatch.title}）匹配度 ${(bestScore * 100).toFixed(1)}%`
       }];
     }
   }
-  
-  const similarity = calculateTextSimilarity(citation.cited_text, kbEntry.content);
-  
-  if (similarity < 0.3) {
-    results.push({
-      id: uuidv4(),
-      qa_record_id: qaRecordId,
-      citation_id: citation.id,
-      status: VALIDATION_STATUS.CONTENT_MISMATCH,
-      score: similarity,
-      reason: `引用文本与知识库条目 "${kbEntry.title}" 内容匹配度过低 (${(similarity * 100).toFixed(1)}%)`
-    });
-  } else if (similarity < 0.6) {
-    results.push({
-      id: uuidv4(),
-      qa_record_id: qaRecordId,
-      citation_id: citation.id,
-      status: VALIDATION_STATUS.PARTIAL_MATCH,
-      score: similarity,
-      reason: `引用文本与知识库条目 "${kbEntry.title}" 部分匹配 (${(similarity * 100).toFixed(1)}%)，建议人工复核`
-    });
-  } else {
-    results.push({
-      id: uuidv4(),
-      qa_record_id: qaRecordId,
-      citation_id: citation.id,
-      status: VALIDATION_STATUS.VALID,
-      score: similarity,
-      reason: `引用有效，与 "${kbEntry.title}" 匹配度 ${(similarity * 100).toFixed(1)}%`
-    });
-  }
-  
-  return results;
+
+  return [{
+    id: uuidv4(),
+    qa_record_id: qaRecordId,
+    citation_id: citation.id,
+    status: VALIDATION_STATUS.MISSING_REFERENCE,
+    score: 0,
+    reason: '无法定位引用来源'
+  }];
 }
 
 function validateQARecord(qaRecordId) {

@@ -12,7 +12,7 @@ const { db, initDatabase } = require('./database');
 const validator = require('./validator');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3003;
 
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
