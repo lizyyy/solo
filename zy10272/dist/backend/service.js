@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOrder = createOrder;
 exports.updateOrderInfo = updateOrderInfo;
@@ -11,7 +44,10 @@ exports.getAllOrders = getAllOrders;
 exports.getOrder = getOrder;
 exports.getActiveOrdersList = getActiveOrdersList;
 exports.getQueueOrdersList = getQueueOrdersList;
+exports.saveUploadedFile = saveUploadedFile;
 const uuid_1 = require("uuid");
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
 const types_1 = require("../types");
 const storage_1 = require("./storage");
 function calculatePrice(paperType, printSide, pageCount, copies) {
@@ -33,6 +69,12 @@ function determineStatus(totalAmount, prepaidAmount) {
     }
 }
 function createOrder(request) {
+    if (request.idempotencyKey) {
+        const existingOrder = (0, storage_1.getOrderByIdempotencyKey)(request.idempotencyKey);
+        if (existingOrder) {
+            return existingOrder;
+        }
+    }
     if (!request.customerName?.trim()) {
         throw new Error('客户姓名不能为空');
     }
@@ -44,6 +86,10 @@ function createOrder(request) {
     }
     if (request.prepaidAmount < 0) {
         throw new Error('预付金额不能为负数');
+    }
+    let file;
+    if (request.fileId) {
+        file = (0, storage_1.getFileById)(request.fileId);
     }
     const { pricePerPage, totalPages, totalAmount } = calculatePrice(request.paperType, request.printSide, request.pageCount, request.copies);
     const balance = calculateBalance(totalAmount, request.prepaidAmount);
@@ -63,6 +109,8 @@ function createOrder(request) {
         prepaidAmount: request.prepaidAmount,
         balance,
         status,
+        idempotencyKey: request.idempotencyKey,
+        file,
         createdAt: now,
         updatedAt: now
     };
@@ -222,4 +270,20 @@ function getActiveOrdersList() {
 }
 function getQueueOrdersList() {
     return (0, storage_1.getQueueOrders)();
+}
+function saveUploadedFile(originalName, fileSize, mimeType, tempPath) {
+    const fileId = (0, uuid_1.v4)();
+    const ext = path.extname(originalName) || '.bin';
+    const storedName = `${fileId}${ext}`;
+    const storedPath = path.join((0, storage_1.getUploadsDir)(), storedName);
+    fs.renameSync(tempPath, storedPath);
+    const fileInfo = {
+        id: fileId,
+        fileName: originalName,
+        fileSize,
+        fileType: mimeType,
+        storedPath
+    };
+    (0, storage_1.addFile)(fileInfo);
+    return { fileId, fileName: originalName };
 }

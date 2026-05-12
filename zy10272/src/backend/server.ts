@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import * as path from 'path';
+import multer from 'multer';
 import { loadData } from './storage';
 import {
   createOrder,
@@ -13,11 +14,19 @@ import {
   getAllOrders,
   getOrder,
   getActiveOrdersList,
-  getQueueOrdersList
+  getQueueOrdersList,
+  saveUploadedFile
 } from './service';
 
 const app = express();
 const PORT = 3001;
+
+const upload = multer({
+  dest: path.join(process.cwd(), 'data', 'temp'),
+  limits: {
+    fileSize: 50 * 1024 * 1024
+  }
+});
 
 app.use(cors());
 app.use(express.json());
@@ -61,6 +70,26 @@ app.get('/api/orders/:id', (req, res) => {
     res.json({ success: true, data: order });
   } catch (error) {
     res.status(500).json({ success: false, error: '获取订单失败' });
+  }
+});
+
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: '没有上传文件' });
+    }
+    const result = saveUploadedFile(
+      req.file.originalname,
+      req.file.size,
+      req.file.mimetype,
+      req.file.path
+    );
+    res.json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : '文件上传失败' 
+    });
   }
 });
 

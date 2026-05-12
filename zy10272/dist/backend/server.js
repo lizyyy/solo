@@ -39,10 +39,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const path = __importStar(require("path"));
+const multer_1 = __importDefault(require("multer"));
 const storage_1 = require("./storage");
 const service_1 = require("./service");
 const app = (0, express_1.default)();
 const PORT = 3001;
+const upload = (0, multer_1.default)({
+    dest: path.join(process.cwd(), 'data', 'temp'),
+    limits: {
+        fileSize: 50 * 1024 * 1024
+    }
+});
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use(express_1.default.static(path.join(process.cwd(), 'public')));
@@ -84,6 +91,21 @@ app.get('/api/orders/:id', (req, res) => {
     }
     catch (error) {
         res.status(500).json({ success: false, error: '获取订单失败' });
+    }
+});
+app.post('/api/upload', upload.single('file'), (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, error: '没有上传文件' });
+        }
+        const result = (0, service_1.saveUploadedFile)(req.file.originalname, req.file.size, req.file.mimetype, req.file.path);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error instanceof Error ? error.message : '文件上传失败'
+        });
     }
 });
 app.post('/api/orders', (req, res) => {

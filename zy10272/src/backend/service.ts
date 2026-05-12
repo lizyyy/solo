@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
+import * as fs from 'fs';
 import {
   Order,
   OrderStatus,
@@ -6,7 +8,8 @@ import {
   UpdateOrderRequest,
   PRICE_CONFIG,
   PaperType,
-  PrintSide
+  PrintSide,
+  OrderFile
 } from '../types';
 import {
   getNextOrderNumber,
@@ -15,7 +18,11 @@ import {
   addOrder,
   updateOrder,
   getActiveOrders,
-  getQueueOrders
+  getQueueOrders,
+  getOrderByIdempotencyKey,
+  getFileById,
+  addFile,
+  getUploadsDir
 } from './storage';
 
 function calculatePrice(
@@ -44,6 +51,13 @@ function determineStatus(totalAmount: number, prepaidAmount: number): OrderStatu
 }
 
 export function createOrder(request: CreateOrderRequest): Order {
+  if (request.idempotencyKey) {
+    const existingOrder = getOrderByIdempotencyKey(request.idempotencyKey);
+    if (existingOrder) {
+      return existingOrder;
+    }
+  }
+
   if (!request.customerName?.trim()) {
     throw new Error('客户姓名不能为空');
   }
@@ -55,6 +69,11 @@ export function createOrder(request: CreateOrderRequest): Order {
   }
   if (request.prepaidAmount < 0) {
     throw new Error('预付金额不能为负数');
+  }
+
+  let file: OrderFile | undefined;
+  if (request.fileId) {
+    file = getFileById(request.fileId);
   }
 
   const { pricePerPage, totalPages, totalAmount } = calculatePrice(
@@ -82,6 +101,8 @@ export function createOrder(request: CreateOrderRequest): Order {
     prepaidAmount: request.prepaidAmount,
     balance,
     status,
+    idempotencyKey: request.idempotencyKey,
+    file,
     createdAt: now,
     updatedAt: now
   };
@@ -285,4 +306,30 @@ export function getActiveOrdersList(): Order[] {
 
 export function getQueueOrdersList(): Order[] {
   return getQueueOrders();
+}
+
+export function saveUploadedFile(
+  originalName: string,
+  fileSize: number,
+  mimeType: string,
+  tempPath: string
+): { fileId: string; fileName: string } {
+  const fileId = uuidv4();
+  const ext = path.extname(originalName) || '.bin';
+  const storedName = `${fileId}${ext}`;
+  const storedPath = path.join(getUploadsDir(), storedName);
+
+  fs.renameSync(tempPath, storedPath);
+
+  const fileInfo = {
+    id: fileId,
+    fileName: originalName,
+    fileSize,
+    fileType: mimeType,
+    storedPath
+  };
+
+  addFile(fileInfo);
+
+  return { fileId, fileName: originalName };
 }

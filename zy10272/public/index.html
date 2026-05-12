@@ -56,11 +56,17 @@
                         </div>
 
                         <div class="form-group">
+                            <label>上传文件</label>
+                            <input type="file" id="orderFile">
+                            <div id="fileStatus" style="margin-top: 8px; font-size: 14px;"></div>
+                        </div>
+
+                        <div class="form-group">
                             <label>预付金额 (元)</label>
                             <input type="number" id="prepaidAmount" min="0" step="0.01" value="0">
                         </div>
 
-                        <button type="submit" class="btn btn-primary">创建订单</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">创建订单</button>
                     </form>
                 </div>
 

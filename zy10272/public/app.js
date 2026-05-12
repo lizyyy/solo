@@ -15,6 +15,12 @@ const STATUS_LABELS = {
 };
 
 let currentOrders = [];
+let uploadedFileId = null;
+let isSubmitting = false;
+
+function generateIdempotencyKey() {
+    return 'idemp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
 
 async function fetchOrders() {
     try {
@@ -43,6 +49,12 @@ function calculatePrice() {
     return totalAmount;
 }
 
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 function formatTime(dateStr) {
     const date = new Date(dateStr);
     return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
@@ -60,6 +72,11 @@ function createOrderCard(order) {
         : `欠 ¥${Math.abs(order.balance).toFixed(2)}`;
     
     const printSideText = order.printSide === 'single' ? '单面' : '双面';
+    
+    let fileInfo = '';
+    if (order.file) {
+        fileInfo = `<div>📄 ${order.file.fileName} (${formatFileSize(order.file.fileSize)})</div>`;
+    }
     
     let actionsHtml = '';
     
@@ -87,6 +104,7 @@ function createOrderCard(order) {
                 <span class="order-status">${STATUS_LABELS[order.status]}</span>
             </div>
             <div class="order-customer">${order.customerName}</div>
+            ${fileInfo ? `<div style="font-size: 14px; color: #666; margin-bottom: 8px;">${fileInfo}</div>` : ''}
             <div class="order-details">
                 <div class="order-info">
                     <div>${order.paperType} · ${printSideText}</div>
@@ -128,8 +146,49 @@ function renderOrders() {
         : '<div class="empty-state"><div class="empty-state-icon">📜</div><p>暂无历史订单</p></div>';
 }
 
+async function handleFileUpload(file) {
+    const fileStatus = document.getElementById('fileStatus');
+    fileStatus.innerHTML = '<span style="color: #666;">上传中...</span>';
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await fetch(`${API_BASE}/upload`, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            uploadedFileId = result.data.fileId;
+            fileStatus.innerHTML = `<span style="color: #2E7D32;">✓ ${result.data.fileName}</span>`;
+        } else {
+            fileStatus.innerHTML = `<span style="color: #D32F2F;">✗ ${result.error}</span>`;
+            uploadedFileId = null;
+        }
+    } catch (error) {
+        fileStatus.innerHTML = `<span style="color: #D32F2F;">✗ 上传失败</span>`;
+        uploadedFileId = null;
+    }
+}
+
 async function createOrder(event) {
     event.preventDefault();
+    
+    if (isSubmitting) {
+        return;
+    }
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.textContent;
+    
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中...';
+    
+    const idempotencyKey = generateIdempotencyKey();
     
     const data = {
         customerName: document.getElementById('customerName').value.trim(),
@@ -137,11 +196,16 @@ async function createOrder(event) {
         printSide: document.getElementById('printSide').value,
         pageCount: parseInt(document.getElementById('pageCount').value),
         copies: parseInt(document.getElementById('copies').value),
-        prepaidAmount: parseFloat(document.getElementById('prepaidAmount').value) || 0
+        prepaidAmount: parseFloat(document.getElementById('prepaidAmount').value) || 0,
+        idempotencyKey,
+        fileId: uploadedFileId
     };
     
     if (!data.customerName) {
         alert('请输入客户姓名');
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
         return;
     }
     
@@ -156,6 +220,8 @@ async function createOrder(event) {
         
         if (result.success) {
             document.getElementById('orderForm').reset();
+            document.getElementById('fileStatus').innerHTML = '';
+            uploadedFileId = null;
             document.getElementById('previewAmount').textContent = '¥0.00';
             fetchOrders();
         } else {
@@ -163,6 +229,10 @@ async function createOrder(event) {
         }
     } catch (error) {
         alert('创建订单失败: ' + error.message);
+    } finally {
+        isSubmitting = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
 }
 
@@ -338,7 +408,7 @@ function refundOrder(id) {
             客户: ${order.customerName}<br>
             预付金额: ¥${order.prepaidAmount.toFixed(2)}
         </p>
-        <p style="color: #F44336; margin-bottom: 20px;">
+        <p style="color: #D32F2F; margin-bottom: 20px;">
             ⚠️ 退款后订单将从队列中移除，此操作不可撤销
         </p>
         <div class="modal-actions">
@@ -422,6 +492,16 @@ function init() {
     document.getElementById('orderForm').addEventListener('submit', createOrder);
     document.getElementById('callNextBtn').addEventListener('click', callNextOrder);
     
+    document.getElementById('orderFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleFileUpload(file);
+        } else {
+            document.getElementById('fileStatus').innerHTML = '';
+            uploadedFileId = null;
+        }
+    });
+    
     ['paperType', 'printSide', 'pageCount', 'copies'].forEach(id => {
         document.getElementById(id).addEventListener('change', calculatePrice);
         document.getElementById(id).addEventListener('input', calculatePrice);
@@ -435,6 +515,7 @@ function init() {
         }
     });
     
+    calculatePrice();
     fetchOrders();
     
     setInterval(fetchOrders, 5000);

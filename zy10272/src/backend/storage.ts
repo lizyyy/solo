@@ -52,8 +52,8 @@ export function loadData(): void {
   try {
     if (fs.existsSync(FILES_FILE)) {
       const filesData = fs.readFileSync(FILES_FILE, 'utf-8');
-      const filesArray = JSON.parse(filesData);
-      inMemoryStore.files = new Map(filesArray.map((f: OrderFile) => [f.id, f]);
+      const filesArray: OrderFile[] = JSON.parse(filesData);
+      inMemoryStore.files = new Map(filesArray.map((f: OrderFile) => [f.id, f]));
     }
   } catch (error) {
     console.error('Error loading files:', error);
@@ -121,4 +121,21 @@ export function getQueueOrders(): Order[] {
   return inMemoryStore.orders.filter(o => 
     o.status === 'paid' || o.status === 'needs_topup'
   ).sort((a, b) => a.orderNumber - b.orderNumber);
+}
+
+export function getOrderByIdempotencyKey(key: string): Order | undefined {
+  return inMemoryStore.orders.find(o => o.idempotencyKey === key);
+}
+
+export function getFileById(fileId: string): OrderFile | undefined {
+  return inMemoryStore.files.get(fileId);
+}
+
+export function addFile(file: OrderFile): void {
+  inMemoryStore.files.set(file.id, file);
+  saveData();
+}
+
+export function getUploadsDir(): string {
+  return UPLOADS_DIR;
 }

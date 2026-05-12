@@ -42,18 +42,28 @@ exports.addOrder = addOrder;
 exports.updateOrder = updateOrder;
 exports.getActiveOrders = getActiveOrders;
 exports.getQueueOrders = getQueueOrders;
+exports.getOrderByIdempotencyKey = getOrderByIdempotencyKey;
+exports.getFileById = getFileById;
+exports.addFile = addFile;
+exports.getUploadsDir = getUploadsDir;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const DATA_DIR = path.join(process.cwd(), 'data');
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 const COUNTER_FILE = path.join(DATA_DIR, 'counter.json');
+const FILES_FILE = path.join(DATA_DIR, 'files.json');
 let inMemoryStore = {
     orders: [],
+    files: new Map(),
     orderCounter: 0
 };
 function ensureDataDir() {
     if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(UPLOADS_DIR)) {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
     }
 }
 function loadData() {
@@ -75,6 +85,17 @@ function loadData() {
         inMemoryStore.orders = [];
     }
     try {
+        if (fs.existsSync(FILES_FILE)) {
+            const filesData = fs.readFileSync(FILES_FILE, 'utf-8');
+            const filesArray = JSON.parse(filesData);
+            inMemoryStore.files = new Map(filesArray.map((f) => [f.id, f]));
+        }
+    }
+    catch (error) {
+        console.error('Error loading files:', error);
+        inMemoryStore.files = new Map();
+    }
+    try {
         if (fs.existsSync(COUNTER_FILE)) {
             const counterData = fs.readFileSync(COUNTER_FILE, 'utf-8');
             inMemoryStore.orderCounter = JSON.parse(counterData).counter || 0;
@@ -89,6 +110,8 @@ function saveData() {
     ensureDataDir();
     try {
         fs.writeFileSync(ORDERS_FILE, JSON.stringify(inMemoryStore.orders, null, 2));
+        const filesArray = Array.from(inMemoryStore.files.values());
+        fs.writeFileSync(FILES_FILE, JSON.stringify(filesArray, null, 2));
         fs.writeFileSync(COUNTER_FILE, JSON.stringify({ counter: inMemoryStore.orderCounter }, null, 2));
     }
     catch (error) {
@@ -122,4 +145,17 @@ function getActiveOrders() {
 }
 function getQueueOrders() {
     return inMemoryStore.orders.filter(o => o.status === 'paid' || o.status === 'needs_topup').sort((a, b) => a.orderNumber - b.orderNumber);
+}
+function getOrderByIdempotencyKey(key) {
+    return inMemoryStore.orders.find(o => o.idempotencyKey === key);
+}
+function getFileById(fileId) {
+    return inMemoryStore.files.get(fileId);
+}
+function addFile(file) {
+    inMemoryStore.files.set(file.id, file);
+    saveData();
+}
+function getUploadsDir() {
+    return UPLOADS_DIR;
 }
