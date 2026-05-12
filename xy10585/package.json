@@ -1,0 +1,16 @@
+{
+  "name": "warehouse-billing-ladder-api",
+  "version": "1.0.0",
+  "description": "仓储计费阶梯 API - 第三方仓储按体积、库龄、温区和操作次数阶梯计费",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "demo": "node src/demo.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1",
+    "json2csv": "^6.0.0-alpha.2"
+  }
+}
