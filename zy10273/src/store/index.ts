@@ -18,7 +18,7 @@ interface AppState {
   abnormalRecords: AbnormalRecord[]
   currentUser: string
   
-  addAppointment: (appointment: Omit<Appointment, 'id' | 'appointmentNo' | 'status' | 'photos' | 'inspectionItems' | 'priceChanges' | 'inspectionLogs' | 'createdAt' | 'updatedAt'>) => { success: boolean; error?: string; appointment?: Appointment }
+  addAppointment: (appointment: Omit<Appointment, 'id' | 'appointmentNo' | 'status' | 'actualPrice' | 'photos' | 'inspectionItems' | 'priceChanges' | 'inspectionLogs' | 'createdAt' | 'updatedAt' | 'settlement' | 'rejectReason' | 'rejectedAt' | 'rejectedBy'>) => { success: boolean; error?: string; appointment?: Appointment }
   updateAppointment: (id: string, updates: Partial<Appointment>) => void
   startInspection: (appointmentId: string) => void
   completeInspection: (appointmentId: string, items: InspectionItem[], actualPrice: number) => void

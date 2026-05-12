@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Camera, Clock, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Camera, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { useAppStore } from '../store'
 import { AppointmentStatus, InspectionItem } from '../types'
 import { formatDate, getStatusBadgeClass, getStatusText, getApplianceTypeText } from '../utils'

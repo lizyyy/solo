@@ -30,7 +30,7 @@ export default function Approvals() {
     })
   })
 
-  const handleApprove = (changeId: string, appointmentId: string) => {
+  const handleApprove = (changeId: string) => {
     approvePriceChange(changeId, true, approvalNotes[changeId] || '')
     setApprovalNotes(prev => ({ ...prev, [changeId]: '' }))
   }
@@ -130,7 +130,7 @@ export default function Approvals() {
                     驳回
                   </button>
                   <button
-                    onClick={() => handleApprove(change.id, appointment.id)}
+                    onClick={() => handleApprove(change.id)}
                     className="btn btn-success flex items-center gap-2"
                   >
                     <Check size={18} />

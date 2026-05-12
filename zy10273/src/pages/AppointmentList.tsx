@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Search, Eye } from 'lucide-react'
 import { useAppStore } from '../store'
-import { AppointmentStatus, ApplianceType } from '../types'
+import { AppointmentStatus } from '../types'
 import { formatDate, getStatusBadgeClass, getStatusText, getApplianceTypeText } from '../utils'
 import CreateAppointmentModal from '../components/CreateAppointmentModal'
 
@@ -94,7 +94,7 @@ export default function AppointmentList() {
                   </td>
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-gray-900">{getApplianceTypeText(applianceType)}</div>
+                      <div className="text-gray-900">{getApplianceTypeText(appointment.applianceType)}</div>
                       <div className="text-sm text-gray-500">{appointment.applianceBrand} {appointment.applianceModel}</div>
                     </div>
                   </td>

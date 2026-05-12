@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { 
-  ClipboardList, Clock, CheckCircle, XCircle, DollarSign, 
-  AlertTriangle, TrendingUp, Users
+  ClipboardList, Clock, CheckCircle, DollarSign, 
+  AlertTriangle, TrendingUp
 } from 'lucide-react'
 import { useAppStore } from '../store'
 import { formatDate } from '../utils'

@@ -82,7 +82,7 @@ export interface Appointment {
   applianceModel: string
   applianceAge: number
   estimatedPrice: number
-  actualPrice: number
+  actualPrice?: number
   status: AppointmentStatus
   technician: string
   scheduledDate: string
