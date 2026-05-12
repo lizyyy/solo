@@ -1,0 +1,34 @@
+[
+  {
+    "name": "api-gateway",
+    "owner": "张晓明",
+    "owner_email": "zhangxm@example.com",
+    "is_internal": false,
+    "is_exposed": true,
+    "description": "API 网关，公网暴露服务"
+  },
+  {
+    "name": "user-service",
+    "owner": "李华",
+    "owner_email": "lihua@example.com",
+    "is_internal": true,
+    "is_exposed": false,
+    "description": "用户服务，内部服务"
+  },
+  {
+    "name": "order-service",
+    "owner": "王强",
+    "owner_email": "wangqiang@example.com",
+    "is_internal": true,
+    "is_exposed": false,
+    "description": "订单服务，内部服务"
+  },
+  {
+    "name": "payment-service",
+    "owner": "赵敏",
+    "owner_email": "zhaomin@example.com",
+    "is_internal": true,
+    "is_exposed": false,
+    "description": "支付服务，内部服务"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "SNYK-JS-LODASH-1018905",
+    "cve_id": "CVE-2021-23337",
+    "title": "Command Injection in lodash",
+    "description": "The package lodash before 4.17.21 are vulnerable to Command Injection via the template function.",
+    "ecosystem": "npm",
+    "package_name": "lodash",
+    "severity": "high",
+    "exploitability": "active",
+    "fixed_version": "4.17.21",
+    "cwe": "CWE-78",
+    "cvss_score": 9.8,
+    "references": [
+      "https://nvd.nist.gov/vuln/detail/CVE-2021-23337",
+      "https://snyk.io/vuln/SNYK-JS-LODASH-1018905"
+    ]
+  },
+  {
+    "id": "SNYK-JAVA-COMFASTERXMLJACKSONCORE-1009829",
+    "cve_id": "CVE-2020-36518",
+    "title": "Deserialization of Untrusted Data",
+    "description": "jackson-databind before 2.13.2 is vulnerable to denial of service via a crafted request.",
+    "ecosystem": "maven",
+    "package_name": "jackson-databind",
+    "severity": "medium",
+    "exploitability": "unproven",
+    "fixed_version": "2.13.2",
+    "cwe": "CWE-502",
+    "cvss_score": 5.9
+  },
+  {
+    "id": "GHSA-33pv-vcgg-jfpc",
+    "title": "Prototype Pollution in minimist",
+    "description": "minimist before 1.2.6 is vulnerable to prototype pollution.",
+    "ecosystem": "npm",
+    "package_name": "minimist",
+    "severity": "critical",
+    "exploitability": "proof_of_concept",
+    "fixed_version": "1.2.6",
+    "cwe": "CWE-1321",
+    "cvss_score": 9.8
+  },
+  {
+    "id": "SNYK-PYTHON-URLLIB3-559452",
+    "title": "Improper Neutralization of CRLF Sequences",
+    "description": "urllib3 before 1.26.5 allows HTTP request smuggling.",
+    "ecosystem": "pypi",
+    "package_name": "urllib3",
+    "severity": "high",
+    "exploitability": "unproven",
+    "fixed_version": "1.26.5",
+    "cwe": "CWE-113",
+    "cvss_score": 7.5
+  }
+]

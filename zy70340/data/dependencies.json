@@ -1,0 +1,42 @@
+[
+  {
+    "name": "lodash",
+    "version": "4.17.20",
+    "ecosystem": "npm",
+    "is_direct": true,
+    "parent_dependencies": [],
+    "service_name": "api-gateway"
+  },
+  {
+    "name": "minimist",
+    "version": "1.2.5",
+    "ecosystem": "npm",
+    "is_direct": false,
+    "parent_dependencies": ["optimist", "yargs"],
+    "service_name": "api-gateway"
+  },
+  {
+    "name": "lodash",
+    "version": "4.17.19",
+    "ecosystem": "npm",
+    "is_direct": true,
+    "parent_dependencies": [],
+    "service_name": "user-service"
+  },
+  {
+    "name": "jackson-databind",
+    "version": "2.12.5",
+    "ecosystem": "maven",
+    "is_direct": true,
+    "parent_dependencies": [],
+    "service_name": "order-service"
+  },
+  {
+    "name": "urllib3",
+    "version": "1.26.4",
+    "ecosystem": "pypi",
+    "is_direct": false,
+    "parent_dependencies": ["requests"],
+    "service_name": "payment-service"
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "tr-SNYK-PYTHON-URLLIB3-559452-payment-service",
+    "vulnerability_id": "SNYK-PYTHON-URLLIB3-559452",
+    "service_name": "payment-service",
+    "status": "fixed",
+    "triager": "赵敏",
+    "triage_date": "2026-05-12",
+    "notes": "升级 requests 到 2.26.0，间接升级 urllib3 到 1.26.7",
+    "fixed_version": "1.26.7"
+  },
+  {
+    "id": "tr-SNYK-JAVA-COMFASTERXMLJACKSONCORE-1009829-order-service",
+    "vulnerability_id": "SNYK-JAVA-COMFASTERXMLJACKSONCORE-1009829",
+    "service_name": "order-service",
+    "status": "triaged",
+    "triager": "王强",
+    "triage_date": "2026-05-12",
+    "notes": "计划在下个迭代升级",
+    "fixed_version": null
+  }
+]

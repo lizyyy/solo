@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>依赖漏洞处置报告</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; line-height: 1.6; }
+        h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h2 { margin-top: 40px; padding: 10px; border-radius: 4px; }
+        .security { background: #fff3cd; color: #856404; }
+        .engineering { background: #f8d7da; color: #721c24; }
+        .triaged { background: #cce5ff; color: #004085; }
+        .waived { background: #e2e3e5; color: #383d41; }
+        .fixed { background: #d4edda; color: #155724; }
+        .false-positive { background: #f8f9fa; color: #6c757d; }
+        .summary { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .summary-item { text-align: center; padding: 15px; border-radius: 4px; }
+        .vuln-card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .vuln-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .critical { background: #dc3545; color: white; }
+        .high { background: #fd7e14; color: white; }
+        .medium { background: #ffc107; color: #333; }
+        .low { background: #28a745; color: white; }
+        .active { background: #dc3545; color: white; }
+        .poc { background: #fd7e14; color: white; }
+        .unproven { background: #6c757d; color: white; }
+        .service-item { background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 10px; }
+        .exposed-tag { background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; margin-left: 5px; }
+    </style>
+</head>
+<body>
+    <h1>依赖漏洞处置报告</h1>
+    <p>生成时间: 2026-05-12</p>
+    
+    <div class="summary">
+        <h3>概览</h3>
+        <div class="summary-grid">
+            <div class="summary-item" style="background: #f8d7da;">
+                <div style="font-size: 32px; font-weight: bold;">1</div>
+                <div>高危/严重 (需立即处理)</div>
+            </div>
+            <div class="summary-item" style="background: #fff3cd;">
+                <div style="font-size: 32px; font-weight: bold;">1</div>
+                <div>待处理</div>
+            </div>
+            <div class="summary-item" style="background: #e2e3e5;">
+                <div style="font-size: 32px; font-weight: bold;">4</div>
+                <div>总漏洞数</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+            <div class="summary-item" style="background: #cce5ff;">
+                <div style="font-size: 24px; font-weight: bold;">1</div>
+                <div>处置中</div>
+            </div>
+            <div class="summary-item" style="background: #e2e3e5;">
+                <div style="font-size: 24px; font-weight: bold;">1</div>
+                <div>已例外</div>
+            </div>
+            <div class="summary-item" style="background: #d4edda;">
+                <div style="font-size: 24px; font-weight: bold;">1</div>
+                <div>已修复</div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <h2 class="security">安全风险 - 高危/严重漏洞</h2>
+    
+    
+<div class="vuln-card">
+    <div class="vuln-header">
+        <strong>SNYK-JS-LODASH-1018905 (CVE-2021-23337)</strong>
+        <div>
+            <span class="badge high">HIGH</span>
+            <span class="badge active">active</span>
+        </div>
+    </div>
+    <div><strong>Command Injection in lodash</strong></div>
+    <div style="color: #666; font-size: 14px; margin-top: 5px;">
+        组件: npm/lodash | 
+        修复版本: 4.17.21
+    </div>
+    
+    
+    <div style="margin-top: 15px;"><strong>影响服务:</strong></div>
+    
+    <div class="service-item">
+        <strong>user-service</strong>
+        
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 李华 (lihua@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 4.17.19
+            
+        </div>
+        
+    </div>
+    
+    <div class="service-item">
+        <strong>api-gateway</strong>
+        <span class="exposed-tag">公网暴露</span>
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 张晓明 (zhangxm@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 4.17.20
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+</div>
+    
+    
+    
+    
+    <h2 class="engineering">工程待办 - 待处理漏洞</h2>
+    
+    
+<div class="vuln-card">
+    <div class="vuln-header">
+        <strong>SNYK-JS-LODASH-1018905 (CVE-2021-23337)</strong>
+        <div>
+            <span class="badge high">HIGH</span>
+            <span class="badge active">active</span>
+        </div>
+    </div>
+    <div><strong>Command Injection in lodash</strong></div>
+    <div style="color: #666; font-size: 14px; margin-top: 5px;">
+        组件: npm/lodash | 
+        修复版本: 4.17.21
+    </div>
+    
+    
+    <div style="margin-top: 15px;"><strong>影响服务:</strong></div>
+    
+    <div class="service-item">
+        <strong>user-service</strong>
+        
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 李华 (lihua@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 4.17.19
+            
+        </div>
+        
+    </div>
+    
+    <div class="service-item">
+        <strong>api-gateway</strong>
+        <span class="exposed-tag">公网暴露</span>
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 张晓明 (zhangxm@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 4.17.20
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+</div>
+    
+    
+    
+    
+    <h2 class="triaged">处置中</h2>
+    
+    
+<div class="vuln-card">
+    <div class="vuln-header">
+        <strong>SNYK-JAVA-COMFASTERXMLJACKSONCORE-1009829 (CVE-2020-36518)</strong>
+        <div>
+            <span class="badge medium">MEDIUM</span>
+            <span class="badge unproven">unproven</span>
+        </div>
+    </div>
+    <div><strong>Deserialization of Untrusted Data</strong></div>
+    <div style="color: #666; font-size: 14px; margin-top: 5px;">
+        组件: maven/jackson-databind | 
+        修复版本: 2.13.2
+    </div>
+    
+    
+    <div style="margin-top: 15px;"><strong>影响服务:</strong></div>
+    
+    <div class="service-item">
+        <strong>order-service</strong>
+        
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 王强 (wangqiang@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 2.12.5
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+</div>
+    
+    
+    
+    
+    <h2 class="waived">已例外</h2>
+    
+    
+<div class="vuln-card">
+    <div class="vuln-header">
+        <strong>GHSA-33pv-vcgg-jfpc</strong>
+        <div>
+            <span class="badge critical">CRITICAL</span>
+            <span class="badge poc">proof_of_concept</span>
+        </div>
+    </div>
+    <div><strong>Prototype Pollution in minimist</strong></div>
+    <div style="color: #666; font-size: 14px; margin-top: 5px;">
+        组件: npm/minimist | 
+        修复版本: 1.2.6
+    </div>
+    
+    
+    <div style="margin-top: 15px;"><strong>影响服务:</strong></div>
+    
+    <div class="service-item">
+        <strong>api-gateway</strong>
+        <span class="exposed-tag">公网暴露</span>
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 张晓明 (zhangxm@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 1.2.5
+            
+            | <span style="color: #856404;">间接依赖</span>
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    
+    
+    <div style="margin-top: 10px; padding: 10px; background: #e2e3e5; border-radius: 4px;">
+        <strong>例外原因:</strong> minimist 仅在构建时使用，运行时不加载，不影响实际服务<br>
+        <strong>到期时间:</strong> 2026-08-10 |
+        <strong>批准人:</strong> 安全团队
+    </div>
+    
+</div>
+    
+    
+    
+    
+    <h2 class="fixed">已修复</h2>
+    
+    
+<div class="vuln-card">
+    <div class="vuln-header">
+        <strong>SNYK-PYTHON-URLLIB3-559452</strong>
+        <div>
+            <span class="badge high">HIGH</span>
+            <span class="badge unproven">unproven</span>
+        </div>
+    </div>
+    <div><strong>Improper Neutralization of CRLF Sequences</strong></div>
+    <div style="color: #666; font-size: 14px; margin-top: 5px;">
+        组件: pypi/urllib3 | 
+        修复版本: 1.26.5
+    </div>
+    
+    
+    <div style="margin-top: 15px;"><strong>影响服务:</strong></div>
+    
+    <div class="service-item">
+        <strong>payment-service</strong>
+        
+        <div style="font-size: 13px; color: #666; margin-top: 3px;">
+            负责人: 赵敏 (zhaomin@example.com)
+        </div>
+        
+        
+        <div style="font-size: 13px; margin-top: 3px;">
+            版本: 1.26.4
+            
+            | <span style="color: #856404;">间接依赖</span>
+            
+        </div>
+        
+    </div>
+    
+    
+    
+    
+    <div style="margin-top: 10px; padding: 10px; background: #cce5ff; border-radius: 4px;">
+        <strong>处置状态:</strong> fixed |
+        <strong>处置人:</strong> 赵敏
+        
+        | <strong>修复版本:</strong> 1.26.7
+        
+    </div>
+    
+    
+    
+</div>
+    
+    
+    
+    
+</body>
+</html>

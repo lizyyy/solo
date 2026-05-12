@@ -1,0 +1,12 @@
+[
+  {
+    "id": "exc-GHSA-33pv-vcgg-jfpc-api-gateway",
+    "vulnerability_id": "GHSA-33pv-vcgg-jfpc",
+    "service_name": "api-gateway",
+    "reason": "minimist 仅在构建时使用，运行时不加载，不影响实际服务",
+    "owner": "安全团队",
+    "approve_date": "2026-05-12",
+    "expire_date": "2026-08-10",
+    "notes": "经过代码审查，确认该依赖仅用于构建脚本"
+  }
+]
