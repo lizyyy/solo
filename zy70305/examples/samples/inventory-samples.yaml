@@ -1,0 +1,24 @@
+samples:
+  - operationId: getInventory
+    responseBody:
+      productId: "prod-1"
+      stock: 100
+      status: "in_stock"
+      warehouse: "WH-001"
+
+  - operationId: getInventoryByProduct
+    responseBody:
+      productId: "prod-2"
+      stock: 50
+      status: "pre_order"
+      warehouse: "WH-002"
+      lastUpdated: "2024-01-01T00:00:00Z"
+
+  - operationId: adjustInventory
+    requestBody:
+      quantity: -10
+      reason: "order adjustment"
+    responseBody:
+      productId: "prod-3"
+      stock: 90
+      status: "low_stock"

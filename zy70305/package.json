@@ -1,0 +1,34 @@
+{
+  "name": "openapi-drift-cli",
+  "version": "1.0.0",
+  "description": "OpenAPI 契约漂移检测 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "openapi-drift": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "example": "ts-node src/cli.ts scan --config examples/config.yaml"
+  },
+  "keywords": ["openapi", "contract", "drift", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0",
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/uuid": "^9.0.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
+  }
+}

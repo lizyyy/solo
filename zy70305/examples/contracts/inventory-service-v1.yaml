@@ -1,0 +1,111 @@
+openapi: 3.0.0
+info:
+  title: 库存服务
+  version: 1.0.0
+  description: 库存管理服务 API
+
+paths:
+  /inventory:
+    get:
+      operationId: getInventory
+      summary: 获取库存列表
+      parameters:
+        - name: productId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: string
+                  stock:
+                    type: integer
+                  status:
+                    type: string
+                    enum: [in_stock, low_stock, out_of_stock]
+                  warehouse:
+                    type: string
+
+  /inventory/{productId}:
+    get:
+      operationId: getInventoryByProduct
+      summary: 获取商品库存
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+        '404':
+          description: 库存不存在
+
+  /inventory/{productId}/adjust:
+    post:
+      operationId: adjustInventory
+      summary: 调整库存
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdjustInventoryRequest'
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+
+components:
+  schemas:
+    InventoryItem:
+      type: object
+      properties:
+        productId:
+          type: string
+        stock:
+          type: integer
+        status:
+          type: string
+          enum: [in_stock, low_stock, out_of_stock, pre_order]
+        warehouse:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+      required:
+        - productId
+        - stock
+        - status
+
+    AdjustInventoryRequest:
+      type: object
+      properties:
+        quantity:
+          type: integer
+        reason:
+          type: string
+        operator:
+          type: string
+      required:
+        - quantity
+        - reason

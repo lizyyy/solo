@@ -1,0 +1,20 @@
+samples:
+  - operationId: getMembers
+    responseBody:
+      items:
+        - id: "member-1"
+          name: "张三"
+          email: "zhangsan@example.com"
+          level: "gold"
+          points: 1000
+
+  - operationId: createMember
+    requestBody:
+      name: "李四"
+      email: "lisi@example.com"
+    responseBody:
+      id: "member-2"
+      name: "李四"
+      email: "lisi@example.com"
+      level: "bronze"
+      points: 0

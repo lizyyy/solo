@@ -1,0 +1,27 @@
+services:
+  - serviceName: order-service
+    oldContractPath: examples/contracts/order-service-v1.yaml
+    newContractPath: examples/contracts/order-service-v2.yaml
+    samplesPath: examples/samples/order-samples.yaml
+    owners:
+      - zhangsan
+      - lisi
+
+  - serviceName: member-service
+    oldContractPath: examples/contracts/member-service-v1.yaml
+    newContractPath: examples/contracts/member-service-v2.yaml
+    samplesPath: examples/samples/member-samples.yaml
+    owners:
+      - wangwu
+
+  - serviceName: inventory-service
+    oldContractPath: examples/contracts/inventory-service-v1.yaml
+    newContractPath: examples/contracts/inventory-service-v2.yaml
+    samplesPath: examples/samples/inventory-samples.yaml
+    owners:
+      - zhaoliu
+      - sunqi
+
+exemptionsPath: examples/exemptions.yaml
+confirmationsPath: examples/confirmations.yaml
+outputDir: reports
