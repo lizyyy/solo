@@ -856,6 +856,11 @@ DEVICE-002,磁盘告警,磁盘空间不足10%,warning,2024-01-01 11:00:00
                 document.getElementById('modalMessage').innerHTML = '';
                 
                 document.getElementById('groupSummary').style.display = 'block';
+                
+                const similarityDisplay = group.similarity_score 
+                    ? `${(group.similarity_score * 100).toFixed(1)}%` 
+                    : '-';
+                
                 document.getElementById('groupSummary').innerHTML = `
                     <div class="group-summary-row">
                         <span>设备ID</span>
@@ -864,6 +869,14 @@ DEVICE-002,磁盘告警,磁盘空间不足10%,warning,2024-01-01 11:00:00
                     <div class="group-summary-row">
                         <span>告警数量</span>
                         <span>${group.alert_count}</span>
+                    </div>
+                    <div class="group-summary-row">
+                        <span>相似度分数</span>
+                        <span>${similarityDisplay}</span>
+                    </div>
+                    <div class="group-summary-row">
+                        <span>归并解释</span>
+                        <span style="text-align: right; max-width: 60%; word-break: break-word;">${group.explanation || '暂无解释'}</span>
                     </div>
                     <div class="group-summary-row">
                         <span>复核状态</span>

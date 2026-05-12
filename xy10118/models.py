@@ -63,6 +63,8 @@ class MergeGroup(db.Model):
     representative_alert_id = db.Column(db.Integer, db.ForeignKey('alerts.id'))
     device_id = db.Column(db.String(100), nullable=False, index=True)
     alert_count = db.Column(db.Integer, default=0)
+    explanation = db.Column(db.Text)
+    similarity_score = db.Column(db.Float, default=0.0)
     status = db.Column(db.String(20), default='pending')
     review_status = db.Column(db.String(20), default='pending')
     reviewer = db.Column(db.String(100))
@@ -81,6 +83,8 @@ class MergeGroup(db.Model):
             'representative_alert_id': self.representative_alert_id,
             'device_id': self.device_id,
             'alert_count': self.alert_count,
+            'explanation': self.explanation,
+            'similarity_score': self.similarity_score,
             'status': self.status,
             'review_status': self.review_status,
             'reviewer': self.reviewer,

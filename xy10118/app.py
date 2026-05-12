@@ -120,6 +120,8 @@ def create_app():
                     group_name=result.group_name,
                     device_id=result.representative.device_id,
                     alert_count=len(result.alerts),
+                    explanation=result.explanation,
+                    similarity_score=result.similarity_score,
                     merge_version_id=version.id,
                     status='merged',
                     review_status='pending'
@@ -218,23 +220,24 @@ def create_app():
         else:
             action = 'unmerged'
         
-        if original_group_id:
-            original_group = MergeGroup.query.get(original_group_id)
-            if original_group:
-                original_group.alert_count = original_group.alerts.count()
-        
-        alert.merge_group_id = new_group_id
-        
-        if new_group_id:
-            new_group = MergeGroup.query.get(new_group_id)
-            if new_group:
-                new_group.alert_count = new_group.alerts.count()
-        
         version_id = None
         if original_group_id:
             original_group = MergeGroup.query.get(original_group_id)
             if original_group:
                 version_id = original_group.merge_version_id
+        
+        alert.merge_group_id = new_group_id
+        db.session.flush()
+        
+        if original_group_id:
+            original_group = MergeGroup.query.get(original_group_id)
+            if original_group:
+                original_group.alert_count = original_group.alerts.count()
+        
+        if new_group_id:
+            new_group = MergeGroup.query.get(new_group_id)
+            if new_group:
+                new_group.alert_count = new_group.alerts.count()
         
         correction = CorrectionHistory(
             merge_version_id=version_id,
@@ -335,7 +338,7 @@ def create_app():
             output = io.StringIO()
             writer = csv.writer(output)
             
-            writer.writerow(['归并组ID', '归并组名称', '设备ID', '告警数量', '复核状态', '告警ID', '告警类型', '告警消息', '时间'])
+            writer.writerow(['归并组ID', '归并组名称', '设备ID', '告警数量', '相似度分数', '归并解释', '复核状态', '告警ID', '告警类型', '告警消息', '时间'])
             
             for group in groups:
                 alerts = Alert.query.filter_by(merge_group_id=group.id).all()
@@ -345,6 +348,8 @@ def create_app():
                         group.group_name,
                         group.device_id,
                         group.alert_count,
+                        group.similarity_score,
+                        group.explanation,
                         group.review_status,
                         alert.id,
                         alert.alert_type,
