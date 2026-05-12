@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { orderApi, anomalyApi } from '../services/api';
 import { formatDate, today } from '../utils';
 import { STATUS_LABELS, STATUS_COLORS, QC_RESULT_LABELS, SEVERITY_LABELS } from '../types';
-import type { ReworkOrder, ReworkRecord, OrderHistory, Anomaly } from '../types';
+import type { ReworkOrder, ReworkRecord, OrderHistory, Anomaly, SeverityLevel } from '../types';
 import { Toast, showToast } from '../components/Toast';
 import { ReworkRecordForm } from '../components/ReworkRecordForm';
 import { QCCheckForm } from '../components/QCCheckForm';
@@ -26,7 +26,12 @@ export default function OrderDetail() {
   const [showAnomalyForm, setShowAnomalyForm] = useState(false);
   const [nextReworkCount, setNextReworkCount] = useState(1);
 
-  const [anomalyForm, setAnomalyForm] = useState({
+  const [anomalyForm, setAnomalyForm] = useState<{
+    anomaly_type: string;
+    description: string;
+    severity: SeverityLevel;
+    reported_by: string;
+  }>({
     anomaly_type: 'process',
     description: '',
     severity: 'medium',

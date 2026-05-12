@@ -28,7 +28,9 @@ export function Toast() {
   useEffect(() => {
     const update = (t: ToastItem[]) => setToasts([...t]);
     listeners.add(update);
-    return () => listeners.delete(update);
+    return () => {
+      listeners.delete(update);
+    };
   }, []);
 
   if (!toasts.length) return null;

@@ -37,12 +37,14 @@ export interface QualityCheck {
   created_at: string;
 }
 
+export type SeverityLevel = 'low' | 'medium' | 'high';
+
 export interface Anomaly {
   id: number;
   order_id: number;
   anomaly_type: string;
   description: string;
-  severity: 'low' | 'medium' | 'high';
+  severity: SeverityLevel;
   reported_by: string;
   reported_date: string;
   status: 'open' | 'resolved';
