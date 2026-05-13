@@ -1,0 +1,746 @@
+{
+  "67bda19f163f896afd9fc0bccb6446bb": {
+    "id": "67bda19f163f896afd9fc0bccb6446bb",
+    "entity": "orders",
+    "primary_key": "id",
+    "pk_value": "ORD007",
+    "diff_type": "old_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": null,
+    "new_record": {
+      "id": "ORD007",
+      "tenant_id": "T004",
+      "order_no": "20240106001",
+      "user_id": "U007",
+      "order_status": "pending",
+      "total_amount": 180.0,
+      "discount_amount": 0,
+      "pay_amount": 180.0,
+      "created_at": "2024-01-06T09:00:00Z",
+      "updated_at": "2024-01-06T09:00:00Z"
+    },
+    "tenant_id": "T004",
+    "created_at": "2026-05-13T17:18:38.993233",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.450561",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "823f574bd2b9b1589e06e0fe03382b58": {
+    "id": "823f574bd2b9b1589e06e0fe03382b58",
+    "entity": "orders",
+    "primary_key": "id",
+    "pk_value": "ORD005",
+    "diff_type": "new_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": {
+      "id": "ORD005",
+      "tenant_id": "T001",
+      "order_no": "20240104001",
+      "user_id": "U005",
+      "status": "paid",
+      "total_amount": 88.88,
+      "discount_amount": 0,
+      "actual_amount": 88.88,
+      "created_at": "2024-01-04T20:00:00Z",
+      "updated_at": "2024-01-04T20:05:00Z"
+    },
+    "new_record": null,
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993324",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.450571",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "fb72f545cb9a022f3e996631fdd52812": {
+    "id": "fb72f545cb9a022f3e996631fdd52812",
+    "entity": "orders",
+    "primary_key": "id",
+    "pk_value": "ORD002",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "status -> order_status",
+        "old_value": "shipped",
+        "new_value": "paid",
+        "mapping_issue": true
+      },
+      {
+        "field": "actual_amount -> pay_amount",
+        "old_value": 200.0,
+        "new_value": 199.99,
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "ORD002",
+      "tenant_id": "T001",
+      "order_no": "20240101002",
+      "user_id": "U002",
+      "status": "shipped",
+      "total_amount": 200.0,
+      "discount_amount": 0,
+      "actual_amount": 200.0,
+      "created_at": "2024-01-01T11:00:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "ORD002",
+      "tenant_id": "T001",
+      "order_no": "20240101002",
+      "user_id": "U002",
+      "order_status": "paid",
+      "total_amount": 200.0,
+      "discount_amount": 0,
+      "pay_amount": 199.99,
+      "created_at": "2024-01-01T11:00:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993263",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.451364",
+    "recurrence_count": 1,
+    "notes": null
+  },
+  "0afb3f5c41a8554010e22957079fb3e3": {
+    "id": "0afb3f5c41a8554010e22957079fb3e3",
+    "entity": "orders",
+    "primary_key": "id",
+    "pk_value": "ORD002",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "pay_amount",
+        "old_value": 200.0,
+        "new_value": 199.99,
+        "mapping_issue": false
+      },
+      {
+        "field": "order_status",
+        "old_value": "shipped",
+        "new_value": "paid",
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "ORD002",
+      "tenant_id": "T001",
+      "order_no": "20240101002",
+      "user_id": "U002",
+      "status": "shipped",
+      "total_amount": 200.0,
+      "discount_amount": 0,
+      "actual_amount": 200.0,
+      "created_at": "2024-01-01T11:00:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "ORD002",
+      "tenant_id": "T001",
+      "order_no": "20240101002",
+      "user_id": "U002",
+      "order_status": "paid",
+      "total_amount": 200.0,
+      "discount_amount": 0,
+      "pay_amount": 199.99,
+      "created_at": "2024-01-01T11:00:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993292",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.451393",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "d2440007aa51ba990ed97bac0f77426b": {
+    "id": "d2440007aa51ba990ed97bac0f77426b",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U005",
+    "diff_type": "new_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": {
+      "id": "U005",
+      "tenant_id": "T001",
+      "user_name": "钱七",
+      "mobile": "13800138005",
+      "email": "qianqi@example.com",
+      "is_active": true,
+      "level": 5,
+      "create_time": "2023-10-05T11:00:00Z",
+      "update_time": "2024-01-05T15:00:00Z"
+    },
+    "new_record": null,
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993655",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452026",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "ec7bdbcfdde3b2b54beb0185b9cb70de": {
+    "id": "ec7bdbcfdde3b2b54beb0185b9cb70de",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U001",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "level -> vip_level",
+        "old_value": 2,
+        "new_value": "gold",
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "U001",
+      "tenant_id": "T001",
+      "user_name": "张三",
+      "mobile": "13800138001",
+      "email": "zhangsan@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-06-01T10:00:00Z",
+      "update_time": "2024-01-01T08:00:00Z"
+    },
+    "new_record": {
+      "id": "U001",
+      "tenant_id": "T001",
+      "nickname": "张三",
+      "phone": "13800138001",
+      "email": "zhangsan@example.com",
+      "active": 1,
+      "vip_level": "gold",
+      "created_at": "2023-06-01T10:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z",
+      "ext_1": "a",
+      "ext_2": "b"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993554",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452044",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "f7ee579ce4b306e23701dbef09929eea": {
+    "id": "f7ee579ce4b306e23701dbef09929eea",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U001",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "vip_level",
+        "old_value": 2,
+        "new_value": "gold",
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "U001",
+      "tenant_id": "T001",
+      "user_name": "张三",
+      "mobile": "13800138001",
+      "email": "zhangsan@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-06-01T10:00:00Z",
+      "update_time": "2024-01-01T08:00:00Z"
+    },
+    "new_record": {
+      "id": "U001",
+      "tenant_id": "T001",
+      "nickname": "张三",
+      "phone": "13800138001",
+      "email": "zhangsan@example.com",
+      "active": 1,
+      "vip_level": "gold",
+      "created_at": "2023-06-01T10:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z",
+      "ext_1": "a",
+      "ext_2": "b"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993581",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452077",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "07f7dd6308aa2e90c947213b24b31280": {
+    "id": "07f7dd6308aa2e90c947213b24b31280",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U003",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "level -> vip_level",
+        "old_value": 3,
+        "new_value": "diamond",
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "U003",
+      "tenant_id": "T002",
+      "user_name": "王五",
+      "mobile": "13800138003",
+      "email": "wangwu@example.com",
+      "is_active": false,
+      "level": 3,
+      "create_time": "2023-08-20T09:00:00Z",
+      "update_time": "2024-01-03T12:00:00Z"
+    },
+    "new_record": {
+      "id": "U003",
+      "tenant_id": "T002",
+      "nickname": "王五",
+      "phone": "13800138003",
+      "email": "wangwu@example.com",
+      "active": 0,
+      "vip_level": "diamond",
+      "created_at": "2023-08-20T09:00:00Z",
+      "updated_at": "2024-01-03T12:00:00Z"
+    },
+    "tenant_id": "T002",
+    "created_at": "2026-05-13T17:18:38.993509",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452087",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "e3f57e9a3a2ac44774df7c9f0b51b6f2": {
+    "id": "e3f57e9a3a2ac44774df7c9f0b51b6f2",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U003",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "vip_level",
+        "old_value": 3,
+        "new_value": "diamond",
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "U003",
+      "tenant_id": "T002",
+      "user_name": "王五",
+      "mobile": "13800138003",
+      "email": "wangwu@example.com",
+      "is_active": false,
+      "level": 3,
+      "create_time": "2023-08-20T09:00:00Z",
+      "update_time": "2024-01-03T12:00:00Z"
+    },
+    "new_record": {
+      "id": "U003",
+      "tenant_id": "T002",
+      "nickname": "王五",
+      "phone": "13800138003",
+      "email": "wangwu@example.com",
+      "active": 0,
+      "vip_level": "diamond",
+      "created_at": "2023-08-20T09:00:00Z",
+      "updated_at": "2024-01-03T12:00:00Z"
+    },
+    "tenant_id": "T002",
+    "created_at": "2026-05-13T17:18:38.993543",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452114",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "ebfe8fa8d48a3b3010d7c8b0082e39c8": {
+    "id": "ebfe8fa8d48a3b3010d7c8b0082e39c8",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U006",
+    "diff_type": "old_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": null,
+    "new_record": {
+      "id": "U006",
+      "tenant_id": "T003",
+      "nickname": "孙八",
+      "phone": "13800138006",
+      "email": "sunba@example.com",
+      "active": 1,
+      "vip_level": "silver",
+      "created_at": "2023-11-20T10:00:00Z",
+      "updated_at": "2024-01-06T08:00:00Z"
+    },
+    "tenant_id": "T003",
+    "created_at": "2026-05-13T17:18:38.993586",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452120",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "db7c41cdff4a080a4452be2492f75768": {
+    "id": "db7c41cdff4a080a4452be2492f75768",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U004",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "level -> vip_level",
+        "old_value": 2,
+        "new_value": "gold",
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "U004",
+      "tenant_id": "T002",
+      "user_name": "赵六",
+      "mobile": "13800138004",
+      "email": "zhaoliu@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-09-10T16:00:00Z",
+      "update_time": "2024-01-04T10:00:00Z"
+    },
+    "new_record": {
+      "id": "U004",
+      "tenant_id": "T002",
+      "nickname": "赵六",
+      "phone": "13800138004",
+      "email": "zhaoliu@example.com",
+      "active": 1,
+      "vip_level": "gold",
+      "created_at": "2023-09-10T16:00:00Z",
+      "updated_at": "2024-01-04T10:00:00Z"
+    },
+    "tenant_id": "T002",
+    "created_at": "2026-05-13T17:18:38.993628",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452130",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "57c9972f0395a66db09580630c6b7d67": {
+    "id": "57c9972f0395a66db09580630c6b7d67",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U004",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "vip_level",
+        "old_value": 2,
+        "new_value": "gold",
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "U004",
+      "tenant_id": "T002",
+      "user_name": "赵六",
+      "mobile": "13800138004",
+      "email": "zhaoliu@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-09-10T16:00:00Z",
+      "update_time": "2024-01-04T10:00:00Z"
+    },
+    "new_record": {
+      "id": "U004",
+      "tenant_id": "T002",
+      "nickname": "赵六",
+      "phone": "13800138004",
+      "email": "zhaoliu@example.com",
+      "active": 1,
+      "vip_level": "gold",
+      "created_at": "2023-09-10T16:00:00Z",
+      "updated_at": "2024-01-04T10:00:00Z"
+    },
+    "tenant_id": "T002",
+    "created_at": "2026-05-13T17:18:38.993650",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452153",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "cca4146cf09c2248cdb082445b306a0e": {
+    "id": "cca4146cf09c2248cdb082445b306a0e",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U002",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "level -> vip_level",
+        "old_value": 1,
+        "new_value": "silver",
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "U002",
+      "tenant_id": "T001",
+      "user_name": "李四",
+      "mobile": "13800138002",
+      "email": "lisi@example.com",
+      "is_active": true,
+      "level": 1,
+      "create_time": "2023-07-15T14:30:00Z",
+      "update_time": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "U002",
+      "tenant_id": "T001",
+      "nickname": "李四",
+      "phone": "13800138002",
+      "email": "lisi@example.com",
+      "active": 1,
+      "vip_level": "silver",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z",
+      "ext_1": "c"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993595",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452163",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "5727fbb9488e89a7f5ea3d1c1b7c1c7c": {
+    "id": "5727fbb9488e89a7f5ea3d1c1b7c1c7c",
+    "entity": "users",
+    "primary_key": "id",
+    "pk_value": "U002",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "vip_level",
+        "old_value": 1,
+        "new_value": "silver",
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "U002",
+      "tenant_id": "T001",
+      "user_name": "李四",
+      "mobile": "13800138002",
+      "email": "lisi@example.com",
+      "is_active": true,
+      "level": 1,
+      "create_time": "2023-07-15T14:30:00Z",
+      "update_time": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "U002",
+      "tenant_id": "T001",
+      "nickname": "李四",
+      "phone": "13800138002",
+      "email": "lisi@example.com",
+      "active": 1,
+      "vip_level": "silver",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z",
+      "ext_1": "c"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993619",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452187",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "fa3bf20a9e93c2514cbf4182dc3e4c00": {
+    "id": "fa3bf20a9e93c2514cbf4182dc3e4c00",
+    "entity": "points",
+    "primary_key": "id",
+    "pk_value": "P002",
+    "diff_type": "mapping_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "balance -> available_points",
+        "old_value": 500,
+        "new_value": 499,
+        "mapping_issue": true
+      },
+      {
+        "field": "total_spent -> used_points",
+        "old_value": 2000,
+        "new_value": 2001,
+        "mapping_issue": true
+      }
+    ],
+    "old_record": {
+      "id": "P002",
+      "tenant_id": "T001",
+      "user_id": "U002",
+      "balance": 500,
+      "total_earned": 2500,
+      "total_spent": 2000,
+      "expire_at": "2025-12-31T23:59:59Z",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "P002",
+      "tenant_id": "T001",
+      "user_id": "U002",
+      "available_points": 499,
+      "earned_points": 2500,
+      "used_points": 2001,
+      "expire_time": "2025-12-31T23:59:59Z",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993808",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452826",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "b8cee6fedb36b8f32a300ade7e6a2140": {
+    "id": "b8cee6fedb36b8f32a300ade7e6a2140",
+    "entity": "points",
+    "primary_key": "id",
+    "pk_value": "P002",
+    "diff_type": "field_diff",
+    "status": "open",
+    "field_diffs": [
+      {
+        "field": "available_points",
+        "old_value": 500,
+        "new_value": 499,
+        "mapping_issue": false
+      },
+      {
+        "field": "used_points",
+        "old_value": 2000,
+        "new_value": 2001,
+        "mapping_issue": false
+      }
+    ],
+    "old_record": {
+      "id": "P002",
+      "tenant_id": "T001",
+      "user_id": "U002",
+      "balance": 500,
+      "total_earned": 2500,
+      "total_spent": 2000,
+      "expire_at": "2025-12-31T23:59:59Z",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "new_record": {
+      "id": "P002",
+      "tenant_id": "T001",
+      "user_id": "U002",
+      "available_points": 499,
+      "earned_points": 2500,
+      "used_points": 2001,
+      "expire_time": "2025-12-31T23:59:59Z",
+      "created_at": "2023-07-15T14:30:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    "tenant_id": "T001",
+    "created_at": "2026-05-13T17:18:38.993828",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452849",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "e969b176b49c7a15a04c7726027b9b5a": {
+    "id": "e969b176b49c7a15a04c7726027b9b5a",
+    "entity": "points",
+    "primary_key": "id",
+    "pk_value": "P006",
+    "diff_type": "old_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": null,
+    "new_record": {
+      "id": "P006",
+      "tenant_id": "T003",
+      "user_id": "U006",
+      "available_points": 100,
+      "earned_points": 500,
+      "used_points": 400,
+      "expire_time": "2025-12-31T23:59:59Z",
+      "created_at": "2023-11-20T10:00:00Z",
+      "updated_at": "2024-01-06T08:00:00Z"
+    },
+    "tenant_id": "T003",
+    "created_at": "2026-05-13T17:18:38.993786",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452867",
+    "recurrence_count": 0,
+    "notes": null
+  },
+  "5bed19b27056c7f92abfcb6de2d7eebb": {
+    "id": "5bed19b27056c7f92abfcb6de2d7eebb",
+    "entity": "points",
+    "primary_key": "id",
+    "pk_value": "P004",
+    "diff_type": "new_missing",
+    "status": "open",
+    "field_diffs": [],
+    "old_record": {
+      "id": "P004",
+      "tenant_id": "T002",
+      "user_id": "U004",
+      "balance": 800,
+      "total_earned": 3200,
+      "total_spent": 2400,
+      "expire_at": "2025-12-31T23:59:59Z",
+      "created_at": "2023-09-10T16:00:00Z",
+      "updated_at": "2024-01-04T10:00:00Z"
+    },
+    "new_record": null,
+    "tenant_id": "T002",
+    "created_at": "2026-05-13T17:18:38.993768",
+    "confirmed_at": null,
+    "fixed_at": null,
+    "first_seen_at": "2026-05-13T17:17:38.452894",
+    "recurrence_count": 0,
+    "notes": null
+  }
+}

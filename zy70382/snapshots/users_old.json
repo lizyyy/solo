@@ -1,0 +1,59 @@
+{
+  "records": [
+    {
+      "id": "U001",
+      "tenant_id": "T001",
+      "user_name": "张三",
+      "mobile": "13800138001",
+      "email": "zhangsan@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-06-01T10:00:00Z",
+      "update_time": "2024-01-01T08:00:00Z"
+    },
+    {
+      "id": "U002",
+      "tenant_id": "T001",
+      "user_name": "李四",
+      "mobile": "13800138002",
+      "email": "lisi@example.com",
+      "is_active": true,
+      "level": 1,
+      "create_time": "2023-07-15T14:30:00Z",
+      "update_time": "2024-01-02T09:00:00Z"
+    },
+    {
+      "id": "U003",
+      "tenant_id": "T002",
+      "user_name": "王五",
+      "mobile": "13800138003",
+      "email": "wangwu@example.com",
+      "is_active": false,
+      "level": 3,
+      "create_time": "2023-08-20T09:00:00Z",
+      "update_time": "2024-01-03T12:00:00Z"
+    },
+    {
+      "id": "U004",
+      "tenant_id": "T002",
+      "user_name": "赵六",
+      "mobile": "13800138004",
+      "email": "zhaoliu@example.com",
+      "is_active": true,
+      "level": 2,
+      "create_time": "2023-09-10T16:00:00Z",
+      "update_time": "2024-01-04T10:00:00Z"
+    },
+    {
+      "id": "U005",
+      "tenant_id": "T001",
+      "user_name": "钱七",
+      "mobile": "13800138005",
+      "email": "qianqi@example.com",
+      "is_active": true,
+      "level": 5,
+      "create_time": "2023-10-05T11:00:00Z",
+      "update_time": "2024-01-05T15:00:00Z"
+    }
+  ]
+}

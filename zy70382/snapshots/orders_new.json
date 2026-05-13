@@ -1,0 +1,77 @@
+{
+  "records": [
+    {
+      "id": "ORD001",
+      "tenant_id": "T001",
+      "order_no": "20240101001",
+      "user_id": "U001",
+      "order_status": "paid",
+      "total_amount": 100.00,
+      "discount_amount": 10.00,
+      "pay_amount": 90.00,
+      "created_at": "2024-01-01T10:00:00Z",
+      "updated_at": "2024-01-01T10:30:00Z",
+      "ext_info": {"source": "app"}
+    },
+    {
+      "id": "ORD002",
+      "tenant_id": "T001",
+      "order_no": "20240101002",
+      "user_id": "U002",
+      "order_status": "paid",
+      "total_amount": 200.00,
+      "discount_amount": 0,
+      "pay_amount": 199.99,
+      "created_at": "2024-01-01T11:00:00Z",
+      "updated_at": "2024-01-02T09:00:00Z"
+    },
+    {
+      "id": "ORD003",
+      "tenant_id": "T002",
+      "order_no": "20240102001",
+      "user_id": "U003",
+      "order_status": "paid",
+      "total_amount": 150.00,
+      "discount_amount": 20.00,
+      "pay_amount": 130.00,
+      "created_at": "2024-01-02T14:00:00Z",
+      "updated_at": "2024-01-02T14:15:00Z"
+    },
+    {
+      "id": "ORD004",
+      "tenant_id": "T002",
+      "order_no": "20240103001",
+      "user_id": "U004",
+      "order_status": "completed",
+      "total_amount": 500.00,
+      "discount_amount": 50.00,
+      "pay_amount": 450.00,
+      "created_at": "2024-01-03T08:00:00Z",
+      "updated_at": "2024-01-10T16:00:00Z"
+    },
+    {
+      "id": "ORD006",
+      "tenant_id": "T003",
+      "order_no": "20240105001",
+      "user_id": "U006",
+      "order_status": "cancelled",
+      "total_amount": 300.00,
+      "discount_amount": 0,
+      "pay_amount": 300.00,
+      "created_at": "2024-01-05T12:00:00Z",
+      "updated_at": "2024-01-05T12:30:00Z"
+    },
+    {
+      "id": "ORD007",
+      "tenant_id": "T004",
+      "order_no": "20240106001",
+      "user_id": "U007",
+      "order_status": "pending",
+      "total_amount": 180.00,
+      "discount_amount": 0,
+      "pay_amount": 180.00,
+      "created_at": "2024-01-06T09:00:00Z",
+      "updated_at": "2024-01-06T09:00:00Z"
+    }
+  ]
+}

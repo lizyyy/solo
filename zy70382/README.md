@@ -1,0 +1,307 @@
+# 双写一致性校验 CLI
+
+服务迁移到新存储时，团队开启了新旧双写，但没人每天确认两边是否真的一致。这个 CLI 工具用于自动校验新旧库的数据一致性。
+
+## 功能特性
+
+- **多类差异检测**：新库缺失、旧库缺失、字段差异、映射差异、状态不一致、金额不一致、重复主键
+- **灵活过滤**：支持按租户、时间范围过滤检查
+- **人工确认流程**：确认差异、标记修复、复发检测
+- **补偿建议**：自动生成补偿方向，已冻结数据禁止自动补偿
+- **丰富报告**：差异数量、影响范围、示例记录、建议补偿方向
+
+## 安装
+
+```bash
+pip install -e .
+```
+
+## 快速开始
+
+```bash
+# 完整检查
+dual-write-check -c config.json -s snapshots check
+
+# 按租户检查
+dual-write-check -c config.json -s snapshots check -t T001
+
+# 按时间范围检查
+dual-write-check -c config.json -s snapshots check \
+  --start-time 2024-01-01T00:00:00 \
+  --end-time 2024-01-31T23:59:59
+
+# 采样检查
+dual-write-check -c config.json -s snapshots sample -e orders -n 5
+
+# 查看差异详情
+dual-write-check -c config.json -s snapshots explain <diff_id>
+
+# 人工确认差异
+dual-write-check -c config.json -s snapshots confirm <diff_id> --notes "已知差异，等待修复"
+
+# 标记修复
+dual-write-check -c config.json -s snapshots mark-fixed <diff_id>
+
+# 查看报告
+dual-write-check -c config.json -s snapshots report
+```
+
+## 命令详解
+
+### check
+
+完整一致性检查，读取快照并比较所有差异。
+
+**参数：**
+- `--entity, -e`：指定实体（可多次指定）
+- `--tenant, -t`：指定租户 ID（可多次指定）
+- `--tenant-field`：租户字段名（默认 tenant_id）
+- `--start-time`：开始时间（ISO 格式）
+- `--end-time`：结束时间（ISO 格式）
+- `--time-field`：时间字段名（默认 created_at）
+- `--no-save`：不保存差异到存储
+
+### sample
+
+采样检查，快速验证数据一致性。
+
+**参数：**
+- `--entity, -e`：指定实体（可多次指定）
+- `--count, -n`：采样数量（默认 5）
+- `--save/--no-save`：是否保存差异
+
+### explain
+
+详细解释单个差异，包括字段对比和补偿建议。
+
+**参数：**
+- `diff_id`：差异 ID（位置参数）
+
+### confirm
+
+人工确认差异，避免下次检查重复提醒。
+
+**参数：**
+- `diff_id`：差异 ID（位置参数）
+- `--notes`：备注信息
+
+### mark-fixed
+
+标记差异为已修复。
+
+**参数：**
+- `diff_ids`：差异 ID 列表（位置参数，可多个）
+- `--all`：标记所有开放状态的差异
+- `--notes`：备注信息
+
+### report
+
+生成差异存储报告，支持 JSON 导出。
+
+**参数：**
+- `--entity, -e`：指定实体（可多次指定）
+- `--format, -f`：输出格式（table/json，默认 table）
+- `--output, -o`：输出文件路径（仅 JSON 格式）
+
+## 配置文件说明
+
+```json
+{
+  "batch_size": 1000,
+  "entities": [
+    {
+      "name": "orders",
+      "old_table": "orders_old",
+      "new_table": "orders_new",
+      "primary_key": "id",
+      "status_field": "status",
+      "amount_fields": ["total_amount", "actual_amount"],
+      "field_mappings": [
+        {"old_field": "status", "new_field": "order_status"},
+        {"old_field": "actual_amount", "new_field": "pay_amount"}
+      ],
+      "ignored_fields": ["updated_at"],
+      "dynamic_field_patterns": ["ext_.*"],
+      "frozen_data_criteria": {"status": "completed"}
+    }
+  ]
+}
+```
+
+**字段说明：**
+- `name`：实体名称
+- `old_table`：旧库表名（快照文件名）
+- `new_table`：新库表名（快照文件名）
+- `primary_key`：主键字段名
+- `status_field`：状态字段名（用于状态不一致检测）
+- `amount_fields`：金额字段列表（用于金额不一致检测）
+- `field_mappings`：字段映射关系（旧库字段 -> 新库字段）
+- `ignored_fields`：忽略比较的字段列表
+- `dynamic_field_patterns`：动态字段正则模式列表（匹配的字段自动忽略）
+- `frozen_data_criteria`：冻结数据条件（匹配的记录禁止自动补偿）
+
+## 差异类型
+
+| 类型 | 说明 |
+|------|------|
+| new_missing | 记录仅存在于旧库，新库缺失 |
+| old_missing | 记录仅存在于新库，旧库缺失 |
+| field_diff | 普通字段值不一致 |
+| mapping_diff | 字段映射不一致 |
+| status_diff | 状态字段不一致 |
+| amount_diff | 金额字段不一致 |
+| duplicate_pk | 重复主键 |
+
+## 差异状态
+
+| 状态 | 说明 |
+|------|------|
+| open | 开放，未处理 |
+| confirmed | 已人工确认 |
+| fixed | 已标记修复 |
+| recurring | 已确认/已修复后再次出现（复发） |
+
+## 补偿动作
+
+| 动作 | 说明 |
+|------|------|
+| copy_to_new | 将记录同步到新库 |
+| copy_to_old | 将记录同步到旧库 |
+| sync_both | 确认正确值后同步两边 |
+| delete_from_new | 从新库删除 |
+| delete_from_old | 从旧库删除 |
+| manual | 需要人工处理（包括冻结数据） |
+
+---
+
+## 补充说明
+
+### 一、主要边界
+
+1. **快照格式边界**
+   - 仅支持 JSON 格式快照
+   - 快照文件命名规则：`{table_name}.json`
+   - 快照内容格式：`{"records": [...]}` 或直接数组
+   - 主键必须可比较（字符串、数字等基础类型）
+
+2. **字段比较边界**
+   - 支持空值与空字符串等价
+   - 支持布尔值与 0/1 等价比较
+   - 支持数值类型精确比较（Decimal 精度）
+   - 不支持嵌套对象/数组的深度比较
+   - 不支持自定义转换函数（目前仅支持字段名映射）
+
+3. **时间过滤边界**
+   - 时间字段必须是 ISO 格式字符串或 datetime 对象
+   - 时间范围是闭区间 `[start_time, end_time]`
+   - 不支持跨时区自动转换
+
+4. **冻结数据边界**
+   - 冻结条件是精确字段值匹配（不支持范围、正则等）
+   - 冻结数据仅禁止自动补偿建议，但仍会被检测为差异
+   - 人工可以确认或标记冻结数据的差异
+
+5. **复发检测边界**
+   - 复发判定基于差异 ID（实体名 + 主键值 + 差异类型的 MD5）
+   - 已确认的差异再次出现时，状态变为 recurring
+   - 已修复的差异再次出现时，状态变为 recurring
+   - 复发次数累加，但不区分是 CONFIRMED 还是 FIXED 后复发
+
+### 二、一个失败路径
+
+**场景：订单 ORD002 的状态不一致 + 金额不一致**
+
+1. **初始状态**
+   - 旧库：`status="shipped"`, `actual_amount=200.00`
+   - 新库：`order_status="paid"`, `pay_amount=199.99`
+   - 配置：`status -> order_status`, `actual_amount -> pay_amount`
+
+2. **第一次 check**
+   ```
+   dual-write-check -c config.json -s snapshots check -e orders
+   ```
+   - 检测到两个差异：
+     - `ORD002`：status_diff（shipped vs paid）
+     - `ORD002`：amount_diff（200.00 vs 199.99）
+   - 两条差异分别生成不同的 diff_id（因为 diff_type 不同）
+   - 保存到 diff_store
+
+3. **人工确认金额差异**
+   ```
+   dual-write-check -c config.json -s snapshots confirm <amount_diff_id> --notes "已知差异，手动修正中"
+   ```
+   - amount_diff 状态变为 confirmed
+   - status_diff 仍为 open
+
+4. **第二次 check（快照未变）**
+   - status_diff：仍为 open（未变化）
+   - amount_diff：状态变为 recurring，recurrence_count=1
+   - 问题：用户可能以为"确认过就不用看了"，但实际仍需关注复发
+
+5. **修复状态后第三次 check**
+   - 修改新库快照：`order_status="shipped"`
+   - 运行 check
+   - status_diff 消失（不再存在）
+   - amount_diff：仍为 recurring（因为快照仍不一致）
+
+**失败点总结：**
+- 同一记录可能产生多条差异（不同类型），需要分别确认
+- confirm 只影响当前类型的复发判定，不影响其他类型
+- 用户可能误解为"确认过就没事了"，需要定期查看 report
+
+### 三、一次重复执行路径
+
+**场景：定期检查订单数据，验证修复效果**
+
+1. **第 1 天：首次检查**
+   ```
+   dual-write-check -c config.json -s snapshots check -e orders --start-time 2024-01-01T00:00:00
+   ```
+   - 发现 5 条差异（new_missing:1, old_missing:1, field_diff:1, status_diff:1, amount_diff:1）
+   - 全部保存到存储，状态 open
+
+2. **人工确认已知差异**
+   ```
+   dual-write-check -c config.json -s snapshots confirm <field_diff_id> --notes "字段名不同，无需修复"
+   dual-write-check -c config.json -s snapshots mark-fixed <old_missing_id> --notes "已从新库删除测试数据"
+   ```
+   - field_diff: confirmed
+   - old_missing: fixed
+   - 其余: open
+
+3. **第 2 天：第二次检查（快照未变）**
+   ```
+   dual-write-check -c config.json -s snapshots check -e orders
+   ```
+   - 重新比较：
+     - new_missing: 仍存在，状态保持 open
+     - old_missing: 仍存在（快照未删），状态变为 recurring
+     - field_diff: 仍存在，状态变为 recurring
+     - status_diff: 仍存在，状态保持 open
+     - amount_diff: 仍存在，状态保持 open
+   - 复发的 2 条在 report 中会特别标识
+
+4. **修复数据后第三次检查**
+   - 修改新库快照：补 ORD005、修正 ORD002 状态和金额
+   ```
+   dual-write-check -c config.json -s snapshots check -e orders
+   ```
+   - 重新比较：
+     - new_missing: ORD005 已存在，差异消失（不报告）
+     - old_missing: 仍存在，状态保持 recurring
+     - field_diff: 仍存在，状态保持 recurring
+     - status_diff: 状态一致，差异消失
+     - amount_diff: 金额一致，差异消失
+
+5. **查看当前报告**
+   ```
+   dual-write-check -c config.json -s snapshots report
+   ```
+   - 统计：total=5, open=1, confirmed=0, fixed=0, recurring=2
+   - 还需关注 3 条：1 条 open（new_missing 可能又有新数据），2 条 recurring（需要人工决策是否要处理）
+
+**重复执行关键点：**
+- 每次 check 都会重新比较全量数据
+- 已存在的差异会根据历史状态更新（confirmed/fixed -> recurring）
+- 消失的差异不会自动清理（仍保留在存储中，状态不变）
+- 需要定期用 report 查看整体进度

@@ -1,0 +1,65 @@
+{
+  "batch_size": 1000,
+  "entities": [
+    {
+      "name": "orders",
+      "old_table": "orders_old",
+      "new_table": "orders_new",
+      "primary_key": "id",
+      "status_field": "status",
+      "amount_fields": ["total_amount", "actual_amount"],
+      "field_mappings": [
+        {"old_field": "status", "new_field": "order_status"},
+        {"old_field": "actual_amount", "new_field": "pay_amount"}
+      ],
+      "ignored_fields": ["updated_at"],
+      "dynamic_field_patterns": ["ext_.*"],
+      "frozen_data_criteria": {"status": "completed"}
+    },
+    {
+      "name": "users",
+      "old_table": "users_old",
+      "new_table": "users_new",
+      "primary_key": "id",
+      "status_field": "is_active",
+      "amount_fields": [],
+      "field_mappings": [
+        {"old_field": "user_name", "new_field": "nickname"},
+        {"old_field": "mobile", "new_field": "phone"},
+        {"old_field": "is_active", "new_field": "active"},
+        {"old_field": "level", "new_field": "vip_level"},
+        {"old_field": "create_time", "new_field": "created_at"},
+        {"old_field": "update_time", "new_field": "updated_at"}
+      ],
+      "ignored_fields": ["updated_at", "update_time"],
+      "dynamic_field_patterns": ["ext_.*"],
+      "frozen_data_criteria": null
+    },
+    {
+      "name": "points",
+      "old_table": "points_old",
+      "new_table": "points_new",
+      "primary_key": "id",
+      "status_field": null,
+      "amount_fields": ["balance", "total_earned", "total_spent"],
+      "field_mappings": [
+        {"old_field": "balance", "new_field": "available_points"},
+        {"old_field": "total_earned", "new_field": "earned_points"},
+        {"old_field": "total_spent", "new_field": "used_points"},
+        {"old_field": "expire_at", "new_field": "expire_time"}
+      ],
+      "ignored_fields": ["updated_at"],
+      "dynamic_field_patterns": [],
+      "frozen_data_criteria": null
+    }
+  ],
+  "tenant_filter": {
+    "tenant_ids": [],
+    "tenant_field": "tenant_id"
+  },
+  "time_range": {
+    "start_time": null,
+    "end_time": null,
+    "time_field": "created_at"
+  }
+}
