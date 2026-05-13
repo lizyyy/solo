@@ -1,9 +1,10 @@
 import argparse
 import os
 import sys
+from typing import Any, Dict, List, Optional
 
 from config import config
-from utils import colorize, print_separator
+from utils import colorize, print_separator, load_json
 from backup_inventory import inventory
 from temp_recovery import temp_recovery
 from validation_checker import validation_checker
@@ -88,18 +89,89 @@ def cmd_table_check(args):
         return
 
     backup = inventory.get_backup(args.backup_id)
-    if not backup:
+    if backup:
         result = validation_checker.check_missing_tables(backup)
         validation_checker.display_result(result, "表完整性检查")
     else:
         print(colorize(f"未找到备份: {args.backup_id}", "red"))
+        print(colorize("可用的备份列表:", "yellow"))
+        inventory.display_list()
 
 
 def cmd_validation(args):
-    from temp_recovery import temp_recovery
-    
-    print(colorize("注意: 此功能需要先执行恢复操作", "yellow"))
-    print(colorize("请先运行恢复，或使用完整演练命令", "yellow"))
+    recovery_id = args.recovery_id
+
+    if recovery_id:
+        recovery_path = os.path.join(config.RECOVERIES_DIR, recovery_id)
+        recovery_result_file = os.path.join(recovery_path, "recovery_result.json")
+        if not os.path.exists(recovery_result_file):
+            print(colorize(f"未找到恢复记录: {recovery_id}", "red"))
+            print(colorize("可用的恢复:", "yellow"))
+            _list_recoveries()
+            return
+        recovery_result = load_json(recovery_result_file)
+    else:
+        recovery_result = _find_latest_recovery()
+        if not recovery_result:
+            print(colorize("未找到任何恢复记录。请先执行恢复操作或使用完整演练命令。", "red"))
+            print(colorize("使用 --recovery-id 指定特定恢复，或运行 python3 main.py run-normal", "yellow"))
+            return
+
+    print(colorize(f"\n使用恢复记录: {recovery_result['recovery_id']}", "blue"))
+    print(colorize(f"备份ID: {recovery_result['backup_id']}", "blue"))
+
+    backup_id = recovery_result.get("backup_id")
+    backup_info = inventory.get_backup(backup_id)
+    if not backup_info:
+        backup_info = {
+            "backup_id": backup_id,
+            "tables": recovery_result.get("restored_tables", []),
+        }
+
+    validation_result = validation_checker.run_data_validation_queries(
+        recovery_result, backup_info
+    )
+    validation_checker.display_result(validation_result, "数据校验结果")
+
+
+def _find_latest_recovery() -> Optional[Dict[str, Any]]:
+    if not os.path.exists(config.RECOVERIES_DIR):
+        return None
+
+    recovery_dirs = [
+        d for d in os.listdir(config.RECOVERIES_DIR)
+        if os.path.isdir(os.path.join(config.RECOVERIES_DIR, d))
+    ]
+
+    if not recovery_dirs:
+        return None
+
+    latest_dir = sorted(recovery_dirs)[-1]
+    recovery_path = os.path.join(config.RECOVERIES_DIR, latest_dir)
+    recovery_result_file = os.path.join(recovery_path, "recovery_result.json")
+
+    if not os.path.exists(recovery_result_file):
+        return None
+
+    return load_json(recovery_result_file)
+
+
+def _list_recoveries() -> None:
+    if not os.path.exists(config.RECOVERIES_DIR):
+        print("  (无恢复记录)")
+        return
+
+    recovery_dirs = [
+        d for d in os.listdir(config.RECOVERIES_DIR)
+        if os.path.isdir(os.path.join(config.RECOVERIES_DIR, d))
+    ]
+
+    if not recovery_dirs:
+        print("  (无恢复记录)")
+        return
+
+    for d in sorted(recovery_dirs):
+        print(f"  {d}")
 
 
 def main():
@@ -107,16 +179,30 @@ def main():
         description="备份恢复演练脚本",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
-示例:
-  python main.py list-backups                    # 列出所有备份
-  python main.py backup-detail <backup_id>      # 查看备份详情
-  python main.py run-normal                  # 运行正常流程演练
-  python main.py run-failure --sample missing_critical_table  # 运行失败流程演练
-  python main.py run-all                    # 运行完整测试套件（正常+失败）
-  python main.py list-samples              # 列出可用的失败样本
-  python main.py sample-detail <sample_id>       # 查看失败样本详情
-  python main.py permission-check           # 检查权限
-  python main.py table-check --backup-id <backup_id  # 检查表完整性
+关键验收命令链路:
+  1. 备份清单
+     python3 main.py list-backups              # 列出所有备份
+     python3 main.py backup-detail <backup_id>  # 查看备份详情
+     python3 main.py export-inventory            # 导出备份清单
+
+  2. 表完整性校验
+     python3 main.py table-check --backup-id bkp_normal_20260509_212250
+
+  3. 权限检查
+     python3 main.py permission-check
+
+  4. 数据校验（需先有恢复记录）
+     python3 main.py validation                  # 使用最新恢复记录
+     python3 main.py validation --recovery-id recovery_bkp_normal_xxx
+
+  5. 完整演练
+     python3 main.py run-normal                  # 正常流程演练
+     python3 main.py run-failure --sample missing_critical_table  # 失败流程演练
+     python3 main.py run-all                    # 完整测试套件（正常+失败）
+
+其他命令:
+  python3 main.py list-samples                 # 列出可用的失败样本
+  python3 main.py sample-detail <sample_id>      # 查看失败样本详情
         """,
     )
 
@@ -170,7 +256,8 @@ def main():
     table_parser.add_argument("--backup-id", help="备份ID")
     table_parser.set_defaults(func=cmd_table_check)
 
-    valid_parser = subparsers.add_parser("validation", help="数据校验（需先恢复）")
+    valid_parser = subparsers.add_parser("validation", help="执行数据校验查询（支持表存在性、主键完整性、行数等校验）")
+    valid_parser.add_argument("--recovery-id", help="指定恢复ID（可选，默认使用最新的恢复记录）")
     valid_parser.set_defaults(func=cmd_validation)
 
     args = parser.parse_args()
