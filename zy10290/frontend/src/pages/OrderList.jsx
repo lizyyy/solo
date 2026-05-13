@@ -230,7 +230,7 @@ const OrderList = ({ activities }) => {
       render: (_, record) => (
         <Space>
           <Button icon={<EyeOutlined />} size="small" onClick={() => viewOrderDetail(record.id)}>详情</Button>
-          {record.payment_status === 'failed' && !record.compensation_reject_reason && (
+          {record.payment_status !== 'paid' && !record.is_manual_compensation && !record.compensation_reject_reason && (
             <Button type="primary" icon={<PlusOutlined />} size="small" onClick={() => { setCurrentOrder(record); setCompensationModalVisible(true); }}>申请补单</Button>
           )}
         </Space>
@@ -313,7 +313,8 @@ const OrderList = ({ activities }) => {
         width={1000}
         footer={[
           <Space>
-            {currentOrder?.payment_status === 'failed' && !currentOrder?.compensation_reject_reason && (
+            {currentOrder?.payment_status !== 'paid' && !currentOrder?.is_manual_compensation && 
+             !currentOrder?.compensation_reject_reason && !currentOrder?.applications?.find(a => a.status === 'pending' || a.status === 'approved') && (
               <Button type="primary" icon={<PlusOutlined />} onClick={() => { setCompensationModalVisible(true); }}>申请补单</Button>
             )}
             {currentOrder?.applications?.find(a => a.status === 'pending') && (

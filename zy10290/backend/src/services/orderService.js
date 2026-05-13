@@ -123,9 +123,17 @@ class OrderService {
       return { success: false, message: '订单不存在' };
     }
 
-    const existingApplication = await get('SELECT id FROM compensation_applications WHERE order_id = ? AND status = ?', [orderId, COMPENSATION_STATUS.PENDING]);
+    const existingApplication = await get('SELECT * FROM compensation_applications WHERE order_id = ?', [orderId]);
     if (existingApplication) {
-      return { success: false, message: '已有待审批的补单申请' };
+      if (existingApplication.status === COMPENSATION_STATUS.PENDING) {
+        return { success: false, message: '已有待审批的补单申请' };
+      } else if (existingApplication.status === COMPENSATION_STATUS.APPROVED) {
+        return { success: false, message: '该订单补单已批准，不可重复申请' };
+      }
+    }
+
+    if (order.payment_status === PAYMENT_STATUS.PAID) {
+      return { success: false, message: '订单已支付，无需补单' };
     }
 
     const applicationId = uuidv4();
@@ -179,11 +187,19 @@ class OrderService {
     }
 
     const newOrderNo = this.generateOrderNo();
+    const compensationTxnId = `COMP_${applicationId}`;
     await run(`
       UPDATE flash_sale_orders 
-      SET is_manual_compensation = 1, compensation_approve_time = CURRENT_TIMESTAMP, order_no = ?, updated_at = CURRENT_TIMESTAMP
+      SET is_manual_compensation = 1, 
+          compensation_approve_time = CURRENT_TIMESTAMP, 
+          order_no = ?, 
+          status = ?, 
+          payment_status = ?, 
+          payment_time = CURRENT_TIMESTAMP,
+          payment_transaction_id = ?,
+          updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `, [newOrderNo, order.id]);
+    `, [newOrderNo, ORDER_STATUS.CONFIRMED, PAYMENT_STATUS.PAID, compensationTxnId, order.id]);
 
     return { success: true, message: '补单审批通过' };
   }
