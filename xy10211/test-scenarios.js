@@ -1,4 +1,6 @@
 const billingService = require('./billing-service');
+const fs = require('fs');
+const path = require('path');
 
 function log(title, data, level = 0) {
   const indent = '  '.repeat(level);
@@ -18,7 +20,44 @@ function formatDateTime(date) {
   return date.toISOString().replace('T', ' ').substring(0, 19);
 }
 
+function generateId(prefix) {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
+function cleanupDatabase() {
+  const dbPath = path.join(__dirname, 'charging-billing.db');
+  const dbWalPath = dbPath + '-wal';
+  const dbShmPath = dbPath + '-shm';
+  
+  console.log('═══════════════════════════════════════════════════════════════');
+  console.log('准备: 清理旧数据库，确保从空数据开始');
+  console.log('═══════════════════════════════════════════════════════════════');
+  
+  try {
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+      printProgress('已删除旧数据库: charging-billing.db');
+    }
+    if (fs.existsSync(dbWalPath)) {
+      fs.unlinkSync(dbWalPath);
+      printProgress('已删除旧数据库: charging-billing.db-wal');
+    }
+    if (fs.existsSync(dbShmPath)) {
+      fs.unlinkSync(dbShmPath);
+      printProgress('已删除旧数据库: charging-billing.db-shm');
+    }
+    console.log('✅ 数据库清理完成，将从空数据开始测试\n');
+  } catch (error) {
+    console.warn('⚠️  清理数据库时出错:', error.message);
+    console.warn('⚠️  将继续测试，但可能会遇到重复请求错误\n');
+  }
+}
+
 async function runCompleteScenario() {
+  cleanupDatabase();
+  
   console.log('\n\n');
   console.log('╔══════════════════════════════════════════════════════════════════╗');
   console.log('║                                                                   ║');
@@ -44,9 +83,16 @@ async function runCompleteScenario() {
   baseTime.setDate(baseTime.getDate() - 1);
   baseTime.setHours(17, 30, 0, 0);
   
-  const sessionId = 'SES-20260509-001';
+  const sessionId = generateId('SES');
+  const requestId1 = generateId('REQ');
+  const requestId2 = generateId('REQ');
+  const requestId3 = generateId('REQ');
+  const originalRetransmitId = generateId('REQ-ORIG');
   const residentId = 'RES-张三-123';
   const chargerId = 'CHARGER-A-05';
+  
+  printProgress(`生成动态会话ID: ${sessionId}`);
+  printProgress(`生成动态请求ID: ${requestId1}, ${requestId2}, ${requestId3}`);
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 2: 充电会话开始 - 17:30-17:50 (平时段)');
@@ -58,7 +104,7 @@ async function runCompleteScenario() {
   printProgress('提交充电记录 (平时段 17:30-17:50, 消耗 3.5 kWh)');
   
   const record1 = {
-    request_id: 'REQ-001-SEG1',
+    request_id: requestId1,
     session_id: sessionId,
     community_id: 'COMM001',
     resident_id: residentId,
@@ -90,7 +136,7 @@ async function runCompleteScenario() {
   const segment2End = new Date(baseTime.getTime() + 45 * 60 * 1000);
   
   const record2 = {
-    request_id: 'REQ-001-SEG2',
+    request_id: requestId2,
     session_id: sessionId,
     community_id: 'COMM001',
     resident_id: residentId,
@@ -101,7 +147,7 @@ async function runCompleteScenario() {
     duration_seconds: 25 * 60,
     status: 'charging',
     is_retransmit: true,
-    original_request_id: 'REQ-001-SEG2-ORIGINAL'
+    original_request_id: originalRetransmitId
   };
   
   const result2 = await billingService.processRecord(record2);
@@ -117,7 +163,7 @@ async function runCompleteScenario() {
   console.log('阶段 4: 重复提交防护测试');
   console.log('═══════════════════════════════════════════════════════════════');
   
-  printProgress('测试: 再次提交相同的 request_id (REQ-001-SEG1)');
+  printProgress(`测试: 再次提交相同的 request_id (${requestId1})`);
   
   const recordDuplicate = { ...record1 };
   const resultDuplicate = await billingService.processRecord(recordDuplicate);
@@ -145,7 +191,7 @@ async function runCompleteScenario() {
   const segment3End = new Date(baseTime.getTime() + 60 * 60 * 1000);
   
   const record3 = {
-    request_id: 'REQ-001-SEG3',
+    request_id: requestId3,
     session_id: sessionId,
     community_id: 'COMM001',
     resident_id: residentId,

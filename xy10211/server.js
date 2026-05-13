@@ -4,6 +4,12 @@ const billingService = require('./billing-service');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+function generateId(prefix) {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -217,6 +223,419 @@ app.get('/api/scenarios/:scenarioId', (req, res) => {
     return res.status(404).json({ success: false, message: 'Scenario not found' });
   }
   res.json({ success: true, data: scenario });
+});
+
+app.post('/api/scenarios/:scenarioId', async (req, res) => {
+  const scenarioId = req.params.scenarioId;
+  const results = [];
+  const sessionId = generateId('SES');
+  const residentId = 'RES-测试用户-API';
+  const chargerId = 'CHARGER-API-01';
+  const communityId = 'COMM001';
+  
+  try {
+    switch (scenarioId) {
+      case 'duplicate-submission': {
+        const reqId = generateId('REQ');
+        const record = {
+          request_id: reqId,
+          session_id: sessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date().toISOString(),
+          start_kwh: 0,
+          end_kwh: 5.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record);
+        results.push({ step: 1, description: '第一次提交', result: result1 });
+        
+        const result2 = await billingService.processRecord({ ...record });
+        results.push({ step: 2, description: '重复提交（相同 request_id）', result: result2 });
+        
+        const passed = result1.success && !result2.success && result2.code === 'DUPLICATE_REQUEST';
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? '重复提交防护工作正常！' : '测试失败'
+        });
+        break;
+      }
+      
+      case 'missing-fields': {
+        const invalidRecord = { community_id: communityId, start_kwh: 0 };
+        const validateResult = billingService.validateRecord(invalidRecord);
+        results.push({ 
+          step: 1, 
+          description: '提交缺少必要字段的记录',
+          result: { 
+            isValid: validateResult.isValid, 
+            errors: validateResult.errors,
+            code: validateResult.isValid ? null : 'VALIDATION_ERROR'
+          }
+        });
+        
+        const passed = !validateResult.isValid && validateResult.errors.length > 0;
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? `字段验证工作正常！检测到 ${validateResult.errors.length} 个错误` : '测试失败'
+        });
+        break;
+      }
+      
+      case 'state-conflict': {
+        const reqId1 = generateId('REQ');
+        const reqId2 = generateId('REQ');
+        const conflictSessionId = generateId('SES-CONFLICT');
+        const baseTime = new Date(Date.now() - 3600000);
+        
+        const record1 = {
+          request_id: reqId1,
+          session_id: conflictSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: baseTime.toISOString(),
+          start_kwh: 0,
+          end_kwh: 10.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record1);
+        results.push({ step: 1, description: '第一次提交（start=0, end=10）', result: result1 });
+        
+        const record2 = {
+          request_id: reqId2,
+          session_id: conflictSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date().toISOString(),
+          start_kwh: 5.0,
+          end_kwh: 15.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result2 = await billingService.processRecord(record2);
+        results.push({ step: 2, description: '第二次提交（start=5, end=15）- 电表读数回退', result: result2 });
+        
+        const passed = result1.success && !result2.success && result2.code === 'CONFLICT_DETECTED';
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? '状态冲突检测工作正常！检测到电表读数回退' : '测试失败'
+        });
+        break;
+      }
+      
+      case 'network-retransmission': {
+        const reqId1 = generateId('REQ');
+        const reqId2 = generateId('REQ-RETRANS');
+        const reqId3 = generateId('REQ');
+        const baseTime = new Date();
+        
+        const record1 = {
+          request_id: reqId1,
+          session_id: sessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: baseTime.toISOString(),
+          start_kwh: 0,
+          end_kwh: 3.5,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record1);
+        results.push({ step: 1, description: '正常充电记录', result: result1 });
+        
+        const record2 = {
+          request_id: reqId2,
+          session_id: sessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date(baseTime.getTime() + 11 * 60 * 1000).toISOString(),
+          start_kwh: 3.5,
+          end_kwh: 7.5,
+          duration_seconds: 15 * 60,
+          status: 'charging',
+          is_retransmit: true,
+          original_request_id: generateId('REQ-ORIG')
+        };
+        
+        const result2 = await billingService.processRecord(record2);
+        results.push({ step: 2, description: '断网补传记录（is_retransmit=true）', result: result2 });
+        
+        const record3 = {
+          request_id: reqId3,
+          session_id: sessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date(baseTime.getTime() + 27 * 60 * 1000).toISOString(),
+          start_kwh: 7.5,
+          end_kwh: 9.5,
+          duration_seconds: 10 * 60,
+          status: 'completed'
+        };
+        
+        const result3 = await billingService.processRecord(record3);
+        results.push({ step: 3, description: '充电完成记录', result: result3 });
+        
+        const passed = result1.success && result2.success && result3.success;
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? '断网补传场景工作正常！系统正确处理了带 is_retransmit 标记的记录' : '测试失败'
+        });
+        break;
+      }
+      
+      case 'source-missing': {
+        const reqId = generateId('REQ');
+        const missingSessionId = generateId('SES-MISSING');
+        
+        const record = {
+          request_id: reqId,
+          session_id: missingSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date().toISOString(),
+          start_kwh: 0,
+          end_kwh: 2.0,
+          duration_seconds: 5 * 60,
+          status: 'charging',
+          is_retransmit: true,
+          original_request_id: 'NONEXISTENT-REQUEST-ID-12345'
+        };
+        
+        const result = await billingService.processRecord(record);
+        results.push({ 
+          step: 1, 
+          description: '补传记录引用不存在的原始请求',
+          result 
+        });
+        
+        const passed = result.success;
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? '来源记录缺失场景工作正常！系统仍会处理补传记录，即使原始请求不存在' : '测试失败'
+        });
+        break;
+      }
+      
+      case 'peak-valley-slicing': {
+        const reqId1 = generateId('REQ');
+        const reqId2 = generateId('REQ');
+        const sliceSessionId = generateId('SES-SLICE');
+        const baseTime = new Date();
+        baseTime.setHours(17, 50, 0, 0);
+        
+        const record1 = {
+          request_id: reqId1,
+          session_id: sliceSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: baseTime.toISOString(),
+          start_kwh: 0,
+          end_kwh: 4.0,
+          duration_seconds: 20 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record1);
+        results.push({ step: 1, description: '提交跨越 18:00 峰电时段的记录', result: result1 });
+        
+        const record2 = {
+          request_id: reqId2,
+          session_id: sliceSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date(baseTime.getTime() + 21 * 60 * 1000).toISOString(),
+          start_kwh: 4.0,
+          end_kwh: 6.0,
+          duration_seconds: 10 * 60,
+          status: 'completed'
+        };
+        
+        const result2 = await billingService.processRecord(record2);
+        results.push({ step: 2, description: '提交充电完成记录', result: result2 });
+        
+        const details = await billingService.getSessionDetails(sliceSessionId);
+        results.push({ step: 3, description: '查看能量切片结果', sliceCount: details?.slices?.length || 0, slices: details?.slices || [] });
+        
+        const billResult = await billingService.generateBill(sliceSessionId);
+        results.push({ step: 4, description: '生成账单', result: billResult });
+        
+        const passed = result1.success && result2.success && billResult.success && details?.slices?.length > 0;
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? `峰谷切片工作正常！共生成 ${details.slices.length} 个能量切片，账单金额: ¥${billResult.bill?.total_amount?.toFixed(2)}` : '测试失败'
+        });
+        break;
+      }
+      
+      case 'manual-adjustment': {
+        const reqId1 = generateId('REQ');
+        const reqId2 = generateId('REQ');
+        const adjSessionId = generateId('SES-ADJUST');
+        const baseTime = new Date();
+        
+        const record1 = {
+          request_id: reqId1,
+          session_id: adjSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: baseTime.toISOString(),
+          start_kwh: 0,
+          end_kwh: 5.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record1);
+        results.push({ step: 1, description: '提交充电记录', result: result1 });
+        
+        const record2 = {
+          request_id: reqId2,
+          session_id: adjSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date(baseTime.getTime() + 11 * 60 * 1000).toISOString(),
+          start_kwh: 5.0,
+          end_kwh: 10.0,
+          duration_seconds: 10 * 60,
+          status: 'completed'
+        };
+        
+        const result2 = await billingService.processRecord(record2);
+        results.push({ step: 2, description: '提交充电完成记录', result: result2 });
+        
+        const billResult = await billingService.generateBill(adjSessionId);
+        results.push({ step: 3, description: '生成账单', result: billResult });
+        
+        if (billResult.success) {
+          const billId = billResult.bill.bill_id;
+          const verifyResult = await billingService.verifyBill(billId, 'API测试员');
+          results.push({ step: 4, description: '复核账单', result: verifyResult });
+          
+          const originalAmount = billResult.bill.total_amount;
+          const adjustResult = await billingService.manuallyAdjustBill(
+            billId,
+            { total_amount: parseFloat((originalAmount - 1.00).toFixed(2)) },
+            'API管理员'
+          );
+          results.push({ step: 5, description: '人工调整账单（减免 ¥1.00）', result: adjustResult });
+          
+          const passed = result1.success && result2.success && billResult.success && 
+                         verifyResult.success && adjustResult.success;
+          res.json({ 
+            success: true, 
+            scenario: scenarioId,
+            passed,
+            results,
+            message: passed ? `人工修正工作正常！原金额: ¥${originalAmount.toFixed(2)} → 调整后: ¥${adjustResult.bill?.total_amount?.toFixed(2)}` : '测试失败'
+          });
+        } else {
+          res.json({ success: true, scenario: scenarioId, passed: false, results, message: '账单生成失败' });
+        }
+        break;
+      }
+      
+      case 'invalid-transition': {
+        const reqId1 = generateId('REQ');
+        const reqId2 = generateId('REQ');
+        const invalidSessionId = generateId('SES-INVALID');
+        const baseTime = new Date();
+        
+        const record1 = {
+          request_id: reqId1,
+          session_id: invalidSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: baseTime.toISOString(),
+          start_kwh: 0,
+          end_kwh: 5.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result1 = await billingService.processRecord(record1);
+        results.push({ step: 1, description: '正常充电记录', result: result1 });
+        
+        const details = await billingService.getSessionDetails(invalidSessionId);
+        const currentStatus = details?.currentStatus;
+        
+        const record2 = {
+          request_id: reqId2,
+          session_id: invalidSessionId,
+          community_id: communityId,
+          resident_id: residentId,
+          charger_id: chargerId,
+          timestamp: new Date(baseTime.getTime() - 3600000).toISOString(),
+          start_kwh: 2.0,
+          end_kwh: 7.0,
+          duration_seconds: 10 * 60,
+          status: 'charging'
+        };
+        
+        const result2 = await billingService.processRecord(record2);
+        results.push({ step: 2, description: '时间冲突的记录', result: result2 });
+        
+        const passed = result1.success && !result2.success && 
+                      (result2.code === 'CONFLICT_DETECTED' || result2.code === 'INVALID_STATE_TRANSITION');
+        res.json({ 
+          success: true, 
+          scenario: scenarioId,
+          passed,
+          results,
+          message: passed ? `非法流转/冲突检测工作正常！当前状态: ${currentStatus}，检测到冲突: ${result2.code}` : '测试失败'
+        });
+        break;
+      }
+      
+      default:
+        res.status(404).json({ 
+          success: false, 
+          message: `Scenario '${scenarioId}' not found. Available: ${Object.keys(testScenarios).join(', ')}` 
+        });
+    }
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      scenario: scenarioId,
+      error: error.message,
+      results 
+    });
+  }
 });
 
 app.get('/health', (req, res) => {
