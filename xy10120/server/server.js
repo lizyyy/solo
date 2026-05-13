@@ -459,11 +459,17 @@ app.get('/api/validation-results', (req, res) => {
   
   let query = `
     SELECT vr.*, q.question, q.answer, c.cited_text, c.document_id, c.knowledge_base_id,
-           kb.title as kb_title, kb.content as kb_content
+           COALESCE(kb1.title, kb2.title) as kb_title,
+           COALESCE(kb1.content, kb2.content) as kb_content
     FROM validation_results vr
     JOIN qa_records q ON vr.qa_record_id = q.id
     LEFT JOIN citations c ON vr.citation_id = c.id
-    LEFT JOIN knowledge_base kb ON c.knowledge_base_id = kb.id
+    LEFT JOIN knowledge_base kb1 ON c.knowledge_base_id = kb1.id
+    LEFT JOIN (
+      SELECT document_id, MIN(id) as id, title, content 
+      FROM knowledge_base 
+      GROUP BY document_id
+    ) kb2 ON c.document_id = kb2.document_id
   `;
   
   let countQuery = 'SELECT COUNT(*) as total FROM validation_results vr WHERE 1=1';
@@ -527,8 +533,8 @@ app.get('/api/export/report', (req, res) => {
       q.answer,
       c.cited_text,
       c.document_id,
-      kb.title as kb_title,
-      kb.content as kb_content,
+      COALESCE(kb1.title, kb2.title) as kb_title,
+      COALESCE(kb1.content, kb2.content) as kb_content,
       vr.status,
       vr.score,
       vr.reason,
@@ -536,7 +542,12 @@ app.get('/api/export/report', (req, res) => {
     FROM validation_results vr
     JOIN qa_records q ON vr.qa_record_id = q.id
     LEFT JOIN citations c ON vr.citation_id = c.id
-    LEFT JOIN knowledge_base kb ON c.knowledge_base_id = kb.id
+    LEFT JOIN knowledge_base kb1 ON c.knowledge_base_id = kb1.id
+    LEFT JOIN (
+      SELECT document_id, MIN(id) as id, title, content 
+      FROM knowledge_base 
+      GROUP BY document_id
+    ) kb2 ON c.document_id = kb2.document_id
     ORDER BY vr.created_at DESC
   `).all();
   
@@ -611,8 +622,8 @@ app.get('/api/export/error-samples', (req, res) => {
       q.answer,
       c.cited_text,
       c.document_id,
-      kb.title as kb_title,
-      kb.content as kb_content,
+      COALESCE(kb1.title, kb2.title) as kb_title,
+      COALESCE(kb1.content, kb2.content) as kb_content,
       vr.status,
       vr.score,
       vr.reason,
@@ -620,7 +631,12 @@ app.get('/api/export/error-samples', (req, res) => {
     FROM validation_results vr
     JOIN qa_records q ON vr.qa_record_id = q.id
     LEFT JOIN citations c ON vr.citation_id = c.id
-    LEFT JOIN knowledge_base kb ON c.knowledge_base_id = kb.id
+    LEFT JOIN knowledge_base kb1 ON c.knowledge_base_id = kb1.id
+    LEFT JOIN (
+      SELECT document_id, MIN(id) as id, title, content 
+      FROM knowledge_base 
+      GROUP BY document_id
+    ) kb2 ON c.document_id = kb2.document_id
     WHERE vr.status IN (${errorStatuses.map(() => '?').join(',')})
     ORDER BY vr.created_at DESC
   `).all(...errorStatuses);
