@@ -1,0 +1,22 @@
+{
+  "name": "low-score-server",
+  "version": "1.0.0",
+  "description": "低分回访系统服务端",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "nodemon src/app.js",
+    "start": "node src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "sequelize": "^6.35.0",
+    "dayjs": "^1.11.10",
+    "exceljs": "^4.4.0",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

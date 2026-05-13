@@ -1,0 +1,11 @@
+{
+  "name": "low-score-return-visit-system",
+  "version": "1.0.0",
+  "description": "低分回访补救派单系统",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["回访", "补救", "派单", "满意度"]
+}
