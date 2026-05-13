@@ -1,0 +1,42 @@
+{
+  "owner_marks": [
+    {
+      "account_id": "ACC007",
+      "owner_employee_id": "EMP001",
+      "marked_by": "SEC001",
+      "marked_at": "2026-05-13T17:43:45.409207",
+      "reason": "确认是张三的测试账号",
+      "is_exemption": false,
+      "exemption_expiry": null
+    },
+    {
+      "account_id": "ACC011",
+      "owner_employee_id": null,
+      "marked_by": "SEC001",
+      "marked_at": "2026-05-13T17:43:49.819064",
+      "reason": "ETL服务账号需要持续运行",
+      "is_exemption": true,
+      "exemption_expiry": "2026-08-11"
+    }
+  ],
+  "disable_plans": [
+    {
+      "account_id": "ACC004",
+      "planned_date": "2026-05-20",
+      "created_by": "SEC001",
+      "created_at": "2026-05-13T17:43:51.247078",
+      "reason": "离职员工吴九的Git账号",
+      "status": "pending",
+      "risk_assessment": null
+    },
+    {
+      "account_id": "ACC005",
+      "planned_date": "2026-05-16",
+      "created_by": "SEC001",
+      "created_at": "2026-05-13T17:43:52.479672",
+      "reason": "离职员工郑十有CRM高权限，紧急处理",
+      "status": "pending",
+      "risk_assessment": null
+    }
+  ]
+}

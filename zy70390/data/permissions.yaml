@@ -1,0 +1,164 @@
+# 权限列表样例
+
+# 张三 (EMP001) - 普通开发者权限
+- permission_id: "PERM001"
+  account_id: "ACC001"
+  system: "git"
+  role: "developer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+  is_high_risk: false
+  granted_at: "2020-01-20 10:30:00"
+
+# 李四 (EMP002) - 普通开发者权限
+- permission_id: "PERM002"
+  account_id: "ACC002"
+  system: "git"
+  role: "developer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+  is_high_risk: false
+  granted_at: "2021-03-25 09:30:00"
+
+# 陈七 (EMP005) - 管理员权限
+- permission_id: "PERM003"
+  account_id: "ACC003"
+  system: "git"
+  role: "admin"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+    - "repo:admin"
+    - "org:admin"
+  is_high_risk: true
+  granted_at: "2017-02-15 11:30:00"
+
+# 吴九 (EMP007) - 已离职，权限未收回
+- permission_id: "PERM004"
+  account_id: "ACC004"
+  system: "git"
+  role: "developer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+  is_high_risk: false
+  granted_at: "2022-01-15 14:30:00"
+
+# 郑十 (EMP008) - 已离职，高权限未收回
+- permission_id: "PERM005"
+  account_id: "ACC005"
+  system: "crm"
+  role: "system_admin"
+  permissions:
+    - "crm:read"
+    - "crm:write"
+    - "crm:admin"
+    - "user:manage"
+  is_high_risk: true
+  granted_at: "2015-05-01 10:30:00"
+
+# 赵六 (EMP004) - 已转岗，仍保留原部门高权限
+- permission_id: "PERM006"
+  account_id: "ACC006"
+  system: "crm"
+  role: "data_manager"
+  permissions:
+    - "crm:read"
+    - "crm:write"
+    - "data:export"
+    - "data:delete"
+  is_high_risk: true
+  granted_at: "2018-08-05 09:30:00"
+
+# 无人账号1 - 有BI权限
+- permission_id: "PERM007"
+  account_id: "ACC007"
+  system: "bi"
+  role: "analyst"
+  permissions:
+    - "report:read"
+    - "report:create"
+  is_high_risk: false
+  granted_at: "2020-06-15 14:30:00"
+
+# 无人账号2 - 有Git权限
+- permission_id: "PERM008"
+  account_id: "ACC008"
+  system: "git"
+  role: "developer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+  is_high_risk: false
+  granted_at: "2021-11-01 09:30:00"
+
+# 重复账号 - 张三的备用账号
+- permission_id: "PERM009"
+  account_id: "ACC009"
+  system: "git"
+  role: "developer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+  is_high_risk: false
+  granted_at: "2019-05-10 08:30:00"
+
+# 服务账号 - CI机器人
+- permission_id: "PERM010"
+  account_id: "ACC010"
+  system: "git"
+  role: "maintainer"
+  permissions:
+    - "repo:read"
+    - "repo:write"
+    - "workflow:run"
+  is_high_risk: true
+  granted_at: "2022-01-01 00:30:00"
+
+# 服务账号 - ETL服务（豁免已过期）
+- permission_id: "PERM011"
+  account_id: "ACC011"
+  system: "crm"
+  role: "super_admin"
+  permissions:
+    - "crm:read"
+    - "crm:write"
+    - "crm:admin"
+    - "data:export"
+  is_high_risk: true
+  granted_at: "2023-06-01 10:30:00"
+
+# 王五 (EMP003) - 销售经理
+- permission_id: "PERM012"
+  account_id: "ACC012"
+  system: "crm"
+  role: "team_lead"
+  permissions:
+    - "crm:read"
+    - "crm:write"
+  is_high_risk: false
+  granted_at: "2019-05-15 09:30:00"
+
+# 销售部张三 (EMP009)
+- permission_id: "PERM013"
+  account_id: "ACC013"
+  system: "crm"
+  role: "sales_rep"
+  permissions:
+    - "crm:read"
+  is_high_risk: false
+  granted_at: "2023-07-05 10:30:00"
+
+# 周八 (EMP006) - 销售总监
+- permission_id: "PERM014"
+  account_id: "ACC014"
+  system: "bi"
+  role: "data_owner"
+  permissions:
+    - "report:read"
+    - "report:create"
+    - "dashboard:manage"
+  is_high_risk: true
+  granted_at: "2016-06-20 11:30:00"

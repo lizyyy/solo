@@ -1,0 +1,27 @@
+# 影子账号清理工具配置
+data_directory: "./data"
+output_directory: "./output"
+history_file: "./output/history.json"
+
+# 各系统配置
+systems:
+  git:
+    high_risk_roles:
+      - "admin"
+      - "owner"
+      - "maintainer"
+  bi:
+    high_risk_roles:
+      - "admin"
+      - "super_admin"
+      - "data_owner"
+  crm:
+    high_risk_roles:
+      - "admin"
+      - "system_admin"
+      - "data_manager"
+
+# 匹配和风险阈值
+match_threshold: 0.6
+risk_threshold_high: 0.7
+risk_threshold_medium: 0.4

@@ -1,0 +1,183 @@
+# 系统账号清单样例
+# 包含正常员工、离职员工、转岗员工、无人认领账号和重复账号
+
+# 正常员工账号
+- account_id: "ACC001"
+  system: "git"
+  username: "zhangsan"
+  name: "张三"
+  email: "zhangsan@company.com"
+  phone: "13800138001"
+  employee_id: "EMP001"
+  status: "active"
+  created_at: "2020-01-20 10:00:00"
+  last_login: "2026-05-10 14:30:00"
+  notes: "正常在职员工"
+
+- account_id: "ACC002"
+  system: "git"
+  username: "lisi"
+  name: "李四"
+  email: "lisi.old@company.com"
+  phone: "13800138002"
+  employee_id: "EMP002"
+  status: "active"
+  created_at: "2021-03-25 09:00:00"
+  last_login: "2026-05-12 08:45:00"
+  notes: "邮箱变更，使用历史邮箱注册"
+
+- account_id: "ACC003"
+  system: "git"
+  username: "chenqi"
+  name: "陈七"
+  email: "chenqi@company.com"
+  phone: "13800138005"
+  employee_id: "EMP005"
+  status: "active"
+  created_at: "2017-02-15 11:00:00"
+  last_login: "2026-05-11 16:20:00"
+  notes: "技术总监"
+
+# 离职员工账号（未禁用）
+- account_id: "ACC004"
+  system: "git"
+  username: "wujiu"
+  name: "吴九"
+  email: "wujiu@company.com"
+  phone: "13800138007"
+  employee_id: "EMP007"
+  status: "active"
+  created_at: "2022-01-15 14:00:00"
+  last_login: "2026-02-01 09:00:00"
+  notes: "已离职但账号未禁用"
+
+- account_id: "ACC005"
+  system: "crm"
+  username: "zhengshi"
+  name: "郑十"
+  email: "zhengshi@company.com"
+  phone: "13800138008"
+  employee_id: "EMP008"
+  status: "active"
+  created_at: "2015-05-01 10:00:00"
+  last_login: "2026-02-28 17:30:00"
+  notes: "已离职但账号仍活跃，有CRM管理权限"
+
+# 转岗员工残留高权限
+- account_id: "ACC006"
+  system: "crm"
+  username: "zhaoliu"
+  name: "赵六"
+  email: "zhaoliu.sales@company.com"
+  phone: "13800138004"
+  employee_id: "EMP004"
+  status: "active"
+  created_at: "2018-08-05 09:00:00"
+  last_login: "2026-04-15 11:00:00"
+  notes: "已从销售部转岗市场部，但仍保留CRM管理员权限"
+
+# 无人认领账号
+- account_id: "ACC007"
+  system: "bi"
+  username: "unknown_user"
+  name: null
+  email: null
+  phone: null
+  employee_id: null
+  status: "active"
+  created_at: "2020-06-15 14:00:00"
+  last_login: "2026-01-10 10:00:00"
+  notes: "无任何身份信息，超过90天未登录"
+
+- account_id: "ACC008"
+  system: "git"
+  username: "test_user"
+  name: "测试用户"
+  email: "test@example.com"
+  phone: null
+  employee_id: null
+  status: "active"
+  created_at: "2021-11-01 09:00:00"
+  last_login: "2026-03-20 15:00:00"
+  notes: "测试账号，无法匹配员工"
+
+# 重复账号（同一人在同一系统多个账号）
+- account_id: "ACC009"
+  system: "git"
+  username: "zhangsan_alt"
+  name: "张三"
+  email: "zhangsan.personal@example.com"
+  phone: "13800138001"
+  employee_id: null
+  status: "active"
+  created_at: "2019-05-10 08:00:00"
+  last_login: "2026-05-09 14:00:00"
+  notes: "张三的备用账号，使用个人邮箱注册"
+
+# 服务账号（需要豁免）
+- account_id: "ACC010"
+  system: "git"
+  username: "ci-bot"
+  name: "CI机器人"
+  email: "ci-bot@company.com"
+  phone: null
+  employee_id: null
+  status: "active"
+  created_at: "2022-01-01 00:00:00"
+  last_login: "2026-05-13 02:00:00"
+  is_service_account: true
+  service_account_owner: "EMP005"
+  service_account_expiry: "2026-12-31"
+  notes: "CI/CD自动化服务账号"
+
+- account_id: "ACC011"
+  system: "crm"
+  username: "etl-service"
+  name: "ETL服务"
+  email: "etl@company.com"
+  phone: null
+  employee_id: null
+  status: "active"
+  created_at: "2023-06-01 10:00:00"
+  last_login: "2026-05-13 04:00:00"
+  is_service_account: true
+  service_account_owner: "EMP003"
+  service_account_expiry: "2026-01-01"
+  notes: "数据同步服务账号，豁免已过期"
+
+# 销售部正常账号
+- account_id: "ACC012"
+  system: "crm"
+  username: "wangwu"
+  name: "王五"
+  email: "wangwu@company.com"
+  phone: "13800138003"
+  employee_id: "EMP003"
+  status: "active"
+  created_at: "2019-05-15 09:00:00"
+  last_login: "2026-05-12 16:00:00"
+  notes: "正常在职销售经理"
+
+- account_id: "ACC013"
+  system: "crm"
+  username: "zhangsan.sales"
+  name: "张三"
+  email: "zhangsan2@company.com"
+  phone: "13800138009"
+  employee_id: "EMP009"
+  status: "active"
+  created_at: "2023-07-05 10:00:00"
+  last_login: "2026-05-11 14:30:00"
+  notes: "销售部张三，同名不同人"
+
+- account_id: "ACC014"
+  system: "bi"
+  username: "zhouba"
+  name: "周八"
+  email: "zhouba@company.com"
+  phone: "13800138006"
+  employee_id: "EMP006"
+  status: "active"
+  created_at: "2016-06-20 11:00:00"
+  last_login: "2026-05-12 10:00:00"
+  notes: "销售总监查看报表"

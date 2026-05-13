@@ -1,0 +1,116 @@
+# HR 员工数据样例
+# 包含正常员工、离职员工、转岗员工
+
+- employee_id: "EMP001"
+  name: "张三"
+  email: "zhangsan@company.com"
+  phone: "13800138001"
+  department: "技术部"
+  position: "高级工程师"
+  status: "active"
+  join_date: "2020-01-15"
+  previous_departments: []
+  previous_emails: []
+  manager_id: "EMP005"
+
+- employee_id: "EMP002"
+  name: "李四"
+  email: "lisi@company.com"
+  phone: "13800138002"
+  department: "技术部"
+  position: "工程师"
+  status: "active"
+  join_date: "2021-03-20"
+  previous_departments: []
+  previous_emails:
+    - "lisi.old@company.com"
+  manager_id: "EMP005"
+
+- employee_id: "EMP003"
+  name: "王五"
+  email: "wangwu@company.com"
+  phone: "13800138003"
+  department: "销售部"
+  position: "销售经理"
+  status: "active"
+  join_date: "2019-05-10"
+  previous_departments:
+    - "市场部"
+  previous_emails: []
+  manager_id: "EMP006"
+
+- employee_id: "EMP004"
+  name: "赵六"
+  email: "zhaoliu@company.com"
+  phone: "13800138004"
+  department: "市场部"
+  position: "市场总监"
+  status: "transferred"
+  join_date: "2018-08-01"
+  previous_departments:
+    - "销售部"
+  previous_emails:
+    - "zhaoliu.sales@company.com"
+  manager_id: "EMP006"
+
+- employee_id: "EMP005"
+  name: "陈七"
+  email: "chenqi@company.com"
+  phone: "13800138005"
+  department: "技术部"
+  position: "技术总监"
+  status: "active"
+  join_date: "2017-02-10"
+  previous_departments: []
+  previous_emails: []
+  manager_id: null
+
+- employee_id: "EMP006"
+  name: "周八"
+  email: "zhouba@company.com"
+  phone: "13800138006"
+  department: "销售部"
+  position: "销售总监"
+  status: "active"
+  join_date: "2016-06-15"
+  previous_departments: []
+  previous_emails: []
+  manager_id: null
+
+- employee_id: "EMP007"
+  name: "吴九"
+  email: "wujiu@company.com"
+  phone: "13800138007"
+  department: "行政部"
+  position: "行政专员"
+  status: "terminated"
+  join_date: "2022-01-10"
+  termination_date: "2026-01-31"
+  previous_departments: []
+  previous_emails: []
+  manager_id: null
+
+- employee_id: "EMP008"
+  name: "郑十"
+  email: "zhengshi@company.com"
+  phone: "13800138008"
+  department: "财务部"
+  position: "财务主管"
+  status: "terminated"
+  join_date: "2015-04-20"
+  termination_date: "2026-02-28"
+  previous_departments: []
+  previous_emails: []
+  manager_id: null
+
+- employee_id: "EMP009"
+  name: "张三"
+  email: "zhangsan2@company.com"
+  phone: "13800138009"
+  department: "销售部"
+  position: "销售代表"
+  status: "active"
+  join_date: "2023-07-01"
+  previous_departments: []
+  previous_emails: []
+  manager_id: "EMP006"

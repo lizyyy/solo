@@ -1,0 +1,212 @@
+{
+  "generated_at": "2026-05-13T17:44:10.554697",
+  "summary": {
+    "total_employees": 9,
+    "total_accounts": 14,
+    "active_accounts": 14,
+    "disabled_accounts": 0,
+    "service_accounts": 2,
+    "matched_accounts": 10,
+    "unmatched_accounts": 2,
+    "high_risk": 1,
+    "medium_risk": 3,
+    "low_risk": 0,
+    "pending_plans": 2,
+    "total_risks": 4
+  },
+  "risks": [
+    {
+      "account_id": "ACC006",
+      "risk_level": "high",
+      "risk_type": "transferred_stale",
+      "description": "转岗员工仍持有原部门高权限 (原部门: 销售部, 现部门: 市场部)",
+      "recommended_action": "重新评估权限并撤销不必要的高权限",
+      "evidence": {
+        "employee_id": "EMP004",
+        "employee_name": "赵六",
+        "current_department": "市场部",
+        "previous_departments": "销售部"
+      },
+      "score": 0.8
+    },
+    {
+      "account_id": "ACC001",
+      "risk_level": "medium",
+      "risk_type": "duplicate",
+      "description": "同一员工在 git 系统有多个活跃账号",
+      "recommended_action": "合并或清理冗余账号",
+      "evidence": {
+        "employee_id": "EMP001",
+        "other_accounts": "zhangsan_alt"
+      },
+      "score": 0.5
+    },
+    {
+      "account_id": "ACC008",
+      "risk_level": "medium",
+      "risk_type": "unclaimed",
+      "description": "无法匹配到任何在职员工的账号",
+      "recommended_action": "确认账号归属或禁用",
+      "evidence": {
+        "last_login_days": "54",
+        "has_high_risk_permission": "False",
+        "system": "git"
+      },
+      "score": 0.5
+    },
+    {
+      "account_id": "ACC009",
+      "risk_level": "medium",
+      "risk_type": "duplicate",
+      "description": "同一员工在 git 系统有多个活跃账号",
+      "recommended_action": "合并或清理冗余账号",
+      "evidence": {
+        "employee_id": "EMP001",
+        "other_accounts": "zhangsan"
+      },
+      "score": 0.5
+    }
+  ],
+  "matches": [
+    {
+      "account_id": "ACC001",
+      "employee_id": "EMP001",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP001"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC002",
+      "employee_id": "EMP002",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP002"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC003",
+      "employee_id": "EMP005",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP005"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC004",
+      "employee_id": "EMP007",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP007"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC005",
+      "employee_id": "EMP008",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP008"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC006",
+      "employee_id": "EMP004",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP004"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC009",
+      "employee_id": "EMP001",
+      "confidence": 0.9,
+      "evidence": {
+        "phone": "13800138001"
+      },
+      "match_method": "exact_phone",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC012",
+      "employee_id": "EMP003",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP003"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC013",
+      "employee_id": "EMP009",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP009"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    },
+    {
+      "account_id": "ACC014",
+      "employee_id": "EMP006",
+      "confidence": 1.0,
+      "evidence": {
+        "employee_id": "EMP006"
+      },
+      "match_method": "exact_employee_id",
+      "is_ambiguous": false
+    }
+  ],
+  "owner_marks": [
+    {
+      "account_id": "ACC007",
+      "owner_employee_id": "EMP001",
+      "marked_by": "SEC001",
+      "marked_at": "2026-05-13 17:43:45.409207",
+      "reason": "确认是张三的测试账号",
+      "is_exemption": false,
+      "exemption_expiry": null
+    },
+    {
+      "account_id": "ACC011",
+      "owner_employee_id": null,
+      "marked_by": "SEC001",
+      "marked_at": "2026-05-13 17:43:49.819064",
+      "reason": "ETL服务账号需要持续运行",
+      "is_exemption": true,
+      "exemption_expiry": "2026-08-11"
+    }
+  ],
+  "disable_plans": [
+    {
+      "account_id": "ACC004",
+      "planned_date": "2026-05-20",
+      "created_by": "SEC001",
+      "created_at": "2026-05-13 17:43:51.247078",
+      "reason": "离职员工吴九的Git账号",
+      "status": "pending",
+      "risk_assessment": null
+    },
+    {
+      "account_id": "ACC005",
+      "planned_date": "2026-05-16",
+      "created_by": "SEC001",
+      "created_at": "2026-05-13 17:43:52.479672",
+      "reason": "离职员工郑十有CRM高权限，紧急处理",
+      "status": "pending",
+      "risk_assessment": null
+    }
+  ]
+}
