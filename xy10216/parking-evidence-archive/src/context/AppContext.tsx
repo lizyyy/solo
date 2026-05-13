@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import type { ParkingCase, CaseStatus, PaymentRecord, TimelineEvent, EvidenceAttachment } from '../types';
+import type { ParkingCase, CaseStatus, PaymentStatus, PaymentRecord, TimelineEvent, EvidenceAttachment } from '../types';
 import { initialCases } from '../data/sampleData';
 import { generateId } from '../utils/helpers';
 
@@ -84,11 +84,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       operator: payment.method,
     };
 
-    setCases(prev => prev.map(c => {
+    const updater = (c: ParkingCase): ParkingCase => {
       if (c.id === caseId) {
         const newPaidAmount = c.paidAmount + payment.amount;
-        const newPaymentStatus = newPaidAmount >= c.feeAmount ? 'paid' : 'partial';
-        const newStatus = newPaidAmount >= c.feeAmount ? 'payment_completed' : 'payment_pending';
+        const newPaymentStatus: PaymentStatus = newPaidAmount >= c.feeAmount ? 'paid' : 'partial';
+        const newStatus: CaseStatus = newPaidAmount >= c.feeAmount ? 'payment_completed' : 'payment_pending';
         
         return {
           ...c,
@@ -101,8 +101,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
       }
       return c;
-    }));
-  }, []);
+    };
+
+    setCases(prev => prev.map(updater));
+    if (selectedCase?.id === caseId) {
+      setSelectedCase(updater(selectedCase));
+    }
+  }, [selectedCase]);
 
   const addEvidence = useCallback((caseId: string, evidence: Omit<EvidenceAttachment, 'id'>) => {
     const newEvidence: EvidenceAttachment = {
@@ -118,18 +123,35 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       operator: '操作员',
     };
 
-    setCases(prev => prev.map(c => {
+    const updater = (c: ParkingCase) => {
       if (c.id === caseId) {
+        const placeholderIndex = c.evidences.findIndex(
+          e => e.placeholder && e.type === evidence.type
+        );
+
+        let updatedEvidences: EvidenceAttachment[];
+        if (placeholderIndex >= 0) {
+          updatedEvidences = [...c.evidences];
+          updatedEvidences[placeholderIndex] = newEvidence;
+        } else {
+          updatedEvidences = [...c.evidences, newEvidence];
+        }
+
         return {
           ...c,
-          evidences: [...c.evidences, newEvidence],
+          evidences: updatedEvidences,
           timeline: [...c.timeline, timelineEvent],
           updatedAt: new Date().toISOString(),
         };
       }
       return c;
-    }));
-  }, []);
+    };
+
+    setCases(prev => prev.map(updater));
+    if (selectedCase?.id === caseId) {
+      setSelectedCase(updater(selectedCase));
+    }
+  }, [selectedCase]);
 
   const reviewManualRelease = useCallback((caseId: string, releaseId: string, approved: boolean, reviewer: string, comment: string) => {
     const timelineEvent: TimelineEvent = {
@@ -140,7 +162,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       operator: reviewer,
     };
 
-    setCases(prev => prev.map(c => {
+    const updater = (c: ParkingCase) => {
       if (c.id === caseId) {
         const updatedReleases = c.manualReleases.map(r => 
           r.id === releaseId 
@@ -169,8 +191,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         };
       }
       return c;
-    }));
-  }, []);
+    };
+
+    setCases(prev => prev.map(updater));
+    if (selectedCase?.id === caseId) {
+      setSelectedCase(updater(selectedCase));
+    }
+  }, [selectedCase]);
 
   const exportCase = useCallback((caseId: string, operator: string) => {
     const timelineEvent: TimelineEvent = {
@@ -181,18 +208,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       operator,
     };
 
-    setCases(prev => prev.map(c => {
+    const updater = (c: ParkingCase): ParkingCase => {
       if (c.id === caseId) {
+        const newStatus: CaseStatus = 'exported';
         return {
           ...c,
-          status: 'exported',
+          status: newStatus,
           timeline: [...c.timeline, timelineEvent],
           updatedAt: new Date().toISOString(),
         };
       }
       return c;
-    }));
-  }, []);
+    };
+
+    setCases(prev => prev.map(updater));
+    if (selectedCase?.id === caseId) {
+      setSelectedCase(updater(selectedCase));
+    }
+  }, [selectedCase]);
 
   return (
     <AppContext.Provider value={{
