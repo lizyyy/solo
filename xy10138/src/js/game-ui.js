@@ -307,10 +307,11 @@ class GameUI {
       ctx.textBaseline = 'middle';
       ctx.fillText(robot.id.toString(), rx, ry);
 
-      if (robot.carrying) {
+      if (robot.pickedCount > 0) {
         ctx.fillStyle = '#F39C12';
-        ctx.font = '14px Arial';
-        ctx.fillText('📦', rx, ry - radius - 10);
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`📦×${robot.pickedCount}`, rx, ry - radius - 12);
       }
     });
   }

@@ -43,9 +43,9 @@
 
     _generateLevel() {
       this.robots = [
-        { id: 1, x: 1, y: 1, carrying: false, color: constants.COLORS.ROBOT_1 },
-        { id: 2, x: constants.GRID_WIDTH - 2, y: 1, carrying: false, color: constants.COLORS.ROBOT_2 },
-        { id: 3, x: 6, y: constants.GRID_HEIGHT - 2, carrying: false, color: constants.COLORS.ROBOT_3 },
+        { id: 1, x: 1, y: 1, color: constants.COLORS.ROBOT_1, pickedCount: 0 },
+        { id: 2, x: constants.GRID_WIDTH - 2, y: 1, color: constants.COLORS.ROBOT_2, pickedCount: 0 },
+        { id: 3, x: 6, y: constants.GRID_HEIGHT - 2, color: constants.COLORS.ROBOT_3, pickedCount: 0 },
       ];
 
       this.cargos = [];
@@ -199,10 +199,6 @@
       const robot = this.robots.find(r => r.id === this.selectedRobot);
       if (!robot) return { success: false, reason: '机器人不存在' };
 
-      if (robot.carrying) {
-        return { success: false, reason: '机器人已携带货物' };
-      }
-
       const cargo = this.cargos.find(c => c.x === robot.x && c.y === robot.y);
       
       if (!cargo) {
@@ -217,7 +213,7 @@
 
       cargo.picked = true;
       cargo.pickedBy = robot.id;
-      robot.carrying = true;
+      robot.pickedCount++;
 
       this._applyScore(constants.SCORE.PICKUP_SUCCESS, `机器人${robot.id}成功取货`);
       this.moveHistory.push({
@@ -326,7 +322,7 @@
           cargo.pickedBy = step.robotId;
         }
         if (robot) {
-          robot.carrying = true;
+          robot.pickedCount++;
         }
       }
 

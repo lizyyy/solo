@@ -181,6 +181,48 @@ runner.test('成功拾取货物加分', () => {
   engine.stopTimer();
 });
 
+runner.test('单个机器人可拾取多个货物', () => {
+  const engine = new GameEngine();
+  engine.init();
+  engine.start();
+  engine.selectRobot(1);
+  
+  engine.cargos[0].x = 1;
+  engine.cargos[0].y = 2;
+  engine.cargos[1].x = 1;
+  engine.cargos[1].y = 3;
+  
+  engine.moveRobot('DOWN');
+  let result = engine.pickupCargo();
+  runner.assert(result.success, '第一个货物应拾取成功');
+  runner.assertEqual(engine.robots[0].pickedCount, 1, 'pickedCount应为1');
+  
+  engine.moveRobot('DOWN');
+  result = engine.pickupCargo();
+  runner.assert(result.success, '第二个货物应拾取成功');
+  runner.assertEqual(engine.robots[0].pickedCount, 2, 'pickedCount应为2');
+  
+  engine.stopTimer();
+});
+
+runner.test('重复拾取返回正确错误信息', () => {
+  const engine = new GameEngine();
+  engine.init();
+  engine.start();
+  
+  engine.cargos[0].x = 1;
+  engine.cargos[0].y = 2;
+  engine.selectRobot(1);
+  engine.moveRobot('DOWN');
+  engine.pickupCargo();
+  
+  const result = engine.pickupCargo();
+  
+  runner.assertEqual(result.success, false, '重复拾取应失败');
+  runner.assertEqual(result.reason, '货物已被取走', '错误原因应正确');
+  engine.stopTimer();
+});
+
 runner.test('重复拾取扣分', () => {
   const engine = new GameEngine();
   engine.init();
@@ -192,11 +234,11 @@ runner.test('重复拾取扣分', () => {
   engine.moveRobot('DOWN');
   engine.pickupCargo();
   
-  engine.robots[0].carrying = false;
+  const initialScore = engine.getState().score;
   const result = engine.pickupCargo();
   
   runner.assertEqual(result.success, false, '重复拾取应失败');
-  runner.assertEqual(result.reason, '货物已被取走', '错误原因应正确');
+  runner.assert(engine.getState().score < initialScore, '分数应减少');
   engine.stopTimer();
 });
 
@@ -212,7 +254,7 @@ runner.test('取空位置扣分', () => {
   engine.pickupCargo();
   
   const initialScore = engine.getState().score;
-  engine.robots[0].carrying = false;
+  engine.moveRobot('DOWN');
   const result = engine.pickupCargo();
   
   runner.assertEqual(result.success, false, '取空应失败');
@@ -310,7 +352,6 @@ runner.test('拾取所有货物游戏结束', () => {
     engine.selectRobot((idx % 3) + 1);
     engine.robots[(idx % 3)].x = cargo.x;
     engine.robots[(idx % 3)].y = cargo.y;
-    engine.robots[(idx % 3)].carrying = false;
     engine.pickupCargo();
   });
   
