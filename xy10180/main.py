@@ -128,7 +128,8 @@ def get_order_history(order_id: int, db: Session = Depends(get_db)):
 @app.post("/inventory/", response_model=InventoryResponse, tags=["库存管理"])
 def create_inventory(data: InventoryCreate, db: Session = Depends(get_db)):
     try:
-        return services.create_inventory(db, data)
+        inventory = services.create_inventory(db, data)
+        return InventoryResponse.from_orm(inventory)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
