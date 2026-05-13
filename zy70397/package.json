@@ -1,0 +1,14 @@
+{
+  "name": "api-compatibility-layer",
+  "version": "1.0.0",
+  "description": "API请求体兼容系统 - 处理移动端版本升级周期长导致的接口字段兼容问题",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
