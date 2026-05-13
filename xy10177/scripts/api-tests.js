@@ -97,7 +97,7 @@ function setMockFailTimes(times) {
     const req = http.request({
       method: 'POST',
       hostname: 'localhost',
-      port: 9999,
+      port: 4568,
       path: '/control/fail',
       headers: { 'Content-Type': 'application/json' },
     }, (res) => {
@@ -144,7 +144,7 @@ function makeRequest(method, path, body = null) {
     const options = {
       method,
       hostname: url.hostname,
-      port: url.port || 3000,
+      port: url.port || PORT,
       path: url.pathname + url.search,
       headers: {
         'Content-Type': 'application/json',
@@ -384,7 +384,7 @@ const tests = [
       end_time: '2026-05-16 15:00:00',
       room_id: room2Id,
       actor: 'CallbackUser',
-      callback_url: 'http://localhost:9999/webhook',
+      callback_url: 'http://localhost:4568/webhook',
     });
     assertEqual(res.status, 200);
     assertTrue(res.body.success);
@@ -411,7 +411,7 @@ const tests = [
     
     const res = await makeRequest('POST', `/api/meetings/${targetMeeting.id}/cancel`, {
       actor: 'CallbackUser',
-      callback_url: 'http://localhost:9999/webhook',
+      callback_url: 'http://localhost:4568/webhook',
     });
     assertEqual(res.status, 200);
     assertTrue(res.body.success);
@@ -455,7 +455,7 @@ const tests = [
       end_time: '2026-05-17 15:00:00',
       room_id: room2Id,
       actor: 'RetryUser',
-      callback_url: 'http://localhost:9999/webhook',
+      callback_url: 'http://localhost:4568/webhook',
     });
     assertEqual(res.status, 200);
     assertTrue(res.body.success);
@@ -513,11 +513,91 @@ const tests = [
     
     console.log('    ✓ Callback retry scheduler works correctly: failed -> callback_failed -> (scheduler retry) -> completed -> (no more retries)');
   }),
+
+  test('Book meeting for invalid state test', async () => {
+    const res = await makeRequest('POST', '/api/meetings/book', {
+      title: 'Invalid State Test Meeting',
+      organizer: 'StateTester',
+      start_time: '2026-05-18 10:00:00',
+      end_time: '2026-05-18 11:00:00',
+      room_id: room1Id,
+    });
+    assertEqual(res.status, 200);
+    assertTrue(res.body.success);
+    console.log(`    Meeting booked: ${res.body.meeting.id}`);
+  }),
+
+  test('Reject reschedule with invalid time range (start >= end)', async () => {
+    const meetingRes = await makeRequest('GET', '/api/meetings');
+    assertEqual(meetingRes.status, 200);
+    const meetings = meetingRes.body.meetings;
+    const targetMeeting = meetings.find(m => m.title === 'Invalid State Test Meeting');
+    assertTrue(targetMeeting, 'Should find invalid state test meeting');
+    const originalTime = targetMeeting.start_time;
+    
+    console.log('    [Phase 1] Attempt reschedule with start_time >= end_time');
+    const res = await makeRequest('POST', `/api/meetings/${targetMeeting.id}/reschedule`, {
+      start_time: '2026-05-18 15:00:00',
+      end_time: '2026-05-18 14:00:00',
+      actor: 'StateTester',
+    });
+    
+    assertEqual(res.status, 409, 'Response should be 409 (transaction validation failed)');
+    assertTrue(!res.body.success, 'Transaction should fail');
+    assertEqual(res.body.error, 'INVALID_TIME_RANGE', 'Error should be INVALID_TIME_RANGE');
+    assertTrue(res.body.transaction_id, 'Should have transaction ID');
+    
+    console.log(`    Transaction ID: ${res.body.transaction_id}`);
+    console.log(`    Error: ${res.body.error}`);
+    
+    console.log('    [Phase 2] Verify transaction is in failed state with steps');
+    const txRes = await makeRequest('GET', `/api/transactions/${res.body.transaction_id}`);
+    assertEqual(txRes.status, 200);
+    assertTrue(txRes.body.success);
+    const tx = txRes.body.transaction;
+    assertEqual(tx.status, 'failed', 'Transaction should be in failed state');
+    assertTrue(tx.steps.length > 0, 'Should have transaction steps');
+    
+    const validateStep = tx.steps.find(s => s.step_name === 'validate_input');
+    assertTrue(validateStep, 'Should have validate_input step');
+    assertEqual(validateStep.status, 'failed', 'validate_input step should be failed');
+    console.log(`    Transaction status: ${tx.status}`);
+    console.log(`    validate_input step status: ${validateStep.status}`);
+    
+    console.log('    [Phase 3] Verify meeting time was NOT changed');
+    const meetingAfter = await makeRequest('GET', `/api/meetings/${targetMeeting.id}`);
+    assertEqual(meetingAfter.status, 200);
+    assertEqual(meetingAfter.body.meeting.start_time, originalTime, 
+                'Meeting time should not be changed after failed validation');
+    console.log(`    Meeting time unchanged: ${meetingAfter.body.meeting.start_time}`);
+    
+    console.log('    ✓ Invalid time range rejected correctly, transaction recorded, meeting unchanged');
+  }),
+
+  test('Reject reschedule with start_time == end_time', async () => {
+    const meetingRes = await makeRequest('GET', '/api/meetings');
+    assertEqual(meetingRes.status, 200);
+    const meetings = meetingRes.body.meetings;
+    const targetMeeting = meetings.find(m => m.title === 'Invalid State Test Meeting');
+    assertTrue(targetMeeting, 'Should find invalid state test meeting');
+    
+    console.log('    Attempt reschedule with start_time == end_time');
+    const res = await makeRequest('POST', `/api/meetings/${targetMeeting.id}/reschedule`, {
+      start_time: '2026-05-18 12:00:00',
+      end_time: '2026-05-18 12:00:00',
+      actor: 'StateTester',
+    });
+    
+    assertEqual(res.status, 409);
+    assertTrue(!res.body.success);
+    assertEqual(res.body.error, 'INVALID_TIME_RANGE');
+    console.log(`    Correctly rejected with: ${res.body.error}`);
+  }),
 ];
 
 async function runApiTests() {
   try {
-    await startMockCallbackServer(9999);
+    await startMockCallbackServer(4568);
     console.log('');
   } catch (err) {
     console.error('[Error] Failed to start mock callback server:', err.message);

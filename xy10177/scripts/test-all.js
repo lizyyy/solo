@@ -66,14 +66,17 @@ async function runTests() {
   let testsPassed = 0;
   let testsFailed = 0;
 
+  const TEST_PORT = '4567';
+  process.env.TEST_PORT = TEST_PORT;
+  
   try {
     console.log('[Setup] Cleaning up old database...');
     cleanupDatabase();
 
-    console.log('[Setup] Starting server on port 3001 with callback scheduler (3s interval)...');
+    console.log(`[Setup] Starting server on port ${TEST_PORT} with callback scheduler (3s interval)...`);
     server = spawn('node', ['src/server.js'], {
       cwd: path.join(__dirname, '..'),
-      env: { ...process.env, PORT: '3001', CALLBACK_SCHEDULER_INTERVAL: '3000' },
+      env: { ...process.env, PORT: TEST_PORT, TEST_PORT, CALLBACK_SCHEDULER_INTERVAL: '3000' },
     });
 
     server.stdout.on('data', (data) => {
@@ -84,7 +87,7 @@ async function runTests() {
       console.error(`[Server Error] ${data.toString().trim()}`);
     });
 
-    await waitForServer(3001, 15000);
+    await waitForServer(TEST_PORT, 15000);
     console.log('[Setup] Server is ready');
     console.log('');
 

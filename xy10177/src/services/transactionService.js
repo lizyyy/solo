@@ -228,6 +228,37 @@ function executeRescheduleTransaction(meetingId, newData, actor = 'system') {
 
   try {
     stepOrder++;
+    updateTransaction(transaction.id, {
+      status: TRANSACTION_STATUSES.INITIATED,
+      step: STEP_NAMES.VALIDATE_INPUT,
+    });
+
+    const startTime = new Date(newStartTime.replace(' ', 'T'));
+    const endTime = new Date(newEndTime.replace(' ', 'T'));
+    if (startTime >= endTime) {
+      const errMsg = 'End time must be after start time';
+      createTransactionStep(
+        transaction.id,
+        stepOrder,
+        STEP_NAMES.VALIDATE_INPUT,
+        'failed',
+        null,
+        errMsg
+      );
+      updateTransaction(transaction.id, {
+        status: TRANSACTION_STATUSES.FAILED,
+        step: null,
+        error_message: errMsg,
+      });
+
+      return {
+        success: false,
+        transaction_id: transaction.id,
+        error: 'INVALID_TIME_RANGE',
+        message: errMsg,
+      };
+    }
+
     createTransactionStep(
       transaction.id,
       stepOrder,
