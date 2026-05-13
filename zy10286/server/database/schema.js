@@ -5,8 +5,8 @@ const dbPath = path.join(__dirname, '../../data/database.db');
 
 function createTables(db) {
   return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      db.run(`CREATE TABLE IF NOT EXISTS classes (
+    const tables = [
+      `CREATE TABLE IF NOT EXISTS classes (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         course_name TEXT NOT NULL,
@@ -15,9 +15,8 @@ function createTables(db) {
         status TEXT DEFAULT 'active',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS students (
+      )`,
+      `CREATE TABLE IF NOT EXISTS students (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         phone TEXT,
@@ -26,19 +25,16 @@ function createTables(db) {
         status TEXT DEFAULT 'active',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS student_accounts (
+      )`,
+      `CREATE TABLE IF NOT EXISTS student_accounts (
         id TEXT PRIMARY KEY,
         student_id TEXT NOT NULL,
         account_type TEXT NOT NULL,
         account_identifier TEXT NOT NULL,
         is_primary INTEGER DEFAULT 0,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS class_enrollments (
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS class_enrollments (
         id TEXT PRIMARY KEY,
         class_id TEXT NOT NULL,
         student_id TEXT NOT NULL,
@@ -48,12 +44,9 @@ function createTables(db) {
         transfer_from_id TEXT,
         transfer_to_id TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (class_id) REFERENCES classes(id),
-        FOREIGN KEY (student_id) REFERENCES students(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS live_sessions (
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS live_sessions (
         id TEXT PRIMARY KEY,
         class_id TEXT NOT NULL,
         title TEXT NOT NULL,
@@ -64,11 +57,9 @@ function createTables(db) {
         replay_expiry_date TEXT,
         status TEXT DEFAULT 'scheduled',
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (class_id) REFERENCES classes(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS replay_permissions (
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS replay_permissions (
         id TEXT PRIMARY KEY,
         student_id TEXT NOT NULL,
         session_id TEXT NOT NULL,
@@ -80,14 +71,9 @@ function createTables(db) {
         revoke_reason TEXT,
         status TEXT DEFAULT 'active',
         source TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (student_id) REFERENCES students(id),
-        FOREIGN KEY (session_id) REFERENCES live_sessions(id),
-        FOREIGN KEY (class_id) REFERENCES classes(id),
-        FOREIGN KEY (enrollment_id) REFERENCES class_enrollments(id)
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS access_logs (
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE TABLE IF NOT EXISTS access_logs (
         id TEXT PRIMARY KEY,
         student_id TEXT,
         account_identifier TEXT,
@@ -99,9 +85,8 @@ function createTables(db) {
         was_allowed INTEGER DEFAULT 1,
         deny_reason TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS business_events (
+      )`,
+      `CREATE TABLE IF NOT EXISTS business_events (
         id TEXT PRIMARY KEY,
         event_type TEXT NOT NULL,
         entity_type TEXT NOT NULL,
@@ -111,9 +96,8 @@ function createTables(db) {
         new_state TEXT,
         operator TEXT,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
-      )`);
-
-      db.run(`CREATE TABLE IF NOT EXISTS permission_anomalies (
+      )`,
+      `CREATE TABLE IF NOT EXISTS permission_anomalies (
         id TEXT PRIMARY KEY,
         anomaly_type TEXT NOT NULL,
         severity TEXT NOT NULL,
@@ -126,17 +110,30 @@ function createTables(db) {
         resolver TEXT,
         status TEXT DEFAULT 'open',
         notes TEXT
-      )`);
+      )`,
+      `CREATE INDEX IF NOT EXISTS idx_enrollments_student ON class_enrollments(student_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_enrollments_class ON class_enrollments(class_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_permissions_student ON replay_permissions(student_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_permissions_session ON replay_permissions(session_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_logs_student ON access_logs(student_id)`,
+      `CREATE INDEX IF NOT EXISTS idx_anomalies_status ON permission_anomalies(status)`
+    ];
 
-      db.run(`CREATE INDEX IF NOT EXISTS idx_enrollments_student ON class_enrollments(student_id)`);
-      db.run(`CREATE INDEX IF NOT EXISTS idx_enrollments_class ON class_enrollments(class_id)`);
-      db.run(`CREATE INDEX IF NOT EXISTS idx_permissions_student ON replay_permissions(student_id)`);
-      db.run(`CREATE INDEX IF NOT EXISTS idx_permissions_session ON replay_permissions(session_id)`);
-      db.run(`CREATE INDEX IF NOT EXISTS idx_logs_student ON access_logs(student_id)`);
-      db.run(`CREATE INDEX IF NOT EXISTS idx_anomalies_status ON permission_anomalies(status)`);
-    }, (err) => {
-      if (err) reject(err);
-      else resolve();
+    let completed = 0;
+    let hasError = false;
+
+    tables.forEach((sql, index) => {
+      db.run(sql, (err) => {
+        if (err && !hasError) {
+          hasError = true;
+          reject(err);
+          return;
+        }
+        completed++;
+        if (completed === tables.length && !hasError) {
+          resolve();
+        }
+      });
     });
   });
 }

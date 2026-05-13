@@ -8,7 +8,7 @@ function runAsync(db, sql, params = []) {
       if (err) reject(err);
       else resolve(this);
     });
-  };
+  });
 }
 
 function getAsync(db, sql, params = []) {

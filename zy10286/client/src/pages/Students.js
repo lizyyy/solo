@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Table, Button, Space, Modal, Form, Input, message, 
-  Tag, Typography, Popconfirm, Select, InputNumber
-} from 'antd';
-import { 
-  PlusOutlined, EditOutlined, EyeOutlined, 
-  SwapOutlined, DollarOutlined
-} from '@ant-design/icons';
+import { Table, Button, Space, Modal, Form, Input, message, Tag, Typography, Popconfirm, Select } from 'antd';
+import { PlusOutlined, EyeOutlined, SwapOutlined, DollarOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
