@@ -144,13 +144,13 @@ function getSessionStatusSync(dbInstance, sessionId) {
 
 function isStatusTransitionValid(currentStatus, newStatus) {
   const validTransitions = {
-    null: ['created'],
+    null: ['created', 'charging', 'paused', 'resumed', 'completed', 'failed'],
     'created': ['charging', 'failed'],
-    'charging': ['paused', 'completed', 'failed'],
-    'paused': ['resumed', 'completed', 'failed'],
-    'resumed': ['paused', 'completed', 'failed'],
-    'completed': ['reconciled'],
-    'failed': ['completed', 'reconciled'],
+    'charging': ['charging', 'paused', 'completed', 'failed'],
+    'paused': ['resumed', 'completed', 'failed', 'paused'],
+    'resumed': ['paused', 'completed', 'failed', 'resumed'],
+    'completed': ['reconciled', 'completed'],
+    'failed': ['completed', 'reconciled', 'failed'],
     'reconciled': []
   };
   
@@ -288,8 +288,15 @@ async function processRecord(record, source = 'charger') {
   }
   
   const currentStatus = await getSessionStatusSync(db, record.session_id);
-  const inferredStatus = record.is_retransmit ? 'resumed' : 
-    (record.status === 'completed' ? 'completed' : 'charging');
+  
+  let inferredStatus;
+  if (record.status === 'completed') {
+    inferredStatus = 'completed';
+  } else if (record.is_retransmit) {
+    inferredStatus = currentStatus === 'paused' ? 'resumed' : 'charging';
+  } else {
+    inferredStatus = 'charging';
+  }
   
   if (!isStatusTransitionValid(currentStatus, inferredStatus)) {
     return {
@@ -465,7 +472,7 @@ async function generateBill(sessionId) {
       flat_energy, flat_amount,
       valley_energy, valley_amount,
       reconciliation_status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
   `, [
     billId, sessionId, session.community_id, session.resident_id,
     parseFloat(totals.totalEnergy.toFixed(3)),

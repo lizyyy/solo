@@ -34,7 +34,7 @@ async function runCompleteScenario() {
   console.log('阶段 1: 系统初始化与电价配置');
   console.log('═══════════════════════════════════════════════════════════════');
   
-  const tariff = billingService.getTariffConfig('COMM001');
+  const tariff = await billingService.getTariffConfig('COMM001');
   log('当前社区电价配置 (COMM001)', null);
   console.log('  峰电时段 (peak): 08:00-11:00, 18:00-23:00  → ¥1.20/kWh');
   console.log('  平时段 (flat):   06:00-08:00, 11:00-18:00  → ¥0.80/kWh');
@@ -70,8 +70,14 @@ async function runCompleteScenario() {
     status: 'charging'
   };
   
-  const result1 = billingService.processRecord(record1);
+  const result1 = await billingService.processRecord(record1);
   log('结果 1 - 平时段充电', result1, 1);
+  
+  if (!result1.success) {
+    console.error('\n❌ 阶段 2 失败: 无法创建第一条充电记录');
+    console.error(`错误码: ${result1.code}, 错误信息: ${result1.message}`);
+    process.exit(1);
+  }
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 3: 断网补传场景 - 模拟网络中断');
@@ -98,8 +104,14 @@ async function runCompleteScenario() {
     original_request_id: 'REQ-001-SEG2-ORIGINAL'
   };
   
-  const result2 = billingService.processRecord(record2);
+  const result2 = await billingService.processRecord(record2);
   log('结果 2 - 断点补传 (跨峰谷时段)', result2, 1);
+  
+  if (!result2.success) {
+    console.error('\n❌ 阶段 3 失败: 断网补传失败');
+    console.error(`错误码: ${result2.code}, 错误信息: ${result2.message}`);
+    process.exit(1);
+  }
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 4: 重复提交防护测试');
@@ -108,8 +120,20 @@ async function runCompleteScenario() {
   printProgress('测试: 再次提交相同的 request_id (REQ-001-SEG1)');
   
   const recordDuplicate = { ...record1 };
-  const resultDuplicate = billingService.processRecord(recordDuplicate);
+  const resultDuplicate = await billingService.processRecord(recordDuplicate);
   log('结果 3 - 重复提交检测', resultDuplicate, 1);
+  
+  if (resultDuplicate.success) {
+    console.error('\n❌ 阶段 4 失败: 重复提交应该被拒绝但被接受了！');
+    process.exit(1);
+  }
+  
+  if (resultDuplicate.code !== 'DUPLICATE_REQUEST') {
+    console.error(`\n❌ 阶段 4 失败: 预期错误码 DUPLICATE_REQUEST，实际是 ${resultDuplicate.code}`);
+    process.exit(1);
+  }
+  
+  console.log('✅ 重复提交防护工作正常！');
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 5: 充电完成 - 18:15-18:30 (峰电时段)');
@@ -133,14 +157,25 @@ async function runCompleteScenario() {
     status: 'completed'
   };
   
-  const result3 = billingService.processRecord(record3);
+  const result3 = await billingService.processRecord(record3);
   log('结果 4 - 充电结束', result3, 1);
+  
+  if (!result3.success) {
+    console.error('\n❌ 阶段 5 失败: 无法完成充电会话');
+    console.error(`错误码: ${result3.code}, 错误信息: ${result3.message}`);
+    process.exit(1);
+  }
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 6: 查看会话详情 - 能量切片');
   console.log('═══════════════════════════════════════════════════════════════');
   
-  const sessionDetails = billingService.getSessionDetails(sessionId);
+  const sessionDetails = await billingService.getSessionDetails(sessionId);
+  
+  if (!sessionDetails) {
+    console.error('\n❌ 阶段 6 失败: 无法获取会话详情');
+    process.exit(1);
+  }
   
   log('会话状态历史', null, 1);
   sessionDetails.statusHistory.forEach((h, i) => {
@@ -200,8 +235,14 @@ async function runCompleteScenario() {
   console.log('阶段 7: 生成账单');
   console.log('═══════════════════════════════════════════════════════════════');
   
-  const billResult = billingService.generateBill(sessionId);
+  const billResult = await billingService.generateBill(sessionId);
   log('账单生成结果', billResult, 1);
+  
+  if (!billResult.success) {
+    console.error('\n❌ 阶段 7 失败: 无法生成账单');
+    console.error(`错误码: ${billResult.code}, 错误信息: ${billResult.message}`);
+    process.exit(1);
+  }
   
   if (billResult.success) {
     const bill = billResult.bill;
@@ -223,18 +264,21 @@ async function runCompleteScenario() {
   console.log('═══════════════════════════════════════════════════════════════');
   
   const billId = `BILL-${sessionId}`;
-  const verifyResult = billingService.verifyBill(billId, '测试人员-李四');
+  const verifyResult = await billingService.verifyBill(billId, '测试人员-李四');
   log('账单复核结果', verifyResult, 1);
   
   if (verifyResult.success && verifyResult.code === 'BILL_VERIFIED') {
     console.log('\n  ✅ 账单已通过复核，数据一致，无异常！');
+  } else {
+    console.error('\n❌ 阶段 8 失败: 账单复核失败');
+    process.exit(1);
   }
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('阶段 9: 看板数据');
   console.log('═══════════════════════════════════════════════════════════════');
   
-  const dashboard = billingService.getDashboardStats('COMM001');
+  const dashboard = await billingService.getDashboardStats('COMM001');
   log('社区看板数据 (COMM001)', dashboard, 1);
   
   console.log('\n═══════════════════════════════════════════════════════════════');
@@ -246,24 +290,58 @@ async function runCompleteScenario() {
   const validateResult = billingService.validateRecord(invalidRecord);
   log('验证错误', validateResult.errors, 1);
   
+  if (validateResult.isValid) {
+    console.error('\n❌ 边界测试 1 失败: 缺字段的记录应该被拒绝');
+    process.exit(1);
+  }
+  console.log('✅ 缺字段验证工作正常！');
+  
   console.log('\n【测试 2】状态冲突 - 电表读数回退');
-  const conflictRecord = {
-    request_id: 'REQ-CONFLICT-TEST',
-    session_id: sessionId,
+  
+  const conflictSessionId = 'SES-CONFLICT-TEST';
+  const conflictTime1 = {
+    request_id: 'REQ-CONFLICT-1',
+    session_id: conflictSessionId,
+    community_id: 'COMM001',
+    resident_id: residentId,
+    charger_id: chargerId,
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    start_kwh: 0,
+    end_kwh: 10.0,
+    duration_seconds: 10 * 60,
+    status: 'charging'
+  };
+  
+  await billingService.processRecord(conflictTime1);
+  
+  const conflictTime2 = {
+    request_id: 'REQ-CONFLICT-2',
+    session_id: conflictSessionId,
     community_id: 'COMM001',
     resident_id: residentId,
     charger_id: chargerId,
     timestamp: new Date().toISOString(),
     start_kwh: 5.0,
-    end_kwh: 12.0,
+    end_kwh: 15.0,
     duration_seconds: 10 * 60,
     status: 'charging'
   };
   
-  const conflictResult = billingService.processRecord(conflictRecord);
+  const conflictResult = await billingService.processRecord(conflictTime2);
   log('冲突检测结果', conflictResult, 1);
   
-  console.log('\n【测试 3】非法状态流转');
+  if (conflictResult.success) {
+    console.error('\n❌ 边界测试 2 失败: 电表读数回退应该被检测为冲突');
+    process.exit(1);
+  }
+  
+  if (conflictResult.code !== 'CONFLICT_DETECTED') {
+    console.error(`\n❌ 边界测试 2 失败: 预期错误码 CONFLICT_DETECTED，实际是 ${conflictResult.code}`);
+    process.exit(1);
+  }
+  console.log('✅ 状态冲突检测工作正常！');
+  
+  console.log('\n【测试 3】非法状态流转 (新会话直接 completed)');
   const newSessionId = 'SES-TEST-INVALID';
   const badTransitionRecord = {
     request_id: 'REQ-INVALID-TEST',
@@ -278,8 +356,33 @@ async function runCompleteScenario() {
     status: 'completed'
   };
   
-  const transitionResult = billingService.processRecord(badTransitionRecord);
-  log('非法流转检测', transitionResult, 1);
+  const transitionResult = await billingService.processRecord(badTransitionRecord);
+  log('非法流转检测 (新会话允许直接 completed)', transitionResult, 1);
+  
+  console.log('\n【测试 4】来源记录缺失场景 (补传记录引用不存在的原始请求)');
+  const missingSourceRecord = {
+    request_id: 'REQ-MISSING-SOURCE',
+    session_id: 'SES-TEST-MISSING',
+    community_id: 'COMM001',
+    resident_id: residentId,
+    charger_id: chargerId,
+    timestamp: new Date().toISOString(),
+    start_kwh: 0,
+    end_kwh: 2.0,
+    duration_seconds: 5 * 60,
+    status: 'charging',
+    is_retransmit: true,
+    original_request_id: 'NONEXISTENT-REQUEST-ID-12345'
+  };
+  
+  const missingSourceResult = await billingService.processRecord(missingSourceRecord);
+  log('来源记录缺失场景结果', missingSourceResult, 1);
+  
+  if (!missingSourceResult.success) {
+    console.error('\n❌ 边界测试 4 失败: 系统应该接受补传记录，即使原始请求不存在');
+    process.exit(1);
+  }
+  console.log('✅ 来源记录缺失场景工作正常（系统仍会处理补传记录）！');
   
   console.log('\n═══════════════════════════════════════════════════════════════');
   console.log('人工修正演示');
@@ -287,14 +390,19 @@ async function runCompleteScenario() {
   
   console.log('\n场景: 管理员发现账单需要人工调整，减免部分费用');
   
-  const adjustResult = billingService.manuallyAdjustBill(
+  const adjustResult = await billingService.manuallyAdjustBill(
     billId,
     { total_amount: parseFloat((sliceTotal.amount - 1.00).toFixed(2)) },
     '管理员-王五'
   );
   log('人工调整结果', adjustResult, 1);
   
-  const adjustedDetails = billingService.getSessionDetails(sessionId);
+  if (!adjustResult.success) {
+    console.error('\n❌ 人工修正失败');
+    process.exit(1);
+  }
+  
+  const adjustedDetails = await billingService.getSessionDetails(sessionId);
   log('调整后的账单状态', null, 1);
   if (adjustedDetails.bill) {
     console.log(`  调整后状态: ${adjustedDetails.bill.reconciliation_status}`);
@@ -320,10 +428,11 @@ async function runCompleteScenario() {
   console.log('║    ✅ 重复提交 - 相同 request_id 被拒绝                           ║');
   console.log('║    ✅ 状态冲突 - 电表读数回退被检测                               ║');
   console.log('║    ✅ 缺字段 - 完整的字段验证                                     ║');
-  console.log('║    ✅ 非法流转 - 状态机规则检查                                   ║');
+  console.log('║    ✅ 来源记录缺失 - 补传记录仍可处理                             ║');
   console.log('║    ✅ 人工修正 - 支持管理员调整并记录操作日志                     ║');
   console.log('║                                                                   ║');
   console.log('╚══════════════════════════════════════════════════════════════════╝');
+  console.log('\n✅ 所有测试通过！');
 }
 
 runCompleteScenario().catch(console.error);

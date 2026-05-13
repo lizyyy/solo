@@ -1,8 +1,0 @@
-batch_id,room_id,linen_type,quantity_returned,quantity_damaged,return_date,received_by,notes
-BATCH-2026-001,101,duvet,3,0,2026-05-02,张阿姨,多回1件-人工改错
-BATCH-2026-001,101,sheet,2,0,2026-05-02,张阿姨,
-BATCH-2026-001,999,pillowcase,2,0,2026-05-02,张阿姨,不存在的房源
-BATCH-2026-999,102,duvet,2,0,2026-05-02,张阿姨,不存在的批次
-BATCH-2026-001,102,duvet,2,0,,张阿姨,缺日期
-BATCH-2026-001,102,duvet,,,2026-05-02,张阿姨,缺数量
-BATCH-2026-001,202,duvet,3,0,2026-05-02,张阿姨,
