@@ -1,0 +1,119 @@
+
+- method: GET
+  path: /users
+  service: user-service
+  owner: zhangsan
+  handler: ListUsers
+  description: 获取用户列表
+
+- method: GET
+  path: /users/{id}
+  service: user-service
+  owner: zhangsan
+  handler: GetUser
+  description: 获取单个用户
+
+- method: POST
+  path: /users
+  service: user-service
+  owner: zhangsan
+  handler: CreateUser
+  description: 创建用户
+
+- method: PUT
+  path: /users/{id}
+  service: user-service
+  owner: zhangsan
+  handler: UpdateUser
+  description: 更新用户
+
+- method: DELETE
+  path: /users/{id}
+  service: user-service
+  owner: zhangsan
+  handler: DeleteUser
+  description: 删除用户
+
+- method: GET
+  path: /users/{id}/orders
+  service: user-service
+  owner: zhangsan
+  handler: GetUserOrders
+  description: 获取用户订单列表
+
+- method: GET
+  path: /orders
+  service: order-service
+  owner: lisi
+  handler: ListOrders
+  description: 获取订单列表
+
+- method: GET
+  path: /orders/{id}
+  service: order-service
+  owner: lisi
+  handler: GetOrder
+  description: 获取单个订单
+
+- method: POST
+  path: /orders
+  service: order-service
+  owner: lisi
+  handler: CreateOrder
+  description: 创建订单
+
+- method: PUT
+  path: /orders/{id}/status
+  service: order-service
+  owner: lisi
+  handler: UpdateOrderStatus
+  description: 更新订单状态
+
+- method: POST
+  path: /orders/{id}/cancel
+  service: order-service
+  owner: lisi
+  handler: CancelOrder
+  description: 取消订单
+
+- method: GET
+  path: /reports/sales
+  service: report-service
+  owner: wangwu
+  handler: SalesReport
+  description: 销售报表
+
+- method: GET
+  path: /reports/orders
+  service: report-service
+  owner: wangwu
+  handler: OrderReport
+  description: 订单报表
+
+- method: GET
+  path: /reports/users
+  service: report-service
+  owner: wangwu
+  handler: UserReport
+  description: 用户报表
+
+- method: POST
+  path: /reports/export
+  service: report-service
+  owner: wangwu
+  handler: ExportReport
+  description: 导出报表
+
+- method: GET
+  path: /internal/health
+  service: internal
+  owner: admin
+  handler: HealthCheck
+  description: 健康检查
+
+- method: GET
+  path: /internal/metrics
+  service: internal
+  owner: admin
+  handler: Metrics
+  description: 监控指标

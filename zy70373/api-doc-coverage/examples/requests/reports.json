@@ -1,0 +1,72 @@
+[
+  {
+    "name": "销售报表 - 响应包含额外字段",
+    "method": "GET",
+    "path": "/reports/sales",
+    "query": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    },
+    "headers": {},
+    "body": {},
+    "response": {
+      "totalRevenue": 10000.00,
+      "orderCount": 100,
+      "averageOrderValue": 100.00,
+      "topProducts": [
+        {
+          "id": 1,
+          "name": "产品A",
+          "sales": 50
+        }
+      ]
+    }
+  },
+  {
+    "name": "订单报表",
+    "method": "GET",
+    "path": "/reports/orders",
+    "query": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    },
+    "headers": {},
+    "body": {},
+    "response": {
+      "totalOrders": 100,
+      "pendingOrders": 10,
+      "completedOrders": 80,
+      "cancelledOrders": 10
+    }
+  },
+  {
+    "name": "用户报表",
+    "method": "GET",
+    "path": "/reports/users",
+    "query": {
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    },
+    "headers": {},
+    "body": {},
+    "response": {
+      "totalUsers": 500,
+      "newUsers": 50,
+      "activeUsers": 300
+    }
+  },
+  {
+    "name": "导出报表",
+    "method": "POST",
+    "path": "/reports/export",
+    "query": {},
+    "headers": {},
+    "body": {
+      "type": "sales",
+      "format": "excel",
+      "startDate": "2024-01-01",
+      "endDate": "2024-01-31"
+    },
+    "response": {}
+  }
+]

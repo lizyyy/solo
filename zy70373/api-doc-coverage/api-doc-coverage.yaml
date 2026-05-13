@@ -1,0 +1,28 @@
+routesDir: /Users/lzy/pro/solo/workspaces/zy70373/api-doc-coverage/examples/routes
+openAPIPath: /Users/lzy/pro/solo/workspaces/zy70373/api-doc-coverage/examples/openapi.yaml
+examplesDir: /Users/lzy/pro/solo/workspaces/zy70373/api-doc-coverage/examples/requests
+ignoreFile: /Users/lzy/pro/solo/workspaces/zy70373/api-doc-coverage/.api-doc-coverage-ignore.json
+
+serviceMap:
+  user-service:
+    name: 用户服务
+    owner: zhangsan
+    prefix: "^/users"
+  order-service:
+    name: 订单服务
+    owner: lisi
+    prefix: "^/orders"
+  report-service:
+    name: 报表服务
+    owner: wangwu
+    prefix: "^/reports"
+  internal:
+    name: 内部服务
+    owner: admin
+    prefix: "^/internal"
+
+ownerMap:
+  zhangsan: zhangsan@example.com
+  lisi: lisi@example.com
+  wangwu: wangwu@example.com
+  admin: admin@example.com

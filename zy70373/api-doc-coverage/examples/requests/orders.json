@@ -1,0 +1,61 @@
+[
+  {
+    "name": "获取订单列表 - 缺少必填参数",
+    "method": "GET",
+    "path": "/orders",
+    "query": {
+      "page": 1
+    },
+    "headers": {},
+    "body": {},
+    "response": {}
+  },
+  {
+    "name": "获取订单详情",
+    "method": "GET",
+    "path": "/orders/{id}",
+    "query": {},
+    "headers": {},
+    "body": {},
+    "response": {
+      "id": 1,
+      "userId": 1,
+      "status": "completed",
+      "totalAmount": 99.99,
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "name": "创建订单",
+    "method": "POST",
+    "path": "/orders",
+    "query": {},
+    "headers": {},
+    "body": {
+      "userId": 1,
+      "items": [
+        {
+          "productId": 1,
+          "quantity": 2,
+          "price": 29.99
+        }
+      ]
+    },
+    "response": {
+      "id": 2,
+      "userId": 1,
+      "status": "pending",
+      "totalAmount": 59.98,
+      "createdAt": "2024-01-03T00:00:00Z"
+    }
+  },
+  {
+    "name": "取消订单",
+    "method": "POST",
+    "path": "/orders/{id}/cancel",
+    "query": {},
+    "headers": {},
+    "body": {},
+    "response": {}
+  }
+]

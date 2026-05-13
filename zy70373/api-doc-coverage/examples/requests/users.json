@@ -1,0 +1,69 @@
+[
+  {
+    "name": "获取用户列表",
+    "method": "GET",
+    "path": "/users",
+    "query": {
+      "page": 1,
+      "pageSize": 10
+    },
+    "headers": {
+      "Authorization": "Bearer token"
+    },
+    "body": {},
+    "response": {
+      "total": 100,
+      "users": [
+        {
+          "id": 1,
+          "name": "张三",
+          "email": "zhangsan@example.com",
+          "createdAt": "2024-01-01T00:00:00Z"
+        }
+      ]
+    }
+  },
+  {
+    "name": "获取用户详情",
+    "method": "GET",
+    "path": "/users/{id}",
+    "query": {},
+    "headers": {},
+    "body": {},
+    "response": {
+      "id": 1,
+      "name": "张三",
+      "email": "zhangsan@example.com",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "name": "创建用户",
+    "method": "POST",
+    "path": "/users",
+    "query": {},
+    "headers": {},
+    "body": {
+      "name": "李四",
+      "email": "lisi@example.com",
+      "password": "password123"
+    },
+    "response": {
+      "id": 2,
+      "name": "李四",
+      "email": "lisi@example.com",
+      "createdAt": "2024-01-02T00:00:00Z"
+    }
+  },
+  {
+    "name": "创建用户 - 缺少必填字段",
+    "method": "POST",
+    "path": "/users",
+    "query": {},
+    "headers": {},
+    "body": {
+      "name": "王五"
+    },
+    "response": {}
+  }
+]
