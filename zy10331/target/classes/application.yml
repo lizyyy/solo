@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: priority-queue-api
+  datasource:
+    url: jdbc:h2:file:./data/batchqueue
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+batchqueue:
+  execution:
+    max-slots: 5
+  priority:
+    levels:
+      - CRITICAL
+      - HIGH
+      - MEDIUM
+      - LOW
+    preemption:
+      enabled: true
+      max-per-hour: 3
