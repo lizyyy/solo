@@ -116,6 +116,61 @@ export const storageService = {
     saveToStorage(STORAGE_KEYS.INVENTORY, inventory);
   },
 
+  getAvailableInventory(uniformType: string, size: string): number {
+    const item = this.getInventoryItem(uniformType, size);
+    if (!item) return 0;
+    return item.quantity - item.lockedQuantity;
+  },
+
+  lockInventory(uniformType: string, size: string, quantity: number = 1): boolean {
+    const inventory = this.getInventory();
+    const item = inventory.find((i) => i.uniformType === uniformType && i.size === size);
+    
+    if (!item) return false;
+    
+    const available = item.quantity - item.lockedQuantity;
+    if (available < quantity) return false;
+    
+    item.lockedQuantity += quantity;
+    this.saveInventory(inventory);
+    return true;
+  },
+
+  unlockInventory(uniformType: string, size: string, quantity: number = 1): boolean {
+    const inventory = this.getInventory();
+    const item = inventory.find((i) => i.uniformType === uniformType && i.size === size);
+    
+    if (!item) return false;
+    if (item.lockedQuantity < quantity) return false;
+    
+    item.lockedQuantity -= quantity;
+    this.saveInventory(inventory);
+    return true;
+  },
+
+  deductInventory(uniformType: string, size: string, quantity: number = 1): boolean {
+    const inventory = this.getInventory();
+    const item = inventory.find((i) => i.uniformType === uniformType && i.size === size);
+    
+    if (!item) return false;
+    if (item.lockedQuantity < quantity) return false;
+    
+    item.quantity -= quantity;
+    item.lockedQuantity -= quantity;
+    this.saveInventory(inventory);
+    return true;
+  },
+
+  returnInventory(uniformType: string, size: string, quantity: number = 1): void {
+    const inventory = this.getInventory();
+    const item = inventory.find((i) => i.uniformType === uniformType && i.size === size);
+    
+    if (!item) return;
+    
+    item.quantity += quantity;
+    this.saveInventory(inventory);
+  },
+
   getExchangeRequests(): ExchangeRequest[] {
     return getFromStorage<ExchangeRequest[]>(STORAGE_KEYS.REQUESTS, []);
   },

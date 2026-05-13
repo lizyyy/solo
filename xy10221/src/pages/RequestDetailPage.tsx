@@ -53,6 +53,10 @@ export function RequestDetailPage() {
     setRequest(updatedRequest);
   };
 
+  const needsInventoryLock = (status: ExchangeStatus) => {
+    return ['inventory_available', 'processing', 'shipped'].includes(status);
+  };
+
   const handleAdvanceStatus = () => {
     if (!request) return;
 
@@ -61,20 +65,54 @@ export function RequestDetailPage() {
       const nextStatus = statusFlow[currentIndex + 1];
       
       if (nextStatus === 'inventory_checking') {
+        const available = storageService.getAvailableInventory(
+          request.uniformType,
+          request.requestedSize
+        );
         const inventory = storageService.getInventoryItem(
           request.uniformType,
           request.requestedSize
         );
-        if (!inventory || inventory.quantity <= 0) {
+        
+        if (available <= 0) {
           const updatedRequest: ExchangeRequest = {
             ...request,
             status: 'inventory_unavailable',
           };
           storageService.updateExchangeRequest(updatedRequest);
           setRequest(updatedRequest);
-          alert('库存不足！');
+          alert(`库存不足！总库存: ${inventory?.quantity || 0}, 已锁定: ${inventory?.lockedQuantity || 0}, 可用: ${available}`);
           return;
         }
+      }
+
+      if (nextStatus === 'inventory_available') {
+        const locked = storageService.lockInventory(
+          request.uniformType,
+          request.requestedSize,
+          1
+        );
+        if (!locked) {
+          alert('锁定库存失败，可能库存已被其他申请占用');
+          return;
+        }
+      }
+
+      if (nextStatus === 'completed') {
+        const deducted = storageService.deductInventory(
+          request.uniformType,
+          request.requestedSize,
+          1
+        );
+        if (!deducted) {
+          alert('扣减库存失败，请检查库存状态');
+          return;
+        }
+        storageService.returnInventory(
+          request.uniformType,
+          request.originalSize,
+          1
+        );
       }
 
       const updatedRequest: ExchangeRequest = {
@@ -89,6 +127,14 @@ export function RequestDetailPage() {
   const handleCancel = () => {
     if (!request) return;
     if (window.confirm('确定要取消此申请吗？')) {
+      if (needsInventoryLock(request.status)) {
+        storageService.unlockInventory(
+          request.uniformType,
+          request.requestedSize,
+          1
+        );
+      }
+      
       const updatedRequest: ExchangeRequest = {
         ...request,
         status: 'cancelled',
@@ -381,14 +427,22 @@ export function RequestDetailPage() {
               <div className="px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-medium text-gray-900">目标库存</h3>
               </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">库存数量</p>
-                  <p className={`text-sm font-medium mt-1 ${inventory.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {inventory.quantity} 件
+              <div className="p-6 space-y-3">
+                <div className="flex justify-between">
+                  <p className="text-sm text-gray-500">总库存</p>
+                  <p className="text-sm font-medium text-gray-900">{inventory.quantity} 件</p>
+                </div>
+                <div className="flex justify-between">
+                  <p className="text-sm text-gray-500">已锁定</p>
+                  <p className="text-sm font-medium text-yellow-600">{inventory.lockedQuantity} 件</p>
+                </div>
+                <div className="flex justify-between pt-2 border-t border-gray-200">
+                  <p className="text-sm text-gray-500">可用库存</p>
+                  <p className={`text-sm font-medium ${inventory.quantity - inventory.lockedQuantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {inventory.quantity - inventory.lockedQuantity} 件
                   </p>
                 </div>
-                <div>
+                <div className="pt-2">
                   <p className="text-sm text-gray-500">存放位置</p>
                   <p className="text-sm font-medium text-gray-900 mt-1">{inventory.location}</p>
                 </div>

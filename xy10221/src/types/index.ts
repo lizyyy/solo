@@ -51,6 +51,7 @@ export interface InventoryItem {
   uniformType: UniformType;
   size: Size;
   quantity: number;
+  lockedQuantity: number;
   location: string;
 }
 

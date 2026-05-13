@@ -111,13 +111,13 @@ export const mockDistributionRecords: DistributionRecord[] = [
 ];
 
 export const mockInventory: InventoryItem[] = [
-  { id: 'inv-1', uniformType: '夏装', size: '120', quantity: 20, location: 'A区-1排' },
-  { id: 'inv-2', uniformType: '夏装', size: '130', quantity: 5, location: 'A区-1排' },
-  { id: 'inv-3', uniformType: '夏装', size: '140', quantity: 0, location: 'A区-2排' },
-  { id: 'inv-4', uniformType: '秋装', size: '130', quantity: 15, location: 'B区-1排' },
-  { id: 'inv-5', uniformType: '秋装', size: '140', quantity: 10, location: 'B区-1排' },
-  { id: 'inv-6', uniformType: '冬装', size: '140', quantity: 8, location: 'C区-1排' },
-  { id: 'inv-7', uniformType: '礼服', size: '130', quantity: 12, location: 'D区-1排' },
+  { id: 'inv-1', uniformType: '夏装', size: '120', quantity: 20, lockedQuantity: 0, location: 'A区-1排' },
+  { id: 'inv-2', uniformType: '夏装', size: '130', quantity: 5, lockedQuantity: 0, location: 'A区-1排' },
+  { id: 'inv-3', uniformType: '夏装', size: '140', quantity: 0, lockedQuantity: 0, location: 'A区-2排' },
+  { id: 'inv-4', uniformType: '秋装', size: '130', quantity: 15, lockedQuantity: 0, location: 'B区-1排' },
+  { id: 'inv-5', uniformType: '秋装', size: '140', quantity: 10, lockedQuantity: 0, location: 'B区-1排' },
+  { id: 'inv-6', uniformType: '冬装', size: '140', quantity: 8, lockedQuantity: 0, location: 'C区-1排' },
+  { id: 'inv-7', uniformType: '礼服', size: '130', quantity: 12, lockedQuantity: 0, location: 'D区-1排' },
 ];
 
 const createValidationResult = (

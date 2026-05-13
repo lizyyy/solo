@@ -77,18 +77,6 @@ export const validationService = {
       };
     }
 
-    if (distribution.distributedSize !== request.originalSize) {
-      return {
-        name: '发放记录核对',
-        passed: false,
-        message: `发放记录中的尺码(${distribution.distributedSize})与申请中的原尺码(${request.originalSize})不一致`,
-        details: { 
-          distributedSize: distribution.distributedSize,
-          requestOriginalSize: request.originalSize,
-        },
-      };
-    }
-
     if (distribution.uniformType !== request.uniformType) {
       return {
         name: '发放记录核对',
@@ -101,11 +89,41 @@ export const validationService = {
       };
     }
 
+    const registeredSize = student?.registeredSize[distribution.uniformType];
+    if (student && registeredSize && distribution.distributedSize !== registeredSize) {
+      return {
+        name: '发放记录核对',
+        passed: false,
+        message: `发放记录不可靠：发放尺码(${distribution.distributedSize})与学生登记尺码(${registeredSize})不一致`,
+        details: { 
+          studentName: student.name,
+          distributedSize: distribution.distributedSize,
+          registeredSize: registeredSize,
+          uniformType: distribution.uniformType,
+        },
+      };
+    }
+
+    if (distribution.distributedSize !== request.originalSize) {
+      return {
+        name: '发放记录核对',
+        passed: false,
+        message: `换领申请与原始数据对不上：申请原尺码(${request.originalSize})与发放记录尺码(${distribution.distributedSize})不一致`,
+        details: { 
+          distributedSize: distribution.distributedSize,
+          requestOriginalSize: request.originalSize,
+        },
+      };
+    }
+
     return {
       name: '发放记录核对',
       passed: true,
-      message: '发放记录与申请一致，且已签字确认',
+      message: '发放记录可靠（与学生登记尺码一致），且已签字确认',
       details: { 
+        studentName: student?.name,
+        registeredSize: registeredSize,
+        distributedSize: distribution.distributedSize,
         distributionDate: distribution.distributionDate,
         distributor: distribution.distributor,
         recipientSignature: distribution.recipientSignature,
