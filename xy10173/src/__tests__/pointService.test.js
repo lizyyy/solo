@@ -362,6 +362,37 @@ describe('BalanceService - 余额一致性校验', () => {
     expect(consistency.isConsistent).toBe(true);
     expect(consistency.diff).toBe(0);
   });
+
+  test('allowFreeze=true 但总额不足时，冻结桶不被修改，一致性保持', () => {
+    const freezeBucketRepo = require('../repositories/FreezeBucketRepository');
+    
+    pointService.recharge(member.id, 5000, 't1', systemOp);
+    pointService.freeze(member.id, 4000, 'TEST_7D', 't2', systemOp);
+    
+    const balanceBefore = balanceService.getCurrentBalance(member.id);
+    const bucketsBefore = freezeBucketRepo.findActiveByMemberId(member.id);
+    const consistencyBefore = balanceService.verifyConsistency(member.id);
+    
+    expect(balanceBefore.totalBalance).toBe(5000);
+    expect(balanceBefore.freezeBalance).toBe(4000);
+    expect(balanceBefore.availableBalance).toBe(1000);
+    expect(consistencyBefore.isConsistent).toBe(true);
+    
+    expect(() => {
+      pointService.consume(member.id, 6000, 't3', systemOp, null, '超总额消费', true);
+    }).toThrow();
+    
+    const balanceAfter = balanceService.getCurrentBalance(member.id);
+    const bucketsAfter = freezeBucketRepo.findActiveByMemberId(member.id);
+    const consistencyAfter = balanceService.verifyConsistency(member.id);
+    
+    expect(balanceAfter.totalBalance).toBe(5000);
+    expect(balanceAfter.freezeBalance).toBe(4000);
+    expect(balanceAfter.availableBalance).toBe(1000);
+    expect(bucketsAfter[0].used_amount).toBe(0);
+    expect(consistencyAfter.isConsistent).toBe(true);
+    expect(consistencyAfter.diff).toBe(0);
+  });
 });
 
 describe('PointService - 失败流水记录', () => {

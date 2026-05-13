@@ -255,38 +255,55 @@ class PointService {
     if (allowFreeze && current.availableBalance < remaining) {
       transType = TRANS_TYPES.CONSUME_FROM_FREEZE;
       
-      if (current.availableBalance > 0) {
-        consumedFromAvailable = current.availableBalance;
-        remaining -= current.availableBalance;
+      if (current.totalBalance < amount) {
+        throw new InsufficientBalanceError(current.totalBalance, amount);
       }
       
       const activeBuckets = freezeBucketRepo.findActiveByMemberId(memberId);
+      const bucketsToConsume = [];
+      
+      let remainingForCalc = amount;
+      
+      if (current.availableBalance > 0) {
+        consumedFromAvailable = current.availableBalance;
+        remainingForCalc -= current.availableBalance;
+      }
+      
       for (const bucket of activeBuckets) {
+        if (remainingForCalc <= 0) break;
+        
         const inBucket = bucket.frozen_amount - bucket.used_amount - bucket.released_amount;
-        const take = Math.min(inBucket, remaining);
+        const take = Math.min(inBucket, remainingForCalc);
         if (take > 0) {
           const newUsed = bucket.used_amount + take;
           const status = (bucket.frozen_amount - newUsed - bucket.released_amount) > 0 ? 'PARTIAL' : 'USED';
           
-          freezeBucketRepo.update(bucket.id, {
-            usedAmount: newUsed,
+          bucketsToConsume.push({
+            bucketId: bucket.id,
+            bucket,
+            amount: take,
+            newUsed,
             status
           });
           
-          usedBuckets.push({
-            bucketId: bucket.id,
-            amount: take
-          });
-          
           consumedFromFreeze += take;
-          remaining -= take;
-          
-          if (remaining === 0) break;
+          remainingForCalc -= take;
         }
       }
       
-      if (remaining > 0) {
+      if (remainingForCalc > 0) {
         throw new InsufficientBalanceError(current.totalBalance, amount);
+      }
+      
+      for (const item of bucketsToConsume) {
+        freezeBucketRepo.update(item.bucketId, {
+          usedAmount: item.newUsed,
+          status: item.status
+        });
+        usedBuckets.push({
+          bucketId: item.bucketId,
+          amount: item.amount
+        });
       }
     } else {
       if (current.availableBalance < amount) {
