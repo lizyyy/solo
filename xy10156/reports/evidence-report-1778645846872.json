@@ -1,0 +1,212 @@
+{
+  "project": {
+    "name": "test-coverage-demo",
+    "description": "测试覆盖证据映射示例项目"
+  },
+  "generatedAt": "2026-05-13T04:17:26.872Z",
+  "version": "1.0.0",
+  "stats": {
+    "totalRequirements": 5,
+    "coveredRequirements": 4,
+    "uncoveredRequirements": 1,
+    "totalTestCases": 7,
+    "passedTestCases": 4,
+    "failedTestCases": 1,
+    "pendingTestCases": 2,
+    "totalCodePaths": 8,
+    "linkedCodePaths": 3,
+    "unlinkedCodePaths": 5,
+    "totalFailures": 0,
+    "requirementsCoverageRate": "80.00",
+    "testCasesPassRate": "57.14",
+    "codeCoverageRate": "37.50"
+  },
+  "evidenceMap": [
+    {
+      "requirement": {
+        "id": "REQ-001",
+        "title": "用户登录功能",
+        "description": "用户可以通过用户名和密码登录系统",
+        "status": "active",
+        "tags": [
+          "authentication",
+          "core"
+        ]
+      },
+      "isCovered": true,
+      "testCases": [
+        {
+          "id": "TC-001",
+          "title": "验证正确的用户名和密码可以登录",
+          "description": "使用有效的用户名和密码进行登录测试",
+          "status": "passed",
+          "lastRun": "2026-05-09T10:30:00Z",
+          "codePaths": [
+            "authService.js:login",
+            "userController.js:handleLogin",
+            "examples/src/authService.js:login"
+          ]
+        },
+        {
+          "id": "TC-002",
+          "title": "验证错误的密码无法登录",
+          "description": "使用错误的密码进行登录测试，应该拒绝访问",
+          "status": "passed",
+          "lastRun": "2026-05-09T10:32:00Z",
+          "codePaths": [
+            "authService.js:login",
+            "authService.js:verifyPassword",
+            "examples/src/authService.js:login",
+            "examples/src/authService.js:verifyPassword"
+          ]
+        }
+      ],
+      "codePaths": [
+        "authService.js:login",
+        "userController.js:handleLogin",
+        "examples/src/authService.js:login",
+        "authService.js:verifyPassword",
+        "examples/src/authService.js:verifyPassword"
+      ]
+    },
+    {
+      "requirement": {
+        "id": "REQ-002",
+        "title": "用户注册功能",
+        "description": "新用户可以创建账户",
+        "status": "active",
+        "tags": [
+          "authentication",
+          "user-management"
+        ]
+      },
+      "isCovered": true,
+      "testCases": [
+        {
+          "id": "TC-003",
+          "title": "验证新用户可以注册",
+          "description": "使用新的用户名和邮箱进行注册测试",
+          "status": "passed",
+          "lastRun": "2026-05-09T10:35:00Z",
+          "codePaths": [
+            "authService.js:register",
+            "userController.js:handleRegister",
+            "examples/src/authService.js:register"
+          ]
+        },
+        {
+          "id": "TC-004",
+          "title": "验证重复用户名无法注册",
+          "description": "使用已存在的用户名进行注册测试，应该失败",
+          "status": "failed",
+          "lastRun": "2026-05-09T10:38:00Z",
+          "codePaths": [
+            "authService.js:register",
+            "userRepository.js:findByUsername",
+            "examples/src/authService.js:register"
+          ]
+        }
+      ],
+      "codePaths": [
+        "authService.js:register",
+        "userController.js:handleRegister",
+        "examples/src/authService.js:register",
+        "userRepository.js:findByUsername"
+      ]
+    },
+    {
+      "requirement": {
+        "id": "REQ-003",
+        "title": "密码重置功能",
+        "description": "用户可以通过邮箱重置密码",
+        "status": "active",
+        "tags": [
+          "authentication",
+          "security"
+        ]
+      },
+      "isCovered": true,
+      "testCases": [
+        {
+          "id": "TC-005",
+          "title": "验证密码重置流程",
+          "description": "测试通过邮箱请求密码重置链接",
+          "status": "pending",
+          "codePaths": [
+            "passwordService.js:requestReset",
+            "emailService.js:sendResetEmail"
+          ]
+        }
+      ],
+      "codePaths": [
+        "passwordService.js:requestReset",
+        "emailService.js:sendResetEmail"
+      ]
+    },
+    {
+      "requirement": {
+        "id": "REQ-004",
+        "title": "用户信息管理",
+        "description": "用户可以查看和编辑个人信息",
+        "status": "active",
+        "tags": [
+          "user-management"
+        ]
+      },
+      "isCovered": true,
+      "testCases": [
+        {
+          "id": "TC-006",
+          "title": "验证用户可以查看个人信息",
+          "description": "登录用户应该能够查看自己的个人信息",
+          "status": "passed",
+          "lastRun": "2026-05-09T10:40:00Z",
+          "codePaths": [
+            "userService.js:getProfile",
+            "userController.js:getUserInfo"
+          ]
+        },
+        {
+          "id": "TC-007",
+          "title": "验证用户可以编辑个人信息",
+          "description": "登录用户应该能够编辑自己的个人信息",
+          "status": "pending",
+          "codePaths": [
+            "userService.js:updateProfile",
+            "userController.js:updateUserInfo"
+          ]
+        }
+      ],
+      "codePaths": [
+        "userService.js:getProfile",
+        "userController.js:getUserInfo",
+        "userService.js:updateProfile",
+        "userController.js:updateUserInfo"
+      ]
+    },
+    {
+      "requirement": {
+        "id": "REQ-005",
+        "title": "权限控制",
+        "description": "系统根据用户角色控制访问权限",
+        "status": "planned",
+        "tags": [
+          "security",
+          "authorization"
+        ]
+      },
+      "isCovered": false,
+      "testCases": [],
+      "codePaths": []
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "overallStatus": "warning",
+    "keyFindings": [
+      "需求覆盖率为 80.00%，仍有 1 个需求未覆盖",
+      "测试用例通过率为 57.14%，有 1 个用例失败",
+      "未覆盖的需求: REQ-005"
+    ]
+  }
+}

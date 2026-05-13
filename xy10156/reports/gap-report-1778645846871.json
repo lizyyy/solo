@@ -1,0 +1,159 @@
+{
+  "generatedAt": "2026-05-13T04:17:26.871Z",
+  "stats": {
+    "requirements": {
+      "total": 5,
+      "covered": 4,
+      "uncovered": 1,
+      "coverageRate": "80.00"
+    },
+    "testCases": {
+      "total": 7,
+      "passed": 4,
+      "failed": 1,
+      "pending": 2
+    },
+    "codeCoverage": {
+      "total": 8,
+      "linked": 3,
+      "unlinked": 5
+    },
+    "gaps": {
+      "total": 18,
+      "high": 2,
+      "medium": 7,
+      "low": 9
+    }
+  },
+  "gaps": [
+    {
+      "type": "requirement",
+      "id": "REQ-005",
+      "title": "权限控制",
+      "description": "需求 \"权限控制\" 没有关联任何测试用例",
+      "severity": "high"
+    },
+    {
+      "type": "test_failed",
+      "id": "TC-004",
+      "title": "验证重复用户名无法注册",
+      "description": "测试用例 \"验证重复用户名无法注册\" 执行失败",
+      "severity": "high",
+      "details": {
+        "lastRun": "2026-05-09T10:38:00Z"
+      }
+    },
+    {
+      "type": "test_pending",
+      "id": "TC-005",
+      "title": "验证密码重置流程",
+      "description": "测试用例 \"验证密码重置流程\" 尚未执行",
+      "severity": "medium"
+    },
+    {
+      "type": "test_pending",
+      "id": "TC-007",
+      "title": "验证用户可以编辑个人信息",
+      "description": "测试用例 \"验证用户可以编辑个人信息\" 尚未执行",
+      "severity": "medium"
+    },
+    {
+      "type": "code",
+      "id": "examples/src/authService.js:AuthService",
+      "title": "examples/src/authService.js:AuthService",
+      "description": "代码路径 \"examples/src/authService.js:AuthService\" 没有关联任何测试用例",
+      "severity": "medium"
+    },
+    {
+      "type": "code",
+      "id": "examples/src/authService.js:constructor",
+      "title": "examples/src/authService.js:constructor",
+      "description": "代码路径 \"examples/src/authService.js:constructor\" 没有关联任何测试用例",
+      "severity": "medium"
+    },
+    {
+      "type": "code",
+      "id": "examples/src/authService.js:if",
+      "title": "examples/src/authService.js:if",
+      "description": "代码路径 \"examples/src/authService.js:if\" 没有关联任何测试用例",
+      "severity": "medium"
+    },
+    {
+      "type": "code",
+      "id": "examples/src/authService.js:hashPassword",
+      "title": "examples/src/authService.js:hashPassword",
+      "description": "代码路径 \"examples/src/authService.js:hashPassword\" 没有关联任何测试用例",
+      "severity": "medium"
+    },
+    {
+      "type": "code",
+      "id": "examples/src/authService.js:generateToken",
+      "title": "examples/src/authService.js:generateToken",
+      "description": "代码路径 \"examples/src/authService.js:generateToken\" 没有关联任何测试用例",
+      "severity": "medium"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-001->userController.js:handleLogin",
+      "title": "测试用例 TC-001",
+      "description": "测试用例 \"验证正确的用户名和密码可以登录\" 关联了不存在的代码路径: userController.js:handleLogin",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-003->userController.js:handleRegister",
+      "title": "测试用例 TC-003",
+      "description": "测试用例 \"验证新用户可以注册\" 关联了不存在的代码路径: userController.js:handleRegister",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-004->userRepository.js:findByUsername",
+      "title": "测试用例 TC-004",
+      "description": "测试用例 \"验证重复用户名无法注册\" 关联了不存在的代码路径: userRepository.js:findByUsername",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-005->passwordService.js:requestReset",
+      "title": "测试用例 TC-005",
+      "description": "测试用例 \"验证密码重置流程\" 关联了不存在的代码路径: passwordService.js:requestReset",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-005->emailService.js:sendResetEmail",
+      "title": "测试用例 TC-005",
+      "description": "测试用例 \"验证密码重置流程\" 关联了不存在的代码路径: emailService.js:sendResetEmail",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-006->userService.js:getProfile",
+      "title": "测试用例 TC-006",
+      "description": "测试用例 \"验证用户可以查看个人信息\" 关联了不存在的代码路径: userService.js:getProfile",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-006->userController.js:getUserInfo",
+      "title": "测试用例 TC-006",
+      "description": "测试用例 \"验证用户可以查看个人信息\" 关联了不存在的代码路径: userController.js:getUserInfo",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-007->userService.js:updateProfile",
+      "title": "测试用例 TC-007",
+      "description": "测试用例 \"验证用户可以编辑个人信息\" 关联了不存在的代码路径: userService.js:updateProfile",
+      "severity": "low"
+    },
+    {
+      "type": "invalid_code_link",
+      "id": "TC-007->userController.js:updateUserInfo",
+      "title": "测试用例 TC-007",
+      "description": "测试用例 \"验证用户可以编辑个人信息\" 关联了不存在的代码路径: userController.js:updateUserInfo",
+      "severity": "low"
+    }
+  ]
+}

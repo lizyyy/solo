@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const ora = require('ora');
 const DataStore = require('../dataStore');
+const { hasMatchingCodePath } = require('../utils/codePathMatcher');
 
 async function analyzeGapsCommand(options) {
   const store = new DataStore();
@@ -112,11 +113,7 @@ async function analyzeGapsCommand(options) {
 
       if (tc.codePaths && coverage.items.length > 0) {
         tc.codePaths.forEach(cpRef => {
-          const exists = coverage.items.some(cp => {
-            return cp.path === cpRef || 
-                   cp.functionName === cpRef ||
-                   `${cp.path}:${cp.functionName}` === cpRef;
-          });
+          const exists = hasMatchingCodePath(cpRef, coverage.items);
           if (!exists) {
             gaps.push({
               type: 'invalid_code_link',
