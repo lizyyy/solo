@@ -1,4 +1,4 @@
-import { ApiResponse, CreateRiskEventRequest, AssessSiteRequest, CreateRebookingRequest, ProcessRebookingRequest, CancelEventRequest, ModifyEventRequest, QuerySummaryRequest } from './types';
+import { ApiResponse, CreateRiskEventRequest, AssessSiteRequest, CreateRebookingRequest, ProcessRebookingRequest, CancelEventRequest, ModifyEventRequest, QuerySummaryRequest, CreateNotificationRequest, SendNotificationRequest, AcknowledgeNotificationRequest, RetryNotificationRequest, QueryNotificationsRequest } from './types';
 export declare function handleCreateRiskEvent(request: CreateRiskEventRequest): ApiResponse;
 export declare function handleAssessSite(request: AssessSiteRequest): ApiResponse;
 export declare function handleCreateRebooking(request: CreateRebookingRequest): ApiResponse;
@@ -9,3 +9,8 @@ export declare function handleQuerySummary(request: QuerySummaryRequest): ApiRes
 export declare function handleQueryProblems(): ApiResponse;
 export declare function handleQuerySites(): ApiResponse;
 export declare function handleQueryOrders(): ApiResponse;
+export declare function handleCreateNotification(request: CreateNotificationRequest): ApiResponse;
+export declare function handleSendNotification(request: SendNotificationRequest): ApiResponse;
+export declare function handleAcknowledgeNotification(request: AcknowledgeNotificationRequest): ApiResponse;
+export declare function handleRetryNotification(request: RetryNotificationRequest): ApiResponse;
+export declare function handleQueryNotifications(request: QueryNotificationsRequest): ApiResponse;

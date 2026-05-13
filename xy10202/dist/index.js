@@ -74,6 +74,45 @@ app.get('/api/orders', (req, res) => {
     const response = (0, businessHandler_1.handleQueryOrders)();
     res.status(response.success ? 200 : 400).json(response);
 });
+app.post('/api/notifications', (req, res) => {
+    const request = req.body;
+    const response = (0, businessHandler_1.handleCreateNotification)(request);
+    res.status(response.success ? 201 : 400).json(response);
+});
+app.post('/api/notifications/:notificationId/send', (req, res) => {
+    const request = {
+        ...req.body,
+        notificationId: req.params.notificationId
+    };
+    const response = (0, businessHandler_1.handleSendNotification)(request);
+    res.status(response.success ? 200 : 400).json(response);
+});
+app.post('/api/notifications/:notificationId/acknowledge', (req, res) => {
+    const request = {
+        ...req.body,
+        notificationId: req.params.notificationId
+    };
+    const response = (0, businessHandler_1.handleAcknowledgeNotification)(request);
+    res.status(response.success ? 200 : 400).json(response);
+});
+app.post('/api/notifications/:notificationId/retry', (req, res) => {
+    const request = {
+        ...req.body,
+        notificationId: req.params.notificationId
+    };
+    const response = (0, businessHandler_1.handleRetryNotification)(request);
+    res.status(response.success ? 200 : 400).json(response);
+});
+app.get('/api/notifications', (req, res) => {
+    const request = {
+        eventId: req.query.eventId,
+        status: req.query.status,
+        recipientType: req.query.recipientType,
+        type: req.query.type
+    };
+    const response = (0, businessHandler_1.handleQueryNotifications)(request);
+    res.status(response.success ? 200 : 400).json(response);
+});
 app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
@@ -97,16 +136,21 @@ app.listen(PORT, () => {
     console.log(`Rain Risk Campground API running on port ${PORT}`);
     console.log(`Health check: http://localhost:${PORT}/health`);
     console.log(`API endpoints:`);
-    console.log(`  POST /api/events          - Create risk event`);
-    console.log(`  POST /api/events/:id/assess - Assess site risk`);
-    console.log(`  POST /api/rebookings      - Create rebooking request`);
+    console.log(`  POST /api/events                 - Create risk event`);
+    console.log(`  POST /api/events/:id/assess       - Assess site risk`);
+    console.log(`  POST /api/rebookings            - Create rebooking request`);
     console.log(`  POST /api/rebookings/:id/process - Process rebooking`);
-    console.log(`  POST /api/events/:id/cancel - Cancel risk event`);
-    console.log(`  PATCH /api/events/:id     - Modify event (withdraw/revise)`);
-    console.log(`  GET /api/summary          - Query summary`);
-    console.log(`  GET /api/problems         - Query problem list`);
-    console.log(`  GET /api/sites            - List all sites`);
-    console.log(`  GET /api/orders           - List all orders`);
+    console.log(`  POST /api/events/:id/cancel      - Cancel risk event`);
+    console.log(`  PATCH /api/events/:id            - Modify event (withdraw/revise)`);
+    console.log(`  GET /api/summary               - Query summary`);
+    console.log(`  GET /api/problems                - Query problem list`);
+    console.log(`  GET /api/sites                   - List all sites`);
+    console.log(`  GET /api/orders                  - List all orders`);
+    console.log(`  POST /api/notifications          - Create and send notification`);
+    console.log(`  POST /api/notifications/:id/send    - Send existing notification`);
+    console.log(`  POST /api/notifications/:id/acknowledge - Acknowledge notification`);
+    console.log(`  POST /api/notifications/:id/retry   - Retry failed notification`);
+    console.log(`  GET /api/notifications             - Query notifications`);
 });
 exports.default = app;
 //# sourceMappingURL=index.js.map

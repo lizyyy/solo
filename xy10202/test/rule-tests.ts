@@ -9,9 +9,15 @@ import {
   handleQuerySummary,
   handleQueryProblems,
   handleQuerySites,
-  handleQueryOrders
+  handleQueryOrders,
+  handleCreateNotification,
+  handleSendNotification,
+  handleAcknowledgeNotification,
+  handleRetryNotification,
+  handleQueryNotifications
 } from '../src/businessHandler';
 import { storage } from '../src/storage';
+import { simulateSendNotification } from '../src/services/notificationService';
 
 interface TestResult {
   rule: string;
@@ -76,6 +82,7 @@ function runAllTests(): void {
   allResults.push(...testRule6_ProblemRecording());
   allResults.push(...testRule7_EventCancellation());
   allResults.push(...testRule8_SummaryQuery());
+  allResults.push(...testRule9_NotificationSystem());
 
   const passed = allResults.filter(r => r.passed).length;
   const failed = allResults.filter(r => !r.passed).length;
@@ -866,6 +873,235 @@ function testRule8_SummaryQuery(): TestResult[] {
       passed: ordersResponse.success === true,
       failureReason: ordersResponse.error?.message
     });
+
+    return results;
+  });
+}
+
+function testRule9_NotificationSystem(): TestResult[] {
+  return runRuleTest('规则组 9: 通知系统', () => {
+    const results: TestResult[] = [];
+
+    const notificationsBefore = handleQueryNotifications({});
+    const notificationCountBefore = notificationsBefore.success ? notificationsBefore.data.summary.total : 0;
+
+    const createEventResponse = handleCreateRiskEvent({
+      requestId: uuidv4(),
+      weatherAlert: {
+        alertId: 'WEATHER-NOTIF-001',
+        alertType: 'HEAVY_RAIN',
+        severity: 'EXTREME',
+        validFrom: new Date().toISOString(),
+        validTo: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        description: '通知测试特大暴雨预警'
+      },
+      source: 'weather-api'
+    });
+
+    results.push({
+      rule: 'R9-1',
+      description: '创建风险事件应自动生成通知',
+      passed: createEventResponse.success === true && createEventResponse.data.notificationsGenerated > 0,
+      failureReason: createEventResponse.error?.message || 'No notifications generated'
+    });
+
+    const notificationsAfter = handleQueryNotifications({});
+    const notificationCountAfter = notificationsAfter.success ? notificationsAfter.data.summary.total : 0;
+
+    results.push({
+      rule: 'R9-2',
+      description: '通知存储数量应增加',
+      passed: notificationCountAfter > notificationCountBefore,
+      failureReason: `Notification count did not increase: ${notificationCountBefore} -> ${notificationCountAfter}`
+    });
+
+    if (notificationsAfter.success && notificationsAfter.data.notifications.length > 0) {
+      const latestNotification = notificationsAfter.data.notifications[0];
+
+      results.push({
+        rule: 'R9-3',
+        description: '通知应包含事件关联信息',
+        passed: latestNotification.eventId !== null || latestNotification.orderId !== null,
+        failureReason: 'Notification should be linked to event or order'
+      });
+
+      results.push({
+        rule: 'R9-4',
+        description: '通知应包含接收者类型和名称',
+        passed: latestNotification.recipientType !== undefined && latestNotification.recipientName !== undefined,
+        failureReason: 'Notification missing recipient info'
+      });
+
+      results.push({
+        rule: 'R9-5',
+        description: '通知初始状态应为 SENT 或 DELIVERED（模拟发送）',
+        passed: ['SENT', 'DELIVERED'].includes(latestNotification.status),
+        failureReason: `Expected SENT or DELIVERED, got ${latestNotification.status}`
+      });
+
+      if (latestNotification.status === 'SENT' || latestNotification.status === 'DELIVERED') {
+        const ackResponse = handleAcknowledgeNotification({
+          requestId: uuidv4(),
+          notificationId: latestNotification.notificationId,
+          acknowledgedBy: 'staff-001',
+          note: '已通知客户',
+          source: 'camp-staff'
+        });
+
+        results.push({
+          rule: 'R9-6',
+          description: '可确认已发送/投递的通知',
+          passed: ackResponse.success === true,
+          failureReason: ackResponse.error?.message
+        });
+
+        if (ackResponse.success) {
+          results.push({
+            rule: 'R9-7',
+            description: '确认后通知状态应为 ACKNOWLEDGED',
+            passed: ackResponse.data.status === 'ACKNOWLEDGED',
+            failureReason: `Expected ACKNOWLEDGED, got ${ackResponse.data.status}`
+          });
+
+          results.push({
+            rule: 'R9-8',
+            description: '确认应记录确认人信息',
+            passed: ackResponse.data.acknowledgedBy === 'staff-001',
+            failureReason: `Expected staff-001, got ${ackResponse.data.acknowledgedBy}`
+          });
+        }
+      }
+    }
+
+    const customNotifRequestId = uuidv4();
+    const customNotifResponse = handleCreateNotification({
+      requestId: customNotifRequestId,
+      recipientId: 'custom-recipient-001',
+      recipientType: 'CUSTOMER',
+      recipientName: '测试客户',
+      recipientContact: 'test@example.com',
+      type: 'EVACUATION_ORDER',
+      channel: 'SMS',
+      title: '紧急撤离通知',
+      content: '请立即撤离至安全区域',
+      source: 'camp-staff'
+    });
+
+    results.push({
+      rule: 'R9-9',
+      description: '可手动创建自定义通知',
+      passed: customNotifResponse.success === true,
+      failureReason: customNotifResponse.error?.message
+    });
+
+    if (customNotifResponse.success) {
+      results.push({
+        rule: 'R9-10',
+        description: '手动创建的通知应自动发送',
+        passed: customNotifResponse.data.sent === true,
+        failureReason: 'Notification should be sent automatically'
+      });
+    }
+
+    const createEventResponse2 = handleCreateRiskEvent({
+      requestId: uuidv4(),
+      weatherAlert: {
+        alertId: 'WEATHER-NOTIF-002',
+        alertType: 'HEAVY_RAIN',
+        severity: 'EXTREME',
+        validFrom: new Date().toISOString(),
+        validTo: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        description: '改签通知测试'
+      },
+      source: 'weather-api'
+    });
+
+    if (createEventResponse2.success && createEventResponse2.data.affectedOrders.length > 0) {
+      const eventId = createEventResponse2.data.eventId;
+      const orderId = createEventResponse2.data.affectedOrders[0];
+
+      const createRebookResponse = handleCreateRebooking({
+        requestId: uuidv4(),
+        eventId,
+        orderId,
+        reason: '暴雨预警测试改签',
+        source: 'camp-staff'
+      });
+
+      results.push({
+        rule: 'R9-11',
+        description: '创建改签请求应生成通知',
+        passed: createRebookResponse.success === true && createRebookResponse.data.notificationsGenerated > 0,
+        failureReason: createRebookResponse.error?.message || 'No notifications generated for rebooking'
+      });
+
+      if (createRebookResponse.success && createRebookResponse.data.availableReplacements.length > 0) {
+        const targetSiteId = createRebookResponse.data.availableReplacements[0].siteId;
+
+        const processRebookResponse = handleProcessRebooking({
+          requestId: uuidv4(),
+          rebookingId: createRebookResponse.data.rebookingId,
+          targetSiteId,
+          source: 'camp-staff'
+        });
+
+        results.push({
+          rule: 'R9-12',
+          description: '完成改签应生成完成通知',
+          passed: processRebookResponse.success === true && processRebookResponse.data.notificationsGenerated > 0,
+          failureReason: processRebookResponse.error?.message || 'No notifications generated for completed rebooking'
+        });
+      }
+    }
+
+    const notificationsQueryResponse = handleQueryNotifications({
+      recipientType: 'CUSTOMER'
+    });
+
+    results.push({
+      rule: 'R9-13',
+      description: '可按接收者类型筛选通知',
+      passed: notificationsQueryResponse.success === true,
+      failureReason: notificationsQueryResponse.error?.message
+    });
+
+    if (notificationsQueryResponse.success) {
+      results.push({
+        rule: 'R9-14',
+        description: '筛选结果应包含汇总统计',
+        passed: notificationsQueryResponse.data.summary !== undefined,
+        failureReason: 'Query should include summary'
+      });
+    }
+
+    const cancelEventResponse = handleCreateRiskEvent({
+      requestId: uuidv4(),
+      weatherAlert: {
+        alertId: 'WEATHER-CANCEL-001',
+        alertType: 'HEAVY_RAIN',
+        severity: 'MEDIUM',
+        validFrom: new Date().toISOString(),
+        validTo: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        description: '取消测试预警'
+      },
+      source: 'weather-api'
+    });
+
+    if (cancelEventResponse.success) {
+      const cancelResult = handleCancelEvent({
+        requestId: uuidv4(),
+        eventId: cancelEventResponse.data.eventId,
+        reason: '预警已解除',
+        source: 'weather-api'
+      });
+
+      results.push({
+        rule: 'R9-15',
+        description: '取消事件应生成取消通知',
+        passed: cancelResult.success === true && cancelResult.data.notificationsGenerated > 0,
+        failureReason: cancelResult.error?.message || 'No notifications generated for event cancellation'
+      });
+    }
 
     return results;
   });

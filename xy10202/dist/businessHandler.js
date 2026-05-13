@@ -43,9 +43,15 @@ exports.handleQuerySummary = handleQuerySummary;
 exports.handleQueryProblems = handleQueryProblems;
 exports.handleQuerySites = handleQuerySites;
 exports.handleQueryOrders = handleQueryOrders;
+exports.handleCreateNotification = handleCreateNotification;
+exports.handleSendNotification = handleSendNotification;
+exports.handleAcknowledgeNotification = handleAcknowledgeNotification;
+exports.handleRetryNotification = handleRetryNotification;
+exports.handleQueryNotifications = handleQueryNotifications;
 const uuid_1 = require("uuid");
 const storage_1 = require("./storage");
 const riskService_1 = require("./services/riskService");
+const notificationService_1 = require("./services/notificationService");
 const crypto = __importStar(require("crypto"));
 function generateNumber(prefix) {
     const timestamp = Date.now().toString(36).toUpperCase();
@@ -181,7 +187,14 @@ function handleCreateRiskEvent(request) {
         event.assessedSites = assessedSites;
         event.affectedOrders = [...new Set(affectedOrderIds)];
         storage_1.storage.updateEvent(event);
-        const response = createSuccessResponse(event, request.requestId);
+        const notifications = (0, notificationService_1.generateRiskAlertNotifications)(event);
+        for (const notification of notifications) {
+            (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+        }
+        const response = createSuccessResponse({
+            ...event,
+            notificationsGenerated: notifications.length
+        }, request.requestId);
         recordIdempotency(request.requestId, 'CREATE_EVENT', request, response);
         return response;
     }
@@ -347,6 +360,10 @@ function handleCreateRebooking(request) {
         storage_1.storage.updateEvent(event);
         order.status = 'REBOOKING';
         storage_1.storage.updateOrder(order);
+        const rebookingNotifications = (0, notificationService_1.generateRebookingInitiatedNotifications)(event, rebooking.rebookingId, order, availableSites.length);
+        for (const notification of rebookingNotifications) {
+            (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+        }
         const response = createSuccessResponse({
             rebookingId: rebooking.rebookingId,
             rebookingNumber: rebooking.rebookingNumber,
@@ -358,7 +375,8 @@ function handleCreateRebooking(request) {
                 siteNumber: s.siteNumber,
                 type: s.type,
                 elevation: s.elevation
-            }))
+            })),
+            notificationsGenerated: rebookingNotifications.length
         }, request.requestId);
         recordIdempotency(request.requestId, 'CREATE_REBOOKING', request, response);
         return response;
@@ -469,6 +487,14 @@ function handleProcessRebooking(request) {
                 storage_1.storage.updateEvent(event);
             }
         }
+        let completedNotifications = 0;
+        if (event) {
+            const completeNotifications = (0, notificationService_1.generateRebookingCompletedNotifications)(event, rebooking.rebookingId, order, originalSite.siteNumber, targetSite.siteNumber);
+            for (const notification of completeNotifications) {
+                (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+            }
+            completedNotifications = completeNotifications.length;
+        }
         const response = createSuccessResponse({
             rebookingId: rebooking.rebookingId,
             rebookingNumber: rebooking.rebookingNumber,
@@ -477,7 +503,8 @@ function handleProcessRebooking(request) {
             originalSiteId: originalSite.siteId,
             targetSiteId: targetSite.siteId,
             targetSiteNumber: targetSite.siteNumber,
-            newOrderStatus: order.status
+            newOrderStatus: order.status,
+            notificationsGenerated: completedNotifications
         }, request.requestId);
         recordIdempotency(request.requestId, 'PROCESS_REBOOKING', request, response);
         return response;
@@ -548,11 +575,16 @@ function handleCancelEvent(request) {
         event.status = 'CANCELLED';
         event.updatedAt = now;
         storage_1.storage.updateEvent(event);
+        const cancelNotifications = (0, notificationService_1.generateEventCancelledNotifications)(event);
+        for (const notification of cancelNotifications) {
+            (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+        }
         const response = createSuccessResponse({
             eventId: event.eventId,
             eventNumber: event.eventNumber,
             newStatus: event.status,
-            cancelledReason: request.reason
+            cancelledReason: request.reason,
+            notificationsGenerated: cancelNotifications.length
         }, request.requestId);
         recordIdempotency(request.requestId, 'CANCEL_EVENT', request, response);
         return response;
@@ -722,6 +754,252 @@ function handleQueryOrders() {
                 checkOutDate: o.checkOutDate,
                 status: o.status,
                 guestCount: o.guestCount
+            }))
+        }, requestId);
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        return createErrorResponse('SYSTEM_ERROR', errorMessage, requestId, { error: error.stack });
+    }
+}
+function handleCreateNotification(request) {
+    const idempotencyCheck = checkIdempotency(request.requestId, 'SEND_NOTIFICATION', request);
+    if (idempotencyCheck.isDuplicate) {
+        return idempotencyCheck.cachedResult;
+    }
+    const validationError = validateRequiredFields(request, [
+        'requestId', 'recipientId', 'recipientType', 'recipientName',
+        'recipientContact', 'type', 'channel', 'title', 'content', 'source'
+    ]);
+    if (validationError) {
+        const response = createErrorResponse('VALIDATION_ERROR', validationError, request.requestId, request);
+        recordProblem('SEND_NOTIFICATION', request.requestId, 'VALIDATION_ERROR', validationError, request, request.source);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+    try {
+        const notification = (0, notificationService_1.createNotification)({
+            eventId: request.eventId,
+            rebookingId: request.rebookingId,
+            orderId: request.orderId,
+            recipientId: request.recipientId,
+            recipientType: request.recipientType,
+            recipientName: request.recipientName,
+            recipientContact: request.recipientContact,
+            type: request.type,
+            channel: request.channel,
+            title: request.title,
+            content: request.content
+        });
+        const sendResult = (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+        const response = createSuccessResponse({
+            notificationId: notification.notificationId,
+            notificationNumber: notification.notificationNumber,
+            status: notification.status,
+            sent: sendResult.success,
+            sendError: sendResult.error
+        }, request.requestId);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        const response = createErrorResponse('SYSTEM_ERROR', errorMessage, request.requestId, { error: error.stack });
+        recordProblem('SEND_NOTIFICATION', request.requestId, 'SYSTEM_ERROR', errorMessage, request, request.source);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+}
+function handleSendNotification(request) {
+    const idempotencyCheck = checkIdempotency(request.requestId, 'SEND_NOTIFICATION', request);
+    if (idempotencyCheck.isDuplicate) {
+        return idempotencyCheck.cachedResult;
+    }
+    const validationError = validateRequiredFields(request, ['requestId', 'notificationId', 'source']);
+    if (validationError) {
+        const response = createErrorResponse('VALIDATION_ERROR', validationError, request.requestId, request);
+        recordProblem('SEND_NOTIFICATION', request.requestId, 'VALIDATION_ERROR', validationError, request, request.source);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+    try {
+        const notification = storage_1.storage.getNotification(request.notificationId);
+        if (!notification) {
+            const response = createErrorResponse('NOTIFICATION_NOT_FOUND', `Notification not found: ${request.notificationId}`, request.requestId, request);
+            recordProblem('SEND_NOTIFICATION', request.requestId, 'NOTIFICATION_NOT_FOUND', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+            return response;
+        }
+        if (['CANCELLED', 'ACKNOWLEDGED'].includes(notification.status)) {
+            const response = createErrorResponse('INVALID_NOTIFICATION_STATUS', `Cannot send notification in ${notification.status} status`, request.requestId, request);
+            recordProblem('SEND_NOTIFICATION', request.requestId, 'INVALID_NOTIFICATION_STATUS', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+            return response;
+        }
+        const sendResult = (0, notificationService_1.simulateSendNotification)(notification.notificationId);
+        const updatedNotification = storage_1.storage.getNotification(notification.notificationId);
+        const response = createSuccessResponse({
+            notificationId: notification.notificationId,
+            status: updatedNotification?.status,
+            sent: sendResult.success,
+            sendError: sendResult.error
+        }, request.requestId);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        const response = createErrorResponse('SYSTEM_ERROR', errorMessage, request.requestId, { error: error.stack });
+        recordProblem('SEND_NOTIFICATION', request.requestId, 'SYSTEM_ERROR', errorMessage, request, request.source);
+        recordIdempotency(request.requestId, 'SEND_NOTIFICATION', request, response);
+        return response;
+    }
+}
+function handleAcknowledgeNotification(request) {
+    const idempotencyCheck = checkIdempotency(request.requestId, 'ACK_NOTIFICATION', request);
+    if (idempotencyCheck.isDuplicate) {
+        return idempotencyCheck.cachedResult;
+    }
+    const validationError = validateRequiredFields(request, ['requestId', 'notificationId', 'acknowledgedBy', 'source']);
+    if (validationError) {
+        const response = createErrorResponse('VALIDATION_ERROR', validationError, request.requestId, request);
+        recordProblem('ACK_NOTIFICATION', request.requestId, 'VALIDATION_ERROR', validationError, request, request.source);
+        recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+        return response;
+    }
+    try {
+        const notification = storage_1.storage.getNotification(request.notificationId);
+        if (!notification) {
+            const response = createErrorResponse('NOTIFICATION_NOT_FOUND', `Notification not found: ${request.notificationId}`, request.requestId, request);
+            recordProblem('ACK_NOTIFICATION', request.requestId, 'NOTIFICATION_NOT_FOUND', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+            return response;
+        }
+        if (!['SENT', 'DELIVERED'].includes(notification.status)) {
+            const response = createErrorResponse('INVALID_NOTIFICATION_STATUS', `Can only acknowledge SENT or DELIVERED notifications, current: ${notification.status}`, request.requestId, request);
+            recordProblem('ACK_NOTIFICATION', request.requestId, 'INVALID_NOTIFICATION_STATUS', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+            return response;
+        }
+        const updated = (0, notificationService_1.acknowledgeNotification)(notification.notificationId, request.acknowledgedBy, request.note);
+        if (!updated) {
+            const response = createErrorResponse('ACKNOWLEDGE_FAILED', 'Failed to acknowledge notification', request.requestId, request);
+            recordProblem('ACK_NOTIFICATION', request.requestId, 'ACKNOWLEDGE_FAILED', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+            return response;
+        }
+        const response = createSuccessResponse({
+            notificationId: updated.notificationId,
+            status: updated.status,
+            acknowledgedAt: updated.acknowledgedAt,
+            acknowledgedBy: updated.acknowledgedBy
+        }, request.requestId);
+        recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+        return response;
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        const response = createErrorResponse('SYSTEM_ERROR', errorMessage, request.requestId, { error: error.stack });
+        recordProblem('ACK_NOTIFICATION', request.requestId, 'SYSTEM_ERROR', errorMessage, request, request.source);
+        recordIdempotency(request.requestId, 'ACK_NOTIFICATION', request, response);
+        return response;
+    }
+}
+function handleRetryNotification(request) {
+    const idempotencyCheck = checkIdempotency(request.requestId, 'RETRY_NOTIFICATION', request);
+    if (idempotencyCheck.isDuplicate) {
+        return idempotencyCheck.cachedResult;
+    }
+    const validationError = validateRequiredFields(request, ['requestId', 'notificationId', 'source']);
+    if (validationError) {
+        const response = createErrorResponse('VALIDATION_ERROR', validationError, request.requestId, request);
+        recordProblem('RETRY_NOTIFICATION', request.requestId, 'VALIDATION_ERROR', validationError, request, request.source);
+        recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+        return response;
+    }
+    try {
+        const notification = storage_1.storage.getNotification(request.notificationId);
+        if (!notification) {
+            const response = createErrorResponse('NOTIFICATION_NOT_FOUND', `Notification not found: ${request.notificationId}`, request.requestId, request);
+            recordProblem('RETRY_NOTIFICATION', request.requestId, 'NOTIFICATION_NOT_FOUND', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+            return response;
+        }
+        if (notification.status !== 'FAILED') {
+            const response = createErrorResponse('INVALID_NOTIFICATION_STATUS', `Can only retry FAILED notifications, current: ${notification.status}`, request.requestId, request);
+            recordProblem('RETRY_NOTIFICATION', request.requestId, 'INVALID_NOTIFICATION_STATUS', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+            return response;
+        }
+        if (notification.retryCount >= notification.maxRetries) {
+            const response = createErrorResponse('MAX_RETRIES_EXCEEDED', `Maximum retries exceeded: ${notification.retryCount}/${notification.maxRetries}`, request.requestId, request);
+            recordProblem('RETRY_NOTIFICATION', request.requestId, 'MAX_RETRIES_EXCEEDED', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+            return response;
+        }
+        const retried = (0, notificationService_1.retryNotification)(notification.notificationId);
+        if (!retried) {
+            const response = createErrorResponse('RETRY_FAILED', 'Failed to retry notification', request.requestId, request);
+            recordProblem('RETRY_NOTIFICATION', request.requestId, 'RETRY_FAILED', response.error.message, request, request.source);
+            recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+            return response;
+        }
+        const response = createSuccessResponse({
+            notificationId: retried.notificationId,
+            status: retried.status,
+            retryCount: retried.retryCount,
+            maxRetries: retried.maxRetries
+        }, request.requestId);
+        recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+        return response;
+    }
+    catch (error) {
+        const errorMessage = error.message || 'Unknown error occurred';
+        const response = createErrorResponse('SYSTEM_ERROR', errorMessage, request.requestId, { error: error.stack });
+        recordProblem('RETRY_NOTIFICATION', request.requestId, 'SYSTEM_ERROR', errorMessage, request, request.source);
+        recordIdempotency(request.requestId, 'RETRY_NOTIFICATION', request, response);
+        return response;
+    }
+}
+function handleQueryNotifications(request) {
+    const requestId = (0, uuid_1.v4)();
+    storage_1.storage.cleanupExpiredRecords();
+    try {
+        const notifications = (0, notificationService_1.queryNotifications)({
+            eventId: request.eventId,
+            status: request.status,
+            recipientType: request.recipientType,
+            type: request.type
+        });
+        const summary = {
+            total: notifications.length,
+            pending: notifications.filter(n => n.status === 'PENDING').length,
+            sending: notifications.filter(n => n.status === 'SENDING').length,
+            sent: notifications.filter(n => n.status === 'SENT').length,
+            delivered: notifications.filter(n => n.status === 'DELIVERED').length,
+            acknowledged: notifications.filter(n => n.status === 'ACKNOWLEDGED').length,
+            failed: notifications.filter(n => n.status === 'FAILED').length
+        };
+        return createSuccessResponse({
+            summary,
+            notifications: notifications.map(n => ({
+                notificationId: n.notificationId,
+                notificationNumber: n.notificationNumber,
+                eventId: n.eventId,
+                rebookingId: n.rebookingId,
+                orderId: n.orderId,
+                recipientType: n.recipientType,
+                recipientName: n.recipientName,
+                type: n.type,
+                channel: n.channel,
+                title: n.title,
+                status: n.status,
+                retryCount: n.retryCount,
+                lastError: n.lastError,
+                createdAt: n.createdAt,
+                sentAt: n.sentAt,
+                deliveredAt: n.deliveredAt,
+                acknowledgedAt: n.acknowledgedAt
             }))
         }, requestId);
     }

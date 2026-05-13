@@ -10,7 +10,85 @@ export type RebookingStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELL
 
 export type LockType = 'RISK_EVENT' | 'REBOOKING' | 'RESERVATION';
 
-export type OperationType = 'CREATE_EVENT' | 'ASSESS_SITES' | 'LOCK_SITE' | 'CREATE_REBOOKING' | 'PROCESS_REBOOKING' | 'CANCEL_EVENT' | 'MODIFY_EVENT' | 'QUERY_SUMMARY';
+export type OperationType = 'CREATE_EVENT' | 'ASSESS_SITES' | 'LOCK_SITE' | 'CREATE_REBOOKING' | 'PROCESS_REBOOKING' | 'CANCEL_EVENT' | 'MODIFY_EVENT' | 'QUERY_SUMMARY' | 'SEND_NOTIFICATION' | 'QUERY_NOTIFICATIONS' | 'ACK_NOTIFICATION' | 'RETRY_NOTIFICATION';
+
+export type NotificationType = 'RISK_ALERT' | 'REBOOKING_INITIATED' | 'REBOOKING_COMPLETED' | 'EVACUATION_ORDER' | 'CAMP_STAFF_ALERT' | 'EVENT_CANCELLED' | 'EVENT_RESOLVED';
+
+export type NotificationChannel = 'SMS' | 'EMAIL' | 'APP_PUSH' | 'IN_APP';
+
+export type NotificationStatus = 'PENDING' | 'SENDING' | 'SENT' | 'DELIVERED' | 'FAILED' | 'ACKNOWLEDGED' | 'CANCELLED';
+
+export type NotificationRecipientType = 'CUSTOMER' | 'CAMP_STAFF' | 'MANAGER';
+
+export interface Notification {
+  notificationId: string;
+  notificationNumber: string;
+  eventId: string | null;
+  rebookingId: string | null;
+  orderId: string | null;
+  recipientId: string;
+  recipientType: NotificationRecipientType;
+  recipientName: string;
+  recipientContact: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  title: string;
+  content: string;
+  status: NotificationStatus;
+  sentAt: string | null;
+  deliveredAt: string | null;
+  acknowledgedAt: string | null;
+  acknowledgedBy: string | null;
+  acknowledgementNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  retryCount: number;
+  maxRetries: number;
+  lastError: string | null;
+}
+
+export interface CreateNotificationRequest {
+  requestId: string;
+  eventId?: string;
+  rebookingId?: string;
+  orderId?: string;
+  recipientId: string;
+  recipientType: NotificationRecipientType;
+  recipientName: string;
+  recipientContact: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  title: string;
+  content: string;
+  source: string;
+}
+
+export interface SendNotificationRequest {
+  requestId: string;
+  notificationId: string;
+  source: string;
+}
+
+export interface AcknowledgeNotificationRequest {
+  requestId: string;
+  notificationId: string;
+  acknowledgedBy: string;
+  note?: string;
+  source: string;
+}
+
+export interface RetryNotificationRequest {
+  requestId: string;
+  notificationId: string;
+  source: string;
+}
+
+export interface QueryNotificationsRequest {
+  eventId?: string;
+  status?: NotificationStatus;
+  recipientType?: NotificationRecipientType;
+  type?: NotificationType;
+}
 
 export interface Site {
   siteId: string;

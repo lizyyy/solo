@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Site, Order, RiskEvent, Rebooking, ResourceLock, ProblemRecord, IdempotentRecord } from './types';
+import { Site, Order, RiskEvent, Rebooking, ResourceLock, ProblemRecord, IdempotentRecord, Notification, NotificationStatus, NotificationRecipientType, NotificationType } from './types';
 
 class Storage {
   private sites: Map<string, Site> = new Map();
@@ -9,6 +9,7 @@ class Storage {
   private locks: Map<string, ResourceLock> = new Map();
   private problems: Map<string, ProblemRecord> = new Map();
   private idempotentRecords: Map<string, IdempotentRecord> = new Map();
+  private notifications: Map<string, Notification> = new Map();
 
   constructor() {
     this.initializeSampleData();
@@ -160,6 +161,32 @@ class Storage {
         this.idempotentRecords.delete(key);
       }
     }
+  }
+
+  createNotification(notification: Notification): Notification {
+    this.notifications.set(notification.notificationId, notification);
+    return notification;
+  }
+
+  getNotification(notificationId: string): Notification | undefined {
+    return this.notifications.get(notificationId);
+  }
+
+  getAllNotifications(): Notification[] {
+    return Array.from(this.notifications.values());
+  }
+
+  getNotificationsByEvent(eventId: string): Notification[] {
+    return Array.from(this.notifications.values()).filter(n => n.eventId === eventId);
+  }
+
+  getNotificationsByStatus(status: NotificationStatus): Notification[] {
+    return Array.from(this.notifications.values()).filter(n => n.status === status);
+  }
+
+  updateNotification(notification: Notification): Notification {
+    this.notifications.set(notification.notificationId, notification);
+    return notification;
   }
 }
 

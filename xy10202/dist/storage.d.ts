@@ -1,4 +1,4 @@
-import { Site, Order, RiskEvent, Rebooking, ResourceLock, ProblemRecord, IdempotentRecord } from './types';
+import { Site, Order, RiskEvent, Rebooking, ResourceLock, ProblemRecord, IdempotentRecord, Notification, NotificationStatus } from './types';
 declare class Storage {
     private sites;
     private orders;
@@ -7,6 +7,7 @@ declare class Storage {
     private locks;
     private problems;
     private idempotentRecords;
+    private notifications;
     constructor();
     private initializeSampleData;
     getSite(siteId: string): Site | undefined;
@@ -34,6 +35,12 @@ declare class Storage {
     createIdempotentRecord(record: IdempotentRecord): IdempotentRecord;
     getIdempotentRecord(requestId: string): IdempotentRecord | undefined;
     cleanupExpiredRecords(): void;
+    createNotification(notification: Notification): Notification;
+    getNotification(notificationId: string): Notification | undefined;
+    getAllNotifications(): Notification[];
+    getNotificationsByEvent(eventId: string): Notification[];
+    getNotificationsByStatus(status: NotificationStatus): Notification[];
+    updateNotification(notification: Notification): Notification;
 }
 export declare const storage: Storage;
 export {};

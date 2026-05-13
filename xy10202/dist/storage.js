@@ -11,6 +11,7 @@ class Storage {
         this.locks = new Map();
         this.problems = new Map();
         this.idempotentRecords = new Map();
+        this.notifications = new Map();
         this.initializeSampleData();
     }
     initializeSampleData() {
@@ -129,6 +130,26 @@ class Storage {
                 this.idempotentRecords.delete(key);
             }
         }
+    }
+    createNotification(notification) {
+        this.notifications.set(notification.notificationId, notification);
+        return notification;
+    }
+    getNotification(notificationId) {
+        return this.notifications.get(notificationId);
+    }
+    getAllNotifications() {
+        return Array.from(this.notifications.values());
+    }
+    getNotificationsByEvent(eventId) {
+        return Array.from(this.notifications.values()).filter(n => n.eventId === eventId);
+    }
+    getNotificationsByStatus(status) {
+        return Array.from(this.notifications.values()).filter(n => n.status === status);
+    }
+    updateNotification(notification) {
+        this.notifications.set(notification.notificationId, notification);
+        return notification;
     }
 }
 exports.storage = new Storage();
