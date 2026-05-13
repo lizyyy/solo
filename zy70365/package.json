@@ -1,0 +1,21 @@
+{
+  "name": "task-sandbox-api",
+  "version": "1.0.0",
+  "description": "任务执行沙箱 API - 安全执行用户脚本的服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "uuid": "^14.0.0",
+    "winston": "^3.19.0"
+  }
+}
