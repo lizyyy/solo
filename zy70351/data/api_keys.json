@@ -1,0 +1,54 @@
+[
+  {
+    "key_id": "KEY-001",
+    "customer_id": "CUST-001",
+    "api_key": "sk_normal_12345",
+    "create_date": "2026-03-14",
+    "permissions": [
+      "user:read",
+      "order:read",
+      "payment:write"
+    ],
+    "rate_limit": 5000,
+    "is_active": true
+  },
+  {
+    "key_id": "KEY-002",
+    "customer_id": "CUST-002",
+    "api_key": "sk_suspected_67890",
+    "create_date": "2026-02-12",
+    "permissions": [
+      "user:read",
+      "order:read",
+      "payment:write",
+      "data:export"
+    ],
+    "rate_limit": 10000,
+    "is_active": true
+  },
+  {
+    "key_id": "KEY-003",
+    "customer_id": "CUST-003",
+    "api_key": "sk_brute_11111",
+    "create_date": "2026-01-13",
+    "permissions": [
+      "user:read",
+      "auth:login",
+      "auth:verify"
+    ],
+    "rate_limit": 3000,
+    "is_active": true
+  },
+  {
+    "key_id": "KEY-004",
+    "customer_id": "CUST-004",
+    "api_key": "sk_false_22222",
+    "create_date": "2026-05-11",
+    "permissions": [
+      "user:read",
+      "order:read"
+    ],
+    "rate_limit": 2000,
+    "is_active": true
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "customer_id": "CUST-001",
+    "key_id": "KEY-001",
+    "usual_regions": [
+      "北京",
+      "上海",
+      "广州",
+      "深圳"
+    ],
+    "usual_ips": [
+      "10.0.1.1",
+      "10.0.1.2",
+      "10.0.2.1"
+    ],
+    "last_updated": "2026-05-13T07:32:44.869698"
+  },
+  {
+    "customer_id": "CUST-002",
+    "key_id": "KEY-002",
+    "usual_regions": [
+      "北京",
+      "天津",
+      "河北"
+    ],
+    "usual_ips": [
+      "10.1.1.1",
+      "10.1.1.2"
+    ],
+    "last_updated": "2026-05-13T07:32:44.870900"
+  },
+  {
+    "customer_id": "CUST-003",
+    "key_id": "KEY-003",
+    "usual_regions": [
+      "杭州",
+      "上海",
+      "苏州"
+    ],
+    "usual_ips": [
+      "10.2.1.1"
+    ],
+    "last_updated": "2026-05-13T07:32:44.872561"
+  },
+  {
+    "customer_id": "CUST-004",
+    "key_id": "KEY-004",
+    "usual_regions": [
+      "成都",
+      "重庆"
+    ],
+    "usual_ips": [
+      "10.3.1.1"
+    ],
+    "last_updated": "2026-05-13T07:32:44.873574"
+  }
+]

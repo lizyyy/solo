@@ -1,0 +1,87 @@
+[
+  {
+    "customer_id": "CUST-001",
+    "customer_name": "正常业务增长公司",
+    "create_date": "2026-02-12",
+    "business_type": "电商",
+    "industry": "零售",
+    "avg_daily_calls": 4800,
+    "peak_hours": [
+      10,
+      11,
+      14,
+      15,
+      20,
+      21
+    ],
+    "usual_regions": [
+      "北京",
+      "上海",
+      "广州",
+      "深圳"
+    ],
+    "is_new_customer": false
+  },
+  {
+    "customer_id": "CUST-002",
+    "customer_name": "疑似密钥泄露公司",
+    "create_date": "2025-11-14",
+    "business_type": "金融",
+    "industry": "银行",
+    "avg_daily_calls": 2400,
+    "peak_hours": [
+      9,
+      10,
+      11,
+      14,
+      15,
+      16
+    ],
+    "usual_regions": [
+      "北京",
+      "天津",
+      "河北"
+    ],
+    "is_new_customer": false
+  },
+  {
+    "customer_id": "CUST-003",
+    "customer_name": "撞库攻击目标公司",
+    "create_date": "2025-05-13",
+    "business_type": "SaaS",
+    "industry": "企业服务",
+    "avg_daily_calls": 1200,
+    "peak_hours": [
+      9,
+      10,
+      11,
+      14,
+      15
+    ],
+    "usual_regions": [
+      "杭州",
+      "上海",
+      "苏州"
+    ],
+    "is_new_customer": false
+  },
+  {
+    "customer_id": "CUST-004",
+    "customer_name": "误报确认公司（新客户）",
+    "create_date": "2026-05-10",
+    "business_type": "电商",
+    "industry": "零售",
+    "avg_daily_calls": 600,
+    "peak_hours": [
+      10,
+      11,
+      20,
+      21
+    ],
+    "usual_regions": [
+      "成都",
+      "重庆"
+    ],
+    "is_new_customer": true
+  }
+]

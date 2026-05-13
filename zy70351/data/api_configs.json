@@ -1,0 +1,50 @@
+[
+  {
+    "endpoint": "/api/v1/user/info",
+    "is_sensitive": false,
+    "permission_required": "user:read",
+    "max_calls_per_hour": 1000
+  },
+  {
+    "endpoint": "/api/v1/payment/create",
+    "is_sensitive": true,
+    "permission_required": "payment:write",
+    "max_calls_per_hour": 100
+  },
+  {
+    "endpoint": "/api/v1/payment/refund",
+    "is_sensitive": true,
+    "permission_required": "payment:write",
+    "max_calls_per_hour": 50
+  },
+  {
+    "endpoint": "/api/v1/order/list",
+    "is_sensitive": false,
+    "permission_required": "order:read",
+    "max_calls_per_hour": 500
+  },
+  {
+    "endpoint": "/api/v1/order/detail",
+    "is_sensitive": true,
+    "permission_required": "order:read",
+    "max_calls_per_hour": 200
+  },
+  {
+    "endpoint": "/api/v1/auth/login",
+    "is_sensitive": true,
+    "permission_required": "auth:login",
+    "max_calls_per_hour": 200
+  },
+  {
+    "endpoint": "/api/v1/auth/verify",
+    "is_sensitive": true,
+    "permission_required": "auth:verify",
+    "max_calls_per_hour": 500
+  },
+  {
+    "endpoint": "/api/v1/data/export",
+    "is_sensitive": true,
+    "permission_required": "data:export",
+    "max_calls_per_hour": 10
+  }
+]
