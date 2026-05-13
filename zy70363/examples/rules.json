@@ -1,0 +1,95 @@
+{
+  "businessPrefixes": [
+    {
+      "prefix": "session:",
+      "description": "用户会话缓存",
+      "owner": "用户中心-张三"
+    },
+    {
+      "prefix": "product:detail:",
+      "description": "商品详情缓存",
+      "owner": "商品服务-李四"
+    },
+    {
+      "prefix": "product:inventory:",
+      "description": "库存缓存",
+      "owner": "商品服务-李四"
+    },
+    {
+      "prefix": "report:daily:",
+      "description": "日报缓存",
+      "owner": "数据平台-王五"
+    },
+    {
+      "prefix": "temp:migration:",
+      "description": "数据迁移临时数据",
+      "owner": "运维团队",
+      "isTemporary": true,
+      "tempExpireDate": "2025-06-30"
+    },
+    {
+      "prefix": "config:",
+      "description": "系统配置",
+      "owner": "架构组"
+    }
+  ],
+  "ttlPolicies": [
+    {
+      "id": "session_policy",
+      "name": "会话策略",
+      "description": "用户登录会话，2小时无操作过期",
+      "minTTL": 1800,
+      "maxTTL": 86400,
+      "suggestedTTL": 7200,
+      "unit": "seconds"
+    },
+    {
+      "id": "product_detail_policy",
+      "name": "商品详情策略",
+      "description": "商品详情页缓存，1小时更新一次",
+      "minTTL": 1800,
+      "maxTTL": 14400,
+      "suggestedTTL": 3600,
+      "unit": "seconds"
+    },
+    {
+      "id": "inventory_policy",
+      "name": "库存策略",
+      "description": "库存缓存需要实时，TTL较短",
+      "minTTL": 30,
+      "maxTTL": 300,
+      "suggestedTTL": 60,
+      "unit": "seconds"
+    },
+    {
+      "id": "report_policy",
+      "name": "报表策略",
+      "description": "日报缓存，保留24小时",
+      "minTTL": 3600,
+      "maxTTL": 86400,
+      "suggestedTTL": 43200,
+      "unit": "seconds"
+    },
+    {
+      "id": "config_policy",
+      "name": "配置策略",
+      "description": "系统配置可长期缓存",
+      "minTTL": 86400,
+      "maxTTL": 604800,
+      "suggestedTTL": 172800,
+      "unit": "seconds"
+    }
+  ],
+  "policyBindings": [
+    { "prefix": "session:", "policyId": "session_policy" },
+    { "prefix": "product:detail:", "policyId": "product_detail_policy" },
+    { "prefix": "product:inventory:", "policyId": "inventory_policy" },
+    { "prefix": "report:daily:", "policyId": "report_policy" },
+    { "prefix": "config:", "policyId": "config_policy" }
+  ],
+  "globalSettings": {
+    "maxAllowedTTL": 2592000,
+    "minWarnTTL": 300,
+    "treatNoTTLAs": "critical"
+  }
+}

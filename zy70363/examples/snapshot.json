@@ -1,0 +1,183 @@
+{
+  "version": "1.0",
+  "generatedAt": 1747104000,
+  "isComplete": false,
+  "sampleRate": 0.1,
+  "keys": [
+    {
+      "key": "session:user:1001",
+      "ttl": 3600,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "session:user:1002",
+      "ttl": 300,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "session:user:1003",
+      "ttl": null,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "session:user:1004",
+      "ttl": 172800,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "session:user:1005",
+      "ttl": 30,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "product:detail:10001",
+      "ttl": 3600,
+      "type": "hash",
+      "size": 8192,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:detail:10002",
+      "ttl": 1800,
+      "type": "hash",
+      "size": 8192,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:detail:10003",
+      "ttl": 60,
+      "type": "hash",
+      "size": 8192,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:detail:10004",
+      "ttl": 86400,
+      "type": "hash",
+      "size": 8192,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:detail:10005",
+      "ttl": null,
+      "type": "hash",
+      "size": 8192,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "product:inventory:10001",
+      "ttl": 60,
+      "type": "string",
+      "size": 64,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:inventory:10002",
+      "ttl": 120,
+      "type": "string",
+      "size": 64,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:inventory:10003",
+      "ttl": 3600,
+      "type": "string",
+      "size": 64,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "product:inventory:10004",
+      "ttl": 10,
+      "type": "string",
+      "size": 64,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "report:daily:2025-01-01",
+      "ttl": 43200,
+      "type": "string",
+      "size": 65536,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "report:daily:2025-01-02",
+      "ttl": 5184000,
+      "type": "string",
+      "size": 65536,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "report:daily:2025-01-03",
+      "ttl": 300,
+      "type": "string",
+      "size": 65536,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "config:app:settings",
+      "ttl": null,
+      "type": "hash",
+      "size": 1024,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "config:feature:flags",
+      "ttl": 86400,
+      "type": "hash",
+      "size": 512,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "temp:migration:user_data_1",
+      "ttl": null,
+      "type": "string",
+      "size": 102400,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "temp:migration:user_data_2",
+      "ttl": null,
+      "type": "string",
+      "size": 102400,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "unknown_key_123",
+      "ttl": 3600,
+      "type": "string",
+      "size": 256,
+      "lastSeenAt": 1747104000
+    },
+    {
+      "key": "legacy:old_cache",
+      "ttl": null,
+      "type": "string",
+      "size": 512,
+      "lastSeenAt": 1747104000
+    },
+    
+    {
+      "key": "session:user:1001",
+      "ttl": 3500,
+      "type": "string",
+      "size": 2048,
+      "lastSeenAt": 1747104100
+    }
+  ]
+}

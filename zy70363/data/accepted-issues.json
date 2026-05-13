@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "updatedAt": 1778634028,
+  "accepted": [
+    {
+      "key": "config:app:settings",
+      "issueType": "no_ttl",
+      "reason": "系统永久配置，业务确认可永不过期",
+      "acceptedAt": 1778634028,
+      "expiresAt": 1798675200,
+      "acceptedBy": "架构组"
+    }
+  ]
+}

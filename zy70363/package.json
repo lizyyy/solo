@@ -1,0 +1,32 @@
+{
+  "name": "redis-ttl-audit",
+  "version": "1.0.0",
+  "description": "Redis Key 过期审计 CLI 工具",
+  "main": "dist/index.js",
+  "bin": {
+    "redis-ttl-audit": "dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli/index.ts",
+    "example": "npm run start -- scan --snapshot examples/snapshot.json --rules examples/rules.json --policies examples/policies.json"
+  },
+  "keywords": [
+    "redis",
+    "ttl",
+    "audit",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/yargs": "^17.0.32",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "yargs": "^17.7.2"
+  }
+}
