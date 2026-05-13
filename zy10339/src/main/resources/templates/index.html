@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源锁冲突解释 API - 管理控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section h2 { font-size: 20px; margin-bottom: 20px; color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .endpoint { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #667eea; }
+        .endpoint .method { display: inline-block; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-right: 10px; }
+        .method.post { background: #49cc90; color: white; }
+        .method.get { background: #61affe; color: white; }
+        .endpoint .path { font-family: monospace; font-size: 14px; color: #333; }
+        .endpoint .desc { margin-top: 8px; color: #666; font-size: 13px; }
+        .code-block { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 13px; overflow-x: auto; margin-top: 12px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-locked { background: #fef0f0; color: #f56c6c; }
+        .status-available { background: #f0f9eb; color: #67c23a; }
+        .status-waiting { background: #fdf6ec; color: #e6a23c; }
+        .status-released { background: #f4f4f5; color: #909399; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 资源锁冲突解释 API</h1>
+            <p>完整的分布式锁管理系统 - 支持加锁、排队、超时释放、审计追踪</p>
+        </div>
+
+        <div class="section">
+            <h2>📡 API 端点</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/locks/acquire</span>
+                <div class="desc">获取资源锁 - 支持排队等待和幂等性</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="path">/api/locks/release</span>
+                <div class="desc">释放资源锁 - 自动激活队列中下一个等待者</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks/{resourceId}</span>
+                <div class="desc">查询指定资源的锁状态</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks/{resourceId}/queue</span>
+                <div class="desc">查询资源的等待队列</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks/{resourceId}/history</span>
+                <div class="desc">查询资源的释放历史记录（审计日志）</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks</span>
+                <div class="desc">查询所有锁的状态</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="section">
+                <h2>📋 获取锁请求示例</h2>
+                <div class="code-block">
+{<br>
+&nbsp;&nbsp;"resourceId": "order:1001",<br>
+&nbsp;&nbsp;"lockHolder": "user:alice",<br>
+&nbsp;&nbsp;"requestId": "req-001",<br>
+&nbsp;&nbsp;"operationSource": "API",<br>
+&nbsp;&nbsp;"timeoutStrategy": "AUTO_RELEASE",<br>
+&nbsp;&nbsp;"timeoutSeconds": 300,<br>
+&nbsp;&nbsp;"waitInQueue": true<br>
+}
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📋 释放锁请求示例</h2>
+                <div class="code-block">
+{<br>
+&nbsp;&nbsp;"resourceId": "order:1001",<br>
+&nbsp;&nbsp;"lockHolder": "user:alice",<br>
+&nbsp;&nbsp;"requestId": "req-release-001",<br>
+&nbsp;&nbsp;"operationSource": "API",<br>
+&nbsp;&nbsp;"releaseReason": "业务处理完成"<br>
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔑 核心特性</h2>
+            <ul style="list-style: none; line-height: 2.2;">
+                <li>✅ <strong>资源加锁</strong> - 基于资源ID的互斥访问控制</li>
+                <li>✅ <strong>冲突解释</strong> - 锁被占用时返回详细冲突原因</li>
+                <li>✅ <strong>等待排队</strong> - 自动维护FIFO等待队列</li>
+                <li>✅ <strong>超时释放</strong> - 定时任务自动处理超时锁</li>
+                <li>✅ <strong>释放审计</strong> - 完整的释放历史记录追踪</li>
+                <li>✅ <strong>幂等性</strong> - 重复请求不会产生脏数据</li>
+                <li>✅ <strong>锁续期</strong> - 同一持有人可自动续期</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🔧 状态枚举</h2>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <span class="status-badge status-locked">LOCKED - 已锁定</span>
+                <span class="status-badge status-available">AVAILABLE - 可用</span>
+                <span class="status-badge status-waiting">WAITING - 等待中</span>
+                <span class="status-badge status-released">RELEASED - 已释放</span>
+                <span class="status-badge status-released">EXPIRED - 已过期</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
