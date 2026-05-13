@@ -1,9 +1,10 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 const { v4: uuid } = require('uuid');
 const dayjs = require('dayjs');
 
 class FreezeRuleRepository {
   create(data) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const id = uuid();
     const stmt = db.prepare(`
@@ -20,14 +21,17 @@ class FreezeRuleRepository {
   }
 
   findById(id) {
+    const db = getDb();
     return db.prepare('SELECT * FROM freeze_rules WHERE id = ?').get(id);
   }
 
   findByCode(code) {
+    const db = getDb();
     return db.prepare('SELECT * FROM freeze_rules WHERE code = ?').get(code);
   }
 
   findAll() {
+    const db = getDb();
     return db.prepare('SELECT * FROM freeze_rules ORDER BY priority DESC').all();
   }
 }

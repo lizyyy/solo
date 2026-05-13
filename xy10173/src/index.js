@@ -1,15 +1,18 @@
-const app = require('./app');
-const fs = require('fs');
-const path = require('path');
+const createApp = require('./app');
+const { getDbPath } = require('./config/database');
 
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+async function start() {
+  const app = await createApp();
+  
+  const PORT = process.env.PORT || 3000;
+  
+  app.listen(PORT, () => {
+    console.log(`Points Freeze API is running on http://localhost:${PORT}`);
+    console.log(`Database: ${getDbPath()}`);
+  });
 }
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Points Freeze API is running on http://localhost:${PORT}`);
-  console.log(`Database: ${process.env.DB_PATH || path.join(__dirname, '../data/app.db')}`);
+start().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

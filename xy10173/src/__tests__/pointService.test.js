@@ -2,26 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 const testDbDir = path.join(__dirname, '../../data-test');
-const testDbPath = path.join(testDbDir, 'test.db');
 
-beforeEach(() => {
-  if (fs.existsSync(testDbDir)) {
-    fs.readdirSync(testDbDir).forEach(f => fs.unlinkSync(path.join(testDbDir, f)));
-  } else {
-    fs.mkdirSync(testDbDir, { recursive: true });
-  }
-  process.env.DB_PATH = testDbPath;
-  delete require.cache[require.resolve('../config/database')];
-});
-
-afterAll(() => {
-  if (fs.existsSync(testDbDir)) {
-    fs.readdirSync(testDbDir).forEach(f => fs.unlinkSync(path.join(testDbDir, f)));
-    fs.rmdirSync(testDbDir);
-  }
-});
-
-function resetModules() {
+function resetModules(dbPath) {
+  try {
+    const dbModule = require('../config/database');
+    dbModule.resetDatabase();
+  } catch(e) {}
+  
+  try {
+    const appModule = require('../app');
+    if (appModule.resetApp) appModule.resetApp();
+  } catch(e) {}
+  
   const modulesToDelete = [
     '../config/database',
     '../database/schema',
@@ -34,10 +26,12 @@ function resetModules() {
     '../services/BalanceService',
     '../services/PointService',
     '../errors/ApiError',
+    '../routes/members',
+    '../routes/points',
     '../app'
   ];
   modulesToDelete.forEach(m => {
-    delete require.cache[require.resolve(m)];
+    try { delete require.cache[require.resolve(m)]; } catch(e) {}
   });
 }
 
@@ -45,18 +39,28 @@ const systemOp = { name: 'test', id: 'test-001', type: 'test' };
 
 describe('PointService - 核心积分操作', () => {
   let memberRepo, freezeRuleRepo, pointService, balanceService;
-  let BalanceService;
   let member;
 
-  beforeEach(() => {
-    resetModules();
-    require('../app');
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-core-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
     memberRepo = require('../repositories/MemberRepository');
     freezeRuleRepo = require('../repositories/FreezeRuleRepository');
     pointService = require('../services/PointService');
     const bs = require('../services/BalanceService');
-    BalanceService = bs.BalanceService;
-    balanceService = new BalanceService();
+    balanceService = new bs.BalanceService();
 
     member = memberRepo.create('测试用户');
     freezeRuleRepo.create({
@@ -66,6 +70,15 @@ describe('PointService - 核心积分操作', () => {
       releaseDays: 7,
       autoRelease: true
     });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('充值积分 - 余额正确累加', () => {
@@ -99,9 +112,21 @@ describe('PointService - 冻结/解冻', () => {
   let memberRepo, freezeRuleRepo, pointService, balanceService;
   let member;
 
-  beforeEach(() => {
-    resetModules();
-    require('../app');
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-freeze-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
     memberRepo = require('../repositories/MemberRepository');
     freezeRuleRepo = require('../repositories/FreezeRuleRepository');
     pointService = require('../services/PointService');
@@ -117,6 +142,15 @@ describe('PointService - 冻结/解冻', () => {
       autoRelease: true
     });
     pointService.recharge(member.id, 10000, 't1', systemOp);
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('冻结积分 - 可用减少，冻结增加，总额不变', () => {
@@ -146,9 +180,21 @@ describe('PointService - 重复扣减拦截（幂等）', () => {
   let memberRepo, freezeRuleRepo, pointService, balanceService;
   let member;
 
-  beforeEach(() => {
-    resetModules();
-    require('../app');
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-idempotent-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
     memberRepo = require('../repositories/MemberRepository');
     freezeRuleRepo = require('../repositories/FreezeRuleRepository');
     pointService = require('../services/PointService');
@@ -157,6 +203,15 @@ describe('PointService - 重复扣减拦截（幂等）', () => {
 
     member = memberRepo.create('测试用户');
     pointService.recharge(member.id, 10000, 't1', systemOp);
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('相同 requestId + action 只扣一次', () => {
@@ -185,9 +240,21 @@ describe('PointService - 消费时可选择使用冻结积分', () => {
   let memberRepo, freezeRuleRepo, pointService, balanceService;
   let member;
 
-  beforeEach(() => {
-    resetModules();
-    require('../app');
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-consume-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
     memberRepo = require('../repositories/MemberRepository');
     freezeRuleRepo = require('../repositories/FreezeRuleRepository');
     pointService = require('../services/PointService');
@@ -202,6 +269,15 @@ describe('PointService - 消费时可选择使用冻结积分', () => {
       releaseDays: 7,
       autoRelease: true
     });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('允许从冻结桶消费时 - 余额不足可用余额会用冻结', () => {
@@ -233,18 +309,29 @@ describe('PointService - 消费时可选择使用冻结积分', () => {
 });
 
 describe('BalanceService - 余额一致性校验', () => {
-  let memberRepo, freezeRuleRepo, pointService, balanceService, BalanceService;
+  let memberRepo, freezeRuleRepo, pointService, balanceService;
   let member;
 
-  beforeEach(() => {
-    resetModules();
-    require('../app');
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-consistency-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
     memberRepo = require('../repositories/MemberRepository');
     freezeRuleRepo = require('../repositories/FreezeRuleRepository');
     pointService = require('../services/PointService');
     const bs = require('../services/BalanceService');
-    BalanceService = bs.BalanceService;
-    balanceService = new BalanceService();
+    balanceService = new bs.BalanceService();
 
     member = memberRepo.create('测试用户');
     freezeRuleRepo.create({
@@ -254,6 +341,15 @@ describe('BalanceService - 余额一致性校验', () => {
       releaseDays: 7,
       autoRelease: true
     });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('操作后一致性检查通过', () => {

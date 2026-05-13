@@ -1,9 +1,10 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 const { v4: uuid } = require('uuid');
 const dayjs = require('dayjs');
 
 class MemberRepository {
   create(name) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const id = uuid();
     const stmt = db.prepare(`
@@ -15,10 +16,12 @@ class MemberRepository {
   }
 
   findById(id) {
+    const db = getDb();
     return db.prepare('SELECT * FROM members WHERE id = ?').get(id);
   }
 
   findAll() {
+    const db = getDb();
     return db.prepare('SELECT * FROM members ORDER BY created_at DESC').all();
   }
 }

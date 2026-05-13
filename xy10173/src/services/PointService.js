@@ -1,4 +1,3 @@
-const db = require('../config/database');
 const { BalanceService, TRANS_TYPES, DIRECTION } = require('./BalanceService');
 const memberRepo = require('../repositories/MemberRepository');
 const freezeBucketRepo = require('../repositories/FreezeBucketRepository');
@@ -17,7 +16,7 @@ const dayjs = require('dayjs');
 const balanceService = new BalanceService();
 
 class PointService {
-  async withIdempotency(requestId, action, operation, operator) {
+  withIdempotency(requestId, action, operation, operator) {
     const existing = idempotencyRepo.findByRequestIdAndAction(requestId, action);
     
     if (existing) {
@@ -51,7 +50,7 @@ class PointService {
     });
 
     try {
-      const result = await operation.execute();
+      const result = operation.execute();
       idempotencyRepo.update(idempotentRecord.id, {
         status: 'SUCCESS',
         result

@@ -1,9 +1,10 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 const { v4: uuid } = require('uuid');
 const dayjs = require('dayjs');
 
 class IdempotencyRepository {
   create(data) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const id = uuid();
     const stmt = db.prepare(`
@@ -20,10 +21,12 @@ class IdempotencyRepository {
   }
 
   findById(id) {
+    const db = getDb();
     return db.prepare('SELECT * FROM idempotency_keys WHERE id = ?').get(id);
   }
 
   findByRequestIdAndAction(requestId, action) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM idempotency_keys 
       WHERE request_id = ? AND action = ?
@@ -31,6 +34,7 @@ class IdempotencyRepository {
   }
 
   update(id, data) {
+    const db = getDb();
     const fields = [];
     const values = [];
     

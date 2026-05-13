@@ -1,9 +1,10 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 const { v4: uuid } = require('uuid');
 const dayjs = require('dayjs');
 
 class PointLedgerRepository {
   create(data) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const id = uuid();
     const stmt = db.prepare(`
@@ -30,10 +31,12 @@ class PointLedgerRepository {
   }
 
   findById(id) {
+    const db = getDb();
     return db.prepare('SELECT * FROM point_ledgers WHERE id = ?').get(id);
   }
 
   findByMemberId(memberId, limit = 100) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM point_ledgers 
       WHERE member_id = ? 
@@ -43,6 +46,7 @@ class PointLedgerRepository {
   }
 
   findByRequestId(requestId) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM point_ledgers 
       WHERE request_id = ? 
@@ -52,12 +56,14 @@ class PointLedgerRepository {
   }
 
   countByMemberAndDate(memberId, date) {
+    const db = getDb();
     const start = dayjs(date).startOf('day').valueOf();
     const end = dayjs(date).endOf('day').valueOf();
-    return db.prepare(`
+    const row = db.prepare(`
       SELECT COUNT(*) as count FROM point_ledgers 
       WHERE member_id = ? AND created_at BETWEEN ? AND ?
-    `).get(memberId, start, end).count;
+    `).get(memberId, start, end);
+    return row ? row.count : 0;
   }
 }
 

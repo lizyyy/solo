@@ -1,9 +1,10 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 const { v4: uuid } = require('uuid');
 const dayjs = require('dayjs');
 
 class FreezeBucketRepository {
   create(data) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const id = uuid();
     const stmt = db.prepare(`
@@ -22,10 +23,12 @@ class FreezeBucketRepository {
   }
 
   findById(id) {
+    const db = getDb();
     return db.prepare('SELECT * FROM freeze_buckets WHERE id = ?').get(id);
   }
 
   findByMemberId(memberId) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM freeze_buckets 
       WHERE member_id = ? 
@@ -34,6 +37,7 @@ class FreezeBucketRepository {
   }
 
   findActiveByMemberId(memberId) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM freeze_buckets 
       WHERE member_id = ? AND status IN ('ACTIVE', 'PARTIAL')
@@ -42,6 +46,7 @@ class FreezeBucketRepository {
   }
 
   findByMemberAndDateBefore(memberId, date) {
+    const db = getDb();
     return db.prepare(`
       SELECT * FROM freeze_buckets 
       WHERE member_id = ? 
@@ -52,6 +57,7 @@ class FreezeBucketRepository {
   }
 
   update(id, data) {
+    const db = getDb();
     const now = dayjs().valueOf();
     const fields = [];
     const values = [];

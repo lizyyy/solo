@@ -1,6 +1,7 @@
-const db = require('../config/database');
+const { getDb } = require('../config/database');
 
-function initSchema() {
+async function initSchema() {
+  const db = await getDb();
   db.exec(`
     CREATE TABLE IF NOT EXISTS members (
       id TEXT PRIMARY KEY,
@@ -31,13 +32,11 @@ function initSchema() {
       status TEXT NOT NULL,
       error_code TEXT,
       error_message TEXT,
-      created_at INTEGER NOT NULL,
-      FOREIGN KEY (member_id) REFERENCES members(id)
+      created_at INTEGER NOT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_point_ledgers_member ON point_ledgers(member_id);
     CREATE INDEX IF NOT EXISTS idx_point_ledgers_request ON point_ledgers(request_id);
-    CREATE INDEX IF NOT EXISTS idx_point_ledgers_ref ON point_ledgers(ref_id, ref_type);
 
     CREATE TABLE IF NOT EXISTS freeze_buckets (
       id TEXT PRIMARY KEY,
@@ -56,8 +55,7 @@ function initSchema() {
       expected_release_at INTEGER,
       released_at INTEGER,
       created_at INTEGER NOT NULL,
-      updated_at INTEGER NOT NULL,
-      FOREIGN KEY (member_id) REFERENCES members(id)
+      updated_at INTEGER NOT NULL
     );
 
     CREATE INDEX IF NOT EXISTS idx_freeze_buckets_member ON freeze_buckets(member_id);
@@ -85,11 +83,8 @@ function initSchema() {
       available_balance INTEGER NOT NULL,
       ledger_count INTEGER NOT NULL,
       created_at INTEGER NOT NULL,
-      UNIQUE(member_id, snapshot_date),
-      FOREIGN KEY (member_id) REFERENCES members(id)
+      UNIQUE(member_id, snapshot_date)
     );
-
-    CREATE INDEX IF NOT EXISTS idx_balance_snapshots_date ON balance_snapshots(snapshot_date);
 
     CREATE TABLE IF NOT EXISTS idempotency_keys (
       id TEXT PRIMARY KEY,

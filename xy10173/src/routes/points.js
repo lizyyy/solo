@@ -56,84 +56,112 @@ router.get('/:memberId/buckets', (req, res) => {
   res.json({ success: true, data: buckets });
 });
 
-router.post('/:memberId/recharge', (req, res) => {
-  requireFields(req.body, ['amount']);
-  const result = pointService.recharge(
-    req.params.memberId,
-    parseInt(req.body.amount),
-    parseRequestId(req, 'recharge'),
-    parseOperator(req),
-    req.body.reason
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/recharge', (req, res, next) => {
+  try {
+    requireFields(req.body, ['amount']);
+    const result = pointService.recharge(
+      req.params.memberId,
+      parseInt(req.body.amount),
+      parseRequestId(req, 'recharge'),
+      parseOperator(req),
+      req.body.reason
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post('/:memberId/freeze', (req, res) => {
-  requireFields(req.body, ['amount', 'freezeRuleCode']);
-  const result = pointService.freeze(
-    req.params.memberId,
-    parseInt(req.body.amount),
-    req.body.freezeRuleCode,
-    parseRequestId(req, 'freeze'),
-    parseOperator(req),
-    req.body.reason
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/freeze', (req, res, next) => {
+  try {
+    requireFields(req.body, ['amount', 'freezeRuleCode']);
+    const result = pointService.freeze(
+      req.params.memberId,
+      parseInt(req.body.amount),
+      req.body.freezeRuleCode,
+      parseRequestId(req, 'freeze'),
+      parseOperator(req),
+      req.body.reason
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post('/:memberId/consume', (req, res) => {
-  requireFields(req.body, ['amount']);
-  const result = pointService.consume(
-    req.params.memberId,
-    parseInt(req.body.amount),
-    parseRequestId(req, 'consume'),
-    parseOperator(req),
-    req.body.refId,
-    req.body.reason,
-    req.body.allowFreeze === true
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/consume', (req, res, next) => {
+  try {
+    requireFields(req.body, ['amount']);
+    const result = pointService.consume(
+      req.params.memberId,
+      parseInt(req.body.amount),
+      parseRequestId(req, 'consume'),
+      parseOperator(req),
+      req.body.refId,
+      req.body.reason,
+      req.body.allowFreeze === true
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post('/:memberId/refund', (req, res) => {
-  requireFields(req.body, ['amount']);
-  const result = pointService.refund(
-    req.params.memberId,
-    parseInt(req.body.amount),
-    parseRequestId(req, 'refund'),
-    parseOperator(req),
-    req.body.refId,
-    req.body.reason
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/refund', (req, res, next) => {
+  try {
+    requireFields(req.body, ['amount']);
+    const result = pointService.refund(
+      req.params.memberId,
+      parseInt(req.body.amount),
+      parseRequestId(req, 'refund'),
+      parseOperator(req),
+      req.body.refId,
+      req.body.reason
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post('/:memberId/unfreeze', (req, res) => {
-  requireFields(req.body, ['bucketId', 'amount']);
-  const result = pointService.unfreeze(
-    req.params.memberId,
-    req.body.bucketId,
-    parseInt(req.body.amount),
-    parseRequestId(req, 'unfreeze'),
-    parseOperator(req),
-    req.body.reason
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/unfreeze', (req, res, next) => {
+  try {
+    requireFields(req.body, ['bucketId', 'amount']);
+    const result = pointService.unfreeze(
+      req.params.memberId,
+      req.body.bucketId,
+      parseInt(req.body.amount),
+      parseRequestId(req, 'unfreeze'),
+      parseOperator(req),
+      req.body.reason
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.post('/:memberId/auto-unfreeze', (req, res) => {
-  const result = pointService.autoUnfreezeExpired(
-    req.params.memberId,
-    parseOperator(req)
-  );
-  res.json({ success: true, data: result });
+router.post('/:memberId/auto-unfreeze', (req, res, next) => {
+  try {
+    const result = pointService.autoUnfreezeExpired(
+      req.params.memberId,
+      parseOperator(req)
+    );
+    res.json({ success: true, data: result });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.get('/:memberId/snapshot/:date', (req, res) => {
-  const { memberId, date } = req.params;
-  const snapshot = balanceService.createSnapshot(memberId, date);
-  const consistency = balanceService.verifyConsistency(memberId);
-  res.json({ success: true, data: { snapshot, consistency } });
+router.get('/:memberId/snapshot/:date', (req, res, next) => {
+  try {
+    const { memberId, date } = req.params;
+    const snapshot = balanceService.createSnapshot(memberId, date);
+    const consistency = balanceService.verifyConsistency(memberId);
+    res.json({ success: true, data: { snapshot, consistency } });
+  } catch (e) {
+    next(e);
+  }
 });
 
 router.get('/rules', (req, res) => {
@@ -141,18 +169,22 @@ router.get('/rules', (req, res) => {
   res.json({ success: true, data: rules });
 });
 
-router.post('/rules', (req, res) => {
-  requireFields(req.body, ['code', 'name', 'releaseType']);
-  const rule = freezeRuleRepo.create({
-    code: req.body.code,
-    name: req.body.name,
-    releaseType: req.body.releaseType,
-    releaseDays: req.body.releaseDays,
-    autoRelease: req.body.autoRelease !== false,
-    priority: req.body.priority || 0,
-    description: req.body.description
-  });
-  res.status(201).json({ success: true, data: rule });
+router.post('/rules', (req, res, next) => {
+  try {
+    requireFields(req.body, ['code', 'name', 'releaseType']);
+    const rule = freezeRuleRepo.create({
+      code: req.body.code,
+      name: req.body.name,
+      releaseType: req.body.releaseType,
+      releaseDays: req.body.releaseDays,
+      autoRelease: req.body.autoRelease !== false,
+      priority: req.body.priority || 0,
+      description: req.body.description
+    });
+    res.status(201).json({ success: true, data: rule });
+  } catch (e) {
+    next(e);
+  }
 });
 
 router.get('/idempotency/:requestId/:action', (req, res) => {

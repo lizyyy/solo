@@ -1,11 +1,19 @@
 const fs = require('fs');
 const path = require('path');
-const request = require('supertest');
 
 const testDbDir = path.join(__dirname, '../../data-test');
-const testDbPath = path.join(testDbDir, 'api-test.db');
 
-function resetModules() {
+function resetModules(dbPath) {
+  try {
+    const dbModule = require('../config/database');
+    dbModule.resetDatabase();
+  } catch(e) {}
+  
+  try {
+    const appModule = require('../app');
+    if (appModule.resetApp) appModule.resetApp();
+  } catch(e) {}
+  
   const modulesToDelete = [
     '../config/database',
     '../database/schema',
@@ -20,6 +28,7 @@ function resetModules() {
     '../errors/ApiError',
     '../routes/members',
     '../routes/points',
+    '../middleware/errorHandler',
     '../app'
   ];
   modulesToDelete.forEach(m => {
@@ -27,27 +36,37 @@ function resetModules() {
   });
 }
 
-let app;
-
-beforeEach(() => {
-  if (fs.existsSync(testDbDir)) {
-    fs.readdirSync(testDbDir).forEach(f => fs.unlinkSync(path.join(testDbDir, f)));
-  } else {
-    fs.mkdirSync(testDbDir, { recursive: true });
-  }
-  process.env.DB_PATH = testDbPath;
-  resetModules();
-  app = require('../app');
-});
-
-afterAll(() => {
-  if (fs.existsSync(testDbDir)) {
-    fs.readdirSync(testDbDir).forEach(f => fs.unlinkSync(path.join(testDbDir, f)));
-    fs.rmdirSync(testDbDir);
-  }
-});
+const systemOp = { name: 'test', id: 'test-001', type: 'test' };
 
 describe('API - 会员管理', () => {
+  let app;
+  let request;
+  
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `api-test-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    request = require('supertest');
+    const createApp = require('../app');
+    app = await createApp();
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
+  });
+
   test('GET /health 返回健康状态', async () => {
     const res = await request(app).get('/health');
     expect(res.statusCode).toBe(200);
@@ -67,9 +86,25 @@ describe('API - 会员管理', () => {
 });
 
 describe('API - 核心接口', () => {
+  let app;
+  let request;
   let memberId;
   
   beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `api-core-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    request = require('supertest');
+    const createApp = require('../app');
+    app = await createApp();
+    
     const memberRes = await request(app)
       .post('/api/v1/members')
       .send({ name: '接口测试用户' });
@@ -80,6 +115,15 @@ describe('API - 核心接口', () => {
       name: 'API测试规则',
       releaseType: 'MANUAL'
     });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
   });
 
   test('POST recharge + GET balance', async () => {
