@@ -167,9 +167,9 @@
                     <h3 class="card-title">快捷操作</h3>
                 </div>
                 <div class="btn-group">
-                    <button class="btn btn-primary" onclick="openModal('child-modal')">新增儿童</button>
+                    <button class="btn btn-primary" onclick="openChildModalForCreate()">新增儿童</button>
                     <button class="btn btn-success" onclick="openModal('authorization-modal')">新增授权</button>
-                    <button class="btn btn-warning" onclick="openModal('delegation-modal')">新建委托</button>
+                    <button class="btn btn-warning" onclick="openDelegationModalForCreate()">新建委托</button>
                     <button class="btn btn-secondary" onclick="exportAllData()">导出全部数据</button>
                 </div>
             </div>
@@ -181,7 +181,7 @@
                     <h3 class="card-title">儿童档案列表</h3>
                     <div class="btn-group">
                         <button class="btn btn-secondary btn-sm" onclick="openModal('import-modal')">📥 导入</button>
-                        <button class="btn btn-primary" onclick="openModal('child-modal')">➕ 新增儿童</button>
+                        <button class="btn btn-primary" onclick="openChildModalForCreate()">➕ 新增儿童</button>
                     </div>
                 </div>
 
@@ -281,7 +281,7 @@
                     <h3 class="card-title">临时委托管理</h3>
                     <div class="btn-group">
                         <button class="btn btn-secondary btn-sm" onclick="exportDelegations()">📤 导出</button>
-                        <button class="btn btn-primary" onclick="openModal('delegation-modal')">➕ 新建委托</button>
+                        <button class="btn btn-primary" onclick="openDelegationModalForCreate()">➕ 新建委托</button>
                     </div>
                 </div>
 
@@ -743,17 +743,6 @@
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('show');
             if (modalId === 'authorization-modal') populateChildSelect('auth-child');
-            if (modalId === 'delegation-modal') {
-                populateChildSelect('delegation-child');
-                document.getElementById('delegation-modal-title').textContent = '新建临时委托';
-                document.getElementById('delegation-id').value = '';
-                document.getElementById('delegation-form').reset();
-            }
-            if (modalId === 'child-modal') {
-                document.getElementById('child-modal-title').textContent = '新增儿童';
-                document.getElementById('child-id').value = '';
-                document.getElementById('child-form').reset();
-            }
         }
 
         function closeModal(modalId) {
@@ -930,11 +919,19 @@
             renderCurrentTab();
         }
 
+        function openChildModalForCreate() {
+            openModal('child-modal');
+            document.getElementById('child-modal-title').textContent = '新增儿童';
+            document.getElementById('child-id').value = '';
+            document.getElementById('child-form').reset();
+        }
+
         function editChild(id) {
             const children = loadData(STORAGE_KEYS.CHILDREN);
             const child = children.find(c => c.id === id);
             if (!child) return;
 
+            openModal('child-modal');
             document.getElementById('child-modal-title').textContent = '编辑儿童';
             document.getElementById('child-id').value = child.id;
             document.getElementById('child-name').value = child.name;
@@ -945,8 +942,6 @@
             document.getElementById('child-parent-name').value = child.parentName || '';
             document.getElementById('child-parent-phone').value = child.parentPhone || '';
             document.getElementById('child-notes').value = child.notes || '';
-            
-            openModal('child-modal');
         }
 
         function deleteChild(id) {
@@ -1236,6 +1231,7 @@
                     <td class="action-cell">
                         <div class="btn-group">
                             <button class="btn btn-secondary btn-sm" onclick="viewDelegationDetail('${d.id}')">详情</button>
+                            ${(d.status === 'pending' || d.status === 'approved') ? `<button class="btn btn-primary btn-sm" onclick="editDelegation('${d.id}')">编辑</button>` : ''}
                             ${d.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="openReviewModal('${d.id}')">审核</button>` : ''}
                             ${d.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="revokeDelegation('${d.id}')">撤回</button>` : ''}
                             ${d.status === 'approved' ? `<button class="btn btn-warning btn-sm" onclick="useDelegation('${d.id}')">标记使用</button>` : ''}
@@ -1267,6 +1263,34 @@
             return map[status] || status;
         }
 
+        function openDelegationModalForCreate() {
+            openModal('delegation-modal');
+            populateChildSelect('delegation-child');
+            document.getElementById('delegation-modal-title').textContent = '新建临时委托';
+            document.getElementById('delegation-id').value = '';
+            document.getElementById('delegation-form').reset();
+        }
+
+        function editDelegation(id) {
+            const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
+            const delegation = delegations.find(d => d.id === id);
+            if (!delegation) return;
+
+            openModal('delegation-modal');
+            populateChildSelect('delegation-child');
+            document.getElementById('delegation-modal-title').textContent = '编辑/补录委托';
+            document.getElementById('delegation-id').value = delegation.id;
+            document.getElementById('delegation-child').value = delegation.childId;
+            document.getElementById('delegation-requester').value = delegation.requester;
+            document.getElementById('delegation-requester-phone').value = delegation.requesterPhone || '';
+            document.getElementById('delegation-delegatee').value = delegation.delegatee;
+            document.getElementById('delegation-delegatee-phone').value = delegation.delegateePhone;
+            document.getElementById('delegation-date').value = delegation.delegationDate;
+            document.getElementById('delegation-time').value = delegation.timeSlot;
+            document.getElementById('delegation-reason').value = delegation.reason || '';
+            document.getElementById('delegation-special-notes').value = delegation.specialNotes || '';
+        }
+
         function saveDelegation() {
             const form = document.getElementById('delegation-form');
             if (!form.checkValidity()) {
@@ -1282,10 +1306,10 @@
 
             const children = loadData(STORAGE_KEYS.CHILDREN);
             const child = children.find(c => c.id === childId);
-
+            const id = document.getElementById('delegation-id').value;
             const delegations = loadData(STORAGE_KEYS.DELEGATIONS);
-            const delegationData = {
-                id: generateId(),
+
+            const newData = {
                 childId: childId,
                 childName: child.name,
                 requester: document.getElementById('delegation-requester').value,
@@ -1296,17 +1320,31 @@
                 timeSlot: document.getElementById('delegation-time').value,
                 reason: document.getElementById('delegation-reason').value,
                 specialNotes: document.getElementById('delegation-special-notes').value,
-                status: 'pending',
-                reviewComments: '',
-                reviewedBy: '',
-                reviewedAt: null,
-                createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
 
-            delegations.push(delegationData);
-            saveData(STORAGE_KEYS.DELEGATIONS, delegations);
-            addHistory('delegation', 'create', delegationData.id, `${child.name} - ${delegationData.delegatee}`, null, delegationData);
+            if (id) {
+                const index = delegations.findIndex(d => d.id === id);
+                if (index !== -1) {
+                    const before = { ...delegations[index] };
+                    delegations[index] = { ...delegations[index], ...newData };
+                    saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+                    addHistory('delegation', 'update', id, `${delegations[index].childName} - ${delegations[index].delegatee}`, before, delegations[index]);
+                }
+            } else {
+                const delegationData = {
+                    id: generateId(),
+                    ...newData,
+                    status: 'pending',
+                    reviewComments: '',
+                    reviewedBy: '',
+                    reviewedAt: null,
+                    createdAt: new Date().toISOString()
+                };
+                delegations.push(delegationData);
+                saveData(STORAGE_KEYS.DELEGATIONS, delegations);
+                addHistory('delegation', 'create', delegationData.id, `${child.name} - ${delegationData.delegatee}`, null, delegationData);
+            }
 
             closeModal('delegation-modal');
             document.getElementById('delegation-form').reset();
