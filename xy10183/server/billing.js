@@ -28,43 +28,82 @@ function canTransition(from, to) {
   return allowed.includes(to);
 }
 
-function calculateOvernightPeriods(startTime, endTime) {
-  const start = new Date(startTime);
-  const end = new Date(endTime);
-  
-  if (start >= end) return 0;
-  
-  let overnightCount = 0;
-  const current = new Date(start);
-  
-  while (current < end) {
-    const currentHour = current.getHours();
-    
-    if (currentHour >= MIDNIGHT_HOUR && currentHour < MORNING_HOUR) {
-      const nextMorning = new Date(current);
-      nextMorning.setHours(MORNING_HOUR, 0, 0, 0);
-      
-      if (nextMorning < end) {
-        overnightCount++;
-      }
-    }
-    
-    current.setHours(current.getHours() + 1);
-  }
-  
-  return overnightCount;
+const OVERNIGHT_START_HOUR = 0;
+const OVERNIGHT_END_HOUR = 6;
+
+function isOvernightHour(hour) {
+  return hour >= OVERNIGHT_START_HOUR && hour < OVERNIGHT_END_HOUR;
 }
 
-function calculateRegularHours(startTime, endTime, overnightPeriods) {
+function getMidnightBefore(date) {
+  const midnight = new Date(date);
+  midnight.setHours(0, 0, 0, 0);
+  return midnight;
+}
+
+function getOvernightWindowsBetween(startTime, endTime) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  
+  if (start >= end) return [];
+  
+  const windows = [];
+  
+  const startMidnight = getMidnightBefore(start);
+  const endMidnight = getMidnightBefore(end);
+  
+  let currentDay = new Date(startMidnight);
+  
+  while (currentDay <= endMidnight) {
+    const windowStart = new Date(currentDay);
+    windowStart.setHours(OVERNIGHT_START_HOUR, 0, 0, 0);
+    
+    const windowEnd = new Date(currentDay);
+    windowEnd.setHours(OVERNIGHT_END_HOUR, 0, 0, 0);
+    
+    const overlapStart = start > windowStart ? start : windowStart;
+    const overlapEnd = end < windowEnd ? end : windowEnd;
+    
+    if (overlapStart < overlapEnd) {
+      windows.push({
+        windowStart: windowStart.toISOString(),
+        windowEnd: windowEnd.toISOString(),
+        overlapStart: overlapStart.toISOString(),
+        overlapEnd: overlapEnd.toISOString(),
+        overlapHours: (overlapEnd - overlapStart) / (1000 * 60 * 60)
+      });
+    }
+    
+    currentDay.setDate(currentDay.getDate() + 1);
+  }
+  
+  return windows;
+}
+
+function calculateHoursExcludingOvernight(startTime, endTime) {
   const start = new Date(startTime);
   const end = new Date(endTime);
   
   if (start >= end) return 0;
   
-  let totalHours = (end - start) / (1000 * 60 * 60);
-  let regularHours = totalHours - (overnightPeriods * 6);
+  let regularHours = 0;
+  let current = new Date(start);
   
-  return Math.max(0, regularHours);
+  while (current < end) {
+    const nextHour = new Date(current);
+    nextHour.setHours(current.getHours() + 1, 0, 0, 0);
+    
+    const segmentEnd = nextHour < end ? nextHour : end;
+    const segmentHours = (segmentEnd - current) / (1000 * 60 * 60);
+    
+    if (!isOvernightHour(current.getHours())) {
+      regularHours += segmentHours;
+    }
+    
+    current = nextHour;
+  }
+  
+  return regularHours;
 }
 
 function calculatePrice(spot, startTime, endTime) {
@@ -72,11 +111,19 @@ function calculatePrice(spot, startTime, endTime) {
   const end = new Date(endTime);
   
   if (start >= end) {
-    return { regularHours: 0, overnightPeriods: 0, regularPrice: 0, overnightPrice: 0, total: 0 };
+    return { 
+      regularHours: 0, 
+      overnightPeriods: 0, 
+      regularPrice: 0, 
+      overnightPrice: 0, 
+      total: 0 
+    };
   }
   
-  const overnightPeriods = calculateOvernightPeriods(startTime, endTime);
-  const regularHours = calculateRegularHours(startTime, endTime, overnightPeriods);
+  const overnightWindows = getOvernightWindowsBetween(startTime, endTime);
+  const overnightPeriods = overnightWindows.length;
+  
+  const regularHours = calculateHoursExcludingOvernight(startTime, endTime);
   
   const regularHoursRounded = Math.ceil(regularHours);
   const regularPrice = regularHoursRounded * spot.pricePerHour;
