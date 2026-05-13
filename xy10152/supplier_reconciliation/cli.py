@@ -32,12 +32,14 @@ def cli():
               help="历史记录目录")
 @click.option("--period", type=click.Choice(["month", "quarter", "year"]),
               default="month", help="账期类型")
+@click.option("--roll-forward", "-r", is_flag=True,
+              help="启用账期滚动：将上期未匹配凭证滚转到当前账期")
 @click.option("--tolerance", type=float, default=0.01,
               help="金额匹配容差")
 @click.option("--skip-dedupe", is_flag=True, help="跳过重复凭证检测")
 @click.option("--no-save", is_flag=True, help="不保存到历史记录")
 @click.option("--verbose", "-v", is_flag=True, help="显示详细信息")
-def reconcile(invoice, grn, payment, output, history_dir, period, 
+def reconcile(invoice, grn, payment, output, history_dir, period, roll_forward,
               tolerance, skip_dedupe, no_save, verbose):
     importer = FileImporter(DataValidator(strict=False))
     documents = []
@@ -59,6 +61,18 @@ def reconcile(invoice, grn, payment, output, history_dir, period,
         documents.extend(docs)
         if verbose:
             click.echo(f"已导入付款文件: {pay_file} ({len(docs)} 条记录)")
+    
+    if roll_forward:
+        history = HistoryManager(history_dir=history_dir)
+        previous_run = history.get_previous_run()
+        if previous_run:
+            click.echo(f"\n🔄 账期滚动：加载上一账期 ({previous_run.get('period')}")
+            rolled_docs = _load_rolled_documents(previous_run)
+            if rolled_docs:
+                click.echo(f"  滚转凭证: {len(rolled_docs)} 条未匹配/部分匹配")
+                documents.extend(rolled_docs)
+        else:
+            click.echo("\nℹ️ 未找到上一账期记录，跳过账期滚动")
     
     if not documents:
         click.echo("未导入任何凭证，请检查文件参数")
@@ -308,6 +322,65 @@ def _print_results_table(run):
     
     headers = ["类型", "凭证号", "供应商", "金额", "已匹配", "剩余", "状态", "账期"]
     click.echo("\n" + tabulate(table, headers=headers, tablefmt="grid"))
+
+
+def _load_rolled_documents(previous_run: Dict) -> List[Document]:
+    from datetime import datetime
+    
+    rolled_docs = []
+    rolled_statuses = {"unmatched", "partial"}
+    
+    seen_keys = set()
+    
+    for result in previous_run.get("results", []):
+        if result.get("status") not in rolled_statuses:
+            continue
+        
+        doc_data = None
+        for d in previous_run.get("documents", []):
+            doc_key = f"{d['doc_type']}:{d['doc_number']}:{d['supplier_id']}"
+            if doc_key == result.get("document_key"):
+                doc_data = d
+                break
+        
+        if doc_data and doc_data.get("is_valid"):
+            doc_key = f"{doc_data['doc_type']}:{doc_data['doc_number']}:{doc_data['supplier_id']}"
+            if doc_key in seen_keys:
+                continue
+            seen_keys.add(doc_key)
+            
+            from .models import Document
+            from datetime import date as date_cls
+            
+            doc_date = None
+            if doc_data.get("doc_date"):
+                doc_date = datetime.fromisoformat(doc_data["doc_date"]).date()
+            
+            due_date = None
+            if doc_data.get("due_date"):
+                due_date = datetime.fromisoformat(doc_data["due_date"]).date()
+            
+            metadata = doc_data.get("metadata", {})
+            metadata["rolled_from_period"] = previous_run.get("period", "")
+            metadata["previous_matched_amount"] = result.get("matched_amount", 0.0)
+            
+            doc = Document(
+                doc_type=DocumentType(doc_data["doc_type"]),
+                doc_number=doc_data["doc_number"],
+                supplier_id=doc_data["supplier_id"],
+                supplier_name=doc_data["supplier_name"],
+                amount=doc_data["amount"],
+                doc_date=doc_date or date_cls.today(),
+                due_date=due_date,
+                description=doc_data.get("description", ""),
+                reference=doc_data.get("reference", ""),
+                metadata=metadata,
+                validation_errors=doc_data.get("validation_errors", []),
+                is_valid=doc_data.get("is_valid", True),
+            )
+            rolled_docs.append(doc)
+    
+    return rolled_docs
 
 
 if __name__ == "__main__":

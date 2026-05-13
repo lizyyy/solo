@@ -35,11 +35,12 @@ class Reconciler:
         effective_date = doc.due_date if doc.due_date else doc.doc_date
         return (as_of_date - effective_date).days
     
-    def _group_by_supplier(self, documents: List[Document]) -> Dict[str, List[Document]]:
+    def _group_by_supplier(self, documents: List[Document], include_duplicates: bool = False) -> Dict[str, List[Document]]:
         groups = defaultdict(list)
         for doc in documents:
-            if doc.is_valid and not doc.metadata.get("is_duplicate", False):
-                groups[doc.supplier_id].append(doc)
+            if doc.is_valid:
+                if include_duplicates or not doc.metadata.get("is_duplicate", False):
+                    groups[doc.supplier_id].append(doc)
         return dict(groups)
     
     def _match_grn_invoice(self, grns: List[Document], invoices: List[Document]) -> List[Tuple[Document, Document, float]]:
@@ -166,7 +167,8 @@ class Reconciler:
     def reconcile(self, documents: List[Document], 
                   period_type: str = "month",
                   as_of_date: Optional[date] = None,
-                  rolling_periods: int = 3) -> ReconciliationRun:
+                  rolling_periods: int = 3,
+                  previous_run_data: Optional[Dict] = None) -> ReconciliationRun:
         
         run_id = f"RECON-{datetime.now().strftime('%Y%m%d%H%M%S')}"
         run_date = datetime.now()
@@ -177,16 +179,19 @@ class Reconciler:
         period = self._get_period(as_of_date, period_type)
         
         results: List[ReconciliationItem] = []
-        supplier_groups = self._group_by_supplier(documents)
+        
+        matched_inv = defaultdict(lambda: {"amount": 0.0, "docs": [], "grn_matched": False})
+        matched_pay = defaultdict(lambda: {"amount": 0.0, "docs": []})
+        matched_grn = defaultdict(lambda: {"amount": 0.0, "docs": []})
+        all_inv_pay_matches: List[Tuple] = []
+        
+        valid_non_duplicate = [d for d in documents if d.is_valid and not d.metadata.get("is_duplicate", False)]
+        supplier_groups = self._group_by_supplier(valid_non_duplicate)
         
         for supplier_id, supplier_docs in supplier_groups.items():
             invoices = [d for d in supplier_docs if d.doc_type == DocumentType.INVOICE]
             payments = [d for d in supplier_docs if d.doc_type == DocumentType.PAYMENT]
             grns = [d for d in supplier_docs if d.doc_type == DocumentType.GRN]
-            
-            matched_inv = defaultdict(lambda: {"amount": 0.0, "docs": [], "grn_matched": False})
-            matched_pay = defaultdict(lambda: {"amount": 0.0, "docs": []})
-            matched_grn = defaultdict(lambda: {"amount": 0.0, "docs": []})
             
             grn_invoice_matches = self._match_grn_invoice(grns, invoices)
             for grn, inv, amount in grn_invoice_matches:
@@ -223,33 +228,33 @@ class Reconciler:
                 remaining_payments_after_amount
             )
             
-            all_inv_pay_matches = inv_pay_by_ref + inv_pay_by_amount + inv_pay_partial
+            all_inv_pay_matches.extend(inv_pay_by_ref + inv_pay_by_amount + inv_pay_partial)
             
-            for inv, pay, amount in all_inv_pay_matches:
+            for inv, pay, amount in (inv_pay_by_ref + inv_pay_by_amount + inv_pay_partial):
                 matched_inv[inv.key]["amount"] += amount
                 matched_inv[inv.key]["docs"].append(pay.key)
                 matched_pay[pay.key]["amount"] += amount
                 matched_pay[pay.key]["docs"].append(inv.key)
+        
+        for doc in documents:
+            item = ReconciliationItem(
+                document=doc,
+                period=self._get_period(doc.doc_date, period_type),
+                aging_days=self._get_aging_days(doc, as_of_date)
+            )
             
-            for doc in supplier_docs:
-                item = ReconciliationItem(
-                    document=doc,
-                    period=self._get_period(doc.doc_date, period_type),
-                    aging_days=self._get_aging_days(doc, as_of_date)
-                )
-                
+            if doc.metadata.get("is_duplicate", False):
+                item.status = ReconciliationStatus.DUPLICATE
+                item.matched_amount = 0.0
+                item.matched_documents = []
+            elif not doc.is_valid:
+                item.status = ReconciliationStatus.INVALID
+                item.matched_amount = 0.0
+                item.matched_documents = []
+            else:
                 if doc.doc_type == DocumentType.INVOICE:
                     if doc.key in matched_inv:
                         inv_match = matched_inv[doc.key]
-                        grn_match_amount = 0.0
-                        payment_match_amount = 0.0
-                        
-                        for other_key in inv_match["docs"]:
-                            if other_key.startswith("grn:"):
-                                continue
-                            else:
-                                payment_match_amount = inv_match["amount"]
-                                break
                         
                         invoice_total = 0.0
                         for m in all_inv_pay_matches:
@@ -275,28 +280,12 @@ class Reconciler:
                     item.status = ReconciliationStatus.PARTIAL
                 else:
                     item.status = ReconciliationStatus.UNMATCHED
-                
-                if doc.metadata.get("is_duplicate", False):
-                    item.status = ReconciliationStatus.DUPLICATE
-                elif not doc.is_valid:
-                    item.status = ReconciliationStatus.INVALID
-                
-                discrepancies = self._identify_discrepancies(item)
-                if discrepancies:
-                    doc.metadata["discrepancies"] = discrepancies
-                
-                results.append(item)
-        
-        invalid_docs = [d for d in documents if not d.is_valid]
-        for doc in invalid_docs:
-            if not any(r.document.key == doc.key for r in results):
-                item = ReconciliationItem(
-                    document=doc,
-                    status=ReconciliationStatus.INVALID,
-                    period=self._get_period(doc.doc_date, period_type),
-                    aging_days=self._get_aging_days(doc, as_of_date)
-                )
-                results.append(item)
+            
+            discrepancies = self._identify_discrepancies(item)
+            if discrepancies:
+                doc.metadata["discrepancies"] = discrepancies
+            
+            results.append(item)
         
         summary = self._generate_summary(results, documents)
         
