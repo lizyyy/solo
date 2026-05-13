@@ -1,0 +1,13 @@
+package com.schema.approval.enums;
+
+public enum SchemaStatus {
+    DRAFT,
+    PENDING_COMPATIBILITY_CHECK,
+    COMPATIBILITY_CHECK_PASSED,
+    COMPATIBILITY_CHECK_FAILED,
+    PENDING_APPROVAL,
+    APPROVED,
+    REJECTED,
+    PUBLISHED,
+    DEPRECATED
+}
