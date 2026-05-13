@@ -1,0 +1,17 @@
+{
+  "name": "session-kickout-api",
+  "version": "1.0.0",
+  "description": "用户会话踢出 API - 支持创建会话、登记设备指纹、风险事件、踢出会话、限制登录和审计查询",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
