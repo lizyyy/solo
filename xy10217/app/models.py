@@ -209,7 +209,8 @@ class BlendingCalculator:
         if not available_materials:
             return []
         
-        plans = []
+        all_generated_plans = []
+        
         high_score_materials = sorted(
             [m for m in available_materials if m.aroma_score >= target_aroma_score],
             key=lambda m: m.aroma_score, reverse=True
@@ -219,55 +220,73 @@ class BlendingCalculator:
             key=lambda m: m.cost_per_kg
         )
         
-        if high_score_materials:
+        if high_score_materials and low_score_materials:
             for i, high_mat in enumerate(high_score_materials[:2]):
-                if low_score_materials:
-                    for low_mat in low_score_materials[:2]:
-                        for high_ratio in [70, 60, 50]:
-                            low_ratio = 100 - high_ratio
-                            if low_ratio <= 0:
-                                continue
-                            
-                            components = [
-                                {"material_id": high_mat.id, "proportion": high_ratio},
-                                {"material_id": low_mat.id, "proportion": low_ratio}
-                            ]
-                            
-                            plan = self.calculate_plan(
-                                batch_name=f"优化方案{i+1}-高{high_ratio}%低{low_ratio}%",
-                                target_weight_kg=target_weight_kg,
-                                target_aroma_score=target_aroma_score,
-                                max_cost_per_kg=max_cost_per_kg,
-                                components=components
-                            )
-                            
-                            if plan.is_feasible and len(plans) < 5:
-                                plans.append(plan)
+                for j, low_mat in enumerate(low_score_materials[:2]):
+                    for high_ratio in [80, 70, 60, 50, 40]:
+                        low_ratio = 100 - high_ratio
+                        if low_ratio <= 0:
+                            continue
+                        
+                        components = [
+                            {"material_id": high_mat.id, "proportion": high_ratio},
+                            {"material_id": low_mat.id, "proportion": low_ratio}
+                        ]
+                        
+                        plan = self.calculate_plan(
+                            batch_name=f"高低配-{high_mat.name}{high_ratio}%+{low_mat.name}{low_ratio}%",
+                            target_weight_kg=target_weight_kg,
+                            target_aroma_score=target_aroma_score,
+                            max_cost_per_kg=max_cost_per_kg,
+                            components=components
+                        )
+                        all_generated_plans.append(plan)
         
-        all_possible_plans = []
-        for mat1 in available_materials:
-            for mat2 in available_materials:
-                if mat1.id >= mat2.id:
-                    continue
-                for ratio in [30, 50, 70]:
-                    components = [
-                        {"material_id": mat1.id, "proportion": ratio},
-                        {"material_id": mat2.id, "proportion": 100 - ratio}
-                    ]
-                    plan = self.calculate_plan(
-                        batch_name=f"组合-{mat1.name}{ratio}%-{mat2.name}{100-ratio}%",
-                        target_weight_kg=target_weight_kg,
-                        target_aroma_score=target_aroma_score,
-                        max_cost_per_kg=max_cost_per_kg,
-                        components=components
-                    )
-                    all_possible_plans.append(plan)
+        if len(available_materials) >= 2:
+            for mat1 in available_materials:
+                for mat2 in available_materials:
+                    if mat1.id >= mat2.id:
+                        continue
+                    for ratio in [20, 30, 50, 70, 80]:
+                        components = [
+                            {"material_id": mat1.id, "proportion": ratio},
+                            {"material_id": mat2.id, "proportion": 100 - ratio}
+                        ]
+                        plan = self.calculate_plan(
+                            batch_name=f"组合-{mat1.name}{ratio}%+{mat2.name}{100-ratio}%",
+                            target_weight_kg=target_weight_kg,
+                            target_aroma_score=target_aroma_score,
+                            max_cost_per_kg=max_cost_per_kg,
+                            components=components
+                        )
+                        all_generated_plans.append(plan)
         
-        feasible_plans = [p for p in all_possible_plans if p.is_feasible]
-        feasible_plans.sort(key=lambda p: p.total_cost)
+        for mat in available_materials:
+            components = [
+                {"material_id": mat.id, "proportion": 100}
+            ]
+            plan = self.calculate_plan(
+                batch_name=f"纯料-{mat.name}100%",
+                target_weight_kg=target_weight_kg,
+                target_aroma_score=target_aroma_score,
+                max_cost_per_kg=max_cost_per_kg,
+                components=components
+            )
+            all_generated_plans.append(plan)
         
-        final_plans = plans + [p for p in feasible_plans if p.batch_name not in [pl.batch_name for pl in plans]]
-        return final_plans[:10]
+        seen = set()
+        unique_plans = []
+        for plan in all_generated_plans:
+            key = tuple(sorted([(c.material_id, c.proportion) for c in plan.components]))
+            if key not in seen:
+                seen.add(key)
+                unique_plans.append(plan)
+        
+        feasible = sorted([p for p in unique_plans if p.is_feasible], key=lambda p: p.total_cost)
+        infeasible = sorted([p for p in unique_plans if not p.is_feasible], 
+                           key=lambda p: len(p.violations))
+        
+        return feasible[:8] + infeasible[:6]
 
 def load_sample_inventory() -> Inventory:
     data_dir = os.path.join(os.path.dirname(__file__), 'data')
