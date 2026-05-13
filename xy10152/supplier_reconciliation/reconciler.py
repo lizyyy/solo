@@ -1,7 +1,14 @@
 from datetime import date, datetime, timedelta
 from typing import List, Dict, Tuple, Optional
 from collections import defaultdict
+from dataclasses import dataclass
 from .models import Document, DocumentType, ReconciliationItem, ReconciliationStatus, ReconciliationRun
+
+
+@dataclass
+class MatchableItem:
+    document: Document
+    remaining: float
 
 
 class Reconciler:
@@ -35,43 +42,98 @@ class Reconciler:
                 groups[doc.supplier_id].append(doc)
         return dict(groups)
     
-    def _match_exact(self, invoices: List[Document], payments: List[Document]) -> List[Tuple[Document, Document, float]]:
+    def _match_grn_invoice(self, grns: List[Document], invoices: List[Document]) -> List[Tuple[Document, Document, float]]:
         matches = []
-        used_payments = set()
+        matched_grns = set()
+        matched_invoices = set()
         
-        for inv in invoices:
-            for pay in payments:
-                if pay.key in used_payments:
+        for grn in grns:
+            for inv in invoices:
+                if grn.key in matched_grns or inv.key in matched_invoices:
                     continue
-                if self._amount_equal(inv.amount, pay.amount):
-                    if self.match_by_reference and inv.reference and pay.reference:
-                        if inv.reference != pay.reference and inv.doc_number != pay.reference:
-                            continue
-                    
-                    matches.append((inv, pay, inv.amount))
-                    used_payments.add(pay.key)
+                
+                ref_match = False
+                if grn.reference and grn.reference == inv.doc_number:
+                    ref_match = True
+                elif inv.reference and inv.reference == grn.doc_number:
+                    ref_match = True
+                
+                if ref_match or self._amount_equal(grn.amount, inv.amount):
+                    match_amount = min(grn.amount, inv.amount)
+                    matches.append((grn, inv, match_amount))
+                    matched_grns.add(grn.key)
+                    matched_invoices.add(inv.key)
                     break
         
         return matches
     
-    def _match_partial(self, invoices: List[Document], payments: List[Document], exact_matches: List[Tuple]) -> List[Tuple[Document, Document, float]]:
+    def _match_invoice_payment_by_ref(self, invoices: List[Document], payments: List[Document]) -> List[Tuple[Document, Document, float]]:
         matches = []
-        matched_invoices = {m[0].key for m in exact_matches}
-        matched_payments = {m[1].key for m in exact_matches}
+        used_payments = set()
+        matched_invoices = set()
         
-        remaining_invoices = [i for i in invoices if i.key not in matched_invoices]
-        remaining_payments = [p for p in payments if p.key not in matched_payments]
-        
-        for inv in remaining_invoices:
-            inv_remaining = inv.amount
-            for pay in remaining_payments:
-                if inv_remaining <= 0:
-                    break
+        for inv in invoices:
+            for pay in payments:
+                if pay.key in used_payments or inv.key in matched_invoices:
+                    continue
                 
-                match_amount = min(inv_remaining, pay.amount)
+                ref_match = False
+                if pay.reference and pay.reference == inv.doc_number:
+                    ref_match = True
+                elif inv.reference and inv.reference == pay.doc_number:
+                    ref_match = True
+                
+                if ref_match:
+                    match_amount = min(inv.amount, pay.amount)
+                    matches.append((inv, pay, match_amount))
+                    used_payments.add(pay.key)
+                    matched_invoices.add(inv.key)
+                    break
+        
+        return matches
+    
+    def _match_invoice_payment_by_amount(self, invoices: List[Document], payments: List[Document]) -> List[Tuple[Document, Document, float]]:
+        matches = []
+        used_payments = set()
+        matched_invoices = set()
+        
+        for inv in invoices:
+            if inv.key in matched_invoices:
+                continue
+            for pay in payments:
+                if pay.key in used_payments:
+                    continue
+                
+                if self._amount_equal(inv.amount, pay.amount):
+                    matches.append((inv, pay, inv.amount))
+                    used_payments.add(pay.key)
+                    matched_invoices.add(inv.key)
+                    break
+        
+        return matches
+    
+    def _match_partial_with_remaining(self, invoices: List[Document], payments: List[Document]) -> List[Tuple[Document, Document, float]]:
+        matches = []
+        
+        inv_remaining = {inv.key: inv.amount for inv in invoices}
+        pay_remaining = {pay.key: pay.amount for pay in payments}
+        
+        for inv in invoices:
+            if inv_remaining[inv.key] <= self.tolerance:
+                continue
+            
+            for pay in payments:
+                if pay_remaining[pay.key] <= self.tolerance:
+                    continue
+                
+                match_amount = min(inv_remaining[inv.key], pay_remaining[pay.key])
                 if match_amount > self.tolerance:
                     matches.append((inv, pay, match_amount))
-                    inv_remaining -= match_amount
+                    inv_remaining[inv.key] -= match_amount
+                    pay_remaining[pay.key] -= match_amount
+                
+                if inv_remaining[inv.key] <= self.tolerance:
+                    break
         
         return matches
     
@@ -122,15 +184,48 @@ class Reconciler:
             payments = [d for d in supplier_docs if d.doc_type == DocumentType.PAYMENT]
             grns = [d for d in supplier_docs if d.doc_type == DocumentType.GRN]
             
-            exact_matches = self._match_exact(invoices, payments)
-            partial_matches = self._match_partial(invoices, payments, exact_matches)
-            
-            all_matches = exact_matches + partial_matches
-            
-            matched_inv = defaultdict(lambda: {"amount": 0.0, "docs": []})
+            matched_inv = defaultdict(lambda: {"amount": 0.0, "docs": [], "grn_matched": False})
             matched_pay = defaultdict(lambda: {"amount": 0.0, "docs": []})
+            matched_grn = defaultdict(lambda: {"amount": 0.0, "docs": []})
             
-            for inv, pay, amount in all_matches:
+            grn_invoice_matches = self._match_grn_invoice(grns, invoices)
+            for grn, inv, amount in grn_invoice_matches:
+                matched_grn[grn.key]["amount"] += amount
+                matched_grn[grn.key]["docs"].append(inv.key)
+                matched_inv[inv.key]["amount"] += amount
+                matched_inv[inv.key]["docs"].append(grn.key)
+                matched_inv[inv.key]["grn_matched"] = True
+            
+            inv_pay_by_ref = self._match_invoice_payment_by_ref(
+                [i for i in invoices],
+                [p for p in payments]
+            )
+            
+            matched_inv_keys_ref = {m[0].key for m in inv_pay_by_ref}
+            matched_pay_keys_ref = {m[1].key for m in inv_pay_by_ref}
+            
+            remaining_invoices_after_ref = [i for i in invoices if i.key not in matched_inv_keys_ref]
+            remaining_payments_after_ref = [p for p in payments if p.key not in matched_pay_keys_ref]
+            
+            inv_pay_by_amount = self._match_invoice_payment_by_amount(
+                remaining_invoices_after_ref,
+                remaining_payments_after_ref
+            )
+            
+            matched_inv_keys_amount = {m[0].key for m in inv_pay_by_amount}
+            matched_pay_keys_amount = {m[1].key for m in inv_pay_by_amount}
+            
+            remaining_invoices_after_amount = [i for i in remaining_invoices_after_ref if i.key not in matched_inv_keys_amount]
+            remaining_payments_after_amount = [p for p in remaining_payments_after_ref if p.key not in matched_pay_keys_amount]
+            
+            inv_pay_partial = self._match_partial_with_remaining(
+                remaining_invoices_after_amount,
+                remaining_payments_after_amount
+            )
+            
+            all_inv_pay_matches = inv_pay_by_ref + inv_pay_by_amount + inv_pay_partial
+            
+            for inv, pay, amount in all_inv_pay_matches:
                 matched_inv[inv.key]["amount"] += amount
                 matched_inv[inv.key]["docs"].append(pay.key)
                 matched_pay[pay.key]["amount"] += amount
@@ -143,12 +238,36 @@ class Reconciler:
                     aging_days=self._get_aging_days(doc, as_of_date)
                 )
                 
-                if doc.key in matched_inv:
-                    item.matched_amount = matched_inv[doc.key]["amount"]
-                    item.matched_documents = matched_inv[doc.key]["docs"]
-                elif doc.key in matched_pay:
-                    item.matched_amount = matched_pay[doc.key]["amount"]
-                    item.matched_documents = matched_pay[doc.key]["docs"]
+                if doc.doc_type == DocumentType.INVOICE:
+                    if doc.key in matched_inv:
+                        inv_match = matched_inv[doc.key]
+                        grn_match_amount = 0.0
+                        payment_match_amount = 0.0
+                        
+                        for other_key in inv_match["docs"]:
+                            if other_key.startswith("grn:"):
+                                continue
+                            else:
+                                payment_match_amount = inv_match["amount"]
+                                break
+                        
+                        invoice_total = 0.0
+                        for m in all_inv_pay_matches:
+                            if m[0].key == doc.key:
+                                invoice_total += m[2]
+                        
+                        item.matched_amount = invoice_total
+                        item.matched_documents = [
+                            k for k in inv_match["docs"] if not k.startswith("grn:")
+                        ]
+                elif doc.doc_type == DocumentType.PAYMENT:
+                    if doc.key in matched_pay:
+                        item.matched_amount = matched_pay[doc.key]["amount"]
+                        item.matched_documents = matched_pay[doc.key]["docs"]
+                elif doc.doc_type == DocumentType.GRN:
+                    if doc.key in matched_grn:
+                        item.matched_amount = matched_grn[doc.key]["amount"]
+                        item.matched_documents = matched_grn[doc.key]["docs"]
                 
                 if self._amount_equal(item.matched_amount, doc.amount):
                     item.status = ReconciliationStatus.MATCHED

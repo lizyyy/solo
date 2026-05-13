@@ -11,45 +11,46 @@ class Deduplicator:
     def _amount_equal(self, a: float, b: float) -> bool:
         return abs(a - b) <= self.tolerance
     
+    def _get_duplicate_keys(self, doc: Document) -> List[str]:
+        keys = []
+        
+        exact_key = f"{doc.doc_type.value}:{doc.doc_number}:{doc.supplier_id}"
+        keys.append(("exact", exact_key))
+        
+        if doc.reference and doc.reference.strip():
+            ref_key = f"{doc.doc_type.value}:ref:{doc.supplier_id}:{doc.amount:.2f}:{doc.reference.strip()}"
+            keys.append(("reference", ref_key))
+        
+        return keys
+    
     def find_duplicates(self, documents: List[Document]) -> Tuple[List[Document], Dict[str, List[Document]]]:
         duplicates = defaultdict(list)
         unique_docs: List[Document] = []
-        first_occurrence: Dict[str, Document] = {}
+        
+        seen_keys: Dict[str, Document] = {}
         
         for doc in documents:
             if not doc.is_valid:
                 unique_docs.append(doc)
                 continue
             
-            exact_key = f"{doc.doc_type.value}:{doc.doc_number}:{doc.supplier_id}"
+            keys = self._get_duplicate_keys(doc)
             
-            if exact_key in first_occurrence:
-                duplicates[exact_key].append(doc)
-                continue
+            is_duplicate = False
+            match_key = None
             
-            loose_match_key = None
-            for existing_key, existing_doc in first_occurrence.items():
-                if existing_doc.doc_type != doc.doc_type:
-                    continue
-                if existing_doc.supplier_id != doc.supplier_id:
-                    continue
-                if not self._amount_equal(existing_doc.amount, doc.amount):
-                    continue
-                
-                if existing_doc.doc_number == doc.doc_number:
-                    loose_match_key = existing_key
-                    break
-                elif doc.reference and existing_doc.doc_number == doc.reference:
-                    loose_match_key = existing_key
-                    break
-                elif existing_doc.reference and doc.doc_number == existing_doc.reference:
-                    loose_match_key = existing_key
+            for key_type, key in keys:
+                if key in seen_keys:
+                    is_duplicate = True
+                    match_key = f"{seen_keys[key].doc_type.value}:{seen_keys[key].doc_number}:{seen_keys[key].supplier_id}"
                     break
             
-            if loose_match_key:
-                duplicates[loose_match_key].append(doc)
+            if is_duplicate and match_key:
+                duplicates[match_key].append(doc)
             else:
-                first_occurrence[exact_key] = doc
+                for key_type, key in keys:
+                    if key not in seen_keys:
+                        seen_keys[key] = doc
                 unique_docs.append(doc)
         
         self.duplicates = dict(duplicates)
