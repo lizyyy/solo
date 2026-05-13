@@ -1,0 +1,30 @@
+database:
+  path: ./member_tags.db
+
+priority_rules:
+  source_priority:
+    - risk_control: 100
+    - customer_service: 50
+    - marketing: 10
+  default_validity_days: 90
+
+mutually_exclusive_tags:
+  - ["高价值", "低价值"]
+  - ["高价值", "疑似风险"]
+  - ["活跃", "流失"]
+  - ["VIP", "普通会员"]
+  - ["优质客户", "风险客户"]
+
+sources:
+  - name: marketing
+    display_name: 营销系统
+  - name: risk_control
+    display_name: 风控系统
+  - name: customer_service
+    display_name: 客服系统
+
+require_reason_tags:
+  - "人工加精"
+  - "人工风险"
+  - "人工排除"
+  - "重点关注"
