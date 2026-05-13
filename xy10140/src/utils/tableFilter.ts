@@ -40,8 +40,12 @@ export function applyTableState(data: TableRow[], state: TableState): FilterResu
   }
 
   const { page, pageSize } = state.pagination;
-  const start = (page - 1) * pageSize;
-  rows = rows.slice(start, start + pageSize);
+  
+  if (pageSize > 0 && isFinite(pageSize) && page >= 1) {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    rows = rows.slice(start, end);
+  }
 
   let groupedData: Record<string, TableRow[]> | undefined;
   if (state.groupBy) {
