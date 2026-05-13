@@ -159,6 +159,17 @@ function calculatePriceDiff(exchangeId, priceDiff) {
     throw error;
   }
 
+  const needsInventory = priceDiff <= 0;
+  
+  if (needsInventory) {
+    const inventory = inventoryService.getInventory(exchange.target_sku);
+    if (!inventory || inventory.available_qty < exchange.target_qty) {
+      const error = new Error('库存不足');
+      error.code = ERROR_CODES.INSUFFICIENT_INVENTORY;
+      throw error;
+    }
+  }
+
   let result = null;
   transaction(() => {
     update(
@@ -183,6 +194,28 @@ function calculatePriceDiff(exchangeId, priceDiff) {
       remark,
       created_at: new Date().toISOString()
     });
+
+    if (needsInventory) {
+      const inv = inventoryService.getInventory(exchange.target_sku);
+      if (!inv || inv.available_qty < exchange.target_qty) {
+        throw new Error('库存不足');
+      }
+      
+      update('inventories', i => i.sku === exchange.target_sku, {
+        available_qty: inv.available_qty - exchange.target_qty,
+        reserved_qty: inv.reserved_qty + exchange.target_qty
+      });
+      
+      insert('inventory_reservations', {
+        id: Date.now(),
+        exchange_id: exchangeId,
+        sku: exchange.target_sku,
+        qty: exchange.target_qty,
+        status: 'reserved',
+        created_at: new Date().toISOString(),
+        released_at: null
+      });
+    }
 
     result = getExchangeById(exchangeId);
   });
@@ -253,9 +286,61 @@ function startReshipping(exchangeId) {
     throw error;
   }
 
-  inventoryService.reserveInventory(exchangeId, exchange.target_sku, exchange.target_qty);
+  const targetStatus = EXCHANGE_STATUSES.RESHIPPING;
 
-  return stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.RESHIPPING);
+  if (!stateMachine.canTransition(exchange.status, targetStatus)) {
+    const error = new Error(`Invalid state transition: ${exchange.status} -> ${targetStatus}`);
+    error.code = ERROR_CODES.INVALID_STATE_TRANSITION;
+    throw error;
+  }
+
+  const inventory = inventoryService.getInventory(exchange.target_sku);
+  if (!inventory || inventory.available_qty < exchange.target_qty) {
+    const error = new Error('库存不足');
+    error.code = ERROR_CODES.INSUFFICIENT_INVENTORY;
+    throw error;
+  }
+
+  let result = null;
+  transaction(() => {
+    const inv = inventoryService.getInventory(exchange.target_sku);
+    if (!inv || inv.available_qty < exchange.target_qty) {
+      throw new Error('库存不足');
+    }
+
+    update('inventories', i => i.sku === exchange.target_sku, {
+      available_qty: inv.available_qty - exchange.target_qty,
+      reserved_qty: inv.reserved_qty + exchange.target_qty
+    });
+
+    insert('inventory_reservations', {
+      id: Date.now(),
+      exchange_id: exchangeId,
+      sku: exchange.target_sku,
+      qty: exchange.target_qty,
+      status: 'reserved',
+      created_at: new Date().toISOString(),
+      released_at: null
+    });
+
+    update('exchanges', e => e.id === exchangeId, {
+      status: targetStatus,
+      updated_at: new Date().toISOString()
+    });
+
+    insert('exchange_status_logs', {
+      id: Date.now() + 1,
+      exchange_id: exchangeId,
+      from_status: exchange.status,
+      to_status: targetStatus,
+      remark: '开始重发商品，已占用库存',
+      created_at: new Date().toISOString()
+    });
+
+    result = getExchangeById(exchangeId);
+  });
+
+  return result;
 }
 
 function complete(exchangeId) {
@@ -266,10 +351,53 @@ function complete(exchangeId) {
     throw error;
   }
 
-  const result = stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.COMPLETED);
-  
-  inventoryService.consumeInventory(exchangeId, exchange.target_sku);
-  
+  const targetStatus = EXCHANGE_STATUSES.COMPLETED;
+
+  if (!stateMachine.canTransition(exchange.status, targetStatus)) {
+    const error = new Error(`Invalid state transition: ${exchange.status} -> ${targetStatus}`);
+    error.code = ERROR_CODES.INVALID_STATE_TRANSITION;
+    throw error;
+  }
+
+  let result = null;
+  transaction(() => {
+    const reservation = queryOne(
+      'inventory_reservations',
+      r => r.exchange_id === exchangeId && r.sku === exchange.target_sku && r.status === 'reserved'
+    );
+
+    update('exchanges', e => e.id === exchangeId, {
+      status: targetStatus,
+      updated_at: new Date().toISOString()
+    });
+
+    insert('exchange_status_logs', {
+      id: Date.now(),
+      exchange_id: exchangeId,
+      from_status: exchange.status,
+      to_status: targetStatus,
+      remark: '换货完成',
+      created_at: new Date().toISOString()
+    });
+
+    if (reservation) {
+      const inv = queryOne('inventories', i => i.sku === exchange.target_sku);
+      if (inv) {
+        update('inventories', i => i.sku === exchange.target_sku, {
+          total_qty: inv.total_qty - reservation.qty,
+          reserved_qty: inv.reserved_qty - reservation.qty
+        });
+      }
+      
+      update('inventory_reservations', r => r.id === reservation.id, {
+        status: 'consumed',
+        released_at: new Date().toISOString()
+      });
+    }
+
+    result = getExchangeById(exchangeId);
+  });
+
   return result;
 }
 
@@ -281,10 +409,53 @@ function cancel(exchangeId) {
     throw error;
   }
 
-  const result = stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.CANCELLED);
-  
-  inventoryService.releaseInventory(exchangeId, exchange.target_sku);
-  
+  const targetStatus = EXCHANGE_STATUSES.CANCELLED;
+
+  if (!stateMachine.canTransition(exchange.status, targetStatus)) {
+    const error = new Error(`Invalid state transition: ${exchange.status} -> ${targetStatus}`);
+    error.code = ERROR_CODES.INVALID_STATE_TRANSITION;
+    throw error;
+  }
+
+  let result = null;
+  transaction(() => {
+    const reservation = queryOne(
+      'inventory_reservations',
+      r => r.exchange_id === exchangeId && r.sku === exchange.target_sku && r.status === 'reserved'
+    );
+
+    update('exchanges', e => e.id === exchangeId, {
+      status: targetStatus,
+      updated_at: new Date().toISOString()
+    });
+
+    insert('exchange_status_logs', {
+      id: Date.now(),
+      exchange_id: exchangeId,
+      from_status: exchange.status,
+      to_status: targetStatus,
+      remark: '取消换货',
+      created_at: new Date().toISOString()
+    });
+
+    if (reservation) {
+      const inv = queryOne('inventories', i => i.sku === exchange.target_sku);
+      if (inv) {
+        update('inventories', i => i.sku === exchange.target_sku, {
+          available_qty: inv.available_qty + reservation.qty,
+          reserved_qty: inv.reserved_qty - reservation.qty
+        });
+      }
+      
+      update('inventory_reservations', r => r.id === reservation.id, {
+        status: 'released',
+        released_at: new Date().toISOString()
+      });
+    }
+
+    result = getExchangeById(exchangeId);
+  });
+
   return result;
 }
 

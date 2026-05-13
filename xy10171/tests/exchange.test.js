@@ -428,4 +428,186 @@ describe('Exchange Service', () => {
       }).toThrow('paid_amount 必须是数字');
     });
   });
+
+  describe('startReshipping atomic operation', () => {
+    test('should reject if state is invalid, no inventory dirty', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-RESHIP-STATE',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      const beforeInventory = inventoryService.getInventory(targetSku);
+      
+      expect(() => {
+        exchangeService.startReshipping(exchange.id);
+      }).toThrow('Invalid state transition');
+
+      const afterInventory = inventoryService.getInventory(targetSku);
+      expect(afterInventory.available_qty).toBe(beforeInventory.available_qty);
+      expect(afterInventory.reserved_qty).toBe(beforeInventory.reserved_qty);
+
+      const afterExchange = exchangeService.getExchangeById(exchange.id);
+      expect(afterExchange.status).toBe(EXCHANGE_STATUSES.PENDING_APPLY);
+    });
+
+    test('should reject if inventory insufficient, no state dirty', () => {
+      const limitedSku = 'SKU-LIMITED';
+      inventoryService.upsertInventory(limitedSku, 1, 1, 0);
+      
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-RESHIP-INV',
+        original_sku: 'SKU-OLD',
+        target_sku: limitedSku,
+        target_qty: 10,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+      exchangeService.calculatePriceDiff(exchange.id, 5000);
+      exchangeService.payDiff(exchange.id, 5000);
+
+      expect(() => {
+        exchangeService.startReshipping(exchange.id);
+      }).toThrow('库存不足');
+
+      const afterExchange = exchangeService.getExchangeById(exchange.id);
+      expect(afterExchange.status).toBe(EXCHANGE_STATUSES.PAID);
+    });
+
+    test('should atomically reserve inventory and change status', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-RESHIP-ATOMIC',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+      exchangeService.calculatePriceDiff(exchange.id, 5000);
+      exchangeService.payDiff(exchange.id, 5000);
+
+      const beforeInventory = inventoryService.getInventory(targetSku);
+      const beforeAvailable = beforeInventory.available_qty;
+      const beforeReserved = beforeInventory.reserved_qty;
+
+      const result = exchangeService.startReshipping(exchange.id);
+
+      expect(result.status).toBe(EXCHANGE_STATUSES.RESHIPPING);
+
+      const afterInventory = inventoryService.getInventory(targetSku);
+      expect(afterInventory.available_qty).toBe(beforeAvailable - 1);
+      expect(afterInventory.reserved_qty).toBe(beforeReserved + 1);
+    });
+  });
+
+  describe('zero price diff flow with inventory', () => {
+    test('should reserve inventory when price_diff is zero', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-ZERO-PRICE',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+
+      const beforeInventory = inventoryService.getInventory(targetSku);
+      const beforeAvailable = beforeInventory.available_qty;
+
+      const result = exchangeService.calculatePriceDiff(exchange.id, 0);
+
+      expect(result.status).toBe(EXCHANGE_STATUSES.RESHIPPING);
+      expect(result.price_diff).toBe(0);
+
+      const afterInventory = inventoryService.getInventory(targetSku);
+      expect(afterInventory.available_qty).toBe(beforeAvailable - 1);
+      expect(afterInventory.reserved_qty).toBe(1);
+
+      const afterExchange = exchangeService.complete(exchange.id);
+      expect(afterExchange.status).toBe(EXCHANGE_STATUSES.COMPLETED);
+
+      const finalInventory = inventoryService.getInventory(targetSku);
+      expect(finalInventory.reserved_qty).toBe(0);
+      expect(finalInventory.total_qty).toBe(beforeAvailable - 1);
+    });
+
+    test('should reject zero price diff when inventory insufficient, no state dirty', () => {
+      const limitedSku = 'SKU-ZERO-LIMITED';
+      inventoryService.upsertInventory(limitedSku, 1, 1, 0);
+      
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-ZERO-NO-INV',
+        original_sku: 'SKU-OLD',
+        target_sku: limitedSku,
+        target_qty: 5,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+
+      expect(() => {
+        exchangeService.calculatePriceDiff(exchange.id, 0);
+      }).toThrow('库存不足');
+
+      const afterExchange = exchangeService.getExchangeById(exchange.id);
+      expect(afterExchange.status).toBe(EXCHANGE_STATUSES.QC_PASSED);
+      expect(afterExchange.price_diff).toBe(0);
+    });
+  });
+
+  describe('complete/cancel with optional inventory', () => {
+    test('complete should work even without inventory reservation', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-COMPLETE-NO-RES',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+      exchangeService.calculatePriceDiff(exchange.id, 5000);
+      exchangeService.payDiff(exchange.id, 5000);
+      exchangeService.startReshipping(exchange.id);
+
+      const beforeInventory = inventoryService.getInventory(targetSku);
+
+      const result = exchangeService.complete(exchange.id);
+      expect(result.status).toBe(EXCHANGE_STATUSES.COMPLETED);
+
+      const afterInventory = inventoryService.getInventory(targetSku);
+      expect(afterInventory.reserved_qty).toBe(0);
+      expect(afterInventory.total_qty).toBe(beforeInventory.total_qty);
+    });
+
+    test('cancel should work even without inventory reservation', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-CANCEL-NO-RES',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+
+      const beforeInventory = inventoryService.getInventory(targetSku);
+
+      const result = exchangeService.cancel(exchange.id);
+      expect(result.status).toBe(EXCHANGE_STATUSES.CANCELLED);
+
+      const afterInventory = inventoryService.getInventory(targetSku);
+      expect(afterInventory.available_qty).toBe(beforeInventory.available_qty);
+    });
+  });
 });
