@@ -1,0 +1,14 @@
+{
+  "name": "ticket-sla-api",
+  "version": "1.0.0",
+  "description": "Ticket SLA Pause API for customer support",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "date-fns": "^3.0.0"
+  }
+}
