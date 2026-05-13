@@ -1,0 +1,20 @@
+{
+  "name": "material-inspection-system",
+  "version": "1.0.0",
+  "description": "装修材料进场验收系统",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "start": "cd server && npm start",
+    "seed": "cd server && npm run seed"
+  },
+  "keywords": ["material", "inspection", "construction"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

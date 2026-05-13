@@ -1,0 +1,25 @@
+{
+  "name": "material-inspection-server",
+  "version": "1.0.0",
+  "description": "材料验收系统后端",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/scripts/seed.js",
+    "migrate": "node src/scripts/migrate.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "sequelize": "^6.35.2",
+    "multer": "^1.4.5-lts.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "body-parser": "^1.20.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
