@@ -269,7 +269,16 @@ class Storage {
     }
     async invalidateExpiredSnapshots(days) {
         const config = await this.getConfig();
-        const retentionDays = days ?? config.cacheConfig.snapshotRetentionDays;
+        let retentionDays;
+        if (days !== undefined) {
+            if (isNaN(days) || days < 0) {
+                throw new Error(`无效的天数: ${days}，必须是非负整数`);
+            }
+            retentionDays = days;
+        }
+        else {
+            retentionDays = config.cacheConfig.snapshotRetentionDays;
+        }
         const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
         const now = new Date();
         let deletedCount = 0;
@@ -288,7 +297,16 @@ class Storage {
     }
     async invalidateExpiredHistory(days) {
         const config = await this.getConfig();
-        const retentionDays = days ?? config.cacheConfig.historyRetentionDays;
+        let retentionDays;
+        if (days !== undefined) {
+            if (isNaN(days) || days < 0) {
+                throw new Error(`无效的天数: ${days}，必须是非负整数`);
+            }
+            retentionDays = days;
+        }
+        else {
+            retentionDays = config.cacheConfig.historyRetentionDays;
+        }
         const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
         const now = new Date();
         let deletedCount = 0;

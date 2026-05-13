@@ -511,37 +511,45 @@ cacheCmd
     .action(async (options) => {
     await handleError(async () => {
         const type = options.type;
-        const days = options.days ? parseInt(options.days, 10) : undefined;
+        const validTypes = ['snapshots', 'history', 'all'];
+        if (!validTypes.includes(type)) {
+            (0, errors_1.exitWithError)(`无效的清理类型: "${type}"，必须是: ${validTypes.join(', ')}`);
+        }
+        let days;
+        if (options.days !== undefined) {
+            const parsedDays = parseInt(options.days, 10);
+            if (isNaN(parsedDays) || parsedDays < 0) {
+                (0, errors_1.exitWithError)(`无效的天数: "${options.days}"，必须是非负整数`);
+            }
+            days = parsedDays;
+        }
         const config = await storage.getConfig();
         const info = await storage.getCacheInfo();
-        let snapshotCount = info.snapshots.expired;
-        let historyCount = info.history.expired;
+        const actualRetentionDays = days ?? (type === 'snapshots' ? config.cacheConfig.snapshotRetentionDays :
+            type === 'history' ? config.cacheConfig.historyRetentionDays :
+                Math.min(config.cacheConfig.snapshotRetentionDays, config.cacheConfig.historyRetentionDays));
         if (days !== undefined) {
             (0, ui_1.printInfo)(`使用自定义保留天数: ${days} 天`);
         }
+        else {
+            (0, ui_1.printInfo)(`使用默认保留天数: ${actualRetentionDays} 天`);
+        }
         if (type === 'snapshots' || type === 'all') {
-            if (snapshotCount === 0 && days === undefined) {
-                (0, ui_1.printInfo)('没有过期的快照需要清理');
+            const deleted = await storage.invalidateExpiredSnapshots(days);
+            if (deleted > 0) {
+                (0, ui_1.printSuccess)(`已清理 ${deleted} 个过期快照`);
             }
             else {
-                if (snapshotCount > 0 || days !== undefined) {
-                    if (!options.yes) {
-                        // 简单确认机制
-                    }
-                    const deleted = await storage.invalidateExpiredSnapshots(days);
-                    (0, ui_1.printSuccess)(`已清理 ${deleted} 个过期快照`);
-                }
+                (0, ui_1.printInfo)('没有过期的快照需要清理');
             }
         }
         if (type === 'history' || type === 'all') {
-            if (historyCount === 0 && days === undefined) {
-                (0, ui_1.printInfo)('没有过期的历史记录需要清理');
+            const deleted = await storage.invalidateExpiredHistory(days);
+            if (deleted > 0) {
+                (0, ui_1.printSuccess)(`已清理 ${deleted} 条过期历史记录`);
             }
             else {
-                if (historyCount > 0 || days !== undefined) {
-                    const deleted = await storage.invalidateExpiredHistory(days);
-                    (0, ui_1.printSuccess)(`已清理 ${deleted} 条过期历史记录`);
-                }
+                (0, ui_1.printInfo)('没有过期的历史记录需要清理');
             }
         }
     });
@@ -556,6 +564,10 @@ cacheCmd
     .action(async (options) => {
     await handleError(async () => {
         const type = options.type;
+        const validTypes = ['snapshots', 'history', 'all'];
+        if (!validTypes.includes(type)) {
+            (0, errors_1.exitWithError)(`无效的清理类型: "${type}"，必须是: ${validTypes.join(', ')}`);
+        }
         if (!options.force && !options.snapshotId) {
             (0, ui_1.printWarning)('此操作将永久删除缓存数据，无法恢复！');
             (0, ui_1.printInfo)('使用 --force 跳过此警告');
@@ -573,6 +585,12 @@ cacheCmd
                 (0, errors_1.exitWithError)(`快照 ${options.snapshotId} 在环境 ${options.env} 中不存在`);
             }
             return;
+        }
+        if (options.env) {
+            const env = await storage.getEnvironment(options.env);
+            if (!env) {
+                (0, errors_1.exitWithError)(`环境 "${options.env}" 不存在`);
+            }
         }
         if (type === 'snapshots' || type === 'all') {
             const deleted = await storage.clearAllSnapshots(options.env);
