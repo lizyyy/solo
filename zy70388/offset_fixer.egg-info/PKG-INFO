@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: offset-fixer
+Version: 1.0.0
+Summary: 消息消费位点修复 CLI 工具
+Author: SRE Team
+Requires-Python: >=3.7
+Requires-Dist: click>=8.0.0
+Requires-Dist: python-dateutil>=2.8.0
+Requires-Dist: tabulate>=0.8.0
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
