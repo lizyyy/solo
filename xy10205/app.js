@@ -140,25 +140,24 @@ const App = (function() {
             return;
         }
 
-        let actualData = null;
         const actualText = document.getElementById('actualDataInput').value.trim();
-        if (actualText) {
-            actualData = WoodDryingApp.parseActualCSV(actualText);
-            if (actualData.length < 3) {
-                alert('实测数据格式错误，请检查CSV格式');
-                return;
-            }
+        if (!actualText) {
+            alert('请输入实测数据！实测数据是校准闭环的核心，用于验证含水率模型是否可靠、批次是否与原始数据对得上。');
+            return;
+        }
+
+        const actualData = WoodDryingApp.parseActualCSV(actualText);
+        if (actualData.length < 3) {
+            alert('实测数据格式错误或数据点不足（至少需要3个点），请检查CSV格式');
+            return;
         }
 
         const batch = WoodDryingApp.getBatchById(batchId);
         const updates = {
             curveData: curveData,
+            actualData: actualData,
             status: 'CURVE_VERIFICATION'
         };
-
-        if (actualData) {
-            updates.actualData = actualData;
-        }
 
         WoodDryingApp.updateBatch(batchId, updates);
         WoodDryingApp.addTimelineEvent(batchId, 'CURVE_VERIFICATION', '曲线数据已导入，开始验证');
@@ -375,8 +374,17 @@ const App = (function() {
             return `
                 <div class="verification-section">
                     <h3>步骤2：含水率模型验证</h3>
-                    <p class="help-text">需要实测数据才能进行模型验证。请在导入界面粘贴实测数据，或使用以下示例：</p>
-                    <div class="data-preview">
+                    <div class="criteria-box failed" style="border-left: 4px solid #ef4444;">
+                        <h4>⚠️ 缺少实测/抽检数据</h4>
+                        <p>含水率模型验证<strong>必须</strong>要有实测数据才能进行。这是校准闭环的核心环节：</p>
+                        <ul>
+                            <li>验证"含水率模型是否可靠"需要对比目标曲线与实测值</li>
+                            <li>验证"批次对比是否和原始数据对得上"需要实测数据作为参考</li>
+                            <li>无实测数据的批次将直接判定为"校准失败"</li>
+                        </ul>
+                    </div>
+                    <div class="data-preview" style="margin-top: 20px;">
+                        <p class="help-text" style="margin-bottom: 10px;">实测数据格式示例（CSV）：</p>
                         <table>
                             <thead>
                                 <tr><th>时间(h)</th><th>实测温度(℃)</th><th>实测湿度(%)</th><th>实测含水率(%)</th></tr>
@@ -390,7 +398,6 @@ const App = (function() {
                     </div>
                     <div style="margin-top: 20px;">
                         <button class="btn btn-primary" id="goToImportBtn">去导入实测数据</button>
-                        <button class="btn btn-secondary" id="skipModelBtn">跳过模型验证（无实测数据）</button>
                     </div>
                 </div>
             `;
@@ -464,8 +471,30 @@ const App = (function() {
     }
 
     function renderBatchComparisonStep(batch) {
+        const hasActualData = batch.actualData && batch.actualData.length > 0;
         const hasComparison = batch.batchComparison;
         const hasFinalResult = batch.finalResult;
+
+        if (!hasActualData) {
+            return `
+                <div class="verification-section">
+                    <h3>步骤3：批次对比校准</h3>
+                    <div class="criteria-box failed" style="border-left: 4px solid #ef4444;">
+                        <h4>⚠️ 缺少实测/抽检数据</h4>
+                        <p>批次对比校准<strong>必须</strong>要有实测数据才能进行。需要对比：</p>
+                        <ul>
+                            <li>目标温度 vs 实测温度</li>
+                            <li>目标湿度 vs 实测湿度</li>
+                            <li>目标含水率 vs 实测含水率</li>
+                        </ul>
+                        <p>无实测数据将直接判定为"校准失败"，无法验证批次是否与原始数据对得上。</p>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" id="goToImportBtn">去导入实测数据</button>
+                    </div>
+                </div>
+            `;
+        }
 
         let comparisonHTML = '';
         if (hasComparison) {
@@ -634,26 +663,6 @@ const App = (function() {
             });
         }
 
-        const skipBtn = document.getElementById('skipModelBtn');
-        if (skipBtn) {
-            skipBtn.addEventListener('click', () => {
-                if (confirm('确定跳过模型验证吗？建议提供实测数据以获得更准确的校准结果。')) {
-                    const batch = WoodDryingApp.getBatchById(currentCalibrationBatch.id);
-                    WoodDryingApp.updateBatch(batch.id, {
-                        status: 'BATCH_COMPARISON'
-                    });
-                    WoodDryingApp.addTimelineEvent(batch.id, 'BATCH_COMPARISON', '跳过模型验证，进入批次对比');
-
-                    currentCalibrationBatch = WoodDryingApp.getBatchById(batch.id);
-                    renderCalibrationHeader(currentCalibrationBatch);
-                    currentCalibrationStep = 3;
-                    updateStepperUI();
-                    renderCalibrationContent();
-                    renderCalibrationFooter();
-                }
-            });
-        }
-
         const goToImportBtn = document.getElementById('goToImportBtn');
         if (goToImportBtn) {
             goToImportBtn.addEventListener('click', () => {
@@ -666,6 +675,16 @@ const App = (function() {
     }
 
     function bindComparisonStepEvents() {
+        const goToImportBtn = document.getElementById('goToImportBtn');
+        if (goToImportBtn) {
+            goToImportBtn.addEventListener('click', () => {
+                closeModal('calibrationModal');
+                UIController.updateImportBatchSelect();
+                document.getElementById('importBatchSelect').value = currentCalibrationBatch.id;
+                openModal('importModal');
+            });
+        }
+
         const runBtn = document.getElementById('runComparisonBtn');
         if (runBtn) {
             runBtn.addEventListener('click', () => {

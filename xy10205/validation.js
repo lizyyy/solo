@@ -413,48 +413,75 @@ const ValidationEngine = (function() {
             return {
                 status: 'FAILED',
                 reason: '曲线导入验证失败',
+                severity: 'critical',
+                missingData: !curveResult
+            };
+        }
+
+        if (!modelResult) {
+            return {
+                status: 'FAILED',
+                reason: '含水率模型验证未执行：缺少实测/抽检数据，无法验证模型可靠性',
+                severity: 'critical',
+                missingData: true
+            };
+        }
+
+        if (!modelResult.passed && modelResult.errors && modelResult.errors.length > 0) {
+            return {
+                status: 'FAILED',
+                reason: '含水率模型验证失败：' + modelResult.errors[0],
                 severity: 'critical'
             };
         }
 
-        if (modelResult) {
-            const modelCritical = modelResult.avgDeviation > ModelThresholds.REVIEW_AVG_DEVIATION ||
-                                 modelResult.maxDeviation > ModelThresholds.REVIEW_MAX_DEVIATION ||
-                                 modelResult.correlationCoefficient < ModelThresholds.REVIEW_CORRELATION;
-
-            if (modelCritical) {
-                return {
-                    status: 'FAILED',
-                    reason: '含水率模型验证严重失败',
-                    severity: 'critical'
-                };
-            }
+        if (!comparisonResult) {
+            return {
+                status: 'FAILED',
+                reason: '批次对比未执行：缺少实测数据，无法验证是否与原始数据对得上',
+                severity: 'critical',
+                missingData: true
+            };
         }
 
-        if (comparisonResult) {
-            const comparisonCritical = comparisonResult.tempDeviationAvg > ComparisonThresholds.REVIEW_TEMP_DEVIATION ||
-                                       comparisonResult.humidityDeviationAvg > ComparisonThresholds.REVIEW_HUMIDITY_DEVIATION;
+        if (!comparisonResult.passed && comparisonResult.errors && comparisonResult.errors.length > 0) {
+            return {
+                status: 'FAILED',
+                reason: '批次对比失败：' + comparisonResult.errors[0],
+                severity: 'critical'
+            };
+        }
 
-            if (comparisonCritical) {
-                return {
-                    status: 'FAILED',
-                    reason: '批次对比偏差过大',
-                    severity: 'critical'
-                };
-            }
+        const modelCritical = modelResult.avgDeviation > ModelThresholds.REVIEW_AVG_DEVIATION ||
+                             modelResult.maxDeviation > ModelThresholds.REVIEW_MAX_DEVIATION ||
+                             modelResult.correlationCoefficient < ModelThresholds.REVIEW_CORRELATION;
+
+        if (modelCritical) {
+            return {
+                status: 'FAILED',
+                reason: '含水率模型验证严重失败',
+                severity: 'critical'
+            };
+        }
+
+        const comparisonCritical = comparisonResult.tempDeviationAvg > ComparisonThresholds.REVIEW_TEMP_DEVIATION ||
+                                   comparisonResult.humidityDeviationAvg > ComparisonThresholds.REVIEW_HUMIDITY_DEVIATION;
+
+        if (comparisonCritical) {
+            return {
+                status: 'FAILED',
+                reason: '批次对比偏差过大',
+                severity: 'critical'
+            };
         }
 
         const hasWarnings = 
-            (modelResult && (
-                modelResult.avgDeviation > ModelThresholds.PASS_AVG_DEVIATION ||
-                modelResult.maxDeviation > ModelThresholds.PASS_MAX_DEVIATION ||
-                modelResult.correlationCoefficient < ModelThresholds.PASS_CORRELATION
-            )) ||
-            (comparisonResult && (
-                comparisonResult.tempDeviationAvg > ComparisonThresholds.PASS_TEMP_DEVIATION ||
-                comparisonResult.humidityDeviationAvg > ComparisonThresholds.PASS_HUMIDITY_DEVIATION ||
-                !comparisonResult.targetMCMet
-            ));
+            (modelResult.avgDeviation > ModelThresholds.PASS_AVG_DEVIATION ||
+             modelResult.maxDeviation > ModelThresholds.PASS_MAX_DEVIATION ||
+             modelResult.correlationCoefficient < ModelThresholds.PASS_CORRELATION) ||
+            (comparisonResult.tempDeviationAvg > ComparisonThresholds.PASS_TEMP_DEVIATION ||
+             comparisonResult.humidityDeviationAvg > ComparisonThresholds.PASS_HUMIDITY_DEVIATION ||
+             !comparisonResult.targetMCMet);
 
         if (hasWarnings) {
             return {
@@ -466,7 +493,7 @@ const ValidationEngine = (function() {
 
         return {
             status: 'PASSED',
-            reason: '所有验证通过',
+            reason: '所有验证通过：曲线格式正确、模型可靠、批次数据对得上',
             severity: 'low'
         };
     }
