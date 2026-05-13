@@ -14,7 +14,7 @@
     "name": "SKU 特价 iPhone",
     "type": "direct_discount",
     "status": "pending",
-    "priority": 20,
+    "priority": 5,
     "skus": ["SKU-IPHONE-001"],
     "discount_value": 200.0,
     "can_overlay": true
@@ -24,7 +24,7 @@
     "name": "买2送1 耳机促销",
     "type": "multibuy",
     "status": "pending",
-    "priority": 15,
+    "priority": 20,
     "skus": ["SKU-EARPODS-001"],
     "buy_count": 2,
     "get_free": 1,

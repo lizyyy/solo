@@ -1,0 +1,26 @@
+{
+  "id": "rule-004",
+  "name": "品牌券满1000减100",
+  "type": "coupon",
+  "status": "pending",
+  "priority": 30,
+  "skus": [],
+  "categories": [],
+  "brands": [
+    "Apple"
+  ],
+  "discount_value": 100.0,
+  "discount_percent": null,
+  "buy_count": null,
+  "get_free": null,
+  "min_amount": 1000.0,
+  "coupon_code": "APPLE100",
+  "valid_from": null,
+  "valid_to": null,
+  "can_overlay": true,
+  "exclude_rule_ids": [],
+  "created_at": "2026-05-13T11:05:36.986048",
+  "updated_at": "2026-05-13T11:05:36.986065",
+  "version": 1,
+  "metadata": {}
+}

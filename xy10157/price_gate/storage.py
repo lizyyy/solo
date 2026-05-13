@@ -28,6 +28,7 @@ class FileStorage:
         self.dirty_dir = self.base_dir / "dirty"
         self.versions_dir = self.base_dir / "versions"
         self.reports_dir = self.base_dir / "reports"
+        self.catalog_file = self.base_dir / "sku_catalog.json"
         self._ensure_dirs()
 
     def _ensure_dirs(self) -> None:
@@ -234,3 +235,20 @@ class FileStorage:
         if self.base_dir.exists():
             shutil.rmtree(self.base_dir)
         self._ensure_dirs()
+
+    def save_sku_catalog(self, catalog: Dict[str, Dict[str, Any]]) -> None:
+        self._safe_write(
+            self.catalog_file,
+            json.dumps(catalog, ensure_ascii=False, indent=2),
+        )
+
+    def load_sku_catalog(self) -> Dict[str, Dict[str, Any]]:
+        if not self.catalog_file.exists():
+            return {}
+        with open(self.catalog_file, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def update_sku_catalog(self, sku: str, info: Dict[str, Any]) -> None:
+        catalog = self.load_sku_catalog()
+        catalog[sku] = info
+        self.save_sku_catalog(catalog)

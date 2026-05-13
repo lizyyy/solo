@@ -121,7 +121,8 @@ class RuleManager:
 
     def detect_conflicts(self) -> List[Conflict]:
         rules = self.storage.load_all_rules()
-        return self.engine.detect_conflicts(rules)
+        sku_catalog = self.storage.load_sku_catalog()
+        return self.engine.detect_conflicts(rules, sku_catalog=sku_catalog)
 
     def validate_pending(
         self,
@@ -130,12 +131,14 @@ class RuleManager:
     ) -> ValidationResult:
         rules = self.storage.load_all_rules()
         samples = self.storage.load_all_samples()
+        sku_catalog = self.storage.load_sku_catalog()
         pending_rules = [r for r in rules if r.status == RuleStatus.PENDING]
         existing = [r for r in rules if r.status != RuleStatus.PENDING]
         return self.engine.validate_changes(
             new_or_updated_rules=pending_rules,
             existing_rules=existing,
             samples=samples,
+            sku_catalog=sku_catalog,
             fail_on_critical=fail_on_critical,
             fail_on_sample_failure=fail_on_sample,
         )
@@ -143,6 +146,7 @@ class RuleManager:
     def approve_rules(self, rule_ids: List[str], actor: Optional[str] = None) -> Tuple[List[str], List[str]]:
         messages: List[str] = []
         approved: List[str] = []
+        sku_catalog = self.storage.load_sku_catalog()
         for rid in rule_ids:
             rule = self.storage.load_rule(rid)
             if not rule:
@@ -158,6 +162,7 @@ class RuleManager:
                 new_or_updated_rules=[rule],
                 existing_rules=other_rules,
                 samples=self.storage.load_all_samples(),
+                sku_catalog=sku_catalog,
             )
             if not vr.success:
                 messages.append(f"规则 {rule.name} 验证失败，无法审批:")
@@ -242,6 +247,7 @@ class RuleManager:
     def playback_samples(self, sample_ids: Optional[List[str]] = None) -> Tuple[int, int, List[Dict[str, Any]]]:
         rules = self.storage.load_all_rules()
         all_samples = self.storage.load_all_samples()
+        sku_catalog = self.storage.load_sku_catalog()
         if sample_ids:
             samples = [s for s in all_samples if s.id in sample_ids]
         else:
@@ -250,13 +256,26 @@ class RuleManager:
         failed = 0
         results: List[Dict[str, Any]] = []
         for sample in samples:
-            pr = self.engine.calculate_sample(sample, rules)
+            pr = self.engine.calculate_sample(sample, rules, sku_catalog=sku_catalog)
             results.append(pr.model_dump())
             if pr.passed:
                 passed += 1
             else:
                 failed += 1
         return passed, failed, results
+
+    def import_sku_catalog(self, file_path: Path) -> int:
+        with open(file_path, "r", encoding="utf-8") as f:
+            catalog = json.load(f)
+        if not isinstance(catalog, dict):
+            raise ValueError("SKU 目录文件根节点必须是字典，key 为 SKU")
+        existing = self.storage.load_sku_catalog()
+        existing.update(catalog)
+        self.storage.save_sku_catalog(existing)
+        return len(catalog)
+
+    def list_sku_catalog(self) -> Dict[str, Dict[str, Any]]:
+        return self.storage.load_sku_catalog()
 
     def retry_dirty(self, dirty_ids: Optional[List[str]] = None, actor: Optional[str] = None) -> Tuple[int, int, List[str]]:
         all_dirty = self.storage.load_all_dirty()

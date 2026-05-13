@@ -1,0 +1,27 @@
+{
+  "id": "rule-001",
+  "name": "618 品类直降 10%",
+  "type": "category",
+  "status": "pending",
+  "priority": 10,
+  "skus": [],
+  "categories": [
+    "手机",
+    "数码"
+  ],
+  "brands": [],
+  "discount_value": null,
+  "discount_percent": 10.0,
+  "buy_count": null,
+  "get_free": null,
+  "min_amount": null,
+  "coupon_code": null,
+  "valid_from": null,
+  "valid_to": null,
+  "can_overlay": true,
+  "exclude_rule_ids": [],
+  "created_at": "2026-05-13T11:05:36.984244",
+  "updated_at": "2026-05-13T11:05:36.984275",
+  "version": 1,
+  "metadata": {}
+}

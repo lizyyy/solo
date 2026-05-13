@@ -1,0 +1,19 @@
+{
+  "id": "sample-002",
+  "name": "耳机买2送1",
+  "description": "测试买赠规则",
+  "items": [
+    {
+      "sku": "SKU-EARPODS-001",
+      "quantity": 3,
+      "original_price": 100.0,
+      "applied_discounts": [],
+      "final_price": 0.0,
+      "total_final": 0.0
+    }
+  ],
+  "expected_total_original": 300.0,
+  "expected_total_final": 200.0,
+  "applied_coupons": [],
+  "created_at": "2026-05-13T11:05:37.125632"
+}

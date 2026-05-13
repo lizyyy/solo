@@ -1,0 +1,33 @@
+{
+  "rule_id": "rule-002",
+  "version": 1,
+  "data": {
+    "id": "rule-002",
+    "name": "SKU 特价 iPhone",
+    "type": "direct_discount",
+    "status": "pending",
+    "priority": 5,
+    "skus": [
+      "SKU-IPHONE-001"
+    ],
+    "categories": [],
+    "brands": [],
+    "discount_value": 200.0,
+    "discount_percent": null,
+    "buy_count": null,
+    "get_free": null,
+    "min_amount": null,
+    "coupon_code": null,
+    "valid_from": null,
+    "valid_to": null,
+    "can_overlay": true,
+    "exclude_rule_ids": [],
+    "created_at": "2026-05-13T11:05:36.984990",
+    "updated_at": "2026-05-13T11:05:36.985004",
+    "version": 1,
+    "metadata": {}
+  },
+  "snapshot_at": "2026-05-13T11:05:36.985168",
+  "action": "create",
+  "actor": null
+}

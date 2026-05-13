@@ -123,6 +123,37 @@ def list_samples(ctx: click.Context, output_json: bool) -> None:
         click.echo(f"共 {len(samples)} 条样例")
 
 
+@cli.command("import-sku-catalog")
+@click.argument("file_path", type=click.Path(exists=True, dir_okay=False))
+@click.pass_context
+def import_sku_catalog(ctx: click.Context, file_path: str) -> None:
+    mgr = get_manager(ctx.obj.get("data_dir"))
+    try:
+        count = mgr.import_sku_catalog(Path(file_path))
+        click.echo(f"完成: 导入 {count} 个 SKU 信息")
+        sys.exit(0)
+    except Exception as e:
+        click.echo(f"导入失败: {e}", err=True)
+        sys.exit(1)
+
+
+@cli.command("list-sku-catalog")
+@click.option("--json", "output_json", is_flag=True, help="JSON 输出")
+@click.pass_context
+def list_sku_catalog(ctx: click.Context, output_json: bool) -> None:
+    mgr = get_manager(ctx.obj.get("data_dir"))
+    catalog = mgr.list_sku_catalog()
+    if output_json or not catalog:
+        click.echo(json.dumps(catalog, ensure_ascii=False, indent=2))
+    else:
+        for sku, info in catalog.items():
+            category = info.get("category", "N/A")
+            brand = info.get("brand", "N/A")
+            name = info.get("name", "")
+            click.echo(f"{sku}: {name} | 品类={category} | 品牌={brand}")
+        click.echo(f"共 {len(catalog)} 个 SKU")
+
+
 @cli.command("detect-conflicts")
 @click.option("--json", "output_json", is_flag=True, help="JSON 输出")
 @click.pass_context

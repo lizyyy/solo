@@ -41,8 +41,11 @@ class PriceEngine:
         return True
 
     @staticmethod
-    def _apply_single_rule(rule: PriceRule, sku_info: SKUInfo) -> float:
-        price = sku_info.original_price
+    def _apply_single_rule(rule: PriceRule, sku_info: SKUInfo, current_price: Optional[float] = None) -> float:
+        if current_price is None:
+            price = sku_info.original_price
+        else:
+            price = current_price
         if rule.type == RuleType.DIRECT_DISCOUNT:
             if rule.discount_percent is not None:
                 price = price * (1 - rule.discount_percent / 100)
@@ -69,23 +72,38 @@ class PriceEngine:
         return max(0, price)
 
     @staticmethod
-    def _calculate_order_total(items: List[Dict], coupons: List[str], rules: List[PriceRule], strict_block: bool = False) -> Tuple[float, List[str], List[Dict]]:
+    def _calculate_order_total(
+        items: List[Dict],
+        coupons: List[str],
+        rules: List[PriceRule],
+        strict_block: bool = False,
+        sku_catalog: Optional[Dict[str, Dict]] = None,
+    ) -> Tuple[float, List[str], List[Dict]]:
         final_items = []
         applied_rule_ids = []
-        total = 0.0
         sorted_rules = sorted(rules, key=lambda r: r.priority, reverse=True)
+        non_coupon_rules = [r for r in sorted_rules if r.type != RuleType.COUPON]
+        coupon_rules = [r for r in sorted_rules if r.type == RuleType.COUPON]
+        subtotal_original = sum(
+            item.get("original_price", 0) * item.get("quantity", 1)
+            for item in items
+        )
+        item_subtotals = []
         for item in items:
+            sku_catalog_info = None
+            if sku_catalog and item["sku"] in sku_catalog:
+                sku_catalog_info = sku_catalog[item["sku"]]
             sku_info = SKUInfo(
                 sku=item["sku"],
-                name=item.get("name", ""),
+                name=item.get("name", sku_catalog_info.get("name", "") if sku_catalog_info else ""),
                 original_price=item["original_price"],
-                category=item.get("category"),
-                brand=item.get("brand"),
+                category=item.get("category") or (sku_catalog_info.get("category") if sku_catalog_info else None),
+                brand=item.get("brand") or (sku_catalog_info.get("brand") if sku_catalog_info else None),
                 quantity=item.get("quantity", 1),
             )
             applied_item_rules = []
             current_price = sku_info.original_price
-            for rule in sorted_rules:
+            for rule in non_coupon_rules:
                 if not PriceEngine._is_rule_applicable(rule, sku_info, coupons):
                     continue
                 if not rule.can_overlay and applied_item_rules:
@@ -94,44 +112,97 @@ class PriceEngine:
                     has_conflict = any(rid in rule.exclude_rule_ids for rid in applied_item_rules)
                     if has_conflict and strict_block:
                         continue
-                current_price = PriceEngine._apply_single_rule(rule, sku_info)
+                current_price = PriceEngine._apply_single_rule(rule, sku_info, current_price)
                 applied_item_rules.append(rule.id)
                 if rule.id not in applied_rule_ids:
                     applied_rule_ids.append(rule.id)
                 if not rule.can_overlay:
                     break
-            item_total = current_price * sku_info.quantity
+            item_subtotal = current_price * sku_info.quantity
+            item_subtotals.append({
+                "sku_info": sku_info,
+                "current_price": current_price,
+                "applied_item_rules": applied_item_rules,
+                "item_subtotal": item_subtotal,
+            })
+        subtotal_after_items = sum(s["item_subtotal"] for s in item_subtotals)
+        applied_coupon_ids = []
+        coupon_order_discount = 0.0
+        for rule in coupon_rules:
+            if rule.coupon_code and rule.coupon_code not in coupons:
+                continue
+            if rule.min_amount is not None and subtotal_original < rule.min_amount:
+                continue
+            coupon_applicable = False
+            for entry in item_subtotals:
+                sku_info = entry["sku_info"]
+                if PriceEngine._is_rule_applicable(rule, sku_info, coupons):
+                    coupon_applicable = True
+                    break
+            if not coupon_applicable:
+                continue
+            if rule.discount_value is not None:
+                coupon_order_discount += rule.discount_value
+            if rule.discount_percent is not None:
+                coupon_order_discount += subtotal_after_items * (rule.discount_percent / 100)
+            if rule.id not in applied_rule_ids:
+                applied_rule_ids.append(rule.id)
+            applied_coupon_ids.append(rule.id)
+        final_total = round(max(0, subtotal_after_items - coupon_order_discount), 2)
+        total_without_coupons = subtotal_after_items
+        coupon_per_item = 0.0
+        item_count = len(item_subtotals)
+        if coupon_order_discount > 0 and item_count > 0 and total_without_coupons > 0:
+            for entry in item_subtotals:
+                share = entry["item_subtotal"] / total_without_coupons
+                entry["coupon_discount_share"] = coupon_order_discount * share
+        for entry in item_subtotals:
+            sku_info = entry["sku_info"]
+            item_discount = entry.get("coupon_discount_share", 0.0)
+            final_item_price = entry["current_price"]
+            if item_discount > 0 and sku_info.quantity > 0:
+                final_item_price = final_item_price - (item_discount / sku_info.quantity)
+                final_item_price = max(0, final_item_price)
+            final_total_item = final_item_price * sku_info.quantity
+            all_applied = entry["applied_item_rules"] + applied_coupon_ids
             final_items.append({
                 "sku": sku_info.sku,
                 "original_price": sku_info.original_price,
-                "final_price": current_price,
+                "final_price": round(final_item_price, 2),
                 "quantity": sku_info.quantity,
-                "total_final": item_total,
-                "applied_rules": applied_item_rules,
+                "total_final": round(final_total_item, 2),
+                "applied_rules": all_applied,
             })
-            total += item_total
-        return round(total, 2), applied_rule_ids, final_items
+        return final_total, applied_rule_ids, final_items
 
     def calculate_sample(
         self,
         sample: SampleOrder,
         rules: List[PriceRule],
         strict_block: bool = False,
+        sku_catalog: Optional[Dict[str, Dict]] = None,
     ) -> PlaybackResult:
         items_data = []
         expected_original = 0.0
         for item in sample.items:
-            items_data.append({
+            item_dict = {
                 "sku": item.sku,
                 "original_price": item.original_price,
                 "quantity": item.quantity,
-            })
+            }
+            if item.sku in sku_catalog if sku_catalog else False:
+                info = sku_catalog[item.sku]
+                item_dict["category"] = info.get("category")
+                item_dict["brand"] = info.get("brand")
+                item_dict["name"] = info.get("name", "")
+            items_data.append(item_dict)
             expected_original += item.original_price * item.quantity
         actual_final, applied_rules, final_items = self._calculate_order_total(
             items_data,
             sample.applied_coupons,
             rules,
             strict_block=strict_block,
+            sku_catalog=sku_catalog,
         )
         diff = actual_final - sample.expected_total_final
         passed = abs(diff) < 0.01
@@ -301,7 +372,7 @@ class PriceEngine:
         sample_results = []
         sample_failures = 0
         for sample in samples:
-            pr = self.calculate_sample(sample, merged_rules)
+            pr = self.calculate_sample(sample, merged_rules, sku_catalog=sku_catalog)
             sample_results.append(pr.model_dump())
             if not pr.passed:
                 sample_failures += 1

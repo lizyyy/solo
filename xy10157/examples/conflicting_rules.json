@@ -1,0 +1,22 @@
+[
+  {
+    "id": "conflict-001",
+    "name": "手机 60% 折扣",
+    "type": "category",
+    "status": "pending",
+    "priority": 15,
+    "categories": ["手机"],
+    "discount_percent": 60.0,
+    "can_overlay": true
+  },
+  {
+    "id": "conflict-002",
+    "name": "iPhone 又 30%",
+    "type": "direct_discount",
+    "status": "pending",
+    "priority": 10,
+    "skus": ["SKU-IPHONE-001"],
+    "discount_percent": 30.0,
+    "can_overlay": true
+  }
+]

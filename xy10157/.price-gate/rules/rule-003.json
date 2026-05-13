@@ -1,0 +1,26 @@
+{
+  "id": "rule-003",
+  "name": "买2送1 耳机促销",
+  "type": "multibuy",
+  "status": "pending",
+  "priority": 20,
+  "skus": [
+    "SKU-EARPODS-001"
+  ],
+  "categories": [],
+  "brands": [],
+  "discount_value": null,
+  "discount_percent": null,
+  "buy_count": 2,
+  "get_free": 1,
+  "min_amount": null,
+  "coupon_code": null,
+  "valid_from": null,
+  "valid_to": null,
+  "can_overlay": false,
+  "exclude_rule_ids": [],
+  "created_at": "2026-05-13T11:05:36.985538",
+  "updated_at": "2026-05-13T11:05:36.985553",
+  "version": 1,
+  "metadata": {}
+}
