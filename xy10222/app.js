@@ -6,7 +6,7 @@ const executionReceiptRoutes = require('./routes/executionReceipts');
 const summaryRoutes = require('./routes/summary');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(bodyParser.json());
 

@@ -3,7 +3,7 @@
 # 宠物寄养喂药提醒 API 验收脚本
 # 请确保服务已启动：node app.js
 
-BASE_URL="http://localhost:3000"
+BASE_URL="http://localhost:3001"
 
 echo "========================================"
 echo "  宠物寄养喂药提醒 API 验收测试"
@@ -454,6 +454,45 @@ RESPONSE=$(curl -s -X POST "${BASE_URL}/api/medication-plans/${TEMP_PLAN_ID}/adv
   }')
 echo "响应：$RESPONSE"
 echo -e "${GREEN}✓ 预期错误：喂药计划状态为 \"withdrawn\"，无法推进${NC}"
+echo ""
+
+echo "尝试为已撤回的计划创建执行回执"
+RESPONSE=$(curl -s -X POST "${BASE_URL}/api/execution-receipts" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "petId": "'"${PET_IDS["豆豆"]}"'",
+    "planId": "'"${TEMP_PLAN_ID}"'",
+    "executedBy": "测试护士",
+    "actualDosage": 10,
+    "dosageUnit": "mg",
+    "executionTime": "2026-05-10T21:00:00Z",
+    "lastMealTime": "2026-05-10T20:30:00Z",
+    "petCondition": "正常",
+    "administrationMethod": "口服"
+  }')
+echo "响应：$RESPONSE"
+echo -e "${GREEN}✓ 预期错误：喂药计划状态不允许创建回执：计划状态为 \"withdrawn\"，仅 \"active\" 状态的计划可以创建执行回执${NC}"
+echo ""
+
+# 异常 6.5：计划与宠物不匹配
+echo -e "${YELLOW}异常测试 6.5：计划与宠物不匹配${NC}"
+echo ""
+echo "尝试为咪咪创建旺财的喂药计划的执行回执"
+RESPONSE=$(curl -s -X POST "${BASE_URL}/api/execution-receipts" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "petId": "'"${PET_IDS["咪咪"]}"'",
+    "planId": "'"${PLAN_IDS["旺财-皮肤"]}"'",
+    "executedBy": "测试护士",
+    "actualDosage": 500,
+    "dosageUnit": "mg",
+    "executionTime": "2026-05-10T21:00:00Z",
+    "lastMealTime": "2026-05-10T20:30:00Z",
+    "petCondition": "正常",
+    "administrationMethod": "口服"
+  }')
+echo "响应：$RESPONSE"
+echo -e "${GREEN}✓ 预期错误：喂药计划不属于该宠物${NC}"
 echo ""
 
 # 异常 7：剂量不一致记录

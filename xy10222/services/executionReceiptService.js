@@ -15,6 +15,14 @@ class ExecutionReceiptService {
       throw new Error(`找不到 ID 为 "${receiptData.planId}" 的喂药计划`);
     }
 
+    if (plan.petId !== receiptData.petId) {
+      throw new Error(`喂药计划不属于该宠物：计划ID "${receiptData.planId}" 不属于宠物ID "${receiptData.petId}"`);
+    }
+
+    if (plan.status !== 'active') {
+      throw new Error(`喂药计划状态不允许创建回执：计划状态为 "${plan.status}"，仅 "active" 状态的计划可以创建执行回执`);
+    }
+
     this.validateExecutionReceipt(receiptData, plan);
 
     const receipt = {
