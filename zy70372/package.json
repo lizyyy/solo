@@ -1,0 +1,22 @@
+{
+  "name": "business-rules-sandbox",
+  "version": "1.0.0",
+  "description": "业务规则沙盘 API - 支持创建规则版本、导入历史样本、运行沙盘、比较规则差异、标记冲突和导出报告",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["rules-engine", "sandbox", "business-rules", "rule-testing"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.6.2"
+  }
+}
