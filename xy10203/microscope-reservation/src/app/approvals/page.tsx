@@ -14,7 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { ReservationWithDetails, ConflictDetail } from '@/lib/types';
-import { getStatusLabel } from '@/lib/services/reservation-service';
+import { getStatusLabel, getAccessoryTypeLabel } from '@/lib/client-utils';
 import { formatDateTime } from '@/lib/utils';
 
 export default function ApprovalsPage() {
@@ -140,7 +140,7 @@ export default function ApprovalsPage() {
       });
 
       if (response.ok) {
-        setShowRejectModal(false);
+        setShowRejectModal(null);
         setRejectReason('');
         setToast({ type: 'success', message: '已拒绝预约' });
         loadData();
@@ -162,14 +162,6 @@ export default function ApprovalsPage() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-
-  function getAccessoryTypeLabel(type: string) {
-    switch (type) {
-      case 'magnification': return '倍率模块';
-      case 'sample_stage': return '样品台';
-      default: return '其他附件';
-    }
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

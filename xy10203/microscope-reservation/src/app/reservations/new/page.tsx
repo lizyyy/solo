@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Microscope as MicroscopeType, Accessory, User, ResearchGroup, ConflictDetail } from '@/lib/types';
 import { formatDateTime } from '@/lib/utils';
+import { getAccessoryTypeLabel } from '@/lib/client-utils';
 
 interface MicroscopeWithAccessories extends MicroscopeType {
   accessories: Accessory[];
@@ -131,14 +132,6 @@ export default function NewReservationPage() {
   function filteredUsers() {
     if (!selectedGroup) return users;
     return users.filter(u => u.group_id === selectedGroup);
-  }
-
-  function getAccessoryTypeLabel(type: string) {
-    switch (type) {
-      case 'magnification': return '倍率模块';
-      case 'sample_stage': return '样品台';
-      default: return '其他附件';
-    }
   }
 
   function getAccessoryTypeColor(type: string) {

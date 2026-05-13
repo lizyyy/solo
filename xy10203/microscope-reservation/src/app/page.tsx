@@ -8,21 +8,21 @@ import {
   Clock, 
   AlertTriangle,
   Users,
-  Microscope,
+  Microscope as MicroscopeIcon,
   BarChart3,
   Activity,
   BookOpen,
   ChevronRight
 } from 'lucide-react';
-import { ReservationWithDetails, User, ResearchGroup, Microscope } from '@/lib/types';
-import { getStatusLabel } from '@/lib/services/reservation-service';
+import type { ReservationWithDetails, User, ResearchGroup, Microscope as MicroscopeType } from '@/lib/types';
+import { getStatusLabel } from '@/lib/client-utils';
 import { formatDateTime } from '@/lib/utils';
 
 export default function Home() {
   const [reservations, setReservations] = useState<ReservationWithDetails[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<ResearchGroup[]>([]);
-  const [microscopes, setMicroscopes] = useState<Microscope[]>([]);
+  const [microscopes, setMicroscopes] = useState<MicroscopeType[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     total: 0,
@@ -102,7 +102,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Microscope className="h-8 w-8 text-blue-600" />
+              <MicroscopeIcon className="h-8 w-8 text-blue-600" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">显微镜共享预约冲突器</h1>
                 <p className="text-sm text-gray-500">实验室资源智能调度系统</p>

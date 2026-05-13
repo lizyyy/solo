@@ -14,7 +14,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { ReservationWithDetails, Microscope as MicroscopeType, Accessory } from '@/lib/types';
-import { getStatusLabel } from '@/lib/services/reservation-service';
+import { getStatusLabel } from '@/lib/client-utils';
 import { formatDateTime, formatDate } from '@/lib/utils';
 import dayjs from 'dayjs';
 

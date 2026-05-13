@@ -12,7 +12,7 @@ import {
   Microscope
 } from 'lucide-react';
 import { ReservationWithDetails, Microscope as MicroscopeType, ResearchGroup } from '@/lib/types';
-import { getStatusLabel } from '@/lib/services/reservation-service';
+import { getStatusLabel } from '@/lib/client-utils';
 import { formatDateTime, formatDate } from '@/lib/utils';
 
 export default function ReservationsPage() {

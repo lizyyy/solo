@@ -20,7 +20,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { ReservationWithDetails, OperationLog } from '@/lib/types';
-import { getStatusLabel } from '@/lib/services/reservation-service';
+import { getStatusLabel, getAccessoryTypeLabel, getActionLabel } from '@/lib/client-utils';
 import { formatDateTime } from '@/lib/utils';
 
 interface PageProps {
@@ -86,27 +86,6 @@ export default function ReservationDetailPage({ params }: PageProps) {
       case 'cancelled': return <X className="h-5 w-5" />;
       default: return <Calendar className="h-5 w-5" />;
     }
-  }
-
-  function getAccessoryTypeLabel(type: string) {
-    switch (type) {
-      case 'magnification': return '倍率模块';
-      case 'sample_stage': return '样品台';
-      default: return '其他附件';
-    }
-  }
-
-  function getActionLabel(action: string) {
-    const labels: Record<string, string> = {
-      create: '创建预约',
-      update: '修改预约',
-      submit: '提交审批',
-      approve: '批准预约',
-      reject: '拒绝预约',
-      cancel: '取消预约',
-      delete: '删除预约'
-    };
-    return labels[action] || action;
   }
 
   async function handleApprove() {
