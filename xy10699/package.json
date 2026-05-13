@@ -1,0 +1,19 @@
+{
+  "name": "cloud-release-approval",
+  "version": "1.0.0",
+  "description": "云资源发布审批系统",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd backend && npm run dev",
+    "client:dev": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "init:data": "cd backend && npm run init:data",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build"
+  },
+  "keywords": ["approval", "release", "cloud"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
