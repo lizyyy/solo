@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>社区团购截单补货系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; min-height: 100vh; }
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 24px; font-weight: 600; }
+    .header p { opacity: 0.9; margin-top: 5px; font-size: 14px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a67d8; }
+    .btn-success { background: #48bb78; color: white; }
+    .btn-success:hover { background: #38a169; }
+    .btn-warning { background: #ed8936; color: white; }
+    .btn-warning:hover { background: #dd6b20; }
+    .btn-danger { background: #e53e3e; color: white; }
+    .btn-danger:hover { background: #c53030; }
+    .btn-info { background: #4299e1; color: white; }
+    .btn-info:hover { background: #3182ce; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px; margin-bottom: 20px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+    .card-header h2 { font-size: 18px; color: #2d3748; }
+    .grid { display: grid; gap: 20px; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .order-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; cursor: pointer; transition: all 0.2s; }
+    .order-card:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15); }
+    .order-card.selected { border-color: #667eea; background: #f0f4ff; }
+    .order-no { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 8px; }
+    .order-info { font-size: 13px; color: #718096; margin-bottom: 5px; }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-CREATED { background: #bee3f8; color: #2b6cb0; }
+    .status-PAID { background: #c6f6d5; color: #276749; }
+    .status-PICKING { background: #feebc8; color: #c05621; }
+    .status-PICKED { background: #e9d8fd; color: #6b46c1; }
+    .status-DELIVERED { background: #fed7d7; color: #c53030; }
+    .status-COMPLETED { background: #c6f6d5; color: #276749; }
+    .status-REFUNDED { background: #fed7d7; color: #c53030; }
+    .status-CANCELLED { background: #e2e8f0; color: #718096; }
+    .detail-section { margin-bottom: 25px; }
+    .detail-section h3 { font-size: 16px; color: #4a5568; margin-bottom: 12px; display: flex; align-items: center; }
+    .detail-section h3::before { content: ''; width: 4px; height: 16px; background: #667eea; margin-right: 8px; border-radius: 2px; }
+    .info-row { display: flex; margin-bottom: 10px; font-size: 14px; }
+    .info-label { width: 100px; color: #718096; flex-shrink: 0; }
+    .info-value { color: #2d3748; }
+    .timeline { position: relative; padding-left: 30px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -26px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #667eea; border: 3px solid white; box-shadow: 0 0 0 2px #e2e8f0; }
+    .timeline-item .time { font-size: 12px; color: #a0aec0; margin-bottom: 4px; }
+    .timeline-item .title { font-size: 14px; font-weight: 600; color: #2d3748; margin-bottom: 4px; }
+    .timeline-item .desc { font-size: 13px; color: #718096; }
+    .timeline-item .operator { font-size: 12px; color: #a0aec0; margin-top: 4px; }
+    .timeline-item .responsible { display: inline-block; margin-left: 8px; padding: 2px 6px; border-radius: 4px; font-size: 11px; background: #e6fffa; color: #234e52; }
+    .table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .table th { background: #f7fafc; color: #4a5568; font-weight: 600; }
+    .table tr:hover { background: #f7fafc; }
+    .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-header h3 { font-size: 18px; color: #2d3748; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #718096; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 14px; color: #4a5568; margin-bottom: 6px; font-weight: 500; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+    .badge-success { background: #c6f6d5; color: #276749; }
+    .badge-warning { background: #feebc8; color: #c05621; }
+    .badge-danger { background: #fed7d7; color: #c53030; }
+    .badge-info { background: #bee3f8; color: #2b6cb0; }
+    .empty-state { text-align: center; padding: 40px; color: #a0aec0; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 10px; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .stat-label { font-size: 13px; color: #718096; margin-bottom: 5px; }
+    .stat-value { font-size: 24px; font-weight: 600; color: #2d3748; }
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    .filter-bar .form-group { margin-bottom: 0; flex: 1; min-width: 150px; }
+    .modified-history { background: #f7fafc; border-radius: 8px; padding: 15px; margin-top: 10px; }
+    .modified-history h4 { font-size: 14px; color: #4a5568; margin-bottom: 10px; }
+    .modified-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid #e2e8f0; }
+    .modified-item:last-child { border-bottom: none; }
+    .modified-field { color: #667eea; font-weight: 500; }
+    .modified-old { color: #e53e3e; text-decoration: line-through; }
+    .modified-new { color: #48bb78; }
+    .tab-container { margin-bottom: 20px; }
+    .tab-buttons { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 15px; }
+    .tab-button { padding: 10px 20px; background: none; border: none; cursor: pointer; font-size: 14px; color: #718096; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab-button.active { color: #667eea; border-bottom-color: #667eea; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>社区团购截单补货系统</h1>
+    <p>小区团单管理 · 替换品确认 · 退款回调 · 团长拣货 · 缺货清单 · 责任报告</p>
+  </div>
+  
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>系统操作</h2>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="initTestData()">初始化测试数据</button>
+          <button class="btn btn-info" onclick="refreshOrders()">刷新订单列表</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">订单总数</div>
+          <div class="stat-value" id="stat-total">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已完成</div>
+          <div class="stat-value" id="stat-completed">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">进行中</div>
+          <div class="stat-value" id="stat-active">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">已退款</div>
+          <div class="stat-value" id="stat-refunded">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h2>订单列表</h2>
+        </div>
+        <div id="order-list">
+          <div class="empty-state">
+            <div class="icon">📦</div>
+            <p>暂无订单，请先初始化测试数据</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>订单详情</h2>
+          <div class="action-buttons" id="detail-actions" style="display: none;">
+            <button class="btn btn-info" onclick="generateReport()">生成报告</button>
+            <button class="btn btn-success" onclick="exportReport()">导出CSV</button>
+          </div>
+        </div>
+        <div id="order-detail">
+          <div class="empty-state">
+            <div class="icon">👆</div>
+            <p>请从左侧选择一个订单查看详情</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="modal-title">操作</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+    let selectedOrderId = null;
+    let orders = [];
+    let products = [];
+
+    async function initTestData() {
+      try {
+        const res = await fetch(`${API_BASE}/orders/init-test-data`);
+        const data = await res.json();
+        if (data.success) {
+          alert('测试数据初始化成功！\n\n已创建：\n- 正常流订单\n- 问题流订单（含缺货替换、退款、重复回调测试）\n- 复核流订单（含部分拣货退款）');
+          await refreshOrders();
+        }
+      } catch (e) {
+        alert('初始化失败：' + e.message);
+      }
+    }
+
+    async function refreshOrders() {
+      try {
+        const [ordersRes, productsRes] = await Promise.all([
+          fetch(`${API_BASE}/orders`),
+          fetch(`${API_BASE}/products`)
+        ]);
+        const ordersData = await ordersRes.json();
+        const productsData = await productsRes.json();
+        
+        if (ordersData.success) {
+          orders = ordersData.data;
+          renderOrderList();
+          updateStats();
+        }
+        if (productsData.success) {
+          products = productsData.data;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateStats() {
+      document.getElementById('stat-total').textContent = orders.length;
+      document.getElementById('stat-completed').textContent = orders.filter(o => o.status === 'COMPLETED').length;
+      document.getElementById('stat-active').textContent = orders.filter(o => ['CREATED', 'PAID', 'PICKING', 'PICKED', 'DELIVERED'].includes(o.status)).length;
+      document.getElementById('stat-refunded').textContent = orders.filter(o => o.status === 'REFUNDED').length;
+    }
+
+    function renderOrderList() {
+      const container = document.getElementById('order-list');
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📦</div>
+            <p>暂无订单，请先初始化测试数据</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = orders.map(order => `
+        <div class="order-card ${selectedOrderId === order.id ? 'selected' : ''}" onclick="selectOrder('${order.id}')">
+          <div class="order-no">${order.orderNo}</div>
+          <div class="order-info">${order.communityName} · ${order.groupLeaderName}</div>
+          <div class="order-info">${order.userName} · ${order.phone}</div>
+          <div class="order-info">商品数：${order.items.length} · ¥${order.actualAmount.toFixed(2)}</div>
+          <span class="status-badge status-${order.status}">${getStatusText(order.status)}</span>
+        </div>
+      `).join('');
+    }
+
+    function getStatusText(status) {
+      const map = {
+        CREATED: '待支付',
+        PAID: '已支付',
+        PICKING: '拣货中',
+        PICKED: '已拣货',
+        DELIVERED: '已配送',
+        COMPLETED: '已完成',
+        CANCELLED: '已取消',
+        REFUNDING: '退款中',
+        REFUNDED: '已退款',
+        OUT_OF_STOCK: '缺货'
+      };
+      return map[status] || status;
+    }
+
+    async function selectOrder(orderId) {
+      selectedOrderId = orderId;
+      renderOrderList();
+      await loadOrderDetail(orderId);
+    }
+
+    async function loadOrderDetail(orderId) {
+      try {
+        const res = await fetch(`${API_BASE}/orders/${orderId}`);
+        const data = await res.json();
+        if (data.success) {
+          renderOrderDetail(data.data);
+          document.getElementById('detail-actions').style.display = 'flex';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderOrderDetail(data) {
+      const { order, timeline, pickingRecords, outOfStockItems } = data;
+      
+      const container = document.getElementById('order-detail');
+      container.innerHTML = `
+        <div class="tab-container">
+          <div class="tab-buttons">
+            <button class="tab-button active" onclick="switchTab('basic', this)">基本信息</button>
+            <button class="tab-button" onclick="switchTab('timeline', this)">时间线</button>
+            <button class="tab-button" onclick="switchTab('items', this)">商品明细</button>
+            <button class="tab-button" onclick="switchTab('modified', this)">修改记录</button>
+          </div>
+
+          <div class="tab-content active" id="tab-basic">
+            <div class="detail-section">
+              <h3>订单信息</h3>
+              <div class="info-row"><span class="info-label">订单号：</span><span class="info-value">${order.orderNo}</span></div>
+              <div class="info-row"><span class="info-label">状态：</span><span class="info-value"><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></span></div>
+              <div class="info-row"><span class="info-label">创建时间：</span><span class="info-value">${new Date(order.createdAt).toLocaleString()}</span></div>
+              <div class="info-row"><span class="info-label">更新时间：</span><span class="info-value">${new Date(order.updatedAt).toLocaleString()}</span></div>
+            </div>
+
+            <div class="detail-section">
+              <h3>小区/团长</h3>
+              <div class="info-row"><span class="info-label">小区：</span><span class="info-value">${order.communityName}</span></div>
+              <div class="info-row"><span class="info-label">团长：</span><span class="info-value">${order.groupLeaderName}</span></div>
+            </div>
+
+            <div class="detail-section">
+              <h3>用户信息</h3>
+              <div class="info-row"><span class="info-label">姓名：</span><span class="info-value">${order.userName}</span></div>
+              <div class="info-row"><span class="info-label">电话：</span><span class="info-value">${order.phone}</span></div>
+              <div class="info-row"><span class="info-label">地址：</span><span class="info-value">${order.address}</span></div>
+            </div>
+
+            <div class="detail-section">
+              <h3>金额信息</h3>
+              <div class="info-row"><span class="info-label">订单金额：</span><span class="info-value">¥${order.totalAmount.toFixed(2)}</span></div>
+              <div class="info-row"><span class="info-label">退款金额：</span><span class="info-value" style="color: #e53e3e;">¥${order.refundAmount.toFixed(2)}</span></div>
+              <div class="info-row"><span class="info-label">实付金额：</span><span class="info-value" style="color: #48bb78; font-weight: 600;">¥${order.actualAmount.toFixed(2)}</span></div>
+            </div>
+
+            <div class="detail-section">
+              <h3>状态操作</h3>
+              <div class="action-buttons">
+                ${renderActionButtons(order)}
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-timeline">
+            <div class="detail-section">
+              <h3>订单时间线</h3>
+              <div class="timeline">
+                ${timeline.map(event => `
+                  <div class="timeline-item">
+                    <div class="time">${new Date(event.timestamp).toLocaleString()}</div>
+                    <div class="title">${event.eventName}</div>
+                    <div class="desc">${event.description}</div>
+                    ${event.operatorName ? `<div class="operator">操作人：${event.operatorName} ${getResponsibleBadge(event)}</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-items">
+            <div class="detail-section">
+              <h3>商品列表</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>商品</th>
+                    <th>SKU</th>
+                    <th>数量</th>
+                    <th>单价</th>
+                    <th>金额</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${order.items.map(item => `
+                    <tr>
+                      <td>${item.productName}${item.replacementProductName ? ` <span class="badge badge-info">替换自: ${item.replacementProductName}</span>` : ''}</td>
+                      <td>${item.sku}</td>
+                      <td>${item.quantity}</td>
+                      <td>¥${item.price.toFixed(2)}</td>
+                      <td>¥${item.amount.toFixed(2)}${item.refundAmount ? ` <span style="color: #e53e3e;">(-¥${item.refundAmount.toFixed(2)})</span>` : ''}</td>
+                      <td><span class="badge ${item.status === 'NORMAL' ? 'badge-success' : item.status === 'REPLACED' ? 'badge-info' : 'badge-danger'}">${getItemStatusText(item.status)}</span></td>
+                      <td>
+                        <div class="action-buttons" style="gap: 5px;">
+                          ${item.status === 'NORMAL' && outOfStockItems.some(o => o.orderItemId === item.id) ? `<button class="btn btn-warning btn-sm" style="padding: 4px 8px; font-size: 12px;" onclick="openReplacementModal('${item.id}')">替换</button>` : ''}
+                          ${['PAID', 'PICKING'].includes(order.status) && item.status === 'NORMAL' ? `<button class="btn btn-danger btn-sm" style="padding: 4px 8px; font-size: 12px;" onclick="openRefundModal('${item.id}')">退款</button>` : ''}
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+
+            ${outOfStockItems.length > 0 ? `
+              <div class="detail-section">
+                <h3>缺货清单</h3>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>商品</th>
+                      <th>需求数量</th>
+                      <th>可用数量</th>
+                      <th>缺量</th>
+                      <th>状态</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${outOfStockItems.map(item => `
+                      <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.requestedQuantity}</td>
+                        <td>${item.availableQuantity}</td>
+                        <td style="color: #e53e3e;">${item.shortageQuantity}</td>
+                        <td><span class="badge ${item.resolved ? 'badge-success' : 'badge-warning'}">${item.resolved ? `已解决(${item.resolution === 'REPLACEMENT' ? '替换' : '退款'})` : '待处理'}</span></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+
+            ${pickingRecords.length > 0 ? `
+              <div class="detail-section">
+                <h3>拣货记录</h3>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>商品</th>
+                      <th>拣货数量</th>
+                      <th>拣货人</th>
+                      <th>时间</th>
+                      <th>备注</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${pickingRecords.map(record => `
+                      <tr>
+                        <td>${record.productName}</td>
+                        <td>${record.pickedQuantity}</td>
+                        <td>${record.operatorName}</td>
+                        <td>${new Date(record.pickedAt).toLocaleString()}</td>
+                        <td>${record.notes || '-'}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="tab-content" id="tab-modified">
+            <div class="detail-section">
+              <h3>修改历史</h3>
+              ${order.modifiedHistory.length === 0 ? `
+                <div class="empty-state" style="padding: 20px;">
+                  <p>暂无修改记录</p>
+                </div>
+              ` : `
+                ${order.modifiedHistory.map(record => `
+                  <div class="modified-history" style="margin-bottom: 10px;">
+                    <div class="modified-item">
+                      <strong>修改类型：</strong>
+                      <span class="badge ${record.type === 'REPLACEMENT' ? 'badge-info' : record.type === 'REFUND' ? 'badge-danger' : 'badge-success'}">
+                        ${record.type === 'REPLACEMENT' ? '替换品' : record.type === 'REFUND' ? '退款' : '订单'}
+                      </span>
+                    </div>
+                    <div class="modified-item">
+                      <strong>字段：</strong><span class="modified-field">${record.field}</span>
+                    </div>
+                    <div class="modified-item">
+                      <strong>修改前：</strong><span class="modified-old">${record.oldValue}</span>
+                    </div>
+                    <div class="modified-item">
+                      <strong>修改后：</strong><span class="modified-new">${record.newValue}</span>
+                    </div>
+                    <div class="modified-item">
+                      <strong>操作人：</strong>${record.operatorName}
+                    </div>
+                    <div class="modified-item">
+                      <strong>时间：</strong>${new Date(record.timestamp).toLocaleString()}
+                    </div>
+                    ${record.reason ? `<div class="modified-item"><strong>原因：</strong>${record.reason}</div>` : ''}
+                  </div>
+                `).join('')}
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getResponsibleBadge(event) {
+      const roleColors = {
+        '用户': 'badge-success',
+        '运营': 'badge-info',
+        '客服': 'badge-warning',
+        '团长': 'badge-success',
+        '系统': 'badge-info',
+        '供应链': 'badge-danger'
+      };
+      return event.operatorName ? `<span class="badge ${roleColors['运营'] || 'badge-info'}" style="margin-left: 8px;">${event.operatorName}</span>` : '';
+    }
+
+    function getItemStatusText(status) {
+      const map = {
+        NORMAL: '正常',
+        REPLACED: '已替换',
+        REFUNDED: '已退款',
+        OUT_OF_STOCK: '缺货'
+      };
+      return map[status] || status;
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    function renderActionButtons(order) {
+      const buttons = [];
+      const operatorId = 'op1';
+      const operatorName = '王运营';
+
+      if (order.status === 'CREATED') {
+        buttons.push(`<button class="btn btn-success" onclick="payOrder()">支付</button>`);
+      }
+      if (order.status === 'PAID') {
+        buttons.push(`<button class="btn btn-warning" onclick="startPicking()">开始拣货</button>`);
+      }
+      if (order.status === 'PICKING') {
+        buttons.push(`<button class="btn btn-info" onclick="openPickingModal()">记录拣货</button>`);
+        buttons.push(`<button class="btn btn-success" onclick="completePicking()">完成拣货</button>`);
+      }
+      if (order.status === 'PICKED') {
+        buttons.push(`<button class="btn btn-primary" onclick="deliverOrder()">配送</button>`);
+      }
+      if (order.status === 'DELIVERED') {
+        buttons.push(`<button class="btn btn-success" onclick="completeOrder()">完成</button>`);
+      }
+      if (['PAID', 'PICKING', 'PICKED'].includes(order.status)) {
+        buttons.push(`<button class="btn btn-danger" onclick="testReleaseInventory()">测试库存释放</button>`);
+      }
+
+      return buttons.length > 0 ? buttons.join('') : '<span style="color: #a0aec0;">无可用操作</span>';
+    }
+
+    async function executeOrderAction(action, data = {}) {
+      try {
+        const res = await fetch(`${API_BASE}/orders/${selectedOrderId}/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ operatorId: 'op1', operatorName: '王运营', ...data })
+        });
+        const result = await res.json();
+        if (result.success) {
+          await refreshOrders();
+          await loadOrderDetail(selectedOrderId);
+        } else {
+          alert('操作失败：' + result.message);
+        }
+      } catch (e) {
+        alert('操作失败：' + e.message);
+      }
+    }
+
+    async function payOrder() { await executeOrderAction('pay'); }
+    async function startPicking() { await executeOrderAction('start-picking'); }
+    async function completePicking() { await executeOrderAction('complete-picking'); }
+    async function deliverOrder() { await executeOrderAction('deliver'); }
+    async function completeOrder() { await executeOrderAction('complete'); }
+
+    async function testReleaseInventory() {
+      const res = await fetch(`${API_BASE}/orders/${selectedOrderId}`);
+      const data = await res.json();
+      if (data.success) {
+        const items = data.data.order.items.map(item => ({
+          id: item.id,
+          productId: item.productId,
+          productName: item.productName,
+          quantity: item.quantity,
+          price: item.price,
+          amount: item.amount,
+          sku: item.sku,
+          status: item.status
+        }));
+        await executeOrderAction('release-inventory', { items, reason: '测试释放' });
+      }
+    }
+
+    function openModal(title, content) {
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = content;
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    function openReplacementModal(orderItemId) {
+      const availableProducts = products.filter(p => p.availableStock > 0);
+      openModal('商品替换', `
+        <div class="form-group">
+          <label>选择替换商品</label>
+          <select id="replacement-product">
+            ${availableProducts.map(p => `<option value="${p.id}">${p.name} - ¥${p.price.toFixed(2)} (库存: ${p.availableStock})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>替换原因</label>
+          <textarea id="replacement-reason" rows="3" placeholder="请输入替换原因..."></textarea>
+        </div>
+        <div class="action-buttons" style="justify-content: flex-end;">
+          <button class="btn btn-primary" onclick="confirmReplacement('${orderItemId}')">确认替换</button>
+        </div>
+      `);
+    }
+
+    async function confirmReplacement(orderItemId) {
+      const replacementProductId = document.getElementById('replacement-product').value;
+      const reason = document.getElementById('replacement-reason').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/orders/${selectedOrderId}/replacement`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderItemId,
+            replacementProductId,
+            operatorId: 'cs1',
+            operatorName: '刘客服',
+            reason
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          closeModal();
+          await refreshOrders();
+          await loadOrderDetail(selectedOrderId);
+        } else {
+          alert('替换失败：' + result.message);
+        }
+      } catch (e) {
+        alert('替换失败：' + e.message);
+      }
+    }
+
+    function openRefundModal(orderItemId) {
+      fetch(`${API_BASE}/orders/${selectedOrderId}`).then(res => res.json()).then(data => {
+        const item = data.data.order.items.find(i => i.id === orderItemId);
+        openModal('商品退款', `
+          <div class="form-group">
+            <label>商品</label>
+            <input type="text" value="${item.productName}" disabled>
+          </div>
+          <div class="form-group">
+            <label>退款金额（元）</label>
+            <input type="number" id="refund-amount" value="${item.amount}" step="0.01" min="0" max="${item.amount}">
+          </div>
+          <div class="action-buttons" style="justify-content: flex-end;">
+            <button class="btn btn-danger" onclick="confirmRefund('${orderItemId}')">确认退款</button>
+          </div>
+        `);
+      });
+    }
+
+    async function confirmRefund(orderItemId) {
+      const amount = parseFloat(document.getElementById('refund-amount').value);
+      const callbackId = 'callback-' + Date.now();
+
+      try {
+        const res = await fetch(`${API_BASE}/orders/refund-callback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: selectedOrderId,
+            orderItemId,
+            callbackId,
+            refundAmount: amount,
+            status: 'SUCCESS'
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert(result.isDuplicate ? '重复回调已被拦截，未重复扣减' : '退款成功');
+          closeModal();
+          await refreshOrders();
+          await loadOrderDetail(selectedOrderId);
+        } else {
+          alert('退款失败：' + result.message);
+        }
+      } catch (e) {
+        alert('退款失败：' + e.message);
+      }
+    }
+
+    function openPickingModal() {
+      fetch(`${API_BASE}/orders/${selectedOrderId}`).then(res => res.json()).then(data => {
+        const items = data.data.order.items.filter(i => i.status !== 'REFUNDED');
+        openModal('记录拣货', `
+          <div class="form-group">
+            <label>选择商品</label>
+            <select id="picking-item">
+              ${items.map(i => `<option value="${i.id}" data-qty="${i.quantity}">${i.productName} (应拣: ${i.quantity})</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>拣货数量</label>
+            <input type="number" id="picking-quantity" value="${items[0]?.quantity || 1}" min="1">
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <textarea id="picking-notes" rows="2" placeholder="拣货备注..."></textarea>
+          </div>
+          <div class="action-buttons" style="justify-content: flex-end;">
+            <button class="btn btn-primary" onclick="recordPicking()">记录</button>
+          </div>
+        `);
+
+        document.getElementById('picking-item').addEventListener('change', function() {
+          const qty = this.options[this.selectedIndex].dataset.qty;
+          document.getElementById('picking-quantity').value = qty;
+        });
+      });
+    }
+
+    async function recordPicking() {
+      const orderItemId = document.getElementById('picking-item').value;
+      const quantity = parseInt(document.getElementById('picking-quantity').value);
+      const notes = document.getElementById('picking-notes').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/orders/${selectedOrderId}/record-picking`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderItemId,
+            pickedQuantity: quantity,
+            operatorId: 'g1',
+            operatorName: '张团长',
+            notes
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          closeModal();
+          await loadOrderDetail(selectedOrderId);
+        } else {
+          alert('记录失败：' + result.message);
+        }
+      } catch (e) {
+        alert('记录失败：' + e.message);
+      }
+    }
+
+    async function generateReport() {
+      try {
+        const res = await fetch(`${API_BASE}/orders/${selectedOrderId}/report`);
+        const data = await res.json();
+        if (data.success) {
+          const report = data.data;
+          openModal('责任节点报告', `
+            <div style="margin-bottom: 15px;">
+              <strong>订单号：</strong>${report.orderNo}<br>
+              <strong>小区：</strong>${report.communityName}<br>
+              <strong>团长：</strong>${report.groupLeaderName}<br>
+              <strong>总金额：</strong>¥${report.totalAmount.toFixed(2)}<br>
+              <strong>退款金额：</strong>¥${report.refundAmount.toFixed(2)}<br>
+              <strong>缺货数：</strong>${report.outOfStockCount}
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>事件</th>
+                  <th>描述</th>
+                  <th>操作人</th>
+                  <th>责任人</th>
+                  <th>角色</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${report.events.map(e => `
+                  <tr>
+                    <td>${new Date(e.timestamp).toLocaleString()}</td>
+                    <td>${e.eventName}</td>
+                    <td>${e.description}</td>
+                    <td>${e.operatorName || '-'}</td>
+                    <td>${e.responsiblePerson}</td>
+                    <td><span class="badge badge-info">${e.responsibleRole}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div class="filter-bar" style="margin-top: 20px;">
+              <div class="form-group">
+                <label>按责任人筛选</label>
+                <select id="filter-operator" onchange="filterReport()">
+                  <option value="">全部</option>
+                  ${[...new Set(report.events.map(e => e.operatorName).filter(Boolean))].map(n => `<option value="${n}">${n}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div class="action-buttons" style="justify-content: flex-end; margin-top: 15px;">
+              <button class="btn btn-success" onclick="exportReport()">导出CSV</button>
+            </div>
+          `);
+        }
+      } catch (e) {
+        alert('生成报告失败：' + e.message);
+      }
+    }
+
+    async function exportReport() {
+      window.open(`${API_BASE}/orders/${selectedOrderId}/report/csv`, '_blank');
+    }
+
+    refreshOrders();
+  </script>
+</body>
+</html>
