@@ -1,0 +1,11 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: webhook-sequence-api
+
+webhook:
+  sequence:
+    gap-timeout-seconds: 30
+    max-wait-queue-size: 1000
