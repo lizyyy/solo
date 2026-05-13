@@ -82,6 +82,10 @@ export const withdrawOffer = (id, reason) => {
   return api.post(`/offers/${id}/withdraw`, { reason }).then(res => res.data);
 };
 
+export const redraftOffer = (id, change_reason) => {
+  return api.post(`/offers/${id}/redraft`, { change_reason }).then(res => res.data);
+};
+
 export const acceptOffer = (id) => {
   return api.post(`/offers/${id}/accept`).then(res => res.data);
 };

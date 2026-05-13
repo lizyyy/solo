@@ -118,8 +118,8 @@ router.post('/', requireRole('hr', 'hr_admin'), logAudit('create_offer', 'offer'
       if (!parentOffer) {
         return res.status(404).json({ success: false, message: '父版本 Offer 不存在' });
       }
-      if (parentOffer.status !== 'approved' && parentOffer.status !== 'rejected') {
-        return res.status(400).json({ success: false, message: '只能基于已审批的 Offer 创建新版本' });
+      if (parentOffer.status !== 'approved' && parentOffer.status !== 'rejected' && parentOffer.status !== 'withdrawn' && parentOffer.status !== 'rejected_by_candidate') {
+        return res.status(400).json({ success: false, message: '只能基于已审批、已撤回或已拒绝的 Offer 创建新版本' });
       }
       version = parentOffer.version + 1;
     }
@@ -238,6 +238,35 @@ router.post('/:id/withdraw', requireRole('hr', 'hr_admin'), logAudit('withdraw_o
     const populated = await populateOffer(updated);
 
     res.json({ success: true, offer: populated, message: 'Offer 已撤回' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/:id/redraft', requireRole('hr', 'hr_admin'), logAudit('redraft_offer', 'offer'), async (req, res, next) => {
+  try {
+    const { change_reason } = req.body;
+    const offer = await db.get(`SELECT * FROM offers WHERE id = ?`, [req.params.id]);
+
+    if (!offer) {
+      return res.status(404).json({ success: false, message: 'Offer 不存在' });
+    }
+
+    if (offer.status !== 'withdrawn' && offer.status !== 'rejected' && offer.status !== 'rejected_by_candidate') {
+      return res.status(400).json({ success: false, message: '只能将已撤回、已拒绝或候选人拒绝的 Offer 重新变为草稿' });
+    }
+
+    await db.run(`DELETE FROM approval_records WHERE offer_id = ?`, [req.params.id]);
+
+    await db.run(
+      `UPDATE offers SET status = 'draft', current_approver_index = 0, is_accepted = 0, accepted_at = NULL, change_reason = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+      [change_reason || '重新编辑', req.params.id]
+    );
+
+    const updated = await db.get(`SELECT * FROM offers WHERE id = ?`, [req.params.id]);
+    const populated = await populateOffer(updated);
+
+    res.json({ success: true, offer: populated, message: 'Offer 已重新变为草稿，可以编辑后重新提交审批' });
   } catch (err) {
     next(err);
   }

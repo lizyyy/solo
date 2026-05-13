@@ -131,7 +131,7 @@ function Offers() {
           >
             详情
           </Button>
-          {record.status === 'approved' && (
+          {(record.status === 'approved' || record.status === 'withdrawn' || record.status === 'rejected' || record.status === 'rejected_by_candidate') && (
             <Button
               type="link"
               icon={<ReloadOutlined />}

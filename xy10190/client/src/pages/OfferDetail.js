@@ -9,7 +9,7 @@ import {
   RollbackOutlined, CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined
 } from '@ant-design/icons';
 import {
-  getOffer, submitOffer, withdrawOffer, acceptOffer, rejectOfferByCandidate,
+  getOffer, submitOffer, withdrawOffer, redraftOffer, acceptOffer, rejectOfferByCandidate,
   downloadOfferPDF
 } from '../services/api';
 import { getOfferStatusTag, formatCurrency, formatDate, formatDateTime } from '../utils/constants';
@@ -22,8 +22,10 @@ function OfferDetail() {
   const [actionLoading, setActionLoading] = useState(false);
   const [withdrawModalVisible, setWithdrawModalVisible] = useState(false);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [redraftModalVisible, setRedraftModalVisible] = useState(false);
   const [withdrawReason, setWithdrawReason] = useState('');
   const [rejectReason, setRejectReason] = useState('');
+  const [redraftReason, setRedraftReason] = useState('');
 
   const loadOffer = async () => {
     setLoading(true);
@@ -98,6 +100,21 @@ function OfferDetail() {
       loadOffer();
     } catch (error) {
       console.error('Failed to reject:', error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRedraft = async () => {
+    try {
+      setActionLoading(true);
+      await redraftOffer(id, redraftReason);
+      message.success('Offer 已重新变为草稿，可以编辑后重新提交审批');
+      setRedraftModalVisible(false);
+      setRedraftReason('');
+      loadOffer();
+    } catch (error) {
+      console.error('Failed to redraft:', error);
     } finally {
       setActionLoading(false);
     }
@@ -191,6 +208,30 @@ function OfferDetail() {
         );
       }
 
+      buttons.push(
+        <Button
+          key="new-version"
+          type="primary"
+          ghost
+          icon={<ReloadOutlined />}
+          onClick={() => navigate(`/offers/new/${offer.id}`)}
+        >
+          新建版本
+        </Button>
+      );
+    }
+
+    if (offer.status === 'withdrawn' || offer.status === 'rejected' || offer.status === 'rejected_by_candidate') {
+      buttons.push(
+        <Button
+          key="redraft"
+          icon={<EditOutlined />}
+          onClick={() => setRedraftModalVisible(true)}
+          loading={actionLoading}
+        >
+          重新编辑
+        </Button>
+      );
       buttons.push(
         <Button
           key="new-version"
@@ -424,6 +465,26 @@ function OfferDetail() {
           placeholder="拒绝原因"
           value={rejectReason}
           onChange={(e) => setRejectReason(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        title="重新编辑 Offer"
+        open={redraftModalVisible}
+        onOk={handleRedraft}
+        onCancel={() => setRedraftModalVisible(false)}
+        confirmLoading={actionLoading}
+        okText="确认重新编辑"
+        cancelText="取消"
+      >
+        <div style={{ marginBottom: 16 }}>
+          确定要将此 Offer 重新变为草稿吗？之前的审批记录将被清除，您可以修改内容后重新提交审批。
+        </div>
+        <Input.TextArea
+          rows={3}
+          placeholder="请填写重新编辑的原因（可选）"
+          value={redraftReason}
+          onChange={(e) => setRedraftReason(e.target.value)}
         />
       </Modal>
     </div>
