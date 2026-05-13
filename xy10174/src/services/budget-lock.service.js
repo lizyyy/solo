@@ -28,21 +28,47 @@ class BudgetLockService {
   }
 
   async createBudget(data) {
+    const totalAmount = parseFloat(data.total_amount);
+    const usedAmount = parseFloat(data.used_amount || 0);
+    const lockedAmount = parseFloat(data.locked_amount || 0);
+    
+    if (isNaN(totalAmount) || totalAmount < 0) {
+      throw new AppError(errorCodes.VALIDATION_ERROR, {
+        field: 'totalAmount',
+        message: '总预算金额不能为负数',
+        provided: data.total_amount
+      });
+    }
+    
+    if (isNaN(usedAmount) || usedAmount < 0) {
+      throw new AppError(errorCodes.VALIDATION_ERROR, {
+        field: 'usedAmount',
+        message: '已使用金额不能为负数',
+        provided: data.used_amount
+      });
+    }
+    
+    if (isNaN(lockedAmount) || lockedAmount < 0) {
+      throw new AppError(errorCodes.VALIDATION_ERROR, {
+        field: 'lockedAmount',
+        message: '已锁定金额不能为负数',
+        provided: data.locked_amount
+      });
+    }
+    
     const id = uuidv4();
     const now = new Date();
     
-    const availableAmount = parseFloat(data.total_amount) - 
-      parseFloat(data.used_amount || 0) - 
-      parseFloat(data.locked_amount || 0);
+    const availableAmount = totalAmount - usedAmount - lockedAmount;
     
     await this.db('budgets').insert({
       id,
       department_id: data.department_id,
       budget_type: data.budget_type,
       fiscal_year: data.fiscal_year,
-      total_amount: data.total_amount,
-      used_amount: data.used_amount || 0,
-      locked_amount: data.locked_amount || 0,
+      total_amount: totalAmount,
+      used_amount: usedAmount,
+      locked_amount: lockedAmount,
       available_amount: availableAmount,
       start_date: data.start_date,
       end_date: data.end_date,
@@ -87,6 +113,15 @@ class BudgetLockService {
       lockDurationHours 
     } = data;
 
+    const requestAmount = parseFloat(amount);
+    if (isNaN(requestAmount) || requestAmount <= 0) {
+      throw new AppError(errorCodes.VALIDATION_ERROR, {
+        field: 'amount',
+        message: '锁定金额必须为正数',
+        provided: amount
+      });
+    }
+
     return await this.db.transaction(async (trx) => {
       const existingLock = await trx('budget_locks')
         .where('application_id', applicationId)
@@ -121,7 +156,6 @@ class BudgetLockService {
       }
 
       const availableAmount = parseFloat(budget.available_amount);
-      const requestAmount = parseFloat(amount);
       
       if (availableAmount < requestAmount) {
         throw new AppError(errorCodes.BUDGET_INSUFFICIENT, {
@@ -201,6 +235,15 @@ class BudgetLockService {
   async updateLock(data) {
     const { lockId, newAmount, operator } = data;
     
+    const newAmountVal = parseFloat(newAmount);
+    if (isNaN(newAmountVal) || newAmountVal <= 0) {
+      throw new AppError(errorCodes.VALIDATION_ERROR, {
+        field: 'newAmount',
+        message: '锁定金额必须为正数',
+        provided: newAmount
+      });
+    }
+    
     return await this.db.transaction(async (trx) => {
       const lock = await trx('budget_locks')
         .where('id', lockId)
@@ -228,7 +271,6 @@ class BudgetLockService {
       }
 
       const oldAmount = parseFloat(lock.amount);
-      const newAmountVal = parseFloat(newAmount);
       const amountDiff = newAmountVal - oldAmount;
 
       if (Math.abs(amountDiff) < 0.01) {

@@ -471,4 +471,170 @@ describe('采购预算锁定 API 测试', () => {
       expect(response.body.code).toBe(5001);
     });
   });
+
+  describe('8. 金额校验测试', () => {
+    let testBudgetId;
+    let testLockId;
+
+    beforeAll(async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const budgetResponse = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'VALIDATION_TEST',
+          fiscalYear,
+          totalAmount: 100000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      testBudgetId = budgetResponse.body.data.id;
+
+      const lockResponse = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: testBudgetId,
+          applicationId: `VALIDATION-TEST-${Date.now()}`,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 10000,
+          createdBy: 'validation_test',
+          reason: '金额校验测试'
+        });
+      testLockId = lockResponse.body.data.lockId;
+    });
+
+    test('锁定金额为负数应该返回错误 9001', async () => {
+      const response = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: testBudgetId,
+          applicationId: `NEGATIVE-TEST-${Date.now()}`,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: -100,
+          createdBy: 'validation_test'
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+      expect(response.body.details.message).toContain('必须为正数');
+    });
+
+    test('锁定金额为 0 应该返回错误 9001', async () => {
+      const response = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: testBudgetId,
+          applicationId: `ZERO-TEST-${Date.now()}`,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 0,
+          createdBy: 'validation_test'
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+    });
+
+    test('修改锁定金额为负数应该返回错误 9001', async () => {
+      const response = await request(app)
+        .put(`/api/budget/locks/${testLockId}`)
+        .send({
+          newAmount: -5000,
+          operator: 'validation_test'
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+      expect(response.body.details.message).toContain('必须为正数');
+    });
+
+    test('修改锁定金额为 0 应该返回错误 9001', async () => {
+      const response = await request(app)
+        .put(`/api/budget/locks/${testLockId}`)
+        .send({
+          newAmount: 0,
+          operator: 'validation_test'
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+    });
+
+    test('创建预算时总预算为负数应该返回错误 9001', async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const response = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'NEGATIVE_BUDGET',
+          fiscalYear,
+          totalAmount: -100000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+      expect(response.body.details.message).toContain('不能为负数');
+    });
+
+    test('创建预算时 used_amount 为负数应该返回错误 9001', async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const response = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'NEGATIVE_USED',
+          fiscalYear,
+          totalAmount: 100000,
+          usedAmount: -5000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      
+      expect(response.status).toBe(400);
+      expect(response.body.success).toBe(false);
+      expect(response.body.code).toBe(9001);
+    });
+
+    test('负数锁定不会破坏预算数据完整性', async () => {
+      const beforeBudget = await request(app)
+        .get(`/api/budget/budgets/${testBudgetId}`);
+      
+      const beforeLocked = parseFloat(beforeBudget.body.data.locked_amount);
+      const beforeAvailable = parseFloat(beforeBudget.body.data.available_amount);
+      
+      await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: testBudgetId,
+          applicationId: `BREAK-TEST-${Date.now()}`,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: -1000,
+          createdBy: 'validation_test'
+        });
+      
+      const afterBudget = await request(app)
+        .get(`/api/budget/budgets/${testBudgetId}`);
+      
+      const afterLocked = parseFloat(afterBudget.body.data.locked_amount);
+      const afterAvailable = parseFloat(afterBudget.body.data.available_amount);
+      
+      expect(afterLocked).toBe(beforeLocked);
+      expect(afterAvailable).toBe(beforeAvailable);
+    });
+  });
 });

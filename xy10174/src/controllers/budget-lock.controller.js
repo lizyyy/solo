@@ -3,6 +3,16 @@ const BudgetLockService = require('../services/budget-lock.service');
 const { v4: uuidv4 } = require('uuid');
 const { getKnex } = require('../db/knex');
 
+function getHttpStatusCode(errorCode) {
+  if (errorCode >= 4000 && errorCode < 5000) {
+    return 409;
+  }
+  if (errorCode === 5001) {
+    return 404;
+  }
+  return 400;
+}
+
 class BudgetLockController {
   constructor() {
     this.service = new BudgetLockService();
@@ -46,6 +56,8 @@ class BudgetLockController {
         budgetType, 
         fiscalYear, 
         totalAmount, 
+        usedAmount,
+        lockedAmount,
         startDate, 
         endDate 
       } = req.body;
@@ -63,6 +75,8 @@ class BudgetLockController {
         budget_type: budgetType,
         fiscal_year: fiscalYear,
         total_amount: totalAmount,
+        used_amount: usedAmount,
+        locked_amount: lockedAmount,
         start_date: startDate,
         end_date: endDate
       });
@@ -70,6 +84,15 @@ class BudgetLockController {
       res.json(success(budget, '预算创建成功'));
     } catch (err) {
       console.error('Create budget error:', err);
+      if (err.code) {
+        return res.status(400).json({
+          success: false,
+          code: err.code,
+          message: err.message,
+          details: err.details,
+          timestamp: Date.now()
+        });
+      }
       res.status(500).json(error(errorCodes.INTERNAL_ERROR, err.message));
     }
   }
@@ -124,8 +147,7 @@ class BudgetLockController {
     } catch (err) {
       console.error('Lock budget error:', err);
       if (err.code) {
-        const statusCode = err.code >= 4000 ? 409 : 400;
-        return res.status(statusCode).json({
+        return res.status(getHttpStatusCode(err.code)).json({
           success: false,
           code: err.code,
           message: err.message,
@@ -160,8 +182,7 @@ class BudgetLockController {
     } catch (err) {
       console.error('Update lock error:', err);
       if (err.code) {
-        const statusCode = err.code >= 4000 ? 409 : 400;
-        return res.status(statusCode).json({
+        return res.status(getHttpStatusCode(err.code)).json({
           success: false,
           code: err.code,
           message: err.message,
@@ -194,8 +215,7 @@ class BudgetLockController {
     } catch (err) {
       console.error('Release lock error:', err);
       if (err.code) {
-        const statusCode = err.code >= 4000 ? 409 : 400;
-        return res.status(statusCode).json({
+        return res.status(getHttpStatusCode(err.code)).json({
           success: false,
           code: err.code,
           message: err.message,
@@ -227,8 +247,7 @@ class BudgetLockController {
     } catch (err) {
       console.error('Commit lock error:', err);
       if (err.code) {
-        const statusCode = err.code >= 4000 ? 409 : 400;
-        return res.status(statusCode).json({
+        return res.status(getHttpStatusCode(err.code)).json({
           success: false,
           code: err.code,
           message: err.message,
