@@ -1,13 +1,17 @@
-import Database from 'better-sqlite3';
-import path from 'path';
-
-const dbPath = path.join(__dirname, '..', 'database.db');
-export const db = new Database(dbPath);
-
-db.pragma('journal_mode = WAL');
-
-export function initDatabase() {
-  db.exec(`
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.db = void 0;
+exports.initDatabase = initDatabase;
+const better_sqlite3_1 = __importDefault(require("better-sqlite3"));
+const path_1 = __importDefault(require("path"));
+const dbPath = path_1.default.join(__dirname, '..', 'database.db');
+exports.db = new better_sqlite3_1.default(dbPath);
+exports.db.pragma('journal_mode = WAL');
+function initDatabase() {
+    exports.db.exec(`
     CREATE TABLE IF NOT EXISTS employees (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,

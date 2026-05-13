@@ -99,7 +99,7 @@ router.get('/:id', (req, res) => {
     LIMIT 1
   `).get(id);
 
-  let duplicates = [];
+  let duplicates: any[] = [];
   if (receipt.duplicate_group_id) {
     duplicates = db.prepare(`
       SELECT r.id, r.receipt_no, r.amount, r.status, r.upload_date,

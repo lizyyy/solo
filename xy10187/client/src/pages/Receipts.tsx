@@ -188,10 +188,6 @@ const Receipts: React.FC = () => {
         <Input.TextArea
           placeholder="请输入拒绝原因"
           rows={3}
-          onOk={(e: any) => {
-            const reason = (e.target as any).value;
-            return handleRejectConfirm(id, reason);
-          }}
         />
       ),
       okText: '确认拒绝',

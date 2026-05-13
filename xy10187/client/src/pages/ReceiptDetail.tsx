@@ -253,7 +253,6 @@ const ReceiptDetailPage: React.FC = () => {
                   value={(data.monthly_allowance || 0) - (data.used_amount || 0)}
                   prefix="¥"
                   precision={2}
-                  size="small"
                   valueStyle={{ color: '#52c41a', fontSize: '16px' }}
                 />
               </Descriptions.Item>
