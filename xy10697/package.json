@@ -1,0 +1,17 @@
+{
+  "name": "cylinder-tracking-system",
+  "version": "1.0.0",
+  "description": "工业气瓶周转回收管理系统",
+  "scripts": {
+    "dev:server": "cd backend && npm run dev",
+    "dev:client": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "start": "concurrently \"npm run dev:server\" \"npm run dev:client\""
+  },
+  "keywords": ["cylinder", "tracking", "industrial"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
