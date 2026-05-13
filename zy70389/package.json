@@ -1,0 +1,14 @@
+{
+  "name": "org-sync-api",
+  "version": "1.0.0",
+  "description": "组织架构同步 API - 同步 HR 系统与权限系统",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
