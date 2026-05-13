@@ -1,0 +1,47 @@
+const express = require('express');
+const router = express.Router();
+const db = require('../database/db');
+
+router.get('/', (req, res) => {
+  db.all('SELECT * FROM tenants ORDER BY created_at DESC', (err, rows) => {
+    if (err) res.status(500).json({ error: err.message });
+    else res.json(rows);
+  });
+});
+
+router.get('/:id', (req, res) => {
+  db.get('SELECT * FROM tenants WHERE id = ?', [req.params.id], (err, row) => {
+    if (err) res.status(500).json({ error: err.message });
+    else res.json(row);
+  });
+});
+
+router.post('/', (req, res) => {
+  const { name, contact_person, phone, email, address } = req.body;
+  const stmt = db.prepare('INSERT INTO tenants (name, contact_person, phone, email, address) VALUES (?, ?, ?, ?, ?)');
+  stmt.run(name, contact_person, phone, email, address, function(err) {
+    if (err) res.status(500).json({ error: err.message });
+    else {
+      const auditStmt = db.prepare('INSERT INTO audit_logs (table_name, record_id, operation, new_values, operator) VALUES (?, ?, ?, ?, ?)');
+      auditStmt.run('tenants', this.lastID, 'create', JSON.stringify(req.body), 'system');
+      res.json({ id: this.lastID, ...req.body });
+    }
+  });
+});
+
+router.put('/:id', (req, res) => {
+  db.get('SELECT * FROM tenants WHERE id = ?', [req.params.id], (err, oldData) => {
+    const { name, contact_person, phone, email, address, status } = req.body;
+    const stmt = db.prepare('UPDATE tenants SET name = ?, contact_person = ?, phone = ?, email = ?, address = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+    stmt.run(name, contact_person, phone, email, address, status || 'active', req.params.id, function(err) {
+      if (err) res.status(500).json({ error: err.message });
+      else {
+        const auditStmt = db.prepare('INSERT INTO audit_logs (table_name, record_id, operation, old_values, new_values, operator) VALUES (?, ?, ?, ?, ?, ?)');
+        auditStmt.run('tenants', req.params.id, 'update', JSON.stringify(oldData), JSON.stringify(req.body), 'system');
+        res.json({ id: req.params.id, ...req.body });
+      }
+    });
+  });
+});
+
+module.exports = router;

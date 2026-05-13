@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>租户水电分摊账单系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.15.14/lib/theme-chalk/index.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif; background: #f5f7fa; }
+        #app { min-height: 100vh; }
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .navbar h1 { font-size: 20px; font-weight: 500; }
+        .main-container { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 200px; background: white; border-right: 1px solid #e4e7ed; padding: 20px 0; }
+        .sidebar .el-menu { border-right: none; }
+        .content { flex: 1; padding: 20px; overflow-y: auto; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .card-header h3 { font-size: 18px; color: #303133; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1); }
+        .stat-card .label { font-size: 14px; color: #909399; margin-bottom: 10px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; color: #303133; }
+        .stat-card.warning .value { color: #e6a23c; }
+        .stat-card.danger .value { color: #f56c6c; }
+        .stat-card.success .value { color: #67c23a; }
+        .exception-badge { background: #f56c6c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        .table-actions { display: flex; gap: 10px; }
+        .upload-area { border: 2px dashed #dcdfe6; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .upload-area:hover { border-color: #409eff; background: #ecf5ff; }
+        .upload-area i { font-size: 48px; color: #c0c4cc; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="navbar">
+            <h1>🏢 租户水电分摊账单系统</h1>
+            <span>{{ currentUser }}</span>
+        </div>
+        <div class="main-container">
+            <div class="sidebar">
+                <el-menu :default-active="activeMenu" @select="handleMenuSelect">
+                    <el-menu-item index="dashboard">
+                        <i class="el-icon-data-board"></i>
+                        <span>异常看板</span>
+                    </el-menu-item>
+                    <el-menu-item index="bills">
+                        <i class="el-icon-document"></i>
+                        <span>账单管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="tenants">
+                        <i class="el-icon-user"></i>
+                        <span>租户管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="contracts">
+                        <i class="el-icon-s-order"></i>
+                        <span>合同管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="meter">
+                        <i class="el-icon-s-data"></i>
+                        <span>抄表记录</span>
+                    </el-menu-item>
+                    <el-menu-item index="devices">
+                        <i class="el-icon-setting"></i>
+                        <span>特殊设备</span>
+                    </el-menu-item>
+                    <el-menu-item index="import">
+                        <i class="el-icon-upload2"></i>
+                        <span>批量导入</span>
+                    </el-menu-item>
+                    <el-menu-item index="reports">
+                        <i class="el-icon-s-finance"></i>
+                        <span>报表导出</span>
+                    </el-menu-item>
+                    <el-menu-item index="audit">
+                        <i class="el-icon-s-check"></i>
+                        <span>审计日志</span>
+                    </el-menu-item>
+                </el-menu>
+            </div>
+            <div class="content">
+                <div v-if="activeMenu === 'dashboard'">
+                    <div class="stats-row">
+                        <div class="stat-card danger">
+                            <div class="label">待处理异常</div>
+                            <div class="value">{{ stats.pendingExceptions }}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">本月账单总额</div>
+                            <div class="value">¥{{ stats.monthTotal }}</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="label">未收款总额</div>
+                            <div class="value">¥{{ stats.unpaidTotal }}</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="label">活跃租户</div>
+                            <div class="value">{{ stats.activeTenants }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>⚠️ 待处理异常账单</h3>
+                            <el-button type="primary" size="small" @click="refreshExceptions">刷新</el-button>
+                        </div>
+                        <el-table :data="exceptionBills" style="width: 100%" border>
+                            <el-table-column prop="bill_month" label="账期" width="100"></el-table-column>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="total_amount" label="总金额" width="120" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="exception_type" label="异常类型" width="120">
+                                <template slot-scope="scope">
+                                    <span class="exception-badge">{{ getExceptionTypeText(scope.row.exception_type) }}</span>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="exception_desc" label="异常描述" show-overflow-tooltip></el-table-column>
+                            <el-table-column label="操作" width="200">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="primary" @click="handleException(scope.row)">处理</el-button>
+                                    <el-button size="mini" @click="viewBillDetail(scope.row)">详情</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>💰 未收款汇总</h3>
+                        </div>
+                        <el-table :data="unpaidSummary" style="width: 100%" border>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="unpaid_bills" label="未结账单数" width="120"></el-table-column>
+                            <el-table-column prop="total_unpaid" label="未收总额" width="150" :formatter="formatMoney"></el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'bills'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>账单管理</h3>
+                            <el-button type="primary" @click="showGenerateBillDialog">生成账单</el-button>
+                        </div>
+                        <div class="filter-bar">
+                            <el-select v-model="billFilters.status" placeholder="账单状态" clearable style="width: 150px">
+                                <el-option label="未付款" value="unpaid"></el-option>
+                                <el-option label="部分付款" value="partial"></el-option>
+                                <el-option label="已付款" value="paid"></el-option>
+                            </el-select>
+                            <el-select v-model="billFilters.has_exception" placeholder="异常状态" clearable style="width: 150px">
+                                <el-option label="有异常" value="true"></el-option>
+                                <el-option label="无异常" value="false"></el-option>
+                            </el-select>
+                            <el-date-picker v-model="billFilters.bill_month" type="month" placeholder="选择月份" value-format="yyyy-MM" style="width: 150px"></el-date-picker>
+                            <el-button type="primary" @click="loadBills">查询</el-button>
+                            <el-button @click="exportBills">导出Excel</el-button>
+                        </div>
+                        <el-table :data="bills" style="width: 100%" border>
+                            <el-table-column prop="bill_month" label="账期" width="100"></el-table-column>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="water_usage" label="用水量(吨)" width="100"></el-table-column>
+                            <el-table-column prop="water_amount" label="水费" width="100" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="electric_usage" label="用电量(度)" width="100"></el-table-column>
+                            <el-table-column prop="electric_amount" label="电费" width="100" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="device_amount" label="设备费" width="100" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="total_amount" label="总金额" width="120" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="paid_amount" label="已付" width="100" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="status" label="状态" width="100">
+                                <template slot-scope="scope">
+                                    <el-tag :type="scope.row.status === 'paid' ? 'success' : scope.row.status === 'partial' ? 'warning' : 'danger'" size="small">
+                                        {{ scope.row.status === 'paid' ? '已付' : scope.row.status === 'partial' ? '部分' : '未付'
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="250">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="success" @click="payDialog(scope.row)">收款</el-button>
+                                    <el-button size="mini" type="warning" @click="adjustDialog(scope.row)">调整</el-button>
+                                    <el-button size="mini" @click="viewAdjustments(scope.row)">调整记录</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'tenants'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>租户管理</h3>
+                            <el-button type="primary" @click="showTenantDialog">新增租户</el-button>
+                        </div>
+                        <el-table :data="tenants" style="width: 100%" border>
+                            <el-table-column prop="name" label="租户名称"></el-table-column>
+                            <el-table-column prop="contact_person" label="联系人" width="100"></el-table-column>
+                            <el-table-column prop="phone" label="电话" width="130"></el-table-column>
+                            <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+                            <el-table-column prop="address" label="地址"></el-table-column>
+                            <el-table-column prop="status" label="状态" width="100">
+                                <template slot-scope="scope">
+                                    <el-tag :type="scope.row.status === 'active' ? 'success' : 'info'" size="small">
+                                        {{ scope.row.status === 'active' ? '正常' : '停用' }}
+                                    </el-tag>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="操作" width="100">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="editTenant(scope.row)">编辑</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'contracts'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>合同管理</h3>
+                            <el-button type="primary" @click="showContractDialog">新增合同</el-button>
+                        </div>
+                        <el-table :data="contracts" style="width: 100%" border>
+                            <el-table-column prop="contract_no" label="合同编号" width="120"></el-table-column>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="start_date" label="开始日期" width="120"></el-table-column>
+                            <el-table-column prop="end_date" label="结束日期" width="120"></el-table-column>
+                            <el-table-column prop="monthly_rent" label="月租金" width="120" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="area" label="面积(㎡)" width="100"></el-table-column>
+                            <el-table-column prop="share_ratio" label="分摊比例" width="100"></el-table-column>
+                            <el-table-column label="操作" width="100">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="editContract(scope.row)">编辑</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'meter'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>抄表记录</h3>
+                            <el-button type="primary" @click="showMeterDialog">新增抄表</el-button>
+                        </div>
+                        <el-table :data="meterReadings" style="width: 100%" border>
+                            <el-table-column prop="reading_date" label="抄表日期" width="120"></el-table-column>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="water_prev" label="水表起码" width="100"></el-table-column>
+                            <el-table-column prop="water_curr" label="水表止码" width="100"></el-table-column>
+                            <el-table-column prop="water_usage" label="用水量" width="100"></el-table-column>
+                            <el-table-column prop="electric_prev" label="电表起码" width="100"></el-table-column>
+                            <el-table-column prop="electric_curr" label="电表止码" width="100"></el-table-column>
+                            <el-table-column prop="electric_usage" label="用电量" width="100"></el-table-column>
+                            <el-table-column prop="reader" label="抄表人" width="100"></el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'devices'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>特殊设备管理</h3>
+                            <el-button type="primary" @click="showDeviceDialog">新增设备</el-button>
+                        </div>
+                        <el-table :data="devices" style="width: 100%" border>
+                            <el-table-column prop="device_name" label="设备名称"></el-table-column>
+                            <el-table-column prop="device_type" label="设备类型" width="120"></el-table-column>
+                            <el-table-column prop="tenant_name" label="租户名称"></el-table-column>
+                            <el-table-column prop="room_no" label="房间号" width="100"></el-table-column>
+                            <el-table-column prop="power" label="功率(W)" width="100"></el-table-column>
+                            <el-table-column prop="hours_per_day" label="每日小时" width="100"></el-table-column>
+                            <el-table-column prop="days_per_month" label="每月天数" width="100"></el-table-column>
+                            <el-table-column label="操作" width="100">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" @click="editDevice(scope.row)">编辑</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'import'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>批量导入数据</h3>
+                        </div>
+                        <el-tabs v-model="activeImportTab">
+                            <el-tab-pane label="导入抄表记录" name="meter">
+                                <div class="upload-area" @click="triggerUpload('meter')">
+                                    <i class="el-icon-upload"></i>
+                                    <p>点击或拖拽上传 Excel 文件</p>
+                                    <p style="color: #909399; font-size: 12px; margin-top: 10px;">支持 .xlsx 格式，需包含：contract_no, reading_date 等字段</p>
+                                </div>
+                                <input type="file" ref="meterFileInput" style="display: none" accept=".xlsx,.xls" @change="handleFileUpload('meter', $event)">
+                            </el-tab-pane>
+                            <el-tab-pane label="导入租户数据" name="tenant">
+                                <div class="upload-area" @click="triggerUpload('tenant')">
+                                    <i class="el-icon-upload"></i>
+                                    <p>点击或拖拽上传 Excel 文件</p>
+                                    <p style="color: #909399; font-size: 12px; margin-top: 10px;">支持 .xlsx 格式，需包含：name 等字段</p>
+                                </div>
+                                <input type="file" ref="tenantFileInput" style="display: none" accept=".xlsx,.xls" @change="handleFileUpload('tenant', $event)">
+                            </el-tab-pane>
+                        </el-tabs>
+                        
+                        <div v-if="importResults.length > 0" style="margin-top: 20px;">
+                            <h4>导入结果</h4>
+                            <p>成功: {{ importSuccessCount }} 条，失败: {{ importErrorCount }} 条</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'reports'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>报表导出</h3>
+                        </div>
+                        <div class="filter-bar">
+                            <el-date-picker v-model="reportFilters.start_month" type="month" placeholder="开始月份" value-format="yyyy-MM" style="width: 150px"></el-date-picker>
+                            <el-date-picker v-model="reportFilters.end_month" type="month" placeholder="结束月份" value-format="yyyy-MM" style="width: 150px"></el-date-picker>
+                            <el-select v-model="reportFilters.handled_by" placeholder="处理人" clearable style="width: 150px">
+                                <el-option v-for="op in operators" :key="op" :label="op" :value="op"></el-option>
+                            </el-select>
+                            <el-select v-model="reportFilters.status" placeholder="账单状态" clearable style="width: 150px">
+                                <el-option label="未付款" value="unpaid"></el-option>
+                                <el-option label="部分付款" value="partial"></el-option>
+                                <el-option label="已付款" value="paid"></el-option>
+                            </el-select>
+                            <el-button type="primary" @click="exportReport">导出报表</el-button>
+                        </div>
+                        
+                        <h4 style="margin: 20px 0;">月度汇总</h4>
+                        <el-table :data="reportSummary" style="width: 100%" border>
+                            <el-table-column prop="bill_month" label="月份" width="120"></el-table-column>
+                            <el-table-column prop="bill_count" label="账单数" width="100"></el-table-column>
+                            <el-table-column prop="total_amount" label="总金额" width="150" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="paid_amount" label="已收金额" width="150" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="unpaid_amount" label="未收金额" width="150" :formatter="formatMoney"></el-table-column>
+                            <el-table-column prop="exception_count" label="异常数" width="100"></el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div v-if="activeMenu === 'audit'">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>审计日志</h3>
+                        </div>
+                        <div class="filter-bar">
+                            <el-select v-model="auditFilters.table_name" placeholder="表名" clearable style="width: 150px">
+                                <el-option label="租户" value="tenants"></el-option>
+                                <el-option label="合同" value="contracts"></el-option>
+                                <el-option label="账单" value="bills"></el-option>
+                                <el-option label="调整" value="adjustments"></el-option>
+                            </el-select>
+                            <el-date-picker v-model="auditFilters.start_date" type="date" placeholder="开始日期" value-format="yyyy-MM-dd" style="width: 150px"></el-date-picker>
+                            <el-date-picker v-model="auditFilters.end_date" type="date" placeholder="结束日期" value-format="yyyy-MM-dd" style="width: 150px"></el-date-picker>
+                            <el-button type="primary" @click="loadAuditLogs">查询</el-button>
+                        </div>
+                        <el-table :data="auditLogs" style="width: 100%" border>
+                            <el-table-column prop="created_at" label="时间" width="180"></el-table-column>
+                            <el-table-column prop="table_name" label="表名" width="100"></el-table-column>
+                            <el-table-column prop="operation" label="操作" width="120"></el-table-column>
+                            <el-table-column prop="operator" label="操作人" width="120"></el-table-column>
+                            <el-table-column prop="old_values" label="修改前" show-overflow-tooltip></el-table-column>
+                            <el-table-column prop="new_values" label="修改后" show-overflow-tooltip></el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <el-dialog :title="generateBillTitle" :visible.sync="showGenerateBill" width="500px">
+            <el-form :model="generateBillForm" label-width="100px">
+                <el-form-item label="选择合同">
+                    <el-select v-model="generateBillForm.contract_id" style="width: 100%">
+                        <el-option v-for="c in contracts" :key="c.id" :label="c.contract_no + ' - ' + c.tenant_name" :value="c.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="账单月份">
+                    <el-date-picker v-model="generateBillForm.bill_month" type="month" value-format="yyyy-MM" style="width: 100%"></el-date-picker>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showGenerateBill = false">取消</el-button>
+                <el-button type="primary" @click="calculateBill">计算</el-button>
+                <el-button type="success" @click="generateBill">生成账单</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="处理异常" :visible.sync="showHandleException" width="500px">
+            <el-form :model="handleExceptionForm" label-width="100px">
+                <el-form-item label="异常类型">{{ currentExceptionBill.exception_desc }}</el-form-item>
+                <el-form-item label="处理人">
+                    <el-input v-model="handleExceptionForm.handled_by"></el-input>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="handleExceptionForm.remarks"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showHandleException = false">取消</el-button>
+                <el-button type="primary" @click="submitHandleException">确认处理</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="收款" :visible.sync="showPayDialog" width="400px">
+            <el-form :model="payForm" label-width="100px">
+                <el-form-item label="当前账单总额">
+                    <span>¥{{ currentPayBill.total_amount }}</span>
+                </el-form-item>
+                <el-form-item label="已付金额">
+                    <span>¥{{ currentPayBill.paid_amount || 0 }}</span>
+                </el-form-item>
+                <el-form-item label="本次收款">
+                    <el-input-number v-model="payForm.paid_amount" :min="0" :max="currentPayBill.unpaid_amount"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showPayDialog = false">取消</el-button>
+                <el-button type="primary" @click="submitPayment">确认收款</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="人工调整" :visible.sync="showAdjustDialog" width="500px">
+            <el-form :model="adjustForm" label-width="100px">
+                <el-form-item label="调整类型">
+                    <el-select v-model="adjustForm.adjust_type" style="width: 100%">
+                        <el-option label="增加费用" value="increase"></el-option>
+                        <el-option label="减少费用" value="decrease"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="调整金额">
+                    <el-input-number v-model="adjustForm.adjust_amount" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="调整原因">
+                    <el-input type="textarea" v-model="adjustForm.adjust_reason"></el-input>
+                </el-form-item>
+                <el-form-item label="调整人">
+                    <el-input v-model="adjustForm.adjusted_by"></el-input>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="adjustForm.remarks"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showAdjustDialog = false">取消</el-button>
+                <el-button type="primary" @click="submitAdjustment">确认调整</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="调整记录" :visible.sync="showAdjustmentsDialog" width="700px">
+            <el-table :data="currentBillAdjustments" style="width: 100%" border>
+                <el-table-column prop="adjust_type" label="调整类型" width="120">
+                    <template slot-scope="scope">
+                        {{ scope.row.adjust_type === 'increase' ? '增加' : '减少' }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="adjust_amount" label="调整金额" width="120" :formatter="formatMoney"></el-table-column>
+                <el-table-column prop="adjust_reason" label="原因"></el-table-column>
+                <el-table-column prop="adjusted_by" label="调整人" width="100"></el-table-column>
+                <el-table-column prop="created_at" label="时间" width="180"></el-table-column>
+                <el-table-column prop="remarks" label="备注"></el-table-column>
+            </el-table>
+            <div slot="footer">
+                <el-button @click="showAdjustmentsDialog = false">关闭</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog :title="tenantDialogTitle" :visible.sync="showTenantDialog" width="600px">
+            <el-form :model="tenantForm" label-width="100px">
+                <el-form-item label="租户名称">
+                    <el-input v-model="tenantForm.name"></el-input>
+                </el-form-item>
+                <el-form-item label="联系人">
+                    <el-input v-model="tenantForm.contact_person"></el-input>
+                </el-form-item>
+                <el-form-item label="电话">
+                    <el-input v-model="tenantForm.phone"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱">
+                    <el-input v-model="tenantForm.email"></el-input>
+                </el-form-item>
+                <el-form-item label="地址">
+                    <el-input v-model="tenantForm.address"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showTenantDialog = false">取消</el-button>
+                <el-button type="primary" @click="saveTenant">保存</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog :title="contractDialogTitle" :visible.sync="showContractDialog" width="600px">
+            <el-form :model="contractForm" label-width="100px">
+                <el-form-item label="租户">
+                    <el-select v-model="contractForm.tenant_id" style="width: 100%">
+                        <el-option v-for="t in tenants" :key="t.id" :label="t.name" :value="t.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="合同编号">
+                    <el-input v-model="contractForm.contract_no"></el-input>
+                </el-form-item>
+                <el-form-item label="房间号">
+                    <el-input v-model="contractForm.room_no"></el-input>
+                </el-form-item>
+                <el-form-item label="开始日期">
+                    <el-date-picker v-model="contractForm.start_date" type="date" value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="结束日期">
+                    <el-date-picker v-model="contractForm.end_date" type="date" value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="月租金">
+                    <el-input-number v-model="contractForm.monthly_rent" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="面积">
+                    <el-input-number v-model="contractForm.area" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="分摊比例">
+                    <el-input-number v-model="contractForm.share_ratio" :min="0" :step="0.1" style="width: 100%"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showContractDialog = false">取消</el-button>
+                <el-button type="primary" @click="saveContract">保存</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="新增抄表" :visible.sync="showMeterDialog" width="600px">
+            <el-form :model="meterForm" label-width="100px">
+                <el-form-item label="合同">
+                    <el-select v-model="meterForm.contract_id" style="width: 100%">
+                        <el-option v-for="c in contracts" :key="c.id" :label="c.contract_no + ' - ' + c.tenant_name" :value="c.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="抄表日期">
+                    <el-date-picker v-model="meterForm.reading_date" type="date" value-format="yyyy-MM-dd" style="width: 100%"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="水表起码">
+                    <el-input-number v-model="meterForm.water_prev" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="水表止码">
+                    <el-input-number v-model="meterForm.water_curr" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="电表起码">
+                    <el-input-number v-model="meterForm.electric_prev" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="电表止码">
+                    <el-input-number v-model="meterForm.electric_curr" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="抄表人">
+                    <el-input v-model="meterForm.reader"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showMeterDialog = false">取消</el-button>
+                <el-button type="primary" @click="saveMeterReading">保存</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog :title="deviceDialogTitle" :visible.sync="showDeviceDialog" width="600px">
+            <el-form :model="deviceForm" label-width="100px">
+                <el-form-item label="合同">
+                    <el-select v-model="deviceForm.contract_id" style="width: 100%">
+                        <el-option v-for="c in contracts" :key="c.id" :label="c.contract_no + ' - ' + c.tenant_name" :value="c.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="设备名称">
+                    <el-input v-model="deviceForm.device_name"></el-input>
+                </el-form-item>
+                <el-form-item label="设备类型">
+                    <el-select v-model="deviceForm.device_type" style="width: 100%">
+                        <el-option label="空调" value="空调"></el-option>
+                        <el-option label="网络设备" value="网络"></el-option>
+                        <el-option label="打印机" value="办公"></el-option>
+                        <el-option label="其他" value="其他"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="功率(W)">
+                    <el-input-number v-model="deviceForm.power" :min="0" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="每日小时">
+                    <el-input-number v-model="deviceForm.hours_per_day" :min="0" :max="24" style="width: 100%"></el-input-number>
+                </el-form-item>
+                <el-form-item label="每月天数">
+                    <el-input-number v-model="deviceForm.days_per_month" :min="0" :max="31" style="width: 100%"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button @click="showDeviceDialog = false">取消</el-button>
+                <el-button type="primary" @click="saveDevice">保存</el-button>
+            </div>
+        </el-dialog>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/element-ui@2.15.14/lib/index.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
