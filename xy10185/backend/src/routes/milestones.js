@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const dayjs = require('dayjs');
 const { queryAll, queryOne, runQuery, db } = require('../utils/db');
 const { success, error, handleAsync } = require('../utils/response');
+const { checkAndUpdatePaymentStatus, getPaymentHistory, getPaymentTriggerLogs } = require('../utils/payment-service');
 
 const router = express.Router();
 
@@ -57,7 +58,10 @@ router.get('/project/:projectId', handleAsync(async (req, res) => {
 }));
 
 router.post('/', handleAsync(async (req, res) => {
-  const { project_id, name, description, sequence, planned_date, payment_percentage, payment_amount } = req.body;
+  const { 
+    project_id, name, description, sequence, planned_date, 
+    payment_percentage, payment_amount, payment_trigger_type, payment_trigger_condition 
+  } = req.body;
   
   if (!project_id || !name) {
     return res.status(400).json(error('项目ID和里程碑名称不能为空', 400));
@@ -72,10 +76,15 @@ router.post('/', handleAsync(async (req, res) => {
   const id = uuidv4();
   const seq = sequence || queryOne('SELECT COALESCE(MAX(sequence), 0) + 1 as next_seq FROM milestones WHERE project_id = ?', [project_id]).next_seq;
   
+  const triggerType = payment_trigger_type || 'all_accepted';
+  const triggerCondition = payment_trigger_condition 
+    ? JSON.stringify(payment_trigger_condition || {}) 
+    : '{}';
+  
   runQuery(
-    `INSERT INTO milestones (id, project_id, name, description, sequence, planned_date, status, payment_percentage, payment_amount, payment_status, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, project_id, name, description || '', seq, planned_date || null, 'pending', payment_percentage || 0, payment_amount || 0, 'unpaid', now, now]
+    `INSERT INTO milestones (id, project_id, name, description, sequence, planned_date, status, payment_percentage, payment_amount, payment_status, payment_trigger_type, payment_trigger_condition, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, project_id, name, description || '', seq, planned_date || null, 'pending', payment_percentage || 0, payment_amount || 0, 'unpaid', triggerType, triggerCondition, now, now]
   );
   
   res.json(success({ id }, '里程碑创建成功'));
@@ -83,7 +92,11 @@ router.post('/', handleAsync(async (req, res) => {
 
 router.put('/:id', handleAsync(async (req, res) => {
   const { id } = req.params;
-  const { name, description, sequence, planned_date, actual_date, status, payment_percentage, payment_amount, payment_status } = req.body;
+  const { 
+    name, description, sequence, planned_date, actual_date, status, 
+    payment_percentage, payment_amount, payment_status,
+    payment_trigger_type, payment_trigger_condition
+  } = req.body;
   
   const existing = queryOne('SELECT * FROM milestones WHERE id = ?', [id]);
   if (!existing) {
@@ -91,6 +104,10 @@ router.put('/:id', handleAsync(async (req, res) => {
   }
   
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
+  
+  const triggerCondition = payment_trigger_condition 
+    ? JSON.stringify(payment_trigger_condition) 
+    : undefined;
   
   runQuery(
     `UPDATE milestones SET 
@@ -103,9 +120,11 @@ router.put('/:id', handleAsync(async (req, res) => {
       payment_percentage = COALESCE(?, payment_percentage),
       payment_amount = COALESCE(?, payment_amount),
       payment_status = COALESCE(?, payment_status),
+      payment_trigger_type = COALESCE(?, payment_trigger_type),
+      payment_trigger_condition = COALESCE(?, payment_trigger_condition),
       updated_at = ?
      WHERE id = ?`,
-    [name, description, sequence, planned_date, actual_date, status, payment_percentage, payment_amount, payment_status, now, id]
+    [name, description, sequence, planned_date, actual_date, status, payment_percentage, payment_amount, payment_status, payment_trigger_type, triggerCondition, now, id]
   );
   
   res.json(success(null, '里程碑更新成功'));

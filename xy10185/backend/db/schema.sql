@@ -26,9 +26,38 @@ CREATE TABLE IF NOT EXISTS milestones (
   payment_percentage REAL DEFAULT 0,
   payment_amount REAL DEFAULT 0,
   payment_status TEXT DEFAULT 'unpaid',
+  payment_trigger_type TEXT DEFAULT 'all_accepted',
+  payment_trigger_condition TEXT DEFAULT '{}',
+  payment_approved INTEGER DEFAULT 0,
+  payment_approved_by TEXT,
+  payment_approved_at TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payment_history (
+  id TEXT PRIMARY KEY,
+  milestone_id TEXT NOT NULL,
+  amount REAL NOT NULL,
+  action TEXT NOT NULL,
+  operator TEXT,
+  reason TEXT,
+  before_status TEXT,
+  after_status TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (milestone_id) REFERENCES milestones(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payment_trigger_logs (
+  id TEXT PRIMARY KEY,
+  milestone_id TEXT NOT NULL,
+  trigger_type TEXT NOT NULL,
+  trigger_source TEXT NOT NULL,
+  source_id TEXT,
+  details TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (milestone_id) REFERENCES milestones(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS deliverables (
@@ -71,6 +100,9 @@ CREATE TABLE IF NOT EXISTS rework_records (
 );
 
 CREATE INDEX IF NOT EXISTS idx_milestones_project ON milestones(project_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_payment_status ON milestones(payment_status);
 CREATE INDEX IF NOT EXISTS idx_deliverables_milestone ON deliverables(milestone_id);
 CREATE INDEX IF NOT EXISTS idx_acceptance_deliverable ON acceptance_records(deliverable_id);
 CREATE INDEX IF NOT EXISTS idx_rework_deliverable ON rework_records(deliverable_id);
+CREATE INDEX IF NOT EXISTS idx_payment_history_milestone ON payment_history(milestone_id);
+CREATE INDEX IF NOT EXISTS idx_payment_trigger_logs_milestone ON payment_trigger_logs(milestone_id);

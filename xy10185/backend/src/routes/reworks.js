@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const dayjs = require('dayjs');
 const { queryAll, queryOne, runQuery } = require('../utils/db');
 const { success, error, handleAsync } = require('../utils/response');
+const { checkAndUpdatePaymentStatus } = require('../utils/payment-service');
 
 const router = express.Router();
 
@@ -76,6 +77,10 @@ router.post('/:id/complete', handleAsync(async (req, res) => {
     return res.status(404).json(error('返工记录不存在', 404));
   }
   
+  if (rework.status === 'completed') {
+    return res.status(400).json(error('该返工已完成，不能重复操作', 400));
+  }
+  
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
   
   runQuery(
@@ -83,7 +88,23 @@ router.post('/:id/complete', handleAsync(async (req, res) => {
     ['completed', dayjs().format('YYYY-MM-DD'), now, id]
   );
   
-  res.json(success(null, '返工已完成'));
+  const deliverable = queryOne('SELECT * FROM deliverables WHERE id = ?', [rework.deliverable_id]);
+  let paymentUpdate = null;
+  
+  if (deliverable) {
+    paymentUpdate = checkAndUpdatePaymentStatus(
+      deliverable.milestone_id,
+      'rework_completed',
+      id
+    );
+  }
+  
+  res.json(success({
+    reworkId: id,
+    payment_update: paymentUpdate
+  }, paymentUpdate && paymentUpdate.updated
+    ? '返工已完成，付款条件已满足'
+    : '返工已完成'));
 }));
 
 router.delete('/:id', handleAsync(async (req, res) => {

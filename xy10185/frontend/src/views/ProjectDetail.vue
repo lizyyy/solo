@@ -65,6 +65,27 @@
                 <el-button type="success" link @click="completeMilestone(ms)" :icon="CircleCheck">
                   完成
                 </el-button>
+                <el-button type="warning" link @click="openPaymentDetail(ms)" :icon="Money">
+                  付款详情
+                </el-button>
+                <el-button 
+                  type="success" 
+                  link 
+                  @click="openApproveDialog(ms)" 
+                  :icon="CircleCheck"
+                  :disabled="ms.payment_status === 'paid' || ms.payment_status === 'partial'"
+                >
+                  审批付款
+                </el-button>
+                <el-button 
+                  type="primary" 
+                  link 
+                  @click="openConfirmDialog(ms)" 
+                  :icon="Check"
+                  :disabled="ms.payment_status === 'paid'"
+                >
+                  确认付款
+                </el-button>
                 <el-button type="primary" link @click="openEditMilestoneDialog(ms)" :icon="Edit">
                   编辑
                 </el-button>
@@ -227,6 +248,38 @@
             <el-option label="部分付款" value="partial" />
             <el-option label="已付款" value="paid" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="付款触发条件">
+          <el-select 
+            v-model="milestoneForm.payment_trigger_type" 
+            placeholder="请选择付款触发条件" 
+            style="width: 100%"
+          >
+            <el-option 
+              v-for="item in paymentTriggerTypes" 
+              :key="item.value" 
+              :label="item.label" 
+              :value="item.value"
+            >
+              <span>{{ item.label }}</span>
+              <div style="font-size: 12px; color: #909399;">{{ item.description }}</div>
+            </el-option>
+          </el-select>
+          <div class="form-tip">设置何时可以触发付款审批</div>
+        </el-form-item>
+        <el-form-item 
+          label="验收通过率" 
+          v-if="milestoneForm.payment_trigger_type === 'percentage_accepted'"
+        >
+          <el-input-number
+            v-model="milestoneForm.payment_trigger_condition.percentage"
+            :min="0"
+            :max="100"
+            :precision="0"
+            style="width: 100%"
+            placeholder="最低验收通过率 (%)"
+          />
+          <div class="form-tip">当验收通过率达到此比例时触发付款</div>
         </el-form-item>
         <el-form-item label="里程碑描述">
           <el-input
@@ -476,6 +529,173 @@
         <el-button type="warning" @click="confirmReject" :loading="submitting">确认驳回</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="paymentDialogVisible"
+      title="付款详情"
+      width="800px"
+      :close-on-click-modal="false"
+    >
+      <div v-if="activeMilestone" class="payment-detail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="里程碑名称">{{ activeMilestone.name }}</el-descriptions-item>
+          <el-descriptions-item label="阶段序号">第{{ activeMilestone.sequence }}阶段</el-descriptions-item>
+          <el-descriptions-item label="付款金额">¥{{ (activeMilestone.payment_amount || 0).toLocaleString() }}</el-descriptions-item>
+          <el-descriptions-item label="付款比例">{{ activeMilestone.payment_percentage || 0 }}%</el-descriptions-item>
+          <el-descriptions-item label="付款状态">
+            <el-tag :type="activeMilestone.payment_status === 'paid' ? 'success' : activeMilestone.payment_status === 'partial' ? 'warning' : 'info'">
+              {{ getPaymentStatusText(activeMilestone.payment_status) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="触发条件">
+            {{ getPaymentTriggerTypeText(activeMilestone.payment_trigger_type) }}
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <el-divider content-position="left">付款状态检测</el-divider>
+        <el-alert
+          :title="paymentStatusCheck?.trigger_met ? '✅ 付款条件已满足' : '⚠️ 付款条件未满足'"
+          :type="paymentStatusCheck?.trigger_met ? 'success' : 'warning'"
+          :closable="false"
+          style="margin-bottom: 16px;"
+        >
+          <template #default>
+            <div v-if="paymentStatusCheck">
+              <p>验收通过: {{ paymentStatusCheck.status?.accepted_count || 0 }}/{{ paymentStatusCheck.status?.total_deliverables || 0 }}</p>
+              <p>待处理返工: {{ paymentStatusCheck.status?.pending_rework_count || 0 }}</p>
+              <p>验收通过率: {{ (paymentStatusCheck.status?.acceptance_rate || 0).toFixed(1) }}%</p>
+              <p v-if="paymentStatusCheck.details">说明: {{ paymentStatusCheck.details }}</p>
+            </div>
+          </template>
+        </el-alert>
+
+        <el-divider content-position="left">付款历史记录</el-divider>
+        <el-table
+          :data="paymentHistory"
+          size="small"
+          stripe
+          empty-text="暂无付款历史"
+        >
+          <el-table-column prop="action" label="操作" width="120">
+            <template #default="{ row }">
+              <el-tag :type="getPaymentActionType(row.action)">{{ getPaymentActionText(row.action) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="amount" label="金额" width="120">
+            <template #default="{ row }">
+              ¥{{ (row.amount || 0).toLocaleString() }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="before_status" label="变更前状态" width="100">
+            <template #default="{ row }">
+              {{ getPaymentStatusText(row.before_status) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="after_status" label="变更后状态" width="100">
+            <template #default="{ row }">
+              {{ getPaymentStatusText(row.after_status) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="operator" label="操作人" width="100" />
+          <el-table-column prop="reason" label="原因/说明" min-width="150" />
+          <el-table-column prop="created_at" label="时间" width="160" />
+        </el-table>
+
+        <el-divider content-position="left">触发条件日志</el-divider>
+        <el-table
+          :data="paymentLogs"
+          size="small"
+          stripe
+          empty-text="暂无触发日志"
+        >
+          <el-table-column prop="trigger_source" label="触发来源" width="120">
+            <template #default="{ row }">
+              {{ getTriggerSourceText(row.trigger_source) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="trigger_type" label="触发类型" width="120">
+            <template #default="{ row }">
+              {{ getPaymentTriggerTypeText(row.trigger_type) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="详情" min-width="200">
+            <template #default="{ row }">
+              <div v-if="row.details_parsed">
+                <span v-if="row.details_parsed.trigger_met" class="text-success">✓ 条件满足</span>
+                <span v-else class="text-warning">✗ 条件未满足</span>
+                <span v-if="row.details_parsed.details"> - {{ row.details_parsed.details }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="created_at" label="时间" width="160" />
+        </el-table>
+      </div>
+      <template #footer>
+        <el-button @click="paymentDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="approveDialogVisible"
+      title="审批付款"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="approveFormRef"
+        :model="approveForm"
+        label-width="80px"
+      >
+        <el-form-item label="审批人">
+          <el-input v-model="approveForm.operator" placeholder="请输入审批人" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="审批意见">
+          <el-input
+            v-model="approveForm.reason"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入审批意见（可选）"
+            maxlength="500"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="approveDialogVisible = false">取消</el-button>
+        <el-button type="success" @click="handleApprove" :loading="submitting">确认审批</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="confirmDialogVisible"
+      title="确认付款"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="confirmFormRef"
+        :model="confirmForm"
+        label-width="80px"
+      >
+        <el-form-item label="操作人">
+          <el-input v-model="confirmForm.operator" placeholder="请输入操作人" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input
+            v-model="confirmForm.reason"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入备注（可选）"
+            maxlength="500"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="confirmDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleConfirm" :loading="submitting">确认付款</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -485,12 +705,13 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { 
   ArrowLeft, Refresh, Download, Plus, Upload, CircleCheck, Edit, Delete, 
-  Document, User, Calendar, Money, UploadFilled 
+  Document, User, Calendar, Money, UploadFilled, Check, History, Timer
 } from '@element-plus/icons-vue'
 import { getProjectDetail } from '@/api/projects'
 import { getMilestones, createMilestone, updateMilestone, deleteMilestone, completeMilestone as completeMsApi } from '@/api/milestones'
 import { createDeliverable, deleteDeliverable, downloadDeliverable, acceptDeliverable as acceptDlApi, rejectDeliverable as rejectDlApi } from '@/api/deliverables'
 import { exportProjectReport } from '@/api/reports'
+import { getPaymentTriggerTypes, getPaymentHistory, getPaymentLogs, approvePayment, confirmPayment } from '@/api/payments'
 
 const route = useRoute()
 const router = useRouter()
@@ -518,6 +739,26 @@ const uploadRef = ref(null)
 const acceptFormRef = ref(null)
 const rejectFormRef = ref(null)
 
+const paymentTriggerTypes = ref([])
+const activeMilestone = ref(null)
+const paymentHistory = ref([])
+const paymentLogs = ref([])
+const paymentLoading = ref(false)
+
+const approveDialogVisible = ref(false)
+const confirmDialogVisible = ref(false)
+const paymentDialogVisible = ref(false)
+
+const approveForm = reactive({
+  operator: '',
+  reason: ''
+})
+
+const confirmForm = reactive({
+  operator: '',
+  reason: ''
+})
+
 const milestoneForm = reactive({
   id: '',
   project_id: '',
@@ -528,7 +769,9 @@ const milestoneForm = reactive({
   payment_percentage: 0,
   payment_amount: 0,
   payment_status: 'unpaid',
-  status: 'pending'
+  status: 'pending',
+  payment_trigger_type: 'all_accepted',
+  payment_trigger_condition: {}
 })
 
 const deliverableForm = reactive({
@@ -631,6 +874,212 @@ function getPaymentStatusText(status) {
   return map[status] || status
 }
 
+const paymentStatusCheck = ref(null)
+
+function getPaymentTriggerTypeText(type) {
+  const map = {
+    all_accepted: '所有交付物验收通过且无待处理返工',
+    no_rework_pending: '无待处理返工',
+    percentage_accepted: '按验收通过率触发',
+    specific_deliverables: '指定交付物验收通过',
+    manual: '手动审批'
+  }
+  return map[type] || type
+}
+
+function getPaymentActionType(action) {
+  const map = {
+    trigger_met: 'success',
+    trigger_not_met: 'info',
+    approved: 'primary',
+    paid: 'success',
+    rejected: 'danger',
+    reset: 'warning'
+  }
+  return map[action] || 'info'
+}
+
+function getPaymentActionText(action) {
+  const map = {
+    trigger_met: '条件满足',
+    trigger_not_met: '条件不满足',
+    approved: '审批通过',
+    paid: '已付款',
+    rejected: '审批拒绝',
+    reset: '重置'
+  }
+  return map[action] || action
+}
+
+function getTriggerSourceText(source) {
+  const map = {
+    acceptance_accepted: '验收通过',
+    acceptance_rejected: '验收驳回',
+    rework_completed: '返工完成',
+    system: '系统检测',
+    manual: '手动操作'
+  }
+  return map[source] || source
+}
+
+async function openPaymentDetail(ms) {
+  activeMilestone.value = ms
+  paymentLoading.value = true
+  
+  try {
+    const [history, logs] = await Promise.all([
+      getPaymentHistory(ms.id),
+      getPaymentLogs(ms.id)
+    ])
+    
+    paymentHistory.value = history
+    paymentLogs.value = logs
+    
+    let triggerCondition = {}
+    if (ms.payment_trigger_condition) {
+      try {
+        triggerCondition = typeof ms.payment_trigger_condition === 'string'
+          ? JSON.parse(ms.payment_trigger_condition)
+          : ms.payment_trigger_condition
+      } catch (e) {
+        triggerCondition = {}
+      }
+    }
+    
+    const acceptedCount = (ms.deliverables || []).filter(d => d.status === 'accepted').length
+    const totalDeliverables = (ms.deliverables || []).length
+    const pendingReworkCount = (ms.deliverables || []).reduce((count, d) => {
+      return count + (d.rework_records || []).filter(r => r.status === 'pending').length
+    }, 0)
+    
+    let triggerMet = false
+    let details = ''
+    
+    const triggerType = ms.payment_trigger_type || 'all_accepted'
+    const acceptanceRate = totalDeliverables > 0 ? (acceptedCount / totalDeliverables) * 100 : 0
+    
+    switch (triggerType) {
+      case 'all_accepted':
+        triggerMet = totalDeliverables > 0 && 
+                     acceptedCount === totalDeliverables && 
+                     pendingReworkCount === 0
+        details = triggerMet
+          ? '所有交付物已验收通过，且无待处理返工'
+          : `验收通过: ${acceptedCount}/${totalDeliverables}, 待返工: ${pendingReworkCount}`
+        break
+        
+      case 'no_rework_pending':
+        triggerMet = pendingReworkCount === 0
+        details = triggerMet
+          ? '无待处理的返工任务'
+          : `仍有 ${pendingReworkCount} 个返工任务待完成`
+        break
+        
+      case 'percentage_accepted':
+        const requiredPercentage = triggerCondition.percentage || 100
+        triggerMet = acceptanceRate >= requiredPercentage
+        details = triggerMet
+          ? `验收通过率 ${acceptanceRate.toFixed(1)}% >= ${requiredPercentage}%`
+          : `验收通过率 ${acceptanceRate.toFixed(1)}% < ${requiredPercentage}%`
+        break
+        
+      case 'manual':
+        triggerMet = ms.payment_approved === 1
+        details = triggerMet ? '已手动审批通过' : '等待手动审批'
+        break
+        
+      default:
+        triggerMet = false
+        details = '未知的付款触发类型'
+    }
+    
+    paymentStatusCheck.value = {
+      trigger_met: triggerMet,
+      trigger_type: triggerType,
+      status: {
+        total_deliverables: totalDeliverables,
+        accepted_count: acceptedCount,
+        pending_rework_count: pendingReworkCount,
+        acceptance_rate: acceptanceRate
+      },
+      details
+    }
+    
+    paymentDialogVisible.value = true
+  } catch (error) {
+    console.error('加载付款详情失败:', error)
+    ElMessage.error('加载付款详情失败')
+  } finally {
+    paymentLoading.value = false
+  }
+}
+
+function openApproveDialog(ms) {
+  if (ms.payment_status === 'paid' || ms.payment_status === 'partial') {
+    ElMessage.warning('该里程碑已审批或已付款')
+    return
+  }
+  
+  activeMilestone.value = ms
+  Object.assign(approveForm, {
+    operator: '',
+    reason: ''
+  })
+  approveDialogVisible.value = true
+}
+
+function openConfirmDialog(ms) {
+  if (ms.payment_status === 'paid') {
+    ElMessage.warning('该里程碑已付款')
+    return
+  }
+  
+  activeMilestone.value = ms
+  Object.assign(confirmForm, {
+    operator: '',
+    reason: ''
+  })
+  confirmDialogVisible.value = true
+}
+
+async function handleApprove() {
+  if (!activeMilestone.value) return
+  
+  submitting.value = true
+  try {
+    await approvePayment(activeMilestone.value.id, {
+      operator: approveForm.operator.trim(),
+      reason: approveForm.reason.trim()
+    })
+    ElMessage.success('付款审批成功')
+    approveDialogVisible.value = false
+    loadData()
+  } catch (error) {
+    console.error('审批失败:', error)
+  } finally {
+    submitting.value = false
+  }
+}
+
+async function handleConfirm() {
+  if (!activeMilestone.value) return
+  
+  submitting.value = true
+  try {
+    await confirmPayment(activeMilestone.value.id, {
+      operator: confirmForm.operator.trim(),
+      reason: confirmForm.reason.trim()
+    })
+    ElMessage.success('付款已确认')
+    confirmDialogVisible.value = false
+    loadData()
+  } catch (error) {
+    console.error('确认付款失败:', error)
+  } finally {
+    submitting.value = false
+  }
+}
+
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 B'
   const k = 1024
@@ -677,6 +1126,14 @@ async function exportReport() {
   }
 }
 
+async function loadPaymentTriggerTypes() {
+  try {
+    paymentTriggerTypes.value = await getPaymentTriggerTypes()
+  } catch (error) {
+    console.error('加载付款触发类型失败:', error)
+  }
+}
+
 function openMilestoneDialog() {
   isEditMilestone.value = false
   Object.assign(milestoneForm, {
@@ -689,13 +1146,25 @@ function openMilestoneDialog() {
     payment_percentage: 0,
     payment_amount: 0,
     payment_status: 'unpaid',
-    status: 'pending'
+    status: 'pending',
+    payment_trigger_type: 'all_accepted',
+    payment_trigger_condition: {}
   })
   milestoneDialogVisible.value = true
 }
 
 function openEditMilestoneDialog(ms) {
   isEditMilestone.value = true
+  let triggerCondition = {}
+  if (ms.payment_trigger_condition) {
+    try {
+      triggerCondition = typeof ms.payment_trigger_condition === 'string' 
+        ? JSON.parse(ms.payment_trigger_condition) 
+        : ms.payment_trigger_condition
+    } catch (e) {
+      triggerCondition = {}
+    }
+  }
   Object.assign(milestoneForm, {
     id: ms.id,
     project_id: projectId.value,
@@ -706,7 +1175,9 @@ function openEditMilestoneDialog(ms) {
     payment_percentage: ms.payment_percentage || 0,
     payment_amount: ms.payment_amount || 0,
     payment_status: ms.payment_status || 'unpaid',
-    status: ms.status || 'pending'
+    status: ms.status || 'pending',
+    payment_trigger_type: ms.payment_trigger_type || 'all_accepted',
+    payment_trigger_condition: triggerCondition
   })
   milestoneDialogVisible.value = true
 }
@@ -729,7 +1200,9 @@ async function submitMilestone() {
       payment_percentage: milestoneForm.payment_percentage || 0,
       payment_amount: milestoneForm.payment_amount || 0,
       payment_status: milestoneForm.payment_status,
-      status: milestoneForm.status
+      status: milestoneForm.status,
+      payment_trigger_type: milestoneForm.payment_trigger_type,
+      payment_trigger_condition: milestoneForm.payment_trigger_condition
     }
     
     if (isEditMilestone.value) {
@@ -952,6 +1425,7 @@ watch(projectId, () => {
 
 onMounted(() => {
   loadData()
+  loadPaymentTriggerTypes()
 })
 
 defineExpose({

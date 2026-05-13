@@ -6,6 +6,7 @@ const fs = require('fs');
 const multer = require('multer');
 const { queryAll, queryOne, runQuery, db } = require('../utils/db');
 const { success, error, handleAsync } = require('../utils/response');
+const { checkAndUpdatePaymentStatus } = require('../utils/payment-service');
 
 const router = express.Router();
 
@@ -224,6 +225,10 @@ router.post('/:id/accept', handleAsync(async (req, res) => {
     return res.status(404).json(error('交付物不存在', 404));
   }
   
+  if (deliverable.status === 'accepted') {
+    return res.status(400).json(error('该交付物已验收通过，不能重复验收', 400));
+  }
+  
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
   
   const recordId = uuidv4();
@@ -238,7 +243,18 @@ router.post('/:id/accept', handleAsync(async (req, res) => {
     ['accepted', now, id]
   );
   
-  res.json(success(null, '验收通过'));
+  const paymentUpdate = checkAndUpdatePaymentStatus(
+    deliverable.milestone_id,
+    'acceptance_accepted',
+    id
+  );
+  
+  res.json(success({
+    deliverableId: id,
+    payment_update: paymentUpdate
+  }, paymentUpdate && paymentUpdate.updated 
+    ? '验收通过，付款条件已满足' 
+    : '验收通过'));
 }));
 
 router.post('/:id/reject', handleAsync(async (req, res) => {
@@ -248,6 +264,10 @@ router.post('/:id/reject', handleAsync(async (req, res) => {
   const deliverable = queryOne('SELECT * FROM deliverables WHERE id = ?', [id]);
   if (!deliverable) {
     return res.status(404).json(error('交付物不存在', 404));
+  }
+  
+  if (deliverable.status === 'accepted') {
+    return res.status(400).json(error('该交付物已验收通过，不能驳回', 400));
   }
   
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
@@ -264,8 +284,9 @@ router.post('/:id/reject', handleAsync(async (req, res) => {
     ['rejected', now, id]
   );
   
+  let reworkId = null;
   if (rework_description) {
-    const reworkId = uuidv4();
+    reworkId = uuidv4();
     runQuery(
       `INSERT INTO rework_records (id, deliverable_id, description, requirements, expected_date, status, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -273,7 +294,16 @@ router.post('/:id/reject', handleAsync(async (req, res) => {
     );
   }
   
-  res.json(success(null, '验收驳回，已创建返工记录'));
+  checkAndUpdatePaymentStatus(
+    deliverable.milestone_id,
+    'acceptance_rejected',
+    id
+  );
+  
+  res.json(success({
+    deliverableId: id,
+    reworkId
+  }, reworkId ? '验收驳回，已创建返工记录' : '验收驳回'));
 }));
 
 module.exports = router;

@@ -10,9 +10,10 @@ const milestonesRouter = require('./src/routes/milestones');
 const deliverablesRouter = require('./src/routes/deliverables');
 const reworksRouter = require('./src/routes/reworks');
 const reportsRouter = require('./src/routes/reports');
+const paymentsRouter = require('./src/routes/payments');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 async function startServer() {
   try {
@@ -27,6 +28,7 @@ async function startServer() {
     app.use('/api/deliverables', deliverablesRouter);
     app.use('/api/reworks', reworksRouter);
     app.use('/api/reports', reportsRouter);
+    app.use('/api/payments', paymentsRouter);
 
     const frontendDist = path.join(__dirname, '../frontend/dist');
     if (fs.existsSync(frontendDist)) {
