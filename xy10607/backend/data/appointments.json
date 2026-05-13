@@ -1,0 +1,245 @@
+[
+  {
+    "id": "6aae4690-38dc-4303-bab0-d1cd085859bc",
+    "status": "rejected",
+    "customerName": "测试客户",
+    "customerPhone": "13800000001",
+    "license": {
+      "number": "110101199001011234",
+      "expiryDate": "2028-05-01",
+      "valid": true
+    },
+    "customerAge": 34,
+    "vehicleId": "v-001",
+    "salespersonId": "s-001",
+    "startTime": "2026-05-15T10:00:00.000Z",
+    "endTime": "2026-05-15T11:30:00.000Z",
+    "hasAccidentHistory": false,
+    "licenseCheck": {
+      "valid": true,
+      "reason": "驾照有效期正常",
+      "code": "LICENSE_VALID"
+    },
+    "vehicleCheck": {
+      "available": true,
+      "reason": "车辆可用",
+      "code": "VEHICLE_AVAILABLE"
+    },
+    "insuranceCheck": {
+      "valid": false,
+      "violations": [
+        {
+          "reason": "车辆保险已过期",
+          "code": "INSURANCE_EXPIRED"
+        }
+      ],
+      "warnings": []
+    },
+    "salespersonCheck": null,
+    "timeline": [
+      {
+        "id": "3d77a7b0-7857-4720-a180-9921f769fc31",
+        "timestamp": "2026-05-13T06:17:55.234Z",
+        "type": "validation",
+        "action": "驾照效期检查",
+        "reason": "驾照有效期正常",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": null,
+        "newValue": {
+          "licenseNumber": "110101199001011234",
+          "expiryDate": "2028-05-01",
+          "valid": true
+        }
+      },
+      {
+        "id": "846b3010-f700-4886-9c25-9467f9885c86",
+        "timestamp": "2026-05-13T06:17:55.234Z",
+        "type": "validation",
+        "action": "试驾车可用性检查",
+        "reason": "车辆可用",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": {
+          "id": "v-001",
+          "status": "available",
+          "model": "Tesla Model 3 2024款"
+        },
+        "newValue": {
+          "available": true,
+          "reason": "车辆可用"
+        }
+      },
+      {
+        "id": "9141ac8e-06f3-41a7-9381-f1b5f9076187",
+        "timestamp": "2026-05-13T06:17:55.235Z",
+        "type": "validation",
+        "action": "保险规则检查",
+        "reason": "车辆保险已过期",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": {
+          "insurance": {
+            "valid": true,
+            "company": "中国平安保险",
+            "policyNumber": "PA2024SH001234",
+            "expiryDate": "2026-03-15"
+          },
+          "model": "Tesla Model 3 2024款"
+        },
+        "newValue": {
+          "valid": false,
+          "violations": [
+            {
+              "reason": "车辆保险已过期",
+              "code": "INSURANCE_EXPIRED"
+            }
+          ],
+          "warnings": []
+        }
+      }
+    ],
+    "createdAt": "2026-05-13T06:17:55.235Z",
+    "updatedAt": "2026-05-13T06:17:55.235Z"
+  },
+  {
+    "id": "041ced77-d32d-4890-8402-fc36fb64a4f8",
+    "status": "pending",
+    "customerName": "测试客户",
+    "customerPhone": "13800000001",
+    "license": {
+      "number": "110101199001011234",
+      "expiryDate": "2028-05-01",
+      "valid": true
+    },
+    "customerAge": 34,
+    "vehicleId": "v-002",
+    "vehicleSnapshot": {
+      "id": "v-002",
+      "model": "BMW 325Li M运动套装",
+      "plateNumber": "沪B67890",
+      "vin": "WBA5B1105NA123457",
+      "status": "available",
+      "color": "白色",
+      "mileage": 8500,
+      "insurance": {
+        "valid": true,
+        "company": "太平洋保险",
+        "policyNumber": "CPIC2024SH005678",
+        "expiryDate": "2026-06-20"
+      },
+      "maintenance": []
+    },
+    "salespersonId": "s-001",
+    "salespersonSnapshot": {
+      "id": "s-001",
+      "name": "张三",
+      "phone": "13800138001",
+      "department": "豪华车销售部",
+      "schedule": []
+    },
+    "startTime": "2026-05-15T10:00:00.000Z",
+    "endTime": "2026-05-15T11:30:00.000Z",
+    "hasAccidentHistory": false,
+    "licenseCheck": {
+      "valid": true,
+      "reason": "驾照有效期正常",
+      "code": "LICENSE_VALID"
+    },
+    "vehicleCheck": {
+      "available": true,
+      "reason": "车辆可用",
+      "code": "VEHICLE_AVAILABLE"
+    },
+    "insuranceCheck": {
+      "valid": true,
+      "warnings": []
+    },
+    "salespersonCheck": {
+      "available": true,
+      "reason": "销售顾问日程可用"
+    },
+    "operationHistory": [],
+    "timeline": [
+      {
+        "id": "54f7be52-0f3f-4ca0-b4d7-637a622f01c9",
+        "timestamp": "2026-05-13T06:18:28.183Z",
+        "type": "validation",
+        "action": "驾照效期检查",
+        "reason": "驾照有效期正常",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": null,
+        "newValue": {
+          "licenseNumber": "110101199001011234",
+          "expiryDate": "2028-05-01",
+          "valid": true
+        }
+      },
+      {
+        "id": "68c1110c-5fcc-4f47-898f-c2ed365ea6fe",
+        "timestamp": "2026-05-13T06:18:28.183Z",
+        "type": "validation",
+        "action": "试驾车可用性检查",
+        "reason": "车辆可用",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": {
+          "id": "v-002",
+          "status": "available",
+          "model": "BMW 325Li M运动套装"
+        },
+        "newValue": {
+          "available": true,
+          "reason": "车辆可用"
+        }
+      },
+      {
+        "id": "0921cca1-bc7d-41fb-aeee-31973583845c",
+        "timestamp": "2026-05-13T06:18:28.183Z",
+        "type": "validation",
+        "action": "保险规则检查",
+        "reason": "保险规则检查通过",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": {
+          "insurance": {
+            "valid": true,
+            "company": "太平洋保险",
+            "policyNumber": "CPIC2024SH005678",
+            "expiryDate": "2026-06-20"
+          },
+          "model": "BMW 325Li M运动套装"
+        },
+        "newValue": {
+          "valid": true,
+          "warnings": []
+        }
+      },
+      {
+        "id": "21027939-e6f6-4571-b87b-9377b9c14303",
+        "timestamp": "2026-05-13T06:18:28.183Z",
+        "type": "validation",
+        "action": "销售日程检查",
+        "reason": "销售顾问日程可用",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": {
+          "id": "s-001",
+          "name": "张三",
+          "schedule": []
+        },
+        "newValue": {
+          "available": true
+        }
+      },
+      {
+        "id": "18ee381f-e494-4c7b-99ba-28d07bbcb521",
+        "timestamp": "2026-05-13T06:18:28.183Z",
+        "type": "status_change",
+        "action": "创建预约",
+        "reason": "所有规则检查通过，创建预约并进入待确认状态",
+        "operator": "æµè¯ç®¡çå",
+        "oldValue": null,
+        "newValue": {
+          "status": "pending"
+        }
+      }
+    ],
+    "createdAt": "2026-05-13T06:18:28.183Z",
+    "updatedAt": "2026-05-13T06:18:28.183Z"
+  }
+]

@@ -1,0 +1,31 @@
+[
+  {
+    "id": "s-001",
+    "name": "张三",
+    "phone": "13800138001",
+    "department": "豪华车销售部",
+    "schedule": [
+      {
+        "id": "041ced77-d32d-4890-8402-fc36fb64a4f8",
+        "startTime": "2026-05-15T10:00:00.000Z",
+        "endTime": "2026-05-15T11:30:00.000Z",
+        "type": "test-drive",
+        "customerName": "测试客户"
+      }
+    ]
+  },
+  {
+    "id": "s-002",
+    "name": "李四",
+    "phone": "13800138002",
+    "department": "新能源车销售部",
+    "schedule": []
+  },
+  {
+    "id": "s-003",
+    "name": "王五",
+    "phone": "13800138003",
+    "department": "豪华车销售部",
+    "schedule": []
+  }
+]

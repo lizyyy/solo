@@ -1,0 +1,62 @@
+[
+  {
+    "customerName": "张三",
+    "customerPhone": "13800138001",
+    "licenseNumber": "110101199001011234",
+    "licenseExpiryDate": "2028-05-01",
+    "customerAge": 34,
+    "vehicleId": "v-001",
+    "salespersonId": "s-001",
+    "startTime": "2026-05-15T10:00:00.000Z",
+    "endTime": "2026-05-15T11:30:00.000Z",
+    "hasAccidentHistory": false
+  },
+  {
+    "customerName": "李四",
+    "customerPhone": "13800138002",
+    "licenseNumber": "110101198505052345",
+    "licenseExpiryDate": "2026-06-01",
+    "customerAge": 40,
+    "vehicleId": "v-002",
+    "salespersonId": "s-002",
+    "startTime": "2026-05-15T14:00:00.000Z",
+    "endTime": "2026-05-15T15:30:00.000Z",
+    "hasAccidentHistory": false
+  },
+  {
+    "customerName": "王五",
+    "customerPhone": "13800138003",
+    "licenseNumber": "110101199508083456",
+    "licenseExpiryDate": "2026-05-20",
+    "customerAge": 30,
+    "vehicleId": "v-003",
+    "salespersonId": "s-003",
+    "startTime": "2026-05-16T09:00:00.000Z",
+    "endTime": "2026-05-16T10:30:00.000Z",
+    "hasAccidentHistory": true
+  },
+  {
+    "customerName": "赵六",
+    "customerPhone": "13800138004",
+    "licenseNumber": "110101200001014567",
+    "licenseExpiryDate": "2025-04-01",
+    "customerAge": 26,
+    "vehicleId": "v-001",
+    "salespersonId": "s-001",
+    "startTime": "2026-05-16T14:00:00.000Z",
+    "endTime": "2026-05-16T15:30:00.000Z",
+    "hasAccidentHistory": false
+  },
+  {
+    "customerName": "钱七",
+    "customerPhone": "13800138005",
+    "licenseNumber": "110101197812125678",
+    "licenseExpiryDate": "2027-12-01",
+    "customerAge": 47,
+    "vehicleId": "v-002",
+    "salespersonId": "s-002",
+    "startTime": "2026-05-17T10:00:00.000Z",
+    "endTime": "2026-05-17T11:30:00.000Z",
+    "hasAccidentHistory": false
+  }
+]
