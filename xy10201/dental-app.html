@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>牙科椅旁耗材补货台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #374151; }
+    .app { min-height: 100vh; display: flex; }
+    
+    .sidebar { width: 220px; background: linear-gradient(180deg, #1e3a5f 0%, #0f2744 100%); color: #fff; position: fixed; top: 0; bottom: 0; left: 0; overflow-y: auto; }
+    .sidebar h1 { font-size: 17px; font-weight: 600; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+    .nav-item { padding: 14px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.8); transition: all 0.2s; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-item.active { background: #3b82f6; color: #fff; border-left: 4px solid #60a5fa; }
+    .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+    .reset-btn { margin: 20px; padding: 8px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8); border-radius: 6px; cursor: pointer; font-size: 12px; }
+    .reset-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    
+    .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+    .header { background: #fff; padding: 16px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header .title { font-size: 18px; font-weight: 600; color: #1f2937; }
+    .header .subtitle { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+    .operator { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .operator select { padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; background: #fff; }
+    
+    .content { padding: 24px; }
+    .page-title { font-size: 22px; font-weight: 600; color: #1f2937; margin-bottom: 20px; }
+    
+    .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid; }
+    .stat-card.blue { border-left-color: #3b82f6; }
+    .stat-card.orange { border-left-color: #f59e0b; }
+    .stat-card.red { border-left-color: #ef4444; }
+    .stat-card.green { border-left-color: #10b981; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #1f2937; }
+    .stat-label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    
+    .tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; }
+    .tag-green { background: #d1fae5; color: #065f46; }
+    .tag-orange { background: #fef3c7; color: #92400e; }
+    .tag-red { background: #fee2e2; color: #991b1b; }
+    .tag-blue { background: #dbeafe; color: #1e40af; }
+    .tag-gray { background: #f3f4f6; color: #4b5563; }
+    
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #2563eb; }
+    .btn-success { background: #10b981; color: #fff; }
+    .btn-success:hover:not(:disabled) { background: #059669; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .btn-danger:hover:not(:disabled) { background: #dc2626; }
+    .btn-warning { background: #f59e0b; color: #fff; }
+    .btn-warning:hover:not(:disabled) { background: #d97706; }
+    .btn-default { background: #f3f4f6; color: #4b5563; }
+    .btn-default:hover { background: #e5e7eb; }
+    .btn-group { display: flex; gap: 8px; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    
+    .form-row { display: flex; gap: 16px; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 500; color: #374151; }
+    .form-input, .form-select, .form-textarea { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 180px; }
+    .form-textarea { height: 80px; resize: vertical; width: 100%; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb; }
+    td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #4b5563; }
+    tr:hover td { background: #f9fafb; }
+    code { font-family: 'SFMono-Regular', Consolas, monospace; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; border: 1px solid; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
+    .alert-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .alert-success { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
+    .alert-info { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+    
+    .empty { text-align: center; padding: 40px; color: #9ca3af; }
+    
+    .binding-card { background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .binding-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
+    .binding-item:last-child { border-bottom: none; }
+    
+    .flow-steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .flow-step { padding: 8px 16px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .flow-step.active { background: #3b82f6; color: #fff; }
+    .flow-step.done { background: #10b981; color: #fff; }
+    .flow-step.todo { background: #e5e7eb; color: #6b7280; }
+    .flow-arrow { color: #9ca3af; }
+    
+    .timeline-item { padding: 12px 0; border-left: 2px solid #e5e7eb; padding-left: 20px; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: -7px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid #3b82f6; }
+    
+    .json-preview { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+    
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { padding: 16px 24px; border-bottom: 1px solid #e5e7eb; font-weight: 600; font-size: 16px; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 8px; }
+    
+    .blockage-card { border-left: 4px solid; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+    .blockage-card.high { border-left-color: #ef4444; background: #fef2f2; }
+    .blockage-card.medium { border-left-color: #f59e0b; background: #fffbeb; }
+    .blockage-card.low { border-left-color: #3b82f6; background: #eff6ff; }
+    .blockage-title { font-weight: 600; margin-bottom: 6px; }
+    .blockage-details { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+    
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+    .toast { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    
+    .tab-buttons { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; background: #f3f4f6; color: #4b5563; }
+    .tab-btn.active { background: #3b82f6; color: #fff; }
+    
+    .hidden { display: none !important; }
+    
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .sidebar { width: 60px; }
+      .sidebar h1, .nav-item span:not(.nav-icon) { display: none; }
+      .main { margin-left: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar">
+      <h1>🦷 牙科耗材管理</h1>
+      <div id="nav-container"></div>
+      <button class="reset-btn" onclick="app.resetData()">↻ 重置数据</button>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <div>
+          <div class="title">牙科椅旁耗材补货台</div>
+          <div class="subtitle" id="page-subtitle">仪表盘</div>
+        </div>
+        <div class="operator">
+          <span>当前操作员：</span>
+          <select id="operator-select" onchange="app.setOperator(this.value)">
+            <option value="护士小王">护士小王 (护士)</option>
+            <option value="护士长李姐">护士长李姐 (护士长)</option>
+            <option value="库管小李">库管小李 (库管)</option>
+          </select>
+        </div>
+      </div>
+      <div class="content" id="content"></div>
+    </div>
+
+    <div class="modal-overlay" id="modal" onclick="if(event.target === this) app.closeModal()">
+      <div class="modal">
+        <div class="modal-header" id="modal-title"></div>
+        <div class="modal-body" id="modal-body"></div>
+        <div class="modal-footer" id="modal-footer"></div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script>
+    const STATUS_FLOW = {
+      REPLENISHMENT: {
+        PENDING: ['APPROVED', 'REJECTED'],
+        APPROVED: ['FULFILLED'],
+        REJECTED: [],
+        FULFILLED: []
+      }
+    };
+
+    const STATUS_LABELS = {
+      PENDING: '待审核',
+      APPROVED: '已通过',
+      REJECTED: '已拒绝',
+      FULFILLED: '已补货'
+    };
+
+    const STATUS_COLORS = {
+      PENDING: '#f59e0b',
+      APPROVED: '#10b981',
+      REJECTED: '#ef4444',
+      FULFILLED: '#3b82f6'
+    };
+
+    const STOCK_STATUS = {
+      NORMAL: { label: '正常', color: '#10b981' },
+      LOW_STOCK: { label: '库存不足', color: '#f59e0b' },
+      OUT_OF_STOCK: { label: '已断货', color: '#ef4444' },
+      OVER_STOCK: { label: '过量', color: '#8b5cf6' }
+    };
+
+    const DEFAULT_DATA = {
+      departments: [
+        { id: 1, name: '口腔内科', code: 'NE', description: '龋病、牙髓病等' },
+        { id: 2, name: '口腔外科', code: 'OS', description: '拔牙、种植等' },
+        { id: 3, name: '口腔修复', code: 'PR', description: '义齿、冠桥等' },
+        { id: 4, name: '口腔正畸', code: 'OR', description: '牙齿矫正等' }
+      ],
+      materials: [
+        { id: 1, name: '高速金刚砂车针', code: 'B001', unit: '支', category: '口腔内科',
+          quantity: 30, warning_threshold: 20, max_threshold: 100, unit_price: 15.5 },
+        { id: 2, name: '一次性检查盘', code: 'C001', unit: '个', category: '综合',
+          quantity: 5, warning_threshold: 10, max_threshold: 50, unit_price: 3.0 },
+        { id: 3, name: '光固化复合树脂', code: 'R001', unit: 'ml', category: '口腔修复',
+          quantity: 3, warning_threshold: 10, max_threshold: 50, unit_price: 85.0 },
+        { id: 4, name: '牙科粘接剂', code: 'A001', unit: '支', category: '口腔修复',
+          quantity: 8, warning_threshold: 5, max_threshold: 30, unit_price: 120.0 },
+        { id: 5, name: '树脂抛光条', code: 'P001', unit: '片', category: '口腔修复',
+          quantity: 2, warning_threshold: 10, max_threshold: 100, unit_price: 8.5 },
+        { id: 6, name: '根管锉K型', code: 'K001', unit: '支', category: '口腔内科',
+          quantity: 15, warning_threshold: 20, max_threshold: 100, unit_price: 25.0 },
+        { id: 7, name: '牙胶尖', code: 'G001', unit: '盒', category: '口腔内科',
+          quantity: 8, warning_threshold: 5, max_threshold: 30, unit_price: 45.0 },
+        { id: 8, name: '碧兰麻', code: 'M001', unit: '支', category: '口腔外科',
+          quantity: 0, warning_threshold: 10, max_threshold: 50, unit_price: 18.0 },
+        { id: 9, name: '明胶海绵', code: 'S001', unit: '片', category: '口腔外科',
+          quantity: 12, warning_threshold: 10, max_threshold: 50, unit_price: 5.5 },
+        { id: 10, name: '正畸托槽', code: 'B002', unit: '副', category: '口腔正畸',
+          quantity: 6, warning_threshold: 10, max_threshold: 30, unit_price: 200.0 }
+      ],
+      treatments: [
+        { id: 1, name: '常规补牙', code: 'T001', department_id: 1, description: '浅/中龋充填治疗' },
+        { id: 2, name: '根管治疗', code: 'T002', department_id: 1, description: '牙髓炎/根尖周炎治疗' },
+        { id: 3, name: '复杂牙拔除', code: 'T003', department_id: 2, description: '智齿/阻生齿拔除' },
+        { id: 4, name: '超声波洁牙', code: 'T004', department_id: 1, description: '牙周洁治' },
+        { id: 5, name: '牙齿美白', code: 'T005', department_id: 3, description: '冷光美白' }
+      ],
+      treatmentMaterials: [
+        { id: 1, treatment_id: 1, material_id: 1, quantity: 2 },
+        { id: 2, treatment_id: 1, material_id: 2, quantity: 1 },
+        { id: 3, treatment_id: 1, material_id: 3, quantity: 5 },
+        { id: 4, treatment_id: 1, material_id: 4, quantity: 1 },
+        { id: 5, treatment_id: 1, material_id: 5, quantity: 2 },
+        { id: 6, treatment_id: 2, material_id: 6, quantity: 4 },
+        { id: 7, treatment_id: 2, material_id: 7, quantity: 2 },
+        { id: 8, treatment_id: 2, material_id: 2, quantity: 1 },
+        { id: 9, treatment_id: 3, material_id: 8, quantity: 2 },
+        { id: 10, treatment_id: 3, material_id: 9, quantity: 3 },
+        { id: 11, treatment_id: 3, material_id: 2, quantity: 1 },
+        { id: 12, treatment_id: 4, material_id: 2, quantity: 1 }
+      ],
+      consumptionRecords: [],
+      replenishmentRequests: [],
+      auditRecords: [],
+      inventorySnapshots: [],
+      operationLogs: []
+    };
+
+    const PAGES = [
+      { key: 'dashboard', label: '仪表盘', icon: '📊' },
+      { key: 'treatments', label: '诊疗项目', icon: '📋' },
+      { key: 'consumption', label: '耗材消耗', icon: '🏥' },
+      { key: 'replenishment', label: '补货申请', icon: '📦' },
+      { key: 'materials', label: '库存管理', icon: '📚' },
+      { key: 'audit', label: '审核中心', icon: '✅' },
+      { key: 'history', label: '历史追溯', icon: '📜' }
+    ];
+
+    function getStockStatus(quantity, warningThreshold, maxThreshold = null) {
+      if (quantity <= 0) return 'OUT_OF_STOCK';
+      if (quantity < warningThreshold) return 'LOW_STOCK';
+      if (maxThreshold && quantity > maxThreshold) return 'OVER_STOCK';
+      return 'NORMAL';
+    }
+
+    function canTransition(current, next) {
+      const allowed = STATUS_FLOW.REPLENISHMENT[current] || [];
+      return allowed.includes(next);
+    }
+
+    function generateRequestNo() {
+      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      const seq = String(Math.floor(Math.random() * 9000) + 1000);
+      return `RP-${date}-${seq}`;
+    }
+
+    function nowISO() {
+      return new Date().toISOString().replace('T', ' ').slice(0, 19);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    class DentalStore {
+      constructor() {
+        this.load();
+      }
+
+      load() {
+        try {
+          const saved = localStorage.getItem('dental_store_data');
+          if (saved) {
+            this.data = JSON.parse(saved);
+          } else {
+            this.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+            this.save();
+          }
+        } catch (e) {
+          this.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        }
+      }
+
+      save() {
+        try {
+          localStorage.setItem('dental_store_data', JSON.stringify(this.data));
+        } catch (e) {}
+      }
+
+      reset() {
+        this.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+        this.save();
+      }
+
+      getMaterials() {
+        return this.data.materials.map(m => ({
+          ...m,
+          stock_status: getStockStatus(m.quantity, m.warning_threshold, m.max_threshold),
+          stock_label: STOCK_STATUS[getStockStatus(m.quantity, m.warning_threshold, m.max_threshold)].label,
+          stock_color: STOCK_STATUS[getStockStatus(m.quantity, m.warning_threshold, m.max_threshold)].color
+        }));
+      }
+
+      getLowStockMaterials() {
+        return this.getMaterials().filter(m =>
+          m.stock_status === 'LOW_STOCK' || m.stock_status === 'OUT_OF_STOCK'
+        );
+      }
+
+      getDepartments() {
+        return this.data.departments;
+      }
+
+      getTreatments(departmentId = null) {
+        let treatments = this.data.treatments;
+        if (departmentId) {
+          treatments = treatments.filter(t => t.department_id === parseInt(departmentId));
+        }
+        return treatments.map(t => ({
+          ...t,
+          department_name: this.data.departments.find(d => d.id === t.department_id)?.name
+        }));
+      }
+
+      getTreatmentBindings(treatmentId) {
+        const bindings = this.data.treatmentMaterials.filter(b =>
+          b.treatment_id === parseInt(treatmentId)
+        );
+        return bindings.map(b => {
+          const material = this.data.materials.find(m => m.id === b.material_id);
+          const stockStatus = getStockStatus(material.quantity, material.warning_threshold);
+          return {
+            ...b,
+            material_name: material.name,
+            material_code: material.code,
+            unit: material.unit,
+            current_stock: material.quantity,
+            warning_threshold: material.warning_threshold,
+            stock_status: stockStatus,
+            stock_label: STOCK_STATUS[stockStatus].label,
+            stock_color: STOCK_STATUS[stockStatus].color
+          };
+        });
+      }
+
+      checkTreatmentStock(treatmentId, quantity = 1) {
+        const bindings = this.getTreatmentBindings(treatmentId);
+        const canExecute = bindings.every(b => b.current_stock >= b.quantity * quantity);
+        const insufficientItems = bindings.filter(b => b.current_stock < b.quantity * quantity);
+        return {
+          canExecute,
+          totalBindings: bindings.length,
+          insufficientCount: insufficientItems.length,
+          bindings,
+          insufficientItems
+        };
+      }
+
+      consumeByTreatment(treatmentId, patientCount = 1, operator, patientName = '') {
+        const check = this.checkTreatmentStock(treatmentId, patientCount);
+        if (!check.canExecute) {
+          const missing = check.insufficientItems.map(i =>
+            `${i.material_name}(需要${i.quantity * patientCount}${i.unit}，现有${i.current_stock}${i.unit})`
+          ).join('、');
+          throw new Error(`库存不足，无法执行：${missing}`);
+        }
+
+        const treatment = this.data.treatments.find(t => t.id === parseInt(treatmentId));
+        const records = [];
+
+        check.bindings.forEach(b => {
+          const material = this.data.materials.find(m => m.id === b.material_id);
+          const before = material.quantity;
+          const consumed = b.quantity * patientCount;
+          material.quantity -= consumed;
+          const after = material.quantity;
+
+          const record = {
+            id: this.data.consumptionRecords.length + 1,
+            consumption_type: 'TREATMENT',
+            material_id: b.material_id,
+            material_name: material.name,
+            department_id: treatment.department_id,
+            department_name: this.data.departments.find(d => d.id === treatment.department_id)?.name,
+            treatment_id: treatmentId,
+            treatment_name: treatment.name,
+            quantity: consumed,
+            unit: material.unit,
+            unit_price: material.unit_price,
+            total_amount: consumed * material.unit_price,
+            patient_name: patientName,
+            operator,
+            created_at: nowISO()
+          };
+          records.push(record);
+          this.data.consumptionRecords.push(record);
+
+          this.data.inventorySnapshots.push({
+            id: this.data.inventorySnapshots.length + 1,
+            material_id: b.material_id,
+            material_name: material.name,
+            before_quantity: before,
+            change_quantity: -consumed,
+            after_quantity: after,
+            change_reason: `诊疗消耗：${treatment.name}`,
+            reference_type: 'CONSUMPTION',
+            reference_id: record.id,
+            operator,
+            created_at: nowISO()
+          });
+
+          this.data.operationLogs.push({
+            id: this.data.operationLogs.length + 1,
+            module: 'CONSUMPTION',
+            action: '消耗',
+            target_type: 'MATERIAL',
+            target_id: b.material_id,
+            before_data: JSON.stringify({ quantity: before }),
+            after_data: JSON.stringify({ quantity: after }),
+            operator,
+            created_at: nowISO()
+          });
+        });
+
+        this.save();
+        return { success: true, records };
+      }
+
+      consumeManual(materialId, quantity, operator, reason = '') {
+        const material = this.data.materials.find(m => m.id === parseInt(materialId));
+        if (!material) throw new Error('耗材不存在');
+        if (material.quantity < quantity) {
+          throw new Error(`库存不足：当前${material.quantity}${material.unit}，需要${quantity}${material.unit}`);
+        }
+
+        const before = material.quantity;
+        material.quantity -= quantity;
+        const after = material.quantity;
+
+        const record = {
+          id: this.data.consumptionRecords.length + 1,
+          consumption_type: 'MANUAL',
+          material_id: parseInt(materialId),
+          material_name: material.name,
+          department_id: null,
+          department_name: null,
+          treatment_id: null,
+          treatment_name: null,
+          quantity,
+          unit: material.unit,
+          unit_price: material.unit_price,
+          total_amount: quantity * material.unit_price,
+          patient_name: null,
+          operator,
+          created_at: nowISO()
+        };
+        this.data.consumptionRecords.push(record);
+
+        this.data.inventorySnapshots.push({
+          id: this.data.inventorySnapshots.length + 1,
+          material_id: parseInt(materialId),
+          material_name: material.name,
+          before_quantity: before,
+          change_quantity: -quantity,
+          after_quantity: after,
+          change_reason: reason || '手动消耗',
+          reference_type: 'CONSUMPTION',
+          reference_id: record.id,
+          operator,
+          created_at: nowISO()
+        });
+
+        this.data.operationLogs.push({
+          id: this.data.operationLogs.length + 1,
+          module: 'CONSUMPTION',
+          action: '手动消耗',
+          target_type: 'MATERIAL',
+          target_id: parseInt(materialId),
+          before_data: JSON.stringify({ quantity: before }),
+          after_data: JSON.stringify({ quantity: after }),
+          operator,
+          created_at: nowISO()
+        });
+
+        this.save();
+        return { success: true, record };
+      }
+
+      createReplenishmentRequest(materialId, quantity, requester, reason = '') {
+        const material = this.data.materials.find(m => m.id === parseInt(materialId));
+        if (!material) throw new Error('耗材不存在');
+
+        const request = {
+          id: this.data.replenishmentRequests.length + 1,
+          request_no: generateRequestNo(),
+          material_id: parseInt(materialId),
+          material_name: material.name,
+          unit: material.unit,
+          unit_price: material.unit_price,
+          requested_quantity: parseInt(quantity),
+          approved_quantity: null,
+          status: 'PENDING',
+          status_label: STATUS_LABELS.PENDING,
+          status_color: STATUS_COLORS.PENDING,
+          department_id: null,
+          department_name: null,
+          requester,
+          reason,
+          reject_reason: null,
+          created_at: nowISO(),
+          fulfilled_at: null
+        };
+
+        this.data.replenishmentRequests.push(request);
+
+        this.data.operationLogs.push({
+          id: this.data.operationLogs.length + 1,
+          module: 'REPLENISHMENT',
+          action: '创建',
+          target_type: 'REPLENISHMENT',
+          target_id: request.id,
+          before_data: null,
+          after_data: JSON.stringify(request),
+          operator: requester,
+          created_at: nowISO()
+        });
+
+        this.save();
+        return request;
+      }
+
+      getReplenishmentRequests(status = null) {
+        let requests = this.data.replenishmentRequests;
+        if (status) {
+          requests = requests.filter(r => r.status === status);
+        }
+        return requests.map(r => ({ ...r }));
+      }
+
+      getReplenishmentRequest(id) {
+        const request = this.data.replenishmentRequests.find(r => r.id === parseInt(id));
+        if (!request) return null;
+        const audits = this.data.auditRecords.filter(a => a.request_id === parseInt(id));
+        return {
+          ...request,
+          audit_history: audits
+        };
+      }
+
+      approveRequest(id, approvedQuantity, auditor) {
+        const request = this.data.replenishmentRequests.find(r => r.id === parseInt(id));
+        if (!request) throw new Error('申请不存在');
+        if (!canTransition(request.status, 'APPROVED')) {
+          throw new Error(`当前状态"${STATUS_LABELS[request.status]}"不允许通过`);
+        }
+
+        request.status = 'APPROVED';
+        request.status_label = STATUS_LABELS.APPROVED;
+        request.status_color = STATUS_COLORS.APPROVED;
+        request.approved_quantity = parseInt(approvedQuantity);
+
+        this.data.auditRecords.push({
+          id: this.data.auditRecords.length + 1,
+          request_id: parseInt(id),
+          action: 'APPROVED',
+          action_label: '审核通过',
+          auditor,
+          approved_quantity: parseInt(approvedQuantity),
+          reason: null,
+          created_at: nowISO()
+        });
+
+        this.save();
+        return request;
+      }
+
+      rejectRequest(id, reason, auditor) {
+        const request = this.data.replenishmentRequests.find(r => r.id === parseInt(id));
+        if (!request) throw new Error('申请不存在');
+        if (!canTransition(request.status, 'REJECTED')) {
+          throw new Error(`当前状态"${STATUS_LABELS[request.status]}"不允许拒绝`);
+        }
+
+        request.status = 'REJECTED';
+        request.status_label = STATUS_LABELS.REJECTED;
+        request.status_color = STATUS_COLORS.REJECTED;
+        request.reject_reason = reason;
+
+        this.data.auditRecords.push({
+          id: this.data.auditRecords.length + 1,
+          request_id: parseInt(id),
+          action: 'REJECTED',
+          action_label: '审核拒绝',
+          auditor,
+          approved_quantity: null,
+          reason,
+          created_at: nowISO()
+        });
+
+        this.save();
+        return request;
+      }
+
+      fulfillRequest(id, operator) {
+        const request = this.data.replenishmentRequests.find(r => r.id === parseInt(id));
+        if (!request) throw new Error('申请不存在');
+        if (!canTransition(request.status, 'FULFILLED')) {
+          throw new Error(`当前状态"${STATUS_LABELS[request.status]}"不允许完成补货`);
+        }
+
+        const material = this.data.materials.find(m => m.id === request.material_id);
+        const before = material.quantity;
+        material.quantity += request.approved_quantity;
+        const after = material.quantity;
+
+        request.status = 'FULFILLED';
+        request.status_label = STATUS_LABELS.FULFILLED;
+        request.status_color = STATUS_COLORS.FULFILLED;
+        request.fulfilled_at = nowISO();
+
+        this.data.auditRecords.push({
+          id: this.data.auditRecords.length + 1,
+          request_id: parseInt(id),
+          action: 'FULFILLED',
+          action_label: '完成补货',
+          auditor: operator,
+          approved_quantity: request.approved_quantity,
+          reason: null,
+          created_at: nowISO()
+        });
+
+        this.data.inventorySnapshots.push({
+          id: this.data.inventorySnapshots.length + 1,
+          material_id: request.material_id,
+          material_name: request.material_name,
+          before_quantity: before,
+          change_quantity: request.approved_quantity,
+          after_quantity: after,
+          change_reason: `补货入库 [${request.request_no}]`,
+          reference_type: 'REPLENISHMENT',
+          reference_id: request.id,
+          operator,
+          created_at: nowISO()
+        });
+
+        this.data.operationLogs.push({
+          id: this.data.operationLogs.length + 1,
+          module: 'INVENTORY',
+          action: '补货入库',
+          target_type: 'MATERIAL',
+          target_id: request.material_id,
+          before_data: JSON.stringify({ quantity: before }),
+          after_data: JSON.stringify({ quantity: after }),
+          operator,
+          created_at: nowISO()
+        });
+
+        this.save();
+        return request;
+      }
+
+      getMaterialHistory(materialId) {
+        return this.data.inventorySnapshots
+          .filter(s => s.material_id === parseInt(materialId))
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      getConsumptionRecords(limit = 50) {
+        return this.data.consumptionRecords
+          .slice(-limit)
+          .reverse();
+      }
+
+      getOperationLogs(limit = 50) {
+        return this.data.operationLogs
+          .slice(-limit)
+          .reverse();
+      }
+
+      getDashboardStats() {
+        const materials = this.getMaterials();
+        const lowStock = materials.filter(m =>
+          m.stock_status === 'LOW_STOCK' || m.stock_status === 'OUT_OF_STOCK'
+        );
+        const outOfStock = materials.filter(m => m.stock_status === 'OUT_OF_STOCK');
+
+        const requests = this.data.replenishmentRequests;
+        const pendingCount = requests.filter(r => r.status === 'PENDING').length;
+        const approvedCount = requests.filter(r => r.status === 'APPROVED').length;
+        const fulfilledCount = requests.filter(r => r.status === 'FULFILLED').length;
+
+        const totalConsumption = this.data.consumptionRecords.reduce((sum, r) => sum + r.total_amount, 0);
+
+        return {
+          totalMaterials: materials.length,
+          lowStockCount: lowStock.length,
+          outOfStockCount: outOfStock.length,
+          pendingRequests: pendingCount,
+          approvedRequests: approvedCount,
+          fulfilledRequests: fulfilledCount,
+          totalConsumption: totalConsumption.toFixed(2)
+        };
+      }
+
+      getFlowStatus() {
+        const lowStock = this.getLowStockMaterials();
+        const pending = this.data.replenishmentRequests.filter(r => r.status === 'PENDING');
+        const approved = this.data.replenishmentRequests.filter(r => r.status === 'APPROVED');
+
+        return {
+          material_status: {
+            normal: this.getMaterials().length - lowStock.length,
+            low_stock: lowStock.filter(m => m.stock_status === 'LOW_STOCK').length,
+            out_of_stock: lowStock.filter(m => m.stock_status === 'OUT_OF_STOCK').length
+          },
+          request_status: {
+            pending: pending.length,
+            approved: approved.length,
+            fulfilled: this.data.replenishmentRequests.filter(r => r.status === 'FULFILLED').length,
+            rejected: this.data.replenishmentRequests.filter(r => r.status === 'REJECTED').length
+          },
+          next_action: pending.length > 0 ? '审核' :
+            approved.length > 0 ? '补货' :
+            lowStock.length > 0 ? '申请补货' : '正常运营'
+        };
+      }
+
+      getBlockages() {
+        const blockages = [];
+        const lowStock = this.getLowStockMaterials();
+        const pending = this.data.replenishmentRequests.filter(r => r.status === 'PENDING');
+        const approved = this.data.replenishmentRequests.filter(r => r.status === 'APPROVED');
+
+        if (lowStock.length > 0) {
+          blockages.push({
+            type: 'LOW_STOCK',
+            title: '库存预警',
+            severity: lowStock.some(m => m.stock_status === 'OUT_OF_STOCK') ? 'high' : 'medium',
+            message: `${lowStock.length} 种耗材库存不足`,
+            details: lowStock.slice(0, 5).map(m => `${m.name}（${m.quantity}${m.unit}）`),
+            action: '建议申请补货'
+          });
+        }
+
+        if (pending.length > 0) {
+          blockages.push({
+            type: 'PENDING_REVIEW',
+            title: '待审核申请',
+            severity: 'medium',
+            message: `${pending.length} 个补货申请等待审核`,
+            details: pending.slice(0, 3).map(r => `${r.material_name} x ${r.requested_quantity}`),
+            action: '请护士长审核'
+          });
+        }
+
+        if (approved.length > 0) {
+          blockages.push({
+            type: 'PENDING_FULFILL',
+            title: '待补货入库',
+            severity: 'low',
+            message: `${approved.length} 个申请已通过等待入库`,
+            details: approved.slice(0, 3).map(r => `${r.material_name} x ${r.approved_quantity}`),
+            action: '请库管确认入库'
+          });
+        }
+
+        return blockages;
+      }
+
+      getSuggestions() {
+        const suggestions = [];
+        const blockages = this.getBlockages();
+
+        blockages.forEach(b => {
+          suggestions.push({
+            type: b.type,
+            priority: b.severity === 'high' ? 1 : b.severity === 'medium' ? 2 : 3,
+            title: b.title,
+            message: b.message,
+            action: b.action
+          });
+        });
+
+        const lowStock = this.getLowStockMaterials();
+        if (lowStock.length === 0 && blockages.length === 0) {
+          suggestions.push({
+            type: 'NORMAL',
+            priority: 99,
+            title: '运营正常',
+            message: '所有耗材库存充足，无待处理事项',
+            action: '继续保持'
+          });
+        }
+
+        return suggestions.sort((a, b) => a.priority - b.priority);
+      }
+    }
+
+    const app = {
+      store: new DentalStore(),
+      currentPage: 'dashboard',
+      operator: '护士小王',
+      state: {},
+
+      init() {
+        this.renderNav();
+        this.render();
+      },
+
+      setOperator(op) {
+        this.operator = op;
+        this.toast(`已切换操作员：${op}`, 'info');
+      },
+
+      resetData() {
+        if (confirm('确定要重置所有数据吗？所有操作记录将被清除。')) {
+          this.store.reset();
+          this.state = {};
+          this.render();
+          this.toast('数据已重置', 'success');
+        }
+      },
+
+      goToPage(page) {
+        this.currentPage = page;
+        this.render();
+      },
+
+      toast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info'}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      },
+
+      renderNav() {
+        const container = document.getElementById('nav-container');
+        container.innerHTML = PAGES.map(p => `
+          <div class="nav-item ${this.currentPage === p.key ? 'active' : ''}" onclick="app.goToPage('${p.key}')">
+            <span class="nav-icon">${p.icon}</span>
+            <span>${p.label}</span>
+          </div>
+        `).join('');
+      },
+
+      render() {
+        this.renderNav();
+        const page = PAGES.find(p => p.key === this.currentPage);
+        document.getElementById('page-subtitle').textContent = page?.label || '';
+        const content = document.getElementById('content');
+        
+        switch (this.currentPage) {
+          case 'dashboard': this.renderDashboard(content); break;
+          case 'treatments': this.renderTreatments(content); break;
+          case 'consumption': this.renderConsumption(content); break;
+          case 'replenishment': this.renderReplenishment(content); break;
+          case 'materials': this.renderMaterials(content); break;
+          case 'audit': this.renderAudit(content); break;
+          case 'history': this.renderHistory(content); break;
+        }
+      },
+
+      renderDashboard(el) {
+        const stats = this.store.getDashboardStats();
+        const flow = this.store.getFlowStatus();
+        const blockages = this.store.getBlockages();
+        const recent = this.store.getConsumptionRecords(10);
+
+        el.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-value">${stats.totalMaterials}</div>
+              <div class="stat-label">耗材总数</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-value">${stats.lowStockCount}</div>
+              <div class="stat-label">库存不足</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-value">${stats.outOfStockCount}</div>
+              <div class="stat-label">已断货</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-value">${stats.pendingRequests}</div>
+              <div class="stat-label">待审核</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">业务流程状态</div>
+            <div class="flow-steps">
+              <div class="flow-step ${flow.material_status.low_stock + flow.material_status.out_of_stock > 0 ? 'todo' : 'done'}">
+                <span>📋</span><span>库存检查</span>
+              </div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-step ${flow.request_status.pending > 0 ? 'active' : 'todo'}">
+                <span>📝</span><span>补货申请</span>
+              </div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-step ${flow.request_status.pending > 0 ? 'todo' : (flow.request_status.approved > 0 ? 'active' : 'done')}">
+                <span>✅</span><span>审核通过</span>
+              </div>
+              <span class="flow-arrow">→</span>
+              <div class="flow-step ${flow.request_status.approved > 0 ? 'todo' : 'done'}">
+                <span>📦</span><span>入库完成</span>
+              </div>
+            </div>
+            <div style="text-align: center; color: #6b7280; font-size: 14px;">
+              下一步：<strong style="color: #1f2937;">${flow.next_action}</strong>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">当前卡点</div>
+            ${blockages.length === 0 ? `
+              <div class="empty">✅ 暂无卡点，运营正常</div>
+            ` : blockages.map(b => `
+              <div class="blockage-card ${b.severity}">
+                <div class="blockage-title">
+                  ${b.severity === 'high' ? '🔴' : b.severity === 'medium' ? '🟠' : '🔵'}
+                  ${b.title}
+                </div>
+                <div class="blockage-details">${escapeHtml(b.message)}</div>
+                ${b.details && b.details.length > 0 ? `<div class="blockage-details">${escapeHtml(b.details.join('、'))}</div>` : ''}
+                <div style="font-size: 12px; color: #3b82f6; font-weight: 500;">
+                  处理建议：${escapeHtml(b.action)}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="card">
+            <div class="card-title">最近历史</div>
+            ${recent.length === 0 ? `
+              <div class="empty">暂无消耗记录</div>
+            ` : `
+              <table>
+                <thead>
+                  <tr><th>时间</th><th>类型</th><th>耗材</th><th>数量</th><th>金额</th><th>操作人</th></tr>
+                </thead>
+                <tbody>
+                  ${recent.map(r => `
+                    <tr>
+                      <td>${escapeHtml(r.created_at)}</td>
+                      <td><span class="tag ${r.consumption_type === 'TREATMENT' ? 'tag-blue' : 'tag-green'}">
+                        ${r.consumption_type === 'TREATMENT' ? '诊疗消耗' : '手动消耗'}
+                      </span></td>
+                      <td>${escapeHtml(r.material_name)}</td>
+                      <td style="color: #ef4444;">-${r.quantity}${r.unit}</td>
+                      <td>¥${r.total_amount.toFixed(2)}</td>
+                      <td>${escapeHtml(r.operator)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+        `;
+      },
+
+      renderTreatments(el) {
+        if (!this.state.treatments) this.state.treatments = {};
+        const filter = this.state.treatments;
+        const depts = this.store.getDepartments();
+        let treatments = this.store.getTreatments(filter.dept);
+
+        el.innerHTML = `
+          <div class="page-title">诊疗项目管理</div>
+          <div class="card">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">科室</label>
+                <select class="form-select" onchange="app.filterTreatments(this.value)">
+                  <option value="">全部科室</option>
+                  ${depts.map(d => `<option value="${d.id}" ${filter.dept == d.id ? 'selected' : ''}>${escapeHtml(d.name)}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr><th>编码</th><th>项目名称</th><th>科室</th><th>绑定耗材数</th><th>库存状态</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                ${treatments.map(t => {
+                  const bindings = this.store.getTreatmentBindings(t.id);
+                  const check = this.store.checkTreatmentStock(t.id);
+                  return `
+                    <tr>
+                      <td><code>${escapeHtml(t.code)}</code></td>
+                      <td><strong>${escapeHtml(t.name)}</strong></td>
+                      <td>${escapeHtml(t.department_name || '')}</td>
+                      <td>${bindings.length} 种</td>
+                      <td>
+                        ${check.canExecute 
+                          ? '<span class="tag tag-green">可执行</span>' 
+                          : `<span class="tag tag-orange">缺${check.insufficientCount}种</span>`}
+                      </td>
+                      <td>
+                        <button class="btn btn-primary btn-sm" onclick="app.showTreatmentDetail(${t.id})">查看绑定</button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      },
+
+      filterTreatments(dept) {
+        this.state.treatments.dept = dept;
+        this.render();
+      },
+
+      showTreatmentDetail(id) {
+        const treatment = this.store.getTreatments().find(t => t.id === id);
+        const bindings = this.store.getTreatmentBindings(id);
+
+        this.showModal('诊疗项目详情', `
+          <div style="margin-bottom: 16px;">
+            <strong>项目：</strong>${escapeHtml(treatment.name)}<br />
+            <strong>科室：</strong>${escapeHtml(treatment.department_name || '')}<br />
+            <strong>说明：</strong>${escapeHtml(treatment.description || '')}
+          </div>
+          <table>
+            <thead>
+              <tr><th>耗材</th><th>标准用量</th><th>当前库存</th><th>状态</th></tr>
+            </thead>
+            <tbody>
+              ${bindings.map(b => `
+                <tr>
+                  <td>${escapeHtml(b.material_name)}</td>
+                  <td>${b.quantity}${b.unit}</td>
+                  <td>${b.current_stock}${b.unit}</td>
+                  <td><span style="color: ${b.stock_color}">${escapeHtml(b.stock_label)}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `);
+      },
+
+      renderConsumption(el) {
+        if (!this.state.consumption) {
+          this.state.consumption = { dept: '', treatment: '', patientCount: 1, patientName: '' };
+        }
+        const s = this.state.consumption;
+        const depts = this.store.getDepartments();
+        const treatments = s.dept ? this.store.getTreatments(s.dept) : [];
+        const materials = this.store.getMaterials();
+        const bindings = s.treatment ? this.store.getTreatmentBindings(s.treatment) : [];
+        const stockCheck = s.treatment ? this.store.checkTreatmentStock(s.treatment, s.patientCount) : null;
+
+        el.innerHTML = `
+          <div class="page-title">耗材消耗</div>
+
+          <div class="card">
+            <div class="card-title">📋 按诊疗项目消耗（推荐）</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">科室</label>
+                <select class="form-select" onchange="app.setConsumptionDept(this.value)">
+                  <option value="">请选择</option>
+                  ${depts.map(d => `<option value="${d.id}" ${s.dept == d.id ? 'selected' : ''}>${escapeHtml(d.name)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">诊疗项目</label>
+                <select class="form-select" onchange="app.setConsumptionTreatment(this.value)" ${!s.dept ? 'disabled' : ''}>
+                  <option value="">请选择</option>
+                  ${treatments.map(t => `<option value="${t.id}" ${s.treatment == t.id ? 'selected' : ''}>${escapeHtml(t.name)}</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">患者数量</label>
+                <input type="number" class="form-input" min="1" max="10" value="${s.patientCount}" onchange="app.setConsumptionCount(this.value)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">患者姓名</label>
+                <input type="text" class="form-input" value="${escapeHtml(s.patientName || '')}" onchange="app.setConsumptionPatient(this.value)" placeholder="可选" />
+              </div>
+            </div>
+
+            ${s.treatment && bindings.length > 0 ? `
+              <div class="binding-card">
+                <div style="font-weight: 600; margin-bottom: 12px;">耗材清单</div>
+                ${bindings.map(b => `
+                  <div class="binding-item">
+                    <span>
+                      ${escapeHtml(b.material_name)}
+                      ${b.stock_status !== 'NORMAL' ? `<span style="color: ${b.stock_color}">(${escapeHtml(b.stock_label)})</span>` : ''}
+                    </span>
+                    <span>
+                      需要 <strong>${b.quantity * s.patientCount}${b.unit}</strong>
+                      (库存: ${b.current_stock}${b.unit})
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+
+              ${!stockCheck.canExecute ? `
+                <div class="alert alert-danger">
+                  ⚠️ 库存不足：${stockCheck.insufficientCount} 种耗材无法满足需求，无法执行消耗<br />
+                  <span style="font-size: 11px;">
+                    缺少：${escapeHtml(stockCheck.insufficientItems.map(i => i.material_name).join('、'))}
+                  </span>
+                </div>
+              ` : ''}
+            ` : ''}
+
+            <button class="btn btn-success" onclick="app.executeTreatmentConsumption()" 
+              ${!s.treatment || (stockCheck && !stockCheck.canExecute) ? 'disabled' : ''}>
+              执行消耗
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">✋ 手动消耗（单种耗材）</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">耗材</label>
+                <select class="form-select" id="manual-material">
+                  <option value="">请选择</option>
+                  ${materials.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (库存: ${m.quantity}${m.unit})</option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">消耗数量</label>
+                <input type="number" class="form-input" min="1" id="manual-quantity" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">原因</label>
+                <input type="text" class="form-input" id="manual-reason" placeholder="可选" />
+              </div>
+              <button class="btn btn-danger" onclick="app.executeManualConsumption()">确认消耗</button>
+            </div>
+          </div>
+        `;
+      },
+
+      setConsumptionDept(val) {
+        this.state.consumption.dept = val;
+        this.state.consumption.treatment = '';
+        this.render();
+      },
+
+      setConsumptionTreatment(val) {
+        this.state.consumption.treatment = val;
+        this.render();
+      },
+
+      setConsumptionCount(val) {
+        this.state.consumption.patientCount = parseInt(val) || 1;
+        this.render();
+      },
+
+      setConsumptionPatient(val) {
+        this.state.consumption.patientName = val;
+      },
+
+      executeTreatmentConsumption() {
+        const s = this.state.consumption;
+        try {
+          const result = this.store.consumeByTreatment(
+            s.treatment,
+            s.patientCount,
+            this.operator,
+            s.patientName
+          );
+          this.toast(`消耗成功！共消耗 ${result.records.length} 种耗材`, 'success');
+          this.state.consumption.treatment = '';
+          this.state.consumption.patientName = '';
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      executeManualConsumption() {
+        const material = document.getElementById('manual-material').value;
+        const quantity = parseInt(document.getElementById('manual-quantity').value);
+        const reason = document.getElementById('manual-reason').value;
+
+        if (!material || !quantity) {
+          this.toast('请选择耗材并填写数量', 'error');
+          return;
+        }
+
+        try {
+          this.store.consumeManual(material, quantity, this.operator, reason);
+          this.toast('手动消耗成功', 'success');
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      renderReplenishment(el) {
+        if (!this.state.replenishment) {
+          this.state.replenishment = { material: '', quantity: '', reason: '' };
+        }
+        const s = this.state.replenishment;
+        const lowStock = this.store.getLowStockMaterials();
+        const requests = this.store.getReplenishmentRequests();
+
+        el.innerHTML = `
+          <div class="page-title">补货申请</div>
+
+          <div class="card">
+            <div class="card-title">新建补货申请</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">耗材</label>
+                <select class="form-select" onchange="app.setReplenishmentMaterial(this.value)">
+                  <option value="">请选择</option>
+                  ${lowStock.map(m => `<option value="${m.id}" ${s.material == m.id ? 'selected' : ''}>
+                    ${escapeHtml(m.name)} (库存: ${m.quantity}${m.unit}, 预警: ${m.warning_threshold})
+                  </option>`).join('')}
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">申请数量</label>
+                <input type="number" class="form-input" min="1" value="${s.quantity}" onchange="app.setReplenishmentQuantity(this.value)" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">申请原因</label>
+                <input type="text" class="form-input" value="${escapeHtml(s.reason)}" onchange="app.setReplenishmentReason(this.value)" placeholder="可选" />
+              </div>
+              <button class="btn btn-primary" onclick="app.createReplenishment()" 
+                ${!s.material || !s.quantity ? 'disabled' : ''}>
+                提交申请
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">申请列表</div>
+            ${requests.length === 0 ? `
+              <div class="empty">暂无申请</div>
+            ` : `
+              <table>
+                <thead>
+                  <tr><th>申请单号</th><th>耗材</th><th>申请量</th><th>审核量</th><th>申请人</th><th>状态</th><th>申请时间</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                  ${requests.map(r => `
+                    <tr>
+                      <td><code>${escapeHtml(r.request_no)}</code></td>
+                      <td>${escapeHtml(r.material_name)}</td>
+                      <td>${r.requested_quantity}${r.unit}</td>
+                      <td>${r.approved_quantity ? r.approved_quantity + r.unit : '-'}</td>
+                      <td>${escapeHtml(r.requester)}</td>
+                      <td>
+                        <span style="background: ${r.status_color}20; color: ${r.status_color}; padding: 3px 8px; border-radius: 4px; border: 1px solid ${r.status_color}">
+                          ${escapeHtml(r.status_label)}
+                        </span>
+                      </td>
+                      <td>${escapeHtml(r.created_at)}</td>
+                      <td>
+                        <button class="btn btn-primary btn-sm" onclick="app.showRequestDetail(${r.id})">详情</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+        `;
+      },
+
+      setReplenishmentMaterial(val) { this.state.replenishment.material = val; this.render(); },
+      setReplenishmentQuantity(val) { this.state.replenishment.quantity = parseInt(val) || ''; this.render(); },
+      setReplenishmentReason(val) { this.state.replenishment.reason = val; },
+
+      createReplenishment() {
+        const s = this.state.replenishment;
+        try {
+          const req = this.store.createReplenishmentRequest(
+            s.material,
+            s.quantity,
+            this.operator,
+            s.reason
+          );
+          this.toast(`申请已提交，单号：${req.request_no}`, 'success');
+          this.state.replenishment = { material: '', quantity: '', reason: '' };
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      showRequestDetail(id) {
+        const req = this.store.getReplenishmentRequest(id);
+        if (!req) return;
+
+        this.showModal('补货申请详情', `
+          <div style="margin-bottom: 16px;">
+            <strong>单号：</strong><code>${escapeHtml(req.request_no)}</code><br />
+            <strong>耗材：</strong>${escapeHtml(req.material_name)}<br />
+            <strong>申请量：</strong>${req.requested_quantity}${req.unit}<br />
+            <strong>审核量：</strong>${req.approved_quantity ? req.approved_quantity + req.unit : '-'}<br />
+            <strong>申请人：</strong>${escapeHtml(req.requester)}<br />
+            <strong>状态：</strong>
+            <span style="background: ${req.status_color}20; color: ${req.status_color}; padding: 2px 6px; border-radius: 4px;">
+              ${escapeHtml(req.status_label)}
+            </span>
+          </div>
+          ${req.audit_history && req.audit_history.length > 0 ? `
+            <div style="font-weight: 600; margin-bottom: 12px;">审核历史</div>
+            ${req.audit_history.map(a => `
+              <div class="timeline-item">
+                <div>
+                  <strong>${escapeHtml(a.action_label)}</strong>
+                  ${a.approved_quantity ? `，审核量：${a.approved_quantity}` : ''}
+                  ${a.reason ? `，原因：${escapeHtml(a.reason)}` : ''}
+                </div>
+                <div style="font-size: 12px; color: #6b7280;">操作人：${escapeHtml(a.auditor)}，${escapeHtml(a.created_at)}</div>
+              </div>
+            `).join('')}
+          ` : ''}
+        `);
+      },
+
+      renderMaterials(el) {
+        if (!this.state.materials) this.state.materials = { status: '' };
+        const filter = this.state.materials;
+        let materials = this.store.getMaterials();
+        if (filter.status) {
+          materials = materials.filter(m => m.stock_status === filter.status);
+        }
+
+        el.innerHTML = `
+          <div class="page-title">库存管理</div>
+          <div class="card">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">库存状态</label>
+                <select class="form-select" onchange="app.filterMaterials(this.value)">
+                  <option value="">全部</option>
+                  <option value="NORMAL" ${filter.status === 'NORMAL' ? 'selected' : ''}>正常</option>
+                  <option value="LOW_STOCK" ${filter.status === 'LOW_STOCK' ? 'selected' : ''}>库存不足</option>
+                  <option value="OUT_OF_STOCK" ${filter.status === 'OUT_OF_STOCK' ? 'selected' : ''}>已断货</option>
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr><th>编码</th><th>耗材名称</th><th>类别</th><th>当前库存</th><th>预警值</th><th>单价</th><th>状态</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                ${materials.map(m => `
+                  <tr>
+                    <td><code>${escapeHtml(m.code)}</code></td>
+                    <td><strong>${escapeHtml(m.name)}</strong></td>
+                    <td>${escapeHtml(m.category)}</td>
+                    <td>
+                      <span style="color: ${m.stock_status === 'NORMAL' ? '#10b981' : '#ef4444'}">
+                        ${m.quantity}${m.unit}
+                      </span>
+                    </td>
+                    <td>${m.warning_threshold}${m.unit}</td>
+                    <td>¥${m.unit_price.toFixed(2)}</td>
+                    <td>
+                      <span style="background: ${m.stock_color}20; color: ${m.stock_color}; padding: 3px 8px; border-radius: 4px;">
+                        ${escapeHtml(m.stock_label)}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="btn-group">
+                        <button class="btn btn-primary btn-sm" onclick="app.quickReplenish(${m.id})">快速补货</button>
+                        <button class="btn btn-warning btn-sm" onclick="app.showMaterialHistory(${m.id})">历史</button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      },
+
+      filterMaterials(status) {
+        this.state.materials.status = status;
+        this.render();
+      },
+
+      quickReplenish(id) {
+        const material = this.store.getMaterials().find(m => m.id === id);
+        if (!material) return;
+
+        const suggested = Math.max(material.warning_threshold - material.quantity, 10);
+        this.state.replenishment = {
+          material: id,
+          quantity: suggested,
+          reason: ''
+        };
+        this.toast(`已选择 ${material.name}，建议补货 ${suggested}${material.unit}`, 'info');
+        this.currentPage = 'replenishment';
+        this.render();
+      },
+
+      showMaterialHistory(id) {
+        const material = this.store.getMaterials().find(m => m.id === id);
+        const history = this.store.getMaterialHistory(id);
+
+        this.showModal('库存变动历史', `
+          <div style="margin-bottom: 16px;">
+            <strong>耗材：</strong>${escapeHtml(material.name)} (${escapeHtml(material.code)})
+          </div>
+          ${history.length === 0 ? `
+            <div class="empty">暂无历史记录</div>
+          ` : `
+            <table>
+              <thead>
+                <tr><th>时间</th><th>变动前</th><th>变动</th><th>变动后</th><th>原因</th><th>操作人</th></tr>
+              </thead>
+              <tbody>
+                ${history.map(s => `
+                  <tr>
+                    <td>${escapeHtml(s.created_at)}</td>
+                    <td>${s.before_quantity}</td>
+                    <td style="color: ${s.change_quantity > 0 ? '#10b981' : '#ef4444'}">
+                      ${s.change_quantity > 0 ? '+' : ''}${s.change_quantity}
+                    </td>
+                    <td>${s.after_quantity}</td>
+                    <td>${escapeHtml(s.change_reason)}</td>
+                    <td>${escapeHtml(s.operator)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `}
+        `);
+      },
+
+      renderAudit(el) {
+        const pending = this.store.getReplenishmentRequests('PENDING');
+        const approved = this.store.getReplenishmentRequests('APPROVED');
+        const historical = this.store.getReplenishmentRequests().filter(r =>
+          r.status === 'FULFILLED' || r.status === 'REJECTED'
+        );
+
+        el.innerHTML = `
+          <div class="page-title">审核中心</div>
+
+          <div class="card">
+            <div class="card-title">待审核（PENDING）</div>
+            ${pending.length === 0 ? `
+              <div class="empty">暂无待审核申请</div>
+            ` : `
+              <table>
+                <thead>
+                  <tr><th>申请单号</th><th>耗材</th><th>申请数量</th><th>申请人</th><th>申请时间</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                  ${pending.map(r => `
+                    <tr>
+                      <td><code>${escapeHtml(r.request_no)}</code></td>
+                      <td>${escapeHtml(r.material_name)}</td>
+                      <td>${r.requested_quantity}${r.unit}</td>
+                      <td>${escapeHtml(r.requester)}</td>
+                      <td>${escapeHtml(r.created_at)}</td>
+                      <td>
+                        <div class="btn-group">
+                          <button class="btn btn-success btn-sm" onclick="app.openApproveModal(${r.id}, ${r.requested_quantity})">通过</button>
+                          <button class="btn btn-danger btn-sm" onclick="app.openRejectModal(${r.id})">拒绝</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <div class="card">
+            <div class="card-title">待入库（APPROVED）</div>
+            ${approved.length === 0 ? `
+              <div class="empty">暂无待入库申请</div>
+            ` : `
+              <table>
+                <thead>
+                  <tr><th>申请单号</th><th>耗材</th><th>审核数量</th><th>申请人</th><th>申请时间</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                  ${approved.map(r => `
+                    <tr>
+                      <td><code>${escapeHtml(r.request_no)}</code></td>
+                      <td>${escapeHtml(r.material_name)}</td>
+                      <td>${r.approved_quantity}${r.unit}</td>
+                      <td>${escapeHtml(r.requester)}</td>
+                      <td>${escapeHtml(r.created_at)}</td>
+                      <td>
+                        <button class="btn btn-success btn-sm" onclick="app.fulfillRequest(${r.id})">确认补货</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+
+          <div class="card">
+            <div class="card-title">历史申请</div>
+            ${historical.length === 0 ? `
+              <div class="empty">暂无历史申请</div>
+            ` : `
+              <table>
+                <thead>
+                  <tr><th>申请单号</th><th>耗材</th><th>申请/审核</th><th>申请人</th><th>状态</th><th>时间</th><th>操作</th></tr>
+                </thead>
+                <tbody>
+                  ${historical.map(r => `
+                    <tr>
+                      <td><code>${escapeHtml(r.request_no)}</code></td>
+                      <td>${escapeHtml(r.material_name)}</td>
+                      <td>${r.requested_quantity} / ${r.approved_quantity || '-'}</td>
+                      <td>${escapeHtml(r.requester)}</td>
+                      <td>
+                        <span style="background: ${r.status_color}20; color: ${r.status_color}; padding: 3px 8px; border-radius: 4px;">
+                          ${escapeHtml(r.status_label)}
+                        </span>
+                      </td>
+                      <td>${escapeHtml(r.created_at)}</td>
+                      <td>
+                        <button class="btn btn-primary btn-sm" onclick="app.showRequestDetail(${r.id})">详情</button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `}
+          </div>
+        `;
+      },
+
+      openApproveModal(id, maxQty) {
+        this.showModal('审核通过', `
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">审核数量（可调整，最多 ${maxQty}）</label>
+            <input type="number" class="form-input" id="approve-qty" min="1" max="${maxQty}" value="${maxQty}" style="width: 100%;" />
+          </div>
+        `, [{
+          text: '确认通过',
+          class: 'btn-success',
+          action: () => {
+            const qty = parseInt(document.getElementById('approve-qty').value);
+            this.doApprove(id, qty);
+          }
+        }]);
+      },
+
+      openRejectModal(id) {
+        this.showModal('审核拒绝', `
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">拒绝原因</label>
+            <textarea class="form-textarea" id="reject-reason" placeholder="请输入拒绝原因..."></textarea>
+          </div>
+        `, [{
+          text: '确认拒绝',
+          class: 'btn-danger',
+          action: () => {
+            const reason = document.getElementById('reject-reason').value.trim();
+            if (!reason) {
+              this.toast('请输入拒绝原因', 'error');
+              return;
+            }
+            this.doReject(id, reason);
+          }
+        }]);
+      },
+
+      doApprove(id, qty) {
+        try {
+          this.store.approveRequest(id, qty, this.operator);
+          this.closeModal();
+          this.toast('审核通过', 'success');
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      doReject(id, reason) {
+        try {
+          this.store.rejectRequest(id, reason, this.operator);
+          this.closeModal();
+          this.toast('已拒绝', 'success');
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      fulfillRequest(id) {
+        const req = this.store.getReplenishmentRequest(id);
+        if (!req) return;
+        try {
+          this.store.fulfillRequest(id, this.operator);
+          this.toast(`补货完成，${req.material_name} +${req.approved_quantity}${req.unit}`, 'success');
+          this.render();
+        } catch (e) {
+          this.toast(e.message, 'error');
+        }
+      },
+
+      renderHistory(el) {
+        if (!this.state.history) this.state.history.tab = 'consumption';
+        const tab = this.state.history.tab;
+        const consumption = this.store.getConsumptionRecords(50);
+        const requests = this.store.getReplenishmentRequests();
+        const logs = this.store.getOperationLogs(50);
+
+        el.innerHTML = `
+          <div class="page-title">历史追溯</div>
+          <div class="card">
+            <div class="tab-buttons">
+              <button class="tab-btn ${tab === 'consumption' ? 'active' : ''}" onclick="app.setHistoryTab('consumption')">消耗记录</button>
+              <button class="tab-btn ${tab === 'replenishment' ? 'active' : ''}" onclick="app.setHistoryTab('replenishment')">补货申请</button>
+              <button class="tab-btn ${tab === 'logs' ? 'active' : ''}" onclick="app.setHistoryTab('logs')">操作日志</button>
+            </div>
+
+            ${tab === 'consumption' ? `
+              ${consumption.length === 0 ? '<div class="empty">暂无消耗记录</div>' : `
+                <table>
+                  <thead>
+                    <tr><th>类型</th><th>耗材</th><th>诊疗项目</th><th>数量</th><th>金额</th><th>患者</th><th>操作人</th><th>时间</th></tr>
+                  </thead>
+                  <tbody>
+                    ${consumption.map(r => `
+                      <tr>
+                        <td><span class="tag ${r.consumption_type === 'TREATMENT' ? 'tag-blue' : 'tag-green'}">
+                          ${r.consumption_type === 'TREATMENT' ? '诊疗' : '手动'}
+                        </span></td>
+                        <td>${escapeHtml(r.material_name)}</td>
+                        <td>${escapeHtml(r.treatment_name || '-')}</td>
+                        <td style="color: #ef4444;">-${r.quantity}${r.unit}</td>
+                        <td>¥${r.total_amount.toFixed(2)}</td>
+                        <td>${escapeHtml(r.patient_name || '-')}</td>
+                        <td>${escapeHtml(r.operator)}</td>
+                        <td>${escapeHtml(r.created_at)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `}
+            ` : ''}
+
+            ${tab === 'replenishment' ? `
+              ${requests.length === 0 ? '<div class="empty">暂无补货申请</div>' : `
+                <table>
+                  <thead>
+                    <tr><th>单号</th><th>耗材</th><th>申请量</th><th>审核量</th><th>申请人</th><th>状态</th><th>时间</th></tr>
+                  </thead>
+                  <tbody>
+                    ${requests.map(r => `
+                      <tr>
+                        <td><code>${escapeHtml(r.request_no)}</code></td>
+                        <td>${escapeHtml(r.material_name)}</td>
+                        <td>${r.requested_quantity}${r.unit}</td>
+                        <td>${r.approved_quantity ? r.approved_quantity + r.unit : '-'}</td>
+                        <td>${escapeHtml(r.requester)}</td>
+                        <td>
+                          <span style="background: ${r.status_color}20; color: ${r.status_color}; padding: 3px 8px; border-radius: 4px;">
+                            ${escapeHtml(r.status_label)}
+                          </span>
+                        </td>
+                        <td>${escapeHtml(r.created_at)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `}
+            ` : ''}
+
+            ${tab === 'logs' ? `
+              ${logs.length === 0 ? '<div class="empty">暂无操作日志</div>' : `
+                <table>
+                  <thead>
+                    <tr><th>模块</th><th>操作</th><th>目标</th><th>变更前</th><th>变更后</th><th>操作人</th><th>时间</th></tr>
+                  </thead>
+                  <tbody>
+                    ${logs.map(log => `
+                      <tr>
+                        <td><span class="tag tag-blue">${escapeHtml(log.module)}</span></td>
+                        <td>${escapeHtml(log.action)}</td>
+                        <td>${escapeHtml(log.target_type)} #${log.target_id}</td>
+                        <td>${log.before_data ? `<span class="json-preview" title="${escapeHtml(this.formatJson(log.before_data))}">${escapeHtml(this.truncateJson(log.before_data))}</span>` : '<span style="color:#9ca3af">-</span>'}</td>
+                        <td>${log.after_data ? `<span class="json-preview" title="${escapeHtml(this.formatJson(log.after_data))}">${escapeHtml(this.truncateJson(log.after_data))}</span>` : '<span style="color:#9ca3af">-</span>'}</td>
+                        <td>${escapeHtml(log.operator)}</td>
+                        <td>${escapeHtml(log.created_at)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              `}
+            ` : ''}
+          </div>
+        `;
+      },
+
+      setHistoryTab(tab) {
+        this.state.history.tab = tab;
+        this.render();
+      },
+
+      truncateJson(jsonStr) {
+        try {
+          const obj = JSON.parse(jsonStr);
+          return JSON.stringify(obj).slice(0, 40) + '...';
+        } catch {
+          return jsonStr;
+        }
+      },
+
+      formatJson(jsonStr) {
+        try {
+          const obj = JSON.parse(jsonStr);
+          return JSON.stringify(obj, null, 2);
+        } catch {
+          return jsonStr;
+        }
+      },
+
+      showModal(title, content, customActions = null) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').innerHTML = content;
+        
+        const footer = document.getElementById('modal-footer');
+        if (customActions) {
+          footer.innerHTML = `
+            <button class="btn btn-default" onclick="app.closeModal()">关闭</button>
+            ${customActions.map((a, i) => `
+              <button class="btn ${a.class}" id="custom-action-${i}">${a.text}</button>
+            `).join('')}
+          `;
+          customActions.forEach((a, i) => {
+            document.getElementById(`custom-action-${i}`).onclick = a.action;
+          });
+        } else {
+          footer.innerHTML = `
+            <button class="btn btn-default" onclick="app.closeModal()">关闭</button>
+          `;
+        }
+        
+        document.getElementById('modal').classList.add('show');
+      },
+
+      closeModal() {
+        document.getElementById('modal').classList.remove('show');
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      app.init();
+    });
+  </script>
+</body>
+</html>
