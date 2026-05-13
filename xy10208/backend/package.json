@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "build": "echo 'Backend does not require compilation' && node --check src/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

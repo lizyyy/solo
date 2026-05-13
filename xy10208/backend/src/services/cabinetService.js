@@ -702,39 +702,73 @@ const resetForDemo = async () => {
   return { success: true, message: '演示数据已重置' };
 };
 
+const initDemoSlot = (cabinetId, slotNumber, status, options = {}) => {
+  let battery = null;
+  let faultReason = null;
+  let locked = false;
+  
+  if (status === SLOT_STATUS.FULL || status === SLOT_STATUS.OCCUPIED) {
+    if (options.batteryFault) {
+      battery = createBattery(BATTERY_STATUS.FAULT, options.batteryCode);
+      faultReason = options.faultReason || '电池故障';
+    } else {
+      battery = createBattery(
+        status === SLOT_STATUS.OCCUPIED ? BATTERY_STATUS.CHARGING : BATTERY_STATUS.FULL,
+        options.batteryCode
+      );
+    }
+  } else if (status === SLOT_STATUS.FAULT) {
+    faultReason = options.faultReason || '槽位故障';
+    locked = true;
+    if (options.withBattery) {
+      battery = createBattery(BATTERY_STATUS.FAULT, options.batteryCode);
+    }
+  }
+  
+  return {
+    id: `slot-${cabinetId}-${slotNumber}`,
+    slotNumber,
+    cabinetId,
+    status,
+    battery,
+    reservationId: options.reservationId || null,
+    currentFlow: options.currentFlow || null,
+    locked,
+    faultReason,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+};
+
 const loadDemoData = async (scenario = 'normal') => {
   cabinets.clear();
-  const cabinet = createCabinet('cabinet-001', '一号换电柜 (中关村店)', 12);
+  const cabinet = {
+    id: 'cabinet-001',
+    name: '一号换电柜 (中关村店)',
+    slotCount: 12,
+    slots: [],
+    reservations: [],
+    history: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
   
   if (scenario === 'normal') {
-    cabinet.slots[0].status = SLOT_STATUS.FULL;
-    cabinet.slots[1].status = SLOT_STATUS.FULL;
-    cabinet.slots[2].status = SLOT_STATUS.FULL;
-    cabinet.slots[3].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[4].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[5].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[6].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[7].status = SLOT_STATUS.FULL;
-    cabinet.slots[8].status = SLOT_STATUS.FULL;
-    cabinet.slots[9].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[10].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[11].status = SLOT_STATUS.EMPTY;
+    cabinet.slots = [
+      initDemoSlot('cabinet-001', 1, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 2, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 3, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 4, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 5, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 6, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 7, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 8, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 9, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 10, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 11, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 12, SLOT_STATUS.EMPTY)
+    ];
   } else if (scenario === 'mixed') {
-    cabinet.slots[0].status = SLOT_STATUS.FAULT;
-    cabinet.slots[0].faultReason = '插槽通信故障';
-    cabinet.slots[1].status = SLOT_STATUS.FULL;
-    cabinet.slots[2].status = SLOT_STATUS.RESERVED;
-    cabinet.slots[3].status = SLOT_STATUS.FULL;
-    cabinet.slots[4].status = SLOT_STATUS.FAULT;
-    cabinet.slots[4].faultReason = '电池温度异常';
-    cabinet.slots[5].status = SLOT_STATUS.RESERVED;
-    cabinet.slots[6].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[7].status = SLOT_STATUS.FULL;
-    cabinet.slots[8].status = SLOT_STATUS.OCCUPIED;
-    cabinet.slots[9].status = SLOT_STATUS.EMPTY;
-    cabinet.slots[10].status = SLOT_STATUS.FULL;
-    cabinet.slots[11].status = SLOT_STATUS.EMPTY;
-    
     const testReservation = createReservationModel('cabinet-001', '测试骑手', '13800138000');
     testReservation.reserveSlot = 3;
     testReservation.returnSlot = 6;
@@ -742,8 +776,37 @@ const loadDemoData = async (scenario = 'normal') => {
     testReservation.currentFlow = FLOW_STATUS.RESERVATION_CONFIRMED;
     cabinet.reservations.push(testReservation);
     
-    cabinet.slots[2].reservationId = testReservation.id;
-    cabinet.slots[5].reservationId = testReservation.id;
+    cabinet.slots = [
+      initDemoSlot('cabinet-001', 1, SLOT_STATUS.FAULT, {
+        faultReason: '插槽通信故障，无法读取电池信息'
+      }),
+      initDemoSlot('cabinet-001', 2, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 3, SLOT_STATUS.RESERVED, {
+        reservationId: testReservation.id,
+        currentFlow: FLOW_STATUS.RESERVATION_CONFIRMED,
+        battery: createBattery(BATTERY_STATUS.FULL),
+        locked: true
+      }),
+      initDemoSlot('cabinet-001', 4, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 5, SLOT_STATUS.FAULT, {
+        withBattery: true,
+        faultReason: '电池温度异常，已自动隔离',
+        batteryCode: 'BAT-FAULT01'
+      }),
+      initDemoSlot('cabinet-001', 6, SLOT_STATUS.RESERVED, {
+        reservationId: testReservation.id,
+        currentFlow: FLOW_STATUS.WAITING_EMPTY_BATTERY,
+        locked: true
+      }),
+      initDemoSlot('cabinet-001', 7, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 8, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 9, SLOT_STATUS.OCCUPIED),
+      initDemoSlot('cabinet-001', 10, SLOT_STATUS.EMPTY),
+      initDemoSlot('cabinet-001', 11, SLOT_STATUS.FULL),
+      initDemoSlot('cabinet-001', 12, SLOT_STATUS.EMPTY)
+    ];
+    
+    cabinet.slots[2].battery = createBattery(BATTERY_STATUS.FULL);
   }
   
   cabinets.set('cabinet-001', cabinet);
