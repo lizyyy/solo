@@ -50,10 +50,10 @@
 
       this.cargos = [];
       const cargoPositions = [
-        { x: 4, y: 2 }, { x: 7, y: 2 }, { x: 2, y: 5 },
-        { x: 9, y: 5 }, { x: 5, y: 7 }, { x: 8, y: 7 },
-        { x: 3, y: 4 }, { x: 6, y: 4 }, { x: 10, y: 3 },
-        { x: 1, y: 7 }, { x: 10, y: 7 }, { x: 5, y: 2 },
+        { x: 2, y: 2 }, { x: 6, y: 2 }, { x: 10, y: 2 },
+        { x: 2, y: 4 }, { x: 6, y: 4 }, { x: 10, y: 4 },
+        { x: 2, y: 6 }, { x: 6, y: 6 }, { x: 10, y: 6 },
+        { x: 2, y: 8 }, { x: 6, y: 8 }, { x: 10, y: 8 },
       ];
 
       cargoPositions.forEach((pos, idx) => {
@@ -80,11 +80,14 @@
         walls.push({ x: constants.GRID_WIDTH - 1, y });
       }
 
-      for (let y = 3; y < 6; y++) {
-        walls.push({ x: 5, y });
+      for (let y = 2; y < 7; y++) {
+        walls.push({ x: 4, y });
+      }
+      for (let y = 2; y < 4; y++) {
+        walls.push({ x: 7, y });
       }
       for (let y = 5; y < 8; y++) {
-        walls.push({ x: 9, y });
+        walls.push({ x: 7, y });
       }
       
       return walls;
