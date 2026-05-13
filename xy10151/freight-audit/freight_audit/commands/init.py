@@ -39,7 +39,7 @@ def init(ctx, force):
         init_db(project_dir)
         click.echo(f'[成功] 初始化数据库: {db_path}')
     
-    config = load_config(project_dir)
+    config, _ = load_config(project_dir)
     reports_dir = os.path.join(project_dir, config.get('report', {}).get('output_dir', 'reports'))
     os.makedirs(reports_dir, exist_ok=True)
     click.echo(f'[成功] 创建报告目录: {reports_dir}')

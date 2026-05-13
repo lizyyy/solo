@@ -6,7 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'click>=8.1.0',
-        'tabulate>=0.9.0',
+        'PyYAML>=6.0',
     ],
     entry_points={
         'console_scripts': [
