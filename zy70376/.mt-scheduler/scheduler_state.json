@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "tasks": {
+    "normal-a-001": {
+      "id": "normal-a-001",
+      "tenant_id": "tenant-a",
+      "name": "普通任务-1",
+      "task_type": "export",
+      "priority": "low",
+      "weight": 1,
+      "status": "completed",
+      "created_at": "2026-05-13 16:30:30.912766",
+      "started_at": "2026-05-13 16:30:47.129970",
+      "completed_at": "2026-05-13 16:30:47.178916",
+      "retry_count": 0,
+      "max_retries": 3,
+      "error_message": null,
+      "metadata": {},
+      "is_urgent_promotion": false,
+      "promotion_reason": null,
+      "execution_history": [
+        {
+          "attempt": 1,
+          "status": "completed",
+          "started_at": "2026-05-13T16:30:47.129970",
+          "completed_at": "2026-05-13T16:30:47.178916",
+          "execution_time_ms": 46
+        }
+      ]
+    },
+    "normal-a-002": {
+      "id": "normal-a-002",
+      "tenant_id": "tenant-a",
+      "name": "普通任务-2",
+      "task_type": "export",
+      "priority": "low",
+      "weight": 1,
+      "status": "completed",
+      "created_at": "2026-05-13 16:30:31.057128",
+      "started_at": "2026-05-13 16:30:47.180543",
+      "completed_at": "2026-05-13 16:30:47.244278",
+      "retry_count": 0,
+      "max_retries": 3,
+      "error_message": null,
+      "metadata": {},
+      "is_urgent_promotion": false,
+      "promotion_reason": null,
+      "execution_history": [
+        {
+          "attempt": 1,
+          "status": "completed",
+          "started_at": "2026-05-13T16:30:47.180543",
+          "completed_at": "2026-05-13T16:30:47.244278",
+          "execution_time_ms": 59
+        }
+      ]
+    },
+    "urgent-a-001": {
+      "id": "urgent-a-001",
+      "tenant_id": "tenant-a",
+      "name": "CEO紧急报表",
+      "task_type": "export_urgent",
+      "priority": "urgent",
+      "weight": 1,
+      "status": "completed",
+      "created_at": "2026-05-13 16:30:31.205745",
+      "started_at": "2026-05-13 16:30:47.083257",
+      "completed_at": "2026-05-13 16:30:47.128597",
+      "retry_count": 0,
+      "max_retries": 3,
+      "error_message": null,
+      "metadata": {},
+      "is_urgent_promotion": true,
+      "promotion_reason": "CEO需要立即查看季度报表",
+      "execution_history": [
+        {
+          "attempt": 1,
+          "status": "completed",
+          "started_at": "2026-05-13T16:30:47.083257",
+          "completed_at": "2026-05-13T16:30:47.128597",
+          "execution_time_ms": 42
+        }
+      ]
+    }
+  },
+  "tenant_configs": {
+    "tenant-a": {
+      "tenant_id": "tenant-a",
+      "name": "大租户-A(批量导出)",
+      "concurrency_quota": 4,
+      "weight": 3,
+      "max_queue_size": 200,
+      "failure_penalty_percent": 20,
+      "failure_threshold": 3,
+      "is_active": true,
+      "metadata": {}
+    },
+    "tenant-b": {
+      "tenant_id": "tenant-b",
+      "name": "中租户-B(实时查询)",
+      "concurrency_quota": 3,
+      "weight": 2,
+      "max_queue_size": 100,
+      "failure_penalty_percent": 25,
+      "failure_threshold": 2,
+      "is_active": true,
+      "metadata": {}
+    },
+    "tenant-c": {
+      "tenant_id": "tenant-c",
+      "name": "小租户-C(实时任务)",
+      "concurrency_quota": 2,
+      "weight": 1,
+      "max_queue_size": 50,
+      "failure_penalty_percent": 30,
+      "failure_threshold": 2,
+      "is_active": true,
+      "metadata": {}
+    }
+  },
+  "tenant_runtime": {
+    "tenant-a": {
+      "tenant_id": "tenant-a",
+      "running_tasks": [],
+      "pending_tasks": [],
+      "completed_tasks": 3,
+      "failed_tasks": 0,
+      "consecutive_failures": 0,
+      "quota_reduction_percent": 0,
+      "last_failure_time": null,
+      "total_execution_time_ms": 147
+    },
+    "tenant-b": {
+      "tenant_id": "tenant-b",
+      "running_tasks": [],
+      "pending_tasks": [],
+      "completed_tasks": 0,
+      "failed_tasks": 0,
+      "consecutive_failures": 0,
+      "quota_reduction_percent": 0,
+      "last_failure_time": null,
+      "total_execution_time_ms": 0
+    },
+    "tenant-c": {
+      "tenant_id": "tenant-c",
+      "running_tasks": [],
+      "pending_tasks": [],
+      "completed_tasks": 0,
+      "failed_tasks": 0,
+      "consecutive_failures": 0,
+      "quota_reduction_percent": 0,
+      "last_failure_time": null,
+      "total_execution_time_ms": 0
+    }
+  },
+  "total_completed": 3,
+  "total_failed": 0,
+  "updated_at": "2026-05-13 16:30:47.244807"
+}

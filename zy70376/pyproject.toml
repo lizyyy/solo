@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mt-scheduler"
+version = "0.1.0"
+description = "多租户任务隔离 CLI - 按租户配置并发配额、任务权重和失败隔离策略"
+requires-python = ">=3.9"
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "pydantic>=2.0.0",
+]
+
+[project.scripts]
+mt-scheduler = "mt_scheduler.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
