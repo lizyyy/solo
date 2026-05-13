@@ -8,10 +8,10 @@ class Conflict {
     this.resourceType = data.resourceType;
     this.resourceId = data.resourceId;
     this.conflictType = data.conflictType || ConflictType.OVERLAP;
-    this.severity = data.severity || this._determineSeverity();
-    this.description = data.description || this._generateDescription();
     this.overlapMinutes = data.overlapMinutes || 0;
     this.affectedSlots = data.affectedSlots || [];
+    this.severity = data.severity || this._determineSeverity();
+    this.description = data.description || this._generateDescription();
     this.suggestion = data.suggestion || this._generateSuggestion();
     this.createdAt = new Date();
   }

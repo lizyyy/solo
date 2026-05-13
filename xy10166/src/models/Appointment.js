@@ -35,9 +35,17 @@ class Appointment {
   }
 
   spansMidnight() {
-    const startDate = this.startTime.toDateString();
-    const endDate = this.endTime.toDateString();
-    return startDate !== endDate;
+    const startUTCDate = Date.UTC(
+      this.startTime.getUTCFullYear(),
+      this.startTime.getUTCMonth(),
+      this.startTime.getUTCDate()
+    );
+    const endUTCDate = Date.UTC(
+      this.endTime.getUTCFullYear(),
+      this.endTime.getUTCMonth(),
+      this.endTime.getUTCDate()
+    );
+    return startUTCDate !== endUTCDate;
   }
 
   toJSON() {
