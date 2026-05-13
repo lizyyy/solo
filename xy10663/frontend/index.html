@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>门诊检验预约报告系统</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F',
+            info: '#86909C'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .tab-active {
+      border-bottom: 2px solid #165DFF;
+      color: #165DFF;
+    }
+    .status-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <i class="fa fa-medkit text-white text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-800">门诊检验预约报告系统</h1>
+            <p class="text-sm text-gray-500">Laboratory Appointment Management System</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600"><i class="fa fa-user-circle-o mr-1"></i> 管理员</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-lg shadow-sm mb-6">
+      <div class="flex border-b">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-6 py-4 font-medium tab-active">
+          <i class="fa fa-dashboard mr-2"></i>异常看板
+        </button>
+        <button onclick="switchTab('list')" id="tab-list" class="px-6 py-4 font-medium text-gray-600 hover:text-primary">
+          <i class="fa fa-list mr-2"></i>预约列表
+        </button>
+        <button onclick="switchTab('import')" id="tab-import" class="px-6 py-4 font-medium text-gray-600 hover:text-primary">
+          <i class="fa fa-upload mr-2"></i>批量导入
+        </button>
+        <button onclick="switchTab('reminders')" id="tab-reminders" class="px-6 py-4 font-medium text-gray-600 hover:text-primary">
+          <i class="fa fa-bell mr-2"></i>患者提醒
+        </button>
+      </div>
+    </div>
+
+    <div id="content-dashboard" class="tab-content">
+      <div id="dashboard-stats" class="grid grid-cols-4 gap-6 mb-6">
+      </div>
+      
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold mb-4"><i class="fa fa-exclamation-triangle text-warning mr-2"></i>异常改约记录</h3>
+          <div id="abnormal-list" class="space-y-3 max-h-80 overflow-y-auto">
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm p-6">
+          <h3 class="text-lg font-semibold mb-4"><i class="fa fa-bar-chart text-primary mr-2"></i>近7日预约趋势</h3>
+          <div id="trend-chart" class="h-64 flex items-end justify-around">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="content-list" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-4"><i class="fa fa-filter text-primary mr-2"></i>筛选条件</h3>
+        <div class="grid grid-cols-4 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">患者姓名</label>
+            <input type="text" id="filter-patient" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">检验项目</label>
+            <input type="text" id="filter-lab-item" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">预约状态</label>
+            <select id="filter-status" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+              <option value="">全部</option>
+              <option value="pending">待确认</option>
+              <option value="confirmed">已确认</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+              <option value="no_show">未到诊</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">报告状态</label>
+            <select id="filter-report-status" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+              <option value="">全部</option>
+              <option value="pending">待检验</option>
+              <option value="processing">检验中</option>
+              <option value="completed">已完成</option>
+              <option value="abnormal">异常</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-4 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+            <input type="date" id="filter-start-date" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+            <input type="date" id="filter-end-date" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">责任人</label>
+            <input type="text" id="filter-handler" placeholder="按操作人筛选" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">操作时间范围</label>
+            <input type="date" id="filter-handler-date" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        <div class="flex justify-between">
+          <div class="space-x-2">
+            <button onclick="applyFilters()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90">
+              <i class="fa fa-search mr-1"></i>查询
+            </button>
+            <button onclick="resetFilters()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+              <i class="fa fa-refresh mr-1"></i>重置
+            </button>
+          </div>
+          <button onclick="exportCSV()" class="bg-success text-white px-4 py-2 rounded-lg hover:bg-success/90">
+            <i class="fa fa-download mr-1"></i>导出CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">患者信息</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">检验项目</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">采样窗口</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">空腹要求</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">预约时间</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">状态</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">改约次数</th>
+                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">操作</th>
+              </tr>
+            </thead>
+            <tbody id="appointment-list" class="divide-y">
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-3 border-t flex justify-between items-center">
+          <div id="pagination-info" class="text-sm text-gray-600"></div>
+          <div class="space-x-2" id="pagination-buttons"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="content-import" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold"><i class="fa fa-cloud-upload text-primary mr-2"></i>批量导入预约数据</h3>
+            <a href="/api/import/template" class="text-primary hover:underline text-sm">
+              <i class="fa fa-download mr-1"></i>下载导入模板
+            </a>
+          </div>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary transition-colors" id="drop-zone">
+            <input type="file" id="file-input" accept=".csv,.xlsx" class="hidden" onchange="handleFileSelect(event)">
+            <i class="fa fa-upload text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600 mb-2">拖拽文件到此处，或 <button type="button" onclick="document.getElementById('file-input').click()" class="text-primary hover:underline">点击选择文件</button></p>
+            <p class="text-sm text-gray-500">支持 .csv 和 .xlsx 格式</p>
+          </div>
+        </div>
+
+        <div id="import-result" class="hidden mb-6">
+          <div class="p-4 rounded-lg" id="result-box">
+            <div class="flex items-center">
+              <i id="result-icon" class="fa fa-2xl mr-3"></i>
+              <div>
+                <h4 id="result-title" class="font-semibold"></h4>
+                <p id="result-message" class="text-sm"></p>
+              </div>
+            </div>
+          </div>
+          <div id="error-list" class="mt-4 hidden">
+            <h5 class="font-medium text-red-700 mb-2">错误详情：</h5>
+            <ul class="list-disc list-inside text-sm text-red-600 space-y-1" id="error-items"></ul>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 rounded-lg p-4">
+          <h4 class="font-medium text-blue-800 mb-2"><i class="fa fa-info-circle mr-1"></i>导入说明</h4>
+          <ul class="text-sm text-blue-700 space-y-1">
+            <li>• 请使用系统提供的模板进行填写，确保字段名称正确</li>
+            <li>• 必填字段：患者姓名、检验项目、预约日期</li>
+            <li>• 空腹字段请填写"是"或"否"</li>
+            <li>• 状态可选值：pending(待确认)、confirmed(已确认)、completed(已完成)、cancelled(已取消)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="content-reminders" class="tab-content hidden">
+      <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold"><i class="fa fa-bell text-warning mr-2"></i>明日待提醒患者</h3>
+          <button onclick="sendAllReminders()" id="send-all-btn" class="bg-warning text-white px-4 py-2 rounded-lg hover:bg-warning/90">
+            <i class="fa fa-paper-plane mr-1"></i>批量发送提醒
+          </button>
+        </div>
+        
+        <div id="reminder-list" class="space-y-4">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="detail-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="px-6 py-4 border-b flex justify-between items-center">
+        <h3 class="text-lg font-semibold">预约详情</h3>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="px-6 py-4" id="modal-content">
+      </div>
+    </div>
+  </div>
+
+  <div id="reschedule-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg w-full max-w-md">
+      <div class="px-6 py-4 border-b flex justify-between items-center">
+        <h3 class="text-lg font-semibold">改约操作</h3>
+        <button onclick="closeRescheduleModal()" class="text-gray-500 hover:text-gray-700">
+          <i class="fa fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="px-6 py-4">
+        <input type="hidden" id="reschedule-id">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">新预约日期</label>
+          <input type="date" id="new-date" class="w-full border rounded-lg px-3 py-2">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">新预约时间</label>
+          <input type="time" id="new-time" class="w-full border rounded-lg px-3 py-2">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">改约原因</label>
+          <input type="text" id="reschedule-reason" class="w-full border rounded-lg px-3 py-2" placeholder="请输入改约原因">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">操作人</label>
+          <input type="text" id="reschedule-operator" value="张三" class="w-full border rounded-lg px-3 py-2">
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button onclick="closeRescheduleModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-50">取消</button>
+          <button onclick="submitReschedule()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">确认改约</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
