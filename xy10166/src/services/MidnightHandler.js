@@ -42,6 +42,8 @@ class MidnightHandler {
     if (!this._isSpanningMidnightUTC(startTime, endTime)) {
       return [{
         ...appointment,
+        slotId: appointment.id,
+        originalId: appointment.id,
         isSplit: false,
         slotDate: this._formatUTCDate(startTime)
       }];
@@ -49,21 +51,25 @@ class MidnightHandler {
     
     const splitSlots = [];
     let currentStart = new Date(startTime);
+    let segmentIndex = 0;
     
     while (currentStart < endTime) {
       const currentEnd = this._getUTCMidnightAfter(currentStart);
-      
       const actualEnd = currentEnd < endTime ? currentEnd : endTime;
+      const slotDate = this._formatUTCDate(currentStart);
       
       splitSlots.push({
         ...appointment,
         startTime: new Date(currentStart),
         endTime: new Date(actualEnd),
+        slotId: `${appointment.id}_${slotDate}`,
         originalId: appointment.id,
+        segmentIndex,
         isSplit: true,
-        slotDate: this._formatUTCDate(currentStart)
+        slotDate
       });
       
+      segmentIndex++;
       currentStart = this._getNextUTCDayStart(currentStart);
     }
     

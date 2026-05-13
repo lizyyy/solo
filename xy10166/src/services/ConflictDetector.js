@@ -152,35 +152,79 @@ class ConflictDetector {
   }
 
   _detectResourceConflicts(sortedSlots, resourceType, resourceId) {
-    const conflicts = [];
-    const processedPairs = new Set();
+    const overlapGroups = new Map();
 
     for (let i = 0; i < sortedSlots.length; i++) {
       for (let j = i + 1; j < sortedSlots.length; j++) {
         const slot1 = sortedSlots[i];
         const slot2 = sortedSlots[j];
 
-        const pairKey = [slot1.id, slot2.id].sort().join('|');
-        if (processedPairs.has(pairKey)) continue;
-        processedPairs.add(pairKey);
+        const slotId1 = slot1.slotId || slot1.id;
+        const slotId2 = slot2.slotId || slot2.id;
+        const originalId1 = slot1.originalId || slot1.id;
+        const originalId2 = slot2.originalId || slot2.id;
+
+        const pairKey = [slotId1, slotId2].sort().join('|');
+        const originalPairKey = [originalId1, originalId2].sort().join('|');
 
         const overlap = this._calculateOverlap(slot1, slot2);
         
         if (overlap > 0) {
-          const conflict = new Conflict({
-            appointmentId1: slot1.id,
-            appointmentId2: slot2.id,
-            resourceType,
-            resourceId,
+          if (!overlapGroups.has(originalPairKey)) {
+            overlapGroups.set(originalPairKey, {
+              appointmentId1: originalId1,
+              appointmentId2: originalId2,
+              totalOverlap: 0,
+              affectedSlots: [],
+              segmentDetails: []
+            });
+          }
+          
+          const group = overlapGroups.get(originalPairKey);
+          group.totalOverlap += overlap;
+          
+          const slotInfo1 = this._formatSlotInfo(slot1);
+          const slotInfo2 = this._formatSlotInfo(slot2);
+          
+          if (!group.affectedSlots.find(s => s.id === slotInfo1.id && s.startTime === slotInfo1.startTime)) {
+            group.affectedSlots.push(slotInfo1);
+          }
+          if (!group.affectedSlots.find(s => s.id === slotInfo2.id && s.startTime === slotInfo2.startTime)) {
+            group.affectedSlots.push(slotInfo2);
+          }
+          
+          group.segmentDetails.push({
+            slotId1,
+            slotId2,
             overlapMinutes: overlap,
-            affectedSlots: [
-              this._formatSlotInfo(slot1),
-              this._formatSlotInfo(slot2)
-            ]
+            slot1StartTime: slot1.startTime,
+            slot1EndTime: slot1.endTime,
+            slot2StartTime: slot2.startTime,
+            slot2EndTime: slot2.endTime
           });
-          conflicts.push(conflict.toJSON());
         }
       }
+    }
+
+    const conflicts = [];
+    for (const group of overlapGroups.values()) {
+      const conflict = new Conflict({
+        appointmentId1: group.appointmentId1,
+        appointmentId2: group.appointmentId2,
+        resourceType,
+        resourceId,
+        overlapMinutes: group.totalOverlap,
+        affectedSlots: group.affectedSlots.sort((a, b) => 
+          new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+        )
+      });
+      const conflictJson = conflict.toJSON();
+      conflictJson.segmentDetails = group.segmentDetails;
+      if (group.affectedSlots.some(s => s.isSplit)) {
+        conflictJson.isSplitConflict = true;
+        conflictJson.totalOverlapMinutes = group.totalOverlap;
+      }
+      conflicts.push(conflictJson);
     }
 
     return conflicts;
