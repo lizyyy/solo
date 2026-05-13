@@ -115,6 +115,8 @@ export function initializeDatabase(dbPath: string = DEFAULT_DB_PATH, force: bool
     );
 
     -- 异常记录表
+    -- 注意: related_id 是多态关联，不使用外键约束
+    -- 可关联: budgets.id, purchase_requests.id, contract_payments.id
     CREATE TABLE IF NOT EXISTS exceptions (
       id TEXT PRIMARY KEY,
       exception_type TEXT NOT NULL,
@@ -125,8 +127,7 @@ export function initializeDatabase(dbPath: string = DEFAULT_DB_PATH, force: bool
       details TEXT,
       is_resolved INTEGER DEFAULT 0,
       resolved_at TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
-      FOREIGN KEY (related_id) REFERENCES purchase_requests(id)
+      created_at TEXT DEFAULT (datetime('now'))
     );
 
     -- 导入记录表
