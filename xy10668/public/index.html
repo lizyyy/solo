@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快递错分追责赔付系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-btn:hover {
+            background: #e8eaf6;
+        }
+        .tab-btn.active:hover {
+            background: #5a6fd6;
+        }
+        .content-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-height: 400px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-normal {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-blocked {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status-reviewing {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        .status-pending {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .status-resolved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+        }
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .log-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        .log-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .log-content {
+            font-size: 14px;
+        }
+        .log-operator {
+            color: #667eea;
+            font-weight: 500;
+        }
+        .hidden {
+            display: none;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 快递错分追责赔付系统</h1>
+    </div>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>包裹总数</h3>
+                <div class="value" id="stat-packages">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>错分记录</h3>
+                <div class="value" id="stat-misclassifications">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>赔付次数</h3>
+                <div class="value" id="stat-compensations">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>赔付总额</h3>
+                <div class="value" id="stat-total-compensation">¥0</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('packages')">包裹管理</button>
+            <button class="tab-btn" onclick="showTab('misclassifications')">错分登记</button>
+            <button class="tab-btn" onclick="showTab('review')">复核面板</button>
+            <button class="tab-btn" onclick="showTab('compensations')">赔付管理</button>
+            <button class="tab-btn" onclick="showTab('logs')">操作日志</button>
+            <button class="tab-btn" onclick="showTab('export')">导出报告</button>
+        </div>
+
+        <div id="packages-section" class="content-section">
+            <div class="section-title">📦 包裹管理</div>
+            <div class="toolbar">
+                <button class="action-btn btn-primary" onclick="initSampleData()">初始化样例数据</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>发件人</th>
+                        <th>收件人</th>
+                        <th>始发地</th>
+                        <th>目的地</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="packages-table"></tbody>
+            </table>
+        </div>
+
+        <div id="misclassifications-section" class="content-section hidden">
+            <div class="section-title">⚠️ 错分登记</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>错分网点</th>
+                        <th>正确网点</th>
+                        <th>发现时间</th>
+                        <th>登记人</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="misclassifications-table"></tbody>
+            </table>
+        </div>
+
+        <div id="review-section" class="content-section hidden">
+            <div class="section-title">🔍 复核面板</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>错分网点</th>
+                        <th>正确网点</th>
+                        <th>发现时间</th>
+                        <th>重派状态</th>
+                        <th>赔付状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="review-table"></tbody>
+            </table>
+        </div>
+
+        <div id="compensations-section" class="content-section hidden">
+            <div class="section-title">💰 赔付管理</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>运单号</th>
+                        <th>赔付金额</th>
+                        <th>责任人</th>
+                        <th>批准时间</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="compensations-table"></tbody>
+            </table>
+        </div>
+
+        <div id="logs-section" class="content-section hidden">
+            <div class="section-title">📋 操作日志</div>
+            <div id="logs-list"></div>
+        </div>
+
+        <div id="export-section" class="content-section hidden">
+            <div class="section-title">📤 导出报告</div>
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>责任人</label>
+                    <input type="text" id="filter-responsible" placeholder="输入责任人姓名">
+                </div>
+                <div class="filter-group">
+                    <label>开始日期</label>
+                    <input type="date" id="filter-start-date">
+                </div>
+                <div class="filter-group">
+                    <label>结束日期</label>
+                    <input type="date" id="filter-end-date">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="action-btn btn-primary" onclick="exportReport()">导出CSV</button>
+                </div>
+            </div>
+            <div class="empty-state">
+                <p>选择筛选条件后点击导出按钮下载报告</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE}/${endpoint}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                return [];
+            }
+        }
+
+        async function loadStatistics() {
+            const stats = await fetchData('statistics');
+            document.getElementById('stat-packages').textContent = stats.packages || 0;
+            document.getElementById('stat-misclassifications').textContent = stats.misclassifications || 0;
+            document.getElementById('stat-compensations').textContent = stats.compensations || 0;
+            document.getElementById('stat-total-compensation').textContent = `¥${stats.totalCompensation || 0}`;
+        }
+
+        async function loadPackages() {
+            const packages = await fetchData('packages');
+            const tbody = document.getElementById('packages-table');
+            tbody.innerHTML = packages.map(pkg => `
+                <tr>
+                    <td><strong>${pkg.tracking_number}</strong></td>
+                    <td>${pkg.sender}</td>
+                    <td>${pkg.receiver}</td>
+                    <td>${pkg.origin}</td>
+                    <td>${pkg.destination}</td>
+                    <td><span class="status-badge status-${pkg.status}">${getStatusText(pkg.status)}</span></td>
+                    <td>${pkg.created_at}</td>
+                    <td>
+                        <button class="action-btn btn-primary" onclick="viewTracks('${pkg.id}')">轨迹</button>
+                        ${pkg.status === 'blocked' ? `<button class="action-btn btn-warning" onclick="markReviewing('${pkg.id}')">复核</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadMisclassifications() {
+            const data = await fetchData('misclassifications');
+            const tbody = document.getElementById('misclassifications-table');
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td><strong>${item.tracking_number}</strong></td>
+                    <td>${item.misclassified_branch}</td>
+                    <td>${item.correct_branch}</td>
+                    <td>${item.found_time}</td>
+                    <td>${item.reporter}</td>
+                    <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
+                    <td>
+                        <button class="action-btn btn-success" onclick="processMisclassification('${item.id}', 'resolved')">处理</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadReview() {
+            const misclassifications = await fetchData('misclassifications');
+            const reassignments = await fetchData('reassignments');
+            const compensations = await fetchData('compensations');
+            
+            const tbody = document.getElementById('review-table');
+            tbody.innerHTML = misclassifications.map(item => {
+                const reassignment = reassignments.find(r => r.misclassification_id === item.id);
+                const compensation = compensations.find(c => c.misclassification_id === item.id);
+                return `
+                <tr>
+                    <td><strong>${item.tracking_number}</strong></td>
+                    <td>${item.misclassified_branch}</td>
+                    <td>${item.correct_branch}</td>
+                    <td>${item.found_time}</td>
+                    <td><span class="status-badge status-${reassignment ? reassignment.status : 'pending'}">${reassignment ? getStatusText(reassignment.status) : '待重派'}</span></td>
+                    <td><span class="status-badge status-${compensation ? compensation.status : 'pending'}">${compensation ? getStatusText(compensation.status) : '待赔付'}</span></td>
+                    <td>
+                        ${!reassignment ? `<button class="action-btn btn-primary" onclick="createReassignment('${item.id}')">创建重派</button>` : ''}
+                        ${!compensation ? `<button class="action-btn btn-warning" onclick="createCompensation('${item.id}')">创建赔付</button>` : ''}
+                    </td>
+                </tr>
+            `;
+            }).join('');
+        }
+
+        async function loadCompensations() {
+            const data = await fetchData('compensations');
+            const tbody = document.getElementById('compensations-table');
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td><strong>${item.tracking_number}</strong></td>
+                    <td style="color: #c62828; font-weight: 600;">¥${item.amount}</td>
+                    <td>${item.responsible_person}</td>
+                    <td>${item.approve_time || '-'}</td>
+                    <td><span class="status-badge status-${item.status}">${getStatusText(item.status)}</span></td>
+                    <td>${item.notes || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadLogs() {
+            const logs = await fetchData('operation-logs');
+            const list = document.getElementById('logs-list');
+            if (logs.length === 0) {
+                list.innerHTML = '<div class="empty-state"><p>暂无操作日志</p></div>';
+                return;
+            }
+            list.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <div class="log-time">${log.created_at}</div>
+                    <div class="log-content">
+                        <span class="log-operator">${log.operator}</span>
+                        ${log.description}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'normal': '正常',
+                'blocked': '已拦截',
+                'reviewing': '复核中',
+                'pending': '待处理',
+                'resolved': '已解决',
+                'completed': '已完成',
+                'approved': '已批准',
+                'processing': '处理中',
+                'delivered': '已送达',
+                'transit': '运输中',
+                'misclassified': '已错分',
+                'active': '激活'
+            };
+            return statusMap[status] || status;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`${tabName}-section`).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            switch(tabName) {
+                case 'packages': loadPackages(); break;
+                case 'misclassifications': loadMisclassifications(); break;
+                case 'review': loadReview(); break;
+                case 'compensations': loadCompensations(); break;
+                case 'logs': loadLogs(); break;
+            }
+        }
+
+        async function initSampleData() {
+            try {
+                await fetch(`${API_BASE}/init-sample-data`, { method: 'POST' });
+                alert('样例数据初始化成功！');
+                loadAllData();
+            } catch (error) {
+                alert('初始化失败：' + error.message);
+            }
+        }
+
+        async function viewTracks(packageId) {
+            const tracks = await fetchData(`packages/${packageId}/tracks`);
+            alert('包裹轨迹：\n' + tracks.map(t => `${t.location} - ${t.description} (${t.created_at})`).join('\n'));
+        }
+
+        async function markReviewing(packageId) {
+            try {
+                await fetch(`${API_BASE}/packages/${packageId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'reviewing', operator: '当前用户' })
+                });
+                loadPackages();
+                loadStatistics();
+            } catch (error) {
+                alert('操作失败');
+            }
+        }
+
+        async function processMisclassification(id, status) {
+            try {
+                await fetch(`${API_BASE}/misclassifications/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, operator: '当前用户' })
+                });
+                loadMisclassifications();
+                loadReview();
+            } catch (error) {
+                alert('操作失败');
+            }
+        }
+
+        async function createReassignment(misclassificationId) {
+            try {
+                await fetch(`${API_BASE}/reassignments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        misclassification_id: misclassificationId,
+                        handler: '处理员',
+                        reassign_time: new Date().toISOString(),
+                        new_route: '重新安排配送路线',
+                        notes: '已重新安排配送',
+                        operator: '当前用户'
+                    })
+                });
+                alert('重派记录创建成功！');
+                loadReview();
+            } catch (error) {
+                alert('操作失败');
+            }
+        }
+
+        async function createCompensation(misclassificationId) {
+            try {
+                const requestId = 'COMP' + Date.now();
+                await fetch(`${API_BASE}/compensations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        misclassification_id: misclassificationId,
+                        amount: 50.00,
+                        responsible_person: '分拣员',
+                        request_id: requestId,
+                        notes: '错分赔付',
+                        operator: '当前用户'
+                    })
+                });
+                alert('赔付记录创建成功！（重复请求不会重复创建）');
+                loadReview();
+                loadCompensations();
+                loadStatistics();
+            } catch (error) {
+                alert('操作失败');
+            }
+        }
+
+        function exportReport() {
+            const responsible = document.getElementById('filter-responsible').value;
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+            
+            let url = `${API_BASE}/export/report?`;
+            if (responsible) url += `responsible_person=${encodeURIComponent(responsible)}&`;
+            if (startDate) url += `start_date=${startDate}&`;
+            if (endDate) url += `end_date=${endDate}`;
+            
+            window.open(url, '_blank');
+        }
+
+        function loadAllData() {
+            loadStatistics();
+            loadPackages();
+        }
+
+        loadAllData();
+    </script>
+</body>
+</html>
