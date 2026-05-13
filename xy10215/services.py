@@ -268,7 +268,7 @@ class FollowupService:
                 'status = ?',
                 'updated_at = CURRENT_TIMESTAMP'
             ]
-            params = [new_planned_date, window_start.strftime('%Y-%m-%d'), window_end.strftime('%Y-%m-%d'), 'rescheduled']
+            params = [new_planned_date, window_start.strftime('%Y-%m-%d'), window_end.strftime('%Y-%m-%d'), 'scheduled']
             
             if new_doctor_id:
                 updates.append('doctor_id = ?')

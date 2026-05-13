@@ -292,6 +292,28 @@ class FollowupPipeline:
 
 class ReportExporter:
     @staticmethod
+    def _cleanup_old_exports(check_date, export_type, run_log_id=None):
+        import os
+        from database import get_db
+        
+        prefix = f"{export_type}_{check_date}_"
+        
+        if os.path.exists(EXPORT_DIR):
+            for f in os.listdir(EXPORT_DIR):
+                if f.startswith(prefix) and f.endswith('.csv'):
+                    try:
+                        os.remove(os.path.join(EXPORT_DIR, f))
+                    except:
+                        pass
+        
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                DELETE FROM exports 
+                WHERE export_type = ? AND file_name LIKE ?
+            ''', (export_type, prefix + '%'))
+    
+    @staticmethod
     def _get_suffix(run_log_id=None):
         if run_log_id:
             run_logs = RunLogService.get_run_logs()
@@ -302,6 +324,8 @@ class ReportExporter:
     
     @staticmethod
     def export_daily_report(check_date, run_log_id=None):
+        ReportExporter._cleanup_old_exports(check_date, 'daily_report', run_log_id)
+        
         window_plans = FollowupService.get_plans_in_window(check_date)
         overdue_plans = FollowupService.get_overdue_plans(check_date)
         patients = PatientService.get_patients()
@@ -351,6 +375,8 @@ class ReportExporter:
     
     @staticmethod
     def export_overdue_report(check_date, run_log_id=None):
+        ReportExporter._cleanup_old_exports(check_date, 'overdue_report', run_log_id)
+        
         overdue_plans = FollowupService.get_overdue_plans(check_date)
         
         suffix = ReportExporter._get_suffix(run_log_id)
