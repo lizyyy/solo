@@ -14,9 +14,8 @@ class QuotaService {
     let hash = 5381;
     for (let i = 0; i < str.length; i++) {
       hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
-      hash = hash >>> 0;
     }
-    return hash;
+    return hash | 0;
   }
 
   static _getRequestIdLockKeys(requestId) {
@@ -43,7 +42,7 @@ class QuotaService {
       throw new AppError(ErrorCode.VALIDATION_ERROR, '参数验证失败', validation.errors);
     }
 
-    const { quotaCode, applyAmount, applicant, reason, requestId } = data;
+    const { quotaCode, applyAmount, applicant, reason, requestId } = validation.value;
 
     try {
       return await db.transaction(async (client) => {
