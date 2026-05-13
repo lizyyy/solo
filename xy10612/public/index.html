@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>药店处方留存监管系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+        }
+        .stat-card.total { border-left-color: #667eea; }
+        .stat-card.pending { border-left-color: #f59e0b; }
+        .stat-card.reviewed { border-left-color: #10b981; }
+        .stat-card.locked { border-left-color: #3b82f6; }
+        .stat-card.archived { border-left-color: #8b5cf6; }
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        .filter-group input, .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending_review {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status-reviewed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-refund_pending {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .status-archived {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 20px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .detail-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .detail-item {
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        .detail-item label {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .detail-item .value {
+            font-weight: 500;
+        }
+        .history-section {
+            margin-top: 20px;
+        }
+        .history-section h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .history-item {
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 2000;
+            display: none;
+        }
+        .toast.success {
+            background: #10b981;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .export-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💊 药店处方留存监管系统</h1>
+    </div>
+    
+    <div class="container">
+        <div class="stats-row">
+            <div class="stat-card total">
+                <h3>处方总数</h3>
+                <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card pending">
+                <h3>待复核</h3>
+                <div class="value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card reviewed">
+                <h3>已复核</h3>
+                <div class="value" id="stat-reviewed">0</div>
+            </div>
+            <div class="stat-card locked">
+                <h3>销售已锁定</h3>
+                <div class="value" id="stat-locked">0</div>
+            </div>
+            <div class="stat-card archived">
+                <h3>已归档</h3>
+                <div class="value" id="stat-archived">0</div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>关键词搜索</label>
+                    <input type="text" id="filter-keyword" placeholder="处方号/患者/医生">
+                </div>
+                <div class="filter-group">
+                    <label>状态</label>
+                    <select id="filter-status">
+                        <option value="">全部</option>
+                        <option value="pending_review">待复核</option>
+                        <option value="reviewed">已复核</option>
+                        <option value="refund_pending">退药审核中</option>
+                        <option value="archived">已归档</option>
+                        <option value="rejected">已拒绝</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>责任人</label>
+                    <input type="text" id="filter-handler" placeholder="药师姓名">
+                </div>
+                <div class="filter-group">
+                    <label>开始日期</label>
+                    <input type="date" id="filter-start">
+                </div>
+                <div class="filter-group">
+                    <label>结束日期</label>
+                    <input type="date" id="filter-end">
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="loadPrescriptions()">搜索</button>
+                </div>
+                <div class="filter-group" style="justify-content: flex-end;">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-secondary" onclick="resetFilters()">重置</button>
+                </div>
+            </div>
+            <div class="export-section">
+                <button class="btn btn-success" onclick="exportData()">导出报告</button>
+                <button class="btn btn-warning" onclick="resetData()">重置数据</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>处方号</th>
+                        <th>患者</th>
+                        <th>医生</th>
+                        <th>药师</th>
+                        <th>药品</th>
+                        <th>附件版本</th>
+                        <th>状态</th>
+                        <th>责任人</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="prescription-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="review-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>药师复核</h2>
+                <button class="close-btn" onclick="closeModal('review-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>处方号</label>
+                <input type="text" id="review-id" readonly>
+            </div>
+            <div class="form-group">
+                <label>药师姓名</label>
+                <input type="text" id="review-pharmacist" placeholder="请输入药师姓名">
+            </div>
+            <div class="form-group">
+                <label>复核结果</label>
+                <select id="review-result">
+                    <option value="true">通过</option>
+                    <option value="false">拒绝</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('review-modal')">取消</button>
+                <button class="btn btn-primary" onclick="submitReview()">确认提交</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>处方详情</h2>
+                <button class="close-btn" onclick="closeModal('detail-modal')">&times;</button>
+            </div>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导出报告</h2>
+                <button class="close-btn" onclick="closeModal('export-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>责任人筛选</label>
+                <input type="text" id="export-handler" placeholder="输入药师姓名，留空则全部">
+            </div>
+            <div class="form-group">
+                <label>开始日期</label>
+                <input type="date" id="export-start">
+            </div>
+            <div class="form-group">
+                <label>结束日期</label>
+                <input type="date" id="export-end">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('export-modal')">取消</button>
+                <button class="btn btn-primary" onclick="confirmExport()">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentPrescriptionId = null;
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'pending_review': '待复核',
+                'reviewed': '已复核',
+                'refund_pending': '退药审核中',
+                'archived': '已归档',
+                'rejected': '已拒绝'
+            };
+            return map[status] || status;
+        }
+
+        function loadStats() {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const stats = data.data;
+                        document.getElementById('stat-total').textContent = stats.total;
+                        document.getElementById('stat-pending').textContent = stats.pendingReview;
+                        document.getElementById('stat-reviewed').textContent = stats.reviewed;
+                        document.getElementById('stat-locked').textContent = stats.salesLocked;
+                        document.getElementById('stat-archived').textContent = stats.archived;
+                    }
+                });
+        }
+
+        function loadPrescriptions() {
+            const keyword = document.getElementById('filter-keyword').value;
+            const status = document.getElementById('filter-status').value;
+            const handler = document.getElementById('filter-handler').value;
+            const startDate = document.getElementById('filter-start').value;
+            const endDate = document.getElementById('filter-end').value;
+
+            const params = new URLSearchParams();
+            if (keyword) params.append('keyword', keyword);
+            if (status) params.append('status', status);
+            if (handler) params.append('handler', handler);
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+
+            fetch('/api/prescriptions?' + params.toString())
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderTable(data.data);
+                    }
+                });
+        }
+
+        function renderTable(prescriptions) {
+            const tbody = document.getElementById('prescription-table');
+            tbody.innerHTML = prescriptions.map(p => `
+                <tr>
+                    <td><strong>${p.id}</strong></td>
+                    <td>${p.patientName}</td>
+                    <td>${p.doctor}</td>
+                    <td>${p.pharmacist || '-'}</td>
+                    <td>${p.drugs.slice(0, 2).join(', ')}${p.drugs.length > 2 ? '...' : ''}</td>
+                    <td>v${p.attachmentVersion}</td>
+                    <td><span class="status-badge status-${p.status}">${getStatusText(p.status)}</span></td>
+                    <td>${p.handler || '-'}</td>
+                    <td>${p.createdAt.split('T')[0]}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-small btn-secondary" onclick="viewDetail('${p.id}')">详情</button>
+                            ${p.status === 'pending_review' ? `<button class="btn btn-small btn-primary" onclick="openReview('${p.id}')">复核</button>` : ''}
+                            ${p.status === 'reviewed' && !p.salesLocked ? `<button class="btn btn-small btn-success" onclick="lockSales('${p.id}')">锁定销售</button>` : ''}
+                            ${p.salesLocked && !p.refundReview && p.status !== 'archived' ? `<button class="btn btn-small btn-warning" onclick="refundReview('${p.id}')">退药审核</button>` : ''}
+                            ${p.refundReview && !p.desensitized ? `<button class="btn btn-small btn-primary" onclick="desensitize('${p.id}')">脱敏归档</button>` : ''}
+                            ${p.desensitized && !p.exported ? `<button class="btn btn-small btn-success" onclick="exportPrescription('${p.id}')">监管导出</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-keyword').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-handler').value = '';
+            document.getElementById('filter-start').value = '';
+            document.getElementById('filter-end').value = '';
+            loadPrescriptions();
+        }
+
+        function viewDetail(id) {
+            fetch('/api/prescriptions/' + id)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const p = data.data;
+                        const hasHistory = Object.keys(p.previousValues).length > 0;
+                        
+                        let historyHtml = '';
+                        if (hasHistory) {
+                            historyHtml = '<div class="history-section"><h3>修改历史</h3>';
+                            if (p.previousValues.attachment) {
+                                historyHtml += `<div class="history-item">
+                                    <strong>附件变更：</strong>${p.previousValues.attachment.join(' → ')} → ${p.attachment}
+                                </div>`;
+                            }
+                            if (p.previousValues.status) {
+                                historyHtml += `<div class="history-item">
+                                    <strong>状态变更：</strong>${p.previousValues.status.map(s => getStatusText(s)).join(' → ')} → ${getStatusText(p.status)}
+                                </div>`;
+                            }
+                            if (p.previousValues.salesLocked) {
+                                historyHtml += `<div class="history-item">
+                                    <strong>销售锁定：</strong>${p.previousValues.salesLocked.map(s => s ? '是' : '否').join(' → ')} → ${p.salesLocked ? '是' : '否'}
+                                </div>`;
+                            }
+                            historyHtml += '</div>';
+                        }
+
+                        document.getElementById('detail-content').innerHTML = `
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>处方号</label>
+                                    <div class="value">${p.id}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>状态</label>
+                                    <div class="value"><span class="status-badge status-${p.status}">${getStatusText(p.status)}</span></div>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>患者姓名</label>
+                                    <div class="value">${p.patientName}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>身份证号</label>
+                                    <div class="value">${p.patientIdCard}</div>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>医生</label>
+                                    <div class="value">${p.doctor}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>药师</label>
+                                    <div class="value">${p.pharmacist || '-'}</div>
+                                </div>
+                            </div>
+                            <div class="detail-item" style="grid-column: 1 / -1;">
+                                <label>药品</label>
+                                <div class="value">${p.drugs.join('、')}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>附件</label>
+                                    <div class="value">${p.attachment} (v${p.attachmentVersion})</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>责任人</label>
+                                    <div class="value">${p.handler || '-'}</div>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>销售锁定</label>
+                                    <div class="value">${p.salesLocked ? '是 (' + (p.lockedAt || '-') + ')' : '否'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>退药审核</label>
+                                    <div class="value">${p.refundReview ? '是 (' + (p.refundAt || '-') + ')' : '否'}</div>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <label>脱敏归档</label>
+                                    <div class="value">${p.desensitized ? '是 (' + (p.desensitizedAt || '-') + ')' : '否'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <label>监管导出</label>
+                                    <div class="value">${p.exported ? '是 (' + (p.exportedAt || '-') + ')' : '否'}</div>
+                                </div>
+                            </div>
+                            ${historyHtml}
+                        `;
+                        document.getElementById('detail-modal').classList.add('active');
+                    }
+                });
+        }
+
+        function openReview(id) {
+            currentPrescriptionId = id;
+            document.getElementById('review-id').value = id;
+            document.getElementById('review-pharmacist').value = '';
+            document.getElementById('review-result').value = 'true';
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function submitReview() {
+            const pharmacist = document.getElementById('review-pharmacist').value.trim();
+            const approved = document.getElementById('review-result').value === 'true';
+
+            if (!pharmacist) {
+                showToast('请输入药师姓名', 'error');
+                return;
+            }
+
+            fetch('/api/prescriptions/' + currentPrescriptionId + '/review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pharmacist, approved })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(approved ? '复核通过' : '已拒绝');
+                    closeModal('review-modal');
+                    loadPrescriptions();
+                    loadStats();
+                } else {
+                    showToast(data.message || '操作失败', 'error');
+                }
+            });
+        }
+
+        function lockSales(id) {
+            fetch('/api/prescriptions/' + id + '/lock', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('销售已锁定');
+                        loadPrescriptions();
+                        loadStats();
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                });
+        }
+
+        function refundReview(id) {
+            fetch('/api/prescriptions/' + id + '/refund', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('退药审核已启动');
+                        loadPrescriptions();
+                        loadStats();
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                });
+        }
+
+        function desensitize(id) {
+            fetch('/api/prescriptions/' + id + '/desensitize', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('脱敏归档完成');
+                        loadPrescriptions();
+                        loadStats();
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                });
+        }
+
+        function exportPrescription(id) {
+            fetch('/api/prescriptions/' + id + '/export', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('监管导出完成');
+                        loadPrescriptions();
+                        loadStats();
+                    } else {
+                        showToast(data.message || '操作失败', 'error');
+                    }
+                });
+        }
+
+        function exportData() {
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        function confirmExport() {
+            const handler = document.getElementById('export-handler').value;
+            const startDate = document.getElementById('export-start').value;
+            const endDate = document.getElementById('export-end').value;
+
+            const params = new URLSearchParams();
+            if (handler) params.append('handler', handler);
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+
+            fetch('/api/export?' + params.toString())
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const csv = convertToCSV(data.data);
+                        downloadCSV(csv, '处方监管报告_' + new Date().toISOString().split('T')[0] + '.csv');
+                        showToast('导出成功');
+                        closeModal('export-modal');
+                    }
+                });
+        }
+
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            const headers = Object.keys(data[0]);
+            const csvRows = [headers.join(',')];
+            
+            for (const row of data) {
+                const values = headers.map(header => {
+                    const val = row[header];
+                    return '"' + String(val).replace(/"/g, '""') + '"';
+                });
+                csvRows.push(values.join(','));
+            }
+            
+            return csvRows.join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        function resetData() {
+            if (confirm('确定要重置所有数据吗？')) {
+                fetch('/api/reset', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('数据已重置');
+                            loadPrescriptions();
+                            loadStats();
+                        }
+                    });
+            }
+        }
+
+        loadStats();
+        loadPrescriptions();
+    </script>
+</body>
+</html>
