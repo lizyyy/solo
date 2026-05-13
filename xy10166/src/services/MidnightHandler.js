@@ -1,39 +1,70 @@
-const { addDays, format } = require('date-fns');
+const { format } = require('date-fns');
 
 class MidnightHandler {
+  static _isSpanningMidnightUTC(startTime, endTime) {
+    const startUTCDate = Date.UTC(
+      startTime.getUTCFullYear(),
+      startTime.getUTCMonth(),
+      startTime.getUTCDate()
+    );
+    const endUTCDate = Date.UTC(
+      endTime.getUTCFullYear(),
+      endTime.getUTCMonth(),
+      endTime.getUTCDate()
+    );
+    return startUTCDate !== endUTCDate;
+  }
+
+  static _getUTCMidnightAfter(date) {
+    const midnight = new Date(date);
+    midnight.setUTCHours(23, 59, 59, 999);
+    return midnight;
+  }
+
+  static _getNextUTCDayStart(date) {
+    const nextDay = new Date(date);
+    nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+    nextDay.setUTCHours(0, 0, 0, 0);
+    return nextDay;
+  }
+
+  static _formatUTCDate(date) {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   static splitMidnightAppointment(appointment) {
     const startTime = new Date(appointment.startTime);
     const endTime = new Date(appointment.endTime);
     
-    const startDate = startTime.toDateString();
-    const endDate = endTime.toDateString();
-    
-    if (startDate === endDate) {
-      return [appointment];
+    if (!this._isSpanningMidnightUTC(startTime, endTime)) {
+      return [{
+        ...appointment,
+        isSplit: false,
+        slotDate: this._formatUTCDate(startTime)
+      }];
     }
     
     const splitSlots = [];
     let currentStart = new Date(startTime);
     
     while (currentStart < endTime) {
-      const currentEnd = new Date(currentStart);
-      currentEnd.setHours(23, 59, 59, 999);
+      const currentEnd = this._getUTCMidnightAfter(currentStart);
       
-      if (currentEnd >= endTime) {
-        currentEnd.setTime(endTime.getTime());
-      }
+      const actualEnd = currentEnd < endTime ? currentEnd : endTime;
       
       splitSlots.push({
         ...appointment,
         startTime: new Date(currentStart),
-        endTime: new Date(currentEnd),
+        endTime: new Date(actualEnd),
         originalId: appointment.id,
         isSplit: true,
-        slotDate: format(currentStart, 'yyyy-MM-dd')
+        slotDate: this._formatUTCDate(currentStart)
       });
       
-      currentStart = addDays(currentStart, 1);
-      currentStart.setHours(0, 0, 0, 0);
+      currentStart = this._getNextUTCDayStart(currentStart);
     }
     
     return splitSlots;

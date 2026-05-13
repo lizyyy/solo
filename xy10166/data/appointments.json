@@ -10,8 +10,8 @@
     "equipmentId": null,
     "appointmentType": "regular",
     "description": "常规门诊",
-    "createdAt": "2026-05-13T04:51:50.634Z",
-    "updatedAt": "2026-05-13T04:51:50.634Z",
+    "createdAt": "2026-05-13T05:07:47.005Z",
+    "updatedAt": "2026-05-13T05:07:47.005Z",
     "spansMidnight": false
   },
   {
@@ -25,8 +25,8 @@
     "equipmentId": null,
     "appointmentType": "regular",
     "description": "常规门诊",
-    "createdAt": "2026-05-13T04:51:50.634Z",
-    "updatedAt": "2026-05-13T04:51:50.634Z",
+    "createdAt": "2026-05-13T05:07:47.005Z",
+    "updatedAt": "2026-05-13T05:07:47.005Z",
     "spansMidnight": false
   },
   {
@@ -40,8 +40,8 @@
     "equipmentId": "E001",
     "appointmentType": "examination",
     "description": "CT检查",
-    "createdAt": "2026-05-13T04:51:50.634Z",
-    "updatedAt": "2026-05-13T04:51:50.634Z",
+    "createdAt": "2026-05-13T05:07:47.005Z",
+    "updatedAt": "2026-05-13T05:07:47.005Z",
     "spansMidnight": false
   },
   {
@@ -55,8 +55,8 @@
     "equipmentId": null,
     "appointmentType": "regular",
     "description": "复诊",
-    "createdAt": "2026-05-13T04:51:50.634Z",
-    "updatedAt": "2026-05-13T04:51:50.634Z",
+    "createdAt": "2026-05-13T05:07:47.005Z",
+    "updatedAt": "2026-05-13T05:07:47.005Z",
     "spansMidnight": false
   },
   {
@@ -70,8 +70,8 @@
     "equipmentId": "E002",
     "appointmentType": "examination",
     "description": "心电图检查",
-    "createdAt": "2026-05-13T04:51:50.634Z",
-    "updatedAt": "2026-05-13T04:51:50.634Z",
+    "createdAt": "2026-05-13T05:07:47.005Z",
+    "updatedAt": "2026-05-13T05:07:47.005Z",
     "spansMidnight": false
   },
   {
@@ -85,8 +85,8 @@
     "equipmentId": null,
     "appointmentType": "emergency",
     "description": "临时加号 - 与张三、李四冲突",
-    "createdAt": "2026-05-13T04:52:12.184Z",
-    "updatedAt": "2026-05-13T04:52:12.184Z",
+    "createdAt": "2026-05-13T05:07:47.114Z",
+    "updatedAt": "2026-05-13T05:07:47.114Z",
     "spansMidnight": false
   },
   {
@@ -100,8 +100,8 @@
     "equipmentId": null,
     "appointmentType": "emergency",
     "description": "紧急加号 - 医生 D001 多重冲突",
-    "createdAt": "2026-05-13T04:52:12.184Z",
-    "updatedAt": "2026-05-13T04:52:12.184Z",
+    "createdAt": "2026-05-13T05:07:47.114Z",
+    "updatedAt": "2026-05-13T05:07:47.114Z",
     "spansMidnight": false
   },
   {
@@ -115,8 +115,8 @@
     "equipmentId": "E001",
     "appointmentType": "examination",
     "description": "与王五、赵六冲突（诊室+设备）",
-    "createdAt": "2026-05-13T04:52:12.184Z",
-    "updatedAt": "2026-05-13T04:52:12.184Z",
+    "createdAt": "2026-05-13T05:07:47.114Z",
+    "updatedAt": "2026-05-13T05:07:47.114Z",
     "spansMidnight": false
   },
   {
@@ -130,8 +130,8 @@
     "equipmentId": null,
     "appointmentType": "night_shift",
     "description": "跨午夜预约 - 夜间急诊处理",
-    "createdAt": "2026-05-13T04:52:12.184Z",
-    "updatedAt": "2026-05-13T04:52:12.184Z",
+    "createdAt": "2026-05-13T05:07:47.114Z",
+    "updatedAt": "2026-05-13T05:07:47.114Z",
     "spansMidnight": true
   },
   {
@@ -145,8 +145,8 @@
     "equipmentId": null,
     "appointmentType": "night_shift",
     "description": "跨午夜冲突 - 与郑十一重叠",
-    "createdAt": "2026-05-13T04:52:12.184Z",
-    "updatedAt": "2026-05-13T04:52:12.184Z",
+    "createdAt": "2026-05-13T05:07:47.114Z",
+    "updatedAt": "2026-05-13T05:07:47.114Z",
     "spansMidnight": true
   }
 ]

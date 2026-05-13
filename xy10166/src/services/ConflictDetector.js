@@ -24,6 +24,7 @@ class ConflictDetector {
       totalAppointments: 0,
       checkedAppointments: 0,
       midnightAppointments: 0,
+      includeMidnight,
       conflicts: [],
       statistics: {
         byType: {
@@ -214,7 +215,13 @@ class ConflictDetector {
   _generateResultMessage(result) {
     const totalConflicts = result.conflicts.length;
     if (totalConflicts === 0) {
-      return `检测完成：检查了 ${result.checkedAppointments} 个预约，未发现冲突`;
+      let msg = `检测完成：检查了 ${result.checkedAppointments} 个预约，未发现冲突`;
+      if (result.midnightAppointments > 0 && result.includeMidnight) {
+        msg += `（包含 ${result.midnightAppointments} 个跨午夜预约的自动拆分检测）`;
+      } else if (result.midnightAppointments > 0 && !result.includeMidnight) {
+        msg += `（注意：有 ${result.midnightAppointments} 个跨午夜预约未进行拆分检测）`;
+      }
+      return msg;
     }
     
     const high = result.statistics.bySeverity.high;
@@ -226,8 +233,10 @@ class ConflictDetector {
     if (medium > 0) msg += `（中等 ${medium}）`;
     if (low > 0) msg += `（轻微 ${low}）`;
     
-    if (result.midnightAppointments > 0) {
+    if (result.midnightAppointments > 0 && result.includeMidnight) {
       msg += `，其中 ${result.midnightAppointments} 个跨午夜预约已自动拆分检测`;
+    } else if (result.midnightAppointments > 0 && !result.includeMidnight) {
+      msg += `（注意：有 ${result.midnightAppointments} 个跨午夜预约未进行拆分检测）`;
     }
     
     return msg;
