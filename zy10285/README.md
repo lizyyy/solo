@@ -55,7 +55,7 @@
 
 ### 后端
 - Node.js + Express
-- SQLite (better-sqlite3)
+- SQLite (sqlite3)
 - Day.js (日期处理)
 - UUID (主键生成)
 

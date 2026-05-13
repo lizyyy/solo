@@ -305,12 +305,12 @@ function Dashboard() {
 
             {capacityCheck && !capacityCheck.available && (
               <div className="alert alert-error">
-                ⚠️ 产能预警：该时段负载已达 {capacityCheck.currentLoad}kg，新增 {capacityCheck.additionalLoad}kg 后将超出最大容量 {capacityCheck.max_capacity}kg
+                ⚠️ 产能预警：该时段负载已达 {capacityCheck.currentLoad}kg，新增 {capacityCheck.additionalLoad}kg 后将超出最大容量 {capacityCheck.maxCapacity}kg
               </div>
             )}
-            {capacityCheck && capacityCheck.available && capacityCheck.currentLoad / capacityCheck.max_capacity > 0.9 && (
+            {capacityCheck && capacityCheck.available && capacityCheck.currentLoad / capacityCheck.maxCapacity > 0.9 && (
               <div className="alert alert-warning">
-                ⚠️ 产能紧张：该时段当前负载 {capacityCheck.currentLoad}kg，使用率 {Math.round(capacityCheck.currentLoad / capacityCheck.max_capacity * 100)}%
+                ⚠️ 产能紧张：该时段当前负载 {capacityCheck.currentLoad}kg，使用率 {Math.round(capacityCheck.currentLoad / capacityCheck.maxCapacity * 100)}%
               </div>
             )}
 

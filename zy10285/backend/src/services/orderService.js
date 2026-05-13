@@ -344,12 +344,83 @@ function getOrderDetail(orderId, callback) {
   });
 }
 
+function checkSignTimeout(callback) {
+  const now = dayjs();
+  const timeoutHours = 4;
+  
+  db.all(`
+    SELECT o.*, sl.date as delivery_date, sl.end_time
+    FROM orders o
+    JOIN delivery_slots sl ON o.delivery_slot_id = sl.id
+    WHERE o.status = 'dispatched'
+  `, [], (err, orders) => {
+    if (err) return callback(err);
+    
+    const refundedOrders = [];
+    let processed = 0;
+    
+    if (orders.length === 0) return callback(null, refundedOrders);
+    
+    orders.forEach(order => {
+      const deadline = dayjs(`${order.delivery_date} ${order.end_time}`).add(timeoutHours, 'hour');
+      
+      if (now.isAfter(deadline)) {
+        refundOrder(order.id, '签收超时自动退款', (err) => {
+          if (!err) {
+            refundedOrders.push(order.id);
+          }
+          processed++;
+          if (processed === orders.length) {
+            callback(null, refundedOrders);
+          }
+        });
+      } else {
+        processed++;
+        if (processed === orders.length) {
+          callback(null, refundedOrders);
+        }
+      }
+    });
+  });
+}
+
+let timeoutCheckInterval = null;
+
+function startTimeoutCheck(intervalMinutes = 15) {
+  if (timeoutCheckInterval) {
+    clearInterval(timeoutCheckInterval);
+  }
+  
+  console.log(`签收超时检查已启动，每 ${intervalMinutes} 分钟扫描一次`);
+  
+  timeoutCheckInterval = setInterval(() => {
+    checkSignTimeout((err, refundedOrders) => {
+      if (err) {
+        console.error('签收超时检查失败:', err);
+      } else if (refundedOrders.length > 0) {
+        console.log(`[${dayjs().format('YYYY-MM-DD HH:mm:ss')}] 签收超时自动退款，共 ${refundedOrders.length} 个订单`);
+      }
+    });
+  }, intervalMinutes * 60 * 1000);
+}
+
+function stopTimeoutCheck() {
+  if (timeoutCheckInterval) {
+    clearInterval(timeoutCheckInterval);
+    timeoutCheckInterval = null;
+    console.log('签收超时检查已停止');
+  }
+}
+
 module.exports = {
   createOrder,
   confirmOrder,
   dispatchOrder,
   signOrder,
   refundOrder,
+  checkSignTimeout,
+  startTimeoutCheck,
+  stopTimeoutCheck,
   getOrders,
   getOrderDetail,
   checkCapacity,

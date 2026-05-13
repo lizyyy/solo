@@ -5,6 +5,7 @@ const path = require('path');
 const ordersRouter = require('./routes/orders');
 const customersRouter = require('./routes/customers');
 const commonRouter = require('./routes/common');
+const orderService = require('./services/orderService');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -32,4 +33,16 @@ app.listen(PORT, () => {
   console.log('  GET  /api/delivery-slots - 配送时段');
   console.log('  GET  /api/coolers - 保温箱列表');
   console.log('  GET  /api/capacity-alerts - 产能预警');
+  
+  orderService.startTimeoutCheck(15);
+});
+
+process.on('SIGTERM', () => {
+  orderService.stopTimeoutCheck();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  orderService.stopTimeoutCheck();
+  process.exit(0);
 });
