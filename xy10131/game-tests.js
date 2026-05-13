@@ -285,7 +285,7 @@ const GameTests = (function() {
         
         const patient3 = EmergencyTriageGame.addTestPatient('orange');
         EmergencyTriageGame.selectPatientForTriage(patient3.id);
-        EmergencyTriageGame.triagePatient('green');
+        EmergencyTriageGame.triagePatient('red');
         
         state = EmergencyTriageGame.getState();
         assertEqual(state.combo, 0, '错误分诊应该重置连击数');
