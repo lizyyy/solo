@@ -72,12 +72,19 @@ const createCabinet = (id, name, slotCount = 12) => {
   };
 };
 
-const createBattery = (status = BATTERY_STATUS.FULL, code = null) => {
+const createBattery = (status = BATTERY_STATUS.FULL, code = null, customSoc = null) => {
+  let soc;
+  if (customSoc !== null) {
+    soc = Math.min(100, Math.max(0, customSoc));
+  } else {
+    soc = status === BATTERY_STATUS.FULL ? 100 : status === BATTERY_STATUS.EMPTY ? 10 : Math.floor(Math.random() * 80) + 20;
+  }
+  
   return {
     id: uuidv4(),
     code: code || `BAT-${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
     status,
-    soc: status === BATTERY_STATUS.FULL ? 100 : status === BATTERY_STATUS.EMPTY ? 10 : Math.floor(Math.random() * 80) + 20,
+    soc,
     temperature: 25,
     health: 100,
     cycleCount: Math.floor(Math.random() * 100),

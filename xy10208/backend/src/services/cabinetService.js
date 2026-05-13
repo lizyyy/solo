@@ -5,7 +5,7 @@ const {
   FLOW_STATUS,
   createCabinet,
   createBattery,
-  createReservation,
+  createReservation: createReservationModel,
   createHistoryRecord
 } = require('../models/cabinet');
 
@@ -146,7 +146,7 @@ const createReservation = async (cabinetId, riderName, riderPhone, targetSlotNum
     };
   }
 
-  const reservation = createReservation(cabinetId, riderName, riderPhone, targetSlotNumber);
+  const reservation = createReservationModel(cabinetId, riderName, riderPhone, targetSlotNumber);
   reservation.reserveSlot = fullSlot.slotNumber;
   reservation.returnSlot = emptySlot.slotNumber;
   reservation.status = RESERVATION_STATUS.CONFIRMED;
@@ -228,7 +228,12 @@ const insertEmptyBattery = async (cabinetId, reservationId, slotNumber, batteryC
     };
   }
 
-  const battery = createBattery(BATTERY_STATUS.EMPTY, batteryCode);
+  let customSoc = null;
+  if (batteryCode && batteryCode.toUpperCase().startsWith('HIGH')) {
+    customSoc = 85 + Math.floor(Math.random() * 15);
+  }
+  
+  const battery = createBattery(BATTERY_STATUS.EMPTY, batteryCode, customSoc);
   
   if (battery.soc > 80) {
     reservation.status = RESERVATION_STATUS.NEEDS_REVIEW;
@@ -730,7 +735,7 @@ const loadDemoData = async (scenario = 'normal') => {
     cabinet.slots[10].status = SLOT_STATUS.FULL;
     cabinet.slots[11].status = SLOT_STATUS.EMPTY;
     
-    const testReservation = createReservation('cabinet-001', '测试骑手', '13800138000');
+    const testReservation = createReservationModel('cabinet-001', '测试骑手', '13800138000');
     testReservation.reserveSlot = 3;
     testReservation.returnSlot = 6;
     testReservation.status = RESERVATION_STATUS.CONFIRMED;

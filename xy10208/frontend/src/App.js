@@ -719,8 +719,8 @@ function App() {
               <div className="suggestion">
                 <h4>💡 提示</h4>
                 <p>
-                  正常流程：输入电量较低的电池编号<br/>
-                  <strong>触发拦截测试</strong>：输入 "HIGH" 或随机高电量电池（系统检测到电量 > 80% 会触发待复核）
+                  ✅ <strong>正常流程</strong>：输入普通电池编号（如 `BAT-001`、`TEST-123`），电量为 10%<br/>
+                  ⚠️ <strong>触发高电量拦截</strong>：输入以 <strong>HIGH</strong> 开头的编号（如 `HIGH-001`、`HIGHTEST`），强制电量 85-99%，触发待复核
                 </p>
               </div>
             </div>
