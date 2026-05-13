@@ -45,6 +45,9 @@ class MaintenanceService {
       if (!batch) {
         throw new Error(`备件批次不存在: ${part.batchNo}`);
       }
+      if (!Number.isInteger(part.quantity) || part.quantity <= 0) {
+        throw new Error(`请求数量不合法: ${part.batchNo}，数量必须为正整数`);
+      }
       if (batch.availableQuantity < part.quantity) {
         throw new Error(`备件库存不足: ${batch.partName} (${batch.batchNo})，可用: ${batch.availableQuantity}，请求: ${part.quantity}`);
       }
@@ -186,6 +189,10 @@ class MaintenanceService {
       const receipts = db.getReceiptRecordsByRequisition(requisition.id);
       if (receipts.length === 0) {
         throw new Error(`该备件尚未签收: ${replacement.batchNo}`);
+      }
+
+      if (!Number.isInteger(replacement.quantity) || replacement.quantity <= 0) {
+        throw new Error(`更换数量不合法: ${replacement.batchNo}，数量必须为正整数`);
       }
 
       if (replacement.quantity > requisition.quantity) {
