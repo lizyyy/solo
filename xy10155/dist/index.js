@@ -388,7 +388,13 @@ program
     .action(async (options) => {
     await handleError(async () => {
         const records = await storage.getHistory(options.start, options.end, options.env);
-        const limit = parseInt(options.limit, 10);
+        let limit;
+        try {
+            limit = (0, utils_1.parseNonNegativeInteger)(options.limit);
+        }
+        catch (e) {
+            (0, errors_1.exitWithError)(`无效的 limit 参数: "${options.limit}"，${e.message}`);
+        }
         const displayRecords = records.slice(0, limit);
         (0, ui_1.printHeader)(`变更历史 (${displayRecords.length}/${records.length} 条)`);
         if (records.length === 0) {
@@ -517,11 +523,12 @@ cacheCmd
         }
         let days;
         if (options.days !== undefined) {
-            const parsedDays = parseInt(options.days, 10);
-            if (isNaN(parsedDays) || parsedDays < 0) {
-                (0, errors_1.exitWithError)(`无效的天数: "${options.days}"，必须是非负整数`);
+            try {
+                days = (0, utils_1.parseNonNegativeInteger)(options.days);
             }
-            days = parsedDays;
+            catch (e) {
+                (0, errors_1.exitWithError)(`无效的天数: "${options.days}"，${e.message}`);
+            }
         }
         const config = await storage.getConfig();
         const info = await storage.getCacheInfo();
@@ -636,18 +643,20 @@ cacheCmd
         }
         const updates = {};
         if (options.snapshotRetention !== undefined) {
-            const days = parseInt(options.snapshotRetention, 10);
-            if (isNaN(days) || days < 0) {
-                (0, errors_1.exitWithError)('快照保留天数必须是非负整数');
+            try {
+                updates.snapshotRetentionDays = (0, utils_1.parseNonNegativeInteger)(options.snapshotRetention);
             }
-            updates.snapshotRetentionDays = days;
+            catch (e) {
+                (0, errors_1.exitWithError)(`无效的快照保留天数: "${options.snapshotRetention}"，${e.message}`);
+            }
         }
         if (options.historyRetention !== undefined) {
-            const days = parseInt(options.historyRetention, 10);
-            if (isNaN(days) || days < 0) {
-                (0, errors_1.exitWithError)('历史记录保留天数必须是非负整数');
+            try {
+                updates.historyRetentionDays = (0, utils_1.parseNonNegativeInteger)(options.historyRetention);
             }
-            updates.historyRetentionDays = days;
+            catch (e) {
+                (0, errors_1.exitWithError)(`无效的历史记录保留天数: "${options.historyRetention}"，${e.message}`);
+            }
         }
         if (options.autoInvalidate !== undefined) {
             const value = options.autoInvalidate.toLowerCase();

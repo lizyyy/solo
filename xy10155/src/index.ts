@@ -11,7 +11,8 @@ import {
   computeChanges,
   formatTimestamp,
   formatValue,
-  formatBytes
+  formatBytes,
+  parseNonNegativeInteger
 } from './utils';
 import {
   Environment,
@@ -463,7 +464,14 @@ program
   .action(async (options) => {
     await handleError(async () => {
       const records = await storage.getHistory(options.start, options.end, options.env);
-      const limit = parseInt(options.limit, 10);
+
+      let limit: number;
+      try {
+        limit = parseNonNegativeInteger(options.limit);
+      } catch (e: any) {
+        exitWithError(`无效的 limit 参数: "${options.limit}"，${e.message}`);
+      }
+
       const displayRecords = records.slice(0, limit);
 
       printHeader(`变更历史 (${displayRecords.length}/${records.length} 条)`);
@@ -612,11 +620,11 @@ cacheCmd
 
       let days: number | undefined;
       if (options.days !== undefined) {
-        const parsedDays = parseInt(options.days, 10);
-        if (isNaN(parsedDays) || parsedDays < 0) {
-          exitWithError(`无效的天数: "${options.days}"，必须是非负整数`);
+        try {
+          days = parseNonNegativeInteger(options.days);
+        } catch (e: any) {
+          exitWithError(`无效的天数: "${options.days}"，${e.message}`);
         }
-        days = parsedDays;
       }
 
       const config = await storage.getConfig();
@@ -741,18 +749,18 @@ cacheCmd
 
       const updates: any = {};
       if (options.snapshotRetention !== undefined) {
-        const days = parseInt(options.snapshotRetention, 10);
-        if (isNaN(days) || days < 0) {
-          exitWithError('快照保留天数必须是非负整数');
+        try {
+          updates.snapshotRetentionDays = parseNonNegativeInteger(options.snapshotRetention);
+        } catch (e: any) {
+          exitWithError(`无效的快照保留天数: "${options.snapshotRetention}"，${e.message}`);
         }
-        updates.snapshotRetentionDays = days;
       }
       if (options.historyRetention !== undefined) {
-        const days = parseInt(options.historyRetention, 10);
-        if (isNaN(days) || days < 0) {
-          exitWithError('历史记录保留天数必须是非负整数');
+        try {
+          updates.historyRetentionDays = parseNonNegativeInteger(options.historyRetention);
+        } catch (e: any) {
+          exitWithError(`无效的历史记录保留天数: "${options.historyRetention}"，${e.message}`);
         }
-        updates.historyRetentionDays = days;
       }
       if (options.autoInvalidate !== undefined) {
         const value = options.autoInvalidate.toLowerCase();

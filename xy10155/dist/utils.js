@@ -10,6 +10,7 @@ exports.compareConfigs = compareConfigs;
 exports.computeChanges = computeChanges;
 exports.formatValue = formatValue;
 exports.formatBytes = formatBytes;
+exports.parseNonNegativeInteger = parseNonNegativeInteger;
 const fs_extra_1 = __importDefault(require("fs-extra"));
 function generateId() {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -192,4 +193,18 @@ function formatBytes(bytes) {
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+function parseNonNegativeInteger(input) {
+    const trimmed = input.trim();
+    if (trimmed === '') {
+        throw new Error('输入不能为空');
+    }
+    if (!/^[0-9]+$/.test(trimmed)) {
+        throw new Error('必须是纯数字的非负整数');
+    }
+    const num = parseInt(trimmed, 10);
+    if (isNaN(num) || num < 0) {
+        throw new Error('必须是有效的非负整数');
+    }
+    return num;
 }

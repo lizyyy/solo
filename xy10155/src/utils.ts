@@ -203,3 +203,23 @@ export function formatBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+export function parseNonNegativeInteger(input: string): number {
+  const trimmed = input.trim();
+
+  if (trimmed === '') {
+    throw new Error('输入不能为空');
+  }
+
+  if (!/^[0-9]+$/.test(trimmed)) {
+    throw new Error('必须是纯数字的非负整数');
+  }
+
+  const num = parseInt(trimmed, 10);
+
+  if (isNaN(num) || num < 0) {
+    throw new Error('必须是有效的非负整数');
+  }
+
+  return num;
+}
