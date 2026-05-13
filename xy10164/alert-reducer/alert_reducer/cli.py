@@ -10,6 +10,7 @@ from alert_reducer.models import init_db, get_session, Alert, ProcessBatch, Fail
 from alert_reducer.importer import AlertImporter
 from alert_reducer.processor import AlertProcessor
 from alert_reducer.reporter import AlertReporter
+from alert_reducer.duty_manager import DutyManager
 
 
 def _parse_datetime(dt_str: str) -> datetime:
@@ -377,6 +378,159 @@ def batches(ctx, status, limit):
     
     headers = ['ID', '状态', '总数', '合并', '抑制', '升级', '开始时间', '错误']
     click.echo(tabulate(table_data, headers=headers, tablefmt='grid'))
+
+
+@cli.command('duty-start')
+@click.option('--name', '-n', required=True, help='值班人员姓名')
+@click.option('--shift', '-s', type=click.Choice(['day', 'night']), default='day', help='班次 (day/night)')
+@click.option('--date', '-d', help='值班日期 (格式: YYYY-MM-DD)')
+@click.pass_context
+def duty_start(ctx, name, shift, date):
+    """开始值班（创建值班记录）"""
+    session = ctx.obj['session']
+    duty_manager = DutyManager(session)
+    
+    # 解析日期
+    duty_date = _parse_datetime(date) if date else datetime.utcnow()
+    
+    click.echo(f"📋 创建值班记录...")
+    click.echo(f"  值班人员: {name}")
+    click.echo(f"  班次: {shift}")
+    click.echo(f"  日期: {duty_date.strftime('%Y-%m-%d')}")
+    
+    try:
+        duty = duty_manager.create_duty_record(
+            oncall_name=name,
+            shift=shift,
+            duty_date=duty_date
+        )
+        
+        click.echo(f"\n✅ 值班记录已创建 (ID: {duty.id})")
+        click.echo(f"  预计统计: 总告警 {duty.total_alerts}, 升级告警 {duty.escalated_alerts}")
+        
+    except Exception as e:
+        click.echo(f"❌ 创建值班记录失败: {e}")
+        sys.exit(1)
+
+
+@cli.command('duty-end')
+@click.option('--id', 'duty_id', type=int, help='值班记录ID')
+@click.option('--notes', '-n', help='值班备注')
+@click.pass_context
+def duty_end(ctx, duty_id, notes):
+    """结束值班（更新值班记录）"""
+    session = ctx.obj['session']
+    duty_manager = DutyManager(session)
+    
+    # 如果没有指定ID，获取当前值班
+    if not duty_id:
+        current_duty = duty_manager.get_current_duty()
+        if current_duty:
+            duty_id = current_duty.id
+            click.echo(f"📋 使用当前值班记录 (ID: {duty_id})")
+        else:
+            click.echo("❌ 未找到当前值班记录，请使用 --id 指定")
+            sys.exit(1)
+    
+    click.echo(f"📋 更新值班记录...")
+    
+    try:
+        # 先获取值班记录
+        from alert_reducer.models import DutyHistory
+        duty = session.query(DutyHistory).filter(DutyHistory.id == duty_id).first()
+        
+        if duty:
+            # 重新计算统计信息
+            stats = duty_manager._calculate_duty_stats(duty.duty_date, duty.shift)
+            duty.total_alerts = stats['total_alerts']
+            duty.escalated_alerts = stats['escalated_alerts']
+            session.commit()
+        
+        # 更新备注
+        updated = duty_manager.update_duty_record(
+            duty_id=duty_id,
+            notes=notes
+        )
+        
+        if updated:
+            click.echo(f"✅ 值班记录已更新 (ID: {updated.id})")
+            click.echo(f"  最终统计: 总告警 {updated.total_alerts}, 升级告警 {updated.escalated_alerts}")
+            if updated.notes:
+                click.echo(f"  备注: {updated.notes}")
+        else:
+            click.echo(f"❌ 未找到值班记录 (ID: {duty_id})")
+            sys.exit(1)
+            
+    except Exception as e:
+        click.echo(f"❌ 更新值班记录失败: {e}")
+        sys.exit(1)
+
+
+@cli.command('duty-history')
+@click.option('--name', '-n', help='按值班人员筛选')
+@click.option('--start', '-s', help='开始日期')
+@click.option('--end', '-e', help='结束日期')
+@click.option('--limit', '-l', type=int, default=50, help='限制返回数量')
+@click.pass_context
+def duty_history(ctx, name, start, end, limit):
+    """查看值班历史"""
+    session = ctx.obj['session']
+    duty_manager = DutyManager(session)
+    
+    # 解析时间
+    start_date = _parse_datetime(start) if start else None
+    end_date = _parse_datetime(end) if end else None
+    
+    duties = duty_manager.get_duty_history(
+        start_date=start_date,
+        end_date=end_date,
+        oncall_name=name,
+        limit=limit
+    )
+    
+    if not duties:
+        click.echo("📭 没有值班历史记录")
+        return
+    
+    table_data = []
+    for duty in duties:
+        table_data.append([
+            duty.id,
+            duty.oncall_name,
+            duty.shift,
+            duty.total_alerts,
+            duty.escalated_alerts,
+            duty.duty_date.strftime('%Y-%m-%d'),
+            duty.notes[:30] if duty.notes else '-'
+        ])
+    
+    headers = ['ID', '值班人员', '班次', '总告警', '升级告警', '日期', '备注']
+    click.echo(tabulate(table_data, headers=headers, tablefmt='grid'))
+    click.echo(f"\n📊 共 {len(duties)} 条值班记录")
+
+
+@cli.command('duty-current')
+@click.pass_context
+def duty_current(ctx):
+    """查看当前值班信息"""
+    session = ctx.obj['session']
+    duty_manager = DutyManager(session)
+    
+    current_duty = duty_manager.get_current_duty()
+    
+    if current_duty:
+        click.echo("📋 当前值班信息:")
+        click.echo(f"  ID: {current_duty.id}")
+        click.echo(f"  值班人员: {current_duty.oncall_name}")
+        click.echo(f"  班次: {current_duty.shift}")
+        click.echo(f"  日期: {current_duty.duty_date.strftime('%Y-%m-%d')}")
+        click.echo(f"  总告警: {current_duty.total_alerts}")
+        click.echo(f"  升级告警: {current_duty.escalated_alerts}")
+        if current_duty.notes:
+            click.echo(f"  备注: {current_duty.notes}")
+    else:
+        click.echo("⚠️  当前没有活动的值班记录")
+        click.echo("💡 使用 `alert-reducer duty-start --name <姓名>` 开始值班")
 
 
 def main():

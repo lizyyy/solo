@@ -124,12 +124,22 @@ class AlertMerger:
         # 按时间排序
         alerts.sort(key=lambda a: a.starts_at)
         
+        # 获取告警的优先级（取最高优先级）
+        severity_order = {'P1': 1, 'P2': 2, 'P3': 3, 'P4': 4, 'P5': 5, 'info': 6, 'debug': 7}
+        sorted_by_severity = sorted(alerts, key=lambda a: severity_order.get(a.severity, 99))
+        highest_severity = sorted_by_severity[0].severity if sorted_by_severity else None
+        
+        # 获取告警名称（使用第一个告警的名称）
+        alertname = alerts[0].alertname if alerts else None
+        
         # 创建合并告警
         merged = MergedAlert(
             merge_key=merge_key,
             alert_count=len(alerts),
             starts_at=alerts[0].starts_at,
             ends_at=alerts[-1].ends_at if alerts[-1].ends_at else None,
+            severity=highest_severity,
+            alertname=alertname,
             status='active',
             batch_id=batch_id
         )

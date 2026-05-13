@@ -129,8 +129,24 @@ class AlertProcessor:
             # 获取剩余未处理的告警
             remaining_alerts = [a for a in alerts if a.status == 'pending']
             
-            # 步骤2: 合并告警
-            merge_result = self.merger.merge_alerts(remaining_alerts, batch.id)
+            # 步骤2: 先对高优先级告警进行升级（防止被合并后丢失优先级信息）
+            # 高优先级告警（P1）应该先升级，而不是先合并
+            high_priority_alerts = [a for a in remaining_alerts if a.severity in ['P1']]
+            other_alerts = [a for a in remaining_alerts if a.severity not in ['P1']]
+            
+            # 升级高优先级单个告警
+            escalate_result_high = self.escalator.escalate_alerts(
+                alerts=high_priority_alerts,
+                merged_alerts=[],  # 此时还没有合并告警
+                batch_id=batch.id
+            )
+            stats['escalated'] += escalate_result_high['escalated_count']
+            
+            # 获取未被升级的其他告警
+            remaining_after_high = [a for a in other_alerts if a.status == 'pending']
+            
+            # 步骤3: 合并普通告警
+            merge_result = self.merger.merge_alerts(remaining_after_high, batch.id)
             stats['merged'] = merge_result['total_merged_alerts']
             
             # 获取合并后的告警
@@ -140,16 +156,24 @@ class AlertProcessor:
             )
             active_merged = [m for m in merged_alerts if m.status in ['active']]
             
-            # 获取仍然是单个的告警（未被合并也未被抑制）
-            single_alerts = [a for a in remaining_alerts if a.status == 'pending']
-            
-            # 步骤3: 升级告警
+            # 步骤4: 升级合并告警和剩余的单个告警
+            remaining_single = [a for a in remaining_after_high if a.status == 'pending']
             escalate_result = self.escalator.escalate_alerts(
-                alerts=single_alerts,
+                alerts=remaining_single,
                 merged_alerts=active_merged,
                 batch_id=batch.id
             )
-            stats['escalated'] = escalate_result['escalated_count']
+            stats['escalated'] += escalate_result['escalated_count']
+            
+            # 合并两次升级结果
+            combined_escalation_result = {
+                'escalated_count': stats['escalated'],
+                'escalated_alerts': escalate_result_high['escalated_alerts'] + escalate_result['escalated_alerts'],
+                'strategies_applied': {
+                    **escalate_result_high.get('strategies_applied', {}),
+                    **escalate_result.get('strategies_applied', {})
+                }
+            }
             
             # 完成批次
             self._complete_batch(batch, stats)
@@ -166,7 +190,7 @@ class AlertProcessor:
                 'details': {
                     'suppression': suppress_result,
                     'merge': merge_result,
-                    'escalation': escalate_result
+                    'escalation': combined_escalation_result
                 }
             }
             

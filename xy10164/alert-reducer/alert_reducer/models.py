@@ -47,6 +47,10 @@ class MergedAlert(Base):
     starts_at = Column(DateTime, nullable=False)
     ends_at = Column(DateTime)
     
+    # 告警信息（从合并的告警中提取）
+    severity = Column(String(50))  # 合并告警的优先级
+    alertname = Column(String(255))  # 合并告警的名称
+    
     # 状态
     status = Column(String(50), default="active")  # active, escalated, resolved
     is_escalated = Column(Boolean, default=False)

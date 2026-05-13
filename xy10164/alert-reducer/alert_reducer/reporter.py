@@ -327,25 +327,79 @@ class AlertReporter:
     def _get_escalated_alerts(self, start_time: datetime = None, 
                                end_time: datetime = None) -> List[Dict[str, Any]]:
         """获取升级的告警"""
-        query = self.session.query(EscalatedAlert)
+        # 获取所有升级记录，然后在内存中过滤
+        all_escalated = self.session.query(EscalatedAlert).order_by(
+            EscalatedAlert.created_at.desc()
+        ).all()
         
-        if start_time:
-            query = query.filter(EscalatedAlert.created_at >= start_time)
-        if end_time:
-            query = query.filter(EscalatedAlert.created_at <= end_time)
-        
-        escalated = query.order_by(EscalatedAlert.created_at.desc()).all()
+        # 如果没有时间范围，返回所有
+        if not start_time and not end_time:
+            escalated = all_escalated
+        else:
+            # 过滤时间范围
+            escalated = []
+            for e in all_escalated:
+                alert_time = None
+                
+                # 尝试获取关联告警的时间
+                if e.alert_id:
+                    alert = self.session.query(Alert).filter(Alert.id == e.alert_id).first()
+                    if alert:
+                        alert_time = alert.starts_at
+                elif e.merged_alert_id:
+                    merged = self.session.query(MergedAlert).filter(
+                        MergedAlert.id == e.merged_alert_id
+                    ).first()
+                    if merged:
+                        alert_time = merged.starts_at
+                
+                # 如果没有时间信息，使用创建时间
+                if not alert_time:
+                    alert_time = e.created_at
+                
+                # 检查时间范围
+                in_range = True
+                if start_time and alert_time < start_time:
+                    in_range = False
+                if end_time and alert_time > end_time:
+                    in_range = False
+                
+                if in_range:
+                    escalated.append(e)
         
         result = []
         for e in escalated:
-            alert = None
+            alertname = 'Unknown'
+            severity = 'N/A'
+            
+            # 优先尝试获取单个告警信息
             if e.alert_id:
                 alert = self.session.query(Alert).filter(Alert.id == e.alert_id).first()
+                if alert:
+                    alertname = alert.alertname
+                    severity = alert.severity
+            # 如果是合并告警，从合并告警表获取信息
+            elif e.merged_alert_id:
+                merged = self.session.query(MergedAlert).filter(
+                    MergedAlert.id == e.merged_alert_id
+                ).first()
+                if merged:
+                    alertname = merged.alertname or 'Merged Alert'
+                    severity = merged.severity or 'N/A'
+                    # 如果合并告警没有存储信息，尝试从关联的告警中获取
+                    if not alertname or alertname == 'Merged Alert':
+                        # 获取合并告警关联的第一个告警
+                        first_alert = self.session.query(Alert).filter(
+                            Alert.merged_alert_id == e.merged_alert_id
+                        ).first()
+                        if first_alert:
+                            alertname = first_alert.alertname
+                            severity = first_alert.severity
             
             result.append({
                 'id': e.id,
-                'alertname': alert.alertname if alert else 'Merged Alert',
-                'severity': alert.severity if alert else 'N/A',
+                'alertname': alertname,
+                'severity': severity,
                 'escalation_level': e.escalation_level,
                 'strategy_name': e.strategy_name,
                 'notify_list': e.notify_list,

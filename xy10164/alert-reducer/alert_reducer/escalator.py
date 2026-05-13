@@ -51,6 +51,11 @@ class AlertEscalator:
         
         # 处理合并告警
         if merged:
+            # 检查优先级（如果策略指定了优先级条件）
+            if 'severity' in conditions:
+                if not merged.severity or merged.severity != conditions['severity']:
+                    return result
+            
             # 检查合并数量
             if 'merged_count_gt' in conditions:
                 if merged.alert_count <= conditions['merged_count_gt']:
