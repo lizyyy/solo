@@ -1,34 +1,25 @@
+const crypto = require('crypto');
 const dayjs = require('dayjs');
 const { EXCEPTION_TYPES, TEMPERATURE_THRESHOLDS } = require('../models/types');
 const { isTemperatureInZone } = require('../utils/validation');
 
 const TEMPERATURE_GAP_THRESHOLD_MINUTES = 120;
 
+function generateExceptionFingerprint(exception) {
+  const evidenceStr = JSON.stringify(exception.evidence || {});
+  const fingerprint = `${exception.lotNumber}|${exception.type}|${evidenceStr}`;
+  return crypto.createHash('sha256').update(fingerprint).digest('hex').substring(0, 16);
+}
+
 class AnalysisService {
   constructor(dataStore) {
     this.dataStore = dataStore;
   }
   
-  runLotMatchingAnalysis(options = {}) {
+  buildLotMatchingExceptions() {
+    const exceptions = [];
     const inventory = this.dataStore.getInventory();
     const temperature = this.dataStore.getTemperature();
-    
-    const results = {
-      analysisTime: dayjs().toISOString(),
-      type: 'lot_matching',
-      matched: [],
-      unmatched: [],
-      partialMatch: [],
-      exceptions: [],
-      stats: {
-        totalLots: inventory.lots.length,
-        lotsWithTemperature: 0,
-        lotsWithoutTemperature: 0,
-        matchedLots: 0,
-        unmatchedLots: 0,
-        temperatureRecordsCount: temperature.records.length
-      }
-    };
     
     const tempRecordMap = new Map();
     for (const record of temperature.records) {
@@ -41,23 +32,8 @@ class AnalysisService {
     for (const lot of inventory.lots) {
       const lotRecords = tempRecordMap.get(lot.lotNumber) || [];
       
-      const lotResult = {
-        lotNumber: lot.lotNumber,
-        productName: lot.productName,
-        wmsZone: lot.zone,
-        wmsQuantity: lot.quantity,
-        temperatureRecordsCount: lotRecords.length,
-        zonesFromTemperature: [],
-        zoneConflict: false,
-        matchStatus: 'unknown'
-      };
-      
       if (lotRecords.length === 0) {
-        results.stats.lotsWithoutTemperature++;
-        lotResult.matchStatus = 'unmatched';
-        results.unmatched.push(lotResult);
-        
-        results.exceptions.push(this.dataStore.addException({
+        exceptions.push({
           type: EXCEPTION_TYPES.MISSING_LOT,
           lotNumber: lot.lotNumber,
           severity: 'medium',
@@ -70,24 +46,14 @@ class AnalysisService {
               productName: lot.productName
             }
           }
-        }));
+        });
       } else {
-        results.stats.lotsWithTemperature++;
-        
         const zones = [...new Set(lotRecords.map(r => r.zone))];
-        lotResult.zonesFromTemperature = zones;
         
         if (zones.length === 1 && zones[0] === lot.zone) {
-          lotResult.matchStatus = 'matched';
-          results.stats.matchedLots++;
-          results.matched.push(lotResult);
+          continue;
         } else if (zones.includes(lot.zone)) {
-          lotResult.matchStatus = 'partial';
-          lotResult.zoneConflict = true;
-          results.partialMatch.push(lotResult);
-          results.stats.lotsWithoutTemperature++;
-          
-          results.exceptions.push(this.dataStore.addException({
+          exceptions.push({
             type: EXCEPTION_TYPES.LOT_MISMATCH,
             lotNumber: lot.lotNumber,
             severity: 'high',
@@ -98,14 +64,9 @@ class AnalysisService {
               tempZones: zones,
               temperatureRecords: lotRecords.length
             }
-          }));
+          });
         } else {
-          lotResult.matchStatus = 'unmatched';
-          lotResult.zoneConflict = true;
-          results.unmatched.push(lotResult);
-          results.stats.unmatchedLots++;
-          
-          results.exceptions.push(this.dataStore.addException({
+          exceptions.push({
             type: EXCEPTION_TYPES.LOT_MISMATCH,
             lotNumber: lot.lotNumber,
             severity: 'critical',
@@ -115,7 +76,7 @@ class AnalysisService {
               wmsZone: lot.zone,
               tempZones: zones
             }
-          }));
+          });
         }
       }
     }
@@ -125,7 +86,7 @@ class AnalysisService {
     
     for (const tempLot of allTempLotNumbers) {
       if (!wmsLotNumbers.has(tempLot)) {
-        results.exceptions.push(this.dataStore.addException({
+        exceptions.push({
           type: EXCEPTION_TYPES.LOT_MISMATCH,
           lotNumber: tempLot,
           severity: 'medium',
@@ -134,30 +95,17 @@ class AnalysisService {
           evidence: {
             source: 'temperature_log'
           }
-        }));
+        });
       }
     }
     
-    return results;
+    return exceptions;
   }
   
-  runTemperatureBreakAnalysis(options = {}) {
+  buildTemperatureBreakExceptions() {
+    const exceptions = [];
     const inventory = this.dataStore.getInventory();
     const temperature = this.dataStore.getTemperature();
-    
-    const results = {
-      analysisTime: dayjs().toISOString(),
-      type: 'temperature_break',
-      gaps: [],
-      outOfRange: [],
-      exceptions: [],
-      stats: {
-        totalRecords: temperature.records.length,
-        lotsAnalyzed: 0,
-        gapsFound: 0,
-        outOfRangeFound: 0
-      }
-    };
     
     const tempByLot = new Map();
     for (const record of temperature.records) {
@@ -168,8 +116,6 @@ class AnalysisService {
     }
     
     for (const [lotNumber, records] of tempByLot) {
-      results.stats.lotsAnalyzed++;
-      
       records.sort((a, b) => dayjs(a.recordTime).valueOf() - dayjs(b.recordTime).valueOf());
       
       for (let i = 1; i < records.length; i++) {
@@ -178,26 +124,13 @@ class AnalysisService {
         const gapMinutes = dayjs(curr.recordTime).diff(dayjs(prev.recordTime), 'minute');
         
         if (gapMinutes > TEMPERATURE_GAP_THRESHOLD_MINUTES) {
-          const gapInfo = {
-            lotNumber,
-            previousRecordTime: prev.recordTime,
-            currentRecordTime: curr.recordTime,
-            gapMinutes,
-            previousZone: prev.zone,
-            currentZone: curr.zone,
-            zoneChanged: prev.zone !== curr.zone
-          };
-          
-          results.gaps.push(gapInfo);
-          results.stats.gapsFound++;
-          
           let severity = 'medium';
           let reason = `批号 ${lotNumber} 存在 ${gapMinutes} 分钟的温度记录断点`;
           
           if (gapMinutes > 360) {
             severity = 'high';
           }
-          if (gapInfo.zoneChanged) {
+          if (prev.zone !== curr.zone) {
             severity = 'high';
             reason += `，并伴随跨温区移动 (${prev.zone} -> ${curr.zone})`;
           }
@@ -205,7 +138,7 @@ class AnalysisService {
             severity = 'critical';
           }
           
-          results.exceptions.push(this.dataStore.addException({
+          exceptions.push({
             type: EXCEPTION_TYPES.TEMPERATURE_BREAK,
             lotNumber,
             severity,
@@ -224,35 +157,24 @@ class AnalysisService {
                 temperature: curr.temperature
               }
             }
-          }));
+          });
         }
       }
       
       for (const record of records) {
         const tempValidation = isTemperatureInZone(record.temperature, record.zone);
         if (!tempValidation.valid) {
-          const outOfRangeInfo = {
-            lotNumber,
-            zone: record.zone,
-            temperature: record.temperature,
-            recordTime: record.recordTime,
-            threshold: TEMPERATURE_THRESHOLDS[record.zone]
-          };
-          
-          results.outOfRange.push(outOfRangeInfo);
-          results.stats.outOfRangeFound++;
-          
           const lot = this.dataStore.findLotByNumber(lotNumber);
-          let severity = 'medium';
           const range = TEMPERATURE_THRESHOLDS[record.zone];
           const deviation = record.temperature < range.min 
             ? range.min - record.temperature
             : record.temperature - range.max;
           
+          let severity = 'medium';
           if (deviation > 5) severity = 'high';
           if (deviation > 10) severity = 'critical';
           
-          results.exceptions.push(this.dataStore.addException({
+          exceptions.push({
             type: EXCEPTION_TYPES.TEMPERATURE_OUT_OF_RANGE,
             lotNumber,
             severity,
@@ -266,63 +188,32 @@ class AnalysisService {
               recordTime: record.recordTime,
               wmsZone: lot?.zone
             }
-          }));
+          });
         }
       }
     }
     
-    return results;
+    return exceptions;
   }
   
-  runInventoryDifferenceAnalysis(options = {}) {
+  buildInventoryDifferenceExceptions() {
+    const exceptions = [];
     const inventory = this.dataStore.getInventory();
-    
-    const results = {
-      analysisTime: dayjs().toISOString(),
-      type: 'inventory_difference',
-      differences: [],
-      zoneMismatches: [],
-      exceptions: [],
-      stats: {
-        totalLots: inventory.lots.length,
-        lotsWithCount: 0,
-        lotsWithoutCount: 0,
-        quantityDifferences: 0,
-        zoneMismatches: 0
-      }
-    };
     
     for (const lot of inventory.lots) {
       if (!lot.lastCounted) {
-        results.stats.lotsWithoutCount++;
         continue;
       }
-      
-      results.stats.lotsWithCount++;
       
       const quantityDiff = lot.lastCounted.quantity - lot.quantity;
       const zoneDiff = lot.lastCounted.zone !== lot.zone;
       
       if (quantityDiff !== 0) {
-        results.stats.quantityDifferences++;
-        const diffInfo = {
-          lotNumber: lot.lotNumber,
-          productName: lot.productName,
-          wmsQuantity: lot.quantity,
-          countedQuantity: lot.lastCounted.quantity,
-          difference: quantityDiff,
-          differencePercentage: ((quantityDiff / lot.quantity) * 100).toFixed(2),
-          countedBy: lot.lastCounted.countedBy,
-          countedAt: lot.lastCounted.countedAt
-        };
-        
-        results.differences.push(diffInfo);
-        
         let severity = 'medium';
         if (Math.abs(quantityDiff) > lot.quantity * 0.2) severity = 'high';
         if (Math.abs(quantityDiff) > lot.quantity * 0.5) severity = 'critical';
         
-        results.exceptions.push(this.dataStore.addException({
+        exceptions.push({
           type: EXCEPTION_TYPES.QUANTITY_DIFFERENCE,
           lotNumber: lot.lotNumber,
           severity,
@@ -335,23 +226,11 @@ class AnalysisService {
             countedBy: lot.lastCounted.countedBy,
             countedAt: lot.lastCounted.countedAt
           }
-        }));
+        });
       }
       
       if (zoneDiff) {
-        results.stats.zoneMismatches++;
-        const mismatchInfo = {
-          lotNumber: lot.lotNumber,
-          productName: lot.productName,
-          wmsZone: lot.zone,
-          countedZone: lot.lastCounted.zone,
-          countedBy: lot.lastCounted.countedBy,
-          countedAt: lot.lastCounted.countedAt
-        };
-        
-        results.zoneMismatches.push(mismatchInfo);
-        
-        results.exceptions.push(this.dataStore.addException({
+        exceptions.push({
           type: EXCEPTION_TYPES.CROSS_ZONE_MOVEMENT,
           lotNumber: lot.lotNumber,
           severity: 'high',
@@ -363,11 +242,238 @@ class AnalysisService {
             countedBy: lot.lastCounted.countedBy,
             countedAt: lot.lastCounted.countedAt
           }
-        }));
+        });
+      }
+    }
+    
+    return exceptions;
+  }
+  
+  updateExceptionLedger(options = {}) {
+    const allExceptions = this.dataStore.getExceptions();
+    const now = dayjs().toISOString();
+    
+    const newExceptionsRaw = [
+      ...this.buildLotMatchingExceptions(),
+      ...this.buildTemperatureBreakExceptions(),
+      ...this.buildInventoryDifferenceExceptions()
+    ];
+    
+    const newFingerprints = new Map();
+    for (const ex of newExceptionsRaw) {
+      const fp = generateExceptionFingerprint(ex);
+      newFingerprints.set(fp, ex);
+    }
+    
+    const existingByFingerprint = new Map();
+    for (const ex of allExceptions.records) {
+      if (ex.fingerprint) {
+        existingByFingerprint.set(ex.fingerprint, ex);
+      }
+    }
+    
+    let newExceptions = 0;
+    let unchangedExceptions = 0;
+    let supercededExceptions = 0;
+    
+    for (const ex of allExceptions.records) {
+      if (ex.status === 'resolved') {
+        continue;
+      }
+      
+      const hasMatchingNew = ex.fingerprint && newFingerprints.has(ex.fingerprint);
+      
+      if (!hasMatchingNew) {
+        ex.status = 'superseded';
+        ex.supersededAt = now;
+        ex.supersededReason = 'new_analysis';
+        supercededExceptions++;
+      } else {
+        unchangedExceptions++;
+      }
+    }
+    
+    for (const [fp, rawEx] of newFingerprints) {
+      if (!existingByFingerprint.has(fp)) {
+        const newRecord = {
+          id: require('uuid').v4(),
+          timestamp: now,
+          status: 'open',
+          fingerprint: fp,
+          firstDetectedAt: now,
+          ...rawEx
+        };
+        allExceptions.records.push(newRecord);
+        newExceptions++;
+      }
+    }
+    
+    this.dataStore.saveExceptions(allExceptions);
+    
+    return {
+      updatedAt: now,
+      newExceptions,
+      unchangedExceptions,
+      supercededExceptions,
+      totalOpen: allExceptions.records.filter(e => e.status === 'open').length,
+      totalResolved: allExceptions.records.filter(e => e.status === 'resolved').length,
+      totalSuperseded: allExceptions.records.filter(e => e.status === 'superseded').length
+    };
+  }
+  
+  runLotMatchingAnalysis(options = {}) {
+    const inventory = this.dataStore.getInventory();
+    const temperature = this.dataStore.getTemperature();
+    const exceptions = this.buildLotMatchingExceptions();
+    
+    const tempRecordMap = new Map();
+    for (const record of temperature.records) {
+      if (!tempRecordMap.has(record.lotNumber)) {
+        tempRecordMap.set(record.lotNumber, []);
+      }
+      tempRecordMap.get(record.lotNumber).push(record);
+    }
+    
+    const results = {
+      analysisTime: dayjs().toISOString(),
+      type: 'lot_matching',
+      matched: [],
+      unmatched: [],
+      partialMatch: [],
+      detectedExceptions: exceptions,
+      stats: {
+        totalLots: inventory.lots.length,
+        lotsWithTemperature: 0,
+        lotsWithoutTemperature: 0,
+        matchedLots: 0,
+        unmatchedLots: 0,
+        temperatureRecordsCount: temperature.records.length
+      }
+    };
+    
+    for (const lot of inventory.lots) {
+      const lotRecords = tempRecordMap.get(lot.lotNumber) || [];
+      const zones = [...new Set(lotRecords.map(r => r.zone))];
+      
+      const lotResult = {
+        lotNumber: lot.lotNumber,
+        productName: lot.productName,
+        wmsZone: lot.zone,
+        wmsQuantity: lot.quantity,
+        temperatureRecordsCount: lotRecords.length,
+        zonesFromTemperature: zones,
+        zoneConflict: zones.length > 1 || (zones.length === 1 && zones[0] !== lot.zone),
+        matchStatus: 'unknown'
+      };
+      
+      if (lotRecords.length === 0) {
+        results.stats.lotsWithoutTemperature++;
+        lotResult.matchStatus = 'unmatched';
+        results.unmatched.push(lotResult);
+      } else if (zones.length === 1 && zones[0] === lot.zone) {
+        results.stats.lotsWithTemperature++;
+        results.stats.matchedLots++;
+        lotResult.matchStatus = 'matched';
+        results.matched.push(lotResult);
+      } else if (zones.includes(lot.zone)) {
+        results.stats.lotsWithTemperature++;
+        lotResult.matchStatus = 'partial';
+        results.partialMatch.push(lotResult);
+      } else {
+        results.stats.lotsWithTemperature++;
+        results.stats.unmatchedLots++;
+        lotResult.matchStatus = 'unmatched';
+        results.unmatched.push(lotResult);
       }
     }
     
     return results;
+  }
+  
+  runTemperatureBreakAnalysis(options = {}) {
+    const temperature = this.dataStore.getTemperature();
+    const exceptions = this.buildTemperatureBreakExceptions();
+    
+    const gaps = exceptions.filter(e => e.type === EXCEPTION_TYPES.TEMPERATURE_BREAK);
+    const outOfRange = exceptions.filter(e => e.type === EXCEPTION_TYPES.TEMPERATURE_OUT_OF_RANGE);
+    
+    const tempByLot = new Map();
+    for (const record of temperature.records) {
+      if (!tempByLot.has(record.lotNumber)) {
+        tempByLot.set(record.lotNumber, []);
+      }
+      tempByLot.get(record.lotNumber).push(record);
+    }
+    
+    return {
+      analysisTime: dayjs().toISOString(),
+      type: 'temperature_break',
+      gaps: gaps.map(g => ({
+        lotNumber: g.lotNumber,
+        previousRecordTime: g.evidence?.previousRecord?.time,
+        currentRecordTime: g.evidence?.currentRecord?.time,
+        gapMinutes: g.evidence?.gapMinutes,
+        previousZone: g.evidence?.previousRecord?.zone,
+        currentZone: g.evidence?.currentRecord?.zone,
+        zoneChanged: g.evidence?.previousRecord?.zone !== g.evidence?.currentRecord?.zone
+      })),
+      outOfRange: outOfRange.map(o => ({
+        lotNumber: o.lotNumber,
+        zone: o.evidence?.zone,
+        temperature: o.evidence?.temperature,
+        recordTime: o.evidence?.recordTime,
+        threshold: o.evidence?.threshold
+      })),
+      detectedExceptions: exceptions,
+      stats: {
+        totalRecords: temperature.records.length,
+        lotsAnalyzed: tempByLot.size,
+        gapsFound: gaps.length,
+        outOfRangeFound: outOfRange.length
+      }
+    };
+  }
+  
+  runInventoryDifferenceAnalysis(options = {}) {
+    const inventory = this.dataStore.getInventory();
+    const exceptions = this.buildInventoryDifferenceExceptions();
+    
+    const differences = exceptions.filter(e => e.type === EXCEPTION_TYPES.QUANTITY_DIFFERENCE);
+    const zoneMismatches = exceptions.filter(e => e.type === EXCEPTION_TYPES.CROSS_ZONE_MOVEMENT);
+    
+    let lotsWithCount = 0;
+    for (const lot of inventory.lots) {
+      if (lot.lastCounted) lotsWithCount++;
+    }
+    
+    return {
+      analysisTime: dayjs().toISOString(),
+      type: 'inventory_difference',
+      differences: differences.map(d => ({
+        lotNumber: d.lotNumber,
+        wmsQuantity: d.evidence?.wmsQuantity,
+        countedQuantity: d.evidence?.countedQuantity,
+        difference: d.evidence?.difference,
+        differencePercentage: ((d.evidence?.difference / d.evidence?.wmsQuantity) * 100).toFixed(2),
+        countedBy: d.evidence?.countedBy,
+        countedAt: d.evidence?.countedAt
+      })),
+      zoneMismatches: zoneMismatches.map(z => ({
+        lotNumber: z.lotNumber,
+        wmsZone: z.evidence?.wmsZone,
+        countedZone: z.evidence?.countedZone,
+        countedBy: z.evidence?.countedBy,
+        countedAt: z.evidence?.countedAt
+      })),
+      detectedExceptions: exceptions,
+      stats: {
+        totalLots: inventory.lots.length,
+        lotsWithCount,
+        lotsWithoutCount: inventory.lots.length - lotsWithCount,
+        quantityDifferences: differences.length,
+        zoneMismatches: zoneMismatches.length
+      }
+    };
   }
   
   runFullAnalysis(options = {}) {
@@ -375,16 +481,23 @@ class AnalysisService {
     const temperatureBreak = this.runTemperatureBreakAnalysis(options);
     const inventoryDiff = this.runInventoryDifferenceAnalysis(options);
     
-    const openExceptions = this.dataStore.getOpenExceptions();
+    const ledgerUpdate = this.updateExceptionLedger(options);
+    
+    const allExceptions = this.dataStore.getExceptions();
+    const openExceptions = allExceptions.records.filter(e => e.status === 'open');
     
     return {
       analysisTime: dayjs().toISOString(),
+      ledgerUpdate,
       lotMatching,
       temperatureBreak,
       inventoryDiff,
       openExceptions,
       summary: {
-        totalExceptions: openExceptions.length,
+        totalExceptions: allExceptions.records.length,
+        totalOpen: openExceptions.length,
+        totalResolved: allExceptions.records.filter(e => e.status === 'resolved').length,
+        totalSuperseded: allExceptions.records.filter(e => e.status === 'superseded').length,
         critical: openExceptions.filter(e => e.severity === 'critical').length,
         high: openExceptions.filter(e => e.severity === 'high').length,
         medium: openExceptions.filter(e => e.severity === 'medium').length,

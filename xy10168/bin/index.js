@@ -359,11 +359,25 @@ function printInventoryAnalysisResult(result) {
 
 function printFullAnalysisResult(result) {
   console.log(chalk.green('\n综合分析结果:'));
-  console.log(`\n  异常总数: ${result.summary.totalExceptions}`);
-  console.log(`    Critical: ${chalk.red(result.summary.critical)}`);
-  console.log(`    High: ${chalk.yellow(result.summary.high)}`);
-  console.log(`    Medium: ${chalk.blue(result.summary.medium)}`);
-  console.log(`    Low: ${chalk.gray(result.summary.low)}`);
+  
+  console.log(chalk.blue('\n  异常台账更新:'));
+  console.log(`    新增: ${result.ledgerUpdate.newExceptions}`);
+  console.log(`    保持不变: ${result.ledgerUpdate.unchangedExceptions}`);
+  console.log(`    已被取代: ${result.ledgerUpdate.supercededExceptions}`);
+  
+  console.log('\n  当前异常状态:');
+  console.log(`    待处理 (Open): ${chalk.red(result.summary.totalOpen)}`);
+  console.log(`    已解决 (Resolved): ${chalk.green(result.summary.totalResolved)}`);
+  console.log(`    已过时 (Superseded): ${chalk.gray(result.summary.totalSuperseded)}`);
+  console.log(`    历史总数: ${result.summary.totalExceptions}`);
+  
+  if (result.summary.totalOpen > 0) {
+    console.log(`\n  严重度分布 (Open):`);
+    console.log(`    Critical: ${chalk.red(result.summary.critical)}`);
+    console.log(`    High: ${chalk.yellow(result.summary.high)}`);
+    console.log(`    Medium: ${chalk.blue(result.summary.medium)}`);
+    console.log(`    Low: ${chalk.gray(result.summary.low)}`);
+  }
   
   console.log('\n  批号匹配:');
   console.log(`    总批号: ${result.lotMatching.stats.totalLots}`);
@@ -378,5 +392,35 @@ function printFullAnalysisResult(result) {
   console.log(`    数量差异: ${result.inventoryDiff.stats.quantityDifferences}`);
   console.log(`    温区不匹配: ${result.inventoryDiff.stats.zoneMismatches}`);
 }
+
+program
+  .command('reset')
+  .description('重置数据（危险操作）')
+  .option('-t, --type <type>', '重置类型: all|exceptions', 'exceptions')
+  .option('-y, --yes', '确认执行，跳过提示')
+  .action((options) => {
+    try {
+      initServices();
+      
+      if (!options.yes) {
+        console.log(chalk.yellow('\n⚠️  危险操作：此命令将清除数据'));
+        console.log(`   类型: ${options.type}`);
+        console.log(chalk.gray('   使用 -y 参数跳过此提示'));
+        console.log(chalk.gray('\n   例如: node bin/index.js reset -t all -y'));
+        process.exit(0);
+      }
+      
+      if (options.type === 'all') {
+        dataStore.resetAllData();
+        console.log(chalk.green('\n✅ 已重置所有数据（库存、温度、异常、导入历史）'));
+      } else {
+        dataStore.resetExceptions();
+        console.log(chalk.green('\n✅ 已重置异常台账'));
+      }
+    } catch (error) {
+      console.error(chalk.red(`错误: ${error.message}`));
+      process.exit(1);
+    }
+  });
 
 program.parseAsync(process.argv);

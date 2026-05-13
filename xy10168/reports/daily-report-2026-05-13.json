@@ -1,27 +1,27 @@
 {
-  "reportId": "RPT-20260509230624",
-  "reportDate": "2026-05-09",
-  "generatedAt": "2026-05-09T15:06:24.398Z",
+  "reportId": "RPT-20260513115938",
+  "reportDate": "2026-05-13",
+  "generatedAt": "2026-05-13T04:59:38.843Z",
   "summary": {
-    "totalLots": 6,
+    "totalLots": 5,
     "totalTemperatureRecords": 10,
-    "totalExceptions": 21,
-    "openExceptions": 21,
-    "importCountToday": 4
+    "totalExceptions": 9,
+    "openExceptions": 9,
+    "importCountToday": 3
   },
   "inventoryOverview": {
     "byZone": {
       "冷冻区": {
         "lotCount": 2,
-        "totalQuantity": 55,
-        "lotsPendingCount": 2,
-        "lotsWithDifference": 0
+        "totalQuantity": 80,
+        "lotsPendingCount": 1,
+        "lotsWithDifference": 1
       },
       "冷藏区": {
-        "lotCount": 2,
-        "totalQuantity": 180,
+        "lotCount": 1,
+        "totalQuantity": 100,
         "lotsPendingCount": 0,
-        "lotsWithDifference": 2
+        "lotsWithDifference": 0
       },
       "保鲜区": {
         "lotCount": 1,
@@ -36,7 +36,7 @@
         "lotsWithDifference": 0
       }
     },
-    "totalCrossZoneMovements": 1,
+    "totalCrossZoneMovements": 0,
     "lotsWithHistory": 4
   },
   "temperatureOverview": {
@@ -48,28 +48,28 @@
   },
   "exceptionsOverview": {
     "byType": {
-      "批号不匹配": 2,
-      "批号缺失": 3,
-      "温度断点": 6,
-      "温度超标": 2,
-      "数量差异": 5,
-      "跨温区移动": 3
+      "批号不匹配": 1,
+      "批号缺失": 1,
+      "温度断点": 3,
+      "温度超标": 1,
+      "数量差异": 2,
+      "跨温区移动": 1
     },
     "bySeverity": {
       "critical": 0,
-      "high": 8,
-      "medium": 13,
+      "high": 3,
+      "medium": 6,
       "low": 0
     },
-    "open": 21,
+    "open": 9,
     "resolved": 0,
     "resolutionRate": "0.0"
   },
   "importAuditTrail": {
-    "totalImports": 4,
+    "totalImports": 3,
     "imports": [
       {
-        "timestamp": "2026-05-09T15:04:52.756Z",
+        "timestamp": "2026-05-13T04:59:37.995Z",
         "type": "inventory",
         "fileName": "inventory.csv",
         "totalRows": 5,
@@ -77,7 +77,7 @@
         "errorCount": 0
       },
       {
-        "timestamp": "2026-05-09T15:05:07.491Z",
+        "timestamp": "2026-05-13T04:59:38.101Z",
         "type": "temperature",
         "fileName": "temperature.csv",
         "totalRows": 10,
@@ -85,19 +85,11 @@
         "errorCount": 0
       },
       {
-        "timestamp": "2026-05-09T15:05:14.679Z",
+        "timestamp": "2026-05-13T04:59:38.206Z",
         "type": "manualCount",
         "fileName": "manual_count.csv",
         "totalRows": 4,
         "successCount": 4,
-        "errorCount": 0
-      },
-      {
-        "timestamp": "2026-05-09T15:05:59.002Z",
-        "type": "inventory",
-        "fileName": "inventory-update.csv",
-        "totalRows": 3,
-        "successCount": 1,
         "errorCount": 0
       }
     ]

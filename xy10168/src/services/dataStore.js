@@ -163,6 +163,19 @@ class DataStore {
     const exceptions = this.getExceptions();
     return exceptions.records.filter(e => e.status === 'open');
   }
+  
+  resetExceptions() {
+    writeJSON(this.exceptionsFile, { records: [] });
+  }
+  
+  resetAllData() {
+    writeJSON(this.inventoryFile, { lots: [], crossZoneMovements: [] });
+    writeJSON(this.temperatureFile, { records: [] });
+    writeJSON(this.exceptionsFile, { records: [] });
+    if (fs.existsSync(this.importHistoryFile)) {
+      fs.unlinkSync(this.importHistoryFile);
+    }
+  }
 }
 
 module.exports = DataStore;

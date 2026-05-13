@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node bin/index.js",
-    "test": "node tests/run-tests.js"
+    "test": "node tests/run-tests.js",
+    "reset": "node bin/index.js reset -t all -y"
   },
   "keywords": ["cold-storage", "inventory", "cli"],
   "author": "",

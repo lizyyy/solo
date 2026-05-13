@@ -172,9 +172,42 @@ node bin/index.js exceptions -s all
 # 查看已处理异常
 node bin/index.js exceptions -s resolved
 
-# 处理异常
+# 查看已被新分析取代的旧异常
+node bin/index.js exceptions -s superseded
+
+# 处理异常（标记为 resolved）
 node bin/index.js resolve-exception <id> <处理人> <处理方式> [-n 备注]
 ```
+
+**异常去重机制说明**：
+
+每次执行 `analyze` 命令时：
+1. 基于「批号 + 异常类型 + 证据数据」生成 SHA256 指纹
+2. 比对现有异常的指纹：
+   - **新异常**：指纹不存在 → 新增记录（status: open）
+   - **不变异常**：指纹已存在 → 保持不变（status: open）
+   - **过时异常**：旧指纹在新结果中不存在 → 标记为已取代（status: superseded）
+3. 已处理的异常（status: resolved）不会被修改，保留历史记录
+
+这样可以确保：
+- 重复执行 `analyze` 不会累积重复异常
+- 数据变化（如库存更新）会正确生成新异常
+- 手动处理过的异常保留历史
+
+### 数据重置
+
+```bash
+# 重置所有数据（库存、温度、异常、导入历史）
+node bin/index.js reset -t all -y
+
+# 仅重置异常台账
+node bin/index.js reset -t exceptions -y
+
+# 或使用 npm script
+npm run reset
+```
+
+**注意**：这是危险操作，会永久删除数据，需要 `-y` 参数确认。
 
 ### 报告生成
 
