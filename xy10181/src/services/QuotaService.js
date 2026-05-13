@@ -32,8 +32,21 @@ class QuotaService {
 
       this._validateQuotaAvailability(quota, applyAmount);
 
-      const updatedQuota = await QuotaModel.updateOccupiedAmount(quota.id, applyAmount, client);
+      const updatedQuota = await QuotaModel.updateOccupiedAmount(
+        quota.id, 
+        applyAmount, 
+        quota.version,
+        client
+      );
       if (!updatedQuota) {
+        const latestQuota = await QuotaModel.findByCode(quotaCode, client);
+        const latestAvailable = parseFloat(latestQuota?.available_amount || 0);
+        if (latestAvailable < applyAmount) {
+          throw new AppError(
+            ErrorCode.QUOTA_INSUFFICIENT,
+            `限额不足，可用: ${latestAvailable}，申请: ${applyAmount}`
+          );
+        }
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }
 
@@ -112,6 +125,7 @@ class QuotaService {
       const updatedQuota = await QuotaModel.deductFromOccupied(
         quota.id,
         parseFloat(approvalRecord.apply_amount),
+        quota.version,
         client
       );
       if (!updatedQuota) {
@@ -184,7 +198,12 @@ class QuotaService {
       }
 
       const applyAmount = parseFloat(approvalRecord.apply_amount);
-      const updatedQuota = await QuotaModel.releaseOccupiedAmount(quota.id, applyAmount, client);
+      const updatedQuota = await QuotaModel.releaseOccupiedAmount(
+        quota.id, 
+        applyAmount,
+        quota.version,
+        client
+      );
       if (!updatedQuota) {
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }
@@ -255,7 +274,12 @@ class QuotaService {
       }
 
       const applyAmount = parseFloat(approvalRecord.apply_amount);
-      const updatedQuota = await QuotaModel.releaseOccupiedAmount(quota.id, applyAmount, client);
+      const updatedQuota = await QuotaModel.releaseOccupiedAmount(
+        quota.id, 
+        applyAmount,
+        quota.version,
+        client
+      );
       if (!updatedQuota) {
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }

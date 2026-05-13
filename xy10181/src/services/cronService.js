@@ -85,7 +85,12 @@ class CronService {
       return;
     }
 
-    const updatedQuota = await QuotaModel.releaseOccupiedAmount(quota.id, applyAmount, client);
+    const updatedQuota = await QuotaModel.releaseOccupiedAmount(
+      quota.id, 
+      applyAmount, 
+      quota.version,
+      client
+    );
     if (!updatedQuota) {
       logger.warn(`限额更新并发冲突，requestId=${record.request_id}，稍后重试`);
       return;

@@ -19,42 +19,48 @@ class QuotaModel {
     return result.rows[0];
   }
 
-  static async updateOccupiedAmount(quotaId, amount, client) {
+  static async updateOccupiedAmount(quotaId, amount, expectedVersion, client) {
     const result = await client.query(`
       UPDATE quotas 
       SET 
         occupied_amount = occupied_amount + $2,
         available_amount = available_amount - $2,
         version = version + 1
-      WHERE id = $1 AND version = (SELECT version FROM quotas WHERE id = $1)
+      WHERE id = $1 
+        AND version = $3
+        AND available_amount >= $2
       RETURNING *
-    `, [quotaId, amount]);
+    `, [quotaId, amount, expectedVersion]);
     return result.rows[0];
   }
 
-  static async releaseOccupiedAmount(quotaId, amount, client) {
+  static async releaseOccupiedAmount(quotaId, amount, expectedVersion, client) {
     const result = await client.query(`
       UPDATE quotas 
       SET 
         occupied_amount = occupied_amount - $2,
         available_amount = available_amount + $2,
         version = version + 1
-      WHERE id = $1 AND version = (SELECT version FROM quotas WHERE id = $1)
+      WHERE id = $1 
+        AND version = $3
+        AND occupied_amount >= $2
       RETURNING *
-    `, [quotaId, amount]);
+    `, [quotaId, amount, expectedVersion]);
     return result.rows[0];
   }
 
-  static async deductFromOccupied(quotaId, amount, client) {
+  static async deductFromOccupied(quotaId, amount, expectedVersion, client) {
     const result = await client.query(`
       UPDATE quotas 
       SET 
         used_amount = used_amount + $2,
         occupied_amount = occupied_amount - $2,
         version = version + 1
-      WHERE id = $1 AND version = (SELECT version FROM quotas WHERE id = $1)
+      WHERE id = $1 
+        AND version = $3
+        AND occupied_amount >= $2
       RETURNING *
-    `, [quotaId, amount]);
+    `, [quotaId, amount, expectedVersion]);
     return result.rows[0];
   }
 
