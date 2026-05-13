@@ -1,10 +1,10 @@
 import click
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 from tabulate import tabulate
-from datetime import date
+from datetime import date, datetime
 
-from .models import DocumentType, ReconciliationStatus
+from .models import DocumentType, ReconciliationStatus, Document
 from .importer import FileImporter
 from .validator import DataValidator
 from .deduplicator import Deduplicator
@@ -324,8 +324,8 @@ def _print_results_table(run):
     click.echo("\n" + tabulate(table, headers=headers, tablefmt="grid"))
 
 
-def _load_rolled_documents(previous_run: Dict) -> List[Document]:
-    from datetime import datetime
+def _load_rolled_documents(previous_run: Dict[str, Any]) -> List[Document]:
+    from datetime import date as date_cls
     
     rolled_docs = []
     rolled_statuses = {"unmatched", "partial"}
@@ -348,9 +348,6 @@ def _load_rolled_documents(previous_run: Dict) -> List[Document]:
             if doc_key in seen_keys:
                 continue
             seen_keys.add(doc_key)
-            
-            from .models import Document
-            from datetime import date as date_cls
             
             doc_date = None
             if doc_data.get("doc_date"):
