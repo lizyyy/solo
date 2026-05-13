@@ -6,7 +6,8 @@ import {
   Snapshot,
   ChangeRecord,
   RiskRule,
-  EnvConfig
+  EnvConfig,
+  CacheInfo
 } from './types';
 
 const DEFAULT_CONFIG_DIR = '.env-drift';
@@ -66,7 +67,12 @@ export class Storage {
       initializedAt: now,
       environments: [],
       rules: defaultRules,
-      dataDir: this.configDir
+      dataDir: this.configDir,
+      cacheConfig: {
+        snapshotRetentionDays: 90,
+        historyRetentionDays: 180,
+        autoInvalidationEnabled: false
+      }
     };
 
     await fs.ensureDir(this.configDir);
@@ -82,7 +88,15 @@ export class Storage {
     if (!(await this.isInitialized())) {
       throw new Error('项目未初始化，请先运行 init 命令');
     }
-    return fs.readJson(path.join(this.configDir, CONFIG_FILE));
+    const config = await fs.readJson(path.join(this.configDir, CONFIG_FILE));
+    if (!config.cacheConfig) {
+      config.cacheConfig = {
+        snapshotRetentionDays: 90,
+        historyRetentionDays: 180,
+        autoInvalidationEnabled: false
+      };
+    }
+    return config;
   }
 
   async saveConfig(config: ProjectConfig): Promise<void> {
@@ -209,5 +223,243 @@ export class Storage {
 
   async clear(): Promise<void> {
     await fs.remove(this.configDir);
+  }
+
+  async getCacheInfo(): Promise<CacheInfo> {
+    const config = await this.getConfig();
+    const envs = config.environments;
+    const now = new Date();
+    const snapshotRetentionMs = config.cacheConfig.snapshotRetentionDays * 24 * 60 * 60 * 1000;
+    const historyRetentionMs = config.cacheConfig.historyRetentionDays * 24 * 60 * 60 * 1000;
+
+    const snapshotByEnv: Record<string, number> = {};
+    let totalSnapshots = 0;
+    let expiredSnapshots = 0;
+
+    for (const env of envs) {
+      const snapshots = await this.listSnapshots(env.name);
+      snapshotByEnv[env.name] = snapshots.length;
+      totalSnapshots += snapshots.length;
+      for (const s of snapshots) {
+        if (now.getTime() - new Date(s.createdAt).getTime() > snapshotRetentionMs) {
+          expiredSnapshots++;
+        }
+      }
+    }
+
+    const allHistory = await this.getHistory();
+    const historyByEnv: Record<string, number> = {};
+    for (const env of envs) {
+      historyByEnv[env.name] = allHistory.filter(h => h.environment === env.name).length;
+    }
+    let expiredHistory = 0;
+    for (const h of allHistory) {
+      if (now.getTime() - new Date(h.timestamp).getTime() > historyRetentionMs) {
+        expiredHistory++;
+      }
+    }
+
+    let storageSize = 0;
+    try {
+      const files = await fs.readdir(this.configDir, { withFileTypes: true });
+      for (const file of files) {
+        const fullPath = path.join(this.configDir, file.name);
+        if (file.isFile()) {
+          const stat = await fs.stat(fullPath);
+          storageSize += stat.size;
+        } else if (file.isDirectory()) {
+          storageSize += await this._getDirSize(fullPath);
+        }
+      }
+    } catch (e) {
+      storageSize = 0;
+    }
+
+    return {
+      snapshots: {
+        total: totalSnapshots,
+        byEnvironment: snapshotByEnv,
+        expired: expiredSnapshots
+      },
+      history: {
+        total: allHistory.length,
+        byEnvironment: historyByEnv,
+        expired: expiredHistory
+      },
+      storageSize
+    };
+  }
+
+  private async _getDirSize(dir: string): Promise<number> {
+    let size = 0;
+    const files = await fs.readdir(dir, { withFileTypes: true });
+    for (const file of files) {
+      const fullPath = path.join(dir, file.name);
+      if (file.isFile()) {
+        const stat = await fs.stat(fullPath);
+        size += stat.size;
+      } else if (file.isDirectory()) {
+        size += await this._getDirSize(fullPath);
+      }
+    }
+    return size;
+  }
+
+  async invalidateExpiredSnapshots(days?: number): Promise<number> {
+    const config = await this.getConfig();
+    const retentionDays = days ?? config.cacheConfig.snapshotRetentionDays;
+    const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
+    const now = new Date();
+    let deletedCount = 0;
+
+    const envs = config.environments;
+    for (const env of envs) {
+      const snapshots = await this.listSnapshots(env.name);
+      for (const s of snapshots) {
+        if (now.getTime() - new Date(s.createdAt).getTime() > retentionMs) {
+          const snapshotPath = path.join(
+            this.configDir, SNAPSHOTS_DIR, env.name, `${s.id}.json`
+          );
+          await fs.remove(snapshotPath);
+          deletedCount++;
+        }
+      }
+    }
+
+    return deletedCount;
+  }
+
+  async invalidateExpiredHistory(days?: number): Promise<number> {
+    const config = await this.getConfig();
+    const retentionDays = days ?? config.cacheConfig.historyRetentionDays;
+    const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
+    const now = new Date();
+    let deletedCount = 0;
+
+    const historyDir = path.join(this.configDir, HISTORY_DIR);
+    if (!(await fs.pathExists(historyDir))) {
+      return 0;
+    }
+
+    const files = await fs.readdir(historyDir);
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue;
+
+      const filePath = path.join(historyDir, file);
+      const records: ChangeRecord[] = await fs.readJson(filePath);
+
+      const remaining = records.filter(r => {
+        return now.getTime() - new Date(r.timestamp).getTime() <= retentionMs;
+      });
+
+      const deleted = records.length - remaining.length;
+      deletedCount += deleted;
+
+      if (remaining.length === 0) {
+        await fs.remove(filePath);
+      } else {
+        await fs.writeJson(filePath, remaining, { spaces: 2 });
+      }
+    }
+
+    return deletedCount;
+  }
+
+  async clearAllSnapshots(envName?: string): Promise<number> {
+    let deletedCount = 0;
+
+    if (envName) {
+      const env = await this.getEnvironment(envName);
+      if (!env) {
+        throw new Error(`环境 "${envName}" 不存在`);
+      }
+      const snapshotDir = path.join(this.configDir, SNAPSHOTS_DIR, envName);
+      if (await fs.pathExists(snapshotDir)) {
+        const files = await fs.readdir(snapshotDir);
+        deletedCount = files.filter(f => f.endsWith('.json')).length;
+        await fs.remove(snapshotDir);
+      }
+    } else {
+      const config = await this.getConfig();
+      for (const env of config.environments) {
+        const snapshotDir = path.join(this.configDir, SNAPSHOTS_DIR, env.name);
+        if (await fs.pathExists(snapshotDir)) {
+          const files = await fs.readdir(snapshotDir);
+          deletedCount += files.filter(f => f.endsWith('.json')).length;
+          await fs.remove(snapshotDir);
+        }
+      }
+    }
+
+    return deletedCount;
+  }
+
+  async clearAllHistory(envName?: string): Promise<number> {
+    let deletedCount = 0;
+    const historyDir = path.join(this.configDir, HISTORY_DIR);
+
+    if (!(await fs.pathExists(historyDir))) {
+      return 0;
+    }
+
+    if (envName) {
+      const env = await this.getEnvironment(envName);
+      if (!env) {
+        throw new Error(`环境 "${envName}" 不存在`);
+      }
+
+      const files = await fs.readdir(historyDir);
+      for (const file of files) {
+        if (!file.endsWith('.json')) continue;
+
+        const filePath = path.join(historyDir, file);
+        const records: ChangeRecord[] = await fs.readJson(filePath);
+
+        const remaining = records.filter(r => r.environment !== envName);
+        const deleted = records.length - remaining.length;
+        deletedCount += deleted;
+
+        if (remaining.length === 0) {
+          await fs.remove(filePath);
+        } else {
+          await fs.writeJson(filePath, remaining, { spaces: 2 });
+        }
+      }
+    } else {
+      const files = await fs.readdir(historyDir);
+      for (const file of files) {
+        if (!file.endsWith('.json')) continue;
+        const filePath = path.join(historyDir, file);
+        const records: ChangeRecord[] = await fs.readJson(filePath);
+        deletedCount += records.length;
+        await fs.remove(filePath);
+      }
+    }
+
+    return deletedCount;
+  }
+
+  async deleteSnapshot(envName: string, snapshotId: string): Promise<boolean> {
+    const snapshotPath = path.join(
+      this.configDir, SNAPSHOTS_DIR, envName, `${snapshotId}.json`
+    );
+    if (await fs.pathExists(snapshotPath)) {
+      await fs.remove(snapshotPath);
+      return true;
+    }
+    return false;
+  }
+
+  async updateCacheConfig(cacheConfig: {
+    snapshotRetentionDays?: number;
+    historyRetentionDays?: number;
+    autoInvalidationEnabled?: boolean;
+  }): Promise<void> {
+    const config = await this.getConfig();
+    config.cacheConfig = {
+      ...config.cacheConfig,
+      ...cacheConfig
+    };
+    await this.saveConfig(config);
   }
 }

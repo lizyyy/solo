@@ -70,4 +70,26 @@ export interface ProjectConfig {
   environments: Environment[];
   rules: RiskRule[];
   dataDir: string;
+  cacheConfig: CacheConfig;
+}
+
+export interface CacheConfig {
+  snapshotRetentionDays: number;
+  historyRetentionDays: number;
+  autoInvalidationEnabled: boolean;
+}
+
+export interface CacheInfo {
+  snapshots: {
+    total: number;
+    byEnvironment: Record<string, number>;
+    expired: number;
+  };
+  history: {
+    total: number;
+    byEnvironment: Record<string, number>;
+    expired: number;
+  };
+  storageSize: number;
+  lastInvalidatedAt?: string;
 }

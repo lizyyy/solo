@@ -54,5 +54,10 @@
       }
     }
   ],
-  "dataDir": "/Users/mac/pro/solo/workspaces/xy10155/.env-drift"
+  "dataDir": "/Users/mac/pro/solo/workspaces/xy10155/.env-drift",
+  "cacheConfig": {
+    "snapshotRetentionDays": 30,
+    "historyRetentionDays": 60,
+    "autoInvalidationEnabled": false
+  }
 }

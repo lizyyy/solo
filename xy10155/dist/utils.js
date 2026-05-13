@@ -9,6 +9,7 @@ exports.parseConfigFile = parseConfigFile;
 exports.compareConfigs = compareConfigs;
 exports.computeChanges = computeChanges;
 exports.formatValue = formatValue;
+exports.formatBytes = formatBytes;
 const fs_extra_1 = __importDefault(require("fs-extra"));
 function generateId() {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -183,4 +184,12 @@ function formatValue(value) {
         return value.substring(0, 50) + '...';
     }
     return String(value);
+}
+function formatBytes(bytes) {
+    if (bytes === 0)
+        return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }

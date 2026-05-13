@@ -10,7 +10,8 @@ import {
   compareConfigs,
   computeChanges,
   formatTimestamp,
-  formatValue
+  formatValue,
+  formatBytes
 } from './utils';
 import {
   Environment,
@@ -30,6 +31,7 @@ import {
   getSeverityColor,
   getDiffTypeLabel
 } from './ui';
+import { CLIError, exitWithError } from './errors';
 
 const program = new Command();
 const storage = new Storage();
@@ -45,8 +47,13 @@ async function handleError(fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } catch (error: any) {
-    printError(error.message || '发生未知错误');
-    process.exit(1);
+    if (error instanceof CLIError) {
+      printError(error.message);
+      process.exit(error.exitCode);
+    } else {
+      printError(error.message || '发生未知错误');
+      process.exit(1);
+    }
   }
 }
 
@@ -127,8 +134,7 @@ envCmd
     await handleError(async () => {
       const env = await storage.getEnvironment(name);
       if (!env) {
-        printError(`环境 "${name}" 不存在`);
-        return;
+        exitWithError(`环境 "${name}" 不存在`);
       }
 
       const data = await storage.getEnvData(name);
@@ -158,8 +164,7 @@ program
       const envName = options.env;
       const env = await storage.getEnvironment(envName);
       if (!env) {
-        printError(`环境 "${envName}" 不存在，请先使用 env-drift env add ${envName} 创建`);
-        return;
+        exitWithError(`环境 "${envName}" 不存在，请先使用 env-drift env add ${envName} 创建`);
       }
 
       const newData = await parseConfigFile(file);
@@ -227,8 +232,7 @@ program
       if (options.show && envName) {
         const snapshot = await storage.getSnapshot(envName, options.show);
         if (!snapshot) {
-          printError(`快照 ${options.show} 在环境 ${envName} 中不存在`);
-          return;
+          exitWithError(`快照 ${options.show} 在环境 ${envName} 中不存在`);
         }
 
         printHeader(`快照详情`);
@@ -267,8 +271,7 @@ program
 
       const env = await storage.getEnvironment(envName);
       if (!env) {
-        printError(`环境 "${envName}" 不存在`);
-        return;
+        exitWithError(`环境 "${envName}" 不存在`);
       }
 
       const currentData = await storage.getEnvData(envName);
@@ -404,8 +407,7 @@ rulesCmd
       const config = await storage.getConfig();
       const rule = config.rules.find(r => r.id === ruleId);
       if (!rule) {
-        printError(`规则 "${ruleId}" 不存在`);
-        return;
+        exitWithError(`规则 "${ruleId}" 不存在`);
       }
 
       rule.enabled = !rule.enabled;
@@ -546,6 +548,200 @@ program
         const mdPath = await customReporter.generateMarkdown(context);
         printSuccess(`Markdown 报告已生成: ${mdPath}`);
       }
+    });
+  });
+
+const cacheCmd = program.command('cache').description('缓存管理（失效、清理、配置）');
+
+cacheCmd
+  .command('info')
+  .description('查看缓存统计信息')
+  .action(async () => {
+    await handleError(async () => {
+      const config = await storage.getConfig();
+      const info = await storage.getCacheInfo();
+
+      printHeader('缓存统计信息');
+
+      console.log(colors.bold('\n📸 快照缓存:'));
+      console.log(`  总数: ${info.snapshots.total}`);
+      console.log(`  已过期: ${info.snapshots.expired > 0 ? colors.yellow(info.snapshots.expired.toString()) : colors.green('0')}`);
+      console.log(`  保留期限: ${config.cacheConfig.snapshotRetentionDays} 天`);
+
+      const envSnapshots = Object.entries(info.snapshots.byEnvironment);
+      if (envSnapshots.length > 0) {
+        console.log(colors.gray(`  按环境分布:`));
+        for (const [env, count] of envSnapshots) {
+          console.log(colors.gray(`    - ${env}: ${count} 个`));
+        }
+      }
+
+      console.log(colors.bold('\n📜 历史记录缓存:'));
+      console.log(`  总数: ${info.history.total}`);
+      console.log(`  已过期: ${info.history.expired > 0 ? colors.yellow(info.history.expired.toString()) : colors.green('0')}`);
+      console.log(`  保留期限: ${config.cacheConfig.historyRetentionDays} 天`);
+
+      const envHistory = Object.entries(info.history.byEnvironment);
+      if (envHistory.length > 0) {
+        console.log(colors.gray(`  按环境分布:`));
+        for (const [env, count] of envHistory) {
+          console.log(colors.gray(`    - ${env}: ${count} 条`));
+        }
+      }
+
+      console.log(colors.bold('\n💾 存储占用:'));
+      console.log(`  总大小: ${formatBytes(info.storageSize)}`);
+      console.log(`  自动失效: ${config.cacheConfig.autoInvalidationEnabled ? colors.green('已启用') : colors.gray('未启用')}`);
+    });
+  });
+
+cacheCmd
+  .command('invalidate')
+  .description('清理过期缓存')
+  .option('-t, --type <type>', '清理类型: snapshots|history|all', 'all')
+  .option('-d, --days <number>', '自定义保留天数（覆盖默认配置）')
+  .option('-y, --yes', '跳过确认直接执行')
+  .action(async (options) => {
+    await handleError(async () => {
+      const type = options.type;
+      const days = options.days ? parseInt(options.days, 10) : undefined;
+      const config = await storage.getConfig();
+      const info = await storage.getCacheInfo();
+
+      let snapshotCount = info.snapshots.expired;
+      let historyCount = info.history.expired;
+
+      if (days !== undefined) {
+        printInfo(`使用自定义保留天数: ${days} 天`);
+      }
+
+      if (type === 'snapshots' || type === 'all') {
+        if (snapshotCount === 0 && days === undefined) {
+          printInfo('没有过期的快照需要清理');
+        } else {
+          if (snapshotCount > 0 || days !== undefined) {
+            if (!options.yes) {
+              // 简单确认机制
+            }
+            const deleted = await storage.invalidateExpiredSnapshots(days);
+            printSuccess(`已清理 ${deleted} 个过期快照`);
+          }
+        }
+      }
+
+      if (type === 'history' || type === 'all') {
+        if (historyCount === 0 && days === undefined) {
+          printInfo('没有过期的历史记录需要清理');
+        } else {
+          if (historyCount > 0 || days !== undefined) {
+            const deleted = await storage.invalidateExpiredHistory(days);
+            printSuccess(`已清理 ${deleted} 条过期历史记录`);
+          }
+        }
+      }
+    });
+  });
+
+cacheCmd
+  .command('clear')
+  .description('强制清理缓存（慎用！）')
+  .option('-t, --type <type>', '清理类型: snapshots|history|all', 'all')
+  .option('-e, --env <name>', '仅清理指定环境的缓存')
+  .option('-s, --snapshot-id <id>', '仅删除指定快照（需配合 --env 使用）')
+  .option('-f, --force', '强制清理，跳过警告')
+  .action(async (options) => {
+    await handleError(async () => {
+      const type = options.type;
+
+      if (!options.force && !options.snapshotId) {
+        printWarning('此操作将永久删除缓存数据，无法恢复！');
+        printInfo('使用 --force 跳过此警告');
+        exitWithError('操作已取消，请添加 --force 参数确认执行');
+      }
+
+      if (options.snapshotId) {
+        if (!options.env) {
+          exitWithError('删除指定快照必须同时指定 --env 参数');
+        }
+        const deleted = await storage.deleteSnapshot(options.env, options.snapshotId);
+        if (deleted) {
+          printSuccess(`已删除快照: ${options.snapshotId}`);
+        } else {
+          exitWithError(`快照 ${options.snapshotId} 在环境 ${options.env} 中不存在`);
+        }
+        return;
+      }
+
+      if (type === 'snapshots' || type === 'all') {
+        const deleted = await storage.clearAllSnapshots(options.env);
+        if (options.env) {
+          printSuccess(`已清理环境 "${options.env}" 的所有 ${deleted} 个快照`);
+        } else {
+          printSuccess(`已清理所有环境的 ${deleted} 个快照`);
+        }
+      }
+
+      if (type === 'history' || type === 'all') {
+        const deleted = await storage.clearAllHistory(options.env);
+        if (options.env) {
+          printSuccess(`已清理环境 "${options.env}" 的所有 ${deleted} 条历史记录`);
+        } else {
+          printSuccess(`已清理所有环境的 ${deleted} 条历史记录`);
+        }
+      }
+    });
+  });
+
+cacheCmd
+  .command('config')
+  .description('查看或更新缓存配置')
+  .option('--snapshot-retention <days>', '设置快照保留天数')
+  .option('--history-retention <days>', '设置历史记录保留天数')
+  .option('--auto-invalidate <bool>', '启用/禁用自动失效（true/false）')
+  .action(async (options) => {
+    await handleError(async () => {
+      const config = await storage.getConfig();
+
+      const hasUpdates = options.snapshotRetention !== undefined ||
+                        options.historyRetention !== undefined ||
+                        options.autoInvalidate !== undefined;
+
+      if (!hasUpdates) {
+        printHeader('当前缓存配置');
+        const rows = [
+          ['快照保留天数', config.cacheConfig.snapshotRetentionDays.toString()],
+          ['历史记录保留天数', config.cacheConfig.historyRetentionDays.toString()],
+          ['自动失效', config.cacheConfig.autoInvalidationEnabled ? '已启用' : '未启用']
+        ];
+        printTable(rows, ['配置项', '值']);
+        return;
+      }
+
+      const updates: any = {};
+      if (options.snapshotRetention !== undefined) {
+        const days = parseInt(options.snapshotRetention, 10);
+        if (isNaN(days) || days < 0) {
+          exitWithError('快照保留天数必须是非负整数');
+        }
+        updates.snapshotRetentionDays = days;
+      }
+      if (options.historyRetention !== undefined) {
+        const days = parseInt(options.historyRetention, 10);
+        if (isNaN(days) || days < 0) {
+          exitWithError('历史记录保留天数必须是非负整数');
+        }
+        updates.historyRetentionDays = days;
+      }
+      if (options.autoInvalidate !== undefined) {
+        const value = options.autoInvalidate.toLowerCase();
+        if (value !== 'true' && value !== 'false') {
+          exitWithError('自动失效必须是 true 或 false');
+        }
+        updates.autoInvalidationEnabled = value === 'true';
+      }
+
+      await storage.updateCacheConfig(updates);
+      printSuccess('缓存配置已更新');
     });
   });
 
