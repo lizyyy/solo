@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type { ParkingCase, CaseStatus, PaymentStatus, PaymentRecord, TimelineEvent, EvidenceAttachment } from '../types';
 import { initialCases } from '../data/sampleData';
 import { generateId } from '../utils/helpers';
+import { generateExportPackage, downloadExportPackage } from '../utils/exportUtils';
 
 interface AppContextType {
   cases: ParkingCase[];
@@ -200,6 +201,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [selectedCase]);
 
   const exportCase = useCallback((caseId: string, operator: string) => {
+    const targetCase = cases.find(c => c.id === caseId) || selectedCase;
+    
+    if (targetCase) {
+      const exportPkg = generateExportPackage(targetCase, operator);
+      downloadExportPackage(exportPkg);
+    }
+
     const timelineEvent: TimelineEvent = {
       id: `TL-${generateId()}`,
       timestamp: new Date().toISOString(),
@@ -225,7 +233,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (selectedCase?.id === caseId) {
       setSelectedCase(updater(selectedCase));
     }
-  }, [selectedCase]);
+  }, [cases, selectedCase]);
 
   return (
     <AppContext.Provider value={{
