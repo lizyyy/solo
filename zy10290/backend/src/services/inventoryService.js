@@ -46,6 +46,10 @@ class InventoryService {
       return { success: false, message: '商品不存在' };
     }
 
+    if (product.locked_stock < quantity) {
+      return { success: false, message: `锁定库存不足，当前锁定${product.locked_stock}，需要${quantity}` };
+    }
+
     const beforeStock = product.locked_stock;
     const afterStock = product.locked_stock - quantity;
 
@@ -72,6 +76,10 @@ class InventoryService {
     const product = await get('SELECT * FROM flash_sale_products WHERE id = ?', [productId]);
     if (!product) {
       return { success: false, message: '商品不存在' };
+    }
+
+    if (product.locked_stock < quantity) {
+      return { success: false, message: '锁定库存不足，无法释放' };
     }
 
     const beforeStock = product.available_stock;

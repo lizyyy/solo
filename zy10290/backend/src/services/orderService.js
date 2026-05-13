@@ -9,13 +9,17 @@ class OrderService {
     return 'FS' + dayjs().format('YYYYMMDDHHmmss') + Math.floor(Math.random() * 10000);
   }
 
+  static generateIdempotentKey(prefix, uniqueId) {
+    return `${prefix}_${uniqueId}`;
+  }
+
   static async createOrder(activityId, productId, userId, userName, userPhone, quantity = 1) {
     const product = await get('SELECT * FROM flash_sale_products WHERE id = ?', [productId]);
     if (!product) {
       return { success: false, message: '商品不存在' };
     }
 
-    const lockKey = `lock_${productId}_${userId}_${Date.now()}`;
+    const lockKey = this.generateIdempotentKey('lock', `${productId}_${userId}_${Date.now()}`);
     const lockResult = await InventoryService.checkAndLockStock(productId, quantity, lockKey, 'system', '系统', '下单锁库存');
     if (!lockResult.success) {
       return { success: false, message: lockResult.message };
@@ -40,7 +44,11 @@ class OrderService {
       return { success: false, message: '订单不存在' };
     }
 
-    const idempotentKey = `payment_${transactionId}`;
+    if (order.status === ORDER_STATUS.CANCELLED) {
+      return { success: false, message: '订单已取消，拒绝支付回调' };
+    }
+
+    const idempotentKey = this.generateIdempotentKey('payment', transactionId);
     const existingLog = await get('SELECT id FROM inventory_change_logs WHERE idempotent_key = ?', [idempotentKey]);
     if (existingLog) {
       return { success: true, duplicate: true, message: '支付回调重复处理' };
@@ -64,8 +72,11 @@ class OrderService {
 
       return { success: true, message: '支付成功' };
     } else {
-      const releaseKey = `release_payfail_${orderId}_${Date.now()}`;
-      await InventoryService.releaseStock(order.product_id, order.quantity, orderId, releaseKey, 'system', '系统', '支付失败释放库存');
+      const releaseKey = this.generateIdempotentKey('release_payfail', orderId);
+      const releaseResult = await InventoryService.releaseStock(order.product_id, order.quantity, orderId, releaseKey, 'system', '系统', '支付失败释放库存');
+      if (!releaseResult.success && !releaseResult.duplicate) {
+        return { success: false, message: releaseResult.message };
+      }
       
       await run(`
         UPDATE flash_sale_orders 
@@ -83,11 +94,15 @@ class OrderService {
       return { success: false, message: '订单不存在' };
     }
 
-    if (order.payment_status !== PAYMENT_STATUS.UNPAID) {
-      return { success: false, message: '订单状态不允许超时取消' };
+    if (order.payment_status === PAYMENT_STATUS.PAID) {
+      return { success: false, message: '订单已支付，不允许超时取消' };
     }
 
-    const releaseKey = `release_timeout_${orderId}`;
+    if (order.status === ORDER_STATUS.CANCELLED) {
+      return { success: true, duplicate: true, message: '订单已取消' };
+    }
+
+    const releaseKey = this.generateIdempotentKey('release_timeout', orderId);
     const releaseResult = await InventoryService.releaseStock(order.product_id, order.quantity, orderId, releaseKey, 'system', '系统', '支付超时释放库存');
     if (!releaseResult.success && !releaseResult.duplicate) {
       return { success: false, message: releaseResult.message };
@@ -114,7 +129,7 @@ class OrderService {
     }
 
     const applicationId = uuidv4();
-    const idempotentKey = `compensation_${orderId}_${Date.now()}`;
+    const idempotentKey = this.generateIdempotentKey('compensation_apply', applicationId);
 
     await run(`
       INSERT INTO compensation_applications (id, order_id, applicant_id, applicant_name, apply_reason, idempotent_key)
@@ -145,7 +160,7 @@ class OrderService {
       return { success: false, message: '订单不存在' };
     }
 
-    const lockKey = `compensation_lock_${applicationId}`;
+    const lockKey = this.generateIdempotentKey('compensation_lock', applicationId);
     const lockResult = await InventoryService.compensationLockStock(order.product_id, order.quantity, lockKey, reviewerId, reviewerName, '补单审批通过锁库存');
     if (!lockResult.success) {
       return { success: false, message: lockResult.message };
@@ -157,8 +172,11 @@ class OrderService {
       WHERE id = ?
     `, [COMPENSATION_STATUS.APPROVED, reviewerId, reviewerName, reviewRemark, applicationId]);
 
-    const confirmKey = `compensation_confirm_${applicationId}`;
-    await InventoryService.confirmStock(order.product_id, order.quantity, order.id, confirmKey, reviewerId, reviewerName, '补单确认扣库存');
+    const confirmKey = this.generateIdempotentKey('compensation_confirm', applicationId);
+    const confirmResult = await InventoryService.confirmStock(order.product_id, order.quantity, order.id, confirmKey, reviewerId, reviewerName, '补单确认扣库存');
+    if (!confirmResult.success && !confirmResult.duplicate) {
+      return { success: false, message: confirmResult.message };
+    }
 
     const newOrderNo = this.generateOrderNo();
     await run(`
@@ -228,10 +246,13 @@ class OrderService {
       return { success: false, message: '订单已退款，不可重复退款' };
     }
 
-    const idempotentKey = `refund_${orderId}_${Date.now()}`;
+    const idempotentKey = this.generateIdempotentKey('refund', orderId);
 
     if (returnStock) {
-      await InventoryService.returnStockAfterRefund(order.product_id, order.quantity, orderId, idempotentKey, operatorId, operatorName, '退款退回库存');
+      const returnResult = await InventoryService.returnStockAfterRefund(order.product_id, order.quantity, orderId, idempotentKey, operatorId, operatorName, '退款退回库存');
+      if (!returnResult.success && !returnResult.duplicate) {
+        return { success: false, message: returnResult.message };
+      }
     }
 
     await run(`
