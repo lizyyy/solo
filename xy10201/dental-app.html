@@ -847,7 +847,13 @@
       resetData() {
         if (confirm('确定要重置所有数据吗？所有操作记录将被清除。')) {
           this.store.reset();
-          this.state = {};
+          this.state = {
+            treatments: {},
+            consumption: {},
+            replenishment: {},
+            materials: {},
+            history: { tab: 'consumption' }
+          };
           this.render();
           this.toast('数据已重置', 'success');
         }
@@ -1641,7 +1647,7 @@
       },
 
       renderHistory(el) {
-        if (!this.state.history) this.state.history.tab = 'consumption';
+        if (!this.state.history) this.state.history = { tab: 'consumption' };
         const tab = this.state.history.tab;
         const consumption = this.store.getConsumptionRecords(50);
         const requests = this.store.getReplenishmentRequests();
@@ -1736,6 +1742,7 @@
       },
 
       setHistoryTab(tab) {
+        if (!this.state.history) this.state.history = { tab: 'consumption' };
         this.state.history.tab = tab;
         this.render();
       },
