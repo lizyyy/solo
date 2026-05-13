@@ -304,6 +304,19 @@ def create_maintenance_order(
     if existing_order:
         return existing_order
     
+    unfinished_order = db.query(MaintenanceOrder).filter(
+        MaintenanceOrder.device_id == request.device_id,
+        MaintenanceOrder.rule_id == request.rule_id,
+        MaintenanceOrder.status.in_([
+            MaintenanceStatus.PENDING,
+            MaintenanceStatus.IN_PROGRESS,
+            MaintenanceStatus.DELAYED
+        ])
+    ).first()
+    
+    if unfinished_order:
+        return unfinished_order
+    
     if rule.parts:
         has_inventory, inventory_check = check_inventory_available(db, rule.parts)
         if not has_inventory:
@@ -358,8 +371,8 @@ def get_all_orders(db: Session) -> List[MaintenanceOrder]:
 
 
 VALID_STATUS_TRANSITIONS = {
-    MaintenanceStatus.PENDING: [MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.DELAYED, MaintenanceStatus.CANCELLED],
-    MaintenanceStatus.DELAYED: [MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.CANCELLED],
+    MaintenanceStatus.PENDING: [MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.DELAYED, MaintenanceStatus.COMPLETED, MaintenanceStatus.CANCELLED],
+    MaintenanceStatus.DELAYED: [MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.COMPLETED, MaintenanceStatus.CANCELLED],
     MaintenanceStatus.IN_PROGRESS: [MaintenanceStatus.COMPLETED, MaintenanceStatus.DELAYED, MaintenanceStatus.CANCELLED],
     MaintenanceStatus.COMPLETED: [],
     MaintenanceStatus.CANCELLED: [],
@@ -520,16 +533,16 @@ def get_maintenance_report(
     
     devices_needing = []
     active_rules = db.query(MaintenanceRule).filter(MaintenanceRule.is_active == 1).all()
+    today = date.today()
     
     for rule in active_rules:
         device = rule.device
         if not device:
             continue
         
-        last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
-        effective_threshold = last_value + rule.threshold_value
-        
         if rule.rule_type == RuleType.HOURS:
+            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
+            effective_threshold = last_value + rule.threshold_value
             if device.total_hours >= effective_threshold:
                 devices_needing.append({
                     "device_id": device.id,
@@ -540,6 +553,8 @@ def get_maintenance_report(
                     "threshold": effective_threshold
                 })
         elif rule.rule_type == RuleType.COUNT:
+            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
+            effective_threshold = last_value + rule.threshold_value
             if device.total_count >= effective_threshold:
                 devices_needing.append({
                     "device_id": device.id,
@@ -548,6 +563,20 @@ def get_maintenance_report(
                     "rule_type": rule.rule_type.value,
                     "current_value": device.total_count,
                     "threshold": effective_threshold
+                })
+        elif rule.rule_type == RuleType.DATE:
+            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
+            rule_date = date.fromtimestamp(rule.threshold_value)
+            effective_threshold_ts = rule.threshold_value + (last_value * 86400)
+            effective_threshold_date = date.fromtimestamp(effective_threshold_ts)
+            if today >= effective_threshold_date:
+                devices_needing.append({
+                    "device_id": device.id,
+                    "device_name": device.name,
+                    "rule_name": rule.name,
+                    "rule_type": rule.rule_type.value,
+                    "current_date": today.isoformat(),
+                    "threshold_date": effective_threshold_date.isoformat()
                 })
     
     return {
