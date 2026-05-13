@@ -132,13 +132,7 @@ const init = async () => {
       console.log('数据库模型同步完成');
     }
 
-    if (require.main === module) {
-      app.listen(PORT, () => {
-        console.log(`服务器运行在端口 ${PORT}`);
-        console.log(`API 文档: http://localhost:${PORT}/api-docs`);
-        console.log(`健康检查: http://localhost:${PORT}/health`);
-      });
-    }
+    return app;
   } catch (error) {
     if (require.main === module) {
       console.error('初始化失败:', error);
@@ -148,10 +142,19 @@ const init = async () => {
   }
 };
 
-if (require.main === module) {
-  init();
-}
-
 app.ready = init();
+
+if (require.main === module) {
+  app.ready.then(() => {
+    app.listen(PORT, () => {
+      console.log(`服务器运行在端口 ${PORT}`);
+      console.log(`API 文档: http://localhost:${PORT}/api-docs`);
+      console.log(`健康检查: http://localhost:${PORT}/health`);
+    });
+  }).catch((err) => {
+    console.error('启动失败:', err);
+    process.exit(1);
+  });
+}
 
 module.exports = app;
