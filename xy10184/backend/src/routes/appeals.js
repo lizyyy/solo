@@ -174,6 +174,24 @@ router.get('/stats', authMiddleware, (req, res) => {
   res.json(stats);
 });
 
+router.get('/constants', (req, res) => {
+  res.json({
+    status_map: STATUS_NAMES,
+    content_types: [
+      { value: 'text', label: '文本' },
+      { value: 'image', label: '图片' },
+      { value: 'video', label: '视频' },
+      { value: 'audio', label: '音频' },
+      { value: 'link', label: '链接' },
+      { value: 'other', label: '其他' }
+    ],
+    results: [
+      { value: 'pass', label: '建议通过' },
+      { value: 'reject', label: '建议驳回' }
+    ]
+  });
+});
+
 router.get('/:id', authMiddleware, (req, res) => {
   const { id } = req.params;
   
@@ -463,24 +481,6 @@ router.put('/:id', authMiddleware, requireRoles('operator', 'admin'), (req, res)
   createLog(req, logActions.UPDATE_APPEAL, logModules.APPEAL, `更新申诉 ${appeal.appeal_no}`, id);
   
   res.json({ success: true });
-});
-
-router.get('/constants', (req, res) => {
-  res.json({
-    status_map: STATUS_NAMES,
-    content_types: [
-      { value: 'text', label: '文本' },
-      { value: 'image', label: '图片' },
-      { value: 'video', label: '视频' },
-      { value: 'audio', label: '音频' },
-      { value: 'link', label: '链接' },
-      { value: 'other', label: '其他' }
-    ],
-    results: [
-      { value: 'pass', label: '建议通过' },
-      { value: 'reject', label: '建议驳回' }
-    ]
-  });
 });
 
 module.exports = router;

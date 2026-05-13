@@ -279,7 +279,7 @@ export default function AppealList() {
               style={{ width: 150 }}
               onChange={(value) => handleSearch({ ...filters, operator_id: value })}
             >
-              {operators.map(user) => (
+              {operators.map((user) => (
                 <Select.Option key={user.id} value={user.id}>
                   {user.name}
                 </Select.Option>
