@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>直播样品借还管理系统</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="header-content">
+        <h1>直播样品借还管理系统</h1>
+        <nav class="nav-tabs">
+          <button class="nav-tab active" data-tab="dashboard">异常看板</button>
+          <button class="nav-tab" data-tab="transactions">借还记录</button>
+          <button class="nav-tab" data-tab="samples">样品管理</button>
+          <button class="nav-tab" data-tab="schedules">主播排期</button>
+        </nav>
+      </div>
+    </header>
+    
+    <main class="app-main">
+      <div id="dashboard" class="tab-content active">
+        <div class="dashboard-header">
+          <h2>异常看板</h2>
+          <button class="btn btn-primary" onclick="refreshAnomalies()">刷新数据</button>
+        </div>
+        <div id="anomalies-container" class="anomalies-grid"></div>
+      </div>
+      
+      <div id="transactions" class="tab-content">
+        <div class="section-header">
+          <h2>借还记录</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="showCreateTransactionModal()">新建记录</button>
+            <button class="btn btn-secondary" onclick="showExportModal()">导出报告</button>
+          </div>
+        </div>
+        
+        <div class="filter-section">
+          <div class="search-box">
+            <input type="text" id="transaction-search" placeholder="搜索SKU、样品名称、主播..." oninput="loadTransactions()">
+          </div>
+          <div class="filter-fields">
+            <select id="filter-type" onchange="loadTransactions()">
+              <option value="">全部类型</option>
+              <option value="borrow">借出</option>
+              <option value="return">归还</option>
+              <option value="sell">销售转正</option>
+              <option value="loss">损耗</option>
+            </select>
+            <select id="filter-status" onchange="loadTransactions()">
+              <option value="">全部状态</option>
+              <option value="pending">待审批</option>
+              <option value="approved">已通过</option>
+              <option value="rejected">已拒绝</option>
+            </select>
+            <select id="filter-responsible" onchange="loadTransactions()">
+              <option value="">全部责任人</option>
+            </select>
+            <input type="date" id="filter-start-date" onchange="loadTransactions()">
+            <input type="date" id="filter-end-date" onchange="loadTransactions()">
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>交易类型</th>
+                <th>SKU</th>
+                <th>样品名称</th>
+                <th>数量</th>
+                <th>主播</th>
+                <th>排期</th>
+                <th>责任人</th>
+                <th>损耗说明</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div id="samples" class="tab-content">
+        <div class="section-header">
+          <h2>样品管理</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="showCreateSampleModal()">新增样品</button>
+          </div>
+        </div>
+        
+        <div class="filter-section">
+          <div class="search-box">
+            <input type="text" id="sample-search" placeholder="搜索SKU或样品名称..." oninput="loadSamples()">
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>SKU</th>
+                <th>样品名称</th>
+                <th>分类</th>
+                <th>单位成本</th>
+                <th>库存</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="samples-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div id="schedules" class="tab-content">
+        <div class="section-header">
+          <h2>主播排期</h2>
+          <div class="header-actions">
+            <button class="btn btn-primary" onclick="showCreateScheduleModal()">新增排期</button>
+          </div>
+        </div>
+        
+        <div class="filter-section">
+          <div class="filter-fields">
+            <select id="filter-schedule-host" onchange="loadSchedules()">
+              <option value="">全部主播</option>
+            </select>
+            <select id="filter-schedule-status" onchange="loadSchedules()">
+              <option value="">全部状态</option>
+              <option value="active">进行中</option>
+              <option value="completed">已完成</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>主播</th>
+                <th>排期日期</th>
+                <th>时间</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="schedules-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">新建记录</h3>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary" id="modal-confirm-btn" onclick="confirmModal()">确认</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="toast-container" class="toast-container"></div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
