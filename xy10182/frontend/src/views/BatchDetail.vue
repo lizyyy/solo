@@ -51,7 +51,6 @@
               </div>
             </div>
           </el-card>
-        </el-card>
         </el-col>
         <el-col :span="16">
           <el-descriptions title="批次信息" :column="2" border>

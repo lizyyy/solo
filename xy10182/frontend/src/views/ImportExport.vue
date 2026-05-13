@@ -52,9 +52,9 @@
           >
             <template #default>
               <ul style="margin-top: 8px; padding-left: 20px;">
-                <li>试剂导入格式：名称、编码、分类、规格、单位、安全库存、最大库存、保质期</li>
-                <li>批次导入格式：试剂编码、批次号、生产厂家、生产日期、有效期、数量、存储位置</li>
-                <li>CSV文件请使用UTF-8编码</li>
+                <li>试剂导入字段：name（名称）、code（编码）、category（分类）、specification（规格）、unit（单位）、minStock（最小库存）、maxStock（最大库存）、shelfLifeDays（保质期天数）</li>
+                <li>批次导入字段：reagentCode（试剂编码）、batchNo（批次号）、manufacturer（生产厂家）、productionDate（生产日期）、expiryDate（有效期）、totalQuantity（数量）、storageLocation（存储位置）</li>
+                <li>导出的CSV可直接再次导入，支持中英文表头自动识别</li>
               </ul>
             </template>
           </el-alert>
@@ -69,7 +69,7 @@
                     class="upload-demo"
                     drag
                     :auto-upload="false"
-                    :on-change="onFileChange('reagent')"
+                    :on-change="(file) => onFileChange('reagent', file)"
                     :limit="1"
                     accept=".csv"
                   >
@@ -140,7 +140,7 @@
         <el-result
           :icon="importResult.imported > 0 ? 'success' : 'error'"
           :title="importResult.imported > 0 ? '导入完成' : '导入失败'"
-          :sub-title="`成功导入 ${importResult.imported} 条，失败 ${importResult.failed} 条"
+          :sub-title="`成功导入 ${importResult.imported} 条，失败 ${importResult.failed} 条`"
         />
         <el-table :data="importResult.importedItems" v-if="importResult.importedItems?.length > 0" style="margin-top: 16px;" stripe>
           <el-table-column label="名称" prop="name" />
@@ -199,6 +199,40 @@ function parseCSV(content) {
   const lines = content.split('\n').filter(line => line.trim())
   if (lines.length < 2) return []
   
+  const headerMap = {
+    '试剂名称': 'name',
+    '名称': 'name',
+    '试剂编码': 'code',
+    '编码': 'code',
+    '分类': 'category',
+    '规格': 'specification',
+    '单位': 'unit',
+    '最小库存': 'minStock',
+    '安全库存': 'minStock',
+    '最大库存': 'maxStock',
+    '保质期': 'shelfLifeDays',
+    '保质期(天)': 'shelfLifeDays',
+    '状态': 'status',
+    '创建时间': 'createdAt',
+    '批次号': 'batchNo',
+    '试剂名称': 'reagentName',
+    '生产厂家': 'manufacturer',
+    '生产日期': 'productionDate',
+    '有效期': 'expiryDate',
+    '总数量': 'totalQuantity',
+    '数量': 'totalQuantity',
+    '已使用': 'usedQuantity',
+    '剩余数量': 'remainingQuantity',
+    '存储位置': 'storageLocation',
+    '二维码': 'qrCode',
+    '操作类型': 'type',
+    '操作员': 'operator',
+    '操作地点': 'location',
+    '扫描码': 'scanCode',
+    '备注': 'remark',
+    '操作时间': 'createdAt'
+  }
+
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''))
   const result = []
   
@@ -206,7 +240,8 @@ function parseCSV(content) {
     const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''))
     const obj = {}
     headers.forEach((header, index) => {
-      obj[header] = values[index] || ''
+      const normalizedHeader = headerMap[header] || header
+      obj[normalizedHeader] = values[index] || ''
     })
     result.push(obj)
   }

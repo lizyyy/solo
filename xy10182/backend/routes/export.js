@@ -12,16 +12,16 @@ router.get('/reagents', (req, res) => {
   const reagents = readJSON('reagents.json');
   
   const fields = [
-    { label: '试剂名称', value: 'name' },
-    { label: '试剂编码', value: 'code' },
-    { label: '分类', value: 'category' },
-    { label: '规格', value: 'specification' },
-    { label: '单位', value: 'unit' },
-    { label: '最小库存', value: 'minStock' },
-    { label: '最大库存', value: 'maxStock' },
-    { label: '保质期(天)', value: 'shelfLifeDays' },
-    { label: '状态', value: 'status' },
-    { label: '创建时间', value: (row) => moment(row.createdAt).format('YYYY-MM-DD HH:mm:ss') }
+    { label: 'name', value: 'name' },
+    { label: 'code', value: 'code' },
+    { label: 'category', value: 'category' },
+    { label: 'specification', value: 'specification' },
+    { label: 'unit', value: 'unit' },
+    { label: 'minStock', value: 'minStock' },
+    { label: 'maxStock', value: 'maxStock' },
+    { label: 'shelfLifeDays', value: 'shelfLifeDays' },
+    { label: 'status', value: 'status' },
+    { label: 'createdAt', value: (row) => moment(row.createdAt).format('YYYY-MM-DD HH:mm:ss') }
   ];
   
   const json2csvParser = new Parser({ fields });
@@ -53,18 +53,18 @@ router.get('/batches', (req, res) => {
   }));
   
   const fields = [
-    { label: '批次号', value: 'batchNo' },
-    { label: '试剂名称', value: 'reagentName' },
-    { label: '试剂编码', value: 'reagentCode' },
-    { label: '生产厂家', value: 'manufacturer' },
-    { label: '生产日期', value: 'productionDate' },
-    { label: '有效期', value: 'expiryDate' },
-    { label: '总数量', value: 'totalQuantity' },
-    { label: '已使用', value: 'usedQuantity' },
-    { label: '剩余数量', value: 'remainingQuantity' },
-    { label: '存储位置', value: 'storageLocation' },
-    { label: '状态', value: 'statusLabel' },
-    { label: '二维码', value: 'qrCode' }
+    { label: 'batchNo', value: 'batchNo' },
+    { label: 'reagentName', value: 'reagentName' },
+    { label: 'reagentCode', value: 'reagentCode' },
+    { label: 'manufacturer', value: 'manufacturer' },
+    { label: 'productionDate', value: 'productionDate' },
+    { label: 'expiryDate', value: 'expiryDate' },
+    { label: 'totalQuantity', value: 'totalQuantity' },
+    { label: 'usedQuantity', value: 'usedQuantity' },
+    { label: 'remainingQuantity', value: 'remainingQuantity' },
+    { label: 'storageLocation', value: 'storageLocation' },
+    { label: 'status', value: 'statusLabel' },
+    { label: 'qrCode', value: 'qrCode' }
   ];
   
   const json2csvParser = new Parser({ fields });
@@ -101,15 +101,15 @@ router.get('/records', (req, res) => {
   }));
   
   const fields = [
-    { label: '操作类型', value: 'typeLabel' },
-    { label: '试剂名称', value: 'reagentName' },
-    { label: '批次号', value: 'batchNo' },
-    { label: '数量', value: 'quantity' },
-    { label: '操作员', value: 'operator' },
-    { label: '操作地点', value: 'location' },
-    { label: '扫描码', value: 'scanCode' },
-    { label: '备注', value: 'remark' },
-    { label: '操作时间', value: 'createdAtStr' }
+    { label: 'type', value: 'typeLabel' },
+    { label: 'reagentName', value: 'reagentName' },
+    { label: 'batchNo', value: 'batchNo' },
+    { label: 'quantity', value: 'quantity' },
+    { label: 'operator', value: 'operator' },
+    { label: 'location', value: 'location' },
+    { label: 'scanCode', value: 'scanCode' },
+    { label: 'remark', value: 'remark' },
+    { label: 'createdAt', value: 'createdAtStr' }
   ];
   
   const json2csvParser = new Parser({ fields });
