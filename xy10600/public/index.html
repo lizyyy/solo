@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>门店价签变更审计系统</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; line-height: 1.6; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px 20px; border-radius: 12px; margin-bottom: 24px; }
+    header h1 { font-size: 28px; margin-bottom: 8px; }
+    header p { opacity: 0.9; font-size: 14px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-card h3 { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .stat-card .value { font-size: 28px; font-weight: bold; color: #333; }
+    
+    .filter-bar { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .filter-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+    .filter-group { display: flex; flex-direction: column; min-width: 150px; }
+    .filter-group label { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .filter-group input, .filter-group select { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: #667eea; color: white; }
+    .btn-primary:hover { background: #5a67d8; }
+    .btn-success { background: #48bb78; color: white; }
+    .btn-success:hover { background: #38a169; }
+    .btn-warning { background: #ed8936; color: white; }
+    .btn-warning:hover { background: #dd6b20; }
+    .btn-danger { background: #e53e3e; color: white; }
+    .btn-danger:hover { background: #c53030; }
+    .btn-secondary { background: #e2e8f0; color: #4a5568; }
+    .btn-secondary:hover { background: #cbd5e0; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+    th { background: #f8fafc; font-weight: 600; font-size: 13px; color: #4a5568; }
+    td { font-size: 14px; }
+    tr:hover { background: #f8fafc; }
+    
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-success { background: #c6f6d5; color: #22543d; }
+    .badge-danger { background: #fed7d7; color: #742a2a; }
+    .badge-warning { background: #feebc8; color: #744210; }
+    .badge-info { background: #bee3f8; color: #2a4365; }
+    .badge-secondary { background: #e2e8f0; color: #4a5568; }
+    .badge-purple { background: #e9d8fd; color: #44337a; }
+    
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal.show { display: flex; }
+    .modal-content { background: white; border-radius: 12px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-header { padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h2 { font-size: 18px; }
+    .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #666; }
+    .modal-body { padding: 20px; }
+    
+    .section { margin-bottom: 24px; }
+    .section h3 { font-size: 14px; color: #4a5568; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .detail-item { background: #f8fafc; padding: 12px; border-radius: 6px; }
+    .detail-item label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+    .detail-item span { font-size: 14px; font-weight: 500; }
+    
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+    .timeline-item { position: relative; padding-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -22px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #667eea; border: 3px solid #fff; box-shadow: 0 0 0 2px #667eea; }
+    .timeline-item h4 { font-size: 13px; color: #333; margin-bottom: 4px; }
+    .timeline-item p { font-size: 12px; color: #666; }
+    .timeline-item .time { font-size: 11px; color: #999; margin-top: 4px; }
+    
+    .empty { text-align: center; padding: 60px 20px; color: #999; }
+    .loading { text-align: center; padding: 40px; color: #666; }
+    
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+    
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+    .tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; }
+    .tab.active { color: #667eea; border-bottom-color: #667eea; font-weight: 500; }
+    
+    .link-btn { background: none; border: none; color: #667eea; cursor: pointer; text-decoration: underline; font-size: 14px; }
+    .link-btn:hover { color: #5a67d8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏪 门店价签变更审计系统</h1>
+      <p>追踪电子价签、收银价、促销活动、设备离线、回滚补发、价差审计</p>
+    </header>
+
+    <div id="stats" class="stats-grid"></div>
+
+    <div class="filter-bar">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label>状态筛选</label>
+          <select id="filterStatus">
+            <option value="">全部状态</option>
+            <option value="SUCCESS">✅ 成功</option>
+            <option value="INTERCEPTED">🚫 已拦截</option>
+            <option value="MANUAL_CORRECTION_REQUIRED">⚠️ 需人工修正</option>
+            <option value="ROLLED_BACK">↩️ 已回滚</option>
+            <option value="REISSUED">🔄 已补发</option>
+            <option value="PENDING_REISSUE">⏳ 待补发</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>商品编码</label>
+          <input type="text" id="filterProduct" placeholder="输入编码...">
+        </div>
+        <div class="filter-group">
+          <label>操作员</label>
+          <input type="text" id="filterOperator" placeholder="输入姓名...">
+        </div>
+        <div class="filter-group">
+          <label>开始日期</label>
+          <input type="date" id="filterStart">
+        </div>
+        <div class="filter-group">
+          <label>结束日期</label>
+          <input type="date" id="filterEnd">
+        </div>
+        <button class="btn btn-primary" onclick="loadData()">🔍 查询</button>
+        <button class="btn btn-secondary" onclick="resetFilters()">重置</button>
+      </div>
+      <div class="actions">
+        <button class="btn btn-success" onclick="showCreateModal()">➕ 新建变更</button>
+        <button class="btn btn-warning" onclick="showBatchModal()">📥 批量导入</button>
+        <button class="btn btn-primary" onclick="exportData()">📤 导出CSV</button>
+      </div>
+    </div>
+
+    <div id="tableContainer">
+      <div class="loading">加载中...</div>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📋 价签变更详情</h2>
+        <button class="modal-close" onclick="closeModal('detailModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="detailContent"></div>
+    </div>
+  </div>
+
+  <div id="createModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ 新建价签变更</h2>
+        <button class="modal-close" onclick="closeModal('createModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="createForm">
+          <div class="form-group">
+            <label>商品编码 *</label>
+            <input type="text" name="product_code" required>
+          </div>
+          <div class="form-group">
+            <label>商品名称</label>
+            <input type="text" name="product_name">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label>原价 *</label>
+              <input type="number" step="0.01" name="old_price" required>
+            </div>
+            <div class="form-group">
+              <label>新价 *</label>
+              <input type="number" step="0.01" name="new_price" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>操作员 *</label>
+            <input type="text" name="operator" required>
+          </div>
+          <div class="form-group">
+            <label>变更原因</label>
+            <textarea name="reason" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>电子价签设备ID (逗号分隔)</label>
+            <input type="text" name="devices" placeholder="ESL-A-001,ESL-A-002">
+          </div>
+          <div class="form-group">
+            <label>收银终端ID (逗号分隔)</label>
+            <input type="text" name="terminals" placeholder="POS-001,POS-002">
+          </div>
+          <div class="form-group">
+            <label>请求ID (用于幂等，不填自动生成)</label>
+            <input type="text" name="request_id" placeholder="可选">
+          </div>
+          <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+              <input type="checkbox" name="simulate_offline"> 模拟设备离线
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+              <input type="checkbox" name="simulate_cashier_failure"> 模拟收银失败
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 14px;">
+              <input type="checkbox" name="force"> 忽略促销强制变更
+            </label>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary">提交</button>
+            <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')">取消</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="batchModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>📥 批量导入</h2>
+        <button class="modal-close" onclick="closeModal('batchModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>上传CSV文件</label>
+          <input type="file" id="batchFile" accept=".csv">
+        </div>
+        <div class="form-group">
+          <label>操作员</label>
+          <input type="text" id="batchOperator" value="system">
+        </div>
+        <div style="background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 16px;">
+          <p style="font-size: 12px; color: #666; margin-bottom: 8px;">CSV格式示例：</p>
+          <code style="font-size: 11px; background: #e2e8f0; padding: 4px 8px; border-radius: 4px; display: block;">
+            product_code,product_name,old_price,new_price,reason,device_id,terminal_id,simulate_offline,simulate_failure<br>
+            SKU101,商品A,10.00,12.00,调价,ESL-001,POS-001,false,false
+          </code>
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <button class="btn btn-primary" onclick="batchImport()">导入</button>
+          <button class="btn btn-secondary" onclick="closeModal('batchModal')">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '';
+
+    const STATUS_MAP = {
+      'SUCCESS': { text: '成功', class: 'badge-success' },
+      'INTERCEPTED': { text: '已拦截', class: 'badge-danger' },
+      'MANUAL_CORRECTION_REQUIRED': { text: '需人工修正', class: 'badge-warning' },
+      'ROLLED_BACK': { text: '已回滚', class: 'badge-secondary' },
+      'REISSUED': { text: '已补发', class: 'badge-info' },
+      'PENDING_REISSUE': { text: '待补发', class: 'badge-purple' },
+      'PROCESSING': { text: '处理中', class: 'badge-info' }
+    };
+
+    const EVENT_MAP = {
+      'SUBMITTED': '📝 提交变更',
+      'COMPLETED': '✅ 处理完成',
+      'PROMOTION_INTERCEPTED': '🚫 促销拦截',
+      'DEVICE_OFFLINE': '📴 设备离线',
+      'CASHIER_FAILURE': '❌ 收银失败',
+      'PRICE_DISCREPANCY_DETECTED': '⚠️ 价差检测',
+      'ROLLED_BACK': '↩️ 已回滚',
+      'REISSUED': '🔄 已补发',
+      'DUPLICATE_SUBMISSION': '🔁 重复提交'
+    };
+
+    async function loadStats() {
+      const res = await fetch(`${API_BASE}/api/statistics`);
+      const data = await res.json();
+      const html = `
+        <div class="stat-card">
+          <h3>变更总数</h3>
+          <div class="value">${data.total || 0}</div>
+        </div>
+        <div class="stat-card">
+          <h3>今日变更</h3>
+          <div class="value">${data.today || 0}</div>
+        </div>
+        <div class="stat-card">
+          <h3>成功</h3>
+          <div class="value" style="color: #38a169;">${data.by_status?.SUCCESS || 0}</div>
+        </div>
+        <div class="stat-card">
+          <h3>需人工修正</h3>
+          <div class="value" style="color: #dd6b20;">${data.by_status?.MANUAL_CORRECTION_REQUIRED || 0}</div>
+        </div>
+        <div class="stat-card">
+          <h3>待处理价差</h3>
+          <div class="value" style="color: #e53e3e;">${data.open_discrepancies || 0}</div>
+        </div>
+      `;
+      document.getElementById('stats').innerHTML = html;
+    }
+
+    async function loadData() {
+      const params = new URLSearchParams();
+      if (document.getElementById('filterStatus').value) params.append('status', document.getElementById('filterStatus').value);
+      if (document.getElementById('filterProduct').value) params.append('product_code', document.getElementById('filterProduct').value);
+      if (document.getElementById('filterOperator').value) params.append('operator', document.getElementById('filterOperator').value);
+      if (document.getElementById('filterStart').value) params.append('start_date', document.getElementById('filterStart').value);
+      if (document.getElementById('filterEnd').value) params.append('end_date', document.getElementById('filterEnd').value);
+
+      document.getElementById('tableContainer').innerHTML = '<div class="loading">加载中...</div>';
+      
+      const res = await fetch(`${API_BASE}/api/price-changes?${params}`);
+      const { data } = await res.json();
+      
+      if (data.length === 0) {
+        document.getElementById('tableContainer').innerHTML = '<div class="empty">暂无数据</div>';
+        return;
+      }
+
+      let html = '<table><thead><tr>';
+      html += '<th>ID</th><th>商品编码</th><th>商品名称</th><th>原价</th><th>新价</th><th>状态</th><th>操作员</th><th>请求ID</th><th>时间</th><th>操作</th>';
+      html += '</tr></thead><tbody>';
+      
+      data.forEach(item => {
+        const status = STATUS_MAP[item.status] || { text: item.status, class: 'badge-secondary' };
+        html += `
+          <tr>
+            <td>${item.id}</td>
+            <td><strong>${item.product_code}</strong></td>
+            <td>${item.product_name || '-'}</td>
+            <td>¥${item.old_price?.toFixed(2)}</td>
+            <td>¥${item.new_price?.toFixed(2)}</td>
+            <td><span class="badge ${status.class}">${status.text}</span></td>
+            <td>${item.operator || '-'}</td>
+            <td><small>${item.request_id || '-'}</small></td>
+            <td><small>${item.created_at}</small></td>
+            <td>
+              <button class="link-btn" onclick="viewDetail(${item.id})">查看</button>
+            </td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      document.getElementById('tableContainer').innerHTML = html;
+      loadStats();
+    }
+
+    function resetFilters() {
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('filterProduct').value = '';
+      document.getElementById('filterOperator').value = '';
+      document.getElementById('filterStart').value = '';
+      document.getElementById('filterEnd').value = '';
+      loadData();
+    }
+
+    async function viewDetail(id) {
+      const res = await fetch(`${API_BASE}/api/price-changes/${id}`);
+      const item = await res.json();
+      const status = STATUS_MAP[item.status] || { text: item.status, class: 'badge-secondary' };
+
+      let html = `
+        <div class="section">
+          <h3>📌 基本信息</h3>
+          <div class="detail-grid">
+            <div class="detail-item"><label>ID</label><span>${item.id}</span></div>
+            <div class="detail-item"><label>状态</label><span class="badge ${status.class}">${status.text}</span></div>
+            <div class="detail-item"><label>商品编码</label><span>${item.product_code}</span></div>
+            <div class="detail-item"><label>商品名称</label><span>${item.product_name || '-'}</span></div>
+            <div class="detail-item"><label>原价</label><span>¥${item.old_price?.toFixed(2)}</span></div>
+            <div class="detail-item"><label>新价</label><span>¥${item.new_price?.toFixed(2)}</span></div>
+            <div class="detail-item"><label>操作员</label><span>${item.operator || '-'}</span></div>
+            <div class="detail-item"><label>请求ID</label><span><small>${item.request_id}</small></span></div>
+            <div class="detail-item"><label>创建时间</label><span>${item.created_at}</span></div>
+            <div class="detail-item"><label>变更原因</label><span>${item.reason || '-'}</span></div>
+          </div>
+        </div>
+      `;
+
+      if (item.esl_changes?.length > 0) {
+        html += `
+          <div class="section">
+            <h3>📱 电子价签变更</h3>
+            <table>
+              <thead><tr><th>设备ID</th><th>原价</th><th>新价</th><th>状态</th><th>发送时间</th><th>同步时间</th></tr></thead>
+              <tbody>
+                ${item.esl_changes.map(e => `
+                  <tr>
+                    <td>${e.device_id}</td>
+                    <td>¥${e.old_price?.toFixed(2)}</td>
+                    <td>¥${e.new_price?.toFixed(2)}</td>
+                    <td><span class="badge ${e.status === 'SYNCED' ? 'badge-success' : e.status === 'OFFLINE' ? 'badge-warning' : 'badge-secondary'}">${e.status}</span></td>
+                    <td>${e.sent_at || '-'}</td>
+                    <td>${e.synced_at || '-'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (item.cashier_changes?.length > 0) {
+        html += `
+          <div class="section">
+            <h3>💰 收银价变更</h3>
+            <table>
+              <thead><tr><th>终端ID</th><th>原价</th><th>新价</th><th>状态</th><th>应用时间</th><th>错误</th></tr></thead>
+              <tbody>
+                ${item.cashier_changes.map(c => `
+                  <tr>
+                    <td>${c.terminal_id}</td>
+                    <td>¥${c.old_price?.toFixed(2)}</td>
+                    <td>¥${c.new_price?.toFixed(2)}</td>
+                    <td><span class="badge ${c.status === 'APPLIED' ? 'badge-success' : c.status === 'FAILED' ? 'badge-danger' : 'badge-secondary'}">${c.status}</span></td>
+                    <td>${c.applied_at || '-'}</td>
+                    <td>${c.error_message || '-'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (item.promotions?.length > 0) {
+        html += `
+          <div class="section">
+            <h3>🎁 促销活动</h3>
+            <table>
+              <thead><tr><th>促销名称</th><th>类型</th><th>生效开始</th><th>生效结束</th><th>状态</th></tr></thead>
+              <tbody>
+                ${item.promotions.map(p => `
+                  <tr>
+                    <td>${p.promotion_name}</td>
+                    <td>${p.rule_type}</td>
+                    <td>${p.effect_start || '-'}</td>
+                    <td>${p.effect_end || '-'}</td>
+                    <td><span class="badge ${p.status === 'ACTIVE' ? 'badge-success' : 'badge-secondary'}">${p.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (item.discrepancies?.length > 0) {
+        html += `
+          <div class="section">
+            <h3>⚠️ 价差审计</h3>
+            <table>
+              <thead><tr><th>电子价</th><th>收银价</th><th>价差</th><th>发现时间</th><th>状态</th></tr></thead>
+              <tbody>
+                ${item.discrepancies.map(d => `
+                  <tr>
+                    <td>¥${d.esl_price?.toFixed(2)}</td>
+                    <td>¥${d.cashier_price?.toFixed(2)}</td>
+                    <td><span class="badge badge-danger">¥${d.difference?.toFixed(2)}</span></td>
+                    <td>${d.discovered_at}</td>
+                    <td><span class="badge ${d.status === 'OPEN' ? 'badge-danger' : 'badge-success'}">${d.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (item.timeline?.length > 0) {
+        html += `
+          <div class="section">
+            <h3>📜 审计时间线</h3>
+            <div class="timeline">
+              ${item.timeline.slice().reverse().map(t => `
+                <div class="timeline-item">
+                  <h4>${EVENT_MAP[t.event_type] || t.event_type}</h4>
+                  <p>${JSON.stringify(t.event_details)}</p>
+                  <div class="time">${t.operator || 'system'} · ${t.created_at}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      html += `
+        <div style="display: flex; gap: 12px; margin-top: 20px;">
+          <button class="btn btn-danger" onclick="rollbackChange(${item.id})">↩️ 回滚</button>
+          <button class="btn btn-warning" onclick="reissueChange(${item.id})">🔄 补发</button>
+        </div>
+      `;
+
+      document.getElementById('detailContent').innerHTML = html;
+      document.getElementById('detailModal').classList.add('show');
+    }
+
+    async function rollbackChange(id) {
+      if (!confirm('确定要回滚这条价签变更吗？')) return;
+      const operator = prompt('请输入操作员姓名:');
+      if (!operator) return;
+      const reason = prompt('请输入回滚原因:') || '';
+      
+      const res = await fetch(`${API_BASE}/api/price-changes/${id}/rollback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rollback_by: operator, rollback_reason: reason, reissue: false })
+      });
+      const data = await res.json();
+      alert(data.success ? '回滚成功！' : '回滚失败: ' + data.error);
+      closeModal('detailModal');
+      loadData();
+    }
+
+    async function reissueChange(id) {
+      if (!confirm('确定要补发这条价签变更吗？')) return;
+      const operator = prompt('请输入操作员姓名:') || 'system';
+      
+      const res = await fetch(`${API_BASE}/api/price-changes/${id}/reissue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ operator })
+      });
+      const data = await res.json();
+      alert(data.success ? `补发成功！已补发 ${data.reissue_count} 次` : '补发失败: ' + data.error);
+      closeModal('detailModal');
+      loadData();
+    }
+
+    function showCreateModal() {
+      document.getElementById('createModal').classList.add('show');
+    }
+
+    function showBatchModal() {
+      document.getElementById('batchModal').classList.add('show');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        product_code: form.product_code.value,
+        product_name: form.product_name.value,
+        old_price: parseFloat(form.old_price.value),
+        new_price: parseFloat(form.new_price.value),
+        operator: form.operator.value,
+        reason: form.reason.value,
+        force: form.force.checked
+      };
+      if (form.request_id.value) data.request_id = form.request_id.value;
+      if (form.devices.value) {
+        data.devices = form.devices.value.split(',').map(d => ({
+          device_id: d.trim(),
+          simulate_offline: form.simulate_offline.checked
+        }));
+      }
+      if (form.terminals.value) {
+        data.terminals = form.terminals.value.split(',').map(t => ({
+          terminal_id: t.trim(),
+          simulate_failure: form.simulate_cashier_failure.checked
+        }));
+      }
+      
+      const res = await fetch(`${API_BASE}/api/price-changes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      
+      if (result.success) {
+        if (result.idempotent) {
+          alert('⚠️ 重复提交，已幂等处理。原记录ID: ' + result.price_change_id);
+        } else {
+          let msg = '✅ 创建成功！\nID: ' + result.price_change_id + '\n状态: ' + result.status;
+          if (result.errors?.length > 0) msg += '\n问题: ' + result.errors.join(', ');
+          alert(msg);
+        }
+        closeModal('createModal');
+        form.reset();
+        loadData();
+      } else {
+        alert('创建失败: ' + result.error);
+      }
+    });
+
+    async function batchImport() {
+      const file = document.getElementById('batchFile').files[0];
+      const operator = document.getElementById('batchOperator').value;
+      if (!file) { alert('请选择文件'); return; }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('operator', operator);
+
+      const res = await fetch(`${API_BASE}/api/price-changes/batch`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      alert(`批量导入完成！\n总数: ${data.total}\n成功: ${data.success}\n失败: ${data.failed}`);
+      closeModal('batchModal');
+      loadData();
+    }
+
+    function exportData() {
+      const params = new URLSearchParams();
+      if (document.getElementById('filterStatus').value) params.append('status', document.getElementById('filterStatus').value);
+      if (document.getElementById('filterProduct').value) params.append('product_code', document.getElementById('filterProduct').value);
+      if (document.getElementById('filterOperator').value) params.append('operator', document.getElementById('filterOperator').value);
+      if (document.getElementById('filterStart').value) params.append('start_date', document.getElementById('filterStart').value);
+      if (document.getElementById('filterEnd').value) params.append('end_date', document.getElementById('filterEnd').value);
+      window.location.href = `${API_BASE}/api/export/price-changes?${params}`;
+    }
+
+    document.querySelectorAll('.modal').forEach(m => {
+      m.addEventListener('click', (e) => {
+        if (e.target === m) m.classList.remove('show');
+      });
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
