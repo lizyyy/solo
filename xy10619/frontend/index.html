@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>图书馆赔偿替代系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sidebar {
+      min-height: 100vh;
+      background: #1a237e;
+    }
+    .sidebar .nav-link {
+      color: rgba(255,255,255,0.8);
+      padding: 12px 20px;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active {
+      color: white;
+      background: rgba(255,255,255,0.1);
+    }
+    .stat-card {
+      border-radius: 12px;
+      border: none;
+      transition: transform 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .severity-high {
+      background: #dc3545;
+      color: white;
+    }
+    .severity-medium {
+      background: #ffc107;
+      color: black;
+    }
+    .severity-low {
+      background: #28a745;
+      color: white;
+    }
+    .table-responsive {
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    .badge-lg {
+      font-size: 0.9em;
+      padding: 6px 12px;
+    }
+    .nav-tabs .nav-link {
+      border: none;
+      padding: 10px 20px;
+    }
+    .nav-tabs .nav-link.active {
+      border-bottom: 3px solid #1a237e;
+      color: #1a237e;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="container-fluid">
+    <div class="row">
+      <div class="col-md-2 sidebar p-0">
+        <div class="p-3 text-white border-bottom border-white/20">
+          <h5 class="mb-0">📚 图书馆赔偿系统</h5>
+        </div>
+        <nav class="nav flex-column mt-3">
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'dashboard'" :class="{ active: currentPage === 'dashboard' }">
+            📊 数据概览
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'borrows'" :class="{ active: currentPage === 'borrows' }">
+            📖 借阅管理
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'anomalies'" :class="{ active: currentPage === 'anomalies' }">
+            ⚠️ 异常看板
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'debts'" :class="{ active: currentPage === 'debts' }">
+            💰 欠费管理
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'compensations'" :class="{ active: currentPage === 'compensations' }">
+            📦 赔偿管理
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'reports'" :class="{ active: currentPage === 'reports' }">
+            📋 报表导出
+          </a>
+          <a class="nav-link" href="#" @click.prevent="currentPage = 'logs'" :class="{ active: currentPage === 'logs' }">
+            📝 修改日志
+          </a>
+        </nav>
+      </div>
+
+      <div class="col-md-10 p-4 bg-light">
+        <div v-if="currentPage === 'dashboard'">
+          <h3 class="mb-4">数据概览</h3>
+          
+          <div class="row mb-4">
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-primary">
+                <div class="card-body">
+                  <h6 class="card-title">逾期数量</h6>
+                  <h2>{{ statistics.overdueCount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-danger">
+                <div class="card-body">
+                  <h6 class="card-title">未缴欠费</h6>
+                  <h2>{{ statistics.unpaidDebtCount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-warning">
+                <div class="card-body">
+                  <h6 class="card-title">欠费总额</h6>
+                  <h2>¥{{ statistics.totalUnpaidAmount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-info">
+                <div class="card-body">
+                  <h6 class="card-title">待处理异常</h6>
+                  <h2>{{ statistics.anomalyCount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-secondary">
+                <div class="card-body">
+                  <h6 class="card-title">待处理遗失</h6>
+                  <h2>{{ statistics.lostCompensationCount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-2 mb-3">
+              <div class="card stat-card text-white bg-success">
+                <div class="card-body">
+                  <h6 class="card-title">待审批减免</h6>
+                  <h2>{{ statistics.pendingReductionCount || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-white">
+                  <h6>最近异常</h6>
+                </div>
+                <div class="card-body p-0">
+                  <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>类型</th>
+                        <th>描述</th>
+                        <th>严重度</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in recentAnomalies" :key="item.id">
+                        <td>{{ item.anomaly_type }}</td>
+                        <td>{{ item.description }}</td>
+                        <td><span class="badge" :class="'severity-' + item.severity">{{ item.severity }}</span></td>
+                        <td><span class="badge" :class="item.is_resolved ? 'bg-success' : 'bg-warning'">{{ item.is_resolved ? '已解决' : '待处理' }}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-white">
+                  <h6>最近欠费</h6>
+                </div>
+                <div class="card-body p-0">
+                  <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>读者</th>
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="item in recentDebts" :key="item.id">
+                        <td>{{ item.reader_name }}</td>
+                        <td>{{ getDebtTypeName(item.debt_type) }}</td>
+                        <td>¥{{ item.final_amount }}</td>
+                        <td><span class="badge" :class="item.is_paid ? 'bg-success' : 'bg-danger'">{{ item.is_paid ? '已缴' : '未缴' }}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'borrows'">
+          <h3 class="mb-4">借阅管理</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <select class="form-select" v-model="filters.readerId">
+                    <option value="">全部读者</option>
+                    <option v-for="r in readers" :key="r.id" :value="r.id">{{ r.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" v-model="filters.status">
+                    <option value="">全部状态</option>
+                    <option value="borrowed">借阅中</option>
+                    <option value="returned">已归还</option>
+                    <option value="damaged">破损</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <input type="date" class="form-control" v-model="filters.startDate" placeholder="开始日期">
+                </div>
+                <div class="col-md-2">
+                  <input type="date" class="form-control" v-model="filters.endDate" placeholder="结束日期">
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-primary w-100" @click="loadBorrows">🔍 搜索</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>读者</th>
+                      <th>图书</th>
+                      <th>借阅日期</th>
+                      <th>应还日期</th>
+                      <th>逾期天数</th>
+                      <th>逾期费用</th>
+                      <th>破损等级</th>
+                      <th>破损赔偿</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in borrows" :key="item.id">
+                      <td>{{ item.reader_name }}</td>
+                      <td>{{ item.book_title }}</td>
+                      <td>{{ item.borrow_date }}</td>
+                      <td>{{ item.due_date }}</td>
+                      <td><span :class="{ 'text-danger': item.overdue_days > 0 }">{{ item.overdue_days }}</span></td>
+                      <td>¥{{ item.overdue_fine }}</td>
+                      <td>{{ item.damage_level_name || '-' }}</td>
+                      <td>¥{{ item.damage_compensation }}</td>
+                      <td><span class="badge bg-secondary">{{ item.status }}</span></td>
+                      <td>
+                        <button class="btn btn-sm btn-outline-primary" @click="editBorrow(item)">编辑</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'anomalies'">
+          <h3 class="mb-4">异常看板</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <select class="form-select" v-model="anomalyFilters.isResolved">
+                    <option value="">全部状态</option>
+                    <option value="0">待处理</option>
+                    <option value="1">已解决</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <select class="form-select" v-model="anomalyFilters.severity">
+                    <option value="">全部严重度</option>
+                    <option value="high">高</option>
+                    <option value="medium">中</option>
+                    <option value="low">低</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <button class="btn btn-primary w-100" @click="loadAnomalies">🔍 搜索</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>记录类型</th>
+                      <th>异常类型</th>
+                      <th>描述</th>
+                      <th>严重度</th>
+                      <th>创建时间</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in anomalies" :key="item.id">
+                      <td>{{ item.record_type }}</td>
+                      <td>{{ item.anomaly_type }}</td>
+                      <td>{{ item.description }}</td>
+                      <td><span class="badge" :class="'severity-' + item.severity">{{ item.severity === 'high' ? '高' : item.severity === 'medium' ? '中' : '低' }}</span></td>
+                      <td>{{ item.created_at }}</td>
+                      <td><span class="badge" :class="item.is_resolved ? 'bg-success' : 'bg-warning'">{{ item.is_resolved ? '已解决' : '待处理' }}</span></td>
+                      <td>
+                        <button v-if="!item.is_resolved" class="btn btn-sm btn-success" @click="resolveAnomaly(item)">解决</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'debts'">
+          <h3 class="mb-4">欠费管理</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <select class="form-select" v-model="debtFilters.readerId">
+                    <option value="">全部读者</option>
+                    <option v-for="r in readers" :key="r.id" :value="r.id">{{ r.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" v-model="debtFilters.debtType">
+                    <option value="">全部类型</option>
+                    <option value="overdue">逾期费用</option>
+                    <option value="damage">破损赔偿</option>
+                    <option value="lost">遗失赔偿</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <select class="form-select" v-model="debtFilters.isPaid">
+                    <option value="">全部状态</option>
+                    <option value="0">未缴</option>
+                    <option value="1">已缴</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-primary w-100" @click="loadDebts">🔍 搜索</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>读者</th>
+                      <th>图书</th>
+                      <th>费用类型</th>
+                      <th>原始金额</th>
+                      <th>减免金额</th>
+                      <th>最终金额</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in debts" :key="item.id">
+                      <td>{{ item.reader_name }}</td>
+                      <td>{{ item.book_title || '-' }}</td>
+                      <td>{{ getDebtTypeName(item.debt_type) }}</td>
+                      <td>¥{{ item.original_amount }}</td>
+                      <td>¥{{ item.reduction_amount }}</td>
+                      <td class="fw-bold">¥{{ item.final_amount }}</td>
+                      <td><span class="badge" :class="item.is_paid ? 'bg-success' : 'bg-danger'">{{ item.is_paid ? '已缴' : '未缴' }}</span></td>
+                      <td>
+                        <button v-if="!item.is_paid" class="btn btn-sm btn-success me-1" @click="payDebt(item)">缴费</button>
+                        <button v-if="!item.is_paid" class="btn btn-sm btn-warning" @click="applyReduction(item)">申请减免</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'compensations'">
+          <h3 class="mb-4">赔偿管理</h3>
+          
+          <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+              <a class="nav-link" href="#" :class="{ active: compTab === 'lost' }" @click.prevent="compTab = 'lost'">遗失赔偿</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" :class="{ active: compTab === 'replacement' }" @click.prevent="compTab = 'replacement'">替代书验收</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" :class="{ active: compTab === 'reduction' }" @click.prevent="compTab = 'reduction'">减免审批</a>
+            </li>
+          </ul>
+
+          <div v-if="compTab === 'lost'" class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>读者</th>
+                      <th>图书</th>
+                      <th>赔偿金额</th>
+                      <th>赔偿类型</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in lostCompensations" :key="item.id">
+                      <td>{{ item.reader_name }}</td>
+                      <td>{{ item.book_title }}</td>
+                      <td>¥{{ item.compensation_amount }}</td>
+                      <td>{{ item.compensation_type }}</td>
+                      <td><span class="badge" :class="item.is_paid ? 'bg-success' : 'bg-danger'">{{ item.is_paid ? '已支付' : '未支付' }}</span></td>
+                      <td>
+                        <button v-if="!item.is_paid" class="btn btn-sm btn-success" @click="payLostCompensation(item)">确认支付</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="compTab === 'replacement'" class="card">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <h6 class="mb-0">替代书列表</h6>
+              <button class="btn btn-primary btn-sm" @click="showAddReplacement = true">+ 添加替代书</button>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>书名</th>
+                      <th>ISBN</th>
+                      <th>出版社</th>
+                      <th>验收状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in replacementBooks" :key="item.id">
+                      <td>{{ item.book_title }}</td>
+                      <td>{{ item.isbn || '-' }}</td>
+                      <td>{{ item.publisher || '-' }}</td>
+                      <td><span class="badge" :class="item.accept_status === 'accepted' ? 'bg-success' : 'bg-warning'">{{ item.accept_status === 'accepted' ? '已验收' : '待验收' }}</span></td>
+                      <td>
+                        <button v-if="item.accept_status !== 'accepted'" class="btn btn-sm btn-success" @click="acceptReplacement(item)">验收通过</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="compTab === 'reduction'" class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>读者</th>
+                      <th>费用类型</th>
+                      <th>原始金额</th>
+                      <th>减免金额</th>
+                      <th>减免原因</th>
+                      <th>状态</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in reductions" :key="item.id">
+                      <td>{{ item.reader_name }}</td>
+                      <td>{{ getDebtTypeName(item.debt_type) }}</td>
+                      <td>¥{{ item.original_amount }}</td>
+                      <td>¥{{ item.reduction_amount }}</td>
+                      <td>{{ item.reduction_reason }}</td>
+                      <td><span class="badge" :class="item.approval_status === 'approved' ? 'bg-success' : 'bg-warning'">{{ item.approval_status === 'approved' ? '已批准' : '待审批' }}</span></td>
+                      <td>
+                        <button v-if="item.approval_status !== 'approved'" class="btn btn-sm btn-success" @click="approveReduction(item)">批准</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'reports'">
+          <h3 class="mb-4">报表导出</h3>
+          
+          <div class="card">
+            <div class="card-body">
+              <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                  <label class="form-label">报表类型</label>
+                  <select class="form-select" v-model="reportFilters.reportType">
+                    <option value="debts">欠费记录报表</option>
+                    <option value="borrows">借阅记录报表</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">处理人</label>
+                  <select class="form-select" v-model="reportFilters.processedBy">
+                    <option value="">全部处理人</option>
+                    <option v-for="s in staff" :key="s.id" :value="s.id">{{ s.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">开始日期</label>
+                  <input type="date" class="form-control" v-model="reportFilters.startDate">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">结束日期</label>
+                  <input type="date" class="form-control" v-model="reportFilters.endDate">
+                </div>
+              </div>
+
+              <div v-if="reportFilters.reportType === 'debts'" class="mb-4">
+                <label class="form-label">包含费用类型</label>
+                <div class="d-flex gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="reportFilters.includeOverdue" id="overdue">
+                    <label class="form-check-label" for="overdue">逾期费用</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="reportFilters.includeDamage" id="damage">
+                    <label class="form-check-label" for="damage">破损赔偿</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="reportFilters.includeLost" id="lost">
+                    <label class="form-check-label" for="lost">遗失赔偿</label>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" @click="exportReport">📥 导出Excel报表</button>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div class="card-header bg-white">
+              <h6>汇总统计</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <div class="text-center p-3 border rounded">
+                    <h6>未缴欠费</h6>
+                    <h3>{{ reportSummary.unpaid?.count || 0 }} 笔</h3>
+                    <p class="text-danger">¥{{ reportSummary.unpaid?.amount || 0 }}</p>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="text-center p-3 border rounded">
+                    <h6>已缴欠费</h6>
+                    <h3>{{ reportSummary.paid?.count || 0 }} 笔</h3>
+                    <p class="text-success">¥{{ reportSummary.paid?.amount || 0 }}</p>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="text-center p-3 border rounded">
+                    <h6>待处理遗失</h6>
+                    <h3>{{ reportSummary.lost?.count || 0 }} 笔</h3>
+                    <p class="text-warning">¥{{ reportSummary.lost?.amount || 0 }}</p>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="text-center p-3 border rounded">
+                    <h6>待审批减免</h6>
+                    <h3>{{ reportSummary.pendingReduction?.count || 0 }} 笔</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'logs'">
+          <h3 class="mb-4">修改日志</h3>
+          
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-md-5">
+                  <select class="form-select" v-model="logFilters.tableName">
+                    <option value="">全部表</option>
+                    <option value="borrow_records">借阅记录</option>
+                    <option value="reader_debts">欠费记录</option>
+                    <option value="lost_compensation">遗失赔偿</option>
+                  </select>
+                </div>
+                <div class="col-md-5">
+                  <input type="text" class="form-control" v-model="logFilters.recordId" placeholder="记录ID">
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-primary w-100" @click="loadLogs">🔍 搜索</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light sticky-top">
+                    <tr>
+                      <th>表名</th>
+                      <th>记录ID</th>
+                      <th>字段</th>
+                      <th>原值</th>
+                      <th>新值</th>
+                      <th>修改人</th>
+                      <th>修改时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in logs" :key="item.id">
+                      <td>{{ item.table_name }}</td>
+                      <td>{{ item.record_id }}</td>
+                      <td>{{ item.field_name }}</td>
+                      <td class="text-danger">{{ item.old_value || '-' }}</td>
+                      <td class="text-success">{{ item.new_value || '-' }}</td>
+                      <td>{{ item.modified_by_name || '-' }}</td>
+                      <td>{{ item.modified_at }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="borrowModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">编辑借阅记录</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">是否逾期</label>
+              <select class="form-select" v-model="editForm.is_overdue">
+                <option :value="0">否</option>
+                <option :value="1">是</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">逾期天数</label>
+              <input type="number" class="form-control" v-model.number="editForm.overdue_days">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">逾期费用</label>
+              <input type="number" step="0.01" class="form-control" v-model.number="editForm.overdue_fine">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">破损等级</label>
+              <select class="form-select" v-model="editForm.damage_level_id">
+                <option :value="null">无</option>
+                <option v-for="d in damageLevels" :key="d.id" :value="d.id">{{ d.level_name }} ({{ d.compensation_ratio }}倍)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">破损赔偿金额</label>
+              <input type="number" step="0.01" class="form-control" v-model.number="editForm.damage_compensation">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">状态</label>
+              <select class="form-select" v-model="editForm.status">
+                <option value="borrowed">借阅中</option>
+                <option value="returned">已归还</option>
+                <option value="damaged">破损</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">处理人</label>
+              <select class="form-select" v-model="editForm.processed_by">
+                <option v-for="s in staff" :key="s.id" :value="s.id">{{ s.name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" @click="saveBorrow">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="reductionModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">申请减免</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">减免金额</label>
+              <input type="number" step="0.01" class="form-control" v-model.number="reductionForm.reductionAmount">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">减免原因</label>
+              <textarea class="form-control" v-model="reductionForm.reductionReason" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" @click="submitReduction">提交申请</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="replacementModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">添加替代书</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">关联遗失赔偿</label>
+              <select class="form-select" v-model="replacementForm.lostCompensationId">
+                <option v-for="lc in unpaidLostCompensations" :key="lc.id" :value="lc.id">{{ lc.book_title }} - {{ lc.reader_name }}</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">书名</label>
+              <input type="text" class="form-control" v-model="replacementForm.bookTitle">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">ISBN</label>
+              <input type="text" class="form-control" v-model="replacementForm.isbn">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">出版社</label>
+              <input type="text" class="form-control" v-model="replacementForm.publisher">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" @click="submitReplacement">提交</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
