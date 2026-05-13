@@ -1,0 +1,95 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "useMock": true,
+  
+  "tenants": [
+    {
+      "id": "tenant-a",
+      "name": "租户A",
+      "tokenKey": "tenantA",
+      "resourceIds": ["doc-a-1", "order-a-1"]
+    },
+    {
+      "id": "tenant-b",
+      "name": "租户B",
+      "tokenKey": "tenantB",
+      "resourceIds": ["doc-b-1", "order-b-1"]
+    }
+  ],
+  
+  "tokens": {
+    "tenantA": "admin-token-a",
+    "tenantB": "admin-token-b"
+  },
+  
+  "testCases": [
+    {
+      "id": "resource-read",
+      "method": "GET",
+      "path": "/api/resources/:id",
+      "description": "读取资源详情",
+      "notes": "测试单个资源的读取权限隔离"
+    },
+    {
+      "id": "resource-list",
+      "method": "GET",
+      "path": "/api/resources",
+      "description": "资源列表",
+      "notes": "列表接口应该只返回当前租户的数据"
+    },
+    {
+      "id": "resource-modify",
+      "method": "PUT",
+      "path": "/api/resources/:id",
+      "description": "修改资源",
+      "body": {
+        "title": "被修改的标题"
+      }
+    },
+    {
+      "id": "resource-export",
+      "method": "GET",
+      "path": "/api/resources/export",
+      "description": "导出资源",
+      "queryParams": {
+        "id": "doc-a-1"
+      },
+      "targetResourceId": "doc-a-1"
+    },
+    {
+      "id": "resource-delete",
+      "method": "DELETE",
+      "path": "/api/resources/:id",
+      "description": "删除资源"
+    },
+    {
+      "id": "order-read",
+      "method": "GET",
+      "path": "/api/orders/:id",
+      "description": "读取订单"
+    },
+    {
+      "id": "order-modify",
+      "method": "PUT",
+      "path": "/api/orders/:id",
+      "description": "修改订单",
+      "body": {
+        "status": "cancelled"
+      }
+    },
+    {
+      "id": "users-list",
+      "method": "GET",
+      "path": "/api/users",
+      "description": "用户列表",
+      "notes": "应只返回当前租户的用户"
+    },
+    {
+      "id": "admin-dashboard",
+      "method": "GET",
+      "path": "/api/admin",
+      "description": "管理后台",
+      "requiresAdmin": true
+    }
+  ]
+}

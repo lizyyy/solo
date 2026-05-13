@@ -1,0 +1,3593 @@
+{
+  "runs": [
+    {
+      "runAt": "2026-05-13T09:44:37.722Z",
+      "duration": 39,
+      "config": {
+        "baseUrl": "http://localhost:3001",
+        "tenantCount": 2,
+        "testCaseCount": 9
+      },
+      "summary": {
+        "totalTests": 18,
+        "vulnerableTests": 11,
+        "safeTests": 7,
+        "skippedTests": 0,
+        "errors": 0,
+        "uniqueIssues": 6,
+        "readIssues": 5,
+        "writeIssues": 1
+      },
+      "testResults": [
+        {
+          "testCaseId": "resource-read",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 20
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取资源详情",
+          "notes": "测试单个资源的读取权限隔离"
+        },
+        {
+          "testCaseId": "resource-read",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取资源详情",
+          "notes": "测试单个资源的读取权限隔离"
+        },
+        {
+          "testCaseId": "resource-list",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 2
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "资源列表",
+          "notes": "列表接口应该只返回当前租户的数据"
+        },
+        {
+          "testCaseId": "resource-list",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "资源列表",
+          "notes": "列表接口应该只返回当前租户的数据"
+        },
+        {
+          "testCaseId": "resource-modify",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 4
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改资源"
+        },
+        {
+          "testCaseId": "resource-modify",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改资源"
+        },
+        {
+          "testCaseId": "resource-export",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "118",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              },
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 403,
+              "statusText": "Forbidden",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "24",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "禁止访问"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "导出资源"
+        },
+        {
+          "testCaseId": "resource-export",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 403,
+              "statusText": "Forbidden",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "24",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "禁止访问"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "118",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "导出资源"
+        },
+        {
+          "testCaseId": "resource-delete",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "delete",
+          "accessTypeLabel": "删除",
+          "method": "DELETE",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 204,
+              "statusText": "No Content",
+              "headers": {
+                "connection": "keep-alive",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": null,
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "资源不存在"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "删除资源"
+        },
+        {
+          "testCaseId": "resource-delete",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "delete",
+          "accessTypeLabel": "删除",
+          "method": "DELETE",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 204,
+              "statusText": "No Content",
+              "headers": {
+                "connection": "keep-alive",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": null,
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "资源不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "删除资源"
+        },
+        {
+          "testCaseId": "order-read",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/orders/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 1
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取订单"
+        },
+        {
+          "testCaseId": "order-read",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/orders/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取订单"
+        },
+        {
+          "testCaseId": "order-modify",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/orders/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 1
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改订单"
+        },
+        {
+          "testCaseId": "order-modify",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/orders/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改订单"
+        },
+        {
+          "testCaseId": "users-list",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "140",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "141",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "用户列表",
+          "notes": "应只返回当前租户的用户"
+        },
+        {
+          "testCaseId": "users-list",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "141",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "140",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "用户列表",
+          "notes": "应只返回当前租户的用户"
+        },
+        {
+          "testCaseId": "admin-dashboard",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": true,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "管理后台"
+        },
+        {
+          "testCaseId": "admin-dashboard",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:37 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": true,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "管理后台"
+        }
+      ],
+      "issues": [
+        {
+          "id": "70242c6d2327",
+          "testCaseId": "resource-read",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/:id",
+          "description": "读取资源详情",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/doc-a-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/doc-b-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "479883ad8f71",
+          "testCaseId": "resource-list",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "description": "资源列表",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ]
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ]
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "352157280203",
+          "testCaseId": "resource-modify",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/:id",
+          "description": "修改资源",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "PUT",
+                "path": "/api/resources/doc-a-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                },
+                "body": {
+                  "title": "被修改的标题"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "PUT",
+                "path": "/api/resources/doc-b-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                },
+                "body": {
+                  "title": "被修改的标题"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              }
+            }
+          ],
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "requiresAdmin": false
+        },
+        {
+          "id": "e182bb94f5fb",
+          "testCaseId": "resource-export",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "description": "导出资源",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/export",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                },
+                "queryParams": {
+                  "id": "doc-a-1"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "6e399b589a05",
+          "testCaseId": "users-list",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "description": "用户列表",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/users",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ]
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/users",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ]
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "620478887820",
+          "testCaseId": "admin-dashboard",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "description": "管理后台",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/admin",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/admin",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": true
+        }
+      ]
+    },
+    {
+      "runAt": "2026-05-13T09:44:55.853Z",
+      "duration": 49,
+      "config": {
+        "baseUrl": "http://localhost:3002",
+        "tenantCount": 2,
+        "testCaseCount": 9
+      },
+      "summary": {
+        "totalTests": 18,
+        "vulnerableTests": 11,
+        "safeTests": 7,
+        "skippedTests": 0,
+        "errors": 0,
+        "uniqueIssues": 6,
+        "readIssues": 5,
+        "writeIssues": 1
+      },
+      "testResults": [
+        {
+          "testCaseId": "resource-read",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 18
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取资源详情",
+          "notes": "测试单个资源的读取权限隔离"
+        },
+        {
+          "testCaseId": "resource-read",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 3
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "89",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取资源详情",
+          "notes": "测试单个资源的读取权限隔离"
+        },
+        {
+          "testCaseId": "resource-list",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "资源列表",
+          "notes": "列表接口应该只返回当前租户的数据"
+        },
+        {
+          "testCaseId": "resource-list",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "181",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "资源列表",
+          "notes": "列表接口应该只返回当前租户的数据"
+        },
+        {
+          "testCaseId": "resource-modify",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 3
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改资源"
+        },
+        {
+          "testCaseId": "resource-modify",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 1
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "title": "被修改的标题"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "93",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改资源"
+        },
+        {
+          "testCaseId": "resource-export",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "118",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              },
+              "duration": 2
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 403,
+              "statusText": "Forbidden",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "24",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "禁止访问"
+              },
+              "duration": 2
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "导出资源"
+        },
+        {
+          "testCaseId": "resource-export",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 403,
+              "statusText": "Forbidden",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "24",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "禁止访问"
+              },
+              "duration": 2
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/resources/export",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "queryParams": {
+                "id": "doc-a-1"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "118",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "导出资源"
+        },
+        {
+          "testCaseId": "resource-delete",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "delete",
+          "accessTypeLabel": "删除",
+          "method": "DELETE",
+          "path": "/api/resources/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 204,
+              "statusText": "No Content",
+              "headers": {
+                "connection": "keep-alive",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": null,
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "资源不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "删除资源"
+        },
+        {
+          "testCaseId": "resource-delete",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "delete",
+          "accessTypeLabel": "删除",
+          "method": "DELETE",
+          "path": "/api/resources/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 204,
+              "statusText": "No Content",
+              "headers": {
+                "connection": "keep-alive",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": null,
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "DELETE",
+              "path": "/api/resources/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "资源不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "删除资源"
+        },
+        {
+          "testCaseId": "order-read",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/orders/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取订单"
+        },
+        {
+          "testCaseId": "order-read",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/orders/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "读取订单"
+        },
+        {
+          "testCaseId": "order-modify",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/orders/doc-a-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-a-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改订单"
+        },
+        {
+          "testCaseId": "order-modify",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/orders/doc-b-1",
+          "normalAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 1
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "PUT",
+              "path": "/api/orders/doc-b-1",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              },
+              "body": {
+                "status": "cancelled"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 404,
+              "statusText": "Not Found",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "27",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "error": "订单不存在"
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": true,
+            "wasAllowed": false
+          },
+          "vulnerable": false,
+          "requiresAdmin": false,
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "description": "修改订单"
+        },
+        {
+          "testCaseId": "users-list",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "140",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "141",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "用户列表",
+          "notes": "应只返回当前租户的用户"
+        },
+        {
+          "testCaseId": "users-list",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "141",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ],
+              "duration": 0
+            },
+            "allowed": true
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/users",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "140",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ],
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": false,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "用户列表",
+          "notes": "应只返回当前租户的用户"
+        },
+        {
+          "testCaseId": "admin-dashboard",
+          "targetTenant": "tenant-a",
+          "attackerTenant": "tenant-b",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": true,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "管理后台"
+        },
+        {
+          "testCaseId": "admin-dashboard",
+          "targetTenant": "tenant-b",
+          "attackerTenant": "tenant-a",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "normalAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-b"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 0
+            },
+            "allowed": false
+          },
+          "crossTenantAccess": {
+            "request": {
+              "method": "GET",
+              "path": "/api/admin",
+              "headers": {
+                "Authorization": "[REDACTED]",
+                "X-Tenant-Id": "tenant-a"
+              }
+            },
+            "response": {
+              "success": true,
+              "status": 200,
+              "statusText": "OK",
+              "headers": {
+                "connection": "keep-alive",
+                "content-length": "54",
+                "content-type": "application/json",
+                "date": "Wed, 13 May 2026 09:44:55 GMT",
+                "keep-alive": "timeout=5"
+              },
+              "data": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              },
+              "duration": 1
+            },
+            "shouldBeDenied": false,
+            "wasAllowed": true
+          },
+          "vulnerable": true,
+          "requiresAdmin": true,
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "description": "管理后台"
+        }
+      ],
+      "issues": [
+        {
+          "id": "70242c6d2327",
+          "testCaseId": "resource-read",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources/:id",
+          "description": "读取资源详情",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/doc-a-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-a-1",
+                "title": "租户A文档1",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/doc-b-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-b-1",
+                "title": "租户B文档1",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "479883ad8f71",
+          "testCaseId": "resource-list",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/resources",
+          "description": "资源列表",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "doc-b-1",
+                  "title": "租户B文档1",
+                  "content": "机密内容B",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "doc-b-2",
+                  "title": "租户B文档2",
+                  "content": "租户B私有",
+                  "tenantId": "tenant-b"
+                }
+              ]
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "doc-a-1",
+                  "title": "租户A文档1",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "doc-a-2",
+                  "title": "租户A文档2",
+                  "content": "租户A私有",
+                  "tenantId": "tenant-a"
+                }
+              ]
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "352157280203",
+          "testCaseId": "resource-modify",
+          "accessType": "modify",
+          "accessTypeLabel": "修改",
+          "method": "PUT",
+          "path": "/api/resources/:id",
+          "description": "修改资源",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "PUT",
+                "path": "/api/resources/doc-a-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                },
+                "body": {
+                  "title": "被修改的标题"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-a-1",
+                "title": "被修改的标题",
+                "content": "机密内容A",
+                "tenantId": "tenant-a"
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "PUT",
+                "path": "/api/resources/doc-b-1",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                },
+                "body": {
+                  "title": "被修改的标题"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "id": "doc-b-1",
+                "title": "被修改的标题",
+                "content": "机密内容B",
+                "tenantId": "tenant-b"
+              }
+            }
+          ],
+          "isReadOperation": false,
+          "isWriteOperation": true,
+          "requiresAdmin": false
+        },
+        {
+          "id": "e182bb94f5fb",
+          "testCaseId": "resource-export",
+          "accessType": "export",
+          "accessTypeLabel": "导出",
+          "method": "GET",
+          "path": "/api/resources/export",
+          "description": "导出资源",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/resources/export",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                },
+                "queryParams": {
+                  "id": "doc-a-1"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "exported": true,
+                "data": {
+                  "id": "doc-a-1",
+                  "title": "被修改的标题",
+                  "content": "机密内容A",
+                  "tenantId": "tenant-a"
+                }
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "6e399b589a05",
+          "testCaseId": "users-list",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/users",
+          "description": "用户列表",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/users",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "user-b-1",
+                  "name": "Carol",
+                  "role": "admin",
+                  "tenantId": "tenant-b"
+                },
+                {
+                  "id": "user-b-2",
+                  "name": "Dave",
+                  "role": "member",
+                  "tenantId": "tenant-b"
+                }
+              ]
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/users",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": [
+                {
+                  "id": "user-a-1",
+                  "name": "Alice",
+                  "role": "admin",
+                  "tenantId": "tenant-a"
+                },
+                {
+                  "id": "user-a-2",
+                  "name": "Bob",
+                  "role": "member",
+                  "tenantId": "tenant-a"
+                }
+              ]
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": false
+        },
+        {
+          "id": "620478887820",
+          "testCaseId": "admin-dashboard",
+          "accessType": "read",
+          "accessTypeLabel": "读取",
+          "method": "GET",
+          "path": "/api/admin",
+          "description": "管理后台",
+          "occurrences": [
+            {
+              "targetTenant": "tenant-a",
+              "attackerTenant": "tenant-b",
+              "targetResourceId": "doc-a-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/admin",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-b"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "tenant": "租户B",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              }
+            },
+            {
+              "targetTenant": "tenant-b",
+              "attackerTenant": "tenant-a",
+              "targetResourceId": "doc-b-1",
+              "request": {
+                "method": "GET",
+                "path": "/api/admin",
+                "headers": {
+                  "Authorization": "[REDACTED]",
+                  "X-Tenant-Id": "tenant-a"
+                }
+              },
+              "responseStatus": 200,
+              "responseData": {
+                "tenant": "租户A",
+                "stats": {
+                  "users": 2,
+                  "resources": 1
+                }
+              }
+            }
+          ],
+          "isReadOperation": true,
+          "isWriteOperation": false,
+          "requiresAdmin": true
+        }
+      ]
+    }
+  ],
+  "markedFixed": [
+    {
+      "issueId": "70242c6d2327",
+      "note": "已添加 tenantId 校验",
+      "markedAt": "2026-05-13T09:44:49.930Z"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "name": "tenant-isolation-tester",
+  "version": "1.0.0",
+  "description": "API 租户隔离测试 CLI - 自动检测多租户系统中的越权漏洞",
+  "main": "src/index.js",
+  "bin": {
+    "tit": "src/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test tests"
+  },
+  "keywords": ["multi-tenant", "security", "api-testing", "isolation", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "chalk": "^5.3.0",
+    "table": "^6.8.2",
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
