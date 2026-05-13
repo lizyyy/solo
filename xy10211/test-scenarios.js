@@ -403,7 +403,18 @@ async function runCompleteScenario() {
   };
   
   const transitionResult = await billingService.processRecord(badTransitionRecord);
-  log('非法流转检测 (新会话允许直接 completed)', transitionResult, 1);
+  log('非法流转检测 (新会话直接 completed 应该被拒绝)', transitionResult, 1);
+  
+  if (transitionResult.success) {
+    console.error('\n❌ 边界测试 3 失败: 新会话直接 completed 应该被状态机拦截但被接受了！');
+    process.exit(1);
+  }
+  
+  if (transitionResult.code !== 'INVALID_STATE_TRANSITION') {
+    console.error(`\n❌ 边界测试 3 失败: 预期错误码 INVALID_STATE_TRANSITION，实际是 ${transitionResult.code}`);
+    process.exit(1);
+  }
+  console.log('✅ 非法状态流转检测工作正常！');
   
   console.log('\n【测试 4】来源记录缺失场景 (补传记录引用不存在的原始请求)');
   const missingSourceRecord = {

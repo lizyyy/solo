@@ -144,7 +144,7 @@ function getSessionStatusSync(dbInstance, sessionId) {
 
 function isStatusTransitionValid(currentStatus, newStatus) {
   const validTransitions = {
-    null: ['created', 'charging', 'paused', 'resumed', 'completed', 'failed'],
+    null: ['created', 'charging', 'paused', 'resumed', 'failed'],
     'created': ['charging', 'failed'],
     'charging': ['charging', 'paused', 'completed', 'failed'],
     'paused': ['resumed', 'completed', 'failed', 'paused'],

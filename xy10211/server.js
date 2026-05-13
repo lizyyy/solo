@@ -144,12 +144,11 @@ const testScenarios = {
   },
   'invalid-transition': {
     name: '非法状态流转',
-    description: '会话处于 charging 状态时，直接发送 completed 前需要符合状态机规则',
+    description: '新会话直接发送 completed 状态，应该被状态机拦截',
     steps: [
-      'POST /api/charging/record (status=charging, 第一次)',
-      'POST /api/charging/record (status=charging, 同 session 但时间冲突)'
+      'POST /api/charging/record (新会话直接 status=completed)'
     ],
-    expected: ['RECORD_ACCEPTED', 'CONFLICT_DETECTED']
+    expected: ['INVALID_STATE_TRANSITION']
   },
   'missing-fields': {
     name: '缺字段验证',
@@ -570,13 +569,12 @@ app.post('/api/scenarios/:scenarioId', async (req, res) => {
       }
       
       case 'invalid-transition': {
-        const reqId1 = generateId('REQ');
-        const reqId2 = generateId('REQ');
+        const reqId = generateId('REQ');
         const invalidSessionId = generateId('SES-INVALID');
         const baseTime = new Date();
         
-        const record1 = {
-          request_id: reqId1,
+        const record = {
+          request_id: reqId,
           session_id: invalidSessionId,
           community_id: communityId,
           resident_id: residentId,
@@ -585,39 +583,19 @@ app.post('/api/scenarios/:scenarioId', async (req, res) => {
           start_kwh: 0,
           end_kwh: 5.0,
           duration_seconds: 10 * 60,
-          status: 'charging'
+          status: 'completed'
         };
         
-        const result1 = await billingService.processRecord(record1);
-        results.push({ step: 1, description: '正常充电记录', result: result1 });
+        const result = await billingService.processRecord(record);
+        results.push({ step: 1, description: '新会话直接发送 completed 状态', result: result });
         
-        const details = await billingService.getSessionDetails(invalidSessionId);
-        const currentStatus = details?.currentStatus;
-        
-        const record2 = {
-          request_id: reqId2,
-          session_id: invalidSessionId,
-          community_id: communityId,
-          resident_id: residentId,
-          charger_id: chargerId,
-          timestamp: new Date(baseTime.getTime() - 3600000).toISOString(),
-          start_kwh: 2.0,
-          end_kwh: 7.0,
-          duration_seconds: 10 * 60,
-          status: 'charging'
-        };
-        
-        const result2 = await billingService.processRecord(record2);
-        results.push({ step: 2, description: '时间冲突的记录', result: result2 });
-        
-        const passed = result1.success && !result2.success && 
-                      (result2.code === 'CONFLICT_DETECTED' || result2.code === 'INVALID_STATE_TRANSITION');
+        const passed = !result.success && result.code === 'INVALID_STATE_TRANSITION';
         res.json({ 
           success: true, 
           scenario: scenarioId,
           passed,
           results,
-          message: passed ? `非法流转/冲突检测工作正常！当前状态: ${currentStatus}，检测到冲突: ${result2.code}` : '测试失败'
+          message: passed ? `非法状态流转检测工作正常！状态机拦截了 ${result.currentStatus} -> ${result.requestedStatus} 的非法流转` : '测试失败'
         });
         break;
       }
