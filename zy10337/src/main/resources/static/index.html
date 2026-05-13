@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量审批回调协调器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .api-list {
+            list-style: none;
+        }
+        .api-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        .api-method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .POST { background: #28a745; color: white; }
+        .GET { background: #007bff; color: white; }
+        .PUT { background: #ffc107; color: #333; }
+        .DELETE { background: #dc3545; color: white; }
+        .api-path {
+            font-family: 'Courier New', monospace;
+            color: #2c3e50;
+        }
+        .api-desc {
+            margin-top: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 批量审批回调协调器</h1>
+
+        <div class="info-box">
+            <h3>📋 核心功能特性</h3>
+            <ul>
+                <li><strong>批次拆分</strong> - 支持将大批量单据按配置分片处理</li>
+                <li><strong>幂等校验</strong> - 通过幂等键防止重复提交产生脏数据</li>
+                <li><strong>部分失败定位</strong> - 精确追踪每个单据的处理状态和错误信息</li>
+                <li><strong>范围重放</strong> - 支持按单据ID、分片号或全量失败重放</li>
+                <li><strong>回执汇总</strong> - 生成可导出的处理回执和问题排查报告</li>
+                <li><strong>时间线追踪</strong> - 完整记录每个关键动作的操作轨迹</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🚀 快速开始 - API 接口列表</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <span class="api-method POST">POST</span>
+                    <span class="api-path">/api/batches</span>
+                    <div class="api-desc">创建审批批次 - 支持批量单据提交，自动分片，幂等校验</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method POST">POST</span>
+                    <span class="api-path">/api/batches/{batchId}/start</span>
+                    <div class="api-desc">开始处理批次 - 推进批次状态至处理中</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method POST">POST</span>
+                    <span class="api-path">/api/batches/callback</span>
+                    <div class="api-desc">处理回调结果 - 接收业务系统的处理回执，更新单据状态</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method POST">POST</span>
+                    <span class="api-path">/api/batches/{batchId}/replay</span>
+                    <div class="api-desc">重放单据 - 支持按单据ID、分片号或全量失败重放</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches/{batchId}</span>
+                    <div class="api-desc">查询批次详情 - 获取批次基本信息和处理统计</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches</span>
+                    <div class="api-desc">批次列表查询 - 支持按时间范围、来源系统筛选</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches/{batchId}/items</span>
+                    <div class="api-desc">查询批次下所有单据</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches/{batchId}/items/failed</span>
+                    <div class="api-desc">查询失败单据列表</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches/{batchId}/timeline</span>
+                    <div class="api-desc">查询批次时间线 - 完整追踪处理轨迹</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method POST">POST</span>
+                    <span class="api-path">/api/batches/{batchId}/receipts</span>
+                    <div class="api-desc">生成处理回执 - 生成结构化的处理汇总报告</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/api/batches/{batchId}/debug-report</span>
+                    <div class="api-desc">导出问题排查报告 - 包含批次信息、失败明细、时间线和排查建议</div>
+                </li>
+                <li class="api-item">
+                    <span class="api-method GET">GET</span>
+                    <span class="api-path">/h2-console</span>
+                    <div class="api-desc">H2 数据库控制台 - 用于调试和查看数据</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>📊 核心数据模型</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <strong>ApprovalBatch</strong> - 审批批次
+                    <div class="api-desc">包含批次ID、业务类型、状态、统计信息、分片配置等</div>
+                </li>
+                <li class="api-item">
+                    <strong>ApprovalItem</strong> - 审批单据
+                    <div class="api-desc">包含单据ID、幂等键、状态、分片号、错误信息、重试次数等</div>
+                </li>
+                <li class="api-item">
+                    <strong>TimelineEvent</strong> - 时间线事件
+                    <div class="api-desc">记录每个关键动作的时间、类型、描述、操作人等</div>
+                </li>
+                <li class="api-item">
+                    <strong>ProcessingReceipt</strong> - 处理回执
+                    <div class="api-desc">结构化的处理汇总，包含明细数据，可导出用于审计</div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🔄 状态流转说明</h2>
+            <ul class="api-list">
+                <li class="api-item">
+                    <strong>批次状态:</strong>
+                    <span class="api-desc">CREATED → PROCESSING → PARTIAL_SUCCESS / COMPLETED → REPLAYING</span>
+                </li>
+                <li class="api-item">
+                    <strong>单据状态:</strong>
+                    <span class="api-desc">PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
