@@ -24,6 +24,14 @@ export declare class CanvasAuditTimeline {
         }>;
     };
     addGroup(group: EventGroup): boolean;
+    removeGroup(groupId: string): boolean;
+    clearGroups(): void;
+    getGroupById(groupId: string): EventGroup | null;
+    getGroupsByEvent(eventId: string): EventGroup[];
+    addEventToGroup(groupId: string, eventId: string): boolean;
+    removeEventFromGroup(groupId: string, eventId: string): boolean;
+    toggleGroupHighlight(groupId: string): boolean;
+    private findGroupAtPosition;
     private updateTimeRange;
     private updateVisibleTimeRange;
     private updateTimelineEventPositions;

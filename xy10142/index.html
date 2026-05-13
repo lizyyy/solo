@@ -421,6 +421,22 @@
           </label>
         </div>
       </div>
+
+      <div class="control-panel">
+        <h3>
+          <span>📁</span>
+          事件分组
+        </h3>
+        <div class="control-group">
+          <button class="btn-primary" id="loadSampleGroupsBtn">加载示例分组</button>
+          <button class="btn-success" id="toggleGroupHighlightBtn">切换高亮</button>
+          <button class="btn-danger" id="clearGroupsBtn">清除分组</button>
+        </div>
+        <div class="control-group">
+          <span style="color: #71717a; font-size: 13px;">提示: 点击上方分组条可高亮组内事件</span>
+        </div>
+        <div class="control-group" id="groupList" style="color: #60a5fa; font-size: 13px;"></div>
+      </div>
     </div>
 
     <div class="canvas-container">
@@ -487,7 +503,8 @@
       generateLargeDataset,
       generateEdgeCaseEvents,
       generateInvalidSampleEvents,
-    } from './dist/index.js';
+      generateSampleGroups,
+    } from './dist/bundle.js';
 
     const canvas = document.getElementById('timelineCanvas');
     const timeline = new CanvasAuditTimeline({
@@ -589,11 +606,28 @@
       const rollbackCount = events.filter(e => e.isRollback).length;
       const users = new Set(events.map(e => e.userId)).size;
       const resources = new Set(events.map(e => e.resourceId)).size;
+      const groups = timeline.getGroups().length;
 
       document.getElementById('totalEvents').textContent = events.length;
       document.getElementById('rollbackEvents').textContent = rollbackCount;
       document.getElementById('userCount').textContent = users;
       document.getElementById('resourceCount').textContent = resources;
+    }
+
+    function updateGroups() {
+      const groupList = document.getElementById('groupList');
+      const groups = timeline.getGroups();
+      const highlightedGroupId = timeline.getState().highlightedGroupId;
+
+      if (groups.length === 0) {
+        groupList.innerHTML = '当前没有分组，点击「加载示例分组」创建分组';
+        return;
+      }
+
+      groupList.innerHTML = `
+        当前 ${groups.length} 个分组
+        ${highlightedGroupId ? ` · 高亮: ${groups.find(g => g.id === highlightedGroupId)?.name || ''}` : ''}
+      `;
     }
 
     function updateZoomLevel() {
@@ -605,6 +639,7 @@
       updateLogs();
       updateEventDetails();
       updateZoomLevel();
+      updateGroups();
     }, 500);
 
     document.getElementById('loadSampleBtn').addEventListener('click', () => {
@@ -721,6 +756,53 @@
     document.getElementById('clearLogsBtn').addEventListener('click', () => {
       timeline.getLogger().clear();
       updateLogs();
+    });
+
+    document.getElementById('loadSampleGroupsBtn').addEventListener('click', () => {
+      if (timeline.getEvents().length === 0) {
+        alert('请先加载示例事件数据！');
+        return;
+      }
+
+      const groups = generateSampleGroups();
+      let successCount = 0;
+
+      for (const group of groups) {
+        const result = timeline.addGroup(group);
+        if (result) successCount++;
+      }
+
+      updateGroups();
+      alert(`成功添加 ${successCount} 个分组`);
+    });
+
+    document.getElementById('toggleGroupHighlightBtn').addEventListener('click', () => {
+      const groups = timeline.getGroups();
+      if (groups.length === 0) {
+        alert('当前没有分组');
+        return;
+      }
+
+      const currentHighlighted = timeline.getState().highlightedGroupId;
+      if (currentHighlighted) {
+        timeline.toggleGroupHighlight(currentHighlighted);
+      } else {
+        timeline.toggleGroupHighlight(groups[0].id);
+      }
+
+      updateGroups();
+    });
+
+    document.getElementById('clearGroupsBtn').addEventListener('click', () => {
+      if (timeline.getGroups().length === 0) {
+        alert('当前没有分组');
+        return;
+      }
+
+      if (confirm('确定要清除所有分组吗？')) {
+        timeline.clearGroups();
+        updateGroups();
+      }
     });
 
     document.getElementById('searchInput').addEventListener('keypress', (e) => {

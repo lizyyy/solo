@@ -46,6 +46,7 @@ export class CanvasAuditTimeline {
       searchResults: [],
       selectedEventId: null,
       highlightedEventId: null,
+      highlightedGroupId: null,
       executionLog: [],
       isDragging: false,
       dragStartX: 0,
@@ -136,6 +137,14 @@ export class CanvasAuditTimeline {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    const clickedGroup = this.findGroupAtPosition(x, y);
+    if (clickedGroup) {
+      this.toggleGroupHighlight(clickedGroup.id);
+      this.logger.success('group-click', `点击分组: ${clickedGroup.name}`);
+      this.render();
+      return;
+    }
+
     const clickedEvent = this.findEventAtPosition(x, y);
     if (clickedEvent) {
       this.state.selectedEventId = clickedEvent.id;
@@ -202,6 +211,133 @@ export class CanvasAuditTimeline {
     return true;
   }
 
+  removeGroup(groupId: string): boolean {
+    const index = this.state.groups.findIndex(g => g.id === groupId);
+    if (index === -1) {
+      this.logger.error('remove-group', `组不存在: ${groupId}`);
+      return false;
+    }
+
+    const [removed] = this.state.groups.splice(index, 1);
+    if (this.state.highlightedGroupId === groupId) {
+      this.state.highlightedGroupId = null;
+    }
+
+    this.logger.success('remove-group', `已移除事件组: ${removed.name}`);
+    this.render();
+    return true;
+  }
+
+  clearGroups(): void {
+    const count = this.state.groups.length;
+    this.state.groups = [];
+    this.state.highlightedGroupId = null;
+    this.logger.success('clear-groups', `已清除所有事件组`, { count });
+    this.render();
+  }
+
+  getGroupById(groupId: string): EventGroup | null {
+    return this.state.groups.find(g => g.id === groupId) || null;
+  }
+
+  getGroupsByEvent(eventId: string): EventGroup[] {
+    return this.state.groups.filter(g => g.events.includes(eventId));
+  }
+
+  addEventToGroup(groupId: string, eventId: string): boolean {
+    const group = this.getGroupById(groupId);
+    if (!group) {
+      this.logger.error('add-event-to-group', `组不存在: ${groupId}`);
+      return false;
+    }
+
+    if (!this.state.events.find(e => e.id === eventId)) {
+      this.logger.error('add-event-to-group', `事件不存在: ${eventId}`);
+      return false;
+    }
+
+    if (!group.events.includes(eventId)) {
+      group.events.push(eventId);
+      group.startTimestamp = Math.min(group.startTimestamp, ...group.events.map(id => {
+        const event = this.state.events.find(e => e.id === id);
+        return event?.timestamp || group.startTimestamp;
+      }));
+      group.endTimestamp = Math.max(group.endTimestamp, ...group.events.map(id => {
+        const event = this.state.events.find(e => e.id === id);
+        return event?.timestamp || group.endTimestamp;
+      }));
+    }
+
+    this.logger.success('add-event-to-group', `已添加事件 ${eventId} 到组 ${group.name}`);
+    this.render();
+    return true;
+  }
+
+  removeEventFromGroup(groupId: string, eventId: string): boolean {
+    const group = this.getGroupById(groupId);
+    if (!group) {
+      this.logger.error('remove-event-from-group', `组不存在: ${groupId}`);
+      return false;
+    }
+
+    const index = group.events.indexOf(eventId);
+    if (index === -1) {
+      this.logger.error('remove-event-from-group', `事件不在组中: ${eventId}`);
+      return false;
+    }
+
+    group.events.splice(index, 1);
+    this.logger.success('remove-event-from-group', `已从组 ${group.name} 移除事件 ${eventId}`);
+    this.render();
+    return true;
+  }
+
+  toggleGroupHighlight(groupId: string): boolean {
+    const group = this.getGroupById(groupId);
+    if (!group) {
+      return false;
+    }
+
+    if (this.state.highlightedGroupId === groupId) {
+      this.state.highlightedGroupId = null;
+      this.logger.success('group-toggle', `取消高亮分组: ${group.name}`);
+    } else {
+      this.state.highlightedGroupId = groupId;
+      this.logger.success('group-toggle', `高亮分组: ${group.name}`);
+    }
+
+    this.updateTimelineEventPositions();
+    this.render();
+    return true;
+  }
+
+  private findGroupAtPosition(x: number, y: number): EventGroup | null {
+    const { options, visibleStartTime, visibleEndTime } = this.state;
+    const { padding, canvasWidth } = options;
+
+    const timeRange = visibleEndTime - visibleStartTime;
+    const drawableWidth = canvasWidth - padding.left - padding.right;
+    const groupBarHeight = 24;
+
+    for (let i = 0; i < this.state.groups.length; i++) {
+      const group = this.state.groups[i];
+      const barY = padding.top - 60 - i * (groupBarHeight + 5);
+
+      const startTime = Math.max(group.startTimestamp, visibleStartTime);
+      const endTime = Math.min(group.endTimestamp, visibleEndTime);
+
+      const startX = padding.left + ((startTime - visibleStartTime) / timeRange) * drawableWidth;
+      const endX = padding.left + ((endTime - visibleStartTime) / timeRange) * drawableWidth;
+      const width = Math.max(endX - startX, 30);
+
+      if (x >= startX && x <= startX + width && y >= barY && y <= barY + groupBarHeight) {
+        return group;
+      }
+    }
+
+    return null;
+  }
+
   private updateTimeRange(): void {
     if (this.state.events.length === 0) {
       const now = Date.now();
@@ -261,6 +397,12 @@ export class CanvasAuditTimeline {
       const resourceIndex = resources.indexOf(event.resourceId);
       const y = padding.top + resourceIndex * rowHeight + (rowHeight - eventHeight) / 2;
 
+      const isInHighlightedGroup = this.state.highlightedGroupId
+        ? this.state.groups
+            .find(g => g.id === this.state.highlightedGroupId)
+            ?.events.includes(event.id) ?? false
+        : false;
+
       const timelineEvent: TimelineEvent = {
         ...event,
         x,
@@ -268,7 +410,9 @@ export class CanvasAuditTimeline {
         width: Math.max(20, 100 * this.state.zoom),
         height: eventHeight,
         visible: x >= padding.left - 50 && x <= options.canvasWidth - padding.right + 50,
-        highlighted: this.state.highlightedEventId === event.id || this.state.searchResults.includes(event.id),
+        highlighted: this.state.highlightedEventId === event.id
+          || this.state.searchResults.includes(event.id)
+          || isInHighlightedGroup,
       };
 
       this.state.timelineEvents.push(timelineEvent);
@@ -693,7 +837,62 @@ export class CanvasAuditTimeline {
   }
 
   private drawGroupHeaders(): void {
-    if (!this.ctx) return;
+    if (!this.ctx || this.state.groups.length === 0) return;
+
+    const ctx = this.ctx;
+    const { options, visibleStartTime, visibleEndTime } = this.state;
+    const { padding, canvasWidth } = options;
+
+    const timeRange = visibleEndTime - visibleStartTime;
+    const drawableWidth = canvasWidth - padding.left - padding.right;
+    const groupBarHeight = 24;
+
+    for (let i = 0; i < this.state.groups.length; i++) {
+      const group = this.state.groups[i];
+      const y = padding.top - 60 - i * (groupBarHeight + 5);
+      const isHighlighted = this.state.highlightedGroupId === group.id;
+
+      const startTime = Math.max(group.startTimestamp, visibleStartTime);
+      const endTime = Math.min(group.endTimestamp, visibleEndTime);
+
+      const startX = padding.left + ((startTime - visibleStartTime) / timeRange) * drawableWidth;
+      const endX = padding.left + ((endTime - visibleStartTime) / timeRange) * drawableWidth;
+      const width = Math.max(endX - startX, 30);
+
+      if (isHighlighted) {
+        ctx.shadowColor = group.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
+
+      ctx.fillStyle = isHighlighted ? group.color + '80' : group.color + '40';
+      ctx.fillRect(startX, y, width, groupBarHeight);
+
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      ctx.strokeStyle = isHighlighted ? '#fbbf24' : group.color;
+      ctx.lineWidth = isHighlighted ? 3 : 2;
+      ctx.strokeRect(startX, y, width, groupBarHeight);
+
+      if (width > 80) {
+        ctx.fillStyle = isHighlighted ? '#fbbf24' : group.color;
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(`${isHighlighted ? '✨ ' : '📁 '}${group.name}`, startX + 8, y + 16);
+
+        ctx.fillStyle = isHighlighted ? '#ffffff' : '#8a8aaa';
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(`${group.events.length} 事件`, startX + width - 8, y + 16);
+      } else if (width > 40) {
+        ctx.fillStyle = isHighlighted ? '#fbbf24' : '#ffffff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${group.events.length}`, startX + width / 2, y + 16);
+      }
+    }
   }
 
   private drawEvents(): void {

@@ -119,9 +119,7 @@ export function validateAuditEvent(event: unknown, existingEvents?: AuditEvent[]
 
   if (e.tags !== undefined && !Array.isArray(e.tags)) {
     errors.push(createValidationError('tags', '标签必须是数组', e.tags));
-  }
-
-  if (e.tags && !e.tags.every(tag => typeof tag === 'string')) {
+  } else if (Array.isArray(e.tags) && !e.tags.every(tag => typeof tag === 'string')) {
     errors.push(createValidationError('tags', '所有标签必须是字符串', e.tags));
   }
 

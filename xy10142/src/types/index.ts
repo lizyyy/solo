@@ -93,6 +93,7 @@ export interface TimelineState {
   searchResults: string[];
   selectedEventId: string | null;
   highlightedEventId: string | null;
+  highlightedGroupId: string | null;
   executionLog: ExecutionLogEntry[];
   isDragging: boolean;
   dragStartX: number;

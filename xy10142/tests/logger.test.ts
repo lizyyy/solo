@@ -1,10 +1,6 @@
 import { ExecutionLogger } from '../src/logger';
-
-const { describe, it } = globalThis as unknown as {
-  describe: typeof import('node:test').describe;
-  it: typeof import('node:test').it;
-};
-const { assert } = await import('node:assert');
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 
 describe('ExecutionLogger', () => {
   it('应该正确初始化', () => {
