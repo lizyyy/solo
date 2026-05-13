@@ -282,20 +282,85 @@ def test_normal_flow():
         assert filter_cancel["reserved_quantity"] == 0
         print_success(f"取消工单后配件已释放, 预留数量: 0")
         
-        print_section("14. 创建按日期触发的保养规则")
-        yesterday_ts = int((datetime.now() - timedelta(days=1)).timestamp())
+        print_section("14. 创建按日期触发的保养规则（间隔天数=0，立即触发）")
         r = client.post("/rules/", {
             "device_id": device_id,
-            "name": "每月定期保养",
+            "name": "每日保养(测试)",
             "rule_type": "date",
-            "threshold_value": yesterday_ts,
-            "description": "每月固定日期保养"
+            "threshold_value": 0,
+            "description": "创建后立即触发，用于测试周期性"
         })
         assert r.status_code == 200
         rule_date = r.json()
-        print_success(f"创建按日期规则成功, ID: {rule_date['id']}, 规则类型: {rule_date['rule_type']}")
+        rule_date_id = rule_date["id"]
+        print_success(f"创建按日期规则成功, ID: {rule_date_id}, 间隔天数=0")
         
-        print_section("15. PENDING 工单可直接完成（无需经过 IN_PROGRESS）")
+        print_section("15. 检查日期规则保养触发")
+        r = client.post("/maintenance/check", {
+            "device_id": device_id
+        })
+        assert r.status_code == 200
+        check_result = r.json()
+        assert check_result["has_triggered"] == True
+        date_triggered = [t for t in check_result["triggered_rules"] if t["rule_type"] == "date"]
+        assert len(date_triggered) >= 1
+        print_success(f"日期规则正确触发, 下次触发日期: {date_triggered[0]['threshold_date']}")
+        
+        print_section("16. 触发日期保养工单并完成")
+        r = client.post("/maintenance/trigger", {
+            "device_id": device_id,
+            "rule_id": rule_date_id,
+            "trigger_value": 0
+        })
+        assert r.status_code == 200
+        order_date = r.json()
+        order_date_id = order_date["id"]
+        print_success(f"创建日期保养工单, ID: {order_date_id}")
+        
+        r = client.put(f"/orders/{order_date_id}/status", {
+            "status": "completed",
+            "completion_note": "完成首次日期保养"
+        })
+        assert r.status_code == 200
+        print_success(f"日期保养工单已完成")
+        
+        print_section("17. 完成后再次检查：不触发（间隔30天）")
+        r = client.post("/rules/", {
+            "device_id": device_id,
+            "name": "月度保养",
+            "rule_type": "date",
+            "threshold_value": 30,
+            "description": "每30天保养一次"
+        })
+        assert r.status_code == 200
+        rule_monthly = r.json()
+        rule_monthly_id = rule_monthly["id"]
+        
+        r = client.post("/maintenance/trigger", {
+            "device_id": device_id,
+            "rule_id": rule_monthly_id,
+            "trigger_value": 0
+        })
+        assert r.status_code == 200
+        order_monthly = r.json()
+        order_monthly_id = order_monthly["id"]
+        
+        r = client.put(f"/orders/{order_monthly_id}/status", {
+            "status": "completed",
+            "completion_note": "完成月度保养"
+        })
+        assert r.status_code == 200
+        
+        r = client.post("/maintenance/check", {
+            "device_id": device_id
+        })
+        assert r.status_code == 200
+        check_result2 = r.json()
+        monthly_rules = [t for t in check_result2["triggered_rules"] if t.get("interval_days") == 30]
+        assert len(monthly_rules) == 0, "间隔30天的规则刚完成不应再次触发"
+        print_success(f"间隔30天的规则完成后不会立即再次触发（周期性验证）")
+        
+        print_section("18. PENDING 工单可直接完成（无需经过 IN_PROGRESS）")
         r = client.post("/maintenance/trigger", {
             "device_id": device_id,
             "rule_id": rule_count_id,
@@ -551,8 +616,7 @@ def test_report():
     
     client = APIClient()
     try:
-        print_section("1. 创建一个带过期日期规则的设备用于报表验证")
-        yesterday_ts = int((datetime.now() - timedelta(days=1)).timestamp())
+        print_section("1. 创建一个带日期规则的设备用于报表验证（间隔天数=0，创建后立即触发）")
         
         r = client.post("/devices/", {
             "name": "报表测试设备",
@@ -565,13 +629,13 @@ def test_report():
         
         r = client.post("/rules/", {
             "device_id": device_report["id"],
-            "name": "月度保养(已过期)",
+            "name": "每日保养",
             "rule_type": "date",
-            "threshold_value": yesterday_ts,
-            "description": "已过期的日期规则"
+            "threshold_value": 0,
+            "description": "间隔天数=0，创建后立即触发"
         })
         assert r.status_code == 200
-        print_success(f"创建报表测试设备和过期日期规则")
+        print_success(f"创建报表测试设备和日期规则（间隔天数=0）")
         
         print_section("2. 获取汇总报表")
         r = client.get("/report/summary")

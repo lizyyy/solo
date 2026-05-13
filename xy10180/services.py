@@ -121,6 +121,22 @@ def get_last_maintenance_value(
     return 0.0
 
 
+def get_last_completed_date(
+    db: Session,
+    device_id: int,
+    rule_type: RuleType
+) -> Optional[date]:
+    order = db.query(MaintenanceOrder).filter(
+        MaintenanceOrder.device_id == device_id,
+        MaintenanceOrder.trigger_type == rule_type,
+        MaintenanceOrder.status == MaintenanceStatus.COMPLETED
+    ).order_by(MaintenanceOrder.completed_at.desc()).first()
+    
+    if order and order.completed_at:
+        return order.completed_at.date()
+    return None
+
+
 def check_device_maintenance(
     db: Session, 
     request: CheckMaintenanceRequest
@@ -134,11 +150,11 @@ def check_device_maintenance(
     
     current_hours = request.current_hours if request.current_hours is not None else device.total_hours
     current_count = request.current_count if request.current_count is not None else device.total_count
+    check_date = request.check_date or date.today()
     
     for rule in rules:
-        last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
-        
         if rule.rule_type == RuleType.HOURS:
+            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
             effective_threshold = last_value + rule.threshold_value
             is_triggered = current_hours >= effective_threshold
             if is_triggered:
@@ -150,6 +166,7 @@ def check_device_maintenance(
                     "current_value": current_hours
                 })
         elif rule.rule_type == RuleType.COUNT:
+            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
             effective_threshold = last_value + rule.threshold_value
             is_triggered = current_count >= effective_threshold
             if is_triggered:
@@ -161,18 +178,23 @@ def check_device_maintenance(
                     "current_value": current_count
                 })
         elif rule.rule_type == RuleType.DATE:
-            check_date = request.check_date or date.today()
-            rule_date = date.fromtimestamp(rule.threshold_value)
-            days_since = (check_date - rule_date).days
-            effective_threshold = rule.threshold_value + (last_value * 86400)
-            is_triggered = check_date >= date.fromtimestamp(effective_threshold)
+            last_completed = get_last_completed_date(db, device.id, rule.rule_type)
+            
+            interval_days = int(rule.threshold_value)
+            if last_completed:
+                next_due_date = last_completed + timedelta(days=interval_days)
+            else:
+                next_due_date = rule.created_at.date() + timedelta(days=interval_days)
+            
+            is_triggered = check_date >= next_due_date
             if is_triggered:
                 triggered.append({
                     "rule_id": rule.id,
                     "rule_name": rule.name,
                     "rule_type": rule.rule_type.value,
-                    "threshold_date": date.fromtimestamp(effective_threshold),
-                    "current_date": check_date
+                    "threshold_date": next_due_date.isoformat(),
+                    "current_date": check_date.isoformat(),
+                    "interval_days": interval_days
                 })
     
     return {
@@ -565,18 +587,21 @@ def get_maintenance_report(
                     "threshold": effective_threshold
                 })
         elif rule.rule_type == RuleType.DATE:
-            last_value = get_last_maintenance_value(db, device.id, rule.rule_type)
-            rule_date = date.fromtimestamp(rule.threshold_value)
-            effective_threshold_ts = rule.threshold_value + (last_value * 86400)
-            effective_threshold_date = date.fromtimestamp(effective_threshold_ts)
-            if today >= effective_threshold_date:
+            last_completed = get_last_completed_date(db, device.id, rule.rule_type)
+            interval_days = int(rule.threshold_value)
+            if last_completed:
+                next_due_date = last_completed + timedelta(days=interval_days)
+            else:
+                next_due_date = rule.created_at.date() + timedelta(days=interval_days)
+            if today >= next_due_date:
                 devices_needing.append({
                     "device_id": device.id,
                     "device_name": device.name,
                     "rule_name": rule.name,
                     "rule_type": rule.rule_type.value,
                     "current_date": today.isoformat(),
-                    "threshold_date": effective_threshold_date.isoformat()
+                    "threshold_date": next_due_date.isoformat(),
+                    "interval_days": interval_days
                 })
     
     return {
