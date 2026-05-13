@@ -6,16 +6,29 @@ from datetime import datetime
 from typing import Dict, List, Optional
 import logging
 
-try:
-    import matplotlib.pyplot as plt
-    import matplotlib.dates as mdates
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-
 from .config import DEFAULT_REPORT_DIR, DEFAULT_TIME_FORMAT
 
 logger = logging.getLogger(__name__)
+
+plt = None
+mdates = None
+HAS_MATPLOTLIB = False
+
+
+def _try_import_matplotlib():
+    """延迟导入 matplotlib，捕获所有可能的导入错误"""
+    global plt, mdates, HAS_MATPLOTLIB
+    try:
+        import matplotlib.pyplot as plt_lib
+        import matplotlib.dates as mdates_lib
+        plt = plt_lib
+        mdates = mdates_lib
+        HAS_MATPLOTLIB = True
+        return True
+    except (ImportError, OSError, PermissionError, RuntimeError) as e:
+        logger.warning(f"matplotlib 无法加载: {e}")
+        HAS_MATPLOTLIB = False
+        return False
 
 
 class ReportGenerator:
@@ -147,8 +160,8 @@ class ReportGenerator:
                              station_id: str = None,
                              filename: str = None) -> Optional[str]:
         """生成图表报告"""
-        if not HAS_MATPLOTLIB:
-            logger.warning("matplotlib未安装，跳过图表生成")
+        if not HAS_MATPLOTLIB and not _try_import_matplotlib():
+            logger.warning("matplotlib 不可用，跳过图表生成")
             return None
 
         if aligned_data.empty:

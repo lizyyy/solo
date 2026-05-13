@@ -14,7 +14,6 @@ from .alignment import TimeSeriesAligner
 from .missing import MissingDataMarker
 from .anomaly import AnomalyDetector
 from .history import HistoryManager
-from .report import ReportGenerator
 from .sample_data import SampleDataGenerator
 
 logging.basicConfig(
@@ -235,6 +234,7 @@ def cmd_report(args):
     print(f"  ✓ 完成，检测到 {anomalies['total_count']} 个异常")
 
     print("\n[步骤4] 生成报告...")
+    from .report import ReportGenerator
     reporter = ReportGenerator(args.report_dir)
 
     text_report = reporter.generate_text_report(
@@ -317,6 +317,7 @@ def cmd_demo(args):
         print(f"  ✓ 未检测到异常")
 
     print("\n[演示步骤5] 生成报告...")
+    from .report import ReportGenerator
     reporter = ReportGenerator(DEFAULT_REPORT_DIR)
 
     text_report = reporter.generate_text_report(
