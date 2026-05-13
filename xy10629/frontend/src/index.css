@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-container {
+  min-height: 100vh;
+}
+
+.main-layout {
+  min-height: 100vh;
+}
+
+.site-layout-background {
+  background: #fff;
+  padding: 24px;
+  min-height: 360px;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.stat-card .ant-statistic-title {
+  font-size: 14px;
+  color: #666;
+}
+
+.stat-card .ant-statistic-content {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.modification-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modification-item:last-child {
+  border-bottom: none;
+}
+
+.modification-label {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.modification-values {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.old-value {
+  color: #ff4d4f;
+  text-decoration: line-through;
+}
+
+.new-value {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.anomaly-card {
+  border-left: 4px solid #ff4d4f;
+}
+
+.anomaly-card .ant-card-head {
+  background: #fff1f0;
+}
