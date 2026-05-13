@@ -452,6 +452,190 @@ describe('采购预算锁定 API 测试', () => {
     });
   });
 
+  describe('6.5 趋势报表数据正确性验证', () => {
+    let trendTestBudgetId;
+    let trendTestLockId;
+    let trendTestApprovalId;
+    const trendApplicationId = `TREND-TEST-${Date.now()}`;
+
+    beforeAll(async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const budgetResponse = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear,
+          totalAmount: 1000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      trendTestBudgetId = budgetResponse.body.data.id;
+
+      const lockResponse = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: trendTestBudgetId,
+          applicationId: trendApplicationId,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 300,
+          createdBy: 'trend_test',
+          reason: '趋势报表验证测试'
+        });
+      trendTestLockId = lockResponse.body.data.lockId;
+
+      const approvalResponse = await request(app)
+        .post('/api/approvals')
+        .send({
+          applicationId: trendApplicationId,
+          currentApprover: 'trend_manager',
+          approvalLevel: 'LEVEL_1'
+        });
+      trendTestApprovalId = approvalResponse.body.data.id;
+
+      await request(app)
+        .post(`/api/approvals/${trendTestApprovalId}/approve`)
+        .send({
+          approvedBy: 'trend_manager',
+          operator: 'trend_manager'
+        });
+    });
+
+    test('预算锁定并审批提交后，趋势报表最终值应该与预算表一致', async () => {
+      const budgetResponse = await request(app)
+        .get(`/api/budget/budgets/${trendTestBudgetId}`);
+      
+      expect(budgetResponse.status).toBe(200);
+      const budgetUsed = parseFloat(budgetResponse.body.data.used_amount);
+      const budgetLocked = parseFloat(budgetResponse.body.data.locked_amount);
+      const budgetAvailable = parseFloat(budgetResponse.body.data.available_amount);
+      
+      expect(budgetUsed).toBe(300);
+      expect(budgetLocked).toBe(0);
+      expect(budgetAvailable).toBe(700);
+
+      const trendResponse = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear
+        });
+      
+      expect(trendResponse.status).toBe(200);
+      expect(trendResponse.body.success).toBe(true);
+      
+      const trend = trendResponse.body.data.trend;
+      expect(trend.length).toBeGreaterThanOrEqual(2);
+      
+      const lastTrendPoint = trend[trend.length - 1];
+      expect(lastTrendPoint.usedAmount).toBe(budgetUsed);
+      expect(lastTrendPoint.lockedAmount).toBe(budgetLocked);
+      expect(lastTrendPoint.availableAmount).toBe(budgetAvailable);
+      
+      expect(lastTrendPoint.usedAmount).toBe(300);
+      expect(lastTrendPoint.lockedAmount).toBe(0);
+      expect(lastTrendPoint.availableAmount).toBe(700);
+    });
+
+    test('趋势报表重放后的最终值应该等于预算表当前值', async () => {
+      const trendResponse = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear
+        });
+      
+      expect(trendResponse.status).toBe(200);
+      
+      const budget = trendResponse.body.data.budget;
+      const trendFinalUsed = trendResponse.body.data.trendFinalUsed;
+      const trendFinalLocked = trendResponse.body.data.trendFinalLocked;
+      const finalAvailable = trendResponse.body.data.finalAvailable;
+      
+      expect(trendFinalUsed).toBe(budget.currentUsed);
+      expect(trendFinalLocked).toBe(budget.currentLocked);
+      expect(finalAvailable).toBe(budget.currentAvailable);
+      
+      expect(trendFinalUsed).toBe(300);
+      expect(trendFinalLocked).toBe(0);
+      expect(finalAvailable).toBe(700);
+    });
+
+    test('趋势报表每个时间点的可用余额计算应该正确', async () => {
+      const trendResponse = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear
+        });
+      
+      expect(trendResponse.status).toBe(200);
+      
+      const trend = trendResponse.body.data.trend;
+      const totalAmount = trendResponse.body.data.budget.totalAmount;
+      
+      for (let i = 0; i < trend.length; i++) {
+        const point = trend[i];
+        const expectedAvailable = totalAmount - point.usedAmount - point.lockedAmount;
+        expect(point.availableAmount).toBe(expectedAvailable);
+        expect(point.availableAmount).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    test('锁定后再释放，趋势报表应该正确反映预算变化', async () => {
+      const testAppId = `RELEASE-TREND-${Date.now()}`;
+      
+      const lockResponse = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: trendTestBudgetId,
+          applicationId: testAppId,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 200,
+          createdBy: 'release_trend_test'
+        });
+      
+      expect(lockResponse.status).toBe(200);
+      const lockId = lockResponse.body.data.lockId;
+
+      const beforeReleaseResponse = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear
+        });
+      
+      const beforeReleaseTrend = beforeReleaseResponse.body.data.trend;
+      const lastPointBefore = beforeReleaseTrend[beforeReleaseTrend.length - 1];
+      expect(lastPointBefore.usedAmount).toBe(300);
+      expect(lastPointBefore.lockedAmount).toBe(200);
+      expect(lastPointBefore.availableAmount).toBe(500);
+
+      await request(app)
+        .post(`/api/budget/locks/${lockId}/release`)
+        .send({
+          operator: 'release_trend_test',
+          reason: '测试释放后趋势'
+        });
+
+      const afterReleaseResponse = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'TREND_VERIFICATION',
+          fiscalYear
+        });
+      
+      const afterReleaseTrend = afterReleaseResponse.body.data.trend;
+      const lastPointAfter = afterReleaseTrend[afterReleaseTrend.length - 1];
+      expect(lastPointAfter.usedAmount).toBe(300);
+      expect(lastPointAfter.lockedAmount).toBe(0);
+      expect(lastPointAfter.availableAmount).toBe(700);
+    });
+  });
+
   describe('7. 错误码验证', () => {
     test('获取不存在的预算应该返回 1001', async () => {
       const fakeId = uuidv4();

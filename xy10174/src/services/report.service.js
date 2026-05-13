@@ -132,11 +132,6 @@ class ReportService {
   }
 
   async getBudgetUsageTrend(departmentId, budgetType, fiscalYear) {
-    const logs = await this.db('transaction_logs')
-      .where('department_id', departmentId)
-      .where('operation_type', 'in', ['BUDGET_LOCK', 'BUDGET_LOCK_COMMIT', 'BUDGET_LOCK_RELEASE'])
-      .orderBy('created_at', 'asc');
-
     const budget = await this.db('budgets')
       .where('department_id', departmentId)
       .where('budget_type', budgetType)
@@ -147,8 +142,14 @@ class ReportService {
       throw new AppError(errorCodes.BUDGET_NOT_FOUND, { departmentId, budgetType, fiscalYear });
     }
 
-    let runningUsed = parseFloat(budget.used_amount);
-    let runningLocked = parseFloat(budget.locked_amount);
+    const logs = await this.db('transaction_logs')
+      .where('department_id', departmentId)
+      .where('budget_id', budget.id)
+      .where('operation_type', 'in', ['BUDGET_LOCK', 'BUDGET_LOCK_COMMIT', 'BUDGET_LOCK_RELEASE'])
+      .orderBy('created_at', 'asc');
+
+    let runningUsed = 0;
+    let runningLocked = 0;
     const trend = [];
 
     for (const log of logs) {
@@ -169,6 +170,7 @@ class ReportService {
         amount,
         usedAmount: runningUsed,
         lockedAmount: runningLocked,
+        availableAmount: parseFloat(budget.total_amount) - runningUsed - runningLocked,
         operator: log.operator
       });
     }
@@ -182,7 +184,10 @@ class ReportService {
         currentAvailable: parseFloat(budget.available_amount)
       },
       trend,
-      totalOperations: trend.length
+      totalOperations: trend.length,
+      trendFinalUsed: runningUsed,
+      trendFinalLocked: runningLocked,
+      finalAvailable: parseFloat(budget.total_amount) - runningUsed - runningLocked
     };
   }
 
