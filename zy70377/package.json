@@ -1,0 +1,13 @@
+{
+  "name": "delivery-eta-api",
+  "version": "1.0.0",
+  "description": "配送路径 ETA API - 实时计算预计送达时间",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
