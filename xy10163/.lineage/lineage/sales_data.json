@@ -1,7 +1,7 @@
 {
   "table_name": "sales_data",
-  "created_at": "2026-05-09T22:50:05.943704",
-  "updated_at": "2026-05-09T22:50:53.547820",
+  "created_at": "2026-05-13T11:51:39.400721",
+  "updated_at": "2026-05-13T11:51:39.664931",
   "fields": {
     "date": {
       "canonical_name": "date",
@@ -12,14 +12,14 @@
         "sale_date"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "date",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943710"
+          "timestamp": "2026-05-13T11:51:39.400753"
         },
         {
           "version": 2,
@@ -27,7 +27,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "date",
-          "timestamp": "2026-05-09T22:50:07.888868"
+          "timestamp": "2026-05-13T11:51:39.433920"
         },
         {
           "version": 3,
@@ -35,7 +35,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "order_date",
-          "timestamp": "2026-05-09T22:50:09.887766"
+          "timestamp": "2026-05-13T11:51:39.503952"
         },
         {
           "version": 4,
@@ -43,15 +43,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "transaction_date",
-          "timestamp": "2026-05-09T22:50:12.483539"
-        },
-        {
-          "version": 1,
-          "name": "date",
-          "dtype": "object",
-          "action": "renamed_from",
-          "old_name": "sale_date",
-          "timestamp": "2026-05-09T22:50:53.547798"
+          "timestamp": "2026-05-13T11:51:39.664745"
         }
       ]
     },
@@ -63,14 +55,14 @@
         "buyer_id"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "user_id",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943712"
+          "timestamp": "2026-05-13T11:51:39.400757"
         },
         {
           "version": 2,
@@ -78,7 +70,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "user_id",
-          "timestamp": "2026-05-09T22:50:07.888874"
+          "timestamp": "2026-05-13T11:51:39.433936"
         },
         {
           "version": 3,
@@ -86,15 +78,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "customer_id",
-          "timestamp": "2026-05-09T22:50:09.887763"
-        },
-        {
-          "version": 1,
-          "name": "user_id",
-          "dtype": "object",
-          "action": "renamed_from",
-          "old_name": "customer_id",
-          "timestamp": "2026-05-09T22:50:53.547809"
+          "timestamp": "2026-05-13T11:51:39.503944"
         }
       ]
     },
@@ -106,14 +90,14 @@
         "buyer_name"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "user_name",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943713"
+          "timestamp": "2026-05-13T11:51:39.400759"
         },
         {
           "version": 2,
@@ -121,7 +105,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "user_name",
-          "timestamp": "2026-05-09T22:50:07.888876"
+          "timestamp": "2026-05-13T11:51:39.433941"
         },
         {
           "version": 3,
@@ -129,15 +113,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "customer_name",
-          "timestamp": "2026-05-09T22:50:09.887752"
-        },
-        {
-          "version": 1,
-          "name": "user_name",
-          "dtype": "object",
-          "action": "renamed_from",
-          "old_name": "customer_name",
-          "timestamp": "2026-05-09T22:50:53.547811"
+          "timestamp": "2026-05-13T11:51:39.503915"
         }
       ]
     },
@@ -150,14 +126,14 @@
         "order_number"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "order_id",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943714"
+          "timestamp": "2026-05-13T11:51:39.400761"
         },
         {
           "version": 2,
@@ -165,7 +141,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "order_id",
-          "timestamp": "2026-05-09T22:50:07.888877"
+          "timestamp": "2026-05-13T11:51:39.433945"
         },
         {
           "version": 3,
@@ -173,7 +149,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "order_no",
-          "timestamp": "2026-05-09T22:50:09.887769"
+          "timestamp": "2026-05-13T11:51:39.503963"
         },
         {
           "version": 4,
@@ -181,15 +157,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "transaction_id",
-          "timestamp": "2026-05-09T22:50:12.483547"
-        },
-        {
-          "version": 1,
-          "name": "order_id",
-          "dtype": "object",
-          "action": "renamed_from",
-          "old_name": "order_number",
-          "timestamp": "2026-05-09T22:50:53.547813"
+          "timestamp": "2026-05-13T11:51:39.664916"
         }
       ]
     },
@@ -202,14 +170,14 @@
         "amount"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "order_amount",
           "dtype": "float64",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943714"
+          "timestamp": "2026-05-13T11:51:39.400763"
         },
         {
           "version": 2,
@@ -217,7 +185,7 @@
           "dtype": "float64",
           "action": "renamed_from",
           "old_name": "order_amount",
-          "timestamp": "2026-05-09T22:50:07.888879"
+          "timestamp": "2026-05-13T11:51:39.433948"
         },
         {
           "version": 3,
@@ -225,7 +193,7 @@
           "dtype": "float64",
           "action": "renamed_from",
           "old_name": "total_amount",
-          "timestamp": "2026-05-09T22:50:09.887765"
+          "timestamp": "2026-05-13T11:51:39.503948"
         },
         {
           "version": 4,
@@ -233,15 +201,7 @@
           "dtype": "float64",
           "action": "renamed_from",
           "old_name": "payment_amount",
-          "timestamp": "2026-05-09T22:50:12.483534"
-        },
-        {
-          "version": 1,
-          "name": "order_amount",
-          "dtype": "float64",
-          "action": "renamed_from",
-          "old_name": "amount",
-          "timestamp": "2026-05-09T22:50:53.547814"
+          "timestamp": "2026-05-13T11:51:39.664463"
         }
       ]
     },
@@ -253,14 +213,14 @@
         "product"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "product_name",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943715"
+          "timestamp": "2026-05-13T11:51:39.400766"
         },
         {
           "version": 2,
@@ -268,7 +228,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "product_name",
-          "timestamp": "2026-05-09T22:50:07.888881"
+          "timestamp": "2026-05-13T11:51:39.433952"
         },
         {
           "version": 3,
@@ -276,7 +236,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "item_name",
-          "timestamp": "2026-05-09T22:50:09.887771"
+          "timestamp": "2026-05-13T11:51:39.503967"
         },
         {
           "version": 4,
@@ -284,7 +244,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "product",
-          "timestamp": "2026-05-09T22:50:12.483523"
+          "timestamp": "2026-05-13T11:51:39.664445"
         }
       ]
     },
@@ -296,14 +256,14 @@
         "qty_ordered"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "quantity",
           "dtype": "int64",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943716"
+          "timestamp": "2026-05-13T11:51:39.408690"
         },
         {
           "version": 2,
@@ -311,7 +271,7 @@
           "dtype": "int64",
           "action": "renamed_from",
           "old_name": "quantity",
-          "timestamp": "2026-05-09T22:50:07.888882"
+          "timestamp": "2026-05-13T11:51:39.433955"
         },
         {
           "version": 3,
@@ -319,7 +279,7 @@
           "dtype": "int64",
           "action": "renamed_from",
           "old_name": "qty",
-          "timestamp": "2026-05-09T22:50:09.887768"
+          "timestamp": "2026-05-13T11:51:39.503958"
         },
         {
           "version": 4,
@@ -327,7 +287,7 @@
           "dtype": "int64",
           "action": "renamed_from",
           "old_name": "qty_ordered",
-          "timestamp": "2026-05-09T22:50:12.483544"
+          "timestamp": "2026-05-13T11:51:39.664904"
         }
       ]
     },
@@ -339,14 +299,14 @@
         "sales_channel"
       ],
       "first_seen_version": 1,
-      "last_seen_version": 1,
+      "last_seen_version": 4,
       "history": [
         {
           "version": 1,
           "name": "channel",
           "dtype": "object",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:05.943717"
+          "timestamp": "2026-05-13T11:51:39.408714"
         },
         {
           "version": 2,
@@ -354,7 +314,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "channel",
-          "timestamp": "2026-05-09T22:50:07.888884"
+          "timestamp": "2026-05-13T11:51:39.433959"
         },
         {
           "version": 3,
@@ -362,15 +322,7 @@
           "dtype": "object",
           "action": "renamed_from",
           "old_name": "purchase_channel",
-          "timestamp": "2026-05-09T22:50:09.887761"
-        },
-        {
-          "version": 1,
-          "name": "channel",
-          "dtype": "object",
-          "action": "renamed_from",
-          "old_name": "sales_channel",
-          "timestamp": "2026-05-09T22:50:53.547816"
+          "timestamp": "2026-05-13T11:51:39.503939"
         }
       ]
     },
@@ -387,13 +339,13 @@
           "name": "discount",
           "dtype": "float64",
           "action": "added",
-          "timestamp": "2026-05-09T22:50:09.887773"
+          "timestamp": "2026-05-13T11:51:39.503974"
         },
         {
           "version": 4,
           "name": "discount",
           "action": "removed",
-          "timestamp": "2026-05-09T22:50:12.483555"
+          "timestamp": "2026-05-13T11:51:39.664928"
         }
       ]
     }

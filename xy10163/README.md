@@ -41,6 +41,7 @@ python -m csv_lineage.cli --help
 | `add-alias` | 手动添加字段别名 |
 | `list-aliases` | 列出所有字段别名 |
 | `check-breaking` | 检查破坏性变更 |
+| `rebuild-lineage` | 从版本历史重建血缘关系（修复被污染的数据） |
 
 ## 完整验收流程
 
@@ -286,7 +287,14 @@ echo "  csv-lineage field-history sales_data order_amount"
 A: 使用 `add-alias` 命令手动添加别名映射。
 
 **Q: 如何确保导入是幂等的？**
-A: 系统使用文件 MD5 哈希，相同文件不会重复导入。
+A: 系统使用文件 MD5 哈希，相同文件不会重复导入。检测到重复导入时会跳过所有血缘更新操作。
+
+**Q: 如果血缘数据被污染了怎么办？**
+A: 使用 `rebuild-lineage` 命令从版本历史重新构建正确的血缘关系：
+```bash
+csv-lineage rebuild-lineage sales_data
+```
+该命令会遍历所有版本，重新计算字段重命名和血缘关系，完全重置血缘数据。
 
 **Q: 数据存在哪里？**
 A: 默认在当前目录的 `.lineage/` 下，可通过 `--storage` 参数指定其他位置。

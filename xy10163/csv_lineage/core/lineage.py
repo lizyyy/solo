@@ -236,3 +236,67 @@ class LineageManager:
             canonical: data["aliases"]
             for canonical, data in lineage["fields"].items()
         }
+
+    def rebuild_from_versions(self, table_name: str, alias_manager, 
+                               schema_analyzer, verbose: bool = False) -> Dict[str, Any]:
+        versions = self.storage.get_all_versions(table_name)
+        if not versions:
+            return {"success": False, "error": "No versions found"}
+        
+        sorted_versions = sorted(versions, key=lambda x: x["version"])
+        
+        from csv_lineage.core.alias import AliasManager
+        
+        first_version = self.storage.get_version(table_name, sorted_versions[0]["version"])
+        first_schema = first_version["schema"]
+        
+        lineage = {
+            "table_name": table_name,
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat(),
+            "fields": {}
+        }
+        
+        for field in first_schema.get("fields", []):
+            field_name = field["name"]
+            lineage["fields"][field_name] = {
+                "canonical_name": field_name,
+                "aliases": [field_name],
+                "first_seen_version": sorted_versions[0]["version"],
+                "last_seen_version": sorted_versions[0]["version"],
+                "history": [{
+                    "version": sorted_versions[0]["version"],
+                    "name": field_name,
+                    "dtype": field.get("dtype"),
+                    "action": "added",
+                    "timestamp": datetime.now().isoformat()
+                }]
+            }
+        
+        self.storage.save_lineage(table_name, lineage)
+        
+        for i in range(1, len(sorted_versions)):
+            prev_version_data = self.storage.get_version(table_name, sorted_versions[i-1]["version"])
+            curr_version_data = self.storage.get_version(table_name, sorted_versions[i]["version"])
+            
+            prev_schema = prev_version_data["schema"]
+            curr_schema = curr_version_data["schema"]
+            curr_version_num = sorted_versions[i]["version"]
+            
+            comparison = schema_analyzer.compare_schemas(prev_schema, curr_schema)
+            renames = alias_manager.detect_renames(prev_schema, curr_schema, table_name)
+            
+            lineage = self.update_lineage(table_name, curr_version_num, curr_schema, comparison, renames)
+            
+            if renames:
+                alias_manager.apply_renames_to_aliases(table_name, renames)
+            
+            if verbose:
+                print(f"  v{curr_version_num}: 检测到 {len(renames)} 个重命名")
+        
+        return {
+            "success": True,
+            "table_name": table_name,
+            "version_count": len(sorted_versions),
+            "field_count": len(lineage["fields"])
+        }

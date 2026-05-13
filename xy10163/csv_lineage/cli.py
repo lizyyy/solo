@@ -328,6 +328,44 @@ def list_aliases(ctx, table_name):
     
     console.print(table)
 
+@cli.command('rebuild-lineage')
+@click.argument('table_name')
+@click.option('--verbose', '-v', is_flag=True, help='显示详细信息')
+@click.pass_context
+def rebuild_lineage(ctx, table_name, verbose):
+    """从版本历史重建血缘关系（修复被污染的血缘数据）"""
+    lineage_manager = ctx.obj['lineage_manager']
+    alias_manager = ctx.obj['alias_manager']
+    schema_analyzer = ctx.obj['schema_analyzer']
+    storage = ctx.obj['storage']
+    
+    tables = storage.list_tables()
+    if table_name not in tables:
+        console.print(f"[red]错误: 表 '{table_name}' 不存在[/red]")
+        ctx.exit(1)
+    
+    versions = storage.get_all_versions(table_name)
+    if not versions:
+        console.print(f"[red]错误: 表 '{table_name}' 没有版本历史[/red]")
+        ctx.exit(1)
+    
+    console.print(f"[cyan]从 {len(versions)} 个版本重建血缘关系...[/cyan]")
+    
+    result = lineage_manager.rebuild_from_versions(
+        table_name, 
+        alias_manager,
+        schema_analyzer,
+        verbose
+    )
+    
+    if result.get('success'):
+        console.print(f"[green]✓ 血缘关系重建成功[/green]")
+        console.print(f"  版本数: {result.get('version_count')}")
+        console.print(f"  字段数: {result.get('field_count')}")
+    else:
+        console.print(f"[red]✗ 重建失败: {result.get('error', 'Unknown error')}[/red]")
+        ctx.exit(1)
+
 @cli.command('check-breaking')
 @click.argument('table_name')
 @click.option('--from-version', '-f', type=int, default=None, help='起始版本')
