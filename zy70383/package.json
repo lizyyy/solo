@@ -1,0 +1,13 @@
+{
+  "name": "event-subscription-permission-api",
+  "version": "1.0.0",
+  "description": "事件订阅权限 API - 开放平台客户事件订阅管理",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node src/app.js"
+  },
+  "keywords": ["webhook", "event-subscription", "api"],
+  "author": "",
+  "license": "ISC"
+}
