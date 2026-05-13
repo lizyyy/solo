@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房产钥匙托管台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        .stat-card.available .number { color: #10b981; }
+        .stat-card.borrowed .number { color: #f59e0b; }
+        .stat-card.lost .number { color: #ef4444; }
+        .stat-card.overdue .number { color: #dc2626; }
+        .stat-card.total .number { color: #667eea; }
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .tab-btn:hover {
+            background: #e0e7ff;
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a67d8;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        tr:hover {
+            background: #f9fafb;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-available { background: #d1fae5; color: #065f46; }
+        .status-borrowed { background: #fef3c7; color: #92400e; }
+        .status-lost { background: #fee2e2; color: #991b1b; }
+        .status-overdue { background: #fecaca; color: #991b1b; animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 20px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 18px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #667eea;
+        }
+        .timeline-item.borrow::before { background: #f59e0b; box-shadow: 0 0 0 2px #f59e0b; }
+        .timeline-item.return::before { background: #10b981; box-shadow: 0 0 0 2px #10b981; }
+        .timeline-item.loss::before { background: #ef4444; box-shadow: 0 0 0 2px #ef4444; }
+        .timeline-time {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+        .timeline-event {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        .key-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .key-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .key-card:hover {
+            border-color: #667eea;
+        }
+        .key-card.selected {
+            border-color: #667eea;
+            background: #e0e7ff;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 房产钥匙托管台</h1>
+        <p>专业管理房源钥匙，追踪借出归还记录</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card total">
+            <div>总钥匙数</div>
+            <div class="number" id="stat-total">0</div>
+        </div>
+        <div class="stat-card available">
+            <div>可借用</div>
+            <div class="number" id="stat-available">0</div>
+        </div>
+        <div class="stat-card borrowed">
+            <div>已借出</div>
+            <div class="number" id="stat-borrowed">0</div>
+        </div>
+        <div class="stat-card lost">
+            <div>已丢失</div>
+            <div class="number" id="stat-lost">0</div>
+        </div>
+        <div class="stat-card overdue">
+            <div>逾期未还</div>
+            <div class="number" id="stat-overdue">0</div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="keys">钥匙状态</button>
+        <button class="tab-btn" data-tab="properties">房源管理</button>
+        <button class="tab-btn" data-tab="agents">经纪人</button>
+        <button class="tab-btn" data-tab="appointments">预约管理</button>
+        <button class="tab-btn" data-tab="borrow">借出归还</button>
+        <button class="tab-btn" data-tab="records">借用记录</button>
+        <button class="tab-btn" data-tab="loss">丢失赔付</button>
+    </div>
+
+    <div id="alert-success" class="alert alert-success"></div>
+    <div id="alert-error" class="alert alert-error"></div>
+
+    <div class="tab-content active" id="tab-keys">
+        <div class="section-title">🔑 钥匙状态列表</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="showAddKeyModal()">添加钥匙</button>
+            <button class="btn btn-success" onclick="refreshKeys()">刷新列表</button>
+        </div>
+        <table id="keys-table">
+            <thead>
+                <tr>
+                    <th>钥匙编号</th>
+                    <th>房源编号</th>
+                    <th>房源地址</th>
+                    <th>状态</th>
+                    <th>借用人</th>
+                    <th>借出时间</th>
+                    <th>预计归还</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="tab-properties">
+        <div class="section-title">🏘️ 房源管理</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="showAddPropertyModal()">添加房源</button>
+            <button class="btn btn-success" onclick="refreshProperties()">刷新列表</button>
+        </div>
+        <table id="properties-table">
+            <thead>
+                <tr>
+                    <th>房源编号</th>
+                    <th>房源地址</th>
+                    <th>业主姓名</th>
+                    <th>业主电话</th>
+                    <th>创建时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="tab-agents">
+        <div class="section-title">👥 经纪人管理</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="showAddAgentModal()">添加经纪人</button>
+            <button class="btn btn-success" onclick="refreshAgents()">刷新列表</button>
+        </div>
+        <table id="agents-table">
+            <thead>
+                <tr>
+                    <th>经纪人编号</th>
+                    <th>姓名</th>
+                    <th>电话</th>
+                    <th>部门</th>
+                    <th>创建时间</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="tab-appointments">
+        <div class="section-title">📅 预约管理</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-primary" onclick="showAddAppointmentModal()">创建预约</button>
+            <button class="btn btn-success" onclick="refreshAppointments()">刷新列表</button>
+        </div>
+        <table id="appointments-table">
+            <thead>
+                <tr>
+                    <th>预约编号</th>
+                    <th>钥匙编号</th>
+                    <th>房源地址</th>
+                    <th>经纪人</th>
+                    <th>预约日期</th>
+                    <th>时段</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="tab-borrow">
+        <div class="section-title">📤 借出 / 归还</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+                <h4 style="margin-bottom: 15px; color: #f59e0b;">借出钥匙</h4>
+                <div class="form-group">
+                    <label>选择钥匙</label>
+                    <select id="borrow-key-id">
+                        <option value="">请选择钥匙</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>经纪人</label>
+                    <select id="borrow-agent-id">
+                        <option value="">请选择经纪人</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>预计归还时间（小时后）</label>
+                    <input type="number" id="borrow-hours" value="4" min="1">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="borrow-notes" rows="2"></textarea>
+                </div>
+                <button class="btn btn-warning" onclick="borrowKey()">借出钥匙</button>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 15px; color: #10b981;">归还钥匙</h4>
+                <div class="form-group">
+                    <label>选择借用记录</label>
+                    <select id="return-record-id">
+                        <option value="">请选择要归还的钥匙</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>归还备注</label>
+                    <textarea id="return-notes" rows="2"></textarea>
+                </div>
+                <button class="btn btn-success" onclick="returnKey()">归还钥匙</button>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h4 style="margin-bottom: 15px; color: #dc2626;">⚠️ 逾期未还列表</h4>
+            <table id="overdue-table" style="margin-top: 10px;">
+                <thead>
+                    <tr>
+                        <th>钥匙编号</th>
+                        <th>房源地址</th>
+                        <th>经纪人</th>
+                        <th>借出时间</th>
+                        <th>应归还时间</th>
+                        <th>逾期时长(小时)</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-records">
+        <div class="section-title">📋 借用记录</div>
+        <table id="records-table">
+            <thead>
+                <tr>
+                    <th>借用编号</th>
+                    <th>钥匙编号</th>
+                    <th>房源地址</th>
+                    <th>经纪人</th>
+                    <th>借出时间</th>
+                    <th>预计归还</th>
+                    <th>实际归还</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="tab-content" id="tab-loss">
+        <div class="section-title">💔 丢失赔付管理</div>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn btn-danger" onclick="showLossModal()">报失登记</button>
+            <button class="btn btn-primary" onclick="exportCompensation()">导出赔付记录</button>
+            <button class="btn btn-success" onclick="refreshLossRecords()">刷新列表</button>
+        </div>
+        <div style="margin-bottom: 15px; font-size: 16px;">
+            <strong>累计赔付金额：</strong><span id="total-compensation" style="color: #dc2626; font-size: 20px;">¥0.00</span>
+        </div>
+        <table id="loss-table">
+            <thead>
+                <tr>
+                    <th>丢失编号</th>
+                    <th>钥匙编号</th>
+                    <th>房源地址</th>
+                    <th>责任人</th>
+                    <th>丢失日期</th>
+                    <th>换锁费用</th>
+                    <th>赔付状态</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="modal" id="timeline-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📜 钥匙借用时间线</h3>
+                <button class="close-btn" onclick="closeModal('timeline-modal')">&times;</button>
+            </div>
+            <div id="timeline-content"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-key-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔑 添加钥匙</h3>
+                <button class="close-btn" onclick="closeModal('add-key-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>钥匙编号</label>
+                <input type="text" id="new-key-code" placeholder="例如: KEY001">
+            </div>
+            <div class="form-group">
+                <label>所属房源</label>
+                <select id="new-key-property"></select>
+            </div>
+            <button class="btn btn-primary" onclick="addKey()" style="margin-top: 15px;">添加</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-property-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏘️ 添加房源</h3>
+                <button class="close-btn" onclick="closeModal('add-property-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>房源编号</label>
+                <input type="text" id="new-property-code" placeholder="例如: PROP001">
+            </div>
+            <div class="form-group">
+                <label>房源地址</label>
+                <input type="text" id="new-property-address" placeholder="例如: 朝阳区XX小区3号楼2单元501">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>业主姓名</label>
+                    <input type="text" id="new-property-owner">
+                </div>
+                <div class="form-group">
+                    <label>业主电话</label>
+                    <input type="text" id="new-property-phone">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addProperty()" style="margin-top: 15px;">添加</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-agent-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 添加经纪人</h3>
+                <button class="close-btn" onclick="closeModal('add-agent-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>经纪人编号</label>
+                <input type="text" id="new-agent-code" placeholder="例如: AGT001">
+            </div>
+            <div class="form-group">
+                <label>姓名</label>
+                <input type="text" id="new-agent-name" placeholder="例如: 张三">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>电话</label>
+                    <input type="text" id="new-agent-phone">
+                </div>
+                <div class="form-group">
+                    <label>部门</label>
+                    <input type="text" id="new-agent-dept">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addAgent()" style="margin-top: 15px;">添加</button>
+        </div>
+    </div>
+
+    <div class="modal" id="add-appointment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📅 创建带看预约</h3>
+                <button class="close-btn" onclick="closeModal('add-appointment-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>钥匙</label>
+                <select id="new-appointment-key"></select>
+            </div>
+            <div class="form-group">
+                <label>经纪人</label>
+                <select id="new-appointment-agent"></select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>预约日期</label>
+                    <input type="date" id="new-appointment-date">
+                </div>
+                <div class="form-group">
+                    <label>时段</label>
+                    <select id="new-appointment-slot">
+                        <option value="09:00-10:00">09:00-10:00</option>
+                        <option value="10:00-11:00">10:00-11:00</option>
+                        <option value="11:00-12:00">11:00-12:00</option>
+                        <option value="14:00-15:00">14:00-15:00</option>
+                        <option value="15:00-16:00">15:00-16:00</option>
+                        <option value="16:00-17:00">16:00-17:00</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="new-appointment-notes" rows="2"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="addAppointment()" style="margin-top: 15px;">创建预约</button>
+        </div>
+    </div>
+
+    <div class="modal" id="loss-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💔 钥匙丢失登记</h3>
+                <button class="close-btn" onclick="closeModal('loss-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>丢失钥匙</label>
+                <select id="loss-key-id">
+                    <option value="">请选择钥匙</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>责任人（经纪人）</label>
+                <select id="loss-agent-id">
+                    <option value="">请选择责任人</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>丢失日期</label>
+                    <input type="date" id="loss-date">
+                </div>
+                <div class="form-group">
+                    <label>换锁费用（元）</label>
+                    <input type="number" id="loss-fee" value="200">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="loss-notes" rows="2"></textarea>
+            </div>
+            <button class="btn btn-danger" onclick="reportLoss()" style="margin-top: 15px;">确认报失</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+
+        function showAlert(message, isError = false) {
+            const alertId = isError ? 'alert-error' : 'alert-success';
+            const alertEl = document.getElementById(alertId);
+            alertEl.textContent = message;
+            alertEl.style.display = 'block';
+            setTimeout(() => {
+                alertEl.style.display = 'none';
+            }, 3000);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        function formatDateShort(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN');
+        }
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showAddKeyModal() {
+            refreshPropertySelect('new-key-property');
+            document.getElementById('add-key-modal').classList.add('active');
+        }
+
+        function showAddPropertyModal() {
+            document.getElementById('add-property-modal').classList.add('active');
+        }
+
+        function showAddAgentModal() {
+            document.getElementById('add-agent-modal').classList.add('active');
+        }
+
+        function showAddAppointmentModal() {
+            refreshKeySelect('new-appointment-key', 'available');
+            refreshAgentSelect('new-appointment-agent');
+            document.getElementById('new-appointment-date').valueAsDate = new Date();
+            document.getElementById('add-appointment-modal').classList.add('active');
+        }
+
+        function showLossModal() {
+            refreshKeySelect('loss-key-id', '!lost');
+            refreshAgentSelect('loss-agent-id');
+            document.getElementById('loss-date').valueAsDate = new Date();
+            document.getElementById('loss-modal').classList.add('active');
+        }
+
+        async function refreshStatistics() {
+            try {
+                const res = await fetch(API_BASE + '/statistics');
+                const data = await res.json();
+                document.getElementById('stat-total').textContent = data.totalKeys;
+                document.getElementById('stat-available').textContent = data.availableKeys;
+                document.getElementById('stat-borrowed').textContent = data.borrowedKeys;
+                document.getElementById('stat-lost').textContent = data.lostKeys;
+                document.getElementById('stat-overdue').textContent = data.overdue;
+                document.getElementById('total-compensation').textContent = '¥' + Number(data.totalCompensation).toFixed(2);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshKeys() {
+            try {
+                const res = await fetch(API_BASE + '/keys');
+                const keys = await res.json();
+                const tbody = document.querySelector('#keys-table tbody');
+                tbody.innerHTML = keys.map(key => {
+                    const statusClass = key.status === 'available' ? 'status-available' : 
+                                       key.status === 'borrowed' ? 'status-borrowed' : 'status-lost';
+                    const statusText = key.status === 'available' ? '可借用' : 
+                                      key.status === 'borrowed' ? '已借出' : '已丢失';
+                    return `<tr>
+                        <td><strong>${key.key_code}</strong></td>
+                        <td>${key.property_code}</td>
+                        <td>${key.address}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${key.borrower_name || '-'}</td>
+                        <td>${formatDate(key.borrow_time)}</td>
+                        <td>${formatDate(key.expected_return_time)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-primary" onclick="showKeyTimeline(${key.id})">查看时间线</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function showKeyTimeline(keyId) {
+            try {
+                const res = await fetch(API_BASE + '/key-timeline/' + keyId);
+                const timeline = await res.json();
+                const content = document.getElementById('timeline-content');
+                
+                if (timeline.length === 0) {
+                    content.innerHTML = '<div class="empty-state">暂无记录</div>';
+                } else {
+                    content.innerHTML = '<div class="timeline">' + timeline.map(item => {
+                        const typeClass = item.type === 'borrow' ? 'borrow' : 
+                                         item.type === 'return' ? 'return' : 'loss';
+                        return `<div class="timeline-item ${typeClass}">
+                            <div class="timeline-time">${formatDate(item.time)}</div>
+                            <div class="timeline-event">${item.event}</div>
+                            <div>操作人：${item.person}</div>
+                        </div>`;
+                    }).join('') + '</div>';
+                }
+                document.getElementById('timeline-modal').classList.add('active');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshProperties() {
+            try {
+                const res = await fetch(API_BASE + '/properties');
+                const properties = await res.json();
+                const tbody = document.querySelector('#properties-table tbody');
+                tbody.innerHTML = properties.map(p => `<tr>
+                    <td><strong>${p.property_code}</strong></td>
+                    <td>${p.address}</td>
+                    <td>${p.owner_name || '-'}</td>
+                    <td>${p.owner_phone || '-'}</td>
+                    <td>${formatDate(p.created_at)}</td>
+                </tr>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshAgents() {
+            try {
+                const res = await fetch(API_BASE + '/agents');
+                const agents = await res.json();
+                const tbody = document.querySelector('#agents-table tbody');
+                tbody.innerHTML = agents.map(a => `<tr>
+                    <td><strong>${a.agent_code}</strong></td>
+                    <td>${a.name}</td>
+                    <td>${a.phone || '-'}</td>
+                    <td>${a.department || '-'}</td>
+                    <td>${formatDate(a.created_at)}</td>
+                </tr>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshAppointments() {
+            try {
+                const res = await fetch(API_BASE + '/appointments');
+                const appointments = await res.json();
+                const tbody = document.querySelector('#appointments-table tbody');
+                tbody.innerHTML = appointments.map(a => `<tr>
+                    <td><strong>${a.appointment_code}</strong></td>
+                    <td>${a.key_code}</td>
+                    <td>${a.address}</td>
+                    <td>${a.agent_name}</td>
+                    <td>${formatDateShort(a.appointment_date)}</td>
+                    <td>${a.time_slot}</td>
+                    <td><span class="status-badge ${a.status === 'pending' ? 'status-borrowed' : 'status-available'}">${a.status === 'pending' ? '待执行' : '已完成'}</span></td>
+                </tr>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshRecords() {
+            try {
+                const res = await fetch(API_BASE + '/borrow-records');
+                const records = await res.json();
+                const tbody = document.querySelector('#records-table tbody');
+                tbody.innerHTML = records.map(r => {
+                    const statusClass = r.status === 'borrowed' ? 'status-borrowed' : 
+                                       r.status === 'returned' ? 'status-available' : 'status-lost';
+                    const statusText = r.status === 'borrowed' ? '借用中' : 
+                                      r.status === 'returned' ? '已归还' : '已丢失';
+                    return `<tr>
+                        <td><strong>${r.borrow_code}</strong></td>
+                        <td>${r.key_code}</td>
+                        <td>${r.address}</td>
+                        <td>${r.agent_name}</td>
+                        <td>${formatDate(r.borrow_time)}</td>
+                        <td>${formatDate(r.expected_return_time)}</td>
+                        <td>${formatDate(r.actual_return_time)}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshOverdueRecords() {
+            try {
+                const res = await fetch(API_BASE + '/overdue-records');
+                const records = await res.json();
+                const tbody = document.querySelector('#overdue-table tbody');
+                tbody.innerHTML = records.map(r => `<tr>
+                    <td><strong>${r.key_code}</strong></td>
+                    <td>${r.address}</td>
+                    <td>${r.agent_name}</td>
+                    <td>${formatDate(r.borrow_time)}</td>
+                    <td>${formatDate(r.expected_return_time)}</td>
+                    <td><span class="status-badge status-overdue">${Number(r.overdue_hours * 24).toFixed(1)}</span></td>
+                    <td><button class="btn btn-sm btn-success" onclick="quickReturn(${r.id})">立即归还</button></td>
+                </tr>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshLossRecords() {
+            try {
+                const res = await fetch(API_BASE + '/loss-records');
+                const records = await res.json();
+                const tbody = document.querySelector('#loss-table tbody');
+                tbody.innerHTML = records.map(r => `<tr>
+                    <td><strong>${r.loss_code}</strong></td>
+                    <td>${r.key_code}</td>
+                    <td>${r.address}</td>
+                    <td>${r.agent_name}</td>
+                    <td>${formatDateShort(r.loss_date)}</td>
+                    <td style="color: #dc2626; font-weight: bold;">¥${Number(r.lock_change_fee).toFixed(2)}</td>
+                    <td><span class="status-badge ${r.fee_paid ? 'status-available' : 'status-borrowed'}">${r.fee_paid ? '已赔付' : '未赔付'}</span></td>
+                    <td>${r.notes || '-'}</td>
+                </tr>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshPropertySelect(selectId) {
+            try {
+                const res = await fetch(API_BASE + '/properties');
+                const properties = await res.json();
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">请选择房源</option>' + 
+                    properties.map(p => `<option value="${p.id}">${p.property_code} - ${p.address}</option>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshKeySelect(selectId, filter = 'all') {
+            try {
+                const res = await fetch(API_BASE + '/keys');
+                let keys = await res.json();
+                if (filter === 'available') keys = keys.filter(k => k.status === 'available');
+                else if (filter === 'borrowed') keys = keys.filter(k => k.status === 'borrowed');
+                else if (filter === '!lost') keys = keys.filter(k => k.status !== 'lost');
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">请选择钥匙</option>' + 
+                    keys.map(k => `<option value="${k.id}">${k.key_code} - ${k.address}</option>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshAgentSelect(selectId) {
+            try {
+                const res = await fetch(API_BASE + '/agents');
+                const agents = await res.json();
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">请选择经纪人</option>' + 
+                    agents.map(a => `<option value="${a.id}">${a.agent_code} - ${a.name}</option>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function refreshBorrowedSelect() {
+            try {
+                const res = await fetch(API_BASE + '/borrow-records');
+                const records = (await res.json()).filter(r => r.status === 'borrowed');
+                const select = document.getElementById('return-record-id');
+                select.innerHTML = '<option value="">请选择要归还的钥匙</option>' + 
+                    records.map(r => `<option value="${r.id}">${r.key_code} - ${r.agent_name} (${formatDate(r.borrow_time)})</option>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function addKey() {
+            const keyCode = document.getElementById('new-key-code').value;
+            const propertyId = document.getElementById('new-key-property').value;
+            
+            if (!keyCode || !propertyId) {
+                showAlert('请填写完整信息', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key_code: keyCode, property_id: propertyId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('钥匙添加成功！');
+                    closeModal('add-key-modal');
+                    refreshKeys();
+                    refreshStatistics();
+                } else {
+                    showAlert(data.error || '添加失败', true);
+                }
+            } catch (e) {
+                showAlert('添加失败', true);
+            }
+        }
+
+        async function addProperty() {
+            const code = document.getElementById('new-property-code').value;
+            const address = document.getElementById('new-property-address').value;
+            const owner = document.getElementById('new-property-owner').value;
+            const phone = document.getElementById('new-property-phone').value;
+            
+            if (!code || !address) {
+                showAlert('请填写房源编号和地址', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/properties', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ property_code: code, address, owner_name: owner, owner_phone: phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('房源添加成功！');
+                    closeModal('add-property-modal');
+                    refreshProperties();
+                } else {
+                    showAlert(data.error || '添加失败', true);
+                }
+            } catch (e) {
+                showAlert('添加失败', true);
+            }
+        }
+
+        async function addAgent() {
+            const code = document.getElementById('new-agent-code').value;
+            const name = document.getElementById('new-agent-name').value;
+            const phone = document.getElementById('new-agent-phone').value;
+            const dept = document.getElementById('new-agent-dept').value;
+            
+            if (!code || !name) {
+                showAlert('请填写经纪人编号和姓名', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/agents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_code: code, name, phone, department: dept })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('经纪人添加成功！');
+                    closeModal('add-agent-modal');
+                    refreshAgents();
+                } else {
+                    showAlert(data.error || '添加失败', true);
+                }
+            } catch (e) {
+                showAlert('添加失败', true);
+            }
+        }
+
+        async function addAppointment() {
+            const keyId = document.getElementById('new-appointment-key').value;
+            const agentId = document.getElementById('new-appointment-agent').value;
+            const date = document.getElementById('new-appointment-date').value;
+            const slot = document.getElementById('new-appointment-slot').value;
+            const notes = document.getElementById('new-appointment-notes').value;
+            
+            if (!keyId || !agentId || !date) {
+                showAlert('请填写完整信息', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/appointments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key_id: keyId, agent_id: agentId, appointment_date: date, time_slot: slot, notes })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('预约创建成功！');
+                    closeModal('add-appointment-modal');
+                    refreshAppointments();
+                } else {
+                    showAlert(data.error || '创建失败', true);
+                }
+            } catch (e) {
+                showAlert('创建失败', true);
+            }
+        }
+
+        async function borrowKey() {
+            const keyId = document.getElementById('borrow-key-id').value;
+            const agentId = document.getElementById('borrow-agent-id').value;
+            const hours = document.getElementById('borrow-hours').value;
+            const notes = document.getElementById('borrow-notes').value;
+            
+            if (!keyId || !agentId) {
+                showAlert('请选择钥匙和经纪人', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/borrow', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key_id: keyId, agent_id: agentId, expected_return_hours: Number(hours), notes })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert(data.hasAppointment ? '借出成功（已关联预约）！' : '借出成功！');
+                    refreshBorrowSelects();
+                    refreshKeys();
+                    refreshRecords();
+                    refreshStatistics();
+                } else {
+                    showAlert(data.error || '借出失败', true);
+                }
+            } catch (e) {
+                showAlert('借出失败', true);
+            }
+        }
+
+        async function returnKey() {
+            const recordId = document.getElementById('return-record-id').value;
+            const notes = document.getElementById('return-notes').value;
+            
+            if (!recordId) {
+                showAlert('请选择要归还的钥匙', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/return', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ borrow_record_id: recordId, notes })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('归还成功！');
+                    refreshBorrowSelects();
+                    refreshKeys();
+                    refreshRecords();
+                    refreshOverdueRecords();
+                    refreshStatistics();
+                } else {
+                    showAlert(data.error || '归还失败', true);
+                }
+            } catch (e) {
+                showAlert('归还失败', true);
+            }
+        }
+
+        async function quickReturn(recordId) {
+            try {
+                const res = await fetch(API_BASE + '/return', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ borrow_record_id: recordId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('归还成功！');
+                    refreshBorrowSelects();
+                    refreshKeys();
+                    refreshRecords();
+                    refreshOverdueRecords();
+                    refreshStatistics();
+                } else {
+                    showAlert(data.error || '归还失败', true);
+                }
+            } catch (e) {
+                showAlert('归还失败', true);
+            }
+        }
+
+        async function reportLoss() {
+            const keyId = document.getElementById('loss-key-id').value;
+            const agentId = document.getElementById('loss-agent-id').value;
+            const date = document.getElementById('loss-date').value;
+            const fee = document.getElementById('loss-fee').value;
+            const notes = document.getElementById('loss-notes').value;
+            
+            if (!keyId || !agentId || !date || !fee) {
+                showAlert('请填写完整信息', true);
+                return;
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/report-loss', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key_id: keyId, agent_id: agentId, loss_date: date, lock_change_fee: Number(fee), notes })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('报失成功！');
+                    closeModal('loss-modal');
+                    refreshLossRecords();
+                    refreshKeys();
+                    refreshStatistics();
+                } else {
+                    showAlert(data.error || '报失失败', true);
+                }
+            } catch (e) {
+                showAlert('报失失败', true);
+            }
+        }
+
+        function exportCompensation() {
+            window.open(API_BASE + '/export-compensation', '_blank');
+        }
+
+        function refreshBorrowSelects() {
+            refreshKeySelect('borrow-key-id', 'available');
+            refreshAgentSelect('borrow-agent-id');
+            refreshBorrowedSelect();
+        }
+
+        function init() {
+            refreshStatistics();
+            refreshKeys();
+            refreshProperties();
+            refreshAgents();
+            refreshAppointments();
+            refreshRecords();
+            refreshOverdueRecords();
+            refreshLossRecords();
+            refreshBorrowSelects();
+        }
+
+        init();
+    </script>
+</body>
+</html>
