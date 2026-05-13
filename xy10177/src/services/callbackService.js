@@ -1,7 +1,6 @@
 const axios = require('axios');
 const db = require('../db');
-const { now } = require('../utils');
-const { getTransaction, updateTransaction, createTransactionStep } = require('./transactionService');
+const { generateId, now } = require('../utils');
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
@@ -18,8 +17,39 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getTransactionById(transactionId) {
+  return db.prepare('SELECT * FROM transactions WHERE id = ?').get(transactionId);
+}
+
+function updateTransactionById(transactionId, updates) {
+  const validUpdates = { ...updates, updated_at: now() };
+  const setClauses = Object.keys(validUpdates).map(field => `${field} = ?`);
+  const values = [...Object.values(validUpdates), transactionId];
+
+  const stmt = db.prepare(`UPDATE transactions SET ${setClauses.join(', ')} WHERE id = ?`);
+  stmt.run(...values);
+  return getTransactionById(transactionId);
+}
+
+function createTransactionStepRecord(transactionId, stepOrder, stepName, status, result = null, errorMessage = null) {
+  const id = generateId();
+  const stmt = db.prepare(`
+    INSERT INTO transaction_steps (
+      id, transaction_id, step_order, step_name, status, result, error_message, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  stmt.run(
+    id, transactionId, stepOrder, stepName, status,
+    result ? JSON.stringify(result) : null,
+    errorMessage,
+    now(),
+    now()
+  );
+  return id;
+}
+
 async function sendCallback(transactionId, meetingId, eventType, data) {
-  const transaction = getTransaction(transactionId);
+  const transaction = getTransactionById(transactionId);
   if (!transaction) {
     console.error(`[Callback] Transaction not found: ${transactionId}`);
     return { success: false, error: 'Transaction not found' };
@@ -31,7 +61,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
     return { success: true, skipped: true };
   }
 
-  updateTransaction(transactionId, {
+  updateTransactionById(transactionId, {
     status: 'callback',
     step: 'send_callback',
   });
@@ -61,7 +91,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
 
       console.log(`[Callback] Success: ${response.status}`);
 
-      createTransactionStep(
+      createTransactionStepRecord(
         transactionId,
         99,
         'send_callback',
@@ -69,7 +99,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
         { attempt, statusCode: response.status }
       );
 
-      updateTransaction(transactionId, {
+      updateTransactionById(transactionId, {
         status: transaction.status === 'compensating' ? 'failed' : transaction.status,
         step: null,
       });
@@ -84,7 +114,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
       console.error(`[Callback] Attempt ${attempt} failed: ${err.message}`);
 
       if (attempt < MAX_RETRIES) {
-        console.log(`[Callback] Retrying in ${RETRY_DELAY_MS}ms...`);
+        console.log(`[Callback] Retrying in ${RETRY_DELAY_MS * attempt}ms...`);
         await sleep(RETRY_DELAY_MS * attempt);
       }
     }
@@ -92,7 +122,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
 
   console.error(`[Callback] All ${MAX_RETRIES} attempts failed`);
   
-  createTransactionStep(
+  createTransactionStepRecord(
     transactionId,
     99,
     'send_callback',
@@ -101,9 +131,9 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
     lastError
   );
 
-  updateTransaction(transactionId, {
+  updateTransactionById(transactionId, {
     status: 'callback_failed',
-    retry_count: transaction.retry_count + 1,
+    retry_count: (transaction.retry_count || 0) + 1,
     error_message: lastError,
   });
 

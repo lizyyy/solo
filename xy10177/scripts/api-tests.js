@@ -1,9 +1,61 @@
 const http = require('http');
 
-const BASE_URL = 'http://localhost:3000';
+const PORT = process.env.TEST_PORT || 3001;
+const BASE_URL = `http://localhost:${PORT}`;
 
 let passed = 0;
 let failed = 0;
+
+let mockCallbackServer = null;
+let callbackReceived = [];
+
+function startMockCallbackServer(port = 9999) {
+  return new Promise((resolve) => {
+    callbackReceived = [];
+    mockCallbackServer = http.createServer((req, res) => {
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', (chunk) => {
+          body += chunk;
+        });
+        req.on('end', () => {
+          try {
+            const data = JSON.parse(body);
+            callbackReceived.push({
+              time: Date.now(),
+              data,
+            });
+            console.log(`[Mock Callback] Received: ${data.event_type} for ${data.meeting_id}`);
+          } catch (e) {}
+          
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        });
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
+    });
+    
+    mockCallbackServer.listen(port, () => {
+      console.log(`[Mock Callback] Server started on port ${port}`);
+      resolve();
+    });
+  });
+}
+
+function stopMockCallbackServer() {
+  return new Promise((resolve) => {
+    if (mockCallbackServer) {
+      mockCallbackServer.close(() => {
+        console.log('[Mock Callback] Server stopped');
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
+}
 
 function test(name, fn) {
   return async () => {
@@ -252,11 +304,89 @@ const tests = [
       'Should be calendar or empty response'
     );
   }),
+
+  test('Book new meeting for callback test', async () => {
+    const res = await makeRequest('POST', '/api/meetings/book', {
+      title: 'Callback Test Meeting',
+      organizer: 'CallbackUser',
+      start_time: '2026-05-16 10:00:00',
+      end_time: '2026-05-16 11:00:00',
+      room_id: room1Id,
+    });
+    assertEqual(res.status, 200);
+    assertTrue(res.body.success);
+  }),
+
+  test('Reschedule with callback_url - verify callback sent', async () => {
+    callbackReceived = [];
+    
+    const meetingRes = await makeRequest('GET', '/api/meetings');
+    assertEqual(meetingRes.status, 200);
+    const meetings = meetingRes.body.meetings;
+    const targetMeeting = meetings.find(m => m.title === 'Callback Test Meeting');
+    assertTrue(targetMeeting, 'Should find callback test meeting');
+    
+    const res = await makeRequest('POST', `/api/meetings/${targetMeeting.id}/reschedule`, {
+      start_time: '2026-05-16 14:00:00',
+      end_time: '2026-05-16 15:00:00',
+      room_id: room2Id,
+      actor: 'CallbackUser',
+      callback_url: 'http://localhost:9999/webhook',
+    });
+    assertEqual(res.status, 200);
+    assertTrue(res.body.success);
+    
+    await new Promise(r => setTimeout(r, 2000));
+    
+    assertTrue(callbackReceived.length > 0, 'Should have received callback');
+    const callback = callbackReceived[0].data;
+    assertEqual(callback.event_type, 'reschedule');
+    assertEqual(callback.meeting_id, targetMeeting.id);
+    assertTrue(callback.data.old, 'Callback should have old values');
+    assertTrue(callback.data.new, 'Callback should have new values');
+    console.log(`    Callback received: event_type=${callback.event_type}, meeting_id=${callback.meeting_id}`);
+  }),
+
+  test('Cancel with callback_url - verify callback sent', async () => {
+    callbackReceived = [];
+    
+    const meetingRes = await makeRequest('GET', '/api/meetings');
+    assertEqual(meetingRes.status, 200);
+    const meetings = meetingRes.body.meetings;
+    const targetMeeting = meetings.find(m => m.title === 'Callback Test Meeting');
+    assertTrue(targetMeeting, 'Should find callback test meeting');
+    
+    const res = await makeRequest('POST', `/api/meetings/${targetMeeting.id}/cancel`, {
+      actor: 'CallbackUser',
+      callback_url: 'http://localhost:9999/webhook',
+    });
+    assertEqual(res.status, 200);
+    assertTrue(res.body.success);
+    
+    await new Promise(r => setTimeout(r, 2000));
+    
+    assertTrue(callbackReceived.length > 0, 'Should have received cancel callback');
+    const callback = callbackReceived[0].data;
+    assertEqual(callback.event_type, 'cancel');
+    assertEqual(callback.meeting_id, targetMeeting.id);
+    console.log(`    Callback received: event_type=${callback.event_type}, meeting_id=${callback.meeting_id}`);
+  }),
 ];
 
 async function runApiTests() {
-  for (const testFn of tests) {
-    await testFn();
+  try {
+    await startMockCallbackServer(9999);
+    console.log('');
+  } catch (err) {
+    console.error('[Error] Failed to start mock callback server:', err.message);
+  }
+
+  try {
+    for (const testFn of tests) {
+      await testFn();
+    }
+  } finally {
+    await stopMockCallbackServer();
   }
 
   console.log('----------------------------------------');

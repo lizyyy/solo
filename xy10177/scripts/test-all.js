@@ -70,10 +70,10 @@ async function runTests() {
     console.log('[Setup] Cleaning up old database...');
     cleanupDatabase();
 
-    console.log('[Setup] Starting server...');
+    console.log('[Setup] Starting server on port 3001...');
     server = spawn('node', ['src/server.js'], {
       cwd: path.join(__dirname, '..'),
-      env: { ...process.env, PORT: '3000' },
+      env: { ...process.env, PORT: '3001', DISABLE_CALLBACK_SCHEDULER: 'true' },
     });
 
     server.stdout.on('data', (data) => {
@@ -84,7 +84,7 @@ async function runTests() {
       console.error(`[Server Error] ${data.toString().trim()}`);
     });
 
-    await waitForServer(3000, 15000);
+    await waitForServer(3001, 15000);
     console.log('[Setup] Server is ready');
     console.log('');
 

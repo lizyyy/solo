@@ -7,6 +7,8 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
+const { startCallbackRetryScheduler } = require('./services/callbackService');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -37,6 +39,13 @@ app.listen(PORT, () => {
   console.log(`Meeting Room Conflict API running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log('');
+  
+  if (process.env.DISABLE_CALLBACK_SCHEDULER !== 'true') {
+    startCallbackRetryScheduler(60000);
+    console.log('[Scheduler] Callback retry scheduler started (60s interval)');
+    console.log('');
+  }
+  
   console.log('Available endpoints:');
   console.log('  GET  /api/resources/rooms');
   console.log('  POST /api/resources/rooms');
