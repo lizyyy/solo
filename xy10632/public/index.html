@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>售后换新备机回收管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .stat-card .highlight {
+            color: #f56565;
+        }
+        .search-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .search-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .search-group label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .search-group input,
+        .search-group select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 180px;
+            transition: border-color 0.2s;
+        }
+        .search-group input:focus,
+        .search-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #38a169;
+        }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #718096;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.2s;
+        }
+        .tab.active {
+            color: #667eea;
+            background: #ebf4ff;
+        }
+        .tab:hover:not(.active) {
+            color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover td {
+            background: #f7fafc;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #d69e2e;
+        }
+        .status-approved {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-rejected {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .status-active {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-close:hover {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        .history-item {
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .history-item h4 {
+            font-size: 13px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .history-item p {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .history-item .diff {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .export-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .message.success {
+            background: #c6f6d5;
+            color: #2f855a;
+            display: block;
+        }
+        .message.error {
+            background: #fed7d7;
+            color: #c53030;
+            display: block;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>售后换新备机回收管理系统</h1>
+    </div>
+    
+    <div class="container">
+        <div id="message" class="message"></div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>保修校验总数</h3>
+                <div class="value" id="stat-warranty">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>检测报告总数</h3>
+                <div class="value" id="stat-inspection">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>备机借用中</h3>
+                <div class="value highlight" id="stat-loaners">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>待审批换新</h3>
+                <div class="value highlight" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>待回收旧机</h3>
+                <div class="value highlight" id="stat-recovery">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>售后总成本</h3>
+                <div class="value" id="stat-costs">¥0</div>
+            </div>
+            <div class="stat-card">
+                <h3>保修通过率</h3>
+                <div class="value" id="stat-passrate">0%</div>
+            </div>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-row">
+                <div class="search-group">
+                    <label>工单号</label>
+                    <input type="text" id="search-orderNo" placeholder="输入工单号">
+                </div>
+                <div class="search-group">
+                    <label>处理人</label>
+                    <select id="search-handler">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="search-group">
+                    <label>开始时间</label>
+                    <input type="date" id="search-start">
+                </div>
+                <div class="search-group">
+                    <label>结束时间</label>
+                    <input type="date" id="search-end">
+                </div>
+                <button class="btn btn-primary" onclick="searchData()">搜索</button>
+                <button class="btn btn-secondary" onclick="resetSearch()">重置</button>
+                <button class="btn btn-success" onclick="exportReport()">导出报表</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('warranty')">保修校验</button>
+            <button class="tab" onclick="switchTab('inspection')">检测报告</button>
+            <button class="tab" onclick="switchTab('loaner')">备机借用</button>
+            <button class="tab" onclick="switchTab('approval')">换新审批</button>
+            <button class="tab" onclick="switchTab('recovery')">旧机回收</button>
+            <button class="tab" onclick="switchTab('cost')">售后成本</button>
+            <button class="tab" onclick="switchTab('review')">复核面板</button>
+        </div>
+        
+        <div id="tab-warranty" class="tab-content active">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>客户姓名</th>
+                            <th>设备型号</th>
+                            <th>保修状态</th>
+                            <th>校验结果</th>
+                            <th>处理人</th>
+                            <th>校验时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="warranty-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-inspection" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>设备型号</th>
+                            <th>故障描述</th>
+                            <th>维修建议</th>
+                            <th>预估费用</th>
+                            <th>状态</th>
+                            <th>检测员</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inspection-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-loaner" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>借用人</th>
+                            <th>备机型号</th>
+                            <th>借出日期</th>
+                            <th>预计归还</th>
+                            <th>实际归还</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loaner-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-approval" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>设备型号</th>
+                            <th>换新原因</th>
+                            <th>换新类型</th>
+                            <th>申请人</th>
+                            <th>审批人</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approval-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-recovery" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>设备型号</th>
+                            <th>回收状态</th>
+                            <th>回收方式</th>
+                            <th>快递单号</th>
+                            <th>收货人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recovery-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-cost" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>费用类型</th>
+                            <th>金额</th>
+                            <th>费用说明</th>
+                            <th>承担方</th>
+                            <th>结算状态</th>
+                            <th>处理人</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cost-table"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="tab-review" class="tab-content">
+            <div class="search-section">
+                <div class="search-row">
+                    <div class="search-group">
+                        <label>输入工单号进行复核</label>
+                        <input type="text" id="review-orderNo" placeholder="输入工单号">
+                    </div>
+                    <button class="btn btn-primary" onclick="loadReviewData()">查询</button>
+                </div>
+            </div>
+            <div class="table-container" id="review-content">
+                <div class="empty-state">请输入工单号查询完整的售后记录</div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">操作</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'warranty';
+        let handlers = [];
+        
+        async function init() {
+            await loadStats();
+            await loadHandlers();
+            await loadAllData();
+        }
+        
+        async function loadStats() {
+            const res = await fetch('/api/overview');
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('stat-warranty').textContent = data.data.totalWarrantyChecks;
+                document.getElementById('stat-inspection').textContent = data.data.totalInspectionReports;
+                document.getElementById('stat-loaners').textContent = data.data.activeLoaners;
+                document.getElementById('stat-pending').textContent = data.data.pendingApprovals;
+                document.getElementById('stat-recovery').textContent = data.data.pendingRecoveries;
+                document.getElementById('stat-costs').textContent = '¥' + data.data.totalCosts;
+                document.getElementById('stat-passrate').textContent = data.data.warrantyPassRate + '%';
+            }
+        }
+        
+        async function loadHandlers() {
+            const res = await fetch('/api/handlers');
+            const data = await res.json();
+            if (data.success) {
+                handlers = data.data;
+                const select = document.getElementById('search-handler');
+                select.innerHTML = '<option value="">全部</option>';
+                handlers.forEach(h => {
+                    const option = document.createElement('option');
+                    option.value = h;
+                    option.textContent = h;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        async function loadAllData() {
+            await Promise.all([
+                loadWarrantyData(),
+                loadInspectionData(),
+                loadLoanerData(),
+                loadApprovalData(),
+                loadRecoveryData(),
+                loadCostData()
+            ]);
+        }
+        
+        function getSearchParams() {
+            return {
+                orderNo: document.getElementById('search-orderNo').value,
+                handler: document.getElementById('search-handler').value
+            };
+        }
+        
+        function buildQuery(params) {
+            const query = new URLSearchParams();
+            Object.keys(params).forEach(key => {
+                if (params[key]) query.append(key, params[key]);
+            });
+            return query.toString();
+        }
+        
+        async function loadWarrantyData() {
+            const params = getSearchParams();
+            const query = buildQuery(params);
+            const res = await fetch('/api/warranty-checks?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('warranty-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.customerName}</td>
+                        <td>${item.deviceModel}</td>
+                        <td>${item.warrantyStatus}</td>
+                        <td><span class="status-badge ${item.checkResult === '通过' ? 'status-approved' : item.checkResult === '异常' ? 'status-rejected' : 'status-pending'}">${item.checkResult}</span></td>
+                        <td>${item.handler}</td>
+                        <td>${formatDate(item.checkTime)}</td>
+                        <td><button class="btn btn-small btn-secondary" onclick="viewHistory('warrantyCheck', '${item.id}')">查看历史</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadInspectionData() {
+            const params = getSearchParams();
+            const query = buildQuery({ orderNo: params.orderNo, inspector: params.handler });
+            const res = await fetch('/api/inspection-reports?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('inspection-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.deviceModel}</td>
+                        <td>${item.faultDescription}</td>
+                        <td>${item.repairSuggestion}</td>
+                        <td>¥${item.estimatedCost}</td>
+                        <td><span class="status-badge ${item.status === '已通过' ? 'status-approved' : item.status === '已拒绝' ? 'status-rejected' : 'status-pending'}">${item.status}</span></td>
+                        <td>${item.inspector}</td>
+                        <td>
+                            <div class="action-buttons">
+                                ${item.status === '待审核' ? `<button class="btn btn-small btn-primary" onclick="verifyInspection('${item.id}', '${item.orderNo}')">审核</button>` : ''}
+                                <button class="btn btn-small btn-secondary" onclick="viewHistory('inspectionReport', '${item.id}')">历史</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadLoanerData() {
+            const params = getSearchParams();
+            const query = buildQuery(params);
+            const res = await fetch('/api/loaner-devices?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('loaner-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.borrower}</td>
+                        <td>${item.loanerDeviceModel}</td>
+                        <td>${formatDate(item.loanDate)}</td>
+                        <td>${formatDate(item.expectedReturnDate)}</td>
+                        <td>${item.actualReturnDate ? formatDate(item.actualReturnDate) : '-'}</td>
+                        <td><span class="status-badge ${item.loanStatus === '已归还' ? 'status-approved' : item.loanStatus === '借用中' ? 'status-active' : 'status-rejected'}">${item.loanStatus}</span></td>
+                        <td><button class="btn btn-small btn-secondary" onclick="viewHistory('loanerDevice', '${item.id}')">查看历史</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadApprovalData() {
+            const params = getSearchParams();
+            const query = buildQuery({ orderNo: params.orderNo, applicant: params.handler });
+            const res = await fetch('/api/replacement-approvals?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('approval-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.deviceModel}</td>
+                        <td>${item.replacementReason}</td>
+                        <td>${item.replacementType}</td>
+                        <td>${item.applicant}</td>
+                        <td>${item.approver || '-'}</td>
+                        <td><span class="status-badge ${item.approvalStatus === '已通过' ? 'status-approved' : item.approvalStatus === '已拒绝' ? 'status-rejected' : 'status-pending'}">${item.approvalStatus}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                ${item.approvalStatus === '待审批' ? `<button class="btn btn-small btn-primary" onclick="advanceApproval('${item.id}', '${item.orderNo}')">审批</button>` : ''}
+                                <button class="btn btn-small btn-secondary" onclick="viewHistory('replacementApproval', '${item.id}')">历史</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadRecoveryData() {
+            const params = getSearchParams();
+            const query = buildQuery(params);
+            const res = await fetch('/api/old-device-recoveries?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('recovery-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.deviceModel}</td>
+                        <td><span class="status-badge ${item.recoveryStatus === '已回收' ? 'status-approved' : item.recoveryStatus === '待回收' ? 'status-pending' : item.recoveryStatus === '回收中' ? 'status-active' : 'status-rejected'}">${item.recoveryStatus}</span></td>
+                        <td>${item.recoveryMethod}</td>
+                        <td>${item.trackingNo || '-'}</td>
+                        <td>${item.receiver || '-'}</td>
+                        <td><button class="btn btn-small btn-primary" onclick="editRecovery('${item.id}', '${item.orderNo}')">编辑</button></td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadCostData() {
+            const params = getSearchParams();
+            const query = buildQuery(params);
+            const res = await fetch('/api/after-sales-costs?' + query);
+            const data = await res.json();
+            if (data.success) {
+                const tbody = document.getElementById('cost-table');
+                tbody.innerHTML = data.data.map(item => `
+                    <tr>
+                        <td>${item.orderNo}</td>
+                        <td>${item.costType}</td>
+                        <td>¥${item.amount}</td>
+                        <td>${item.costDescription}</td>
+                        <td>${item.costBearer}</td>
+                        <td><span class="status-badge ${item.settlementStatus === '已结算' ? 'status-approved' : item.settlementStatus === '待结算' ? 'status-pending' : 'status-active'}">${item.settlementStatus}</span></td>
+                        <td>${item.handler}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+        
+        async function loadReviewData() {
+            const orderNo = document.getElementById('review-orderNo').value.trim();
+            if (!orderNo) {
+                showMessage('请输入工单号', 'error');
+                return;
+            }
+            
+            const res = await fetch(`/api/order-detail/${orderNo}`);
+            const data = await res.json();
+            if (data.success && data.data.warrantyCheck) {
+                const d = data.data;
+                document.getElementById('review-content').innerHTML = `
+                    <h3 style="margin-bottom: 20px; color: #667eea;">工单 ${orderNo} 完整记录</h3>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">📋 保修校验</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>客户:</strong> ${d.warrantyCheck.customerName} | <strong>设备:</strong> ${d.warrantyCheck.deviceModel}</p>
+                            <p><strong>保修状态:</strong> ${d.warrantyCheck.warrantyStatus} | <strong>校验结果:</strong> ${d.warrantyCheck.checkResult}</p>
+                            <p><strong>处理人:</strong> ${d.warrantyCheck.handler} | <strong>时间:</strong> ${formatDate(d.warrantyCheck.checkTime)}</p>
+                        </div>
+                    </div>
+                    
+                    ${d.inspectionReport ? `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">🔍 检测报告</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>故障:</strong> ${d.inspectionReport.faultDescription} | <strong>建议:</strong> ${d.inspectionReport.repairSuggestion}</p>
+                            <p><strong>预估费用:</strong> ¥${d.inspectionReport.estimatedCost} | <strong>状态:</strong> ${d.inspectionReport.status}</p>
+                            <p><strong>检测员:</strong> ${d.inspectionReport.inspector}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${d.loanerDevice ? `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">📱 备机借用</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>借用人:</strong> ${d.loanerDevice.borrower} | <strong>备机:</strong> ${d.loanerDevice.loanerDeviceModel}</p>
+                            <p><strong>借出:</strong> ${formatDate(d.loanerDevice.loanDate)} | <strong>预计归还:</strong> ${formatDate(d.loanerDevice.expectedReturnDate)}</p>
+                            <p><strong>状态:</strong> ${d.loanerDevice.loanStatus}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${d.replacementApproval ? `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">✅ 换新审批</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>原因:</strong> ${d.replacementApproval.replacementReason} | <strong>类型:</strong> ${d.replacementApproval.replacementType}</p>
+                            <p><strong>申请人:</strong> ${d.replacementApproval.applicant} | <strong>审批人:</strong> ${d.replacementApproval.approver || '-'}</p>
+                            <p><strong>状态:</strong> ${d.replacementApproval.approvalStatus} | <strong>意见:</strong> ${d.replacementApproval.approvalComments || '-'}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${d.oldDeviceRecovery ? `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">♻️ 旧机回收</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            <p><strong>状态:</strong> ${d.oldDeviceRecovery.recoveryStatus} | <strong>方式:</strong> ${d.oldDeviceRecovery.recoveryMethod}</p>
+                            <p><strong>快递单号:</strong> ${d.oldDeviceRecovery.trackingNo || '-'} | <strong>收货人:</strong> ${d.oldDeviceRecovery.receiver || '-'}</p>
+                            <p><strong>仓库位置:</strong> ${d.oldDeviceRecovery.warehouseLocation || '-'}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${d.afterSalesCosts.length > 0 ? `
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">💰 售后成本</h4>
+                        <div style="background: #f7fafc; padding: 15px; border-radius: 8px;">
+                            ${d.afterSalesCosts.map(c => `<p><strong>${c.costType}:</strong> ¥${c.amount} - ${c.costDescription} (${c.costBearer})</p>`).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                `;
+            } else {
+                document.getElementById('review-content').innerHTML = '<div class="empty-state">未找到该工单数据</div>';
+            }
+        }
+        
+        async function verifyInspection(id, orderNo) {
+            openModal('审核检测报告 - ' + orderNo, `
+                <div class="form-group">
+                    <label>审核结果</label>
+                    <select id="verify-status">
+                        <option value="已通过">通过</option>
+                        <option value="已拒绝">拒绝</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>审核意见</label>
+                    <textarea id="verify-comments" placeholder="请输入审核意见（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitVerify('${id}')">提交</button>
+                </div>
+            `);
+        }
+        
+        async function submitVerify(id) {
+            const status = document.getElementById('verify-status').value;
+            const comments = document.getElementById('verify-comments').value;
+            
+            const res = await fetch(`/api/inspection-reports/${id}/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Handler': '当前用户' },
+                body: JSON.stringify({ status, comments })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                showMessage('审核成功', 'success');
+                closeModal();
+                await loadInspectionData();
+                await loadStats();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        }
+        
+        async function advanceApproval(id, orderNo) {
+            openModal('审批换新申请 - ' + orderNo, `
+                <div class="form-group">
+                    <label>审批结果</label>
+                    <select id="approval-status">
+                        <option value="已通过">通过</option>
+                        <option value="已拒绝">拒绝</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>审批意见</label>
+                    <textarea id="approval-comments" placeholder="请输入审批意见（可选）"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="submitApproval('${id}')">提交</button>
+                </div>
+            `);
+        }
+        
+        async function submitApproval(id) {
+            const status = document.getElementById('approval-status').value;
+            const comments = document.getElementById('approval-comments').value;
+            
+            const res = await fetch(`/api/replacement-approvals/${id}/advance`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Handler': '当前用户' },
+                body: JSON.stringify({ status, comments })
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                showMessage('审批成功', 'success');
+                closeModal();
+                await loadApprovalData();
+                await loadStats();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        }
+        
+        async function editRecovery(id, orderNo) {
+            const res = await fetch('/api/old-device-recoveries');
+            const data = await res.json();
+            const recovery = data.data.find(r => r.id === id);
+            
+            if (!recovery) return;
+            
+            openModal('编辑旧机回收 - ' + orderNo, `
+                <div class="form-group">
+                    <label>回收状态</label>
+                    <select id="recovery-status">
+                        <option value="待回收" ${recovery.recoveryStatus === '待回收' ? 'selected' : ''}>待回收</option>
+                        <option value="回收中" ${recovery.recoveryStatus === '回收中' ? 'selected' : ''}>回收中</option>
+                        <option value="已回收" ${recovery.recoveryStatus === '已回收' ? 'selected' : ''}>已回收</option>
+                        <option value="无法回收" ${recovery.recoveryStatus === '无法回收' ? 'selected' : ''}>无法回收</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>回收方式</label>
+                    <select id="recovery-method">
+                        <option value="上门取件" ${recovery.recoveryMethod === '上门取件' ? 'selected' : ''}>上门取件</option>
+                        <option value="客户寄送" ${recovery.recoveryMethod === '客户寄送' ? 'selected' : ''}>客户寄送</option>
+                        <option value="门店自送" ${recovery.recoveryMethod === '门店自送' ? 'selected' : ''}>门店自送</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>快递单号</label>
+                    <input type="text" id="recovery-tracking" value="${recovery.trackingNo || ''}">
+                </div>
+                <div class="form-group">
+                    <label>收货人</label>
+                    <input type="text" id="recovery-receiver" value="${recovery.receiver || ''}">
+                </div>
+                <div class="form-group">
+                    <label>仓库位置</label>
+                    <input type="text" id="recovery-warehouse" value="${recovery.warehouseLocation || ''}">
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="recovery-remarks">${recovery.remarks || ''}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveRecovery('${id}')">保存</button>
+                </div>
+            `);
+        }
+        
+        async function saveRecovery(id) {
+            const updateData = {
+                recoveryStatus: document.getElementById('recovery-status').value,
+                recoveryMethod: document.getElementById('recovery-method').value,
+                trackingNo: document.getElementById('recovery-tracking').value,
+                receiver: document.getElementById('recovery-receiver').value,
+                warehouseLocation: document.getElementById('recovery-warehouse').value,
+                remarks: document.getElementById('recovery-remarks').value
+            };
+            
+            const res = await fetch(`/api/old-device-recoveries/${id}/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Handler': '当前用户' },
+                body: JSON.stringify(updateData)
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                showMessage('保存成功', 'success');
+                closeModal();
+                await loadRecoveryData();
+                await loadStats();
+            } else {
+                showMessage(data.message, 'error');
+            }
+        }
+        
+        async function viewHistory(type, id) {
+            const res = await fetch(`/api/modification-history/${type}/${id}`);
+            const data = await res.json();
+            
+            if (data.success && data.data.length > 0) {
+                openModal('修改历史记录', data.data.map(h => `
+                    <div class="history-item">
+                        <h4>修改时间: ${formatDate(h.modifyTime)} | 操作人: ${h.handler || '系统'}</h4>
+                        <p><strong>修改前:</strong></p>
+                        <p><span class="diff">${JSON.stringify(h.oldValue).substring(0, 200)}...</span></p>
+                        <p><strong>修改后:</strong></p>
+                        <p><span class="diff">${JSON.stringify(h.newValue).substring(0, 200)}...</span></p>
+                    </div>
+                `).join(''));
+            } else {
+                openModal('修改历史记录', '<div class="empty-state">暂无修改记录</div>');
+            }
+        }
+        
+        function exportReport() {
+            const handler = document.getElementById('search-handler').value;
+            const startTime = document.getElementById('search-start').value;
+            const endTime = document.getElementById('search-end').value;
+            
+            const params = new URLSearchParams();
+            params.append('type', 'all');
+            if (handler) params.append('handler', handler);
+            if (startTime) params.append('startTime', startTime);
+            if (endTime) params.append('endTime', endTime);
+            
+            window.open('/api/export-report?' + params.toString(), '_blank');
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+        
+        function searchData() {
+            loadAllData();
+        }
+        
+        function resetSearch() {
+            document.getElementById('search-orderNo').value = '';
+            document.getElementById('search-handler').value = '';
+            document.getElementById('search-start').value = '';
+            document.getElementById('search-end').value = '';
+            loadAllData();
+        }
+        
+        function openModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            setTimeout(() => {
+                msg.className = 'message';
+            }, 3000);
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        init();
+    </script>
+</body>
+</html>
