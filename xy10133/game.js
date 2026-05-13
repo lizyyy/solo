@@ -470,6 +470,8 @@ class PharmacyGame {
 
     destroy() {
         this._stopTimer();
+        this._cancelRoundTransition();
+        this.isRoundLocked = false;
     }
 }
 

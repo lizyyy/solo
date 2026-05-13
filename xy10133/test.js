@@ -413,6 +413,90 @@ runTest('重新开始应取消所有待执行的回合切换回调', function() 
     game.destroy();
 });
 
+runTest('destroy() 应取消待执行的回合切换回调', function(done) {
+    let cabinetChangeCount = 0;
+    
+    const game = new PharmacyGame({
+        onCabinetChange: function() {
+            cabinetChangeCount++;
+        }
+    });
+    
+    game.start();
+    
+    const countAfterStart = cabinetChangeCount;
+    
+    const state = game.getState();
+    const correctMedicine = state.cabinetMedicines.find(m => m.isCorrect);
+    
+    game.selectMedicine(correctMedicine.id);
+    
+    game.destroy();
+    
+    setTimeout(() => {
+        const countAfterWait = cabinetChangeCount;
+        
+        assert.strictEqual(countAfterStart, 1, 'start 应触发 1 次回调');
+        assert.strictEqual(countAfterWait, 1, 'destroy 后等待 650ms 不应触发额外回调');
+        
+        game.destroy();
+        done();
+    }, 650);
+});
+
+runTest('销毁旧实例后启动新实例，旧实例的异步回调不应触发新实例的状态变化', function(done) {
+    let oldGameCallbackCount = 0;
+    let newGameCallbackCount = 0;
+    
+    const oldGame = new PharmacyGame({
+        onCabinetChange: function() {
+            oldGameCallbackCount++;
+        }
+    });
+    
+    oldGame.start();
+    
+    const state = oldGame.getState();
+    const correctMedicine = state.cabinetMedicines.find(m => m.isCorrect);
+    
+    oldGame.selectMedicine(correctMedicine.id);
+    
+    const initialOldHistoryLength = oldGame.getGameHistory().length;
+    
+    oldGame.destroy();
+    
+    const newGame = new PharmacyGame({
+        onCabinetChange: function() {
+            newGameCallbackCount++;
+        }
+    });
+    
+    newGame.start();
+    
+    const initialNewHistoryLength = newGame.getGameHistory().length;
+    
+    setTimeout(() => {
+        const finalOldHistoryLength = oldGame.getGameHistory().length;
+        const finalNewHistoryLength = newGame.getGameHistory().length;
+        
+        assert.strictEqual(
+            finalOldHistoryLength, 
+            initialOldHistoryLength, 
+            '旧实例 destroy 后历史记录不应增长'
+        );
+        
+        assert.strictEqual(
+            finalNewHistoryLength, 
+            initialNewHistoryLength, 
+            '新实例历史记录不应被旧实例影响'
+        );
+        
+        oldGame.destroy();
+        newGame.destroy();
+        done();
+    }, 700);
+});
+
 console.log('\n========================================');
 console.log(`  测试结果: ${testResults.passed} 个通过, ${testResults.failed} 个失败`);
 console.log('========================================\n');
