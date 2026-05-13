@@ -280,8 +280,13 @@ npm run test:coverage
 ### 验收测试
 
 ```bash
-chmod +x scripts/acceptance-test.sh
-./scripts/acceptance-test.sh
+npm run acceptance
+```
+
+或者手动执行：
+
+```bash
+bash scripts/acceptance-test.sh
 ```
 
 ## 项目结构

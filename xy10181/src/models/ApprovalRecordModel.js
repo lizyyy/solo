@@ -3,7 +3,7 @@ const { ApprovalStatus } = require('../utils/constants');
 
 class ApprovalRecordModel {
   static async findByRequestId(requestId, client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(
       'SELECT * FROM approval_records WHERE request_id = $1',
       [requestId]
@@ -52,7 +52,7 @@ class ApprovalRecordModel {
   }
 
   static async getStatistics(client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(`
       SELECT 
         status,

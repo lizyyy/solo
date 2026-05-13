@@ -2,7 +2,7 @@ const db = require('../config/database');
 
 class QuotaModel {
   static async findByCode(quotaCode, client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(
       'SELECT * FROM quotas WHERE quota_code = $1',
       [quotaCode]
@@ -11,7 +11,7 @@ class QuotaModel {
   }
 
   static async findById(id, client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(
       'SELECT * FROM quotas WHERE id = $1',
       [id]
@@ -65,7 +65,7 @@ class QuotaModel {
   }
 
   static async getStatistics(client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(`
       SELECT 
         COUNT(*) as total_quotas,

@@ -22,7 +22,7 @@ class QuotaOperationModel {
   }
 
   static async findByRequestId(requestId, operationType = null, client = null) {
-    const query = db || client;
+    const query = client || db;
     let sql = `SELECT * FROM quota_operations WHERE request_id = $1`;
     const params = [requestId];
     
@@ -36,7 +36,7 @@ class QuotaOperationModel {
   }
 
   static async getQuotaOperations(quotaId, limit = 100, client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(`
       SELECT * FROM quota_operations 
       WHERE quota_id = $1 
@@ -47,7 +47,7 @@ class QuotaOperationModel {
   }
 
   static async getStatistics(client = null) {
-    const query = db || client;
+    const query = client || db;
     const result = await query.query(`
       SELECT 
         operation_type,
