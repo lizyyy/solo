@@ -1,6 +1,6 @@
-import { defaultTimelineOptions, EVENT_TYPE_COLORS, } from '../types';
-import { validateAuditEvent, validateEventGroup, validateSearchOptions, validateExportOptions, assertValid, } from '../validators';
-import { ExecutionLogger } from '../logger';
+import { defaultTimelineOptions, EVENT_TYPE_COLORS, } from '../types/index.js';
+import { validateAuditEvent, validateEventGroup, validateSearchOptions, validateExportOptions, assertValid, } from '../validators/index.js';
+import { ExecutionLogger } from '../logger/index.js';
 export class CanvasAuditTimeline {
     constructor(options) {
         this.canvas = null;

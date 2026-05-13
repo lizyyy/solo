@@ -2,7 +2,7 @@
   "name": "canvas-audit-timeline",
   "version": "1.0.0",
   "description": "Canvas 审计时间轴工具 - 可视化审计事件的时间线",
-  "main": "dist/index.js",
+  "main": "dist/bundle.js",
   "type": "module",
   "scripts": {
     "build": "tsc && npm run bundle",

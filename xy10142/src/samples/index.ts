@@ -1,4 +1,4 @@
-import type { AuditEvent, EventGroup } from '../types';
+import type { AuditEvent, EventGroup } from '../types/index.js';
 
 const now = Date.now();
 

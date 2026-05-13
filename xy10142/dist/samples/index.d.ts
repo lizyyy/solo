@@ -1,4 +1,4 @@
-import type { AuditEvent, EventGroup } from '../types';
+import type { AuditEvent, EventGroup } from '../types/index.js';
 export declare function generateValidSampleEvents(): AuditEvent[];
 export declare function generateInvalidSampleEvents(): Array<{
     event: Partial<AuditEvent>;

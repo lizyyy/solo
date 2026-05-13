@@ -1,6 +1,6 @@
-export * from './types';
-export { CanvasAuditTimeline } from './timeline';
-export { ExecutionLogger } from './logger';
-export * from './validators';
-export * from './samples';
+export * from './types/index.js';
+export { CanvasAuditTimeline } from './timeline/index.js';
+export { ExecutionLogger } from './logger/index.js';
+export * from './validators/index.js';
+export * from './samples/index.js';
 //# sourceMappingURL=index.js.map

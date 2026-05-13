@@ -6,19 +6,19 @@ import type {
   TimelineState,
   SearchOptions,
   ExportOptions,
-} from '../types';
+} from '../types/index.js';
 import {
   defaultTimelineOptions,
   EVENT_TYPE_COLORS,
-} from '../types';
+} from '../types/index.js';
 import {
   validateAuditEvent,
   validateEventGroup,
   validateSearchOptions,
   validateExportOptions,
   assertValid,
-} from '../validators';
-import { ExecutionLogger } from '../logger';
+} from '../validators/index.js';
+import { ExecutionLogger } from '../logger/index.js';
 
 export class CanvasAuditTimeline {
   private canvas: HTMLCanvasElement | null = null;

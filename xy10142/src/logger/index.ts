@@ -1,4 +1,4 @@
-import type { ExecutionLogEntry } from '../types';
+import type { ExecutionLogEntry } from '../types/index.js';
 
 export class ExecutionLogger {
   private logs: ExecutionLogEntry[] = [];

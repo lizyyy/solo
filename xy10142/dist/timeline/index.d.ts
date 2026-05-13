@@ -1,5 +1,5 @@
-import type { AuditEvent, EventGroup, TimelineOptions, TimelineState, SearchOptions, ExportOptions } from '../types';
-import { ExecutionLogger } from '../logger';
+import type { AuditEvent, EventGroup, TimelineOptions, TimelineState, SearchOptions, ExportOptions } from '../types/index.js';
+import { ExecutionLogger } from '../logger/index.js';
 export declare class CanvasAuditTimeline {
     private canvas;
     private ctx;
@@ -67,7 +67,7 @@ export declare class CanvasAuditTimeline {
     getSelectedEvent(): AuditEvent | null;
     getState(): Readonly<TimelineState>;
     getLogger(): ExecutionLogger;
-    getExecutionLogs(): import("../types").ExecutionLogEntry[];
+    getExecutionLogs(): import("../types/index.js").ExecutionLogEntry[];
     destroy(): void;
 }
 //# sourceMappingURL=index.d.ts.map

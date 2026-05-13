@@ -6,7 +6,7 @@ import type {
   ExportOptions,
   ValidationError,
   ValidationResult,
-} from '../types';
+} from '../types/index.js';
 
 const VALID_EVENT_TYPES: AuditEvent['type'][] = [
   'create', 'update', 'delete', 'rollback', 'restore', 'read', 'login', 'logout'

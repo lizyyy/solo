@@ -1,4 +1,4 @@
-import type { AuditEvent, ValidationError, ValidationResult } from '../types';
+import type { AuditEvent, ValidationError, ValidationResult } from '../types/index.js';
 export declare function createValidationError(field: string, message: string, value?: unknown): ValidationError;
 export declare function isNonEmptyString(value: unknown): value is string;
 export declare function isPositiveNumber(value: unknown): value is number;
