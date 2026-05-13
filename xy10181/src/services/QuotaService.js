@@ -10,6 +10,33 @@ const QuotaOperationModel = require('../models/QuotaOperationModel');
 const AuditLogModel = require('../models/AuditLogModel');
 
 class QuotaService {
+  static _hashStringToInt32(str) {
+    let hash = 5381;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+      hash = hash >>> 0;
+    }
+    return hash;
+  }
+
+  static _getRequestIdLockKeys(requestId) {
+    const seed1 = this._hashStringToInt32('quota_approval:' + requestId);
+    const seed2 = this._hashStringToInt32(requestId + ':v1');
+    return [seed1, seed2];
+  }
+
+  static async _acquireRequestIdLock(requestId, client) {
+    const [key1, key2] = this._getRequestIdLockKeys(requestId);
+    await client.query(
+      'SELECT pg_advisory_xact_lock($1, $2)',
+      [key1, key2]
+    );
+  }
+
+  static async _findExistingApprovalRecord(requestId, client) {
+    return await ApprovalRecordModel.findByRequestId(requestId, client);
+  }
+
   static async applyQuota(data, reqInfo = {}) {
     const validation = this._validateApplyData(data);
     if (!validation.valid) {
@@ -18,84 +45,109 @@ class QuotaService {
 
     const { quotaCode, applyAmount, applicant, reason, requestId } = data;
 
-    return await db.transaction(async (client) => {
-      const existingRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
-      if (existingRecord) {
-        logger.info(`检测到重复请求，requestId=${requestId}，直接返回已有记录`);
-        return this._buildApplyResponse(existingRecord);
-      }
+    try {
+      return await db.transaction(async (client) => {
+        await this._acquireRequestIdLock(requestId, client);
 
-      const quota = await QuotaModel.findByCode(quotaCode, client);
-      if (!quota) {
-        throw new AppError(ErrorCode.QUOTA_NOT_FOUND, `限额 ${quotaCode} 不存在`);
-      }
-
-      this._validateQuotaAvailability(quota, applyAmount);
-
-      const updatedQuota = await QuotaModel.updateOccupiedAmount(
-        quota.id, 
-        applyAmount, 
-        quota.version,
-        client
-      );
-      if (!updatedQuota) {
-        const latestQuota = await QuotaModel.findByCode(quotaCode, client);
-        const latestAvailable = parseFloat(latestQuota?.available_amount || 0);
-        if (latestAvailable < applyAmount) {
-          throw new AppError(
-            ErrorCode.QUOTA_INSUFFICIENT,
-            `限额不足，可用: ${latestAvailable}，申请: ${applyAmount}`
-          );
+        const existingRecord = await this._findExistingApprovalRecord(requestId, client);
+        if (existingRecord) {
+          logger.info(`检测到重复请求，requestId=${requestId}，直接返回已有记录`);
+          return this._buildApplyResponse(existingRecord);
         }
-        throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
+
+        const quota = await QuotaModel.findByCode(quotaCode, client);
+        if (!quota) {
+          throw new AppError(ErrorCode.QUOTA_NOT_FOUND, `限额 ${quotaCode} 不存在`);
+        }
+
+        this._validateQuotaAvailability(quota, applyAmount);
+
+        const updatedQuota = await QuotaModel.updateOccupiedAmount(
+          quota.id, 
+          applyAmount, 
+          quota.version,
+          client
+        );
+        if (!updatedQuota) {
+          const latestQuota = await QuotaModel.findByCode(quotaCode, client);
+          const latestAvailable = parseFloat(latestQuota?.available_amount || 0);
+          if (latestAvailable < applyAmount) {
+            throw new AppError(
+              ErrorCode.QUOTA_INSUFFICIENT,
+              `限额不足，可用: ${latestAvailable}，申请: ${applyAmount}`
+            );
+          }
+          throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
+        }
+
+        const approvalTimeoutSeconds = parseInt(process.env.APPROVAL_TIMEOUT_SECONDS) || 3600;
+        const expiredAt = new Date(Date.now() + approvalTimeoutSeconds * 1000);
+
+        let approvalRecord;
+        try {
+          approvalRecord = await ApprovalRecordModel.create({
+            requestId,
+            quotaId: quota.id,
+            quotaCode: quota.quota_code,
+            applyAmount,
+            applicant,
+            reason,
+            expiredAt,
+          }, client);
+        } catch (insertError) {
+          if (insertError.code === '23505') {
+            logger.info(`检测到唯一键冲突，requestId=${requestId}，查询已有记录`);
+            const existingAfterConflict = await this._findExistingApprovalRecord(requestId, client);
+            if (existingAfterConflict) {
+              return this._buildApplyResponse(existingAfterConflict);
+            }
+          }
+          throw insertError;
+        }
+
+        await QuotaOperationModel.create({
+          quotaId: quota.id,
+          quotaCode: quota.quota_code,
+          approvalRecordId: approvalRecord.id,
+          requestId,
+          operationType: QuotaActionType.OCCUPY,
+          amount: applyAmount,
+          operator: applicant,
+          description: `审批申请占用限额，申请金额: ${applyAmount}`,
+        }, client);
+
+        await AuditLogModel.create({
+          auditType: 'QUOTA_OPERATION',
+          entityType: 'APPROVAL',
+          entityId: requestId,
+          action: ApprovalAction.SUBMIT,
+          beforeData: null,
+          afterData: {
+            quotaCode,
+            applyAmount,
+            applicant,
+            reason,
+            status: ApprovalStatus.PENDING,
+          },
+          operator: applicant,
+          ipAddress: reqInfo.ip,
+          userAgent: reqInfo.userAgent,
+        }, client);
+
+        logger.info(`成功创建审批申请，requestId=${requestId}, quotaCode=${quotaCode}, amount=${applyAmount}`);
+
+        return this._buildApplyResponse(approvalRecord, updatedQuota);
+      });
+    } catch (outerError) {
+      if (outerError.code === '23505' || outerError.name === 'UniqueViolationError') {
+        logger.info(`外层捕获唯一键冲突，requestId=${requestId}，查询已有记录`);
+        const existingRecord = await ApprovalRecordModel.findByRequestId(requestId);
+        if (existingRecord) {
+          return this._buildApplyResponse(existingRecord);
+        }
       }
-
-      const approvalTimeoutSeconds = parseInt(process.env.APPROVAL_TIMEOUT_SECONDS) || 3600;
-      const expiredAt = new Date(Date.now() + approvalTimeoutSeconds * 1000);
-
-      const approvalRecord = await ApprovalRecordModel.create({
-        requestId,
-        quotaId: quota.id,
-        quotaCode: quota.quota_code,
-        applyAmount,
-        applicant,
-        reason,
-        expiredAt,
-      }, client);
-
-      await QuotaOperationModel.create({
-        quotaId: quota.id,
-        quotaCode: quota.quota_code,
-        approvalRecordId: approvalRecord.id,
-        requestId,
-        operationType: QuotaActionType.OCCUPY,
-        amount: applyAmount,
-        operator: applicant,
-        description: `审批申请占用限额，申请金额: ${applyAmount}`,
-      }, client);
-
-      await AuditLogModel.create({
-        auditType: 'QUOTA_OPERATION',
-        entityType: 'APPROVAL',
-        entityId: requestId,
-        action: ApprovalAction.SUBMIT,
-        beforeData: null,
-        afterData: {
-          quotaCode,
-          applyAmount,
-          applicant,
-          reason,
-          status: ApprovalStatus.PENDING,
-        },
-        operator: applicant,
-        ipAddress: reqInfo.ip,
-        userAgent: reqInfo.userAgent,
-      }, client);
-
-      logger.info(`成功创建审批申请，requestId=${requestId}, quotaCode=${quotaCode}, amount=${applyAmount}`);
-
-      return this._buildApplyResponse(approvalRecord, updatedQuota);
-    });
+      throw outerError;
+    }
   }
 
   static async approveApproval(requestId, approver, comments, reqInfo = {}) {
@@ -104,6 +156,8 @@ class QuotaService {
     }
 
     return await db.transaction(async (client) => {
+      await this._acquireRequestIdLock(requestId, client);
+
       const approvalRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
       if (!approvalRecord) {
         throw new AppError(ErrorCode.APPROVAL_NOT_FOUND, `审批记录 ${requestId} 不存在`);
@@ -129,6 +183,11 @@ class QuotaService {
         client
       );
       if (!updatedQuota) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.APPROVED) {
+          logger.info(`检测到并发审批通过，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }
 
@@ -141,6 +200,11 @@ class QuotaService {
       );
 
       if (!updatedRecord) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.APPROVED) {
+          logger.info(`检测到并发审批通过，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.APPROVAL_ALREADY_PROCESSED, '审批已被处理');
       }
 
@@ -179,6 +243,8 @@ class QuotaService {
     }
 
     return await db.transaction(async (client) => {
+      await this._acquireRequestIdLock(requestId, client);
+
       const approvalRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
       if (!approvalRecord) {
         throw new AppError(ErrorCode.APPROVAL_NOT_FOUND, `审批记录 ${requestId} 不存在`);
@@ -205,6 +271,11 @@ class QuotaService {
         client
       );
       if (!updatedQuota) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.REJECTED) {
+          logger.info(`检测到并发驳回，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }
 
@@ -217,6 +288,11 @@ class QuotaService {
       );
 
       if (!updatedRecord) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.REJECTED) {
+          logger.info(`检测到并发驳回，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.APPROVAL_ALREADY_PROCESSED, '审批已被处理');
       }
 
@@ -255,6 +331,8 @@ class QuotaService {
     }
 
     return await db.transaction(async (client) => {
+      await this._acquireRequestIdLock(requestId, client);
+
       const approvalRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
       if (!approvalRecord) {
         throw new AppError(ErrorCode.APPROVAL_NOT_FOUND, `审批记录 ${requestId} 不存在`);
@@ -281,6 +359,11 @@ class QuotaService {
         client
       );
       if (!updatedQuota) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.CANCELED) {
+          logger.info(`检测到并发撤回，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.CONCURRENT_CONFLICT, '并发冲突，限额更新失败，请重试');
       }
 
@@ -293,6 +376,11 @@ class QuotaService {
       );
 
       if (!updatedRecord) {
+        const latestRecord = await ApprovalRecordModel.findByRequestId(requestId, client);
+        if (latestRecord && latestRecord.status === ApprovalStatus.CANCELED) {
+          logger.info(`检测到并发撤回，requestId=${requestId}，返回已有结果`);
+          return this._buildApprovalResponse(latestRecord);
+        }
         throw new AppError(ErrorCode.APPROVAL_ALREADY_PROCESSED, '审批已被处理');
       }
 
