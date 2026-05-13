@@ -36,7 +36,7 @@ class LineageStorage:
             return hashlib.md5(f.read()).hexdigest()
 
     def save_version(self, table_name: str, file_path: str, 
-                     schema: Dict[str, Any], comment: str = "") -> int:
+                     schema: Dict[str, Any], comment: str = "") -> tuple:
         meta = self.get_meta()
         
         if table_name not in meta["tables"]:
@@ -50,7 +50,7 @@ class LineageStorage:
         
         if file_hash in meta["tables"][table_name]["file_hashes"]:
             existing_version = meta["tables"][table_name]["file_hashes"][file_hash]
-            return existing_version
+            return (existing_version, False)
         
         version_num = meta["version_count"] + 1
         meta["version_count"] = version_num
@@ -78,7 +78,7 @@ class LineageStorage:
         })
         
         self.save_meta(meta)
-        return version_num
+        return (version_num, True)
 
     def get_version(self, table_name: str, version: int = None) -> Optional[Dict[str, Any]]:
         meta = self.get_meta()

@@ -1,0 +1,38 @@
+{
+  "date": [
+    "date",
+    "order_date",
+    "sale_date"
+  ],
+  "user_id": [
+    "user_id",
+    "customer_id"
+  ],
+  "user_name": [
+    "user_name",
+    "customer_name"
+  ],
+  "order_id": [
+    "order_id",
+    "order_no",
+    "order_number"
+  ],
+  "order_amount": [
+    "order_amount",
+    "total_amount",
+    "amount"
+  ],
+  "product_name": [
+    "product_name",
+    "item_name"
+  ],
+  "quantity": [
+    "quantity",
+    "qty"
+  ],
+  "channel": [
+    "channel",
+    "purchase_channel",
+    "sales_channel"
+  ]
+}

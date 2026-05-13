@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "table_name": "sales_data",
+  "file_path": "examples/sales_week1.csv",
+  "file_hash": "26d212e4eb08eedb76186d6bbebb6cd1",
+  "schema": {
+    "file_path": "examples/sales_week1.csv",
+    "row_count": 10,
+    "field_count": 8,
+    "fields": [
+      {
+        "name": "date",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 5,
+        "sample_values": [
+          "2024-01-01",
+          "2024-01-01",
+          "2024-01-02",
+          "2024-01-02",
+          "2024-01-03"
+        ],
+        "max_length": 10
+      },
+      {
+        "name": "user_id",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 5,
+        "sample_values": [
+          "U001",
+          "U002",
+          "U001",
+          "U003",
+          "U002"
+        ],
+        "max_length": 4
+      },
+      {
+        "name": "user_name",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 5,
+        "sample_values": [
+          "张三",
+          "李四",
+          "张三",
+          "王五",
+          "李四"
+        ],
+        "max_length": 2
+      },
+      {
+        "name": "order_id",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "sample_values": [
+          "O001",
+          "O002",
+          "O003",
+          "O004",
+          "O005"
+        ],
+        "max_length": 4
+      },
+      {
+        "name": "order_amount",
+        "dtype": "float64",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "min": 19.99,
+        "max": 1599.0,
+        "mean": 516.495
+      },
+      {
+        "name": "product_name",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 10,
+        "sample_values": [
+          "iPhone",
+          "MacBook",
+          "AirPods",
+          "iPad",
+          "Case"
+        ],
+        "max_length": 11
+      },
+      {
+        "name": "quantity",
+        "dtype": "int64",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 3,
+        "min": 1.0,
+        "max": 3.0,
+        "mean": 1.4
+      },
+      {
+        "name": "channel",
+        "dtype": "object",
+        "null_count": 0,
+        "non_null_count": 10,
+        "unique_count": 2,
+        "sample_values": [
+          "app",
+          "web",
+          "app",
+          "web",
+          "app"
+        ],
+        "max_length": 3
+      }
+    ]
+  },
+  "comment": "第一周",
+  "imported_at": "2026-05-13T11:34:02.937513"
+}

@@ -51,7 +51,13 @@ def import_csv(ctx, table_name, csv_file, comment, auto_alias):
     old_version = storage.get_version(table_name) if not is_first_import else None
     
     console.print(f"[cyan]保存版本...[/cyan]")
-    new_version_num = storage.save_version(table_name, csv_file, schema, comment)
+    new_version_num, is_new_version = storage.save_version(table_name, csv_file, schema, comment)
+    
+    if not is_new_version:
+        console.print(f"[yellow]⚠ 检测到重复导入[/yellow]")
+        console.print(f"  该文件已存在于版本 v{new_version_num}")
+        console.print(f"  跳过血缘更新以避免污染状态")
+        return
     
     if is_first_import:
         lineage_manager.initialize_lineage(table_name, new_version_num, schema)

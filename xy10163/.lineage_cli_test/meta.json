@@ -1,0 +1,30 @@
+{
+  "version_count": 3,
+  "tables": {
+    "sales_data": {
+      "current_version": 3,
+      "versions": [
+        {
+          "version": 1,
+          "imported_at": "2026-05-13T11:34:02.937513",
+          "comment": "\u7b2c\u4e00\u5468"
+        },
+        {
+          "version": 2,
+          "imported_at": "2026-05-13T11:34:05.304376",
+          "comment": "\u7b2c\u4e8c\u5468"
+        },
+        {
+          "version": 3,
+          "imported_at": "2026-05-13T11:34:11.970869",
+          "comment": "\u7b2c\u56db\u5468"
+        }
+      ],
+      "file_hashes": {
+        "26d212e4eb08eedb76186d6bbebb6cd1": 1,
+        "ef23c87f07a396abb7daf3487b2ff4ae": 2,
+        "e9c21f63a5c6a387213d290f3595bcc2": 3
+      }
+    }
+  }
+}
