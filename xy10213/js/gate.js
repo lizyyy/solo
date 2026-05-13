@@ -76,11 +76,12 @@ class Gate {
     }
 
     reset() {
+        const wasInactive = this.status === 'inactive';
         this.currentVehicle = null;
         this.processingStartTime = null;
         this.processedCount = 0;
         this.totalProcessingTime = 0;
-        this.status = 'idle';
+        this.status = wasInactive ? 'inactive' : 'idle';
     }
 
     toJSON(currentTime = 0) {
@@ -231,7 +232,7 @@ class GateManager {
     }
 
     reset() {
-        this.gates.forEach(gate => gate.reset());
+        this.initGates();
     }
 
     toJSON(currentTime = 0) {
