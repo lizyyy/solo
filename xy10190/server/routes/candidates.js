@@ -37,7 +37,7 @@ router.get('/:id', async (req, res, next) => {
       [req.params.id]
     );
 
-    if (!candidate) {
+    if (candidate) {
       res.json({ success: true, candidate });
     } else {
       res.status(404).json({ success: false, message: '候选人不存在' });
@@ -75,7 +75,7 @@ router.put('/:id', requireRole('hr', 'hr_admin'), logAudit('update_candidate', '
     const { name, phone, email, position, department, status } = req.body;
     const candidate = await db.get(`SELECT * FROM candidates WHERE id = ?`, [req.params.id]);
 
-    if (!candidate) {
+    if (candidate) {
       await db.run(
         `UPDATE candidates SET name = ?, phone = ?, email = ?, position = ?, department = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
         [name || candidate.name, phone || candidate.phone, email || candidate.email, position || candidate.position, department || candidate.department, status || candidate.status, req.params.id]

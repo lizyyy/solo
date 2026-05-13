@@ -58,7 +58,7 @@ router.post('/logout', (req, res) => {
 });
 
 router.get('/me', (req, res) => {
-  if (!req.session.userId) {
+  if (req.session.userId) {
     res.json({
       success: true,
       user: {
@@ -68,7 +68,7 @@ router.get('/me', (req, res) => {
       }
     });
   } else {
-    res.status(401).json({ success: false, message: '未登录' });
+    res.json({ success: false, message: '未登录' });
   }
 });
 

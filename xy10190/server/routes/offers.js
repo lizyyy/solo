@@ -81,7 +81,7 @@ router.get('/:id', async (req, res, next) => {
   try {
     const offer = await db.get(`SELECT * FROM offers WHERE id = ?`, [req.params.id]);
 
-    if (!offer) {
+    if (offer) {
       res.json({ success: true, offer });
     } else {
       res.status(404).json({ success: false, message: 'Offer 不存在' });
