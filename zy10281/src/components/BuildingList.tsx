@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Building } from '../types';
-import { ElevatorSignStore } from '../store';
+import { ElevatorService } from '../services/ElevatorService';
 
 interface BuildingListProps {
   buildings: Building[];
@@ -34,7 +34,7 @@ export const BuildingList: React.FC<BuildingListProps> = ({
           </div>
         ) : (
           buildings.map(building => {
-            const stats = ElevatorSignStore.getProgressStats(building.id);
+            const stats = ElevatorService.getProgressStats(building.id);
             return (
               <div
                 key={building.id}

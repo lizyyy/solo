@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import type { Resident, SignRecord, SignStatus, BuildingVersion } from '../types';
-import { ElevatorSignStore } from '../store';
+import type { Resident, SignRecord, BuildingVersion, SignStatus } from '../types';
+import { ElevatorService } from '../services/ElevatorService';
 
 interface ResidentSignListProps {
   buildingId: string;
   residents: Resident[];
   currentVersion: BuildingVersion;
+  signRecords: SignRecord[];
   onSign: (residentId: string, status: SignStatus, objectionReason?: string) => void;
   onWithdraw: (recordId: string, stillCounted?: boolean) => void;
   onUpdateObjection: (recordId: string, status: 'processing' | 'resolved' | 'rejected') => void;
@@ -22,6 +23,7 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
   buildingId,
   residents,
   currentVersion,
+  signRecords,
   onSign,
   onWithdraw,
   onUpdateObjection,
@@ -35,12 +37,13 @@ export const ResidentSignList: React.FC<ResidentSignListProps> = ({
   const [objectionReason, setObjectionReason] = useState('');
 
   const getResidentSignInCurrentVersion = (residentId: string): SignRecord | undefined => {
-    const allRecords = ElevatorSignStore.getSignRecords(buildingId, currentVersion.id);
-    return allRecords.find(r => r.residentId === residentId);
+    const residentRecords = signRecords.filter(r => r.residentId === residentId && r.versionId === currentVersion.id);
+    if (residentRecords.length === 0) return undefined;
+    return residentRecords.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   };
 
   const getResidentLatestSignAnyVersion = (residentId: string): SignRecord | undefined => {
-    return ElevatorSignStore.getResidentLatestSign(residentId, buildingId);
+    return ElevatorService.getResidentLatestSign(residentId, buildingId);
   };
 
   const filteredResidents = residents.filter(resident => {

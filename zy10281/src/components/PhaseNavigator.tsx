@@ -1,11 +1,11 @@
 import React from 'react';
 import type { BusinessPhase } from '../types';
-import { ElevatorSignStore } from '../store';
 
 interface PhaseNavigatorProps {
-  buildingId: string;
   currentPhase: BusinessPhase;
   onAdvance: () => void;
+  canAdvanceToNext: boolean;
+  advanceBlockReason?: string;
 }
 
 const phases: { key: BusinessPhase; label: string; desc: string }[] = [
@@ -17,14 +17,14 @@ const phases: { key: BusinessPhase; label: string; desc: string }[] = [
 ];
 
 export const PhaseNavigator: React.FC<PhaseNavigatorProps> = ({
-  buildingId,
   currentPhase,
   onAdvance,
+  canAdvanceToNext,
+  advanceBlockReason,
 }) => {
   const currentIndex = phases.findIndex(p => p.key === currentPhase);
   const canAdvance = currentIndex < phases.length - 1;
   const nextPhase = canAdvance ? phases[currentIndex + 1] : null;
-  const advanceCheck = nextPhase ? ElevatorSignStore.canAdvancePhase(buildingId, nextPhase.key) : null;
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
@@ -77,15 +77,15 @@ export const PhaseNavigator: React.FC<PhaseNavigatorProps> = ({
             <div>
               <div className="text-sm text-gray-600">下一阶段</div>
               <div className="font-semibold text-gray-800">{nextPhase?.label}</div>
-              {advanceCheck && !advanceCheck.can && (
-                <div className="text-sm text-red-500 mt-1">{advanceCheck.reason}</div>
+              {!canAdvanceToNext && advanceBlockReason && (
+                <div className="text-sm text-red-500 mt-1">{advanceBlockReason}</div>
               )}
             </div>
             <button
               onClick={onAdvance}
-              disabled={!advanceCheck?.can}
+              disabled={!canAdvanceToNext}
               className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                advanceCheck?.can
+                canAdvanceToNext
                   ? 'bg-green-500 text-white hover:bg-green-600'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}

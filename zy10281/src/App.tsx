@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { Building, Resident, CostScheme, PublicityComment, BuildingVersion, SignStatus, BusinessPhase } from './types';
-import { ElevatorSignStore } from './store';
+import type { Building, Resident, SignRecord, CostScheme, PublicityComment, BuildingVersion, SignStatus, BusinessPhase } from './types';
+import { BuildingApi, ResidentApi, SignRecordApi, VersionApi, CostSchemeApi, CommentApi, StatsApi, ExportApi, AppApi } from './api';
 import { StatsPanel } from './components/StatsPanel';
 import { BuildingList } from './components/BuildingList';
 import { ResidentSignList } from './components/ResidentSignList';
@@ -17,174 +17,279 @@ function App() {
   const [versions, setVersions] = useState<BuildingVersion[]>([]);
   const [costSchemes, setCostSchemes] = useState<CostScheme[]>([]);
   const [comments, setComments] = useState<PublicityComment[]>([]);
-  const [stats, setStats] = useState(ElevatorSignStore.getProgressStats(''));
+  const [signRecords, setSignRecords] = useState<SignRecord[]>([]);
+  const [stats, setStats] = useState({ totalHouseholds: 0, signedCount: 0, agreeCount: 0, disagreeCount: 0, pendingCount: 0, agreeRate: 0, signedRate: 0, objectionCount: 0, unresolvedObjectionCount: 0 });
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'signs' | 'versions' | 'scheme' | 'comments'>('signs');
   const [showAddBuilding, setShowAddBuilding] = useState(false);
   const [newBuilding, setNewBuilding] = useState({ name: '', address: '', units: '1单元,2单元' });
 
-  const refreshData = useCallback((buildingId?: string) => {
-    setBuildings(ElevatorSignStore.getAllBuildings());
-    
-    if (buildingId) {
-      setResidents(ElevatorSignStore.getResidents(buildingId));
-      setVersions(ElevatorSignStore.getVersions(buildingId));
-      setCostSchemes(ElevatorSignStore.getCostSchemes(buildingId));
-      setComments(ElevatorSignStore.getComments(buildingId));
-      setStats(ElevatorSignStore.getProgressStats(buildingId));
-    } else if (selectedBuilding) {
-      setResidents(ElevatorSignStore.getResidents(selectedBuilding.id));
-      setVersions(ElevatorSignStore.getVersions(selectedBuilding.id));
-      setCostSchemes(ElevatorSignStore.getCostSchemes(selectedBuilding.id));
-      setComments(ElevatorSignStore.getComments(selectedBuilding.id));
-      setStats(ElevatorSignStore.getProgressStats(selectedBuilding.id));
+  const refreshData = useCallback(async (buildingId?: string) => {
+    setLoading(true);
+    try {
+      const buildingsRes = await BuildingApi.getAll();
+      setBuildings(buildingsRes.data);
+      
+      const targetId = buildingId || selectedBuilding?.id;
+      if (targetId) {
+        const [residentsRes, versionsRes, schemesRes, commentsRes, statsRes, signsRes] = await Promise.all([
+          ResidentApi.getByBuilding(targetId),
+          VersionApi.getByBuilding(targetId),
+          CostSchemeApi.getByBuilding(targetId),
+          CommentApi.getByBuilding(targetId),
+          StatsApi.getProgress(targetId),
+          SignRecordApi.getByBuilding(targetId),
+        ]);
+        setResidents(residentsRes.data);
+        setVersions(versionsRes.data);
+        setCostSchemes(schemesRes.data);
+        setComments(commentsRes.data);
+        setStats(statsRes.data);
+        setSignRecords(signsRes.data);
+      }
+    } catch (error) {
+      console.error('数据加载失败:', error);
+    } finally {
+      setLoading(false);
     }
   }, [selectedBuilding]);
 
   useEffect(() => {
-    if (!initialized.current) {
-      ElevatorSignStore.initializeDemoData();
-      setBuildings(ElevatorSignStore.getAllBuildings());
-      initialized.current = true;
-    }
+    const init = async () => {
+      if (!initialized.current) {
+        setLoading(true);
+        try {
+          await AppApi.initializeDemo();
+          const buildingsRes = await BuildingApi.getAll();
+          setBuildings(buildingsRes.data);
+          initialized.current = true;
+        } catch (error) {
+          console.error('初始化失败:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    init();
   }, []);
 
-  const handleSelectBuilding = (building: Building) => {
+  const handleSelectBuilding = async (building: Building) => {
     setSelectedBuilding(building);
-    refreshData(building.id);
+    await refreshData(building.id);
   };
 
-  const handleAddBuilding = () => {
+  const handleAddBuilding = async () => {
     if (newBuilding.name.trim()) {
-      const building = ElevatorSignStore.saveBuilding({
-        name: newBuilding.name,
-        address: newBuilding.address,
-        totalHouseholds: 0,
-        totalFloors: 6,
-        units: newBuilding.units.split(',').map(u => u.trim()),
-        currentPhase: 'preparation',
-        currentEffectiveVersionId: '',
-      });
-      ElevatorSignStore.createVersion(building.id, '初始版本', '项目启动', '创建楼栋信息', '系统');
-      refreshData();
-      setShowAddBuilding(false);
-      setNewBuilding({ name: '', address: '', units: '1单元,2单元' });
+      setLoading(true);
+      try {
+        const buildingRes = await BuildingApi.create({
+          name: newBuilding.name,
+          address: newBuilding.address,
+          totalHouseholds: 0,
+          totalFloors: 6,
+          units: newBuilding.units.split(',').map(u => u.trim()),
+          currentPhase: 'preparation',
+        });
+        await VersionApi.create(buildingRes.data.id, '初始版本', '项目启动', '创建楼栋信息', '系统');
+        await refreshData();
+        setShowAddBuilding(false);
+        setNewBuilding({ name: '', address: '', units: '1单元,2单元' });
+      } catch (error) {
+        console.error('创建楼栋失败:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleSign = (residentId: string, status: SignStatus, objectionReason?: string) => {
+  const handleSign = async (residentId: string, status: SignStatus, objectionReason?: string) => {
     if (!selectedBuilding) return;
     
     const currentVersion = versions.find(v => v.isEffective);
     if (!currentVersion) return;
 
-    ElevatorSignStore.saveSignRecord({
-      buildingId: selectedBuilding.id,
-      residentId,
-      versionId: currentVersion.id,
-      status,
-      signDate: new Date().toISOString(),
-      objectionReason,
-      objectionStatus: objectionReason ? 'pending' : undefined,
-      handler: '当前用户',
-      isDuplicate: false,
-      isWithdrawnButCounted: false,
-    });
-    refreshData();
+    setLoading(true);
+    try {
+      await SignRecordApi.create({
+        buildingId: selectedBuilding.id,
+        residentId,
+        versionId: currentVersion.id,
+        status,
+        signDate: new Date().toISOString(),
+        objectionReason,
+        objectionStatus: objectionReason ? 'pending' : undefined,
+        handler: '当前用户',
+        isDuplicate: false,
+        isWithdrawnButCounted: false,
+      });
+      await refreshData();
+    } catch (error) {
+      console.error('签字失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleWithdraw = (recordId: string, stillCounted: boolean = false) => {
-    ElevatorSignStore.withdrawSign(recordId, '当前用户', stillCounted);
-    refreshData();
+  const handleWithdraw = async (recordId: string, stillCounted: boolean = false) => {
+    setLoading(true);
+    try {
+      await SignRecordApi.withdraw(recordId, '当前用户', stillCounted);
+      await refreshData();
+    } catch (error) {
+      console.error('撤回失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleUpdateObjection = (recordId: string, status: 'processing' | 'resolved' | 'rejected') => {
-    ElevatorSignStore.updateObjectionStatus(recordId, status, '当前用户');
-    refreshData();
+  const handleUpdateObjection = async (recordId: string, status: 'processing' | 'resolved' | 'rejected') => {
+    setLoading(true);
+    try {
+      await SignRecordApi.updateObjectionStatus(recordId, status, '当前用户');
+      await refreshData();
+    } catch (error) {
+      console.error('处理异议失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreateVersion = (name: string, description: string, changeLog: string) => {
+  const handleCreateVersion = async (name: string, description: string, changeLog: string) => {
     if (!selectedBuilding) return;
-    ElevatorSignStore.createVersion(selectedBuilding.id, name, description, changeLog, '当前用户');
-    const updated = ElevatorSignStore.getBuilding(selectedBuilding.id);
-    if (updated) setSelectedBuilding(updated);
-    refreshData();
+    setLoading(true);
+    try {
+      await VersionApi.create(selectedBuilding.id, name, description, changeLog, '当前用户');
+      const updated = await BuildingApi.getById(selectedBuilding.id);
+      if (updated.data) setSelectedBuilding(updated.data);
+      await refreshData();
+    } catch (error) {
+      console.error('创建版本失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveScheme = (scheme: Omit<CostScheme, 'id' | 'createdAt'>) => {
-    ElevatorSignStore.saveCostScheme(scheme);
-    refreshData();
+  const handleSaveScheme = async (scheme: Omit<CostScheme, 'id' | 'createdAt'>) => {
+    setLoading(true);
+    try {
+      await CostSchemeApi.create(scheme);
+      await refreshData();
+    } catch (error) {
+      console.error('保存方案失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSaveSchemeWithNewVersion = (
+  const handleSaveSchemeWithNewVersion = async (
     versionName: string,
     versionDesc: string,
     changeLog: string,
     scheme: Omit<CostScheme, 'id' | 'createdAt'>
   ) => {
     if (!selectedBuilding) return;
-    
-    const newVersion = ElevatorSignStore.createVersion(
-      selectedBuilding.id,
-      versionName,
-      versionDesc,
-      changeLog,
-      '当前用户'
-    );
-    
-    ElevatorSignStore.saveCostScheme({
-      ...scheme,
-      versionId: newVersion.id,
-    });
-    
-    const updated = ElevatorSignStore.getBuilding(selectedBuilding.id);
-    if (updated) setSelectedBuilding(updated);
-    refreshData();
+    setLoading(true);
+    try {
+      const newVersionRes = await VersionApi.create(
+        selectedBuilding.id,
+        versionName,
+        versionDesc,
+        changeLog,
+        '当前用户'
+      );
+      
+      await CostSchemeApi.create({
+        ...scheme,
+        versionId: newVersionRes.data.id,
+      });
+      
+      const updated = await BuildingApi.getById(selectedBuilding.id);
+      if (updated.data) setSelectedBuilding(updated.data);
+      await refreshData();
+    } catch (error) {
+      console.error('创建版本和方案失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAddComment = (content: string, commenter: string) => {
+  const handleAddComment = async (content: string, commenter: string) => {
     if (!selectedBuilding) return;
     const currentVersion = versions.find(v => v.isEffective);
     if (!currentVersion) return;
     
-    ElevatorSignStore.saveComment({
-      buildingId: selectedBuilding.id,
-      versionId: currentVersion.id,
-      content,
-      commenter,
-      isResolved: false,
-    });
-    refreshData();
+    setLoading(true);
+    try {
+      await CommentApi.create({
+        buildingId: selectedBuilding.id,
+        versionId: currentVersion.id,
+        content,
+        commenter,
+        isResolved: false,
+      });
+      await refreshData();
+    } catch (error) {
+      console.error('添加评论失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRespondComment = (commentId: string, response: string, responder: string) => {
-    ElevatorSignStore.respondToComment(commentId, response, responder);
-    refreshData();
+  const handleRespondComment = async (commentId: string, response: string, responder: string) => {
+    setLoading(true);
+    try {
+      await CommentApi.respond(commentId, response, responder);
+      await refreshData();
+    } catch (error) {
+      console.error('回复评论失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleAdvancePhase = () => {
+  const handleAdvancePhase = async () => {
     if (!selectedBuilding) return;
     
     const phases: BusinessPhase[] = ['preparation', 'signing', 'publicity', 'implementation', 'completed'];
     const currentIndex = phases.indexOf(selectedBuilding.currentPhase);
     if (currentIndex < phases.length - 1) {
       const nextPhase = phases[currentIndex + 1];
-      ElevatorSignStore.updateBuilding(selectedBuilding.id, { currentPhase: nextPhase });
-      const updated = ElevatorSignStore.getBuilding(selectedBuilding.id);
-      if (updated) setSelectedBuilding(updated);
-      refreshData();
+      setLoading(true);
+      try {
+        const canAdvance = await StatsApi.canAdvancePhase(selectedBuilding.id, nextPhase);
+        if (canAdvance.data.can) {
+          await BuildingApi.update(selectedBuilding.id, { currentPhase: nextPhase });
+          const updated = await BuildingApi.getById(selectedBuilding.id);
+          if (updated.data) setSelectedBuilding(updated.data);
+          await refreshData();
+        } else {
+          alert(`无法推进到下一阶段: ${canAdvance.data.reason}`);
+        }
+      } catch (error) {
+        console.error('推进阶段失败:', error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!selectedBuilding) return;
-    const data = ElevatorSignStore.exportData(selectedBuilding.id);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${selectedBuilding.name}-电梯加装项目数据.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    setLoading(true);
+    try {
+      const exportRes = await ExportApi.exportData(selectedBuilding.id);
+      const blob = new Blob([exportRes.data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${selectedBuilding.name}-电梯加装项目数据.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('导出失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const currentVersion = versions.find(v => v.isEffective);
@@ -211,6 +316,15 @@ function App() {
         </div>
       </header>
 
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 flex items-center gap-3 shadow-lg">
+            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-gray-700 font-medium">加载中...</span>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
@@ -233,9 +347,9 @@ function App() {
               <>
                 <StatsPanel stats={stats} currentPhase={selectedBuilding.currentPhase} />
                 <PhaseNavigator
-                  buildingId={selectedBuilding.id}
                   currentPhase={selectedBuilding.currentPhase}
                   onAdvance={handleAdvancePhase}
+                  canAdvanceToNext={true}
                 />
 
                 <div className="bg-white rounded-xl shadow-sm">
@@ -267,6 +381,7 @@ function App() {
                         buildingId={selectedBuilding.id}
                         residents={residents}
                         currentVersion={currentVersion}
+                        signRecords={signRecords}
                         onSign={handleSign}
                         onWithdraw={handleWithdraw}
                         onUpdateObjection={handleUpdateObjection}
