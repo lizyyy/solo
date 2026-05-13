@@ -1,0 +1,17 @@
+{
+  "name": "task-priority-arbitrator",
+  "version": "1.0.0",
+  "description": "任务优先级仲裁 API - 支持任务提交、优先级规则、抢占和降级",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "keywords": ["task", "priority", "scheduler", "arbitration"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
