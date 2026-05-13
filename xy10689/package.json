@@ -1,0 +1,16 @@
+{
+  "name": "meeting-room-booking",
+  "version": "1.0.0",
+  "description": "会议室设备服务预约系统",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "init:db": "cd server && node scripts/initDB.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
