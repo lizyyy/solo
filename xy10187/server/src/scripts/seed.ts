@@ -21,6 +21,17 @@ function seedData() {
 
   console.log('开始插入初始数据...');
 
+  db.exec(`
+    DELETE FROM status_logs;
+    DELETE FROM settlement_items;
+    DELETE FROM settlements;
+    DELETE FROM appeals;
+    DELETE FROM duplicate_groups;
+    DELETE FROM receipts;
+    DELETE FROM employees;
+    DELETE FROM merchants;
+  `);
+
   const insertEmployee = db.prepare(`
     INSERT OR IGNORE INTO employees (id, name, department, monthly_allowance, used_amount, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -42,8 +53,8 @@ function seedData() {
   const insertReceipt = db.prepare(`
     INSERT OR IGNORE INTO receipts (
       id, employee_id, merchant_id, receipt_no, amount, consumption_date, 
-      upload_date, status, is_duplicate, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      upload_date, status, is_duplicate, duplicate_group_id, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const insertStatusLog = db.prepare(`
@@ -63,7 +74,8 @@ function seedData() {
       consumption_date: '2026-05-01',
       upload_date: '2026-05-01',
       status: 'approved',
-      is_duplicate: 0
+      is_duplicate: 1,
+      duplicate_group_id: duplicateGroupId
     },
     {
       id: uuidv4(),
@@ -138,7 +150,8 @@ function seedData() {
   receipts.forEach((r, index) => {
     insertReceipt.run(
       r.id, r.employee_id, r.merchant_id, r.receipt_no, r.amount,
-      r.consumption_date, r.upload_date, r.status, r.is_duplicate, now, now
+      r.consumption_date, r.upload_date, r.status, r.is_duplicate, 
+      r.duplicate_group_id || null, now, now
     );
 
     if (r.status !== 'pending') {

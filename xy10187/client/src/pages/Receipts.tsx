@@ -8,6 +8,7 @@ import {
   Form,
   Select,
   Input,
+  InputNumber,
   DatePicker,
   Space,
   Modal,
@@ -491,7 +492,7 @@ const Receipts: React.FC = () => {
                   { type: 'number', message: '请输入有效金额' },
                 ]}
               >
-                <Input type="number" placeholder="请输入消费金额" />
+                <InputNumber style={{ width: '100%' }} placeholder="请输入消费金额" min={0} step={0.01} />
               </Form.Item>
             </Col>
             <Col span={12}>
