@@ -75,10 +75,26 @@ function getProcessRecords(violationId) {
 app.post('/api/violations', (req, res) => {
   const { riderId, violationType, amount, description } = req.body;
   
-  if (!riderId || !violationType || !amount) {
+  if (!riderId || !violationType || amount === undefined || amount === null) {
     return res.status(400).json({
       success: false,
       message: '缺少必要参数',
+    });
+  }
+  
+  const amountNum = Number(amount);
+  
+  if (isNaN(amountNum) || !isFinite(amountNum)) {
+    return res.status(400).json({
+      success: false,
+      message: '扣罚金额必须是有效数字',
+    });
+  }
+  
+  if (amountNum <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: '扣罚金额必须大于0',
     });
   }
   
@@ -86,7 +102,7 @@ app.post('/api/violations', (req, res) => {
     id: uuidv4(),
     riderId,
     violationType,
-    amount: Number(amount),
+    amount: amountNum,
     description,
     status: VIOLATION_STATUS.PENDING,
     currentStep: '创建违规单',
@@ -323,13 +339,13 @@ app.post('/api/violations/:id/review', (req, res) => {
     if (violation.statusBeforeAppeal === VIOLATION_STATUS.FROZEN) {
       balance.frozen -= violation.amount;
       balance.available += violation.amount;
+      saveBalance(balance);
     } else if (violation.statusBeforeAppeal === VIOLATION_STATUS.DEDUCTED) {
       balance.available += violation.amount;
+      saveBalance(balance);
+      addFlow(violation.riderId, '回滚', violation.amount, violation.id,
+        `申诉回滚：${violation.violationType}`);
     }
-    saveBalance(balance);
-    
-    addFlow(violation.riderId, '回滚', violation.amount, violation.id,
-      `申诉回滚：${violation.violationType}`);
     
     violation.status = VIOLATION_STATUS.ROLLED_BACK;
     violation.currentStep = '申诉成功，已回滚';
