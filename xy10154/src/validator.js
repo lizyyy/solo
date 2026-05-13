@@ -72,9 +72,17 @@ function detectSignedBeforeCollect(traces) {
   return anomalies;
 }
 
+const ABSTRACT_LOCATIONS = ['运输途中', '在途中', '转运中', '发往', '运往', '派送中', '派送'];
+
+function isAbstractLocation(city) {
+  if (!city) return true;
+  const lower = city.toLowerCase();
+  return ABSTRACT_LOCATIONS.some(al => lower.includes(al));
+}
+
 function detectCityJumps(traces) {
   const anomalies = [];
-  const MIN_SPEED_KMH = 500;
+  const MIN_SPEED_KMH = 800;
   
   for (let i = 0; i < traces.length - 1; i++) {
     const current = traces[i];
@@ -83,11 +91,15 @@ function detectCityJumps(traces) {
     const currentCity = extractCity(current.location || current.city);
     const nextCity = extractCity(next.location || next.city);
     
-    if (!currentCity || !nextCity || currentCity === nextCity) {
+    if (!currentCity || !nextCity) {
       continue;
     }
     
-    if (isSameLocation(currentCity, nextCity)) {
+    if (isAbstractLocation(currentCity) || isAbstractLocation(nextCity)) {
+      continue;
+    }
+    
+    if (currentCity === nextCity || isSameLocation(currentCity, nextCity)) {
       continue;
     }
     
@@ -176,7 +188,7 @@ function detectDuplicateScans(traces) {
       
       anomalies.push({
         type: ANOMALY_TYPES.DUPLICATE_SCAN,
-        severity: 'low',
+        severity: 'medium',
         message: `重复扫描：第 ${previousIndex + 1} 条与第 ${index + 1} 条记录相同`,
         details: {
           firstTrace: traces[previousIndex],
