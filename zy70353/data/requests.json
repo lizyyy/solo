@@ -1,0 +1,110 @@
+[
+  {
+    "id": "req-001",
+    "path": "/api/recommend",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 50,
+      "cacheState": "hit"
+    }
+  },
+  {
+    "id": "req-002",
+    "path": "/api/recommend",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 80,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-003",
+    "path": "/api/recommend",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 150,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-004",
+    "path": "/api/products",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 30,
+      "cacheState": "hit"
+    }
+  },
+  {
+    "id": "req-005",
+    "path": "/api/products",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 200,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-006",
+    "path": "/api/search",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 100,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-007",
+    "path": "/api/recommend/trending",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 250,
+      "cacheState": "hit"
+    }
+  },
+  {
+    "id": "req-008",
+    "path": "/api/recommend/personal",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 60,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-009",
+    "path": "/api/users/profile",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 90,
+      "cacheState": "hit"
+    }
+  },
+  {
+    "id": "req-010",
+    "path": "/api/orders",
+    "method": "POST",
+    "metadata": {
+      "requestCount": 40,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-011",
+    "path": "/api/recommend",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 120,
+      "cacheState": "miss"
+    }
+  },
+  {
+    "id": "req-012",
+    "path": "/api/products/details",
+    "method": "GET",
+    "metadata": {
+      "requestCount": 75,
+      "cacheState": "hit"
+    }
+  }
+]

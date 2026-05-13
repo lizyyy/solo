@@ -1,0 +1,18 @@
+{
+  "name": "config-replay-cli",
+  "version": "1.0.0",
+  "description": "配置热更新回放CLI - 定位配置变更导致的性能问题",
+  "main": "src/index.js",
+  "bin": {
+    "config-replay": "./src/index.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": ["config", "hot-reload", "replay", "bisect", "debug"],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

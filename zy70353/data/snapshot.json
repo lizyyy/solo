@@ -1,0 +1,31 @@
+{
+  "timestamp": "2024-01-15T08:00:00Z",
+  "config": {
+    "rateLimit": {
+      "enabled": true,
+      "threshold": 100,
+      "windowMs": 60000
+    },
+    "recommendation": {
+      "enabled": true,
+      "algorithm": "simple",
+      "maxResults": 10,
+      "personalization": false,
+      "realTime": false
+    },
+    "caching": {
+      "enabled": true,
+      "ttl": 300,
+      "methods": ["GET", "HEAD"],
+      "excludePaths": ["/api/auth"]
+    },
+    "security": {
+      "enabled": true,
+      "mode": "strict"
+    }
+  },
+  "frozen": {
+    "security.enabled": true,
+    "security.mode": true
+  }
+}
