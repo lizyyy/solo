@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疫苗冷柜盘点冻结系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .status-badge { padding: 0.35em 0.65em; border-radius: 0.25rem; font-size: 0.75em; }
+        .status-normal { background-color: #198754; color: white; }
+        .status-pending { background-color: #ffc107; color: black; }
+        .status-discrepancy { background-color: #dc3545; color: white; }
+        .status-matched { background-color: #198754; color: white; }
+        .status-resolved { background-color: #0dcaf0; color: white; }
+        .status-approved { background-color: #198754; color: white; }
+        .status-rejected { background-color: #dc3545; color: white; }
+        .status-confirmed { background-color: #0d6efd; color: white; }
+        .status-completed { background-color: #198754; color: white; }
+        .status-cancelled { background-color: #6c757d; color: white; }
+        .stat-card { transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .tab-content { min-height: 500px; }
+    </style>
+</head>
+<body>
+    <div id="app" class="container-fluid py-4">
+        <nav class="navbar navbar-dark bg-dark mb-4 rounded">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1">💉 疫苗冷柜盘点冻结系统</span>
+                <span class="text-white-50">当前用户: {{ currentUser }}</span>
+            </div>
+        </nav>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-2">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.freezers }}</h5>
+                        <p class="card-text">冷柜数量</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.vaccines }}</h5>
+                        <p class="card-text">疫苗批次</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.appointments }}</h5>
+                        <p class="card-text">预约记录</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-warning text-dark">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.pendingInventory }}</h5>
+                        <p class="card-text">待复核盘点</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.pendingDamage }}</h5>
+                        <p class="card-text">待审批报损</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card stat-card bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ stats.totalOperations }}</h5>
+                        <p class="card-text">操作记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'freezers' }" @click="activeTab = 'freezers'">
+                            ❄️ 冷柜管理
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'vaccines' }" @click="activeTab = 'vaccines'">
+                            💉 疫苗管理
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'appointments' }" @click="activeTab = 'appointments'">
+                            📅 预约管理
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'inventory' }" @click="activeTab = 'inventory'">
+                            📋 盘点管理
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'damage' }" @click="activeTab = 'damage'">
+                            📝 报损审批
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'history' }" @click="activeTab = 'history'">
+                            📜 操作历史
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" :class="{ active: activeTab === 'export' }" @click="activeTab = 'export'">
+                            📊 监管导出
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div v-if="activeTab === 'freezers'">
+                    <h5 class="mb-3">冷柜温度监控</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>冷柜名称</th>
+                                    <th>位置</th>
+                                    <th>当前温度</th>
+                                    <th>温度范围</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="freezer in freezers" :key="freezer.id">
+                                    <td>{{ freezer.name }}</td>
+                                    <td>{{ freezer.location }}</td>
+                                    <td :class="freezer.current_temperature < -25 || freezer.current_temperature > -15 ? 'text-danger fw-bold' : ''">
+                                        {{ freezer.current_temperature }}°C
+                                    </td>
+                                    <td>{{ freezer.min_temperature }}°C ~ {{ freezer.max_temperature }}°C</td>
+                                    <td><span class="status-badge" :class="getStatusClass(freezer.status)">{{ freezer.status }}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" @click="showTempModal(freezer)">更新温度</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'vaccines'">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>疫苗批次管理</h5>
+                        <button class="btn btn-primary btn-sm" @click="showVaccineModal()">+ 新增疫苗</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>批号</th>
+                                    <th>疫苗名称</th>
+                                    <th>生产厂家</th>
+                                    <th>有效期</th>
+                                    <th>总数量</th>
+                                    <th>可用数量</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="vaccine in vaccines" :key="vaccine.id">
+                                    <td class="fw-bold">{{ vaccine.batch_number }}</td>
+                                    <td>{{ vaccine.name }}</td>
+                                    <td>{{ vaccine.manufacturer }}</td>
+                                    <td>{{ vaccine.expiry_date }}</td>
+                                    <td>{{ vaccine.total_count }}</td>
+                                    <td>{{ vaccine.available_count }}</td>
+                                    <td><span class="status-badge" :class="getStatusClass(vaccine.status)">{{ vaccine.status }}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'appointments'">
+                    <h5 class="mb-3">预约占用管理</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>疫苗批号</th>
+                                    <th>患者姓名</th>
+                                    <th>患者ID</th>
+                                    <th>预约时间</th>
+                                    <th>数量</th>
+                                    <th>状态</th>
+                                    <th>操作人</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="apt in appointments" :key="apt.id">
+                                    <td>{{ apt.batch_number }}</td>
+                                    <td>{{ apt.patient_name }}</td>
+                                    <td>{{ apt.patient_id }}</td>
+                                    <td>{{ apt.appointment_date }}</td>
+                                    <td>{{ apt.quantity }}</td>
+                                    <td><span class="status-badge" :class="getStatusClass(apt.status)">{{ apt.status }}</span></td>
+                                    <td>{{ apt.operator }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-success" @click="updateAptStatus(apt.id, 'confirmed')" v-if="apt.status === 'pending'">确认</button>
+                                            <button class="btn btn-primary" @click="updateAptStatus(apt.id, 'completed')" v-if="apt.status === 'confirmed'">完成</button>
+                                            <button class="btn btn-secondary" @click="updateAptStatus(apt.id, 'cancelled')">取消</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'inventory'">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>盘点差异管理</h5>
+                        <button class="btn btn-primary btn-sm" @click="showInventoryModal()">+ 新建盘点</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>疫苗批号</th>
+                                    <th>预期数量</th>
+                                    <th>实际数量</th>
+                                    <th>差异</th>
+                                    <th>操作人</th>
+                                    <th>状态</th>
+                                    <th>复核人</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="inv in inventoryRecords" :key="inv.id">
+                                    <td>{{ inv.batch_number }}</td>
+                                    <td>{{ inv.expected_count }}</td>
+                                    <td>{{ inv.actual_count }}</td>
+                                    <td :class="inv.difference !== 0 ? 'text-danger fw-bold' : 'text-success'">{{ inv.difference }}</td>
+                                    <td>{{ inv.operator }}</td>
+                                    <td><span class="status-badge" :class="getStatusClass(inv.status)">{{ inv.status }}</span></td>
+                                    <td>{{ inv.reviewer || '-' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" @click="showReviewModal(inv)" v-if="inv.status === 'pending' || inv.status === 'discrepancy'">
+                                            复核
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'damage'">
+                    <div class="d-flex justify-content-between mb-3">
+                        <h5>报损审批管理</h5>
+                        <button class="btn btn-primary btn-sm" @click="showDamageModal()">+ 提交报损</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>疫苗批号</th>
+                                    <th>疫苗名称</th>
+                                    <th>报损数量</th>
+                                    <th>报损原因</th>
+                                    <th>上报人</th>
+                                    <th>状态</th>
+                                    <th>审批人</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="dmg in damageReports" :key="dmg.id">
+                                    <td>{{ dmg.batch_number }}</td>
+                                    <td>{{ dmg.vaccine_name }}</td>
+                                    <td>{{ dmg.quantity }}</td>
+                                    <td>{{ dmg.reason }}</td>
+                                    <td>{{ dmg.reporter }}</td>
+                                    <td><span class="status-badge" :class="getStatusClass(dmg.status)">{{ dmg.status }}</span></td>
+                                    <td>{{ dmg.approver || '-' }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" @click="showApproveModal(dmg)" v-if="dmg.status === 'pending'">
+                                            审批
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'history'">
+                    <h5 class="mb-3">操作历史记录</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>操作类型</th>
+                                    <th>修改字段</th>
+                                    <th>原值</th>
+                                    <th>新值</th>
+                                    <th>操作人</th>
+                                    <th>操作时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="h in history" :key="h.id">
+                                    <td>{{ h.operation_type }}</td>
+                                    <td>{{ h.field_name }}</td>
+                                    <td class="text-muted">{{ h.old_value || '-' }}</td>
+                                    <td class="fw-bold">{{ h.new_value }}</td>
+                                    <td>{{ h.operator }}</td>
+                                    <td>{{ h.operation_time }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div v-if="activeTab === 'export'">
+                    <h5 class="mb-3">监管数据导出</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">盘点记录导出</div>
+                                <div class="card-body">
+                                    <form @submit.prevent="exportData('inventory')" class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">责任人</label>
+                                            <input type="text" class="form-control form-control-sm" v-model="exportFilter.responsible_person">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">疫苗批号</label>
+                                            <input type="text" class="form-control form-control-sm" v-model="exportFilter.batch_number">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">开始日期</label>
+                                            <input type="date" class="form-control form-control-sm" v-model="exportFilter.start_date">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">结束日期</label>
+                                            <input type="date" class="form-control form-control-sm" v-model="exportFilter.end_date">
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary btn-sm">导出盘点Excel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">报损记录导出</div>
+                                <div class="card-body">
+                                    <form @submit.prevent="exportData('damage')" class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">责任人</label>
+                                            <input type="text" class="form-control form-control-sm" v-model="exportFilter.responsible_person">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">疫苗批号</label>
+                                            <input type="text" class="form-control form-control-sm" v-model="exportFilter.batch_number">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">开始日期</label>
+                                            <input type="date" class="form-control form-control-sm" v-model="exportFilter.start_date">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">结束日期</label>
+                                            <input type="date" class="form-control form-control-sm" v-model="exportFilter.end_date">
+                                        </div>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-success btn-sm">导出报损Excel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">操作历史导出</div>
+                        <div class="card-body">
+                            <form @submit.prevent="exportData('history')" class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">操作人</label>
+                                    <input type="text" class="form-control form-control-sm" v-model="exportFilter.responsible_person">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">开始日期</label>
+                                    <input type="date" class="form-control form-control-sm" v-model="exportFilter.start_date">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">结束日期</label>
+                                    <input type="date" class="form-control form-control-sm" v-model="exportFilter.end_date">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-secondary btn-sm">导出历史Excel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="tempModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">更新冷柜温度</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">当前冷柜: {{ selectedFreezer?.name }}</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">新温度 (°C)</label>
+                            <input type="number" step="0.1" class="form-control" v-model="newTemperature" :min="selectedFreezer?.min_temperature" :max="selectedFreezer?.max_temperature">
+                            <div class="form-text">有效范围: {{ selectedFreezer?.min_temperature }}°C ~ {{ selectedFreezer?.max_temperature }}°C</div>
+                        </div>
+                        <div v-if="tempError" class="alert alert-danger">{{ tempError }}</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="updateTemperature">确认更新</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="reviewModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">盘点复核</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">批号: {{ selectedInventory?.batch_number }}</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">复核状态</label>
+                            <select class="form-select" v-model="reviewStatus">
+                                <option value="matched">账实相符</option>
+                                <option value="discrepancy">存在差异</option>
+                                <option value="resolved">差异已处理</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">复核备注</label>
+                            <textarea class="form-control" v-model="reviewRemarks" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="submitReview">提交复核</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="approveModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">报损审批</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">批号: {{ selectedDamage?.batch_number }}</label>
+                            <br>
+                            <label class="form-label">数量: {{ selectedDamage?.quantity }}</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">审批状态</label>
+                            <select class="form-select" v-model="approvalStatus">
+                                <option value="approved">同意报损</option>
+                                <option value="rejected">驳回申请</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">审批备注</label>
+                            <textarea class="form-control" v-model="approvalRemarks" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="submitApproval">提交审批</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
