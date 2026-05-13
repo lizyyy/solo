@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公益时长补录审核系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Microsoft YaHei', sans-serif;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    .stat-card .card-body {
+      padding: 20px;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    .filter-section {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .audit-table {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .audit-table th {
+      background: #f8f9fa;
+      border: none;
+      font-weight: 600;
+    }
+    .status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .btn-action {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .history-item {
+      padding: 10px;
+      border-left: 3px solid #667eea;
+      background: #f8f9fa;
+      margin-bottom: 10px;
+      border-radius: 0 8px 8px 0;
+    }
+    .tab-content {
+      background: white;
+      padding: 20px;
+      border-radius: 0 0 12px 12px;
+    }
+    .nav-tabs .nav-link.active {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="container">
+      <h1 class="text-center mb-0">
+        <i class="bi bi-shield-check me-2"></i>公益时长补录审核系统
+      </h1>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row mb-4" id="statistics-row">
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <div class="stat-number" id="pending-count">0</div>
+            <div class="stat-label">待审核</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <div class="stat-number text-success" id="approved-count">0</div>
+            <div class="stat-label">已通过</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <div class="stat-number text-danger" id="rejected-count">0</div>
+            <div class="stat-label">已拒绝</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <div class="stat-number text-warning" id="missing-count">0</div>
+            <div class="stat-label">缺签退</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <div class="stat-number text-info" id="hours-count">0</div>
+            <div class="stat-label">补录总时长</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 col-6 mb-3">
+        <div class="card stat-card">
+          <div class="card-body text-center">
+            <button class="btn btn-primary w-100" onclick="exportReport()">
+              <i class="bi bi-download"></i> 导出报告
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-section">
+      <h5 class="mb-3"><i class="bi bi-filter"></i> 搜索筛选</h5>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="filter-volunteer" placeholder="志愿者姓名">
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="filter-activity" placeholder="活动名称">
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" id="filter-status">
+            <option value="">全部状态</option>
+            <option value="pending">待审核</option>
+            <option value="approved">已通过</option>
+            <option value="rejected">已拒绝</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <input type="date" class="form-control" id="filter-start-date">
+        </div>
+        <div class="col-md-2">
+          <input type="date" class="form-control" id="filter-end-date">
+        </div>
+      </div>
+      <div class="mt-3">
+        <button class="btn btn-primary me-2" onclick="loadAudits()">
+          <i class="bi bi-search"></i> 搜索
+        </button>
+        <button class="btn btn-secondary" onclick="resetFilters()">
+          <i class="bi bi-x-circle"></i> 重置
+        </button>
+        <button class="btn btn-outline-primary ms-2" onclick="refreshData()">
+          <i class="bi bi-arrow-clockwise"></i> 刷新
+        </button>
+      </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="audit-tab" data-bs-toggle="tab" data-bs-target="#audit-panel" type="button">
+          补录审核
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="missing-tab" data-bs-toggle="tab" data-bs-target="#missing-panel" type="button">
+          缺签退处理
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="audit-panel" role="tabpanel">
+        <div class="audit-table">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>志愿者</th>
+                  <th>活动名称</th>
+                  <th>活动日期</th>
+                  <th>签到时间</th>
+                  <th>原始时长</th>
+                  <th>建议时长</th>
+                  <th>队长确认</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="missing-panel" role="tabpanel">
+        <div class="audit-table">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>志愿者</th>
+                  <th>活动名称</th>
+                  <th>活动日期</th>
+                  <th>签到时间</th>
+                  <th>备注</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="missing-table-body">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="auditModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">审核详情</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="audit-modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="missingModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">缺签退处理</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="missing-modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">导出报告筛选</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">处理人</label>
+            <input type="text" class="form-control" id="export-handled-by" placeholder="输入处理人姓名">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">开始时间</label>
+            <input type="datetime-local" class="form-control" id="export-start-time">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">结束时间</label>
+            <input type="datetime-local" class="form-control" id="export-end-time">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary" onclick="doExport()">导出Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
