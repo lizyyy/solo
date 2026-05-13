@@ -24,15 +24,21 @@ class DataCleaner:
             return None
         
         if isinstance(value, bool):
-            return not value
+            return value
         
         s = str(value).strip().lower()
-        if s in {"true", "yes", "y", "1", "是", "合格", "pass", "p"}:
-            return False
         if s in {"false", "no", "n", "0", "否", "不合格", "fail", "f"}:
             return True
+        if s in {"true", "yes", "y", "1", "是", "合格", "pass", "p"}:
+            return False
         
         self._warn("error", "invalid_bool", f"{field_name} '{value}' 无法解析为布尔值", context)
+        return None
+
+    def _get_first_non_none(self, raw: Dict, *keys: str) -> Any:
+        for key in keys:
+            if key in raw and raw[key] is not None:
+                return raw[key]
         return None
 
     def parse_int(self, value: Any, field_name: str, min_val: int = 0,
@@ -117,10 +123,11 @@ class DataCleaner:
             self._warn("error", "missing_id", f"样本 {sample_index} 缺少样本编号", context)
             return None
         
+        result_value = self._get_first_non_none(raw, "is_defective", "是否不合格", "结果")
         is_defective = self.parse_bool(
-            raw.get("is_defective") or raw.get("是否不合格") or raw.get("结果"),
+            result_value,
             "样本结果",
-            {**context, "raw_value": raw.get("is_defective") or raw.get("是否不合格")}
+            {**context, "raw_value": result_value}
         )
         if is_defective is None:
             return None
@@ -162,16 +169,18 @@ class DataCleaner:
             self._warn("error", "missing_id", f"复检记录 {index} 缺少样本编号", context)
             return None
         
+        original_value = self._get_first_non_none(raw, "original_result", "原始结果")
         original_result = self.parse_bool(
-            raw.get("original_result") or raw.get("原始结果"),
+            original_value,
             "复检原始结果",
             context
         )
         if original_result is None:
             return None
         
+        recheck_value = self._get_first_non_none(raw, "recheck_result", "复检结果")
         recheck_result = self.parse_bool(
-            raw.get("recheck_result") or raw.get("复检结果"),
+            recheck_value,
             "复检结果",
             context
         )

@@ -6,15 +6,19 @@ class TestDataCleaner:
     def setup_method(self):
         self.cleaner = DataCleaner()
 
-    def test_parse_bool_various_formats(self):
+    def test_parse_bool_string_formats(self):
         assert self.cleaner.parse_bool("合格", "测试") is False
         assert self.cleaner.parse_bool("不合格", "测试") is True
         assert self.cleaner.parse_bool("PASS", "测试") is False
         assert self.cleaner.parse_bool("fail", "测试") is True
         assert self.cleaner.parse_bool("1", "测试") is False
         assert self.cleaner.parse_bool("0", "测试") is True
-        assert self.cleaner.parse_bool(True, "测试") is False
-        assert self.cleaner.parse_bool(False, "测试") is True
+        assert self.cleaner.parse_bool("是", "测试") is False
+        assert self.cleaner.parse_bool("否", "测试") is True
+
+    def test_parse_bool_native_bool(self):
+        assert self.cleaner.parse_bool(True, "测试") is True
+        assert self.cleaner.parse_bool(False, "测试") is False
 
     def test_parse_bool_invalid(self):
         result = self.cleaner.parse_bool("invalid", "测试")
@@ -53,10 +57,32 @@ class TestDataCleaner:
         assert result is None
         assert any(w["code"] == "invalid_datetime" for w in self.cleaner.warnings)
 
-    def test_clean_sample_minimal(self):
+    def test_clean_sample_with_chinese_labels(self):
         raw = {
             "sample_id": "S001",
             "是否不合格": "合格",
+        }
+        sample = self.cleaner.clean_sample(raw, "B001", 0)
+        
+        assert sample is not None
+        assert sample.sample_id == "S001"
+        assert sample.is_defective is False
+
+    def test_clean_sample_with_native_bool_true(self):
+        raw = {
+            "sample_id": "S001",
+            "is_defective": True,
+        }
+        sample = self.cleaner.clean_sample(raw, "B001", 0)
+        
+        assert sample is not None
+        assert sample.sample_id == "S001"
+        assert sample.is_defective is True
+
+    def test_clean_sample_with_native_bool_false(self):
+        raw = {
+            "sample_id": "S001",
+            "is_defective": False,
         }
         sample = self.cleaner.clean_sample(raw, "B001", 0)
         
@@ -101,6 +127,26 @@ class TestDataCleaner:
         assert len(batch.samples) == 3
         assert batch.defective_count == 1
 
+    def test_clean_batch_with_native_bool_samples(self):
+        raw_batch = {
+            "batch_id": "B001",
+            "product": "测试产品",
+            "total_quantity": 100,
+        }
+        raw_samples = [
+            {"sample_id": "S001", "is_defective": True},
+            {"sample_id": "S002", "is_defective": False},
+            {"sample_id": "S003", "is_defective": True},
+            {"sample_id": "S004", "is_defective": False},
+        ]
+
+        batch = self.cleaner.clean_batch(raw_batch, raw_samples)
+        
+        assert batch is not None
+        assert len(batch.samples) == 4
+        assert batch.defective_count == 2
+        assert batch.pass_rate == 0.5
+
     def test_clean_batch_no_valid_samples(self):
         raw_batch = {"batch_id": "B001", "product": "测试"}
         raw_samples = [
@@ -111,7 +157,7 @@ class TestDataCleaner:
         assert batch is None
         assert any(w["code"] == "no_valid_samples" for w in self.cleaner.warnings)
 
-    def test_clean_recheck(self):
+    def test_clean_recheck_with_chinese_labels(self):
         raw = {
             "样本编号": "S001",
             "原始结果": "不合格",
@@ -125,6 +171,35 @@ class TestDataCleaner:
         assert recheck.sample_id == "S001"
         assert recheck.original_result is True
         assert recheck.recheck_result is False
+
+    def test_clean_recheck_with_native_bool(self):
+        raw = {
+            "sample_id": "S001",
+            "original_result": True,
+            "recheck_result": False,
+            "recheck_time": "2026-05-01 10:00:00",
+        }
+        
+        recheck = self.cleaner.clean_recheck(raw, 0)
+        
+        assert recheck is not None
+        assert recheck.sample_id == "S001"
+        assert recheck.original_result is True
+        assert recheck.recheck_result is False
+
+    def test_clean_recheck_with_false_native_bool(self):
+        raw = {
+            "sample_id": "S001",
+            "original_result": False,
+            "recheck_result": True,
+            "recheck_time": "2026-05-01 10:00:00",
+        }
+        
+        recheck = self.cleaner.clean_recheck(raw, 0)
+        
+        assert recheck is not None
+        assert recheck.original_result is False
+        assert recheck.recheck_result is True
 
     def test_clean_sampling_rule(self):
         raw = {
