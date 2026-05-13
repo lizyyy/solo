@@ -1,0 +1,19 @@
+{
+  "name": "failure-kb-cli",
+  "version": "1.0.0",
+  "description": "任务失败知识库 CLI - 记录和搜索任务失败处理经验",
+  "main": "index.js",
+  "bin": {
+    "failure-kb": "./index.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["cli", "knowledge-base", "troubleshooting", "incident-management"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2"
+  }
+}

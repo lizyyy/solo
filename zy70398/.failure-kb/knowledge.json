@@ -1,0 +1,118 @@
+[
+  {
+    "id": "b35573be-0f11-4794-8d66-9f6871fdc436",
+    "fingerprint": {
+      "taskName": "daily-report-generator",
+      "errorCode": "CONNECTION",
+      "stackSignature": "Connection._handleTimeoutError|listOnTimeout|processTimers",
+      "contextHash": "4a143a13"
+    },
+    "fingerprintHash": "b7d057b1842aad42496d2b631a7c1d2b5ae454c1759444d1633b588415879600",
+    "taskName": "daily-report-generator",
+    "errorMessage": "Error: Connection timeout after 30000ms",
+    "stackTrace": "Error: Connection timeout after 30000ms\n    at Connection._handleTimeoutError (/app/node_modules/mysql/lib/Connection.js:199:17)\n    at listOnTimeout (internal/timers.js:554:17)\n    at processTimers (internal/timers.js:497:7)",
+    "context": {
+      "database": "reports_db",
+      "query": "SELECT * FROM daily_stats"
+    },
+    "resolution": "处理步骤：\n1. 检查数据库连接池配置\n2. 查看慢查询日志: SHOW PROCESSLIST\n3. 临时解决方案: 重启任务重试\n4. 长期优化: 添加索引到 daily_stats 表的 date 字段\n5. 考虑调整任务执行时间到非高峰时段",
+    "notes": "每天凌晨3点左右出现，数据库负载高",
+    "createdAt": "2026-05-13T23:04:24.573Z",
+    "updatedAt": "2026-05-13T23:04:24.574Z",
+    "resolvedAt": null,
+    "usefulCount": 0,
+    "notUsefulCount": 0,
+    "feedbackScore": 0,
+    "status": "resolved",
+    "expiryDate": "2026-08-11T23:04:24.574Z",
+    "resolvedBy": null,
+    "tags": []
+  },
+  {
+    "id": "358d02c5-4ea4-49f9-85b5-21375540361a",
+    "fingerprint": {
+      "taskName": "data-import-job",
+      "errorCode": "USER",
+      "stackSignature": "Request.extractError|Request.callListeners",
+      "contextHash": "5555511b"
+    },
+    "fingerprintHash": "4206070fcb4660b07006535eaa3ab3f9bff00a20734ecf3e2bf04d3c26569af6",
+    "taskName": "data-import-job",
+    "errorMessage": "AccessDeniedException: User: arn:aws:iam::123456:user/worker is not authorized to perform: s3:GetObject",
+    "stackTrace": "AccessDeniedException: User: arn:aws:iam::123456:user/worker is not authorized\n    at Request.extractError (/app/node_modules/aws-sdk/lib/services/s3.js:712:35)\n    at Request.callListeners (/app/node_modules/aws-sdk/lib/sequential_executor.js:106:20)",
+    "context": {
+      "bucket": "prod-data-import",
+      "region": "us-east-1"
+    },
+    "resolution": "处理步骤：\n1. 确认 IAM 角色/用户配置\n2. 检查 S3 bucket 策略\n3. 需要的权限: s3:GetObject, s3:ListBucket\n4. 更新 IAM policy 后等待 5 分钟生效\n5. 验证: aws s3 ls s3://prod-data-import/",
+    "notes": "新部署的worker权限不足",
+    "createdAt": "2026-05-13T23:04:24.574Z",
+    "updatedAt": "2026-05-13T23:04:24.574Z",
+    "resolvedAt": null,
+    "usefulCount": 0,
+    "notUsefulCount": 0,
+    "feedbackScore": 0,
+    "status": "resolved",
+    "expiryDate": "2026-08-11T23:04:24.574Z",
+    "resolvedBy": null,
+    "tags": []
+  },
+  {
+    "id": "b395d8a8-8a50-4fed-9a36-aece0e5ac8fd",
+    "fingerprint": {
+      "taskName": "user-sync-service",
+      "errorCode": "INVALID",
+      "stackSignature": "ValidationError: Invalid JSON format position 452|JSON.parse|parseUserData|processBatch",
+      "contextHash": "80f7e245"
+    },
+    "fingerprintHash": "05e5471ebf9baeb35997172345b1a76b36b4a42350561cb4c45d8876307396f5",
+    "taskName": "user-sync-service",
+    "errorMessage": "ValidationError: Invalid JSON format at position 452",
+    "stackTrace": "ValidationError: Invalid JSON format at position 452\n    at JSON.parse (<anonymous>)\n    at parseUserData (/app/src/parsers/user.js:23:15)\n    at processBatch (/app/src/services/sync.js:87:22)",
+    "context": {
+      "source": "api-gateway",
+      "batchSize": 100
+    },
+    "resolution": "处理步骤：\n1. 查看原始数据: cat /tmp/failed_batch_*.json\n2. 使用 jq 验证: jq . /tmp/failed_batch_*.json\n3. 检查上游API文档是否有变更\n4. 临时: 跳过损坏记录继续处理\n5. 联系上游团队确认数据格式",
+    "notes": "上游API返回的数据格式变化",
+    "createdAt": "2026-05-13T23:04:24.574Z",
+    "updatedAt": "2026-05-13T23:04:24.574Z",
+    "resolvedAt": null,
+    "usefulCount": 0,
+    "notUsefulCount": 0,
+    "feedbackScore": 0,
+    "status": "resolved",
+    "expiryDate": "2026-08-11T23:04:24.574Z",
+    "resolvedBy": null,
+    "tags": []
+  },
+  {
+    "id": "a2906add-1108-4534-af71-bec83b514871",
+    "fingerprint": {
+      "taskName": "payment-gateway-webhook",
+      "errorCode": "CONNECT",
+      "stackSignature": "TCPConnectWrap.afterConnect [as oncomplete]|processTicksAndRejections|async sendWebhook",
+      "contextHash": "2e051a94"
+    },
+    "fingerprintHash": "a272add7bfe34602825bbeef46345826403c36262222fee4c6115e87adfa4688",
+    "taskName": "payment-gateway-webhook",
+    "errorMessage": "Error: connect ECONNREFUSED 10.0.0.100:443",
+    "stackTrace": "Error: connect ECONNREFUSED 10.0.0.100:443\n    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1144:16)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)\n    at async sendWebhook (/app/src/services/webhook.js:45:18)",
+    "context": {
+      "endpoint": "https://partner-payment.example.com/webhook",
+      "retries": 3
+    },
+    "resolution": "处理步骤：\n1. 检查网络连通性: ping 10.0.0.100\n2. 测试端口: telnet 10.0.0.100 443\n3. 查看第三方服务状态页\n4. 临时: 启用队列缓冲，等待服务恢复\n5. 联系第三方技术支持确认",
+    "notes": "第三方支付网关服务不可用",
+    "createdAt": "2026-05-13T23:04:24.574Z",
+    "updatedAt": "2026-05-13T23:04:24.574Z",
+    "resolvedAt": null,
+    "usefulCount": 0,
+    "notUsefulCount": 0,
+    "feedbackScore": 0,
+    "status": "resolved",
+    "expiryDate": "2026-08-11T23:04:24.574Z",
+    "resolvedBy": null,
+    "tags": []
+  }
+]
