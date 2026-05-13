@@ -1,0 +1,21 @@
+{
+  "name": "museum-insurance-system",
+  "version": "1.0.0",
+  "description": "美术馆布撤展保险管理系统",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["museum", "insurance", "exhibition"],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "json2csv": "^6.0.0-alpha.2",
+    "uuid": "^14.0.0"
+  }
+}

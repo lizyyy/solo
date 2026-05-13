@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美术馆布撤展保险管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active { display: flex; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <h1 class="text-2xl font-bold">美术馆布撤展保险管理系统</h1>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">展品总数</div>
+                <div class="text-3xl font-bold text-blue-600" id="stat-exhibits">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">有效保单</div>
+                <div class="text-3xl font-bold text-green-600" id="stat-insurances">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">环境告警</div>
+                <div class="text-3xl font-bold text-red-600" id="stat-alerts">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">待验收</div>
+                <div class="text-3xl font-bold text-yellow-600" id="stat-acceptance">0</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4">
+                <div class="text-gray-500 text-sm">风险报告</div>
+                <div class="text-3xl font-bold text-purple-600" id="stat-reports">0</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow mb-6">
+            <div class="flex border-b">
+                <button class="tab-btn px-6 py-3 font-medium text-blue-600 border-b-2 border-blue-600" data-tab="exhibits">展品档案</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="transport">运输交接</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="insurance">保险管理</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="environment">环境监控</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="acceptance">撤展验收</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="reports">风险报告</button>
+                <button class="tab-btn px-6 py-3 font-medium text-gray-500 hover:text-blue-600" data-tab="history">操作历史</button>
+            </div>
+        </div>
+
+        <div id="exhibits" class="tab-content active">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">展品列表</h2>
+                    <button onclick="showAddExhibitModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">添加展品</button>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">名称</th>
+                                <th class="pb-3">类型</th>
+                                <th class="pb-3">价值</th>
+                                <th class="pb-3">位置</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exhibits-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="transport" class="tab-content">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">运输交接记录</h2>
+                    <button onclick="showAddTransportModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">新增运输</button>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">展品</th>
+                                <th class="pb-3">出发地</th>
+                                <th class="pb-3">目的地</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transport-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="insurance" class="tab-content">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">保险管理</h2>
+                    <button onclick="showAddInsuranceModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">新增保单</button>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">保单号</th>
+                                <th class="pb-3">展品</th>
+                                <th class="pb-3">保额</th>
+                                <th class="pb-3">有效期</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="insurance-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="environment" class="tab-content">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">环境告警</h2>
+                    <button onclick="showAddAlertModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">新增告警</button>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">展品</th>
+                                <th class="pb-3">告警类型</th>
+                                <th class="pb-3">当前值/阈值</th>
+                                <th class="pb-3">位置</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="environment-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="acceptance" class="tab-content">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">撤展验收</h2>
+                    <button onclick="showAddAcceptanceModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">新增验收</button>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">展品</th>
+                                <th class="pb-3">检验员</th>
+                                <th class="pb-3">结果</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="acceptance-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content">
+            <div class="bg-white rounded-lg shadow mb-4">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-semibold">风险报告</h2>
+                    <div class="flex gap-2">
+                        <button onclick="showExportModal()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">导出报告</button>
+                        <button onclick="showAddReportModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">新增报告</button>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">标题</th>
+                                <th class="pb-3">类型</th>
+                                <th class="pb-3">风险等级</th>
+                                <th class="pb-3">创建人</th>
+                                <th class="pb-3">状态</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-4 border-b">
+                    <h2 class="text-lg font-semibold">操作历史</h2>
+                </div>
+                <div class="p-4">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="text-left text-gray-500 border-b">
+                                <th class="pb-3">实体类型</th>
+                                <th class="pb-3">操作类型</th>
+                                <th class="pb-3">操作人</th>
+                                <th class="pb-3">时间</th>
+                                <th class="pb-3">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="transport-check-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 class="text-lg font-semibold mb-4">运输交接检验</h3>
+            <form id="transport-check-form">
+                <input type="hidden" id="check-transport-id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">检验员</label>
+                        <input type="text" id="checker" class="w-full border rounded px-3 py-2" required>
+                    </div>
+                    <div class="border p-4 rounded">
+                        <h4 class="font-medium mb-3">必检项目</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span>包装检查</span>
+                                <select class="border rounded px-3 py-1" data-check="packaging">
+                                    <option value="pass">通过</option>
+                                    <option value="fail">不通过</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>品相检查</span>
+                                <select class="border rounded px-3 py-1" data-check="condition">
+                                    <option value="pass">通过</option>
+                                    <option value="fail">不通过</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>文件检查</span>
+                                <select class="border rounded px-3 py-1" data-check="documentation">
+                                    <option value="pass">通过</option>
+                                    <option value="fail">不通过</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>温度检查</span>
+                                <select class="border rounded px-3 py-1" data-check="temperature">
+                                    <option value="pass">通过</option>
+                                    <option value="fail">不通过</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <textarea id="check-notes" class="w-full border rounded px-3 py-2" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('transport-check-modal')" class="px-4 py-2 border rounded hover:bg-gray-50">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">提交检验</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="review-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 class="text-lg font-semibold mb-4">验收复核</h3>
+            <form id="review-form">
+                <input type="hidden" id="review-acceptance-id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">复核人</label>
+                        <input type="text" id="reviewer" class="w-full border rounded px-3 py-2" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">复核结果</label>
+                        <select id="review-result" class="w-full border rounded px-3 py-2">
+                            <option value="pass">通过</option>
+                            <option value="fail">不通过</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">复核意见</label>
+                        <textarea id="review-notes" class="w-full border rounded px-3 py-2" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('review-modal')" class="px-4 py-2 border rounded hover:bg-gray-50">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">提交复核</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="export-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 class="text-lg font-semibold mb-4">导出风险报告</h3>
+            <form id="export-form">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">责任人</label>
+                        <select id="export-responsible" class="w-full border rounded px-3 py-2">
+                            <option value="">全部</option>
+                            <option value="张三">张三</option>
+                            <option value="李四">李四</option>
+                            <option value="王五">王五</option>
+                            <option value="赵六">赵六</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+                            <input type="date" id="export-start-date" class="w-full border rounded px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">结束日期</label>
+                            <input type="date" id="export-end-date" class="w-full border rounded px-3 py-2">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('export-modal')" class="px-4 py-2 border rounded hover:bg-gray-50">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">导出CSV</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="history-detail-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6">
+            <h3 class="text-lg font-semibold mb-4">操作详情</h3>
+            <div id="history-detail-content" class="space-y-4"></div>
+            <div class="flex justify-end mt-6">
+                <button type="button" onclick="closeModal('history-detail-modal')" class="px-4 py-2 border rounded hover:bg-gray-50">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="report-detail-modal" class="modal">
+        <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 p-6">
+            <h3 class="text-lg font-semibold mb-4">风险报告详情</h3>
+            <div id="report-detail-content" class="space-y-4"></div>
+            <div class="flex justify-end mt-6">
+                <button type="button" onclick="closeModal('report-detail-modal')" class="px-4 py-2 border rounded hover:bg-gray-50">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+
+        function generateIdempotencyKey() {
+            return 'key-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        async function apiRequest(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+            
+            if (options.method && options.method !== 'GET') {
+                headers['x-idempotency-key'] = generateIdempotencyKey();
+            }
+            
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers
+            });
+            
+            const data = await response.json();
+            if (!response.ok) {
+                alert(data.error || '请求失败');
+                throw new Error(data.error);
+            }
+            return data;
+        }
+
+        function getStatusBadge(status, type) {
+            const styles = {
+                active: 'bg-green-100 text-green-800',
+                pending: 'bg-yellow-100 text-yellow-800',
+                completed: 'bg-blue-100 text-blue-800',
+                approved: 'bg-green-100 text-green-800',
+                rejected: 'bg-red-100 text-red-800',
+                resolved: 'bg-gray-100 text-gray-800',
+                in_transit: 'bg-blue-100 text-blue-800',
+                exhibiting: 'bg-green-100 text-green-800',
+                in_storage: 'bg-gray-100 text-gray-800',
+                open: 'bg-red-100 text-red-800',
+                closed: 'bg-gray-100 text-gray-800',
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800',
+                pass: 'bg-green-100 text-green-800',
+                fail: 'bg-red-100 text-red-800'
+            };
+            
+            const labels = {
+                active: '有效',
+                pending: '待处理',
+                completed: '已完成',
+                approved: '已通过',
+                rejected: '已拒绝',
+                resolved: '已解决',
+                in_transit: '运输中',
+                exhibiting: '展出中',
+                in_storage: '入库',
+                open: '处理中',
+                closed: '已关闭',
+                high: '高风险',
+                medium: '中风险',
+                low: '低风险',
+                pass: '通过',
+                fail: '不通过'
+            };
+            
+            return `<span class="status-badge ${styles[status] || styles.pending}">${labels[status] || status}</span>`;
+        }
+
+        async function loadStats() {
+            const stats = await apiRequest('/stats');
+            document.getElementById('stat-exhibits').textContent = stats.totalExhibits;
+            document.getElementById('stat-insurances').textContent = stats.activeInsurances;
+            document.getElementById('stat-alerts').textContent = stats.environmentAlerts;
+            document.getElementById('stat-acceptance').textContent = stats.pendingAcceptance;
+            document.getElementById('stat-reports').textContent = stats.riskReports;
+        }
+
+        async function loadExhibits() {
+            const exhibits = await apiRequest('/exhibits');
+            const tbody = document.getElementById('exhibits-list');
+            tbody.innerHTML = exhibits.map(exhibit => `
+                <tr class="border-b">
+                    <td class="py-3">${exhibit.name}</td>
+                    <td class="py-3">${exhibit.type}</td>
+                    <td class="py-3">¥${exhibit.value.toLocaleString()}</td>
+                    <td class="py-3">${exhibit.location}</td>
+                    <td class="py-3">${getStatusBadge(exhibit.status)}</td>
+                    <td class="py-3">
+                        <button onclick="editExhibit('${exhibit.id}')" class="text-blue-600 hover:underline mr-2">编辑</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadTransport() {
+            const transports = await apiRequest('/transportations');
+            const tbody = document.getElementById('transport-list');
+            tbody.innerHTML = transports.map(t => `
+                <tr class="border-b">
+                    <td class="py-3">${t.exhibitName}</td>
+                    <td class="py-3">${t.fromLocation}</td>
+                    <td class="py-3">${t.toLocation}</td>
+                    <td class="py-3">${getStatusBadge(t.status)}</td>
+                    <td class="py-3">
+                        ${t.status === 'in_transit' ? `<button onclick="showTransportCheckModal('${t.id}')" class="text-blue-600 hover:underline mr-2">交接检验</button>` : ''}
+                        <button onclick="viewTransportChecks('${t.id}')" class="text-green-600 hover:underline">查看检验</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadInsurance() {
+            const insurances = await apiRequest('/insurances');
+            const tbody = document.getElementById('insurance-list');
+            tbody.innerHTML = insurances.map(i => `
+                <tr class="border-b">
+                    <td class="py-3">${i.policyNumber}</td>
+                    <td class="py-3">${i.exhibitName}</td>
+                    <td class="py-3">¥${i.coverageAmount.toLocaleString()}</td>
+                    <td class="py-3">${new Date(i.startDate).toLocaleDateString()} - ${new Date(i.endDate).toLocaleDateString()}</td>
+                    <td class="py-3">${getStatusBadge(i.status)}</td>
+                    <td class="py-3">
+                        ${i.status === 'pending' ? `<button onclick="activateInsurance('${i.id}')" class="text-blue-600 hover:underline mr-2">生效</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadEnvironment() {
+            const alerts = await apiRequest('/environment-alerts');
+            const tbody = document.getElementById('environment-list');
+            tbody.innerHTML = alerts.map(a => `
+                <tr class="border-b">
+                    <td class="py-3">${a.exhibitName}</td>
+                    <td class="py-3">${a.alertType === 'temperature' ? '温度' : '湿度'}</td>
+                    <td class="py-3">${a.value} / ${a.threshold}</td>
+                    <td class="py-3">${a.location}</td>
+                    <td class="py-3">${getStatusBadge(a.status)}</td>
+                    <td class="py-3">
+                        ${a.status === 'active' ? `<button onclick="resolveAlert('${a.id}')" class="text-green-600 hover:underline">处理</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadAcceptance() {
+            const acceptances = await apiRequest('/acceptance-checks');
+            const tbody = document.getElementById('acceptance-list');
+            tbody.innerHTML = acceptances.map(a => `
+                <tr class="border-b">
+                    <td class="py-3">${a.exhibitName}</td>
+                    <td class="py-3">${a.checker}</td>
+                    <td class="py-3">${getStatusBadge(a.result)}</td>
+                    <td class="py-3">${getStatusBadge(a.status)}</td>
+                    <td class="py-3">
+                        ${a.status === 'pending' ? `<button onclick="showReviewModal('${a.id}')" class="text-blue-600 hover:underline mr-2">复核</button>` : ''}
+                        <button onclick="viewAcceptanceDetail('${a.id}')" class="text-green-600 hover:underline">查看留痕</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadReports() {
+            const reports = await apiRequest('/risk-reports');
+            const tbody = document.getElementById('reports-list');
+            tbody.innerHTML = reports.map(r => `
+                <tr class="border-b">
+                    <td class="py-3">${r.title}</td>
+                    <td class="py-3">${r.type}</td>
+                    <td class="py-3">${getStatusBadge(r.riskLevel, 'risk')}</td>
+                    <td class="py-3">${r.createdBy}</td>
+                    <td class="py-3">${getStatusBadge(r.status)}</td>
+                    <td class="py-3">
+                        <button onclick="viewReportDetail('${r.id}')" class="text-blue-600 hover:underline">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadHistory() {
+            const history = await apiRequest('/history');
+            const tbody = document.getElementById('history-list');
+            tbody.innerHTML = history.map(h => `
+                <tr class="border-b">
+                    <td class="py-3">${h.entityType}</td>
+                    <td class="py-3">${h.action}</td>
+                    <td class="py-3">${h.operator}</td>
+                    <td class="py-3">${new Date(h.timestamp).toLocaleString()}</td>
+                    <td class="py-3">
+                        <button onclick="viewHistoryDetail('${h.id}')" class="text-blue-600 hover:underline">详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showTransportCheckModal(transportId) {
+            document.getElementById('check-transport-id').value = transportId;
+            document.getElementById('transport-check-modal').classList.add('active');
+        }
+
+        function showReviewModal(acceptanceId) {
+            document.getElementById('review-acceptance-id').value = acceptanceId;
+            document.getElementById('review-modal').classList.add('active');
+        }
+
+        function showExportModal() {
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        async function viewHistoryDetail(historyId) {
+            const history = await apiRequest('/history');
+            const record = history.find(h => h.id === historyId);
+            if (!record) return;
+            
+            const content = document.getElementById('history-detail-content');
+            content.innerHTML = `
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">实体类型</div>
+                    <div class="font-medium">${record.entityType}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">操作类型</div>
+                    <div class="font-medium">${record.action}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">操作人</div>
+                    <div class="font-medium">${record.operator}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">操作时间</div>
+                    <div class="font-medium">${new Date(record.timestamp).toLocaleString()}</div>
+                </div>
+                ${record.oldData ? `
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500 mb-2">修改前</div>
+                    <pre class="bg-gray-50 p-3 rounded text-sm overflow-x-auto">${JSON.stringify(record.oldData, null, 2)}</pre>
+                </div>
+                ` : ''}
+                <div>
+                    <div class="text-sm text-gray-500 mb-2">修改后</div>
+                    <pre class="bg-gray-50 p-3 rounded text-sm overflow-x-auto">${JSON.stringify(record.newData, null, 2)}</pre>
+                </div>
+            `;
+            document.getElementById('history-detail-modal').classList.add('active');
+        }
+
+        async function viewReportDetail(reportId) {
+            const report = await apiRequest(`/risk-reports/${reportId}`);
+            const content = document.getElementById('report-detail-content');
+            content.innerHTML = `
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">报告标题</div>
+                    <div class="font-medium">${report.title}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">报告类型</div>
+                    <div class="font-medium">${report.type}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">风险等级</div>
+                    <div class="font-medium">${getStatusBadge(report.riskLevel, 'risk')}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">创建人</div>
+                    <div class="font-medium">${report.createdBy}</div>
+                </div>
+                <div class="border-b pb-3">
+                    <div class="text-sm text-gray-500">创建时间</div>
+                    <div class="font-medium">${new Date(report.createdAt).toLocaleString()}</div>
+                </div>
+                <div>
+                    <div class="text-sm text-gray-500">报告描述</div>
+                    <div class="font-medium">${report.description}</div>
+                </div>
+            `;
+            document.getElementById('report-detail-modal').classList.add('active');
+        }
+
+        async function activateInsurance(insuranceId) {
+            if (!confirm('确认要使该保单生效吗？')) return;
+            await apiRequest(`/insurances/${insuranceId}/activate`, {
+                method: 'POST',
+                body: JSON.stringify({ operator: '当前用户' })
+            });
+            loadInsurance();
+            loadStats();
+        }
+
+        async function resolveAlert(alertId) {
+            if (!confirm('确认要处理该告警吗？')) return;
+            await apiRequest(`/environment-alerts/${alertId}/resolve`, {
+                method: 'POST',
+                body: JSON.stringify({ operator: '当前用户', resolutionNotes: '已处理' })
+            });
+            loadEnvironment();
+            loadStats();
+        }
+
+        document.getElementById('transport-check-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const transportId = document.getElementById('check-transport-id').value;
+            const checker = document.getElementById('checker').value;
+            const notes = document.getElementById('check-notes').value;
+            
+            const checkItems = [
+                { type: 'packaging', result: document.querySelector('[data-check="packaging"]').value, notes: '' },
+                { type: 'condition', result: document.querySelector('[data-check="condition"]').value, notes: '' },
+                { type: 'documentation', result: document.querySelector('[data-check="documentation"]').value, notes: '' },
+                { type: 'temperature', result: document.querySelector('[data-check="temperature"]').value, notes: '' }
+            ];
+            
+            await apiRequest(`/transportations/${transportId}/check`, {
+                method: 'POST',
+                body: JSON.stringify({ checkItems, checker, notes })
+            });
+            
+            closeModal('transport-check-modal');
+            loadTransport();
+            alert('检验提交成功！');
+        });
+
+        document.getElementById('review-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const acceptanceId = document.getElementById('review-acceptance-id').value;
+            const reviewer = document.getElementById('reviewer').value;
+            const reviewResult = document.getElementById('review-result').value;
+            const reviewNotes = document.getElementById('review-notes').value;
+            
+            await apiRequest(`/acceptance-checks/${acceptanceId}/review`, {
+                method: 'POST',
+                body: JSON.stringify({ reviewer, reviewResult, reviewNotes })
+            });
+            
+            closeModal('review-modal');
+            loadAcceptance();
+            loadStats();
+            alert('复核提交成功！');
+        });
+
+        document.getElementById('export-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const responsiblePerson = document.getElementById('export-responsible').value;
+            const startDate = document.getElementById('export-start-date').value;
+            const endDate = document.getElementById('export-end-date').value;
+            
+            const params = new URLSearchParams();
+            if (responsiblePerson) params.append('responsiblePerson', responsiblePerson);
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+            
+            window.open(`${API_BASE}/export/risk-reports?${params.toString()}`, '_blank');
+            closeModal('export-modal');
+        });
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                    b.classList.add('text-gray-500');
+                });
+                btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                btn.classList.remove('text-gray-500');
+                
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        function showAddExhibitModal() { alert('功能演示：添加展品'); }
+        function showAddTransportModal() { alert('功能演示：新增运输'); }
+        function showAddInsuranceModal() { alert('功能演示：新增保单'); }
+        function showAddAlertModal() { alert('功能演示：新增告警'); }
+        function showAddAcceptanceModal() { alert('功能演示：新增验收'); }
+        function showAddReportModal() { alert('功能演示：新增报告'); }
+        function editExhibit(id) { alert('功能演示：编辑展品 ' + id); }
+        function viewTransportChecks(id) { alert('功能演示：查看运输检验 ' + id); }
+        function viewAcceptanceDetail(id) { alert('功能演示：查看验收留痕 ' + id); }
+
+        async function init() {
+            await loadStats();
+            await loadExhibits();
+            await loadTransport();
+            await loadInsurance();
+            await loadEnvironment();
+            await loadAcceptance();
+            await loadReports();
+            await loadHistory();
+        }
+
+        init();
+    </script>
+</body>
+</html>
