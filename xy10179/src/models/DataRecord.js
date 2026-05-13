@@ -29,6 +29,10 @@ const DataRecord = sequelize.define('DataRecord', {
     type: DataTypes.ENUM('draft', 'pending', 'approved', 'rejected'),
     defaultValue: 'draft'
   },
+  idempotencyKey: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   createdBy: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -54,6 +58,10 @@ const DataRecord = sequelize.define('DataRecord', {
   indexes: [
     {
       fields: ['tenantId', 'status']
+    },
+    {
+      fields: ['tenantId', 'createdBy', 'idempotencyKey'],
+      unique: true
     }
   ]
 });

@@ -32,13 +32,13 @@ router.post('/',
         const existingRecord = await DataRecord.findOne({
           where: {
             tenantId,
-            createdBy: user.id
+            createdBy: user.id,
+            idempotencyKey
           },
-          order: [['createdAt', 'DESC']],
           transaction: t
         });
 
-        if (existingRecord && existingRecord.title === title) {
+        if (existingRecord) {
           await SecurityIncident.create({
             tenantId,
             userId: user.id,
@@ -68,6 +68,7 @@ router.post('/',
         title,
         content: content || '',
         status: status || 'draft',
+        idempotencyKey: idempotencyKey || null,
         createdBy: user.id,
         updatedBy: user.id
       }, { transaction: t });
@@ -82,6 +83,24 @@ router.post('/',
       });
     } catch (error) {
       await t.rollback();
+      
+      if (error.name === 'SequelizeUniqueConstraintError' && 
+          error.fields && error.fields.idempotencyKey) {
+        const existingRecord = await DataRecord.findOne({
+          where: {
+            tenantId,
+            createdBy: user.id,
+            idempotencyKey
+          }
+        });
+        
+        return res.status(409).json({
+          success: false,
+          error: 'DUPLICATE',
+          message: '检测到重复提交，请求已忽略',
+          data: { existingRecordId: existingRecord?.id }
+        });
+      }
       
       res.status(500).json({
         success: false,

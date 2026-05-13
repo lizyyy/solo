@@ -13,6 +13,7 @@ router.get('/audit-logs',
   auditMiddleware('READ', 'Report'),
   async (req, res) => {
     try {
+      const { tenantId, user } = req;
       const { 
         page = 1, 
         pageSize = 20, 
@@ -24,7 +25,7 @@ router.get('/audit-logs',
         endDate
       } = req.query;
       
-      const where = {};
+      const where = { tenantId };
       
       if (action) where.action = action;
       if (resourceType) where.resourceType = resourceType;
@@ -70,6 +71,7 @@ router.get('/security-incidents',
   auditMiddleware('READ', 'Report'),
   async (req, res) => {
     try {
+      const { tenantId } = req;
       const { 
         page = 1, 
         pageSize = 20, 
@@ -80,7 +82,7 @@ router.get('/security-incidents',
         endDate
       } = req.query;
       
-      const where = {};
+      const where = { tenantId };
       
       if (type) where.type = type;
       if (severity) where.severity = severity;
@@ -125,17 +127,22 @@ router.get('/risk-summary',
   auditMiddleware('READ', 'Report'),
   async (req, res) => {
     try {
-      const { startDate, endDate, tenantId } = req.query;
+      const { tenantId } = req;
+      const { startDate, endDate } = req.query;
       
       const dateWhere = {};
       if (startDate) dateWhere[Op.gte] = new Date(startDate);
       if (endDate) dateWhere[Op.lte] = new Date(endDate);
       
-      const incidentWhere = {};
+      const incidentWhere = { tenantId };
       if (Object.keys(dateWhere).length > 0) {
         incidentWhere.createdAt = dateWhere;
       }
-      if (tenantId) incidentWhere.tenantId = tenantId;
+
+      const auditWhere = { tenantId };
+      if (Object.keys(dateWhere).length > 0) {
+        auditWhere.createdAt = dateWhere;
+      }
 
       const [incidentStats, auditStats] = await Promise.all([
         SecurityIncident.findAll({
@@ -149,9 +156,7 @@ router.get('/risk-summary',
           group: ['type', 'severity', 'status']
         }),
         AuditLog.findAll({
-          where: {
-            createdAt: dateWhere
-          },
+          where: auditWhere,
           attributes: [
             'action',
             'status',
@@ -229,6 +234,7 @@ router.get('/tenant-access-stats',
   auditMiddleware('READ', 'Report'),
   async (req, res) => {
     try {
+      const { tenantId } = req;
       const { startDate, endDate } = req.query;
       
       const dateWhere = {};
@@ -238,6 +244,7 @@ router.get('/tenant-access-stats',
       const [tenantSwitchLogs, crossTenantAttempts] = await Promise.all([
         AuditLog.findAll({
           where: {
+            tenantId,
             action: 'TENANT_SWITCH',
             status: 'success',
             createdAt: dateWhere
@@ -250,6 +257,7 @@ router.get('/tenant-access-stats',
         }),
         SecurityIncident.findAll({
           where: {
+            tenantId,
             type: 'CROSS_TENANT_ACCESS',
             createdAt: dateWhere
           },

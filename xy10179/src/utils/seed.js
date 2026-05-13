@@ -1,10 +1,19 @@
 const { sequelize, Tenant, User, DataRecord } = require('../models');
 
 async function seedDatabase() {
-  console.log('开始初始化数据库...');
+  console.log('开始检查数据库状态...');
   
-  await sequelize.sync({ force: true });
-  console.log('数据库表已创建');
+  await sequelize.sync();
+  console.log('数据库表已同步（保留现有数据）');
+
+  const existingTenants = await Tenant.count();
+  
+  if (existingTenants > 0) {
+    console.log('数据库已有数据，跳过初始化');
+    return null;
+  }
+
+  console.log('检测到空数据库，开始初始化...');
 
   const tenantA = await Tenant.create({
     name: '租户A - 科技公司',
@@ -151,6 +160,8 @@ async function seedDatabase() {
     tenantB: tenantBRecords.length,
     tenantC: tenantCRecords.length
   });
+
+  console.log('✅ 数据库初始化完成');
 
   return {
     tenants: { A: tenantA, B: tenantB, C: tenantC },
