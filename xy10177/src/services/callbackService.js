@@ -61,6 +61,14 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
     return { success: true, skipped: true };
   }
 
+  const originalStatus = transaction.status === 'callback_failed' 
+    ? (transaction.original_status || 'completed') 
+    : transaction.status;
+
+  if (transaction.status === 'callback_failed') {
+    console.log(`[Callback] Retrying callback_failed transaction, original status was: ${originalStatus}`);
+  }
+
   updateTransactionById(transactionId, {
     status: 'callback',
     step: 'send_callback',
@@ -70,7 +78,7 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
     transaction_id: transactionId,
     meeting_id: meetingId,
     event_type: eventType,
-    status: transaction.status,
+    status: originalStatus,
     data: data,
     timestamp: now(),
   };
@@ -99,10 +107,14 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
         { attempt, statusCode: response.status }
       );
 
+      const finalStatus = originalStatus === 'compensating' ? 'failed' : originalStatus;
       updateTransactionById(transactionId, {
-        status: transaction.status === 'compensating' ? 'failed' : transaction.status,
+        status: finalStatus,
+        original_status: null,
         step: null,
       });
+
+      console.log(`[Callback] Transaction ${transactionId} final status: ${finalStatus}`);
 
       return {
         success: true,
@@ -133,9 +145,12 @@ async function sendCallback(transactionId, meetingId, eventType, data) {
 
   updateTransactionById(transactionId, {
     status: 'callback_failed',
+    original_status: originalStatus,
     retry_count: (transaction.retry_count || 0) + 1,
     error_message: lastError,
   });
+
+  console.log(`[Callback] Transaction ${transactionId} set to callback_failed, original status: ${originalStatus}`);
 
   return {
     success: false,

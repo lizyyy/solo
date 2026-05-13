@@ -41,8 +41,9 @@ app.listen(PORT, () => {
   console.log('');
   
   if (process.env.DISABLE_CALLBACK_SCHEDULER !== 'true') {
-    startCallbackRetryScheduler(60000);
-    console.log('[Scheduler] Callback retry scheduler started (60s interval)');
+    const intervalMs = parseInt(process.env.CALLBACK_SCHEDULER_INTERVAL) || 60000;
+    startCallbackRetryScheduler(intervalMs);
+    console.log(`[Scheduler] Callback retry scheduler started (${intervalMs}ms interval)`);
     console.log('');
   }
   

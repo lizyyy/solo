@@ -134,4 +134,21 @@ CREATE INDEX IF NOT EXISTS idx_meetings_time ON meetings(start_time, end_time);
 
 db.exec(tables);
 
+const migrations = [
+  `ALTER TABLE transactions ADD COLUMN original_status TEXT`,
+];
+
+for (const migration of migrations) {
+  try {
+    db.exec(migration);
+    console.log(`[DB Migration] Applied: ${migration.substring(0, 50)}...`);
+  } catch (err) {
+    if (err.message.includes('duplicate column name') || 
+        err.message.includes('already exists')) {
+    } else {
+      console.error('[DB Migration] Error:', err.message);
+    }
+  }
+}
+
 module.exports = db;

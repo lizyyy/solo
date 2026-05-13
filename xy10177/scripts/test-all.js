@@ -70,10 +70,10 @@ async function runTests() {
     console.log('[Setup] Cleaning up old database...');
     cleanupDatabase();
 
-    console.log('[Setup] Starting server on port 3001...');
+    console.log('[Setup] Starting server on port 3001 with callback scheduler (3s interval)...');
     server = spawn('node', ['src/server.js'], {
       cwd: path.join(__dirname, '..'),
-      env: { ...process.env, PORT: '3001', DISABLE_CALLBACK_SCHEDULER: 'true' },
+      env: { ...process.env, PORT: '3001', CALLBACK_SCHEDULER_INTERVAL: '3000' },
     });
 
     server.stdout.on('data', (data) => {
