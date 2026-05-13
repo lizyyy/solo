@@ -1,0 +1,635 @@
+{
+  "config": {
+    "max_connections": 5,
+    "queue_timeout_sec": 30.0,
+    "connection_timeout_sec": 5.0,
+    "concurrency_simulated": 100,
+    "slow_query_ratio": 0.0,
+    "slow_query_ms": 2000,
+    "normal_query_ms": 150,
+    "duration_sec": 12,
+    "actual_duration_sec": 12.627907991409302
+  },
+  "summary": {
+    "total_requests": 406,
+    "successful": 406,
+    "failed": 0,
+    "timeouts": 0,
+    "success_rate": 100.0,
+    "slow_queries_executed": 0,
+    "interrupted": false
+  },
+  "wait_time_stats": {
+    "min_ms": 0.0019073486328125,
+    "max_ms": 11665.010929107666,
+    "avg_ms": 2437.836840822192,
+    "median_ms": 1698.653221130371,
+    "p95_ms": 7579.186916351318,
+    "p99_ms": 8818.468153476715
+  },
+  "pool_snapshots": [
+    {
+      "timestamp": 1778713075.966326,
+      "active_connections": 5,
+      "waiting_requests": 90,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.0704901,
+      "active_connections": 5,
+      "waiting_requests": 98,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.175348,
+      "active_connections": 5,
+      "waiting_requests": 103,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.278922,
+      "active_connections": 5,
+      "waiting_requests": 106,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.382588,
+      "active_connections": 5,
+      "waiting_requests": 113,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.4871502,
+      "active_connections": 5,
+      "waiting_requests": 119,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.590741,
+      "active_connections": 5,
+      "waiting_requests": 122,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.6932359,
+      "active_connections": 5,
+      "waiting_requests": 128,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.796546,
+      "active_connections": 5,
+      "waiting_requests": 134,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713076.898415,
+      "active_connections": 5,
+      "waiting_requests": 138,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.003805,
+      "active_connections": 5,
+      "waiting_requests": 144,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.1088378,
+      "active_connections": 5,
+      "waiting_requests": 151,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.213561,
+      "active_connections": 5,
+      "waiting_requests": 154,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.316374,
+      "active_connections": 5,
+      "waiting_requests": 160,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.42047,
+      "active_connections": 5,
+      "waiting_requests": 167,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.52475,
+      "active_connections": 5,
+      "waiting_requests": 171,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.628971,
+      "active_connections": 5,
+      "waiting_requests": 177,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.733131,
+      "active_connections": 5,
+      "waiting_requests": 183,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.8373609,
+      "active_connections": 5,
+      "waiting_requests": 188,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713077.9408698,
+      "active_connections": 5,
+      "waiting_requests": 192,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.043539,
+      "active_connections": 5,
+      "waiting_requests": 199,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.145777,
+      "active_connections": 5,
+      "waiting_requests": 203,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.250876,
+      "active_connections": 5,
+      "waiting_requests": 207,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.353287,
+      "active_connections": 5,
+      "waiting_requests": 215,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.455263,
+      "active_connections": 5,
+      "waiting_requests": 219,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.5595672,
+      "active_connections": 5,
+      "waiting_requests": 223,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.6622741,
+      "active_connections": 5,
+      "waiting_requests": 231,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.766152,
+      "active_connections": 5,
+      "waiting_requests": 235,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.871198,
+      "active_connections": 5,
+      "waiting_requests": 239,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713078.975561,
+      "active_connections": 5,
+      "waiting_requests": 247,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.080152,
+      "active_connections": 5,
+      "waiting_requests": 252,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.182992,
+      "active_connections": 5,
+      "waiting_requests": 256,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.286114,
+      "active_connections": 5,
+      "waiting_requests": 263,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.3913379,
+      "active_connections": 5,
+      "waiting_requests": 266,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.496356,
+      "active_connections": 5,
+      "waiting_requests": 270,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.598289,
+      "active_connections": 5,
+      "waiting_requests": 277,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.702979,
+      "active_connections": 5,
+      "waiting_requests": 282,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.806627,
+      "active_connections": 5,
+      "waiting_requests": 286,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713079.907918,
+      "active_connections": 5,
+      "waiting_requests": 293,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.012324,
+      "active_connections": 5,
+      "waiting_requests": 298,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.115786,
+      "active_connections": 5,
+      "waiting_requests": 302,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.2207282,
+      "active_connections": 5,
+      "waiting_requests": 310,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.323267,
+      "active_connections": 5,
+      "waiting_requests": 315,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.427902,
+      "active_connections": 5,
+      "waiting_requests": 319,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.5322409,
+      "active_connections": 5,
+      "waiting_requests": 326,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.63625,
+      "active_connections": 5,
+      "waiting_requests": 331,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.741261,
+      "active_connections": 5,
+      "waiting_requests": 335,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.84581,
+      "active_connections": 5,
+      "waiting_requests": 341,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713080.948846,
+      "active_connections": 5,
+      "waiting_requests": 348,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.052973,
+      "active_connections": 5,
+      "waiting_requests": 352,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.1565282,
+      "active_connections": 5,
+      "waiting_requests": 357,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.261282,
+      "active_connections": 5,
+      "waiting_requests": 363,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.36484,
+      "active_connections": 5,
+      "waiting_requests": 368,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.469144,
+      "active_connections": 5,
+      "waiting_requests": 373,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.572381,
+      "active_connections": 5,
+      "waiting_requests": 379,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.675783,
+      "active_connections": 5,
+      "waiting_requests": 384,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.778024,
+      "active_connections": 5,
+      "waiting_requests": 390,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.880639,
+      "active_connections": 5,
+      "waiting_requests": 395,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713081.983465,
+      "active_connections": 5,
+      "waiting_requests": 400,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.0849159,
+      "active_connections": 5,
+      "waiting_requests": 405,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.1877189,
+      "active_connections": 5,
+      "waiting_requests": 407,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.291276,
+      "active_connections": 5,
+      "waiting_requests": 412,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.395468,
+      "active_connections": 5,
+      "waiting_requests": 417,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.4993951,
+      "active_connections": 5,
+      "waiting_requests": 423,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.60323,
+      "active_connections": 5,
+      "waiting_requests": 428,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.7074418,
+      "active_connections": 5,
+      "waiting_requests": 434,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.810427,
+      "active_connections": 5,
+      "waiting_requests": 439,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713082.912981,
+      "active_connections": 5,
+      "waiting_requests": 444,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.015594,
+      "active_connections": 5,
+      "waiting_requests": 449,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.11846,
+      "active_connections": 5,
+      "waiting_requests": 455,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.222958,
+      "active_connections": 5,
+      "waiting_requests": 460,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.3276632,
+      "active_connections": 5,
+      "waiting_requests": 464,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.4287481,
+      "active_connections": 5,
+      "waiting_requests": 471,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.533515,
+      "active_connections": 5,
+      "waiting_requests": 476,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.635264,
+      "active_connections": 5,
+      "waiting_requests": 479,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.737464,
+      "active_connections": 5,
+      "waiting_requests": 487,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.839926,
+      "active_connections": 5,
+      "waiting_requests": 491,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713083.944799,
+      "active_connections": 5,
+      "waiting_requests": 495,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.048332,
+      "active_connections": 5,
+      "waiting_requests": 503,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.1532521,
+      "active_connections": 5,
+      "waiting_requests": 507,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.257643,
+      "active_connections": 5,
+      "waiting_requests": 511,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.360138,
+      "active_connections": 5,
+      "waiting_requests": 518,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.464589,
+      "active_connections": 5,
+      "waiting_requests": 523,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.5668721,
+      "active_connections": 5,
+      "waiting_requests": 526,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.670959,
+      "active_connections": 5,
+      "waiting_requests": 534,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.773591,
+      "active_connections": 5,
+      "waiting_requests": 539,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.878187,
+      "active_connections": 5,
+      "waiting_requests": 543,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713084.982431,
+      "active_connections": 5,
+      "waiting_requests": 550,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.085005,
+      "active_connections": 5,
+      "waiting_requests": 555,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.189421,
+      "active_connections": 5,
+      "waiting_requests": 558,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.294358,
+      "active_connections": 5,
+      "waiting_requests": 566,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.397624,
+      "active_connections": 5,
+      "waiting_requests": 571,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.502124,
+      "active_connections": 5,
+      "waiting_requests": 575,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.6066282,
+      "active_connections": 5,
+      "waiting_requests": 582,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.710176,
+      "active_connections": 5,
+      "waiting_requests": 587,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.81112,
+      "active_connections": 5,
+      "waiting_requests": 591,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713085.916244,
+      "active_connections": 5,
+      "waiting_requests": 598,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713086.019468,
+      "active_connections": 5,
+      "waiting_requests": 603,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713086.1237068,
+      "active_connections": 5,
+      "waiting_requests": 606,
+      "free_connections": 0
+    },
+    {
+      "timestamp": 1778713086.2268941,
+      "active_connections": 5,
+      "waiting_requests": 612,
+      "free_connections": 0
+    }
+  ],
+  "timeout_analysis": {
+    "has_timeouts": false
+  }
+}
