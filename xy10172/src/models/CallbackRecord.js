@@ -132,8 +132,7 @@ callbackRecordSchema.statics.getStatuses = () => CALLBACK_STATUS;
 callbackRecordSchema.statics.getEvents = () => CALLBACK_EVENTS;
 
 callbackRecordSchema.methods.canRetry = function() {
-  return this.attemptCount < this.maxAttempts && 
-         [CALLBACK_STATUS.FAILED, CALLBACK_STATUS.PENDING].includes(this.status);
+  return this.attemptCount < this.maxAttempts;
 };
 
 callbackRecordSchema.methods.markProcessing = function() {

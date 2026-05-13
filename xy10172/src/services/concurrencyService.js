@@ -8,7 +8,7 @@ class LockManager {
   }
 
   generateLockKey(contractId, operation) {
-    return `lock:${contractId}:${operation}`;
+    return `lock:${contractId}`;
   }
 
   async acquireLock(contractId, operation, options = {}) {
