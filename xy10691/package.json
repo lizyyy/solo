@@ -1,0 +1,14 @@
+{
+  "name": "meeting-meal-system",
+  "version": "1.0.0",
+  "description": "园区会议访客餐核销系统",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && node server.js",
+    "client": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
