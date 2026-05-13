@@ -90,6 +90,7 @@ const initDatabase = () => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         main_order_id INTEGER NOT NULL,
         merged_order_id INTEGER NOT NULL,
+        merge_reason TEXT,
         merge_time DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (main_order_id) REFERENCES repair_orders(id),
         FOREIGN KEY (merged_order_id) REFERENCES repair_orders(id)

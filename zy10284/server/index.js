@@ -91,7 +91,7 @@ app.post('/api/repair-orders', async (req, res) => {
   const { dorm_id, student_name, student_phone, repair_type, description, images } = req.body;
   
   try {
-    const existingOrder = await new Promise((resolve, reject) => {
+    const mainOrder = await new Promise((resolve, reject) => {
       db.get(`
         SELECT ro.id, ro.order_no FROM repair_orders ro
         WHERE ro.dorm_id = ? AND ro.repair_type = ? AND ro.status != 'completed' AND ro.status != 'merged'
@@ -102,23 +102,35 @@ app.post('/api/repair-orders', async (req, res) => {
       });
     });
 
-    if (existingOrder) {
-      return res.json({ 
-        id: existingOrder.id, 
-        order_no: existingOrder.order_no, 
-        duplicated: true,
-        message: '该宿舍已有同类报修在处理中，请勿重复提交'
-      });
-    }
-
     const order_no = await generateOrderNo();
     
     db.run(`
       INSERT INTO repair_orders (order_no, dorm_id, student_name, student_phone, repair_type, description, images, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `, [order_no, dorm_id, student_name, student_phone, repair_type, description, images, 'pending'], function(err) {
+    `, [order_no, dorm_id, student_name, student_phone, repair_type, description, images, mainOrder ? 'merged' : 'pending'], function(err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, order_no, duplicated: false });
+      
+      const newOrderId = this.lastID;
+      
+      if (mainOrder) {
+        db.run(`
+          INSERT INTO merged_orders (main_order_id, merged_order_id, merge_reason)
+          VALUES (?, ?, ?)
+        `, [mainOrder.id, newOrderId, '同房间同类报修自动合并'], (mergeErr) => {
+          if (mergeErr) console.error('合并记录创建失败:', mergeErr);
+        });
+        
+        return res.json({ 
+          id: newOrderId, 
+          order_no, 
+          merged: true, 
+          merged_to: mainOrder.id,
+          merged_to_order_no: mainOrder.order_no,
+          message: '该宿舍已有同类报修在处理中，已合并到主工单'
+        });
+      }
+      
+      res.json({ id: newOrderId, order_no, merged: false });
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
