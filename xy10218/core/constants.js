@@ -9,6 +9,12 @@ const ISSUE_TYPE = {
     DURATION_EXCEED: 'duration_exceed',
     DURATION_WARNING: 'duration_warning',
     SINGLE_DURATION_EXCEED: 'single_duration_exceed',
+    DURATION_NAN: 'duration_nan',
+    DURATION_NEGATIVE: 'duration_negative',
+    DURATION_ZERO: 'duration_zero',
+    DURATION_EMPTY: 'duration_empty',
+    TITLE_EMPTY: 'title_empty',
+    TITLE_WHITESPACE: 'title_whitespace',
     SENSITIVE_WORD: 'sensitive_word',
     PUBLISH_BLOCKED: 'publish_blocked',
     WITHDRAW_SUCCESS: 'withdraw_success'

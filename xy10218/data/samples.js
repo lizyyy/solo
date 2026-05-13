@@ -154,6 +154,48 @@ const SAMPLES = {
                 }
             ]
         }
+    },
+    'dirty-data': {
+        id: 'dirty-data',
+        name: '🧪 脏数据测试样例',
+        description: '空标题、NaN、负数时长等非法值',
+        tag: 'tag-danger',
+        data: {
+            date: '2026-05-14',
+            slot: 'morning',
+            programs: [
+                {
+                    id: 'p1',
+                    title: '',
+                    duration: 10,
+                    content: '这是一个没有标题的节目'
+                },
+                {
+                    id: 'p2',
+                    title: '   ',
+                    duration: 15,
+                    content: '标题只有空白字符'
+                },
+                {
+                    id: 'p3',
+                    title: '非法时长节目',
+                    duration: -5,
+                    content: '时长为负数'
+                },
+                {
+                    id: 'p4',
+                    title: '零时长节目',
+                    duration: 0,
+                    content: '时长为0'
+                },
+                {
+                    id: 'p5',
+                    title: '正常节目',
+                    duration: 20,
+                    content: '这是一个正常的节目'
+                }
+            ]
+        }
     }
 };
 
@@ -201,6 +243,12 @@ const RULES = [
         description: '单个节目时长不超过30分钟'
     },
     {
+        id: 'duration-valid',
+        category: '时长',
+        icon: '🔢',
+        description: '时长必须是大于0的有效数字（非NaN、非负）'
+    },
+    {
         id: 'duration-total',
         category: '时长',
         icon: '📊',
@@ -211,6 +259,12 @@ const RULES = [
         category: '时长',
         icon: '⚠️',
         description: '总时长达到时段90%时发出警告'
+    },
+    {
+        id: 'title-required',
+        category: '标题',
+        icon: '📝',
+        description: '节目标题不能为空或纯空白字符'
     },
     {
         id: 'sensitive-scan',

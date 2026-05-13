@@ -111,8 +111,12 @@ const UI = {
                 </div>
                 <div class="check-result-detail">
                     <p><strong>输入：</strong>${result.input.slotName}时段 (${result.input.slotDisplay})，${result.input.programCount}个节目</p>
-                    <p><strong>输出：</strong>总时长${result.output.totalDuration}分钟 / 时段上限${result.output.slotMaxDuration}分钟 (${result.output.percentage}%)</p>
+                    <p><strong>输出：</strong>有效节目${result.output.validPrograms}个，无效节目${result.output.invalidPrograms}个，有效总时长${result.output.totalDuration}/${result.output.slotMaxDuration}分钟 (${result.output.percentage}%)</p>
                 </div>
+        `;
+
+        if (!result.hasInvalidData) {
+            html += `
                 <div class="duration-bar">
                     <div class="duration-bar-fill ${barClass}" style="width: ${Math.min(percentage, 100)}%"></div>
                 </div>
@@ -121,12 +125,20 @@ const UI = {
                     <span>警告阈值 (${result.output.slotWarningThreshold}分钟)</span>
                     <span>上限 (${result.output.slotMaxDuration}分钟)</span>
                 </div>
-        `;
+            `;
+        } else {
+            html += `
+                <div class="check-result-detail" style="margin-top: 12px; color: #dc3545;">
+                    <strong>⚠️ 检测到脏数据，所有非法值已记录到问题列表，发布门禁已锁定</strong>
+                </div>
+            `;
+        }
 
         if (result.failures.length > 0) {
-            html += `<div class="check-result-detail" style="margin-top: 16px;"><strong>❌ 失败原因：</strong></div>`;
-            result.failures.forEach(f => {
-                html += `<div class="check-result-detail">• ${f.message}</div>`;
+            html += `<div class="check-result-detail" style="margin-top: 16px;"><strong>❌ 失败原因（共${result.failures.length}项）：</strong></div>`;
+            result.failures.forEach((f, i) => {
+                const valueDisplay = f.value !== undefined ? ` [原始值: ${JSON.stringify(f.value)}]` : '';
+                html += `<div class="check-result-detail">[${i + 1}] • ${f.message}${valueDisplay}</div>`;
             });
         }
 
@@ -142,21 +154,32 @@ const UI = {
         if (result.details && result.details.length > 0) {
             html += `<div class="check-result" style="margin-top: 20px;">
                 <div class="check-result-header">
-                    <div class="check-result-title">📋 各节目时长详情</div>
+                    <div class="check-result-title">📋 各节目详细检查</div>
                 </div>
             `;
             result.details.forEach(detail => {
                 const detailStatus = detail.status === CHECK_STATUS.PASS ? 'status-pass' : 'status-fail';
-                const detailStatusText = detail.status === CHECK_STATUS.PASS ? '正常' : '超限';
+                const detailStatusText = detail.status === CHECK_STATUS.PASS ? '通过' : '失败';
+                const titleDisplay = detail.title || `(空标题 - 节目${detail.index})`;
+                
+                let issuesHtml = '';
+                if (detail.issues.length > 0) {
+                    issuesHtml = detail.issues.map(i => {
+                        const valueDisplay = i.value !== undefined ? 
+                            `<span style="font-family: monospace; color: #dc3545;">原始值: ${JSON.stringify(i.value)}</span>` : '';
+                        return `<div style="margin-top: 4px; color: #721c24;">• ${i.message} ${valueDisplay}</div>`;
+                    }).join('');
+                }
+                
                 html += `
                     <div class="program-check-item">
                         <div class="program-check-item-header">
-                            <span>${detail.index}. ${detail.title}</span>
+                            <span>${detail.index}. ${titleDisplay}</span>
                             <span class="check-result-status ${detailStatus}">${detailStatusText}</span>
                         </div>
                         <div class="check-result-detail">
-                            时长: ${detail.duration}分钟
-                            ${detail.issues.length > 0 ? ` (超限: ${detail.issues.map(i => i.message).join('; ')})` : ''}
+                            时长: <code>${JSON.stringify(detail.duration)}</code> (类型: ${typeof detail.duration})
+                            ${issuesHtml}
                         </div>
                     </div>
                 `;

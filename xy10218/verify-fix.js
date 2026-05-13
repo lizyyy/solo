@@ -1,3 +1,72 @@
+#!/usr/bin/env node
+
+const CHECK_STATUS = {
+    PASS: 'pass',
+    WARNING: 'warning',
+    FAIL: 'fail',
+    PENDING: 'pending'
+};
+
+const ISSUE_TYPE = {
+    DURATION_EXCEED: 'duration_exceed',
+    DURATION_WARNING: 'duration_warning',
+    SINGLE_DURATION_EXCEED: 'single_duration_exceed',
+    DURATION_NAN: 'duration_nan',
+    DURATION_NEGATIVE: 'duration_negative',
+    DURATION_ZERO: 'duration_zero',
+    DURATION_EMPTY: 'duration_empty',
+    TITLE_EMPTY: 'title_empty',
+    TITLE_WHITESPACE: 'title_whitespace',
+    SENSITIVE_WORD: 'sensitive_word',
+    PUBLISH_BLOCKED: 'publish_blocked',
+    WITHDRAW_SUCCESS: 'withdraw_success'
+};
+
+const ISSUE_LEVEL = {
+    ERROR: 'error',
+    WARNING: 'warning',
+    INFO: 'info'
+};
+
+const PUBLISH_STATUS = {
+    DRAFT: 'draft',
+    PUBLISHED: 'published',
+    WITHDRAWN: 'withdrawn'
+};
+
+const LOG_TYPE = {
+    INFO: 'info',
+    SUCCESS: 'success',
+    WARNING: 'warning',
+    ERROR: 'error'
+};
+
+const MAX_SINGLE_DURATION = 30;
+
+const TIME_SLOTS = {
+    'morning': {
+        name: '早间',
+        display: '07:00-08:00',
+        duration: 60,
+        warningThreshold: 55,
+        maxDuration: 60
+    },
+    'noon': {
+        name: '午间',
+        display: '12:00-12:30',
+        duration: 30,
+        warningThreshold: 27,
+        maxDuration: 30
+    },
+    'evening': {
+        name: '晚间',
+        display: '18:00-19:00',
+        duration: 60,
+        warningThreshold: 55,
+        maxDuration: 60
+    }
+};
+
 const DurationValidator = {
     MIN_DURATION: 1,
 
@@ -261,3 +330,185 @@ const DurationValidator = {
         return lines.join('\n');
     }
 };
+
+console.log('========================================');
+console.log('  校园广播节目单门禁修复验证');
+console.log('========================================\n');
+
+let allPassed = true;
+let testCount = 0;
+let passCount = 0;
+
+function runTest(name, testFn) {
+    testCount++;
+    console.log(`\n[测试 ${testCount}] ${name}`);
+    console.log('-'.repeat(50));
+    try {
+        const result = testFn();
+        if (result) {
+            passCount++;
+            console.log('✅ 通过');
+        } else {
+            allPassed = false;
+            console.log('❌ 失败');
+        }
+    } catch (e) {
+        allPassed = false;
+        console.log('❌ 异常:', e.message);
+    }
+}
+
+console.log('\n📋 测试场景 1: 空标题');
+runTest('空标题应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '', duration: 10, content: 'test' }]
+    });
+    const hasTitleEmpty = result.failures.some(f => f.type === ISSUE_TYPE.TITLE_EMPTY);
+    console.log('  status:', result.status);
+    console.log('  检测到空标题:', hasTitleEmpty);
+    console.log('  failures:', result.failures.map(f => f.type));
+    return result.status === CHECK_STATUS.FAIL && hasTitleEmpty;
+});
+
+console.log('\n📋 测试场景 2: 纯空白标题');
+runTest('纯空白标题应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '   ', duration: 10, content: 'test' }]
+    });
+    const hasWhitespace = result.failures.some(f => f.type === ISSUE_TYPE.TITLE_WHITESPACE);
+    console.log('  status:', result.status);
+    console.log('  检测到空白标题:', hasWhitespace);
+    return result.status === CHECK_STATUS.FAIL && hasWhitespace;
+});
+
+console.log('\n📋 测试场景 3: NaN时长');
+runTest('NaN时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: NaN, content: 'test' }]
+    });
+    const hasNaN = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_NAN);
+    console.log('  status:', result.status);
+    console.log('  检测到NaN:', hasNaN);
+    console.log('  failures:', result.failures.map(f => f.type));
+    return result.status === CHECK_STATUS.FAIL && hasNaN;
+});
+
+console.log('\n📋 测试场景 4: 负数时长');
+runTest('负数时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: -5, content: 'test' }]
+    });
+    const hasNegative = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_NEGATIVE);
+    console.log('  status:', result.status);
+    console.log('  检测到负数:', hasNegative);
+    return result.status === CHECK_STATUS.FAIL && hasNegative;
+});
+
+console.log('\n📋 测试场景 5: 0时长');
+runTest('0时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: 0, content: 'test' }]
+    });
+    const hasZero = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_ZERO);
+    console.log('  status:', result.status);
+    console.log('  检测到0时长:', hasZero);
+    return result.status === CHECK_STATUS.FAIL && hasZero;
+});
+
+console.log('\n📋 测试场景 6: 空时长');
+runTest('空时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: '', content: 'test' }]
+    });
+    const hasEmpty = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_EMPTY);
+    console.log('  status:', result.status);
+    console.log('  检测到空时长:', hasEmpty);
+    return result.status === CHECK_STATUS.FAIL && hasEmpty;
+});
+
+console.log('\n📋 测试场景 7: 字符串类型时长');
+runTest('字符串类型时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: '10', content: 'test' }]
+    });
+    const hasWrongType = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_NAN);
+    console.log('  status:', result.status);
+    console.log('  检测到类型错误:', hasWrongType);
+    return result.status === CHECK_STATUS.FAIL && hasWrongType;
+});
+
+console.log('\n📋 测试场景 8: 无穷大时长');
+runTest('无穷大时长应该被检测', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [{ id: 'p1', title: '测试', duration: Infinity, content: 'test' }]
+    });
+    const hasNaN = result.failures.some(f => f.type === ISSUE_TYPE.DURATION_NAN);
+    console.log('  status:', result.status);
+    console.log('  检测到无穷大:', hasNaN);
+    return result.status === CHECK_STATUS.FAIL && hasNaN;
+});
+
+console.log('\n📋 测试场景 9: 脏数据样例（综合测试）');
+runTest('脏数据样例应该检测出多个问题', () => {
+    const result = DurationValidator.validate({
+        date: '2026-05-14',
+        slot: 'morning',
+        programs: [
+            { id: 'p1', title: '', duration: 10, content: '空标题' },
+            { id: 'p2', title: '   ', duration: 15, content: '空白标题' },
+            { id: 'p3', title: '非法时长', duration: -5, content: '负数' },
+            { id: 'p4', title: '零时长', duration: 0, content: '0' },
+            { id: 'p5', title: '正常', duration: 20, content: '正常' }
+        ]
+    });
+    console.log('  status:', result.status);
+    console.log('  hasInvalidData:', result.hasInvalidData);
+    console.log('  有效节目:', result.output.validPrograms);
+    console.log('  无效节目:', result.output.invalidPrograms);
+    console.log('  failures数:', result.failures.length);
+    console.log('  问题类型:', result.failures.map(f => f.type));
+    return result.status === CHECK_STATUS.FAIL && 
+           result.hasInvalidData && 
+           result.failures.length >= 4 &&
+           result.output.invalidPrograms >= 4;
+});
+
+console.log('\n📋 测试场景 10: 正常数据应该通过');
+runTest('正常数据应该通过', () => {
+    const result = DurationValidator.validate({
+        slot: 'morning',
+        programs: [
+            { id: 'p1', title: '新闻', duration: 15, content: 'test' },
+            { id: 'p2', title: '音乐', duration: 20, content: 'test' }
+        ]
+    });
+    console.log('  status:', result.status);
+    console.log('  有效节目:', result.output.validPrograms);
+    console.log('  无效节目:', result.output.invalidPrograms);
+    return result.status === CHECK_STATUS.PASS && 
+           result.output.invalidPrograms === 0 &&
+           result.failures.length === 0;
+});
+
+console.log('\n\n========================================');
+console.log('  验证结果汇总');
+console.log('========================================');
+console.log(`总测试数: ${testCount}`);
+console.log(`通过数: ${passCount}`);
+console.log(`失败数: ${testCount - passCount}`);
+
+if (allPassed) {
+    console.log('\n🎉 所有测试通过！修复已生效。');
+    process.exit(0);
+} else {
+    console.log('\n❌ 部分测试失败，请检查修复。');
+    process.exit(1);
+}
