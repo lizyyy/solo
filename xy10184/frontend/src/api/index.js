@@ -58,8 +58,11 @@ export const attachmentApi = {
     api.post(`/attachments/${appealId}/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
-  download: (id) => 
-    `${import.meta.env.VITE_API_BASE || ''}/api/attachments/${id}/download`,
+  download: (id) => {
+    const token = localStorage.getItem('token');
+    const baseUrl = `${import.meta.env.VITE_API_BASE || ''}/api/attachments/${id}/download`;
+    return token ? `${baseUrl}?token=${encodeURIComponent(token)}` : baseUrl;
+  },
   delete: (id) => api.delete(`/attachments/${id}`)
 };
 
@@ -70,14 +73,22 @@ export const logApi = {
 
 export const exportApi = {
   exportAppeals: (params) => {
-    const queryString = new URLSearchParams(params).toString();
+    const token = localStorage.getItem('token');
+    const mergedParams = { ...params };
+    if (token) mergedParams.token = token;
+    const queryString = new URLSearchParams(mergedParams).toString();
     window.location.href = `/api/export/appeals?${queryString}`;
   },
   exportAppealDetail: (id) => {
-    window.location.href = `/api/export/appeal/${id}`;
+    const token = localStorage.getItem('token');
+    const queryString = token ? `?token=${encodeURIComponent(token)}` : '';
+    window.location.href = `/api/export/appeal/${id}${queryString}`;
   },
   exportLogs: (params) => {
-    const queryString = new URLSearchParams(params).toString();
+    const token = localStorage.getItem('token');
+    const mergedParams = { ...params };
+    if (token) mergedParams.token = token;
+    const queryString = new URLSearchParams(mergedParams).toString();
     window.location.href = `/api/logs/export?${queryString}`;
   }
 };
