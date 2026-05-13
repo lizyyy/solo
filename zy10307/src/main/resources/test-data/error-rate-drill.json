@@ -1,0 +1,23 @@
+{
+  "requestId": "error-rate-drill-001",
+  "planName": "错误率阈值演练",
+  "description": "测试错误率达到阈值自动停止",
+  "createdBy": "admin",
+  "targetApi": {
+    "path": "/api/payment/create",
+    "method": "POST",
+    "description": "支付创建接口"
+  },
+  "fallbackResponse": {
+    "httpStatus": 503,
+    "responseBody": "{\"code\":503,\"message\":\"服务暂不可用\",\"data\":null}",
+    "contentType": "application/json",
+    "delayMs": 50
+  },
+  "stopCondition": {
+    "conditionType": "ERROR_RATE",
+    "threshold": 0.05,
+    "metricName": "error_rate",
+    "durationSeconds": null
+  }
+}

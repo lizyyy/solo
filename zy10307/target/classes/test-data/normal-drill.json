@@ -1,0 +1,23 @@
+{
+  "requestId": "normal-drill-001",
+  "planName": "正常降级演练-订单查询接口",
+  "description": "测试订单查询接口的兜底降级逻辑",
+  "createdBy": "admin",
+  "targetApi": {
+    "path": "/api/order/query",
+    "method": "GET",
+    "description": "订单查询接口"
+  },
+  "fallbackResponse": {
+    "httpStatus": 200,
+    "responseBody": "{\"code\":200,\"message\":\"服务降级中，请稍后重试\",\"data\":[]}",
+    "contentType": "application/json",
+    "delayMs": 100
+  },
+  "stopCondition": {
+    "conditionType": "DURATION",
+    "threshold": null,
+    "metricName": null,
+    "durationSeconds": 30
+  }
+}

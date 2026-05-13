@@ -1,0 +1,23 @@
+{
+  "requestId": "invalid-drill-001",
+  "planName": "异常演练-缺少停止条件",
+  "description": "测试校验失败场景",
+  "createdBy": "admin",
+  "targetApi": {
+    "path": "/api/user/info",
+    "method": "GET",
+    "description": "用户信息接口"
+  },
+  "fallbackResponse": {
+    "httpStatus": 500,
+    "responseBody": "{\"code\":500,\"message\":\"内部服务器错误\"}",
+    "contentType": "application/json",
+    "delayMs": 0
+  },
+  "stopCondition": {
+    "conditionType": "DURATION",
+    "threshold": null,
+    "metricName": null,
+    "durationSeconds": -10
+  }
+}
