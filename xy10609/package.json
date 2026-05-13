@@ -1,0 +1,19 @@
+{
+  "name": "gov-material-precheck",
+  "version": "1.0.0",
+  "description": "政务材料预审补正系统",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon backend/server.js",
+    "client": "cd frontend && npm run dev",
+    "init": "node backend/scripts/initDB.js",
+    "build": "cd frontend && npm run build"
+  },
+  "keywords": ["gov", "material", "precheck"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
+  }
+}
