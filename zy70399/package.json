@@ -1,0 +1,15 @@
+{
+  "name": "noise-reduction-notification-api",
+  "version": "1.0.0",
+  "description": "服务级降噪通知 API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node tests/test-all.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.1"
+  }
+}
