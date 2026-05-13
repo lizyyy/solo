@@ -12,6 +12,8 @@
     "dev:web": "vite",
     "build": "npm run build:node && npm run build:web",
     "build:node": "tsc",
+    "build:server": "tsc",
+    "build:cli": "tsc",
     "build:web": "vite build",
     "start": "node dist/server/index.js",
     "test": "jest",

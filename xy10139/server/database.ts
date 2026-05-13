@@ -39,6 +39,7 @@ export function initDatabase() {
       updated_at TEXT NOT NULL,
       schema_id TEXT NOT NULL,
       source_file TEXT,
+      content_hash TEXT,
       results_file TEXT,
       report_file TEXT,
       errors TEXT,
@@ -70,7 +71,16 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_row_results_job_id ON row_results(job_id);
     CREATE INDEX IF NOT EXISTS idx_row_results_status ON row_results(status);
     CREATE INDEX IF NOT EXISTS idx_import_jobs_status ON import_jobs(status);
+    CREATE INDEX IF NOT EXISTS idx_import_jobs_content_hash ON import_jobs(content_hash);
   `)
+
+  try {
+    db.prepare('ALTER TABLE import_jobs ADD COLUMN content_hash TEXT').run()
+  } catch (e: any) {
+    if (!e.message.includes('duplicate column name')) {
+      console.warn('Warning during migration:', e.message)
+    }
+  }
 
   return db
 }

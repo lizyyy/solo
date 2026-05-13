@@ -87,10 +87,16 @@ program
 program
   .command('schemas')
   .description('列出可用的校验规则')
-  .action(() => {
+  .option('-j, --json', '输出 JSON 格式')
+  .action((options) => {
     try {
       const service = getImportService()
       const schemas = service.getSchemas()
+
+      if (options.json) {
+        console.log(JSON.stringify(schemas, null, 2))
+        return
+      }
 
       if (schemas.length === 0) {
         console.log(chalk.yellow('暂无校验规则'))

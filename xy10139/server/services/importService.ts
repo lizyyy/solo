@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 import path from 'path'
+import crypto from 'crypto'
 import { getDb } from '../database'
 import { fileParser } from './fileParser'
 import { validator } from './validator'
@@ -36,7 +37,9 @@ export class ImportService {
       throw new Error(`校验规则不存在: ${options.schemaId}`)
     }
 
-    const existingJob = this.findExistingJob(options)
+    const contentHash = this.getFileHash(options.filePath)
+
+    const existingJob = this.findExistingJob(contentHash, options.schemaId)
     if (existingJob) {
       return this.getJobWithSummary(existingJob.id)
     }
@@ -58,7 +61,7 @@ export class ImportService {
       sourceFile: options.filePath
     }
 
-    this.saveJob(job)
+    this.saveJob(job, contentHash)
 
     const context = validator.createContext(job.id, schema, parsed.rows)
     const rowResults: RowResult[] = []
@@ -90,24 +93,23 @@ export class ImportService {
     return { job, summary }
   }
 
-  private findExistingJob(options: ImportOptions): ImportJob | null {
-    const fileHash = this.getFileHash(options.filePath)
+  private findExistingJob(contentHash: string, schemaId: string): ImportJob | null {
     const stmt = this.db.prepare(`
       SELECT j.* FROM import_jobs j
-      WHERE j.source_file = ? AND j.schema_id = ? AND j.status = 'completed'
+      WHERE j.content_hash = ? AND j.schema_id = ? AND j.status = 'completed'
       ORDER BY j.created_at DESC
       LIMIT 1
     `)
     
-    const row: any = stmt.get(options.filePath, options.schemaId)
+    const row: any = stmt.get(contentHash, schemaId)
     if (!row) return null
 
     return this.mapJobFromRow(row)
   }
 
   private getFileHash(filePath: string): string {
-    const stats = fs.statSync(filePath)
-    return `${filePath}-${stats.size}-${stats.mtime.getTime()}`
+    const content = fs.readFileSync(filePath)
+    return crypto.createHash('sha256').update(content).digest('hex')
   }
 
   async retryFailed(jobId: string, rowIds?: string[], overrideData?: Record<string, Record<string, any>>): Promise<{
@@ -456,12 +458,12 @@ export class ImportService {
     }
   }
 
-  private saveJob(job: ImportJob): void {
+  private saveJob(job: ImportJob, contentHash?: string): void {
     const stmt = this.db.prepare(`
       INSERT INTO import_jobs (
         id, name, type, status, total_rows, success_count, failed_count,
-        skipped_count, created_at, updated_at, schema_id, source_file
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        skipped_count, created_at, updated_at, schema_id, source_file, content_hash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     stmt.run(
       job.id,
@@ -475,7 +477,8 @@ export class ImportService {
       job.createdAt,
       job.updatedAt,
       job.schemaId,
-      job.sourceFile || null
+      job.sourceFile || null,
+      contentHash || null
     )
   }
 

@@ -112,10 +112,12 @@
       </template>
 
       <el-table 
+        ref="tableRef"
         :data="filteredRows" 
         v-loading="loadingRows" 
         stripe
         max-height="500"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" v-if="activeTab === 'failed'" />
         <el-table-column prop="rowIndex" label="行号" width="80" fixed="left" />
@@ -225,6 +227,7 @@ const editDialogVisible = ref(false)
 const editingRow = ref<RowResult | null>(null)
 const editForm = ref<Record<string, any>>({})
 const selectedRows = ref<RowResult[]>([])
+const tableRef = ref<InstanceType<any> | null>(null)
 
 const typeLabels: Record<string, string> = {
   user: '用户',
@@ -278,6 +281,21 @@ const filteredRows = computed(() => {
 })
 
 onMounted(() => loadData())
+
+watch(activeTab, () => {
+  clearSelection()
+})
+
+function handleSelectionChange(rows: RowResult[]) {
+  selectedRows.value = rows
+}
+
+function clearSelection() {
+  selectedRows.value = []
+  if (tableRef.value) {
+    tableRef.value.clearSelection?.()
+  }
+}
 
 async function loadData() {
   const jobId = route.params.id as string
