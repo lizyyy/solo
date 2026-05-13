@@ -19,7 +19,10 @@
       "functionName": "login",
       "startLine": 6,
       "endLine": 18,
-      "testCases": []
+      "testCases": [
+        "TC-001",
+        "TC-002"
+      ]
     },
     {
       "path": "examples/src/authService.js",
@@ -33,14 +36,19 @@
       "functionName": "register",
       "startLine": 20,
       "endLine": 34,
-      "testCases": []
+      "testCases": [
+        "TC-003",
+        "TC-004"
+      ]
     },
     {
       "path": "examples/src/authService.js",
       "functionName": "verifyPassword",
       "startLine": 36,
       "endLine": 38,
-      "testCases": []
+      "testCases": [
+        "TC-002"
+      ]
     },
     {
       "path": "examples/src/authService.js",
@@ -57,11 +65,11 @@
       "testCases": []
     }
   ],
-  "lastUpdated": "2026-05-09T14:12:54.242Z",
+  "lastUpdated": "2026-05-13T03:48:04.246Z",
   "stats": {
     "totalFiles": 1,
     "totalCodePaths": 8,
-    "linkedCodePaths": 0,
+    "linkedCodePaths": 5,
     "parseErrors": 0
   }
 }
