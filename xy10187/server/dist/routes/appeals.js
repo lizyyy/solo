@@ -96,11 +96,12 @@ router.post('/', (req, res) => {
     }
     const now = new Date().toISOString();
     const id = (0, uuid_1.v4)();
+    const originalStatus = receipt.status;
     db_1.db.prepare(`
     INSERT INTO appeals (
-      id, receipt_id, appellant, appeal_type, reason, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
-  `).run(id, receipt_id, appellant, appeal_type, reason, now, now);
+      id, receipt_id, appellant, appeal_type, reason, status, original_status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)
+  `).run(id, receipt_id, appellant, appeal_type, reason, originalStatus, now, now);
     db_1.db.prepare(`
     UPDATE receipts SET status = 'appealed', updated_at = ? WHERE id = ?
   `).run(now, receipt_id);
@@ -110,7 +111,7 @@ router.post('/', (req, res) => {
   `).run((0, uuid_1.v4)(), receipt_id, receipt.status, 'appealed', appellant, `提交申诉: ${reason}`, now);
     res.json({
         success: true,
-        data: { id },
+        data: { id, original_status: originalStatus },
         message: '申诉提交成功'
     });
 });
@@ -137,6 +138,7 @@ router.put('/:id/handle', (req, res) => {
     WHERE id = ?
   `).run(status, handler, handle_result, now, id);
     const receipt = db_1.db.prepare('SELECT * FROM receipts WHERE id = ?').get(appeal.receipt_id);
+    const originalStatus = appeal.original_status || 'rejected';
     if (status === 'resolved' && approve) {
         db_1.db.prepare(`
       UPDATE receipts SET status = 'approved', updated_at = ? WHERE id = ?
@@ -145,7 +147,7 @@ router.put('/:id/handle', (req, res) => {
       INSERT INTO status_logs (id, receipt_id, old_status, new_status, operator, reason, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run((0, uuid_1.v4)(), appeal.receipt_id, 'appealed', 'approved', handler, `申诉通过: ${handle_result}`, now);
-        if (receipt.status === 'rejected') {
+        if (originalStatus === 'rejected' || originalStatus === 'duplicate') {
             const employee = db_1.db.prepare('SELECT * FROM employees WHERE id = ?').get(receipt.employee_id);
             const remaining = employee.monthly_allowance - employee.used_amount;
             if (remaining >= receipt.amount) {
@@ -154,7 +156,6 @@ router.put('/:id/handle', (req, res) => {
         }
     }
     else if (status === 'rejected' || (status === 'resolved' && !approve)) {
-        const originalStatus = receipt.status === 'appealed' ? 'rejected' : receipt.status;
         db_1.db.prepare(`
       UPDATE receipts SET status = ?, updated_at = ? WHERE id = ?
     `).run(originalStatus, now, appeal.receipt_id);

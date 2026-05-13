@@ -113,12 +113,13 @@ router.post('/', (req, res) => {
 
   const now = new Date().toISOString();
   const id = uuidv4();
+  const originalStatus = receipt.status;
 
   db.prepare(`
     INSERT INTO appeals (
-      id, receipt_id, appellant, appeal_type, reason, status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
-  `).run(id, receipt_id, appellant, appeal_type, reason, now, now);
+      id, receipt_id, appellant, appeal_type, reason, status, original_status, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)
+  `).run(id, receipt_id, appellant, appeal_type, reason, originalStatus, now, now);
 
   db.prepare(`
     UPDATE receipts SET status = 'appealed', updated_at = ? WHERE id = ?
@@ -131,7 +132,7 @@ router.post('/', (req, res) => {
 
   res.json({
     success: true,
-    data: { id },
+    data: { id, original_status: originalStatus },
     message: '申诉提交成功'
   });
 });
@@ -166,6 +167,7 @@ router.put('/:id/handle', (req, res) => {
   `).run(status, handler, handle_result, now, id);
 
   const receipt = db.prepare('SELECT * FROM receipts WHERE id = ?').get(appeal.receipt_id) as any;
+  const originalStatus = appeal.original_status || 'rejected';
 
   if (status === 'resolved' && approve) {
     db.prepare(`
@@ -177,7 +179,7 @@ router.put('/:id/handle', (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(uuidv4(), appeal.receipt_id, 'appealed', 'approved', handler, `申诉通过: ${handle_result}`, now);
 
-    if (receipt.status === 'rejected') {
+    if (originalStatus === 'rejected' || originalStatus === 'duplicate') {
       const employee = db.prepare('SELECT * FROM employees WHERE id = ?').get(receipt.employee_id) as any;
       const remaining = employee.monthly_allowance - employee.used_amount;
       if (remaining >= receipt.amount) {
@@ -185,7 +187,6 @@ router.put('/:id/handle', (req, res) => {
       }
     }
   } else if (status === 'rejected' || (status === 'resolved' && !approve)) {
-    const originalStatus = receipt.status === 'appealed' ? 'rejected' : receipt.status;
     db.prepare(`
       UPDATE receipts SET status = ?, updated_at = ? WHERE id = ?
     `).run(originalStatus, now, appeal.receipt_id);

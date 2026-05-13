@@ -88,6 +88,7 @@ function initDatabase() {
       appeal_type TEXT NOT NULL,
       reason TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
+      original_status TEXT,
       handler TEXT,
       handle_result TEXT,
       created_at TEXT NOT NULL,
@@ -103,4 +104,9 @@ function initDatabase() {
       created_at TEXT NOT NULL
     );
   `);
+    const columns = exports.db.prepare("PRAGMA table_info(appeals)").all();
+    const hasOriginalStatus = columns.some((col) => col.name === 'original_status');
+    if (!hasOriginalStatus) {
+        exports.db.exec("ALTER TABLE appeals ADD COLUMN original_status TEXT");
+    }
 }
