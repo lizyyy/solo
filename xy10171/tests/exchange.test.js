@@ -11,8 +11,9 @@ function getRandomSku() {
 describe('Exchange Service', () => {
   let targetSku;
 
-  beforeAll(async () => {
-    await initDb();
+  beforeAll(() => {
+    process.env.DB_PATH = ':memory:';
+    initDb();
   });
 
   beforeEach(() => {
@@ -229,5 +230,202 @@ describe('Exchange Service', () => {
     expect(() => {
       exchangeService.submitApply('NON-EXISTENT-ID');
     }).toThrow('换货单不存在');
+  });
+
+  describe('createExchange validation', () => {
+    test('should reject missing order_id', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku
+        });
+      }).toThrow('order_id 不能为空');
+    });
+
+    test('should reject empty order_id', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: '   ',
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku
+        });
+      }).toThrow('order_id 不能为空');
+    });
+
+    test('should reject missing original_sku', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          target_sku: targetSku
+        });
+      }).toThrow('original_sku 不能为空');
+    });
+
+    test('should reject missing target_sku', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-OLD'
+        });
+      }).toThrow('target_sku 不能为空');
+    });
+
+    test('should reject when original_sku equals target_sku', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-SAME',
+          target_sku: 'SKU-SAME'
+        });
+      }).toThrow('换货商品不能与原商品相同');
+    });
+
+    test('should reject invalid original_qty (negative)', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku,
+          original_qty: -1
+        });
+      }).toThrow('original_qty 必须是正整数');
+    });
+
+    test('should reject invalid original_qty (zero)', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku,
+          original_qty: 0
+        });
+      }).toThrow('original_qty 必须是正整数');
+    });
+
+    test('should reject invalid original_qty (decimal)', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku,
+          original_qty: 1.5
+        });
+      }).toThrow('original_qty 必须是正整数');
+    });
+
+    test('should reject invalid target_qty', () => {
+      expect(() => {
+        exchangeService.createExchange({
+          order_id: 'ORD-TEST',
+          original_sku: 'SKU-OLD',
+          target_sku: targetSku,
+          target_qty: 0
+        });
+      }).toThrow('target_qty 必须是正整数');
+    });
+
+    test('should use default qty of 1 when not provided', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-TEST-DEFAULT',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku
+      });
+      expect(exchange.original_qty).toBe(1);
+      expect(exchange.target_qty).toBe(1);
+    });
+
+    test('should trim whitespace from skus and order_id', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: '  ORD-TRIM  ',
+        original_sku: '  SKU-OLD-TRIM  ',
+        target_sku: `  ${targetSku}  `
+      });
+      expect(exchange.order_id).toBe('ORD-TRIM');
+      expect(exchange.original_sku).toBe('SKU-OLD-TRIM');
+      expect(exchange.target_sku).toBe(targetSku);
+    });
+  });
+
+  describe('calculatePriceDiff strict state check', () => {
+    test('should reject if state is not qc_passed', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-STATE-TEST',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      expect(() => {
+        exchangeService.calculatePriceDiff(exchange.id, 1000);
+      }).toThrow('Invalid state transition');
+
+      const after = exchangeService.getExchangeById(exchange.id);
+      expect(after.price_diff).toBe(0);
+      expect(after.status).toBe(EXCHANGE_STATUSES.PENDING_APPLY);
+    });
+
+    test('should reject invalid price_diff type', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-PRICE-TEST',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      expect(() => {
+        exchangeService.calculatePriceDiff(exchange.id, 'not a number');
+      }).toThrow('price_diff 必须是数字');
+    });
+
+    test('should reject NaN price_diff', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-PRICE-NAN',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      expect(() => {
+        exchangeService.calculatePriceDiff(exchange.id, NaN);
+      }).toThrow('price_diff 必须是数字');
+    });
+  });
+
+  describe('payDiff strict state check', () => {
+    test('should reject if state is not need_payment', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-PAY-TEST',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      exchangeService.submitApply(exchange.id);
+      exchangeService.shipBack(exchange.id);
+      exchangeService.passQC(exchange.id);
+      exchangeService.calculatePriceDiff(exchange.id, 5000);
+
+      exchangeService.payDiff(exchange.id, 5000);
+      
+      expect(() => {
+        exchangeService.payDiff(exchange.id, 0);
+      }).toThrow('Invalid state transition');
+
+      const after = exchangeService.getExchangeById(exchange.id);
+      expect(after.paid_amount).toBe(5000);
+    });
+
+    test('should reject invalid paid_amount type', () => {
+      const exchange = exchangeService.createExchange({
+        order_id: 'ORD-PAY-TYPE',
+        original_sku: 'SKU-OLD',
+        target_sku: targetSku,
+        reason: 'test'
+      });
+
+      expect(() => {
+        exchangeService.payDiff(exchange.id, 'invalid');
+      }).toThrow('paid_amount 必须是数字');
+    });
   });
 });

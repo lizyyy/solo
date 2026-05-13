@@ -1,5 +1,7 @@
-const { JSONFile, Low } = require('lowdb');
 const path = require('path');
+
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
 
 let db;
 let dbAdapter;
@@ -12,26 +14,19 @@ const DEFAULT_DATA = {
   exchange_status_logs: []
 };
 
-async function initDb() {
+function initDb() {
   const dbPath = process.env.DB_PATH || path.join(__dirname, '../../db.json');
-  const adapter = new JSONFile(dbPath);
-  dbAdapter = new Low(adapter);
-  
-  await dbAdapter.read();
-  
-  if (!dbAdapter.data) {
-    dbAdapter.data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-    await dbAdapter.write();
-  }
+  const adapter = new FileSync(dbPath);
+  dbAdapter = low(adapter);
   
   for (const key of Object.keys(DEFAULT_DATA)) {
-    if (!dbAdapter.data[key]) {
-      dbAdapter.data[key] = [];
+    if (!dbAdapter.has(key).value()) {
+      dbAdapter.set(key, []).write();
     }
   }
   
-  await dbAdapter.write();
-  db = dbAdapter.data;
+  dbAdapter.defaults(DEFAULT_DATA).write();
+  db = dbAdapter.value();
 }
 
 function getDb() {
@@ -41,18 +36,19 @@ function getDb() {
   return db;
 }
 
-async function persist() {
+function persist() {
   if (dbAdapter) {
-    await dbAdapter.write();
+    dbAdapter.write();
   }
 }
 
 function resetDb() {
-  const newData = JSON.parse(JSON.stringify(DEFAULT_DATA));
   if (dbAdapter) {
-    dbAdapter.data = newData;
+    for (const key of Object.keys(DEFAULT_DATA)) {
+      dbAdapter.set(key, []).write();
+    }
+    db = dbAdapter.value();
   }
-  db = newData;
 }
 
 function query(collectionName, filterFn = null) {

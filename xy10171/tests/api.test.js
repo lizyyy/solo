@@ -11,8 +11,9 @@ function getRandomSku() {
 describe('API Integration Tests', () => {
   let targetSku;
 
-  beforeAll(async () => {
-    await initDb();
+  beforeAll(() => {
+    process.env.DB_PATH = ':memory:';
+    initDb();
   });
 
   beforeEach(() => {

@@ -31,8 +31,9 @@ function createTestExchange() {
 }
 
 describe('State Machine', () => {
-  beforeAll(async () => {
-    await initDb();
+  beforeAll(() => {
+    process.env.DB_PATH = ':memory:';
+    initDb();
   });
 
   beforeEach(() => {

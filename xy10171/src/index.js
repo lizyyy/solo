@@ -32,8 +32,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-async function startServer() {
-  await initDb();
+function startServer() {
+  initDb();
   app.listen(PORT, () => {
     console.log(`换货状态机 API 服务已启动: http://localhost:${PORT}`);
     console.log(`健康检查: http://localhost:${PORT}/api/health`);

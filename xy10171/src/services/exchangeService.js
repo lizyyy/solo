@@ -46,22 +46,60 @@ function createExchange(payload) {
     order_id,
     original_sku,
     target_sku,
-    original_qty = 1,
-    target_qty = 1,
+    original_qty,
+    target_qty,
     reason = ''
   } = payload;
+
+  if (!order_id || typeof order_id !== 'string' || order_id.trim() === '') {
+    const error = new Error('order_id 不能为空');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
+  if (!original_sku || typeof original_sku !== 'string' || original_sku.trim() === '') {
+    const error = new Error('original_sku 不能为空');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
+  if (!target_sku || typeof target_sku !== 'string' || target_sku.trim() === '') {
+    const error = new Error('target_sku 不能为空');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
+  if (original_sku.trim() === target_sku.trim()) {
+    const error = new Error('换货商品不能与原商品相同');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
+  const origQty = original_qty !== undefined ? original_qty : 1;
+  if (!Number.isInteger(origQty) || origQty <= 0) {
+    const error = new Error('original_qty 必须是正整数');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
+  const tgtQty = target_qty !== undefined ? target_qty : 1;
+  if (!Number.isInteger(tgtQty) || tgtQty <= 0) {
+    const error = new Error('target_qty 必须是正整数');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
 
   const id = generateExchangeId();
   const now = new Date().toISOString();
 
   const exchange = insert('exchanges', {
     id,
-    order_id,
-    original_sku,
-    target_sku,
-    original_qty,
-    target_qty,
-    reason,
+    order_id: order_id.trim(),
+    original_sku: original_sku.trim(),
+    target_sku: target_sku.trim(),
+    original_qty: origQty,
+    target_qty: tgtQty,
+    reason: typeof reason === 'string' ? reason : '',
     status: EXCHANGE_STATUSES.PENDING_APPLY,
     price_diff: 0,
     paid_amount: 0,
@@ -98,6 +136,12 @@ function failQC(exchangeId) {
 }
 
 function calculatePriceDiff(exchangeId, priceDiff) {
+  if (typeof priceDiff !== 'number' || !Number.isFinite(priceDiff)) {
+    const error = new Error('price_diff 必须是数字');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
   const exchange = getExchangeById(exchangeId);
   if (!exchange) {
     const error = new Error('换货单不存在');
@@ -105,23 +149,54 @@ function calculatePriceDiff(exchangeId, priceDiff) {
     throw error;
   }
 
-  update(
-    'exchanges',
-    e => e.id === exchangeId,
-    {
-      price_diff: priceDiff,
-      updated_at: new Date().toISOString()
-    }
-  );
+  const targetStatus = priceDiff > 0 
+    ? EXCHANGE_STATUSES.NEED_PAYMENT 
+    : EXCHANGE_STATUSES.RESHIPPING;
 
-  if (priceDiff > 0) {
-    return stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.NEED_PAYMENT);
-  } else {
-    return stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.RESHIPPING);
+  if (!stateMachine.canTransition(exchange.status, targetStatus)) {
+    const error = new Error(`Invalid state transition: ${exchange.status} -> ${targetStatus}`);
+    error.code = ERROR_CODES.INVALID_STATE_TRANSITION;
+    throw error;
   }
+
+  let result = null;
+  transaction(() => {
+    update(
+      'exchanges',
+      e => e.id === exchangeId,
+      {
+        price_diff: priceDiff,
+        status: targetStatus,
+        updated_at: new Date().toISOString()
+      }
+    );
+
+    const remark = priceDiff > 0 
+      ? `计算差价，需补 ${priceDiff} 分` 
+      : '计算差价，无差价直接重发';
+    
+    insert('exchange_status_logs', {
+      id: Date.now(),
+      exchange_id: exchangeId,
+      from_status: exchange.status,
+      to_status: targetStatus,
+      remark,
+      created_at: new Date().toISOString()
+    });
+
+    result = getExchangeById(exchangeId);
+  });
+
+  return result;
 }
 
 function payDiff(exchangeId, paidAmount) {
+  if (typeof paidAmount !== 'number' || !Number.isFinite(paidAmount)) {
+    const error = new Error('paid_amount 必须是数字');
+    error.code = ERROR_CODES.INVALID_REQUEST_DATA;
+    throw error;
+  }
+
   const exchange = getExchangeById(exchangeId);
   if (!exchange) {
     const error = new Error('换货单不存在');
@@ -135,16 +210,39 @@ function payDiff(exchangeId, paidAmount) {
     throw error;
   }
 
-  update(
-    'exchanges',
-    e => e.id === exchangeId,
-    {
-      paid_amount: paidAmount,
-      updated_at: new Date().toISOString()
-    }
-  );
+  const targetStatus = EXCHANGE_STATUSES.PAID;
 
-  return stateMachine.transitionState(exchangeId, EXCHANGE_STATUSES.PAID);
+  if (!stateMachine.canTransition(exchange.status, targetStatus)) {
+    const error = new Error(`Invalid state transition: ${exchange.status} -> ${targetStatus}`);
+    error.code = ERROR_CODES.INVALID_STATE_TRANSITION;
+    throw error;
+  }
+
+  let result = null;
+  transaction(() => {
+    update(
+      'exchanges',
+      e => e.id === exchangeId,
+      {
+        paid_amount: paidAmount,
+        status: targetStatus,
+        updated_at: new Date().toISOString()
+      }
+    );
+
+    insert('exchange_status_logs', {
+      id: Date.now(),
+      exchange_id: exchangeId,
+      from_status: exchange.status,
+      to_status: targetStatus,
+      remark: `用户已支付差价 ${paidAmount} 分`,
+      created_at: new Date().toISOString()
+    });
+
+    result = getExchangeById(exchangeId);
+  });
+
+  return result;
 }
 
 function startReshipping(exchangeId) {

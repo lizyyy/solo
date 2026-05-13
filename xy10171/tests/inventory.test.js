@@ -12,8 +12,9 @@ function createTestExchange() {
 }
 
 describe('Inventory Service', () => {
-  beforeAll(async () => {
-    await initDb();
+  beforeAll(() => {
+    process.env.DB_PATH = ':memory:';
+    initDb();
   });
 
   beforeEach(() => {
