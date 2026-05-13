@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from alert_reducer.models import DutyHistory, Alert, EscalatedAlert
+from alert_reducer.models import DutyHistory, Alert, EscalatedAlert, MergedAlert
 
 
 class DutyManager:
@@ -45,18 +45,39 @@ class DutyManager:
             Alert.starts_at <= end_time
         ).count()
         
-        # 查询升级的告警
-        escalated_alerts = self.session.query(EscalatedAlert).filter(
-            EscalatedAlert.created_at >= start_time,
-            EscalatedAlert.created_at <= end_time
-        ).count()
+        # 查询升级的告警 - 基于关联告警的时间而不是创建时间
+        all_escalated = self.session.query(EscalatedAlert).all()
+        escalated_count = 0
+        
+        for e in all_escalated:
+            alert_time = None
+            
+            # 尝试获取关联告警的时间
+            if e.alert_id:
+                alert = self.session.query(Alert).filter(Alert.id == e.alert_id).first()
+                if alert:
+                    alert_time = alert.starts_at
+            elif e.merged_alert_id:
+                merged = self.session.query(MergedAlert).filter(
+                    MergedAlert.id == e.merged_alert_id
+                ).first()
+                if merged:
+                    alert_time = merged.starts_at
+            
+            # 如果没有时间信息，使用创建时间
+            if not alert_time:
+                alert_time = e.created_at
+            
+            # 检查时间范围
+            if start_time <= alert_time <= end_time:
+                escalated_count += 1
         
         # 计算平均响应时间（简单估算）
         response_time_avg = None
         
         return {
             'total_alerts': total_alerts,
-            'escalated_alerts': escalated_alerts,
+            'escalated_alerts': escalated_count,
             'response_time_avg': response_time_avg
         }
     

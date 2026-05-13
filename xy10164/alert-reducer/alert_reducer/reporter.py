@@ -411,14 +411,29 @@ class AlertReporter:
     def _get_suppressed_alerts(self, start_time: datetime = None,
                                 end_time: datetime = None) -> List[Dict[str, Any]]:
         """获取抑制的告警"""
-        query = self.session.query(SuppressedAlert)
+        # 获取所有抑制记录，然后在内存中根据关联告警的时间过滤
+        all_suppressed = self.session.query(SuppressedAlert).order_by(
+            SuppressedAlert.created_at.desc()
+        ).all()
         
-        if start_time:
-            query = query.filter(SuppressedAlert.created_at >= start_time)
-        if end_time:
-            query = query.filter(SuppressedAlert.created_at <= end_time)
-        
-        suppressed = query.order_by(SuppressedAlert.created_at.desc()).all()
+        # 如果没有时间范围，返回所有
+        if not start_time and not end_time:
+            suppressed = all_suppressed
+        else:
+            # 根据关联告警的时间过滤
+            suppressed = []
+            for s in all_suppressed:
+                alert = self.session.query(Alert).filter(Alert.id == s.alert_id).first()
+                alert_time = alert.starts_at if alert else s.created_at
+                
+                in_range = True
+                if start_time and alert_time < start_time:
+                    in_range = False
+                if end_time and alert_time > end_time:
+                    in_range = False
+                
+                if in_range:
+                    suppressed.append(s)
         
         result = []
         for s in suppressed:
@@ -481,14 +496,43 @@ class AlertReporter:
     def _get_batches(self, start_time: datetime = None,
                      end_time: datetime = None) -> List[ProcessBatch]:
         """获取处理批次"""
-        query = self.session.query(ProcessBatch)
+        # 批次数量通常很少，先获取所有批次，然后在内存中过滤
+        all_batches = self.session.query(ProcessBatch).order_by(
+            ProcessBatch.created_at.desc()
+        ).all()
         
-        if start_time:
-            query = query.filter(ProcessBatch.created_at >= start_time)
-        if end_time:
-            query = query.filter(ProcessBatch.created_at <= end_time)
+        # 如果没有时间范围，返回所有
+        if not start_time and not end_time:
+            return all_batches
         
-        return query.order_by(ProcessBatch.created_at.desc()).all()
+        # 根据批次的创建时间过滤
+        # 批次的创建时间应该在查询时间范围之后（因为批次是处理告警时创建的）
+        # 为了实用性，我们查找查询时间范围之后7天内创建的批次
+        # 或者简单地返回所有批次（因为批次数量通常很少）
+        # 这里我们采用一个更实用的方法：查找创建时间在查询时间范围之后30天内的批次
+        filtered_batches = []
+        for batch in all_batches:
+            batch_created = batch.created_at
+            
+            # 批次创建时间应该在查询时间之后（处理告警时创建批次）
+            # 允许批次在查询时间之后30天内创建
+            # 如果没有指定结束时间，使用当前时间
+            query_end = end_time or datetime.utcnow()
+            max_create_time = query_end + timedelta(days=30)
+            
+            # 批次创建时间应该 >= 查询开始时间（允许一定的延迟）
+            # 并且 <= 查询结束时间 + 30天
+            in_range = True
+            if start_time and batch_created < start_time - timedelta(days=1):
+                # 允许批次创建时间比查询开始时间早1天（处理前一天的告警）
+                in_range = False
+            if batch_created > max_create_time:
+                in_range = False
+            
+            if in_range:
+                filtered_batches.append(batch)
+        
+        return filtered_batches
     
     def _generate_suggestions(self, stats: Dict[str, Any], 
                                alerts: List[Alert]) -> List[str]:

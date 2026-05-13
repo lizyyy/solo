@@ -45,12 +45,16 @@ class AlertImporter:
     def _generate_alert_id(self, alert_data: Dict[str, Any]) -> str:
         """生成唯一的告警ID"""
         # 使用关键信息生成哈希
+        # 使用标准化后的字段名 starts_at，而不是原始的 startsAt
+        starts_at_value = alert_data.get('starts_at')
+        starts_at_str = starts_at_value.isoformat() if starts_at_value else ''
+        
         key_parts = [
             alert_data.get('alertname', ''),
             alert_data.get('severity', ''),
             alert_data.get('job', ''),
             alert_data.get('instance', ''),
-            alert_data.get('startsAt', '')
+            starts_at_str
         ]
         key = "|".join(key_parts)
         return str(uuid.uuid5(uuid.NAMESPACE_OID, key))
