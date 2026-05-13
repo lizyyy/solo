@@ -82,7 +82,8 @@ router.get('/:id', async (req, res, next) => {
     const offer = await db.get(`SELECT * FROM offers WHERE id = ?`, [req.params.id]);
 
     if (offer) {
-      res.json({ success: true, offer });
+      const populated = await populateOffer(offer);
+      res.json({ success: true, offer: populated });
     } else {
       res.status(404).json({ success: false, message: 'Offer 不存在' });
     }

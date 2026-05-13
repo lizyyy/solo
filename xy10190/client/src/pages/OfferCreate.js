@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Form, Input, Select, InputNumber, DatePicker, Transfer, Button, message, Space, Row, Col, Steps, Alert } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { getCandidates, getApprovers, createOffer, getOffer } from '../services/api';
+import { getCandidates, getApprovers, createOffer, getOffer, submitOffer } from '../services/api';
 
 function OfferCreate() {
   const navigate = useNavigate();
@@ -85,11 +85,15 @@ function OfferCreate() {
       
       if (response.success) {
         if (submitForApproval) {
-          message.success('Offer 已创建并提交审批');
+          const submitResp = await submitOffer(response.offer.id);
+          if (submitResp.success) {
+            message.success('Offer 已创建并提交审批');
+            navigate(`/offers/${response.offer.id}`);
+          }
         } else {
           message.success('Offer 已保存为草稿');
+          navigate(`/offers/${response.offer.id}`);
         }
-        navigate(`/offers/${response.offer.id}`);
       }
     } catch (error) {
       if (error.errorFields) {
