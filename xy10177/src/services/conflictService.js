@@ -1,6 +1,6 @@
 const db = require('../db');
 const { timesOverlap, AppError } = require('../utils');
-const { RESOURCE_TYPES } = require('./resourceService');
+const { RESOURCE_TYPES, getResource } = require('./resourceService');
 
 const BOOKING_STATUSES = {
   ACTIVE: 'active',
@@ -59,12 +59,24 @@ function checkAllResourcesAvailability(roomId, deviceId, cateringId, startTime, 
   };
 
   if (roomId) {
+    const room = getResource(RESOURCE_TYPES.ROOM, roomId);
+    if (!room) {
+      throw new AppError(`Room not found: ${roomId}`, 404, 'ROOM_NOT_FOUND');
+    }
     results.room = checkResourceAvailability(RESOURCE_TYPES.ROOM, roomId, startTime, endTime, excludeMeetingId);
   }
   if (deviceId) {
+    const device = getResource(RESOURCE_TYPES.DEVICE, deviceId);
+    if (!device) {
+      throw new AppError(`Device not found: ${deviceId}`, 404, 'DEVICE_NOT_FOUND');
+    }
     results.device = checkResourceAvailability(RESOURCE_TYPES.DEVICE, deviceId, startTime, endTime, excludeMeetingId);
   }
   if (cateringId) {
+    const catering = getResource(RESOURCE_TYPES.CATERING, cateringId);
+    if (!catering) {
+      throw new AppError(`Catering not found: ${cateringId}`, 404, 'CATERING_NOT_FOUND');
+    }
     results.catering = checkResourceAvailability(RESOURCE_TYPES.CATERING, cateringId, startTime, endTime, excludeMeetingId);
   }
 

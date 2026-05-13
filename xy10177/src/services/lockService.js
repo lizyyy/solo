@@ -45,31 +45,26 @@ function acquireLock(resourceType, resourceId, meetingId, transactionId, lockTyp
     }
   }
 
+  const cleanupStmt = db.prepare(`
+    DELETE FROM resource_locks
+    WHERE resource_type = ? AND resource_id = ? AND lock_type = ? AND status != ?
+  `);
+  cleanupStmt.run(resourceType, resourceId, lockType, LOCK_STATUSES.ACTIVE);
+
   const id = generateId();
   const expiresAt = addMinutes(now(), LOCK_DURATION_MINUTES);
   
-  try {
-    const stmt = db.prepare(`
-      INSERT INTO resource_locks (
-        id, resource_type, resource_id, meeting_id, transaction_id,
-        lock_type, status, expires_at, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    stmt.run(
-      id, resourceType, resourceId, meetingId, transactionId,
-      lockType, LOCK_STATUSES.ACTIVE, expiresAt, now(), now()
-    );
-    return getLock(id);
-  } catch (err) {
-    if (err.message.includes('UNIQUE')) {
-      throw new AppError(
-        `Resource ${resourceType}:${resourceId} is already locked for this operation`,
-        409,
-        'LOCK_CONFLICT'
-      );
-    }
-    throw err;
-  }
+  const stmt = db.prepare(`
+    INSERT INTO resource_locks (
+      id, resource_type, resource_id, meeting_id, transaction_id,
+      lock_type, status, expires_at, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  stmt.run(
+    id, resourceType, resourceId, meetingId, transactionId,
+    lockType, LOCK_STATUSES.ACTIVE, expiresAt, now(), now()
+  );
+  return getLock(id);
 }
 
 function getLock(id) {

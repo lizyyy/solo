@@ -19,6 +19,7 @@ const {
   cancelBookingsByMeeting,
   cancelMeeting,
 } = require('./meetingService');
+const { sendCallback } = require('./callbackService');
 
 const TRANSACTION_TYPES = {
   CREATE: 'create',
@@ -412,6 +413,22 @@ function executeRescheduleTransaction(meetingId, newData, actor = 'system') {
       actor
     );
 
+    if (newData.callback_url) {
+      setImmediate(() => {
+        sendCallback(
+          transaction.id,
+          meetingId,
+          TRANSACTION_TYPES.RESCHEDULE,
+          {
+            old: oldValues,
+            new: newValues,
+          }
+        ).catch(err => {
+          console.error('[Async Callback] Failed:', err);
+        });
+      });
+    }
+
     return {
       success: true,
       transaction_id: transaction.id,
@@ -547,6 +564,22 @@ function executeCancelTransaction(meetingId, actor = 'system', callbackUrl = nul
       { status: MEETING_STATUSES.CANCELLED },
       actor
     );
+
+    if (callbackUrl) {
+      setImmediate(() => {
+        sendCallback(
+          transaction.id,
+          meetingId,
+          TRANSACTION_TYPES.CANCEL,
+          {
+            cancelled_at: now(),
+            original_start_time: meeting.start_time,
+          }
+        ).catch(err => {
+          console.error('[Async Callback] Failed:', err);
+        });
+      });
+    }
 
     return {
       success: true,
