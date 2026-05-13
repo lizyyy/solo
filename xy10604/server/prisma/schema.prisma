@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  OPERATOR
+  AUDITOR
+  REVIEWER
+}
+
+enum ReagentStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  BLOCKED
+  DISCARDED
+}
+
+enum ExperimentStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+  REVIEWING
+  COMPLETED
+  CANCELLED
+}
+
+enum BlockReason {
+  EXPIRED
+  NEAR_EXPIRY
+  INVALID_BATCH
+  OPEN_DATE_INVALID
+  MANUAL_BLOCK
+}
+
+enum ReviewDecision {
+  APPROVE
+  REJECT
+  MODIFY
+}
+
+enum DiscardReason {
+  EXPIRED
+  CONTAMINATED
+  UNUSED
+  MANUAL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      UserRole @default(OPERATOR)
+  email     String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+  
+  reagentBatches   ReagentBatch[]   @relation("reagentBatches_createdBy")
+  openRecords      OpenRecord[]     @relation("openRecords_createdBy")
+  experiments      Experiment[]     @relation("experiments_createdBy")
+  reviews          ReviewRecord[]   @relation("reviews_reviewer")
+  discards         DiscardRecord[]  @relation("discards_createdBy")
+  auditLogs        AuditLog[]       @relation("auditLogs_user")
+  
+  @@map("users")
+}
+
+model Reagent {
+  id            String         @id @default(uuid())
+  name          String
+  code          String         @unique
+  description   String?
+  defaultExpiryDays Int        @default(30)
+  nearExpiryDays Int           @default(7)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  
+  batches       ReagentBatch[]
+  
+  @@map("reagents")
+}
+
+model ReagentBatch {
+  id              String         @id @default(uuid())
+  reagentId       String
+  batchNumber     String
+  productionDate  DateTime
+  expiryDate      DateTime
+  originalQty     Float
+  currentQty      Float
+  unit            String
+  status          ReagentStatus  @default(PENDING)
+  createdById     String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  
+  reagent         Reagent        @relation(fields: [reagentId], references: [id])
+  createdBy       User           @relation("reagentBatches_createdBy", fields: [createdById], references: [id])
+  openRecords     OpenRecord[]
+  experiments     Experiment[]
+  blockRecords    BlockRecord[]
+  reviewRecords   ReviewRecord[]
+  discardRecords  DiscardRecord[]
+  
+  @@unique([reagentId, batchNumber])
+  @@map("reagent_batches")
+}
+
+model OpenRecord {
+  id               String         @id @default(uuid())
+  batchId          String
+  openDate         DateTime
+  expectedExpiry   DateTime
+  actualExpiry     DateTime?
+  isOpened         Boolean        @default(true)
+  notes            String?
+  createdById      String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  batch            ReagentBatch   @relation(fields: [batchId], references: [id])
+  createdBy        User           @relation("openRecords_createdBy", fields: [createdById], references: [id])
+  experiments      Experiment[]
+  blockRecords     BlockRecord[]
+  reviewRecords    ReviewRecord[]
+  
+  @@map("open_records")
+}
+
+model Experiment {
+  id               String           @id @default(uuid())
+  name             String
+  code             String
+  batchId          String
+  openRecordId     String?
+  scheduledDate    DateTime
+  actualStartDate  DateTime?
+  actualEndDate    DateTime?
+  status           ExperimentStatus @default(PENDING)
+  createdById      String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  batch            ReagentBatch     @relation(fields: [batchId], references: [id])
+  openRecord       OpenRecord?      @relation(fields: [openRecordId], references: [id])
+  createdBy        User             @relation("experiments_createdBy", fields: [createdById], references: [id])
+  blockRecords     BlockRecord[]
+  reviewRecords    ReviewRecord[]
+  
+  @@map("experiments")
+}
+
+model BlockRecord {
+  id               String         @id @default(uuid())
+  batchId          String
+  openRecordId     String?
+  experimentId     String?
+  reason           BlockReason
+  details          String?
+  blockedAt        DateTime       @default(now())
+  isResolved       Boolean        @default(false)
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  resolutionNotes  String?
+  
+  batch            ReagentBatch   @relation(fields: [batchId], references: [id])
+  openRecord       OpenRecord?    @relation(fields: [openRecordId], references: [id])
+  experiment       Experiment?    @relation(fields: [experimentId], references: [id])
+  reviewRecords    ReviewRecord[]
+  
+  @@map("block_records")
+}
+
+model ReviewRecord {
+  id               String         @id @default(uuid())
+  batchId          String
+  openRecordId     String?
+  experimentId     String?
+  blockRecordId    String?
+  reviewerId       String
+  decision         ReviewDecision
+  reason           String
+  notes            String?
+  reviewedAt       DateTime       @default(now())
+  affectedRecords  Json?
+  
+  batch            ReagentBatch   @relation(fields: [batchId], references: [id])
+  openRecord       OpenRecord?    @relation(fields: [openRecordId], references: [id])
+  experiment       Experiment?    @relation(fields: [experimentId], references: [id])
+  blockRecord      BlockRecord?   @relation(fields: [blockRecordId], references: [id])
+  reviewer         User           @relation("reviews_reviewer", fields: [reviewerId], references: [id])
+  
+  @@map("review_records")
+}
+
+model DiscardRecord {
+  id               String         @id @default(uuid())
+  batchId          String
+  reason           DiscardReason
+  details          String?
+  discardedQty     Float
+  discardedAt      DateTime       @default(now())
+  createdById      String
+  createdAt        DateTime       @default(now())
+  
+  batch            ReagentBatch   @relation(fields: [batchId], references: [id])
+  createdBy        User           @relation("discards_createdBy", fields: [createdById], references: [id])
+  
+  @@map("discard_records")
+}
+
+model AuditLog {
+  id               String   @id @default(uuid())
+  action           String
+  entityType       String
+  entityId         String
+  oldValues        Json?
+  newValues        Json?
+  userId           String
+  timestamp        DateTime @default(now())
+  ipAddress        String?
+  userAgent        String?
+  requestInfo      Json?
+  
+  user             User     @relation("auditLogs_user", fields: [userId], references: [id])
+  
+  @@map("audit_logs")
+}

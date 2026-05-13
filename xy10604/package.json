@@ -1,0 +1,16 @@
+{
+  "name": "reagent-expiry-management",
+  "version": "1.0.0",
+  "description": "实验试剂开封效期管理系统",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "start": "cd server && npm start"
+  },
+  "keywords": ["reagent", "expiry", "management", "lab"],
+  "author": "",
+  "license": "MIT"
+}
