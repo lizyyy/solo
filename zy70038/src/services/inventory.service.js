@@ -38,14 +38,16 @@ class InventoryService {
   reserveStock(orderId, storeId, items) {
     const inventoryList = storage.getInventory();
     const stockOperations = storage.getStockOperations();
+    
     const results = [];
+    const pendingOperations = [];
     
     for (const item of items) {
       const index = inventoryList.findIndex(i => i.storeId === storeId && i.sku === item.sku);
       if (index === -1) {
         this._recordException(orderId, ExceptionType.STOCK_RESERVE_FAILED, 
           `商品 ${item.sku} 在门店 ${storeId} 不存在`, 
-          { sku: item.sku, storeId, quantity: item.quantity });
+          { sku: item.sku, storeId, quantity: item.quantity, orderId });
         results.push({ sku: item.sku, success: false, reason: '商品不存在' });
         continue;
       }
@@ -59,35 +61,37 @@ class InventoryService {
         this._recordException(orderId, ExceptionType.STOCK_RESERVE_FAILED, 
           reserveResult.reason, 
           { sku: item.sku, storeId, quantity: item.quantity, 
-            available: previousAvailable });
+            available: previousAvailable, orderId });
         results.push({ sku: item.sku, success: false, reason: reserveResult.reason });
         continue;
       }
       
       inventoryList[index] = inventory.toJSON();
       
-      stockOperations.push(new StockOperation({
-        operationId: generateStockRecordId(),
-        orderId: orderId,
-        storeId: storeId,
-        sku: item.sku,
-        quantity: item.quantity,
-        operationType: StockOperationType.RESERVE,
-        operator: 'system',
-        reason: '订单预留库存',
-        previousReserved: previousReserved,
-        previousAvailable: previousAvailable,
-        newReserved: inventory.reservedStock,
-        newAvailable: inventory.availableStock
-      }).toJSON());
+      pendingOperations.push({
+        index: index,
+        inventorySnapshot: inventory.toJSON(),
+        stockOp: new StockOperation({
+          operationId: generateStockRecordId(),
+          orderId: orderId,
+          storeId: storeId,
+          sku: item.sku,
+          quantity: item.quantity,
+          operationType: StockOperationType.RESERVE,
+          operator: 'system',
+          reason: '订单预留库存',
+          previousReserved: previousReserved,
+          previousAvailable: previousAvailable,
+          newReserved: inventory.reservedStock,
+          newAvailable: inventory.availableStock
+        })
+      });
       
       results.push({ sku: item.sku, success: true });
     }
     
-    storage.saveInventory(inventoryList);
-    storage.saveStockOperations(stockOperations);
-    
     const allSuccess = results.every(r => r.success);
+    
     if (!allSuccess) {
       return {
         success: false,
@@ -95,6 +99,13 @@ class InventoryService {
         details: results
       };
     }
+    
+    for (const op of pendingOperations) {
+      stockOperations.push(op.stockOp.toJSON());
+    }
+    
+    storage.saveInventory(inventoryList);
+    storage.saveStockOperations(stockOperations);
     
     return { success: true };
   }

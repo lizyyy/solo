@@ -1,13 +1,14 @@
 {
   "name": "self-pickup-timeout-service",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "到店自提超时释放服务 - 管理自提码、保留时长、超时释放、核销、客服延长和库存回补",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node tests/main-flow.test.js && node tests/boundary.test.js",
+    "test": "node tests/main-flow.test.js && node tests/boundary.test.js && node tests/consistency.test.js",
     "test:main": "node tests/main-flow.test.js",
-    "test:boundary": "node tests/boundary.test.js"
+    "test:boundary": "node tests/boundary.test.js",
+    "test:consistency": "node tests/consistency.test.js"
   },
   "engines": {
     "node": ">=16.0.0"

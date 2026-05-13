@@ -1,0 +1,115 @@
+[
+  {
+    "exceptionId": "EXP-MP4P23LT-1BAG",
+    "orderId": "ORD-MP4P23LT-Q2UTVX",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715121601,
+    "message": "商品 SKU-NOTEXIST 在门店 001 不存在",
+    "details": {
+      "sku": "SKU-NOTEXIST",
+      "storeId": "001",
+      "quantity": 1,
+      "orderId": "ORD-MP4P23LT-Q2UTVX"
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P23LU-ITDP",
+    "orderId": "ORD-MP4P23LT-Q2UTVX",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715121602,
+    "message": "订单创建失败：库存预留部分或全部失败",
+    "details": {
+      "orderId": "ORD-MP4P23LT-Q2UTVX",
+      "storeId": "001",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "quantity": 5
+        },
+        {
+          "sku": "SKU-NOTEXIST",
+          "quantity": 1
+        }
+      ],
+      "customerPhone": "13800138010",
+      "reserveDetails": [
+        {
+          "sku": "SKU-A001",
+          "success": true
+        },
+        {
+          "sku": "SKU-NOTEXIST",
+          "success": false,
+          "reason": "商品不存在"
+        }
+      ]
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P23LU-PIYN",
+    "orderId": "ORD-MP4P23LU-3ECER1",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715121602,
+    "message": "库存不足，可用: 50, 需要: 999",
+    "details": {
+      "sku": "SKU-B002",
+      "storeId": "001",
+      "quantity": 999,
+      "available": 50,
+      "orderId": "ORD-MP4P23LU-3ECER1"
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P23LU-FY2R",
+    "orderId": "ORD-MP4P23LU-3ECER1",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715121602,
+    "message": "订单创建失败：库存预留部分或全部失败",
+    "details": {
+      "orderId": "ORD-MP4P23LU-3ECER1",
+      "storeId": "001",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "quantity": 5
+        },
+        {
+          "sku": "SKU-B002",
+          "quantity": 999
+        }
+      ],
+      "customerPhone": "13800138011",
+      "reserveDetails": [
+        {
+          "sku": "SKU-A001",
+          "success": true
+        },
+        {
+          "sku": "SKU-B002",
+          "success": false,
+          "reason": "库存不足，可用: 50, 需要: 999"
+        }
+      ]
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  }
+]

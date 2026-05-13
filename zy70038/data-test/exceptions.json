@@ -1,0 +1,100 @@
+[
+  {
+    "exceptionId": "EXP-MP4P1NMZ-97XA",
+    "orderId": "ORD-MP4P1NMZ-CE4GJV",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715100907,
+    "message": "库存不足，可用: 100, 需要: 999",
+    "details": {
+      "sku": "SKU-A001",
+      "storeId": "001",
+      "quantity": 999,
+      "available": 100,
+      "orderId": "ORD-MP4P1NMZ-CE4GJV"
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P1NMZ-B4WR",
+    "orderId": "ORD-MP4P1NMZ-CE4GJV",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715100907,
+    "message": "订单创建失败：库存预留部分或全部失败",
+    "details": {
+      "orderId": "ORD-MP4P1NMZ-CE4GJV",
+      "storeId": "001",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "quantity": 999
+        }
+      ],
+      "customerPhone": "13800138002",
+      "reserveDetails": [
+        {
+          "sku": "SKU-A001",
+          "success": false,
+          "reason": "库存不足，可用: 100, 需要: 999"
+        }
+      ]
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P2188-TDXJ",
+    "orderId": "ORD-MP4P2188-T55KMH",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715118520,
+    "message": "库存不足，可用: 100, 需要: 999",
+    "details": {
+      "sku": "SKU-A001",
+      "storeId": "001",
+      "quantity": 999,
+      "available": 100,
+      "orderId": "ORD-MP4P2188-T55KMH"
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  },
+  {
+    "exceptionId": "EXP-MP4P2188-2ZVQ",
+    "orderId": "ORD-MP4P2188-T55KMH",
+    "exceptionType": "stock_reserve_failed",
+    "severity": "error",
+    "timestamp": 1778715118520,
+    "message": "订单创建失败：库存预留部分或全部失败",
+    "details": {
+      "orderId": "ORD-MP4P2188-T55KMH",
+      "storeId": "001",
+      "items": [
+        {
+          "sku": "SKU-A001",
+          "quantity": 999
+        }
+      ],
+      "customerPhone": "13800138002",
+      "reserveDetails": [
+        {
+          "sku": "SKU-A001",
+          "success": false,
+          "reason": "库存不足，可用: 100, 需要: 999"
+        }
+      ]
+    },
+    "resolved": false,
+    "resolvedAt": null,
+    "resolvedBy": null,
+    "resolutionNotes": null
+  }
+]

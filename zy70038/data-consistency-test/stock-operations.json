@@ -1,0 +1,62 @@
+[
+  {
+    "operationId": "STK-MP4P23LU-G2CG",
+    "orderId": "ORD-MP4P23LU-8IH4KT",
+    "storeId": "001",
+    "sku": "SKU-A001",
+    "quantity": 2,
+    "operationType": "reserve",
+    "timestamp": 1778715121602,
+    "operator": "system",
+    "reason": "订单预留库存",
+    "previousReserved": 0,
+    "previousAvailable": 100,
+    "newReserved": 2,
+    "newAvailable": 98
+  },
+  {
+    "operationId": "STK-MP4P23LU-QZPM",
+    "orderId": "ORD-MP4P23LU-8IH4KT",
+    "storeId": "001",
+    "sku": "SKU-B002",
+    "quantity": 1,
+    "operationType": "reserve",
+    "timestamp": 1778715121602,
+    "operator": "system",
+    "reason": "订单预留库存",
+    "previousReserved": 0,
+    "previousAvailable": 50,
+    "newReserved": 1,
+    "newAvailable": 49
+  },
+  {
+    "operationId": "STK-MP4P23LV-RXUA",
+    "orderId": "ORD-MP4P23LU-8IH4KT",
+    "storeId": "001",
+    "sku": "SKU-A001",
+    "quantity": 2,
+    "operationType": "deduct",
+    "timestamp": 1778715121603,
+    "operator": "system",
+    "reason": "订单核销扣减库存",
+    "previousReserved": 2,
+    "previousAvailable": 98,
+    "newReserved": 0,
+    "newAvailable": 98
+  },
+  {
+    "operationId": "STK-MP4P23LV-J6CS",
+    "orderId": "ORD-MP4P23LU-8IH4KT",
+    "storeId": "001",
+    "sku": "SKU-B002",
+    "quantity": 1,
+    "operationType": "deduct",
+    "timestamp": 1778715121603,
+    "operator": "system",
+    "reason": "订单核销扣减库存",
+    "previousReserved": 1,
+    "previousAvailable": 49,
+    "newReserved": 0,
+    "newAvailable": 49
+  }
+]

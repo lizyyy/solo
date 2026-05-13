@@ -1,0 +1,130 @@
+[
+  {
+    "orderId": "ORD-MP4P1NL9-KC2ZRX",
+    "storeId": "001",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "quantity": 2
+      },
+      {
+        "sku": "SKU-B002",
+        "quantity": 1
+      }
+    ],
+    "customerPhone": "13800138001",
+    "customerName": "张三",
+    "pickupCode": "519451",
+    "pickupCodeGeneratedAt": 1778715100845,
+    "holdTime": 7200000,
+    "createdAt": 1778715100845,
+    "expiresAt": 1778725900845,
+    "status": "picked_up",
+    "pickedUpAt": 1778715100846,
+    "pickedUpBy": "店员小李",
+    "timeoutReleasedAt": null,
+    "extensions": [
+      {
+        "extensionId": "EXT-MP4P1NLA-TX0Z",
+        "additionalTime": 3600000,
+        "extendedAt": 1778715100846,
+        "extendedBy": "客服小王",
+        "reason": "客户堵车，请求延长1小时",
+        "previousExpiresAt": 1778722300845,
+        "newExpiresAt": 1778725900845
+      }
+    ],
+    "totalHoldTime": 10800000,
+    "stockReserved": true,
+    "stockRestored": false
+  },
+  {
+    "orderId": "ORD-MP4P1NMZ-XZ4QHH",
+    "storeId": "001",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "quantity": 1
+      }
+    ],
+    "customerPhone": "13800138004",
+    "customerName": "超时测试用户",
+    "pickupCode": "128699",
+    "pickupCodeGeneratedAt": 1778715100908,
+    "holdTime": 2000,
+    "createdAt": 1778715100907,
+    "expiresAt": 1778715102907,
+    "status": "timeout_released",
+    "pickedUpAt": null,
+    "pickedUpBy": null,
+    "timeoutReleasedAt": 1778715103911,
+    "extensions": [],
+    "totalHoldTime": 2000,
+    "stockReserved": true,
+    "stockRestored": true
+  },
+  {
+    "orderId": "ORD-MP4P216H-LWS5WV",
+    "storeId": "001",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "quantity": 2
+      },
+      {
+        "sku": "SKU-B002",
+        "quantity": 1
+      }
+    ],
+    "customerPhone": "13800138001",
+    "customerName": "张三",
+    "pickupCode": "768643",
+    "pickupCodeGeneratedAt": 1778715118457,
+    "holdTime": 7200000,
+    "createdAt": 1778715118457,
+    "expiresAt": 1778725918457,
+    "status": "picked_up",
+    "pickedUpAt": 1778715118458,
+    "pickedUpBy": "店员小李",
+    "timeoutReleasedAt": null,
+    "extensions": [
+      {
+        "extensionId": "EXT-MP4P216I-BWIF",
+        "additionalTime": 3600000,
+        "extendedAt": 1778715118458,
+        "extendedBy": "客服小王",
+        "reason": "客户堵车，请求延长1小时",
+        "previousExpiresAt": 1778722318457,
+        "newExpiresAt": 1778725918457
+      }
+    ],
+    "totalHoldTime": 10800000,
+    "stockReserved": true,
+    "stockRestored": false
+  },
+  {
+    "orderId": "ORD-MP4P2188-6VCOR4",
+    "storeId": "001",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "quantity": 1
+      }
+    ],
+    "customerPhone": "13800138004",
+    "customerName": "超时测试用户",
+    "pickupCode": "794167",
+    "pickupCodeGeneratedAt": 1778715118520,
+    "holdTime": 2000,
+    "createdAt": 1778715118520,
+    "expiresAt": 1778715120520,
+    "status": "timeout_released",
+    "pickedUpAt": null,
+    "pickedUpBy": null,
+    "timeoutReleasedAt": 1778715121523,
+    "extensions": [],
+    "totalHoldTime": 2000,
+    "stockReserved": true,
+    "stockRestored": true
+  }
+]

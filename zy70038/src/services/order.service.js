@@ -39,10 +39,20 @@ class OrderService {
     );
     
     if (!reserveResult.success) {
+      this._recordException(orderId, ExceptionType.STOCK_RESERVE_FAILED,
+        '订单创建失败：库存预留部分或全部失败',
+        { 
+          orderId,
+          storeId: options.storeId,
+          items: options.items,
+          customerPhone: options.customerPhone,
+          reserveDetails: reserveResult.details
+        });
       return {
         success: false,
         reason: reserveResult.reason,
-        details: reserveResult.details
+        details: reserveResult.details,
+        orderId: orderId
       };
     }
     
@@ -55,9 +65,18 @@ class OrderService {
       order.pickupCodeGeneratedAt = Date.now();
     } catch (error) {
       inventoryService.restoreStock(orderId, options.storeId, options.items, '自提码生成失败，库存回滚');
+      this._recordException(orderId, ExceptionType.UNEXPECTED_ERROR,
+        '订单创建失败：自提码生成失败',
+        { 
+          orderId,
+          storeId: options.storeId,
+          error: error.message,
+          stockRolledBack: true
+        });
       return {
         success: false,
-        reason: error.message
+        reason: error.message,
+        orderId: orderId
       };
     }
     
@@ -214,6 +233,17 @@ class OrderService {
         order.items
       );
       order.stockRestored = restoreResult.success;
+      
+      if (!restoreResult.success) {
+        this._recordException(orderId, ExceptionType.STOCK_RESTORE_FAILED,
+          '超时释放后库存回补失败',
+          { 
+            orderId,
+            storeId: order.storeId,
+            items: order.items,
+            restoreDetails: restoreResult.details
+          });
+      }
     }
     
     const orders = storage.getOrders();

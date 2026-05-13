@@ -1,0 +1,31 @@
+[
+  {
+    "orderId": "ORD-MP4P23LU-8IH4KT",
+    "storeId": "001",
+    "items": [
+      {
+        "sku": "SKU-A001",
+        "quantity": 2
+      },
+      {
+        "sku": "SKU-B002",
+        "quantity": 1
+      }
+    ],
+    "customerPhone": "13800138012",
+    "customerName": "正常用户",
+    "pickupCode": "803336",
+    "pickupCodeGeneratedAt": 1778715121603,
+    "holdTime": 7200000,
+    "createdAt": 1778715121602,
+    "expiresAt": 1778722321602,
+    "status": "picked_up",
+    "pickedUpAt": 1778715121603,
+    "pickedUpBy": "店员测试",
+    "timeoutReleasedAt": null,
+    "extensions": [],
+    "totalHoldTime": 7200000,
+    "stockReserved": true,
+    "stockRestored": false
+  }
+]
