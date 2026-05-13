@@ -118,6 +118,8 @@ const updatePresetStatus = (presetId, newStatus, operator, comment = '') => {
 };
 
 const freezePreset = (presetId, operator) => {
+  const preset = getPresetById(presetId);
+  sceneService.checkSceneEditable(preset.sceneId);
   return updatePresetStatus(presetId, PresetStatus.FROZEN, operator);
 };
 
@@ -127,6 +129,8 @@ const activatePreset = (presetId, operator) => {
   if (preset.status !== PresetStatus.APPROVED && preset.status !== PresetStatus.FROZEN) {
     throw createBusinessError.invalidPresetStatus(preset.status, [PresetStatus.APPROVED, PresetStatus.FROZEN]);
   }
+  
+  sceneService.checkSceneEditable(preset.sceneId);
   
   const scene = database.scenes.get(preset.sceneId);
   
@@ -154,6 +158,8 @@ const rollbackPreset = (data) => {
   if (!scene) {
     throw createBusinessError.sceneNotFound(sceneId);
   }
+  
+  sceneService.checkSceneEditable(sceneId);
   
   const targetPreset = database.presets.get(targetPresetId);
   if (!targetPreset) {

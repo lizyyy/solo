@@ -5,8 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "test": "node direct-verify.js",
+    "direct-verify": "node direct-verify.js",
     "verify": "node simple-verify.js",
-    "test": "node tests/run-tests.js",
+    "test-http": "node tests/run-tests.js",
     "test-normal": "node tests/normal-flow.js",
     "test-abnormal": "node tests/abnormal-cases.js"
   },
