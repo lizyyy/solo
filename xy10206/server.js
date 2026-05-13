@@ -9,15 +9,20 @@ const approvalRoutes = require('./routes/approvalRoutes');
 const app = express();
 const HOST = '127.0.0.1';
 
-const PORT_RANGES = [
-  { start: 10000, end: 10100, name: '用户端口范围 (10000-10100)' },
-  { start: 8080, end: 8180, name: '常用端口范围 (8080-8180)' },
-  { start: 8888, end: 8988, name: '备用端口范围 (8888-8988)' },
-  { start: 3000, end: 3100, name: '开发端口范围 (3000-3100)' }
+const PORT_CANDIDATES = [
+  49152, 49153, 49154, 49155, 49156,
+  50000, 50001, 50002, 50003, 50004,
+  55000, 55001, 55002, 55003, 55004,
+  58000, 58001, 58002, 58003, 58004,
+  60000, 60001, 60002, 60003, 60004,
+  65000, 65001, 65002, 65003, 65004,
+  10000, 10001, 10002, 10003, 10004,
+  8080, 8081, 8082, 8083, 8084,
+  8888, 8889, 8890, 8891, 8892,
+  3000, 3001, 3002, 3003, 3004
 ];
 
-let currentRangeIndex = 0;
-let currentPort = 0;
+let portIndex = 0;
 
 app.use(express.json());
 
@@ -63,78 +68,92 @@ app.use((req, res) => {
   });
 });
 
-const getNextPort = () => {
-  if (currentRangeIndex >= PORT_RANGES.length) {
+const printSuccess = (port) => {
+  console.log(`\n========================================`);
+  console.log(`  舞台灯光预设回滚 API 已启动`);
+  console.log(`  监听地址: ${HOST}:${port}`);
+  console.log(`  服务地址: http://${HOST}:${port}`);
+  console.log(`  健康检查: http://${HOST}:${port}/health`);
+  console.log(`========================================\n`);
+  console.log(`示例场景已创建：`);
+  console.log(`  - 场景ID: scene-001`);
+  console.log(`  - 场景名: 《天鹅湖》第二幕 - 月夜湖畔`);
+  console.log(`  - 预设版本: v1.0.0 (已批准)、v2.0.0 (草稿)\n`);
+  console.log(`💡 提示：在其他终端使用此端口测试：`);
+  console.log(`   export API_PORT=${port}`);
+  console.log(`   curl http://${HOST}:${port}/health\n`);
+};
+
+const tryPort = (port) => {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, HOST, () => {
+      const actualPort = server.address().port;
+      resolve({ server, port: actualPort });
+    });
+    server.on('error', (err) => {
+      reject(err);
+    });
+  });
+};
+
+const tryPortZero = async () => {
+  console.log('📡 尝试让系统自动分配端口 (port=0)...');
+  try {
+    const result = await tryPort(0);
+    console.log(`✅ 系统自动分配端口成功: ${result.port}`);
+    printSuccess(result.port);
+    return result.server;
+  } catch (err) {
+    console.log(`❌ 自动分配端口失败: ${err.message}`);
     return null;
   }
-  
-  const range = PORT_RANGES[currentRangeIndex];
-  
-  if (currentPort === 0) {
-    currentPort = range.start;
-  } else {
-    currentPort++;
-  }
-  
-  if (currentPort > range.end) {
-    currentRangeIndex++;
-    currentPort = 0;
-    return getNextPort();
-  }
-  
-  return currentPort;
 };
 
-const tryStartServer = () => {
-  const port = getNextPort();
-  
-  if (!port) {
-    console.error('\n❌ 错误：无法找到可用端口');
-    console.error('请检查系统防火墙或端口限制设置');
-    process.exit(1);
-  }
-  
-  const range = PORT_RANGES[currentRangeIndex];
-  
-  const server = app.listen(port, HOST, () => {
-    const actualPort = server.address().port;
-    console.log(`\n========================================`);
-    console.log(`  舞台灯光预设回滚 API 已启动`);
-    console.log(`  监听地址: ${HOST}:${actualPort}`);
-    console.log(`  服务地址: http://${HOST}:${actualPort}`);
-    console.log(`  健康检查: http://${HOST}:${actualPort}/health`);
-    console.log(`========================================\n`);
-    console.log(`示例场景已创建：`);
-    console.log(`  - 场景ID: scene-001`);
-    console.log(`  - 场景名: 《天鹅湖》第二幕 - 月夜湖畔`);
-    console.log(`  - 预设版本: v1.0.0 (已批准)、v2.0.0 (草稿)\n`);
-    console.log(`💡 提示：在其他终端使用此端口测试：`);
-    console.log(`   export API_PORT=${actualPort}`);
-    console.log(`   curl http://${HOST}:${actualPort}/health\n`);
-  });
-
-  server.on('error', (err) => {
+const trySpecificPort = async (port) => {
+  console.log(`📡 尝试端口: ${port}`);
+  try {
+    const result = await tryPort(port);
+    console.log(`✅ 端口 ${port} 可用`);
+    printSuccess(result.port);
+    return result.server;
+  } catch (err) {
     if (err.code === 'EADDRINUSE') {
-      console.log(`端口 ${port} 已被占用，尝试下一个...`);
-      tryStartServer();
+      console.log(`⏭️  端口 ${port} 已被占用，尝试下一个...`);
     } else if (err.code === 'EPERM' || err.code === 'EACCES') {
-      console.log(`端口 ${port} 权限不足，尝试 ${range.name} 的其他端口...`);
-      tryStartServer();
+      console.log(`⏭️  端口 ${port} 权限不足，尝试下一个...`);
     } else {
-      console.error(`端口 ${port} 启动失败 (${err.code})，尝试下一个...`);
-      tryStartServer();
+      console.log(`⏭️  端口 ${port} 不可用 (${err.code})，尝试下一个...`);
     }
-  });
+    return null;
+  }
 };
 
-console.log('🚀 正在启动舞台灯光预设回滚 API...');
-console.log('🔍 正在寻找可用端口...');
+const startServer = async () => {
+  console.log('🚀 正在启动舞台灯光预设回滚 API...');
+  
+  const envPort = parseInt(process.env.PORT);
+  if (envPort && envPort > 0 && envPort < 65536) {
+    console.log(`📌 环境变量指定端口: ${envPort}`);
+    const result = await trySpecificPort(envPort);
+    if (result) return;
+    console.log(`⚠️  指定端口不可用，将尝试其他端口...`);
+  }
+  
+  console.log('🔍 正在寻找可用端口...');
+  
+  const portZeroResult = await tryPortZero();
+  if (portZeroResult) return;
+  
+  console.log('🔄 尝试常用端口范围...');
+  
+  for (const port of PORT_CANDIDATES) {
+    const result = await trySpecificPort(port);
+    if (result) return;
+  }
+  
+  console.error('\n❌ 错误：无法找到可用端口');
+  console.error('请检查系统防火墙或端口限制设置');
+  process.exit(1);
+};
 
-const envPort = parseInt(process.env.PORT);
-if (envPort) {
-  console.log(`📌 尝试使用环境变量指定的端口: ${envPort}`);
-  currentRangeIndex = -1;
-  currentPort = envPort - 1;
-}
-
-tryStartServer();
+startServer();
