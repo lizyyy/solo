@@ -260,11 +260,17 @@ export class Validator {
   }
 
   createContext(jobId: string, schema: ValidationSchema, allRows: Record<string, any>[]): ValidationContext {
+    const seenValues = new Map<string, Set<any>>()
+    
+    for (const row of allRows) {
+      this.updateSeenValues(row, schema, seenValues)
+    }
+    
     return {
       jobId,
       schema,
       allRows,
-      seenValues: new Map()
+      seenValues
     }
   }
 }

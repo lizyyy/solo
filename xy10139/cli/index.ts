@@ -235,8 +235,9 @@ program
       let rows: RowResult[]
       
       if (options.rows) {
-        const rowIds = options.rows.split(',').map((r: string) => r.trim())
-        rows = service.getFailedRows(jobId, rowIds)
+        const rowIndices = options.rows.split(',').map((r: string) => parseInt(r.trim()))
+        const allRows = service.getAllRows(jobId)
+        rows = allRows.filter(r => rowIndices.includes(r.rowIndex))
       } else if (options.success) {
         rows = service.getSuccessRows(jobId)
       } else if (options.all) {
@@ -323,9 +324,17 @@ program
         process.exit(1)
       }
 
-      const failedRows = options.rows 
-        ? service.getFailedRows(jobId, options.rows.split(',').map((r: string) => r.trim()))
-        : service.getFailedRows(jobId)
+      let failedRows: RowResult[]
+      let retryRowIds: string[] | undefined = undefined
+      
+      if (options.rows) {
+        const rowIndices = options.rows.split(',').map((r: string) => parseInt(r.trim()))
+        const allFailedRows = service.getFailedRows(jobId)
+        failedRows = allFailedRows.filter(r => rowIndices.includes(r.rowIndex))
+        retryRowIds = failedRows.map(r => r.id)
+      } else {
+        failedRows = service.getFailedRows(jobId)
+      }
 
       if (failedRows.length === 0) {
         console.log(chalk.green('没有失败的行需要重试'))
@@ -372,13 +381,9 @@ program
         })
       }
 
-      const rowIds = options.rows 
-        ? options.rows.split(',').map((r: string) => r.trim())
-        : undefined
-
       console.log(chalk.cyan(`\n正在重试 ${failedRows.length} 条记录...`))
 
-      const { job: updatedJob, summary } = await service.retryFailed(jobId, rowIds, overrideData)
+      const { job: updatedJob, summary } = await service.retryFailed(jobId, retryRowIds, overrideData)
 
       console.log(chalk.green('\n✓ 重试完成'))
       console.log(`\n统计:`)
