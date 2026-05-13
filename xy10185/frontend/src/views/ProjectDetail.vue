@@ -73,7 +73,8 @@
                   link 
                   @click="openApproveDialog(ms)" 
                   :icon="CircleCheck"
-                  :disabled="ms.payment_status === 'paid' || ms.payment_status === 'partial'"
+                  :disabled="!isMilestonePaymentApprovalAllowed(ms)"
+                  :title="isMilestonePaymentApprovalAllowed(ms) ? '' : (ms && checkMilestonePaymentTrigger(ms).details)"
                 >
                   审批付款
                 </el-button>
@@ -82,7 +83,8 @@
                   link 
                   @click="openConfirmDialog(ms)" 
                   :icon="Check"
-                  :disabled="ms.payment_status === 'paid'"
+                  :disabled="!isMilestonePaymentConfirmationAllowed(ms)"
+                  :title="isMilestonePaymentConfirmationAllowed(ms) ? '' : (ms && checkMilestonePaymentTrigger(ms).details)"
                 >
                   确认付款
                 </el-button>
@@ -920,6 +922,110 @@ function getTriggerSourceText(source) {
     manual: '手动操作'
   }
   return map[source] || source
+}
+
+function checkMilestonePaymentTrigger(ms) {
+  if (!ms) return { trigger_met: false, details: '未知里程碑' }
+  
+  const acceptedCount = (ms.deliverables || []).filter(d => d.status === 'accepted').length
+  const totalDeliverables = (ms.deliverables || []).length
+  const pendingReworkCount = (ms.deliverables || []).reduce((count, d) => {
+    return count + (d.rework_records || []).filter(r => r.status === 'pending').length
+  }, 0)
+  
+  let triggerMet = false
+  let details = ''
+  
+  const triggerType = ms.payment_trigger_type || 'all_accepted'
+  const acceptanceRate = totalDeliverables > 0 ? (acceptedCount / totalDeliverables) * 100 : 0
+  
+  let triggerCondition = {}
+  if (ms.payment_trigger_condition) {
+    try {
+      triggerCondition = typeof ms.payment_trigger_condition === 'string'
+        ? JSON.parse(ms.payment_trigger_condition)
+        : ms.payment_trigger_condition
+    } catch (e) {
+      triggerCondition = {}
+    }
+  }
+  
+  switch (triggerType) {
+    case 'all_accepted':
+      triggerMet = totalDeliverables > 0 && 
+                   acceptedCount === totalDeliverables && 
+                   pendingReworkCount === 0
+      details = triggerMet
+        ? '所有交付物已验收通过，且无待处理返工'
+        : `验收通过: ${acceptedCount}/${totalDeliverables}, 待返工: ${pendingReworkCount}`
+      break
+      
+    case 'no_rework_pending':
+      triggerMet = pendingReworkCount === 0
+      details = triggerMet
+        ? '无待处理的返工任务'
+        : `仍有 ${pendingReworkCount} 个返工任务待完成`
+      break
+      
+    case 'percentage_accepted':
+      const requiredPercentage = triggerCondition.percentage || 100
+      triggerMet = acceptanceRate >= requiredPercentage
+      details = triggerMet
+        ? `验收通过率 ${acceptanceRate.toFixed(1)}% >= ${requiredPercentage}%`
+        : `验收通过率 ${acceptanceRate.toFixed(1)}% < ${requiredPercentage}%`
+      break
+      
+    case 'manual':
+      triggerMet = ms.payment_approved === 1
+      details = triggerMet ? '已手动审批通过' : '等待手动审批'
+      break
+      
+    default:
+      triggerMet = false
+      details = '未知的付款触发类型'
+  }
+  
+  return {
+    trigger_met: triggerMet,
+    trigger_type: triggerType,
+    details
+  }
+}
+
+function isMilestonePaymentApprovalAllowed(ms) {
+  if (!ms) return false
+  
+  if (ms.payment_status === 'paid' || ms.payment_status === 'partial') {
+    return false
+  }
+  
+  const triggerType = ms.payment_trigger_type || 'all_accepted'
+  if (triggerType === 'manual') {
+    return true
+  }
+  
+  const triggerResult = checkMilestonePaymentTrigger(ms)
+  return triggerResult.trigger_met
+}
+
+function isMilestonePaymentConfirmationAllowed(ms) {
+  if (!ms) return false
+  
+  if (ms.payment_status === 'paid') {
+    return false
+  }
+  
+  if (ms.payment_status === 'partial') {
+    return true
+  }
+  
+  const triggerType = ms.payment_trigger_type || 'all_accepted'
+  if (triggerType === 'manual') {
+    return ms.payment_approved === 1
+  }
+  
+  const triggerResult = checkMilestonePaymentTrigger(ms)
+  return triggerResult.trigger_met
 }
 
 async function openPaymentDetail(ms) {

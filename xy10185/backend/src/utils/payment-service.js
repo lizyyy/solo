@@ -200,6 +200,18 @@ function approvePayment(milestoneId, operator, reason) {
     return { success: false, message: '该里程碑已付款' };
   }
   
+  const triggerType = milestone.payment_trigger_type || 'all_accepted';
+  
+  if (triggerType !== PAYMENT_TRIGGER_TYPES.MANUAL) {
+    const triggerResult = checkPaymentTrigger(milestone);
+    if (!triggerResult.trigger_met) {
+      return { 
+        success: false, 
+        message: `付款触发条件未满足：${triggerResult.details}` 
+      };
+    }
+  }
+  
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
   const beforeStatus = milestone.payment_status;
   
@@ -233,6 +245,24 @@ function confirmPayment(milestoneId, operator, reason) {
   
   if (milestone.payment_status === 'paid') {
     return { success: false, message: '该里程碑已付款' };
+  }
+  
+  if (milestone.payment_status === 'unpaid') {
+    const triggerType = milestone.payment_trigger_type || 'all_accepted';
+    
+    if (triggerType !== PAYMENT_TRIGGER_TYPES.MANUAL) {
+      const triggerResult = checkPaymentTrigger(milestone);
+      if (!triggerResult.trigger_met) {
+        return { 
+          success: false, 
+          message: `付款触发条件未满足：${triggerResult.details}` 
+        };
+      }
+    }
+    
+    if (triggerType === PAYMENT_TRIGGER_TYPES.MANUAL && milestone.payment_approved !== 1) {
+      return { success: false, message: '手动审批类型需要先审批付款' };
+    }
   }
   
   const now = dayjs().format('YYYY-MM-DD HH:mm:ss');
