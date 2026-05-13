@@ -7,7 +7,7 @@
     "log-scan": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test tests/"
+    "test": "node --test tests/*.js"
   },
   "keywords": ["log", "security", "scan", "cli", "脱敏"],
   "author": "",

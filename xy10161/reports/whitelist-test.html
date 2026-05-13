@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日志脱敏检查报告</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 2rem; max-width: 1200px; margin: 0 auto; background: #f5f5f5; }
+    .container { background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { color: #333; margin-bottom: 1.5rem; }
+    .status { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: bold; font-size: 1.2rem; }
+    .status.blocked { background: #fee; color: #c00; }
+    .status.passed { background: #efe; color: #070; }
+    .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .meta-item { background: #f8f9fa; padding: 1rem; border-radius: 4px; }
+    .meta-label { font-size: 0.85rem; color: #666; margin-bottom: 0.25rem; }
+    .meta-value { font-weight: bold; color: #333; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .summary-item { text-align: center; padding: 1rem; border-radius: 8px; }
+    .summary-item.critical { background: #fee; color: #c00; }
+    .summary-item.high { background: #fff3e0; color: #e65100; }
+    .summary-item.medium { background: #fff9c4; color: #f57f17; }
+    .summary-item.low { background: #e3f2fd; color: #1565c0; }
+    .summary-item.whitelisted { background: #f3e5f5; color: #6a1b9a; }
+    .summary-count { font-size: 1.5rem; font-weight: bold; }
+    .summary-label { font-size: 0.85rem; margin-top: 0.25rem; }
+    h2 { margin: 2rem 0 1rem; color: #333; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
+    .finding { background: #fafafa; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; border-left: 4px solid #ccc; }
+    .finding.critical { border-left-color: #c00; }
+    .finding.high { border-left-color: #e65100; }
+    .finding.medium { border-left-color: #f57f17; }
+    .finding.low { border-left-color: #1565c0; }
+    .finding-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .finding-title { font-weight: bold; color: #333; }
+    .finding-code { background: #eee; padding: 2px 8px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; }
+    .finding-detail { margin: 0.25rem 0; color: #555; }
+    .finding-match { background: #fff5f5; padding: 0.25rem 0.5rem; border-radius: 4px; font-family: monospace; }
+    pre { background: #f5f5f5; padding: 0.5rem; border-radius: 4px; overflow-x: auto; }
+    .block-codes { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .block-code { background: #ffcdd2; color: #b71c1c; padding: 0.5rem 1rem; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>日志脱敏检查报告</h1>
+    <div class="status passed">检查通过</div>
+
+    <div class="meta">
+      <div class="meta-item"><div class="meta-label">生成时间</div><div class="meta-value">2026-05-13T04:22:59.504Z</div></div>
+      <div class="meta-item"><div class="meta-label">扫描目标</div><div class="meta-value">samples/whitelist-only-test.txt</div></div>
+      <div class="meta-item"><div class="meta-label">扫描类型</div><div class="meta-value">full-check</div></div>
+      <div class="meta-item"><div class="meta-label">加载规则数</div><div class="meta-value">5</div></div>
+      <div class="meta-item"><div class="meta-label">白名单条目</div><div class="meta-value">2</div></div>
+      <div class="meta-item"><div class="meta-label">扫描文件数</div><div class="meta-value">1</div></div>
+    </div>
+
+    <h2>检查摘要</h2>
+    <div class="summary">
+      <div class="summary-item critical"><div class="summary-count">0</div><div class="summary-label">Critical</div></div>
+      <div class="summary-item high"><div class="summary-count">0</div><div class="summary-label">High</div></div>
+      <div class="summary-item medium"><div class="summary-count">0</div><div class="summary-label">Medium</div></div>
+      <div class="summary-item low"><div class="summary-count">0</div><div class="summary-label">Low</div></div>
+      <div class="summary-item whitelisted"><div class="summary-count">2</div><div class="summary-label">白名单</div></div>
+    </div>
+
+    
+
+    
+    <h2>白名单排除的问题</h2>
+        <div class="finding low">
+          <div class="finding-header">
+            <span class="finding-title">调试Token</span>
+            <span class="finding-code">已排除</span>
+          </div>
+          <div class="finding-detail"><strong>匹配:</strong> <span class="finding-match">token: internal-debug-token-12345</span></div>
+          <div class="finding-detail"><strong>原因:</strong> 内部测试 token，生产环境不会暴露</div>
+        </div>
+      
+        <div class="finding low">
+          <div class="finding-header">
+            <span class="finding-title">邮箱</span>
+            <span class="finding-code">已排除</span>
+          </div>
+          <div class="finding-detail"><strong>匹配:</strong> <span class="finding-match">test@example.com</span></div>
+          <div class="finding-detail"><strong>原因:</strong> 测试用例示例邮箱，安全无害</div>
+        </div>
+      
+  </div>
+</body>
+</html>

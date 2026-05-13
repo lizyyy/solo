@@ -8,6 +8,7 @@ const { RuleLoader } = require('./rules');
 const { Scanner } = require('./scanner');
 const { Whitelist } = require('./whitelist');
 const { ReportGenerator } = require('./report');
+const { StateManager } = require('./state');
 
 const program = new Command();
 
@@ -22,6 +23,7 @@ program
   .option('-f, --file <path>', '从文件加载规则')
   .option('-d, --dir <path>', '从目录加载规则')
   .option('--no-default', '不加载默认规则')
+  .option('--reset', '重置持久化状态，所有文件都会重新加载')
   .action((options) => {
     runRulesCommand(options);
   });
@@ -60,7 +62,13 @@ function runRulesCommand(options) {
   console.log(chalk.gray('─'.repeat(60)));
 
   const loader = new RuleLoader();
+  const stateManager = new StateManager();
   const results = [];
+
+  if (options.reset) {
+    stateManager.clear();
+    console.log(chalk.gray('⏹️  已重置持久化状态'));
+  }
 
   if (options.default !== false) {
     const result = loader.loadDefaultRules();
@@ -69,20 +77,23 @@ function runRulesCommand(options) {
   }
 
   if (options.file) {
-    const result = loader.loadFromFile(options.file);
+    const result = loadWithStateCheck(loader, stateManager, options.file);
     results.push({ type: 'file', ...result });
     printRuleLoadResult(result, `文件: ${options.file}`);
   }
 
   if (options.dir) {
-    const result = loader.loadFromDirectory(options.dir);
-    results.push({ type: 'dir', ...result });
-    if (result.success) {
-      result.files.forEach((f, i) => {
-        printRuleLoadResult(f, `文件 ${i + 1}: ${path.basename(f.filePath)}`);
-      });
+    const fs = require('fs');
+    const fullDir = path.resolve(options.dir);
+    if (!fs.existsSync(fullDir)) {
+      console.log(chalk.red(`❌ 目录加载失败: 目录不存在`));
     } else {
-      console.log(chalk.red(`❌ 目录加载失败: ${result.error}`));
+      const files = fs.readdirSync(fullDir).filter(f => f.endsWith('.json'));
+      for (let i = 0; i < files.length; i++) {
+        const filePath = path.join(fullDir, files[i]);
+        const result = loadWithStateCheck(loader, stateManager, filePath);
+        printRuleLoadResult(result, `文件 ${i + 1}: ${path.basename(filePath)}`);
+      }
     }
   }
 
@@ -114,6 +125,22 @@ function runRulesCommand(options) {
   console.log('');
 }
 
+function loadWithStateCheck(loader, stateManager, filePath) {
+  const isRepeat = stateManager.isRepeatLoad(filePath);
+  const hasChanged = stateManager.hasFileChanged(filePath);
+
+  const result = loader.loadFromFile(filePath);
+
+  if (result.success) {
+    stateManager.markLoaded(filePath);
+
+    result.isRepeat = isRepeat;
+    result.hasChanged = isRepeat && hasChanged;
+  }
+
+  return result;
+}
+
 function printRuleLoadResult(result, label) {
   if (!result.success) {
     console.log(chalk.red(`❌ ${label}: ${result.error}`));
@@ -127,7 +154,17 @@ function printRuleLoadResult(result, label) {
     if (result.hasChanged) {
       console.log(chalk.blue(`🔄 ${label}: 文件已更新，重新加载`));
     } else {
-      console.log(chalk.gray(`⏭️  ${label}: 重复导入，文件未变化，跳过`));
+      console.log(chalk.gray(`⏭️  ${label}: 重复导入，文件未变化（仍会加载规则）`));
+      if (result.invalid && result.invalid.length > 0) {
+        console.log(chalk.yellow(`⚠️  ${label}: ${result.invalid.length} 条规则无效`));
+        result.invalid.forEach(inv => {
+          console.log(chalk.yellow(`    - ${inv.key}: ${inv.reason}`));
+        });
+      }
+      if (result.disabled && result.disabled.length > 0) {
+        console.log(chalk.gray(`⏹️  ${label}: ${result.disabled.length} 条规则被禁用`));
+      }
+      return;
     }
   }
 
@@ -250,11 +287,13 @@ function handleScanResult(scanResult, whitelist, options) {
 
   const { allowed, excluded } = whitelist.filterFindings(scanResult.findings);
 
-  printScanResults(allowed, excluded, scanResult.stats);
+  const filteredStats = calculateFilteredStats(allowed);
+
+  printScanResults(allowed, excluded, filteredStats);
 
   const reportGen = new ReportGenerator();
   const report = reportGen.generate(
-    scanResult.stats,
+    filteredStats,
     allowed,
     excluded,
     {
@@ -283,14 +322,38 @@ function handleScanResult(scanResult, whitelist, options) {
     }
   }
 
-  const shouldExit = scanResult.stats.shouldBlock && options.block !== false;
+  const shouldExit = filteredStats.shouldBlock && options.block !== false;
   if (shouldExit) {
     console.log(chalk.red(`\n❌ 发现阻断级别问题，发布被阻断`));
-    console.log(chalk.red(`   阻断码: ${scanResult.stats.blockCodes.join(', ')}`));
+    console.log(chalk.red(`   阻断码: ${filteredStats.blockCodes.join(', ')}`));
     process.exit(1);
   }
 
   console.log(chalk.green('\n✅ 扫描完成'));
+}
+
+function calculateFilteredStats(findings) {
+  const stats = {
+    critical: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
+    total: findings.length,
+    byRule: {},
+    blockCodes: []
+  };
+
+  for (const f of findings) {
+    stats[f.severity]++;
+    stats.byRule[f.ruleId] = (stats.byRule[f.ruleId] || 0) + 1;
+    if (!stats.blockCodes.includes(f.blockCode)) {
+      stats.blockCodes.push(f.blockCode);
+    }
+  }
+
+  stats.shouldBlock = stats.critical > 0 || stats.high > 0;
+
+  return stats;
 }
 
 function printScanResults(allowed, excluded, stats) {
@@ -386,22 +449,22 @@ function runCheckCommand(target, options) {
   console.log(chalk.bold('📊 检查摘要:'));
   console.log(chalk.gray('─'.repeat(60)));
 
-  const stats = context.scanResult?.stats || {};
+  const filteredStats = context.filteredStats || calculateFilteredStats(context.allowed || []);
   console.log(`  扫描文件数: ${context.scanResult?.fileCount || 1}`);
   console.log(`  加载规则数: ${context.rulesCount || 0}`);
   console.log(`  白名单条目: ${context.whitelistCount || 0}`);
-  console.log(`  发现问题: ${stats.total || 0}`);
+  console.log(`  发现问题: ${context.scanResult?.stats?.total || 0}`);
   console.log(`  白名单排除: ${context.excluded?.length || 0}`);
-  console.log(`  有效问题: ${context.allowed?.length || 0}`);
+  console.log(`  有效问题: ${filteredStats.total || 0}`);
 
-  if (stats.blockCodes?.length > 0) {
-    console.log(`  阻断码: ${chalk.red(stats.blockCodes.join(', '))}`);
+  if (filteredStats.blockCodes?.length > 0) {
+    console.log(`  阻断码: ${chalk.red(filteredStats.blockCodes.join(', '))}`);
   }
 
-  const shouldBlock = stats.shouldBlock && options.block !== false;
+  const shouldBlock = filteredStats.shouldBlock && options.block !== false;
   if (shouldBlock) {
     console.log(chalk.red(`\n❌ 检查结果: 阻断发布`));
-    console.log(chalk.red(`   存在 Critical 或 High 级别的问题`));
+    console.log(chalk.red(`   存在 Critical 或 High 级别的有效问题`));
     process.exit(1);
   } else {
     console.log(chalk.green(`\n✅ 检查结果: 通过`));
@@ -476,6 +539,7 @@ function stepApplyWhitelist(ctx, options) {
   }
 
   const { allowed, excluded } = whitelist.filterFindings(ctx.scanResult.findings);
+  const filteredStats = calculateFilteredStats(allowed);
 
   console.log(`  白名单排除: ${excluded.length} 条`);
   console.log(`  有效问题: ${allowed.length} 条`);
@@ -484,6 +548,7 @@ function stepApplyWhitelist(ctx, options) {
   ctx.whitelistCount = whitelist.getEntries().length;
   ctx.allowed = allowed;
   ctx.excluded = excluded;
+  ctx.filteredStats = filteredStats;
 
   return { success: true };
 }
@@ -492,7 +557,7 @@ function stepGenerateReport(ctx, options, target) {
   const reportGen = new ReportGenerator();
 
   const report = reportGen.generate(
-    ctx.scanResult.stats,
+    ctx.filteredStats,
     ctx.allowed,
     ctx.excluded,
     {

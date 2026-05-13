@@ -133,13 +133,24 @@ log-scan rules -f config/bad-rules.json
 # - 2 条规则无效（invalidPattern 正则无效，missingPattern 缺少 pattern）
 # - 1 条规则被禁用（disabledRule）
 
-# 测试 4: 重复导入
+# 测试 4: 重复导入（状态会被持久化）
+# 首先重置状态，然后连续运行两次
+log-scan rules --reset -f config/rules.json
 log-scan rules -f config/rules.json
 
-# 预期输出:
-# - 显示"重复导入，文件未变化，跳过"
-# - 规则不会重复计数
-```
+# 预期输出（第一次）:
+# - 显示"已重置持久化状态"
+# - 显示"新增 1 条规则"、"更新 4 条规则"
+# - 显示 5 条规则列表（含银行卡号）
+
+# 预期输出（第二次）:
+# - 显示"重复导入，文件未变化（仍会加载规则）"
+# - 规则会被加载（显示 5 条规则）
+# - 状态会被持久化到临时文件
+
+# 测试 5: 查看持久化状态
+# 状态文件位置：系统临时目录下的 log-scan-state.json
+
 
 ### 步骤 3: 样例扫描测试
 
@@ -184,16 +195,30 @@ log-scan scan samples/log-sample-2.txt -r config/rules.json
 # - 手机号 (High)
 # - 邮箱 test@example.com (Medium)
 # - token internal-debug-token-12345 (Critical)
+# - 阻断码: BLOCK_BANKCARD, BLOCK_PHONE, BLOCK_EMAIL, BLOCK_TOKEN
+# - exit code: 1
 
-# 测试 2: 使用白名单扫描
+# 测试 2: 使用白名单扫描（关键验证！）
 log-scan scan samples/log-sample-2.txt -r config/rules.json -w config/whitelist.json
 
-# 预期输出:
+# 预期输出（白名单过滤后的数据）:
+# - 统计: Critical: 1, High: 1, Medium: 0
 # - 有效问题: 银行卡号、手机号
 # - 白名单排除: test@example.com、internal-debug-token-12345
+# - 阻断码: BLOCK_BANKCARD, BLOCK_PHONE（注意：不包含 BLOCK_EMAIL, BLOCK_TOKEN）
 # - 白名单原因会显示
 
-# 测试 3: 查看白名单效果报告
+# 测试 3: 所有问题都在白名单中（验证不会误阻断）
+log-scan scan samples/whitelist-only-test.txt -r config/rules.json -w config/whitelist.json
+
+# 预期输出（完全通过，不阻断）:
+# - 有效问题: 0
+# - 白名单排除: 2
+# - 无阻断码显示
+# - 显示"扫描完成"
+# - exit code: 0（关键！不会误阻断）
+
+# 测试 4: 查看白名单效果报告
 log-scan check samples/log-sample-2.txt -r config/rules.json -w config/whitelist.json -n whitelist-test
 # 然后打开 reports/whitelist-test.html 查看可视化报告
 ```

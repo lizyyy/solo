@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-13T04:22:59.504Z",
+  "version": "1.0.0",
+  "context": {
+    "scanTarget": "samples/whitelist-only-test.txt",
+    "scanType": "full-check",
+    "rulesLoaded": 5,
+    "whitelistEntries": 2,
+    "filesScanned": 1
+  },
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "total": 0,
+    "byRule": {},
+    "blockCodes": [],
+    "shouldBlock": false,
+    "whitelistedCount": 2
+  },
+  "findings": [],
+  "whitelisted": [
+    {
+      "ruleId": "token",
+      "ruleName": "调试Token",
+      "severity": "critical",
+      "blockCode": "BLOCK_TOKEN",
+      "match": "token: internal-debug-token-12345",
+      "source": "/Users/mac/pro/solo/workspaces/xy10161/samples/whitelist-only-test.txt",
+      "line": 3,
+      "column": 32,
+      "description": "常见调试 token 模式",
+      "whitelistReason": "内部测试 token，生产环境不会暴露"
+    },
+    {
+      "ruleId": "email",
+      "ruleName": "邮箱",
+      "severity": "medium",
+      "blockCode": "BLOCK_EMAIL",
+      "match": "test@example.com",
+      "source": "/Users/mac/pro/solo/workspaces/xy10161/samples/whitelist-only-test.txt",
+      "line": 2,
+      "column": 35,
+      "description": "电子邮箱地址",
+      "whitelistReason": "测试用例示例邮箱，安全无害"
+    }
+  ],
+  "shouldBlock": false,
+  "blockCodes": []
+}
