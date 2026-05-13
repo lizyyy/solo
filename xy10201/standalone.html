@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>牙科椅旁耗材补货台</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.6.1/dist/index.css">
+  <script src="https://cdn.jsdelivr.net/npm/element-plus@2.6.1/dist/index.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/element-plus@2.6.1/dist/locale/zh-cn.min.js"></script>
+  <script src="standalone-app.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif; background: #f0f2f5; }
+    #app { min-height: 100vh; display: flex; flex-direction: column; }
+    .sidebar { width: 220px; background: linear-gradient(180deg, #1e3a5f 0%, #0f2744 100%); color: white; padding: 20px 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; }
+    .sidebar h1 { font-size: 18px; font-weight: 600; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+    .sidebar .nav-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; transition: all 0.2s; color: rgba(255,255,255,0.8); }
+    .sidebar .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .sidebar .nav-item.active { background: #3b82f6; color: white; border-left: 4px solid #60a5fa; }
+    .sidebar .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+    .main { margin-left: 220px; flex: 1; }
+    .header { background: white; padding: 15px 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .header .operator { display: flex; align-items: center; gap: 12px; }
+    .header .operator .name { font-weight: 500; color: #374151; }
+    .header .operator select { padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+    .content { padding: 24px; }
+    .page-title { font-size: 22px; font-weight: 600; color: #1f2937; margin-bottom: 20px; }
+    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .card-title { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 4px solid; }
+    .stat-card.blue { border-left-color: #3b82f6; }
+    .stat-card.orange { border-left-color: #f59e0b; }
+    .stat-card.red { border-left-color: #ef4444; }
+    .stat-card.green { border-left-color: #10b981; }
+    .stat-value { font-size: 28px; font-weight: 700; color: #1f2937; }
+    .stat-label { font-size: 13px; color: #6b7280; margin-top: 4px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .tag-green { background: #d1fae5; color: #065f46; }
+    .tag-orange { background: #fef3c7; color: #92400e; }
+    .tag-red { background: #fee2e2; color: #991b1b; }
+    .tag-blue { background: #dbeafe; color: #1e40af; }
+    .tag-purple { background: #ede9fe; color: #5b21b6; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-group { display: flex; gap: 8px; }
+    .form-row { display: flex; gap: 16px; align-items: flex-end; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 500; color: #374151; }
+    .form-input { padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; width: 180px; }
+    .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151; border-bottom: 1px solid #e5e7eb; }
+    td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; font-size: 13px; color: #4b5563; }
+    tr:hover td { background: #f9fafb; }
+    .alert { padding: 12px 16px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+    .alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+    .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .empty { text-align: center; padding: 40px; color: #9ca3af; }
+    .binding-card { background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .binding-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e5e7eb; }
+    .binding-item:last-child { border-bottom: none; }
+    .flow-steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; }
+    .flow-step { padding: 8px 16px; border-radius: 20px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+    .flow-step.active { background: #3b82f6; color: white; }
+    .flow-step.done { background: #10b981; color: white; }
+    .flow-step.todo { background: #e5e7eb; color: #6b7280; }
+    .flow-arrow { color: #9ca3af; }
+    .timeline-item { padding: 12px 0; border-left: 2px solid #e5e7eb; padding-left: 20px; position: relative; }
+    .timeline-item::before { content: ''; position: absolute; left: -7px; top: 16px; width: 12px; height: 12px; border-radius: 50%; background: white; border: 3px solid #3b82f6; }
+    .json-preview { font-family: monospace; font-size: 11px; background: #f3f4f6; padding: 2px 6px; border-radius: 4px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .modal-header { padding: 16px 24px; border-bottom: 1px solid #e5e7eb; font-weight: 600; font-size: 16px; }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 8px; }
+    .blockage-card { border-left: 4px solid; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+    .blockage-card.high { border-left-color: #ef4444; background: #fef2f2; }
+    .blockage-card.medium { border-left-color: #f59e0b; background: #fffbeb; }
+    .blockage-card.low { border-left-color: #3b82f6; background: #eff6ff; }
+    .blockage-title { font-weight: 600; margin-bottom: 6px; }
+    .blockage-details { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+    .toast { padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .reset-btn { background: none; border: none; color: #9ca3af; cursor: pointer; padding: 4px 8px; font-size: 12px; }
+    .reset-btn:hover { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="sidebar">
+      <h1>🦷 牙科耗材管理</h1>
+      <div v-for="item in navItems" :key="item.key"
+           :class="['nav-item', { active: currentPage === item.key }]"
+           @click="currentPage = item.key">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span>{{ item.label }}</span>
+      </div>
+      <div style="margin-top: 20px; padding: 0 20px;">
+        <button class="reset-btn" @click="resetData">↻ 重置数据</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="header">
+        <div>
+          <div style="font-size: 18px; font-weight: 600; color: #1f2937;">牙科椅旁耗材补货台</div>
+          <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">{{ currentNavLabel }}</div>
+        </div>
+        <div class="operator">
+          <span>当前操作员：</span>
+          <select v-model="operator" @change="onOperatorChange">
+            <option v-for="u in operators" :key="u.name" :value="u.name">{{ u.name }} ({{ u.role }})</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="content">
+        <div v-if="currentPage === 'dashboard'">
+          <div class="stats-grid">
+            <div class="stat-card blue">
+              <div class="stat-value">{{ dashboard.totalMaterials }}</div>
+              <div class="stat-label">耗材总数</div>
+            </div>
+            <div class="stat-card orange">
+              <div class="stat-value">{{ dashboard.lowStockCount }}</div>
+              <div class="stat-label">库存不足</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-value">{{ dashboard.outOfStockCount }}</div>
+              <div class="stat-label">已断货</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-value">{{ dashboard.pendingRequests }}</div>
+              <div class="stat-label">待审核</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">业务流程状态</div>
+            <div class="flow-steps">
+              <div :class="['flow-step', getFlowStepClass('consumption')]">
+                <span>📋</span>
+                <span>库存检查</span>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div :class="['flow-step', getFlowStepClass('request')]">
+                <span>📝</span>
+                <span>补货申请</span>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div :class="['flow-step', getFlowStepClass('review')]">
+                <span>✅</span>
+                <span>审核通过</span>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div :class="['flow-step', getFlowStepClass('fulfill')]">
+                <span>📦</span>
+                <span>入库完成</span>
+              </div>
+            </div>
+            <div style="text-align: center; color: #6b7280; font-size: 14px;">
+              下一步：<strong style="color: #1f2937;">{{ flowStatus.next_action }}</strong>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">当前卡点</div>
+            <div v-if="blockages.length === 0" class="empty">
+              ✅ 暂无卡点，运营正常
+            </div>
+            <div v-else>
+              <div v-for="b in blockages" :key="b.type" :class="['blockage-card', b.severity]">
+                <div class="blockage-title">
+                  <span v-if="b.severity === 'high'">🔴</span>
+                  <span v-else-if="b.severity === 'medium'">🟠</span>
+                  <span v-else>🔵</span>
+                  {{ b.title }}
+                </div>
+                <div class="blockage-details">{{ b.message }}</div>
+                <div v-if="b.details && b.details.length > 0" class="blockage-details">
+                  {{ b.details.join('、') }}
+                </div>
+                <div style="font-size: 12px; color: #3b82f6; font-weight: 500;">
+                  处理建议：{{ b.action }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">最近历史</div>
+            <table v-if="recentConsumption.length > 0">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>类型</th>
+                  <th>耗材</th>
+                  <th>数量</th>
+                  <th>金额</th>
+                  <th>操作人</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in recentConsumption" :key="r.id">
+                  <td>{{ r.created_at }}</td>
+                  <td>
+                    <span :class="['tag', r.consumption_type === 'TREATMENT' ? 'tag-blue' : 'tag-green']">
+                      {{ r.consumption_type === 'TREATMENT' ? '诊疗消耗' : '手动消耗' }}
+                    </span>
+                  </td>
+                  <td>{{ r.material_name }}</td>
+                  <td style="color: #ef4444;">-{{ r.quantity }}{{ r.unit }}</td>
+                  <td>¥{{ r.total_amount.toFixed(2) }}</td>
+                  <td>{{ r.operator }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="empty">暂无消耗记录</div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'treatments'">
+          <div class="page-title">诊疗项目管理</div>
+          <div class="card">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">科室</label>
+                <select class="form-input" v-model="treatmentFilter.dept">
+                  <option value="">全部科室</option>
+                  <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>项目名称</th>
+                  <th>科室</th>
+                  <th>绑定耗材数</th>
+                  <th>库存状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="t in filteredTreatments" :key="t.id">
+                  <td>{{ t.code }}</td>
+                  <td><strong>{{ t.name }}</strong></td>
+                  <td>{{ t.department_name }}</td>
+                  <td>{{ getBindingCount(t.id) }} 种</td>
+                  <td>
+                    <span v-if="getTreatmentStockCheck(t.id).canExecute" class="tag tag-green">可执行</span>
+                    <span v-else class="tag tag-orange">
+                      缺{{ getTreatmentStockCheck(t.id).insufficientCount }}种
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-primary" @click="showTreatmentDetail(t)">查看绑定</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'consumption'">
+          <div class="page-title">耗材消耗</div>
+
+          <div class="card">
+            <div class="card-title">📋 按诊疗项目消耗（推荐）</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">科室</label>
+                <select class="form-input" v-model="consumptionForm.dept">
+                  <option value="">请选择</option>
+                  <option v-for="d in departments" :key="d.id" :value="d.id">{{ d.name }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">诊疗项目</label>
+                <select class="form-input" v-model="consumptionForm.treatment" :disabled="!consumptionForm.dept">
+                  <option value="">请选择</option>
+                  <option v-for="t in treatmentsByDept" :key="t.id" :value="t.id">{{ t.name }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">患者数量</label>
+                <input type="number" class="form-input" v-model.number="consumptionForm.patientCount" min="1" max="10" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">患者姓名</label>
+                <input type="text" class="form-input" v-model="consumptionForm.patientName" placeholder="可选" />
+              </div>
+            </div>
+
+            <div v-if="consumptionForm.treatment" class="binding-card">
+              <div style="font-weight: 600; margin-bottom: 12px;">耗材清单</div>
+              <div v-for="b in treatmentBindings" :key="b.material_id" class="binding-item">
+                <span>
+                  {{ b.material_name }}
+                  <span v-if="b.stock_status !== 'NORMAL'" :style="{ color: b.stock_color }">
+                    ({{ b.stock_label }})
+                  </span>
+                </span>
+                <span>
+                  需要 <strong>{{ b.quantity * consumptionForm.patientCount }}{{ b.unit }}</strong>
+                  (库存: {{ b.current_stock }}{{ b.unit }})
+                </span>
+              </div>
+
+              <div v-if="!treatmentStockCheck.canExecute" class="alert alert-danger" style="margin-top: 12px;">
+                ⚠️ 库存不足：{{ treatmentStockCheck.insufficientCount }} 种耗材无法满足需求，无法执行消耗
+                <br />
+                <span style="font-size: 11px;">
+                  缺少：{{ treatmentStockCheck.insufficientItems.map(i => i.material_name).join('、') }}
+                </span>
+              </div>
+            </div>
+
+            <button class="btn btn-success" @click="executeConsumption"
+                    :disabled="!treatmentStockCheck.canExecute || !consumptionForm.treatment">
+              执行消耗
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">✋ 手动消耗（单种耗材）</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">耗材</label>
+                <select class="form-input" v-model="manualForm.material">
+                  <option value="">请选择</option>
+                  <option v-for="m in materials" :key="m.id" :value="m.id">
+                    {{ m.name }} (库存: {{ m.quantity }}{{ m.unit }})
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">消耗数量</label>
+                <input type="number" class="form-input" v-model.number="manualForm.quantity" min="1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">原因</label>
+                <input type="text" class="form-input" v-model="manualForm.reason" placeholder="可选" />
+              </div>
+              <button class="btn btn-danger" @click="executeManualConsumption"
+                      :disabled="!manualForm.material || !manualForm.quantity">
+                确认消耗
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'replenishment'">
+          <div class="page-title">补货申请</div>
+
+          <div class="card">
+            <div class="card-title">新建补货申请</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">耗材</label>
+                <select class="form-input" v-model="requestForm.material">
+                  <option value="">请选择</option>
+                  <option v-for="m in lowStockMaterials" :key="m.id" :value="m.id">
+                    {{ m.name }} (库存: {{ m.quantity }}{{ m.unit }}, 预警: {{ m.warning_threshold }})
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">申请数量</label>
+                <input type="number" class="form-input" v-model.number="requestForm.quantity" min="1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">申请原因</label>
+                <input type="text" class="form-input" v-model="requestForm.reason" placeholder="可选" />
+              </div>
+              <button class="btn btn-primary" @click="createRequest"
+                      :disabled="!requestForm.material || !requestForm.quantity">
+                提交申请
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">申请列表</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>申请单号</th>
+                  <th>耗材</th>
+                  <th>申请量</th>
+                  <th>审核量</th>
+                  <th>申请人</th>
+                  <th>状态</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in requests" :key="r.id">
+                  <td><code>{{ r.request_no }}</code></td>
+                  <td>{{ r.material_name }}</td>
+                  <td>{{ r.requested_quantity }}{{ r.unit }}</td>
+                  <td>{{ r.approved_quantity ? r.approved_quantity + r.unit : '-' }}</td>
+                  <td>{{ r.requester }}</td>
+                  <td>
+                    <span :style="{ background: r.status_color + '20', color: r.status_color, borderColor: r.status_color, padding: '3px 8px', borderRadius: '4px', border: '1px solid' }">
+                      {{ r.status_label }}
+                    </span>
+                  </td>
+                  <td>{{ r.created_at }}</td>
+                  <td>
+                    <button class="btn btn-primary" @click="showRequestDetail(r)">详情</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-if="requests.length === 0" class="empty">暂无申请</div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'materials'">
+          <div class="page-title">库存管理</div>
+          <div class="card">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">库存状态</label>
+                <select class="form-input" v-model="materialFilter.status">
+                  <option value="">全部</option>
+                  <option value="NORMAL">正常</option>
+                  <option value="LOW_STOCK">库存不足</option>
+                  <option value="OUT_OF_STOCK">已断货</option>
+                </select>
+              </div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>耗材名称</th>
+                  <th>类别</th>
+                  <th>当前库存</th>
+                  <th>预警值</th>
+                  <th>单价</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="m in filteredMaterials" :key="m.id">
+                  <td><code>{{ m.code }}</code></td>
+                  <td><strong>{{ m.name }}</strong></td>
+                  <td>{{ m.category }}</td>
+                  <td>
+                    <span :style="{ color: m.stock_status === 'NORMAL' ? '#10b981' : '#ef4444' }">
+                      {{ m.quantity }}{{ m.unit }}
+                    </span>
+                  </td>
+                  <td>{{ m.warning_threshold }}{{ m.unit }}</td>
+                  <td>¥{{ m.unit_price.toFixed(2) }}</td>
+                  <td>
+                    <span :style="{ background: m.stock_color + '20', color: m.stock_color, padding: '3px 8px', borderRadius: '4px' }">
+                      {{ m.stock_label }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group">
+                      <button class="btn btn-primary" @click="quickReplenish(m)">快速补货</button>
+                      <button class="btn btn-warning" @click="showMaterialHistory(m)">历史</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'audit'">
+          <div class="page-title">审核中心</div>
+
+          <div class="card">
+            <div class="card-title">待审核（PENDING）</div>
+            <table v-if="pendingRequests.length > 0">
+              <thead>
+                <tr>
+                  <th>申请单号</th>
+                  <th>耗材</th>
+                  <th>申请数量</th>
+                  <th>申请人</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in pendingRequests" :key="r.id">
+                  <td><code>{{ r.request_no }}</code></td>
+                  <td>{{ r.material_name }}</td>
+                  <td>{{ r.requested_quantity }}{{ r.unit }}</td>
+                  <td>{{ r.requester }}</td>
+                  <td>{{ r.created_at }}</td>
+                  <td>
+                    <div class="btn-group">
+                      <button class="btn btn-success" @click="openApproveModal(r)">通过</button>
+                      <button class="btn btn-danger" @click="openRejectModal(r)">拒绝</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="empty">暂无待审核申请</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">待入库（APPROVED）</div>
+            <table v-if="approvedRequests.length > 0">
+              <thead>
+                <tr>
+                  <th>申请单号</th>
+                  <th>耗材</th>
+                  <th>审核数量</th>
+                  <th>申请人</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in approvedRequests" :key="r.id">
+                  <td><code>{{ r.request_no }}</code></td>
+                  <td>{{ r.material_name }}</td>
+                  <td>{{ r.approved_quantity }}{{ r.unit }}</td>
+                  <td>{{ r.requester }}</td>
+                  <td>{{ r.created_at }}</td>
+                  <td>
+                    <button class="btn btn-success" @click="fulfillRequest(r)">确认补货</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="empty">暂无待入库申请</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">历史申请</div>
+            <table v-if="historicalRequests.length > 0">
+              <thead>
+                <tr>
+                  <th>申请单号</th>
+                  <th>耗材</th>
+                  <th>申请/审核</th>
+                  <th>申请人</th>
+                  <th>状态</th>
+                  <th>时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="r in historicalRequests" :key="r.id">
+                  <td><code>{{ r.request_no }}</code></td>
+                  <td>{{ r.material_name }}</td>
+                  <td>{{ r.requested_quantity }} / {{ r.approved_quantity || '-' }}</td>
+                  <td>{{ r.requester }}</td>
+                  <td>
+                    <span :style="{ background: r.status_color + '20', color: r.status_color, padding: '3px 8px', borderRadius: '4px' }">
+                      {{ r.status_label }}
+                    </span>
+                  </td>
+                  <td>{{ r.created_at }}</td>
+                  <td>
+                    <button class="btn btn-primary" @click="showRequestDetail(r)">详情</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="empty">暂无历史申请</div>
+          </div>
+        </div>
+
+        <div v-if="currentPage === 'history'">
+          <div class="page-title">历史追溯</div>
+          <div class="card">
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <button v-for="tab in historyTabs" :key="tab.key"
+                      :class="['btn', historyTab === tab.key ? 'btn-primary' : '']"
+                      :style="historyTab !== tab.key ? 'background: #f3f4f6; color: #4b5563;' : ''"
+                      @click="historyTab = tab.key">
+                {{ tab.label }}
+              </button>
+            </div>
+
+            <div v-if="historyTab === 'consumption'">
+              <table v-if="consumptionHistory.length > 0">
+                <thead>
+                  <tr>
+                    <th>类型</th>
+                    <th>耗材</th>
+                    <th>诊疗项目</th>
+                    <th>数量</th>
+                    <th>金额</th>
+                    <th>患者</th>
+                    <th>操作人</th>
+                    <th>时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="r in consumptionHistory" :key="r.id">
+                    <td>
+                      <span :class="['tag', r.consumption_type === 'TREATMENT' ? 'tag-blue' : 'tag-green']">
+                        {{ r.consumption_type === 'TREATMENT' ? '诊疗' : '手动' }}
+                      </span>
+                    </td>
+                    <td>{{ r.material_name }}</td>
+                    <td>{{ r.treatment_name || '-' }}</td>
+                    <td style="color: #ef4444;">-{{ r.quantity }}{{ r.unit }}</td>
+                    <td>¥{{ r.total_amount.toFixed(2) }}</td>
+                    <td>{{ r.patient_name || '-' }}</td>
+                    <td>{{ r.operator }}</td>
+                    <td>{{ r.created_at }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-else class="empty">暂无消耗记录</div>
+            </div>
+
+            <div v-if="historyTab === 'replenishment'">
+              <table v-if="requests.length > 0">
+                <thead>
+                  <tr>
+                    <th>单号</th>
+                    <th>耗材</th>
+                    <th>申请量</th>
+                    <th>审核量</th>
+                    <th>申请人</th>
+                    <th>状态</th>
+                    <th>时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="r in requests" :key="r.id">
+                    <td><code>{{ r.request_no }}</code></td>
+                    <td>{{ r.material_name }}</td>
+                    <td>{{ r.requested_quantity }}{{ r.unit }}</td>
+                    <td>{{ r.approved_quantity ? r.approved_quantity + r.unit : '-' }}</td>
+                    <td>{{ r.requester }}</td>
+                    <td>
+                      <span :style="{ background: r.status_color + '20', color: r.status_color, padding: '3px 8px', borderRadius: '4px' }">
+                        {{ r.status_label }}
+                      </span>
+                    </td>
+                    <td>{{ r.created_at }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-else class="empty">暂无补货申请</div>
+            </div>
+
+            <div v-if="historyTab === 'logs'">
+              <table v-if="operationLogs.length > 0">
+                <thead>
+                  <tr>
+                    <th>模块</th>
+                    <th>操作</th>
+                    <th>目标</th>
+                    <th>变更前</th>
+                    <th>变更后</th>
+                    <th>操作人</th>
+                    <th>时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="log in operationLogs" :key="log.id">
+                    <td><span class="tag tag-blue">{{ log.module }}</span></td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.target_type }} #{{ log.target_id }}</td>
+                    <td>
+                      <span v-if="log.before_data" class="json-preview" :title="formatJson(log.before_data)">
+                        {{ truncateJson(log.before_data) }}
+                      </span>
+                      <span v-else style="color: #9ca3af;">-</span>
+                    </td>
+                    <td>
+                      <span v-if="log.after_data" class="json-preview" :title="formatJson(log.after_data)">
+                        {{ truncateJson(log.after_data) }}
+                      </span>
+                      <span v-else style="color: #9ca3af;">-</span>
+                    </td>
+                    <td>{{ log.operator }}</td>
+                    <td>{{ log.created_at }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-else class="empty">暂无操作日志</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="modal.show" class="modal-overlay" @click.self="modal.show = false">
+      <div class="modal">
+        <div class="modal-header">{{ modal.title }}</div>
+        <div class="modal-body">
+          <div v-if="modal.type === 'treatment'">
+            <div style="margin-bottom: 16px;">
+              <strong>项目：</strong>{{ modal.data.name }}<br />
+              <strong>科室：</strong>{{ modal.data.department_name }}<br />
+              <strong>说明：</strong>{{ modal.data.description }}
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>耗材</th>
+                  <th>标准用量</th>
+                  <th>当前库存</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="b in modal.data.bindings" :key="b.material_id">
+                  <td>{{ b.material_name }}</td>
+                  <td>{{ b.quantity }}{{ b.unit }}</td>
+                  <td>{{ b.current_stock }}{{ b.unit }}</td>
+                  <td>
+                    <span :style="{ color: b.stock_color }">{{ b.stock_label }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-if="modal.type === 'request'">
+            <div style="margin-bottom: 16px;">
+              <strong>单号：</strong><code>{{ modal.data.request_no }}</code><br />
+              <strong>耗材：</strong>{{ modal.data.material_name }}<br />
+              <strong>申请量：</strong>{{ modal.data.requested_quantity }}{{ modal.data.unit }}<br />
+              <strong>审核量：</strong>{{ modal.data.approved_quantity ? modal.data.approved_quantity + modal.data.unit : '-' }}<br />
+              <strong>申请人：</strong>{{ modal.data.requester }}<br />
+              <strong>状态：</strong>
+              <span :style="{ background: modal.data.status_color + '20', color: modal.data.status_color, padding: '2px 6px', borderRadius: '4px' }">
+                {{ modal.data.status_label }}
+              </span>
+            </div>
+
+            <div v-if="modal.data.audit_history && modal.data.audit_history.length > 0">
+              <div style="font-weight: 600; margin-bottom: 12px;">审核历史</div>
+              <div v-for="audit in modal.data.audit_history" :key="audit.id" class="timeline-item">
+                <div>
+                  <strong>{{ audit.action_label }}</strong>
+                  <span v-if="audit.approved_quantity">，审核量：{{ audit.approved_quantity }}</span>
+                  <span v-if="audit.reason">，原因：{{ audit.reason }}</span>
+                </div>
+                <div style="font-size: 12px; color: #6b7280;">操作人：{{ audit.auditor }}，{{ audit.created_at }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="modal.type === 'material-history'">
+            <div style="margin-bottom: 16px;">
+              <strong>耗材：</strong>{{ modal.data.name }} ({{ modal.data.code }})
+            </div>
+            <table v-if="modal.data.history && modal.data.history.length > 0">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>变动前</th>
+                  <th>变动</th>
+                  <th>变动后</th>
+                  <th>原因</th>
+                  <th>操作人</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="s in modal.data.history" :key="s.id">
+                  <td>{{ s.created_at }}</td>
+                  <td>{{ s.before_quantity }}</td>
+                  <td :style="{ color: s.change_quantity > 0 ? '#10b981' : '#ef4444' }">
+                    {{ s.change_quantity > 0 ? '+' : '' }}{{ s.change_quantity }}
+                  </td>
+                  <td>{{ s.after_quantity }}</td>
+                  <td>{{ s.change_reason }}</td>
+                  <td>{{ s.operator }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div v-else class="empty">暂无历史记录</div>
+          </div>
+
+          <div v-if="modal.type === 'approve'">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">申请耗材</label>
+              <div>{{ modal.data.material_name }}</div>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">申请数量</label>
+              <div>{{ modal.data.requested_quantity }}{{ modal.data.unit }}</div>
+            </div>
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">审核数量（可调整）</label>
+              <input type="number" class="form-input" v-model.number="modal.approveQuantity"
+                     min="1" :max="modal.data.requested_quantity" style="width: 100%;" />
+            </div>
+          </div>
+
+          <div v-if="modal.type === 'reject'">
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label">拒绝原因</label>
+              <textarea class="form-input" v-model="modal.rejectReason"
+                        style="width: 100%; height: 80px; resize: none;"
+                        placeholder="请输入拒绝原因..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" style="background: #f3f4f6; color: #4b5563;" @click="modal.show = false">关闭</button>
+          <button v-if="modal.type === 'approve'" class="btn btn-success" @click="doApprove">确认通过</button>
+          <button v-if="modal.type === 'reject'" class="btn btn-danger" @click="doReject">确认拒绝</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container">
+      <div v-for="toast in toasts" :key="toast.id"
+           :class="['toast', toast.type === 'error' ? 'alert-danger' : toast.type === 'success' ? 'alert-success' : 'alert-info']">
+        {{ toast.message }}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, reactive, onMounted, watch } = Vue;
+
+    createApp({
+      setup() {
+        const store = new DentalStore();
+
+        const navItems = [
+          { key: 'dashboard', label: '仪表盘', icon: '📊' },
+          { key: 'treatments', label: '诊疗项目', icon: '📋' },
+          { key: 'consumption', label: '耗材消耗', icon: '🏥' },
+          { key: 'replenishment', label: '补货申请', icon: '📦' },
+          { key: 'materials', label: '库存管理', icon: '📚' },
+          { key: 'audit', label: '审核中心', icon: '✅' },
+          { key: 'history', label: '历史追溯', icon: '📜' }
+        ];
+
+        const operators = [
+          { name: '护士小王', role: '护士' },
+          { name: '护士长李姐', role: '护士长' },
+          { name: '库管小李', role: '库管' }
+        ];
+
+        const currentPage = ref('dashboard');
+        const operator = ref('护士小王');
+        const historyTab = ref('consumption');
+        const toasts = ref([]);
+
+        const consumptionForm = reactive({
+          dept: '',
+          treatment: '',
+          patientCount: 1,
+          patientName: ''
+        });
+
+        const manualForm = reactive({
+          material: '',
+          quantity: null,
+          reason: ''
+        });
+
+        const requestForm = reactive({
+          material: '',
+          quantity: null,
+          reason: ''
+        });
+
+        const materialFilter = reactive({ status: '' });
+        const treatmentFilter = reactive({ dept: '' });
+
+        const modal = reactive({
+          show: false,
+          type: '',
+          data: null,
+          approveQuantity: 0,
+          rejectReason: ''
+        });
+
+        const departments = ref([]);
+        const materials = ref([]);
+        const treatments = ref([]);
+        const requests = ref([]);
+        const consumptionHistory = ref([]);
+        const operationLogs = ref([]);
+
+        function showToast(message, type = 'info') {
+          const id = Date.now();
+          toasts.value.push({ id, message, type });
+          setTimeout(() => {
+            toasts.value = toasts.value.filter(t => t.id !== id);
+          }, 3000);
+        }
+
+        function refreshData() {
+          departments.value = store.getDepartments();
+          materials.value = store.getMaterials();
+          treatments.value = store.getTreatments();
+          requests.value = store.getReplenishmentRequests();
+          consumptionHistory.value = store.getConsumptionRecords(50);
+          operationLogs.value = store.getOperationLogs(50);
+        }
+
+        function resetData() {
+          if (confirm('确定要重置所有数据吗？所有操作记录将被清除。')) {
+            store.reset();
+            refreshData();
+            showToast('数据已重置', 'success');
+          }
+        }
+
+        function onOperatorChange() {
+          showToast(`已切换操作员：${operator.value}`, 'info');
+        }
+
+        const currentNavLabel = computed(() =>
+          navItems.find(n => n.key === currentPage.value)?.label || ''
+        );
+
+        const dashboard = computed(() => store.getDashboardStats());
+        const flowStatus = computed(() => store.getFlowStatus());
+        const blockages = computed(() => store.getBlockages());
+        const recentConsumption = computed(() => store.getConsumptionRecords(10));
+
+        const lowStockMaterials = computed(() => store.getLowStockMaterials());
+
+        const treatmentsByDept = computed(() =>
+          consumptionForm.dept ? store.getTreatments(consumptionForm.dept) : []
+        );
+
+        const treatmentBindings = computed(() =>
+          consumptionForm.treatment ? store.getTreatmentBindings(consumptionForm.treatment) : []
+        );
+
+        const treatmentStockCheck = computed(() =>
+          consumptionForm.treatment
+            ? store.checkTreatmentStock(consumptionForm.treatment, consumptionForm.patientCount)
+            : { canExecute: true, insufficientCount: 0 }
+        );
+
+        const filteredMaterials = computed(() => {
+          let list = materials.value;
+          if (materialFilter.status) {
+            list = list.filter(m => m.stock_status === materialFilter.status);
+          }
+          return list;
+        });
+
+        const filteredTreatments = computed(() =>
+          treatmentFilter.dept
+            ? treatments.value.filter(t => t.department_id === parseInt(treatmentFilter.dept))
+            : treatments.value
+        );
+
+        const pendingRequests = computed(() =>
+          requests.value.filter(r => r.status === 'PENDING')
+        );
+
+        const approvedRequests = computed(() =>
+          requests.value.filter(r => r.status === 'APPROVED')
+        );
+
+        const historicalRequests = computed(() =>
+          requests.value.filter(r => r.status === 'FULFILLED' || r.status === 'REJECTED')
+        );
+
+        const historyTabs = [
+          { key: 'consumption', label: '消耗记录' },
+          { key: 'replenishment', label: '补货申请' },
+          { key: 'logs', label: '操作日志' }
+        ];
+
+        function getFlowStepClass(step) {
+          const fs = flowStatus.value;
+          if (step === 'consumption') {
+            return fs.material_status.low_stock > 0 || fs.material_status.out_of_stock > 0 ? 'todo' : 'done';
+          }
+          if (step === 'request') {
+            return fs.request_status.pending > 0 ? 'active' : 'todo';
+          }
+          if (step === 'review') {
+            return fs.request_status.pending > 0 ? 'todo' : (fs.request_status.approved > 0 ? 'active' : 'done');
+          }
+          if (step === 'fulfill') {
+            return fs.request_status.approved > 0 ? 'todo' : 'done';
+          }
+          return 'todo';
+        }
+
+        function getBindingCount(treatmentId) {
+          return store.getTreatmentBindings(treatmentId).length;
+        }
+
+        function getTreatmentStockCheck(treatmentId) {
+          return store.checkTreatmentStock(treatmentId);
+        }
+
+        function showTreatmentDetail(treatment) {
+          const bindings = store.getTreatmentBindings(treatment.id);
+          modal.show = true;
+          modal.type = 'treatment';
+          modal.data = { ...treatment, bindings };
+        }
+
+        function showRequestDetail(request) {
+          modal.show = true;
+          modal.type = 'request';
+          modal.data = store.getReplenishmentRequest(request.id);
+        }
+
+        function showMaterialHistory(material) {
+          modal.show = true;
+          modal.type = 'material-history';
+          modal.data = {
+            ...material,
+            history: store.getMaterialHistory(material.id)
+          };
+        }
+
+        function quickReplenish(material) {
+          const suggested = Math.max(material.warning_threshold - material.quantity, 10);
+          requestForm.material = material.id;
+          requestForm.quantity = suggested;
+          currentPage.value = 'replenishment';
+          showToast(`已选择 ${material.name}，建议补货 ${suggested}${material.unit}`, 'info');
+        }
+
+        function openApproveModal(request) {
+          modal.show = true;
+          modal.type = 'approve';
+          modal.data = request;
+          modal.approveQuantity = request.requested_quantity;
+        }
+
+        function openRejectModal(request) {
+          modal.show = true;
+          modal.type = 'reject';
+          modal.data = request;
+          modal.rejectReason = '';
+        }
+
+        function executeConsumption() {
+          try {
+            const result = store.consumeByTreatment(
+              consumptionForm.treatment,
+              consumptionForm.patientCount,
+              operator.value,
+              consumptionForm.patientName
+            );
+            refreshData();
+            consumptionForm.treatment = '';
+            consumptionForm.patientName = '';
+            showToast(`消耗成功！共消耗 ${result.records.length} 种耗材`, 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function executeManualConsumption() {
+          try {
+            store.consumeManual(
+              manualForm.material,
+              manualForm.quantity,
+              operator.value,
+              manualForm.reason
+            );
+            refreshData();
+            manualForm.material = '';
+            manualForm.quantity = null;
+            manualForm.reason = '';
+            showToast('手动消耗成功', 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function createRequest() {
+          try {
+            const req = store.createReplenishmentRequest(
+              requestForm.material,
+              requestForm.quantity,
+              operator.value,
+              requestForm.reason
+            );
+            refreshData();
+            requestForm.material = '';
+            requestForm.quantity = null;
+            requestForm.reason = '';
+            showToast(`申请已提交，单号：${req.request_no}`, 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function doApprove() {
+          try {
+            store.approveRequest(modal.data.id, modal.approveQuantity, operator.value);
+            refreshData();
+            modal.show = false;
+            showToast('审核通过', 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function doReject() {
+          if (!modal.rejectReason.trim()) {
+            showToast('请输入拒绝原因', 'error');
+            return;
+          }
+          try {
+            store.rejectRequest(modal.data.id, modal.rejectReason, operator.value);
+            refreshData();
+            modal.show = false;
+            showToast('已拒绝', 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function fulfillRequest(request) {
+          try {
+            store.fulfillRequest(request.id, operator.value);
+            refreshData();
+            showToast(`补货完成，${request.material_name} +${request.approved_quantity}${request.unit}`, 'success');
+          } catch (e) {
+            showToast(e.message, 'error');
+          }
+        }
+
+        function truncateJson(jsonStr) {
+          try {
+            const obj = JSON.parse(jsonStr);
+            return JSON.stringify(obj).slice(0, 40) + '...';
+          } catch {
+            return jsonStr;
+          }
+        }
+
+        function formatJson(jsonStr) {
+          try {
+            const obj = JSON.parse(jsonStr);
+            return JSON.stringify(obj, null, 2);
+          } catch {
+            return jsonStr;
+          }
+        }
+
+        onMounted(() => {
+          refreshData();
+        });
+
+        return {
+          navItems,
+          operators,
+          currentPage,
+          operator,
+          historyTab,
+          toasts,
+          consumptionForm,
+          manualForm,
+          requestForm,
+          materialFilter,
+          treatmentFilter,
+          modal,
+          departments,
+          materials,
+          treatments,
+          requests,
+          consumptionHistory,
+          operationLogs,
+
+          currentNavLabel,
+          dashboard,
+          flowStatus,
+          blockages,
+          recentConsumption,
+          lowStockMaterials,
+          treatmentsByDept,
+          treatmentBindings,
+          treatmentStockCheck,
+          filteredMaterials,
+          filteredTreatments,
+          pendingRequests,
+          approvedRequests,
+          historicalRequests,
+          historyTabs,
+
+          onOperatorChange,
+          resetData,
+          getFlowStepClass,
+          getBindingCount,
+          getTreatmentStockCheck,
+          showTreatmentDetail,
+          showRequestDetail,
+          showMaterialHistory,
+          quickReplenish,
+          openApproveModal,
+          openRejectModal,
+          executeConsumption,
+          executeManualConsumption,
+          createRequest,
+          doApprove,
+          doReject,
+          fulfillRequest,
+          truncateJson,
+          formatJson
+        };
+      }
+    }).use(ElementPlus).mount('#app');
+  </script>
+</body>
+</html>

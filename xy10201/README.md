@@ -40,11 +40,26 @@
 
 ## 快速开始
 
-### 环境要求
+### 方式一：零依赖单页应用（推荐，无需安装任何东西）
+
+直接在浏览器中打开 `standalone.html` 文件即可运行完整应用！
+
+- **Windows**：双击 `standalone.html`
+- **macOS**：双击 `standalone.html`（或右键 → 打开方式 → Safari/Chrome）
+- **Linux**：`xdg-open standalone.html`
+
+**数据存储**：使用浏览器 `localStorage`，关闭浏览器不丢失。
+**重置数据**：点击左侧菜单底部的「↻ 重置数据」按钮。
+
+---
+
+### 方式二：全栈模式（需要 npm）
+
+#### 环境要求
 - Node.js >= 16
 - npm 或 yarn
 
-### 安装依赖
+#### 安装依赖
 
 ```bash
 # 安装后端依赖
@@ -54,7 +69,7 @@ npm install
 cd client && npm install && cd ..
 ```
 
-### 初始化数据
+#### 初始化数据
 
 ```bash
 # 初始化数据库（创建表结构）
@@ -64,9 +79,9 @@ npm run init-db
 npm run seed-data
 ```
 
-### 启动服务
+#### 启动服务
 
-**方式一：开发模式（前后端分离）**
+**开发模式（前后端分离）**
 
 ```bash
 # 终端1 - 启动后端（端口 3001）
@@ -78,7 +93,7 @@ cd client && npm run dev
 
 访问：http://localhost:5173
 
-**方式二：生产模式（前后端一体）**
+**生产模式（前后端一体）**
 
 ```bash
 # 构建前端
@@ -90,11 +105,21 @@ npm start
 
 访问：http://localhost:3001
 
-### 运行测试
+#### 运行测试
 
 ```bash
 npm test
 ```
+
+---
+
+### 方式三：业务逻辑验证（纯 JavaScript）
+
+```bash
+node demo-logic.js
+```
+
+输出包含 27 项业务逻辑验证，涵盖状态机、库存预警、消耗/补货闭环、数据一致性。
 
 ## 样例数据位置
 
