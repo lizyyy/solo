@@ -9,11 +9,22 @@ const {
   IdempotentConflictError,
   FreezeRuleNotFoundError,
   InvalidAmountError,
-  FreezeBucketNotFoundError
+  FreezeBucketNotFoundError,
+  ConsumptionNotFoundError,
+  RefundExceedsConsumptionError,
+  DuplicateRefundError
 } = require('../errors/ApiError');
 const dayjs = require('dayjs');
 
 const balanceService = new BalanceService();
+
+const ACTION_TO_TRANS_TYPE = {
+  'recharge': TRANS_TYPES.RECHARGE,
+  'consume': TRANS_TYPES.CONSUME,
+  'freeze': TRANS_TYPES.FREEZE,
+  'unfreeze': TRANS_TYPES.UNFREEZE,
+  'refund': TRANS_TYPES.REFUND
+};
 
 class PointService {
   withIdempotency(requestId, action, operation, operator) {
@@ -57,6 +68,26 @@ class PointService {
       });
       return { isIdempotent: false, status: 'SUCCESS', result };
     } catch (e) {
+      const transType = ACTION_TO_TRANS_TYPE[action];
+      const memberId = operation.memberId;
+      const amount = operation.amount;
+      
+      if (transType && memberId && amount) {
+        try {
+          balanceService.recordFailedLedger(
+            memberId,
+            transType,
+            amount,
+            requestId,
+            e.code || 'UNKNOWN_ERROR',
+            e.message,
+            operator
+          );
+        } catch (recordError) {
+          console.error('记录失败流水失败:', recordError);
+        }
+      }
+      
       idempotencyRepo.update(idempotentRecord.id, {
         status: 'FAILED',
         errorCode: e.code || 'UNKNOWN_ERROR',
@@ -75,6 +106,7 @@ class PointService {
 
     return this.withIdempotency(requestId, 'recharge', {
       memberId,
+      amount,
       execute: () => this._doRecharge(memberId, amount, requestId, operator, reason)
     }, operator);
   }
@@ -128,6 +160,7 @@ class PointService {
 
     return this.withIdempotency(requestId, 'freeze', {
       memberId,
+      amount,
       execute: () => this._doFreeze(memberId, amount, rule, requestId, operator, reason)
     }, operator);
   }
@@ -205,6 +238,7 @@ class PointService {
 
     return this.withIdempotency(requestId, 'consume', {
       memberId,
+      amount,
       execute: () => this._doConsume(memberId, amount, requestId, operator, refId, reason, allowFreeze)
     }, operator);
   }
@@ -311,11 +345,32 @@ class PointService {
 
     return this.withIdempotency(requestId, 'refund', {
       memberId,
+      amount,
       execute: () => this._doRefund(memberId, amount, requestId, operator, refId, reason)
     }, operator);
   }
 
   _doRefund(memberId, amount, requestId, operator, refId, reason) {
+    if (!refId) {
+      throw new ConsumptionNotFoundError(refId);
+    }
+
+    const consumption = balanceService.findConsumptionByRefId(memberId, refId);
+    if (!consumption) {
+      throw new ConsumptionNotFoundError(refId);
+    }
+
+    const totalRefunded = balanceService.getTotalRefundedForRefId(memberId, refId);
+    const maxRefund = consumption.amount - totalRefunded;
+
+    if (maxRefund <= 0) {
+      throw new DuplicateRefundError(refId);
+    }
+
+    if (amount > maxRefund) {
+      throw new RefundExceedsConsumptionError(amount, maxRefund, consumption.amount, totalRefunded);
+    }
+
     const current = balanceService.getCurrentBalance(memberId);
 
     const newTotal = current.totalBalance + amount;
@@ -339,7 +394,7 @@ class PointService {
       operatorId: operator?.id,
       operatorType: operator?.type,
       refId,
-      refType: refId ? 'order' : null
+      refType: 'order'
     });
 
     return {
@@ -349,6 +404,11 @@ class PointService {
         totalBalance: newTotal,
         freezeBalance: current.freezeBalance,
         availableBalance: newAvailable
+      },
+      consumption: {
+        originalAmount: consumption.amount,
+        totalRefunded: totalRefunded + amount,
+        remaining: maxRefund - amount
       }
     };
   }
@@ -362,6 +422,7 @@ class PointService {
 
     return this.withIdempotency(requestId, 'unfreeze', {
       memberId,
+      amount,
       execute: () => this._doUnfreeze(memberId, bucketId, amount, requestId, operator, reason)
     }, operator);
   }

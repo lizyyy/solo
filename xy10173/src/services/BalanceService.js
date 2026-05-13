@@ -108,6 +108,19 @@ class BalanceService {
       diff: fromLedgers.freezeBalance - fromBuckets
     };
   }
+
+  findConsumptionByRefId(memberId, refId) {
+    return pointLedgerRepo.findConsumptionByRefId(memberId, refId);
+  }
+
+  findRefundsByRefId(memberId, refId) {
+    return pointLedgerRepo.findRefundsByRefId(memberId, refId);
+  }
+
+  getTotalRefundedForRefId(memberId, refId) {
+    const refunds = this.findRefundsByRefId(memberId, refId);
+    return refunds.reduce((sum, r) => sum + r.amount, 0);
+  }
 }
 
 module.exports = { BalanceService, TRANS_TYPES, DIRECTION };

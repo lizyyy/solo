@@ -65,6 +65,37 @@ class PointLedgerRepository {
     `).get(memberId, start, end);
     return row ? row.count : 0;
   }
+
+  findByRefIdAndTransType(memberId, refId, transType) {
+    const db = getDb();
+    return db.prepare(`
+      SELECT * FROM point_ledgers 
+      WHERE member_id = ? AND ref_id = ? AND trans_type = ?
+      ORDER BY created_at DESC
+    `).all(memberId, refId, transType);
+  }
+
+  findConsumptionByRefId(memberId, refId) {
+    const db = getDb();
+    return db.prepare(`
+      SELECT * FROM point_ledgers 
+      WHERE member_id = ? AND ref_id = ? 
+        AND trans_type IN ('consume', 'consume_from_freeze')
+        AND status = 'SUCCESS'
+      ORDER BY created_at DESC
+    `).get(memberId, refId);
+  }
+
+  findRefundsByRefId(memberId, refId) {
+    const db = getDb();
+    return db.prepare(`
+      SELECT * FROM point_ledgers 
+      WHERE member_id = ? AND ref_id = ? 
+        AND trans_type = 'refund'
+        AND status = 'SUCCESS'
+      ORDER BY created_at DESC
+    `).all(memberId, refId);
+  }
 }
 
 module.exports = new PointLedgerRepository();

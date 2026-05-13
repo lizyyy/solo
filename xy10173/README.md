@@ -403,6 +403,9 @@ curl http://localhost:3000/api/v1/points/$MEMBER_ID/balance
 | `FREEZE_BUCKET_NOT_FOUND` | 404 | 冻结桶不存在 |
 | `INVALID_AMOUNT` | 400 | 无效金额 |
 | `VALIDATION_ERROR` | 400 | 参数校验失败 |
+| `CONSUMPTION_NOT_FOUND` | 404 | 未找到对应消费记录 |
+| `REFUND_EXCEEDS_CONSUMPTION` | 400 | 退款金额超过已消费金额 |
+| `DUPLICATE_REFUND` | 409 | 已存在相同订单的退款 |
 | `NOT_FOUND` | 404 | 接口不存在 |
 
 ## 数据一致性校验

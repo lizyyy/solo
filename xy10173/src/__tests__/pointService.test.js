@@ -355,11 +355,189 @@ describe('BalanceService - 余额一致性校验', () => {
   test('操作后一致性检查通过', () => {
     pointService.recharge(member.id, 10000, 't1', systemOp);
     pointService.freeze(member.id, 3000, 'TEST_7D', 't2', systemOp);
-    pointService.consume(member.id, 2000, 't3', systemOp);
-    pointService.refund(member.id, 1000, 't4', systemOp);
+    pointService.consume(member.id, 2000, 't3', systemOp, 'ORDER-001');
+    pointService.refund(member.id, 1000, 't4', systemOp, 'ORDER-001');
     
     const consistency = balanceService.verifyConsistency(member.id);
     expect(consistency.isConsistent).toBe(true);
     expect(consistency.diff).toBe(0);
+  });
+});
+
+describe('PointService - 失败流水记录', () => {
+  let memberRepo, freezeRuleRepo, pointService, balanceService, pointLedgerRepo;
+  let member;
+
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-failed-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
+    memberRepo = require('../repositories/MemberRepository');
+    freezeRuleRepo = require('../repositories/FreezeRuleRepository');
+    pointService = require('../services/PointService');
+    pointLedgerRepo = require('../repositories/PointLedgerRepository');
+    const bs = require('../services/BalanceService');
+    balanceService = new bs.BalanceService();
+
+    member = memberRepo.create('测试用户');
+    freezeRuleRepo.create({
+      code: 'TEST_7D',
+      name: '测试7天冻结',
+      releaseType: 'TIME',
+      releaseDays: 7,
+      autoRelease: true
+    });
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
+  });
+
+  test('消费失败时记录 FAILED 流水', () => {
+    pointService.recharge(member.id, 1000, 't1', systemOp);
+    
+    expect(() => {
+      pointService.consume(member.id, 5000, 't2', systemOp, null, '测试失败消费', false);
+    }).toThrow();
+    
+    const ledgers = pointLedgerRepo.findByMemberId(member.id, 10);
+    const failedLedger = ledgers.find(l => l.status === 'FAILED');
+    
+    expect(failedLedger).toBeDefined();
+    expect(failedLedger.trans_type).toBe('consume');
+    expect(failedLedger.error_code).toBe('INSUFFICIENT_BALANCE');
+    expect(failedLedger.balance_before).toBe(1000);
+    expect(failedLedger.balance_after).toBe(1000);
+  });
+
+  test('冻结失败时记录 FAILED 流水（可用余额不足）', () => {
+    expect(() => {
+      pointService.freeze(member.id, 5000, 'TEST_7D', 't1', systemOp);
+    }).toThrow();
+    
+    const ledgers = pointLedgerRepo.findByMemberId(member.id, 10);
+    const failedLedger = ledgers.find(l => l.status === 'FAILED');
+    
+    expect(failedLedger).toBeDefined();
+    expect(failedLedger.trans_type).toBe('freeze');
+    expect(failedLedger.error_code).toBe('INSUFFICIENT_BALANCE');
+  });
+});
+
+describe('PointService - 退款重复扣款防护', () => {
+  let memberRepo, pointService, balanceService;
+  let member;
+
+  beforeEach(async () => {
+    const testDbPath = path.join(testDbDir, `service-refund-protection-${Date.now()}.db`);
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+    } else {
+      fs.mkdirSync(testDbDir, { recursive: true });
+    }
+    process.env.DB_PATH = testDbPath;
+    resetModules(testDbPath);
+    
+    const createApp = require('../app');
+    await createApp();
+    
+    memberRepo = require('../repositories/MemberRepository');
+    pointService = require('../services/PointService');
+    const bs = require('../services/BalanceService');
+    balanceService = new bs.BalanceService();
+
+    member = memberRepo.create('测试用户');
+  });
+
+  afterAll(() => {
+    if (fs.existsSync(testDbDir)) {
+      fs.readdirSync(testDbDir).forEach(f => {
+        try { fs.unlinkSync(path.join(testDbDir, f)); } catch(e) {}
+      });
+      try { fs.rmdirSync(testDbDir); } catch(e) {}
+    }
+  });
+
+  test('没有对应消费记录时退款失败', () => {
+    pointService.recharge(member.id, 10000, 't1', systemOp);
+    
+    expect(() => {
+      pointService.refund(member.id, 1000, 't2', systemOp, 'NON_EXISTENT_ORDER');
+    }).toThrow();
+    
+    const balance = balanceService.getCurrentBalance(member.id);
+    expect(balance.totalBalance).toBe(10000);
+  });
+
+  test('同一订单使用不同 requestId 不能重复退款', () => {
+    pointService.recharge(member.id, 10000, 't1', systemOp);
+    pointService.consume(member.id, 3000, 't2', systemOp, 'PROTECTED_ORDER_001');
+    
+    const balance1 = balanceService.getCurrentBalance(member.id);
+    expect(balance1.totalBalance).toBe(7000);
+    
+    pointService.refund(member.id, 3000, 't3', systemOp, 'PROTECTED_ORDER_001');
+    
+    const balance2 = balanceService.getCurrentBalance(member.id);
+    expect(balance2.totalBalance).toBe(10000);
+    
+    expect(() => {
+      pointService.refund(member.id, 3000, 't4', systemOp, 'PROTECTED_ORDER_001');
+    }).toThrow();
+    
+    const balance3 = balanceService.getCurrentBalance(member.id);
+    expect(balance3.totalBalance).toBe(10000);
+  });
+
+  test('退款金额不能超过已消费金额', () => {
+    pointService.recharge(member.id, 10000, 't1', systemOp);
+    pointService.consume(member.id, 2000, 't2', systemOp, 'OVERFLOW_ORDER_001');
+    
+    expect(() => {
+      pointService.refund(member.id, 5000, 't3', systemOp, 'OVERFLOW_ORDER_001');
+    }).toThrow();
+    
+    const balance = balanceService.getCurrentBalance(member.id);
+    expect(balance.totalBalance).toBe(8000);
+  });
+
+  test('部分退款后剩余金额可再次退款', () => {
+    pointService.recharge(member.id, 10000, 't1', systemOp);
+    pointService.consume(member.id, 3000, 't2', systemOp, 'PARTIAL_ORDER_001');
+    
+    const balance1 = balanceService.getCurrentBalance(member.id);
+    expect(balance1.totalBalance).toBe(7000);
+    
+    pointService.refund(member.id, 1000, 't3', systemOp, 'PARTIAL_ORDER_001');
+    
+    const balance2 = balanceService.getCurrentBalance(member.id);
+    expect(balance2.totalBalance).toBe(8000);
+    
+    pointService.refund(member.id, 2000, 't4', systemOp, 'PARTIAL_ORDER_001');
+    
+    const balance3 = balanceService.getCurrentBalance(member.id);
+    expect(balance3.totalBalance).toBe(10000);
+    
+    expect(() => {
+      pointService.refund(member.id, 100, 't5', systemOp, 'PARTIAL_ORDER_001');
+    }).toThrow();
   });
 });

@@ -62,6 +62,24 @@ class ValidationError extends ApiError {
   }
 }
 
+class ConsumptionNotFoundError extends ApiError {
+  constructor(refId) {
+    super('CONSUMPTION_NOT_FOUND', `未找到对应消费记录: ${refId}`, 404, { refId });
+  }
+}
+
+class RefundExceedsConsumptionError extends ApiError {
+  constructor(amount, maxRefund, consumed, totalRefunded) {
+    super('REFUND_EXCEEDS_CONSUMPTION', `退款金额超过已消费金额`, 400, { amount, maxRefund, consumed, totalRefunded });
+  }
+}
+
+class DuplicateRefundError extends ApiError {
+  constructor(refId) {
+    super('DUPLICATE_REFUND', `已存在相同订单的退款: ${refId}`, 409, { refId });
+  }
+}
+
 module.exports = {
   ApiError,
   MemberNotFoundError,
@@ -70,5 +88,8 @@ module.exports = {
   FreezeRuleNotFoundError,
   InvalidAmountError,
   FreezeBucketNotFoundError,
-  ValidationError
+  ValidationError,
+  ConsumptionNotFoundError,
+  RefundExceedsConsumptionError,
+  DuplicateRefundError
 };
