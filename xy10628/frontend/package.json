@@ -1,0 +1,12 @@
+{
+  "name": "charging-station-frontend",
+  "version": "1.0.0",
+  "description": "充电桩系统前端",
+  "scripts": {
+    "dev": "npx serve -l 3000 public",
+    "build": "echo 'Static files ready'"
+  },
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
