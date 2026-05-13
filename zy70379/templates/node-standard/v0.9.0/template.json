@@ -1,0 +1,59 @@
+{
+  "name": "node-standard",
+  "version": "0.9.0",
+  "type": "node",
+  "description": "Node.js 标准服务脚手架 v0.9.0（旧版本）",
+  "packageJson": {
+    "name": "node-service-template",
+    "version": "0.9.0",
+    "engines": {
+      "node": ">=16.0.0"
+    },
+    "scripts": {
+      "start": "node src/index.js",
+      "test": "mocha tests/",
+      "dev": "nodemon src/index.js"
+    },
+    "dependencies": {
+      "express": "^4.17.0",
+      "morgan": "^1.10.0"
+    },
+    "devDependencies": {
+      "mocha": "^9.0.0"
+    }
+  },
+  "dockerfile": {
+    "baseImage": "node:16-alpine",
+    "user": "node",
+    "workdir": "/app",
+    "exposePort": 3000,
+    "healthcheck": {
+      "interval": "60s",
+      "timeout": "20s",
+      "retries": 2,
+      "startPeriod": "30s"
+    }
+  },
+  "healthcheck": {
+    "http": {
+      "path": "/ping",
+      "method": "GET"
+    }
+  },
+  "logging": {
+    "format": "text",
+    "level": "debug",
+    "destination": "file",
+    "library": "morgan"
+  },
+  "directoryStructure": [
+    "src",
+    "tests"
+  ],
+  "requiredFiles": [
+    "package.json",
+    "Dockerfile",
+    ".gitignore",
+    "src/index.js"
+  ]
+}

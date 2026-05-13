@@ -1,0 +1,59 @@
+{
+  "name": "go-standard",
+  "version": "1.0.0",
+  "type": "go",
+  "description": "Go 标准服务脚手架 v1.0.0",
+  "goMod": {
+    "module": "github.com/example/service",
+    "go": "1.21"
+  },
+  "makefile": {
+    "targets": ["build", "test", "lint", "run", "docker-build"]
+  },
+  "dockerfile": {
+    "baseImage": "golang:1.21-alpine",
+    "buildStage": "builder",
+    "user": "root",
+    "workdir": "/app",
+    "exposePort": 8080,
+    "healthcheck": {
+      "interval": "30s",
+      "timeout": "10s",
+      "retries": 3,
+      "startPeriod": "15s"
+    }
+  },
+  "healthcheck": {
+    "http": {
+      "path": "/health",
+      "method": "GET"
+    }
+  },
+  "logging": {
+    "format": "json",
+    "level": "info",
+    "destination": "stdout",
+    "library": "zap"
+  },
+  "directoryStructure": [
+    "cmd",
+    "cmd/server",
+    "internal",
+    "internal/handler",
+    "internal/service",
+    "internal/repository",
+    "pkg",
+    "api",
+    "configs",
+    "test"
+  ],
+  "requiredFiles": [
+    "go.mod",
+    "go.sum",
+    "Makefile",
+    "Dockerfile",
+    ".gitignore",
+    "README.md",
+    "cmd/server/main.go"
+  ]
+}

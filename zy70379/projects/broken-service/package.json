@@ -1,0 +1,17 @@
+{
+  "name": "broken-service",
+  "version": "1.0.0",
+  "description": "手工改坏的服务 - 多处偏离模板",
+  "scripts": {
+    "start": "node lib/app.js",
+    "custom-dev": "nodemon lib/app.js",
+    "run-tests": "jest"
+  },
+  "dependencies": {
+    "express": "^4.16.0",
+    "lodash": "^4.17.0"
+  },
+  "devDependencies": {
+    "jest": "^26.0.0"
+  }
+}

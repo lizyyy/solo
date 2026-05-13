@@ -1,0 +1,62 @@
+{
+  "version": "0.9.0",
+  "name": "node-service-template-legacy",
+  "type": "node",
+  "description": "老模板 Node 服务脚手架 v0.9.0（已弃用）",
+  "packageJson": {
+    "name": "@org/service",
+    "scripts": {
+      "start": "node server.js",
+      "test": "mocha",
+      "lint": "jshint ."
+    },
+    "engines": {
+      "node": ">=14.0.0"
+    },
+    "dependencies": {
+      "express": "^4.17.0",
+      "morgan": "^1.10.0",
+      "config": "^3.3.0"
+    },
+    "devDependencies": {
+      "mocha": "^8.4.0",
+      "jshint": "^2.13.0"
+    }
+  },
+  "dockerfile": {
+    "baseImage": "node:14-alpine",
+    "exposePort": 3000,
+    "healthcheck": {
+      "interval": "60s",
+      "timeout": "30s",
+      "retries": 2,
+      "startPeriod": "60s"
+    },
+    "user": "root",
+    "workdir": "/usr/src/app"
+  },
+  "healthcheck": {
+    "http": {
+      "path": "/healthz",
+      "method": "GET",
+      "expectedStatus": 200
+    }
+  },
+  "logging": {
+    "format": "text",
+    "level": "debug",
+    "destination": "file"
+  },
+  "directoryStructure": [
+    "routes/",
+    "models/",
+    "controllers/",
+    "test/"
+  ],
+  "requiredFiles": [
+    "Dockerfile",
+    "package.json",
+    "server.js",
+    "README.md"
+  ]
+}

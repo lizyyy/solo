@@ -1,0 +1,24 @@
+{
+  "version": "1.0.0",
+  "allowedDrifts": [
+    {
+      "id": "dockerfile-1234567890",
+      "ruleId": "dockerfile",
+      "reason": "需要在 root 用户下运行特殊权限的工具，后续会迁移到 sidecar 模式",
+      "allowedUntil": "2027-12-31",
+      "approvedBy": "platform-team",
+      "approvedAt": "2024-01-15",
+      "reviewRequired": true
+    },
+    {
+      "id": "package-scripts-1234567891",
+      "ruleId": "package-scripts",
+      "mismatchedScript": "start",
+      "reason": "项目使用 lib/ 目录而非 src/，是历史遗留问题，已纳入技术债务",
+      "allowedUntil": "2025-01-01",
+      "approvedBy": "tech-lead",
+      "approvedAt": "2024-06-01",
+      "reviewRequired": true
+    }
+  ]
+}

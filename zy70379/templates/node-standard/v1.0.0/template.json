@@ -1,0 +1,66 @@
+{
+  "name": "node-standard",
+  "version": "1.0.0",
+  "type": "node",
+  "description": "Node.js 标准服务脚手架 v1.0.0",
+  "packageJson": {
+    "name": "node-service-template",
+    "version": "1.0.0",
+    "engines": {
+      "node": ">=18.0.0"
+    },
+    "scripts": {
+      "start": "node src/index.js",
+      "build": "echo 'Build completed'",
+      "test": "node --test",
+      "lint": "eslint src/",
+      "healthcheck": "curl -f http://localhost:3000/health || exit 1"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "winston": "^3.11.0"
+    },
+    "devDependencies": {
+      "eslint": "^8.55.0"
+    }
+  },
+  "dockerfile": {
+    "baseImage": "node:18-alpine",
+    "user": "node",
+    "workdir": "/app",
+    "exposePort": 3000,
+    "healthcheck": {
+      "interval": "30s",
+      "timeout": "10s",
+      "retries": 3,
+      "startPeriod": "10s"
+    }
+  },
+  "healthcheck": {
+    "http": {
+      "path": "/health",
+      "method": "GET"
+    }
+  },
+  "logging": {
+    "format": "json",
+    "level": "info",
+    "destination": "stdout",
+    "library": "winston"
+  },
+  "directoryStructure": [
+    "src",
+    "src/controllers",
+    "src/services",
+    "src/routes",
+    "tests",
+    "config"
+  ],
+  "requiredFiles": [
+    "package.json",
+    "Dockerfile",
+    ".gitignore",
+    "README.md",
+    "src/index.js"
+  ]
+}
