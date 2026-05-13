@@ -1,0 +1,13 @@
+{
+  "name": "multi-region-conflict-api",
+  "version": "1.0.0",
+  "description": "异地多活冲突API - 模拟多区域数据写入、冲突检测和仲裁",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
