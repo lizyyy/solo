@@ -85,6 +85,43 @@ class Queue {
         return [...this.items];
     }
 
+    getVehicleById(id) {
+        return this.items.find(v => v.id === parseInt(id));
+    }
+
+    getVehicleIndexById(id) {
+        return this.items.findIndex(v => v.id === parseInt(id));
+    }
+
+    moveVehicle(fromIndex, toIndex) {
+        if (fromIndex < 0 || fromIndex >= this.items.length) return false;
+        if (toIndex < 0 || toIndex >= this.items.length) return false;
+        if (fromIndex === toIndex) return false;
+        
+        const [vehicle] = this.items.splice(fromIndex, 1);
+        this.items.splice(toIndex, 0, vehicle);
+        return true;
+    }
+
+    moveVehicleToFront(id) {
+        const index = this.getVehicleIndexById(id);
+        if (index <= 0) return false;
+        return this.moveVehicle(index, 0);
+    }
+
+    moveVehicleToBack(id) {
+        const index = this.getVehicleIndexById(id);
+        if (index < 0 || index >= this.items.length - 1) return false;
+        return this.moveVehicle(index, this.items.length - 1);
+    }
+
+    removeVehicleById(id) {
+        const index = this.getVehicleIndexById(id);
+        if (index < 0) return null;
+        const [vehicle] = this.items.splice(index, 1);
+        return vehicle;
+    }
+
     getOverflowVehicles() {
         return [...this.overflowVehicles];
     }

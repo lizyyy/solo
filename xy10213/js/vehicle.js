@@ -94,14 +94,14 @@ class VehicleGenerator {
     shouldGenerateVehicle(currentTime, lastGenerationTime) {
         const currentHour = currentTime / 60;
         const arrivalRate = this.getCurrentArrivalRate(currentHour);
-        const interval = 60 / arrivalRate;
+        const interval = 1 / arrivalRate;
         return (currentTime - lastGenerationTime) >= interval;
     }
 
     getNextGenerationTime(currentTime, lastGenerationTime) {
         const currentHour = currentTime / 60;
         const arrivalRate = this.getCurrentArrivalRate(currentHour);
-        const interval = 60 / arrivalRate;
+        const interval = 1 / arrivalRate;
         return lastGenerationTime + interval;
     }
 }

@@ -34,6 +34,10 @@ class App {
         this.testDataSet = document.getElementById('testDataSet');
         this.loadTestBtn = document.getElementById('loadTestBtn');
         
+        this.addVehicleBtn = document.getElementById('addVehicleBtn');
+        this.skipToPeakBtn = document.getElementById('skipToPeakBtn');
+        this.clearQueueBtn = document.getElementById('clearQueueBtn');
+        
         this.currentTimeEl = document.getElementById('currentTime');
         this.simulationStatusEl = document.getElementById('simulationStatus');
         this.processedCountEl = document.getElementById('processedCount');
@@ -77,6 +81,10 @@ class App {
         
         this.loadTestBtn.addEventListener('click', () => this.loadTestData());
         
+        this.addVehicleBtn.addEventListener('click', () => this.addManualVehicle());
+        this.skipToPeakBtn.addEventListener('click', () => this.skipToPeakTime());
+        this.clearQueueBtn.addEventListener('click', () => this.clearQueue());
+        
         this.setupDragAndDrop();
     }
 
@@ -96,11 +104,15 @@ class App {
 
     setupDragAndDrop() {
         let draggedVehicleId = null;
+        let draggedElement = null;
         
         document.addEventListener('dragstart', (e) => {
             if (e.target.classList.contains('vehicle-item')) {
-                draggedVehicleId = e.target.dataset.vehicleId;
+                draggedVehicleId = parseInt(e.target.dataset.vehicleId);
+                draggedElement = e.target;
                 e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedVehicleId);
             }
         });
         
@@ -108,21 +120,96 @@ class App {
             if (e.target.classList.contains('vehicle-item')) {
                 e.target.classList.remove('dragging');
                 draggedVehicleId = null;
+                draggedElement = null;
+                this.clearDropIndicators();
             }
         });
         
         document.addEventListener('dragover', (e) => {
-            if (e.target.classList.contains('queue-area')) {
+            const vehicleItem = e.target.closest('.vehicle-item');
+            if (vehicleItem && draggedVehicleId) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                this.showDropIndicator(vehicleItem);
+            } else if (e.target.classList.contains('queue-area')) {
                 e.preventDefault();
             }
         });
         
+        document.addEventListener('dragleave', (e) => {
+            this.clearDropIndicators();
+        });
+        
         document.addEventListener('drop', (e) => {
-            if (e.target.classList.contains('queue-area') && draggedVehicleId) {
-                e.preventDefault();
-                this.addLogEntry('info', `车辆 #${draggedVehicleId} 被拖拽到队列区域`);
+            e.preventDefault();
+            this.clearDropIndicators();
+            
+            if (!draggedVehicleId) return;
+            
+            const targetVehicle = e.target.closest('.vehicle-item');
+            if (targetVehicle) {
+                const targetVehicleId = parseInt(targetVehicle.dataset.vehicleId);
+                
+                if (draggedVehicleId !== targetVehicleId) {
+                    const fromIndex = this.simulation.getQueueVehicleIndex(draggedVehicleId);
+                    const toIndex = this.simulation.getQueueVehicleIndex(targetVehicleId);
+                    
+                    if (fromIndex >= 0 && toIndex >= 0) {
+                        const success = this.simulation.moveVehicleInQueue(fromIndex, toIndex);
+                        if (success) {
+                            this.addLogEntry('success', `手动调度：车辆 #${draggedVehicleId} 移到位置 ${toIndex + 1}`);
+                            this.updateUI();
+                        }
+                    }
+                }
             }
         });
+    }
+
+    showDropIndicator(targetElement) {
+        this.clearDropIndicators();
+        targetElement.style.boxShadow = '0 0 10px 3px #38ef7d';
+        targetElement.style.transform = 'scale(1.05)';
+    }
+
+    clearDropIndicators() {
+        document.querySelectorAll('.vehicle-item').forEach(item => {
+            item.style.boxShadow = '';
+            item.style.transform = '';
+        });
+    }
+
+    addManualVehicle() {
+        const success = this.simulation.addManualVehicle();
+        if (success) {
+            this.addLogEntry('success', '手动添加了一辆车到队列');
+        } else {
+            this.addLogEntry('error', '队列已满，车辆溢出');
+        }
+        this.updateUI();
+    }
+
+    skipToPeakTime() {
+        const peakStartMinutes = 6 * 60;
+        if (this.simulation.currentTime < peakStartMinutes) {
+            this.simulation.currentTime = peakStartMinutes;
+            this.simulation.lastGenerationTime = peakStartMinutes;
+            this.addLogEntry('info', '已跳到高峰时段（06:00）');
+            this.updateUI();
+        } else {
+            this.addLogEntry('warning', '当前已在高峰时段或之后');
+        }
+    }
+
+    clearQueue() {
+        if (this.simulation.queue.size() > 0) {
+            const count = this.simulation.queue.size();
+            this.simulation.queue.clear();
+            this.addLogEntry('warning', `手动清空了队列中的 ${count} 辆车`);
+            this.updateUI();
+        } else {
+            this.addLogEntry('info', '队列为空，无需清空');
+        }
     }
 
     updateConfig() {
@@ -297,6 +384,8 @@ class App {
         gates.forEach(gate => {
             let gateClass = '';
             let statusText = '';
+            let clickable = false;
+            let actionHint = '';
             
             switch (gate.status) {
                 case 'processing':
@@ -305,16 +394,22 @@ class App {
                     break;
                 case 'idle':
                     gateClass = 'active';
-                    statusText = '空闲';
+                    statusText = '空闲 - 点击关闭';
+                    clickable = true;
+                    actionHint = 'cursor-pointer';
                     break;
                 case 'inactive':
                     gateClass = 'inactive';
-                    statusText = '未启用';
+                    statusText = '未启用 - 点击开启';
+                    clickable = true;
+                    actionHint = 'cursor-pointer';
                     break;
             }
             
             html += `
-                <div class="gate-item ${gateClass}">
+                <div class="gate-item ${gateClass} ${actionHint}" 
+                     data-gate-id="${gate.id}"
+                     ${clickable ? 'title="点击切换闸口状态"' : ''}>
                     <div class="gate-header">闸口 #${gate.id}</div>
                     <div class="gate-status">${statusText}</div>
                     ${gate.status === 'processing' ? `
@@ -330,6 +425,28 @@ class App {
         });
         
         this.gatesContainer.innerHTML = html;
+        this.setupGateClickHandlers();
+    }
+
+    setupGateClickHandlers() {
+        this.gatesContainer.querySelectorAll('.gate-item').forEach(gateElement => {
+            gateElement.addEventListener('click', (e) => {
+                const gateId = parseInt(gateElement.dataset.gateId);
+                const gate = this.simulation.getGateById(gateId);
+                
+                if (gate && (gate.status === 'idle' || gate.status === 'inactive')) {
+                    const success = this.simulation.toggleGate(gateId);
+                    if (success) {
+                        const newStatus = gate.status === 'idle' ? '已开启' : '已关闭';
+                        const verb = gate.status === 'idle' ? '关闭' : '开启';
+                        this.addLogEntry('success', `手动${verb}闸口 #${gateId}`);
+                        this.updateUI();
+                    } else {
+                        this.addLogEntry('warning', '至少需要保持一个闸口开启');
+                    }
+                }
+            });
+        });
     }
 
     generateReport() {

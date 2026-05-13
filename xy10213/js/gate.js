@@ -192,6 +192,44 @@ class GateManager {
         return this.gates.map(gate => gate.toJSON(currentTime));
     }
 
+    toggleGate(gateId) {
+        const gate = this.gates.find(g => g.id === gateId);
+        if (!gate) return false;
+        
+        if (gate.status === 'inactive') {
+            if (this.activeGates >= this.totalGates) return false;
+            gate.status = 'idle';
+            this.activeGates++;
+            return true;
+        } else if (gate.status === 'idle') {
+            if (this.activeGates <= 1) return false;
+            gate.status = 'inactive';
+            this.activeGates--;
+            return true;
+        }
+        return false;
+    }
+
+    activateGate(gateId) {
+        const gate = this.gates.find(g => g.id === gateId);
+        if (!gate || gate.status !== 'inactive') return false;
+        if (this.activeGates >= this.totalGates) return false;
+        
+        gate.status = 'idle';
+        this.activeGates++;
+        return true;
+    }
+
+    deactivateGate(gateId) {
+        const gate = this.gates.find(g => g.id === gateId);
+        if (!gate || gate.status !== 'idle') return false;
+        if (this.activeGates <= 1) return false;
+        
+        gate.status = 'inactive';
+        this.activeGates--;
+        return true;
+    }
+
     reset() {
         this.gates.forEach(gate => gate.reset());
     }

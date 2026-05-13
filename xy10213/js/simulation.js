@@ -341,6 +341,93 @@ class Simulation {
             strategyInfo: this.strategyManager.getStrategyInfo(this.currentTime)
         };
     }
+
+    moveVehicleInQueue(fromIndex, toIndex) {
+        const success = this.queue.moveVehicle(fromIndex, toIndex);
+        if (success) {
+            this.logEvent('manual_queue_reorder', {
+                time: this.currentTime,
+                fromIndex: fromIndex,
+                toIndex: toIndex
+            });
+        }
+        return success;
+    }
+
+    moveVehicleToFront(vehicleId) {
+        const success = this.queue.moveVehicleToFront(vehicleId);
+        if (success) {
+            this.logEvent('manual_priority', {
+                time: this.currentTime,
+                vehicleId: vehicleId,
+                action: 'moved_to_front'
+            });
+        }
+        return success;
+    }
+
+    toggleGate(gateId) {
+        const success = this.gateManager.toggleGate(gateId);
+        if (success) {
+            const gate = this.gateManager.gates.find(g => g.id === gateId);
+            this.logEvent('manual_gate_toggle', {
+                time: this.currentTime,
+                gateId: gateId,
+                newStatus: gate ? gate.status : 'unknown'
+            });
+        }
+        return success;
+    }
+
+    activateGate(gateId) {
+        const success = this.gateManager.activateGate(gateId);
+        if (success) {
+            this.logEvent('manual_gate_activate', {
+                time: this.currentTime,
+                gateId: gateId
+            });
+        }
+        return success;
+    }
+
+    deactivateGate(gateId) {
+        const success = this.gateManager.deactivateGate(gateId);
+        if (success) {
+            this.logEvent('manual_gate_deactivate', {
+                time: this.currentTime,
+                gateId: gateId
+            });
+        }
+        return success;
+    }
+
+    addManualVehicle() {
+        const vehicle = this.vehicleGenerator.generateVehicle(this.currentTime);
+        const added = this.queue.enqueue(vehicle);
+        this.totalGenerated++;
+        
+        if (added) {
+            this.logEvent('manual_vehicle_added', {
+                vehicleId: vehicle.id,
+                time: this.currentTime
+            });
+        } else {
+            this.logEvent('manual_vehicle_overflow', {
+                vehicleId: vehicle.id,
+                time: this.currentTime
+            });
+        }
+        
+        return added;
+    }
+
+    getQueueVehicleIndex(vehicleId) {
+        return this.queue.getVehicleIndexById(vehicleId);
+    }
+
+    getGateById(gateId) {
+        return this.gateManager.gates.find(g => g.id === gateId);
+    }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
