@@ -1,0 +1,83 @@
+[
+  {
+    "config_hash": "cfg-hash-001",
+    "config_path": "config/production/user-service.yaml",
+    "content_hash": "sha256:abcdef1234567890",
+    "snapshot_time": "2024-01-15T09:00:00Z",
+    "config_data": {
+      "database": {
+        "host": "db-prod-01.example.com",
+        "port": 5432,
+        "pool_size": 20
+      },
+      "redis": {
+        "host": "redis-prod-01.example.com",
+        "port": 6379,
+        "timeout": 5000
+      },
+      "logging": {
+        "level": "INFO",
+        "format": "json"
+      }
+    }
+  },
+  {
+    "config_hash": "cfg-hash-002",
+    "config_path": "config/production/order-service.yaml",
+    "content_hash": "sha256:1234567890abcdef",
+    "snapshot_time": "2024-01-15T10:00:00Z",
+    "config_data": {
+      "database": {
+        "host": "db-prod-02.example.com",
+        "port": 5432
+      },
+      "message_queue": {
+        "broker": "kafka",
+        "topic": "orders"
+      }
+    }
+  },
+  {
+    "config_hash": "cfg-hash-099",
+    "config_path": "config/production/payment-service.yaml",
+    "content_hash": "sha256:9876543210fedcba",
+    "snapshot_time": "2024-01-15T12:00:00Z",
+    "config_data": {
+      "payment_providers": ["alipay", "wechat"],
+      "currency": "CNY",
+      "timeout": 30000
+    }
+  },
+  {
+    "config_hash": "cfg-hash-004",
+    "config_path": "config/production/user-service-v2.yaml",
+    "content_hash": "sha256:0fedcba987654321",
+    "snapshot_time": "2024-01-10T07:00:00Z",
+    "config_data": {
+      "auth": {
+        "jwt_secret": "********",
+        "token_expiry": 3600
+      },
+      "database": {
+        "host": "db-prod-01.example.com",
+        "port": 5432
+      }
+    }
+  },
+  {
+    "config_hash": "cfg-hash-005",
+    "config_path": "config/production/notification-service.yaml",
+    "content_hash": "sha256:abcdef0987654321",
+    "snapshot_time": "2024-01-15T15:00:00Z",
+    "config_data": {
+      "sms": {
+        "provider": "aliyun",
+        "sign_name": "MyApp"
+      },
+      "email": {
+        "provider": "sendgrid",
+        "from_address": "no-reply@example.com"
+      }
+    }
+  }
+]

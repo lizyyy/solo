@@ -1,0 +1,62 @@
+[
+  {
+    "build_number": "BUILD-1001",
+    "commit_hash": "a1b2c3d4e5f6g7h8i9j0",
+    "build_time": "2024-01-15T09:00:00Z",
+    "builder": "zhangsan",
+    "build_machine": "jenkins-agent-01",
+    "config_hash": "cfg-hash-001",
+    "branch": "main",
+    "build_url": "https://ci.example.com/job/user-service/1001",
+    "artifact_version": "v2.1.0",
+    "versions": ["v2.1.0"]
+  },
+  {
+    "build_number": "BUILD-1002",
+    "commit_hash": "b2c3d4e5f6g7h8i9j0a1",
+    "build_time": "2024-01-15T10:00:00Z",
+    "builder": "lisi",
+    "build_machine": "jenkins-agent-02",
+    "config_hash": "cfg-hash-002",
+    "branch": "main",
+    "build_url": "https://ci.example.com/job/order-service/1002",
+    "artifact_version": "v1.8.0",
+    "versions": ["v1.8.0"]
+  },
+  {
+    "build_number": null,
+    "commit_hash": "c3d4e5f6g7h8i9j0a1b2",
+    "build_time": "2024-01-15T08:00:00Z",
+    "builder": "wangwu",
+    "build_machine": "jenkins-agent-03",
+    "config_hash": "cfg-hash-003",
+    "branch": "main",
+    "build_url": null,
+    "artifact_version": "v3.2.0",
+    "versions": ["v3.2.0"]
+  },
+  {
+    "build_number": "BUILD-1000",
+    "commit_hash": "d4e5f6g7h8i9j0a1b2c3",
+    "build_time": "2024-01-10T07:00:00Z",
+    "builder": "zhangsan",
+    "build_machine": "jenkins-agent-01",
+    "config_hash": "cfg-hash-004",
+    "branch": "main",
+    "build_url": "https://ci.example.com/job/user-service/1000",
+    "artifact_version": "v2.0.0",
+    "versions": ["v2.0.0"]
+  },
+  {
+    "build_number": "BUILD-1003",
+    "commit_hash": "e5f6g7h8i9j0a1b2c3d4",
+    "build_time": "2024-01-15T15:00:00Z",
+    "builder": "zhaoliu",
+    "build_machine": "jenkins-agent-02",
+    "config_hash": "cfg-hash-005",
+    "branch": "feature/notification",
+    "build_url": "https://ci.example.com/job/notification-service/1003",
+    "artifact_version": "v1.5.0",
+    "versions": ["v1.5.0"]
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "artifact_id": "art-001",
+    "name": "user-service",
+    "version": "v2.1.0",
+    "environment": "production",
+    "deploy_time": "2024-01-15T10:30:00Z"
+  },
+  {
+    "artifact_id": "art-002",
+    "name": "user-service",
+    "version": "v2.1.0",
+    "environment": "staging",
+    "deploy_time": "2024-01-14T15:00:00Z"
+  },
+  {
+    "artifact_id": "art-003",
+    "name": "order-service",
+    "version": "v1.8.0",
+    "environment": "production",
+    "deploy_time": "2024-01-15T11:00:00Z"
+  },
+  {
+    "artifact_id": "art-004",
+    "name": "payment-service",
+    "version": "v3.2.0",
+    "environment": "production",
+    "deploy_time": "2024-01-15T09:00:00Z"
+  },
+  {
+    "artifact_id": "art-005",
+    "name": "user-service",
+    "version": "v2.0.0",
+    "environment": "production",
+    "deploy_time": "2024-01-10T08:00:00Z"
+  },
+  {
+    "artifact_id": "art-006",
+    "name": "user-service",
+    "version": "v2.0.0",
+    "environment": "production",
+    "deploy_time": "2024-01-15T14:00:00Z"
+  },
+  {
+    "artifact_id": "art-007",
+    "name": "notification-service",
+    "version": "v1.5.0",
+    "environment": "production",
+    "deploy_time": "2024-01-15T16:00:00Z"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "APR-001",
+    "artifact_version": "v2.1.0",
+    "approver": "tech-lead@example.com",
+    "approval_time": "2024-01-15T10:00:00Z",
+    "status": "approved",
+    "comments": "用户画像功能经过完整测试，批准上线"
+  },
+  {
+    "id": "APR-002",
+    "artifact_version": "v1.8.0",
+    "approver": "arch@example.com",
+    "approval_time": "2024-01-15T12:00:00Z",
+    "status": "approved",
+    "comments": "订单状态修复经过验证"
+  },
+  {
+    "id": "APR-003",
+    "artifact_version": "v2.0.0",
+    "approver": "qa-lead@example.com",
+    "approval_time": "2024-01-10T07:30:00Z",
+    "status": "approved",
+    "comments": "登录功能测试通过"
+  },
+  {
+    "id": "APR-004",
+    "artifact_version": "v1.5.0",
+    "approver": "devops-lead@example.com",
+    "approval_time": "2024-01-15T15:30:00Z",
+    "status": "approved",
+    "comments": "通知服务紧急上线，简化审批流程"
+  }
+]
