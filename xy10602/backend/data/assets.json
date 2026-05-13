@@ -1,0 +1,62 @@
+[
+  {
+    "id": "asset-001",
+    "assetNumber": "AST-2024-001",
+    "previousAssetNumber": "AST-2023-045",
+    "name": "MacBook Pro 16寸",
+    "category": "电脑",
+    "status": "in_use",
+    "currentHolder": "emp-001",
+    "purchaseDate": "2024-01-10",
+    "value": 24999,
+    "location": "研发部办公区"
+  },
+  {
+    "id": "asset-002",
+    "assetNumber": "AST-2024-002",
+    "previousAssetNumber": "AST-2023-078",
+    "name": "Dell 显示器 27寸",
+    "category": "显示器",
+    "status": "in_use",
+    "currentHolder": "emp-002",
+    "purchaseDate": "2024-02-15",
+    "value": 3999,
+    "location": "产品部办公区"
+  },
+  {
+    "id": "asset-003",
+    "assetNumber": "AST-2024-003",
+    "previousAssetNumber": "AST-2022-156",
+    "name": "iPhone 15 Pro",
+    "category": "手机",
+    "status": "pending_return",
+    "currentHolder": "emp-003",
+    "purchaseDate": "2023-09-20",
+    "value": 8999,
+    "location": "市场部办公区"
+  },
+  {
+    "id": "asset-004",
+    "assetNumber": "AST-2024-004",
+    "previousAssetNumber": "AST-2021-034",
+    "name": "ThinkPad X1 Carbon",
+    "category": "电脑",
+    "status": "pending_return",
+    "currentHolder": "emp-004",
+    "purchaseDate": "2021-08-05",
+    "value": 12999,
+    "location": "待归还"
+  },
+  {
+    "id": "asset-005",
+    "assetNumber": "AST-2024-005",
+    "previousAssetNumber": "AST-2024-005",
+    "name": "机械键盘",
+    "category": "外设",
+    "status": "in_use",
+    "currentHolder": "emp-005",
+    "purchaseDate": "2024-02-20",
+    "value": 899,
+    "location": "人力资源部办公区"
+  }
+]

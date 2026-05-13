@@ -1,0 +1,23 @@
+[
+  {
+    "id": "fee-001",
+    "acceptanceId": "accept-002",
+    "assetId": "asset-003",
+    "assetNumber": "AST-2024-003",
+    "employeeId": "emp-003",
+    "employeeName": "王五",
+    "damageType": "严重损坏",
+    "description": "屏幕破损、触控失灵、充电器丢失",
+    "oldValue": 8999,
+    "oldStatus": "in_use",
+    "newFeeAmount": 4500,
+    "newStatus": "pending_approval",
+    "reportDate": "2026-05-12",
+    "dueDate": "2026-05-25",
+    "status": "pending_approval",
+    "approver": null,
+    "approverName": null,
+    "operator": "admin-01",
+    "operatorName": "管理员A"
+  }
+]

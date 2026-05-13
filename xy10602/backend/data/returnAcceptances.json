@@ -1,0 +1,42 @@
+[
+  {
+    "id": "accept-001",
+    "assetId": "asset-004",
+    "assetNumber": "AST-2024-004",
+    "employeeId": "emp-004",
+    "employeeName": "赵六",
+    "returnDate": "2026-05-01",
+    "acceptanceDate": "2026-05-02",
+    "status": "completed",
+    "oldCondition": "良好",
+    "newCondition": "有轻微划痕",
+    "checkItems": {
+      "appearance": { "old": "完好", "new": "轻微划痕", "passed": true },
+      "function": { "old": "正常", "new": "正常", "passed": true },
+      "accessories": { "old": "齐全", "new": "齐全", "passed": true }
+    },
+    "operator": "admin-01",
+    "operatorName": "管理员A",
+    "notes": "外观有轻微使用痕迹，功能正常"
+  },
+  {
+    "id": "accept-002",
+    "assetId": "asset-003",
+    "assetNumber": "AST-2024-003",
+    "employeeId": "emp-003",
+    "employeeName": "王五",
+    "returnDate": "2026-05-10",
+    "acceptanceDate": "2026-05-11",
+    "status": "pending",
+    "oldCondition": "全新",
+    "newCondition": "屏幕破损",
+    "checkItems": {
+      "appearance": { "old": "完好", "new": "屏幕破损", "passed": false },
+      "function": { "old": "正常", "new": "触控失灵", "passed": false },
+      "accessories": { "old": "齐全", "new": "充电器丢失", "passed": false }
+    },
+    "operator": "admin-01",
+    "operatorName": "管理员A",
+    "notes": "设备损坏严重，需要进一步处理"
+  }
+]

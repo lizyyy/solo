@@ -1,0 +1,19 @@
+{
+  "name": "asset-management-tool",
+  "version": "1.0.0",
+  "description": "全栈员工设备管理工具 - 处理领用归还、资产编号追踪、离职校验、损坏扣费、盘点差异",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "test": "echo '测试说明详见 README.md'"
+  },
+  "keywords": ["asset-management", "employee-devices", "inventory"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0"
+  }
+}

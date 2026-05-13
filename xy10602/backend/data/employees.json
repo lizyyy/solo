@@ -1,0 +1,44 @@
+[
+  {
+    "id": "emp-001",
+    "name": "张三",
+    "department": "研发部",
+    "status": "active",
+    "hireDate": "2023-01-15",
+    "email": "zhangsan@company.com"
+  },
+  {
+    "id": "emp-002",
+    "name": "李四",
+    "department": "产品部",
+    "status": "active",
+    "hireDate": "2022-06-20",
+    "email": "lisi@company.com"
+  },
+  {
+    "id": "emp-003",
+    "name": "王五",
+    "department": "市场部",
+    "status": "pending_resignation",
+    "hireDate": "2021-03-10",
+    "resignationDate": "2026-05-20",
+    "email": "wangwu@company.com"
+  },
+  {
+    "id": "emp-004",
+    "name": "赵六",
+    "department": "财务部",
+    "status": "resigned",
+    "hireDate": "2020-08-01",
+    "resignationDate": "2026-04-30",
+    "email": "zhaoliu@company.com"
+  },
+  {
+    "id": "emp-005",
+    "name": "孙七",
+    "department": "人力资源部",
+    "status": "active",
+    "hireDate": "2024-02-01",
+    "email": "sunqi@company.com"
+  }
+]

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资产设备管理工具</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <h1>资产设备管理工具</h1>
+        <p class="subtitle">员工设备领用归还 | 资产编号追踪 | 离职校验 | 损坏扣费 | 盘点差异</p>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="search-section">
+        <div class="search-container">
+          <div class="search-group">
+            <input type="text" id="globalSearch" placeholder="搜索资产编号、员工姓名、责任人等..." class="search-input">
+            <select id="searchType" class="search-select">
+              <option value="all">全部类型</option>
+              <option value="assets">资产</option>
+              <option value="employees">员工</option>
+              <option value="acceptances">归还验收</option>
+              <option value="fees">损坏扣费</option>
+              <option value="differences">盘点差异</option>
+            </select>
+            <button id="searchBtn" class="btn btn-primary">搜索</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-section">
+        <h2 class="section-title">统计概览</h2>
+        <div class="stats-grid" id="statsGrid">
+        </div>
+      </section>
+
+      <section class="filter-section">
+        <h2 class="section-title">筛选条件</h2>
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label>状态筛选</label>
+            <select id="statusFilter" class="filter-select">
+              <option value="">全部状态</option>
+              <option value="pending">待处理</option>
+              <option value="approved">已通过</option>
+              <option value="completed">已完成</option>
+              <option value="resolved">已解决</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>责任人</label>
+            <select id="responsiblePersonFilter" class="filter-select">
+              <option value="">全部责任人</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>开始日期</label>
+            <input type="date" id="startDateFilter" class="filter-input">
+          </div>
+          <div class="filter-item">
+            <label>结束日期</label>
+            <input type="date" id="endDateFilter" class="filter-input">
+          </div>
+          <div class="filter-item">
+            <button id="applyFilters" class="btn btn-primary">应用筛选</button>
+            <button id="resetFilters" class="btn btn-secondary">重置</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="review-section">
+        <div class="section-header">
+          <h2 class="section-title">复核面板</h2>
+          <button id="exportBtn" class="btn btn-success">导出报告</button>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="reviews">复核记录</button>
+          <button class="tab-btn" data-tab="acceptances">归还验收</button>
+          <button class="tab-btn" data-tab="fees">损坏扣费</button>
+          <button class="tab-btn" data-tab="differences">盘点差异</button>
+          <button class="tab-btn" data-tab="trails">设备轨迹</button>
+        </div>
+
+        <div class="tab-content">
+          <div id="tab-reviews" class="tab-pane active">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>类型</th>
+                    <th>资产编号</th>
+                    <th>员工</th>
+                    <th>变更前</th>
+                    <th>变更后</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewsTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-acceptances" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>资产编号</th>
+                    <th>员工</th>
+                    <th>验收日期</th>
+                    <th>旧状态</th>
+                    <th>新状态</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="acceptancesTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-fees" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>资产编号</th>
+                    <th>员工</th>
+                    <th>损坏类型</th>
+                    <th>费用</th>
+                    <th>旧状态</th>
+                    <th>新状态</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="feesTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-differences" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>资产编号</th>
+                    <th>旧编号</th>
+                    <th>差异类型</th>
+                    <th>责任人</th>
+                    <th>日期</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="differencesTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="tab-trails" class="tab-pane">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>资产编号</th>
+                    <th>操作类型</th>
+                    <th>变更前</th>
+                    <th>变更后</th>
+                    <th>时间</th>
+                    <th>操作人</th>
+                  </tr>
+                </thead>
+                <tbody id="trailsTableBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="validation-section">
+        <h2 class="section-title">员工离职校验</h2>
+        <div class="validation-container">
+          <div class="validation-input">
+            <select id="employeeSelect" class="filter-select">
+              <option value="">选择员工</option>
+            </select>
+            <button id="validateBtn" class="btn btn-primary">校验离职状态</button>
+          </div>
+          <div id="validationResult" class="validation-result">
+            <p class="validation-hint">选择员工后点击校验按钮</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="add-diff-section">
+        <h2 class="section-title">新增盘点差异</h2>
+        <form id="diffForm" class="diff-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>资产编号 *</label>
+              <input type="text" id="diffAssetNumber" class="form-input" placeholder="例如：AST-2024-001" required>
+            </div>
+            <div class="form-group">
+              <label>旧资产编号</label>
+              <input type="text" id="diffPrevNumber" class="form-input" placeholder="如无变更可留空">
+            </div>
+            <div class="form-group">
+              <label>盘点周期</label>
+              <input type="text" id="diffPeriod" class="form-input" value="2026-Q2">
+            </div>
+            <div class="form-group">
+              <label>旧位置</label>
+              <input type="text" id="diffOldLocation" class="form-input" placeholder="例如：研发部办公区">
+            </div>
+            <div class="form-group">
+              <label>新位置</label>
+              <input type="text" id="diffNewLocation" class="form-input" placeholder="例如：仓库">
+            </div>
+            <div class="form-group">
+              <label>旧状态</label>
+              <input type="text" id="diffOldStatus" class="form-input" placeholder="例如：in_use">
+            </div>
+            <div class="form-group">
+              <label>新状态</label>
+              <input type="text" id="diffNewStatus" class="form-input" placeholder="例如：missing">
+            </div>
+            <div class="form-group">
+              <label>责任人 *</label>
+              <input type="text" id="diffResponsible" class="form-input" placeholder="例如：张三" required>
+            </div>
+            <div class="form-group">
+              <label>差异类型</label>
+              <input type="text" id="diffType" class="form-input" placeholder="例如：位置差异">
+            </div>
+            <div class="form-group full-width">
+              <label>描述 *</label>
+              <textarea id="diffDescription" class="form-textarea" placeholder="详细描述差异情况..." required></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>备注</label>
+              <textarea id="diffNotes" class="form-textarea" placeholder="其他说明..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">保存差异</button>
+            <button type="reset" class="btn btn-secondary">重置表单</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">详情</h3>
+          <span class="close-modal">&times;</span>
+        </div>
+        <div id="modalBody" class="modal-body">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
