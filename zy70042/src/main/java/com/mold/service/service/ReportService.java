@@ -93,26 +93,30 @@ public class ReportService {
                 .filter(s -> s.getMoldImpactStatus() != null)
                 .collect(Collectors.groupingBy(ProductionSchedule::getMoldImpactStatus));
         
-        Map<String, List<ScheduleImpactReport.ScheduleImpactDetail>> lineGroups = activeSchedules.stream()
+        Map<String, List<ProductionSchedule>> lineGroups = activeSchedules.stream()
                 .collect(Collectors.groupingBy(ProductionSchedule::getProductionLine));
         
         List<ScheduleImpactReport.LineImpactSummary> lineSummaries = new ArrayList<>();
         
-        for (Map.Entry<String, List<ScheduleImpactReport.ScheduleImpactDetail>> entry : lineGroups.entrySet()) {
+        for (Map.Entry<String, List<ProductionSchedule>> entry : lineGroups.entrySet()) {
             ScheduleImpactReport.LineImpactSummary lineSummary = new ScheduleImpactReport.LineImpactSummary();
             lineSummary.setProductionLine(entry.getKey());
             lineSummary.setTotalSchedules(entry.getValue().size());
             
-            long normalCount = entry.getValue().stream()
+            List<ScheduleImpactReport.ScheduleImpactDetail> details = entry.getValue().stream()
+                    .map(this::toScheduleImpactDetail)
+                    .collect(Collectors.toList());
+            
+            long normalCount = details.stream()
                     .filter(s -> s.getMoldImpactStatus() == ProductionSchedule.ImpactStatus.NORMAL)
                     .count();
-            long warningCount = entry.getValue().stream()
+            long warningCount = details.stream()
                     .filter(s -> s.getMoldImpactStatus() == ProductionSchedule.ImpactStatus.WARNING)
                     .count();
-            long atRiskCount = entry.getValue().stream()
+            long atRiskCount = details.stream()
                     .filter(s -> s.getMoldImpactStatus() == ProductionSchedule.ImpactStatus.AT_RISK)
                     .count();
-            long needChangeCount = entry.getValue().stream()
+            long needChangeCount = details.stream()
                     .filter(s -> s.getMoldImpactStatus() == ProductionSchedule.ImpactStatus.NEEDS_MOLD_CHANGE)
                     .count();
             
@@ -120,7 +124,7 @@ public class ReportService {
             lineSummary.setWarningCount(warningCount);
             lineSummary.setAtRiskCount(atRiskCount);
             lineSummary.setNeedChangeCount(needChangeCount);
-            lineSummary.setDetails(entry.getValue());
+            lineSummary.setDetails(details);
             lineSummaries.add(lineSummary);
         }
         
@@ -253,6 +257,22 @@ public class ReportService {
             return 0.0;
         }
         return (double) numerator / denominator * 100;
+    }
+    
+    private ScheduleImpactReport.ScheduleImpactDetail toScheduleImpactDetail(ProductionSchedule schedule) {
+        ScheduleImpactReport.ScheduleImpactDetail detail = new ScheduleImpactReport.ScheduleImpactDetail();
+        detail.setScheduleId(schedule.getId());
+        detail.setScheduleNo(schedule.getScheduleNo());
+        detail.setProductionLine(schedule.getProductionLine());
+        detail.setProductCode(schedule.getProductCode());
+        detail.setMoldId(schedule.getMoldId());
+        detail.setMoldCode(schedule.getMoldCode());
+        detail.setScheduleStatus(schedule.getStatus());
+        detail.setMoldImpactStatus(schedule.getMoldImpactStatus());
+        detail.setMoldImpactDetail(schedule.getMoldImpactDetail());
+        detail.setPlannedStartTime(schedule.getPlannedStartTime());
+        detail.setPlannedEndTime(schedule.getPlannedEndTime());
+        return detail;
     }
     
     @Data

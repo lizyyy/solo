@@ -14,6 +14,8 @@ public interface ProductionScheduleRepository extends JpaRepository<ProductionSc
     
     Optional<ProductionSchedule> findByScheduleNo(String scheduleNo);
     
+    List<ProductionSchedule> findByStatusIn(List<ProductionSchedule.ScheduleStatus> statuses);
+    
     List<ProductionSchedule> findByProductionLineAndStatusIn(String productionLine, List<ProductionSchedule.ScheduleStatus> statuses);
     
     List<ProductionSchedule> findByMoldIdAndStatusIn(Long moldId, List<ProductionSchedule.ScheduleStatus> statuses);

@@ -76,6 +76,12 @@ public class MoldExtensionApproval {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
     
+    @Column(length = 50)
+    private String createdBy;
+    
+    @Column(length = 50)
+    private String updatedBy;
+    
     @Version
     private Long version;
     
