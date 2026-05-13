@@ -1,0 +1,40 @@
+plan_id: CORR_20260513_003
+plan_name: 用户标签订正计划
+created_at: 2026-05-13 11:00:00
+created_by: 用户运营-李四
+description: 由于标签算法更新，需要修正一批历史用户标签，影响用户画像和销售提成
+items:
+  - order_id: ORDER_20260115_005
+    field_name: user_tag
+    old_value: 普通会员
+    new_value: VIP会员
+    field_type: user_tag
+    reason: 标签算法更新，累计消费达到VIP标准
+
+  - order_id: ORDER_20260220_010
+    field_name: user_tag
+    old_value: VIP会员
+    new_value: SVIP会员
+    field_type: user_tag
+    reason: 标签算法更新，累计消费达到SVIP标准
+
+  - order_id: ORDER_20260310_008
+    field_name: user_tag
+    old_value: 新用户
+    new_value: 普通会员
+    field_type: user_tag
+    reason: 标签算法更新，复购次数达到普通会员标准
+
+  - order_id: ORDER_20260405_003
+    field_name: user_tag
+    old_value: 沉睡用户
+    new_value: 普通会员
+    field_type: user_tag
+    reason: 用户近期有活跃，标签需更新
+
+  - order_id: ORDER_20260501_007
+    field_name: user_tag
+    old_value: 普通会员
+    new_value: 高价值用户
+    field_type: user_tag
+    reason: 累计消费额达到高价值用户标准

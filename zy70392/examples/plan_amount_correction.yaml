@@ -1,0 +1,40 @@
+plan_id: CORR_20260513_002
+plan_name: 订单金额字段订正计划
+created_at: 2026-05-13 10:00:00
+created_by: 财务-王五
+description: 由于系统计算错误，部分订单金额需要修正，涉及已结算账单
+items:
+  - order_id: ORDER_20260401_005
+    field_name: amount
+    old_value: 999.00
+    new_value: 1299.00
+    field_type: amount
+    reason: 系统折扣计算错误
+
+  - order_id: ORDER_20260415_010
+    field_name: amount
+    old_value: 599.00
+    new_value: 699.00
+    field_type: amount
+    reason: 系统折扣计算错误
+
+  - order_id: ORDER_20260420_008
+    field_name: amount
+    old_value: 2499.00
+    new_value: 2199.00
+    field_type: amount
+    reason: 重复计算了优惠券
+
+  - order_id: ORDER_20260505_003
+    field_name: amount
+    old_value: 899.00
+    new_value: 849.00
+    field_type: amount
+    reason: 会员折扣未生效
+
+  - order_id: ORDER_20260510_007
+    field_name: amount
+    old_value: 1599.00
+    new_value: 1699.00
+    field_type: amount
+    reason: 满减活动计算错误

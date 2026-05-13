@@ -1,0 +1,134 @@
+generated_at: 2026-05-13 17:43:55.431042
+plan_id: CORR_20260513_002
+rollback_plan:
+- action: rollback_recalc
+  description: 回滚 月度销售报表 的操作
+  step: 1
+  target: 月度销售报表
+- action: rollback_recalc
+  description: 回滚 佣金计算引擎 的操作
+  step: 2
+  target: 佣金计算引擎
+- action: rollback_refresh_cache
+  description: 回滚 订单查询缓存 的操作
+  step: 3
+  target: 订单查询缓存
+- action: rollback_recalc
+  description: 回滚 月度销售报表 的操作
+  step: 4
+  target: 月度销售报表
+- action: rollback_recalc
+  description: 回滚 财务收入日报 的操作
+  step: 5
+  target: 财务收入日报
+- action: rollback_recalc
+  description: 回滚 2026年4月渠道佣金账单 的操作
+  step: 6
+  target: 2026年4月渠道佣金账单
+- action: rollback_recalc
+  description: 回滚 2026年5月渠道佣金账单 的操作
+  step: 7
+  target: 2026年5月渠道佣金账单
+- action: rollback_recalc
+  description: 回滚 2026年Q1销售提成账单 的操作
+  step: 8
+  target: 2026年Q1销售提成账单
+- action: rollback_refresh_cache
+  description: 回滚 订单详情缓存 的操作
+  step: 9
+  target: 订单详情缓存
+- action: rollback_refresh_cache
+  description: 回滚 报表结果缓存 的操作
+  step: 10
+  target: 报表结果缓存
+steps:
+- action: recalc
+  description: '重新生成报表: 月度销售报表'
+  is_settled: false
+  owner: 数据分析师-张三
+  requires_approval: true
+  risk_level: high
+  step: 1
+  target: 月度销售报表
+  type: report
+- action: recalc
+  description: '重新计算账单: 佣金计算引擎'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: high
+  step: 2
+  target: 佣金计算引擎
+  type: bill
+- action: recalc
+  description: '重新生成报表: 月度销售报表'
+  is_settled: false
+  owner: 数据分析师-张三
+  requires_approval: true
+  risk_level: high
+  step: 3
+  target: 月度销售报表
+  type: report
+- action: recalc
+  description: '重新生成报表: 财务收入日报'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: high
+  step: 4
+  target: 财务收入日报
+  type: report
+- action: recalc
+  description: '重新计算账单: 2026年4月渠道佣金账单'
+  is_settled: true
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: critical
+  step: 5
+  target: 2026年4月渠道佣金账单
+  type: bill
+- action: recalc
+  description: '重新计算账单: 2026年5月渠道佣金账单'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: high
+  step: 6
+  target: 2026年5月渠道佣金账单
+  type: bill
+- action: recalc
+  description: '重新计算账单: 2026年Q1销售提成账单'
+  is_settled: true
+  owner: 财务-赵七
+  requires_approval: true
+  risk_level: critical
+  step: 7
+  target: 2026年Q1销售提成账单
+  type: bill
+- action: refresh_cache
+  description: '刷新缓存: 订单查询缓存'
+  is_settled: false
+  owner: null
+  requires_approval: false
+  risk_level: low
+  step: 8
+  target: 订单查询缓存
+  type: cache
+- action: refresh_cache
+  description: '刷新缓存: 订单详情缓存'
+  is_settled: false
+  owner: 技术-钱八
+  requires_approval: false
+  risk_level: low
+  step: 9
+  target: 订单详情缓存
+  type: cache
+- action: refresh_cache
+  description: '刷新缓存: 报表结果缓存'
+  is_settled: false
+  owner: null
+  requires_approval: false
+  risk_level: low
+  step: 10
+  target: 报表结果缓存
+  type: cache

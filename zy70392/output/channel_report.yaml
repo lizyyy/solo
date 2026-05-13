@@ -1,0 +1,209 @@
+affected_objects:
+- action: recalc
+  name: 月度销售报表
+  owner: 数据分析师-张三
+  reason: 依赖字段 channel 被修改
+  risk_level: medium
+  type: report
+- action: recalc
+  name: 用户标签系统
+  owner: 用户运营-李四
+  reason: 依赖字段 channel 被修改
+  risk_level: medium
+  type: tag
+- action: recalc
+  name: 佣金计算引擎
+  owner: 财务-王五
+  reason: 依赖字段 channel 被修改
+  risk_level: high
+  type: bill
+- action: refresh_cache
+  name: 订单查询缓存
+  owner: null
+  reason: 依赖字段 channel 被修改
+  risk_level: low
+  type: cache
+- action: recalc
+  name: 周报汇总系统
+  owner: 运营-赵六
+  reason: 依赖字段 channel 被修改
+  risk_level: medium
+  type: report
+- action: recalc
+  name: 月度销售报表
+  owner: 数据分析师-张三
+  reason: 报表依赖字段 channel 被修改，影响 2 个周期
+  risk_level: medium
+  type: report
+- action: recalc
+  name: 渠道分析周报
+  owner: 运营-赵六
+  reason: 报表依赖字段 channel 被修改，影响 2 个周期
+  risk_level: medium
+  type: report
+- action: recalc
+  name: 财务收入日报
+  owner: 财务-王五
+  reason: 报表依赖字段 channel 被修改，影响 3 个周期
+  risk_level: medium
+  type: report
+- action: recalc
+  name: 2026年4月渠道佣金账单
+  owner: 财务-王五
+  reason: 账单渠道字段被修改（已结算账单，需二次审批）
+  risk_level: high
+  type: bill
+- action: recalc
+  name: 2026年5月渠道佣金账单
+  owner: 财务-王五
+  reason: 账单渠道字段被修改
+  risk_level: medium
+  type: bill
+- action: refresh_cache
+  name: 订单详情缓存
+  owner: 技术-钱八
+  reason: 缓存依赖字段 channel 被修改，需刷新 2 个缓存键
+  risk_level: low
+  type: cache
+- action: refresh_cache
+  name: 报表结果缓存
+  owner: null
+  reason: 缓存依赖字段 channel 被修改，需刷新 2 个缓存键
+  risk_level: low
+  type: cache
+cannot_auto_process:
+- name: 佣金计算引擎
+  reason: '需要审批: 依赖字段 channel 被修改'
+  risk_level: high
+  type: bill
+- name: 2026年4月渠道佣金账单
+  reason: '需要审批: 账单渠道字段被修改（已结算账单，需二次审批）'
+  risk_level: high
+  type: bill
+- name: 订单查询缓存
+  reason: 缺少负责人，无法自动处理
+  risk_level: medium
+  type: unknown
+- name: 报表结果缓存
+  reason: 缺少负责人，无法自动处理
+  risk_level: medium
+  type: unknown
+created_by: 运营-孙九
+generated_at: 2026-05-13 17:44:28.580036
+plan_id: CORR_20260513_001
+plan_name: 历史订单渠道字段订正计划
+recalc_steps:
+- action: recalc
+  description: '重新生成报表: 月度销售报表'
+  is_settled: false
+  owner: 数据分析师-张三
+  requires_approval: false
+  risk_level: medium
+  step: 1
+  target: 月度销售报表
+  type: report
+- action: recalc
+  description: '重新计算下游系统: 用户标签系统'
+  is_settled: false
+  owner: 用户运营-李四
+  requires_approval: false
+  risk_level: medium
+  step: 2
+  target: 用户标签系统
+  type: tag
+- action: recalc
+  description: '重新计算账单: 佣金计算引擎'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: high
+  step: 3
+  target: 佣金计算引擎
+  type: bill
+- action: recalc
+  description: '重新生成报表: 周报汇总系统'
+  is_settled: false
+  owner: 运营-赵六
+  requires_approval: false
+  risk_level: medium
+  step: 4
+  target: 周报汇总系统
+  type: report
+- action: recalc
+  description: '重新生成报表: 月度销售报表'
+  is_settled: false
+  owner: 数据分析师-张三
+  requires_approval: false
+  risk_level: medium
+  step: 5
+  target: 月度销售报表
+  type: report
+- action: recalc
+  description: '重新生成报表: 渠道分析周报'
+  is_settled: false
+  owner: 运营-赵六
+  requires_approval: false
+  risk_level: medium
+  step: 6
+  target: 渠道分析周报
+  type: report
+- action: recalc
+  description: '重新生成报表: 财务收入日报'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: false
+  risk_level: medium
+  step: 7
+  target: 财务收入日报
+  type: report
+- action: recalc
+  description: '重新计算账单: 2026年4月渠道佣金账单'
+  is_settled: true
+  owner: 财务-王五
+  requires_approval: true
+  risk_level: high
+  step: 8
+  target: 2026年4月渠道佣金账单
+  type: bill
+- action: recalc
+  description: '重新计算账单: 2026年5月渠道佣金账单'
+  is_settled: false
+  owner: 财务-王五
+  requires_approval: false
+  risk_level: medium
+  step: 9
+  target: 2026年5月渠道佣金账单
+  type: bill
+risk_level: high
+rollback_suggestions:
+- ⚠️ 已结算账单修改需执行二次审批流程
+- 执行前备份原始数据
+- 先执行非关键路径的重算，验证结果后再执行关键路径
+- 已结算账单的修改需财务审批后执行
+- 建议在业务低峰期执行缓存刷新
+- 执行完成后抽查关键报表和账单数据
+settled_items:
+- name: 2026年4月渠道佣金账单
+  reason: 账单渠道字段被修改（已结算账单，需二次审批）
+  risk_level: high
+  type: bill
+signature_fields:
+  approver: ''
+  approver_date: null
+  approver_signature: ''
+  assessor: ''
+  assessor_date: null
+  assessor_signature: ''
+suggested_order:
+- 月度销售报表 (recalc)
+- 用户标签系统 (recalc)
+- 【需审批】佣金计算引擎 (recalc)
+- 周报汇总系统 (recalc)
+- 月度销售报表 (recalc)
+- 渠道分析周报 (recalc)
+- 财务收入日报 (recalc)
+- 【需审批】【已结算⚠️】2026年4月渠道佣金账单 (recalc)
+- 2026年5月渠道佣金账单 (recalc)
+- 订单查询缓存 (refresh_cache)
+- 订单详情缓存 (refresh_cache)
+- 报表结果缓存 (refresh_cache)

@@ -1,0 +1,46 @@
+rules:
+  - rule_id: rpt_001
+    report_name: 月度销售报表
+    affected_fields:
+      - channel
+      - amount
+    period: monthly
+    affected_periods:
+      - 2026-04-01
+      - 2026-03-01
+    owner: 数据分析师-张三
+    requires_recalc: true
+
+  - rule_id: rpt_002
+    report_name: 渠道分析周报
+    affected_fields:
+      - channel
+    period: weekly
+    affected_periods:
+      - 2026-05-04
+      - 2026-04-27
+    owner: 运营-赵六
+    requires_recalc: true
+
+  - rule_id: rpt_003
+    report_name: 用户画像季度报告
+    affected_fields:
+      - user_tag
+    period: quarterly
+    affected_periods:
+      - 2026-04-01
+    owner: 用户运营-李四
+    requires_recalc: true
+
+  - rule_id: rpt_004
+    report_name: 财务收入日报
+    affected_fields:
+      - amount
+      - channel
+    period: daily
+    affected_periods:
+      - 2026-05-10
+      - 2026-05-11
+      - 2026-05-12
+    owner: 财务-王五
+    requires_recalc: true

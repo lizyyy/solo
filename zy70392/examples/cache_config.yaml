@@ -1,0 +1,33 @@
+configs:
+  - cache_id: cache_001
+    cache_name: 订单详情缓存
+    affected_fields:
+      - channel
+      - amount
+      - user_tag
+    ttl_seconds: 3600
+    cache_keys:
+      - order:{order_id}:detail
+      - order:{order_id}:summary
+    owner: 技术-钱八
+
+  - cache_id: cache_002
+    cache_name: 用户画像缓存
+    affected_fields:
+      - user_tag
+    ttl_seconds: 86400
+    cache_keys:
+      - user:{user_id}:profile
+      - user:{user_id}:tags
+    owner: 用户运营-李四
+
+  - cache_id: cache_003
+    cache_name: 报表结果缓存
+    affected_fields:
+      - channel
+      - amount
+    ttl_seconds: 1800
+    cache_keys:
+      - report:monthly:{period}
+      - report:weekly:{period}
+    owner: null

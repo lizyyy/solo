@@ -1,0 +1,55 @@
+dependencies:
+  - dependency_id: dep_001
+    name: 月度销售报表
+    type: report
+    owner: 数据分析师-张三
+    affected_fields:
+      - channel
+      - amount
+    refresh_method: recalc
+    priority: 1
+    depends_on: []
+
+  - dependency_id: dep_002
+    name: 用户标签系统
+    type: tag
+    owner: 用户运营-李四
+    affected_fields:
+      - user_tag
+      - channel
+    refresh_method: recalc
+    priority: 2
+    depends_on: []
+
+  - dependency_id: dep_003
+    name: 佣金计算引擎
+    type: bill
+    owner: 财务-王五
+    affected_fields:
+      - amount
+      - channel
+    refresh_method: recalc
+    priority: 1
+    depends_on: []
+
+  - dependency_id: dep_004
+    name: 订单查询缓存
+    type: cache
+    owner: null
+    affected_fields:
+      - channel
+      - amount
+      - user_tag
+    refresh_method: refresh_cache
+    priority: 3
+    depends_on: []
+
+  - dependency_id: dep_005
+    name: 周报汇总系统
+    type: report
+    owner: 运营-赵六
+    affected_fields:
+      - channel
+    refresh_method: recalc
+    priority: 2
+    depends_on: []

@@ -1,0 +1,37 @@
+rules:
+  - rule_id: bill_001
+    bill_name: 2026年4月渠道佣金账单
+    affected_fields:
+      - channel
+      - amount
+    affected_periods:
+      - 2026-04-01
+    is_settled: true
+    settled_at: 2026-05-05 10:00:00
+    owner: 财务-王五
+    affects_amount: true
+
+  - rule_id: bill_002
+    bill_name: 2026年5月渠道佣金账单
+    affected_fields:
+      - channel
+      - amount
+    affected_periods:
+      - 2026-05-01
+    is_settled: false
+    owner: 财务-王五
+    affects_amount: true
+
+  - rule_id: bill_003
+    bill_name: 2026年Q1销售提成账单
+    affected_fields:
+      - user_tag
+      - amount
+    affected_periods:
+      - 2026-01-01
+      - 2026-02-01
+      - 2026-03-01
+    is_settled: true
+    settled_at: 2026-04-10 14:30:00
+    owner: 财务-赵七
+    affects_amount: true

@@ -1,0 +1,40 @@
+plan_id: CORR_20260513_001
+plan_name: 历史订单渠道字段订正计划
+created_at: 2026-05-13 09:00:00
+created_by: 运营-孙九
+description: 运营团队需要修正一批历史订单的渠道字段，这些订单在录入时渠道信息有误
+items:
+  - order_id: ORDER_20260415_001
+    field_name: channel
+    old_value: 自然流量
+    new_value: 抖音推广
+    field_type: channel
+    reason: 渠道归因错误
+
+  - order_id: ORDER_20260415_002
+    field_name: channel
+    old_value: 自然流量
+    new_value: 快手推广
+    field_type: channel
+    reason: 渠道归因错误
+
+  - order_id: ORDER_20260420_001
+    field_name: channel
+    old_value: 淘宝搜索
+    new_value: 淘宝直播
+    field_type: channel
+    reason: 渠道归因错误
+
+  - order_id: ORDER_20260501_003
+    field_name: channel
+    old_value: 拼多多推荐
+    new_value: 拼多多直播
+    field_type: channel
+    reason: 渠道归因错误
+
+  - order_id: ORDER_20260510_001
+    field_name: channel
+    old_value: 京东自营
+    new_value: 京东第三方
+    field_type: channel
+    reason: 渠道归因错误

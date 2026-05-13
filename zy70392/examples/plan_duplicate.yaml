@@ -1,0 +1,26 @@
+plan_id: CORR_TEST_DUPLICATE
+plan_name: 重复订正当测试
+created_at: 2026-05-13 12:00:00
+created_by: 测试用户
+description: 用于测试重复订正验证
+items:
+  - order_id: ORDER_001
+    field_name: channel
+    old_value: A
+    new_value: B
+    field_type: channel
+    reason: 测试
+
+  - order_id: ORDER_001
+    field_name: channel
+    old_value: B
+    new_value: C
+    field_type: channel
+    reason: 重复
+
+  - order_id: ORDER_002
+    field_name: amount
+    old_value: 100
+    new_value: 200
+    field_type: amount
+    reason: 测试
