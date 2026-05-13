@@ -323,11 +323,15 @@ const OrderList = ({ activities }) => {
                 <Button danger icon={<CloseOutlined /> } onClick={() => setRejectModalVisible(true)}>拒绝补单</Button>
               </>
             )}
-            {currentOrder?.payment_status === 'paid' && currentOrder?.shipping_status !== 'shipped' && (
+            {currentOrder?.payment_status === 'paid' && currentOrder?.status === 'confirmed' && 
+             currentOrder?.shipping_status !== 'shipped' && currentOrder?.refund_status !== 'completed' && (
               <Button type="primary" icon={<TruckOutlined /> } onClick={() => setShipModalVisible(true)}>发货</Button>
             )}
-            {currentOrder?.payment_status === 'paid' && currentOrder?.refund_status !== 'completed' && (
-              <Button danger icon={<RollbackOutlined /> } onClick={() => setRefundModalVisible(true)}>退款</Button>
+            {currentOrder?.payment_status === 'paid' && currentOrder?.status === 'confirmed' && 
+             currentOrder?.refund_status !== 'completed' && (
+              <Button danger icon={<RollbackOutlined /> } onClick={() => setRefundModalVisible(true)}>
+                {currentOrder?.shipping_status === 'shipped' ? '退货退款' : '取消退款'}
+              </Button>
             )}
             <Button onClick={() => setDetailVisible(false)}>关闭</Button>
           </Space>
@@ -426,13 +430,13 @@ const OrderList = ({ activities }) => {
         </Form>
       </Modal>
 
-      <Modal title="退款" open={refundModalVisible} onCancel={() => setRefundModalVisible(false)} onOk={() => form.submit()}>
-        <Form form={form} onFinish={handleRefund}>
+      <Modal title={currentOrder?.shipping_status === 'shipped' ? '退货退款' : '取消退款'} open={refundModalVisible} onCancel={() => setRefundModalVisible(false)} onOk={() => form.submit()}>
+        <Form form={form} onFinish={handleRefund} initialValues={{ returnStock: currentOrder?.shipping_status === 'shipped' }}>
           <Form.Item name="refundAmount" rules={[{ required: true, message: '请输入退款金额' }]}>
             <Input type="number" placeholder="请输入退款金额..." prefix="¥" />
           </Form.Item>
           <Form.Item name="returnStock" valuePropName="checked">
-            <Select>
+            <Select disabled={currentOrder?.shipping_status !== 'shipped'}>
               <Option value={true}>退回库存</Option>
               <Option value={false}>不退回库存</Option>
             </Select>

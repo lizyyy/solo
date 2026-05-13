@@ -262,6 +262,18 @@ class OrderService {
       return { success: false, message: '订单已退款，不可重复退款' };
     }
 
+    if (order.status === ORDER_STATUS.CANCELLED) {
+      return { success: false, message: '订单已取消，无法退款' };
+    }
+
+    if (order.payment_status !== PAYMENT_STATUS.PAID) {
+      return { success: false, message: '订单未支付，无法退款' };
+    }
+
+    if (returnStock && order.shipping_status !== SHIPPING_STATUS.SHIPPED) {
+      return { success: false, message: '订单未发货，无需退回库存，请选择不回滚库存' };
+    }
+
     const idempotentKey = this.generateIdempotentKey('refund', orderId);
 
     if (returnStock) {
@@ -273,9 +285,16 @@ class OrderService {
 
     await run(`
       UPDATE flash_sale_orders 
-      SET refund_status = ?, refund_time = CURRENT_TIMESTAMP, refund_amount = ?, operator_id = ?, operator_name = ?, updated_at = CURRENT_TIMESTAMP
+      SET refund_status = ?, 
+          refund_time = CURRENT_TIMESTAMP, 
+          refund_amount = ?, 
+          operator_id = ?, 
+          operator_name = ?, 
+          payment_status = ?,
+          status = ?,
+          updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
-    `, [REFUND_STATUS.COMPLETED, refundAmount, operatorId, operatorName, orderId]);
+    `, [REFUND_STATUS.COMPLETED, refundAmount, operatorId, operatorName, PAYMENT_STATUS.REFUNDED, ORDER_STATUS.CANCELLED, orderId]);
 
     return { success: true, message: '退款成功' };
   }
