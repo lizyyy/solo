@@ -257,6 +257,13 @@ router.post('/exits', async (req, res) => {
       [person_id, exit_date, exit_reason, actualBadgeReturned ? 1 : 0, approver, remarks]
     );
     
+    if (actualBadgeReturned && hasBadge) {
+      await runUpdate(
+        'UPDATE badges SET status = "returned", returned_date = ? WHERE person_id = ? AND status != "returned"',
+        [exit_date, person_id]
+      );
+    }
+    
     if (!actualBadgeReturned && hasBadge) {
       res.json({ id, message: '离场登记成功（注意：工牌未回收）', warning: '工牌未回收' });
     } else {

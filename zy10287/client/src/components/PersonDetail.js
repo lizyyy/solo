@@ -402,7 +402,7 @@ function PersonDetail({ person, onBack }) {
           <Form.Item name="exit_reason" label="离场原因">
             <Input />
           </Form.Item>
-          <Form.Item name="badge_returned" label="工牌是否已回收" valuePropName="checked">
+          <Form.Item name="badge_returned" label="工牌是否已回收">
             <Select>
               <Option value={true}>是</Option>
               <Option value={false}>否</Option>
