@@ -181,7 +181,16 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="abnormal_desc" label="异常描述" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="abnormal_desc" label="异常描述" min-width="120" show-overflow-tooltip />
+            <el-table-column label="报告文件" width="100">
+              <template #default="{ row }">
+                <el-button type="primary" link v-if="row.report_file" @click="openReport(row.report_file)">
+                  <el-icon><Download /></el-icon>
+                  下载
+                </el-button>
+                <span v-else style="color: #909399;">-</span>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-col>
@@ -259,8 +268,8 @@
     </el-dialog>
 
     <el-dialog v-model="showExamDialog" title="上传检查结果" width="600px">
-      <el-form :model="examForm" label-width="100px">
-        <el-form-item label="检查类型">
+      <el-form :model="examForm" label-width="100px" ref="examFormRef" :rules="examRules">
+        <el-form-item label="检查类型" prop="exam_type">
           <el-select v-model="examForm.exam_type" style="width: 100%">
             <el-option label="影像检查" value="影像检查" />
             <el-option label="检验检查" value="检验检查" />
@@ -269,10 +278,10 @@
             <el-option label="其他" value="其他" />
           </el-select>
         </el-form-item>
-        <el-form-item label="检查项目">
+        <el-form-item label="检查项目" prop="exam_name">
           <el-input v-model="examForm.exam_name" />
         </el-form-item>
-        <el-form-item label="检查时间">
+        <el-form-item label="检查时间" prop="exam_time">
           <el-date-picker
             v-model="examForm.exam_time"
             type="datetime"
@@ -281,11 +290,27 @@
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="检查医生">
+        <el-form-item label="检查医生" prop="exam_doctor">
           <el-input v-model="examForm.exam_doctor" />
         </el-form-item>
         <el-form-item label="检查结果">
-          <el-input v-model="examForm.exam_result" type="textarea" :rows="4" />
+          <el-input v-model="examForm.exam_result" type="textarea" :rows="3" placeholder="可填写文字结果或上传报告文件" />
+        </el-form-item>
+        <el-form-item label="报告文件">
+          <el-upload
+            drag
+            :auto-upload="false"
+            :limit="1"
+            :on-change="handleReportFileChange"
+            :on-remove="handleReportFileRemove"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          >
+            <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+            <div class="el-upload__text">将报告文件拖到此处，或<em>点击上传</em></div>
+            <template #tip>
+              <div class="el-upload__tip">支持 PDF、图片、Word 格式（检查结果文本和报告文件至少填写一个）</div>
+            </template>
+          </el-upload>
         </el-form-item>
         <el-form-item label="是否异常">
           <el-switch v-model="examForm.abnormal_flag" active-value="1" inactive-value="0" />
@@ -296,7 +321,7 @@
       </el-form>
       <template #footer>
         <el-button @click="showExamDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitExam">确定</el-button>
+        <el-button type="primary" @click="submitExam" :loading="examSubmitting">确定</el-button>
       </template>
     </el-dialog>
   </div>
@@ -305,7 +330,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import axios from 'axios'
 
 const router = useRouter()
@@ -315,6 +340,9 @@ const loading = ref(true)
 const order = ref(null)
 const showAppointmentDialog = ref(false)
 const showExamDialog = ref(false)
+const examFormRef = ref(null)
+const examSubmitting = ref(false)
+const reportFile = ref(null)
 
 const departments = ref(['内科', '外科', '妇产科', '儿科', '骨科', '神经内科', '心血管内科', '消化内科', '呼吸内科', '肿瘤科'])
 
@@ -335,6 +363,21 @@ const examForm = reactive({
   abnormal_flag: '0',
   abnormal_desc: ''
 })
+
+const examRules = {
+  exam_type: [{ required: true, message: '请选择检查类型', trigger: 'change' }],
+  exam_name: [{ required: true, message: '请输入检查项目', trigger: 'blur' }],
+  exam_time: [{ required: true, message: '请选择检查时间', trigger: 'change' }],
+  exam_doctor: [{ required: true, message: '请输入检查医生', trigger: 'blur' }]
+}
+
+const exceptionTypeMap = {
+  'no_visit': { name: '未到诊', tag: 'danger' },
+  'no_exam': { name: '未检查', tag: 'warning' },
+  'no_report': { name: '未回传', tag: 'danger' },
+  'timeout': { name: '超时断链', tag: 'warning' },
+  'exam_abnormal': { name: '检查异常', tag: 'warning' }
+}
 
 const getStatusText = (status) => {
   const map = {
@@ -429,7 +472,30 @@ const handleClose = async () => {
 }
 
 const submitAppointment = async () => {
+  if (!appointmentForm.check_item || !appointmentForm.dept_name || !appointmentForm.appointment_time) {
+    ElMessage.warning('请填写完整的预约信息')
+    return
+  }
+
   try {
+    const conflictRes = await axios.get('/api/appointments/check-conflict', {
+      params: {
+        dept_name: appointmentForm.dept_name,
+        appointment_time: appointmentForm.appointment_time,
+        bed_no: appointmentForm.bed_no
+      }
+    })
+    
+    if (conflictRes.data.success && conflictRes.data.data.hasConflict) {
+      const conflict = conflictRes.data.data.conflicts[0]
+      const confirm = await ElMessageBox.confirm(
+        `该时间段（${conflict.appointment_time}）存在预约冲突：\n患者：${conflict.patient_name}（${conflict.referral_no}）\n\n是否继续？`,
+        '预约冲突提醒',
+        { type: 'warning', confirmButtonText: '确认继续', cancelButtonText: '取消预约' }
+      )
+      if (!confirm) return
+    }
+
     const res = await axios.post('/api/appointments', {
       referral_order_id: order.value.id,
       ...appointmentForm
@@ -440,7 +506,11 @@ const submitAppointment = async () => {
       loadData()
     }
   } catch (e) {
-    ElMessage.error(e?.message || '操作失败')
+    if (e?.message && e.message.includes('冲突')) {
+      ElMessage.error(e.message)
+    } else {
+      ElMessage.error(e?.response?.data?.message || e?.message || '操作失败')
+    }
   }
 }
 
@@ -452,23 +522,70 @@ const updateAppointmentStatus = async (row, status) => {
       loadData()
     }
   } catch (e) {
-    ElMessage.error(e?.message || '操作失败')
+    ElMessage.error(e?.response?.data?.message || e?.message || '操作失败')
   }
+}
+
+const handleReportFileChange = (file) => {
+  reportFile.value = file.raw
+}
+
+const handleReportFileRemove = () => {
+  reportFile.value = null
+}
+
+const openReport = (filePath) => {
+  window.open(filePath, '_blank')
 }
 
 const submitExam = async () => {
   try {
-    const res = await axios.post('/api/exam-results', {
-      referral_order_id: order.value.id,
-      ...examForm
+    if (!examFormRef.value) return
+    await examFormRef.value.validate()
+
+    if (!examForm.exam_result && !reportFile.value) {
+      ElMessage.warning('请填写检查结果或上传报告文件（至少一个）')
+      return
+    }
+
+    examSubmitting.value = true
+    const formData = new FormData()
+    formData.append('referral_order_id', order.value.id)
+    formData.append('exam_type', examForm.exam_type)
+    formData.append('exam_name', examForm.exam_name)
+    formData.append('exam_time', examForm.exam_time)
+    formData.append('exam_doctor', examForm.exam_doctor)
+    formData.append('exam_result', examForm.exam_result || '')
+    formData.append('abnormal_flag', examForm.abnormal_flag)
+    formData.append('abnormal_desc', examForm.abnormal_desc || '')
+    
+    if (reportFile.value) {
+      formData.append('report_file', reportFile.value)
+    }
+
+    const res = await axios.post('/api/exam-results/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
+    
     if (res.data.success) {
       ElMessage.success('上传成功')
+      if (examForm.abnormal_flag === '1') {
+        ElNotification.warning({
+          title: '检查异常提醒',
+          message: '该检查结果标记为异常，已生成异常提醒',
+          duration: 5000
+        })
+      }
       showExamDialog.value = false
+      reportFile.value = null
       loadData()
     }
   } catch (e) {
-    ElMessage.error(e?.message || '操作失败')
+    if (e?.message && e.message !== 'cancel') {
+      ElMessage.error(e?.response?.data?.message || e?.message || '操作失败')
+    }
+  } finally {
+    examSubmitting.value = false
   }
 }
 

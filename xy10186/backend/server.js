@@ -233,6 +233,81 @@ app.put('/api/referral-orders/:id/status', async (req, res) => {
     const { id } = req.params;
     const { status, visit_time, check_time, report_time, close_time } = req.body;
 
+    const currentOrders = await asyncQuery('SELECT * FROM referral_orders WHERE id = ?', [id]);
+    if (currentOrders.length === 0) {
+      return res.status(404).json({ success: false, message: '转诊单不存在' });
+    }
+    const currentOrder = currentOrders[0];
+
+    if (status) {
+      const statusFlow = {
+        'pending': ['accepted', 'cancelled'],
+        'accepted': ['checking', 'cancelled'],
+        'checking': ['reported', 'cancelled'],
+        'reported': ['closed', 'cancelled'],
+        'closed': [],
+        'cancelled': []
+      };
+
+      const validNextStatuses = statusFlow[currentOrder.status] || [];
+      if (!validNextStatuses.includes(status)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `状态流转不合法：当前状态为"${currentOrder.status}"，不允许直接变更为"${status}"` 
+        });
+      }
+
+      if (status === 'checking') {
+        const appointments = await asyncQuery(
+          'SELECT COUNT(*) as count FROM appointments WHERE referral_order_id = ? AND status IN ("scheduled", "ongoing", "completed")',
+          [id]
+        );
+        if (appointments[0].count === 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: '必须先创建预约才能进入检查中状态' 
+          });
+        }
+      }
+
+      if (status === 'reported') {
+        const exams = await asyncQuery(
+          'SELECT COUNT(*) as count FROM exam_results WHERE referral_order_id = ?',
+          [id]
+        );
+        if (exams[0].count === 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: '必须上传检查结果才能进入已出报告状态' 
+          });
+        }
+      }
+
+      if (status === 'closed') {
+        const exams = await asyncQuery(
+          'SELECT COUNT(*) as count FROM exam_results WHERE referral_order_id = ?',
+          [id]
+        );
+        if (exams[0].count === 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: '必须有检查结果才能闭环' 
+          });
+        }
+
+        const unhandledExceptions = await asyncQuery(
+          'SELECT COUNT(*) as count FROM exceptions WHERE referral_order_id = ? AND handled = 0',
+          [id]
+        );
+        if (unhandledExceptions[0].count > 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: '存在未处理的异常，请先处理所有异常后再闭环' 
+          });
+        }
+      }
+    }
+
     const updateFields = [];
     const updateValues = [];
 
@@ -282,6 +357,53 @@ app.put('/api/referral-orders/:id/status', async (req, res) => {
   }
 });
 
+app.get('/api/appointments/check-conflict', async (req, res) => {
+  try {
+    const { dept_name, appointment_time, bed_no, exclude_id } = req.query;
+    
+    if (!dept_name || !appointment_time) {
+      return res.json({ success: true, data: { hasConflict: false } });
+    }
+
+    const appointmentDate = new Date(appointment_time);
+    const startDate = new Date(appointmentDate.getTime() - 30 * 60 * 1000);
+    const endDate = new Date(appointmentDate.getTime() + 30 * 60 * 1000);
+
+    let sql = `
+      SELECT a.*, ro.referral_no, p.name as patient_name
+      FROM appointments a
+      LEFT JOIN referral_orders ro ON a.referral_order_id = ro.id
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE a.dept_name = ? 
+        AND a.appointment_time BETWEEN ? AND ?
+        AND a.status != 'cancelled'
+    `;
+    const params = [dept_name, startDate.toISOString(), endDate.toISOString()];
+
+    if (exclude_id) {
+      sql += ' AND a.id != ?';
+      params.push(exclude_id);
+    }
+
+    if (bed_no) {
+      sql += ' AND a.bed_no = ?';
+      params.push(bed_no);
+    }
+
+    const conflicts = await asyncQuery(sql, params);
+
+    res.json({ 
+      success: true, 
+      data: { 
+        hasConflict: conflicts.length > 0,
+        conflicts 
+      } 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 app.get('/api/appointments', async (req, res) => {
   try {
     const { referral_order_id, status, page = 1, pageSize = 10 } = req.query;
@@ -320,8 +442,42 @@ app.get('/api/appointments', async (req, res) => {
 app.post('/api/appointments', async (req, res) => {
   try {
     const { referral_order_id, appointment_time, check_type, check_item, dept_name, bed_no } = req.body;
-    const id = uuidv4();
 
+    if (!referral_order_id || !appointment_time || !check_type || !check_item || !dept_name) {
+      return res.status(400).json({ success: false, message: '必填参数不完整' });
+    }
+
+    const appointmentDate = new Date(appointment_time);
+    const startDate = new Date(appointmentDate.getTime() - 30 * 60 * 1000);
+    const endDate = new Date(appointmentDate.getTime() + 30 * 60 * 1000);
+
+    let conflictSql = `
+      SELECT a.*, ro.referral_no, p.name as patient_name
+      FROM appointments a
+      LEFT JOIN referral_orders ro ON a.referral_order_id = ro.id
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE a.dept_name = ? 
+        AND a.appointment_time BETWEEN ? AND ?
+        AND a.status != 'cancelled'
+        AND a.referral_order_id != ?
+    `;
+    let conflictParams = [dept_name, startDate.toISOString(), endDate.toISOString(), referral_order_id];
+
+    if (bed_no) {
+      conflictSql += ' AND a.bed_no = ?';
+      conflictParams.push(bed_no);
+    }
+
+    const conflicts = await asyncQuery(conflictSql, conflictParams);
+    if (conflicts.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `该时间段存在预约冲突，冲突患者：${conflicts[0].patient_name} (${conflicts[0].referral_no})`,
+        conflicts
+      });
+    }
+
+    const id = uuidv4();
     await asyncRun(
       `INSERT INTO appointments 
        (id, referral_order_id, appointment_time, check_type, check_item, dept_name, bed_no, status) 
@@ -335,6 +491,46 @@ app.post('/api/appointments', async (req, res) => {
     );
 
     res.json({ success: true, data: { id } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/exam-results/upload', upload.single('report_file'), async (req, res) => {
+  try {
+    const { referral_order_id, exam_type, exam_name, exam_time, exam_doctor, exam_result, abnormal_flag, abnormal_desc } = req.body;
+    const report_file = req.file ? `/uploads/${req.file.filename}` : null;
+
+    if (!referral_order_id || !exam_type || !exam_name || !exam_time || !exam_doctor) {
+      return res.status(400).json({ success: false, message: '必填参数不完整' });
+    }
+
+    if (!exam_result && !report_file) {
+      return res.status(400).json({ success: false, message: '请填写检查结果或上传报告文件' });
+    }
+
+    const id = uuidv4();
+    await asyncRun(
+      `INSERT INTO exam_results 
+       (id, referral_order_id, exam_type, exam_name, exam_time, exam_doctor, exam_result, report_file, abnormal_flag, abnormal_desc) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, referral_order_id, exam_type, exam_name, exam_time, exam_doctor, exam_result, report_file, parseInt(abnormal_flag || 0), abnormal_desc]
+    );
+
+    await asyncRun(
+      'INSERT INTO operation_logs (id, referral_order_id, operation_type, operation_content, operator) VALUES (?, ?, ?, ?, ?)',
+      [uuidv4(), referral_order_id, 'exam_upload', `上传${exam_type}：${exam_name}${report_file ? '（含报告文件）' : ''}`, '系统']
+    );
+
+    if (parseInt(abnormal_flag) === 1) {
+      await asyncRun(
+        `INSERT INTO exceptions (id, referral_order_id, exception_type, exception_level, exception_content) 
+         VALUES (?, ?, ?, ?, ?)`,
+        [uuidv4(), referral_order_id, 'exam_abnormal', 'warning', abnormal_desc || '检查结果异常']
+      );
+    }
+
+    res.json({ success: true, data: { id, report_file } });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -782,6 +978,140 @@ app.get('/api/dashboard/summary', async (req, res) => {
   }
 });
 
+async function checkExceptions() {
+  console.log('[系统] 开始检查异常...');
+  const now = new Date();
+  
+  try {
+    const pendingVisitOrders = await asyncQuery(`
+      SELECT ro.*, p.name as patient_name
+      FROM referral_orders ro
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE ro.status = 'pending' 
+        AND ro.referral_time IS NOT NULL
+        AND ro.referral_time < ?
+    `, [new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()]);
+
+    for (const order of pendingVisitOrders) {
+      const existing = await asyncQuery(
+        'SELECT * FROM exceptions WHERE referral_order_id = ? AND exception_type = ? AND handled = 0',
+        [order.id, 'no_visit']
+      );
+      
+      if (existing.length === 0) {
+        await asyncRun(
+          'INSERT INTO exceptions (id, referral_order_id, exception_type, exception_level, exception_content) VALUES (?, ?, ?, ?, ?)',
+          [uuidv4(), order.id, 'no_visit', 'danger', 
+            `转诊单超过24小时未接诊，请确认患者${order.patient_name}是否到诊（转诊单号：${order.referral_no}）`]
+        );
+        console.log(`[异常] 未接诊预警: ${order.referral_no} - ${order.patient_name}`);
+      }
+    }
+
+    const acceptedOrders = await asyncQuery(`
+      SELECT ro.*, p.name as patient_name
+      FROM referral_orders ro
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE ro.status = 'accepted' 
+        AND ro.visit_time IS NOT NULL
+        AND ro.visit_time < ?
+    `, [new Date(now.getTime() - 72 * 60 * 60 * 1000).toISOString()]);
+
+    for (const order of acceptedOrders) {
+      const existing = await asyncQuery(
+        'SELECT * FROM exceptions WHERE referral_order_id = ? AND exception_type = ? AND handled = 0',
+        [order.id, 'no_exam']
+      );
+      
+      if (existing.length === 0) {
+        await asyncRun(
+          'INSERT INTO exceptions (id, referral_order_id, exception_type, exception_level, exception_content) VALUES (?, ?, ?, ?, ?)',
+          [uuidv4(), order.id, 'no_exam', 'warning', 
+            `接诊已超过72小时未安排检查，患者${order.patient_name}（转诊单号：${order.referral_no}）`]
+        );
+        console.log(`[异常] 未检查预警: ${order.referral_no} - ${order.patient_name}`);
+      }
+    }
+
+    const checkingOrders = await asyncQuery(`
+      SELECT ro.*, p.name as patient_name
+      FROM referral_orders ro
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE ro.status = 'checking' 
+        AND ro.check_time IS NOT NULL
+        AND ro.check_time < ?
+    `, [new Date(now.getTime() - 120 * 60 * 60 * 1000).toISOString()]);
+
+    for (const order of checkingOrders) {
+      const existing = await asyncQuery(
+        'SELECT * FROM exceptions WHERE referral_order_id = ? AND exception_type = ? AND handled = 0',
+        [order.id, 'no_report']
+      );
+      
+      if (existing.length === 0) {
+        await asyncRun(
+          'INSERT INTO exceptions (id, referral_order_id, exception_type, exception_level, exception_content) VALUES (?, ?, ?, ?, ?)',
+          [uuidv4(), order.id, 'no_report', 'danger', 
+            `检查已超过5天未回传报告，患者${order.patient_name}（转诊单号：${order.referral_no}），请联系上级医院追要报告`]
+        );
+        console.log(`[异常] 未回传预警: ${order.referral_no} - ${order.patient_name}`);
+      }
+    }
+
+    const timeoutOrders = await asyncQuery(`
+      SELECT ro.*, p.name as patient_name
+      FROM referral_orders ro
+      LEFT JOIN patients p ON ro.patient_id = p.id
+      WHERE ro.status IN ('pending', 'accepted', 'checking', 'reported') 
+        AND ro.create_time < ?
+    `, [new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()]);
+
+    for (const order of timeoutOrders) {
+      const existing = await asyncQuery(
+        'SELECT * FROM exceptions WHERE referral_order_id = ? AND exception_type = ? AND handled = 0',
+        [order.id, 'timeout']
+      );
+      
+      if (existing.length === 0) {
+        await asyncRun(
+          'INSERT INTO exceptions (id, referral_order_id, exception_type, exception_level, exception_content) VALUES (?, ?, ?, ?, ?)',
+          [uuidv4(), order.id, 'timeout', 'warning', 
+            `转诊单已创建超过30天未闭环，患者${order.patient_name}（转诊单号：${order.referral_no}），请及时跟进处理`]
+        );
+        console.log(`[异常] 超时预警: ${order.referral_no} - ${order.patient_name}`);
+      }
+    }
+
+    console.log('[系统] 异常检查完成');
+  } catch (error) {
+    console.error('[系统] 异常检查出错:', error.message);
+  }
+}
+
+app.post('/api/exception-check/run', async (req, res) => {
+  try {
+    await checkExceptions();
+    res.json({ success: true, message: '异常检查完成' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.get('/api/exception-rules', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { type: 'no_visit', name: '未到诊', level: 'danger', desc: '转诊超过24小时未接诊', timeout_hours: 24 },
+      { type: 'no_exam', name: '未检查', level: 'warning', desc: '接诊超过72小时未安排检查', timeout_hours: 72 },
+      { type: 'no_report', name: '未回传', level: 'danger', desc: '检查超过5天未回传报告', timeout_hours: 120 },
+      { type: 'timeout', name: '超时断链', level: 'warning', desc: '创建超过30天未闭环', timeout_hours: 720 },
+      { type: 'exam_abnormal', name: '检查异常', level: 'warning', desc: '检查结果异常' }
+    ]
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`服务器运行在 http://localhost:${PORT}`);
+  checkExceptions();
+  setInterval(checkExceptions, 30 * 60 * 1000);
 });
