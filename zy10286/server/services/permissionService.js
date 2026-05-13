@@ -77,27 +77,37 @@ class PermissionService {
     
     if (!session) throw new Error('Session not found');
 
-    const existingPerm = await this.getAsync(
+    const existingPermSameEnrollment = await this.getAsync(
       `SELECT * FROM replay_permissions 
        WHERE student_id = ? AND session_id = ? AND enrollment_id = ?`,
       [enrollment.student_id, sessionId, enrollmentId]
     );
 
-    if (existingPerm) {
-      if (existingPerm.status === 'active') {
-        return { permission: existingPerm, isNew: false };
+    if (existingPermSameEnrollment) {
+      if (existingPermSameEnrollment.status === 'active') {
+        return { permission: existingPermSameEnrollment, isNew: false };
       } else {
         await this.runAsync(
           `UPDATE replay_permissions 
            SET status = 'active', revoked_at = NULL, revoke_reason = NULL, granted_at = CURRENT_TIMESTAMP
            WHERE id = ?`,
-          [existingPerm.id]
+          [existingPermSameEnrollment.id]
         );
-        await this.recordEvent('permission_reinstated', 'replay_permission', existingPerm.id,
+        await this.recordEvent('permission_reinstated', 'replay_permission', existingPermSameEnrollment.id,
           `恢复回放权限: 学生 ${enrollment.student_id} 场次 ${session.title}`);
-        const updatedPerm = await this.getAsync(`SELECT * FROM replay_permissions WHERE id = ?`, [existingPerm.id]);
+        const updatedPerm = await this.getAsync(`SELECT * FROM replay_permissions WHERE id = ?`, [existingPermSameEnrollment.id]);
         return { permission: updatedPerm, isNew: false };
       }
+    }
+
+    const existingActivePerm = await this.getAsync(
+      `SELECT * FROM replay_permissions 
+       WHERE student_id = ? AND session_id = ? AND status = 'active'`,
+      [enrollment.student_id, sessionId]
+    );
+
+    if (existingActivePerm) {
+      return { permission: existingActivePerm, isNew: false, warning: 'Duplicate active permission prevented' };
     }
 
     const permId = uuidv4();
@@ -146,7 +156,10 @@ class PermissionService {
     );
     
     if (!enrollment) throw new Error('Enrollment not found');
-    if (enrollment.status === 'refunded') return { enrollment, permissionsRevoked: 0 };
+    if (enrollment.status === 'refunded') return { enrollment, permissionsRevoked: 0, alreadyRefunded: true };
+    if (enrollment.status !== 'active' && enrollment.status !== 'transferred') {
+      throw new Error('Enrollment is not active, cannot refund');
+    }
 
     await this.runAsync(
       `UPDATE class_enrollments 
@@ -182,7 +195,20 @@ class PermissionService {
     );
     
     if (!enrollment) throw new Error('Enrollment not found');
+    
     if (enrollment.class_id === targetClassId) throw new Error('Cannot transfer to same class');
+    
+    if (enrollment.status !== 'active') throw new Error('Enrollment is not active, cannot transfer');
+    
+    if (enrollment.transfer_to_id) throw new Error('This enrollment has already been transferred');
+
+    const existingEnrollment = await this.getAsync(
+      `SELECT * FROM class_enrollments 
+       WHERE student_id = ? AND class_id = ? AND status = 'active'`,
+      [enrollment.student_id, targetClassId]
+    );
+    
+    if (existingEnrollment) throw new Error('Student is already enrolled in the target class');
 
     const targetClass = await this.getAsync(
       `SELECT * FROM classes WHERE id = ?`,
@@ -201,14 +227,14 @@ class PermissionService {
 
     await this.runAsync(
       `UPDATE class_enrollments 
-       SET transfer_to_id = ?, updated_at = CURRENT_TIMESTAMP
+       SET status = 'transferred', transfer_to_id = ?, updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [newEnrollmentId, enrollmentId]
     );
 
     await this.recordEvent('student_transferred', 'class_enrollment', enrollmentId,
       `学员转班: 从班级 ${enrollment.class_id} 转到 ${targetClassId}`,
-      enrollment, { ...enrollment, transfer_to_id: newEnrollmentId }, operator);
+      enrollment, { ...enrollment, status: 'transferred', transfer_to_id: newEnrollmentId }, operator);
 
     const targetSessions = await this.allAsync(
       `SELECT * FROM live_sessions WHERE class_id = ?`,
@@ -230,7 +256,7 @@ class PermissionService {
     }
 
     return {
-      oldEnrollment: enrollment,
+      oldEnrollment: await this.getAsync(`SELECT * FROM class_enrollments WHERE id = ?`, [enrollmentId]),
       newEnrollment: await this.getAsync(`SELECT * FROM class_enrollments WHERE id = ?`, [newEnrollmentId]),
       oldPermissionsRevoked: oldPermissions.length,
       newPermissionsGranted: targetSessions.length

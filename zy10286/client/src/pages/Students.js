@@ -138,9 +138,12 @@ function Students() {
         message.success('转班成功，权限已迁移');
         setTransferModalVisible(false);
         fetchStudents();
+      } else {
+        const error = await response.json();
+        message.error(error.error || '转班失败');
       }
     } catch (error) {
-      message.error('操作失败');
+      message.error('操作失败：' + error.message);
     }
   };
 
@@ -165,9 +168,12 @@ function Students() {
         message.success('退费成功，该班级所有回放权限已回收');
         setRefundModalVisible(false);
         fetchStudents();
+      } else {
+        const error = await response.json();
+        message.error(error.error || '退费失败');
       }
     } catch (error) {
-      message.error('操作失败');
+      message.error('操作失败：' + error.message);
     }
   };
 
