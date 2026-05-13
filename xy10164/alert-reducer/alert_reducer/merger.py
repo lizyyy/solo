@@ -52,8 +52,74 @@ class AlertMerger:
         # 允许告警在合并告警开始时间之后的窗口内
         return 0 <= time_diff <= window_seconds
     
+    def _split_into_windows(self, alerts: List[Alert]) -> List[List[Alert]]:
+        """按时间窗口切分告警组"""
+        if not alerts:
+            return []
+        
+        # 按时间排序
+        sorted_alerts = sorted(alerts, key=lambda a: a.starts_at)
+        
+        windows = []
+        current_window = [sorted_alerts[0]]
+        window_start = sorted_alerts[0].starts_at
+        window_seconds = self.merge_window_minutes * 60
+        
+        for alert in sorted_alerts[1:]:
+            # 检查当前告警是否在当前窗口内
+            time_diff = (alert.starts_at - window_start).total_seconds()
+            
+            if time_diff <= window_seconds:
+                # 在当前窗口内，添加到当前窗口
+                current_window.append(alert)
+            else:
+                # 超出当前窗口，保存当前窗口并开始新窗口
+                windows.append(current_window)
+                current_window = [alert]
+                window_start = alert.starts_at
+        
+        # 添加最后一个窗口
+        if current_window:
+            windows.append(current_window)
+        
+        return windows
+    
+    def _find_existing_merged_for_window(self, merge_key: str, 
+                                          window_start: datetime,
+                                          window_end: datetime) -> Optional[MergedAlert]:
+        """查找与当前时间窗口重叠的现有合并告警"""
+        # 查找在时间范围内的合并告警
+        existing = self.session.query(MergedAlert).filter(
+            MergedAlert.merge_key == merge_key,
+            MergedAlert.status.in_(['active', 'escalated']),
+            # 合并告警的时间范围与当前窗口有重叠
+            MergedAlert.starts_at <= window_end,
+            # 合并告警的结束时间 >= 窗口开始时间（如果结束时间为空，则认为是活跃的）
+        ).all()
+        
+        # 检查哪个合并告警与当前窗口最匹配
+        for merged in existing:
+            # 如果合并告警还没有结束，或者结束时间在窗口之后
+            if not merged.ends_at or merged.ends_at >= window_start:
+                # 检查窗口开始时间是否在合并告警的窗口内
+                if self._is_alert_in_merged_window(window_start, merged):
+                    return merged
+        
+        return None
+    
+    def _is_alert_in_merged_window(self, alert_time: datetime, 
+                                    merged: MergedAlert) -> bool:
+        """检查时间是否在合并告警的窗口内"""
+        if not merged.starts_at:
+            return False
+        
+        time_diff = (alert_time - merged.starts_at).total_seconds()
+        window_seconds = self.merge_window_minutes * 60
+        
+        return 0 <= time_diff <= window_seconds
+    
     def merge_alerts(self, alerts: List[Alert], batch_id: int = None) -> Dict[str, Any]:
-        """合并告警"""
+        """合并告警 - 按时间窗口切分"""
         results = {
             'merged_groups': 0,
             'total_merged_alerts': 0,
@@ -79,38 +145,51 @@ class AlertMerger:
             if len(group_alerts) == 0:
                 continue
             
-            # 按时间排序
-            group_alerts.sort(key=lambda a: a.starts_at)
+            # 按时间窗口切分
+            windows = self._split_into_windows(group_alerts)
             
-            # 创建或更新合并告警
-            # 检查是否已有活跃的合并告警
-            existing_merged = self._find_existing_merged_alert(
-                group_alerts[0], 
-                merge_key,
-                group_alerts[0].starts_at + timedelta(minutes=self.merge_window_minutes)
-            )
-            
-            if existing_merged:
-                # 更新现有合并告警
-                self._update_merged_alert(existing_merged, group_alerts, batch_id)
-                results['merged_alerts'].append({
-                    'id': existing_merged.id,
-                    'merge_key': merge_key,
-                    'alert_count': existing_merged.alert_count,
-                    'is_new': False
-                })
-            else:
-                # 创建新的合并告警
-                merged_alert = self._create_merged_alert(merge_key, group_alerts, batch_id)
-                results['merged_groups'] += 1
-                results['merged_alerts'].append({
-                    'id': merged_alert.id,
-                    'merge_key': merge_key,
-                    'alert_count': merged_alert.alert_count,
-                    'is_new': True
-                })
-            
-            results['total_merged_alerts'] += len(group_alerts)
+            # 处理每个时间窗口
+            for window_alerts in windows:
+                if not window_alerts:
+                    continue
+                
+                # 按时间排序
+                window_alerts.sort(key=lambda a: a.starts_at)
+                
+                # 计算窗口时间范围
+                window_start = window_alerts[0].starts_at
+                window_end = window_start + timedelta(minutes=self.merge_window_minutes)
+                
+                # 检查是否已有匹配的合并告警
+                existing_merged = self._find_existing_merged_for_window(
+                    merge_key, window_start, window_end
+                )
+                
+                if existing_merged:
+                    # 更新现有合并告警
+                    self._update_merged_alert(existing_merged, window_alerts, batch_id)
+                    results['merged_alerts'].append({
+                        'id': existing_merged.id,
+                        'merge_key': merge_key,
+                        'alert_count': existing_merged.alert_count,
+                        'is_new': False,
+                        'window_start': window_start.isoformat(),
+                        'window_end': window_end.isoformat()
+                    })
+                else:
+                    # 创建新的合并告警
+                    merged_alert = self._create_merged_alert(merge_key, window_alerts, batch_id)
+                    results['merged_groups'] += 1
+                    results['merged_alerts'].append({
+                        'id': merged_alert.id,
+                        'merge_key': merge_key,
+                        'alert_count': merged_alert.alert_count,
+                        'is_new': True,
+                        'window_start': window_start.isoformat(),
+                        'window_end': window_end.isoformat()
+                    })
+                
+                results['total_merged_alerts'] += len(window_alerts)
         
         self.session.commit()
         return results

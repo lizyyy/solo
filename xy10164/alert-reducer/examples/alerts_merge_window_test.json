@@ -1,0 +1,58 @@
+[
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率过高",
+      "description": "服务器 server-01 CPU使用率超过80%"
+    },
+    "startsAt": "2026-05-09T03:00:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率过高",
+      "description": "服务器 server-01 CPU使用率超过85%"
+    },
+    "startsAt": "2026-05-09T03:05:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率过高",
+      "description": "服务器 server-01 CPU使用率超过90%"
+    },
+    "startsAt": "2026-05-09T04:00:00+08:00",
+    "endsAt": null
+  },
+  {
+    "labels": {
+      "alertname": "HighCPUUsage",
+      "severity": "P3",
+      "job": "api-server",
+      "instance": "server-01:8080"
+    },
+    "annotations": {
+      "summary": "CPU使用率过高",
+      "description": "服务器 server-01 CPU使用率超过88%"
+    },
+    "startsAt": "2026-05-09T04:05:00+08:00",
+    "endsAt": null
+  }
+]
