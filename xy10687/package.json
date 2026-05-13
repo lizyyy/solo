@@ -1,0 +1,22 @@
+{
+  "name": "road-rescue-dispatch",
+  "version": "1.0.0",
+  "description": "道路救援备件派单系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "axios": "^1.16.1"
+  }
+}

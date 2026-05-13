@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>道路救援备件派单系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', Arial, sans-serif; background: #f5f5f5; }
+        .header { background: #1890ff; color: white; padding: 16px 24px; font-size: 20px; font-weight: bold; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .nav { background: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav button { padding: 10px 20px; margin-right: 10px; border: none; border-radius: 4px; cursor: pointer; background: #e6f7ff; color: #1890ff; }
+        .nav button.active { background: #1890ff; color: white; }
+        .card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card h2 { margin-bottom: 16px; color: #333; font-size: 18px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #fafafa; font-weight: 600; color: #666; }
+        tr:hover { background: #fafafa; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 13px; }
+        .btn-primary { background: #1890ff; color: white; }
+        .btn-success { background: #52c41a; color: white; }
+        .btn-warning { background: #faad14; color: white; }
+        .btn-danger { background: #ff4d4f; color: white; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-pending { background: #fff7e6; color: #fa8c16; }
+        .status-assigned { background: #e6f7ff; color: #1890ff; }
+        .status-completed { background: #f6ffed; color: #52c41a; }
+        .status-cancelled { background: #fff1f0; color: #ff4d4f; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #666; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #e8e8e8; }
+        .timeline-item { position: relative; padding-bottom: 24px; }
+        .timeline-dot { position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #1890ff; border: 3px solid white; box-shadow: 0 0 0 2px #1890ff; }
+        .timeline-content { background: #fafafa; padding: 12px 16px; border-radius: 6px; }
+        .timeline-time { color: #999; font-size: 12px; margin-bottom: 4px; }
+        .timeline-action { font-weight: 600; color: #333; margin-bottom: 4px; }
+        .timeline-reason { color: #666; font-size: 13px; }
+        .timeline-changes { margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8e8e8; font-size: 12px; color: #888; }
+        .change-item { margin-bottom: 4px; }
+        .hidden { display: none; }
+        .flex { display: flex; justify-content: space-between; align-items: center; }
+        .filters { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filters input, .filters select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; }
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; border-radius: 8px; padding: 24px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        .tag { display: inline-block; padding: 2px 8px; background: #f0f0f0; border-radius: 4px; font-size: 12px; margin-right: 4px; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h3 { margin-bottom: 12px; color: #333; font-size: 16px; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .detail-item { padding: 8px 0; }
+        .detail-label { color: #999; font-size: 13px; }
+        .detail-value { color: #333; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="header">道路救援备件派单系统</div>
+    <div class="container">
+        <div class="nav">
+            <button class="active" onclick="showPage('orders')">工单管理</button>
+            <button onclick="showPage('technicians')">技师管理</button>
+            <button onclick="showPage('spareparts')">备件管理</button>
+        </div>
+
+        <div id="page-orders">
+            <div class="card">
+                <div class="flex">
+                    <h2>工单列表</h2>
+                    <div>
+                        <button class="btn btn-primary" onclick="showCreateOrderModal()">新建工单</button>
+                        <button class="btn btn-success" onclick="showImportModal()">批量导入</button>
+                        <button class="btn btn-warning" onclick="exportOrders()">导出Excel</button>
+                    </div>
+                </div>
+                <div class="filters">
+                    <select id="filter-status" onchange="loadOrders()">
+                        <option value="">全部状态</option>
+                        <option value="待派单">待派单</option>
+                        <option value="已派单">已派单</option>
+                        <option value="技师出发">技师出发</option>
+                        <option value="已到达">已到达</option>
+                        <option value="维修中">维修中</option>
+                        <option value="已完成">已完成</option>
+                        <option value="已取消">已取消</option>
+                        <option value="库存异常">库存异常</option>
+                    </select>
+                    <input type="text" id="filter-responsible" placeholder="责任人" onchange="loadOrders()">
+                    <input type="date" id="filter-start" placeholder="开始日期" onchange="loadOrders()">
+                    <input type="date" id="filter-end" placeholder="结束日期" onchange="loadOrders()">
+                </div>
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>工单号</th>
+                            <th>车主</th>
+                            <th>位置</th>
+                            <th>故障类型</th>
+                            <th>技师</th>
+                            <th>预计到达</th>
+                            <th>状态</th>
+                            <th>责任人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-technicians" class="hidden">
+            <div class="card">
+                <div class="flex">
+                    <h2>技师列表</h2>
+                    <button class="btn btn-primary" onclick="showCreateTechModal()">添加技师</button>
+                </div>
+                <table id="tech-table">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>电话</th>
+                            <th>状态</th>
+                            <th>当前位置</th>
+                            <th>技能</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="page-spareparts" class="hidden">
+            <div class="card">
+                <div class="flex">
+                    <h2>备件列表</h2>
+                    <button class="btn btn-primary" onclick="showCreatePartModal()">添加备件</button>
+                </div>
+                <table id="parts-table">
+                    <thead>
+                        <tr>
+                            <th>备件名称</th>
+                            <th>编码</th>
+                            <th>库存数量</th>
+                            <th>单位</th>
+                            <th>位置</th>
+                            <th>警戒线</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="order-detail-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>工单详情</h3>
+                <button class="close-btn" onclick="closeModal('order-detail-modal')">&times;</button>
+            </div>
+            <div id="order-detail-content"></div>
+        </div>
+    </div>
+
+    <div id="create-order-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建工单</h3>
+                <button class="close-btn" onclick="closeModal('create-order-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>车主姓名</label>
+                <input type="text" id="order-owner-name">
+            </div>
+            <div class="form-group">
+                <label>车主电话</label>
+                <input type="text" id="order-owner-phone">
+            </div>
+            <div class="form-group">
+                <label>车主位置</label>
+                <input type="text" id="order-owner-location">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>纬度</label>
+                    <input type="number" step="0.0001" id="order-owner-lat" value="39.9042">
+                </div>
+                <div class="form-group">
+                    <label>经度</label>
+                    <input type="number" step="0.0001" id="order-owner-lng" value="116.4074">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>故障类型</label>
+                <select id="order-fault-type">
+                    <option value="轮胎爆胎">轮胎爆胎</option>
+                    <option value="电瓶没电">电瓶没电</option>
+                    <option value="发动机故障">发动机故障</option>
+                    <option value="无法启动">无法启动</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>故障描述</label>
+                <textarea id="order-fault-desc" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('create-order-modal')">取消</button>
+                <button class="btn btn-primary" onclick="createOrder()">创建工单</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="assign-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>派单</h3>
+                <button class="close-btn" onclick="closeModal('assign-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择技师</label>
+                <select id="assign-technician"></select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('assign-modal')">取消</button>
+                <button class="btn btn-primary" onclick="assignOrder()">确认派单</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="advance-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>推进状态</h3>
+                <button class="close-btn" onclick="closeModal('advance-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>目标状态</label>
+                <select id="advance-status"></select>
+            </div>
+            <div class="form-group">
+                <label>原因/备注</label>
+                <textarea id="advance-reason" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('advance-modal')">取消</button>
+                <button class="btn btn-primary" onclick="advanceOrder()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="correct-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>修正信息</h3>
+                <button class="close-btn" onclick="closeModal('correct-modal')">&times;</button>
+            </div>
+            <div id="correct-form"></div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('correct-modal')">取消</button>
+                <button class="btn btn-primary" onclick="correctOrder()">确认修正</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="import-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入</h3>
+                <button class="close-btn" onclick="closeModal('import-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择Excel/CSV文件</label>
+                <input type="file" id="import-file" accept=".xlsx,.xls,.csv">
+            </div>
+            <p style="color: #666; font-size: 13px; margin-top: 10px;">
+                支持的列名：车主姓名/ownerName、车主电话/ownerPhone、车主位置/ownerLocation、纬度、经度、故障类型/faultType、故障描述/faultDescription
+            </p>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('import-modal')">取消</button>
+                <button class="btn btn-primary" onclick="importOrders()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let currentOrderId = null;
+        let currentOrder = null;
+
+        function showPage(page) {
+            document.querySelectorAll('[id^="page-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (page === 'orders') loadOrders();
+            if (page === 'technicians') loadTechnicians();
+            if (page === 'spareparts') loadSpareParts();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                '待派单': 'status-pending',
+                '已派单': 'status-assigned',
+                '技师出发': 'status-assigned',
+                '已到达': 'status-assigned',
+                '维修中': 'status-assigned',
+                '已完成': 'status-completed',
+                '已取消': 'status-cancelled',
+                '库存异常': 'status-cancelled'
+            };
+            return map[status] || '';
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString('zh-CN');
+        }
+
+        async function loadOrders() {
+            const status = document.getElementById('filter-status').value;
+            const responsible = document.getElementById('filter-responsible').value;
+            const start = document.getElementById('filter-start').value;
+            const end = document.getElementById('filter-end').value;
+
+            let url = API_BASE + '/orders?';
+            if (status) url += 'status=' + encodeURIComponent(status) + '&';
+            if (responsible) url += 'responsiblePerson=' + encodeURIComponent(responsible) + '&';
+            if (start) url += 'startDate=' + new Date(start).getTime() + '&';
+            if (end) url += 'endDate=' + (new Date(end).getTime() + 86400000) + '&';
+
+            const res = await fetch(url);
+            const orders = await res.json();
+
+            const tbody = document.querySelector('#orders-table tbody');
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td><strong>${order.orderNo}</strong></td>
+                    <td>${order.ownerName}<br><small>${order.ownerPhone}</small></td>
+                    <td>${order.ownerLocation}</td>
+                    <td>${order.faultType}</td>
+                    <td>${order.technicianName || '-'}</td>
+                    <td>${order.estimatedArrivalTime ? order.estimatedArrivalTime + '分钟' : '-'}</td>
+                    <td><span class="status ${getStatusClass(order.status)}">${order.status}</span></td>
+                    <td>${order.responsiblePerson || '-'}</td>
+                    <td>${formatDate(order.createdAt)}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="viewOrderDetail('${order.id}')">详情</button>
+                        ${order.status === '待派单' ? `<button class="btn btn-success" onclick="showAssignModal('${order.id}')">派单</button>` : ''}
+                        ${!['待派单', '已完成', '已取消', '库存异常'].includes(order.status) ? `<button class="btn btn-warning" onclick="showAdvanceModal('${order.id}')">推进</button>` : ''}
+                        <button class="btn" onclick="showCorrectModal('${order.id}')">修正</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewOrderDetail(orderId) {
+            const res = await fetch(`${API_BASE}/orders/${orderId}`);
+            const order = await res.json();
+            currentOrder = order;
+
+            const content = document.getElementById('order-detail-content');
+            content.innerHTML = `
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">工单号</div><div class="detail-value">${order.orderNo}</div></div>
+                        <div class="detail-item"><div class="detail-label">状态</div><div class="detail-value"><span class="status ${getStatusClass(order.status)}">${order.status}</span></div></div>
+                        <div class="detail-item"><div class="detail-label">车主姓名</div><div class="detail-value">${order.ownerName}</div></div>
+                        <div class="detail-item"><div class="detail-label">车主电话</div><div class="detail-value">${order.ownerPhone}</div></div>
+                        <div class="detail-item"><div class="detail-label">车主位置</div><div class="detail-value">${order.ownerLocation} (${order.ownerLocationLat}, ${order.ownerLocationLng})</div></div>
+                        <div class="detail-item"><div class="detail-label">故障类型</div><div class="detail-value">${order.faultType}</div></div>
+                        <div class="detail-item"><div class="detail-label">技师</div><div class="detail-value">${order.technicianName || '-'}</div></div>
+                        <div class="detail-item"><div class="detail-label">预计到达</div><div class="detail-value">${order.estimatedArrivalTime ? order.estimatedArrivalTime + '分钟' : '-'}</div></div>
+                        <div class="detail-item"><div class="detail-label">实际到达</div><div class="detail-value">${order.actualArrivalTime ? formatDate(order.actualArrivalTime) : '-'}</div></div>
+                        <div class="detail-item"><div class="detail-label">责任人</div><div class="detail-value">${order.responsiblePerson || '-'}</div></div>
+                    </div>
+                    <div class="detail-item" style="grid-column: span 2;"><div class="detail-label">故障描述</div><div class="detail-value">${order.faultDescription || '-'}</div></div>
+                </div>
+                <div class="detail-section">
+                    <h3>时间线</h3>
+                    <div class="timeline">
+                        ${order.timeline.map(item => `
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <div class="timeline-time">${formatDate(item.createdAt)} - ${item.operator}</div>
+                                    <div class="timeline-action">${item.action}</div>
+                                    <div class="timeline-reason">${item.reason}</div>
+                                    ${item.changes && Object.keys(item.changes).length > 0 ? `
+                                        <div class="timeline-changes">
+                                            <strong>变更记录：</strong>
+                                            ${Object.entries(item.changes).map(([key, val]) => `
+                                                <div class="change-item">${key}: ${val.before || '-'} → ${val.after}</div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('order-detail-modal').classList.remove('hidden');
+        }
+
+        function showCreateOrderModal() {
+            document.getElementById('create-order-modal').classList.remove('hidden');
+        }
+
+        async function createOrder() {
+            const data = {
+                ownerName: document.getElementById('order-owner-name').value,
+                ownerPhone: document.getElementById('order-owner-phone').value,
+                ownerLocation: document.getElementById('order-owner-location').value,
+                ownerLocationLat: parseFloat(document.getElementById('order-owner-lat').value),
+                ownerLocationLng: parseFloat(document.getElementById('order-owner-lng').value),
+                faultType: document.getElementById('order-fault-type').value,
+                faultDescription: document.getElementById('order-fault-desc').value,
+                createdBy: '管理员'
+            };
+
+            await fetch(API_BASE + '/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal('create-order-modal');
+            loadOrders();
+        }
+
+        async function showAssignModal(orderId) {
+            currentOrderId = orderId;
+            const res = await fetch(API_BASE + '/technicians');
+            const technicians = await res.json();
+            
+            const select = document.getElementById('assign-technician');
+            select.innerHTML = technicians.map(tech => `
+                <option value="${tech.id}">${tech.name} - ${tech.currentLocation} (${tech.status})</option>
+            `).join('');
+
+            document.getElementById('assign-modal').classList.remove('hidden');
+        }
+
+        async function assignOrder() {
+            await fetch(`${API_BASE}/orders/${currentOrderId}/assign`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    technicianId: document.getElementById('assign-technician').value,
+                    operator: '管理员'
+                })
+            });
+
+            closeModal('assign-modal');
+            loadOrders();
+        }
+
+        async function showAdvanceModal(orderId) {
+            currentOrderId = orderId;
+            const res = await fetch(`${API_BASE}/orders/${orderId}`);
+            const order = await res.json();
+            
+            const transitions = {
+                '已派单': ['技师出发', '已取消'],
+                '技师出发': ['已到达', '已取消'],
+                '已到达': ['维修中', '已取消'],
+                '维修中': ['已完成', '已取消', '库存异常']
+            };
+
+            const select = document.getElementById('advance-status');
+            select.innerHTML = (transitions[order.status] || []).map(s => `<option value="${s}">${s}</option>`).join('');
+
+            document.getElementById('advance-modal').classList.remove('hidden');
+        }
+
+        async function advanceOrder() {
+            await fetch(`${API_BASE}/orders/${currentOrderId}/advance`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: document.getElementById('advance-status').value,
+                    reason: document.getElementById('advance-reason').value,
+                    operator: '管理员'
+                })
+            });
+
+            closeModal('advance-modal');
+            loadOrders();
+        }
+
+        async function showCorrectModal(orderId) {
+            currentOrderId = orderId;
+            const res = await fetch(`${API_BASE}/orders/${orderId}`);
+            const order = await res.json();
+
+            const form = document.getElementById('correct-form');
+            form.innerHTML = `
+                <div class="form-group">
+                    <label>车主位置</label>
+                    <input type="text" id="correct-location" value="${order.ownerLocation}">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>纬度</label>
+                        <input type="number" step="0.0001" id="correct-lat" value="${order.ownerLocationLat}">
+                    </div>
+                    <div class="form-group">
+                        <label>经度</label>
+                        <input type="number" step="0.0001" id="correct-lng" value="${order.ownerLocationLng}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>故障类型</label>
+                    <input type="text" id="correct-fault" value="${order.faultType}">
+                </div>
+                <div class="form-group">
+                    <label>故障描述</label>
+                    <textarea id="correct-desc" rows="3">${order.faultDescription || ''}</textarea>
+                </div>
+                ${order.technicianLocation ? `
+                    <div class="form-group">
+                        <label>技师位置</label>
+                        <input type="text" id="correct-tech-location" value="${order.technicianLocation}">
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('correct-modal').classList.remove('hidden');
+        }
+
+        async function correctOrder() {
+            const data = {
+                ownerLocation: document.getElementById('correct-location').value,
+                ownerLocationLat: parseFloat(document.getElementById('correct-lat').value),
+                ownerLocationLng: parseFloat(document.getElementById('correct-lng').value),
+                faultType: document.getElementById('correct-fault').value,
+                faultDescription: document.getElementById('correct-desc').value,
+                operator: '管理员'
+            };
+
+            if (document.getElementById('correct-tech-location')) {
+                data.technicianLocation = document.getElementById('correct-tech-location').value;
+            }
+
+            await fetch(`${API_BASE}/orders/${currentOrderId}/correct`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal('correct-modal');
+            loadOrders();
+        }
+
+        function showImportModal() {
+            document.getElementById('import-modal').classList.remove('hidden');
+        }
+
+        async function importOrders() {
+            const fileInput = document.getElementById('import-file');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('operator', '管理员');
+
+            const res = await fetch(`${API_BASE}/orders/import`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.json();
+            alert(`导入成功：${result.success}条，失败：${result.failed}条`);
+            closeModal('import-modal');
+            loadOrders();
+        }
+
+        function exportOrders() {
+            const responsible = document.getElementById('filter-responsible').value;
+            const start = document.getElementById('filter-start').value;
+            const end = document.getElementById('filter-end').value;
+
+            let url = `${API_BASE}/orders/export/download?`;
+            if (responsible) url += 'responsiblePerson=' + encodeURIComponent(responsible) + '&';
+            if (start) url += 'startDate=' + new Date(start).getTime() + '&';
+            if (end) url += 'endDate=' + (new Date(end).getTime() + 86400000) + '&';
+
+            window.open(url);
+        }
+
+        async function loadTechnicians() {
+            const res = await fetch(API_BASE + '/technicians');
+            const technicians = await res.json();
+
+            const tbody = document.querySelector('#tech-table tbody');
+            tbody.innerHTML = technicians.map(tech => `
+                <tr>
+                    <td>${tech.name}</td>
+                    <td>${tech.phone}</td>
+                    <td><span class="status ${tech.status === '空闲' ? 'status-completed' : 'status-pending'}">${tech.status}</span></td>
+                    <td>${tech.currentLocation}</td>
+                    <td>${(JSON.parse(tech.skills) || []).map(s => `<span class="tag">${s}</span>`).join('')}</td>
+                    <td>${formatDate(tech.createdAt)}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadSpareParts() {
+            const res = await fetch(API_BASE + '/spare-parts');
+            const parts = await res.json();
+
+            const tbody = document.querySelector('#parts-table tbody');
+            tbody.innerHTML = parts.map(part => `
+                <tr>
+                    <td>${part.name}</td>
+                    <td>${part.code}</td>
+                    <td><strong style="color: ${part.quantity <= part.threshold ? '#ff4d4f' : '#333'}">${part.quantity}</strong></td>
+                    <td>${part.unit}</td>
+                    <td>${part.location}</td>
+                    <td>${part.threshold}</td>
+                    <td>
+                        ${part.quantity <= part.threshold ? '<span class="status status-cancelled">库存预警</span>' : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showCreateTechModal() {
+            alert('请通过后端API添加技师');
+        }
+
+        function showCreatePartModal() {
+            alert('请通过后端API添加备件');
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>
