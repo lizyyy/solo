@@ -1,0 +1,59 @@
+[
+  {
+    "id": "CHG-001",
+    "type": "deployment",
+    "service": "order-service",
+    "instance": "order-01.example.com",
+    "tenant": "acme-corp",
+    "start_time": "2026-05-13T06:47:58",
+    "end_time": "2026-05-13T07:02:58",
+    "description": "发布 v2.3.1，包含订单创建逻辑重构",
+    "metadata": {
+      "version": "2.3.1",
+      "commit": "abc1234",
+      "deployer": "zhang.san"
+    },
+    "excluded": false,
+    "exclude_reason": null,
+    "marked_cause": true,
+    "cause_remark": "发布 v2.3.1 引入了订单创建逻辑的 bug，导致 500 错误率飙升"
+  },
+  {
+    "id": "CHG-002",
+    "type": "scale",
+    "service": "user-service",
+    "instance": null,
+    "tenant": null,
+    "start_time": "2026-05-13T06:57:58",
+    "end_time": "2026-05-13T07:07:58",
+    "description": "扩容 user-service 从 3 实例到 6 实例",
+    "metadata": {
+      "old_replicas": 3,
+      "new_replicas": 6,
+      "reason": "流量峰值预期"
+    },
+    "excluded": true,
+    "exclude_reason": "扩容是预防性操作，在告警前已完成，CPU告警是新实例启动正常现象",
+    "marked_cause": false,
+    "cause_remark": null
+  },
+  {
+    "id": "CHG-003",
+    "type": "config_change",
+    "service": "payment-service",
+    "instance": "payment-02.example.com",
+    "tenant": "acme-corp",
+    "start_time": "2026-05-13T07:32:58",
+    "end_time": "2026-05-13T07:37:58",
+    "description": "修改支付超时配置从 10s 到 30s",
+    "metadata": {
+      "config_key": "payment.timeout",
+      "old_value": "10s",
+      "new_value": "30s"
+    },
+    "excluded": false,
+    "exclude_reason": null,
+    "marked_cause": false,
+    "cause_remark": null
+  }
+]

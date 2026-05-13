@@ -1,0 +1,714 @@
+{
+  "generated_at": "2026-05-13T09:18:15.171948",
+  "changes": [
+    {
+      "id": "CHG-001",
+      "type": "deployment",
+      "service": "order-service",
+      "instance": "order-01.example.com",
+      "tenant": "acme-corp",
+      "start_time": "2026-05-13T06:47:58",
+      "end_time": "2026-05-13T07:02:58",
+      "description": "发布 v2.3.1，包含订单创建逻辑重构",
+      "metadata": {
+        "version": "2.3.1",
+        "commit": "abc1234",
+        "deployer": "zhang.san"
+      },
+      "excluded": false,
+      "exclude_reason": null,
+      "marked_cause": false,
+      "cause_remark": null
+    },
+    {
+      "id": "CHG-002",
+      "type": "scale",
+      "service": "user-service",
+      "instance": null,
+      "tenant": null,
+      "start_time": "2026-05-13T06:57:58",
+      "end_time": "2026-05-13T07:07:58",
+      "description": "扩容 user-service 从 3 实例到 6 实例",
+      "metadata": {
+        "old_replicas": 3,
+        "new_replicas": 6,
+        "reason": "流量峰值预期"
+      },
+      "excluded": true,
+      "exclude_reason": "扩容是预防性操作，在告警前已完成，CPU告警是新实例启动正常现象",
+      "marked_cause": false,
+      "cause_remark": null
+    },
+    {
+      "id": "CHG-003",
+      "type": "config_change",
+      "service": "payment-service",
+      "instance": "payment-02.example.com",
+      "tenant": "acme-corp",
+      "start_time": "2026-05-13T07:32:58",
+      "end_time": "2026-05-13T07:37:58",
+      "description": "修改支付超时配置从 10s 到 30s",
+      "metadata": {
+        "config_key": "payment.timeout",
+        "old_value": "10s",
+        "new_value": "30s"
+      },
+      "excluded": false,
+      "exclude_reason": null,
+      "marked_cause": false,
+      "cause_remark": null
+    }
+  ],
+  "alerts": [
+    {
+      "id": "ALT-001",
+      "service": "order-service",
+      "instance": "order-01.example.com",
+      "tenant": "acme-corp",
+      "metric_type": "error_rate",
+      "start_time": "2026-05-13T07:05:58",
+      "end_time": "2026-05-13T07:47:58",
+      "severity": "critical",
+      "description": "订单服务错误率从 0.1% 飙升至 15%",
+      "metadata": {
+        "error_type": "500 Internal Server Error",
+        "affected_endpoints": [
+          "/api/v1/orders",
+          "/api/v1/orders/create"
+        ]
+      },
+      "deduplicated_from": null
+    },
+    {
+      "id": "ALT-002",
+      "service": "order-service",
+      "instance": "order-01.example.com",
+      "tenant": "acme-corp",
+      "metric_type": "error_rate",
+      "start_time": "2026-05-13T07:07:58",
+      "end_time": "2026-05-13T07:49:58",
+      "severity": "critical",
+      "description": "订单服务错误率持续高企",
+      "metadata": {
+        "note": "这是 ALT-001 的重复告警"
+      },
+      "deduplicated_from": null
+    },
+    {
+      "id": "ALT-003",
+      "service": "user-service",
+      "instance": "user-05.example.com",
+      "tenant": null,
+      "metric_type": "cpu",
+      "start_time": "2026-05-13T07:12:58",
+      "end_time": "2026-05-13T07:27:58",
+      "severity": "warning",
+      "description": "user-05 CPU 使用率 85%",
+      "metadata": {
+        "cpu_usage": "85%",
+        "threshold": "80%"
+      },
+      "deduplicated_from": null
+    },
+    {
+      "id": "ALT-004",
+      "service": "payment-svc",
+      "instance": "payment-02.example.com",
+      "tenant": "acme-corp",
+      "metric_type": "latency",
+      "start_time": "2026-05-13T07:47:58",
+      "end_time": "2026-05-13T08:32:58",
+      "severity": "warning",
+      "description": "支付服务 P99 延迟从 500ms 上升至 2.5s",
+      "metadata": {
+        "p50": "200ms",
+        "p95": "800ms",
+        "p99": "2500ms"
+      },
+      "deduplicated_from": null
+    },
+    {
+      "id": "ALT-005",
+      "service": "payment-service",
+      "instance": null,
+      "tenant": "acme-corp",
+      "metric_type": "latency",
+      "start_time": "2026-05-13T07:52:58",
+      "end_time": "2026-05-13T08:37:58",
+      "severity": "warning",
+      "description": "支付服务整体延迟上升",
+      "metadata": {
+        "note": "这是 ALT-004 的服务级别告警"
+      },
+      "deduplicated_from": null
+    }
+  ],
+  "correlations": [
+    {
+      "change": {
+        "id": "CHG-001",
+        "type": "deployment",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T06:47:58",
+        "end_time": "2026-05-13T07:02:58",
+        "description": "发布 v2.3.1，包含订单创建逻辑重构",
+        "metadata": {
+          "version": "2.3.1",
+          "commit": "abc1234",
+          "deployer": "zhang.san"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-001",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "error_rate",
+        "start_time": "2026-05-13T07:05:58",
+        "end_time": "2026-05-13T07:47:58",
+        "severity": "critical",
+        "description": "订单服务错误率从 0.1% 飙升至 15%",
+        "metadata": {
+          "error_type": "500 Internal Server Error",
+          "affected_endpoints": [
+            "/api/v1/orders",
+            "/api/v1/orders/create"
+          ]
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-001",
+        "alert_id": "ALT-001",
+        "total_score": 1.0,
+        "time_score": 1.0,
+        "time_reason": "告警在变更结束后3.0分钟内发生，时间高度相关",
+        "service_score": 1.0,
+        "service_reason": "服务名完全匹配: order-service",
+        "instance_score": 1.0,
+        "instance_reason": "实例完全匹配: order-01.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "deployment变更通常会影响error_rate指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-001",
+        "type": "deployment",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T06:47:58",
+        "end_time": "2026-05-13T07:02:58",
+        "description": "发布 v2.3.1，包含订单创建逻辑重构",
+        "metadata": {
+          "version": "2.3.1",
+          "commit": "abc1234",
+          "deployer": "zhang.san"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-002",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "error_rate",
+        "start_time": "2026-05-13T07:07:58",
+        "end_time": "2026-05-13T07:49:58",
+        "severity": "critical",
+        "description": "订单服务错误率持续高企",
+        "metadata": {
+          "note": "这是 ALT-001 的重复告警"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-001",
+        "alert_id": "ALT-002",
+        "total_score": 1.0,
+        "time_score": 1.0,
+        "time_reason": "告警在变更结束后5.0分钟内发生，时间高度相关",
+        "service_score": 1.0,
+        "service_reason": "服务名完全匹配: order-service",
+        "instance_score": 1.0,
+        "instance_reason": "实例完全匹配: order-01.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "deployment变更通常会影响error_rate指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-003",
+        "type": "config_change",
+        "service": "payment-service",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T07:32:58",
+        "end_time": "2026-05-13T07:37:58",
+        "description": "修改支付超时配置从 10s 到 30s",
+        "metadata": {
+          "config_key": "payment.timeout",
+          "old_value": "10s",
+          "new_value": "30s"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-004",
+        "service": "payment-svc",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "latency",
+        "start_time": "2026-05-13T07:47:58",
+        "end_time": "2026-05-13T08:32:58",
+        "severity": "warning",
+        "description": "支付服务 P99 延迟从 500ms 上升至 2.5s",
+        "metadata": {
+          "p50": "200ms",
+          "p95": "800ms",
+          "p99": "2500ms"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-003",
+        "alert_id": "ALT-004",
+        "total_score": 0.94,
+        "time_score": 0.8,
+        "time_reason": "告警在变更结束后10.0分钟内发生，时间强相关",
+        "service_score": 1.0,
+        "service_reason": "服务名完全匹配: payment-service",
+        "instance_score": 1.0,
+        "instance_reason": "实例完全匹配: payment-02.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "config_change变更通常会影响latency指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-003",
+        "type": "config_change",
+        "service": "payment-service",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T07:32:58",
+        "end_time": "2026-05-13T07:37:58",
+        "description": "修改支付超时配置从 10s 到 30s",
+        "metadata": {
+          "config_key": "payment.timeout",
+          "old_value": "10s",
+          "new_value": "30s"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-005",
+        "service": "payment-service",
+        "instance": null,
+        "tenant": "acme-corp",
+        "metric_type": "latency",
+        "start_time": "2026-05-13T07:52:58",
+        "end_time": "2026-05-13T08:37:58",
+        "severity": "warning",
+        "description": "支付服务整体延迟上升",
+        "metadata": {
+          "note": "这是 ALT-004 的服务级别告警"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-003",
+        "alert_id": "ALT-005",
+        "total_score": 0.835,
+        "time_score": 0.8,
+        "time_reason": "告警在变更结束后15.0分钟内发生，时间强相关",
+        "service_score": 1.0,
+        "service_reason": "服务名完全匹配: payment-service",
+        "instance_score": 0.3,
+        "instance_reason": "告警未指定实例，变更影响范围可能更广",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "config_change变更通常会影响latency指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-001",
+        "type": "deployment",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T06:47:58",
+        "end_time": "2026-05-13T07:02:58",
+        "description": "发布 v2.3.1，包含订单创建逻辑重构",
+        "metadata": {
+          "version": "2.3.1",
+          "commit": "abc1234",
+          "deployer": "zhang.san"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-005",
+        "service": "payment-service",
+        "instance": null,
+        "tenant": "acme-corp",
+        "metric_type": "latency",
+        "start_time": "2026-05-13T07:52:58",
+        "end_time": "2026-05-13T08:37:58",
+        "severity": "warning",
+        "description": "支付服务整体延迟上升",
+        "metadata": {
+          "note": "这是 ALT-004 的服务级别告警"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-001",
+        "alert_id": "ALT-005",
+        "total_score": 0.405,
+        "time_score": 0.2,
+        "time_reason": "告警在变更结束后50.0分钟内发生，在时间窗口60分钟内",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: order-service vs payment-service",
+        "instance_score": 0.3,
+        "instance_reason": "告警未指定实例，变更影响范围可能更广",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "deployment变更通常会影响latency指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-001",
+        "type": "deployment",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T06:47:58",
+        "end_time": "2026-05-13T07:02:58",
+        "description": "发布 v2.3.1，包含订单创建逻辑重构",
+        "metadata": {
+          "version": "2.3.1",
+          "commit": "abc1234",
+          "deployer": "zhang.san"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-004",
+        "service": "payment-svc",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "latency",
+        "start_time": "2026-05-13T07:47:58",
+        "end_time": "2026-05-13T08:32:58",
+        "severity": "warning",
+        "description": "支付服务 P99 延迟从 500ms 上升至 2.5s",
+        "metadata": {
+          "p50": "200ms",
+          "p95": "800ms",
+          "p99": "2500ms"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-001",
+        "alert_id": "ALT-004",
+        "total_score": 0.39,
+        "time_score": 0.3,
+        "time_reason": "告警在变更结束后45.0分钟内发生，在时间窗口60分钟内",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: order-service vs payment-svc",
+        "instance_score": 0.0,
+        "instance_reason": "实例不匹配: order-01.example.com vs payment-02.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "deployment变更通常会影响latency指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-001",
+        "type": "deployment",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T06:47:58",
+        "end_time": "2026-05-13T07:02:58",
+        "description": "发布 v2.3.1，包含订单创建逻辑重构",
+        "metadata": {
+          "version": "2.3.1",
+          "commit": "abc1234",
+          "deployer": "zhang.san"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-003",
+        "service": "user-service",
+        "instance": "user-05.example.com",
+        "tenant": null,
+        "metric_type": "cpu",
+        "start_time": "2026-05-13T07:12:58",
+        "end_time": "2026-05-13T07:27:58",
+        "severity": "warning",
+        "description": "user-05 CPU 使用率 85%",
+        "metadata": {
+          "cpu_usage": "85%",
+          "threshold": "80%"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-001",
+        "alert_id": "ALT-003",
+        "total_score": 0.31,
+        "time_score": 0.8,
+        "time_reason": "告警在变更结束后10.0分钟内发生，时间强相关",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: order-service vs user-service",
+        "instance_score": 0.0,
+        "instance_reason": "实例不匹配: order-01.example.com vs user-05.example.com",
+        "tenant_score": 0.3,
+        "tenant_reason": "告警未指定租户，可能影响所有租户",
+        "metric_score": 0.2,
+        "metric_reason": "deployment变更与cpu指标关联性较弱",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-003",
+        "type": "config_change",
+        "service": "payment-service",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T07:32:58",
+        "end_time": "2026-05-13T07:37:58",
+        "description": "修改支付超时配置从 10s 到 30s",
+        "metadata": {
+          "config_key": "payment.timeout",
+          "old_value": "10s",
+          "new_value": "30s"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-001",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "error_rate",
+        "start_time": "2026-05-13T07:05:58",
+        "end_time": "2026-05-13T07:47:58",
+        "severity": "critical",
+        "description": "订单服务错误率从 0.1% 飙升至 15%",
+        "metadata": {
+          "error_type": "500 Internal Server Error",
+          "affected_endpoints": [
+            "/api/v1/orders",
+            "/api/v1/orders/create"
+          ]
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-003",
+        "alert_id": "ALT-001",
+        "total_score": 0.3,
+        "time_score": 0.0,
+        "time_reason": "告警时间(2026-05-13 07:05:58)早于变更开始时间(2026-05-13 07:32:58)",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: payment-service vs order-service",
+        "instance_score": 0.0,
+        "instance_reason": "实例不匹配: payment-02.example.com vs order-01.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "config_change变更通常会影响error_rate指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-003",
+        "type": "config_change",
+        "service": "payment-service",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T07:32:58",
+        "end_time": "2026-05-13T07:37:58",
+        "description": "修改支付超时配置从 10s 到 30s",
+        "metadata": {
+          "config_key": "payment.timeout",
+          "old_value": "10s",
+          "new_value": "30s"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-002",
+        "service": "order-service",
+        "instance": "order-01.example.com",
+        "tenant": "acme-corp",
+        "metric_type": "error_rate",
+        "start_time": "2026-05-13T07:07:58",
+        "end_time": "2026-05-13T07:49:58",
+        "severity": "critical",
+        "description": "订单服务错误率持续高企",
+        "metadata": {
+          "note": "这是 ALT-001 的重复告警"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-003",
+        "alert_id": "ALT-002",
+        "total_score": 0.3,
+        "time_score": 0.0,
+        "time_reason": "告警时间(2026-05-13 07:07:58)早于变更开始时间(2026-05-13 07:32:58)",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: payment-service vs order-service",
+        "instance_score": 0.0,
+        "instance_reason": "实例不匹配: payment-02.example.com vs order-01.example.com",
+        "tenant_score": 1.0,
+        "tenant_reason": "租户完全匹配: acme-corp",
+        "metric_score": 1.0,
+        "metric_reason": "config_change变更通常会影响error_rate指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    },
+    {
+      "change": {
+        "id": "CHG-003",
+        "type": "config_change",
+        "service": "payment-service",
+        "instance": "payment-02.example.com",
+        "tenant": "acme-corp",
+        "start_time": "2026-05-13T07:32:58",
+        "end_time": "2026-05-13T07:37:58",
+        "description": "修改支付超时配置从 10s 到 30s",
+        "metadata": {
+          "config_key": "payment.timeout",
+          "old_value": "10s",
+          "new_value": "30s"
+        },
+        "excluded": false,
+        "exclude_reason": null,
+        "marked_cause": false,
+        "cause_remark": null
+      },
+      "alert": {
+        "id": "ALT-003",
+        "service": "user-service",
+        "instance": "user-05.example.com",
+        "tenant": null,
+        "metric_type": "cpu",
+        "start_time": "2026-05-13T07:12:58",
+        "end_time": "2026-05-13T07:27:58",
+        "severity": "warning",
+        "description": "user-05 CPU 使用率 85%",
+        "metadata": {
+          "cpu_usage": "85%",
+          "threshold": "80%"
+        },
+        "deduplicated_from": null
+      },
+      "score": {
+        "change_id": "CHG-003",
+        "alert_id": "ALT-003",
+        "total_score": 0.23,
+        "time_score": 0.0,
+        "time_reason": "告警时间(2026-05-13 07:12:58)早于变更开始时间(2026-05-13 07:32:58)",
+        "service_score": 0.0,
+        "service_reason": "服务名不匹配: payment-service vs user-service",
+        "instance_score": 0.0,
+        "instance_reason": "实例不匹配: payment-02.example.com vs user-05.example.com",
+        "tenant_score": 0.3,
+        "tenant_reason": "告警未指定租户，可能影响所有租户",
+        "metric_score": 1.0,
+        "metric_reason": "config_change变更通常会影响cpu指标",
+        "time_window_minutes": 60
+      },
+      "is_root_cause": false
+    }
+  ],
+  "excluded_changes": [
+    {
+      "id": "CHG-002",
+      "type": "scale",
+      "service": "user-service",
+      "instance": null,
+      "tenant": null,
+      "start_time": "2026-05-13T06:57:58",
+      "end_time": "2026-05-13T07:07:58",
+      "description": "扩容 user-service 从 3 实例到 6 实例",
+      "metadata": {
+        "old_replicas": 3,
+        "new_replicas": 6,
+        "reason": "流量峰值预期"
+      },
+      "excluded": true,
+      "exclude_reason": "扩容是预防性操作，在告警前已完成，CPU告警是新实例启动正常现象",
+      "marked_cause": false,
+      "cause_remark": null
+    }
+  ],
+  "marked_root_causes": []
+}
