@@ -564,6 +564,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useParkingStore } from '../stores/parking'
 import dayjs from 'dayjs'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
@@ -580,6 +581,10 @@ const {
   anomalyHistory, 
   loading, 
   openAnomaliesCount,
+  failedSyncCount
+} = storeToRefs(store)
+
+const {
   fetchStatistics, 
   fetchAnomalies, 
   fetchCards,
@@ -670,12 +675,12 @@ async function refreshAll() {
 }
 
 function handleAnomalyClick(row: any) {
-  store.selectedAnomaly = row
+  selectedAnomaly.value = row
   fetchAnomalyHistory(row.id)
 }
 
 function handleProcessAnomaly(row: any) {
-  store.selectedAnomaly = row
+  selectedAnomaly.value = row
   fetchAnomalyHistory(row.id)
 }
 
