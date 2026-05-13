@@ -2,20 +2,75 @@ const initSqlJs = require('sql.js');
 const fs = require('fs');
 const path = require('path');
 
-let db = null;
+let nativeDb = null;
 const dbPath = path.join(__dirname, 'cold_chain.db');
+
+function now() {
+  return new Date().toLocaleString('zh-CN', { hour12: false });
+}
+
+function saveDb() {
+  const data = nativeDb.export();
+  const buffer = Buffer.from(data);
+  fs.writeFileSync(dbPath, buffer);
+}
+
+function stmtRun(sql, params = []) {
+  const stmt = nativeDb.prepare(sql);
+  stmt.bind(params);
+  stmt.step();
+  stmt.free();
+  saveDb();
+  
+  const result = nativeDb.exec('SELECT last_insert_rowid() as id, changes() as changes');
+  const lastInsertRowid = result[0]?.values?.[0]?.[0] || 0;
+  const changes = result[0]?.values?.[0]?.[1] || 0;
+  return { lastInsertRowid, changes };
+}
+
+function stmtAll(sql, params = []) {
+  const stmt = nativeDb.prepare(sql);
+  stmt.bind(params);
+  const results = [];
+  while (stmt.step()) {
+    results.push(stmt.getAsObject());
+  }
+  stmt.free();
+  return results;
+}
+
+function stmtGet(sql, params = []) {
+  const results = stmtAll(sql, params);
+  return results[0] || null;
+}
+
+function createPreparedStatement(sql) {
+  return {
+    run: function(...params) {
+      return stmtRun(sql, params);
+    },
+    get: function(...params) {
+      return stmtGet(sql, params);
+    },
+    all: function(...params) {
+      return stmtAll(sql, params);
+    }
+  };
+}
 
 async function initDb() {
   const SQL = await initSqlJs();
 
   if (fs.existsSync(dbPath)) {
     const fileBuffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(fileBuffer);
+    nativeDb = new SQL.Database(fileBuffer);
   } else {
-    db = new SQL.Database();
+    nativeDb = new SQL.Database();
   }
 
-  db.run(`
+  const currentTime = now();
+
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS sign_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       batch_no TEXT UNIQUE NOT NULL,
@@ -30,12 +85,12 @@ async function initDb() {
       actual_temp REAL,
       status TEXT NOT NULL DEFAULT 'pending',
       is_abnormal INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT (datetime('now', 'localtime')),
-      updated_at TEXT DEFAULT (datetime('now', 'localtime'))
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS temp_evidence (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER NOT NULL,
@@ -44,11 +99,11 @@ async function initDb() {
       uploader TEXT NOT NULL,
       upload_time TEXT NOT NULL,
       remark TEXT,
-      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      created_at TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS responsibility_transfer (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER NOT NULL,
@@ -58,11 +113,11 @@ async function initDb() {
       to_user TEXT NOT NULL,
       reason TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
-      transfer_time TEXT DEFAULT (datetime('now', 'localtime'))
+      transfer_time TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS supplementary_review (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER NOT NULL,
@@ -73,11 +128,11 @@ async function initDb() {
       reviewer TEXT,
       review_remark TEXT,
       review_time TEXT,
-      submit_time TEXT DEFAULT (datetime('now', 'localtime'))
+      submit_time TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER NOT NULL,
@@ -85,11 +140,11 @@ async function initDb() {
       sender_role TEXT NOT NULL,
       content TEXT NOT NULL,
       is_read INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      created_at TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS trace_reports (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER UNIQUE NOT NULL,
@@ -98,11 +153,11 @@ async function initDb() {
       responsibility TEXT NOT NULL,
       action_plan TEXT NOT NULL,
       generated_by TEXT NOT NULL,
-      generated_at TEXT DEFAULT (datetime('now', 'localtime'))
+      generated_at TEXT NOT NULL
     )
   `);
 
-  db.run(`
+  nativeDb.run(`
     CREATE TABLE IF NOT EXISTS audit_logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       record_id INTEGER NOT NULL,
@@ -110,73 +165,33 @@ async function initDb() {
       operator TEXT NOT NULL,
       operator_role TEXT NOT NULL,
       detail TEXT,
-      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      created_at TEXT NOT NULL
     )
   `);
 
   saveDb();
-  return db;
-}
 
-function saveDb() {
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
-}
-
-function rowToObject(stmt) {
-  const columns = stmt.getColumnNames();
-  const results = [];
-  while (stmt.step()) {
-    const row = stmt.getAsObject();
-    results.push(row);
-  }
-  return results;
-}
-
-function getLastInsertId() {
-  const result = db.exec('SELECT last_insert_rowid() as id');
-  return result[0]?.values[0][0];
-}
-
-function run(sql, params = []) {
-  db.run(sql, params);
-  saveDb();
-}
-
-function all(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  return rowToObject(stmt);
-}
-
-function get(sql, params = []) {
-  const results = all(sql, params);
-  return results[0] || null;
-}
-
-function prepare(sql) {
   return {
-    run: function(...params) {
-      db.run(sql, params);
-      saveDb();
-      return { lastInsertRowid: getLastInsertId() };
+    prepare: function(sql) {
+      return createPreparedStatement(sql);
     },
-    get: function(...params) {
-      const results = all(sql, params);
-      return results[0] || null;
+    run: function(sql, params = []) {
+      return stmtRun(sql, params);
     },
-    all: function(...params) {
-      return all(sql, params);
-    }
+    get: function(sql, params = []) {
+      return stmtGet(sql, params);
+    },
+    all: function(sql, params = []) {
+      return stmtAll(sql, params);
+    },
+    exec: function(sql) {
+      return nativeDb.exec(sql);
+    },
+    _native: nativeDb,
+    save: saveDb
   };
 }
 
 module.exports = {
-  initDb,
-  run,
-  all,
-  get,
-  prepare,
-  saveDb
+  initDb
 };
