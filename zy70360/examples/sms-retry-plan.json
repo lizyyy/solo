@@ -1,0 +1,25 @@
+{
+  "name": "sms-test-retry",
+  "description": "短信通知重试和死信测试",
+  "topic": "notification.sms",
+  "messages": [
+    {
+      "businessKey": "SMS-TEST-001",
+      "payload": {
+        "phone": "13800138000",
+        "template": "ORDER_SHIPPED",
+        "params": {
+          "orderId": "ORDER-TEST-001",
+          "trackingNumber": "SF1234567890"
+        }
+      }
+    }
+  ],
+  "rules": {
+    "consumerFailure": {
+      "enabled": true,
+      "probability": 1.0
+    },
+    "ignoreHistory": true
+  }
+}

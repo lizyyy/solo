@@ -1,0 +1,120 @@
+[
+  {
+    "id": "a070b70f-3880-4b2a-88e7-980f59d9944a",
+    "name": "order-test-normal",
+    "description": "订单创建正常投递测试",
+    "topic": "order.created",
+    "messages": [
+      {
+        "id": "a171321f-5069-4958-afb3-40d292f704ec",
+        "topic": "order.created",
+        "businessKey": "ORDER-TEST-001",
+        "payload": {
+          "orderId": "ORDER-TEST-001",
+          "userId": "user-001",
+          "amount": 99,
+          "items": [
+            {
+              "skuId": "SKU-001",
+              "quantity": 1,
+              "price": 99
+            }
+          ]
+        },
+        "createdAt": 1778633836108,
+        "metadata": {},
+        "sequence": 0
+      },
+      {
+        "id": "9e315e01-5d23-41b3-b364-6dc3b8811da2",
+        "topic": "order.created",
+        "businessKey": "ORDER-TEST-002",
+        "payload": {
+          "orderId": "ORDER-TEST-002",
+          "userId": "user-002",
+          "amount": 299,
+          "items": [
+            {
+              "skuId": "SKU-002",
+              "quantity": 2,
+              "price": 149.5
+            }
+          ]
+        },
+        "createdAt": 1778633836108,
+        "metadata": {},
+        "sequence": 1
+      }
+    ],
+    "rules": {},
+    "schedule": "immediate",
+    "createdAt": 1778633836108,
+    "status": "completed"
+  },
+  {
+    "id": "a5d4e2ad-3046-44ea-b0cd-7854ff375a53",
+    "name": "order-test-duplicate",
+    "description": "订单创建重复投递测试 - 验证幂等性",
+    "topic": "order.created",
+    "messages": [
+      {
+        "id": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+        "topic": "order.created",
+        "businessKey": "ORDER-DUPLICATE-001",
+        "payload": {
+          "orderId": "ORDER-DUPLICATE-001",
+          "userId": "user-003",
+          "amount": 599,
+          "action": "create"
+        },
+        "createdAt": 1778633845550,
+        "metadata": {},
+        "sequence": 0
+      }
+    ],
+    "rules": {
+      "duplicateDelivery": {
+        "enabled": true,
+        "probability": 1,
+        "count": 2
+      }
+    },
+    "schedule": "immediate",
+    "createdAt": 1778633845550,
+    "status": "completed"
+  },
+  {
+    "id": "ae86c90b-a7dd-4361-b08f-f827e9602f5c",
+    "name": "sms-test-retry",
+    "description": "短信通知重试和死信测试",
+    "topic": "notification.sms",
+    "messages": [
+      {
+        "id": "99eb27d7-3ff1-4f6e-8a5f-b2e7fa6c766a",
+        "topic": "notification.sms",
+        "businessKey": "SMS-TEST-001",
+        "payload": {
+          "phone": "13800138000",
+          "template": "ORDER_SHIPPED",
+          "params": {
+            "orderId": "ORDER-TEST-001",
+            "trackingNumber": "SF1234567890"
+          }
+        },
+        "createdAt": 1778633870845,
+        "metadata": {},
+        "sequence": 0
+      }
+    ],
+    "rules": {
+      "consumerFailure": {
+        "enabled": true,
+        "probability": 1
+      },
+      "ignoreHistory": true
+    },
+    "schedule": "immediate",
+    "createdAt": 1778633870845,
+    "status": "completed"
+  }
+]

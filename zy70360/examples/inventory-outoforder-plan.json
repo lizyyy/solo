@@ -1,0 +1,46 @@
+{
+  "name": "inventory-test-outoforder",
+  "description": "库存扣减乱序投递测试",
+  "topic": "inventory.deducted",
+  "messages": [
+    {
+      "businessKey": "SKU-TEST-001",
+      "sequence": 1,
+      "payload": {
+        "skuId": "SKU-TEST-001",
+        "warehouseId": "WH-001",
+        "quantity": 1,
+        "operation": "reserve"
+      }
+    },
+    {
+      "businessKey": "SKU-TEST-001",
+      "sequence": 2,
+      "payload": {
+        "skuId": "SKU-TEST-001",
+        "warehouseId": "WH-001",
+        "quantity": 1,
+        "operation": "confirm"
+      }
+    },
+    {
+      "businessKey": "SKU-TEST-001",
+      "sequence": 3,
+      "payload": {
+        "skuId": "SKU-TEST-001",
+        "warehouseId": "WH-001",
+        "quantity": 1,
+        "operation": "deduct"
+      }
+    }
+  ],
+  "rules": {
+    "outOfOrder": {
+      "enabled": true,
+      "probability": 1.0
+    },
+    "mergeByBusinessKey": {
+      "enabled": true
+    }
+  }
+}

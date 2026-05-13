@@ -1,0 +1,230 @@
+[
+  {
+    "id": "4da32aa2-ae17-4efa-8f34-7668f7e8a938",
+    "messageId": "a171321f-5069-4958-afb3-40d292f704ec",
+    "businessKey": "ORDER-TEST-001",
+    "topic": "order.created",
+    "deliveryCount": 1,
+    "status": "success",
+    "consumerResult": {
+      "success": true,
+      "messageId": "a171321f-5069-4958-afb3-40d292f704ec",
+      "businessKey": "ORDER-TEST-001",
+      "topic": "order.created",
+      "attempt": 1,
+      "reason": "CONSUMER_ACK_SUCCESS",
+      "timestamp": 1778633841572,
+      "processingTime": "100"
+    },
+    "isDuplicateIgnored": false,
+    "isDeadLetter": false,
+    "deliveries": [
+      {
+        "id": "cf32ef25-43c3-4ac4-b3cc-08c012d9799b",
+        "attempt": 1,
+        "timestamp": 1778633841571,
+        "type": "delivery",
+        "status": "success",
+        "result": {
+          "success": true,
+          "messageId": "a171321f-5069-4958-afb3-40d292f704ec",
+          "businessKey": "ORDER-TEST-001",
+          "topic": "order.created",
+          "attempt": 1,
+          "reason": "CONSUMER_ACK_SUCCESS",
+          "timestamp": 1778633841572,
+          "processingTime": "100"
+        }
+      }
+    ],
+    "createdAt": 1778633841571,
+    "updatedAt": 1778633841572
+  },
+  {
+    "id": "0da00b81-c711-4c00-b37b-670f0fb219f1",
+    "messageId": "9e315e01-5d23-41b3-b364-6dc3b8811da2",
+    "businessKey": "ORDER-TEST-002",
+    "topic": "order.created",
+    "deliveryCount": 1,
+    "status": "success",
+    "consumerResult": {
+      "success": true,
+      "messageId": "9e315e01-5d23-41b3-b364-6dc3b8811da2",
+      "businessKey": "ORDER-TEST-002",
+      "topic": "order.created",
+      "attempt": 1,
+      "reason": "CONSUMER_ACK_SUCCESS",
+      "timestamp": 1778633841572,
+      "processingTime": "100"
+    },
+    "isDuplicateIgnored": false,
+    "isDeadLetter": false,
+    "deliveries": [
+      {
+        "id": "78abc246-ffe6-41c6-b85b-cad4adb7ca08",
+        "attempt": 1,
+        "timestamp": 1778633841572,
+        "type": "delivery",
+        "status": "success",
+        "result": {
+          "success": true,
+          "messageId": "9e315e01-5d23-41b3-b364-6dc3b8811da2",
+          "businessKey": "ORDER-TEST-002",
+          "topic": "order.created",
+          "attempt": 1,
+          "reason": "CONSUMER_ACK_SUCCESS",
+          "timestamp": 1778633841572,
+          "processingTime": "100"
+        }
+      }
+    ],
+    "createdAt": 1778633841572,
+    "updatedAt": 1778633841572
+  },
+  {
+    "id": "699d7956-f27a-4308-8985-79efbbfdaa2b",
+    "messageId": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+    "businessKey": "ORDER-DUPLICATE-001",
+    "topic": "order.created",
+    "deliveryCount": 3,
+    "status": "success",
+    "consumerResult": {
+      "success": true,
+      "messageId": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+      "businessKey": "ORDER-DUPLICATE-001",
+      "topic": "order.created",
+      "attempt": 1,
+      "reason": "CONSUMER_ACK_SUCCESS",
+      "timestamp": 1778633849747,
+      "processingTime": "100"
+    },
+    "isDuplicateIgnored": false,
+    "isDeadLetter": false,
+    "deliveries": [
+      {
+        "id": "6beea10a-ba41-4ff6-920f-1185eb0fd105",
+        "attempt": 1,
+        "timestamp": 1778633849747,
+        "type": "delivery",
+        "status": "success",
+        "result": {
+          "success": true,
+          "messageId": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+          "businessKey": "ORDER-DUPLICATE-001",
+          "topic": "order.created",
+          "attempt": 1,
+          "reason": "CONSUMER_ACK_SUCCESS",
+          "timestamp": 1778633849747,
+          "processingTime": "100"
+        }
+      },
+      {
+        "id": "b7c7a944-893d-418d-aa32-3af7aed82dcf",
+        "attempt": "duplicate-1",
+        "timestamp": 1778633849747,
+        "type": "duplicate_delivery",
+        "status": "success",
+        "result": {
+          "success": true,
+          "messageId": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+          "businessKey": "ORDER-DUPLICATE-001",
+          "topic": "order.created",
+          "attempt": "duplicate-1",
+          "reason": "CONSUMER_ACK_SUCCESS",
+          "timestamp": 1778633849747,
+          "processingTime": "100"
+        },
+        "isDuplicate": true
+      },
+      {
+        "id": "e7fa8ca9-56dc-40a1-8e88-de963b10f20e",
+        "attempt": "duplicate-2",
+        "timestamp": 1778633849747,
+        "type": "duplicate_delivery",
+        "status": "success",
+        "result": {
+          "success": true,
+          "messageId": "c9cbcbaf-9600-4bab-b5b0-df1f7140ee86",
+          "businessKey": "ORDER-DUPLICATE-001",
+          "topic": "order.created",
+          "attempt": "duplicate-2",
+          "reason": "CONSUMER_ACK_SUCCESS",
+          "timestamp": 1778633849747,
+          "processingTime": "100"
+        },
+        "isDuplicate": true
+      }
+    ],
+    "createdAt": 1778633849746,
+    "updatedAt": 1778633849747
+  },
+  {
+    "id": "de851504-fe93-467d-8545-9ed7d4a0f5c2",
+    "messageId": "99eb27d7-3ff1-4f6e-8a5f-b2e7fa6c766a",
+    "businessKey": "SMS-TEST-001",
+    "topic": "notification.sms",
+    "deliveryCount": 3,
+    "status": "dead_letter",
+    "consumerResult": null,
+    "isDuplicateIgnored": false,
+    "isDeadLetter": true,
+    "deliveries": [
+      {
+        "id": "7de9d837-c836-4650-a79b-c46b5430e46a",
+        "attempt": 1,
+        "timestamp": 1778633874689,
+        "type": "delivery",
+        "status": "failed",
+        "result": {
+          "success": false,
+          "messageId": "99eb27d7-3ff1-4f6e-8a5f-b2e7fa6c766a",
+          "businessKey": "SMS-TEST-001",
+          "topic": "notification.sms",
+          "attempt": 1,
+          "reason": "CONSUMER_ALWAYS_FAIL",
+          "timestamp": 1778633874689,
+          "processingTime": "100",
+          "shouldRetry": true
+        }
+      },
+      {
+        "id": "5b5a84fb-7eef-496e-a7ab-3722b6119525",
+        "attempt": 2,
+        "timestamp": 1778633879691,
+        "type": "delivery",
+        "status": "failed",
+        "result": {
+          "success": false,
+          "messageId": "99eb27d7-3ff1-4f6e-8a5f-b2e7fa6c766a",
+          "businessKey": "SMS-TEST-001",
+          "topic": "notification.sms",
+          "attempt": 2,
+          "reason": "CONSUMER_ALWAYS_FAIL",
+          "timestamp": 1778633879691,
+          "processingTime": "100",
+          "shouldRetry": true
+        }
+      },
+      {
+        "id": "4b4e753e-b2cf-48d8-8598-296990694ea6",
+        "attempt": 3,
+        "timestamp": 1778633884693,
+        "type": "delivery",
+        "status": "failed",
+        "result": {
+          "success": false,
+          "messageId": "99eb27d7-3ff1-4f6e-8a5f-b2e7fa6c766a",
+          "businessKey": "SMS-TEST-001",
+          "topic": "notification.sms",
+          "attempt": 3,
+          "reason": "CONSUMER_ALWAYS_FAIL",
+          "timestamp": 1778633884693,
+          "processingTime": "100",
+          "shouldRetry": true
+        }
+      }
+    ],
+    "createdAt": 1778633874689,
+    "updatedAt": 1778633884694
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "name": "mq-simulator",
+  "version": "1.0.0",
+  "description": "本地消息投递模拟CLI，用于测试消息幂等性",
+  "main": "src/index.js",
+  "bin": {
+    "mq-sim": "./bin/mq-sim.js"
+  },
+  "scripts": {
+    "start": "node bin/mq-sim.js"
+  },
+  "keywords": [
+    "mq",
+    "message-queue",
+    "simulator",
+    "idempotency",
+    "testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "uuid": "^9.0.1"
+  }
+}

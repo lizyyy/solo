@@ -1,0 +1,23 @@
+{
+  "name": "order-test-duplicate",
+  "description": "订单创建重复投递测试 - 验证幂等性",
+  "topic": "order.created",
+  "messages": [
+    {
+      "businessKey": "ORDER-DUPLICATE-001",
+      "payload": {
+        "orderId": "ORDER-DUPLICATE-001",
+        "userId": "user-003",
+        "amount": 599.00,
+        "action": "create"
+      }
+    }
+  ],
+  "rules": {
+    "duplicateDelivery": {
+      "enabled": true,
+      "probability": 1.0,
+      "count": 2
+    }
+  }
+}

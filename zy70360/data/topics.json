@@ -1,0 +1,29 @@
+[
+  {
+    "name": "order.created",
+    "description": "订单创建",
+    "consumerGroup": "order-service",
+    "maxRetry": 3,
+    "retryDelay": 5000,
+    "deadLetterTopic": "DLQ-order.created",
+    "partitions": 1
+  },
+  {
+    "name": "inventory.deducted",
+    "description": "库存扣减",
+    "consumerGroup": "inventory-service",
+    "maxRetry": 5,
+    "retryDelay": 5000,
+    "deadLetterTopic": "DLQ-inventory.deducted",
+    "partitions": 1
+  },
+  {
+    "name": "notification.sms",
+    "description": "短信通知",
+    "consumerGroup": "notification-service",
+    "maxRetry": 2,
+    "retryDelay": 5000,
+    "deadLetterTopic": "DLQ-notification.sms",
+    "partitions": 1
+  }
+]

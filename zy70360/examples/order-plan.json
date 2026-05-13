@@ -1,0 +1,30 @@
+{
+  "name": "order-test-normal",
+  "description": "订单创建正常投递测试",
+  "topic": "order.created",
+  "messages": [
+    {
+      "businessKey": "ORDER-TEST-001",
+      "payload": {
+        "orderId": "ORDER-TEST-001",
+        "userId": "user-001",
+        "amount": 99.00,
+        "items": [
+          { "skuId": "SKU-001", "quantity": 1, "price": 99.00 }
+        ]
+      }
+    },
+    {
+      "businessKey": "ORDER-TEST-002",
+      "payload": {
+        "orderId": "ORDER-TEST-002",
+        "userId": "user-002",
+        "amount": 299.00,
+        "items": [
+          { "skuId": "SKU-002", "quantity": 2, "price": 149.50 }
+        ]
+      }
+    }
+  ],
+  "rules": {}
+}
