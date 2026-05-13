@@ -357,16 +357,21 @@ def _load_rolled_documents(previous_run: Dict[str, Any]) -> List[Document]:
             if doc_data.get("due_date"):
                 due_date = datetime.fromisoformat(doc_data["due_date"]).date()
             
+            previous_matched = result.get("matched_amount", 0.0)
+            original_amount = doc_data["amount"]
+            remaining_amount = original_amount - previous_matched
+            
             metadata = doc_data.get("metadata", {})
             metadata["rolled_from_period"] = previous_run.get("period", "")
-            metadata["previous_matched_amount"] = result.get("matched_amount", 0.0)
+            metadata["original_amount"] = original_amount
+            metadata["previous_matched_amount"] = previous_matched
             
             doc = Document(
                 doc_type=DocumentType(doc_data["doc_type"]),
                 doc_number=doc_data["doc_number"],
                 supplier_id=doc_data["supplier_id"],
                 supplier_name=doc_data["supplier_name"],
-                amount=doc_data["amount"],
+                amount=remaining_amount,
                 doc_date=doc_date or date_cls.today(),
                 due_date=due_date,
                 description=doc_data.get("description", ""),
