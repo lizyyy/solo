@@ -115,6 +115,10 @@ class AlertProcessor:
             # 获取待处理的告警
             alerts = self._get_alerts_in_range(start_time, end_time, status='pending')
             
+            # 保存告警时间范围到批次记录（用于重跑）
+            batch.alerts_start_time = start_time
+            batch.alerts_end_time = end_time
+            
             stats = {
                 'total': len(alerts),
                 'merged': 0,
@@ -174,6 +178,11 @@ class AlertProcessor:
                     **escalate_result.get('strategies_applied', {})
                 }
             }
+            
+            # 回写batch_id到所有被处理的告警
+            for alert in alerts:
+                if alert.status in ['suppressed', 'merged', 'escalated']:
+                    alert.batch_id = batch.id
             
             # 完成批次
             self._complete_batch(batch, stats)
@@ -243,10 +252,13 @@ class AlertProcessor:
                 
                 self.session.commit()
                 
-                # 重新处理
+                # 重新处理 - 使用告警时间范围而非批次执行时间
+                rerun_start = batch.alerts_start_time if batch.alerts_start_time else batch.start_time
+                rerun_end = batch.alerts_end_time if batch.alerts_end_time else batch.end_time
+                
                 return self.process(
-                    start_time=batch.start_time,
-                    end_time=batch.end_time
+                    start_time=rerun_start,
+                    end_time=rerun_end
                 )
             elif start_time and end_time:
                 # 根据时间范围重跑

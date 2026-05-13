@@ -110,10 +110,14 @@ class ProcessBatch(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     batch_uuid = Column(String(255), unique=True, nullable=False)
     
-    # 处理信息
+    # 处理执行时间
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime)
     status = Column(String(50), default="running")  # running, completed, failed
+    
+    # 告警时间范围（用于重跑）
+    alerts_start_time = Column(DateTime)
+    alerts_end_time = Column(DateTime)
     
     # 统计信息
     total_alerts = Column(Integer, default=0)
