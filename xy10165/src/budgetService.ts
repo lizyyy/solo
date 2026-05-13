@@ -252,8 +252,9 @@ export function createPurchaseRequest(params: CreatePurchaseRequestParams): stri
   }
 
   const availableForReservation = budget.amount - budget.used_amount - budget.reserved_amount;
+  const isOverBudget = params.requestedAmount > availableForReservation;
   
-  if (params.requestedAmount > availableForReservation) {
+  if (isOverBudget) {
     recordException(
       'BUDGET_EXCEEDED',
       `采购申请「${params.requestNo}」金额 ${params.requestedAmount.toLocaleString()} 超出可用预算，可用金额: ${availableForReservation.toLocaleString()}`,
@@ -272,25 +273,29 @@ export function createPurchaseRequest(params: CreatePurchaseRequestParams): stri
   }
 
   const id = uuidv4();
+  const status = isOverBudget ? 'needs_review' : 'approved';
+  
   db.prepare(`
     INSERT INTO purchase_requests (
       id, request_no, department_id, budget_id, item_name, requested_amount, 
       status, request_date, requester, description
-    ) VALUES (?, ?, ?, ?, ?, ?, 'approved', ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     id, params.requestNo, departmentId, budget.id, params.itemName, params.requestedAmount,
-    params.requestDate, params.requester || null, params.description || null
+    status, params.requestDate, params.requester || null, params.description || null
   );
 
-  updateBudgetReserved(
-    budget.id,
-    params.requestedAmount,
-    true,
-    'purchase_request',
-    id,
-    params.requester,
-    `采购申请占用预算: ${params.itemName}`
-  );
+  if (!isOverBudget) {
+    updateBudgetReserved(
+      budget.id,
+      params.requestedAmount,
+      true,
+      'purchase_request',
+      id,
+      params.requester,
+      `采购申请占用预算: ${params.itemName}`
+    );
+  }
 
   return id;
 }
@@ -441,20 +446,21 @@ export function checkAllBudgets(): CheckResult[] {
   `).all() as (Budget & { department_name: string })[];
 
   for (const budget of budgetsWithDept) {
-    const remainingAmount = budget.amount - budget.used_amount;
-    const usageRate = budget.amount > 0 ? budget.used_amount / budget.amount : 0;
+    const totalCommitted = budget.used_amount + budget.reserved_amount;
+    const remainingAmount = budget.amount - totalCommitted;
+    const usageRate = budget.amount > 0 ? totalCommitted / budget.amount : 0;
     const issues: string[] = [];
 
-    if (budget.used_amount > budget.amount) {
-      issues.push(`超支 ${(budget.used_amount - budget.amount).toLocaleString()} 元`);
+    if (totalCommitted > budget.amount) {
+      issues.push(`超支 ${(totalCommitted - budget.amount).toLocaleString()} 元（已用+预留已超出预算）`);
     }
 
-    if (usageRate >= budget.threshold && budget.used_amount <= budget.amount) {
+    if (usageRate >= budget.threshold && totalCommitted <= budget.amount) {
       issues.push(`使用率达到 ${(usageRate * 100).toFixed(1)}%，超过阈值 ${(budget.threshold * 100)}%`);
     }
 
     const isOverThreshold = usageRate >= budget.threshold;
-    const isOverBudget = budget.used_amount > budget.amount;
+    const isOverBudget = totalCommitted > budget.amount;
 
     if (isOverBudget) {
       const existing = db.prepare(`
@@ -467,14 +473,16 @@ export function checkAllBudgets(): CheckResult[] {
       if (!existing) {
         recordException(
           'BUDGET_ALARM',
-          `部门「${budget.department_name}」「${budget.period}」期间「${budget.budget_type}」预算已超支`,
+          `部门「${budget.department_name}」「${budget.period}」期间「${budget.budget_type}」预算已超支，已用+预留共 ${totalCommitted.toLocaleString()} 元超出预算 ${budget.amount.toLocaleString()} 元`,
           'critical',
           'budget',
           budget.id,
           JSON.stringify({
             budgetAmount: budget.amount,
             usedAmount: budget.used_amount,
-            overAmount: budget.used_amount - budget.amount
+            reservedAmount: budget.reserved_amount,
+            totalCommitted,
+            overAmount: totalCommitted - budget.amount
           })
         );
       }
@@ -513,15 +521,16 @@ export function checkBudgetStatus(budgetId: string): CheckResult | undefined {
     return undefined;
   }
 
-  const remainingAmount = budgetWithDept.amount - budgetWithDept.used_amount;
-  const usageRate = budgetWithDept.amount > 0 ? budgetWithDept.used_amount / budgetWithDept.amount : 0;
+  const totalCommitted = budgetWithDept.used_amount + budgetWithDept.reserved_amount;
+  const remainingAmount = budgetWithDept.amount - totalCommitted;
+  const usageRate = budgetWithDept.amount > 0 ? totalCommitted / budgetWithDept.amount : 0;
   const issues: string[] = [];
 
-  if (budgetWithDept.used_amount > budgetWithDept.amount) {
-    issues.push(`超支 ${(budgetWithDept.used_amount - budgetWithDept.amount).toLocaleString()} 元`);
+  if (totalCommitted > budgetWithDept.amount) {
+    issues.push(`超支 ${(totalCommitted - budgetWithDept.amount).toLocaleString()} 元（已用+预留已超出预算）`);
   }
 
-  if (usageRate >= budgetWithDept.threshold && budgetWithDept.used_amount <= budgetWithDept.amount) {
+  if (usageRate >= budgetWithDept.threshold && totalCommitted <= budgetWithDept.amount) {
     issues.push(`使用率达到 ${(usageRate * 100).toFixed(1)}%，超过阈值 ${(budgetWithDept.threshold * 100)}%`);
   }
 
@@ -537,7 +546,7 @@ export function checkBudgetStatus(budgetId: string): CheckResult | undefined {
     usageRate,
     threshold: budgetWithDept.threshold,
     isOverThreshold: usageRate >= budgetWithDept.threshold,
-    isOverBudget: budgetWithDept.used_amount > budgetWithDept.amount,
+    isOverBudget: totalCommitted > budgetWithDept.amount,
     issues
   };
 }
