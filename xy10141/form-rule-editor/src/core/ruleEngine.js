@@ -84,8 +84,14 @@ export function evaluateCondition(fieldValue, condition, fields) {
       return fieldValue !== '' && fieldValue !== null && fieldValue !== undefined && 
              !(Array.isArray(fieldValue) && fieldValue.length === 0)
     case OPERATORS.IS_TRUE:
+      if (Array.isArray(fieldValue)) {
+        return fieldValue.length > 0 && fieldValue.some(v => v === true || v === 'true')
+      }
       return fieldValue === true || fieldValue === 'true'
     case OPERATORS.IS_FALSE:
+      if (Array.isArray(fieldValue)) {
+        return fieldValue.length === 0 || !fieldValue.some(v => v === true || v === 'true')
+      }
       return fieldValue === false || fieldValue === 'false'
     default:
       return false
@@ -156,19 +162,24 @@ export function executeRules(rules, fields) {
     const result = evaluateRule(rule, fieldValues, fields)
     executionResults.push(result)
     
-    if (!result.triggered) continue
-    
     const targetState = fieldStates[rule.targetField]
     if (!targetState) continue
     
     switch (rule.type) {
       case RULE_TYPES.VISIBILITY:
-        targetState.visible = rule.action.visible !== false
+        const wantsVisible = rule.action.visible !== false
+        if (result.triggered) {
+          targetState.visible = wantsVisible
+        } else {
+          targetState.visible = !wantsVisible
+        }
         break
       case RULE_TYPES.REQUIRED:
+        if (!result.triggered) continue
         targetState.required = rule.action.required !== false
         break
       case RULE_TYPES.VALIDATION:
+        if (!result.triggered) continue
         if (rule.action.message) {
           targetState.errors.push({
             ruleId: rule.id,

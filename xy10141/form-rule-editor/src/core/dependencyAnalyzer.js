@@ -16,6 +16,11 @@ export function buildDependencyGraph(rules) {
     
     rule.conditions.forEach(condition => {
       const sourceField = condition.fieldId
+      
+      if (rule.type === 'validation' && sourceField === targetField) {
+        return
+      }
+      
       nodes.add(sourceField)
       
       dependencies.get(targetField).add(sourceField)
@@ -177,6 +182,10 @@ export function detectConflicts(rules, fields) {
   
   rules.forEach(rule => {
     if (!rule.enabled) return
+    
+    if (rule.type === 'validation') {
+      return
+    }
     
     const hasSelfReference = rule.conditions.some(c => c.fieldId === rule.targetField)
     if (hasSelfReference) {
