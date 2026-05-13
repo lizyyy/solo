@@ -521,6 +521,94 @@ runner.test('核心修复验证 - 满足条件后警情自动处置成功', (eng
   assertEqual(completedEmergency.id, emergency.id, '处置成功的应是目标警情');
 });
 
+runner.test('资源循环验证 - 警情处置成功后人员归还消防站', (engine) => {
+  engine.start();
+  const station = engine.stations[0];
+  const initialPersonnel = station.personnel;
+  
+  const emergency = engine.emergencies[0];
+  
+  const vehicle = engine.vehicles.find(v => v.status === 'available' && v.stationId === station.id);
+  assertTrue(vehicle, '消防站应有可用车辆');
+  
+  const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+  const personnelToSend = Math.min(2, vehicleConfig.capacity, station.personnel);
+  
+  engine.dispatch(vehicle.id, emergency.id, personnelToSend, false);
+  
+  assertEqual(station.personnel, initialPersonnel - personnelToSend, '派遣后消防站人员应减少');
+  
+  vehicle.status = 'arrived';
+  vehicle.x = emergency.x;
+  vehicle.y = emergency.y;
+  
+  engine.resolveEmergency(emergency, 'success');
+  
+  assertEqual(station.personnel, initialPersonnel, '警情处置成功后人员应归还消防站');
+  assertEqual(vehicle.personnel, 0, '车辆上的人员应已清空');
+});
+
+runner.test('资源循环验证 - 警情处置失败后人员也应归还', (engine) => {
+  engine.start();
+  const station = engine.stations[0];
+  const initialPersonnel = station.personnel;
+  
+  const emergency = engine.emergencies[0];
+  
+  const vehicle = engine.vehicles.find(v => v.status === 'available' && v.stationId === station.id);
+  assertTrue(vehicle, '消防站应有可用车辆');
+  
+  const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+  const personnelToSend = Math.min(1, vehicleConfig.capacity, station.personnel);
+  
+  engine.dispatch(vehicle.id, emergency.id, personnelToSend, false);
+  
+  assertEqual(station.personnel, initialPersonnel - personnelToSend, '派遣后消防站人员应减少');
+  
+  engine.resolveEmergency(emergency, 'timeout');
+  
+  assertEqual(station.personnel, initialPersonnel, '警情处置失败后人员也应归还消防站');
+});
+
+runner.test('资源循环验证 - 多警情连续调度人员资源正确循环', (engine) => {
+  engine.start();
+  const station = engine.stations[0];
+  const initialPersonnel = station.personnel;
+  
+  let totalPersonnelDispatched = 0;
+  let usedVehicleIds = [];
+  
+  for (const vehicle of engine.vehicles) {
+    if (vehicle.status !== 'available' || vehicle.stationId !== station.id) continue;
+    
+    const vehicleConfig = GameConfig.VEHICLE_TYPES[vehicle.type];
+    const personnelToSend = 1;
+    
+    if (station.personnel < personnelToSend) break;
+    
+    engine.dispatch(vehicle.id, engine.emergencies[0].id, personnelToSend, false);
+    totalPersonnelDispatched += personnelToSend;
+    usedVehicleIds.push(vehicle.id);
+    
+    vehicle.status = 'arrived';
+    vehicle.x = engine.emergencies[0].x;
+    vehicle.y = engine.emergencies[0].y;
+  }
+  
+  assertTrue(totalPersonnelDispatched > 0, '应派遣了至少一辆车');
+  assertEqual(station.personnel, initialPersonnel - totalPersonnelDispatched, '人员应已扣减');
+  
+  engine.resolveEmergency(engine.emergencies[0], 'success');
+  
+  assertEqual(station.personnel, initialPersonnel, '所有人员应已归还消防站');
+  
+  const vehiclesAfter = engine.vehicles.filter(v => usedVehicleIds.includes(v.id));
+  for (const v of vehiclesAfter) {
+    assertEqual(v.status, 'returning', '车辆状态应为 returning');
+    assertEqual(v.personnel, 0, '车辆人员应已清空');
+  }
+});
+
 if (require.main === module) {
   process.exit(runner.run() ? 0 : 1);
 }

@@ -196,13 +196,16 @@ class GameEngine {
       const vehicle = this.vehicles.find(v => v.id === dv.id);
       if (vehicle) {
         vehicle.status = 'returning';
-        vehicle.personnel = 0;
-        vehicle.water = 0;
+        
         const station = this.stations.find(s => s.id === vehicle.stationId);
         if (station) {
+          station.personnel += dv.personnel;
           vehicle.targetX = station.x;
           vehicle.targetY = station.y;
         }
+        
+        vehicle.personnel = 0;
+        vehicle.water = 0;
       }
     });
   }
