@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短租清洁派单返工管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: #2c3e50;
+        }
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            border-radius: 0;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: #34495e;
+            color: #fff;
+        }
+        .main-content {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card-stat {
+            border-left: 4px solid;
+        }
+        .card-stat.primary { border-color: #007bff; }
+        .card-stat.warning { border-color: #ffc107; }
+        .card-stat.danger { border-color: #dc3545; }
+        .card-stat.success { border-color: #28a745; }
+        .status-badge { padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; }
+        .status-pending { background: #ffc107; color: #000; }
+        .status-in_progress { background: #007bff; color: #fff; }
+        .status-completed { background: #28a745; color: #fff; }
+        .status-needs_review { background: #dc3545; color: #fff; }
+        .status-assigned { background: #17a2b8; color: #fff; }
+        .page-section { display: none; }
+        .page-section.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-2 d-md-block sidebar">
+                <div class="p-3 text-white">
+                    <h5>🏠 清洁管理系统</h5>
+                </div>
+                <div class="nav flex-column">
+                    <a class="nav-link active" href="#" data-page="dashboard">
+                        📊 异常看板
+                    </a>
+                    <a class="nav-link" href="#" data-page="calendar">
+                        📅 房源日历
+                    </a>
+                    <a class="nav-link" href="#" data-page="checkout">
+                        🚪 退房事件
+                    </a>
+                    <a class="nav-link" href="#" data-page="assignments">
+                        🧹 保洁派单
+                    </a>
+                    <a class="nav-link" href="#" data-page="rework">
+                        ⚠️ 返工记录
+                    </a>
+                    <a class="nav-link" href="#" data-page="materials">
+                        📦 物料管理
+                    </a>
+                    <a class="nav-link" href="#" data-page="performance">
+                        📈 绩效评分
+                    </a>
+                    <a class="nav-link" href="#" data-page="audit">
+                        📋 操作日志
+                    </a>
+                </div>
+            </nav>
+
+            <main class="col-md-10 ms-sm-auto main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2" id="page-title">异常看板</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-outline-secondary me-2" onclick="showImportModal()">
+                            📥 批量导入
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="exportData()">
+                            📤 导出数据
+                        </button>
+                    </div>
+                </div>
+
+                <div id="page-dashboard" class="page-section active">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card card-stat primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">待处理派单</h5>
+                                    <h2 id="stat-pending">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">待处理返工</h5>
+                                    <h2 id="stat-rework">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">进行中返工</h5>
+                                    <h2 id="stat-inprogress">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card card-stat danger">
+                                <div class="card-body">
+                                    <h5 class="card-title">物料异常</h5>
+                                    <h2 id="stat-anomaly">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>近期投诉</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>日期</th>
+                                                    <th>房源</th>
+                                                    <th>类型</th>
+                                                    <th>状态</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="recent-complaints">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>即将到来的派单</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>日期</th>
+                                                    <th>房源</th>
+                                                    <th>保洁员</th>
+                                                    <th>状态</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="upcoming-assignments">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-calendar" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6>房源日历</h6>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm" id="cal-property-filter" style="width: auto;">
+                                        <option value="">全部房源</option>
+                                    </select>
+                                    <input type="date" class="form-control form-control-sm" id="cal-start-date" style="width: auto;">
+                                    <input type="date" class="form-control form-control-sm" id="cal-end-date" style="width: auto;">
+                                    <button class="btn btn-sm btn-primary" onclick="loadCalendar()">查询</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>日期</th>
+                                            <th>房源</th>
+                                            <th>事件类型</th>
+                                            <th>客人姓名</th>
+                                            <th>入住/退房时间</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="calendar-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-checkout" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>退房事件</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>退房日期</th>
+                                            <th>房源</th>
+                                            <th>客人姓名</th>
+                                            <th>实际退房时间</th>
+                                            <th>房间状况</th>
+                                            <th>损坏备注</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="checkout-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-assignments" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6>保洁派单</h6>
+                                <div class="d-flex gap-2">
+                                    <select class="form-select form-select-sm" id="assign-status-filter" style="width: auto;">
+                                        <option value="">全部状态</option>
+                                        <option value="assigned">已分配</option>
+                                        <option value="in_progress">进行中</option>
+                                        <option value="completed">已完成</option>
+                                        <option value="needs_review">需复审</option>
+                                    </select>
+                                    <select class="form-select form-select-sm" id="assign-property-filter" style="width: auto;">
+                                        <option value="">全部房源</option>
+                                    </select>
+                                    <select class="form-select form-select-sm" id="assign-cleaner-filter" style="width: auto;">
+                                        <option value="">全部保洁员</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-primary" onclick="loadAssignments()">查询</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>派单日期</th>
+                                            <th>房源</th>
+                                            <th>保洁员</th>
+                                            <th>预定时间</th>
+                                            <th>状态</th>
+                                            <th>质量评分</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="assignments-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-rework" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6>返工记录</h6>
+                                <button class="btn btn-sm btn-primary" onclick="showAddReworkModal()">+ 新增返工</button>
+                            </div>
+                            <div class="d-flex gap-2 mt-2">
+                                <select class="form-select form-select-sm" id="rework-status-filter" style="width: auto;">
+                                    <option value="">全部状态</option>
+                                    <option value="pending">待处理</option>
+                                    <option value="in_progress">进行中</option>
+                                    <option value="completed">已完成</option>
+                                </select>
+                                <select class="form-select form-select-sm" id="rework-responsible-filter" style="width: auto;">
+                                    <option value="">全部责任人</option>
+                                </select>
+                                <input type="date" class="form-control form-control-sm" id="rework-start-date" style="width: auto;" placeholder="开始日期">
+                                <input type="date" class="form-control form-control-sm" id="rework-end-date" style="width: auto;" placeholder="结束日期">
+                                <button class="btn btn-sm btn-primary" onclick="loadReworkRecords()">查询</button>
+                                <button class="btn btn-sm btn-success" onclick="exportRework()">导出</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>投诉日期</th>
+                                            <th>房源</th>
+                                            <th>投诉来源</th>
+                                            <th>投诉类型</th>
+                                            <th>描述</th>
+                                            <th>责任人</th>
+                                            <th>返工安排</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rework-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-materials" class="page-section">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>物料库存</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>物料名称</th>
+                                                    <th>单位</th>
+                                                    <th>库存数量</th>
+                                                    <th>阈值</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="materials-table">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6>物料消耗记录</h6>
+                                        <select class="form-select form-select-sm" id="material-status-filter" style="width: auto;" onchange="loadMaterialConsumption()">
+                                            <option value="">全部</option>
+                                            <option value="normal">正常</option>
+                                            <option value="anomaly">异常</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>物料</th>
+                                                    <th>保洁员</th>
+                                                    <th>消耗数量</th>
+                                                    <th>预期数量</th>
+                                                    <th>状态</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="consumption-table">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-performance" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>绩效评分</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>保洁员</th>
+                                            <th>月份</th>
+                                            <th>总工单</th>
+                                            <th>准时完成</th>
+                                            <th>平均评分</th>
+                                            <th>返工次数</th>
+                                            <th>人工调整</th>
+                                            <th>最终得分</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="performance-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-audit" class="page-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>操作日志</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>时间</th>
+                                            <th>表名</th>
+                                            <th>记录ID</th>
+                                            <th>操作</th>
+                                            <th>修改前</th>
+                                            <th>修改后</th>
+                                            <th>操作人</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="audit-table">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editAssignmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">编辑派单</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAssignmentForm">
+                        <input type="hidden" id="edit-assignment-id">
+                        <div class="mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="edit-assignment-status">
+                                <option value="assigned">已分配</option>
+                                <option value="in_progress">进行中</option>
+                                <option value="completed">已完成</option>
+                                <option value="needs_review">需复审</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">质量评分</label>
+                            <input type="number" class="form-control" id="edit-assignment-score" min="0" max="100">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">检查备注</label>
+                            <textarea class="form-control" id="edit-assignment-notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAssignment()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addReworkModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增返工记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addReworkForm">
+                        <div class="mb-3">
+                            <label class="form-label">派单</label>
+                            <select class="form-select" id="rework-assignment-id">
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">投诉来源</label>
+                            <select class="form-select" id="rework-source">
+                                <option value="guest">客人投诉</option>
+                                <option value="inspection">质检发现</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">投诉日期</label>
+                            <input type="date" class="form-control" id="rework-date">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">投诉类型</label>
+                            <select class="form-select" id="rework-type">
+                                <option value="cleanliness">清洁不彻底</option>
+                                <option value="forgotten_items">物品遗漏</option>
+                                <option value="odor">异味</option>
+                                <option value="damage">物品损坏</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">描述</label>
+                            <textarea class="form-control" id="rework-description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">责任人</label>
+                            <input type="text" class="form-control" id="rework-responsible">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">返工安排给</label>
+                            <input type="text" class="form-control" id="rework-assign-to">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">返工日期</label>
+                            <input type="date" class="form-control" id="rework-scheduled-date">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRework()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editReworkModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">处理返工</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editReworkForm">
+                        <input type="hidden" id="edit-rework-id">
+                        <div class="mb-3">
+                            <label class="form-label">状态</label>
+                            <select class="form-select" id="edit-rework-status">
+                                <option value="pending">待处理</option>
+                                <option value="in_progress">进行中</option>
+                                <option value="completed">已完成</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">完成日期</label>
+                            <input type="date" class="form-control" id="edit-rework-completion-date">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">解决备注</label>
+                            <textarea class="form-control" id="edit-rework-resolution" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="updateRework()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">批量导入数据</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>支持导入CSV格式的数据文件</p>
+                    <input type="file" class="form-control" id="import-file" accept=".csv">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="doImport()">导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
