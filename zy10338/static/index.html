@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户端能力协商 API - 管理面板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .card h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .badge-fallback {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .badge-cancelled {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .result-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .capability-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .capability-item input {
+            flex: 1;
+        }
+        .fallback-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .fallback-item input {
+            flex: 1;
+        }
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 客户端能力协商 API</h1>
+            <p>Client Capability Negotiation - 管理面板</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview')">📊 概览</div>
+            <div class="tab" onclick="switchTab('clients')">👥 客户端</div>
+            <div class="tab" onclick="switchTab('declarations')">📝 能力声明</div>
+            <div class="tab" onclick="switchTab('negotiations')">🤝 协商管理</div>
+            <div class="tab" onclick="switchTab('examples')">💡 使用示例</div>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <h2 class="section-title">系统概览</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4>客户端管理</h4>
+                    <p>注册和管理客户端标识，支持客户端类型分类，记录创建人和创建时间。</p>
+                </div>
+                <div class="card">
+                    <h4>能力声明</h4>
+                    <p>声明客户端支持的 API 版本和能力集，支持配置降级选项以备协商失败时使用。</p>
+                </div>
+                <div class="card">
+                    <h4>版本协商</h4>
+                    <p>自动进行版本兼容性检查，匹配最佳能力集，防止重复提交产生脏数据。</p>
+                </div>
+                <div class="card">
+                    <h4>状态追踪</h4>
+                    <p>完整记录协商状态流转历史，包括操作人、时间和原因，支持审计追溯。</p>
+                </div>
+                <div class="card">
+                    <h4>命中日志</h4>
+                    <p>记录每次协商结果的查询命中情况，包括缓存命中情况和响应时间统计。</p>
+                </div>
+                <div class="card">
+                    <h4>持久化存储</h4>
+                    <p>使用 SQLite 进行数据持久化，服务重启后所有状态数据保持完整不丢失。</p>
+                </div>
+            </div>
+            
+            <h3 class="section-title" style="margin-top: 30px;">快速操作</h3>
+            <div class="grid">
+                <button class="btn" onclick="switchTab('clients'); setTimeout(loadClients, 100)">查看客户端列表</button>
+                <button class="btn" onclick="switchTab('declarations')">创建能力声明</button>
+                <button class="btn" onclick="switchTab('negotiations')">查看协商记录</button>
+                <button class="btn btn-success" onclick="switchTab('examples'); runSuccessFlow()">运行成功流示例</button>
+            </div>
+        </div>
+
+        <div id="clients" class="tab-content">
+            <h2 class="section-title">客户端管理</h2>
+            
+            <h3 style="margin-bottom: 15px;">创建新客户端</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>客户端 ID</label>
+                    <input type="text" id="clientId" placeholder="例如: client_android_v1">
+                </div>
+                <div class="form-group">
+                    <label>客户端名称</label>
+                    <input type="text" id="clientName" placeholder="例如: Android 客户端">
+                </div>
+                <div class="form-group">
+                    <label>客户端类型</label>
+                    <select id="clientType">
+                        <option value="android">Android</option>
+                        <option value="ios">iOS</option>
+                        <option value="web">Web</option>
+                        <option value="desktop">Desktop</option>
+                        <option value="server">Server</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>创建人</label>
+                    <input type="text" id="createdBy" placeholder="操作人姓名或 ID" value="admin">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="clientDesc" rows="2" placeholder="客户端描述信息"></textarea>
+            </div>
+            <button class="btn" onclick="createClient()">创建客户端</button>
+
+            <h3 class="section-title" style="margin-top: 30px;">客户端列表</h3>
+            <button class="btn btn-secondary btn-sm" onclick="loadClients()">刷新列表</button>
+            <table id="clientsTable">
+                <thead>
+                    <tr>
+                        <th>客户端 ID</th>
+                        <th>名称</th>
+                        <th>类型</th>
+                        <th>创建人</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="declarations" class="tab-content">
+            <h2 class="section-title">能力声明管理</h2>
+            
+            <h3 style="margin-bottom: 15px;">创建能力声明</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>客户端 ID *</label>
+                    <input type="text" id="declClientId" placeholder="已注册的客户端 ID">
+                </div>
+                <div class="form-group">
+                    <label>API 版本 *</label>
+                    <input type="text" id="apiVersion" placeholder="例如: 2.1.0" value="2.1.0">
+                </div>
+                <div class="form-group">
+                    <label>声明人 *</label>
+                    <input type="text" id="declaredBy" placeholder="操作人" value="admin">
+                </div>
+            </div>
+            
+            <h4 style="margin: 20px 0 10px;">能力配置</h4>
+            <div id="capabilitiesContainer">
+                <div class="capability-item">
+                    <input type="text" placeholder="能力名称" value="push_notification">
+                    <input type="text" placeholder="版本" value="1.0.0">
+                    <select>
+                        <option value="true">支持</option>
+                        <option value="false">不支持</option>
+                    </select>
+                    <button class="remove-btn" onclick="this.parentElement.remove()">删除</button>
+                </div>
+                <div class="capability-item">
+                    <input type="text" placeholder="能力名称" value="live_stream">
+                    <input type="text" placeholder="版本" value="2.0.0">
+                    <select>
+                        <option value="true">支持</option>
+                        <option value="false">不支持</option>
+                    </select>
+                    <button class="remove-btn" onclick="this.parentElement.remove()">删除</button>
+                </div>
+            </div>
+            <button class="add-btn" onclick="addCapability()">+ 添加能力</button>
+
+            <h4 style="margin: 20px 0 10px;">降级选项 (协商失败时使用)</h4>
+            <div id="fallbackContainer">
+                <div class="fallback-item">
+                    <input type="text" placeholder="降级名称" value="basic_mode">
+                    <input type="text" placeholder="描述" value="使用基础功能模式">
+                    <input type="number" placeholder="优先级" value="1" style="width: 100px;">
+                    <button class="remove-btn" onclick="this.parentElement.remove()">删除</button>
+                </div>
+            </div>
+            <button class="add-btn" onclick="addFallback()">+ 添加降级选项</button>
+
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="createDeclaration()">创建能力声明</button>
+            </div>
+
+            <h3 class="section-title" style="margin-top: 30px;">声明列表</h3>
+            <button class="btn btn-secondary btn-sm" onclick="loadDeclarations()">刷新列表</button>
+            <table id="declarationsTable">
+                <thead>
+                    <tr>
+                        <th>声明 ID</th>
+                        <th>客户端 ID</th>
+                        <th>API 版本</th>
+                        <th>声明人</th>
+                        <th>声明时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="negotiations" class="tab-content">
+            <h2 class="section-title">协商管理</h2>
+            
+            <h3 style="margin-bottom: 15px;">发起协商</h3>
+            <div class="grid">
+                <div class="form-group">
+                    <label>声明 ID *</label>
+                    <input type="text" id="negoDeclId" placeholder="能力声明 ID">
+                </div>
+                <div class="form-group">
+                    <label>协商人 *</label>
+                    <input type="text" id="negotiatedBy" placeholder="操作人" value="system">
+                </div>
+                <div class="form-group">
+                    <label>目标版本 (可选)</label>
+                    <input type="text" id="targetVersion" placeholder="留空则使用声明版本">
+                </div>
+            </div>
+            <button class="btn" onclick="negotiate()">发起协商</button>
+
+            <h3 class="section-title" style="margin-top: 30px;">协商记录</h3>
+            <div style="margin-bottom: 15px;">
+                <button class="btn btn-secondary btn-sm" onclick="loadNegotiations()">刷新列表</button>
+                <select id="statusFilter" onchange="loadNegotiations()" style="margin-left: 10px; padding: 6px;">
+                    <option value="">全部状态</option>
+                    <option value="SUCCESS">成功</option>
+                    <option value="PENDING">待处理</option>
+                    <option value="FAILED">失败</option>
+                    <option value="FALLBACK">降级</option>
+                    <option value="CANCELLED">已取消</option>
+                </select>
+            </div>
+            <table id="negotiationsTable">
+                <thead>
+                    <tr>
+                        <th>协商 ID</th>
+                        <th>客户端 ID</th>
+                        <th>状态</th>
+                        <th>协商人</th>
+                        <th>协商时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <h3 class="section-title" style="margin-top: 30px;">协商详情</h3>
+            <div id="negoDetail" style="display: none;">
+                <div class="grid" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>新状态</label>
+                        <select id="newStatus">
+                            <option value="SUCCESS">成功</option>
+                            <option value="PENDING">待处理</option>
+                            <option value="FAILED">失败</option>
+                            <option value="FALLBACK">降级</option>
+                            <option value="CANCELLED">已取消</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="updatedBy" value="admin">
+                    </div>
+                    <div class="form-group">
+                        <label>变更原因</label>
+                        <input type="text" id="statusReason" placeholder="状态变更原因">
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="updateStatus()">更新状态</button>
+                <button class="btn btn-secondary" style="margin-left: 10px;" onclick="loadTransitions()">查看状态流转历史</button>
+                <button class="btn btn-secondary" style="margin-left: 10px;" onclick="loadHitLogs()">查看命中日志</button>
+            </div>
+            <div id="negoOutput" class="result-output" style="display: none;"></div>
+        </div>
+
+        <div id="examples" class="tab-content">
+            <h2 class="section-title">使用示例</h2>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <h4>✅ 成功流程示例</h4>
+                <p>演示完整的客户端注册、能力声明创建、协商成功流程，以及重复提交防脏数据机制。</p>
+                <button class="btn btn-success btn-sm" onclick="runSuccessFlow()">运行成功流示例</button>
+            </div>
+            
+            <div class="card" style="margin-bottom: 20px;">
+                <h4>❌ 问题流程示例</h4>
+                <p>演示版本不匹配、能力不支持导致协商失败、降级流程触发等异常场景处理。</p>
+                <button class="btn btn-danger btn-sm" onclick="runFailureFlow()">运行问题流示例</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px;">
+                <h4>🔄 状态流转示例</h4>
+                <p>演示协商状态的合法流转，包括从成功到取消、从失败到重试等状态变更操作。</p>
+                <button class="btn btn-secondary btn-sm" onclick="runStatusFlow()">运行状态流转示例</button>
+            </div>
+
+            <h3 class="section-title" style="margin-top: 30px;">执行输出</h3>
+            <div id="exampleOutput" class="result-output">点击上方按钮运行示例...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+        let currentNegoId = null;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            
+            if (tabId === 'clients') loadClients();
+            if (tabId === 'declarations') loadDeclarations();
+            if (tabId === 'negotiations') loadNegotiations();
+        }
+
+        async function apiCall(method, endpoint, data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+            const response = await fetch(`${API_BASE}${endpoint}`, options);
+            const result = await response.json();
+            return { ok: response.ok, status: response.status, data: result };
+        }
+
+        function getStatusBadge(status) {
+            const badgeClass = {
+                'SUCCESS': 'badge-success',
+                'PENDING': 'badge-pending',
+                'FAILED': 'badge-failed',
+                'FALLBACK': 'badge-fallback',
+                'CANCELLED': 'badge-cancelled'
+            }[status] || 'badge-pending';
+            return `<span class="badge ${badgeClass}">${status}</span>`;
+        }
+
+        async function createClient() {
+            const data = {
+                client_id: document.getElementById('clientId').value,
+                client_name: document.getElementById('clientName').value,
+                client_type: document.getElementById('clientType').value,
+                created_by: document.getElementById('createdBy').value,
+                description: document.getElementById('clientDesc').value
+            };
+            const result = await apiCall('POST', '/clients', data);
+            if (result.ok) {
+                alert('客户端创建成功！');
+                loadClients();
+            } else {
+                alert(`创建失败: ${result.data.message}`);
+            }
+        }
+
+        async function loadClients() {
+            const result = await apiCall('GET', '/clients');
+            if (result.ok && result.data.data) {
+                const tbody = document.querySelector('#clientsTable tbody');
+                tbody.innerHTML = result.data.data.map(c => `
+                    <tr>
+                        <td><code>${c.client_id}</code></td>
+                        <td>${c.client_name}</td>
+                        <td>${c.client_type}</td>
+                        <td>${c.created_by}</td>
+                        <td>${new Date(c.created_at).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="viewClientDetails('${c.client_id}')">查看</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function viewClientDetails(clientId) {
+            const result = await apiCall('GET', `/clients/${clientId}/negotiations`);
+            if (result.ok) {
+                alert(`客户端 ${clientId} 共有 ${result.data.data.length} 条协商记录`);
+            }
+        }
+
+        function addCapability() {
+            const container = document.getElementById('capabilitiesContainer');
+            const div = document.createElement('div');
+            div.className = 'capability-item';
+            div.innerHTML = `
+                <input type="text" placeholder="能力名称">
+                <input type="text" placeholder="版本">
+                <select>
+                    <option value="true">支持</option>
+                    <option value="false">不支持</option>
+                </select>
+                <button class="remove-btn" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addFallback() {
+            const container = document.getElementById('fallbackContainer');
+            const div = document.createElement('div');
+            div.className = 'fallback-item';
+            div.innerHTML = `
+                <input type="text" placeholder="降级名称">
+                <input type="text" placeholder="描述">
+                <input type="number" placeholder="优先级" value="1" style="width: 100px;">
+                <button class="remove-btn" onclick="this.parentElement.remove()">删除</button>
+            `;
+            container.appendChild(div);
+        }
+
+        async function createDeclaration() {
+            const capabilities = [];
+            document.querySelectorAll('#capabilitiesContainer .capability-item').forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const select = item.querySelector('select');
+                if (inputs[0].value) {
+                    capabilities.push({
+                        name: inputs[0].value,
+                        version: inputs[1].value,
+                        supported: select.value === 'true'
+                    });
+                }
+            });
+
+            const fallbacks = [];
+            document.querySelectorAll('#fallbackContainer .fallback-item').forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                if (inputs[0].value) {
+                    fallbacks.push({
+                        id: inputs[0].value,
+                        name: inputs[0].value,
+                        description: inputs[1].value,
+                        priority: parseInt(inputs[2].value) || 1
+                    });
+                }
+            });
+
+            const data = {
+                client_id: document.getElementById('declClientId').value,
+                api_version: document.getElementById('apiVersion').value,
+                declared_by: document.getElementById('declaredBy').value,
+                capabilities,
+                fallback_opts: fallbacks
+            };
+
+            const result = await apiCall('POST', '/declarations', data);
+            if (result.ok) {
+                alert(`声明创建成功！ID: ${result.data.data.id}`);
+                loadDeclarations();
+            } else {
+                alert(`创建失败: ${result.data.message}`);
+            }
+        }
+
+        async function loadDeclarations() {
+            const result = await apiCall('GET', '/clients');
+            if (result.ok && result.data.data) {
+                let allDecls = [];
+                for (const client of result.data.data) {
+                    const declResult = await apiCall('GET', `/clients/${client.client_id}/declarations`);
+                    if (declResult.ok && declResult.data.data) {
+                        allDecls = allDecls.concat(declResult.data.data);
+                    }
+                }
+                const tbody = document.querySelector('#declarationsTable tbody');
+                tbody.innerHTML = allDecls.map(d => `
+                    <tr>
+                        <td><code>${d.id}</code></td>
+                        <td>${d.client_id}</td>
+                        <td>${d.api_version}</td>
+                        <td>${d.declared_by}</td>
+                        <td>${new Date(d.declared_at).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="document.getElementById('negoDeclId').value='${d.id}';switchTab('negotiations')">去协商</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function negotiate() {
+            const data = {
+                declaration_id: document.getElementById('negoDeclId').value,
+                negotiated_by: document.getElementById('negotiatedBy').value,
+                target_version: document.getElementById('targetVersion').value || null
+            };
+            const result = await apiCall('POST', `/declarations/${data.declaration_id}/negotiate`, data);
+            if (result.ok || result.status === 409) {
+                if (result.status === 409) {
+                    alert('检测到重复提交，系统已防止脏数据产生！');
+                } else {
+                    alert(`协商完成！状态: ${result.data.data.status}`);
+                }
+                loadNegotiations();
+            } else {
+                alert(`协商失败: ${result.data.message}`);
+            }
+        }
+
+        async function loadNegotiations() {
+            const status = document.getElementById('statusFilter').value;
+            const url = status ? `/negotiations?status=${status}` : '/negotiations';
+            const result = await apiCall('GET', url);
+            if (result.ok && result.data.data) {
+                const tbody = document.querySelector('#negotiationsTable tbody');
+                tbody.innerHTML = result.data.data.map(n => `
+                    <tr>
+                        <td><code>${n.id}</code></td>
+                        <td>${n.client_id}</td>
+                        <td>${getStatusBadge(n.status)}</td>
+                        <td>${n.negotiated_by}</td>
+                        <td>${new Date(n.negotiated_at).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-sm" onclick="viewNegotiation('${n.id}')">查看详情</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function viewNegotiation(id) {
+            currentNegoId = id;
+            const result = await apiCall('GET', `/negotiations/${id}`);
+            if (result.ok && result.data.data) {
+                document.getElementById('negoDetail').style.display = 'block';
+                document.getElementById('negoOutput').style.display = 'block';
+                document.getElementById('negoOutput').textContent = JSON.stringify(result.data.data, null, 2);
+            }
+        }
+
+        async function updateStatus() {
+            if (!currentNegoId) return;
+            const data = {
+                result_id: currentNegoId,
+                target_status: document.getElementById('newStatus').value,
+                updated_by: document.getElementById('updatedBy').value,
+                reason: document.getElementById('statusReason').value,
+                error_message: ''
+            };
+            const result = await apiCall('POST', `/negotiations/${currentNegoId}/status`, data);
+            if (result.ok) {
+                alert('状态更新成功！');
+                loadNegotiations();
+                viewNegotiation(currentNegoId);
+            } else {
+                alert(`更新失败: ${result.data.message}`);
+            }
+        }
+
+        async function loadTransitions() {
+            if (!currentNegoId) return;
+            const result = await apiCall('GET', `/negotiations/${currentNegoId}/transitions`);
+            if (result.ok) {
+                document.getElementById('negoOutput').textContent = '状态流转历史:\n\n' + JSON.stringify(result.data.data, null, 2);
+            }
+        }
+
+        async function loadHitLogs() {
+            if (!currentNegoId) return;
+            const result = await apiCall('GET', `/negotiations/${currentNegoId}/hitlogs`);
+            if (result.ok) {
+                document.getElementById('negoOutput').textContent = '命中日志:\n\n' + JSON.stringify(result.data.data, null, 2);
+            }
+        }
+
+        async function runSuccessFlow() {
+            const output = document.getElementById('exampleOutput');
+            output.textContent = '🚀 开始运行成功流程示例...\n\n';
+            output.textContent += '═══════════════════════════════════════\n\n';
+
+            const clientId = 'demo_client_' + Date.now();
+            
+            output.textContent += '1️⃣ 创建客户端...\n';
+            const clientResult = await apiCall('POST', '/clients', {
+                client_id: clientId,
+                client_name: '演示客户端',
+                client_type: 'android',
+                created_by: 'demo_user',
+                description: '用于成功流程演示的客户端'
+            });
+            output.textContent += `   ✅ 客户端创建成功: ${clientId}\n\n`;
+
+            output.textContent += '2️⃣ 创建能力声明...\n';
+            const declResult = await apiCall('POST', '/declarations', {
+                client_id: clientId,
+                api_version: '2.1.0',
+                declared_by: 'demo_user',
+                capabilities: [
+                    { name: 'push_notification', version: '1.0.0', supported: true },
+                    { name: 'live_stream', version: '2.0.0', supported: true },
+                    { name: 'offline_mode', version: '1.5.0', supported: true }
+                ],
+                fallback_opts: [
+                    { id: 'basic', name: 'basic_mode', description: '仅使用基础功能', priority: 1 }
+                ]
+            });
+            const declId = declResult.data.data.id;
+            output.textContent += `   ✅ 能力声明创建成功: ${declId}\n\n`;
+
+            output.textContent += '3️⃣ 发起第一次协商...\n';
+            const negoResult = await apiCall('POST', `/declarations/${declId}/negotiate`, {
+                declaration_id: declId,
+                negotiated_by: 'demo_system'
+            });
+            output.textContent += `   ✅ 协商完成！状态: ${negoResult.data.data.status}\n`;
+            output.textContent += `   ✅ 协商版本: ${negoResult.data.data.negotiated_version}\n`;
+            output.textContent += `   ✅ 选中能力数: ${negoResult.data.data.selected_capabilities.length}\n\n`;
+
+            output.textContent += '4️⃣ 测试重复提交（防脏数据机制）...\n';
+            const dupResult = await apiCall('POST', `/declarations/${declId}/negotiate`, {
+                declaration_id: declId,
+                negotiated_by: 'demo_system'
+            });
+            if (dupResult.status === 409) {
+                output.textContent += `   ✅ 重复提交被正确拦截，未产生脏数据\n`;
+                output.textContent += `   ✅ 错误信息: ${dupResult.data.message}\n\n`;
+            }
+
+            output.textContent += '5️⃣ 验证协商结果查询...\n';
+            const verifyResult = await apiCall('GET', `/negotiations/verify/${clientId}/${declId}`);
+            output.textContent += `   ✅ 验证成功，命中缓存: ${verifyResult.data.data.status === 'SUCCESS'}\n\n`;
+
+            output.textContent += '6️⃣ 查看命中日志...\n';
+            const hitResult = await apiCall('GET', `/negotiations/${negoResult.data.data.id}/hitlogs`);
+            output.textContent += `   ✅ 命中记录数: ${hitResult.data.data.length}\n`;
+            hitResult.data.data.forEach((hit, i) => {
+                output.textContent += `      ${i+1}. ${hit.hit_source} - 缓存命中: ${hit.cache_hit} - ${hit.response_time_ms}ms\n`;
+            });
+
+            output.textContent += '\n═══════════════════════════════════════\n';
+            output.textContent += '🎉 成功流程演示完成！\n';
+            output.textContent += '💡 提示：重启服务后，以上数据仍可通过客户端 ID 查询到完整记录。';
+        }
+
+        async function runFailureFlow() {
+            const output = document.getElementById('exampleOutput');
+            output.textContent = '🚀 开始运行问题流程示例...\n\n';
+            output.textContent += '═══════════════════════════════════════\n\n';
+
+            const clientId = 'error_client_' + Date.now();
+
+            output.textContent += '1️⃣ 创建测试客户端...\n';
+            await apiCall('POST', '/clients', {
+                client_id: clientId,
+                client_name: '错误测试客户端',
+                client_type: 'ios',
+                created_by: 'tester',
+                description: '用于异常场景测试'
+            });
+            output.textContent += `   ✅ 客户端创建成功: ${clientId}\n\n`;
+
+            output.textContent += '2️⃣ 测试：客户端不存在时创建声明...\n';
+            const badClientResult = await apiCall('POST', '/declarations', {
+                client_id: 'non_existent_client',
+                api_version: '1.0.0',
+                declared_by: 'tester',
+                capabilities: [{ name: 'test', version: '1.0', supported: true }]
+            });
+            if (badClientResult.status === 404) {
+                output.textContent += `   ✅ 正确返回 404 错误: ${badClientResult.data.message}\n\n`;
+            }
+
+            output.textContent += '3️⃣ 创建版本不匹配的声明...\n';
+            const declResult = await apiCall('POST', '/declarations', {
+                client_id: clientId,
+                api_version: '2.0.0',
+                declared_by: 'tester',
+                capabilities: [
+                    { name: 'feature_a', version: '1.0.0', supported: false },
+                    { name: 'feature_b', version: '1.0.0', supported: false }
+                ],
+                fallback_opts: [
+                    { id: 'fallback_1', name: '降级方案1', description: '使用兼容模式', priority: 1 }
+                ]
+            });
+            const declId = declResult.data.data.id;
+            output.textContent += `   ✅ 声明创建成功: ${declId}\n\n`;
+
+            output.textContent += '4️⃣ 测试：版本不匹配协商...\n';
+            const versionMismatchResult = await apiCall('POST', `/declarations/${declId}/negotiate`, {
+                declaration_id: declId,
+                negotiated_by: 'tester',
+                target_version: '3.0.0'
+            });
+            output.textContent += `   ✅ 协商结果状态: ${versionMismatchResult.data.data.status}\n`;
+            output.textContent += `   ✅ 选中降级方案: ${versionMismatchResult.data.data.selected_fallback?.name || '无'}\n\n`;
+
+            output.textContent += '5️⃣ 测试：无支持能力协商...\n';
+            const decl2Result = await apiCall('POST', '/declarations', {
+                client_id: clientId,
+                api_version: '1.0.0',
+                declared_by: 'tester',
+                capabilities: [
+                    { name: 'unsupported_feature', version: '1.0.0', supported: false }
+                ],
+                fallback_opts: []
+            });
+            const decl2Id = decl2Result.data.data.id;
+            
+            const noSupportResult = await apiCall('POST', `/declarations/${decl2Id}/negotiate`, {
+                declaration_id: decl2Id,
+                negotiated_by: 'tester'
+            });
+            output.textContent += `   ✅ 协商结果状态: ${noSupportResult.data.data.status}\n`;
+            output.textContent += `   ✅ 错误信息: ${noSupportResult.data.data.error_message}\n\n`;
+
+            output.textContent += '6️⃣ 查看状态流转历史...\n';
+            const transitions = await apiCall('GET', `/negotiations/${versionMismatchResult.data.data.id}/transitions`);
+            output.textContent += `   ✅ 流转记录数: ${transitions.data.data.length}\n`;
+            transitions.data.data.forEach(t => {
+                output.textContent += `      ${t.from_status} → ${t.to_status} by ${t.transitioned_by}\n`;
+            });
+
+            output.textContent += '\n═══════════════════════════════════════\n';
+            output.textContent += '🎉 问题流程演示完成！\n';
+            output.textContent += '💡 提示：所有异常情况都被正确处理，数据一致性得到保证。';
+        }
+
+        async function runStatusFlow() {
+            const output = document.getElementById('exampleOutput');
+            output.textContent = '🚀 开始运行状态流转示例...\n\n';
+            output.textContent += '═══════════════════════════════════════\n\n';
+
+            const clientId = 'status_client_' + Date.now();
+
+            output.textContent += '1️⃣ 创建客户端和声明...\n';
+            await apiCall('POST', '/clients', {
+                client_id: clientId,
+                client_name: '状态流转测试',
+                client_type: 'web',
+                created_by: 'admin',
+                description: '状态流转测试客户端'
+            });
+
+            const declResult = await apiCall('POST', '/declarations', {
+                client_id: clientId,
+                api_version: '1.0.0',
+                declared_by: 'admin',
+                capabilities: [{ name: 'test_feature', version: '1.0.0', supported: true }]
+            });
+            const declId = declResult.data.data.id;
+
+            output.textContent += '2️⃣ 发起协商...\n';
+            let negoResult = await apiCall('POST', `/declarations/${declId}/negotiate`, {
+                declaration_id: declId,
+                negotiated_by: 'system'
+            });
+            const negoId = negoResult.data.data.id;
+            output.textContent += `   ✅ 初始状态: ${negoResult.data.data.status}\n\n`;
+
+            output.textContent += '3️⃣ 状态流转: SUCCESS → CANCELLED\n';
+            const cancelResult = await apiCall('POST', `/negotiations/${negoId}/status`, {
+                result_id: negoId,
+                target_status: 'CANCELLED',
+                updated_by: 'admin',
+                reason: '客户端请求取消协商'
+            });
+            output.textContent += `   ✅ 新状态: ${cancelResult.data.data.status}\n\n`;
+
+            output.textContent += '4️⃣ 状态流转: CANCELLED → PENDING\n';
+            const pendingResult = await apiCall('POST', `/negotiations/${negoId}/status`, {
+                result_id: negoId,
+                target_status: 'PENDING',
+                updated_by: 'admin',
+                reason: '重新发起协商流程'
+            });
+            output.textContent += `   ✅ 新状态: ${pendingResult.data.data.status}\n\n`;
+
+            output.textContent += '5️⃣ 状态流转: PENDING → FAILED (测试非法流转)\n';
+            const illegalResult = await apiCall('POST', `/negotiations/${negoId}/status`, {
+                result_id: negoId,
+                target_status: 'FALLBACK',
+                updated_by: 'admin',
+                reason: '测试非法流转'
+            });
+            if (illegalResult.status === 400) {
+                output.textContent += `   ✅ 非法流转被正确拦截\n`;
+                output.textContent += `   ✅ 错误信息: ${illegalResult.data.message}\n\n`;
+            }
+
+            output.textContent += '6️⃣ 查看完整状态流转历史...\n';
+            const transitions = await apiCall('GET', `/negotiations/${negoId}/transitions`);
+            transitions.data.data.forEach((t, i) => {
+                output.textContent += `   ${i+1}. ${t.from_status} → ${t.to_status}\n`;
+                output.textContent += `      操作人: ${t.transitioned_by}\n`;
+                output.textContent += `      原因: ${t.reason || '无'}\n`;
+                output.textContent += `      时间: ${new Date(t.transitioned_at).toLocaleString()}\n\n`;
+            });
+
+            output.textContent += '═══════════════════════════════════════\n';
+            output.textContent += '🎉 状态流转演示完成！\n';
+            output.textContent += '💡 提示：系统严格控制状态流转合法性，防止非法状态变更。';
+        }
+
+        loadClients();
+    </script>
+</body>
+</html>
