@@ -1,0 +1,9 @@
+export { default as ResidentAddress } from './ResidentAddress';
+export { default as ProblemType } from './ProblemType';
+export { default as GridWorker } from './GridWorker';
+export { default as ResponsibleUnit } from './ResponsibleUnit';
+export { default as WorkOrder } from './WorkOrder';
+export { default as WorkOrderPhoto } from './WorkOrderPhoto';
+export { default as FollowUp } from './FollowUp';
+export { default as OperationLog } from './OperationLog';
+export { default as ModificationHistory } from './ModificationHistory';
