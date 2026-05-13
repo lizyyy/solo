@@ -1,0 +1,8 @@
+[2024-01-15 10:00:00] INFO  Starting application...
+[2024-01-15 10:00:01] INFO  Database connected
+[2024-01-15 10:00:02] INFO  User login: phone=138****5678, email=user@test.example.com
+[2024-01-15 10:00:03] INFO  Order created: user=用户A
+[2024-01-15 10:00:04] ERROR Payment failed: card=****1234, amount=999.00
+[2024-01-15 10:00:05] INFO  Delivery scheduled: address=北京****
+[2024-01-15 10:00:06] DEBUG Notification sent to xxxxxxxxxx
+[2024-01-15 10:00:07] INFO  Application ready

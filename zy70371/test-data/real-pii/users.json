@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "张三",
+      "realName": "王小明",
+      "phone": "13812345678",
+      "email": "wangxiaoming@company.com",
+      "idCard": "110101199001011234",
+      "bankCard": "6222021234567890123",
+      "address": "北京市朝阳区建国路88号SOHO现代城1208室"
+    },
+    {
+      "id": 2,
+      "name": "李四",
+      "realName": "李翠花",
+      "phone": "15987654321",
+      "email": "licuihua@example.org",
+      "idCard": "310101198505152345",
+      "bankCard": "6217001234567890456",
+      "address": "上海市浦东新区张江高科技园区郭守敬路351号"
+    }
+  ]
+}

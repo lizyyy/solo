@@ -1,0 +1,18 @@
+{
+  "name": "local-pii-scanner",
+  "version": "1.0.0",
+  "description": "本地 PII 扫描 CLI 工具，用于识别测试数据和日志中的敏感信息",
+  "main": "src/index.js",
+  "bin": {
+    "pii-scan": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": ["pii", "scanner", "security", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2"
+  }
+}
