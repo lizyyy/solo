@@ -102,6 +102,15 @@ app.post('/api/repair-orders', async (req, res) => {
       });
     });
 
+    if (existingOrder) {
+      return res.json({ 
+        id: existingOrder.id, 
+        order_no: existingOrder.order_no, 
+        duplicated: true,
+        message: '该宿舍已有同类报修在处理中，请勿重复提交'
+      });
+    }
+
     const order_no = await generateOrderNo();
     
     db.run(`
@@ -109,32 +118,7 @@ app.post('/api/repair-orders', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `, [order_no, dorm_id, student_name, student_phone, repair_type, description, images, 'pending'], function(err) {
       if (err) return res.status(500).json({ error: err.message });
-      
-      const newOrderId = this.lastID;
-      
-      if (existingOrder) {
-        db.run(`
-          INSERT INTO merged_orders (main_order_id, merged_order_id, merge_reason)
-          VALUES (?, ?, ?)
-        `, [existingOrder.id, newOrderId, '同房间同类报修自动合并'], (mergeErr) => {
-          if (mergeErr) console.error('合并记录创建失败:', mergeErr);
-        });
-        
-        db.run('UPDATE repair_orders SET status = ? WHERE id = ?', ['merged', newOrderId], (updateErr) => {
-          if (updateErr) console.error('更新合并状态失败:', updateErr);
-        });
-        
-        return res.json({ 
-          id: newOrderId, 
-          order_no, 
-          merged: true, 
-          merged_to: existingOrder.id,
-          merged_to_order_no: existingOrder.order_no,
-          message: '该宿舍已有同类报修在处理中，已自动合并到现有工单'
-        });
-      }
-      
-      res.json({ id: newOrderId, order_no, merged: false });
+      res.json({ id: this.lastID, order_no, duplicated: false });
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -307,6 +291,15 @@ app.post('/api/repair-orders/:id/assign', async (req, res) => {
   }
 });
 
+const getExistingMaterials = (orderId) => {
+  return new Promise((resolve, reject) => {
+    db.all('SELECT material_name FROM materials WHERE order_id = ?', [orderId], (err, rows) => {
+      if (err) reject(err);
+      else resolve(rows.map(r => r.material_name));
+    });
+  });
+};
+
 app.post('/api/repair-orders/:id/materials', async (req, res) => {
   const { materials } = req.body;
   const orderId = req.params.id;
@@ -320,10 +313,17 @@ app.post('/api/repair-orders/:id/materials', async (req, res) => {
       return res.status(400).json({ error: '当前状态不允许记录材料，只有维修中状态可以操作' });
     }
     
+    const existingMaterials = await getExistingMaterials(orderId);
+    
     const stmt = db.prepare('INSERT INTO materials (order_id, material_name, quantity, unit, is_over_limit) VALUES (?, ?, ?, ?, ?)');
     
     const results = [];
+    const skipped = [];
     materials.forEach(mat => {
+      if (existingMaterials.includes(mat.material_name)) {
+        skipped.push(mat.material_name);
+        return;
+      }
       const limit = materialLimit[mat.material_name] || 10;
       const isOverLimit = mat.quantity > limit ? 1 : 0;
       stmt.run(orderId, mat.material_name, mat.quantity, mat.unit || '个', isOverLimit);
@@ -332,7 +332,12 @@ app.post('/api/repair-orders/:id/materials', async (req, res) => {
     
     stmt.finalize((err) => {
       if (err) res.status(500).json({ error: err.message });
-      else res.json({ success: true, materials: results });
+      else res.json({ 
+        success: true, 
+        materials: results, 
+        skipped: skipped,
+        message: skipped.length > 0 ? `已跳过已存在的材料: ${skipped.join(', ')}` : null
+      });
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

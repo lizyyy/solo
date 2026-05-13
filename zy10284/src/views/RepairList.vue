@@ -356,8 +356,8 @@ const getStatusText = (status) => {
 const createOrder = async () => {
   try {
     const res = await axios.post('/api/repair-orders', newOrder.value)
-    if (res.data.merged) {
-      ElMessage.warning(`报修已自动合并至工单 ${res.data.merged_to_order_no}`)
+    if (res.data.duplicated) {
+      ElMessage.warning(`该宿舍已有同类报修在处理中，工单编号: ${res.data.order_no}`)
     } else {
       ElMessage.success('报修提交成功')
     }

@@ -53,16 +53,16 @@ npm run dev
 
 #### 方式二：分别启动
 ```bash
-# 启动后端服务（端口 3001）
+# 启动后端服务（端口 3003）
 npm run server
 
-# 启动前端服务（端口 3000）
+# 启动前端服务（端口 3002）
 npm run client
 ```
 
 ### 访问系统
 
-打开浏览器访问：http://localhost:3000
+打开浏览器访问：http://localhost:3002
 
 ## 预置数据
 
