@@ -1,0 +1,20 @@
+package com.infrastructure.drain.model;
+
+public enum DrainStatus {
+    INIT,
+    VALIDATING,
+    VALIDATED,
+    TRAFFIC_OFFLOADING,
+    TRAFFIC_OFFLOADED,
+    CONNECTION_OBSERVING,
+    CONNECTIONS_EMPTY,
+    TASK_MIGRATING,
+    TASKS_MIGRATED,
+    DRAINING,
+    DRAINED,
+    COMPLETED,
+    FAILED,
+    RECOVERING,
+    RECOVERED,
+    CANCELLED
+}
