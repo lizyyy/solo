@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线上问诊处方配送系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .tab:hover {
+            background: #e8ecf1;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-normal { background: #d4edda; color: #155724; }
+        .status-blocked { background: #f8d7da; color: #721c24; }
+        .status-reviewing { background: #fff3cd; color: #856404; }
+        .status-delivered { background: #d1ecf1; color: #0c5460; }
+        .status-pending { background: #e2e3e5; color: #383d41; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-shipping { background: #cce5ff; color: #004085; }
+        .status-preparing { background: #fff3cd; color: #856404; }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .table td {
+            font-size: 14px;
+        }
+        
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            margin-right: 8px;
+        }
+        
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-info:hover { background: #138496; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .detail-panel {
+            position: fixed;
+            right: -500px;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            transition: right 0.3s;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .detail-panel.open {
+            right: 0;
+        }
+        
+        .detail-header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .detail-content {
+            padding: 24px;
+        }
+        
+        .detail-section {
+            margin-bottom: 24px;
+        }
+        
+        .detail-section h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .log-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .log-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+        
+        .log-operator {
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .log-action {
+            color: #495057;
+        }
+        
+        .change-history-item {
+            padding: 10px;
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 8px;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .export-section {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 13px;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        
+        .review-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        
+        .review-panel textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-height: 100px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+        
+        .review-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .overview-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .overview-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .overview-card h3 {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        
+        .overview-card .number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .path-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .path-normal { background: #e8f5e9; color: #2e7d32; }
+        .path-blocked { background: #ffebee; color: #c62828; }
+        .path-review { background: #fff8e1; color: #f57f17; }
+        .path-export { background: #e3f2fd; color: #1565c0; }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 999;
+        }
+        
+        .overlay.open {
+            display: block;
+        }
+        
+        .medicine-list {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        
+        .medicine-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .medicine-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>线上问诊处方配送系统</h1>
+        <p>API驱动的全栈医疗管理平台 | 支持四种业务路径</p>
+    </div>
+    
+    <div class="container">
+        <div class="overview-cards">
+            <div class="overview-card">
+                <h3>问诊记录总数</h3>
+                <div class="number" id="consultCount">0</div>
+            </div>
+            <div class="overview-card">
+                <h3>待审核处方</h3>
+                <div class="number" id="pendingReview">0</div>
+            </div>
+            <div class="overview-card">
+                <h3>配送中</h3>
+                <div class="number" id="shippingCount">0</div>
+            </div>
+            <div class="overview-card">
+                <h3>已完成</h3>
+                <div class="number" id="completedCount">0</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="consultations">问诊记录</button>
+            <button class="tab" data-tab="prescriptions">处方版本</button>
+            <button class="tab" data-tab="reviews">药师审核</button>
+            <button class="tab" data-tab="payments">支付订单</button>
+            <button class="tab" data-tab="inventory">库存替换</button>
+            <button class="tab" data-tab="delivery">配送状态</button>
+            <button class="tab" data-tab="logs">操作日志</button>
+            <button class="tab" data-tab="export">导出报告</button>
+        </div>
+        
+        <div id="consultations" class="tab-content active">
+            <div class="card">
+                <div class="card-title">问诊记录列表</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>医生</th>
+                            <th>科室</th>
+                            <th>诊断</th>
+                            <th>状态</th>
+                            <th>路径</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consultTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="prescriptions" class="tab-content">
+            <div class="card">
+                <div class="card-title">处方版本管理</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>医生</th>
+                            <th>版本</th>
+                            <th>药品</th>
+                            <th>备注</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prescriptionTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="reviews" class="tab-content">
+            <div class="card">
+                <div class="card-title">药师审核面板</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>处方版本</th>
+                            <th>药师</th>
+                            <th>审核结果</th>
+                            <th>审核时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="payments" class="tab-content">
+            <div class="card">
+                <div class="card-title">支付订单管理</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>金额</th>
+                            <th>支付方式</th>
+                            <th>状态</th>
+                            <th>交易号</th>
+                            <th>支付时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="inventory" class="tab-content">
+            <div class="card">
+                <div class="card-title">库存替换申请</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>原药品</th>
+                            <th>替换药品</th>
+                            <th>原因</th>
+                            <th>状态</th>
+                            <th>审批人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="delivery" class="tab-content">
+            <div class="card">
+                <div class="card-title">配送状态追踪</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>患者姓名</th>
+                            <th>配送状态</th>
+                            <th>快递公司</th>
+                            <th>运单号</th>
+                            <th>预计送达</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deliveryTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="logs" class="tab-content">
+            <div class="card">
+                <div class="card-title">操作日志</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>操作人</th>
+                            <th>操作类型</th>
+                            <th>详情</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="export" class="tab-content">
+            <div class="card">
+                <div class="card-title">导出报告</div>
+                <div class="export-section">
+                    <div class="form-group">
+                        <label>按责任人筛选</label>
+                        <select id="filterOperator">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>开始日期</label>
+                        <input type="date" id="filterStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label>结束日期</label>
+                        <input type="date" id="filterEndDate">
+                    </div>
+                    <button class="btn btn-primary" onclick="exportReport()">导出 CSV 报告</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">四种业务路径说明</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #2e7d32; margin-bottom: 10px;">正常路径</h4>
+                        <p style="font-size: 14px; color: #666;">问诊 → 处方创建 → 药师审核通过 → 支付完成 → 库存确认 → 配送完成</p>
+                    </div>
+                    <div style="background: #ffebee; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #c62828; margin-bottom: 10px;">拦截路径</h4>
+                        <p style="font-size: 14px; color: #666;">药师审核拒绝 → 流程终止 → 记录变更历史 → 医生重新开方</p>
+                    </div>
+                    <div style="background: #fff8e1; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #f57f17; margin-bottom: 10px;">复核路径</h4>
+                        <p style="font-size: 14px; color: #666;">审核中 → 药师复核 → 更新审核意见 → 记录修改前后值 → 继续流程</p>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 20px; border-radius: 8px;">
+                        <h4 style="color: #1565c0; margin-bottom: 10px;">导出路径</h4>
+                        <p style="font-size: 14px; color: #666;">按责任人 / 时间范围筛选 → 生成 CSV 报告 → 包含全流程数据</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="overlay" id="overlay" onclick="closeDetail()"></div>
+    
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <h3 id="detailTitle">详情</h3>
+            <button class="detail-close" onclick="closeDetail()">×</button>
+        </div>
+        <div class="detail-content" id="detailContent"></div>
+    </div>
+
+    <script>
+        let currentConsultationId = null;
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+                
+                if (tab.dataset.tab === 'logs') loadLogs();
+                if (tab.dataset.tab === 'export') loadOperators();
+            });
+        });
+        
+        function getStatusClass(status) {
+            const classes = {
+                'completed': 'status-normal',
+                'blocked': 'status-blocked',
+                'reviewing': 'status-reviewing',
+                'delivered': 'status-delivered',
+                'pending': 'status-pending',
+                'approved': 'status-approved',
+                'rejected': 'status-rejected',
+                'paid': 'status-paid',
+                'shipping': 'status-shipping',
+                'preparing': 'status-preparing',
+                'created': 'status-reviewing'
+            };
+            return classes[status] || 'status-pending';
+        }
+        
+        function getPathClass(status) {
+            const classes = {
+                'completed': 'path-normal',
+                'blocked': 'path-blocked',
+                'reviewing': 'path-review',
+                'delivered': 'path-export'
+            };
+            return classes[status] || 'path-normal';
+        }
+        
+        function getPathLabel(status) {
+            const labels = {
+                'completed': '正常完成',
+                'blocked': '已拦截',
+                'reviewing': '复核中',
+                'delivered': '已配送'
+            };
+            return labels[status] || '处理中';
+        }
+        
+        async function loadConsultations() {
+            const res = await fetch('/api/consultations');
+            const data = await res.json();
+            
+            document.getElementById('consultCount').textContent = data.length;
+            document.getElementById('completedCount').textContent = data.filter(c => c.status === 'completed' || c.status === 'delivered').length;
+            
+            const tbody = document.getElementById('consultTable');
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td><strong>${c.patient_name}</strong></td>
+                    <td>${c.doctor_name}</td>
+                    <td>${c.department || '-'}</td>
+                    <td>${c.diagnosis || '-'}</td>
+                    <td><span class="status-badge ${getStatusClass(c.status)}">${c.status}</span></td>
+                    <td><span class="path-indicator ${getPathClass(c.status)}">${getPathLabel(c.status)}</span></td>
+                    <td>${new Date(c.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="showDetail('${c.id}')">查看详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadPrescriptions() {
+            const res = await fetch('/api/prescriptions');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('prescriptionTable');
+            tbody.innerHTML = data.map(p => `
+                <tr>
+                    <td><strong>${p.patient_name}</strong></td>
+                    <td>${p.created_by}</td>
+                    <td><span class="status-badge status-reviewing">v${p.version}</span></td>
+                    <td>${JSON.parse(p.medicines).map(m => m.name).join(', ')}</td>
+                    <td>${p.notes || '-'}</td>
+                    <td>${new Date(p.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-info" onclick="showPrescriptionDetail('${p.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadReviews() {
+            const res = await fetch('/api/pharmacist-reviews');
+            const data = await res.json();
+            
+            document.getElementById('pendingReview').textContent = data.filter(r => r.status === 'pending').length;
+            
+            const tbody = document.getElementById('reviewTable');
+            tbody.innerHTML = data.map(r => `
+                <tr>
+                    <td><strong>${r.patient_name}</strong></td>
+                    <td>v${r.version}</td>
+                    <td>${r.pharmacist_name}</td>
+                    <td><span class="status-badge ${getStatusClass(r.status)}">${r.review_result}</span></td>
+                    <td>${r.reviewed_at ? new Date(r.reviewed_at).toLocaleString() : '-'}</td>
+                    <td>
+                        ${r.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="reviewPrescription('${r.id}', 'approved')">通过</button>
+                            <button class="btn btn-danger" onclick="reviewPrescription('${r.id}', 'rejected')">拒绝</button>
+                        ` : `
+                            <button class="btn btn-warning" onclick="reReviewPrescription('${r.id}')">复核修改</button>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadPayments() {
+            const res = await fetch('/api/payments');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('paymentTable');
+            tbody.innerHTML = data.map(p => `
+                <tr>
+                    <td><strong>${p.patient_name}</strong></td>
+                    <td>¥${p.amount.toFixed(2)}</td>
+                    <td>${p.payment_method === 'wechat' ? '微信支付' : '支付宝'}</td>
+                    <td><span class="status-badge ${getStatusClass(p.payment_status)}">${p.payment_status === 'paid' ? '已支付' : '待支付'}</span></td>
+                    <td>${p.transaction_id || '-'}</td>
+                    <td>${p.paid_at ? new Date(p.paid_at).toLocaleString() : '-'}</td>
+                    <td>
+                        ${p.payment_status === 'pending' ? `
+                            <button class="btn btn-success" onclick="confirmPayment('${p.id}')">确认支付</button>
+                        ` : '<span class="status-badge status-paid">已完成</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadInventory() {
+            const res = await fetch('/api/inventory-replacements');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('inventoryTable');
+            tbody.innerHTML = data.map(i => `
+                <tr>
+                    <td><strong>${i.patient_name}</strong></td>
+                    <td>${i.original_medicine}</td>
+                    <td>${i.replacement_medicine}</td>
+                    <td>${i.reason || '-'}</td>
+                    <td><span class="status-badge ${getStatusClass(i.status)}">${i.status === 'approved' ? '已批准' : '待审批'}</span></td>
+                    <td>${i.approved_by || '-'}</td>
+                    <td>
+                        ${i.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="approveReplacement('${i.id}')">批准</button>
+                        ` : '<span class="status-badge status-approved">已批准</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadDelivery() {
+            const res = await fetch('/api/delivery');
+            const data = await res.json();
+            
+            document.getElementById('shippingCount').textContent = data.filter(d => d.status === 'shipping' || d.status === 'preparing').length;
+            
+            const tbody = document.getElementById('deliveryTable');
+            tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td><strong>${d.patient_name}</strong></td>
+                    <td><span class="status-badge ${getStatusClass(d.status)}">${d.status}</span></td>
+                    <td>${d.courier || '-'}</td>
+                    <td>${d.tracking_number || '-'}</td>
+                    <td>${d.estimated_delivery || '-'}</td>
+                    <td>
+                        ${d.status !== 'delivered' ? `
+                            <button class="btn btn-primary" onclick="updateDeliveryStatus('${d.id}', 'preparing')">备货</button>
+                            <button class="btn btn-warning" onclick="updateDeliveryStatus('${d.id}', 'shipping')">发货</button>
+                            <button class="btn btn-success" onclick="updateDeliveryStatus('${d.id}', 'delivered')">签收</button>
+                        ` : '<span class="status-badge status-delivered">已完成</span>'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadLogs() {
+            const res = await fetch('/api/logs');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('logsTable');
+            tbody.innerHTML = data.map(l => `
+                <tr>
+                    <td><strong>${l.operator}</strong></td>
+                    <td><span class="status-badge status-reviewing">${l.action}</span></td>
+                    <td>${JSON.stringify(JSON.parse(l.details)).substring(0, 50)}...</td>
+                    <td>${new Date(l.created_at).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadOperators() {
+            const res = await fetch('/api/operators');
+            const data = await res.json();
+            
+            const select = document.getElementById('filterOperator');
+            select.innerHTML = '<option value="">全部</option>' + data.map(o => `<option value="${o}">${o}</option>`).join('');
+        }
+        
+        async function showDetail(consultationId) {
+            const res = await fetch(`/api/summary/${consultationId}`);
+            const data = await res.json();
+            
+            const html = `
+                <div class="detail-section">
+                    <h4>问诊信息</h4>
+                    <div class="detail-row">
+                        <span class="detail-label">患者姓名</span>
+                        <span class="detail-value">${data.consultation.patient_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">医生</span>
+                        <span class="detail-value">${data.consultation.doctor_name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">科室</span>
+                        <span class="detail-value">${data.consultation.department || '-'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">症状</span>
+                        <span class="detail-value">${data.consultation.symptoms || '-'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">诊断</span>
+                        <span class="detail-value">${data.consultation.diagnosis || '-'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">状态</span>
+                        <span class="status-badge ${getStatusClass(data.consultation.status)}">${data.consultation.status}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>处方信息</h4>
+                    ${data.prescriptions.map(p => `
+                        <div class="medicine-list">
+                            <div style="margin-bottom: 8px;">
+                                <strong>版本 ${p.version}</strong>
+                                <span style="float: right;">${p.created_by}</span>
+                            </div>
+                            ${p.medicines.map(m => `
+                                <div class="medicine-item">
+                                    <strong>${m.name}</strong> - ${m.dosage} ${m.frequency}
+                                </div>
+                            `).join('')}
+                            ${p.notes ? `<div style="margin-top: 8px; font-size: 13px; color: #666;">备注: ${p.notes}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>药师审核记录</h4>
+                    ${data.reviews.map(r => `
+                        <div class="log-item">
+                            <div class="log-operator">${r.pharmacist_name}</div>
+                            <div style="margin-top: 4px;">
+                                <span class="status-badge ${getStatusClass(r.status)}">${r.review_result}</span>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 13px;">${r.review_notes || '-'}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>变更历史记录</h4>
+                    ${data.history.map(h => `
+                        <div class="change-history-item">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                                ${new Date(h.changed_at).toLocaleString()} - ${h.changed_by}
+                            </div>
+                            <div style="font-size: 13px;">
+                                <strong>${h.field_name}</strong>: 
+                                <span style="color: #dc3545; text-decoration: line-through;">${h.old_value || '空'}</span> 
+                                → 
+                                <span style="color: #28a745;">${h.new_value}</span>
+                            </div>
+                        </div>
+                    `).join('') || '<p style="color: #999;">暂无变更记录</p>'}
+                </div>
+                
+                <div class="detail-section">
+                    <h4>操作日志</h4>
+                    ${data.logs.map(l => `
+                        <div class="log-item">
+                            <div class="log-time">${new Date(l.created_at).toLocaleString()}</div>
+                            <div class="log-operator">${l.operator}</div>
+                            <div class="log-action">${l.action}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('detailTitle').textContent = '问诊详情 - ' + data.consultation.patient_name;
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailPanel').classList.add('open');
+            document.getElementById('overlay').classList.add('open');
+        }
+        
+        function closeDetail() {
+            document.getElementById('detailPanel').classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+        }
+        
+        async function reviewPrescription(reviewId, result) {
+            const notes = result === 'approved' ? '处方审核通过' : '处方存在问题，需要修改';
+            await fetch(`/api/pharmacist-reviews/${reviewId}/review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    review_result: result,
+                    review_notes: notes,
+                    pharmacist_name: '当前药师',
+                    pharmacist_id: 'PH_CURRENT'
+                })
+            });
+            loadReviews();
+        }
+        
+        function reReviewPrescription(reviewId) {
+            const newResult = prompt('请输入新的审核结果 (approved/rejected):');
+            const newNotes = prompt('请输入审核意见:');
+            if (newResult && newNotes) {
+                reviewPrescription(reviewId, newResult);
+            }
+        }
+        
+        async function confirmPayment(paymentId) {
+            await fetch(`/api/payments/${paymentId}/confirm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    transaction_id: 'TXN' + Date.now(),
+                    operator_name: '财务人员',
+                    operator_id: 'FIN_001'
+                })
+            });
+            loadPayments();
+        }
+        
+        async function approveReplacement(replacementId) {
+            await fetch(`/api/inventory-replacements/${replacementId}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    approved_by: '主管医生'
+                })
+            });
+            loadInventory();
+        }
+        
+        async function updateDeliveryStatus(deliveryId, status) {
+            await fetch(`/api/delivery/${deliveryId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: status,
+                    operator_name: '物流人员',
+                    operator_id: 'LOG_001'
+                })
+            });
+            loadDelivery();
+        }
+        
+        function exportReport() {
+            const operator = document.getElementById('filterOperator').value;
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            
+            let url = '/api/export?';
+            if (operator) url += `operator=${encodeURIComponent(operator)}&`;
+            if (startDate) url += `start_date=${startDate}&`;
+            if (endDate) url += `end_date=${endDate}`;
+            
+            window.location.href = url;
+        }
+        
+        async function showPrescriptionDetail(prescriptionId) {
+            const prescriptions = await fetch('/api/prescriptions').then(r => r.json());
+            const p = prescriptions.find(x => x.id === prescriptionId);
+            if (p) {
+                const medicines = JSON.parse(p.medicines);
+                alert(`处方详情:\n患者: ${p.patient_name}\n版本: ${p.version}\n药品: ${medicines.map(m => m.name).join(', ')}\n备注: ${p.notes || '无'}`);
+            }
+        }
+        
+        loadConsultations();
+        loadPrescriptions();
+        loadReviews();
+        loadPayments();
+        loadInventory();
+        loadDelivery();
+        
+        setInterval(() => {
+            loadConsultations();
+            loadPrescriptions();
+            loadReviews();
+            loadPayments();
+            loadInventory();
+            loadDelivery();
+        }, 30000);
+    </script>
+</body>
+</html>
