@@ -1,9 +1,19 @@
 const { spawn } = require('child_process');
 const path = require('path');
+const http = require('http');
 
 let server = null;
+let actualPort = null;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const extractPort = (output) => {
+  const match = output.match(/监听地址:\s*127\.0\.0\.1:(\d+)/);
+  if (match) return parseInt(match[1]);
+  const match2 = output.match(/服务地址:\s*http:\/\/127\.0\.0\.1:(\d+)/);
+  if (match2) return parseInt(match2[1]);
+  return null;
+};
 
 const startServer = () => {
   return new Promise((resolve, reject) => {
@@ -17,7 +27,11 @@ const startServer = () => {
     server.stdout.on('data', (data) => {
       const output = data.toString();
       console.log(output);
-      if (output.includes('舞台灯光预设回滚 API 已启动')) {
+      const port = extractPort(output);
+      if (port) {
+        actualPort = port;
+      }
+      if (output.includes('舞台灯光预设回滚 API 已启动') && actualPort) {
         resolve();
       }
     });
@@ -31,8 +45,12 @@ const startServer = () => {
     });
 
     setTimeout(() => {
-      resolve();
-    }, 3000);
+      if (actualPort) {
+        resolve();
+      } else {
+        reject(new Error('服务器启动超时，未能获取端口号'));
+      }
+    }, 10000);
   });
 };
 
@@ -48,8 +66,11 @@ const runTest = (testFile) => {
   return new Promise((resolve, reject) => {
     console.log(`\n🧪 运行测试: ${testFile}`);
     
+    const env = { ...process.env, API_PORT: actualPort.toString() };
+    
     const test = spawn('node', [path.join(__dirname, testFile)], {
-      stdio: ['inherit', 'inherit', 'inherit']
+      stdio: ['inherit', 'inherit', 'inherit'],
+      env: env
     });
 
     test.on('close', (code) => {

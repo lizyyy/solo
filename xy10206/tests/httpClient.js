@@ -1,7 +1,7 @@
 const http = require('http');
 
-const BASE_URL = 'localhost';
-const PORT = 3001;
+const BASE_URL = '127.0.0.1';
+const PORT = parseInt(process.env.API_PORT) || parseInt(process.env.PORT) || 3001;
 
 const request = (method, path, body = null) => {
   return new Promise((resolve, reject) => {
