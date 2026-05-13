@@ -387,4 +387,244 @@ describe('赔付案件分摊 API 测试', () => {
       });
     });
   });
+  
+  describe('版本历史数据正确性验证', () => {
+    let versionTestClaimId = null;
+    
+    beforeAll(async () => {
+      const res = await request(app)
+        .post('/api/claims')
+        .send({
+          caseNumber: `VERSION-TEST-${Date.now()}`,
+          totalAmount: 10000.00,
+          operator: 'test_user'
+        });
+      versionTestClaimId = res.body.data.id;
+      
+      await request(app)
+        .post(`/api/claims/${versionTestClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.40,
+          warehouseRatio: 0.35,
+          deliveryRatio: 0.25,
+          operator: 'test_user'
+        });
+    });
+    
+    test('版本历史接口应该返回正确的配送方金额（10000 * 25% = 2500）', async () => {
+      const res = await request(app)
+        .get(`/api/claims/${versionTestClaimId}/versions`);
+      
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      
+      const latestVersion = res.body.data[0];
+      expect(latestVersion.merchantRatio).toBe(0.4);
+      expect(latestVersion.warehouseRatio).toBe(0.35);
+      expect(latestVersion.deliveryRatio).toBe(0.25);
+      expect(latestVersion.merchantAmount).toBe(4000.00);
+      expect(latestVersion.warehouseAmount).toBe(3500.00);
+      expect(latestVersion.deliveryAmount).toBe(2500.00);
+      
+      const total = latestVersion.merchantAmount + 
+                    latestVersion.warehouseAmount + 
+                    latestVersion.deliveryAmount;
+      expect(total).toBe(10000.00);
+    });
+  });
+  
+  describe('失败操作审计日志验证', () => {
+    let auditTestClaimId = null;
+    
+    beforeAll(async () => {
+      const res = await request(app)
+        .post('/api/claims')
+        .send({
+          caseNumber: `AUDIT-TEST-${Date.now()}`,
+          totalAmount: 8000.00,
+          operator: 'test_user'
+        });
+      auditTestClaimId = res.body.data.id;
+    });
+    
+    test('比例校验失败应该写入审计日志（success=false）', async () => {
+      await request(app)
+        .post(`/api/claims/${auditTestClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.5,
+          warehouseRatio: 0.5,
+          deliveryRatio: 0.2,
+          operator: 'audit_tester'
+        });
+      
+      const logsRes = await request(app)
+        .get(`/api/claims/${auditTestClaimId}/audit-logs`);
+      
+      const invalidRatioLogs = logsRes.body.data.filter(log => 
+        log.action === 'UPDATE_RATIO' && 
+        log.success === false &&
+        log.operator === 'audit_tester'
+      );
+      
+      expect(invalidRatioLogs.length).toBeGreaterThan(0);
+      expect(invalidRatioLogs[0].errorMessage).toContain('责任比例之和');
+      expect(invalidRatioLogs[0].newStatus).toBeNull();
+    });
+    
+    test('重复提交拦截应该写入审计日志', async () => {
+      await request(app)
+        .post(`/api/claims/${auditTestClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.4,
+          warehouseRatio: 0.3,
+          deliveryRatio: 0.3,
+          operator: 'duplicate_tester',
+          requestId: 'audit-req-001'
+        });
+      
+      await request(app)
+        .post(`/api/claims/${auditTestClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.4,
+          warehouseRatio: 0.3,
+          deliveryRatio: 0.3,
+          operator: 'duplicate_tester',
+          requestId: 'audit-req-001'
+        });
+      
+      const logsRes = await request(app)
+        .get(`/api/claims/${auditTestClaimId}/audit-logs`);
+      
+      const duplicateLogs = logsRes.body.data.filter(log => 
+        log.action === 'UPDATE_RATIO' && 
+        log.success === false &&
+        log.operator === 'duplicate_tester' &&
+        log.requestId === 'audit-req-001'
+      );
+      
+      expect(duplicateLogs.length).toBeGreaterThan(0);
+      expect(duplicateLogs[0].errorMessage).toContain('重复的请求');
+    });
+    
+    test('已付款案件修改比例失败应该写入审计日志', async () => {
+      const paidRes = await request(app)
+        .post('/api/claims')
+        .send({
+          caseNumber: `PAID-AUDIT-${Date.now()}`,
+          totalAmount: 5000.00,
+          operator: 'test_user'
+        });
+      const paidClaimId = paidRes.body.data.id;
+      
+      await request(app)
+        .post(`/api/claims/${paidClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.5,
+          warehouseRatio: 0.3,
+          deliveryRatio: 0.2,
+          operator: 'test_user'
+        });
+      
+      await request(app)
+        .post(`/api/claims/${paidClaimId}/allocate`)
+        .send({ operator: 'test_user' });
+      
+      await request(app)
+        .post(`/api/claims/${paidClaimId}/confirm`)
+        .send({ operator: 'test_user' });
+      
+      await request(app)
+        .post(`/api/claims/${paidClaimId}/pay`)
+        .send({ operator: 'test_user' });
+      
+      await request(app)
+        .post(`/api/claims/${paidClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.6,
+          warehouseRatio: 0.2,
+          deliveryRatio: 0.2,
+          operator: 'paid_status_tester'
+        });
+      
+      const logsRes = await request(app)
+        .get(`/api/claims/${paidClaimId}/audit-logs`);
+      
+      const invalidStatusLogs = logsRes.body.data.filter(log => 
+        log.action === 'UPDATE_RATIO' && 
+        log.success === false &&
+        log.operator === 'paid_status_tester'
+      );
+      
+      expect(invalidStatusLogs.length).toBeGreaterThan(0);
+      expect(invalidStatusLogs[0].errorMessage).toContain('PAID');
+      expect(invalidStatusLogs[0].previousStatus).toBe('PAID');
+    });
+    
+    test('状态转换失败应该写入审计日志', async () => {
+      const res = await request(app)
+        .post('/api/claims')
+        .send({
+          caseNumber: `FLOW-AUDIT-${Date.now()}`,
+          totalAmount: 3000.00,
+          operator: 'test_user'
+        });
+      const flowClaimId = res.body.data.id;
+      
+      await request(app)
+        .post(`/api/claims/${flowClaimId}/confirm`)
+        .send({ operator: 'flow_tester' });
+      
+      const logsRes = await request(app)
+        .get(`/api/claims/${flowClaimId}/audit-logs`);
+      
+      const confirmLogs = logsRes.body.data.filter(log => 
+        log.action === 'CONFIRM' && 
+        log.success === false &&
+        log.operator === 'flow_tester'
+      );
+      
+      expect(confirmLogs.length).toBeGreaterThan(0);
+      expect(confirmLogs[0].errorMessage).toContain('转换到 CONFIRMED');
+      expect(confirmLogs[0].previousStatus).toBe('PENDING');
+    });
+    
+    test('回滚到不存在的版本应该写入审计日志', async () => {
+      const res = await request(app)
+        .post('/api/claims')
+        .send({
+          caseNumber: `ROLLBACK-AUDIT-${Date.now()}`,
+          totalAmount: 4000.00,
+          operator: 'test_user'
+        });
+      const rbClaimId = res.body.data.id;
+      
+      await request(app)
+        .post(`/api/claims/${rbClaimId}/ratios`)
+        .send({
+          merchantRatio: 0.5,
+          warehouseRatio: 0.3,
+          deliveryRatio: 0.2,
+          operator: 'test_user'
+        });
+      
+      await request(app)
+        .post(`/api/claims/${rbClaimId}/rollback`)
+        .send({
+          targetVersion: 999,
+          operator: 'rollback_tester'
+        });
+      
+      const logsRes = await request(app)
+        .get(`/api/claims/${rbClaimId}/audit-logs`);
+      
+      const rollbackLogs = logsRes.body.data.filter(log => 
+        log.action === 'ROLLBACK' && 
+        log.success === false &&
+        log.operator === 'rollback_tester'
+      );
+      
+      expect(rollbackLogs.length).toBeGreaterThan(0);
+      expect(rollbackLogs[0].errorMessage).toContain('版本 999 不存在');
+    });
+  });
 });

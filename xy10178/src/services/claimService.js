@@ -10,6 +10,16 @@ const STATUS_FLOW = {
   CANCELLED: []
 };
 
+const ACTION_TYPES = {
+  CREATE: 'CREATE',
+  UPDATE_RATIO: 'UPDATE_RATIO',
+  ALLOCATE: 'ALLOCATE',
+  CONFIRM: 'CONFIRM',
+  PAY: 'PAY',
+  CANCEL: 'CANCEL',
+  ROLLBACK: 'ROLLBACK'
+};
+
 function validateRatios(merchantRatio, warehouseRatio, deliveryRatio) {
   const total = Number(merchantRatio) + Number(warehouseRatio) + Number(deliveryRatio);
   const diff = Math.abs(total - 1.0);
@@ -68,6 +78,21 @@ async function createAuditLog({
   });
 }
 
+async function logFailure({ claimId, action, operator, requestId, errorMessage, previousStatus = null, previousData = null }) {
+  return createAuditLog({
+    claimId,
+    action,
+    operator,
+    requestId,
+    previousStatus,
+    newStatus: null,
+    previousData,
+    newData: null,
+    success: false,
+    errorMessage
+  });
+}
+
 async function getClaimWithVersion(claimId) {
   const claim = await Claim.findByPk(claimId, {
     include: [
@@ -106,6 +131,12 @@ async function getClaimWithVersion(claimId) {
       createdBy: currentVersion.createdBy
     } : null
   };
+}
+
+async function getClaimSimple(claimId) {
+  return await Claim.findByPk(claimId, {
+    include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }]
+  });
 }
 
 async function createClaim({ caseNumber, totalAmount, description = null, operator, requestId }) {
@@ -149,7 +180,7 @@ async function createClaim({ caseNumber, totalAmount, description = null, operat
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'CREATE',
+      action: ACTION_TYPES.CREATE,
       operator,
       requestId,
       previousStatus: null,
@@ -187,7 +218,34 @@ async function updateRatios({
   operator,
   requestId
 }) {
+  const claim = await getClaimSimple(claimId);
+  const claimStatus = claim ? claim.status : null;
+  const currentVersion = claim?.versions?.[0];
+  const previousData = currentVersion ? {
+    ratios: {
+      merchant: Number(currentVersion.merchantRatio),
+      warehouse: Number(currentVersion.warehouseRatio),
+      delivery: Number(currentVersion.deliveryRatio)
+    },
+    amounts: {
+      merchant: Number(currentVersion.merchantAmount),
+      warehouse: Number(currentVersion.warehouseAmount),
+      delivery: Number(currentVersion.deliveryAmount)
+    }
+  } : null;
+  
   if (!validateRatios(merchantRatio, warehouseRatio, deliveryRatio)) {
+    if (claim) {
+      await logFailure({
+        claimId,
+        action: ACTION_TYPES.UPDATE_RATIO,
+        operator,
+        requestId,
+        errorMessage: '责任比例之和必须等于 100%（1.0）',
+        previousStatus: claimStatus,
+        previousData
+      });
+    }
     return {
       success: false,
       code: 'INVALID_RATIO',
@@ -197,6 +255,15 @@ async function updateRatios({
   
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.UPDATE_RATIO,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -204,46 +271,34 @@ async function updateRatios({
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  if (claim.status === 'CANCELLED' || claim.status === 'PAID') {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.UPDATE_RATIO,
+      operator,
+      requestId,
+      errorMessage: `当前状态 ${claim.status} 不允许修改责任比例`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS',
+      message: `当前状态 ${claim.status} 不允许修改责任比例`
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    if (claim.status === 'CANCELLED' || claim.status === 'PAID') {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS',
-        message: `当前状态 ${claim.status} 不允许修改责任比例`
-      };
-    }
-    
-    const currentVersion = claim.versions[0];
-    const previousData = {
-      ratios: {
-        merchant: Number(currentVersion.merchantRatio),
-        warehouse: Number(currentVersion.warehouseRatio),
-        delivery: Number(currentVersion.deliveryRatio)
-      },
-      amounts: {
-        merchant: Number(currentVersion.merchantAmount),
-        warehouse: Number(currentVersion.warehouseAmount),
-        delivery: Number(currentVersion.deliveryAmount)
-      }
-    };
-    
     const amounts = calculateAmounts(
       claim.totalAmount,
       merchantRatio,
@@ -253,7 +308,7 @@ async function updateRatios({
     
     const newVersionNumber = claim.currentVersion + 1;
     
-    const newVersion = await ClaimVersion.create({
+    await ClaimVersion.create({
       claimId: claim.id,
       version: newVersionNumber,
       merchantRatio,
@@ -282,10 +337,10 @@ async function updateRatios({
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'UPDATE_RATIO',
+      action: ACTION_TYPES.UPDATE_RATIO,
       operator,
       requestId,
-      previousStatus: claim.status,
+      previousStatus: claimStatus,
       newStatus: 'REVIEWING',
       previousData,
       newData
@@ -307,8 +362,29 @@ async function updateRatios({
 }
 
 async function allocateClaim({ claimId, operator, requestId }) {
+  const claim = await getClaimSimple(claimId);
+  const claimStatus = claim ? claim.status : null;
+  const currentVersion = claim?.versions?.[0];
+  const previousData = currentVersion ? {
+    ratios: {
+      merchant: Number(currentVersion.merchantRatio),
+      warehouse: Number(currentVersion.warehouseRatio),
+      delivery: Number(currentVersion.deliveryRatio)
+    },
+    status: claimStatus
+  } : null;
+  
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ALLOCATE,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -316,46 +392,55 @@ async function allocateClaim({ claimId, operator, requestId }) {
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  const hasRatios = Number(currentVersion.merchantRatio) + 
+                    Number(currentVersion.warehouseRatio) + 
+                    Number(currentVersion.deliveryRatio) > 0;
+  
+  if (!hasRatios) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ALLOCATE,
+      operator,
+      requestId,
+      errorMessage: '请先设置责任比例',
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'NO_RATIOS_SET',
+      message: '请先设置责任比例'
+    };
+  }
+  
+  if (!canTransition(claim.status, 'ALLOCATED')) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ALLOCATE,
+      operator,
+      requestId,
+      errorMessage: `无法从 ${claim.status} 转换到 ALLOCATED`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS_TRANSITION',
+      message: `无法从 ${claim.status} 转换到 ALLOCATED`
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    const currentVersion = claim.versions[0];
-    const hasRatios = Number(currentVersion.merchantRatio) + 
-                      Number(currentVersion.warehouseRatio) + 
-                      Number(currentVersion.deliveryRatio) > 0;
-    
-    if (!hasRatios) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'NO_RATIOS_SET',
-        message: '请先设置责任比例'
-      };
-    }
-    
-    if (!canTransition(claim.status, 'ALLOCATED')) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS_TRANSITION',
-        message: `无法从 ${claim.status} 转换到 ALLOCATED`
-      };
-    }
-    
     const previousStatus = claim.status;
     
     await claim.update({
@@ -369,7 +454,7 @@ async function allocateClaim({ claimId, operator, requestId }) {
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'ALLOCATE',
+      action: ACTION_TYPES.ALLOCATE,
       operator,
       requestId,
       previousStatus,
@@ -394,8 +479,21 @@ async function allocateClaim({ claimId, operator, requestId }) {
 }
 
 async function confirmClaim({ claimId, operator, requestId }) {
+  const claim = await getClaimSimple(claimId);
+  const claimStatus = claim ? claim.status : null;
+  const previousData = claim ? { status: claimStatus } : null;
+  
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.CONFIRM,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -403,32 +501,34 @@ async function confirmClaim({ claimId, operator, requestId }) {
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  if (!canTransition(claim.status, 'CONFIRMED')) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.CONFIRM,
+      operator,
+      requestId,
+      errorMessage: `无法从 ${claim.status} 转换到 CONFIRMED`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS_TRANSITION',
+      message: `无法从 ${claim.status} 转换到 CONFIRMED`
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    if (!canTransition(claim.status, 'CONFIRMED')) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS_TRANSITION',
-        message: `无法从 ${claim.status} 转换到 CONFIRMED`
-      };
-    }
-    
     const previousStatus = claim.status;
     const currentVersion = claim.versions[0];
     
@@ -443,7 +543,7 @@ async function confirmClaim({ claimId, operator, requestId }) {
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'CONFIRM',
+      action: ACTION_TYPES.CONFIRM,
       operator,
       requestId,
       previousStatus,
@@ -468,8 +568,21 @@ async function confirmClaim({ claimId, operator, requestId }) {
 }
 
 async function payClaim({ claimId, operator, requestId }) {
+  const claim = await getClaimSimple(claimId);
+  const claimStatus = claim ? claim.status : null;
+  const previousData = claim ? { status: claimStatus } : null;
+  
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.PAY,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -477,32 +590,34 @@ async function payClaim({ claimId, operator, requestId }) {
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  if (!canTransition(claim.status, 'PAID')) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.PAY,
+      operator,
+      requestId,
+      errorMessage: `无法从 ${claim.status} 转换到 PAID`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS_TRANSITION',
+      message: `无法从 ${claim.status} 转换到 PAID`
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    if (!canTransition(claim.status, 'PAID')) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS_TRANSITION',
-        message: `无法从 ${claim.status} 转换到 PAID`
-      };
-    }
-    
     const previousStatus = claim.status;
     const currentVersion = claim.versions[0];
     
@@ -517,7 +632,7 @@ async function payClaim({ claimId, operator, requestId }) {
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'PAY',
+      action: ACTION_TYPES.PAY,
       operator,
       requestId,
       previousStatus,
@@ -542,8 +657,21 @@ async function payClaim({ claimId, operator, requestId }) {
 }
 
 async function cancelClaim({ claimId, operator, reason = '', requestId }) {
+  const claim = await getClaimSimple(claimId);
+  const claimStatus = claim ? claim.status : null;
+  const previousData = claim ? { status: claimStatus } : null;
+  
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.CANCEL,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -551,32 +679,34 @@ async function cancelClaim({ claimId, operator, reason = '', requestId }) {
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  if (!canTransition(claim.status, 'CANCELLED')) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.CANCEL,
+      operator,
+      requestId,
+      errorMessage: `无法从 ${claim.status} 转换到 CANCELLED`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS_TRANSITION',
+      message: `无法从 ${claim.status} 转换到 CANCELLED`
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [{ model: ClaimVersion, as: 'versions', order: [['version', 'DESC']], limit: 1 }],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    if (!canTransition(claim.status, 'CANCELLED')) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS_TRANSITION',
-        message: `无法从 ${claim.status} 转换到 CANCELLED`
-      };
-    }
-    
     const previousStatus = claim.status;
     const currentVersion = claim.versions[0];
     
@@ -591,7 +721,7 @@ async function cancelClaim({ claimId, operator, reason = '', requestId }) {
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'CANCEL',
+      action: ACTION_TYPES.CANCEL,
       operator,
       requestId,
       previousStatus,
@@ -616,8 +746,34 @@ async function cancelClaim({ claimId, operator, reason = '', requestId }) {
 }
 
 async function rollbackToVersion({ claimId, targetVersion, operator, requestId }) {
+  const claim = await Claim.findByPk(claimId, {
+    include: [
+      { model: ClaimVersion, as: 'versions', order: [['version', 'DESC']] }
+    ]
+  });
+  const claimStatus = claim ? claim.status : null;
+  const currentVersion = claim?.versions?.[0];
+  const previousData = currentVersion ? {
+    version: currentVersion.version,
+    ratios: {
+      merchant: Number(currentVersion.merchantRatio),
+      warehouse: Number(currentVersion.warehouseRatio),
+      delivery: Number(currentVersion.deliveryRatio)
+    },
+    status: claimStatus
+  } : null;
+  
   const isDuplicate = await checkDuplicateRequest(claimId, requestId);
   if (isDuplicate) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ROLLBACK,
+      operator,
+      requestId,
+      errorMessage: '重复的请求，请检查 requestId',
+      previousStatus: claimStatus,
+      previousData
+    });
     return {
       success: false,
       code: 'DUPLICATE_REQUEST',
@@ -625,63 +781,69 @@ async function rollbackToVersion({ claimId, targetVersion, operator, requestId }
     };
   }
   
+  if (!claim) {
+    return {
+      success: false,
+      code: 'CLAIM_NOT_FOUND',
+      message: '案件不存在'
+    };
+  }
+  
+  if (claim.status === 'PAID' || claim.status === 'CANCELLED') {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ROLLBACK,
+      operator,
+      requestId,
+      errorMessage: `当前状态 ${claim.status} 不允许回滚`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_STATUS',
+      message: `当前状态 ${claim.status} 不允许回滚`
+    };
+  }
+  
+  const targetVersionData = claim.versions.find(v => v.version === targetVersion);
+  if (!targetVersionData) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ROLLBACK,
+      operator,
+      requestId,
+      errorMessage: `版本 ${targetVersion} 不存在`,
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'VERSION_NOT_FOUND',
+      message: `版本 ${targetVersion} 不存在`
+    };
+  }
+  
+  if (targetVersionData.version >= claim.currentVersion) {
+    await logFailure({
+      claimId,
+      action: ACTION_TYPES.ROLLBACK,
+      operator,
+      requestId,
+      errorMessage: '只能回滚到历史版本',
+      previousStatus: claimStatus,
+      previousData
+    });
+    return {
+      success: false,
+      code: 'INVALID_TARGET_VERSION',
+      message: '只能回滚到历史版本'
+    };
+  }
+  
   const transaction = await sequelize.transaction();
   
   try {
-    const claim = await Claim.findByPk(claimId, {
-      include: [
-        { model: ClaimVersion, as: 'versions', order: [['version', 'DESC']] }
-      ],
-      transaction
-    });
-    
-    if (!claim) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'CLAIM_NOT_FOUND',
-        message: '案件不存在'
-      };
-    }
-    
-    if (claim.status === 'PAID' || claim.status === 'CANCELLED') {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_STATUS',
-        message: `当前状态 ${claim.status} 不允许回滚`
-      };
-    }
-    
-    const targetVersionData = claim.versions.find(v => v.version === targetVersion);
-    if (!targetVersionData) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'VERSION_NOT_FOUND',
-        message: `版本 ${targetVersion} 不存在`
-      };
-    }
-    
-    if (targetVersionData.version >= claim.currentVersion) {
-      await transaction.rollback();
-      return {
-        success: false,
-        code: 'INVALID_TARGET_VERSION',
-        message: '只能回滚到历史版本'
-      };
-    }
-    
-    const currentVersion = claim.versions[0];
-    const previousData = {
-      version: currentVersion.version,
-      ratios: {
-        merchant: Number(currentVersion.merchantRatio),
-        warehouse: Number(currentVersion.warehouseRatio),
-        delivery: Number(currentVersion.deliveryRatio)
-      }
-    };
-    
     const newVersionNumber = claim.currentVersion + 1;
     const amounts = calculateAmounts(
       claim.totalAmount,
@@ -720,10 +882,10 @@ async function rollbackToVersion({ claimId, targetVersion, operator, requestId }
     
     await createAuditLog({
       claimId: claim.id,
-      action: 'ROLLBACK',
+      action: ACTION_TYPES.ROLLBACK,
       operator,
       requestId,
-      previousStatus: claim.status,
+      previousStatus: claimStatus,
       newStatus: 'REVIEWING',
       previousData,
       newData,
@@ -815,7 +977,7 @@ async function getVersionHistory(claimId) {
       deliveryRatio: Number(v.deliveryRatio),
       merchantAmount: Number(v.merchantAmount),
       warehouseAmount: Number(v.warehouseAmount),
-      deliveryAmount: Number(v.merchantAmount),
+      deliveryAmount: Number(v.deliveryAmount),
       status: v.status,
       createdBy: v.createdBy,
       createdAt: v.createdAt
