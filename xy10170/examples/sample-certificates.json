@@ -1,0 +1,28 @@
+[
+  {
+    "name": "生产环境SSL证书",
+    "type": "SSL",
+    "domain": "prod.example.com",
+    "issuer": "DigiCert",
+    "issueDate": "2025-03-01",
+    "expiryDate": "2026-03-01",
+    "serialNumber": "SN100",
+    "fingerprint": "FP100",
+    "description": "生产环境主证书",
+    "ownerName": "运维主管",
+    "ownerEmail": "ops@example.com",
+    "department": "运维组"
+  },
+  {
+    "name": "官方网站域名",
+    "type": "DOMAIN",
+    "domain": "www.example.com",
+    "issuer": "GoDaddy",
+    "issueDate": "2024-08-01",
+    "expiryDate": "2026-08-01",
+    "description": "公司官网域名",
+    "ownerName": "市场经理",
+    "ownerEmail": "marketing@example.com",
+    "department": "市场部"
+  }
+]

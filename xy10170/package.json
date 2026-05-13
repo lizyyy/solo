@@ -1,0 +1,51 @@
+{
+  "name": "cert-audit-cli",
+  "version": "1.0.0",
+  "description": "证书到期批量盘点 CLI - 多源清单导入、到期窗口、责任人映射、重复证书合并、提醒导出",
+  "main": "dist/index.js",
+  "bin": {
+    "cert-audit": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "certificate",
+    "ssl",
+    "expiry",
+    "audit",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "sqlite3": "^5.1.6",
+    "chalk": "^5.3.0",
+    "csv-parser": "^3.0.0",
+    "xlsx": "^0.18.5",
+    "date-fns": "^3.0.0",
+    "inquirer": "^9.2.0",
+    "ora": "^7.0.0",
+    "table": "^6.8.0",
+    "fs-extra": "^11.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.10.0",
+    "@types/sqlite3": "^3.1.11",
+    "@types/fs-extra": "^11.0.4",
+    "ts-node": "^10.9.2",
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "eslint": "^8.54.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0"
+  }
+}

@@ -1,0 +1,12 @@
+name,type,domain,issuer,issueDate,expiryDate,serialNumber,fingerprint,description,ownerName,ownerEmail,department
+主站SSL证书,SSL,example.com,Let's Encrypt,2025-01-01,2026-01-01,SN001,FP001,主网站HTTPS证书,张三,zhangsan@example.com,技术部
+支付网关证书,SSL,pay.example.com,Let's Encrypt,2025-02-01,2026-05-01,SN002,FP002,支付系统证书,李四,lisi@example.com,支付组
+API域名,DOMAIN,api.example.com,DigiCert,2024-06-01,2026-06-01,SN003,FP003,API服务域名,王五,wangwu@example.com,架构组
+测试域名,DOMAIN,test.example.com,DigiCert,2024-07-01,2025-06-01,SN004,FP004,测试环境域名,赵六,zhaoliu@example.com,测试组
+供应商A资质,VENDOR,,,2024-01-01,2025-07-01,SN005,FP005,供应商A的ISO9001资质,周七,zhouqi@example.com,采购部
+供应商B资质,VENDOR,,,2024-03-01,2025-12-31,SN006,FP006,供应商B的安全资质,周七,zhouqi@example.com,采购部
+员工A证书,EMPLOYEE,,,2024-04-01,2025-04-01,SN007,FP007,员工A的资格证书,张三,zhangsan@example.com,技术部
+员工B证书,EMPLOYEE,,,2024-05-01,2026-05-01,SN008,FP008,员工B的职业证书,李四,lisi@example.com,支付组
+主站SSL证书(重复),SSL,example.com,Let's Encrypt,2025-01-01,2026-01-01,SN001,FP001,主网站HTTPS证书副本,张三,zhangsan@example.com,技术部
+即将到期证书,SSL,old.example.com,Let's Encrypt,2024-01-01,2026-05-15,SN010,FP010,一个月内到期的证书,钱八,qianba@example.com,运维组
+已过期证书,SSL,expired.example.com,Let's Encrypt,2023-01-01,2024-01-01,SN011,FP011,已过期的测试证书,孙九,sunjiu@example.com,测试组
