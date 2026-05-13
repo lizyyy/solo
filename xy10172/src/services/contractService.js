@@ -3,6 +3,7 @@ const stateMachineService = require('./stateMachineService');
 const versionService = require('./versionService');
 const callbackService = require('./callbackService');
 const auditService = require('./auditService');
+const concurrencyService = require('./concurrencyService');
 const { v4: uuidv4 } = require('uuid');
 
 const PARTY_STATUS = Contract.getPartyStatuses();
@@ -74,405 +75,440 @@ async function createContract(data, operator, requestId) {
 }
 
 async function initiateSigning(contractId, operator, requestId, options = {}) {
-  const contract = await Contract.findById(contractId);
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.INITIATE,
+    async () => {
+      const contract = await Contract.findById(contractId);
 
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
 
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
 
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.INITIATE
-  );
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.INITIATE
+      );
 
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
 
-  if (contract.parties.length === 0) {
-    throw new Error('合同没有签署方');
-  }
+      if (contract.parties.length === 0) {
+        throw new Error('合同没有签署方');
+      }
 
-  const previousState = {
-    status: contract.status,
-    version: contract.currentVersion
-  };
-
-  contract.previousStatus = contract.status;
-  contract.status = stateMachineService.SIGN_STATUSES.INITIATED;
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await versionService.freezeVersion(
-    contract._id,
-    contract.currentVersion,
-    operator.id,
-    '发起签署前自动冻结',
-    requestId
-  );
-
-  await auditService.logInitiateSigning(contract, operator, requestId, previousState);
-
-  if (contract.callbackUrl) {
-    await callbackService.createAndExecuteCallback(
-      contract,
-      callbackService.CALLBACK_EVENTS.SIGNING_INITIATED,
-      {
-        contractId: contract._id,
-        contractNo: contract.contractNo,
+      const previousState = {
         status: contract.status,
-        initiator: contract.initiator,
-        parties: contract.parties.map(p => ({
-          id: p.id,
-          name: p.name,
-          email: p.email
-        })),
-        timestamp: new Date().toISOString()
-      },
-      { operationId: contract.lastOperationId }
-    );
-  }
+        version: contract.currentVersion
+      };
 
-  return contract;
+      contract.previousStatus = contract.status;
+      contract.status = stateMachineService.SIGN_STATUSES.INITIATED;
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await versionService.freezeVersion(
+        contract._id,
+        contract.currentVersion,
+        operator.id,
+        '发起签署前自动冻结',
+        requestId
+      );
+
+      await auditService.logInitiateSigning(contract, operator, requestId, previousState);
+
+      if (contract.callbackUrl) {
+        await callbackService.createAndExecuteCallback(
+          contract,
+          callbackService.CALLBACK_EVENTS.SIGNING_INITIATED,
+          {
+            contractId: contract._id,
+            contractNo: contract.contractNo,
+            status: contract.status,
+            initiator: contract.initiator,
+            parties: contract.parties.map(p => ({
+              id: p.id,
+              name: p.name,
+              email: p.email
+            })),
+            timestamp: new Date().toISOString()
+          },
+          { operationId: contract.lastOperationId }
+        );
+      }
+
+      return contract;
+    }
+  );
 }
 
 async function signContract(contractId, partyId, signatureData, operator, requestId) {
-  const contract = await Contract.findById(contractId);
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.SIGN,
+    async () => {
+      const contract = await Contract.findById(contractId);
 
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
 
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
 
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.SIGN
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.SIGN
+      );
+
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
+
+      const party = contract.parties.find(p => p.id === partyId);
+
+      if (!party) {
+        throw new Error(`签署方 ${partyId} 不存在`);
+      }
+
+      if (party.status === PARTY_STATUS.SIGNED) {
+        throw new Error('该签署方已签署');
+      }
+
+      if (party.status === PARTY_STATUS.REJECTED) {
+        throw new Error('该签署方已拒签');
+      }
+
+      party.status = PARTY_STATUS.SIGNED;
+      party.signedAt = new Date();
+      party.signature = signatureData.signature;
+      party.ip = operator.ip;
+      party.userAgent = operator.userAgent;
+
+      const signedCount = contract.parties.filter(p => p.status === PARTY_STATUS.SIGNED).length;
+      const totalParties = contract.parties.length;
+
+      if (signedCount === totalParties) {
+        contract.previousStatus = contract.status;
+        contract.status = stateMachineService.SIGN_STATUSES.COMPLETED;
+      } else if (signedCount > 0 && signedCount < totalParties) {
+        contract.previousStatus = contract.status;
+        contract.status = stateMachineService.SIGN_STATUSES.PARTIALLY_SIGNED;
+      } else {
+        contract.previousStatus = contract.status;
+        contract.status = stateMachineService.SIGN_STATUSES.IN_SIGNING;
+      }
+
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await auditService.logSign(contract, party, operator, requestId);
+
+      if (contract.callbackUrl) {
+        const event = contract.status === stateMachineService.SIGN_STATUSES.COMPLETED
+          ? callbackService.CALLBACK_EVENTS.CONTRACT_COMPLETED
+          : callbackService.CALLBACK_EVENTS.PARTY_SIGNED;
+
+        await callbackService.createAndExecuteCallback(
+          contract,
+          event,
+          {
+            contractId: contract._id,
+            contractNo: contract.contractNo,
+            status: contract.status,
+            party: {
+              id: party.id,
+              name: party.name,
+              email: party.email,
+              signedAt: party.signedAt
+            },
+            signedCount,
+            totalParties,
+            timestamp: new Date().toISOString()
+          },
+          { operationId: contract.lastOperationId }
+        );
+      }
+
+      if (contract.status === stateMachineService.SIGN_STATUSES.COMPLETED) {
+        await auditService.logComplete(contract, operator, requestId);
+      }
+
+      return { contract, party };
+    }
   );
-
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
-
-  const party = contract.parties.find(p => p.id === partyId);
-
-  if (!party) {
-    throw new Error(`签署方 ${partyId} 不存在`);
-  }
-
-  if (party.status === PARTY_STATUS.SIGNED) {
-    throw new Error('该签署方已签署');
-  }
-
-  if (party.status === PARTY_STATUS.REJECTED) {
-    throw new Error('该签署方已拒签');
-  }
-
-  party.status = PARTY_STATUS.SIGNED;
-  party.signedAt = new Date();
-  party.signature = signatureData.signature;
-  party.ip = operator.ip;
-  party.userAgent = operator.userAgent;
-
-  const signedCount = contract.parties.filter(p => p.status === PARTY_STATUS.SIGNED).length;
-  const totalParties = contract.parties.length;
-
-  if (signedCount === totalParties) {
-    contract.previousStatus = contract.status;
-    contract.status = stateMachineService.SIGN_STATUSES.COMPLETED;
-  } else if (signedCount > 0 && signedCount < totalParties) {
-    contract.previousStatus = contract.status;
-    contract.status = stateMachineService.SIGN_STATUSES.PARTIALLY_SIGNED;
-  } else {
-    contract.previousStatus = contract.status;
-    contract.status = stateMachineService.SIGN_STATUSES.IN_SIGNING;
-  }
-
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await auditService.logSign(contract, party, operator, requestId);
-
-  if (contract.callbackUrl) {
-    const event = contract.status === stateMachineService.SIGN_STATUSES.COMPLETED
-      ? callbackService.CALLBACK_EVENTS.CONTRACT_COMPLETED
-      : callbackService.CALLBACK_EVENTS.PARTY_SIGNED;
-
-    await callbackService.createAndExecuteCallback(
-      contract,
-      event,
-      {
-        contractId: contract._id,
-        contractNo: contract.contractNo,
-        status: contract.status,
-        party: {
-          id: party.id,
-          name: party.name,
-          email: party.email,
-          signedAt: party.signedAt
-        },
-        signedCount,
-        totalParties,
-        timestamp: new Date().toISOString()
-      },
-      { operationId: contract.lastOperationId }
-    );
-  }
-
-  if (contract.status === stateMachineService.SIGN_STATUSES.COMPLETED) {
-    await auditService.logComplete(contract, operator, requestId);
-  }
-
-  return { contract, party };
 }
 
 async function rejectContract(contractId, partyId, reason, operator, requestId) {
-  const contract = await Contract.findById(contractId);
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.REJECT,
+    async () => {
+      const contract = await Contract.findById(contractId);
 
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
 
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
 
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.REJECT
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.REJECT
+      );
+
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
+
+      const party = contract.parties.find(p => p.id === partyId);
+
+      if (!party) {
+        throw new Error(`签署方 ${partyId} 不存在`);
+      }
+
+      if (party.status === PARTY_STATUS.SIGNED) {
+        throw new Error('该签署方已签署，无法拒签');
+      }
+
+      if (party.status === PARTY_STATUS.REJECTED) {
+        throw new Error('该签署方已拒签');
+      }
+
+      party.status = PARTY_STATUS.REJECTED;
+      contract.previousStatus = contract.status;
+      contract.status = stateMachineService.SIGN_STATUSES.REJECTED;
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await auditService.logReject(contract, party, operator, requestId, reason);
+
+      if (contract.callbackUrl) {
+        await callbackService.createAndExecuteCallback(
+          contract,
+          callbackService.CALLBACK_EVENTS.PARTY_REJECTED,
+          {
+            contractId: contract._id,
+            contractNo: contract.contractNo,
+            status: contract.status,
+            party: {
+              id: party.id,
+              name: party.name,
+              email: party.email
+            },
+            reason,
+            timestamp: new Date().toISOString()
+          },
+          { operationId: contract.lastOperationId }
+        );
+      }
+
+      return { contract, party };
+    }
   );
-
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
-
-  const party = contract.parties.find(p => p.id === partyId);
-
-  if (!party) {
-    throw new Error(`签署方 ${partyId} 不存在`);
-  }
-
-  if (party.status === PARTY_STATUS.SIGNED) {
-    throw new Error('该签署方已签署，无法拒签');
-  }
-
-  if (party.status === PARTY_STATUS.REJECTED) {
-    throw new Error('该签署方已拒签');
-  }
-
-  party.status = PARTY_STATUS.REJECTED;
-  contract.previousStatus = contract.status;
-  contract.status = stateMachineService.SIGN_STATUSES.REJECTED;
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await auditService.logReject(contract, party, operator, requestId, reason);
-
-  if (contract.callbackUrl) {
-    await callbackService.createAndExecuteCallback(
-      contract,
-      callbackService.CALLBACK_EVENTS.PARTY_REJECTED,
-      {
-        contractId: contract._id,
-        contractNo: contract.contractNo,
-        status: contract.status,
-        party: {
-          id: party.id,
-          name: party.name,
-          email: party.email
-        },
-        reason,
-        timestamp: new Date().toISOString()
-      },
-      { operationId: contract.lastOperationId }
-    );
-  }
-
-  return { contract, party };
 }
 
 async function withdrawContract(contractId, reason, operator, requestId) {
-  const contract = await Contract.findById(contractId);
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.WITHDRAW,
+    async () => {
+      const contract = await Contract.findById(contractId);
 
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
 
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
 
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.WITHDRAW
-  );
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.WITHDRAW
+      );
 
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
 
-  const previousState = {
-    status: contract.status,
-    version: contract.currentVersion
-  };
-
-  contract.previousStatus = contract.status;
-  contract.status = stateMachineService.SIGN_STATUSES.WITHDRAWN;
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await auditService.logWithdraw(contract, operator, requestId, reason, previousState);
-
-  if (contract.callbackUrl) {
-    await callbackService.createAndExecuteCallback(
-      contract,
-      callbackService.CALLBACK_EVENTS.CONTRACT_WITHDRAWN,
-      {
-        contractId: contract._id,
-        contractNo: contract.contractNo,
+      const previousState = {
         status: contract.status,
-        reason,
-        previousStatus: previousState.status,
-        timestamp: new Date().toISOString()
-      },
-      { operationId: contract.lastOperationId }
-    );
-  }
+        version: contract.currentVersion
+      };
 
-  return contract;
+      contract.previousStatus = contract.status;
+      contract.status = stateMachineService.SIGN_STATUSES.WITHDRAWN;
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await auditService.logWithdraw(contract, operator, requestId, reason, previousState);
+
+      if (contract.callbackUrl) {
+        await callbackService.createAndExecuteCallback(
+          contract,
+          callbackService.CALLBACK_EVENTS.CONTRACT_WITHDRAWN,
+          {
+            contractId: contract._id,
+            contractNo: contract.contractNo,
+            status: contract.status,
+            reason,
+            previousStatus: previousState.status,
+            timestamp: new Date().toISOString()
+          },
+          { operationId: contract.lastOperationId }
+        );
+      }
+
+      return contract;
+    }
+  );
 }
 
 async function reinitiateContract(contractId, updates, operator, requestId) {
-  const contract = await Contract.findById(contractId);
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.REINITIATE,
+    async () => {
+      const contract = await Contract.findById(contractId);
 
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
 
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
 
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.REINITIATE
-  );
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.REINITIATE
+      );
 
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
 
-  const previousState = {
-    status: contract.status,
-    version: contract.currentVersion
-  };
+      const previousState = {
+        status: contract.status,
+        version: contract.currentVersion
+      };
 
-  if (updates) {
-    if (updates.title) contract.title = updates.title;
-    if (updates.description) contract.description = updates.description;
-    if (updates.pdfMetadata) contract.pdfMetadata = { ...contract.pdfMetadata, ...updates.pdfMetadata };
-    if (updates.callbackUrl) contract.callbackUrl = updates.callbackUrl;
-    if (updates.effectiveDate) contract.effectiveDate = new Date(updates.effectiveDate);
-    if (updates.expirationDate) contract.expirationDate = new Date(updates.expirationDate);
-    if (updates.metadata) {
-      contract.metadata = new Map([...(contract.metadata || []), ...Object.entries(updates.metadata)]);
+      if (updates) {
+        if (updates.title) contract.title = updates.title;
+        if (updates.description) contract.description = updates.description;
+        if (updates.pdfMetadata) contract.pdfMetadata = { ...contract.pdfMetadata, ...updates.pdfMetadata };
+        if (updates.callbackUrl) contract.callbackUrl = updates.callbackUrl;
+        if (updates.effectiveDate) contract.effectiveDate = new Date(updates.effectiveDate);
+        if (updates.expirationDate) contract.expirationDate = new Date(updates.expirationDate);
+        if (updates.metadata) {
+          contract.metadata = new Map([...(contract.metadata || []), ...Object.entries(updates.metadata)]);
+        }
+
+        if (updates.parties) {
+          contract.parties = updates.parties.map((party, index) => ({
+            id: party.id || `PARTY-${index + 1}-${uuidv4().slice(0, 6).toUpperCase()}`,
+            name: party.name,
+            email: party.email,
+            phone: party.phone,
+            status: PARTY_STATUS.PENDING
+          }));
+        }
+      }
+
+      contract.previousStatus = contract.status;
+      contract.status = stateMachineService.SIGN_STATUSES.REINITIATED;
+      contract.currentVersion += 1;
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await versionService.createVersion(contract, operator.id, true, '重新发起前自动冻结');
+
+      await auditService.logReinitiate(contract, operator, requestId, previousState);
+
+      if (contract.callbackUrl) {
+        await callbackService.createAndExecuteCallback(
+          contract,
+          callbackService.CALLBACK_EVENTS.CONTRACT_REINITIATED,
+          {
+            contractId: contract._id,
+            contractNo: contract.contractNo,
+            status: contract.status,
+            newVersion: contract.currentVersion,
+            previousStatus: previousState.status,
+            timestamp: new Date().toISOString()
+          },
+          { operationId: contract.lastOperationId }
+        );
+      }
+
+      return contract;
     }
+  );
+}
 
-    if (updates.parties) {
-      contract.parties = updates.parties.map((party, index) => ({
-        id: party.id || `PARTY-${index + 1}-${uuidv4().slice(0, 6).toUpperCase()}`,
+async function supplementSign(contractId, additionalParties, operator, requestId) {
+  return concurrencyService.withContractLock(
+    contractId,
+    stateMachineService.OPERATIONS.SUPPLEMENT_SIGN,
+    async () => {
+      const contract = await Contract.findById(contractId);
+
+      if (!contract) {
+        throw new Error('合同不存在');
+      }
+
+      if (contract.isDeleted) {
+        throw new Error('合同已删除');
+      }
+
+      const opCheck = stateMachineService.canPerformOperation(
+        contract.status,
+        stateMachineService.OPERATIONS.SUPPLEMENT_SIGN
+      );
+
+      if (!opCheck.allowed) {
+        throw new Error(opCheck.reason);
+      }
+
+      const startIndex = contract.parties.length;
+
+      const newParties = additionalParties.map((party, index) => ({
+        id: party.id || `PARTY-${startIndex + index + 1}-${uuidv4().slice(0, 6).toUpperCase()}`,
         name: party.name,
         email: party.email,
         phone: party.phone,
         status: PARTY_STATUS.PENDING
       }));
+
+      contract.parties = [...contract.parties, ...newParties];
+      contract.previousStatus = contract.status;
+      contract.status = stateMachineService.SIGN_STATUSES.IN_SIGNING;
+      contract.currentVersion += 1;
+      contract.lastOperationId = auditService.generateOperationId();
+
+      await contract.save();
+
+      await versionService.createVersion(contract, operator.id, true, '补签前自动冻结');
+
+      await auditService.logSupplementSign(contract, operator, requestId);
+
+      return contract;
     }
-  }
-
-  contract.previousStatus = contract.status;
-  contract.status = stateMachineService.SIGN_STATUSES.REINITIATED;
-  contract.currentVersion += 1;
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await versionService.createVersion(contract, operator.id, true, '重新发起前自动冻结');
-
-  await auditService.logReinitiate(contract, operator, requestId, previousState);
-
-  if (contract.callbackUrl) {
-    await callbackService.createAndExecuteCallback(
-      contract,
-      callbackService.CALLBACK_EVENTS.CONTRACT_REINITIATED,
-      {
-        contractId: contract._id,
-        contractNo: contract.contractNo,
-        status: contract.status,
-        newVersion: contract.currentVersion,
-        previousStatus: previousState.status,
-        timestamp: new Date().toISOString()
-      },
-      { operationId: contract.lastOperationId }
-    );
-  }
-
-  return contract;
-}
-
-async function supplementSign(contractId, additionalParties, operator, requestId) {
-  const contract = await Contract.findById(contractId);
-
-  if (!contract) {
-    throw new Error('合同不存在');
-  }
-
-  if (contract.isDeleted) {
-    throw new Error('合同已删除');
-  }
-
-  const opCheck = stateMachineService.canPerformOperation(
-    contract.status,
-    stateMachineService.OPERATIONS.SUPPLEMENT_SIGN
   );
-
-  if (!opCheck.allowed) {
-    throw new Error(opCheck.reason);
-  }
-
-  const existingPartyIds = contract.parties.map(p => p.id);
-  const startIndex = contract.parties.length;
-
-  const newParties = additionalParties.map((party, index) => ({
-    id: party.id || `PARTY-${startIndex + index + 1}-${uuidv4().slice(0, 6).toUpperCase()}`,
-    name: party.name,
-    email: party.email,
-    phone: party.phone,
-    status: PARTY_STATUS.PENDING
-  }));
-
-  contract.parties = [...contract.parties, ...newParties];
-  contract.previousStatus = contract.status;
-  contract.status = stateMachineService.SIGN_STATUSES.IN_SIGNING;
-  contract.currentVersion += 1;
-  contract.lastOperationId = auditService.generateOperationId();
-
-  await contract.save();
-
-  await versionService.createVersion(contract, operator.id, true, '补签前自动冻结');
-
-  await auditService.logSupplementSign(contract, operator, requestId);
-
-  return contract;
 }
 
 async function getContract(contractId) {

@@ -47,7 +47,7 @@ async function getContractFullHistory(contractId) {
     });
   });
 
-  events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp);
+  events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   return {
     contract,
