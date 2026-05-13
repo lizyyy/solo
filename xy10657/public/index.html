@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场馆课程候补换课管理系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 30px; color: #2c3e50; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 20px; background: #fff; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+        .tab.active { background: #3498db; color: #fff; border-color: #3498db; }
+        .tab:hover:not(.active) { background: #e8f4fc; }
+        .panel { display: none; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .panel.active { display: block; }
+        .section { margin-bottom: 25px; }
+        .section-title { font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        tr:hover { background: #f8f9fa; }
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 5px; }
+        .btn-primary { background: #3498db; color: #fff; }
+        .btn-success { background: #27ae60; color: #fff; }
+        .btn-warning { background: #f39c12; color: #fff; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn:hover { opacity: 0.9; }
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-waiting { background: #fff3cd; color: #856404; }
+        .status-advanced { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .status-completed { background: #d1ecf1; color: #0c5460; }
+        .status-scheduled { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #495057; }
+        input, select, textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #3498db; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #e9ecef; }
+        .timeline-item { position: relative; padding-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -24px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #3498db; border: 2px solid #fff; box-shadow: 0 0 0 2px #3498db; }
+        .timeline-time { font-size: 12px; color: #6c757d; margin-bottom: 5px; }
+        .timeline-action { font-weight: 600; color: #2c3e50; margin-bottom: 3px; }
+        .timeline-operator { font-size: 13px; color: #495057; }
+        .timeline-reason { font-size: 13px; color: #6c757d; margin-top: 5px; }
+        .timeline-details { font-size: 12px; color: #868e96; margin-top: 3px; background: #f8f9fa; padding: 8px; border-radius: 4px; }
+        .diff-container { background: #fff; border: 1px solid #e9ecef; border-radius: 4px; padding: 10px; margin-top: 8px; font-size: 12px; }
+        .diff-title { font-weight: 600; margin-bottom: 5px; color: #495057; }
+        .diff-before { color: #e74c3c; }
+        .diff-after { color: #27ae60; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #fff; border-radius: 8px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #6c757d; }
+        .action-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .search-box { display: flex; gap: 10px; align-items: center; }
+        .search-box input { flex: 1; }
+        .import-area { border: 2px dashed #ddd; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .import-area:hover { border-color: #3498db; background: #f8f9fa; }
+        .import-area.dragover { border-color: #3498db; background: #e8f4fc; }
+        .preview-table { margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 20px; border-radius: 8px; }
+        .stat-card:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stat-card:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .stat-card:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .stat-value { font-size: 32px; font-weight: 700; }
+        .stat-label { font-size: 14px; opacity: 0.9; }
+        .priority-vip { color: #e74c3c; font-weight: 600; }
+        .priority-normal { color: #6c757d; }
+        .filter-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .filter-group select, .filter-group input { width: auto; min-width: 150px; }
+        .message { padding: 10px 15px; border-radius: 4px; margin-bottom: 15px; display: none; }
+        .message.success { background: #d4edda; color: #155724; display: block; }
+        .message.error { background: #f8d7da; color: #721c24; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ 场馆课程候补换课管理系统</h1>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="tabs">
+            <div class="tab active" data-panel="dashboard">仪表盘</div>
+            <div class="tab" data-panel="waitlist">候补队列</div>
+            <div class="tab" data-panel="schedules">课程排期</div>
+            <div class="tab" data-panel="packages">会员课包</div>
+            <div class="tab" data-panel="balance">消课余额</div>
+            <div class="tab" data-panel="coach-leaves">教练请假</div>
+            <div class="tab" data-panel="history">调课历史</div>
+            <div class="tab" data-panel="import">批量导入</div>
+        </div>
+
+        <div id="dashboard" class="panel active">
+            <div class="section-title">系统概览</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-waiting">0</div>
+                    <div class="stat-label">等待候补</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-schedules">0</div>
+                    <div class="stat-label">课程排期</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-members">0</div>
+                    <div class="stat-label">会员课包</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-transfers">0</div>
+                    <div class="stat-label">调课记录</div>
+                </div>
+            </div>
+            <div class="section-title">最近候补记录</div>
+            <table id="recent-waitlist">
+                <thead>
+                    <tr>
+                        <th>会员</th>
+                        <th>课程</th>
+                        <th>日期时间</th>
+                        <th>位置</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="waitlist" class="panel">
+            <div class="section-title">候补队列管理</div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="showAddWaitlistModal()">+ 添加候补</button>
+                <div class="filter-group">
+                    <select id="filter-schedule" onchange="loadWaitlist()">
+                        <option value="">全部课程</option>
+                    </select>
+                    <select id="filter-status" onchange="loadWaitlist()">
+                        <option value="">全部状态</option>
+                        <option value="waiting">等待中</option>
+                        <option value="advanced">已推进</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>会员姓名</th>
+                        <th>会员电话</th>
+                        <th>课程名称</th>
+                        <th>课程日期</th>
+                        <th>课程时间</th>
+                        <th>队列位置</th>
+                        <th>优先级</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="waitlist-body"></tbody>
+            </table>
+        </div>
+
+        <div id="schedules" class="panel">
+            <div class="section-title">课程排期</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>课程名称</th>
+                        <th>教练</th>
+                        <th>日期</th>
+                        <th>时间</th>
+                        <th>容量</th>
+                        <th>已报名</th>
+                        <th>候补人数</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="schedules-body"></tbody>
+            </table>
+        </div>
+
+        <div id="packages" class="panel">
+            <div class="section-title">会员课包</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>会员姓名</th>
+                        <th>会员电话</th>
+                        <th>课包名称</th>
+                        <th>总次数</th>
+                        <th>已使用</th>
+                        <th>有效期</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody id="packages-body"></tbody>
+            </table>
+        </div>
+
+        <div id="balance" class="panel">
+            <div class="section-title">消课余额管理</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>会员姓名</th>
+                        <th>总次数</th>
+                        <th>已使用</th>
+                        <th>剩余次数</th>
+                        <th>最后消费</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="balance-body"></tbody>
+            </table>
+        </div>
+
+        <div id="coach-leaves" class="panel">
+            <div class="section-title">教练请假管理</div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="showAddLeaveModal()">+ 添加请假</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>教练姓名</th>
+                        <th>请假日期</th>
+                        <th>原因</th>
+                        <th>状态</th>
+                        <th>处理人</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id="leaves-body"></tbody>
+            </table>
+        </div>
+
+        <div id="history" class="panel">
+            <div class="section-title">调课历史记录</div>
+            <div class="action-bar">
+                <div class="filter-group">
+                    <select id="filter-handler" onchange="loadTransferHistory()">
+                        <option value="">全部处理人</option>
+                    </select>
+                    <input type="date" id="filter-start-date" placeholder="开始日期" onchange="loadTransferHistory()">
+                    <input type="date" id="filter-end-date" placeholder="结束日期" onchange="loadTransferHistory()">
+                </div>
+                <button class="btn btn-success" onclick="exportHistory()">导出 CSV</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>会员姓名</th>
+                        <th>原课程</th>
+                        <th>新课程</th>
+                        <th>状态</th>
+                        <th>原因</th>
+                        <th>处理人</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body"></tbody>
+            </table>
+        </div>
+
+        <div id="import" class="panel">
+            <div class="section-title">批量导入</div>
+            <div class="form-group">
+                <label>选择导入类型</label>
+                <select id="import-type">
+                    <option value="memberPackages">会员课包</option>
+                    <option value="courseSchedules">课程排期</option>
+                </select>
+            </div>
+            <div class="import-area" id="import-area" onclick="document.getElementById('import-file').click()">
+                <p>点击或拖拽文件到此处上传</p>
+                <p style="font-size: 12px; color: #6c757d; margin-top: 10px;">支持 JSON 格式</p>
+                <input type="file" id="import-file" accept=".json" style="display: none" onchange="handleFileSelect(event)">
+            </div>
+            <div id="import-preview" class="preview-table" style="display: none;">
+                <h4 style="margin-bottom: 10px;">数据预览</h4>
+                <table id="preview-table"></table>
+                <button class="btn btn-success" style="margin-top: 15px;" onclick="confirmImport()">确认导入</button>
+            </div>
+            <div id="import-result" style="display: none; margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div id="waitlist-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">添加候补</div>
+                <button class="modal-close" onclick="closeModal('waitlist-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择会员</label>
+                <select id="waitlist-member"></select>
+            </div>
+            <div class="form-group">
+                <label>选择课程</label>
+                <select id="waitlist-schedule"></select>
+            </div>
+            <div class="form-group">
+                <label>优先级</label>
+                <select id="waitlist-priority">
+                    <option value="normal">普通</option>
+                    <option value="vip">VIP</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="waitlist-operator" value="管理员">
+            </div>
+            <button class="btn btn-primary" onclick="submitWaitlist()">提交</button>
+        </div>
+    </div>
+
+    <div id="timeline-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">状态时间线</div>
+                <button class="modal-close" onclick="closeModal('timeline-modal')">&times;</button>
+            </div>
+            <div id="timeline-content" class="timeline"></div>
+        </div>
+    </div>
+
+    <div id="correct-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">修正状态</div>
+                <button class="modal-close" onclick="closeModal('correct-modal')">&times;</button>
+            </div>
+            <input type="hidden" id="correct-id">
+            <div class="form-group">
+                <label>新状态</label>
+                <select id="correct-status">
+                    <option value="waiting">等待中</option>
+                    <option value="advanced">已推进</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>新位置（留空保持不变）</label>
+                <input type="number" id="correct-position" min="1">
+            </div>
+            <div class="form-group">
+                <label>修正原因</label>
+                <input type="text" id="correct-reason" placeholder="请输入修正原因">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="correct-operator" value="管理员">
+            </div>
+            <button class="btn btn-warning" onclick="submitCorrect()">提交修正</button>
+        </div>
+    </div>
+
+    <div id="advance-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">推进候补</div>
+                <button class="modal-close" onclick="closeModal('advance-modal')">&times;</button>
+            </div>
+            <input type="hidden" id="advance-id">
+            <div id="advance-info"></div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>推进原因</label>
+                <input type="text" id="advance-reason" value="课程有空位">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="advance-operator" value="系统">
+            </div>
+            <button class="btn btn-success" onclick="submitAdvance()">确认推进</button>
+        </div>
+    </div>
+
+    <div id="adjust-balance-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">调整消课余额</div>
+                <button class="modal-close" onclick="closeModal('adjust-balance-modal')">&times;</button>
+            </div>
+            <input type="hidden" id="adjust-balance-id">
+            <div id="adjust-balance-info"></div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>调整次数（正数增加剩余，负数减少）</label>
+                <input type="number" id="adjustment-value" value="1">
+            </div>
+            <div class="form-group">
+                <label>调整原因</label>
+                <input type="text" id="adjust-reason" placeholder="请输入调整原因">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="adjust-operator" value="管理员">
+            </div>
+            <button class="btn btn-warning" onclick="submitBalanceAdjust()">提交调整</button>
+        </div>
+    </div>
+
+    <div id="add-leave-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">添加教练请假</div>
+                <button class="modal-close" onclick="closeModal('add-leave-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择教练</label>
+                <select id="leave-coach">
+                    <option value="coach_001">张教练</option>
+                    <option value="coach_002">李教练</option>
+                    <option value="coach_003">王教练</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>请假日期</label>
+                <input type="date" id="leave-date">
+            </div>
+            <div class="form-group">
+                <label>请假原因</label>
+                <input type="text" id="leave-reason" placeholder="请输入请假原因">
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="leave-operator" value="管理员">
+            </div>
+            <button class="btn btn-primary" onclick="submitLeave()">提交</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        let importData = [];
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.panel).classList.add('active');
+                
+                switch(tab.dataset.panel) {
+                    case 'dashboard': loadDashboard(); break;
+                    case 'waitlist': loadWaitlist(); break;
+                    case 'schedules': loadSchedules(); break;
+                    case 'packages': loadPackages(); break;
+                    case 'balance': loadBalance(); break;
+                    case 'coach-leaves': loadLeaves(); break;
+                    case 'history': loadTransferHistory(); break;
+                }
+            });
+        });
+
+        function showMessage(text, type = 'success') {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            setTimeout(() => msg.className = 'message', 3000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function loadDashboard() {
+            const [waitlist, schedules, packages, transfers] = await Promise.all([
+                fetch(`${API_BASE}/waitlist`).then(r => r.json()),
+                fetch(`${API_BASE}/course-schedules`).then(r => r.json()),
+                fetch(`${API_BASE}/member-packages`).then(r => r.json()),
+                fetch(`${API_BASE}/transfer-history`).then(r => r.json())
+            ]);
+
+            document.getElementById('stat-waiting').textContent = waitlist.data.filter(w => w.status === 'waiting').length;
+            document.getElementById('stat-schedules').textContent = schedules.data.length;
+            document.getElementById('stat-members').textContent = packages.data.length;
+            document.getElementById('stat-transfers').textContent = transfers.data.length;
+
+            const tbody = document.querySelector('#recent-waitlist tbody');
+            tbody.innerHTML = waitlist.data.slice(0, 5).map(w => `
+                <tr>
+                    <td>${w.memberName}</td>
+                    <td>${w.courseName}</td>
+                    <td>${w.courseDate} ${w.courseTime}</td>
+                    <td>${w.position}</td>
+                    <td><span class="status-badge status-${w.status}">${w.status === 'waiting' ? '等待中' : w.status === 'advanced' ? '已推进' : '已取消'}</span></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="showTimeline('${w.id}')">时间线</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadWaitlist() {
+            const scheduleId = document.getElementById('filter-schedule').value;
+            const status = document.getElementById('filter-status').value;
+            
+            const [waitlist, schedules] = await Promise.all([
+                fetch(`${API_BASE}/waitlist?scheduleId=${scheduleId}&status=${status}`).then(r => r.json()),
+                fetch(`${API_BASE}/course-schedules`).then(r => r.json())
+            ]);
+
+            const filterSchedule = document.getElementById('filter-schedule');
+            const currentValue = filterSchedule.value;
+            filterSchedule.innerHTML = '<option value="">全部课程</option>' + 
+                schedules.data.map(s => `<option value="${s.id}">${s.courseName} (${s.date})</option>`).join('');
+            filterSchedule.value = currentValue;
+
+            const tbody = document.getElementById('waitlist-body');
+            tbody.innerHTML = waitlist.data.map(w => `
+                <tr>
+                    <td>${w.memberName}</td>
+                    <td>${w.memberPhone}</td>
+                    <td>${w.courseName}</td>
+                    <td>${w.courseDate}</td>
+                    <td>${w.courseTime}</td>
+                    <td>${w.position}</td>
+                    <td class="priority-${w.priority}">${w.priority === 'vip' ? 'VIP' : '普通'}</td>
+                    <td><span class="status-badge status-${w.status}">${w.status === 'waiting' ? '等待中' : w.status === 'advanced' ? '已推进' : '已取消'}</span></td>
+                    <td>${new Date(w.createdAt).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="showAdvance('${w.id}')" ${w.status !== 'waiting' ? 'disabled' : ''}>推进</button>
+                        <button class="btn btn-warning" onclick="showCorrect('${w.id}')">修正</button>
+                        <button class="btn btn-primary" onclick="showTimeline('${w.id}')">时间线</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadSchedules() {
+            const [schedules, waitlist] = await Promise.all([
+                fetch(`${API_BASE}/course-schedules`).then(r => r.json()),
+                fetch(`${API_BASE}/waitlist`).then(r => r.json())
+            ]);
+
+            const tbody = document.getElementById('schedules-body');
+            tbody.innerHTML = schedules.data.map(s => {
+                const waitCount = waitlist.data.filter(w => w.scheduleId === s.id && w.status === 'waiting').length;
+                return `
+                <tr>
+                    <td>${s.courseName}</td>
+                    <td>${s.coachName}</td>
+                    <td>${s.date}</td>
+                    <td>${s.startTime} - ${s.endTime}</td>
+                    <td>${s.capacity}</td>
+                    <td>${s.enrolledCount}</td>
+                    <td>${waitCount}</td>
+                    <td><span class="status-badge status-${s.status}">${s.status === 'scheduled' ? '已排期' : '已取消'}</span></td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadPackages() {
+            const res = await fetch(`${API_BASE}/member-packages`);
+            const data = await res.json();
+            const tbody = document.getElementById('packages-body');
+            tbody.innerHTML = data.data.map(p => `
+                <tr>
+                    <td>${p.memberName}</td>
+                    <td>${p.memberPhone}</td>
+                    <td>${p.packageName}</td>
+                    <td>${p.totalCount}</td>
+                    <td>${p.usedCount}</td>
+                    <td>${p.validFrom} 至 ${p.validTo}</td>
+                    <td><span class="status-badge status-${p.status}">${p.status === 'active' ? '有效' : '无效'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadBalance() {
+            const res = await fetch(`${API_BASE}/consumption-balance`);
+            const data = await res.json();
+            const tbody = document.getElementById('balance-body');
+            tbody.innerHTML = data.data.map(b => `
+                <tr>
+                    <td>${b.memberName}</td>
+                    <td>${b.totalCount}</td>
+                    <td>${b.usedCount}</td>
+                    <td style="font-weight: 600; color: ${b.remainingCount > 5 ? '#27ae60' : b.remainingCount > 0 ? '#f39c12' : '#e74c3c'}">${b.remainingCount}</td>
+                    <td>${new Date(b.lastConsumption).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="showAdjustBalance('${b.id}')">调整</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadLeaves() {
+            const res = await fetch(`${API_BASE}/coach-leaves`);
+            const data = await res.json();
+            const tbody = document.getElementById('leaves-body');
+            tbody.innerHTML = data.data.map(l => `
+                <tr>
+                    <td>${l.coachName}</td>
+                    <td>${l.leaveDate}</td>
+                    <td>${l.reason}</td>
+                    <td><span class="status-badge status-${l.status}">${l.status === 'approved' ? '已批准' : '待处理'}</span></td>
+                    <td>${l.handledBy}</td>
+                    <td>${new Date(l.createdAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadTransferHistory() {
+            const handledBy = document.getElementById('filter-handler').value;
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+
+            const res = await fetch(`${API_BASE}/transfer-history?handledBy=${handledBy}&startDate=${startDate}&endDate=${endDate}`);
+            const data = await res.json();
+
+            const handlers = [...new Set(data.data.map(t => t.handledBy))];
+            const filterHandler = document.getElementById('filter-handler');
+            const currentValue = filterHandler.value;
+            filterHandler.innerHTML = '<option value="">全部处理人</option>' + 
+                handlers.map(h => `<option value="${h}">${h}</option>`).join('');
+            filterHandler.value = currentValue;
+
+            const tbody = document.getElementById('history-body');
+            tbody.innerHTML = data.data.map(t => `
+                <tr>
+                    <td>${t.type === 'waitlist_to_enrolled' ? '候补转正' : '主动调课'}</td>
+                    <td>${t.memberName}</td>
+                    <td>${t.fromCourseName || '-'}</td>
+                    <td>${t.toCourseName}</td>
+                    <td><span class="status-badge status-${t.status}">${t.status === 'completed' ? '已完成' : '处理中'}</span></td>
+                    <td>${t.reason}</td>
+                    <td>${t.handledBy}</td>
+                    <td>${new Date(t.createdAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function showAddWaitlistModal() {
+            const [packages, schedules] = await Promise.all([
+                fetch(`${API_BASE}/member-packages`).then(r => r.json()),
+                fetch(`${API_BASE}/course-schedules`).then(r => r.json())
+            ]);
+
+            document.getElementById('waitlist-member').innerHTML = 
+                packages.data.map(p => `<option value="${p.memberId}">${p.memberName} (${p.memberPhone})</option>`).join('');
+            
+            document.getElementById('waitlist-schedule').innerHTML = 
+                schedules.data.filter(s => s.status === 'scheduled').map(s => `<option value="${s.id}">${s.courseName} - ${s.date} ${s.startTime}</option>`).join('');
+
+            document.getElementById('waitlist-modal').classList.add('active');
+        }
+
+        async function submitWaitlist() {
+            const memberId = document.getElementById('waitlist-member').value;
+            const scheduleId = document.getElementById('waitlist-schedule').value;
+            const priority = document.getElementById('waitlist-priority').value;
+            const operator = document.getElementById('waitlist-operator').value;
+
+            const res = await fetch(`${API_BASE}/waitlist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ memberId, scheduleId, priority, operator })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showMessage('添加候补成功');
+                closeModal('waitlist-modal');
+                loadWaitlist();
+                loadDashboard();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        async function showTimeline(id) {
+            const res = await fetch(`${API_BASE}/waitlist/${id}/timeline`);
+            const result = await res.json();
+            
+            if (result.success) {
+                const timeline = result.data.timeline;
+                const content = document.getElementById('timeline-content');
+                content.innerHTML = timeline.map(t => `
+                    <div class="timeline-item">
+                        <div class="timeline-time">${new Date(t.time).toLocaleString()}</div>
+                        <div class="timeline-action">${t.action}</div>
+                        <div class="timeline-operator">操作人：${t.operator}</div>
+                        ${t.reason ? `<div class="timeline-reason">原因：${t.reason}</div>` : ''}
+                        ${t.details ? `<div class="timeline-details">${t.details}</div>` : ''}
+                        ${t.hasDiff ? `
+                            <div class="diff-container">
+                                <div class="diff-title">变更对比：</div>
+                                <div class="diff-before">修改前：${JSON.stringify(t.before, null, 2)}</div>
+                                <div class="diff-after">修改后：${JSON.stringify(t.after, null, 2)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+                
+                document.getElementById('timeline-modal').classList.add('active');
+            }
+        }
+
+        function showCorrect(id) {
+            document.getElementById('correct-id').value = id;
+            document.getElementById('correct-modal').classList.add('active');
+        }
+
+        async function submitCorrect() {
+            const id = document.getElementById('correct-id').value;
+            const newStatus = document.getElementById('correct-status').value;
+            const newPosition = document.getElementById('correct-position').value;
+            const reason = document.getElementById('correct-reason').value;
+            const operator = document.getElementById('correct-operator').value;
+
+            const res = await fetch(`${API_BASE}/waitlist/${id}/correct`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    newStatus, 
+                    newPosition: newPosition ? parseInt(newPosition) : undefined,
+                    reason, 
+                    operator 
+                })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showMessage('状态修正成功');
+                closeModal('correct-modal');
+                loadWaitlist();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        async function showAdvance(id) {
+            document.getElementById('advance-id').value = id;
+            
+            const res = await fetch(`${API_BASE}/waitlist`);
+            const data = await res.json();
+            const item = data.data.find(w => w.id === id);
+            
+            document.getElementById('advance-info').innerHTML = `
+                <p><strong>会员：</strong>${item.memberName}</p>
+                <p><strong>课程：</strong>${item.courseName} (${item.courseDate} ${item.courseTime})</p>
+                <p><strong>当前位置：</strong>${item.position}</p>
+            `;
+            
+            document.getElementById('advance-modal').classList.add('active');
+        }
+
+        async function submitAdvance() {
+            const id = document.getElementById('advance-id').value;
+            const reason = document.getElementById('advance-reason').value;
+            const operator = document.getElementById('advance-operator').value;
+
+            const res = await fetch(`${API_BASE}/waitlist/${id}/advance`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason, operator })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showMessage('候补推进成功，会员已转为正式报名');
+                closeModal('advance-modal');
+                loadWaitlist();
+                loadDashboard();
+                loadSchedules();
+                loadBalance();
+                loadTransferHistory();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        async function showAdjustBalance(id) {
+            document.getElementById('adjust-balance-id').value = id;
+            
+            const res = await fetch(`${API_BASE}/consumption-balance`);
+            const data = await res.json();
+            const item = data.data.find(b => b.id === id);
+            
+            document.getElementById('adjust-balance-info').innerHTML = `
+                <p><strong>会员：</strong>${item.memberName}</p>
+                <p><strong>当前剩余次数：</strong>${item.remainingCount}</p>
+            `;
+            
+            document.getElementById('adjust-balance-modal').classList.add('active');
+        }
+
+        async function submitBalanceAdjust() {
+            const id = document.getElementById('adjust-balance-id').value;
+            const adjustment = parseInt(document.getElementById('adjustment-value').value);
+            const reason = document.getElementById('adjust-reason').value;
+            const operator = document.getElementById('adjust-operator').value;
+
+            const res = await fetch(`${API_BASE}/consumption-balance/${id}/adjust`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adjustment, reason, operator })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showMessage('余额调整成功');
+                closeModal('adjust-balance-modal');
+                loadBalance();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        function showAddLeaveModal() {
+            document.getElementById('leave-date').valueAsDate = new Date();
+            document.getElementById('add-leave-modal').classList.add('active');
+        }
+
+        async function submitLeave() {
+            const coachId = document.getElementById('leave-coach').value;
+            const leaveDate = document.getElementById('leave-date').value;
+            const reason = document.getElementById('leave-reason').value;
+            const operator = document.getElementById('leave-operator').value;
+
+            const res = await fetch(`${API_BASE}/coach-leaves`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ coachId, leaveDate, reason, operator })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                showMessage(`请假记录添加成功，影响 ${result.affectedSchedules} 个课程排期`);
+                closeModal('add-leave-modal');
+                loadLeaves();
+                loadWaitlist();
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        function exportHistory() {
+            const handledBy = document.getElementById('filter-handler').value;
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+
+            window.open(`${API_BASE}/export/transfer-history?format=csv&handledBy=${handledBy}&startDate=${startDate}&endDate=${endDate}`);
+        }
+
+        const importArea = document.getElementById('import-area');
+        
+        importArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            importArea.classList.add('dragover');
+        });
+
+        importArea.addEventListener('dragleave', () => {
+            importArea.classList.remove('dragover');
+        });
+
+        importArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            importArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) handleFile(file);
+        }
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    importData = JSON.parse(e.target.result);
+                    previewImportData();
+                } catch (err) {
+                    showMessage('JSON 格式解析错误', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function previewImportData() {
+            if (!importData.length) {
+                showMessage('没有可导入的数据', 'error');
+                return;
+            }
+
+            const previewDiv = document.getElementById('import-preview');
+            const table = document.getElementById('preview-table');
+            
+            const keys = Object.keys(importData[0]);
+            let html = '<thead><tr>' + keys.map(k => `<th>${k}</th>`).join('') + '</tr></thead>';
+            html += '<tbody>' + importData.slice(0, 10).map(row => 
+                '<tr>' + keys.map(k => `<td>${row[k] || '-'}</td>`).join('') + '</tr>'
+            ).join('') + '</tbody>';
+            
+            table.innerHTML = html;
+            previewDiv.style.display = 'block';
+            
+            if (importData.length > 10) {
+                table.insertAdjacentHTML('afterend', `<p style="margin-top: 10px; color: #6c757d; font-size: 12px;">仅显示前 10 条，共 ${importData.length} 条数据</p>`);
+            }
+        }
+
+        async function confirmImport() {
+            const entityType = document.getElementById('import-type').value;
+            
+            const res = await fetch(`${API_BASE}/batch-import`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ entityType, data: importData, operator: '管理员' })
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById('import-result').style.display = 'block';
+                document.getElementById('import-result').innerHTML = `
+                    <div style="padding: 15px; background: #d4edda; border-radius: 4px; color: #155724;">
+                        <strong>导入完成！</strong><br>
+                        成功：${result.results.success} 条<br>
+                        失败：${result.results.failed} 条
+                        ${result.results.errors.length ? '<br>错误信息：' + result.results.errors.join(', ') : ''}
+                    </div>
+                `;
+                showMessage('批量导入完成');
+                loadDashboard();
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>
