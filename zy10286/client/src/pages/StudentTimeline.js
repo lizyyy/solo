@@ -25,7 +25,7 @@ function StudentTimeline() {
       const studentData = await studentRes.json();
       setStudent(studentData);
 
-      const eventsRes = await fetch(`/api/events?entity_id=${id}`);
+      const eventsRes = await fetch(`/api/events?student_id=${id}`);
       const eventsData = await eventsRes.json();
       setEvents(eventsData);
 
@@ -38,6 +38,9 @@ function StudentTimeline() {
       setLoading(false);
     }
   };
+
+  // 暴露刷新方法给外部调用
+  window.refreshStudentTimeline = fetchStudentDetail;
 
   const getEventIcon = (type) => {
     if (type.includes('enroll') || type.includes('student')) return <TeamOutlined />;
@@ -57,9 +60,12 @@ function StudentTimeline() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/students')}>
           返回学员列表
+        </Button>
+        <Button onClick={fetchStudentDetail}>
+          刷新数据
         </Button>
       </div>
 

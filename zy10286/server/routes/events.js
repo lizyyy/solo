@@ -12,15 +12,20 @@ function allAsync(db, sql, params = []) {
 
 router.get('/', async (req, res) => {
   try {
-    const { entity_type, entity_id, limit = 200 } = req.query;
+    const { entity_type, entity_id, student_id, limit = 200 } = req.query;
     let whereClause = 'WHERE 1=1';
     let params = [];
     
-    if (entity_type) {
+    if (student_id) {
+      whereClause += ` AND (
+        entity_id = ? 
+        OR entity_id IN (SELECT id FROM class_enrollments WHERE student_id = ?)
+      )`;
+      params.push(student_id, student_id);
+    } else if (entity_type) {
       whereClause += ' AND event_type = ?';
       params.push(entity_type);
-    }
-    if (entity_id) {
+    } else if (entity_id) {
       whereClause += ' AND entity_id = ?';
       params.push(entity_id);
     }

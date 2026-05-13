@@ -15,6 +15,8 @@ function Students() {
   const [transferModalVisible, setTransferModalVisible] = useState(false);
   const [refundModalVisible, setRefundModalVisible] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [studentDetail, setStudentDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [form] = Form.useForm();
   const [enrollForm] = Form.useForm();
   const navigate = useNavigate();
@@ -44,6 +46,21 @@ function Students() {
       setClasses(data);
     } catch (error) {
       console.error('获取班级列表失败:', error);
+    }
+  };
+
+  const fetchStudentDetail = async (studentId) => {
+    setDetailLoading(true);
+    try {
+      const response = await fetch(`/api/students/${studentId}`);
+      const data = await response.json();
+      setStudentDetail(data);
+      return data;
+    } catch (error) {
+      message.error('获取学员详情失败');
+      return null;
+    } finally {
+      setDetailLoading(false);
     }
   };
 
@@ -97,9 +114,14 @@ function Students() {
     }
   };
 
-  const handleTransfer = (student) => {
+  const handleTransfer = async (student) => {
     setSelectedStudent(student);
-    setTransferModalVisible(true);
+    const detail = await fetchStudentDetail(student.id);
+    if (detail && detail.enrollments && detail.enrollments.filter(e => e.status === 'active').length > 0) {
+      setTransferModalVisible(true);
+    } else if (detail) {
+      message.warning('该学员没有活跃的报名记录，无法转班');
+    }
   };
 
   const handleTransferSubmit = async (values) => {
@@ -113,7 +135,7 @@ function Students() {
         })
       });
       if (response.ok) {
-        message.success('转班成功');
+        message.success('转班成功，权限已迁移');
         setTransferModalVisible(false);
         fetchStudents();
       }
@@ -122,9 +144,14 @@ function Students() {
     }
   };
 
-  const handleRefund = (student) => {
+  const handleRefund = async (student) => {
     setSelectedStudent(student);
-    setRefundModalVisible(true);
+    const detail = await fetchStudentDetail(student.id);
+    if (detail && detail.enrollments && detail.enrollments.filter(e => e.status === 'active').length > 0) {
+      setRefundModalVisible(true);
+    } else if (detail) {
+      message.warning('该学员没有活跃的报名记录，无法退费');
+    }
   };
 
   const handleRefundSubmit = async (values) => {
@@ -135,7 +162,7 @@ function Students() {
         body: JSON.stringify({ operator: '教务管理员' })
       });
       if (response.ok) {
-        message.success('退费成功，权限已回收');
+        message.success('退费成功，该班级所有回放权限已回收');
         setRefundModalVisible(false);
         fetchStudents();
       }
@@ -194,17 +221,9 @@ function Students() {
           <Button size="small" icon={<SwapOutlined />} type="link" onClick={() => handleTransfer(record)}>
             转班
           </Button>
-          <Popconfirm
-            title="确认退费"
-            description="退费后将立即回收该学员的所有回放权限"
-            onConfirm={() => handleRefund(record)}
-            okText="确认"
-            cancelText="取消"
-          >
-            <Button size="small" icon={<DollarOutlined />} type="link" danger>
-              退费
-            </Button>
-          </Popconfirm>
+          <Button size="small" icon={<DollarOutlined />} type="link" danger onClick={() => handleRefund(record)}>
+            退费
+          </Button>
         </Space>
       )
     }
@@ -214,7 +233,7 @@ function Students() {
     <div>
       <div className="page-header">
         <Title level={3} style={{ margin: 0 }}>学员管理</Title>
-        <Text type="secondary">管理学员信息、报名、转班和退费</Text>
+        <Text type="secondary">管理学员信息、报名、转班和退费，亲手推进业务节点并查看历史变化</Text>
       </div>
 
       <div style={{ marginBottom: 16, textAlign: 'right' }}>
@@ -282,15 +301,21 @@ function Students() {
         open={transferModalVisible}
         onCancel={() => setTransferModalVisible(false)}
         footer={null}
+        confirmLoading={detailLoading}
       >
         <Form layout="vertical" onFinish={handleTransferSubmit}>
           <div style={{ marginBottom: 16 }}>
             <Text strong>学员：</Text> {selectedStudent?.name}
           </div>
+          <div style={{ marginBottom: 16, padding: 12, background: '#e6f7ff', borderRadius: 8 }}>
+            <Text type="info">
+              ✨ 转班后将自动回收原班级的所有回放权限，并授予新班级的回放权限，操作历史可在学员详情页查看
+            </Text>
+          </div>
           <Form.Item name="enrollment_id" label="原报名记录" rules={[{ required: true }]}>
             <Select placeholder="选择原报名班级">
-              {selectedStudent?.enrollments?.filter(e => e.status === 'active').map(e => (
-                <Option key={e.id} value={e.id}>{e.class_name}</Option>
+              {studentDetail?.enrollments?.filter(e => e.status === 'active').map(e => (
+                <Option key={e.id} value={e.id}>{e.class_name}（报名时间：{new Date(e.enrollment_date).toLocaleDateString()}）</Option>
               ))}
             </Select>
           </Form.Item>
@@ -315,6 +340,7 @@ function Students() {
         open={refundModalVisible}
         onCancel={() => setRefundModalVisible(false)}
         footer={null}
+        confirmLoading={detailLoading}
       >
         <Form layout="vertical" onFinish={handleRefundSubmit}>
           <div style={{ marginBottom: 16 }}>
@@ -322,13 +348,13 @@ function Students() {
           </div>
           <div style={{ marginBottom: 16, padding: 16, background: '#fff2f0', borderRadius: 8 }}>
             <Text type="danger" strong>
-              ⚠️ 退费后将立即回收该学员对应班级的所有回放权限
+              ⚠️ 退费后将立即回收该学员对应班级的所有回放权限，操作历史可在学员详情页查看
             </Text>
           </div>
           <Form.Item name="enrollment_id" label="选择报名记录" rules={[{ required: true }]}>
             <Select placeholder="选择要退费的班级">
-              {selectedStudent?.enrollments?.filter(e => e.status === 'active').map(e => (
-                <Option key={e.id} value={e.id}>{e.class_name}</Option>
+              {studentDetail?.enrollments?.filter(e => e.status === 'active').map(e => (
+                <Option key={e.id} value={e.id}>{e.class_name}（报名时间：{new Date(e.enrollment_date).toLocaleDateString()}）</Option>
               ))}
             </Select>
           </Form.Item>
