@@ -1,0 +1,35 @@
+const express = require('express');
+const cors = require('cors');
+require('./database');
+const idempotentMiddleware = require('./middleware/idempotent');
+const activitiesRouter = require('./routes/activities');
+const inventoryRouter = require('./routes/inventory');
+const ordersRouter = require('./routes/orders');
+const splitOrdersRouter = require('./routes/splitOrders');
+const refundsRouter = require('./routes/refunds');
+const manualGiftsRouter = require('./routes/manualGifts');
+const recalculationsRouter = require('./routes/recalculations');
+const historyRouter = require('./routes/history');
+const statsRouter = require('./routes/stats');
+const exportRouter = require('./routes/export');
+const app = express();
+const PORT = 3001;
+app.use(cors());
+app.use(express.json());
+app.use(idempotentMiddleware);
+app.use('/api/activities', activitiesRouter);
+app.use('/api/inventory', inventoryRouter);
+app.use('/api/orders', ordersRouter);
+app.use('/api/split-orders', splitOrdersRouter);
+app.use('/api/refunds', refundsRouter);
+app.use('/api/manual-gifts', manualGiftsRouter);
+app.use('/api/recalculations', recalculationsRouter);
+app.use('/api/history', historyRouter);
+app.use('/api/stats', statsRouter);
+app.use('/api/export', exportRouter);
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, message: '服务运行正常' });
+});
+app.listen(PORT, () => {
+  console.log(`电商赠品拆单退款系统后端服务运行在 http://localhost:${PORT}`);
+});
