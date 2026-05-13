@@ -69,7 +69,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { jobsApi, type ImportJob } from './api'
+import { jobsApi, type ImportJob } from '../api'
 
 const router = useRouter()
 const loading = ref(false)

@@ -111,7 +111,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import { UploadFilled } from '@element-plus/icons-vue'
-import { schemasApi, importApi, type ValidationSchema, type ImportJob, type ImportSummary } from './api'
+import { schemasApi, importApi, type ValidationSchema, type ImportJob, type ImportSummary } from '../api'
 
 const router = useRouter()
 const formRef = ref<FormInstance>()

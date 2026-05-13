@@ -210,7 +210,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowLeft, ArrowDown } from '@element-plus/icons-vue'
-import { jobsApi, type ImportJob, type ImportSummary, type RowResult } from './api'
+import { jobsApi, type ImportJob, type ImportSummary, type RowResult } from '../api'
 
 const router = useRouter()
 const route = useRoute()

@@ -4,9 +4,11 @@ import fs from 'fs'
 
 const DB_PATH = process.env.DB_PATH || './data/import-validator.db'
 
-export let db: Database.Database
+export let db: Database.Database | null = null
 
 export function initDatabase() {
+  if (db) return db
+
   const dbDir = path.dirname(DB_PATH)
   if (!fs.existsSync(dbDir)) {
     fs.mkdirSync(dbDir, { recursive: true })
@@ -73,9 +75,9 @@ export function initDatabase() {
   return db
 }
 
-export function getDb() {
+export function getDb(): Database.Database {
   if (!db) {
-    throw new Error('Database not initialized')
+    return initDatabase()
   }
   return db
 }
