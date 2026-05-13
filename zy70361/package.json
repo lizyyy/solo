@@ -1,0 +1,14 @@
+{
+  "name": "readonly-replica-latency-api",
+  "version": "1.0.0",
+  "description": "只读副本延迟模拟 API - 用于测试和演示主从同步延迟场景",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}
