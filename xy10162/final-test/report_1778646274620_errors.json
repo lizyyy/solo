@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "type": "金额合计不一致",
+    "message": "金额不一致: 计算值 904.00 ≠ 申报值 905.00",
+    "field": "totalAmount",
+    "relatedInvoiceId": "fae502cc-3f8e-42cf-b38e-5a582e5e24e9"
+  },
+  {
+    "id": 2,
+    "type": "无效发票号码",
+    "message": "发票号码格式无效: 2024-01-20",
+    "field": "invoiceNumber",
+    "relatedInvoiceId": "fcb4aee7-32b0-4ff3-9601-426118e00057"
+  },
+  {
+    "id": 3,
+    "type": "无效发票代码",
+    "message": "发票代码格式无效: 00012345",
+    "field": "invoiceCode",
+    "relatedInvoiceId": "fcb4aee7-32b0-4ff3-9601-426118e00057"
+  },
+  {
+    "id": 4,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "b916b64e-fdc4-4aed-8d95-9a2a8cac418b"
+  },
+  {
+    "id": 5,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "3e6641d9-d5d7-4abd-8163-dfc3afc35edb"
+  },
+  {
+    "id": 6,
+    "type": "红冲发票无对应原票",
+    "message": "红冲发票 123456789012-00012349: 红冲金额与原票金额不一致: 红冲 1695.00 ≠ 原票 905.00",
+    "field": "",
+    "relatedInvoiceId": "4e90ac2a-f99a-4bc1-804c-f3d87bb99a36"
+  }
+]

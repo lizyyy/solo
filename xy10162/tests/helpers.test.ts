@@ -88,18 +88,38 @@ describe('Helpers', () => {
   });
 
   describe('isRedInvoiceSignaled', () => {
-    it('should detect red invoice by keyword', () => {
+    it('should detect red invoice by status keyword', () => {
       expect(isRedInvoiceSignaled({ status: '红冲' })).toBe(true);
-      expect(isRedInvoiceSignaled({ remark: '红字发票' })).toBe(true);
+      expect(isRedInvoiceSignaled({ '状态': '红冲' })).toBe(true);
+      expect(isRedInvoiceSignaled({ status: 'red' })).toBe(true);
+    });
+
+    it('should detect red invoice by explicit red flag', () => {
+      expect(isRedInvoiceSignaled({ isRedInvoice: true })).toBe(true);
+      expect(isRedInvoiceSignaled({ '是否红冲': '是' })).toBe(true);
+      expect(isRedInvoiceSignaled({ '是否红冲': 'true' })).toBe(true);
+      expect(isRedInvoiceSignaled({ '红冲': 1 })).toBe(true);
     });
 
     it('should detect red invoice by negative amount', () => {
       expect(isRedInvoiceSignaled({ amount: -100 })).toBe(true);
       expect(isRedInvoiceSignaled({ totalAmount: -1000 })).toBe(true);
+      expect(isRedInvoiceSignaled({ '金额': '-2000' })).toBe(true);
     });
 
     it('should return false for normal invoices', () => {
       expect(isRedInvoiceSignaled({ amount: 100, status: '正常' })).toBe(false);
+      expect(isRedInvoiceSignaled({ '金额': 1000, '状态': '正常' })).toBe(false);
+    });
+
+    it('should not detect red by remark mentioning red', () => {
+      expect(isRedInvoiceSignaled({ remark: '红冲票对应的原票', status: '正常', amount: 100 })).toBe(false);
+      expect(isRedInvoiceSignaled({ '备注': '对应红冲发票', '状态': '正常', '金额': 2000 })).toBe(false);
+    });
+
+    it('should respect explicit no flag', () => {
+      expect(isRedInvoiceSignaled({ '是否红冲': '否', '金额': -100 })).toBe(false);
+      expect(isRedInvoiceSignaled({ isRedInvoice: false, amount: -100 })).toBe(false);
     });
   });
 

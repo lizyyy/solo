@@ -103,19 +103,81 @@ export function isValidDate(dateStr: string): boolean {
 }
 
 export function isRedInvoiceSignaled(data: Record<string, any>): boolean {
-  const keywords = ['红冲', '红票', '负数', '红字', 'red', 'negative'];
-  const fieldsToCheck = ['status', 'type', 'remark', 'invoiceType', 'isRedInvoice'];
+  const positiveKeywords = ['红冲', '红票', '负数', '红字', 'red', 'negative'];
   
-  for (const field of fieldsToCheck) {
+  const booleanFields = ['isRedInvoice', '是否红冲', '红冲', '红字'];
+  const statusFields = ['status', '状态'];
+  
+  let hasExplicitNegativeSignal = false;
+  let hasExplicitPositiveSignal = false;
+  let hasNegativeAmount = false;
+  
+  for (const field of booleanFields) {
     const value = data[field];
-    if (typeof value === 'string' && keywords.some(kw => value.toLowerCase().includes(kw.toLowerCase()))) {
-      return true;
+    if (value === undefined || value === null || value === '') continue;
+    
+    if (typeof value === 'boolean') {
+      if (value) {
+        hasExplicitNegativeSignal = true;
+      } else {
+        hasExplicitPositiveSignal = true;
+      }
+    } else if (typeof value === 'number') {
+      if (value === 1) {
+        hasExplicitNegativeSignal = true;
+      } else if (value === 0) {
+        hasExplicitPositiveSignal = true;
+      }
+    } else if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (normalized === '否' || normalized === 'false' || normalized === 'no' || normalized === 'n' || normalized === '0') {
+        hasExplicitPositiveSignal = true;
+      }
+      if (normalized === '是' || normalized === 'true' || normalized === 'yes' || normalized === 'y' || normalized === '1') {
+        hasExplicitNegativeSignal = true;
+      }
+      if (positiveKeywords.some(kw => normalized.includes(kw.toLowerCase()))) {
+        hasExplicitNegativeSignal = true;
+      }
     }
   }
   
-  const amount = sanitizeNumber(data.amount);
-  const totalAmount = sanitizeNumber(data.totalAmount);
-  return isNegativeAmount(amount) || isNegativeAmount(totalAmount);
+  if (hasExplicitPositiveSignal && !hasExplicitNegativeSignal) {
+    return false;
+  }
+  
+  const amountFields = [
+    'amount', 'totalAmount', '金额', '价税合计', '合计', '总额', 'total'
+  ];
+  
+  for (const field of amountFields) {
+    const value = data[field];
+    if (value !== undefined && value !== null) {
+      const num = sanitizeNumber(value);
+      if (isNegativeAmount(num)) {
+        hasNegativeAmount = true;
+        break;
+      }
+    }
+  }
+  
+  if (hasNegativeAmount || hasExplicitNegativeSignal) {
+    return true;
+  }
+  
+  for (const field of statusFields) {
+    const value = data[field];
+    if (value === undefined || value === null || value === '') continue;
+    
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (positiveKeywords.some(kw => normalized.includes(kw.toLowerCase()))) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
 }
 
 export function createInvoiceKey(invoiceCode: string, invoiceNumber: string): string {

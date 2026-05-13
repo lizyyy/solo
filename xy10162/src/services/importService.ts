@@ -78,6 +78,14 @@ function transformRawToInvoice(raw: RawInvoiceData, batchId: string): Invoice {
     invoice.remark = remark;
   }
 
+  const requiredErrors = validateRequiredFields(invoice);
+  for (const error of requiredErrors) {
+    invoice.validationErrors?.push({
+      type: 'MISSING_REQUIRED_FIELD',
+      message: error
+    });
+  }
+
   return invoice;
 }
 
@@ -176,16 +184,16 @@ async function processImportResults(
 
     try {
       const invoice = transformRawToInvoice(raw, batchId);
-      const validationErrors = validateRequiredFields(invoice);
       
-      if (validationErrors.length > 0) {
+      invoices.push(invoice);
+      
+      const hasRequiredErrors = invoice.validationErrors?.filter(e => e.type === 'MISSING_REQUIRED_FIELD') || [];
+      if (hasRequiredErrors.length > 0) {
         failedRecords.push({
           lineNumber,
           rawData: raw,
-          error: validationErrors.join('; ')
+          error: hasRequiredErrors.map(e => e.message).join('; ')
         });
-      } else {
-        invoices.push(invoice);
       }
     } catch (error) {
       failedRecords.push({

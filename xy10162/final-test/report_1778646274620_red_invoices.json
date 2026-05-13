@@ -1,0 +1,26 @@
+[
+  {
+    "isValid": "有效",
+    "reason": "",
+    "redInvoiceCode": "123456789012",
+    "redInvoiceNumber": "00012348",
+    "redInvoiceDate": "2024-01-17",
+    "redAmount": -2260,
+    "originalInvoiceCode": "123456789012",
+    "originalInvoiceNumber": "00012347",
+    "originalInvoiceDate": "2024-01-17",
+    "originalAmount": 2260
+  },
+  {
+    "isValid": "无效",
+    "reason": "红冲金额与原票金额不一致: 红冲 1695.00 ≠ 原票 905.00",
+    "redInvoiceCode": "123456789012",
+    "redInvoiceNumber": "00012349",
+    "redInvoiceDate": "2024-01-18",
+    "redAmount": -1695,
+    "originalInvoiceCode": "123456789012",
+    "originalInvoiceNumber": "00012350",
+    "originalInvoiceDate": "2024-01-18",
+    "originalAmount": 905
+  }
+]

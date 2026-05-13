@@ -1,0 +1,247 @@
+{
+  "summary": {
+    "totalInvoices": 9,
+    "validInvoices": 4,
+    "invalidInvoices": 5,
+    "duplicateGroups": 1,
+    "redInvoiceRelations": 2,
+    "validRedInvoices": 1,
+    "invalidRedInvoices": 1,
+    "errors": 6,
+    "processingTime": "0ms"
+  },
+  "invoices": [
+    {
+      "id": "b916b64e-fdc4-4aed-8d95-9a2a8cac418b",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012345",
+      "invoiceDate": "2024-01-15",
+      "amount": 1000,
+      "taxAmount": 130,
+      "totalAmount": 1130,
+      "sellerName": "北京科技有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税专用发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "正常发票示例1",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": true,
+      "errorCount": 1,
+      "errors": [
+        {
+          "type": "重复发票",
+          "message": "发现重复发票，组内共 2 张"
+        }
+      ]
+    },
+    {
+      "id": "a21e781e-ce3e-4e89-b407-5dbbb6084a52",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012346",
+      "invoiceDate": "2024-01-16",
+      "amount": 500,
+      "taxAmount": 65,
+      "totalAmount": 565,
+      "sellerName": "深圳电子有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税普通发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "正常发票示例2",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": false,
+      "errorCount": 0,
+      "errors": []
+    },
+    {
+      "id": "3e6641d9-d5d7-4abd-8163-dfc3afc35edb",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012345",
+      "invoiceDate": "2024-01-15",
+      "amount": 1000,
+      "taxAmount": 130,
+      "totalAmount": 1130,
+      "sellerName": "北京科技有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税专用发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "重复发票-与第1条相同",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": true,
+      "errorCount": 1,
+      "errors": [
+        {
+          "type": "重复发票",
+          "message": "发现重复发票，组内共 2 张"
+        }
+      ]
+    },
+    {
+      "id": "4c1e9d1a-eebc-4663-b7aa-eb82f087c4fc",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012347",
+      "invoiceDate": "2024-01-17",
+      "amount": 2000,
+      "taxAmount": 260,
+      "totalAmount": 2260,
+      "sellerName": "广州服务有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税专用发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "红冲票对应的原票",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": false,
+      "errorCount": 0,
+      "errors": []
+    },
+    {
+      "id": "3e1071ef-8d92-46f2-be88-f5cfc0dc60d2",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012348",
+      "invoiceDate": "2024-01-17",
+      "amount": -2000,
+      "taxAmount": -260,
+      "totalAmount": -2260,
+      "sellerName": "广州服务有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税专用发票",
+      "status": "红冲",
+      "isRedInvoice": true,
+      "originalInvoiceNumber": "00012347",
+      "originalInvoiceCode": "123456789012",
+      "remark": "有效的红冲发票-金额匹配",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": false,
+      "errorCount": 0,
+      "errors": []
+    },
+    {
+      "id": "4e90ac2a-f99a-4bc1-804c-f3d87bb99a36",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012349",
+      "invoiceDate": "2024-01-18",
+      "amount": -1500,
+      "taxAmount": -195,
+      "totalAmount": -1695,
+      "sellerName": "杭州制造有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "增值税专用发票",
+      "status": "红冲",
+      "isRedInvoice": true,
+      "originalInvoiceNumber": "00012350",
+      "originalInvoiceCode": "123456789012",
+      "remark": "无效红冲发票-原票不存在",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": true,
+      "errorCount": 1,
+      "errors": [
+        {
+          "type": "红冲发票无对应原票",
+          "message": "红冲金额与原票金额不一致: 红冲 1695.00 ≠ 原票 905.00"
+        }
+      ]
+    },
+    {
+      "id": "fae502cc-3f8e-42cf-b38e-5a582e5e24e9",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012350",
+      "invoiceDate": "2024-01-18",
+      "amount": 800,
+      "taxAmount": 104,
+      "totalAmount": 905,
+      "sellerName": "武汉物流有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "电子普通发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "金额不一致示例-计算应为904",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": true,
+      "errorCount": 1,
+      "errors": [
+        {
+          "type": "金额合计不一致",
+          "message": "金额不一致: 计算值 904.00 ≠ 申报值 905.00"
+        }
+      ]
+    },
+    {
+      "id": "3760e37c-56e7-4684-8562-00d486f7985d",
+      "invoiceCode": "123456789012",
+      "invoiceNumber": "00012351",
+      "invoiceDate": "2024-01-19",
+      "amount": 1200,
+      "taxAmount": 156,
+      "totalAmount": 1356,
+      "sellerName": "成都咨询有限公司",
+      "buyerName": "上海贸易有限公司",
+      "invoiceType": "电子专用发票",
+      "status": "正常",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "",
+      "originalInvoiceCode": "",
+      "remark": "完整字段示例",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": false,
+      "errorCount": 0,
+      "errors": []
+    },
+    {
+      "id": "fcb4aee7-32b0-4ff3-9601-426118e00057",
+      "invoiceCode": "00012345",
+      "invoiceNumber": "2024-01-20",
+      "invoiceDate": "",
+      "amount": 0,
+      "taxAmount": 0,
+      "totalAmount": 0,
+      "sellerName": "上海贸易有限公司",
+      "buyerName": "其他",
+      "invoiceType": "正常",
+      "status": "待核验",
+      "isRedInvoice": false,
+      "originalInvoiceNumber": "脏数据示例-缺少必填字段",
+      "originalInvoiceCode": "",
+      "remark": "",
+      "batchId": "BATCH-1778646274615-A709D709",
+      "importTime": "2026-05-13 11:24:34",
+      "hasErrors": true,
+      "errorCount": 3,
+      "errors": [
+        {
+          "type": "缺少必填字段",
+          "message": "缺少金额信息"
+        },
+        {
+          "type": "无效发票号码",
+          "message": "发票号码格式无效: 2024-01-20"
+        },
+        {
+          "type": "无效发票代码",
+          "message": "发票代码格式无效: 00012345"
+        }
+      ]
+    }
+  ],
+  "exportTime": "2026-05-13 11:24:34"
+}

@@ -1,0 +1,149 @@
+[
+  {
+    "id": 1,
+    "type": "金额合计不一致",
+    "message": "金额不一致: 计算值 904.00 ≠ 申报值 905.00",
+    "field": "totalAmount",
+    "relatedInvoiceId": "6eff799a-71c2-4597-8b33-6a321933d338"
+  },
+  {
+    "id": 2,
+    "type": "无效发票号码",
+    "message": "发票号码格式无效: 2024-01-20",
+    "field": "invoiceNumber",
+    "relatedInvoiceId": "7c751b34-e706-401d-8dd9-5724711bb647"
+  },
+  {
+    "id": 3,
+    "type": "无效发票代码",
+    "message": "发票代码格式无效: 00012345",
+    "field": "invoiceCode",
+    "relatedInvoiceId": "7c751b34-e706-401d-8dd9-5724711bb647"
+  },
+  {
+    "id": 4,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "58ab1a60-7ae4-4fce-824b-d89dec4828ab"
+  },
+  {
+    "id": 5,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012345 存在重复",
+    "field": "",
+    "relatedInvoiceId": "3ec4e198-8356-4f9f-8176-ea2266fad965"
+  },
+  {
+    "id": 6,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012346 存在重复",
+    "field": "",
+    "relatedInvoiceId": "868666eb-150c-44bf-a969-7242e9d95ccc"
+  },
+  {
+    "id": 7,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012346 存在重复",
+    "field": "",
+    "relatedInvoiceId": "e2bc88b3-b72b-4930-b8fc-408717fc32a2"
+  },
+  {
+    "id": 8,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012347 存在重复",
+    "field": "",
+    "relatedInvoiceId": "3843fde4-8c82-4fb5-bb31-c8442807523c"
+  },
+  {
+    "id": 9,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012347 存在重复",
+    "field": "",
+    "relatedInvoiceId": "da26fe85-225a-4d30-bfc9-4102b460af53"
+  },
+  {
+    "id": 10,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012348 存在重复",
+    "field": "",
+    "relatedInvoiceId": "7bd66569-18c2-419a-8e33-64f57362f086"
+  },
+  {
+    "id": 11,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012348 存在重复",
+    "field": "",
+    "relatedInvoiceId": "b3ece4bb-9ae1-4024-980a-a41dc783a80e"
+  },
+  {
+    "id": 12,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012349 存在重复",
+    "field": "",
+    "relatedInvoiceId": "5433847e-5d0c-4e2a-9e22-93d6556233e5"
+  },
+  {
+    "id": 13,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012349 存在重复",
+    "field": "",
+    "relatedInvoiceId": "945ecb9c-8452-445e-8f6f-fa5a04dc3b72"
+  },
+  {
+    "id": 14,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012350 存在重复",
+    "field": "",
+    "relatedInvoiceId": "fd212712-8e48-4b2c-9a4f-bdae982119ca"
+  },
+  {
+    "id": 15,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012350 存在重复",
+    "field": "",
+    "relatedInvoiceId": "6eff799a-71c2-4597-8b33-6a321933d338"
+  },
+  {
+    "id": 16,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012351 存在重复",
+    "field": "",
+    "relatedInvoiceId": "40b82594-69c4-49dd-b930-b3f79dcc4985"
+  },
+  {
+    "id": 17,
+    "type": "重复发票",
+    "message": "发票 123456789012-00012351 存在重复",
+    "field": "",
+    "relatedInvoiceId": "142317d8-a561-46b7-9c6b-943b5c6f4f5c"
+  },
+  {
+    "id": 18,
+    "type": "红冲发票无对应原票",
+    "message": "红冲发票 123456789012-00012345: 红冲发票缺少对应的原发票信息（原票代码或原票号码）",
+    "field": "",
+    "relatedInvoiceId": "58ab1a60-7ae4-4fce-824b-d89dec4828ab"
+  },
+  {
+    "id": 19,
+    "type": "红冲发票无对应原票",
+    "message": "红冲发票 123456789012-00012345: 红冲发票缺少对应的原发票信息（原票代码或原票号码）",
+    "field": "",
+    "relatedInvoiceId": "3ec4e198-8356-4f9f-8176-ea2266fad965"
+  },
+  {
+    "id": 20,
+    "type": "红冲发票无对应原票",
+    "message": "红冲发票 123456789012-00012347: 红冲发票缺少对应的原发票信息（原票代码或原票号码）",
+    "field": "",
+    "relatedInvoiceId": "da26fe85-225a-4d30-bfc9-4102b460af53"
+  },
+  {
+    "id": 21,
+    "type": "红冲发票无对应原票",
+    "message": "红冲发票 123456789012-00012349: 红冲金额与原票金额不一致: 红冲 1695.00 ≠ 原票 905.00",
+    "field": "",
+    "relatedInvoiceId": "945ecb9c-8452-445e-8f6f-fa5a04dc3b72"
+  }
+]
