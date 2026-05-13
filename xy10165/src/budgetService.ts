@@ -223,12 +223,12 @@ export function createPurchaseRequest(params: CreatePurchaseRequestParams): stri
   const budget = findBudgetForDepartment(departmentId, params.period, params.budgetType);
 
   if (!budget) {
-    const exceptionId = recordException(
+    recordException(
       'BUDGET_NOT_CONFIGURED',
       `部门「${params.departmentName}」在「${params.period || '未指定'}」期间的「${params.budgetType || '未指定'}」类型预算未配置`,
       'error',
       'purchase_request',
-      null,
+      undefined,
       JSON.stringify({ 
         departmentName: params.departmentName,
         period: params.period,
@@ -259,7 +259,7 @@ export function createPurchaseRequest(params: CreatePurchaseRequestParams): stri
       `采购申请「${params.requestNo}」金额 ${params.requestedAmount.toLocaleString()} 超出可用预算，可用金额: ${availableForReservation.toLocaleString()}`,
       'critical',
       'purchase_request',
-      null,
+      undefined,
       JSON.stringify({ 
         requestNo: params.requestNo,
         requestedAmount: params.requestedAmount,
@@ -320,7 +320,7 @@ export function createContractPayment(params: CreateContractPaymentParams): stri
         `付款「${params.paymentNo}」关联的采购申请「${params.requestNo}」不存在`,
         'warning',
         'contract_payment',
-        null,
+        undefined,
         JSON.stringify({ 
           paymentNo: params.paymentNo,
           requestNo: params.requestNo
@@ -338,12 +338,12 @@ export function createContractPayment(params: CreateContractPaymentParams): stri
   }
 
   if (!budget) {
-    const exceptionId = recordException(
+    recordException(
       'BUDGET_NOT_CONFIGURED',
       `部门「${params.departmentName}」在「${params.period || '未指定'}」期间的「${params.budgetType || '未指定'}」类型预算未配置`,
       'error',
       'contract_payment',
-      null,
+      undefined,
       JSON.stringify({ 
         departmentName: params.departmentName,
         period: params.period,
@@ -375,7 +375,7 @@ export function createContractPayment(params: CreateContractPaymentParams): stri
       `合同付款「${params.paymentNo}」导致预算超支，付款金额: ${params.amount.toLocaleString()}，预算余额: ${available.toLocaleString()}`,
       'critical',
       'contract_payment',
-      null,
+      undefined,
       JSON.stringify({ 
         paymentNo: params.paymentNo,
         paymentAmount: params.amount,
@@ -401,7 +401,7 @@ export function createContractPayment(params: CreateContractPaymentParams): stri
   if (purchaseRequest) {
     updateBudgetReserved(
       budget.id,
-      purchaseRequest.requestedAmount,
+      purchaseRequest.requested_amount,
       false,
       'purchase_request',
       purchaseRequest.id,
