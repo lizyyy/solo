@@ -51,6 +51,56 @@ describe('物资核对逻辑测试', () => {
     expect(result.quantityMismatch[0].received).toBe(2);
   });
 
+  test('应发3袋实收2袋的场景：应产生数量差异且matchedItems仍有记录（用于验证状态判断逻辑）', () => {
+    const expected = [
+      { itemName: '大米', quantity: 3, unit: '袋' }
+    ];
+    const received = [
+      { itemName: '大米', quantity: 2, unit: '袋' }
+    ];
+
+    const result = compareItems(expected, received);
+
+    expect(result.matchedItems.length).toBe(1);
+    expect(result.matchedItems[0].quantity).toBe(2);
+    expect(result.quantityMismatch.length).toBe(1);
+    expect(result.quantityMismatch[0].expected).toBe(3);
+    expect(result.quantityMismatch[0].received).toBe(2);
+    
+    const allMatchConditions = 
+      result.matchedItems.length === expected.length &&
+      result.missingItems.length === 0 &&
+      result.extraItems.length === 0 &&
+      result.quantityMismatch.length === 0;
+    
+    expect(allMatchConditions).toBe(false);
+  });
+
+  test('多物资场景：一个完全匹配一个数量不足，应产生数量差异', () => {
+    const expected = [
+      { itemName: '大米', quantity: 2, unit: '袋' },
+      { itemName: '食用油', quantity: 1, unit: '桶' }
+    ];
+    const received = [
+      { itemName: '大米', quantity: 2, unit: '袋' },
+      { itemName: '食用油', quantity: 0, unit: '桶' }
+    ];
+
+    const result = compareItems(expected, received);
+
+    expect(result.matchedItems.length).toBe(1);
+    expect(result.quantityMismatch.length).toBe(1);
+    expect(result.quantityMismatch[0].itemName).toBe('食用油');
+    
+    const allMatchConditions = 
+      result.matchedItems.length === expected.length &&
+      result.missingItems.length === 0 &&
+      result.extraItems.length === 0 &&
+      result.quantityMismatch.length === 0;
+    
+    expect(allMatchConditions).toBe(false);
+  });
+
   test('多收到物资应返回额外列表', () => {
     const expected = [
       { itemName: '大米', quantity: 2, unit: '袋' }

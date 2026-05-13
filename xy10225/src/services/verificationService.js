@@ -166,6 +166,7 @@ const verifyDelivery = (deliveryId) => {
   if (verificationResult.matchedItems.length === delivery.items.length && 
       verificationResult.missingItems.length === 0 &&
       verificationResult.extraItems.length === 0 &&
+      verificationResult.quantityMismatch.length === 0 &&
       signature.signatureType !== SIGNATURE_TYPES.NONE) {
     finalStatus = VERIFICATION_STATUS.MATCHED;
     delivery.status = 'completed';
