@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 证书吊销列表服务</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #1a202c; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { color: #2d3748; margin-bottom: 15px; font-size: 18px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        button { background: #4299e1; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; margin-bottom: 10px; }
+        button:hover { background: #3182ce; }
+        button.danger { background: #e53e3e; }
+        button.success { background: #38a169; }
+        pre { background: #2d3748; color: #f7fafc; padding: 15px; border-radius: 4px; overflow-x: auto; font-size: 12px; margin-top: 10px; }
+        input, select { width: 100%; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 10px; }
+        label { display: block; margin-bottom: 5px; color: #4a5568; font-weight: 500; }
+        .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+        .status-REGISTERED { background: #fef3c7; color: #92400e; }
+        .status-DISTRIBUTED { background: #dbeafe; color: #1e40af; }
+        .status-CACHE_CONFIRMED { background: #c6f6d5; color: #22543d; }
+        .status-ACTIVE { background: #fed7d7; color: #742a2a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API 证书吊销列表服务</h1>
+        
+        <div class="grid">
+            <div class="card">
+                <h2>登记吊销证书</h2>
+                <form id="registerForm">
+                    <label>证书序列号</label>
+                    <input type="text" id="serialNumber" placeholder="例如: 1234567890ABCDEF" required>
+                    
+                    <label>吊销原因</label>
+                    <select id="reason" required>
+                        <option value="KEY_COMPROMISE">密钥泄露</option>
+                        <option value="CA_COMPROMISE">CA 泄露</option>
+                        <option value="AFFILIATION_CHANGED">归属变更</option>
+                        <option value="SUPERSEDED">被取代</option>
+                        <option value="CESSATION_OF_OPERATION">停止运营</option>
+                        <option value="CERTIFICATE_HOLD">证书挂起</option>
+                    </select>
+                    
+                    <label>请求 ID (可选，用于幂等性)</label>
+                    <input type="text" id="requestId" placeholder="留空自动生成">
+                    
+                    <button type="submit" class="success">登记吊销</button>
+                </form>
+                <pre id="registerResult"></pre>
+            </div>
+
+            <div class="card">
+                <h2>检查证书状态</h2>
+                <label>证书序列号</label>
+                <input type="text" id="checkSerialNumber" placeholder="输入证书序列号">
+                <button onclick="checkRevocation()">检查状态</button>
+                <pre id="checkResult"></pre>
+            </div>
+
+            <div class="card">
+                <h2>分发管理</h2>
+                <button onclick="createVersion()" class="success">创建分发版本</button>
+                <button onclick="getVersions()">获取版本列表</button>
+                <pre id="versionResult"></pre>
+            </div>
+
+            <div class="card">
+                <h2>状态推进</h2>
+                <label>证书序列号</label>
+                <input type="text" id="statusSerialNumber" placeholder="输入证书序列号">
+                <button onclick="confirmCache()">确认缓存</button>
+                <button onclick="activateRevocation()">激活吊销</button>
+                <pre id="statusResult"></pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>吊销列表</h2>
+            <button onclick="getAllRevocations()">刷新列表</button>
+            <button onclick="getReport()">获取报表</button>
+            <pre id="listResult"></pre>
+        </div>
+
+        <div class="card">
+            <h2>API 使用示例</h2>
+            <pre>
+# 登记吊销
+curl -X POST http://localhost:8080/api/v1/revocations \
+  -H "Content-Type: application/json" \
+  -d '{"serial_number": "12345", "reason": "KEY_COMPROMISE"}'
+
+# 检查吊销状态
+curl http://localhost:8080/api/v1/revocations/12345/check
+
+# 创建分发版本
+curl -X POST http://localhost:8080/api/v1/versions
+
+# 确认缓存
+curl -X POST http://localhost:8080/api/v1/revocations/12345/confirm-cache
+
+# 激活吊销
+curl -X POST http://localhost:8080/api/v1/revocations/12345/activate
+
+# 获取历史
+curl http://localhost:8080/api/v1/revocations/12345/history
+
+# 获取报表
+curl http://localhost:8080/api/v1/report
+            </pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/v1';
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                serial_number: document.getElementById('serialNumber').value,
+                reason: document.getElementById('reason').value,
+                request_id: document.getElementById('requestId').value || undefined
+            };
+            const res = await fetch(`${API_BASE}/revocations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            document.getElementById('registerResult').textContent = JSON.stringify(await res.json(), null, 2);
+        });
+
+        async function checkRevocation() {
+            const sn = document.getElementById('checkSerialNumber').value;
+            const res = await fetch(`${API_BASE}/revocations/${sn}/check`);
+            document.getElementById('checkResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function createVersion() {
+            const res = await fetch(`${API_BASE}/versions`, { method: 'POST' });
+            document.getElementById('versionResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function getVersions() {
+            const res = await fetch(`${API_BASE}/versions`);
+            document.getElementById('versionResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function confirmCache() {
+            const sn = document.getElementById('statusSerialNumber').value;
+            const res = await fetch(`${API_BASE}/revocations/${sn}/confirm-cache`, { method: 'POST' });
+            document.getElementById('statusResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function activateRevocation() {
+            const sn = document.getElementById('statusSerialNumber').value;
+            const res = await fetch(`${API_BASE}/revocations/${sn}/activate`, { method: 'POST' });
+            document.getElementById('statusResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function getAllRevocations() {
+            const res = await fetch(`${API_BASE}/revocations`);
+            document.getElementById('listResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+
+        async function getReport() {
+            const res = await fetch(`${API_BASE}/report`);
+            document.getElementById('listResult').textContent = JSON.stringify(await res.json(), null, 2);
+        }
+    </script>
+</body>
+</html>
