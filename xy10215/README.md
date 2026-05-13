@@ -54,6 +54,14 @@ python cli.py export-overdue --date 2026-05-10    # 逾期报告
 python cli.py export-run <批次>                    # 运行日志报告
 ```
 
+### 清理工具
+
+```bash
+python cli.py cleanup-failed      # 清理失败的运行批次
+python cli.py cleanup-orphan    # 清理孤立的导出文件
+python cli.py cleanup-full --confirm  # 完全清理
+```
+
 ## 检查结果
 
 运行演示后，检查以下内容验证业务联动：

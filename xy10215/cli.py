@@ -6,7 +6,7 @@ from tabulate import tabulate
 from database import init_db, clear_all_tables
 from services import (
     DoctorService, ScheduleService, PatientService, 
-    FollowupService, EventService, RunLogService, ExportService
+    FollowupService, EventService, RunLogService, ExportService, CleanupService
 )
 from pipeline import FollowupPipeline, ReportExporter
 
@@ -206,6 +206,21 @@ class CommandToolkit:
             print(tabulate(rows, headers=headers, tablefmt='simple'))
         else:
             print('暂无导出记录')
+    
+    def cmd_cleanup_failed(self, args):
+        count = CleanupService.remove_failed_runs()
+        print(f'已清理 {count} 个失败的运行批次')
+    
+    def cmd_cleanup_orphan(self, args):
+        count = CleanupService.remove_orphan_exports()
+        print(f'已清理 {count} 个孤立的导出文件')
+    
+    def cmd_cleanup_full(self, args):
+        if args.confirm:
+            result = CleanupService.full_cleanup()
+            print(f'清理完成: 失败批次={result["failed_runs"]}, 孤立文件={result["orphan_exports"]}')
+        else:
+            print('请使用 --confirm 参数确认清理操作')
 
 
 def main():
@@ -288,6 +303,16 @@ def main():
     
     list_exports = subparsers.add_parser('exports', help='列出导出记录')
     list_exports.set_defaults(func=CommandToolkit().cmd_list_exports)
+    
+    cleanup_failed = subparsers.add_parser('cleanup-failed', help='清理失败的运行批次')
+    cleanup_failed.set_defaults(func=CommandToolkit().cmd_cleanup_failed)
+    
+    cleanup_orphan = subparsers.add_parser('cleanup-orphan', help='清理孤立的导出文件')
+    cleanup_orphan.set_defaults(func=CommandToolkit().cmd_cleanup_orphan)
+    
+    cleanup_full = subparsers.add_parser('cleanup-full', help='完全清理（失败批次+孤立文件）')
+    cleanup_full.add_argument('--confirm', action='store_true', help='确认清理')
+    cleanup_full.set_defaults(func=CommandToolkit().cmd_cleanup_full)
     
     args = parser.parse_args()
     

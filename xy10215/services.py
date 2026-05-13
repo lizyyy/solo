@@ -438,3 +438,62 @@ class ExportService:
             else:
                 cursor.execute('SELECT * FROM exports ORDER BY created_at DESC')
             return [dict(row) for row in cursor.fetchall()]
+
+
+class CleanupService:
+    @staticmethod
+    def remove_failed_runs():
+        with get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT id FROM run_logs WHERE status = ?', ('failed',))
+            failed_ids = [row[0] for row in cursor.fetchall()]
+            
+            if not failed_ids:
+                return 0
+            
+            ids_str = ','.join(['?'] * len(failed_ids))
+            
+            cursor.execute(f'DELETE FROM run_history WHERE run_log_id IN ({ids_str})', failed_ids)
+            cursor.execute(f'DELETE FROM statistics WHERE run_log_id IN ({ids_str})', failed_ids)
+            cursor.execute(f'DELETE FROM exports WHERE run_log_id IN ({ids_str})', failed_ids)
+            cursor.execute(f'DELETE FROM run_logs WHERE id IN ({ids_str})', failed_ids)
+            
+            return len(failed_ids)
+    
+    @staticmethod
+    def remove_orphan_exports():
+        import os
+        from config import EXPORT_DIR
+        
+        db_exports = ExportService.get_exports()
+        db_files = {e['file_name'] for e in db_exports}
+        
+        removed = 0
+        if os.path.exists(EXPORT_DIR):
+            for f in os.listdir(EXPORT_DIR):
+                if f.endswith('.csv') and f not in db_files:
+                    try:
+                        os.remove(os.path.join(EXPORT_DIR, f))
+                        removed += 1
+                    except:
+                        pass
+        
+        return removed
+    
+    @staticmethod
+    def clean_export_files_for_rerun(check_date):
+        import os
+        from config import EXPORT_DIR
+        
+        removed = 0
+        if os.path.exists(EXPORT_DIR):
+            for f in os.listdir(EXPORT_DIR):
+                if f.startswith(f'daily_report_{check_date}_') or f.startswith(f'overdue_report_{check_date}_'):
+                    continue
+        return removed
+    
+    @staticmethod
+    def full_cleanup():
+        failed_count = CleanupService.remove_failed_runs()
+        orphan_count = CleanupService.remove_orphan_exports()
+        return {'failed_runs': failed_count, 'orphan_exports': orphan_count}
