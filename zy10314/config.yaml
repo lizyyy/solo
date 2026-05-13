@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  mode: debug
+
+database:
+  path: ./circuit_breaker.db
+
+circuit_breaker:
+  default_failure_threshold: 5
+  default_half_open_max_calls: 3
+  default_sleep_window_seconds: 30
+  default_minimum_requests: 10

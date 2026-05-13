@@ -1,0 +1,163 @@
+{
+  "external_apis": [
+    {
+      "name": "Payment Gateway API",
+      "endpoint": "https://api.payment.example.com/v1/charge",
+      "method": "POST",
+      "description": "Third-party payment processing service"
+    },
+    {
+      "name": "SMS Notification API",
+      "endpoint": "https://api.sms.example.com/send",
+      "method": "POST",
+      "description": "SMS notification service provider"
+    },
+    {
+      "name": "Weather Data API",
+      "endpoint": "https://api.weather.example.com/current",
+      "method": "GET",
+      "description": "Weather data service provider"
+    }
+  ],
+  "business_callers": [
+    {
+      "name": "Order Service",
+      "system_code": "order-svc-001",
+      "description": "E-commerce order processing service"
+    },
+    {
+      "name": "Notification Service",
+      "system_code": "notification-svc-001",
+      "description": "System notification delivery service"
+    },
+    {
+      "name": "User Service",
+      "system_code": "user-svc-001",
+      "description": "User management service"
+    }
+  ],
+  "test_scenarios": {
+    "normal_flow": {
+      "description": "正常调用流程：多次成功调用，断路器保持 CLOSED 状态",
+      "steps": [
+        {
+          "action": "check_circuit",
+          "request_id": "req-normal-001",
+          "expected_state": "CLOSED",
+          "expected_allowed": true
+        },
+        {
+          "action": "record_call",
+          "result": "SUCCESS",
+          "duration_ms": 150,
+          "response_code": 200
+        },
+        {
+          "action": "record_call",
+          "result": "SUCCESS",
+          "duration_ms": 120,
+          "response_code": 200
+        },
+        {
+          "action": "record_call",
+          "result": "SUCCESS",
+          "duration_ms": 180,
+          "response_code": 200
+        }
+      ]
+    },
+    "abnormal_flow": {
+      "description": "异常触发熔断：连续失败达到阈值，断路器切换到 OPEN 状态",
+      "steps": [
+        {
+          "action": "record_call",
+          "result": "FAILURE",
+          "duration_ms": 500,
+          "error_message": "Connection timeout",
+          "response_code": 504
+        },
+        {
+          "action": "record_call",
+          "result": "FAILURE",
+          "duration_ms": 600,
+          "error_message": "Service unavailable",
+          "response_code": 503
+        },
+        {
+          "action": "record_call",
+          "result": "FAILURE",
+          "duration_ms": 450,
+          "error_message": "Internal server error",
+          "response_code": 500
+        },
+        {
+          "action": "record_call",
+          "result": "FAILURE",
+          "duration_ms": 520,
+          "error_message": "Gateway timeout",
+          "response_code": 504
+        },
+        {
+          "action": "record_call",
+          "result": "FAILURE",
+          "duration_ms": 480,
+          "error_message": "Bad gateway",
+          "response_code": 502
+        },
+        {
+          "action": "check_circuit",
+          "expected_state": "OPEN",
+          "expected_allowed": false
+        }
+      ]
+    },
+    "duplicate_request": {
+      "description": "重复请求检测：相同 request_id 或相同内容的请求将被拦截",
+      "steps": [
+        {
+          "action": "check_circuit",
+          "request_id": "req-dup-test-001",
+          "expected_allowed": true,
+          "expected_is_duplicate": false
+        },
+        {
+          "action": "check_circuit",
+          "request_id": "req-dup-test-001",
+          "expected_is_duplicate": true
+        },
+        {
+          "action": "check_circuit",
+          "request_id": "req-dup-test-002",
+          "note": "Same content different request_id, should be detected by hash",
+          "expected_is_duplicate": true
+        }
+      ]
+    },
+    "manual_intervention": {
+      "description": "人工干预：强制开启熔断和手动重置",
+      "steps": [
+        {
+          "action": "force_open",
+          "operator": "admin@example.com",
+          "reason": "Emergency maintenance on third-party service",
+          "expected_state": "OPEN"
+        },
+        {
+          "action": "check_circuit",
+          "expected_allowed": false,
+          "expected_state": "OPEN"
+        },
+        {
+          "action": "manual_reset",
+          "operator": "admin@example.com",
+          "expected_state": "CLOSED"
+        },
+        {
+          "action": "check_circuit",
+          "expected_allowed": true,
+          "expected_state": "CLOSED"
+        }
+      ]
+    }
+  }
+}
