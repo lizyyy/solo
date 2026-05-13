@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物疫苗批次提醒管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        .stat-card.warning .number {
+            color: #f59e0b;
+        }
+        .stat-card.danger .number {
+            color: #ef4444;
+        }
+        .filter-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-group label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 160px;
+            transition: border-color 0.3s;
+        }
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .panel-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 16px 24px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 13px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background: #f8fafc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        .history-item {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .history-item .change {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+        .history-item .old-value {
+            color: #ef4444;
+            text-decoration: line-through;
+        }
+        .history-item .new-value {
+            color: #10b981;
+            font-weight: 500;
+        }
+        .history-item .meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        .validate-result {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+        }
+        .validate-result.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+        .validate-result.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐾 宠物疫苗批次提醒管理系统</h1>
+            <p>确保宠物品种更新时，接种间隔和回访结果口径一致</p>
+        </div>
+
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="number" id="totalCount">0</div>
+                <div class="label">疫苗记录总数</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number" id="abnormalCount">0</div>
+                <div class="label">异常反应数量</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number" id="pendingCount">0</div>
+                <div class="label">待跟进回访</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="batchCount">0</div>
+                <div class="label">疫苗批次</div>
+            </div>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>关键词搜索</label>
+                    <input type="text" id="searchInput" placeholder="宠物名/品种/批次号">
+                </div>
+                <div class="filter-group">
+                    <label>宠物品种</label>
+                    <select id="breedFilter">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>疫苗批次</label>
+                    <select id="batchFilter">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="align-self: flex-end;">
+                    <button class="btn btn-primary" onclick="loadData()">搜索</button>
+                </div>
+                <div class="filter-group" style="align-self: flex-end;">
+                    <button class="btn btn-secondary" onclick="resetFilters()">重置</button>
+                </div>
+                <div class="filter-group" style="align-self: flex-end;">
+                    <button class="btn btn-success" onclick="openReportModal()">导出报告</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>📋 疫苗记录复核面板</h2>
+                <button class="btn btn-primary" onclick="openValidateModal()">校验疫苗批次</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>宠物名</th>
+                            <th>宠物品种</th>
+                            <th>疫苗批次</th>
+                            <th>接种间隔</th>
+                            <th>异常反应</th>
+                            <th>预约提醒</th>
+                            <th>回访结果</th>
+                            <th>责任人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vaccineTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑疫苗记录</h3>
+                <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>宠物品种</label>
+                    <select id="editPetBreed"></select>
+                </div>
+                <div class="form-group">
+                    <label>疫苗批次</label>
+                    <select id="editVaccineBatch"></select>
+                </div>
+                <div class="form-group">
+                    <label>接种间隔（天）</label>
+                    <input type="number" id="editIntervalDays" min="1" max="90">
+                </div>
+                <div class="form-group">
+                    <label>异常反应</label>
+                    <select id="editAbnormalReaction"></select>
+                </div>
+                <div class="form-group">
+                    <label>预约提醒日期</label>
+                    <input type="date" id="editAppointmentReminder">
+                </div>
+                <div class="form-group">
+                    <label>回访结果</label>
+                    <select id="editFollowUpResult"></select>
+                </div>
+                <div class="form-group">
+                    <label>责任人</label>
+                    <select id="editHandler"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="abnormalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>推进异常反应处理</h3>
+                <button class="close-btn" onclick="closeModal('abnormalModal')">&times;</button>
+            </div>
+            <form id="abnormalForm">
+                <input type="hidden" id="abnormalId">
+                <div class="form-group">
+                    <label>异常反应状态</label>
+                    <select id="abnormalStatus"></select>
+                </div>
+                <div class="form-group">
+                    <label>处理人</label>
+                    <select id="abnormalHandler"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('abnormalModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">推进</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="reminderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>保存预约提醒</h3>
+                <button class="close-btn" onclick="closeModal('reminderModal')">&times;</button>
+            </div>
+            <form id="reminderForm">
+                <input type="hidden" id="reminderId">
+                <div class="form-group">
+                    <label>提醒日期</label>
+                    <input type="date" id="reminderDate">
+                </div>
+                <div class="form-group">
+                    <label>责任人</label>
+                    <select id="reminderHandler"></select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('reminderModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>修改历史记录</h3>
+                <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="validateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>疫苗批次校验</h3>
+                <button class="close-btn" onclick="closeModal('validateModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>疫苗批次</label>
+                <select id="validateBatch"></select>
+            </div>
+            <div class="form-group">
+                <label>宠物品种</label>
+                <select id="validateBreed"></select>
+            </div>
+            <button class="btn btn-primary" onclick="validateVaccine()" style="width: 100%;">开始校验</button>
+            <div id="validateResult" class="validate-result"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>导出修改报告</h3>
+                <button class="close-btn" onclick="closeModal('reportModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>责任人筛选</label>
+                <select id="reportHandler">
+                    <option value="">全部责任人</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>开始时间</label>
+                <input type="date" id="reportStartTime">
+            </div>
+            <div class="form-group">
+                <label>结束时间</label>
+                <input type="date" id="reportEndTime">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('reportModal')">取消</button>
+                <button type="button" class="btn btn-primary" onclick="exportReport()">导出</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let options = {};
+        let currentRecords = [];
+
+        async function loadOptions() {
+            const res = await fetch('/api/options');
+            options = await res.json();
+            
+            const selects = [
+                { id: 'breedFilter', data: options.petBreeds },
+                { id: 'batchFilter', data: options.vaccineBatches },
+                { id: 'editPetBreed', data: options.petBreeds },
+                { id: 'editVaccineBatch', data: options.vaccineBatches },
+                { id: 'editAbnormalReaction', data: options.abnormalReactions },
+                { id: 'editFollowUpResult', data: options.followUpResults },
+                { id: 'editHandler', data: options.handlers },
+                { id: 'abnormalStatus', data: options.abnormalReactions },
+                { id: 'abnormalHandler', data: options.handlers },
+                { id: 'reminderHandler', data: options.handlers },
+                { id: 'validateBatch', data: options.vaccineBatches },
+                { id: 'validateBreed', data: options.petBreeds },
+                { id: 'reportHandler', data: options.handlers }
+            ];
+
+            selects.forEach(({ id, data }) => {
+                const select = document.getElementById(id);
+                const hasEmpty = select.querySelector('option[value=""]');
+                if (!hasEmpty && id !== 'breedFilter' && id !== 'batchFilter' && id !== 'reportHandler') {
+                    select.innerHTML = '';
+                }
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        async function loadStatistics() {
+            const res = await fetch('/api/statistics');
+            const stats = await res.json();
+            
+            document.getElementById('totalCount').textContent = stats.total;
+            document.getElementById('abnormalCount').textContent = stats.abnormalCount;
+            document.getElementById('pendingCount').textContent = stats.pendingFollowUp;
+            document.getElementById('batchCount').textContent = Object.keys(stats.batchStats).length;
+        }
+
+        async function loadData() {
+            const search = document.getElementById('searchInput').value;
+            const petBreed = document.getElementById('breedFilter').value;
+            const batchNo = document.getElementById('batchFilter').value;
+
+            let url = '/api/vaccines?';
+            if (search) url += `search=${encodeURIComponent(search)}&`;
+            if (petBreed) url += `petBreed=${encodeURIComponent(petBreed)}&`;
+            if (batchNo) url += `batchNo=${encodeURIComponent(batchNo)}&`;
+
+            const res = await fetch(url);
+            currentRecords = await res.json();
+            renderTable(currentRecords);
+        }
+
+        function renderTable(records) {
+            const tbody = document.getElementById('vaccineTable');
+            tbody.innerHTML = records.map(record => `
+                <tr>
+                    <td><strong>${record.petName}</strong></td>
+                    <td><span class="badge badge-info">${record.petBreed}</span></td>
+                    <td><code>${record.vaccineBatch}</code></td>
+                    <td>${record.intervalDays}天</td>
+                    <td><span class="badge ${record.abnormalReaction === '无反应' ? 'badge-success' : 'badge-warning'}">${record.abnormalReaction}</span></td>
+                    <td>${record.appointmentReminder}</td>
+                    <td><span class="badge ${record.followUpResult === '良好' || record.followUpResult === '已康复' ? 'badge-success' : 'badge-warning'}">${record.followUpResult}</span></td>
+                    <td>${record.handler}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn btn-sm btn-primary" onclick="openEditModal('${record.id}')">编辑</button>
+                            <button class="btn btn-sm btn-secondary" onclick="openAbnormalModal('${record.id}', '${record.abnormalReaction}')">异常处理</button>
+                            <button class="btn btn-sm btn-success" onclick="openReminderModal('${record.id}', '${record.appointmentReminder}')">预约提醒</button>
+                            <button class="btn btn-sm btn-secondary" onclick="viewHistory('${record.id}')">历史</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('breedFilter').value = '';
+            document.getElementById('batchFilter').value = '';
+            loadData();
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function openEditModal(id) {
+            const res = await fetch(`/api/vaccines/${id}`);
+            const record = await res.json();
+            
+            document.getElementById('editId').value = record.id;
+            document.getElementById('editPetBreed').value = record.petBreed;
+            document.getElementById('editVaccineBatch').value = record.vaccineBatch;
+            document.getElementById('editIntervalDays').value = record.intervalDays;
+            document.getElementById('editAbnormalReaction').value = record.abnormalReaction;
+            document.getElementById('editAppointmentReminder').value = record.appointmentReminder;
+            document.getElementById('editFollowUpResult').value = record.followUpResult;
+            document.getElementById('editHandler').value = record.handler;
+            
+            openModal('editModal');
+        }
+
+        function openAbnormalModal(id, currentStatus) {
+            document.getElementById('abnormalId').value = id;
+            document.getElementById('abnormalStatus').value = currentStatus;
+            document.getElementById('abnormalHandler').value = options.handlers[0];
+            openModal('abnormalModal');
+        }
+
+        function openReminderModal(id, currentDate) {
+            document.getElementById('reminderId').value = id;
+            document.getElementById('reminderDate').value = currentDate;
+            document.getElementById('reminderHandler').value = options.handlers[0];
+            openModal('reminderModal');
+        }
+
+        async function viewHistory(id) {
+            const res = await fetch('/api/history');
+            const history = await res.json();
+            const recordHistory = history.filter(h => h.recordId === id);
+            
+            const historyList = document.getElementById('historyList');
+            if (recordHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">暂无修改历史</p>';
+            } else {
+                historyList.innerHTML = recordHistory.map(item => `
+                    <div class="history-item">
+                        <strong>${item.petName}</strong> 的修改记录
+                        ${item.changes.map(change => `
+                            <div class="change">
+                                <span>${change.fieldName}:</span>
+                                <span class="old-value">${change.oldValue}</span>
+                                <span>→</span>
+                                <span class="new-value">${change.newValue}</span>
+                            </div>
+                        `).join('')}
+                        <div class="meta">
+                            责任人: ${item.handler} | 修改时间: ${new Date(item.changeTime).toLocaleString('zh-CN')}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            openModal('historyModal');
+        }
+
+        function openValidateModal() {
+            document.getElementById('validateResult').className = 'validate-result';
+            document.getElementById('validateResult').textContent = '';
+            openModal('validateModal');
+        }
+
+        async function validateVaccine() {
+            const batchNo = document.getElementById('validateBatch').value;
+            const petBreed = document.getElementById('validateBreed').value;
+            
+            const res = await fetch('/api/vaccines/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ batchNo, petBreed })
+            });
+            const result = await res.json();
+            
+            const resultDiv = document.getElementById('validateResult');
+            resultDiv.className = `validate-result ${result.valid ? 'success' : 'error'}`;
+            resultDiv.innerHTML = `
+                <strong>${result.message}</strong><br>
+                批次校验: ${result.batchValid ? '✅ 通过' : '❌ 失败'}<br>
+                品种校验: ${result.breedValid ? '✅ 通过' : '❌ 失败'}
+            `;
+        }
+
+        function openReportModal() {
+            openModal('reportModal');
+        }
+
+        async function exportReport() {
+            const handler = document.getElementById('reportHandler').value;
+            const startTime = document.getElementById('reportStartTime').value;
+            const endTime = document.getElementById('reportEndTime').value;
+
+            let url = '/api/report?';
+            if (handler) url += `handler=${encodeURIComponent(handler)}&`;
+            if (startTime) url += `startTime=${encodeURIComponent(startTime)}&`;
+            if (endTime) url += `endTime=${encodeURIComponent(endTime)}&`;
+
+            const res = await fetch(url);
+            const report = await res.json();
+
+            let csv = '宠物名,修改字段,旧值,新值,责任人,修改时间\n';
+            report.forEach(item => {
+                item.changes.forEach(change => {
+                    csv += `${item.petName},${change.fieldName},${change.oldValue},${change.newValue},${item.handler},${new Date(item.changeTime).toLocaleString('zh-CN')}\n`;
+                });
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `疫苗修改报告_${new Date().toISOString().slice(0, 10)}.csv`;
+            link.click();
+
+            closeModal('reportModal');
+            alert('报告导出成功！');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                petBreed: document.getElementById('editPetBreed').value,
+                vaccineBatch: document.getElementById('editVaccineBatch').value,
+                intervalDays: parseInt(document.getElementById('editIntervalDays').value),
+                abnormalReaction: document.getElementById('editAbnormalReaction').value,
+                appointmentReminder: document.getElementById('editAppointmentReminder').value,
+                followUpResult: document.getElementById('editFollowUpResult').value,
+                handler: document.getElementById('editHandler').value
+            };
+
+            const res = await fetch(`/api/vaccines/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                closeModal('editModal');
+                loadData();
+                loadStatistics();
+            } else {
+                const error = await res.json();
+                alert(error.error);
+            }
+        });
+
+        document.getElementById('abnormalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('abnormalId').value;
+            const data = {
+                status: document.getElementById('abnormalStatus').value,
+                handler: document.getElementById('abnormalHandler').value
+            };
+
+            await fetch(`/api/vaccines/${id}/abnormal`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal('abnormalModal');
+            loadData();
+            loadStatistics();
+        });
+
+        document.getElementById('reminderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('reminderId').value;
+            const data = {
+                reminderDate: document.getElementById('reminderDate').value,
+                handler: document.getElementById('reminderHandler').value
+            };
+
+            await fetch(`/api/vaccines/${id}/reminder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            closeModal('reminderModal');
+            loadData();
+        });
+
+        (async function init() {
+            await loadOptions();
+            await loadStatistics();
+            await loadData();
+        })();
+    </script>
+</body>
+</html>
