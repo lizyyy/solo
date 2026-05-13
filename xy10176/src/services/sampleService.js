@@ -108,7 +108,8 @@ class SampleService {
         };
       }
 
-      const nextStatus = stateMachine.getNextStatus(sample.status, stepType);
+      const fromStatus = sample.status;
+      const nextStatus = stateMachine.getNextStatus(fromStatus, stepType);
       const timeField = stateMachine.getTimeField(stepType);
       const now = new Date();
 
@@ -128,7 +129,7 @@ class SampleService {
         barcode: sample.barcode,
         stepType,
         action: 'NORMAL',
-        fromStatus: sample.status,
+        fromStatus,
         toStatus: nextStatus,
         handler,
         requestId,
@@ -208,6 +209,9 @@ class SampleService {
       }
 
       const originalStatus = sample.status;
+      const exceptionStepType = originalStatus === SampleStatus.INIT ? StepType.COLLECT :
+                               originalStatus === SampleStatus.COLLECTED ? StepType.CENTRIFUGE :
+                               originalStatus === SampleStatus.CENTRIFUGED ? StepType.TEST : StepType.REVIEW;
 
       await sample.update({
         status: SampleStatus.EXCEPTION,
@@ -218,9 +222,7 @@ class SampleService {
       await Audit.create({
         sampleId: sample.id,
         barcode: sample.barcode,
-        stepType: sample.status === SampleStatus.INIT ? StepType.COLLECT :
-                  sample.status === SampleStatus.COLLECTED ? StepType.CENTRIFUGE :
-                  sample.status === SampleStatus.CENTRIFUGED ? StepType.TEST : StepType.REVIEW,
+        stepType: exceptionStepType,
         action: 'EXCEPTION',
         fromStatus: originalStatus,
         toStatus: SampleStatus.EXCEPTION,
