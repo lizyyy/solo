@@ -61,6 +61,8 @@ export const OrderDetail: React.FC = () => {
     estimatedPrice: 0,
     completed: false
   });
+  const [statusError, setStatusError] = useState<string | null>(null);
+  const [forcePickupConfirmed, setForcePickupConfirmed] = useState(false);
 
   if (!order) {
     return (
@@ -81,9 +83,14 @@ export const OrderDetail: React.FC = () => {
   const pickupValidation = validatePickup(order.id, pickupData);
 
   const handleUpdateStatus = () => {
-    updateStatus(order.id, selectedStatus, statusNote);
-    setStatusModalOpen(false);
-    setStatusNote('');
+    const result = updateStatus(order.id, selectedStatus, statusNote);
+    if (result.success) {
+      setStatusModalOpen(false);
+      setStatusNote('');
+      setStatusError(null);
+    } else {
+      setStatusError(result.error || '状态更新失败');
+    }
   };
 
   const handleConfirmQuote = () => {
@@ -92,11 +99,27 @@ export const OrderDetail: React.FC = () => {
   };
 
   const handlePickup = () => {
-    if (!pickupValidation.isValid && pickupValidation.warnings.length > 0) {
-      if (!confirm('存在验证警告，是否继续取件？')) return;
+    if (!pickupValidation.isCustomerMatch) {
+      if (!forcePickupConfirmed) {
+        alert('取件人信息与登记客户不匹配！如需强制取件，请勾选"管理员强制放行"。');
+        return;
+      }
+      if (!confirm('确认管理员强制放行？此操作将被记录。')) {
+        return;
+      }
     }
-    pickupOrder(order.id, pickupData);
+    
+    if (pickupValidation.requiresIdCard && !pickupData.pickerIdCard) {
+      alert('贵重物品取件必须登记身份证号！');
+      return;
+    }
+    
+    pickupOrder(order.id, {
+      ...pickupData,
+      note: !pickupValidation.isCustomerMatch ? '[管理员强制放行]' : undefined
+    } as any);
     setPickupModalOpen(false);
+    setForcePickupConfirmed(false);
   };
 
   const handleExportSignature = () => {
@@ -469,8 +492,13 @@ export const OrderDetail: React.FC = () => {
         </div>
       </div>
 
-      <Modal isOpen={statusModalOpen} onClose={() => setStatusModalOpen(false)} title="更新订单状态">
+      <Modal isOpen={statusModalOpen} onClose={() => { setStatusModalOpen(false); setStatusError(null); }} title="更新订单状态">
         <div className="space-y-4">
+          {statusError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-700">❌ {statusError}</p>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">选择状态</label>
             <select
@@ -479,7 +507,10 @@ export const OrderDetail: React.FC = () => {
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {availableStatuses.map(status => (
-                <option key={status} value={status}>{statusLabels[status]}</option>
+                <option key={status} value={status}>
+                  {statusLabels[status]}
+                  {status === RepairStatus.REPAIRING && !order.quoteConfirmedAt && ' (需先报价确认)'}
+                </option>
               ))}
             </select>
           </div>
@@ -494,14 +525,15 @@ export const OrderDetail: React.FC = () => {
           </div>
           <div className="flex justify-end gap-4 pt-4">
             <button
-              onClick={() => setStatusModalOpen(false)}
+              onClick={() => { setStatusModalOpen(false); setStatusError(null); }}
               className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               取消
             </button>
             <button
               onClick={handleUpdateStatus}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={selectedStatus === RepairStatus.REPAIRING && !order.quoteConfirmedAt}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               确认更新
             </button>
@@ -623,18 +655,46 @@ export const OrderDetail: React.FC = () => {
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+          
+          {!pickupValidation.isCustomerMatch && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={forcePickupConfirmed}
+                  onChange={(e) => setForcePickupConfirmed(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 text-red-600"
+                />
+                <div>
+                  <p className="text-sm font-medium text-red-800">管理员强制放行</p>
+                  <p className="text-xs text-red-600 mt-1">
+                    取件人信息与登记客户不匹配，勾选此项可强制取件，操作将被记录。
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+          
           <div className="flex justify-end gap-4 pt-4">
             <button
-              onClick={() => setPickupModalOpen(false)}
+              onClick={() => { setPickupModalOpen(false); setForcePickupConfirmed(false); }}
               className="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               取消
             </button>
             <button
               onClick={handlePickup}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              disabled={
+                !pickupData.pickerName || 
+                !pickupData.pickerPhone ||
+                (pickupValidation.requiresIdCard && !pickupData.pickerIdCard) ||
+                (!pickupValidation.isCustomerMatch && !forcePickupConfirmed)
+              }
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              确认取件
+              {!pickupValidation.isCustomerMatch && !forcePickupConfirmed 
+                ? '请先勾选强制放行' 
+                : '确认取件'}
             </button>
           </div>
         </div>

@@ -26,7 +26,7 @@ interface RepairStore {
   deleteOrder: (orderId: string) => void;
   selectOrder: (order: RepairOrder | null) => void;
   
-  updateStatus: (orderId: string, status: RepairStatus, note?: string) => void;
+  updateStatus: (orderId: string, status: RepairStatus, note?: string) => { success: boolean; error?: string };
   confirmQuote: (orderId: string, data: QuoteConfirmDTO) => void;
   pickupOrder: (orderId: string, data: PickupDTO) => void;
   addPhoto: (orderId: string, url: string, description: string) => void;
@@ -376,13 +376,24 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
   },
 
   updateStatus: (orderId, status, note) => {
+    const { orders } = get();
+    const order = orders.find(o => o.id === orderId);
+    
+    if (!order) {
+      return { success: false, error: '订单不存在' };
+    }
+    
+    if (order.status === RepairStatus.PICKED_UP) {
+      return { success: false, error: '已取件订单不能修改状态' };
+    }
+    
+    if (status === RepairStatus.REPAIRING && !order.quoteConfirmedAt) {
+      return { success: false, error: '未完成报价确认的订单不能进入维修状态' };
+    }
+
     set((state) => ({
       orders: state.orders.map((order) => {
         if (order.id !== orderId) return order;
-        
-        if (order.status === RepairStatus.PICKED_UP) {
-          return order;
-        }
 
         const newHistory = {
           id: generateId(),
@@ -405,6 +416,8 @@ export const useRepairStore = create<RepairStore>((set, get) => ({
         return { ...order, ...updates };
       })
     }));
+    
+    return { success: true };
   },
 
   confirmQuote: (orderId, data) => {

@@ -9,6 +9,7 @@ export const NewOrder: React.FC = () => {
   const { addOrder, checkDuplicate, calculateTotalEstimatedPrice } = useRepairStore();
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [duplicateInfo, setDuplicateInfo] = useState<{ reason: string; orderNo: string } | null>(null);
+  const [duplicateConfirmed, setDuplicateConfirmed] = useState(false);
   
   const [formData, setFormData] = useState<CreateOrderDTO>({
     customerName: '',
@@ -53,6 +54,13 @@ export const NewOrder: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (showDuplicateWarning && !duplicateConfirmed) {
+      if (!confirm('检测到可能存在重复寄存记录，是否确认继续提交？')) {
+        return;
+      }
+    }
+    
     const order = addOrder(formData);
     navigate(`/orders/${order.id}`);
   };
@@ -99,24 +107,41 @@ export const NewOrder: React.FC = () => {
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!formData.customerName || !formData.customerPhone || !formData.jewelryName || !formData.jewelryDescription}
+            disabled={
+              !formData.customerName || 
+              !formData.customerPhone || 
+              !formData.jewelryName || 
+              !formData.jewelryDescription ||
+              (showDuplicateWarning && !duplicateConfirmed)
+            }
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4" />
-            保存
+            {showDuplicateWarning && !duplicateConfirmed ? '请先确认重复' : '保存'}
           </button>
         </div>
       </div>
 
       {showDuplicateWarning && duplicateInfo && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-yellow-800 font-medium">⚠️ 可能重复录入</p>
-              <p className="text-yellow-700 text-sm mt-1">{duplicateInfo.reason}</p>
-              <p className="text-yellow-600 text-sm mt-1">已有订单：{duplicateInfo.orderNo}</p>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-yellow-800 font-medium">⚠️ 可能重复录入</p>
+                <p className="text-yellow-700 text-sm mt-1">{duplicateInfo.reason}</p>
+                <p className="text-yellow-600 text-sm mt-1">已有订单：{duplicateInfo.orderNo}</p>
+              </div>
             </div>
+            <label className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-yellow-300 cursor-pointer hover:bg-yellow-50">
+              <input
+                type="checkbox"
+                checked={duplicateConfirmed}
+                onChange={(e) => setDuplicateConfirmed(e.target.checked)}
+                className="w-4 h-4 text-blue-600"
+              />
+              <span className="text-sm text-yellow-800">确认非重复，继续提交</span>
+            </label>
           </div>
         </div>
       )}
