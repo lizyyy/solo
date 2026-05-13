@@ -1,11 +1,24 @@
 import { useState } from 'react';
-import { TableState, ReplayCommand, HistoryEntry, ValidationError } from '../types';
+import { TableState, ReplayCommand, HistoryEntry, ValidationError, ExportReport } from '../types';
 import { getHistory, addToHistory, removeFromHistory, formatHistoryTime, clearHistory } from '../utils/history';
 import { getSavedCommands, createReplayCommand, saveCommand, removeCommand, serializeCommand, deserializeCommand } from '../utils/idempotent';
 import { createReport, exportAsJSON, exportAsCSV, exportAsZip } from '../utils/export';
 import { setStateToURL, encodeTableState, decodeTableState } from '../utils/urlState';
 import { TABLE_COLUMNS } from '../data/mockData';
 import { TableRow } from '../types';
+
+function isExportReport(value: unknown): value is ExportReport {
+  if (typeof value !== 'object' || value === null) return false;
+  const obj = value as Record<string, unknown>;
+  
+  return (
+    typeof obj.commandId === 'string' &&
+    typeof obj.commandName === 'string' &&
+    typeof obj.executedAt === 'number' &&
+    typeof obj.originalState === 'object' &&
+    obj.originalState !== null
+  );
+}
 
 interface ActionBarProps {
   state: TableState;
@@ -90,6 +103,35 @@ export default function ActionBar({
       setImportError('');
       setShowImport(false);
       alert('状态恢复成功');
+    } catch (e) {
+      setImportError(e instanceof Error ? e.message : '导入失败');
+    }
+  };
+
+  const handleImportReport = () => {
+    try {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(importText);
+      } catch {
+        throw new Error('不是有效的 JSON 格式');
+      }
+
+      if (!isExportReport(parsed)) {
+        throw new Error('不是有效的 report.json 格式，缺少 commandId 或 originalState 字段');
+      }
+
+      const report = parsed as ExportReport;
+      
+      if (!report.originalState) {
+        throw new Error('report.json 中缺少 originalState 字段');
+      }
+
+      onRestoreState(report.originalState);
+      setImportText('');
+      setImportError('');
+      setShowImport(false);
+      alert(`从报告恢复成功\n命令: ${report.commandName}\n执行时间: ${new Date(report.executedAt).toLocaleString()}`);
     } catch (e) {
       setImportError(e instanceof Error ? e.message : '导入失败');
     }
@@ -406,10 +448,10 @@ export default function ActionBar({
           <textarea
             value={importText}
             onChange={(e) => setImportText(e.target.value)}
-            placeholder="粘贴命令 JSON 或状态编码..."
+            placeholder="粘贴命令 JSON、状态编码 或 report.json 内容..."
             className="w-full px-3 py-2 border rounded mb-2 h-24 font-mono text-sm"
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleImportCommand}
               className="px-3 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
@@ -422,7 +464,16 @@ export default function ActionBar({
             >
               恢复状态
             </button>
+            <button
+              onClick={handleImportReport}
+              className="px-3 py-2 bg-amber-500 text-white rounded hover:bg-amber-600"
+            >
+              从报告恢复
+            </button>
           </div>
+          <p className="text-xs text-gray-500 mt-2">
+            提示：从 ZIP 导出的 report.json 中复制内容，点击「从报告恢复」可提取 originalState 恢复筛选条件。
+          </p>
         </div>
       )}
     </div>

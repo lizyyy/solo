@@ -15,8 +15,17 @@ export function applyTableState(data: TableRow[], state: TableState): FilterResu
   }
 
   for (const filter of state.filters) {
+    const validation = validateFilterValue(filter.field, filter.operator, filter.value);
+    if (!validation.valid && validation.error) {
+      errors.push(`筛选条件 [${filter.field}:${filter.operator}] 无效: ${validation.error}`);
+    }
+    
     try {
-      rows = applyFilter(rows, filter);
+      const result = applyFilterWithValidation(rows, filter);
+      if (result.errors.length > 0) {
+        errors.push(...result.errors);
+      }
+      rows = result.rows;
     } catch (e) {
       errors.push(`筛选条件 [${filter.field}:${filter.operator}] 执行失败: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -30,6 +39,10 @@ export function applyTableState(data: TableRow[], state: TableState): FilterResu
     }
   }
 
+  const { page, pageSize } = state.pagination;
+  const start = (page - 1) * pageSize;
+  rows = rows.slice(start, start + pageSize);
+
   let groupedData: Record<string, TableRow[]> | undefined;
   if (state.groupBy) {
     try {
@@ -38,10 +51,6 @@ export function applyTableState(data: TableRow[], state: TableState): FilterResu
       errors.push(`分组 [${state.groupBy.field}] 执行失败: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
-
-  const { page, pageSize } = state.pagination;
-  const start = (page - 1) * pageSize;
-  rows = rows.slice(start, start + pageSize);
 
   return { rows, errors, groupedData };
 }
@@ -56,13 +65,41 @@ function applySearch(rows: TableRow[], searchText: string): TableRow[] {
   });
 }
 
-function applyFilter(rows: TableRow[], filter: FilterCondition): TableRow[] {
+function applyFilterWithValidation(rows: TableRow[], filter: FilterCondition): { rows: TableRow[]; errors: string[] } {
   const { field, operator, value } = filter;
+  const errors: string[] = [];
 
-  return rows.filter(row => {
+  const matchingRows = rows.filter(row => {
     const rowValue = row[field];
     return evaluateCondition(rowValue, operator, value);
   });
+
+  if ((operator === 'greaterThan' || operator === 'lessThan') && typeof value !== 'number') {
+    const num = Number(value);
+    if (Number.isNaN(num)) {
+      errors.push(`筛选条件 [${field}:${operator}] 值 "${value}" 不是有效数值，请输入数字`);
+    }
+  }
+
+  if (operator === 'between' && Array.isArray(value)) {
+    const invalidValues = value.filter(v => {
+      const num = Number(v);
+      return Number.isNaN(num);
+    });
+    if (invalidValues.length > 0) {
+      errors.push(`筛选条件 [${field}:${operator}] 值 "${invalidValues.join(', ')}" 不是有效数值，请输入数字范围`);
+    }
+  }
+
+  if ((operator === 'in' || operator === 'between') && !Array.isArray(value)) {
+    errors.push(`筛选条件 [${field}:${operator}] 需要数组类型的值，当前类型: ${typeof value}`);
+  }
+
+  if (operator === 'between' && Array.isArray(value) && value.length < 2) {
+    errors.push(`筛选条件 [${field}:${operator}] 需要至少两个值，当前只有 ${value.length} 个`);
+  }
+
+  return { rows: matchingRows, errors };
 }
 
 function evaluateCondition(
@@ -164,7 +201,8 @@ function applyGroup(rows: TableRow[], group: GroupConfig): Record<string, TableR
   return groups;
 }
 
-export function validateFilterValue(_field: string, operator: string, value: unknown): { valid: boolean; error?: string } {
+export function validateFilterValue(field: string, operator: string, value: unknown): { valid: boolean; error?: string } {
+  void field;
   if (operator === 'in' || operator === 'between') {
     if (!Array.isArray(value)) {
       return { valid: false, error: `${operator} 操作符需要数组类型的值` };
