@@ -259,11 +259,13 @@ export class Validator {
     }
   }
 
-  createContext(jobId: string, schema: ValidationSchema, allRows: Record<string, any>[]): ValidationContext {
+  createContext(jobId: string, schema: ValidationSchema, allRows: Record<string, any>[], preloadSuccessRows?: Record<string, any>[]): ValidationContext {
     const seenValues = new Map<string, Set<any>>()
     
-    for (const row of allRows) {
-      this.updateSeenValues(row, schema, seenValues)
+    if (preloadSuccessRows) {
+      for (const row of preloadSuccessRows) {
+        this.updateSeenValues(row, schema, seenValues)
+      }
     }
     
     return {

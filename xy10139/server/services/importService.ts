@@ -36,9 +36,7 @@ export class ImportService {
     if (!schema) {
       throw new Error(`校验规则不存在: ${options.schemaId}`)
     }
-第三轮修复了部分上一轮问题，但仍未达到原始目标中“失败重试、可复验命令、坏数据不能静默跳过、README 示例可直接验收”的要求。README.md:257-267 声明 CLI 的 `-r` 参数按行号复验/重试，但 cli/index.ts:237-239、326-327 实际把这些数字传给按 `id` 过滤的查询，指定行号命令会查不到目标行。更严重的是 retry 链路没有把已成功行的唯一值预载入校验上下文，重复值失败行可在不修改数据的情况下被重试为成功，破坏核心校验可信度。
 
-请修改上一轮发现的问题， 保留已有功能，完成后确保项目仍可安装、可运行、可验证。
     const contentHash = this.getFileHash(options.filePath)
 
     const existingJob = this.findExistingJob(contentHash, options.schemaId)
@@ -134,14 +132,15 @@ export class ImportService {
     }
 
     const successRows = this.getSuccessRows(jobId)
-    const allRows = [...successRows.map(r => r.data), ...failedRows.map(r => {
+    const successRowData = successRows.map(r => r.data)
+    const allRows = [...successRowData, ...failedRows.map(r => {
       if (overrideData && overrideData[r.id]) {
         return { ...r.data, ...overrideData[r.id] }
       }
       return r.data
     })]
 
-    const context = validator.createContext(jobId, schema, allRows)
+    const context = validator.createContext(jobId, schema, allRows, successRowData)
     
     let newSuccessCount = 0
     const updatedRows: RowResult[] = []
