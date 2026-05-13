@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烘焙订单排产系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .nav {
+            display: flex;
+            gap: 15px;
+        }
+        .nav button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .nav button:hover, .nav button.active {
+            background: rgba(255,255,255,0.3);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ddd;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 2px solid white;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+        .timeline-operator {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 150px;
+        }
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍰 烘焙订单排产系统</h1>
+        <div class="nav">
+            <button class="active" onclick="showPage('orders')">订单管理</button>
+            <button onclick="showPage('reschedule')">改期申请</button>
+            <button onclick="showPage('logs')">操作日志</button>
+            <button onclick="showPage('reports')">导出报告</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="orders" class="page active">
+            <div class="card">
+                <h2>创建新订单</h2>
+                <div id="orderFormAlert"></div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div class="form-group">
+                        <label>客户姓名</label>
+                        <input type="text" id="customerName" placeholder="请输入客户姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>产品口味</label>
+                        <select id="recipeId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>数量</label>
+                        <input type="number" id="quantity" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>取货时间</label>
+                        <input type="datetime-local" id="pickupTime">
+                    </div>
+                    <div class="form-group">
+                        <label>操作人</label>
+                        <input type="text" id="operator" placeholder="请输入操作人姓名" value="admin">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="notes" rows="2"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="createOrder()">创建订单</button>
+            </div>
+
+            <div class="card">
+                <h2>订单列表</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>客户</th>
+                            <th>产品</th>
+                            <th>数量</th>
+                            <th>取货时间</th>
+                            <th>班次</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reschedule" class="page">
+            <div class="card">
+                <h2>改期申请列表</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>订单号</th>
+                            <th>客户</th>
+                            <th>原取货时间</th>
+                            <th>申请取货时间</th>
+                            <th>改期原因</th>
+                            <th>申请人</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rescheduleTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="logs" class="page">
+            <div class="card">
+                <h2>操作日志</h2>
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>操作人</label>
+                        <input type="text" id="logOperator" placeholder="筛选操作人">
+                    </div>
+                    <div class="filter-item">
+                        <label>开始日期</label>
+                        <input type="date" id="logStartDate">
+                    </div>
+                    <div class="filter-item">
+                        <label>结束日期</label>
+                        <input type="date" id="logEndDate">
+                    </div>
+                    <div class="filter-item">
+                        <label>实体类型</label>
+                        <select id="logEntityType">
+                            <option value="">全部</option>
+                            <option value="flavor_recipe">口味配方</option>
+                            <option value="oven_capacity">烤炉容量</option>
+                            <option value="ingredient_stock">原料库存</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="loadLogs()">筛选</button>
+                <br><br>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>操作类型</th>
+                            <th>实体类型</th>
+                            <th>操作人</th>
+                            <th>操作时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reports" class="page">
+            <div class="card">
+                <h2>导出改期申请报告</h2>
+                <div class="filter-row">
+                    <div class="filter-item">
+                        <label>申请人</label>
+                        <input type="text" id="reportRequestedBy" placeholder="筛选申请人">
+                    </div>
+                    <div class="filter-item">
+                        <label>审核人</label>
+                        <input type="text" id="reportReviewedBy" placeholder="筛选审核人">
+                    </div>
+                    <div class="filter-item">
+                        <label>开始日期</label>
+                        <input type="date" id="reportStartDate">
+                    </div>
+                    <div class="filter-item">
+                        <label>结束日期</label>
+                        <input type="date" id="reportEndDate">
+                    </div>
+                    <div class="filter-item">
+                        <label>状态</label>
+                        <select id="reportStatus">
+                            <option value="">全部</option>
+                            <option value="pending_review">待审核</option>
+                            <option value="approved">已批准</option>
+                            <option value="rejected">已拒绝</option>
+                            <option value="auto_approved">自动批准</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="exportRescheduleReport()">导出改期报告</button>
+                <button class="btn btn-primary" onclick="exportChangesReport()" style="margin-left: 10px;">导出变更历史</button>
+            </div>
+            
+            <div class="card">
+                <h2>班次统计</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>班次名称</th>
+                            <th>时间</th>
+                            <th>最大订单数</th>
+                            <th>当前订单数</th>
+                            <th>总数量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shiftStatsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="orderDetailModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 10px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>订单详情 - <span id="detailOrderNumber"></span></h3>
+                <button onclick="closeOrderDetail()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="orderDetailContent"></div>
+            <div style="margin-top: 20px;">
+                <h4>时间线</h4>
+                <div class="timeline" id="orderTimeline"></div>
+            </div>
+            <div style="margin-top: 20px;">
+                <h4>申请改期</h4>
+                <div class="form-group">
+                    <label>新取货时间</label>
+                    <input type="datetime-local" id="newPickupTime">
+                </div>
+                <div class="form-group">
+                    <label>改期原因</label>
+                    <textarea id="rescheduleReason" rows="2"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitReschedule()">提交改期申请</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let currentOrderId = null;
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (pageId === 'orders') loadOrders();
+            if (pageId === 'reschedule') loadRescheduleRequests();
+            if (pageId === 'logs') loadLogs();
+            if (pageId === 'reports') loadShiftStats();
+        }
+
+        async function loadRecipes() {
+            const res = await fetch(`${API_BASE}/flavor-recipes`);
+            const data = await res.json();
+            const select = document.getElementById('recipeId');
+            select.innerHTML = data.data.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+        }
+
+        async function loadOrders() {
+            const res = await fetch(`${API_BASE}/orders`);
+            const data = await res.json();
+            const tbody = document.getElementById('ordersTable');
+            tbody.innerHTML = data.data.map(o => `
+                <tr>
+                    <td>${o.order_number}</td>
+                    <td>${o.customer_name}</td>
+                    <td>${o.recipe_name || '-'}</td>
+                    <td>${o.quantity}</td>
+                    <td>${new Date(o.pickup_time).toLocaleString()}</td>
+                    <td>${o.shift_name || '-'}</td>
+                    <td><span class="badge badge-${o.status === 'confirmed' ? 'success' : 'warning'}">${o.status}</span></td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;" onclick="showOrderDetail('${o.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function createOrder() {
+            const orderData = {
+                customer_name: document.getElementById('customerName').value,
+                recipe_id: document.getElementById('recipeId').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                pickup_time: document.getElementById('pickupTime').value,
+                notes: document.getElementById('notes').value,
+                operator: document.getElementById('operator').value
+            };
+
+            const alertDiv = document.getElementById('orderFormAlert');
+            
+            try {
+                const res = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    alertDiv.innerHTML = `<div class="alert alert-success">订单创建成功！场景: ${data.scenario}</div>`;
+                    loadOrders();
+                } else {
+                    alertDiv.innerHTML = `<div class="alert alert-error">${data.message} (场景: ${data.scenario})</div>`;
+                }
+            } catch (err) {
+                alertDiv.innerHTML = `<div class="alert alert-error">创建失败: ${err.message}</div>`;
+            }
+        }
+
+        async function showOrderDetail(orderId) {
+            currentOrderId = orderId;
+            const res = await fetch(`${API_BASE}/orders/${orderId}`);
+            const data = await res.json();
+            const order = data.data;
+            
+            document.getElementById('detailOrderNumber').textContent = order.order_number;
+            document.getElementById('orderDetailContent').innerHTML = `
+                <p><strong>客户:</strong> ${order.customer_name}</p>
+                <p><strong>产品:</strong> ${order.recipe_name || '-'}</p>
+                <p><strong>数量:</strong> ${order.quantity}</p>
+                <p><strong>取货时间:</strong> ${new Date(order.pickup_time).toLocaleString()}</p>
+                <p><strong>状态:</strong> ${order.status}</p>
+                <p><strong>备注:</strong> ${order.notes || '-'}</p>
+            `;
+            
+            const timelineHtml = order.timeline.map(t => `
+                <div class="timeline-item">
+                    <div class="timeline-time">${new Date(t.event_time).toLocaleString()}</div>
+                    <div class="timeline-operator">${t.operator}</div>
+                    <div>${t.event_description}</div>
+                </div>
+            `).join('');
+            document.getElementById('orderTimeline').innerHTML = timelineHtml || '<p>暂无记录</p>';
+            
+            document.getElementById('orderDetailModal').style.display = 'flex';
+        }
+
+        function closeOrderDetail() {
+            document.getElementById('orderDetailModal').style.display = 'none';
+            currentOrderId = null;
+        }
+
+        async function submitReschedule() {
+            const data = {
+                requested_pickup_time: document.getElementById('newPickupTime').value,
+                reason: document.getElementById('rescheduleReason').value,
+                operator: document.getElementById('operator').value
+            };
+            
+            const res = await fetch(`${API_BASE}/orders/${currentOrderId}/reschedule`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                alert('改期申请提交成功！' + (result.scenario ? '场景: ' + result.scenario : ''));
+                closeOrderDetail();
+                loadOrders();
+            } else {
+                alert('提交失败: ' + result.message);
+            }
+        }
+
+        async function loadRescheduleRequests() {
+            const res = await fetch(`${API_BASE}/reports/reschedule`);
+            const data = await res.json();
+            const tbody = document.getElementById('rescheduleTable');
+            tbody.innerHTML = data.data.map(r => `
+                <tr>
+                    <td>${r.order_number}</td>
+                    <td>${r.customer_name}</td>
+                    <td>${new Date(r.original_pickup_time).toLocaleString()}</td>
+                    <td>${new Date(r.requested_pickup_time).toLocaleString()}</td>
+                    <td>${r.reason}</td>
+                    <td>${r.requested_by}</td>
+                    <td><span class="badge badge-${r.status === 'approved' ? 'success' : r.status === 'rejected' ? 'danger' : 'warning'}">${r.status}</span></td>
+                    <td>
+                        ${r.status === 'pending_review' ? `
+                            <button class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="reviewReschedule('${r.id}', true)">批准</button>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px; margin-left: 5px;" onclick="reviewReschedule('${r.id}', false)">拒绝</button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function reviewReschedule(requestId, approved) {
+            const reason = approved ? '' : prompt('请输入拒绝原因:');
+            const data = {
+                approved,
+                review_notes: reason,
+                operator: document.getElementById('operator').value
+            };
+            
+            const res = await fetch(`${API_BASE}/orders/reschedule/${requestId}/review`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            if (result.success) {
+                alert('审核成功！');
+                loadRescheduleRequests();
+            } else {
+                alert('审核失败: ' + result.message);
+            }
+        }
+
+        async function loadLogs() {
+            const params = new URLSearchParams({
+                operator: document.getElementById('logOperator').value,
+                start_date: document.getElementById('logStartDate').value,
+                end_date: document.getElementById('logEndDate').value,
+                entity_type: document.getElementById('logEntityType').value
+            });
+            
+            const res = await fetch(`${API_BASE}/reports/logs?${params}`);
+            const data = await res.json();
+            const tbody = document.getElementById('logsTable');
+            tbody.innerHTML = data.data.map(l => `
+                <tr>
+                    <td><span class="badge badge-info">${l.operation_type}</span></td>
+                    <td>${l.entity_type}</td>
+                    <td>${l.operator}</td>
+                    <td>${new Date(l.operation_time).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function exportRescheduleReport() {
+            const params = new URLSearchParams({
+                requested_by: document.getElementById('reportRequestedBy').value,
+                reviewed_by: document.getElementById('reportReviewedBy').value,
+                start_date: document.getElementById('reportStartDate').value,
+                end_date: document.getElementById('reportEndDate').value,
+                status: document.getElementById('reportStatus').value
+            });
+            
+            window.open(`${API_BASE}/reports/export/reschedule?${params}`, '_blank');
+        }
+
+        async function exportChangesReport() {
+            const params = new URLSearchParams({
+                operator: document.getElementById('reportRequestedBy').value,
+                start_date: document.getElementById('reportStartDate').value,
+                end_date: document.getElementById('reportEndDate').value
+            });
+            
+            window.open(`${API_BASE}/reports/export/changes?${params}`, '_blank');
+        }
+
+        async function loadShiftStats() {
+            const res = await fetch(`${API_BASE}/orders/statistics/shifts`);
+            const data = await res.json();
+            const tbody = document.getElementById('shiftStatsTable');
+            tbody.innerHTML = data.data.map(s => `
+                <tr>
+                    <td>${s.shift_name}</td>
+                    <td>${s.start_time} - ${s.end_time}</td>
+                    <td>${s.max_orders}</td>
+                    <td>${s.current_orders}</td>
+                    <td>${s.total_quantity}</td>
+                </tr>
+            `).join('');
+        }
+
+        loadRecipes();
+        loadOrders();
+    </script>
+</body>
+</html>
