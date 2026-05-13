@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from app import db
-from models import (
+from app.database import db
+from app.models import (
     InspectionItem, DefectTicket, WorkOrder, Reinspection,
-    DowntimeRecord, ImpactStatistics, TicketStatus, DefectSeverity
+    DowntimeRecord, ImpactStatistics
 )
+from app.enums import TicketStatus, DefectSeverity
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -215,10 +216,7 @@ def record_downtime(ticket_id):
     db.session.add(downtime)
 
     if duration:
-        total_downtime = db.session.query(
-            db.func.coalesce(db.func.sum(DowntimeRecord.duration_hours), 0)
-        ).filter_by(defect_ticket_id=ticket.id).scalar()
-        ticket.downtime_hours = total_downtime + duration
+        ticket.downtime_hours = ticket.downtime_hours + duration
 
     db.session.commit()
     return jsonify(downtime.to_dict()), 201

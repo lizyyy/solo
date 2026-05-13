@@ -38,13 +38,15 @@ def generate_statistics(app, db, models):
         models.DefectTicket.created_at <= period_end
     ).all()
 
-    critical_count = sum(1 for t in tickets if t.severity == models.DefectSeverity.CRITICAL)
-    high_count = sum(1 for t in tickets if t.severity == models.DefectSeverity.HIGH)
-    medium_count = sum(1 for t in tickets if t.severity == models.DefectSeverity.MEDIUM)
-    low_count = sum(1 for t in tickets if t.severity == models.DefectSeverity.LOW)
+    from app.enums import DefectSeverity, TicketStatus
+
+    critical_count = sum(1 for t in tickets if t.severity == DefectSeverity.CRITICAL)
+    high_count = sum(1 for t in tickets if t.severity == DefectSeverity.HIGH)
+    medium_count = sum(1 for t in tickets if t.severity == DefectSeverity.MEDIUM)
+    low_count = sum(1 for t in tickets if t.severity == DefectSeverity.LOW)
     total_downtime = sum(t.downtime_hours for t in tickets)
 
-    closed_tickets = [t for t in tickets if t.status == models.TicketStatus.CLOSED]
+    closed_tickets = [t for t in tickets if t.status == TicketStatus.CLOSED]
     avg_resolution = 0
     if closed_tickets:
         total_hours = sum(
@@ -103,8 +105,8 @@ def background_job_loop(app, db, models):
 
 
 def init_app(app, start_jobs=False):
-    from app import db
-    import models
+    from app.database import db
+    from app import models as models_module
 
     def start_background_jobs():
         if _job_state['running']:
@@ -113,7 +115,7 @@ def init_app(app, start_jobs=False):
         _job_state['running'] = True
         _job_state['thread'] = threading.Thread(
             target=background_job_loop,
-            args=(app, db, models),
+            args=(app, db, models_module),
             daemon=True
         )
         _job_state['thread'].start()

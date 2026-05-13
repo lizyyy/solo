@@ -1,8 +1,10 @@
-from app import create_app, db
-from models import (
+from app import create_app
+from app.database import db
+from app.models import (
     InspectionItem, DefectTicket, WorkOrder, Reinspection,
-    DowntimeRecord, ImpactStatistics, TicketStatus, DefectSeverity
+    DowntimeRecord, ImpactStatistics
 )
+from app.enums import TicketStatus, DefectSeverity
 from datetime import datetime, timedelta
 
 app = create_app()
@@ -66,7 +68,7 @@ with app.app_context():
         print(f'  - ID={t.id}: {t.severity.value} - {t.status.value}（版本{t.version}）')
 
     print('\n=== 3. 模拟主流程：工单 #1 ===')
-    ticket = DefectTicket.query.get(1)
+    ticket = db.session.get(DefectTicket, 1)
     print(f'初始状态：{ticket.status.value}（版本 {ticket.version}）')
 
     print('  动作：派单给维修组A')
@@ -96,9 +98,9 @@ with app.app_context():
         reason='电机过热需要停机冷却并检查'
     )
     db.session.add(downtime)
-    ticket.downtime_hours = 2.5
+    ticket.downtime_hours = ticket.downtime_hours + 2.5
     db.session.commit()
-    print(f'  记录停机：2.5 小时')
+    print(f'  记录停机：2.5 小时，工单停机总数={ticket.downtime_hours}')
 
     print('  动作：维修完成')
     work_order.completed_at = now + timedelta(hours=3)
@@ -124,8 +126,35 @@ with app.app_context():
     db.session.commit()
     print(f'  状态变为：{ticket.status.value}（版本 {ticket.version}）')
 
-    print('\n=== 4. 模拟另一个工单的复验失败场景：工单 #2 ===')
-    ticket2 = DefectTicket.query.get(2)
+    print('\n=== 4. 模拟停机记录累加测试（验证修复的 bug）===')
+    ticket_test = db.session.get(DefectTicket, 1)
+    original_downtime = ticket_test.downtime_hours
+    print(f'  工单 #1 当前停机时长：{original_downtime} 小时')
+
+    print('  添加 1.5 小时停机记录...')
+    downtime2 = DowntimeRecord(
+        defect_ticket_id=ticket_test.id,
+        start_time=now + timedelta(hours=4),
+        end_time=now + timedelta(hours=5, minutes=30),
+        duration_hours=1.5,
+        reason='额外测试停机'
+    )
+    db.session.add(downtime2)
+    ticket_test.downtime_hours = ticket_test.downtime_hours + 1.5
+    db.session.commit()
+    db.session.refresh(ticket_test)
+
+    expected = original_downtime + 1.5
+    actual = ticket_test.downtime_hours
+    print(f'  预期结果：{expected} 小时')
+    print(f'  实际结果：{actual} 小时')
+    if abs(expected - actual) < 0.001:
+        print('  ✓ 停机时间累加正确，未重复计算')
+    else:
+        print(f'  ✗ 停机时间累加错误！预期 {expected}，实际 {actual}')
+
+    print('\n=== 5. 模拟另一个工单的复验失败场景：工单 #2 ===')
+    ticket2 = db.session.get(DefectTicket, 2)
     print(f'初始状态：{ticket2.status.value}（版本 {ticket2.version}）')
 
     work_order2 = WorkOrder(
@@ -157,7 +186,7 @@ with app.app_context():
     db.session.commit()
     print(f'  状态变为：{ticket2.status.value}（复验失败，需要重新派单）')
 
-    print('\n=== 5. 生成影响统计 ===')
+    print('\n=== 6. 生成影响统计 ===')
     period_end = now
     period_start = now - timedelta(days=30)
     all_tickets = DefectTicket.query.filter(

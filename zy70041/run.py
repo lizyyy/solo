@@ -1,5 +1,6 @@
-from app import create_app, db
-from models import InspectionItem
+from app import create_app
+from app.database import db
+from app.models import InspectionItem
 
 app = create_app(start_background_jobs=True)
 
