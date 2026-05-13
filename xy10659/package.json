@@ -1,0 +1,24 @@
+{
+  "name": "auto-maintenance-system",
+  "version": "1.0.0",
+  "description": "汽修保养套餐核销系统",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "init-db": "node server/scripts/init-db.js",
+    "client": "cd client && npm run serve",
+    "build": "cd client && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "exceljs": "^4.4.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
