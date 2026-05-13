@@ -145,7 +145,7 @@ class ReportService {
     const logs = await this.db('transaction_logs')
       .where('department_id', departmentId)
       .where('budget_id', budget.id)
-      .where('operation_type', 'in', ['BUDGET_LOCK', 'BUDGET_LOCK_COMMIT', 'BUDGET_LOCK_RELEASE'])
+      .where('operation_type', 'in', ['BUDGET_LOCK', 'BUDGET_LOCK_UPDATE', 'BUDGET_LOCK_COMMIT', 'BUDGET_LOCK_RELEASE'])
       .orderBy('created_at', 'asc');
 
     let runningUsed = 0;
@@ -156,6 +156,8 @@ class ReportService {
       const amount = parseFloat(log.amount) || 0;
       
       if (log.operation_type === 'BUDGET_LOCK') {
+        runningLocked += amount;
+      } else if (log.operation_type === 'BUDGET_LOCK_UPDATE') {
         runningLocked += amount;
       } else if (log.operation_type === 'BUDGET_LOCK_COMMIT') {
         runningLocked -= amount;

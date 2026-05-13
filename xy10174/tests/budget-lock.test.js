@@ -634,6 +634,164 @@ describe('采购预算锁定 API 测试', () => {
       expect(lastPointAfter.lockedAmount).toBe(0);
       expect(lastPointAfter.availableAmount).toBe(700);
     });
+
+    test('修改锁定金额后，趋势报表应该正确反映金额变化', async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const budgetResponse = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'UPDATE_TREND_TEST',
+          fiscalYear,
+          totalAmount: 1000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      
+      expect(budgetResponse.status).toBe(200);
+      const updateTestBudgetId = budgetResponse.body.data.id;
+
+      const testAppId = `UPDATE-TREND-${Date.now()}`;
+      
+      const lockResponse = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: updateTestBudgetId,
+          applicationId: testAppId,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 100,
+          createdBy: 'update_trend_test'
+        });
+      
+      expect(lockResponse.status).toBe(200);
+      const lockId = lockResponse.body.data.lockId;
+
+      const afterLockBudget = await request(app)
+        .get(`/api/budget/budgets/${updateTestBudgetId}`);
+      expect(parseFloat(afterLockBudget.body.data.locked_amount)).toBe(100);
+      expect(parseFloat(afterLockBudget.body.data.available_amount)).toBe(900);
+
+      const afterLockTrend = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'UPDATE_TREND_TEST',
+          fiscalYear
+        });
+      
+      const lastPointAfterLock = afterLockTrend.body.data.trend[afterLockTrend.body.data.trend.length - 1];
+      expect(lastPointAfterLock.lockedAmount).toBe(100);
+      expect(lastPointAfterLock.availableAmount).toBe(900);
+
+      const updateResponse = await request(app)
+        .put(`/api/budget/locks/${lockId}`)
+        .send({
+          newAmount: 150,
+          operator: 'update_trend_test'
+        });
+      
+      expect(updateResponse.status).toBe(200);
+
+      const afterUpdateBudget = await request(app)
+        .get(`/api/budget/budgets/${updateTestBudgetId}`);
+      expect(parseFloat(afterUpdateBudget.body.data.locked_amount)).toBe(150);
+      expect(parseFloat(afterUpdateBudget.body.data.available_amount)).toBe(850);
+
+      const afterUpdateTrend = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'UPDATE_TREND_TEST',
+          fiscalYear
+        });
+      
+      expect(afterUpdateTrend.status).toBe(200);
+      
+      const trend = afterUpdateTrend.body.data.trend;
+      expect(trend.length).toBeGreaterThanOrEqual(2);
+      
+      const lastPoint = trend[trend.length - 1];
+      expect(lastPoint.operationType).toBe('BUDGET_LOCK_UPDATE');
+      expect(lastPoint.amount).toBe(50);
+      expect(lastPoint.lockedAmount).toBe(150);
+      expect(lastPoint.availableAmount).toBe(850);
+      expect(lastPoint.usedAmount).toBe(0);
+      
+      const budget = afterUpdateTrend.body.data.budget;
+      expect(afterUpdateTrend.body.data.trendFinalLocked).toBe(budget.currentLocked);
+      expect(afterUpdateTrend.body.data.trendFinalUsed).toBe(budget.currentUsed);
+      expect(afterUpdateTrend.body.data.finalAvailable).toBe(budget.currentAvailable);
+      
+      expect(afterUpdateTrend.body.data.trendFinalLocked).toBe(150);
+      expect(afterUpdateTrend.body.data.trendFinalUsed).toBe(0);
+      expect(afterUpdateTrend.body.data.finalAvailable).toBe(850);
+    });
+
+    test('减少锁定金额后，趋势报表应该正确反映金额变化', async () => {
+      const startDate = new Date();
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+      
+      const budgetResponse = await request(app)
+        .post('/api/budget/budgets')
+        .send({
+          departmentId,
+          budgetType: 'DECREASE_TREND_TEST',
+          fiscalYear,
+          totalAmount: 1000,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString()
+        });
+      
+      const decreaseTestBudgetId = budgetResponse.body.data.id;
+
+      const testAppId = `DECREASE-TREND-${Date.now()}`;
+      
+      const lockResponse = await request(app)
+        .post('/api/budget/locks')
+        .send({
+          budgetId: decreaseTestBudgetId,
+          applicationId: testAppId,
+          applicationType: 'PURCHASE_REQUEST',
+          amount: 200,
+          createdBy: 'decrease_trend_test'
+        });
+      
+      const lockId = lockResponse.body.data.lockId;
+
+      const updateResponse = await request(app)
+        .put(`/api/budget/locks/${lockId}`)
+        .send({
+          newAmount: 80,
+          operator: 'decrease_trend_test'
+        });
+      
+      expect(updateResponse.status).toBe(200);
+
+      const afterUpdateBudget = await request(app)
+        .get(`/api/budget/budgets/${decreaseTestBudgetId}`);
+      expect(parseFloat(afterUpdateBudget.body.data.locked_amount)).toBe(80);
+      expect(parseFloat(afterUpdateBudget.body.data.available_amount)).toBe(920);
+
+      const afterUpdateTrend = await request(app)
+        .get(`/api/reports/departments/${departmentId}/trend`)
+        .query({
+          budgetType: 'DECREASE_TREND_TEST',
+          fiscalYear
+        });
+      
+      const trend = afterUpdateTrend.body.data.trend;
+      const lastPoint = trend[trend.length - 1];
+      expect(lastPoint.operationType).toBe('BUDGET_LOCK_UPDATE');
+      expect(lastPoint.amount).toBe(-120);
+      expect(lastPoint.lockedAmount).toBe(80);
+      expect(lastPoint.availableAmount).toBe(920);
+      
+      expect(afterUpdateTrend.body.data.trendFinalLocked).toBe(80);
+      expect(afterUpdateTrend.body.data.trendFinalUsed).toBe(0);
+      expect(afterUpdateTrend.body.data.finalAvailable).toBe(920);
+    });
   });
 
   describe('7. 错误码验证', () => {
