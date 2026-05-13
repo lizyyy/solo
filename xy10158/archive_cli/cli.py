@@ -34,7 +34,12 @@ def dryrun():
 def dryrun_run(config: str, verbose: bool, save_report: bool):
     """执行 dry-run 预演：分析分区影响，生成报告"""
     
+    import sys
+    exec_command = ' '.join(sys.argv)
+    abs_config_path = os.path.abspath(config)
+    
     click.echo(f"{Fore.CYAN}正在加载配置文件: {config}{Style.RESET_ALL}")
+    click.echo(f"  绝对路径: {abs_config_path}")
     
     try:
         app_config = AppConfig.from_yaml(config)
@@ -62,12 +67,26 @@ def dryrun_run(config: str, verbose: bool, save_report: bool):
         'archive': {
             'source_table': app_config.archive.source_table,
             'target_table': app_config.archive.target_table,
+            'primary_key': app_config.archive.primary_key,
             'partition_type': app_config.archive.partition.type,
-            'partition_column': app_config.archive.partition.column
+            'partition_column': app_config.archive.partition.column,
+            'batch_size': app_config.archive.batch_size,
+            'archive_condition': app_config.archive.archive_condition,
+            'validate_columns': app_config.archive.validate_columns
+        },
+        'report': {
+            'output_dir': app_config.report.output_dir,
+            'include_sample_data': app_config.report.include_sample_data,
+            'sample_limit': app_config.report.sample_limit
         }
     }
     
-    report = report_generator.generate_dry_run_report(result, config_dict)
+    report = report_generator.generate_dry_run_report(
+        result, 
+        config_dict,
+        config_file_path=abs_config_path,
+        execution_command=exec_command
+    )
     
     report_generator.print_console_report(report)
     
@@ -138,7 +157,7 @@ def archive_execute(config: str, confirm: bool, dry_run: bool):
     click.echo(f"{Fore.CYAN}开始执行归档操作...{Style.RESET_ALL}")
     
     executor = ArchiveExecutor(app_config)
-    success, records, errors = executor.execute_archive()
+    success, records, errors, stats = executor.execute_archive()
     
     rollback_manager = RollbackManager(app_config)
     
@@ -146,11 +165,18 @@ def archive_execute(config: str, confirm: bool, dry_run: bool):
         rollback_file = rollback_manager.save_archive_record(records)
         click.echo(f"{Fore.GREEN}✓ 回滚记录已保存: {rollback_file}{Style.RESET_ALL}")
     
+    click.echo(f"\n{Fore.CYAN}幂等性检查统计:{Style.RESET_ALL}")
+    click.echo(f"  检查的总记录数: {stats['total_checked']:,}")
+    click.echo(f"  已存在的记录数(跳过): {Fore.YELLOW}{stats['already_exists']:,}{Style.RESET_ALL}")
+    click.echo(f"  新归档的记录数: {Fore.GREEN}{stats['newly_archived']:,}{Style.RESET_ALL}")
+    
     if success:
         total_rows = sum(r.count for r in records)
         click.echo(f"\n{Fore.GREEN}归档成功完成！{Style.RESET_ALL}")
         click.echo(f"已归档分区数: {len(records)}")
         click.echo(f"已归档记录数: {total_rows}")
+        if stats['already_exists'] > 0:
+            click.echo(f"{Fore.YELLOW}注意: {stats['already_exists']} 条记录已存在于目标表，已跳过(保证幂等性){Style.RESET_ALL}")
     else:
         click.echo(f"\n{Fore.RED}归档过程中出现错误:{Style.RESET_ALL}")
         for error in errors:

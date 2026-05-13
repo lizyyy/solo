@@ -31,6 +31,14 @@ class ImpactAnalysis:
 
 
 @dataclass
+class PartitionSample:
+    partition_name: str
+    sample_rows: List[Dict[str, Any]]
+    primary_keys: List[Any]
+    total_count: int
+
+
+@dataclass
 class DryRunResult:
     success: bool
     partitions: List[PartitionInfo] = field(default_factory=list)
@@ -38,6 +46,8 @@ class DryRunResult:
     sql_statements: List[Dict[str, Any]] = field(default_factory=list)
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
+    partition_samples: Dict[str, PartitionSample] = field(default_factory=dict)
+    validation_issues_detailed: List[ValidationIssue] = field(default_factory=list)
 
 
 @dataclass
@@ -151,6 +161,72 @@ class ArchiveExecutor:
         
         return analysis
     
+    def collect_partition_samples(
+        self, 
+        partitions: List[PartitionInfo]
+    ) -> Tuple[Dict[str, PartitionSample], List[ValidationIssue]]:
+        samples = {}
+        issues = []
+        
+        for partition in partitions:
+            if partition.row_count is None or partition.row_count == 0:
+                continue
+            
+            try:
+                select_sql = self.strategy.generate_select_sql(partition)
+                select_sql = select_sql.format(
+                    source_table=self._get_full_table_name(self.config.archive.source_table)
+                )
+                
+                if self.config.archive.archive_condition:
+                    select_sql = f"{select_sql} AND ({self.config.archive.archive_condition})"
+                
+                limit = self.config.report.sample_limit if self.config.report.include_sample_data else 0
+                
+                if limit > 0:
+                    sample_sql = f"SELECT * FROM ({select_sql}) AS subquery LIMIT {limit}"
+                    sample_data = self.db_manager.execute_query(sample_sql, partition.parameters)
+                    sample_rows = sample_data.to_dict('records')
+                    primary_keys_sample = sample_data[self.config.archive.primary_key].tolist()
+                else:
+                    sample_rows = []
+                    primary_keys_sample = []
+                
+                pk_sql = f"SELECT {self.config.archive.primary_key} FROM ({select_sql}) AS subquery"
+                pk_data = self.db_manager.execute_query(pk_sql, partition.parameters)
+                all_primary_keys = pk_data[self.config.archive.primary_key].tolist()
+                
+                for col in self.config.archive.validate_columns:
+                    if limit > 0 and col in sample_data.columns:
+                        null_count = sample_data[col].isna().sum()
+                        if null_count > 0:
+                            null_rows = sample_data[sample_data[col].isna()]
+                            null_sample = null_rows.head(min(5, len(null_rows))).to_dict('records')
+                            
+                            issues.append(ValidationIssue(
+                                type="data",
+                                severity="warning",
+                                message=f"Partition {partition.name}: Column '{col}' has {null_count} NULL values in sample",
+                                affected_rows=null_count,
+                                sample_data=null_sample
+                            ))
+                
+                samples[partition.name] = PartitionSample(
+                    partition_name=partition.name,
+                    sample_rows=sample_rows,
+                    primary_keys=all_primary_keys,
+                    total_count=partition.row_count or 0
+                )
+                
+            except Exception as e:
+                issues.append(ValidationIssue(
+                    type="data",
+                    severity="error",
+                    message=f"Failed to collect samples for partition {partition.name}: {str(e)}"
+                ))
+        
+        return samples, issues
+    
     def validate_data_integrity(self, partitions: List[PartitionInfo]) -> List[ValidationIssue]:
         issues = []
         
@@ -261,8 +337,11 @@ class ArchiveExecutor:
                     else:
                         result.warnings.append(issue.message)
             
-            data_issues = self.validate_data_integrity(partitions)
-            for issue in data_issues:
+            samples, sample_issues = self.collect_partition_samples(partitions)
+            result.partition_samples = samples
+            result.validation_issues_detailed = sample_issues
+            
+            for issue in sample_issues:
                 if issue.severity == 'error':
                     result.errors.append(issue.message)
                 else:
@@ -276,9 +355,43 @@ class ArchiveExecutor:
         
         return result
     
-    def execute_archive(self) -> Tuple[bool, List[ArchiveRecord], List[str]]:
+    def _check_existing_records(self, data: pd.DataFrame) -> pd.DataFrame:
+        target_table = self.config.archive.target_table
+        pk = self.config.archive.primary_key
+        schema = self.config.database.schema
+        
+        if not self.db_manager.table_exists(target_table, schema):
+            return data
+        
+        pk_values = data[pk].tolist()
+        if not pk_values:
+            return data
+        
+        placeholders = ','.join([f':pk{i}' for i in range(len(pk_values))])
+        params = {f'pk{i}': pk for i, pk in enumerate(pk_values)}
+        
+        check_sql = f"""
+        SELECT {pk} FROM {self._get_full_table_name(target_table)}
+        WHERE {pk} IN ({placeholders})
+        """
+        
+        existing = self.db_manager.execute_query(check_sql, params)
+        existing_pks = set(existing[pk].tolist())
+        
+        if existing_pks:
+            new_data = data[~data[pk].isin(existing_pks)]
+            return new_data
+        
+        return data
+    
+    def execute_archive(self) -> Tuple[bool, List[ArchiveRecord], List[str], Dict[str, int]]:
         records = []
         errors = []
+        stats = {
+            'total_checked': 0,
+            'already_exists': 0,
+            'newly_archived': 0
+        }
         
         try:
             self.initialize()
@@ -301,31 +414,41 @@ class ArchiveExecutor:
                     data = self.db_manager.execute_query(select_sql, partition.parameters)
                     
                     if len(data) > 0:
-                        pk_values = data[self.config.archive.primary_key].tolist()
+                        stats['total_checked'] += len(data)
                         
-                        data.to_sql(
-                            name=self.config.archive.target_table,
-                            con=self.db_manager.connect(),
-                            schema=self.config.database.schema,
-                            if_exists='append',
-                            index=False
-                        )
+                        data_to_archive = self._check_existing_records(data)
                         
-                        delete_sql = self.strategy.generate_delete_sql(partition)
-                        delete_sql = delete_sql.format(
-                            source_table=self._get_full_table_name(self.config.archive.source_table)
-                        )
+                        existing_count = len(data) - len(data_to_archive)
+                        if existing_count > 0:
+                            stats['already_exists'] += existing_count
                         
-                        if self.config.archive.archive_condition:
-                            delete_sql = f"{delete_sql} AND ({self.config.archive.archive_condition})"
-                        
-                        self.db_manager.execute_update(delete_sql, partition.parameters)
-                        
-                        records.append(ArchiveRecord(
-                            partition_name=partition.name,
-                            primary_key_values=pk_values,
-                            count=len(pk_values)
-                        ))
+                        if len(data_to_archive) > 0:
+                            pk_values = data_to_archive[self.config.archive.primary_key].tolist()
+                            stats['newly_archived'] += len(data_to_archive)
+                            
+                            data_to_archive.to_sql(
+                                name=self.config.archive.target_table,
+                                con=self.db_manager.connect(),
+                                schema=self.config.database.schema,
+                                if_exists='append',
+                                index=False
+                            )
+                            
+                            placeholders = ','.join([f':pk{i}' for i in range(len(pk_values))])
+                            pk_params = {f'pk{i}': pk for i, pk in enumerate(pk_values)}
+                            
+                            delete_sql = f"""
+                            DELETE FROM {self._get_full_table_name(self.config.archive.source_table)}
+                            WHERE {self.config.archive.primary_key} IN ({placeholders})
+                            """
+                            
+                            self.db_manager.execute_update(delete_sql, pk_params)
+                            
+                            records.append(ArchiveRecord(
+                                partition_name=partition.name,
+                                primary_key_values=pk_values,
+                                count=len(pk_values)
+                            ))
                         
                         partition.status = "completed"
                     
@@ -336,4 +459,4 @@ class ArchiveExecutor:
         except Exception as e:
             errors.append(f"Archive execution failed: {str(e)}")
         
-        return (len(errors) == 0, records, errors)
+        return (len(errors) == 0, records, errors, stats)
