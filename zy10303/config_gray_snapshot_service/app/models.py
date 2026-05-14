@@ -69,7 +69,7 @@ class HitSample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sample_key = db.Column(db.String(128), unique=True, nullable=False)
     batch_id = db.Column(db.Integer, db.ForeignKey('release_batch.id'), nullable=False)
-    condition_id = db.Column(db.Integer, db.ForeignKey('gray_condition.id'), nullable=False)
+    condition_id = db.Column(db.Integer, db.ForeignKey('gray_condition.id'), nullable=True)
     user_id = db.Column(db.String(128), nullable=False)
     user_attributes = db.Column(db.Text)
     hit_time = db.Column(db.DateTime, default=datetime.utcnow)

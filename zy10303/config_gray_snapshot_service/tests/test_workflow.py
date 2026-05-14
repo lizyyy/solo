@@ -8,7 +8,7 @@ from datetime import datetime
 
 import requests
 
-BASE_URL = "http://localhost:5000/api/v1"
+BASE_URL = "http://localhost:5001/api/v1"
 
 
 def print_section(title):
@@ -251,8 +251,79 @@ def test_rollback_workflow():
     print("\n✅ 回滚场景测试完成!")
 
 
+def test_percentage_hit_only():
+    print_section("测试场景 3: 纯百分比命中（无灰度条件）")
+    
+    print("1. 创建配置版本（不添加任何灰度条件）...")
+    config_data = {
+        "config_name": "pure-percentage-service",
+        "config_content": {"feature": "percent-only"},
+        "version": "v1.0.0",
+        "created_by": "engineer_wang"
+    }
+    resp = requests.post(f"{BASE_URL}/configs", json=config_data)
+    result = resp.json()
+    version_key = result.get('version_key')
+    print(f"   创建成功: {version_key}")
+    
+    print("\n2. 创建发布批次，设置 100% 灰度...")
+    batch_data = {
+        "version_key": version_key,
+        "batch_name": "percentage-only-batch",
+        "target_percentage": 100,
+        "created_by": "engineer_wang"
+    }
+    resp = requests.post(f"{BASE_URL}/batches", json=batch_data)
+    result = resp.json()
+    batch_key = result.get('batch_key')
+    print(f"   批次创建成功: {batch_key}")
+    
+    print("\n3. 推进状态到 RUNNING，设置 current_percentage=100...")
+    status_data = {"new_status": "pending", "updated_by": "release_manager"}
+    requests.put(f"{BASE_URL}/batches/{batch_key}/status", json=status_data)
+    status_data = {"new_status": "running", "updated_by": "release_manager", "current_percentage": 100}
+    resp = requests.put(f"{BASE_URL}/batches/{batch_key}/status", json=status_data)
+    print(f"   状态更新: {resp.status_code}")
+    
+    print("\n4. 评估灰度命中（核心修复验证 - 之前会 500 错误）...")
+    eval_data = {
+        "user_id": "percentage_user_001",
+        "user_attributes": {"region": "anywhere"},
+        "operator": "api_gateway"
+    }
+    resp = requests.post(f"{BASE_URL}/batches/{batch_key}/evaluate", json=eval_data)
+    print(f"   状态码: {resp.status_code} (预期 200，之前是 500)")
+    
+    if resp.status_code == 200:
+        result = resp.json()
+        print(f"   命中结果: {result.get('hit')}")
+        print(f"   命中解释: {result.get('hit_explanation')}")
+        print(f"   sample_key: {result.get('sample_key')}")
+        assert result.get('hit') == True, "应该命中"
+        assert "percentage" in result.get('hit_explanation', ''), "应该显示百分比命中解释"
+        print("\n   ✅ 核心修复验证通过！百分比命中不再抛出 500 错误")
+    else:
+        print(f"   错误详情: {resp.text}")
+        raise AssertionError("核心修复未通过")
+    
+    print("\n5. 重复提交验证幂等性...")
+    resp = requests.post(f"{BASE_URL}/batches/{batch_key}/evaluate", json=eval_data)
+    print(f"   状态码: {resp.status_code}")
+    print(f"   already_hit: {resp.json().get('already_hit')}")
+    assert resp.json().get('already_hit') == True, "应该已命中标记"
+    
+    print("\n6. 验证历史查询中 condition_id 为 NULL 的情况...")
+    resp = requests.get(f"{BASE_URL}/batches/{batch_key}/history")
+    history = resp.json()
+    print(f"   命中样本数: {len(history['hit_samples'])}")
+    print(f"   审计日志数: {len(history['audit_logs'])}")
+    print(f"   批次结论: {history['batch']['status']}")
+    
+    print("\n✅ 纯百分比命中场景测试完成!")
+
+
 def test_edge_cases():
-    print_section("测试场景 3: 异常情况与边界测试")
+    print_section("测试场景 4: 异常情况与边界测试")
     
     print("1. 重复创建相同配置版本...")
     config_data = {
@@ -311,7 +382,7 @@ def test_edge_cases():
 
 
 def test_data_persistence():
-    print_section("测试场景 4: 数据持久化验证")
+    print_section("测试场景 5: 数据持久化验证")
     
     print("查询之前创建的批次历史...")
     print("(重启服务后运行此测试验证数据未丢失)")
@@ -341,6 +412,7 @@ if __name__ == "__main__":
         
         test_successful_workflow()
         test_rollback_workflow()
+        test_percentage_hit_only()
         test_edge_cases()
         test_data_persistence()
         
