@@ -1,0 +1,123 @@
+{
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "name": "首页Chrome兼容性测试",
+      "target_url": "https://example.com/home",
+      "browser_matrix": [
+        "Chrome-118",
+        "Firefox-119",
+        "Safari-17"
+      ],
+      "status": "diff_detected",
+      "original_input": "<html><head><title>Home</title></head><body>Home Content</body></html>",
+      "processed_result": "<html><head><title>Home</title></head><body>Modified Content</body></html>",
+      "diff_regions": [
+        {
+          "region_id": "R001",
+          "selector": ".header-nav",
+          "description": "导航栏高度不一致，Chrome比Firefox高2px",
+          "severity": "high",
+          "intercepted": true,
+          "human_confirmed": false
+        },
+        {
+          "region_id": "R002",
+          "selector": ".footer-links",
+          "description": "底部链接颜色差异",
+          "severity": "low",
+          "intercepted": false,
+          "human_confirmed": true,
+          "confirmed_by": "admin",
+          "confirmed_at": "2024-05-10 14:30:00"
+        }
+      ],
+      "report_id": "REP-001",
+      "created_at": "2024-05-14 10:00:00",
+      "error_reason": null,
+      "rollback_count": 0
+    },
+    {
+      "id": "TASK-002",
+      "name": "商品页面Safari布局测试",
+      "target_url": "https://example.com/products",
+      "browser_matrix": [
+        "Safari-16",
+        "Safari-17"
+      ],
+      "status": "success",
+      "original_input": "<html><body>Products</body></html>",
+      "processed_result": "<html><body>Products</body></html>",
+      "diff_regions": [],
+      "report_id": "REP-002",
+      "created_at": "2024-05-13 09:00:00",
+      "error_reason": null,
+      "rollback_count": 1
+    },
+    {
+      "id": "TASK-003",
+      "name": "登录页脏数据测试",
+      "target_url": "https://example.com/login",
+      "browser_matrix": [
+        "Chrome-118",
+        "Edge-118"
+      ],
+      "status": "error",
+      "original_input": "<html><body>Login {{invalid_template</body></html>",
+      "processed_result": null,
+      "diff_regions": [],
+      "report_id": null,
+      "created_at": "2024-05-12 15:00:00",
+      "error_reason": "HTML模板解析失败：语法错误，未闭合的模板标签",
+      "rollback_count": 0
+    },
+    {
+      "id": "TASK-004",
+      "name": "结算页多浏览器测试",
+      "target_url": "https://example.com/checkout",
+      "browser_matrix": [
+        "Chrome-118",
+        "Firefox-119",
+        "Safari-17",
+        "Edge-118"
+      ],
+      "status": "pending_manual",
+      "original_input": "<html><body>Checkout Form</body></html>",
+      "processed_result": "<html><body>Checkout Form Modified</body></html>",
+      "diff_regions": [
+        {
+          "region_id": "R003",
+          "selector": ".payment-button",
+          "description": "支付按钮在Safari下宽度异常",
+          "severity": "critical",
+          "intercepted": true,
+          "human_confirmed": false
+        }
+      ],
+      "report_id": "REP-003",
+      "created_at": "2024-05-14 11:00:00",
+      "error_reason": null,
+      "rollback_count": 0
+    }
+  ],
+  "rollback_history": [
+    {
+      "id": "RB-001",
+      "task_id": "TASK-002",
+      "operator": "admin",
+      "reason": "布局回归测试失败",
+      "timestamp": "2024-05-13 10:30:00"
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "AUD-001",
+      "action": "manual_confirm",
+      "task_id": "TASK-001",
+      "region_id": "R002",
+      "operator": "admin",
+      "timestamp": "2024-05-10 14:30:00",
+      "details": "确认底部链接颜色差异为预期设计变更"
+    }
+  ]
+}

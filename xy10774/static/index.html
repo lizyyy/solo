@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>浏览器兼容截图台 - 控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; margin-bottom: 5px; }
+        .header .subtitle { opacity: 0.9; font-size: 14px; }
+        
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        
+        .permission-banner { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px 20px; margin-bottom: 20px; border-radius: 4px; display: flex; align-items: center; gap: 10px; }
+        .permission-banner .icon { font-size: 20px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .stat-card .number { font-size: 32px; font-weight: bold; color: #667eea; }
+        .stat-card .label { color: #666; font-size: 14px; margin-top: 5px; }
+        .stat-card.success .number { color: #28a745; }
+        .stat-card.error .number { color: #dc3545; }
+        .stat-card.warning .number { color: #ffc107; }
+        
+        .actions-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        
+        .filters { background: white; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 14px; color: #666; }
+        .filter-group select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        
+        .task-list { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow: hidden; }
+        .task-header { background: #f8f9fa; padding: 15px 20px; font-weight: 600; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 100px 2fr 120px 120px 150px; gap: 15px; }
+        .task-item { padding: 15px 20px; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 100px 2fr 120px 120px 150px; gap: 15px; align-items: center; transition: background 0.2s; }
+        .task-item:hover { background: #f8f9fa; }
+        .task-item:last-child { border-bottom: none; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; display: inline-block; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-diff { background: #fff3cd; color: #856404; }
+        .status-pending { background: #cce5ff; color: #004085; }
+        .status-rolledback { background: #e2e3e5; color: #383d41; }
+        .status-confirmed { background: #d1ecf1; color: #0c5460; }
+        
+        .task-actions { display: flex; gap: 6px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 8px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-header h2 { font-size: 18px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group textarea { min-height: 80px; resize: vertical; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+        
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h3 { font-size: 16px; margin-bottom: 10px; color: #333; }
+        .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .detail-label { width: 120px; color: #666; font-size: 14px; }
+        .detail-value { flex: 1; font-size: 14px; }
+        
+        .diff-region { background: #f8f9fa; border-radius: 6px; padding: 15px; margin-bottom: 10px; border-left: 3px solid #ffc107; }
+        .diff-region.intercepted { border-left-color: #dc3545; }
+        .diff-region.confirmed { border-left-color: #28a745; }
+        .diff-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .diff-selector { font-family: monospace; background: #e9ecef; padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        .diff-severity { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .severity-critical { background: #f8d7da; color: #721c24; }
+        .severity-high { background: #ffe5d0; color: #853504; }
+        .severity-low { background: #d4edda; color: #155724; }
+        
+        .code-block { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        
+        .tabs { display: flex; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; font-size: 14px; }
+        .tab.active { border-bottom-color: #667eea; color: #667eea; font-weight: 500; }
+        
+        .audit-log { background: #f8f9fa; border-radius: 6px; padding: 12px; margin-bottom: 8px; font-size: 13px; }
+        .audit-log .time { color: #999; margin-right: 10px; }
+        .audit-log .action { font-weight: 500; margin-right: 10px; }
+        
+        .error-reason { background: #f8d7da; color: #721c24; padding: 10px 15px; border-radius: 6px; font-size: 13px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🖥️ 浏览器兼容截图台</h1>
+        <div class="subtitle">差异区域管理 · 回滚控制 · 审计追踪</div>
+    </div>
+    
+    <div class="container">
+        <div class="permission-banner">
+            <span class="icon">⚠️</span>
+            <span><strong>权限提示：</strong>回滚操作需要管理员权限。当前用户：<span id="currentUser">admin</span></span>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+        </div>
+        
+        <div class="actions-bar">
+            <button class="btn btn-primary" onclick="refreshData()">🔄 刷新数据</button>
+            <button class="btn btn-success" onclick="exportReport()">📊 导出汇总报告</button>
+            <button class="btn btn-warning" onclick="showReconcile()">📋 对账统计</button>
+            <button class="btn btn-danger" onclick="showRollbackHistory()">⏪ 回滚历史</button>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label>状态筛选：</label>
+                <select id="statusFilter" onchange="loadTasks()">
+                    <option value="">全部</option>
+                    <option value="success">成功</option>
+                    <option value="diff_detected">差异检测</option>
+                    <option value="error">错误</option>
+                    <option value="pending_manual">待人工确认</option>
+                    <option value="rolled_back">已回滚</option>
+                    <option value="confirmed">已确认</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="task-list">
+            <div class="task-header">
+                <span>任务ID</span>
+                <span>任务名称</span>
+                <span>状态</span>
+                <span>创建时间</span>
+                <span>操作</span>
+            </div>
+            <div id="taskList">
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>任务详情</h2>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('basic')">基本信息</div>
+                <div class="tab" onclick="switchTab('diff')">差异区域</div>
+                <div class="tab" onclick="switchTab('source')">原始/处理结果</div>
+                <div class="tab" onclick="switchTab('audit')">审计日志</div>
+            </div>
+            <div id="detailContent">
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="rollbackModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>确认回滚</h2>
+                <button class="close-btn" onclick="closeModal('rollbackModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>任务ID</label>
+                <input type="text" id="rollbackTaskId" readonly>
+            </div>
+            <div class="form-group">
+                <label>操作人员</label>
+                <input type="text" id="rollbackOperator" value="admin">
+            </div>
+            <div class="form-group">
+                <label>回滚原因</label>
+                <textarea id="rollbackReason" placeholder="请输入回滚原因..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('rollbackModal')">取消</button>
+                <button class="btn btn-danger" onclick="confirmRollback()">确认回滚</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>人工确认差异</h2>
+                <button class="close-btn" onclick="closeModal('confirmModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>差异区域</label>
+                <input type="text" id="confirmRegion" readonly>
+            </div>
+            <div class="form-group">
+                <label>操作人员</label>
+                <input type="text" id="confirmOperator" value="admin">
+            </div>
+            <div class="form-group">
+                <label>确认备注</label>
+                <textarea id="confirmNotes" placeholder="请输入确认备注..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('confirmModal')">取消</button>
+                <button class="btn btn-success" onclick="confirmDiff()">确认处理</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>回滚历史</h2>
+                <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div id="historyContent">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTask = null;
+        let currentRegion = null;
+        let currentTab = 'basic';
+        
+        async function refreshData() {
+            await Promise.all([loadStats(), loadTasks()]);
+        }
+        
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/reconcile');
+                const data = await res.json();
+                if (data.success) {
+                    renderStats(data.data);
+                }
+            } catch (e) {
+                console.error('加载统计失败', e);
+            }
+        }
+        
+        function renderStats(stats) {
+            const html = `
+                <div class="stat-card">
+                    <div class="number">${stats.total}</div>
+                    <div class="label">总任务数</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="number">${stats.success}</div>
+                    <div class="label">成功</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="number">${stats.diff_detected}</div>
+                    <div class="label">差异检测</div>
+                </div>
+                <div class="stat-card error">
+                    <div class="number">${stats.error}</div>
+                    <div class="label">错误</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${stats.pending_manual}</div>
+                    <div class="label">待人工确认</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${stats.rolled_back}</div>
+                    <div class="label">已回滚</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${stats.diff_regions_total}</div>
+                    <div class="label">差异区域总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${stats.diff_regions_confirmed}</div>
+                    <div class="label">已人工确认</div>
+                </div>
+            `;
+            document.getElementById('statsGrid').innerHTML = html;
+        }
+        
+        async function loadTasks() {
+            const status = document.getElementById('statusFilter').value;
+            const url = status ? `/api/tasks?status=${status}` : '/api/tasks';
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.success) {
+                    renderTasks(data.data);
+                }
+            } catch (e) {
+                console.error('加载任务失败', e);
+            }
+        }
+        
+        function getStatusClass(status) {
+            const map = {
+                'success': 'status-success',
+                'error': 'status-error',
+                'diff_detected': 'status-diff',
+                'pending_manual': 'status-pending',
+                'rolled_back': 'status-rolledback',
+                'confirmed': 'status-confirmed',
+                'processing': 'status-pending'
+            };
+            return map[status] || '';
+        }
+        
+        function getStatusText(status) {
+            const map = {
+                'success': '成功',
+                'error': '错误',
+                'diff_detected': '差异检测',
+                'pending_manual': '待人工确认',
+                'rolled_back': '已回滚',
+                'confirmed': '已确认',
+                'processing': '处理中'
+            };
+            return map[status] || status;
+        }
+        
+        function renderTasks(tasks) {
+            const html = tasks.map(task => `
+                <div class="task-item">
+                    <span>${task.id}</span>
+                    <span>${task.name}</span>
+                    <span><span class="status-badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</span></span>
+                    <span>${task.created_at}</span>
+                    <span class="task-actions">
+                        <button class="btn btn-sm btn-primary" onclick="showDetail('${task.id}')">详情</button>
+                        ${task.status === 'error' ? `<button class="btn btn-sm btn-success" onclick="retryTask('${task.id}')">重试</button>` : ''}
+                        ${task.status !== 'rolled_back' ? `<button class="btn btn-sm btn-danger" onclick="showRollback('${task.id}')">回滚</button>` : ''}
+                    </span>
+                </div>
+            `).join('');
+            document.getElementById('taskList').innerHTML = html || '<div style="padding:20px;text-align:center;color:#999;">暂无数据</div>';
+        }
+        
+        async function showDetail(taskId) {
+            try {
+                const res = await fetch(`/api/tasks/${taskId}`);
+                const data = await res.json();
+                if (data.success) {
+                    currentTask = data.data;
+                    currentTab = 'basic';
+                    document.querySelectorAll('#detailModal .tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('#detailModal .tab')[0].classList.add('active');
+                    renderDetail();
+                    document.getElementById('detailModal').classList.add('active');
+                }
+            } catch (e) {
+                console.error('加载详情失败', e);
+            }
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('#detailModal .tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderDetail();
+        }
+        
+        function renderDetail() {
+            const task = currentTask;
+            let html = '';
+            
+            if (currentTab === 'basic') {
+                html = `
+                    <div class="detail-section">
+                        <h3>基本信息</h3>
+                        <div class="detail-row"><div class="detail-label">任务ID</div><div class="detail-value">${task.id}</div></div>
+                        <div class="detail-row"><div class="detail-label">任务名称</div><div class="detail-value">${task.name}</div></div>
+                        <div class="detail-row"><div class="detail-label">目标页面</div><div class="detail-value"><a href="${task.target_url}" target="_blank">${task.target_url}</a></div></div>
+                        <div class="detail-row"><div class="detail-label">浏览器矩阵</div><div class="detail-value">${task.browser_matrix.join(', ')}</div></div>
+                        <div class="detail-row"><div class="detail-label">状态</div><div class="detail-value"><span class="status-badge ${getStatusClass(task.status)}">${getStatusText(task.status)}</span></div></div>
+                        <div class="detail-row"><div class="detail-label">报告ID</div><div class="detail-value">${task.report_id || '-'}</div></div>
+                        <div class="detail-row"><div class="detail-label">创建时间</div><div class="detail-value">${task.created_at}</div></div>
+                        <div class="detail-row"><div class="detail-label">回滚次数</div><div class="detail-value">${task.rollback_count || 0}</div></div>
+                    </div>
+                    ${task.error_reason ? `<div class="error-reason">❌ 错误原因：${task.error_reason}</div>` : ''}
+                `;
+            } else if (currentTab === 'diff') {
+                if (task.diff_regions && task.diff_regions.length > 0) {
+                    html = task.diff_regions.map(region => `
+                        <div class="diff-region ${region.intercepted ? 'intercepted' : ''} ${region.human_confirmed ? 'confirmed' : ''}">
+                            <div class="diff-header">
+                                <span class="diff-selector">${region.selector}</span>
+                                <span class="diff-severity severity-${region.severity}">${region.severity === 'critical' ? '严重' : region.severity === 'high' ? '高' : '低'}</span>
+                            </div>
+                            <p><strong>描述：</strong>${region.description}</p>
+                            <p><strong>状态：</strong>
+                                ${region.intercepted ? '<span style="color:#dc3545;">🔴 已拦截</span>' : '<span style="color:#28a745;">🟢 未拦截</span>'}
+                                ${region.human_confirmed ? '<span style="color:#28a745;margin-left:10px;">✅ 已人工确认</span>' : '<span style="color:#ffc107;margin-left:10px;">⏳ 待人工确认</span>'}
+                            </p>
+                            ${region.human_confirmed ? `
+                                <p><strong>确认人：</strong>${region.confirmed_by} @ ${region.confirmed_at}</p>
+                                ${region.notes ? `<p><strong>备注：</strong>${region.notes}</p>` : ''}
+                            ` : `
+                                <button class="btn btn-sm btn-success" style="margin-top:10px;" onclick="showConfirmDiff('${task.id}', '${region.region_id}', '${region.selector}')">👆 人工确认</button>
+                            `}
+                        </div>
+                    `).join('');
+                } else {
+                    html = '<p style="color:#999;text-align:center;padding:20px;">无差异区域</p>';
+                }
+            } else if (currentTab === 'source') {
+                html = `
+                    <div class="detail-section">
+                        <h3>原始输入 HTML</h3>
+                        <div class="code-block">${escapeHtml(task.original_input || '无')}</div>
+                    </div>
+                    <div class="detail-section">
+                        <h3>处理后结果 HTML</h3>
+                        <div class="code-block">${escapeHtml(task.processed_result || '无（处理失败或未开始）')}</div>
+                    </div>
+                `;
+            } else if (currentTab === 'audit') {
+                html = '<p style="color:#999;text-align:center;padding:20px;">加载中...</p>';
+                loadAuditLogs();
+                return;
+            }
+            
+            document.getElementById('detailContent').innerHTML = html;
+        }
+        
+        async function loadAuditLogs() {
+            try {
+                const res = await fetch('/api/audit');
+                const data = await res.json();
+                if (data.success) {
+                    const taskLogs = data.data.filter(log => log.task_id === currentTask.id);
+                    let html = '';
+                    if (taskLogs.length > 0) {
+                        html = taskLogs.map(log => `
+                            <div class="audit-log">
+                                <span class="time">${log.timestamp}</span>
+                                <span class="action">${log.action === 'rollback' ? '回滚' : log.action === 'retry' ? '重试' : log.action === 'manual_confirm' ? '人工确认' : log.action}</span>
+                                <span>操作人：${log.operator}</span>
+                                ${log.details ? `<br><span style="margin-left:140px;color:#666;">${log.details}</span>` : ''}
+                            </div>
+                        `).join('');
+                    } else {
+                        html = '<p style="color:#999;text-align:center;padding:20px;">暂无审计记录</p>';
+                    }
+                    document.getElementById('detailContent').innerHTML = html;
+                }
+            } catch (e) {
+                console.error('加载审计日志失败', e);
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function retryTask(taskId) {
+            if (!confirm('确定要重试此任务吗？')) return;
+            try {
+                const res = await fetch(`/api/tasks/${taskId}/retry`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('重试任务已启动！');
+                    refreshData();
+                }
+            } catch (e) {
+                console.error('重试失败', e);
+            }
+        }
+        
+        function showRollback(taskId) {
+            document.getElementById('rollbackTaskId').value = taskId;
+            document.getElementById('rollbackReason').value = '';
+            document.getElementById('rollbackModal').classList.add('active');
+        }
+        
+        async function confirmRollback() {
+            const taskId = document.getElementById('rollbackTaskId').value;
+            const operator = document.getElementById('rollbackOperator').value;
+            const reason = document.getElementById('rollbackReason').value;
+            
+            if (!reason) {
+                alert('请输入回滚原因！');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`/api/tasks/${taskId}/rollback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ operator, reason })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('回滚成功！');
+                    closeModal('rollbackModal');
+                    refreshData();
+                }
+            } catch (e) {
+                console.error('回滚失败', e);
+            }
+        }
+        
+        function showConfirmDiff(taskId, regionId, selector) {
+            currentTask = { id: taskId };
+            currentRegion = regionId;
+            document.getElementById('confirmRegion').value = selector;
+            document.getElementById('confirmNotes').value = '';
+            closeModal('detailModal');
+            document.getElementById('confirmModal').classList.add('active');
+        }
+        
+        async function confirmDiff() {
+            const operator = document.getElementById('confirmOperator').value;
+            const notes = document.getElementById('confirmNotes').value;
+            
+            try {
+                const res = await fetch(`/api/tasks/${currentTask.id}/confirm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ region_id: currentRegion, operator, notes })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('确认成功！');
+                    closeModal('confirmModal');
+                    refreshData();
+                }
+            } catch (e) {
+                console.error('确认失败', e);
+            }
+        }
+        
+        async function showRollbackHistory() {
+            try {
+                const res = await fetch('/api/rollbacks');
+                const data = await res.json();
+                if (data.success) {
+                    let html = '';
+                    if (data.data.length > 0) {
+                        html = data.data.map(rb => `
+                            <div class="audit-log">
+                                <span class="time">${rb.timestamp}</span>
+                                <span class="action">回滚</span>
+                                <span>任务：${rb.task_id}</span>
+                                <span style="margin-left:10px;">操作人：${rb.operator}</span>
+                                <br><span style="margin-left:140px;color:#666;">原因：${rb.reason}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        html = '<p style="color:#999;text-align:center;padding:20px;">暂无回滚记录</p>';
+                    }
+                    document.getElementById('historyContent').innerHTML = html;
+                    document.getElementById('historyModal').classList.add('active');
+                }
+            } catch (e) {
+                console.error('加载回滚历史失败', e);
+            }
+        }
+        
+        async function exportReport() {
+            try {
+                const res = await fetch('/api/export');
+                const data = await res.json();
+                if (data.success) {
+                    window.location.href = data.data.download_url;
+                    alert('报告导出成功！正在下载...');
+                }
+            } catch (e) {
+                console.error('导出失败', e);
+            }
+        }
+        
+        async function showReconcile() {
+            try {
+                const res = await fetch('/api/reconcile');
+                const data = await res.json();
+                if (data.success) {
+                    const stats = data.data;
+                    alert(`
+对账统计：
+总任务数：${stats.total}
+成功：${stats.success}
+差异检测：${stats.diff_detected}
+错误：${stats.error}
+待人工确认：${stats.pending_manual}
+已回滚：${stats.rolled_back}
+已确认：${stats.confirmed}
+
+差异区域统计：
+总数：${stats.diff_regions_total}
+已拦截：${stats.diff_regions_intercepted}
+已人工确认：${stats.diff_regions_confirmed}
+                    `);
+                }
+            } catch (e) {
+                console.error('加载统计失败', e);
+            }
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+        
+        refreshData();
+    </script>
+</body>
+</html>
