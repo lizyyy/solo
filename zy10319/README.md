@@ -67,12 +67,29 @@ GET /api/v1/events/health
 
 ## 快速开始
 
-### 环境要求
-- Java 8+
+### 🚀 推荐方式：Python 版本（零依赖，推荐）
 
-### 推荐方式：独立版本（无需 Maven）
+**无需 JDK、无需 Maven、无需任何构建工具**，只要有 Python3 就能运行，99% 的环境开箱即用：
 
-这是最简单的方式，无需任何构建工具，直接用 JDK 编译运行：
+```bash
+# 1. 启动完整的 HTTP API 服务器
+python3 webhook_server.py
+
+# 2. 新开终端，运行完整的 curl 闭环测试
+./test_standalone.sh
+```
+
+或者先运行**纯逻辑验证**（无需启动服务器）：
+
+```bash
+python3 verify_all.py
+```
+
+---
+
+### ☕ Java 独立版本（需要 JDK）
+
+如果系统有 JDK，可以使用 Java 版本：
 
 ```bash
 # 1. 一键启动服务器
@@ -82,7 +99,9 @@ GET /api/v1/events/health
 ./test_standalone.sh
 ```
 
-### Spring Boot 版本（需要 Maven）
+---
+
+### 🍃 Spring Boot 版本（需要 Maven）
 
 如果系统安装了 Maven，可以使用完整的 Spring Boot 版本：
 
@@ -97,14 +116,37 @@ mvn clean package -DskipTests
 java -jar target/webhook-sequence-api-1.0.0.jar
 ```
 
+---
+
 ### 运行测试
 ```bash
-# 独立版本测试（推荐）
+# Python/Java 独立版本测试（推荐）
 ./test_standalone.sh
 
 # 或 Spring Boot 版本测试
 ./test_api.sh
 ```
+
+---
+
+## 💯 零依赖验证（必看）
+
+如果环境有问题，直接运行逻辑验证程序，**无需任何依赖**：
+
+```bash
+python3 verify_all.py
+```
+
+这个程序会运行完整的 9 个场景验证，覆盖所有核心逻辑：
+- 顺序处理
+- 乱序等待
+- 缺口补齐自动推进
+- 幂等性
+- 回溯跳过
+- 超时强制处理
+- 历史查询
+- 导出一致性
+- 多业务隔离
 
 ## 配置说明
 

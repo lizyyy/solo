@@ -346,6 +346,11 @@ class JsonUtil {
         int start = idx + search.length();
         if (start >= json.length()) return null;
         
+        while (start < json.length() && json.charAt(start) == ' ') {
+            start++;
+        }
+        if (start >= json.length()) return null;
+        
         char c = json.charAt(start);
         if (c == '"') {
             int end = json.indexOf("\"", start + 1);
