@@ -1,0 +1,72 @@
+[
+  {
+    "name": "requests",
+    "version": "2.31.0",
+    "license": "Apache-2.0",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "flask",
+    "version": "2.3.3",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "numpy",
+    "version": "1.25.2",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "pandas",
+    "version": "2.1.0",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "matplotlib",
+    "version": "3.7.2",
+    "license": "PSF-2.0",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "django",
+    "version": "4.2.4",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "celery",
+    "version": "5.3.1",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "redis-py",
+    "version": "5.0.0",
+    "license": "MIT",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "sqlalchemy",
+    "version": "2.0.20",
+    "license": "MIT",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "pydantic",
+    "version": "2.3.0",
+    "license": "MIT",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  }
+]

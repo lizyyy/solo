@@ -1,0 +1,569 @@
+================================================================================
+依赖许可证巡检报告
+生成时间: 2026-05-15 06:09:34
+================================================================================
+
+统计汇总:
+  总依赖数: 10
+  通过: 29
+  失败: 0
+  警告: 0
+  待处理: 21
+
+--------------------------------------------------------------------------------
+审计记录详情:
+--------------------------------------------------------------------------------
+
+[1] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[2] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[3] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[4] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pass
+    系统原因: 许可证 Apache-2.0 符合要求
+
+[5] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[6] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[7] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[8] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[9] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[10] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[11] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[12] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[13] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[14] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[15] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[16] pandas (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[17] pandas (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[18] pandas (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[19] pandas (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[20] pandas (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[21] matplotlib (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[22] matplotlib (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[23] matplotlib (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[24] matplotlib (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[25] matplotlib (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[26] django (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[27] django (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[28] django (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[29] django (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[30] django (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[31] celery (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[32] celery (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[33] celery (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[34] celery (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[35] celery (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[36] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[37] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[38] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pass
+    系统原因: 许可证 MIT 符合要求
+
+[39] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[40] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[41] sqlalchemy (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[42] sqlalchemy (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[43] sqlalchemy (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pass
+    系统原因: 许可证 MIT 符合要求
+
+[44] sqlalchemy (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[45] sqlalchemy (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[46] pydantic (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[47] pydantic (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[48] pydantic (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pass
+    系统原因: 许可证 MIT 符合要求
+
+[49] pydantic (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[50] pydantic (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+--------------------------------------------------------------------------------
+取证目录 (可追溯至原始输入):
+--------------------------------------------------------------------------------
+
+[1] 字段: license
+    原始值: Apache-2.0
+    位置: samples/normal_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 4197bdf3-4679-4a4c-a370-6ece3dac1f5a
+
+[2] 字段: license
+    原始值: Apache-2.0
+    位置: samples/normal_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 31bbce5d-fd57-4515-843e-9c5a544d8620
+
+[3] 字段: license
+    原始值: Apache-2.0
+    位置: samples/normal_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 209b0747-6f01-410b-a099-96bbcc8723f9
+
+[4] 字段: license
+    原始值: Apache-2.0
+    位置: samples/normal_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 7f77d700-aefe-496c-8aa1-3bf66aa1538a
+
+[5] 字段: license
+    原始值: Apache-2.0
+    位置: samples/normal_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 3c1270de-6ee3-4fd1-a3f3-be4a8f6024e1
+
+[6] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:2
+    类型: license_detection
+    关联记录ID: ced46f63-eb69-40c3-a105-a8611877e4f7
+
+[7] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 23364010-c1e2-45c7-90f9-d5fbebc71e7a
+
+[8] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 80923cb7-fd6d-46e5-90ac-e8abccf1585e
+
+[9] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:2
+    类型: license_detection
+    关联记录ID: a73f5520-c45f-4729-b54c-c5e6d09ecd6e
+
+[10] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 76cd73a1-fe47-4608-88c9-28bc4d6faa6c
+
+[11] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 259f8d00-292f-4212-b0c4-e4fc12d4fce7
+
+[12] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:3
+    类型: license_detection
+    关联记录ID: c0921b59-b286-4949-ab5e-8d6c8f1793c0
+
+[13] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:3
+    类型: license_detection
+    关联记录ID: f0278f3f-927a-4f30-9bda-5fdeea4395e7
+
+[14] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 7461326e-8bc7-40bc-b4ba-689db9c8f554
+
+[15] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 95305c18-a3b7-45d5-a0e6-ee7c47bb3763
+
+[16] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 5685c507-9ac7-4a61-8dc6-7621e2b4d512
+
+[17] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 438810fa-9bfa-4228-ad4e-ba5425cf1e5b
+
+[18] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 9ae3c17e-8062-4540-826b-ac4185dfb1cb
+
+[19] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 79cd52f0-3f0b-4cad-aeae-219168196840
+
+[20] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:4
+    类型: license_detection
+    关联记录ID: b4846be8-8442-4f34-ac54-cf30b60fb75e
+
+[21] 字段: license
+    原始值: PSF-2.0
+    位置: samples/normal_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 244beed7-fc1f-43ea-8921-81d588c75ce9
+
+[22] 字段: license
+    原始值: PSF-2.0
+    位置: samples/normal_dependencies.json:5
+    类型: license_detection
+    关联记录ID: cc0bb471-8bae-47ba-be40-ead19b00c90f
+
+[23] 字段: license
+    原始值: PSF-2.0
+    位置: samples/normal_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 812fa643-0d04-4b38-b25e-7459eeba0b26
+
+[24] 字段: license
+    原始值: PSF-2.0
+    位置: samples/normal_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 1dd20565-77a5-42a2-b24a-29e04188f8ba
+
+[25] 字段: license
+    原始值: PSF-2.0
+    位置: samples/normal_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 86311d43-dec3-45d5-be9e-ee68ae009d63
+
+[26] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 059daa6b-52c0-408f-8418-b15979037bf5
+
+[27] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 36ebe99c-bbb4-486e-8eec-a20d836daa69
+
+[28] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:6
+    类型: license_detection
+    关联记录ID: abc20bf3-06cc-45bf-a6cf-3f348226f5fd
+
+[29] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 5f76777d-1a5d-489d-85fa-2cae0f44c365
+
+[30] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 4957666f-135c-4981-a3a5-a20e4c16c126
+
+[31] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 7c2d2227-4a7e-4277-9f53-6480972ce979
+
+[32] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 376ec565-be1c-4a1b-84ef-8bc0804710dd
+
+[33] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:7
+    类型: license_detection
+    关联记录ID: dbe6aed9-c17b-4c60-b151-2089cd1ab1d8
+
+[34] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 8a543ef0-8633-4ce5-939d-ae8b2a36b3da
+
+[35] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/normal_dependencies.json:7
+    类型: license_detection
+    关联记录ID: aa61dda8-b778-4dcf-9c8b-29d959801cb4
+
+[36] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:8
+    类型: license_detection
+    关联记录ID: ac31aab2-9469-452f-83df-0bd9de3b8930
+
+[37] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:8
+    类型: license_detection
+    关联记录ID: ce951e7d-a08e-44d6-9197-c678fba1dd33
+
+[38] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:8
+    类型: license_detection
+    关联记录ID: d540d9fc-49e4-4e87-8fc8-955dffb12f09
+
+[39] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:8
+    类型: license_detection
+    关联记录ID: f9c970c5-5a56-492b-98fb-b287de42a549
+
+[40] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 853209b5-6e5d-4111-b91f-5525bc3c26a8
+
+[41] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 6ec86472-0786-44a4-b41a-cdb8952df9fc
+
+[42] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:9
+    类型: license_detection
+    关联记录ID: bc7d24ad-d57b-4f08-864e-639e9450f767
+
+[43] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 9cd13229-84a2-4d02-bdb9-d9f63a2fef07
+
+[44] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 18e9beda-613a-4528-88ef-a7b3787305f0
+
+[45] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 6b092b2d-f928-490c-bed4-600bb5dd53e7
+
+[46] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 4dedb86e-c2c6-43ed-9e7e-17f3af61bbea
+
+[47] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:10
+    类型: license_detection
+    关联记录ID: ae55022d-6865-4790-9fb0-a426137080cd
+
+[48] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 18a666aa-b524-4156-b3c3-8c364f7bcb4b
+
+[49] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 86cf5a19-3c6e-421a-b541-15e0175119d3
+
+[50] 字段: license
+    原始值: MIT
+    位置: samples/normal_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 4e6ed7d6-27ce-4b85-9910-5330702891ee

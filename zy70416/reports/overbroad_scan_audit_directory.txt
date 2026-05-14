@@ -1,0 +1,1063 @@
+================================================================================
+多源审计取证目录
+================================================================================
+
+报告生成时间: 2026-05-15 06:09:40
+
+--------------------------------------------------------------------------------
+环境: 北京朝阳门店-设备台账系统
+--------------------------------------------------------------------------------
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: bbff8ab0-6876-45a0-8073-27653aaa61f9
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: adecf81e-d6cc-49b9-afb7-ddee1de0726b
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: 8c01e6e8-dbd3-4188-8163-d4380bd5bf2c
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: 4d733acd-cef5-4f84-baec-621e0f59412f
+  检测规则: Apache-2.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: ba9d6c21-71e6-4c3f-aa3d-d92149f008a2
+  检测规则: BSD-check
+  系统状态: pending
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: 7ab5e3ed-bccd-4d48-9b41-8e5982e77485
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: requests
+  依赖ID: 511f5651-82c3-472c-8446-40ac9494c472
+  记录ID: eaa0901f-9ee5-4f32-9d04-09e1c2cede8b
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: Apache-2.0
+  原始位置: samples/overbroad_dependencies.json:1
+  完整原始输入:
+    name: requests
+    version: 2.31.0
+    license: Apache-2.0
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: b8dd71c5-f69a-473c-91c1-4676480df682
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: e3d930bd-a35c-4d2c-86bb-2b0a4138e56d
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: 4defb658-8637-48eb-9136-dae3dd6c4442
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: c21fad86-1925-415a-b6af-90446793f109
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: 4264d6a3-8680-4248-be90-76e3e3670dcf
+  检测规则: BSD-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: 1c5ebe9f-1307-47a7-9511-2c08601f9f3c
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: flask
+  依赖ID: 6920147d-c253-4b43-8556-6883ba36fa5e
+  记录ID: 7f354026-f3b4-4a4f-90af-66e8fc97fd77
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:2
+  完整原始输入:
+    name: flask
+    version: 2.3.3
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: d1231d72-cd1e-4b26-9153-604d599e5a49
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: 844209fe-f9c4-4626-b901-7d40ce8f1968
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: e39ee180-2c19-42a5-8c45-97b1fd396ac7
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: 6d20ba72-7c69-4223-b941-359e9bae862b
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: 5a406f2c-a0f0-4799-8579-6adf7e5a7fbf
+  检测规则: BSD-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: e47d3d2a-b9c1-4602-a8f7-728bb76e60d3
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: numpy
+  依赖ID: 52ed3a7e-b3d4-48d3-bf1c-935e91a786e7
+  记录ID: 66e1b534-7631-453a-bf91-78f972cf5a16
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:3
+  完整原始输入:
+    name: numpy
+    version: 1.25.2
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: 73d07b29-779d-4182-a387-b7100b2da85c
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: 7185a50a-8fe8-4271-b44d-4026a38a091d
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: 469ef8e0-a610-4132-87b7-c327f72e98a2
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: e33a7d81-2eb3-4dfb-86cf-0460eadb2684
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: 74234d70-ca30-4cc1-b521-c2a505a0a6cc
+  检测规则: BSD-check
+  系统状态: pending
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: 6b574fa4-6455-40c4-8fc0-84678eb00dc1
+  检测规则: OVERBROAD-any-GPL
+  系统状态: fail
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-gpl2
+  依赖ID: 0c109065-95de-4d6d-ba17-6dfa898bf8a7
+  记录ID: dda6fe09-948c-433c-b294-25d8f1c70c68
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: GPL-2.0
+  原始位置: samples/overbroad_dependencies.json:4
+  完整原始输入:
+    name: bad-lib-gpl2
+    version: 1.0.0
+    license: GPL-2.0
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: ffe213e0-1ac7-4a94-9ccd-a507944c5dfb
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: 0b6b2531-171d-4a99-8b0f-baeac8d1c678
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: 3eb005a2-a0a2-4c27-aec4-bdca12d152e5
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: 46129c47-0790-493d-b735-bd36bedf4cf6
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: 68b83b3c-add7-4d37-87c5-dd7651ba41d6
+  检测规则: BSD-check
+  系统状态: pending
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: 7c2c1ce6-9b97-4442-95be-ffe966e2a12c
+  检测规则: OVERBROAD-any-GPL
+  系统状态: fail
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+依赖: bad-lib-lgpl
+  依赖ID: 45a4aa9a-1e31-47e3-9fdf-39363ba99539
+  记录ID: bfac4a6b-758e-477e-801c-6b2ea8637f47
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: LGPL-2.1
+  原始位置: samples/overbroad_dependencies.json:5
+  完整原始输入:
+    name: bad-lib-lgpl
+    version: 2.1.0
+    license: LGPL-2.1
+    source: custom
+    environment_name: 北京朝阳门店-设备台账系统
+
+--------------------------------------------------------------------------------
+环境: 上海浦东店-会员管理系统
+--------------------------------------------------------------------------------
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: e06eba0c-8b9b-46e6-bc19-93b6d087cd3b
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: 911a8622-4560-4282-96a0-b9d30f2dc7ff
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: 808842ed-d6ad-4f6c-8054-6bd8aaf5368a
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: 659b1f18-69d0-44e2-b579-925d145e816f
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: 37e100c1-0c62-41ea-a560-219e7960170a
+  检测规则: BSD-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: 09c7a700-597a-41b9-a047-8e73122215e8
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: django
+  依赖ID: ebfd0cae-c439-466a-85c2-ca77a35723d4
+  记录ID: dd1e47ad-157c-4a1a-b0e1-7e9125682730
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:6
+  完整原始输入:
+    name: django
+    version: 4.2.4
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: 7b9d3882-c62d-40ef-a7f0-618cad7a165f
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: 558e0323-695a-4a25-99d3-13e83bb54f25
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: 8f0cbf91-d1aa-4d5f-98d8-5830fb98c8d6
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: ea79644b-7d9c-4137-bc63-dc321804eed0
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: 52173506-9c11-417b-8fd2-9cd412a38ebd
+  检测规则: BSD-check
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: ce7ce593-1655-4799-87fc-907384fea4be
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: celery
+  依赖ID: 38f8c25e-8ef9-425d-9a76-8555194c335b
+  记录ID: f4ec2fef-58ed-4663-a1af-74c5b8fa0ab5
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: BSD-3-Clause
+  原始位置: samples/overbroad_dependencies.json:7
+  完整原始输入:
+    name: celery
+    version: 5.3.1
+    license: BSD-3-Clause
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: f430be7d-3c18-4a9a-800c-c0b04f95a8fa
+  检测规则: GPL-3.0-check
+  系统状态: pass
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: 2648ed22-6bce-4306-a0d0-3e48c2126df7
+  检测规则: AGPL-check
+  系统状态: pass
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: 3dd329ce-749c-4558-bbdc-17ed939b992b
+  检测规则: MIT-license
+  系统状态: pass
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: 7c51d2f9-db7f-4ac5-9f33-5ccb5103ec37
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: 5bab975c-d0f8-4ed6-a961-e573daf8910a
+  检测规则: BSD-check
+  系统状态: pending
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: 145c86ba-73c9-44c7-b595-720d613dd8c7
+  检测规则: OVERBROAD-any-GPL
+  系统状态: pass
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: redis-py
+  依赖ID: 1eb2fb90-0e80-4ca4-86ba-19788604a7c5
+  记录ID: d855095b-319f-41d0-8930-afbd36949096
+  检测规则: OVERBROAD-non-MIT
+  系统状态: pass
+  取证字段: license
+  原始值: MIT
+  原始位置: samples/overbroad_dependencies.json:8
+  完整原始输入:
+    name: redis-py
+    version: 5.0.0
+    license: MIT
+    source: pypi
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 83f534ad-1292-4280-b57e-afd2a0106287
+  检测规则: GPL-3.0-check
+  系统状态: fail
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 57784867-7852-4199-93e3-0d9c8ee1764b
+  检测规则: AGPL-check
+  系统状态: fail
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 7d2d0802-f599-4242-b7d4-f3053ba7f545
+  检测规则: MIT-license
+  系统状态: pending
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: dd4685d7-7a90-4c3d-abf5-adf1e1772020
+  检测规则: Apache-2.0-check
+  系统状态: pending
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 0dd8149b-cc2f-4e7a-9d1d-f6b4f49a2bc0
+  检测规则: BSD-check
+  系统状态: pending
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 44e71888-d652-4273-b6ed-a056c4c19b97
+  检测规则: OVERBROAD-any-GPL
+  系统状态: fail
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-agpl
+  依赖ID: 5741905b-a116-4b85-a0ae-a26830bf8f6e
+  记录ID: 20d382dd-2383-4bad-90b7-222a800fa518
+  检测规则: OVERBROAD-non-MIT
+  系统状态: fail
+  取证字段: license
+  原始值: AGPL-3.0
+  原始位置: samples/overbroad_dependencies.json:9
+  完整原始输入:
+    name: bad-lib-agpl
+    version: 3.0.0
+    license: AGPL-3.0
+    source: custom
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: be1b91eb-a3b5-4831-b73e-db82f2820854
+  检测规则: GPL-3.0-check
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: caefed6b-af3f-47c4-af66-d511ed28b68e
+  检测规则: AGPL-check
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: eaeaa569-28d0-45e3-af4c-726fa03fe787
+  检测规则: MIT-license
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: f657a3b7-632a-48db-8cf4-b869061c5f9f
+  检测规则: Apache-2.0-check
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: fb54272b-b34c-4fc8-a985-d39c0234427c
+  检测规则: BSD-check
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: 6a22af73-954d-4321-966d-3ba14ca0327b
+  检测规则: OVERBROAD-any-GPL
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统
+
+依赖: bad-lib-empty-license
+  依赖ID: 914df2a8-72ff-4371-b823-a51ca6f829bb
+  记录ID: 29983da1-09a6-4f74-b713-02a9abe4519e
+  检测规则: OVERBROAD-non-MIT
+  系统状态: warning
+  取证字段: license
+  原始值: 
+  原始位置: samples/overbroad_dependencies.json:10
+  完整原始输入:
+    name: bad-lib-empty-license
+    version: 1.5.0
+    license: 
+    source: unknown
+    environment_name: 上海浦东店-会员管理系统

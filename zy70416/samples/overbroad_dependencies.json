@@ -1,0 +1,72 @@
+[
+  {
+    "name": "requests",
+    "version": "2.31.0",
+    "license": "Apache-2.0",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "flask",
+    "version": "2.3.3",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "numpy",
+    "version": "1.25.2",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "bad-lib-gpl2",
+    "version": "1.0.0",
+    "license": "GPL-2.0",
+    "source": "custom",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "bad-lib-lgpl",
+    "version": "2.1.0",
+    "license": "LGPL-2.1",
+    "source": "custom",
+    "environment_name": "北京朝阳门店-设备台账系统"
+  },
+  {
+    "name": "django",
+    "version": "4.2.4",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "celery",
+    "version": "5.3.1",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "redis-py",
+    "version": "5.0.0",
+    "license": "MIT",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "bad-lib-agpl",
+    "version": "3.0.0",
+    "license": "AGPL-3.0",
+    "source": "custom",
+    "environment_name": "上海浦东店-会员管理系统"
+  },
+  {
+    "name": "bad-lib-empty-license",
+    "version": "1.5.0",
+    "license": "",
+    "source": "unknown",
+    "environment_name": "上海浦东店-会员管理系统"
+  }
+]

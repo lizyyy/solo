@@ -1,0 +1,869 @@
+================================================================================
+依赖许可证巡检报告
+生成时间: 2026-05-15 06:09:40
+================================================================================
+
+统计汇总:
+  总依赖数: 10
+  通过: 0
+  失败: 13
+  警告: 7
+  待处理: 21
+
+--------------------------------------------------------------------------------
+审计记录详情:
+--------------------------------------------------------------------------------
+
+[1] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[2] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[3] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[4] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pass
+    系统原因: 许可证 Apache-2.0 符合要求
+
+[5] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[6] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[7] requests (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'Apache-2.0' 被标记为失败
+        实际值: Apache-2.0
+        位置: samples/overbroad_dependencies.json:1
+
+[8] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[9] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[10] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[11] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[12] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[13] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[14] flask (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'BSD-3-Clause' 被标记为失败
+        实际值: BSD-3-Clause
+        位置: samples/overbroad_dependencies.json:2
+
+[15] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[16] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[17] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[18] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[19] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[20] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[21] numpy (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'BSD-3-Clause' 被标记为失败
+        实际值: BSD-3-Clause
+        位置: samples/overbroad_dependencies.json:3
+
+[22] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[23] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[24] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[25] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[26] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[27] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 只要包含GPL就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-any-GPL' 匹配: 'GPL-2.0' 被标记为失败
+        实际值: GPL-2.0
+        位置: samples/overbroad_dependencies.json:4
+
+[28] bad-lib-gpl2 (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'GPL-2.0' 被标记为失败
+        实际值: GPL-2.0
+        位置: samples/overbroad_dependencies.json:4
+
+[29] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[30] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[31] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[32] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[33] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[34] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 只要包含GPL就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-any-GPL' 匹配: 'LGPL-2.1' 被标记为失败
+        实际值: LGPL-2.1
+        位置: samples/overbroad_dependencies.json:5
+
+[35] bad-lib-lgpl (环境: 北京朝阳门店-设备台账系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'LGPL-2.1' 被标记为失败
+        实际值: LGPL-2.1
+        位置: samples/overbroad_dependencies.json:5
+
+[36] django (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[37] django (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[38] django (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[39] django (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[40] django (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[41] django (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[42] django (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'BSD-3-Clause' 被标记为失败
+        实际值: BSD-3-Clause
+        位置: samples/overbroad_dependencies.json:6
+
+[43] celery (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[44] celery (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[45] celery (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[46] celery (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[47] celery (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pass
+    系统原因: 许可证 BSD-3-Clause 符合要求
+
+[48] celery (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[49] celery (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'BSD-3-Clause' 被标记为失败
+        实际值: BSD-3-Clause
+        位置: samples/overbroad_dependencies.json:7
+
+[50] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[51] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: pass
+    系统原因: 未检测到高风险许可证
+
+[52] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pass
+    系统原因: 许可证 MIT 符合要求
+
+[53] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[54] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[55] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[56] redis-py (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: pass
+    系统原因: 过宽规则未匹配
+
+[57] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: fail
+    系统原因: 高风险许可证: 检测GPL-3.0许可证，该许可证具有强传染性
+    字段错误:
+      - license: 检测到高风险许可证: AGPL-3.0
+        实际值: AGPL-3.0
+        位置: samples/overbroad_dependencies.json:9
+
+[58] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: fail
+    系统原因: 高风险许可证: 检测AGPL许可证，网络使用也需要开源
+    字段错误:
+      - license: 检测到高风险许可证: AGPL-3.0
+        实际值: AGPL-3.0
+        位置: samples/overbroad_dependencies.json:9
+
+[59] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[60] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[61] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: pending
+    系统原因: 需要进一步检测
+
+[62] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 只要包含GPL就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-any-GPL' 匹配: 'AGPL-3.0' 被标记为失败
+        实际值: AGPL-3.0
+        位置: samples/overbroad_dependencies.json:9
+
+[63] bad-lib-agpl (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: fail
+    系统原因: 过宽规则匹配: [过宽规则] 不是MIT就标记为失败
+    字段错误:
+      - license: 过宽规则 'OVERBROAD-non-MIT' 匹配: 'AGPL-3.0' 被标记为失败
+        实际值: AGPL-3.0
+        位置: samples/overbroad_dependencies.json:9
+
+[64] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: GPL-3.0-check
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[65] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: AGPL-check
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[66] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: MIT-license
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[67] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: Apache-2.0-check
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[68] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: BSD-check
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[69] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-any-GPL
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+[70] bad-lib-empty-license (环境: 上海浦东店-会员管理系统)
+    规则: OVERBROAD-non-MIT
+    系统判断: warning
+    系统原因: 许可证字段为空
+    字段错误:
+      - license: 许可证字段为空
+        实际值: 
+        位置: samples/overbroad_dependencies.json:10
+
+--------------------------------------------------------------------------------
+取证目录 (可追溯至原始输入):
+--------------------------------------------------------------------------------
+
+[1] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: bbff8ab0-6876-45a0-8073-27653aaa61f9
+
+[2] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: adecf81e-d6cc-49b9-afb7-ddee1de0726b
+
+[3] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 8c01e6e8-dbd3-4188-8163-d4380bd5bf2c
+
+[4] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 4d733acd-cef5-4f84-baec-621e0f59412f
+
+[5] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: ba9d6c21-71e6-4c3f-aa3d-d92149f008a2
+
+[6] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: 7ab5e3ed-bccd-4d48-9b41-8e5982e77485
+
+[7] 字段: license
+    原始值: Apache-2.0
+    位置: samples/overbroad_dependencies.json:1
+    类型: license_detection
+    关联记录ID: eaa0901f-9ee5-4f32-9d04-09e1c2cede8b
+
+[8] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: b8dd71c5-f69a-473c-91c1-4676480df682
+
+[9] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: e3d930bd-a35c-4d2c-86bb-2b0a4138e56d
+
+[10] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 4defb658-8637-48eb-9136-dae3dd6c4442
+
+[11] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: c21fad86-1925-415a-b6af-90446793f109
+
+[12] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 4264d6a3-8680-4248-be90-76e3e3670dcf
+
+[13] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 1c5ebe9f-1307-47a7-9511-2c08601f9f3c
+
+[14] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:2
+    类型: license_detection
+    关联记录ID: 7f354026-f3b4-4a4f-90af-66e8fc97fd77
+
+[15] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: d1231d72-cd1e-4b26-9153-604d599e5a49
+
+[16] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 844209fe-f9c4-4626-b901-7d40ce8f1968
+
+[17] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: e39ee180-2c19-42a5-8c45-97b1fd396ac7
+
+[18] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 6d20ba72-7c69-4223-b941-359e9bae862b
+
+[19] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 5a406f2c-a0f0-4799-8579-6adf7e5a7fbf
+
+[20] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: e47d3d2a-b9c1-4602-a8f7-728bb76e60d3
+
+[21] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:3
+    类型: license_detection
+    关联记录ID: 66e1b534-7631-453a-bf91-78f972cf5a16
+
+[22] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 73d07b29-779d-4182-a387-b7100b2da85c
+
+[23] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 7185a50a-8fe8-4271-b44d-4026a38a091d
+
+[24] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 469ef8e0-a610-4132-87b7-c327f72e98a2
+
+[25] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: e33a7d81-2eb3-4dfb-86cf-0460eadb2684
+
+[26] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 74234d70-ca30-4cc1-b521-c2a505a0a6cc
+
+[27] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: 6b574fa4-6455-40c4-8fc0-84678eb00dc1
+
+[28] 字段: license
+    原始值: GPL-2.0
+    位置: samples/overbroad_dependencies.json:4
+    类型: license_detection
+    关联记录ID: dda6fe09-948c-433c-b294-25d8f1c70c68
+
+[29] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: ffe213e0-1ac7-4a94-9ccd-a507944c5dfb
+
+[30] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 0b6b2531-171d-4a99-8b0f-baeac8d1c678
+
+[31] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 3eb005a2-a0a2-4c27-aec4-bdca12d152e5
+
+[32] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 46129c47-0790-493d-b735-bd36bedf4cf6
+
+[33] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 68b83b3c-add7-4d37-87c5-dd7651ba41d6
+
+[34] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: 7c2c1ce6-9b97-4442-95be-ffe966e2a12c
+
+[35] 字段: license
+    原始值: LGPL-2.1
+    位置: samples/overbroad_dependencies.json:5
+    类型: license_detection
+    关联记录ID: bfac4a6b-758e-477e-801c-6b2ea8637f47
+
+[36] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: e06eba0c-8b9b-46e6-bc19-93b6d087cd3b
+
+[37] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 911a8622-4560-4282-96a0-b9d30f2dc7ff
+
+[38] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 808842ed-d6ad-4f6c-8054-6bd8aaf5368a
+
+[39] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 659b1f18-69d0-44e2-b579-925d145e816f
+
+[40] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 37e100c1-0c62-41ea-a560-219e7960170a
+
+[41] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: 09c7a700-597a-41b9-a047-8e73122215e8
+
+[42] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:6
+    类型: license_detection
+    关联记录ID: dd1e47ad-157c-4a1a-b0e1-7e9125682730
+
+[43] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 7b9d3882-c62d-40ef-a7f0-618cad7a165f
+
+[44] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 558e0323-695a-4a25-99d3-13e83bb54f25
+
+[45] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 8f0cbf91-d1aa-4d5f-98d8-5830fb98c8d6
+
+[46] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: ea79644b-7d9c-4137-bc63-dc321804eed0
+
+[47] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: 52173506-9c11-417b-8fd2-9cd412a38ebd
+
+[48] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: ce7ce593-1655-4799-87fc-907384fea4be
+
+[49] 字段: license
+    原始值: BSD-3-Clause
+    位置: samples/overbroad_dependencies.json:7
+    类型: license_detection
+    关联记录ID: f4ec2fef-58ed-4663-a1af-74c5b8fa0ab5
+
+[50] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: f430be7d-3c18-4a9a-800c-c0b04f95a8fa
+
+[51] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 2648ed22-6bce-4306-a0d0-3e48c2126df7
+
+[52] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 3dd329ce-749c-4558-bbdc-17ed939b992b
+
+[53] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 7c51d2f9-db7f-4ac5-9f33-5ccb5103ec37
+
+[54] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 5bab975c-d0f8-4ed6-a961-e573daf8910a
+
+[55] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: 145c86ba-73c9-44c7-b595-720d613dd8c7
+
+[56] 字段: license
+    原始值: MIT
+    位置: samples/overbroad_dependencies.json:8
+    类型: license_detection
+    关联记录ID: d855095b-319f-41d0-8930-afbd36949096
+
+[57] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 83f534ad-1292-4280-b57e-afd2a0106287
+
+[58] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 57784867-7852-4199-93e3-0d9c8ee1764b
+
+[59] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 7d2d0802-f599-4242-b7d4-f3053ba7f545
+
+[60] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: dd4685d7-7a90-4c3d-abf5-adf1e1772020
+
+[61] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 0dd8149b-cc2f-4e7a-9d1d-f6b4f49a2bc0
+
+[62] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 44e71888-d652-4273-b6ed-a056c4c19b97
+
+[63] 字段: license
+    原始值: AGPL-3.0
+    位置: samples/overbroad_dependencies.json:9
+    类型: license_detection
+    关联记录ID: 20d382dd-2383-4bad-90b7-222a800fa518
+
+[64] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: be1b91eb-a3b5-4831-b73e-db82f2820854
+
+[65] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: caefed6b-af3f-47c4-af66-d511ed28b68e
+
+[66] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: eaeaa569-28d0-45e3-af4c-726fa03fe787
+
+[67] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: f657a3b7-632a-48db-8cf4-b869061c5f9f
+
+[68] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: fb54272b-b34c-4fc8-a985-d39c0234427c
+
+[69] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 6a22af73-954d-4321-966d-3ba14ca0327b
+
+[70] 字段: license
+    原始值: 
+    位置: samples/overbroad_dependencies.json:10
+    类型: license_detection
+    关联记录ID: 29983da1-09a6-4f74-b713-02a9abe4519e

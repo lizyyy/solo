@@ -1,0 +1,222 @@
+[
+  {
+    "id": "511f5651-82c3-472c-8446-40ac9494c472",
+    "name": "requests",
+    "version": "2.31.0",
+    "license": "Apache-2.0",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "raw_input": {
+      "name": "requests",
+      "version": "2.31.0",
+      "license": "Apache-2.0",
+      "source": "pypi",
+      "environment_name": "北京朝阳门店-设备台账系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518184"
+  },
+  {
+    "id": "6920147d-c253-4b43-8556-6883ba36fa5e",
+    "name": "flask",
+    "version": "2.3.3",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "raw_input": {
+      "name": "flask",
+      "version": "2.3.3",
+      "license": "BSD-3-Clause",
+      "source": "pypi",
+      "environment_name": "北京朝阳门店-设备台账系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518197"
+  },
+  {
+    "id": "52ed3a7e-b3d4-48d3-bf1c-935e91a786e7",
+    "name": "numpy",
+    "version": "1.25.2",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "北京朝阳门店-设备台账系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "raw_input": {
+      "name": "numpy",
+      "version": "1.25.2",
+      "license": "BSD-3-Clause",
+      "source": "pypi",
+      "environment_name": "北京朝阳门店-设备台账系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518206"
+  },
+  {
+    "id": "0c109065-95de-4d6d-ba17-6dfa898bf8a7",
+    "name": "bad-lib-gpl2",
+    "version": "1.0.0",
+    "license": "GPL-2.0",
+    "source": "custom",
+    "environment_name": "北京朝阳门店-设备台账系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"bad-lib-gpl2\", \"version\": \"1.0.0\", \"license\": \"GPL-2.0\", \"source\": \"custom\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "raw_input": {
+      "name": "bad-lib-gpl2",
+      "version": "1.0.0",
+      "license": "GPL-2.0",
+      "source": "custom",
+      "environment_name": "北京朝阳门店-设备台账系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518214"
+  },
+  {
+    "id": "45a4aa9a-1e31-47e3-9fdf-39363ba99539",
+    "name": "bad-lib-lgpl",
+    "version": "2.1.0",
+    "license": "LGPL-2.1",
+    "source": "custom",
+    "environment_name": "北京朝阳门店-设备台账系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"bad-lib-lgpl\", \"version\": \"2.1.0\", \"license\": \"LGPL-2.1\", \"source\": \"custom\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "raw_input": {
+      "name": "bad-lib-lgpl",
+      "version": "2.1.0",
+      "license": "LGPL-2.1",
+      "source": "custom",
+      "environment_name": "北京朝阳门店-设备台账系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518221"
+  },
+  {
+    "id": "ebfd0cae-c439-466a-85c2-ca77a35723d4",
+    "name": "django",
+    "version": "4.2.4",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "raw_input": {
+      "name": "django",
+      "version": "4.2.4",
+      "license": "BSD-3-Clause",
+      "source": "pypi",
+      "environment_name": "上海浦东店-会员管理系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518227"
+  },
+  {
+    "id": "38f8c25e-8ef9-425d-9a76-8555194c335b",
+    "name": "celery",
+    "version": "5.3.1",
+    "license": "BSD-3-Clause",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "raw_input": {
+      "name": "celery",
+      "version": "5.3.1",
+      "license": "BSD-3-Clause",
+      "source": "pypi",
+      "environment_name": "上海浦东店-会员管理系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518234"
+  },
+  {
+    "id": "1eb2fb90-0e80-4ca4-86ba-19788604a7c5",
+    "name": "redis-py",
+    "version": "5.0.0",
+    "license": "MIT",
+    "source": "pypi",
+    "environment_name": "上海浦东店-会员管理系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "raw_input": {
+      "name": "redis-py",
+      "version": "5.0.0",
+      "license": "MIT",
+      "source": "pypi",
+      "environment_name": "上海浦东店-会员管理系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518260"
+  },
+  {
+    "id": "5741905b-a116-4b85-a0ae-a26830bf8f6e",
+    "name": "bad-lib-agpl",
+    "version": "3.0.0",
+    "license": "AGPL-3.0",
+    "source": "custom",
+    "environment_name": "上海浦东店-会员管理系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"bad-lib-agpl\", \"version\": \"3.0.0\", \"license\": \"AGPL-3.0\", \"source\": \"custom\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "raw_input": {
+      "name": "bad-lib-agpl",
+      "version": "3.0.0",
+      "license": "AGPL-3.0",
+      "source": "custom",
+      "environment_name": "上海浦东店-会员管理系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518272"
+  },
+  {
+    "id": "914df2a8-72ff-4371-b823-a51ca6f829bb",
+    "name": "bad-lib-empty-license",
+    "version": "1.5.0",
+    "license": "",
+    "source": "unknown",
+    "environment_name": "上海浦东店-会员管理系统",
+    "source_location": {
+      "file_path": "samples/overbroad_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"bad-lib-empty-license\", \"version\": \"1.5.0\", \"license\": \"\", \"source\": \"unknown\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "raw_input": {
+      "name": "bad-lib-empty-license",
+      "version": "1.5.0",
+      "license": "",
+      "source": "unknown",
+      "environment_name": "上海浦东店-会员管理系统"
+    },
+    "created_at": "2026-05-15T06:09:40.518339"
+  }
+]
