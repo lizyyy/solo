@@ -1,13 +1,11 @@
-import db, { initDatabase } from './database';
+import { run, get, all } from './database';
 import { subDays } from 'date-fns';
 
-function seedData() {
-  initDatabase();
-
+export async function seedData() {
   console.log('开始导入样例数据...');
 
-  const existingFamilies = db.prepare('SELECT COUNT(*) as count FROM families').get() as any;
-  if (existingFamilies.count > 0) {
+  const existingFamilies = await get('SELECT COUNT(*) as count FROM families') as any;
+  if (existingFamilies && existingFamilies.count > 0) {
     console.log('数据已存在，跳过导入');
     return;
   }
@@ -25,15 +23,13 @@ function seedData() {
     { familyId: 'F010', name: '王十二家庭', members: 3, address: '诚信巷10号', phone: '13800138010', status: 'approved' },
   ];
 
-  const insertFamily = db.prepare(`
-    INSERT INTO families (familyId, name, members, address, phone, status, createdAt, updatedAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  families.forEach(f => {
-    insertFamily.run(f.familyId, f.name, f.members, f.address, f.phone, f.status, new Date().toISOString(), new Date().toISOString());
-  });
-  console.log(`已导入 ${families.length} 个家庭');
+  for (const f of families) {
+    await run(`
+      INSERT INTO families (familyId, name, members, address, phone, status, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [f.familyId, f.name, f.members, f.address, f.phone, f.status, new Date().toISOString(), new Date().toISOString()]);
+  }
+  console.log(`已导入 ${families.length} 个家庭`);
 
   const materials = [
     { code: 'M001', name: '大米', unit: '袋', description: '10公斤装东北大米' },
@@ -41,14 +37,12 @@ function seedData() {
     { code: 'M003', name: '食用油', unit: '桶', description: '5升装调和油' },
   ];
 
-  const insertMaterial = db.prepare(`
-    INSERT INTO materials (code, name, unit, description, createdAt)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  materials.forEach(m => {
-    insertMaterial.run(m.code, m.name, m.unit, m.description, new Date().toISOString());
-  });
+  for (const m of materials) {
+    await run(`
+      INSERT INTO materials (code, name, unit, description, createdAt)
+      VALUES (?, ?, ?, ?, ?)
+    `, [m.code, m.name, m.unit, m.description, new Date().toISOString()]);
+  }
   console.log(`已导入 ${materials.length} 种物资`);
 
   const batches = [
@@ -74,102 +68,83 @@ function seedData() {
     },
   ];
 
-  const insertBatch = db.prepare(`
-    INSERT INTO batches (code, name, materialId, quantity, cycleDays, startTime, endTime, status, createdAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  const insertInventory = db.prepare(`
-    INSERT INTO inventory (materialId, batchId, totalQuantity, availableQuantity, updatedAt)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  batches.forEach(b => {
-    const result = insertBatch.run(b.code, b.name, b.materialId, b.quantity, b.cycleDays, b.startTime, b.endTime, b.status, new Date().toISOString());
-    insertInventory.run(b.materialId, result.lastInsertRowid, b.quantity, b.quantity, new Date().toISOString());
-  });
+  for (const b of batches) {
+    const result = await run(`
+      INSERT INTO batches (code, name, materialId, quantity, cycleDays, startTime, endTime, status, createdAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [b.code, b.name, b.materialId, b.quantity, b.cycleDays, b.startTime, b.endTime, b.status, new Date().toISOString()]);
+    
+    await run(`
+      INSERT INTO inventory (materialId, batchId, totalQuantity, availableQuantity, updatedAt)
+      VALUES (?, ?, ?, ?, ?)
+    `, [b.materialId, result.lastID, b.quantity, b.quantity, new Date().toISOString()]);
+  }
   console.log(`已导入 ${batches.length} 个批次`);
 
   const now = new Date();
   
   const distributions = [
-    {
-      familyId: 1, batchId: 1, quantity: 1, status: 'distributed', distributor: '张志愿者', distributeTime: subDays(now, 5).toISOString(), isProxy: false
-    },
-    {
-      familyId: 2, batchId: 1, quantity: 1, status: 'distributed', distributor: '李志愿者', distributeTime: subDays(now, 4).toISOString(), isProxy: false
-    },
-    {
-      familyId: 3, batchId: 1, quantity: 2, status: 'distributed', distributor: '王志愿者', distributeTime: subDays(now, 3).toISOString(), isProxy: true, proxyName: '刘代理', proxyIdCard: '110101199001011234', proxyProof: true
-    },
-    {
-      familyId: 5, batchId: 1, quantity: 2, status: 'distributed', distributor: '赵志愿者', distributeTime: subDays(now, 2).toISOString(), isProxy: false
-    },
-    {
-      familyId: 6, batchId: 1, quantity: 1, status: 'pending', isProxy: true, proxyName: '孙代领', proxyIdCard: '110101199002021234', proxyProof: false, needReview: true
-    },
-    {
-      familyId: 8, batchId: 2, quantity: 1, status: 'distributed', distributor: '钱志愿者', distributeTime: subDays(now, 1).toISOString(), isProxy: false
-    },
+    { familyId: 1, batchId: 1, quantity: 1, status: 'distributed', distributor: '张志愿者', distributeTime: subDays(now, 5).toISOString(), isProxy: false },
+    { familyId: 2, batchId: 1, quantity: 1, status: 'distributed', distributor: '李志愿者', distributeTime: subDays(now, 4).toISOString(), isProxy: false },
+    { familyId: 3, batchId: 1, quantity: 2, status: 'distributed', distributor: '王志愿者', distributeTime: subDays(now, 3).toISOString(), isProxy: true, proxyName: '刘代理', proxyIdCard: '110101199001011234', proxyProof: true },
+    { familyId: 5, batchId: 1, quantity: 2, status: 'distributed', distributor: '赵志愿者', distributeTime: subDays(now, 2).toISOString(), isProxy: false },
+    { familyId: 6, batchId: 1, quantity: 1, status: 'pending', isProxy: true, proxyName: '孙代领', proxyIdCard: '110101199002021234', proxyProof: false, needReview: true },
+    { familyId: 8, batchId: 2, quantity: 1, status: 'distributed', distributor: '钱志愿者', distributeTime: subDays(now, 1).toISOString(), isProxy: false },
   ];
 
-  const insertDistribution = db.prepare(`
-    INSERT INTO distributions (
-      distributionNo, familyId, batchId, quantity, status,
-      distributor, distributeTime, isProxy, proxyName, proxyIdCard, proxyProof,
-      needReview, reviewStatus, createdAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  const insertHistory = db.prepare(`
-    INSERT INTO distribution_history (distributionId, action, operator, details, createdAt)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  distributions.forEach((d, idx) => {
-    const distributionNo = `DIS${1000 + idx}`;
-    const result = insertDistribution.run(
+  for (const d of distributions) {
+    const distributionNo = `DIS${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    const result = await run(`
+      INSERT INTO distributions (
+        distributionNo, familyId, batchId, quantity, status,
+        distributor, distributeTime, isProxy, proxyName, proxyIdCard, proxyProof,
+        needReview, reviewStatus, createdAt
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
       distributionNo,
       d.familyId, d.batchId, d.quantity, d.status,
-      d.distributor, d.distributeTime,
-      d.isProxy ? 1 : 0, d.proxyName, d.proxyIdCard, d.proxyProof ? 1 : 0,
+      d.distributor || null, d.distributeTime || null,
+      d.isProxy ? 1 : 0, d.proxyName || null, d.proxyIdCard || null, d.proxyProof ? 1 : 0,
       d.needReview ? 1 : 0, d.status === 'distributed' ? 'approved' : 'pending',
-      d.distributeTime || new Date().toISOString()
-    );
+      new Date().toISOString()
+    ]);
 
     if (d.status === 'distributed') {
-      db.prepare(`
+      await run(`
         UPDATE inventory 
         SET distributedQuantity = distributedQuantity + ?,
             availableQuantity = availableQuantity - ?,
             updatedAt = ?
         WHERE batchId = ?
-      `).run(d.quantity, d.quantity, new Date().toISOString(), d.batchId);
+      `, [d.quantity, d.quantity, new Date().toISOString(), d.batchId]);
 
-      insertHistory.run(result.lastInsertRowid, 'create', d.distributor, '创建发放记录', d.distributeTime);
-      insertHistory.run(result.lastInsertRowid, 'approve', d.distributor, `审核通过，发放物资', d.distributeTime);
+      await run(`
+        INSERT INTO distribution_history (distributionId, action, operator, details, createdAt)
+        VALUES (?, ?, ?, ?, ?)
+      `, [result.lastID, 'create', d.distributor || 'system', '创建发放记录', d.distributeTime]);
+      
+      await run(`
+        INSERT INTO distribution_history (distributionId, action, operator, details, createdAt)
+        VALUES (?, ?, ?, ?, ?)
+      `, [result.lastID, 'approve', d.distributor || 'system', `审核通过，发放物资`, d.distributeTime]);
     }
-  });
+  }
   console.log(`已导入 ${distributions.length} 条发放记录`);
 
   const blockedDistributions = [
     { familyId: 1, batchId: 1, quantity: 1, blockReason: '该家庭已在本批次中领取过物资，不能重复领取' },
   ];
 
-  const insertBlocked = db.prepare(`
-    INSERT INTO distributions (
-      distributionNo, familyId, batchId, quantity, status,
-      isProxy, blockReason, needReview, reviewStatus, createdAt
-    ) VALUES (?, ?, ?, ?, 'blocked', 0, ?, 0, 'pending', ?)
-  `);
-
-  blockedDistributions.forEach((d, idx) => {
-    const distributionNo = `BLK${2000 + idx}`;
-    insertBlocked.run(distributionNo, d.familyId, d.batchId, d.quantity, d.blockReason, new Date().toISOString());
-  });
-  console.log(`已导入 ${blockedDistributions.length} 条拦截记录（重复领取样例`);
+  for (const d of blockedDistributions) {
+    const distributionNo = `BLK${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    await run(`
+      INSERT INTO distributions (
+        distributionNo, familyId, batchId, quantity, status,
+        isProxy, blockReason, needReview, reviewStatus, createdAt
+      ) VALUES (?, ?, ?, ?, 'blocked', 0, ?, 0, 'pending', ?)
+    `, [distributionNo, d.familyId, d.batchId, d.quantity, d.blockReason, new Date().toISOString()]);
+  }
+  console.log(`已导入 ${blockedDistributions.length} 条拦截记录（重复领取样例）`);
 
   console.log('样例数据导入完成！');
 }
-
-seedData();

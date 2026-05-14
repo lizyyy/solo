@@ -1,5 +1,5 @@
 import express from 'express';
-import db from './database';
+import { get, run, all } from './database';
 import { DistributionService } from './services/DistributionService';
 import { createObjectCsvWriter } from 'csv-writer';
 import path from 'path';
@@ -7,8 +7,7 @@ import fs from 'fs';
 
 const router = express.Router();
 
-// 家庭管理
-router.get('/families', (req, res) => {
+router.get('/families', async (req, res) => {
   const { status } = req.query;
   let query = 'SELECT * FROM families';
   const params: any[] = [];
@@ -19,119 +18,110 @@ router.get('/families', (req, res) => {
   }
   query += ' ORDER BY createdAt DESC';
   
-  const families = db.prepare(query).all(...params);
+  const families = await all(query, params);
   res.json(families);
 });
 
-router.get('/families/:id', (req, res) => {
-  const family = db.prepare('SELECT * FROM families WHERE id = ?').get(req.params.id);
+router.get('/families/:id', async (req, res) => {
+  const family = await get('SELECT * FROM families WHERE id = ?', [req.params.id]);
   if (!family) {
     return res.status(404).json({ error: '家庭不存在' });
   }
   res.json(family);
 });
 
-router.post('/families', (req, res) => {
+router.post('/families', async (req, res) => {
   const { familyId, name, members, address, phone } = req.body;
   
-  const existing = db.prepare('SELECT id FROM families WHERE familyId = ?').get(familyId);
+  const existing = await get('SELECT id FROM families WHERE familyId = ?', [familyId]);
   if (existing) {
     return res.status(400).json({ error: '家庭编号已存在' });
   }
 
-  const stmt = db.prepare(`
+  const now = new Date().toISOString();
+  const result = await run(`
     INSERT INTO families (familyId, name, members, address, phone, status, createdAt, updatedAt)
     VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
-  `);
+  `, [familyId, name, members || 1, address, phone, now, now]);
   
-  const now = new Date().toISOString();
-  const result = stmt.run(familyId, name, members || 1, address, phone, now, now);
-  
-  res.json({ id: result.lastInsertRowid, familyId, name });
+  res.json({ id: result.lastID, familyId, name });
 });
 
-router.put('/families/:id/approve', (req, res) => {
+router.put('/families/:id/approve', async (req, res) => {
   const { reviewer, remarks } = req.body;
   
-  db.prepare(`
+  await run(`
     UPDATE families 
     SET status = 'approved', reviewer = ?, reviewTime = ?, remarks = ?, updatedAt = ?
     WHERE id = ?
-  `).run(reviewer || '系统', new Date().toISOString(), remarks, new Date().toISOString(), req.params.id);
+  `, [reviewer || '系统', new Date().toISOString(), remarks, new Date().toISOString(), req.params.id]);
   
   res.json({ success: true });
 });
 
-router.put('/families/:id/reject', (req, res) => {
+router.put('/families/:id/reject', async (req, res) => {
   const { reviewer, remarks } = req.body;
   
-  db.prepare(`
+  await run(`
     UPDATE families 
     SET status = 'rejected', reviewer = ?, reviewTime = ?, remarks = ?, updatedAt = ?
     WHERE id = ?
-  `).run(reviewer || '系统', new Date().toISOString(), remarks, new Date().toISOString(), req.params.id);
+  `, [reviewer || '系统', new Date().toISOString(), remarks, new Date().toISOString(), req.params.id]);
   
   res.json({ success: true });
 });
 
-// 物资管理
-router.get('/materials', (req, res) => {
-  const materials = db.prepare('SELECT * FROM materials ORDER BY createdAt DESC').all();
+router.get('/materials', async (req, res) => {
+  const materials = await all('SELECT * FROM materials ORDER BY createdAt DESC');
   res.json(materials);
 });
 
-router.post('/materials', (req, res) => {
+router.post('/materials', async (req, res) => {
   const { code, name, unit, description } = req.body;
   
-  const stmt = db.prepare(`
+  const result = await run(`
     INSERT INTO materials (code, name, unit, description, createdAt)
     VALUES (?, ?, ?, ?, ?)
-  `);
+  `, [code, name, unit, description, new Date().toISOString()]);
   
-  const result = stmt.run(code, name, unit, description, new Date().toISOString());
-  res.json({ id: result.lastInsertRowid, code, name });
+  res.json({ id: result.lastID, code, name });
 });
 
-// 批次管理
-router.get('/batches', (req, res) => {
-  const batches = db.prepare(`
+router.get('/batches', async (req, res) => {
+  const batches = await all(`
     SELECT b.*, m.name as materialName, m.unit as materialUnit
     FROM batches b
     JOIN materials m ON b.materialId = m.id
     ORDER BY b.createdAt DESC
-  `).all();
+  `);
   res.json(batches);
 });
 
-router.post('/batches', (req, res) => {
+router.post('/batches', async (req, res) => {
   const { code, name, materialId, quantity, cycleDays, startTime, endTime } = req.body;
   
-  const stmt = db.prepare(`
+  const batchResult = await run(`
     INSERT INTO batches (code, name, materialId, quantity, cycleDays, startTime, endTime, status, createdAt)
     VALUES (?, ?, ?, ?, ?, ?, ?, 'active', ?)
-  `);
+  `, [code, name, materialId, quantity, cycleDays || 30, startTime, endTime, new Date().toISOString()]);
   
-  const result = stmt.run(code, name, materialId, quantity, cycleDays || 30, startTime, endTime, new Date().toISOString());
-  const batchId = result.lastInsertRowid as number;
-  
-  db.prepare(`
+  await run(`
     INSERT INTO inventory (materialId, batchId, totalQuantity, availableQuantity, updatedAt)
     VALUES (?, ?, ?, ?, ?)
-  `).run(materialId, batchId, quantity, quantity, new Date().toISOString());
+  `, [materialId, batchResult.lastID, quantity, quantity, new Date().toISOString()]);
   
-  res.json({ id: batchId, code, name });
+  res.json({ id: batchResult.lastID, code, name });
 });
 
-router.put('/batches/:id/close', (req, res) => {
-  db.prepare("UPDATE batches SET status = 'closed' WHERE id = ?").run(req.params.id);
+router.put('/batches/:id/close', async (req, res) => {
+  await run("UPDATE batches SET status = 'closed' WHERE id = ?", [req.params.id]);
   res.json({ success: true });
 });
 
-// 发放管理
-router.get('/distributions', (req, res) => {
+router.get('/distributions', async (req, res) => {
   const { status, needReview, familyId } = req.query;
   let query = `
-    SELECT d.*, f.name as familyName, f.familyId, m.name as materialName, b.name as batchName
+    SELECT d.*, f.name as familyName, m.name as materialName, b.name as batchName
     FROM distributions d
     JOIN families f ON d.familyId = f.id
     JOIN batches b ON d.batchId = b.id
@@ -157,43 +147,43 @@ router.get('/distributions', (req, res) => {
   }
   query += ' ORDER BY d.createdAt DESC';
   
-  const distributions = db.prepare(query).all(...params);
+  const distributions = await all(query, params);
   res.json(distributions);
 });
 
-router.get('/distributions/:id', (req, res) => {
-  const distribution = db.prepare(`
-    SELECT d.*, f.name as familyName, f.familyId, m.name as materialName, b.name as batchName
+router.get('/distributions/:id', async (req, res) => {
+  const distribution = await get(`
+    SELECT d.*, f.name as familyName, m.name as materialName, b.name as batchName
     FROM distributions d
     JOIN families f ON d.familyId = f.id
     JOIN batches b ON d.batchId = b.id
     JOIN materials m ON b.materialId = m.id
     WHERE d.id = ?
-  `).get(req.params.id);
+  `, [req.params.id]);
   
   if (!distribution) {
     return res.status(404).json({ error: '发放记录不存在' });
   }
   
-  const history = DistributionService.getDistributionHistory(parseInt(req.params.id));
+  const history = await DistributionService.getDistributionHistory(parseInt(req.params.id));
   res.json({ ...distribution, history });
 });
 
-router.get('/distributions/family/:familyId', (req, res) => {
-  const history = DistributionService.getFamilyDistributionHistory(parseInt(req.params.familyId));
+router.get('/distributions/family/:familyId', async (req, res) => {
+  const history = await DistributionService.getFamilyDistributionHistory(parseInt(req.params.familyId));
   res.json(history);
 });
 
-router.post('/distributions', (req, res) => {
-  const result = DistributionService.createDistribution({
+router.post('/distributions', async (req, res) => {
+  const result = await DistributionService.createDistribution({
     ...req.body,
     operator: req.body.operator || '志愿者'
   });
   res.json(result);
 });
 
-router.put('/distributions/:id/approve', (req, res) => {
-  const result = DistributionService.approveDistribution(
+router.put('/distributions/:id/approve', async (req, res) => {
+  const result = await DistributionService.approveDistribution(
     parseInt(req.params.id),
     req.body.operator || '志愿者',
     req.body.quantity
@@ -201,8 +191,8 @@ router.put('/distributions/:id/approve', (req, res) => {
   res.json(result);
 });
 
-router.put('/distributions/:id/reject', (req, res) => {
-  const result = DistributionService.rejectDistribution(
+router.put('/distributions/:id/reject', async (req, res) => {
+  const result = await DistributionService.rejectDistribution(
     parseInt(req.params.id),
     req.body.operator || '志愿者',
     req.body.reason
@@ -210,8 +200,8 @@ router.put('/distributions/:id/reject', (req, res) => {
   res.json(result);
 });
 
-router.post('/distributions/:id/return', (req, res) => {
-  const result = DistributionService.returnDistribution(
+router.post('/distributions/:id/return', async (req, res) => {
+  const result = await DistributionService.returnDistribution(
     parseInt(req.params.id),
     req.body.quantity,
     req.body.reason,
@@ -220,29 +210,27 @@ router.post('/distributions/:id/return', (req, res) => {
   res.json(result);
 });
 
-// 库存管理
-router.get('/inventory', (req, res) => {
-  const inventory = db.prepare(`
+router.get('/inventory', async (req, res) => {
+  const inventory = await all(`
     SELECT i.*, m.name as materialName, m.unit as materialUnit, b.name as batchName
     FROM inventory i
     JOIN materials m ON i.materialId = m.id
     JOIN batches b ON i.batchId = b.id
     ORDER BY i.updatedAt DESC
-  `).all();
+  `);
   res.json(inventory);
 });
 
-// 看板数据
-router.get('/dashboard/stats', (req, res) => {
-  const familyStats = db.prepare(`
+router.get('/dashboard/stats', async (req, res) => {
+  const familyStats = await get(`
     SELECT 
       COUNT(*) as total,
       SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
       SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending
     FROM families
-  `).get() as any;
+  `) as any;
 
-  const distributionStats = db.prepare(`
+  const distributionStats = await get(`
     SELECT 
       COUNT(*) as total,
       SUM(CASE WHEN status = 'distributed' THEN 1 ELSE 0 END) as distributed,
@@ -250,15 +238,15 @@ router.get('/dashboard/stats', (req, res) => {
       SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END) as blocked,
       SUM(CASE WHEN needReview = 1 AND reviewStatus = 'pending' THEN 1 ELSE 0 END) as needReview
     FROM distributions
-  `).get() as any;
+  `) as any;
 
-  const inventoryStats = db.prepare(`
+  const inventoryStats = await get(`
     SELECT 
       SUM(totalQuantity) as total,
       SUM(distributedQuantity) as distributed,
       SUM(availableQuantity) as available
     FROM inventory
-  `).get() as any;
+  `) as any;
 
   res.json({
     families: familyStats,
@@ -267,8 +255,8 @@ router.get('/dashboard/stats', (req, res) => {
   });
 });
 
-router.get('/dashboard/recent', (req, res) => {
-  const recent = db.prepare(`
+router.get('/dashboard/recent', async (req, res) => {
+  const recent = await all(`
     SELECT d.*, f.name as familyName, m.name as materialName
     FROM distributions d
     JOIN families f ON d.familyId = f.id
@@ -276,19 +264,18 @@ router.get('/dashboard/recent', (req, res) => {
     JOIN materials m ON b.materialId = m.id
     ORDER BY d.createdAt DESC
     LIMIT 10
-  `).all();
+  `);
   
   res.json(recent);
 });
 
-// 导出库存CSV
 router.get('/export/inventory', async (req, res) => {
-  const inventory = db.prepare(`
+  const inventory = await all(`
     SELECT i.*, m.name as materialName, m.code as materialCode, m.unit, b.name as batchName, b.code as batchCode
     FROM inventory i
     JOIN materials m ON i.materialId = m.id
     JOIN batches b ON i.batchId = b.id
-  `).all() as any[];
+  `) as any[];
 
   const exportDir = path.join(__dirname, '..', 'exports');
   if (!fs.existsSync(exportDir)) {
@@ -318,9 +305,8 @@ router.get('/export/inventory', async (req, res) => {
   res.download(filepath, filename);
 });
 
-// 退回记录
-router.get('/returns', (req, res) => {
-  const returns = db.prepare(`
+router.get('/returns', async (req, res) => {
+  const returns = await all(`
     SELECT r.*, d.distributionNo, f.name as familyName, m.name as materialName
     FROM return_records r
     JOIN distributions d ON r.distributionId = d.id
@@ -328,17 +314,17 @@ router.get('/returns', (req, res) => {
     JOIN batches b ON d.batchId = b.id
     JOIN materials m ON b.materialId = m.id
     ORDER BY r.createdAt DESC
-  `).all();
+  `);
   res.json(returns);
 });
 
-router.put('/returns/:id/restore', (req, res) => {
-  const returnRecord = db.prepare('SELECT * FROM return_records WHERE id = ?').get(req.params.id) as any;
+router.put('/returns/:id/restore', async (req, res) => {
+  const returnRecord = await get('SELECT * FROM return_records WHERE id = ?', [req.params.id]) as any;
   if (!returnRecord) {
     return res.status(404).json({ error: '退回记录不存在' });
   }
 
-  const result = DistributionService.restoreInventory(
+  const result = await DistributionService.restoreInventory(
     returnRecord.distributionId,
     returnRecord.quantity,
     req.body.operator || '系统'

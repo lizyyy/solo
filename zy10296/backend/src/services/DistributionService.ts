@@ -1,15 +1,15 @@
-import db from '../database';
-import { addDays, differenceInDays, format } from 'date-fns';
+import { get, run, all } from '../database';
+import { subDays, differenceInDays } from 'date-fns';
 
 export class DistributionService {
-  static checkDuplicateDistribution(familyId: number, batchId: number): { duplicate: boolean; message?: string } {
-    const batch = db.prepare('SELECT * FROM batches WHERE id = ?').get(batchId) as any;
+  static async checkDuplicateDistribution(familyId: number, batchId: number): Promise<{ duplicate: boolean; message?: string; needReview?: boolean }> {
+    const batch = await get('SELECT * FROM batches WHERE id = ?', [batchId]);
     if (!batch) return { duplicate: false };
 
-    const existingDistributions = db.prepare(`
+    const existingDistributions = await all(`
       SELECT * FROM distributions 
       WHERE familyId = ? AND batchId = ? AND status IN ('distributed', 'pending')
-    `).all(familyId, batchId);
+    `, [familyId, batchId]);
 
     if (existingDistributions.length > 0) {
       return {
@@ -18,7 +18,7 @@ export class DistributionService {
       };
     }
 
-    const recentDistributions = db.prepare(`
+    const recentDistribution = await get(`
       SELECT d.*, b.cycleDays, b.endTime 
       FROM distributions d
       JOIN batches b ON d.batchId = b.id
@@ -27,27 +27,27 @@ export class DistributionService {
         AND b.materialId = (SELECT materialId FROM batches WHERE id = ?)
       ORDER BY d.distributeTime DESC
       LIMIT 1
-    `).get(familyId, batchId) as any;
+    `, [familyId, batchId]) as any;
 
-    if (recentDistributions) {
+    if (recentDistribution) {
       const daysSinceLastDistribution = differenceInDays(
         new Date(),
-        new Date(recentDistributions.distributeTime)
+        new Date(recentDistribution.distributeTime)
       );
       
-      if (daysSinceLastDistribution < recentDistributions.cycleDays) {
-        const daysRemaining = recentDistributions.cycleDays - daysSinceLastDistribution;
+      if (daysSinceLastDistribution < recentDistribution.cycleDays) {
+        const daysRemaining = recentDistribution.cycleDays - daysSinceLastDistribution;
         return {
           duplicate: true,
-          message: `该家庭距离上一次领取仅${daysSinceLastDistribution}天，未满${recentDistributions.cycleDays}天周期，还需等待${daysRemaining}天`
+          message: `该家庭距离上一次领取仅${daysSinceLastDistribution}天，未满${recentDistribution.cycleDays}天周期，还需等待${daysRemaining}天`
         };
       }
 
-      if (daysSinceLastDistribution >= recentDistributions.cycleDays - 2 && daysSinceLastDistribution < recentDistributions.cycleDays) {
+      if (daysSinceLastDistribution >= recentDistribution.cycleDays - 2 && daysSinceLastDistribution < recentDistribution.cycleDays) {
         return {
           duplicate: false,
           needReview: true,
-          message: `该家庭距离上一次领取${daysSinceLastDistribution}天，接近${recentDistributions.cycleDays}天周期，建议人工复核`
+          message: `该家庭距离上一次领取${daysSinceLastDistribution}天，接近${recentDistribution.cycleDays}天周期，建议人工复核`
         };
       }
     }
@@ -55,18 +55,18 @@ export class DistributionService {
     return { duplicate: false };
   }
 
-  static checkFamilyApproved(familyId: number): boolean {
-    const family = db.prepare('SELECT status FROM families WHERE id = ?').get(familyId) as any;
+  static async checkFamilyApproved(familyId: number): Promise<boolean> {
+    const family = await get('SELECT status FROM families WHERE id = ?', [familyId]) as any;
     return family && family.status === 'approved';
   }
 
-  static checkBatchActive(batchId: number): boolean {
-    const batch = db.prepare('SELECT status FROM batches WHERE id = ?').get(batchId) as any;
+  static async checkBatchActive(batchId: number): Promise<boolean> {
+    const batch = await get('SELECT status FROM batches WHERE id = ?', [batchId]) as any;
     return batch && batch.status === 'active';
   }
 
-  static checkInventoryAvailable(batchId: number, quantity: number): { available: boolean; availableQuantity: number } {
-    const inventory = db.prepare('SELECT availableQuantity FROM inventory WHERE batchId = ?').get(batchId) as any;
+  static async checkInventoryAvailable(batchId: number, quantity: number): Promise<{ available: boolean; availableQuantity: number }> {
+    const inventory = await get('SELECT availableQuantity FROM inventory WHERE batchId = ?', [batchId]) as any;
     if (!inventory) return { available: false, availableQuantity: 0 };
     return {
       available: inventory.availableQuantity >= quantity,
@@ -74,7 +74,7 @@ export class DistributionService {
     };
   }
 
-  static createDistribution(data: {
+  static async createDistribution(data: {
     familyId: number;
     batchId: number;
     quantity: number;
@@ -83,20 +83,18 @@ export class DistributionService {
     proxyIdCard?: string;
     proxyProof?: boolean;
     operator: string;
-  }): { success: boolean; data?: any; error?: string; blocked?: boolean } {
-    const duplicateCheck = this.checkDuplicateDistribution(data.familyId, data.batchId);
+  }): Promise<{ success: boolean; data?: any; error?: string; blocked?: boolean }> {
+    const duplicateCheck = await this.checkDuplicateDistribution(data.familyId, data.batchId);
     if (duplicateCheck.duplicate) {
-      const distributionNo = `BLK${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+      const distributionNo = `BLK${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
       
-      const stmt = db.prepare(`
+      await run(`
         INSERT INTO distributions (
           distributionNo, familyId, batchId, quantity, status, 
           isProxy, proxyName, proxyIdCard, proxyProof,
           blockReason, needReview, reviewStatus, createdAt
         ) VALUES (?, ?, ?, ?, 'blocked', ?, ?, ?, ?, ?, 0, 'pending', ?)
-      `);
-      
-      const result = stmt.run(
+      `, [
         distributionNo,
         data.familyId,
         data.batchId,
@@ -107,31 +105,33 @@ export class DistributionService {
         data.proxyProof ? 1 : 0,
         duplicateCheck.message,
         new Date().toISOString()
-      );
+      ]);
 
       return {
         success: false,
         blocked: true,
         error: duplicateCheck.message,
-        data: { id: result.lastInsertRowid, distributionNo, status: 'blocked' }
+        data: { distributionNo, status: 'blocked' }
       };
     }
 
-    if (!this.checkFamilyApproved(data.familyId)) {
+    const familyApproved = await this.checkFamilyApproved(data.familyId);
+    if (!familyApproved) {
       return {
         success: false,
         error: '该家庭尚未通过审核，无法领取物资'
       };
     }
 
-    if (!this.checkBatchActive(data.batchId)) {
+    const batchActive = await this.checkBatchActive(data.batchId);
+    if (!batchActive) {
       return {
         success: false,
         error: '该发放批次已关闭'
       };
     }
 
-    const inventoryCheck = this.checkInventoryAvailable(data.batchId, data.quantity);
+    const inventoryCheck = await this.checkInventoryAvailable(data.batchId, data.quantity);
     if (!inventoryCheck.available) {
       return {
         success: false,
@@ -145,17 +145,15 @@ export class DistributionService {
       needReview = true;
     }
 
-    const distributionNo = `DIS${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+    const distributionNo = `DIS${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     
-    const stmt = db.prepare(`
+    const result = await run(`
       INSERT INTO distributions (
         distributionNo, familyId, batchId, quantity, status,
         isProxy, proxyName, proxyIdCard, proxyProof,
         needReview, reviewStatus, createdAt
       ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, 'pending', ?)
-    `);
-
-    const result = stmt.run(
+    `, [
       distributionNo,
       data.familyId,
       data.batchId,
@@ -166,16 +164,14 @@ export class DistributionService {
       data.proxyProof ? 1 : 0,
       needReview ? 1 : 0,
       new Date().toISOString()
-    );
+    ]);
 
-    const distributionId = result.lastInsertRowid as number;
-
-    this.addHistory(distributionId, 'create', data.operator, '创建发放记录');
+    await this.addHistory(result.lastID, 'create', data.operator, '创建发放记录');
 
     return {
       success: true,
       data: {
-        id: distributionId,
+        id: result.lastID,
         distributionNo,
         status: 'pending',
         needReview
@@ -183,18 +179,18 @@ export class DistributionService {
     };
   }
 
-  static approveDistribution(distributionId: number, operator: string, quantity?: number): { success: boolean; error?: string } {
-    const distribution = db.prepare('SELECT * FROM distributions WHERE id = ?').get(distributionId) as any;
+  static async approveDistribution(distributionId: number, operator: string, quantity?: number): Promise<{ success: boolean; error?: string }> {
+    const distribution = await get('SELECT * FROM distributions WHERE id = ?', [distributionId]) as any;
     if (!distribution) return { success: false, error: '发放记录不存在' };
     if (distribution.status !== 'pending') return { success: false, error: '当前状态不允许审核' };
 
     const finalQuantity = quantity || distribution.quantity;
-    const inventoryCheck = this.checkInventoryAvailable(distribution.batchId, finalQuantity);
+    const inventoryCheck = await this.checkInventoryAvailable(distribution.batchId, finalQuantity);
     if (!inventoryCheck.available) {
       return { success: false, error: `库存不足，当前可用库存：${inventoryCheck.availableQuantity}` };
     }
 
-    db.prepare(`
+    await run(`
       UPDATE distributions 
       SET status = 'distributed', 
           distributor = ?, 
@@ -204,26 +200,26 @@ export class DistributionService {
           reviewer = ?,
           reviewTime = ?
       WHERE id = ?
-    `).run(operator, new Date().toISOString(), finalQuantity, operator, new Date().toISOString(), distributionId);
+    `, [operator, new Date().toISOString(), finalQuantity, operator, new Date().toISOString(), distributionId]);
 
-    db.prepare(`
+    await run(`
       UPDATE inventory 
       SET distributedQuantity = distributedQuantity + ?,
           availableQuantity = availableQuantity - ?,
           updatedAt = ?
       WHERE batchId = ?
-    `).run(finalQuantity, finalQuantity, new Date().toISOString(), distribution.batchId);
+    `, [finalQuantity, finalQuantity, new Date().toISOString(), distribution.batchId]);
 
-    this.addHistory(distributionId, 'approve', operator, `审核通过，发放${finalQuantity}单位物资`);
+    await this.addHistory(distributionId, 'approve', operator, `审核通过，发放${finalQuantity}单位物资`);
 
     return { success: true };
   }
 
-  static rejectDistribution(distributionId: number, operator: string, reason: string): { success: boolean; error?: string } {
-    const distribution = db.prepare('SELECT * FROM distributions WHERE id = ?').get(distributionId) as any;
+  static async rejectDistribution(distributionId: number, operator: string, reason: string): Promise<{ success: boolean; error?: string }> {
+    const distribution = await get('SELECT * FROM distributions WHERE id = ?', [distributionId]) as any;
     if (!distribution) return { success: false, error: '发放记录不存在' };
 
-    db.prepare(`
+    await run(`
       UPDATE distributions 
       SET status = 'blocked',
           blockReason = ?,
@@ -231,15 +227,15 @@ export class DistributionService {
           reviewer = ?,
           reviewTime = ?
       WHERE id = ?
-    `).run(reason, operator, new Date().toISOString(), distributionId);
+    `, [reason, operator, new Date().toISOString(), distributionId]);
 
-    this.addHistory(distributionId, 'reject', operator, `审核拒绝：${reason}`);
+    await this.addHistory(distributionId, 'reject', operator, `审核拒绝：${reason}`);
 
     return { success: true };
   }
 
-  static returnDistribution(distributionId: number, quantity: number, reason: string, operator: string): { success: boolean; error?: string; needReview?: boolean } {
-    const distribution = db.prepare('SELECT * FROM distributions WHERE id = ?').get(distributionId) as any;
+  static async returnDistribution(distributionId: number, quantity: number, reason: string, operator: string): Promise<{ success: boolean; error?: string; needReview?: boolean }> {
+    const distribution = await get('SELECT * FROM distributions WHERE id = ?', [distributionId]) as any;
     if (!distribution) return { success: false, error: '发放记录不存在' };
     if (distribution.status !== 'distributed') return { success: false, error: '只有已发放的物资可以退回' };
 
@@ -248,73 +244,72 @@ export class DistributionService {
       needReview = true;
     }
 
-    const stmt = db.prepare(`
+    await run(`
       INSERT INTO return_records (
         distributionId, quantity, reason, returnTime, operator, inventoryRestored, createdAt
       ) VALUES (?, ?, ?, ?, ?, 0, ?)
-    `);
-    stmt.run(distributionId, quantity, reason, new Date().toISOString(), operator, new Date().toISOString());
+    `, [distributionId, quantity, reason, new Date().toISOString(), operator, new Date().toISOString()]);
 
-    db.prepare(`
+    await run(`
       UPDATE distributions SET status = 'returned' WHERE id = ?
-    `).run(distributionId);
+    `, [distributionId]);
 
-    this.addHistory(distributionId, 'return', operator, `退回${quantity}单位物资，原因：${reason}`);
+    await this.addHistory(distributionId, 'return', operator, `退回${quantity}单位物资，原因：${reason}`);
 
     if (!needReview) {
-      this.restoreInventory(distributionId, quantity, operator);
+      await this.restoreInventory(distributionId, quantity, operator);
     }
 
     return { success: true, needReview };
   }
 
-  static restoreInventory(distributionId: number, quantity: number, operator: string): { success: boolean; error?: string } {
-    const distribution = db.prepare('SELECT * FROM distributions WHERE id = ?').get(distributionId) as any;
+  static async restoreInventory(distributionId: number, quantity: number, operator: string): Promise<{ success: boolean; error?: string }> {
+    const distribution = await get('SELECT * FROM distributions WHERE id = ?', [distributionId]) as any;
     if (!distribution) return { success: false, error: '发放记录不存在' };
 
-    db.prepare(`
+    await run(`
       UPDATE inventory 
       SET returnedQuantity = returnedQuantity + ?,
           availableQuantity = availableQuantity + ?,
           updatedAt = ?
       WHERE batchId = ?
-    `).run(quantity, quantity, new Date().toISOString(), distribution.batchId);
+    `, [quantity, quantity, new Date().toISOString(), distribution.batchId]);
 
-    const returnRecord = db.prepare('SELECT id FROM return_records WHERE distributionId = ? ORDER BY id DESC LIMIT 1').get(distributionId) as any;
+    const returnRecord = await get('SELECT id FROM return_records WHERE distributionId = ? ORDER BY id DESC LIMIT 1', [distributionId]) as any;
     if (returnRecord) {
-      db.prepare(`
+      await run(`
         UPDATE return_records 
         SET inventoryRestored = 1, restoreTime = ?
         WHERE id = ?
-      `).run(new Date().toISOString(), returnRecord.id);
+      `, [new Date().toISOString(), returnRecord.id]);
     }
 
-    this.addHistory(distributionId, 'restore_inventory', operator, `库存恢复${quantity}单位`);
+    await this.addHistory(distributionId, 'restore_inventory', operator, `库存恢复${quantity}单位`);
 
     return { success: true };
   }
 
-  static addHistory(distributionId: number, action: string, operator: string, details: string) {
-    db.prepare(`
+  static async addHistory(distributionId: number, action: string, operator: string, details: string) {
+    await run(`
       INSERT INTO distribution_history (distributionId, action, operator, details, createdAt)
       VALUES (?, ?, ?, ?, ?)
-    `).run(distributionId, action, operator, details, new Date().toISOString());
+    `, [distributionId, action, operator, details, new Date().toISOString()]);
   }
 
-  static getDistributionHistory(distributionId: number) {
-    return db.prepare(`
+  static async getDistributionHistory(distributionId: number) {
+    return await all(`
       SELECT * FROM distribution_history WHERE distributionId = ? ORDER BY createdAt DESC
-    `).all(distributionId);
+    `, [distributionId]);
   }
 
-  static getFamilyDistributionHistory(familyId: number) {
-    return db.prepare(`
+  static async getFamilyDistributionHistory(familyId: number) {
+    return await all(`
       SELECT d.*, m.name as materialName, b.name as batchName
       FROM distributions d
       JOIN batches b ON d.batchId = b.id
       JOIN materials m ON b.materialId = m.id
       WHERE d.familyId = ?
       ORDER BY d.createdAt DESC
-    `).all(familyId);
+    `, [familyId]);
   }
 }
