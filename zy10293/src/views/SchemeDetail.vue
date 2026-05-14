@@ -246,7 +246,7 @@ const loadData = async () => {
       schemeItems.value = res.data.items || []
       versionHistory.value = res.data.history || []
       
-      initPieChart()
+      setTimeout(() => initPieChart(), 100)
     } else {
       const copyId = sessionStorage.getItem('copy_scheme_id')
       if (copyId) {
@@ -267,6 +267,10 @@ const loadData = async () => {
 }
 
 const initPieChart = () => {
+  if (!pieChartRef.value) {
+    setTimeout(() => initPieChart(), 50)
+    return
+  }
   const chart = echarts.init(pieChartRef.value)
   const data = schemeItems.value.map((item: any) => ({
     name: item.material_name,

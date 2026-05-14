@@ -286,14 +286,55 @@ router.post('/products', (req: Request, res: Response) => {
     return res.status(400).json({ error: '该方案尚未通过审核，无法入库' })
   }
   
-  const product_no = generateNo('FP')
-  const stmt = db.prepare(`
-    INSERT INTO finished_products (product_no, scheme_id, name, production_date, quantity, unit, cost_price, selling_price, notes)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `)
-  const result = stmt.run(product_no, scheme_id, name, production_date, quantity, unit || 'g', cost_price, selling_price, notes)
+  const items: any[] = db.prepare(`
+    SELECT i.material_id, i.ratio, i.quantity, m.name, m.stock_quantity
+    FROM blending_items i
+    JOIN raw_materials m ON i.material_id = m.id
+    WHERE i.scheme_id = ?
+  `).all(scheme_id)
   
-  res.json({ id: result.lastInsertRowid, product_no })
+  if (items.length === 0) {
+    return res.status(400).json({ error: '该方案没有配置原料明细' })
+  }
+  
+  const baseRatio = items.reduce((sum, item) => sum + item.quantity, 0)
+  if (baseRatio === 0) {
+    return res.status(400).json({ error: '方案基准用量配置错误' })
+  }
+  
+  for (const item of items) {
+    const requiredQty = (item.quantity / baseRatio) * quantity
+    if (item.stock_quantity < requiredQty) {
+      return res.status(400).json({ 
+        error: `原料【${item.name}】库存不足，需要${requiredQty.toFixed(2)}，当前库存${item.stock_quantity}`,
+        code: 'INSUFFICIENT_STOCK'
+      })
+    }
+  }
+  
+  const product_no = generateNo('FP')
+  
+  let productId: any
+  
+  db.transaction(() => {
+    const stmt = db.prepare(`
+      INSERT INTO finished_products (product_no, scheme_id, name, production_date, quantity, unit, cost_price, selling_price, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    const result = stmt.run(product_no, scheme_id, name, production_date, quantity, unit || 'g', cost_price, selling_price, notes)
+    productId = result.lastInsertRowid
+    
+    const updateStock = db.prepare(`
+      UPDATE raw_materials SET stock_quantity = stock_quantity - ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+    `)
+    
+    for (const item of items) {
+      const requiredQty = (item.quantity / baseRatio) * quantity
+      updateStock.run(requiredQty, item.material_id)
+    }
+  })()
+  
+  res.json({ id: productId, product_no })
 })
 
 router.get('/sales', (req: Request, res: Response) => {

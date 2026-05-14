@@ -45,7 +45,7 @@
           <el-input v-model="form.name" placeholder="输入产品名称" />
         </el-form-item>
         <el-form-item label="拼配方案" required>
-          <el-select v-model="form.scheme_id" placeholder="选择已审核的方案" style="width: 100%">
+          <el-select v-model="form.scheme_id" placeholder="选择已审核的方案" style="width: 100%" @change="loadSchemeItems">
             <el-option
               v-for="s in approvedSchemes"
               :key="s.id"
@@ -54,6 +54,33 @@
             />
           </el-select>
           <div class="form-tip">只有审核通过的方案才能用于生产</div>
+        </el-form-item>
+        
+        <el-form-item v-if="schemeItems.length > 0" label="原料清单">
+          <table class="material-table">
+            <thead>
+              <tr>
+                <th>原料名称</th>
+                <th>配比(%)</th>
+                <th>当前库存</th>
+                <th>预计用量</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in schemeItems" :key="item.material_id" :class="{ 'low-stock': item.insufficient }">
+                <td>{{ item.material_name }} ({{ item.batch_no }})</td>
+                <td align="right">{{ item.ratio }}%</td>
+                <td align="right">{{ item.stock_quantity }} g</td>
+                <td align="right">{{ item.required_qty.toFixed(2) }} g</td>
+                <td>
+                  <el-tag v-if="item.insufficient" type="danger" size="small">库存不足</el-tag>
+                  <el-tag v-else type="success" size="small">充足</el-tag>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="total-usage">预计总用量: {{ totalUsage.toFixed(2) }} g</div>
         </el-form-item>
         <el-form-item label="生产日期" required>
           <el-date-picker v-model="form.production_date" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
@@ -88,13 +115,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { productApi, schemeApi } from '../api'
 
 const tableData = ref([])
 const approvedSchemes = ref([])
 const dialogVisible = ref(false)
+const schemeItems = ref<any[]>([])
+const currentScheme = ref<any>(null)
 
 const form = reactive({
   name: '',
@@ -106,6 +135,46 @@ const form = reactive({
   selling_price: 0,
   notes: ''
 })
+
+const baseRatio = computed(() => {
+  return schemeItems.value.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)
+})
+
+const totalUsage = computed(() => {
+  if (baseRatio.value === 0) return 0
+  return schemeItems.value.reduce((sum, item) => {
+    return sum + (Number(item.quantity) / baseRatio.value * form.quantity)
+  }, 0)
+})
+
+watch(() => form.quantity, () => {
+  if (schemeItems.value.length > 0) {
+    calculateRequiredQty()
+  }
+})
+
+const calculateRequiredQty = () => {
+  if (baseRatio.value === 0) return
+  schemeItems.value.forEach(item => {
+    item.required_qty = (Number(item.quantity) / baseRatio.value) * form.quantity
+    item.insufficient = Number(item.stock_quantity) < item.required_qty
+  })
+}
+
+const loadSchemeItems = async (schemeId: number) => {
+  if (!schemeId) {
+    schemeItems.value = []
+    return
+  }
+  try {
+    const res = await schemeApi.get(schemeId)
+    currentScheme.value = res.data
+    schemeItems.value = res.data.items || []
+    calculateRequiredQty()
+  } catch (e) {
+    ElMessage.error('加载方案明细失败')
+  }
+}
 
 const loadData = async () => {
   try {
@@ -136,6 +205,7 @@ const openDialog = () => {
     selling_price: 0,
     notes: ''
   })
+  schemeItems.value = []
   dialogVisible.value = true
 }
 
@@ -177,5 +247,38 @@ onMounted(() => {
   font-size: 12px;
   color: #909399;
   margin-top: 4px;
+}
+
+.material-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.material-table th {
+  border: 1px solid #ebeef5;
+}
+
+.material-table th,
+.material-table td {
+  padding: 8px 12px;
+  border: 1px solid #ebeef5;
+}
+
+.material-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+
+.material-table tr.low-stock {
+  background: #fef0f0;
+}
+
+.total-usage {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #606266;
+  text-align: right;
+  font-weight: 600;
 }
 </style>
