@@ -65,9 +65,9 @@ func (s *RouterService) selectBucket(strategy *model.RoutingStrategy, retryAttem
 	case model.StrategyTypePriority:
 		return s.selectByPriority(availableBuckets, retryAttempt)
 	case model.StrategyTypeRoundRobin:
-		return s.selectRoundRobin(availableBuckets)
+		return s.selectRoundRobin(strategy.ID, availableBuckets)
 	case model.StrategyTypeWeighted:
-		return s.selectByWeight(availableBuckets)
+		return s.selectByWeight(availableBuckets, retryAttempt)
 	default:
 		return s.selectByPriority(availableBuckets, retryAttempt)
 	}
@@ -93,11 +93,28 @@ func (s *RouterService) selectByPriority(buckets []*model.Bucket, retryAttempt i
 	return buckets[idx], nil
 }
 
-func (s *RouterService) selectRoundRobin(buckets []*model.Bucket) (*model.Bucket, error) {
-	return buckets[0], nil
+func (s *RouterService) selectRoundRobin(strategyID string, buckets []*model.Bucket) (*model.Bucket, error) {
+	idx := s.store.GetAndIncrementRoundRobinIndex(strategyID)
+	return buckets[idx%len(buckets)], nil
 }
 
-func (s *RouterService) selectByWeight(buckets []*model.Bucket) (*model.Bucket, error) {
+func (s *RouterService) selectByWeight(buckets []*model.Bucket, retryAttempt int) (*model.Bucket, error) {
+	var totalWeight int
+	for _, b := range buckets {
+		if b.Weight <= 0 {
+			b.Weight = 1
+		}
+		totalWeight += b.Weight
+	}
+
+	randVal := (time.Now().UnixNano() + int64(retryAttempt*12345)) % int64(totalWeight)
+	cumulative := 0
+	for _, b := range buckets {
+		cumulative += b.Weight
+		if int64(cumulative) > randVal {
+			return b, nil
+		}
+	}
 	return buckets[0], nil
 }
 
@@ -257,11 +274,11 @@ func (s *RouterService) GetUploadHistory(uploadID string) (map[string]interface{
 	}
 
 	history := map[string]interface{}{
-		"upload_request":  upload,
+		"upload_request":   upload,
 		"routing_switches": s.store.GetRoutingSwitches(uploadID),
 		"checksum_summary": s.store.GetChecksumSummaries(uploadID),
-		"access_links":    s.store.GetAccessLinks(uploadID),
-		"audit_logs":      s.store.GetAuditLogs(uploadID),
+		"access_links":     s.store.GetAccessLinks(uploadID),
+		"audit_logs":       s.store.GetAuditLogs(uploadID),
 	}
 
 	return history, nil
@@ -273,11 +290,11 @@ func (s *RouterService) ListUploadHistory() []map[string]interface{} {
 
 	for _, upload := range uploads {
 		history := map[string]interface{}{
-			"upload_request":  upload,
+			"upload_request":   upload,
 			"routing_switches": s.store.GetRoutingSwitches(upload.ID),
 			"checksum_summary": s.store.GetChecksumSummaries(upload.ID),
-			"access_links":    s.store.GetAccessLinks(upload.ID),
-			"audit_logs":      s.store.GetAuditLogs(upload.ID),
+			"access_links":     s.store.GetAccessLinks(upload.ID),
+			"audit_logs":       s.store.GetAuditLogs(upload.ID),
 		}
 		historyList = append(historyList, history)
 	}

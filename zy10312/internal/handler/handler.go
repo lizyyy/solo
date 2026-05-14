@@ -12,8 +12,8 @@ import (
 )
 
 type Handler struct {
-	store   *service.Store
-	router  *service.RouterService
+	store  *service.Store
+	router *service.RouterService
 }
 
 func NewHandler(store *service.Store, router *service.RouterService) *Handler {
@@ -97,6 +97,12 @@ func (h *Handler) CreateUploadRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err := h.store.GetStrategy(req.StrategyID)
+	if err != nil {
+		errors.NewErrorResponse(err.(*errors.AppError)).WriteJSON(w)
+		return
+	}
+
 	upload := &model.UploadRequest{
 		FileName:       req.FileName,
 		FileSize:       req.FileSize,
@@ -125,7 +131,7 @@ func (h *Handler) RouteUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errors.NewSuccessResponse(map[string]interface{}{
-		"bucket": bucket,
+		"bucket":    bucket,
 		"upload_id": uploadID,
 	}).WriteJSON(w)
 }
@@ -164,7 +170,7 @@ func (h *Handler) HandleFailover(w http.ResponseWriter, r *http.Request) {
 }
 
 type ChecksumRequest struct {
-	Algorithm   string `json:"algorithm"`
+	Algorithm    string `json:"algorithm"`
 	ExpectedHash string `json:"expected_hash"`
 	ActualData   []byte `json:"actual_data"`
 }
@@ -237,7 +243,7 @@ func (h *Handler) CompleteUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	errors.NewSuccessResponse(map[string]string{
-		"status": "completed",
+		"status":    "completed",
 		"upload_id": uploadID,
 	}).WriteJSON(w)
 }

@@ -7,10 +7,10 @@ import (
 type Provider string
 
 const (
-	ProviderAWS    Provider = "aws"
-	ProviderAliyun Provider = "aliyun"
+	ProviderAWS     Provider = "aws"
+	ProviderAliyun  Provider = "aliyun"
 	ProviderTencent Provider = "tencent"
-	ProviderHuawei Provider = "huawei"
+	ProviderHuawei  Provider = "huawei"
 )
 
 type BucketStatus string
@@ -29,6 +29,7 @@ type Bucket struct {
 	Endpoint  string       `json:"endpoint"`
 	Status    BucketStatus `json:"status"`
 	Priority  int          `json:"priority"`
+	Weight    int          `json:"weight"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 }
@@ -36,9 +37,9 @@ type Bucket struct {
 type StrategyType string
 
 const (
-	StrategyTypePriority StrategyType = "priority"
+	StrategyTypePriority   StrategyType = "priority"
 	StrategyTypeRoundRobin StrategyType = "round_robin"
-	StrategyTypeWeighted StrategyType = "weighted"
+	StrategyTypeWeighted   StrategyType = "weighted"
 )
 
 type FailoverMode string
@@ -63,36 +64,36 @@ type RoutingStrategy struct {
 type UploadStatus string
 
 const (
-	UploadStatusPending    UploadStatus = "pending"
-	UploadStatusRouting    UploadStatus = "routing"
-	UploadStatusUploading  UploadStatus = "uploading"
-	UploadStatusSuccess    UploadStatus = "success"
-	UploadStatusFailed     UploadStatus = "failed"
-	UploadStatusSwitched   UploadStatus = "switched"
+	UploadStatusPending   UploadStatus = "pending"
+	UploadStatusRouting   UploadStatus = "routing"
+	UploadStatusUploading UploadStatus = "uploading"
+	UploadStatusSuccess   UploadStatus = "success"
+	UploadStatusFailed    UploadStatus = "failed"
+	UploadStatusSwitched  UploadStatus = "switched"
 )
 
 type UploadRequest struct {
-	ID             string       `json:"id"`
-	RequestID      string       `json:"request_id"`
-	FileName       string       `json:"file_name"`
-	FileSize       int64        `json:"file_size"`
-	ContentType    string       `json:"content_type"`
-	StrategyID     string       `json:"strategy_id"`
-	CurrentBucketID string      `json:"current_bucket_id"`
-	Status         UploadStatus `json:"status"`
-	IdempotencyKey string       `json:"idempotency_key"`
-	CreatedAt      time.Time    `json:"created_at"`
-	UpdatedAt      time.Time    `json:"updated_at"`
+	ID              string       `json:"id"`
+	RequestID       string       `json:"request_id"`
+	FileName        string       `json:"file_name"`
+	FileSize        int64        `json:"file_size"`
+	ContentType     string       `json:"content_type"`
+	StrategyID      string       `json:"strategy_id"`
+	CurrentBucketID string       `json:"current_bucket_id"`
+	Status          UploadStatus `json:"status"`
+	IdempotencyKey  string       `json:"idempotency_key"`
+	CreatedAt       time.Time    `json:"created_at"`
+	UpdatedAt       time.Time    `json:"updated_at"`
 }
 
 type SwitchReason string
 
 const (
-	SwitchReasonTimeout      SwitchReason = "timeout"
-	SwitchReasonError        SwitchReason = "error"
-	SwitchReasonRateLimit    SwitchReason = "rate_limit"
-	SwitchReasonCapacity     SwitchReason = "capacity"
-	SwitchReasonManual       SwitchReason = "manual"
+	SwitchReasonTimeout   SwitchReason = "timeout"
+	SwitchReasonError     SwitchReason = "error"
+	SwitchReasonRateLimit SwitchReason = "rate_limit"
+	SwitchReasonCapacity  SwitchReason = "capacity"
+	SwitchReasonManual    SwitchReason = "manual"
 )
 
 type RoutingSwitch struct {

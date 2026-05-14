@@ -23,6 +23,7 @@ type Store struct {
 	checksumSummary map[string][]*model.ChecksumSummary
 	accessLinks     map[string][]*model.AccessLink
 	auditLogs       map[string][]*model.RoutingAudit
+	roundRobinIndex map[string]int
 }
 
 func NewStore() *Store {
@@ -35,6 +36,7 @@ func NewStore() *Store {
 		checksumSummary: make(map[string][]*model.ChecksumSummary),
 		accessLinks:     make(map[string][]*model.AccessLink),
 		auditLogs:       make(map[string][]*model.RoutingAudit),
+		roundRobinIndex: make(map[string]int),
 	}
 }
 
@@ -94,6 +96,12 @@ func (s *Store) CreateUploadRequest(req *model.UploadRequest) (*model.UploadRequ
 
 	if req.IdempotencyKey != "" {
 		if existing, exists := s.idempotencyMap[req.IdempotencyKey]; exists {
+			if existing.FileName != req.FileName ||
+				existing.FileSize != req.FileSize ||
+				existing.ContentType != req.ContentType ||
+				existing.StrategyID != req.StrategyID {
+				return nil, errors.New(errors.ErrCodeIdempotencyConflict, "idempotency key conflict with different request content")
+			}
 			return existing, nil
 		}
 	}
@@ -110,6 +118,14 @@ func (s *Store) CreateUploadRequest(req *model.UploadRequest) (*model.UploadRequ
 	}
 
 	return req, nil
+}
+
+func (s *Store) GetAndIncrementRoundRobinIndex(strategyID string) int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	idx := s.roundRobinIndex[strategyID]
+	s.roundRobinIndex[strategyID] = idx + 1
+	return idx
 }
 
 func (s *Store) GetUploadRequest(id string) (*model.UploadRequest, error) {

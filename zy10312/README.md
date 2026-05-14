@@ -35,8 +35,8 @@
 
 ### 2. 核心规则
 
-- **策略匹配**: 根据路由策略选择目标存储桶
-- **失败切换**: 上传失败时自动切换到备用存储桶
+- **策略匹配**: 根据路由策略选择目标存储桶，支持优先级、轮询、加权三种策略
+- **失败切换**: 上传失败时自动切换到备用存储桶，支持最大重试次数限制
 - **摘要校验**: 支持 MD5、SHA1、SHA256 等哈希算法校验
 - **链接签发**: 生成带过期时间的访问链接
 - **路由审计**: 完整的操作日志记录
@@ -58,10 +58,18 @@
 | GET | /api/uploads/{id}/history | 获取单条上传历史 |
 | GET | /api/history | 获取所有上传历史 |
 
-### 4. 幂等性
+### 4. 策略类型说明
 
-- 支持通过 `idempotency_key` 请求头实现幂等性
-- 重复提交相同的幂等键不会创建新记录
+- **priority (优先级策略)**: 根据 bucket 的 priority 字段排序，priority 越小优先级越高；重试时依次尝试下一个优先级桶
+- **round_robin (轮询策略)**: 依次循环选择每个可用的存储桶，基于策略级别的计数器实现
+- **weighted (加权策略)**: 根据 bucket 的 weight 字段按概率选择，weight 越大选中概率越高
+
+### 5. 幂等性
+
+- 支持通过 `idempotency_key` 请求字段实现幂等性
+- 重复提交相同的幂等键 + 相同请求内容，直接返回已存在的记录
+- 相同幂等键 + 不同请求内容，返回 IDEMPOTENCY_CONFLICT 错误
+- 创建上传请求时会校验 strategy_id 对应的策略是否真实存在
 
 ## 启动服务
 
@@ -90,7 +98,7 @@ curl -X POST http://localhost:8080/api/buckets \
     "priority": 1
   }'
 
-# 创建阿里云存储桶
+# 创建阿里云存储桶（带权重，用于加权策略）
 curl -X POST http://localhost:8080/api/buckets \
   -H "Content-Type: application/json" \
   -d '{
@@ -99,7 +107,8 @@ curl -X POST http://localhost:8080/api/buckets \
     "region": "cn-hangzhou",
     "endpoint": "https://oss-cn-hangzhou.aliyuncs.com",
     "status": "active",
-    "priority": 2
+    "priority": 2,
+    "weight": 3
   }'
 ```
 
@@ -107,11 +116,37 @@ curl -X POST http://localhost:8080/api/buckets \
 
 ```bash
 # 注意: 替换下面的 bucket_ids 为实际返回的 ID
+
+# 优先级策略示例
 curl -X POST http://localhost:8080/api/strategies \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "multi-cloud-failover",
+    "name": "multi-cloud-priority",
     "type": "priority",
+    "failover_mode": "automatic",
+    "bucket_ids": ["bkt_xxx", "bkt_yyy"],
+    "retry_count": 3,
+    "timeout_sec": 30
+  }'
+
+# 轮询策略示例
+curl -X POST http://localhost:8080/api/strategies \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "multi-cloud-roundrobin",
+    "type": "round_robin",
+    "failover_mode": "automatic",
+    "bucket_ids": ["bkt_xxx", "bkt_yyy"],
+    "retry_count": 3,
+    "timeout_sec": 30
+  }'
+
+# 加权策略示例（weight 越大，选中概率越高）
+curl -X POST http://localhost:8080/api/strategies \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "multi-cloud-weighted",
+    "type": "weighted",
     "failover_mode": "automatic",
     "bucket_ids": ["bkt_xxx", "bkt_yyy"],
     "retry_count": 3,
@@ -133,12 +168,23 @@ curl -X POST http://localhost:8080/api/uploads \
     "idempotency_key": "unique-key-12345"
   }'
 
-# 重复提交相同的 idempotency_key，将返回相同结果（不会创建新记录）
+# 重复提交相同的 idempotency_key + 相同内容，将返回相同结果（不会创建新记录）
 curl -X POST http://localhost:8080/api/uploads \
   -H "Content-Type: application/json" \
   -d '{
     "file_name": "example.txt",
     "file_size": 1024,
+    "content_type": "text/plain",
+    "strategy_id": "strat_xxx",
+    "idempotency_key": "unique-key-12345"
+  }'
+
+# 相同 idempotency_key + 不同内容，将返回 IDEMPOTENCY_CONFLICT 错误
+curl -X POST http://localhost:8080/api/uploads \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_name": "different.txt",
+    "file_size": 2048,
     "content_type": "text/plain",
     "strategy_id": "strat_xxx",
     "idempotency_key": "unique-key-12345"
