@@ -9,12 +9,6 @@ const router = (0, express_1.Router)();
 router.post('/initialize', async (req, res) => {
     try {
         const { tenantId, tenantName, packagePath } = req.body;
-        if (!tenantId || !tenantName || !packagePath) {
-            return res.status(400).json({
-                success: false,
-                error: '缺少必要参数: tenantId, tenantName, packagePath'
-            });
-        }
         const result = await tenantInitService_1.tenantInitService.initializeTenant(tenantId, tenantName, packagePath);
         res.json({
             success: result.success,

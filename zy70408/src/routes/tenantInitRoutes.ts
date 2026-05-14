@@ -10,13 +10,6 @@ router.post('/initialize', async (req: Request, res: Response) => {
   try {
     const { tenantId, tenantName, packagePath } = req.body;
 
-    if (!tenantId || !tenantName || !packagePath) {
-      return res.status(400).json({
-        success: false,
-        error: '缺少必要参数: tenantId, tenantName, packagePath'
-      });
-    }
-
     const result = await tenantInitService.initializeTenant(tenantId, tenantName, packagePath);
 
     res.json({

@@ -205,13 +205,39 @@ export class TenantInitService {
   }
 
   public async initializeTenant(tenantId: string, tenantName: string, packagePath: string): Promise<{ recordId: string; success: boolean; currentStep?: InitStep; error?: string }> {
-    const recordId = await this.createRecord(tenantId, tenantName, packagePath);
+    const recordId = await this.createRecord(tenantId || '', tenantName || '', packagePath || '');
 
     try {
       await this.updateRecordStatus(recordId, ProcessingStatus.PROCESSING, InitStep.VALIDATE_PACKAGE);
 
+      if (!tenantId || !tenantName) {
+        const error = '缺少必要参数: tenantId, tenantName';
+        await this.createDetailItem(
+          recordId,
+          'PARAMETER_VALIDATION',
+          'PARAMS',
+          '参数校验',
+          ItemStatus.FAILED,
+          InitStep.VALIDATE_PACKAGE,
+          error,
+          JSON.stringify({ tenantId, tenantName, packagePath })
+        );
+        await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, InitStep.VALIDATE_PACKAGE, error);
+        return { recordId, success: false, currentStep: InitStep.VALIDATE_PACKAGE, error };
+      }
+
       const packageValidation = await this.validatePackagePath(packagePath);
       if (!packageValidation.valid) {
+        await this.createDetailItem(
+          recordId,
+          'PACKAGE_VALIDATION',
+          'PACKAGE_PATH',
+          '压缩包路径校验',
+          ItemStatus.FAILED,
+          InitStep.VALIDATE_PACKAGE,
+          packageValidation.error,
+          JSON.stringify({ packagePath })
+        );
         await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, InitStep.VALIDATE_PACKAGE, packageValidation.error);
         return { recordId, success: false, currentStep: InitStep.VALIDATE_PACKAGE, error: packageValidation.error };
       }
@@ -219,6 +245,16 @@ export class TenantInitService {
       await this.updateRecordStatus(recordId, ProcessingStatus.PROCESSING, InitStep.EXTRACT_FILES);
       const extractResult = await this.extractFiles(recordId, packagePath);
       if (!extractResult.success) {
+        await this.createDetailItem(
+          recordId,
+          'FILE_EXTRACTION',
+          'EXTRACT',
+          '文件解压',
+          ItemStatus.FAILED,
+          InitStep.EXTRACT_FILES,
+          extractResult.error,
+          ''
+        );
         await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, InitStep.EXTRACT_FILES, extractResult.error);
         return { recordId, success: false, currentStep: InitStep.EXTRACT_FILES, error: extractResult.error };
       }
@@ -226,6 +262,16 @@ export class TenantInitService {
       await this.updateRecordStatus(recordId, ProcessingStatus.PROCESSING, InitStep.PARSE_METADATA);
       const parseResult = await this.parseMetadata(recordId, extractResult.files!);
       if (!parseResult.success) {
+        await this.createDetailItem(
+          recordId,
+          'METADATA_PARSE',
+          'PARSE',
+          '元数据解析',
+          ItemStatus.FAILED,
+          InitStep.PARSE_METADATA,
+          parseResult.error,
+          JSON.stringify({ files: extractResult.files })
+        );
         await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, InitStep.PARSE_METADATA, parseResult.error);
         return { recordId, success: false, currentStep: InitStep.PARSE_METADATA, error: parseResult.error };
       }
@@ -235,6 +281,16 @@ export class TenantInitService {
       await this.updateRecordStatus(recordId, ProcessingStatus.PROCESSING, InitStep.CREATE_TENANT);
       const createTenantResult = await this.createTenant(recordId, tenantId, tenantName);
       if (!createTenantResult.success) {
+        await this.createDetailItem(
+          recordId,
+          'TENANT_CREATE',
+          'TENANT',
+          '租户创建',
+          ItemStatus.FAILED,
+          InitStep.CREATE_TENANT,
+          createTenantResult.error,
+          JSON.stringify({ tenantId, tenantName })
+        );
         await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, InitStep.CREATE_TENANT, createTenantResult.error);
         return { recordId, success: false, currentStep: InitStep.CREATE_TENANT, error: createTenantResult.error };
       }
@@ -251,6 +307,16 @@ export class TenantInitService {
       await this.updateRecordStatus(recordId, ProcessingStatus.PROCESSING, InitStep.CONFIGURE_PERMISSIONS);
       const permResult = await this.configurePermissions(recordId, tenantId);
       if (!permResult.success) {
+        await this.createDetailItem(
+          recordId,
+          'PERMISSION_CONFIG',
+          'PERMISSION',
+          '权限配置',
+          ItemStatus.FAILED,
+          InitStep.CONFIGURE_PERMISSIONS,
+          permResult.error,
+          JSON.stringify({ tenantId })
+        );
         await this.updateRecordStatus(recordId, ProcessingStatus.PARTIAL_SUCCESS, InitStep.CONFIGURE_PERMISSIONS, permResult.error);
         return { recordId, success: false, currentStep: InitStep.CONFIGURE_PERMISSIONS, error: permResult.error };
       }
@@ -264,8 +330,18 @@ export class TenantInitService {
       return { recordId, success: true };
     } catch (error: any) {
       const currentStep = await this.getCurrentStep(recordId);
+      await this.createDetailItem(
+        recordId,
+        'UNEXPECTED_ERROR',
+        'SYSTEM',
+        '系统异常',
+        ItemStatus.FAILED,
+        currentStep || InitStep.VALIDATE_PACKAGE,
+        error.message,
+        ''
+      );
       await this.updateRecordStatus(recordId, ProcessingStatus.FAILED, currentStep, error.message);
-      return { recordId, success: false, currentStep: currentStep || undefined, error: error.message };
+      return { recordId, success: false, currentStep: currentStep || InitStep.VALIDATE_PACKAGE, error: error.message };
     }
   }
 
