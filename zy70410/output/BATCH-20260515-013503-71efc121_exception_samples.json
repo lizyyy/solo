@@ -1,0 +1,22 @@
+[
+  {
+    "order_id": "REP-2024-003",
+    "risk_type": "permission_over_granted",
+    "field_path": "property.repair.order.items.2.permission_level",
+    "old_value": "admin",
+    "new_value": "normal",
+    "source": "property.repair.order.items.2.permission_level",
+    "processing_basis": "根据业务规则和权限管理规范执行修复",
+    "needs_review": true
+  },
+  {
+    "order_id": "REP-2024-GRAY-001",
+    "risk_type": "grayscale_record",
+    "field_path": "property.repair.grayscale.memo.0",
+    "old_value": null,
+    "new_value": "灰度发布人工修正记录：2024-05-15批次权限修复需人工复核跨天工单状态",
+    "source": "property.repair.grayscale.memo.0",
+    "processing_basis": "根据业务规则和权限管理规范执行修复",
+    "needs_review": true
+  }
+]

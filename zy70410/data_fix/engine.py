@@ -1,7 +1,9 @@
 import uuid
+import json
 from datetime import datetime
 from typing import List, Dict, Any
 from copy import deepcopy
+from pathlib import Path
 
 from .models import (
     PropertyRepairOrder, FixSuggestion, FixRecord, ExecutionResult,
@@ -166,12 +168,10 @@ class DataFixEngine:
         return results
 
     def export_failed_records(self, report: BatchExecutionReport, filepath: str) -> None:
-        import json
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump([fr.model_dump() for fr in report.failed_records], f, ensure_ascii=False, indent=2, default=str)
 
     def export_exception_samples(self, report: BatchExecutionReport, filepath: str) -> None:
-        import json
         samples = []
         for record in report.fix_records:
             if record.risk_type in [RiskType.PERMISSION_OVER_GRANTED, RiskType.GRAYSCALE_RECORD]:
@@ -187,3 +187,54 @@ class DataFixEngine:
                 })
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(samples, f, ensure_ascii=False, indent=2, default=str)
+
+    def load_history_from_directory(self, directory: str) -> List[BatchExecutionReport]:
+        dir_path = Path(directory)
+        if not dir_path.exists():
+            return []
+
+        history_records = []
+        for report_file in dir_path.glob("*_report.json"):
+            try:
+                report = self._load_report_from_file(str(report_file))
+                if report:
+                    history_records.append(report)
+            except Exception:
+                continue
+
+        history_records.sort(key=lambda x: x.start_time, reverse=True)
+        return history_records
+
+    def _load_report_from_file(self, filepath: str) -> BatchExecutionReport:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
+        fix_records = []
+        for record_data in data.get("fix_records_with_details", []):
+            fix_records.append(FixRecord(
+                order_id=record_data["order_id"],
+                risk_type=RiskType(record_data["risk_type"]),
+                field_path=record_data["field_path"],
+                old_value=record_data["old_value"],
+                new_value=record_data["new_value"],
+                result=ExecutionResult(record_data["result"]),
+                error_message=record_data.get("error_message"),
+                executed_at=datetime.fromisoformat(record_data["executed_at"])
+            ))
+
+        report = BatchExecutionReport(
+            batch_id=data["batch_id"],
+            operator=data["operator"],
+            start_time=datetime.fromisoformat(data["start_time"]),
+            end_time=datetime.fromisoformat(data["end_time"]) if data.get("end_time") else None,
+            total_count=data["summary"]["total_count"],
+            success_count=data["summary"]["success_count"],
+            failed_count=data["summary"]["failed_count"],
+            skipped_count=data["summary"]["skipped_count"],
+            fix_records=fix_records,
+            failed_records=[],
+            next_steps=data.get("next_steps", []),
+            grayscale_notes=data.get("grayscale_notes", [])
+        )
+
+        return report

@@ -90,10 +90,15 @@ def query(ctx, batch_id, operator, risk_type):
     """查询历史执行记录"""
     engine = ctx.obj['engine']
     reporter = ctx.obj['reporter']
+    output_dir = ctx.obj['output_dir']
 
-    if not engine.execution_history:
+    file_history = engine.load_history_from_directory(str(output_dir))
+    if not engine.execution_history and not file_history:
         click.echo("暂无历史执行记录，请先运行 datafix run")
         return
+
+    all_history = engine.execution_history + file_history
+    engine.execution_history = all_history
 
     risk_type_enum = RiskType(risk_type) if risk_type else None
     results = engine.query_history(batch_id, operator, risk_type_enum)
