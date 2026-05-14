@@ -1,0 +1,151 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ----------------------------------------------------------------------------
+
+if [ -z "$MAVEN_SKIP_RC" ] ; then
+
+  if [ -f /etc/mavenrc ] ; then
+    . /etc/mavenrc
+  fi
+
+  if [ -f "$HOME/.mavenrc" ] ; then
+    . "$HOME/.mavenrc"
+  fi
+
+fi
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+darwin=false;
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
+  Darwin*) darwin=true
+           #
+           # Look for the Apple JDKs first to preserve the existing behaviour, and then look
+           # for other JDKs with the different naming conventions.
+           #
+           if [ -z "$JAVA_HOME" ]; then
+             jdkHome=`/usr/libexec/java_home 2>/dev/null`
+             if [ $? -eq 0 ]; then
+               JAVA_HOME="$jdkHome"
+             else
+               jdkHome=`/usr/libexec/java_home -v 1.8+ 2>/dev/null`
+               if [ $? -eq 0 ]; then
+                 JAVA_HOME="$jdkHome"
+               fi
+             fi
+           fi
+           ;;
+esac
+
+if [ -z "$JAVA_HOME" ] ; then
+  javaExecutable="`which javac`"
+  if [ -n "$javaExecutable" ] && ! [ "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
+    # readlink(1) is not available as standard on Solaris 10.
+    readLink=`which readlink`
+    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
+      if $darwin ; then
+        javaHome="`dirname \"$javaExecutable\"`"
+        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
+      else
+        javaExecutable="`readlink -f \"$javaExecutable\"`"
+      fi
+      javaHome="`dirname \"$javaExecutable\"`"
+      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
+      JAVA_HOME="$javaHome"
+      export JAVA_HOME
+    fi
+fi
+
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+      JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+    fi
+  else
+    JAVACMD="`which java`"
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly." >&2
+  echo "  We cannot execute $JAVACMD" >&2
+  exit 1
+fi
+
+if [ -z "$JAVA_HOME" ] ; then
+  echo "Warning: JAVA_HOME environment variable is not set."
+fi
+
+CLASSWORLDS_JAR=`echo "${0%/*}"/.mvn/wrapper/maven-wrapper-*.jar`
+if [ ! -f "$CLASSWORLDS_JAR" ]; then
+  echo "Maven wrapper JAR not found. Downloading..."
+  mkdir -p "${0%/*}/.mvn/wrapper"
+  wrapperVersion="0.5.6"
+  wrapperUrl="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/${wrapperVersion}/maven-wrapper-${wrapperVersion}.jar"
+  if command -v curl > /dev/null 2>&1; then
+    curl -s -o "${0%/*}/.mvn/wrapper/maven-wrapper-${wrapperVersion}.jar" "$wrapperUrl"
+  elif command -v wget > /dev/null 2>&1; then
+    wget -q -O "${0%/*}/.mvn/wrapper/maven-wrapper-${wrapperVersion}.jar" "$wrapperUrl"
+  else
+    echo "Error: Neither curl nor wget found. Please install Maven manually."
+    exit 1
+  fi
+  CLASSWORLDS_JAR="${0%/*}/.mvn/wrapper/maven-wrapper-${wrapperVersion}.jar"
+fi
+
+wrapperJarPath="$CLASSWORLDS_JAR"
+
+if $cygwin; then
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --unix "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --unix "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+fi
+
+if $mingw ; then
+  [ -n "$M2_HOME" ] &&
+    M2_HOME="`(cd "$M2_HOME"; pwd)`"
+  [ -n "$JAVA_HOME" ] &&
+    JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
+fi
+
+BASE_DIR=`dirname "$0"`
+if [ "$BASE_DIR" = "." ]; then
+  BASE_DIR=`pwd`
+fi
+
+MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
+export MAVEN_PROJECTBASEDIR
+
+# For Cygwin, switch paths to Windows format before running java
+if $cygwin; then
+  [ -n "$M2_HOME" ] && M2_HOME=`cygpath --path --windows "$M2_HOME"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
+  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+  [ -n "$MAVEN_PROJECTBASEDIR" ] && MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
+  wrapperJarPath=`cygpath --path --windows "$wrapperJarPath"`
+fi
+
+exec "$JAVACMD" \
+  $MAVEN_OPTS \
+  -classpath "$wrapperJarPath" \
+  "-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@"
