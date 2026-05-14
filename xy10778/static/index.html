@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT设备固件升级台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: #ddd; border: none; cursor: pointer; border-radius: 4px; }
+        .tab.active { background: #007bff; color: white; }
+        .tab-content { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        button.danger { background: #dc3545; }
+        button.warning { background: #ffc107; color: #333; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-blocked { background: #f8d7da; color: #721c24; }
+        .status-retryable { background: #cce5ff; color: #004085; }
+        .result-box { margin-top: 20px; padding: 15px; border-radius: 4px; display: none; }
+        .result-box.show { display: block; }
+        .permission-warning { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: 600; }
+        .file-upload { border: 2px dashed #ddd; padding: 40px; text-align: center; border-radius: 8px; cursor: pointer; }
+        .file-upload:hover { border-color: #007bff; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 32px; font-weight: bold; color: #007bff; }
+        .stat-label { color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IoT设备固件升级台</h1>
+        
+        <div class="permission-warning">
+            <strong>⚠️ 权限提示：</strong>当前用户为「普通操作员」，以下操作受限：
+            <ul style="margin-top: 8px; margin-left: 20px;">
+                <li>批次状态为「待复核」时需要管理员审批</li>
+                <li>不能修改灰度策略（仅管理员可配置）</li>
+                <li>单次批量导入最多500台设备</li>
+            </ul>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('validate')">批次校验</button>
+            <button class="tab" onclick="showTab('import')">批量导入</button>
+            <button class="tab" onclick="showTab('execute')">执行升级</button>
+            <button class="tab" onclick="showTab('statistics')">统计导出</button>
+            <button class="tab" onclick="showTab('demo')">样例演示</button>
+        </div>
+
+        <div id="validate" class="tab-content active">
+            <h2>设备批次校验</h2>
+            <div class="form-group">
+                <label>批次ID</label>
+                <input type="text" id="batchId" value="batch-demo-001">
+            </div>
+            <div class="form-group">
+                <label>设备列表（逗号分隔）</label>
+                <textarea id="devices" rows="3">dev-001,dev-002,dev-003,dev-004,dev-005</textarea>
+            </div>
+            <div class="form-group">
+                <label>目标固件版本</label>
+                <select id="targetVersion"></select>
+            </div>
+            <div class="form-group">
+                <label>当前版本</label>
+                <input type="text" id="currentVersion" value="v2.0.5">
+            </div>
+            <div class="form-group">
+                <label>硬件版本</label>
+                <input type="text" id="hardwareVersion" value="hw-v1.5">
+            </div>
+            <div class="form-group">
+                <label>负责人</label>
+                <input type="text" id="owner" value="张三">
+            </div>
+            <div class="form-group">
+                <label>升级窗口</label>
+                <select id="upgradeWindow"></select>
+            </div>
+            <button onclick="validateBatch()">校验批次</button>
+            
+            <div id="validateResult" class="result-box"></div>
+        </div>
+
+        <div id="import" class="tab-content">
+            <h2>批量导入</h2>
+            <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+                <p>点击或拖拽上传 Excel/CSV 文件</p>
+                <p style="color: #999; font-size: 12px; margin-top: 10px;">支持字段: batch_id, devices, target_version, current_version, hardware_version, owner, upgrade_window_id</p>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.csv" style="display: none" onchange="importFile()">
+            <div id="importResult" class="result-box" style="margin-top: 20px;"></div>
+        </div>
+
+        <div id="execute" class="tab-content">
+            <h2>执行升级</h2>
+            <div class="form-group">
+                <label>批次ID</label>
+                <input type="text" id="execBatchId" value="batch-demo-001">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <label style="margin-bottom: 0;">应用灰度策略</label>
+                <input type="checkbox" id="applyGray" checked style="width: auto;">
+            </div>
+            <button onclick="executeBatch()">执行升级</button>
+            <div id="executeResult" class="result-box"></div>
+        </div>
+
+        <div id="statistics" class="tab-content">
+            <h2>升级统计与导出</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statGray">0</div>
+                    <div class="stat-label">灰度发布</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statNonGray">0</div>
+                    <div class="stat-label">全量发布</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statRollback">0</div>
+                    <div class="stat-label">触发回滚</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>导出分组方式</label>
+                <select id="groupBy" onchange="loadExport()">
+                    <option value="owner">按负责人分组</option>
+                    <option value="window">按升级窗口分组</option>
+                    <option value="date">按日期分组</option>
+                </select>
+            </div>
+            <button onclick="loadExport()">刷新数据</button>
+            <div id="exportResult"></div>
+        </div>
+
+        <div id="demo" class="tab-content">
+            <h2>样例演示 - 失败路径与灰度差异</h2>
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 10px;">场景1: 脏数据 - 硬件不兼容（被拦截）</h3>
+                <button class="danger" onclick="runDemo1()">运行演示</button>
+                <div id="demo1Result" class="result-box"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 10px;">场景2: 脏数据 - 无回滚版本（被拦截）</h3>
+                <button class="danger" onclick="runDemo2()">运行演示</button>
+                <div id="demo2Result" class="result-box"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 10px;">场景3: 灰度策略介入（10%设备先行）</h3>
+                <button class="warning" onclick="runDemo3()">运行演示</button>
+                <div id="demo3Result" class="result-box"></div>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 10px;">场景4: 测试版本（待复核）</h3>
+                <button class="warning" onclick="runDemo4()">运行演示</button>
+                <div id="demo4Result" class="result-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let firmwareVersions = [];
+        let upgradeWindows = [];
+
+        async function init() {
+            const [fwRes, windowRes] = await Promise.all([
+                fetch('/api/firmware/'),
+                fetch('/api/windows/')
+            ]);
+            firmwareVersions = await fwRes.json();
+            upgradeWindows = await windowRes.json();
+            
+            const fwSelect = document.getElementById('targetVersion');
+            firmwareVersions.forEach(fw => {
+                const opt = document.createElement('option');
+                opt.value = fw.version;
+                opt.textContent = `${fw.version} ${fw.is_stable ? '(稳定版)' : '(测试版)'}`;
+                fwSelect.appendChild(opt);
+            });
+
+            const windowSelect = document.getElementById('upgradeWindow');
+            upgradeWindows.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.id;
+                opt.textContent = w.name;
+                windowSelect.appendChild(opt);
+            });
+
+            loadStats();
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'success': return 'status-success';
+                case 'pending_review': return 'status-pending';
+                case 'blocked': return 'status-blocked';
+                case 'retryable': return 'status-retryable';
+                default: return '';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'success': return '成功';
+                case 'pending_review': return '待复核';
+                case 'blocked': return '已拦截';
+                case 'retryable': return '可重试';
+                default: return status;
+            }
+        }
+
+        async function validateBatch() {
+            const data = {
+                batch_id: document.getElementById('batchId').value,
+                devices: document.getElementById('devices').value.split(',').map(d => d.trim()),
+                target_version: document.getElementById('targetVersion').value,
+                current_version: document.getElementById('currentVersion').value,
+                hardware_version: document.getElementById('hardwareVersion').value,
+                owner: document.getElementById('owner').value,
+                upgrade_window_id: document.getElementById('upgradeWindow').value
+            };
+
+            const res = await fetch('/api/batches/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            const box = document.getElementById('validateResult');
+            box.className = 'result-box show';
+            box.style.background = result.status === 'blocked' ? '#f8d7da' : 
+                                   result.status === 'pending_review' ? '#fff3cd' : '#d4edda';
+            box.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <span class="status-badge ${getStatusClass(result.status)}">${getStatusText(result.status)}</span>
+                </div>
+                <p><strong>${result.message}</strong></p>
+                <p>设备数量: ${result.device_count}</p>
+                ${result.blocked_reasons ? `<div style="margin-top: 10px;"><strong>拦截原因：</strong><ul>${result.blocked_reasons.map(r => `<li>${r}</li>`).join('')}</ul></div>` : ''}
+                ${result.details.warnings ? `<div style="margin-top: 10px;"><strong>警告信息：</strong><ul>${result.details.warnings.map(w => `<li>${w}</li>`).join('')}</ul></div>` : ''}
+                ${result.retry_suggestion ? `<p style="margin-top: 10px;">建议: ${result.retry_suggestion}</p>` : ''}
+            `;
+        }
+
+        async function importFile() {
+            const file = document.getElementById('fileInput').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/batches/import', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            const box = document.getElementById('importResult');
+            box.className = 'result-box show';
+            box.innerHTML = `
+                <h3>导入结果</h3>
+                <p>成功导入: ${result.imported} 个批次</p>
+                <table>
+                    <thead>
+                        <tr><th>行号</th><th>批次ID</th><th>状态</th><th>消息</th></tr>
+                    </thead>
+                    <tbody>
+                        ${result.results.map(r => `
+                            <tr>
+                                <td>${r.row}</td>
+                                <td>${r.batch_id || '-'}</td>
+                                <td><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></td>
+                                <td>${r.message}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function executeBatch() {
+            const batchId = document.getElementById('execBatchId').value;
+            const applyGray = document.getElementById('applyGray').checked;
+
+            const res = await fetch(`/api/batches/${batchId}/execute?apply_gray=${applyGray}`, {
+                method: 'POST'
+            });
+            
+            if (!res.ok) {
+                const error = await res.json();
+                document.getElementById('executeResult').className = 'result-box show';
+                document.getElementById('executeResult').style.background = '#f8d7da';
+                document.getElementById('executeResult').innerHTML = `
+                    <span class="status-badge status-blocked">已拦截</span>
+                    <p><strong>${error.detail.message}</strong></p>
+                    <ul>${error.detail.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
+                `;
+                return;
+            }
+
+            const result = await res.json();
+            const grayCount = result.details.filter(d => d.gray_applied).length;
+            
+            document.getElementById('executeResult').className = 'result-box show';
+            document.getElementById('executeResult').style.background = '#d4edda';
+            document.getElementById('executeResult').innerHTML = `
+                <span class="status-badge status-success">成功</span>
+                <p><strong>批次执行完成</strong></p>
+                <p>执行设备数: ${result.executed}</p>
+                <p>灰度发布: ${grayCount} 台</p>
+                <p>排队等待: ${result.executed - grayCount} 台</p>
+                <table>
+                    <thead>
+                        <tr><th>设备ID</th><th>状态</th><th>灰度</th></tr>
+                    </thead>
+                    <tbody>
+                        ${result.details.map(d => `
+                            <tr>
+                                <td>${d.device_id}</td>
+                                <td>${d.status}</td>
+                                <td>${d.gray_applied ? '✓ 是' : '— 否'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            loadStats();
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/statistics/');
+            const data = await res.json();
+            document.getElementById('statGray').textContent = data.gray_statistics.gray_applied;
+            document.getElementById('statNonGray').textContent = data.gray_statistics.non_gray;
+            document.getElementById('statRollback').textContent = data.gray_statistics.rollback_triggered;
+        }
+
+        async function loadExport() {
+            const groupBy = document.getElementById('groupBy').value;
+            const res = await fetch(`/api/export/?group_by=${groupBy}`);
+            const data = await res.json();
+            
+            let html = `<table style="margin-top: 20px;">
+                <thead>
+                    <tr><th>分组</th><th>批次ID</th><th>设备数</th><th>目标版本</th><th>升级窗口</th><th>成功</th><th>失败</th><th>灰度</th></tr>
+                </thead>
+                <tbody>`;
+            
+            for (const [group, batches] of Object.entries(data.data)) {
+                batches.forEach((b, i) => {
+                    html += `
+                        <tr>
+                            ${i === 0 ? `<td rowspan="${batches.length}"><strong>${group}</strong></td>` : ''}
+                            <td>${b.batch_id}</td>
+                            <td>${b.device_count}</td>
+                            <td>${b.target_version}</td>
+                            <td>${b.upgrade_window}</td>
+                            <td>${b.success_count}</td>
+                            <td>${b.failed_count}</td>
+                            <td>${b.gray_count}</td>
+                        </tr>
+                    `;
+                });
+            }
+            html += '</tbody></table>';
+            document.getElementById('exportResult').innerHTML = html;
+        }
+
+        async function runDemo1() {
+            const data = {
+                batch_id: "demo-blocked-hw",
+                devices: ["dev-bad-001", "dev-bad-002"],
+                target_version: "v2.1.0",
+                current_version: "v2.0.5",
+                hardware_version: "hw-v0.8",
+                owner: "测试员",
+                upgrade_window_id: "window-001"
+            };
+
+            const res = await fetch('/api/batches/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            const box = document.getElementById('demo1Result');
+            box.className = 'result-box show';
+            box.style.background = '#f8d7da';
+            box.innerHTML = `
+                <span class="status-badge status-blocked">已拦截</span>
+                <p><strong>拦截原因：硬件版本不兼容</strong></p>
+                <p>提交的硬件版本: hw-v0.8</p>
+                <p>最低要求: hw-v1.2</p>
+                <p style="margin-top: 10px; color: #721c24;">系统检测到硬件低于固件最低要求，自动拦截该批次，防止变砖风险。</p>
+            `;
+        }
+
+        async function runDemo2() {
+            const data = {
+                batch_id: "demo-blocked-rollback",
+                devices: ["dev-rollback-001"],
+                target_version: "v2.0.5",
+                current_version: "v2.0.0",
+                hardware_version: "hw-v1.5",
+                owner: "测试员",
+                upgrade_window_id: "window-001"
+            };
+
+            const res = await fetch('/api/batches/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            const box = document.getElementById('demo2Result');
+            box.className = 'result-box show';
+            box.style.background = '#f8d7da';
+            box.innerHTML = `
+                <span class="status-badge status-blocked">已拦截</span>
+                <p><strong>拦截原因：无安全回滚路径</strong></p>
+                <p>目标固件 v2.0.5 未配置回滚版本</p>
+                <p>升级失败后无法自动回退</p>
+                <p style="margin-top: 10px; color: #721c24;">系统强制要求所有生产环境固件必须有回滚版本，确保失败时可恢复。</p>
+            `;
+        }
+
+        async function runDemo3() {
+            const devices = Array.from({length: 100}, (_, i) => `dev-gray-${String(i+1).padStart(3, '0')}`);
+            const batchData = {
+                batch_id: "demo-gray-diff",
+                devices: devices,
+                target_version: "v2.1.0",
+                current_version: "v2.0.5",
+                hardware_version: "hw-v1.5",
+                owner: "灰度测试",
+                upgrade_window_id: "window-001"
+            };
+
+            await fetch('/api/batches/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(batchData)
+            });
+
+            const res = await fetch('/api/batches/demo-gray-diff/execute?apply_gray=true', { method: 'POST' });
+            const result = await res.json();
+            const grayCount = result.details.filter(d => d.gray_applied).length;
+            
+            const box = document.getElementById('demo3Result');
+            box.className = 'result-box show';
+            box.style.background = '#fff3cd';
+            box.innerHTML = `
+                <span class="status-badge status-pending">灰度发布中</span>
+                <p><strong>灰度策略介入效果对比</strong></p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 4px;">
+                        <h4 style="color: #28a745;">有灰度策略（当前）</h4>
+                        <p>立即执行: <strong>${grayCount}</strong> 台 (前10%)</p>
+                        <p>排队等待: ${100 - grayCount} 台</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 10px;">小流量验证，发现问题只影响少量设备</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 4px;">
+                        <h4 style="color: #dc3545;">无灰度策略（对比）</h4>
+                        <p>全部立即执行: <strong>100</strong> 台</p>
+                        <p>排队等待: 0 台</p>
+                        <p style="font-size: 12px; color: #666; margin-top: 10px;">全量发布，一旦有问题影响全部设备</p>
+                    </div>
+                </div>
+            `;
+            loadStats();
+        }
+
+        async function runDemo4() {
+            const data = {
+                batch_id: "demo-pending-beta",
+                devices: ["dev-beta-001", "dev-beta-002"],
+                target_version: "v3.0.0-beta",
+                current_version: "v2.1.0",
+                hardware_version: "hw-v2.5",
+                owner: "测试员",
+                upgrade_window_id: "window-001"
+            };
+
+            const res = await fetch('/api/batches/validate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+            
+            const box = document.getElementById('demo4Result');
+            box.className = 'result-box show';
+            box.style.background = '#fff3cd';
+            box.innerHTML = `
+                <span class="status-badge status-pending">待复核</span>
+                <p><strong>警告：目标固件为测试版本</strong></p>
+                <p>固件: v3.0.0-beta (非稳定版)</p>
+                <p style="margin-top: 10px; color: #856404;">
+                    系统检测到非稳定版固件，已自动标记为「待复核」状态。
+                    需要管理员人工审批后才能执行升级。
+                </p>
+            `;
+        }
+
+        init();
+    </script>
+</body>
+</html>
