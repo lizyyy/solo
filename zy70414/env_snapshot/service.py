@@ -122,10 +122,16 @@ class EnvSnapshotService:
         )
 
         snapshot_id = f"SNAP-{uuid.uuid4().hex[:8].upper()}"
+        rerun_marker = f"RERUN-{datetime.now().strftime('%Y%m%d')}-{snapshot_id}"
         
         batch = None
         if batch_id:
             batch = self.db.query(Batch).filter(Batch.batch_id == batch_id).first()
+
+        material_summary = (
+            f"环境变量数: {len(env_vars)}, 供应商: {supplier_name}, "
+            f"算法: {algorithm}, 期望算法: {expected_algorithm}"
+        )
 
         snapshot = EnvSnapshot(
             snapshot_id=snapshot_id,
@@ -135,8 +141,9 @@ class EnvSnapshotService:
             signature=signature,
             algorithm=algorithm,
             operator=operator,
-            material_summary=f"环境变量数: {len(env_vars)}, 供应商: {supplier_name}",
-            conclusion="验证通过" if is_valid else "验证失败"
+            material_summary=material_summary,
+            conclusion="验证通过" if is_valid else "验证失败",
+            rerun_marker=rerun_marker
         )
         self.db.add(snapshot)
         self.db.flush()
@@ -193,6 +200,7 @@ class EnvSnapshotService:
                 "operator": snap.operator,
                 "created_at": snap.created_at.isoformat(),
                 "conclusion": snap.conclusion,
+                "material_summary": snap.material_summary,
                 "rerun_marker": snap.rerun_marker,
                 "error_count": len(errors),
                 "errors": [{"type": e.risk_type, "description": e.description} for e in errors]

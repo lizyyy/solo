@@ -38,6 +38,7 @@ class ReportGenerator:
                 md_lines.append(f"- **算法**: {snap.get('algorithm', '未知')}")
                 md_lines.append(f"- **操作者**: {snap.get('operator', '未知')}")
                 md_lines.append(f"- **结论**: {snap.get('conclusion', '未知')}")
+                md_lines.append(f"- **材料摘要**: {snap.get('material_summary', '无')}")
                 if snap.get("rerun_marker"):
                     md_lines.append(f"- **重跑标记**: `{snap['rerun_marker']}`")
                 md_lines.append("")
