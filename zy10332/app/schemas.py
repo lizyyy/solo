@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class DatasetBase(BaseModel):
@@ -30,7 +30,7 @@ class Dataset(DatasetBase):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FreshnessRecordBase(BaseModel):
@@ -45,8 +45,10 @@ class FreshnessRecordBase(BaseModel):
 class FreshnessRecordCreate(FreshnessRecordBase):
     request_id: Optional[str] = Field(None, description="请求ID，用于幂等性控制")
 
-    @validator('cache_updated_at')
-    def cache_not_before_source(cls, v, values):
+    @field_validator('cache_updated_at')
+    @classmethod
+    def cache_not_before_source(cls, v, info):
+        values = info.data
         if 'source_updated_at' in values and v < values['source_updated_at']:
             raise ValueError('缓存更新时间不能早于数据源更新时间')
         return v
@@ -62,7 +64,7 @@ class FreshnessRecord(FreshnessRecordBase):
     request_id: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FreshnessCheckRequest(BaseModel):
@@ -125,3 +127,54 @@ class PaginatedFreshnessRecords(BaseModel):
     limit: int
     offset: int
     records: List[FreshnessRecord]
+
+
+class SubscriptionCreate(BaseModel):
+    dataset_id: str = Field(..., description="数据集ID")
+    subscriber: str = Field(..., description="订阅者标识")
+    notification_channel: str = Field("api", description="通知渠道")
+    threshold_score: float = Field(0.5, ge=0, le=1, description="新鲜度阈值")
+    notify_on_expired: bool = Field(True, description="过期时通知")
+    is_active: bool = Field(True, description="是否激活")
+
+
+class SubscriptionUpdate(BaseModel):
+    threshold_score: Optional[float] = Field(None, ge=0, le=1)
+    notify_on_expired: Optional[bool] = None
+    is_active: Optional[bool] = None
+
+
+class Subscription(BaseModel):
+    id: str
+    dataset_id: str
+    subscriber: str
+    notification_channel: str
+    threshold_score: float
+    notify_on_expired: bool
+    is_active: bool
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class Notification(BaseModel):
+    id: str
+    subscription_id: str
+    dataset_id: str
+    subscriber: str
+    notification_type: str
+    message: str
+    freshness_score: float
+    is_expired: bool
+    is_sent: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ExportFormat(BaseModel):
+    format: str = Field("json", description="导出格式: json 或 csv")
+    include_metadata: bool = Field(True, description="是否包含元数据")

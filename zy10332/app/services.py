@@ -328,3 +328,141 @@ def query_freshness_history(db: Session, params: schemas.HistoryQueryParams) -> 
                    .all()
     
     return total, records
+
+
+def export_freshness_records(db: Session, params: schemas.HistoryQueryParams, export_format: str, include_metadata: bool):
+    total, records = query_freshness_history(db, params)
+    
+    if export_format.lower() == "csv":
+        import csv
+        from io import StringIO
+        
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        headers = ["id", "dataset_id", "source_updated_at", "cache_updated_at", 
+                "sync_watermark", "query_consumer", "is_fresh", 
+                "freshness_score", "is_expired", "expiration_explanation", "recorded_at"]
+        if include_metadata:
+            headers.append("record_metadata")
+        writer.writerow(headers)
+        
+        for r in records:
+            row = [
+                r.id, r.dataset_id, r.source_updated_at, r.cache_updated_at,
+                r.sync_watermark, r.query_consumer, r.is_fresh,
+                r.freshness_score, r.is_expired, r.expiration_explanation, r.recorded_at
+            ]
+            if include_metadata:
+                row.append(str(r.record_metadata))
+            writer.writerow(row)
+        
+        return output.getvalue(), "text/csv"
+    else:
+        import json
+        result = []
+        for r in records:
+            item = {
+                "id": r.id,
+                "dataset_id": r.dataset_id,
+                "source_updated_at": r.source_updated_at.isoformat(),
+                "cache_updated_at": r.cache_updated_at.isoformat(),
+                "sync_watermark": r.sync_watermark,
+                "query_consumer": r.query_consumer,
+                "is_fresh": r.is_fresh,
+                "freshness_score": r.freshness_score,
+                "is_expired": r.is_expired,
+                "expiration_explanation": r.expiration_explanation,
+                "recorded_at": r.recorded_at.isoformat()
+            }
+            if include_metadata:
+                item["record_metadata"] = r.record_metadata
+            result.append(item)
+        return json.dumps(result, ensure_ascii=False, indent=2), "application/json"
+
+
+def create_subscription(db: Session, sub: schemas.SubscriptionCreate) -> models.Subscription:
+    db_sub = models.Subscription(**sub.model_dump())
+    db.add(db_sub)
+    db.commit()
+    db.refresh(db_sub)
+    return db_sub
+
+
+def get_subscriptions(db: Session, sub_id: str) -> Optional[models.Subscription]:
+    return db.query(models.Subscription).filter(models.Subscription.id == sub_id).first()
+
+
+def get_subscriptions_by_dataset(db: Session, dataset_id: str) -> list:
+    return db.query(models.Subscription).filter(
+        models.Subscription.dataset_id == dataset_id,
+        models.Subscription.is_active == True
+    ).all()
+
+
+def update_subscription(db: Session, sub_id: str, sub_update: schemas.SubscriptionUpdate) -> Optional[models.Subscription]:
+    db_sub = get_subscriptions(db, sub_id)
+    if not db_sub:
+        return None
+    
+    update_data = sub_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_sub, field, value)
+    
+    db.commit()
+    db.refresh(db_sub)
+    return db_sub
+
+
+def delete_subscription(db: Session, sub_id: str) -> bool:
+    db_sub = get_subscriptions(db, sub_id)
+    if db_sub:
+        db.delete(db_sub)
+        db.commit()
+        return True
+    return False
+
+
+def check_and_trigger_notifications(db: Session, dataset: models.Dataset, freshness_result: schemas.FreshnessCheckResult):
+    subscriptions = get_subscriptions_by_dataset(db, dataset.id)
+    
+    notifications = []
+    
+    for sub in subscriptions:
+        should_notify = False
+        notification_type = "threshold"
+        
+        if freshness_result.freshness_score < sub.threshold_score:
+            should_notify = True
+            notification_type = "low_freshness"
+        elif sub.notify_on_expired and freshness_result.is_expired:
+            should_notify = True
+            notification_type = "expired"
+        
+        if should_notify:
+            message = f"数据集 '{dataset.name}' 新鲜度告警: 分数={freshness_result.freshness_score:.2f}, 过期={freshness_result.is_expired}"
+            db_notification = models.Notification(
+                subscription_id=sub.id,
+                dataset_id=dataset.id,
+                subscriber=sub.subscriber,
+                notification_type=notification_type,
+                message=message,
+                freshness_score=freshness_result.freshness_score,
+                is_expired=freshness_result.is_expired,
+                is_sent=True
+            )
+            db.add(db_notification)
+            notifications.append(db_notification)
+    
+    db.commit()
+    for n in notifications:
+        db.refresh(n)
+    
+    return notifications
+
+
+def get_pending_notifications(db: Session, subscriber: str = None, limit: int = 100):
+    query = db.query(models.Notification).filter(models.Notification.is_sent == False)
+    if subscriber:
+        query = query.filter(models.Notification.subscriber == subscriber)
+    return query.order_by(models.Notification.created_at.desc()).limit(limit).all()

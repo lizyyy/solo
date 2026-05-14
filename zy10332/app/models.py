@@ -51,3 +51,32 @@ class IdempotentRequest(Base):
     operation_type = Column(String, nullable=False)
     response_data = Column(JSON, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    dataset_id = Column(String, index=True, nullable=False)
+    subscriber = Column(String, index=True, nullable=False)
+    notification_channel = Column(String, default="api")
+    threshold_score = Column(Float, default=0.5)
+    notify_on_expired = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()), index=True)
+    subscription_id = Column(String, index=True, nullable=False)
+    dataset_id = Column(String, index=True, nullable=False)
+    subscriber = Column(String, index=True, nullable=False)
+    notification_type = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    freshness_score = Column(Float, nullable=False)
+    is_expired = Column(Boolean, nullable=False)
+    is_sent = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

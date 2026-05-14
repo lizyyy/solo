@@ -18,7 +18,7 @@ def create_dataset(dataset: schemas.DatasetCreate, db: Session = Depends(get_db)
                 error_code="DATASET_EXISTS",
                 message=f"数据集名称 '{dataset.name}' 已存在",
                 timestamp=datetime.now(timezone.utc)
-            ).dict()
+            ).model_dump()
         )
     
     return services.create_dataset(db=db, dataset=dataset)
@@ -43,7 +43,7 @@ def get_dataset(dataset_id: str, db: Session = Depends(get_db)):
                 error_code="DATASET_NOT_FOUND",
                 message=f"数据集 '{dataset_id}' 不存在",
                 timestamp=datetime.now(timezone.utc)
-            ).dict()
+            ).model_dump()
         )
     return dataset
 
@@ -58,7 +58,7 @@ def update_dataset(dataset_id: str, dataset_update: schemas.DatasetUpdate, db: S
                 error_code="DATASET_NOT_FOUND",
                 message=f"数据集 '{dataset_id}' 不存在",
                 timestamp=datetime.now(timezone.utc)
-            ).dict()
+            ).model_dump()
         )
     
     updated = services.update_dataset(db, dataset_id=dataset_id, dataset_update=dataset_update)
