@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>异步任务队列看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .drawer-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+        }
+        .drawer-content {
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+        .drawer-open .drawer-content {
+            transform: translateX(0);
+        }
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .priority-critical { border-left: 4px solid #ef4444; }
+        .priority-high { border-left: 4px solid #f97316; }
+        .priority-medium { border-left: 4px solid #eab308; }
+        .priority-low { border-left: 4px solid #22c55e; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">异步任务队列看板</h1>
+            <p class="text-gray-600 mt-1">管理和监控异步任务执行状态</p>
+        </header>
+
+        <div id="stats" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <div class="flex flex-wrap gap-4 items-center">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">状态筛选</label>
+                    <select id="statusFilter" class="border rounded px-3 py-2">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="processing">处理中</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                        <option value="dead_letter">死信</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">任务类型</label>
+                    <select id="typeFilter" class="border rounded px-3 py-2">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <button onclick="refreshTasks()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mt-6">
+                    刷新列表
+                </button>
+                <button onclick="createNewTask()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mt-6">
+                    新建任务
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">任务类型</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">优先级</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">状态</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">重试次数</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">创建时间</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detailDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="drawer-overlay absolute inset-0" onclick="closeDrawer()"></div>
+        <div class="drawer-content absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-xl overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold">任务详情</h2>
+                    <button onclick="closeDrawer()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="taskDetailContent">
+                </div>
+
+                <div id="reviewSection" class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200 hidden">
+                    <h3 class="font-bold text-yellow-800 mb-3">复核修正</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">修正原因</label>
+                            <input type="text" id="modificationReason" class="w-full border rounded px-3 py-2" placeholder="请输入修正原因">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">操作人</label>
+                            <input type="text" id="modifiedBy" class="w-full border rounded px-3 py-2" value="operator">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">修正后输入内容</label>
+                            <textarea id="modifiedInput" rows="4" class="w-full border rounded px-3 py-2 font-mono text-sm"></textarea>
+                        </div>
+                        <button onclick="submitReview()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">
+                            提交复核并重置
+                        </button>
+                    </div>
+                </div>
+
+                <div id="retrySection" class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200 hidden">
+                    <h3 class="font-bold text-orange-800 mb-3">人工重跑</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">重跑原因</label>
+                            <input type="text" id="retryReason" class="w-full border rounded px-3 py-2" placeholder="请输入重跑原因">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">操作人</label>
+                            <input type="text" id="executedBy" class="w-full border rounded px-3 py-2" value="operator">
+                        </div>
+                        <button onclick="submitRetry()" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600">
+                            执行重跑
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="font-bold text-gray-800 mb-3">版本历史</h3>
+                    <div id="versionList" class="space-y-3">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="font-bold text-gray-800 mb-3">执行记录</h3>
+                    <div id="executionList" class="space-y-3">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="newTaskModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeNewTaskModal()"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
+                <h2 class="text-xl font-bold mb-4">新建任务</h2>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">任务类型</label>
+                        <input type="text" id="newTaskType" class="w-full border rounded px-3 py-2" placeholder="例如：订单同步">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">优先级</label>
+                        <select id="newTaskPriority" class="w-full border rounded px-3 py-2">
+                            <option value="low">低</option>
+                            <option value="medium" selected>中</option>
+                            <option value="high">高</option>
+                            <option value="critical">紧急</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">输入内容</label>
+                        <textarea id="newTaskInput" rows="4" class="w-full border rounded px-3 py-2 font-mono text-sm"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button onclick="closeNewTaskModal()" class="px-4 py-2 border rounded hover:bg-gray-50">取消</button>
+                    <button onclick="submitNewTask()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">创建</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        let currentTaskId = null;
+
+        const statusLabels = {
+            'pending': '待处理',
+            'processing': '处理中',
+            'success': '成功',
+            'failed': '失败',
+            'dead_letter': '死信'
+        };
+
+        const statusColors = {
+            'pending': 'bg-gray-200 text-gray-800',
+            'processing': 'bg-blue-200 text-blue-800',
+            'success': 'bg-green-200 text-green-800',
+            'failed': 'bg-red-200 text-red-800',
+            'dead_letter': 'bg-purple-200 text-purple-800'
+        };
+
+        const priorityLabels = {
+            'low': '低',
+            'medium': '中',
+            'high': '高',
+            'critical': '紧急'
+        };
+
+        async function loadStatistics() {
+            const response = await fetch(`${API_BASE}/statistics`);
+            const data = await response.json();
+            const statsHtml = `
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-gray-800">${data.total}</div>
+                    <div class="text-sm text-gray-600">总任务数</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-green-600">${data.success}</div>
+                    <div class="text-sm text-gray-600">成功</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-red-600">${data.failed}</div>
+                    <div class="text-sm text-gray-600">失败</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-purple-600">${data.dead_letter}</div>
+                    <div class="text-sm text-gray-600">死信</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-yellow-600">${data.pending}</div>
+                    <div class="text-sm text-gray-600">待处理</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="text-2xl font-bold text-orange-600">${data.manual_retries}</div>
+                    <div class="text-sm text-gray-600">人工重跑</div>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+        }
+
+        async function loadTaskTypes() {
+            const response = await fetch(`${API_BASE}/task-types`);
+            const data = await response.json();
+            const select = document.getElementById('typeFilter');
+            select.innerHTML = '<option value="">全部</option>';
+            data.task_types.forEach(type => {
+                select.innerHTML += `<option value="${type}">${type}</option>`;
+            });
+        }
+
+        async function loadTasks() {
+            const status = document.getElementById('statusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            let url = `${API_BASE}/tasks`;
+            const params = [];
+            if (status) params.push(`status=${status}`);
+            if (type) params.push(`task_type=${type}`);
+            if (params.length > 0) url += '?' + params.join('&');
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            const tbody = document.getElementById('taskTableBody');
+            tbody.innerHTML = '';
+            
+            data.tasks.forEach(task => {
+                const row = document.createElement('tr');
+                row.className = `border-b priority-${task.priority} hover:bg-gray-50`;
+                row.innerHTML = `
+                    <td class="px-4 py-3 text-sm">${task.id}</td>
+                    <td class="px-4 py-3 text-sm font-medium">${task.task_type}</td>
+                    <td class="px-4 py-3 text-sm">${priorityLabels[task.priority]}</td>
+                    <td class="px-4 py-3">
+                        <span class="status-badge ${statusColors[task.status]}">${statusLabels[task.status]}</span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">${task.retry_count}/${task.max_retries}</td>
+                    <td class="px-4 py-3 text-sm text-gray-500">${new Date(task.created_at).toLocaleString()}</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="viewTask(${task.id})" class="text-blue-500 hover:text-blue-700 mr-2">详情</button>
+                        ${task.status === 'pending' ? `<button onclick="executeTask(${task.id})" class="text-green-500 hover:text-green-700 mr-2">执行</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function refreshTasks() {
+            await Promise.all([loadStatistics(), loadTasks()]);
+        }
+
+        async function viewTask(taskId) {
+            currentTaskId = taskId;
+            const response = await fetch(`${API_BASE}/tasks/${taskId}`);
+            const data = await response.json();
+            const task = data.task;
+            
+            let detailHtml = `
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-sm text-gray-500">任务ID</div>
+                            <div class="font-medium">${task.id}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">任务类型</div>
+                            <div class="font-medium">${task.task_type}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">优先级</div>
+                            <div class="font-medium">${priorityLabels[task.priority]}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">状态</div>
+                            <span class="status-badge ${statusColors[task.status]}">${statusLabels[task.status]}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">重试次数</div>
+                            <div class="font-medium">${task.retry_count}/${task.max_retries}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">更新时间</div>
+                            <div class="font-medium text-sm">${new Date(task.updated_at).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">原始输入</div>
+                        <pre class="bg-gray-100 p-3 rounded text-sm overflow-x-auto">${task.original_input}</pre>
+                    </div>
+                    ${task.processed_result ? `
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">处理结果</div>
+                        <pre class="bg-green-50 p-3 rounded text-sm overflow-x-auto text-green-800">${task.processed_result}</pre>
+                    </div>
+                    ` : ''}
+                    ${task.dead_letter_reason ? `
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">死信原因</div>
+                        <pre class="bg-red-50 p-3 rounded text-sm overflow-x-auto text-red-800">${task.dead_letter_reason}</pre>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('taskDetailContent').innerHTML = detailHtml;
+            
+            const reviewSection = document.getElementById('reviewSection');
+            const retrySection = document.getElementById('retrySection');
+            
+            if (task.status === 'failed' || task.status === 'dead_letter') {
+                reviewSection.classList.remove('hidden');
+                document.getElementById('modifiedInput').value = task.original_input;
+            } else {
+                reviewSection.classList.add('hidden');
+            }
+            
+            if (task.status === 'failed' || task.status === 'dead_letter') {
+                retrySection.classList.remove('hidden');
+            } else {
+                retrySection.classList.add('hidden');
+            }
+            
+            const versionList = document.getElementById('versionList');
+            versionList.innerHTML = data.versions.map(v => `
+                <div class="border rounded p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-medium">版本 ${v.version_number}</span>
+                        <span class="text-sm text-gray-500">${new Date(v.created_at).toLocaleString()}</span>
+                    </div>
+                    <div class="text-sm text-gray-600 mb-1">修改人: ${v.modified_by}</div>
+                    ${v.modification_reason ? `<div class="text-sm text-gray-600 mb-2">原因: ${v.modification_reason}</div>` : ''}
+                    <pre class="bg-gray-50 p-2 rounded text-xs overflow-x-auto">${v.original_input}</pre>
+                </div>
+            `).join('');
+            
+            const executionList = document.getElementById('executionList');
+            executionList.innerHTML = data.executions.map(e => `
+                <div class="border rounded p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="status-badge ${statusColors[e.status]}">${statusLabels[e.status]}</span>
+                        <span class="text-sm text-gray-500">${new Date(e.started_at).toLocaleString()}</span>
+                    </div>
+                    <div class="text-sm text-gray-600">执行方: ${e.executed_by}</div>
+                    ${e.execution_reason ? `<div class="text-sm text-gray-600">原因: ${e.execution_reason}</div>` : ''}
+                    ${e.error_message ? `<pre class="bg-red-50 p-2 rounded text-xs text-red-800 mt-2">${e.error_message}</pre>` : ''}
+                </div>
+            `).join('');
+            
+            document.getElementById('detailDrawer').classList.remove('hidden');
+            document.getElementById('detailDrawer').classList.add('drawer-open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('detailDrawer').classList.add('hidden');
+            document.getElementById('detailDrawer').classList.remove('drawer-open');
+            currentTaskId = null;
+        }
+
+        async function submitReview() {
+            const reason = document.getElementById('modificationReason').value;
+            const modifiedBy = document.getElementById('modifiedBy').value;
+            const modifiedInput = document.getElementById('modifiedInput').value;
+            
+            if (!reason || !modifiedInput) {
+                alert('请填写修正原因和修正后内容');
+                return;
+            }
+            
+            const response = await fetch(`${API_BASE}/tasks/${currentTaskId}/review`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    modified_input: modifiedInput,
+                    modification_reason: reason,
+                    modified_by: modifiedBy
+                })
+            });
+            
+            if (response.ok) {
+                alert('复核提交成功，任务已重置为待处理状态');
+                closeDrawer();
+                refreshTasks();
+            }
+        }
+
+        async function submitRetry() {
+            const reason = document.getElementById('retryReason').value;
+            const executedBy = document.getElementById('executedBy').value;
+            
+            if (!reason) {
+                alert('请填写重跑原因');
+                return;
+            }
+            
+            const response = await fetch(`${API_BASE}/tasks/${currentTaskId}/retry`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    execution_reason: reason,
+                    executed_by: executedBy
+                })
+            });
+            
+            if (response.ok) {
+                alert('重跑执行成功');
+                viewTask(currentTaskId);
+                refreshTasks();
+            }
+        }
+
+        async function executeTask(taskId) {
+            const response = await fetch(`${API_BASE}/tasks/${taskId}/execute`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                refreshTasks();
+            }
+        }
+
+        function createNewTask() {
+            document.getElementById('newTaskModal').classList.remove('hidden');
+        }
+
+        function closeNewTaskModal() {
+            document.getElementById('newTaskModal').classList.add('hidden');
+            document.getElementById('newTaskType').value = '';
+            document.getElementById('newTaskInput').value = '';
+        }
+
+        async function submitNewTask() {
+            const taskType = document.getElementById('newTaskType').value;
+            const priority = document.getElementById('newTaskPriority').value;
+            const input = document.getElementById('newTaskInput').value;
+            
+            if (!taskType || !input) {
+                alert('请填写任务类型和输入内容');
+                return;
+            }
+            
+            const response = await fetch(`${API_BASE}/tasks`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    task_type: taskType,
+                    original_input: input,
+                    priority: priority
+                })
+            });
+            
+            if (response.ok) {
+                alert('任务创建成功');
+                closeNewTaskModal();
+                refreshTasks();
+                loadTaskTypes();
+            }
+        }
+
+        document.getElementById('statusFilter').addEventListener('change', loadTasks);
+        document.getElementById('typeFilter').addEventListener('change', loadTasks);
+
+        refreshTasks();
+        loadTaskTypes();
+    </script>
+</body>
+</html>
