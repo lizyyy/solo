@@ -1,0 +1,155 @@
+{
+  "sessions": [
+    {
+      "id": "sess-001",
+      "exam_id": "exam-2024-001",
+      "student_id": "stu-1001",
+      "student_name": "张三",
+      "start_time": "2024-05-14T09:00:00",
+      "status": "failed",
+      "abnormal_level": "critical",
+      "camera_status": "off",
+      "screen_switch_count": 7,
+      "handler": "监考老师A",
+      "handled_at": "2024-05-14T09:45:00",
+      "handle_reason": "频繁切屏且摄像头长时间关闭，判定为作弊行为",
+      "updated_at": "2024-05-14T09:45:00"
+    },
+    {
+      "id": "sess-002",
+      "exam_id": "exam-2024-001",
+      "student_id": "stu-1002",
+      "student_name": "李四",
+      "start_time": "2024-05-14T09:05:00",
+      "status": "warning",
+      "abnormal_level": "warning",
+      "camera_status": "on",
+      "screen_switch_count": 3,
+      "handler": null,
+      "handled_at": null,
+      "handle_reason": null,
+      "updated_at": "2024-05-14T09:30:00"
+    },
+    {
+      "id": "sess-003",
+      "exam_id": "exam-2024-001",
+      "student_id": "stu-1003",
+      "student_name": "王五",
+      "start_time": "2024-05-14T09:10:00",
+      "status": "normal",
+      "abnormal_level": "normal",
+      "camera_status": "on",
+      "screen_switch_count": 0,
+      "handler": null,
+      "handled_at": null,
+      "handle_reason": null,
+      "updated_at": "2024-05-14T09:10:00"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-001",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:15:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-002",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:20:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-003",
+      "session_id": "sess-001",
+      "event_type": "camera_off",
+      "timestamp": "2024-05-14T09:25:00",
+      "description": "摄像头关闭",
+      "duration": 180
+    },
+    {
+      "id": "evt-004",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:28:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-005",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:32:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-006",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:35:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-007",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:38:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-008",
+      "session_id": "sess-001",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:40:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-009",
+      "session_id": "sess-002",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:18:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-010",
+      "session_id": "sess-002",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:22:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    },
+    {
+      "id": "evt-011",
+      "session_id": "sess-002",
+      "event_type": "screen_switch",
+      "timestamp": "2024-05-14T09:26:00",
+      "description": "切屏到其他应用",
+      "duration": 0
+    }
+  ],
+  "appeals": [
+    {
+      "id": "appeal-001",
+      "session_id": "sess-001",
+      "student_id": "stu-1001",
+      "student_name": "张三",
+      "content": "我只是不小心切屏了，摄像头关闭是因为电脑自动休眠，我没有作弊",
+      "status": "handled",
+      "created_at": "2024-05-14T10:00:00",
+      "handler": "巡考主任",
+      "handled_at": "2024-05-14T10:30:00",
+      "handle_result": "部分认可",
+      "handle_reason": "经核实，摄像头关闭确为电脑休眠导致，但切屏次数过多，给予警告处理，成绩有效"
+    }
+  ],
+  "reports": []
+}
