@@ -12,7 +12,8 @@ function exportToJSON(auditResult, options = {}) {
     operator: auditResult.operator,
     auditTime: auditResult.auditTime,
     summary: auditResult.summary,
-    anomalies: auditResult.allAnomalies
+    anomalies: auditResult.allAnomalies,
+    allAnomalies: auditResult.allAnomalies
   };
   
   if (includeRawInputs) {

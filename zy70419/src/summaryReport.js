@@ -1,14 +1,35 @@
 import { detectGatewayErrors } from './auditDetector.js';
 
-function groupAnomaliesByBusinessNo(auditResult) {
+function getAnomalies(auditResult) {
+  return auditResult.allAnomalies || auditResult.anomalies || [];
+}
+
+function groupAnomaliesByBusinessNo(auditResult, gatewayErrors = []) {
   const grouped = new Map();
   
-  for (const anomaly of auditResult.allAnomalies) {
-    const businessNo = anomaly.businessNo;
+  const anomalies = getAnomalies(auditResult);
+  for (const anomaly of anomalies) {
+    const businessNo = anomaly.businessNo || '未知业务单号';
     if (!grouped.has(businessNo)) {
       grouped.set(businessNo, []);
     }
     grouped.get(businessNo).push(anomaly);
+  }
+  
+  if (gatewayErrors.length > 0) {
+    const gatewayBusinessNo = `BATCH-${auditResult.batchId || '系统级'}`;
+    if (!grouped.has(gatewayBusinessNo)) {
+      grouped.set(gatewayBusinessNo, []);
+    }
+    for (const error of gatewayErrors) {
+      grouped.get(gatewayBusinessNo).push({
+        type: 'gateway_error',
+        code: error.code,
+        message: error.message,
+        detectedAt: error.detectedAt,
+        isGatewayError: true
+      });
+    }
   }
   
   return grouped;
@@ -25,6 +46,10 @@ function generateCorrectionSuggestion(anomaly) {
     },
     gateway_error: '建议：检查网络连接和网关服务状态，必要时重试或联系运维'
   };
+  
+  if (anomaly.type === 'gateway_error') {
+    return suggestions.gateway_error;
+  }
   
   if (anomaly.type === 'data_anomaly') {
     if (anomaly.subtype) {
@@ -77,8 +102,9 @@ function generateConclusion(anomalies) {
 }
 
 function generateSummaryReport(auditResult, gatewayLogs = '') {
-  const groupedAnomalies = groupAnomaliesByBusinessNo(auditResult);
   const gatewayErrors = detectGatewayErrors(gatewayLogs);
+  const groupedAnomalies = groupAnomaliesByBusinessNo(auditResult, gatewayErrors);
+  const allAnomaliesList = getAnomalies(auditResult);
   
   const report = {
     reportId: `RPT${Date.now()}`,
@@ -87,7 +113,7 @@ function generateSummaryReport(auditResult, gatewayLogs = '') {
     operator: auditResult.operator,
     summary: {
       totalBusinessNos: groupedAnomalies.size,
-      totalAnomalies: auditResult.allAnomalies.length,
+      totalAnomalies: allAnomaliesList.length + gatewayErrors.length,
       gatewayErrors: gatewayErrors.length,
       byLevel: {
         critical: 0,
@@ -104,19 +130,24 @@ function generateSummaryReport(auditResult, gatewayLogs = '') {
     const conclusion = generateConclusion(anomalies);
     report.summary.byLevel[conclusion.level]++;
     
+    const hasGatewayError = anomalies.some(a => a.isGatewayError);
+    
     const businessNoSummary = {
       businessNo,
       anomalyCount: anomalies.length,
+      hasGatewayError,
       conclusionLevel: conclusion.level,
       conclusion: conclusion.message,
       anomalies: anomalies.map(a => ({
         type: a.type,
+        code: a.code || null,
         message: a.message,
         rawContent: a.rawContent || null,
         sampleId: a.sampleId || null,
         field: a.field || null,
         value: a.value || null,
-        missingFields: a.missingFields || []
+        missingFields: a.missingFields || [],
+        isGatewayError: a.isGatewayError || false
       })),
       corrections: anomalies.map(a => ({
         anomalyType: a.type,
@@ -129,6 +160,8 @@ function generateSummaryReport(auditResult, gatewayLogs = '') {
   
   report.businessNoSummaries.sort((a, b) => {
     const levelOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+    if (a.hasGatewayError && !b.hasGatewayError) return -1;
+    if (!a.hasGatewayError && b.hasGatewayError) return 1;
     return levelOrder[a.conclusionLevel] - levelOrder[b.conclusionLevel];
   });
   
@@ -157,15 +190,7 @@ function summaryReportToMarkdown(report) {
   md += `| 🟡 中 (Medium) | ${report.summary.byLevel.medium} |\n`;
   md += `| 🟢 低 (Low) | ${report.summary.byLevel.low} |\n\n`;
   
-  if (report.gatewayErrors.length > 0) {
-    md += `## 网关错误摘录\n\n`;
-    for (const error of report.gatewayErrors) {
-      md += `- **${error.code}**: ${error.message}\n`;
-    }
-    md += '\n';
-  }
-  
-  md += `## 按业务单号汇总\n\n`;
+  md += `## 按业务单号汇总（含网关错误）\n\n`;
   
   for (const summary of report.businessNoSummaries) {
     const levelIcon = {
@@ -175,11 +200,14 @@ function summaryReportToMarkdown(report) {
       low: '🟢'
     }[summary.conclusionLevel];
     
-    md += `### ${levelIcon} 业务单号: ${summary.businessNo}\n\n`;
+    const gatewayIcon = summary.hasGatewayError ? ' ⚠️ 含网关错误' : '';
+    
+    md += `### ${levelIcon} 业务单号: ${summary.businessNo}${gatewayIcon}\n\n`;
     
     md += `#### 异常情况 (共${summary.anomalyCount}项)\n\n`;
     for (const anomaly of summary.anomalies) {
-      md += `- **${anomaly.type}**: ${anomaly.message}\n`;
+      const typeLabel = anomaly.isGatewayError ? '网关错误' : anomaly.type;
+      md += `- **${typeLabel}**${anomaly.code ? ` [${anomaly.code}]` : ''}: ${anomaly.message}\n`;
       if (anomaly.rawContent) {
         md += `  - 原始内容: \`${anomaly.rawContent}\`\n`;
       }

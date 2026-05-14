@@ -1,6 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+function getAnomalies(auditResult) {
+  return auditResult.allAnomalies || auditResult.anomalies || [];
+}
+
 function generateCleanupCandidates(auditResult, options = {}) {
   const {
     includeSwallowed = true,
@@ -10,8 +14,9 @@ function generateCleanupCandidates(auditResult, options = {}) {
   } = options;
   
   const candidates = [];
+  const allAnomalies = getAnomalies(auditResult);
   
-  for (const anomaly of auditResult.allAnomalies) {
+  for (const anomaly of allAnomalies) {
     let shouldInclude = false;
     let severity = 'low';
     let action = 'review';
@@ -141,10 +146,8 @@ function filterByRiskType(history, riskType) {
 
 function filterByAnomalyType(history, anomalyType) {
   return history.filter(record => {
-    if (record.allAnomalies) {
-      return record.allAnomalies.some(a => a.type === anomalyType);
-    }
-    return false;
+    const anomalies = record.allAnomalies || record.anomalies || [];
+    return anomalies.some(a => a.type === anomalyType);
   });
 }
 

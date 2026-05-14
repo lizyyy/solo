@@ -1,6 +1,6 @@
 {
-  "batchId": "BATCH1778797248656",
-  "generatedAt": "2026-05-14T22:20:48.659Z",
+  "batchId": "BATCH1778797911470",
+  "generatedAt": "2026-05-14T22:31:51.474Z",
   "totalCandidates": 2,
   "bySeverity": {
     "critical": 1,
@@ -10,7 +10,7 @@
   },
   "candidates": [
     {
-      "businessNo": "LAB202605148575",
+      "businessNo": "LAB202605141123",
       "sampleId": null,
       "anomalyType": "swallowed",
       "anomalyMessage": "该行数据格式异常，字段缺失严重，被系统自动过滤",
@@ -20,10 +20,10 @@
       "missingFields": [],
       "canBeSafelyDeleted": true,
       "requiresManualReview": true,
-      "addedAt": "2026-05-14T22:20:48.659Z"
+      "addedAt": "2026-05-14T22:31:51.474Z"
     },
     {
-      "businessNo": "LAB202605142543",
+      "businessNo": "LAB202605147511",
       "sampleId": null,
       "anomalyType": "malformed",
       "anomalyMessage": "字段数量不匹配，后续字段截断",
@@ -33,7 +33,7 @@
       "missingFields": [],
       "canBeSafelyDeleted": false,
       "requiresManualReview": true,
-      "addedAt": "2026-05-14T22:20:48.659Z"
+      "addedAt": "2026-05-14T22:31:51.474Z"
     }
   ]
 }
