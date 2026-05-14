@@ -10,3 +10,23 @@
 {"level":"info","message":"[finance_user] 标记已出款: 批次 BATCH-NORMAL-1778339304025","timestamp":"2026-05-09T15:09:35.058Z"}
 {"level":"info","message":"POST /api/batches/cmoyhb0wq000aa3693qm6kwd8/mark-paid","timestamp":"2026-05-09T15:09:40.124Z"}
 {"level":"info","message":"POST /api/reports/batches/cmoyhb0wq000aa3693qm6kwd8/mark-paid","timestamp":"2026-05-09T15:09:46.243Z"}
+{"level":"info","message":"数据库连接成功","timestamp":"2026-05-14T00:34:36.810Z"}
+{"level":"info","message":"服务器启动成功: http://localhost:3000","timestamp":"2026-05-14T00:34:36.813Z"}
+{"level":"info","message":"GET /api/reports/dashboard","timestamp":"2026-05-14T00:34:50.846Z"}
+{"level":"info","message":"数据库连接成功","timestamp":"2026-05-14T00:35:24.967Z"}
+{"level":"info","message":"服务器启动成功: http://localhost:3000","timestamp":"2026-05-14T00:35:24.969Z"}
+{"level":"info","message":"GET /api/batches","timestamp":"2026-05-14T00:35:40.684Z"}
+{"level":"info","message":"GET /api/merchants","timestamp":"2026-05-14T00:35:49.406Z"}
+{"level":"info","message":"POST /api/batches","timestamp":"2026-05-14T00:36:01.948Z"}
+{"level":"info","message":"[test_user] 创建清算批次: BATCH-20260514-47E506","timestamp":"2026-05-14T00:36:01.953Z"}
+{"level":"info","message":"POST /api/batches/cmp4rceu600023h981as9f4ky/process","timestamp":"2026-05-14T00:36:07.239Z"}
+{"batchId":"cmp4rceu600023h981as9f4ky","level":"warn","message":"异常记录创建: EXC-20260514-789B3760","timestamp":"2026-05-14T00:36:07.243Z","type":"REFUND_PENDING"}
+{"level":"warn","message":"[system] 自动挂起批次: BATCH-20260514-47E506","note":"自动挂起: 存在待处理退款","reason":"REFUND","timestamp":"2026-05-14T00:36:07.246Z"}
+{"level":"info","message":"GET /api/batches/cmp4rceu600023h981as9f4ky/exceptions","timestamp":"2026-05-14T00:36:11.705Z"}
+{"level":"info","message":"POST /api/batches","timestamp":"2026-05-14T00:36:19.583Z"}
+{"level":"info","message":"[test_user] 创建清算批次: BATCH-20260514-E8CF55","timestamp":"2026-05-14T00:36:19.586Z"}
+{"level":"info","message":"POST /api/batches/cmp4rcsg0000h3h9882fidrdu/process","timestamp":"2026-05-14T00:36:26.749Z"}
+{"batchId":"cmp4rcsg0000h3h9882fidrdu","level":"warn","message":"异常记录创建: EXC-20260514-29C40D08","timestamp":"2026-05-14T00:36:26.751Z","type":"CHARGEBACK_PENDING"}
+{"level":"warn","message":"[system] 自动挂起批次: BATCH-20260514-E8CF55","note":"自动挂起: 存在待处理拒付","reason":"CHARGEBACK","timestamp":"2026-05-14T00:36:26.753Z"}
+{"level":"info","message":"GET /api/batches/cmp4rcsg0000h3h9882fidrdu/exceptions","timestamp":"2026-05-14T00:36:26.762Z"}
+{"level":"info","message":"GET /api/exceptions/pending","timestamp":"2026-05-14T00:36:32.420Z"}

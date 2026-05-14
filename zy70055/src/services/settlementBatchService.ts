@@ -157,7 +157,7 @@ class SettlementBatchService {
         validation.suspendReasons[0],
         `自动挂起: ${validation.warnings.join('; ')}`,
         'system',
-        null,
+        undefined,
         true
       );
     }
@@ -235,11 +235,27 @@ class SettlementBatchService {
     if (hasPendingRefund) {
       suspendReasons.push(SuspendReason.REFUND);
       warnings.push('存在待处理退款');
+      const pendingTxns = batch.transactions.filter(t => t.hasPendingRefund);
+      await exceptionService.createException({
+        batchId,
+        exceptionType: ExceptionType.REFUND_PENDING,
+        severity: 'HIGH',
+        message: '存在待处理退款',
+        detail: `共 ${pendingTxns.length} 笔交易有待处理退款: ${pendingTxns.map(t => t.transactionNo).join(', ')}`,
+      });
     }
 
     if (hasPendingChargeback) {
       suspendReasons.push(SuspendReason.CHARGEBACK);
       warnings.push('存在待处理拒付');
+      const pendingTxns = batch.transactions.filter(t => t.hasPendingChargeback);
+      await exceptionService.createException({
+        batchId,
+        exceptionType: ExceptionType.CHARGEBACK_PENDING,
+        severity: 'HIGH',
+        message: '存在待处理拒付',
+        detail: `共 ${pendingTxns.length} 笔交易有待处理拒付: ${pendingTxns.map(t => t.transactionNo).join(', ')}`,
+      });
     }
 
     let feeValidation: BatchValidationResult['feeValidation'];
@@ -292,7 +308,8 @@ class SettlementBatchService {
       throw new DuplicateOperationError(`批次 ${batch.batchNo} 已处于挂起状态`);
     }
 
-    if (![SettlementBatchStatus.PENDING, SettlementBatchStatus.PROCESSING].includes(batch.status)) {
+    const allowedStatuses: string[] = [SettlementBatchStatus.PENDING, SettlementBatchStatus.PROCESSING];
+    if (!allowedStatuses.includes(batch.status)) {
       throw new StatusTransitionError(`批次状态 ${batch.status} 不能进行挂起操作`);
     }
 
