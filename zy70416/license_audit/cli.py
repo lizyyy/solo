@@ -102,17 +102,57 @@ def cmd_correct(args):
     status = args.status
     remark = args.remark
     operator = args.operator or "unknown"
+    rule_filter = args.rule
+    fail_only = args.fail_only
 
     records = storage.load_audit_records(result_name)
-    target_record = None
+    
+    matched_records = []
     for record in records:
         if record.id == record_id or record.dependency_name == record_id:
-            target_record = record
-            break
+            matched_records.append(record)
 
-    if not target_record:
+    if not matched_records:
         print(f"错误: 未找到记录: {record_id}")
         sys.exit(1)
+
+    if rule_filter:
+        matched_records = [r for r in matched_records if r.detection_rule_name == rule_filter]
+        if not matched_records:
+            print(f"错误: 在规则 '{rule_filter}' 下未找到匹配记录")
+            sys.exit(1)
+
+    if fail_only:
+        from .models import DetectionStatus
+        matched_records = [r for r in matched_records if r.system_status == DetectionStatus.FAIL]
+        if not matched_records:
+            print(f"错误: 未找到失败状态的匹配记录")
+            sys.exit(1)
+
+    target_record = None
+    if len(matched_records) == 1:
+        target_record = matched_records[0]
+    else:
+        print(f"找到 {len(matched_records)} 条匹配记录，请选择要修正的记录:")
+        for i, record in enumerate(matched_records, 1):
+            has_manual = " [已人工审核]" if record.manual_status else ""
+            print(f"  [{i}] 记录ID: {record.id}")
+            print(f"      依赖: {record.dependency_name}")
+            print(f"      规则: {record.detection_rule_name}")
+            print(f"      系统状态: {record.system_status.value}{has_manual}")
+            if record.field_errors:
+                print(f"      字段错误: {len(record.field_errors)} 个")
+        
+        while True:
+            try:
+                choice = int(input(f"\n请输入序号 (1-{len(matched_records)}): ")) - 1
+                if 0 <= choice < len(matched_records):
+                    target_record = matched_records[choice]
+                    break
+                else:
+                    print(f"请输入 1 到 {len(matched_records)} 之间的数字")
+            except ValueError:
+                print("请输入有效的数字")
 
     manual_status = ManualStatus(status)
     target_record.manual_status = manual_status
@@ -122,9 +162,10 @@ def cmd_correct(args):
 
     storage.update_audit_record(target_record, result_name)
 
-    print(f"人工修正已保存:")
+    print(f"\n人工修正已保存:")
     print(f"  记录ID: {target_record.id}")
     print(f"  依赖: {target_record.dependency_name}")
+    print(f"  规则: {target_record.detection_rule_name}")
     print(f"  系统状态: {target_record.system_status.value}")
     print(f"  人工状态: {manual_status.value}")
     print(f"  备注: {remark}")
@@ -164,6 +205,8 @@ def main():
     correct_parser.add_argument("--status", required=True, choices=["confirmed", "rejected", "needs_review"], help="人工状态")
     correct_parser.add_argument("--remark", required=True, help="修正备注")
     correct_parser.add_argument("--operator", help="操作人")
+    correct_parser.add_argument("--rule", help="指定要修正的规则名称")
+    correct_parser.add_argument("--fail-only", action="store_true", help="只匹配失败状态的记录")
 
     rules_parser = subparsers.add_parser("rules", help="查看检测规则")
 

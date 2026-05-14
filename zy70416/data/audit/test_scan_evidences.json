@@ -1,0 +1,702 @@
+[
+  {
+    "id": "8b59e042-2659-4e44-b521-1895ea1e5ae1",
+    "audit_record_id": "e8ba7e2b-e805-4d48-b7eb-bc2e28e59516",
+    "field_name": "license",
+    "original_value": "Apache-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483520"
+  },
+  {
+    "id": "8129bf73-bcf6-4235-ae0a-929ebe4b3571",
+    "audit_record_id": "80262a20-cb11-48da-9368-ac3f0841deb7",
+    "field_name": "license",
+    "original_value": "Apache-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483577"
+  },
+  {
+    "id": "3a05e7c5-644e-4649-a24b-fbda90b646fd",
+    "audit_record_id": "59871bcb-466b-4ef8-a2e8-4cf274255f0f",
+    "field_name": "license",
+    "original_value": "Apache-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483789"
+  },
+  {
+    "id": "346b5e25-1ca4-4bcd-9a46-2a4995d8366a",
+    "audit_record_id": "bef28f2e-46ce-4633-a474-ade1cf3c9057",
+    "field_name": "license",
+    "original_value": "Apache-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483849"
+  },
+  {
+    "id": "cda693c0-5fdc-4f58-b3e6-3b46c24a8961",
+    "audit_record_id": "4432e21f-b67a-4480-aeb4-105d864cd351",
+    "field_name": "license",
+    "original_value": "Apache-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 1,
+      "column": null,
+      "raw_context": "{\"name\": \"requests\", \"version\": \"2.31.0\", \"license\": \"Apache-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483909"
+  },
+  {
+    "id": "e803fb82-80ca-465b-9214-7a2932343c59",
+    "audit_record_id": "7d5ab741-ed4b-4aa7-b6b3-cfdbb33358d6",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483921"
+  },
+  {
+    "id": "eea839f4-1c72-4692-a4b9-bd271b93d684",
+    "audit_record_id": "edd3e375-7277-4c3b-b813-2fc7d2b3ccf3",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483930"
+  },
+  {
+    "id": "3aa76c95-f8c8-4a2a-9eb5-fbf9ba16e785",
+    "audit_record_id": "78919def-1d9d-482d-9dc1-b4fdca5a1aff",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483940"
+  },
+  {
+    "id": "2bb51f53-7053-4009-bb5f-1ee997a9b01a",
+    "audit_record_id": "fd38adc2-4f6a-4b5a-bf2d-e81c4f8a1746",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483950"
+  },
+  {
+    "id": "86315725-4a53-4bec-a346-bb5117550d94",
+    "audit_record_id": "adc07b18-8668-4aca-8a63-ec735ec39cc0",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 2,
+      "column": null,
+      "raw_context": "{\"name\": \"flask\", \"version\": \"2.3.3\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483959"
+  },
+  {
+    "id": "11eb3815-d9c5-4bbb-b16b-fe89e2844b0a",
+    "audit_record_id": "a2261289-7ef1-4124-97ce-46a9ca24f4fb",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483968"
+  },
+  {
+    "id": "c5223a66-68e2-4b58-9fff-427e1acc39ce",
+    "audit_record_id": "bfc28d4d-d79a-46c8-8029-31d02d2d826b",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483977"
+  },
+  {
+    "id": "c15e79e7-06a0-4c6d-9a5c-d1fdd9f2c3c2",
+    "audit_record_id": "6d4f493a-d8fe-413a-a2ef-69459304686e",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483987"
+  },
+  {
+    "id": "c87d6021-3a14-45d4-ac88-e79c0963f759",
+    "audit_record_id": "3129f4f9-921c-45cf-bd19-cac3787220ba",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.483996"
+  },
+  {
+    "id": "727d1595-0f4b-4c2b-8fda-1a4bf9b69285",
+    "audit_record_id": "76e244e4-2c53-4c1a-85ea-4a9cc099647c",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 3,
+      "column": null,
+      "raw_context": "{\"name\": \"numpy\", \"version\": \"1.25.2\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484005"
+  },
+  {
+    "id": "edb0068f-0036-487a-bf9e-21d776e8372a",
+    "audit_record_id": "8925d67b-8733-4530-954c-ad1f8e91bb53",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"pandas\", \"version\": \"2.1.0\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484013"
+  },
+  {
+    "id": "87d35c48-3035-4b1f-a29c-dface3f89c4f",
+    "audit_record_id": "ef9721b9-430b-4e34-b7ee-d9555ea80aa5",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"pandas\", \"version\": \"2.1.0\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484022"
+  },
+  {
+    "id": "4d3b17a7-664b-4485-bdc9-81ed8a8f5d43",
+    "audit_record_id": "38ab6ee0-8b73-4407-9fac-6882e9c4df23",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"pandas\", \"version\": \"2.1.0\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484031"
+  },
+  {
+    "id": "ca5b9eb9-1512-49aa-9c72-90b8e73241b8",
+    "audit_record_id": "f4d0eb8d-48e3-4c96-9d39-6c0ea35179dd",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"pandas\", \"version\": \"2.1.0\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484040"
+  },
+  {
+    "id": "106670c1-d085-407a-8638-476666fb00d0",
+    "audit_record_id": "5ac764ac-d32c-46cc-9d1b-94689640fa6a",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 4,
+      "column": null,
+      "raw_context": "{\"name\": \"pandas\", \"version\": \"2.1.0\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484049"
+  },
+  {
+    "id": "d6daa3d7-5d30-4b42-b0da-74a1a8059582",
+    "audit_record_id": "1ae16439-a614-4de1-8128-c281add2ea83",
+    "field_name": "license",
+    "original_value": "PSF-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"matplotlib\", \"version\": \"3.7.2\", \"license\": \"PSF-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484058"
+  },
+  {
+    "id": "328133a4-3643-419b-8f10-16bb4aceb9f6",
+    "audit_record_id": "3f807fc9-5d4b-41a2-8bbd-b7e89b963aac",
+    "field_name": "license",
+    "original_value": "PSF-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"matplotlib\", \"version\": \"3.7.2\", \"license\": \"PSF-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484067"
+  },
+  {
+    "id": "62987263-d6d7-4e8b-ac30-ca1b5259fccc",
+    "audit_record_id": "dc6b86b9-3eaa-4d40-b0bb-f69da021a514",
+    "field_name": "license",
+    "original_value": "PSF-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"matplotlib\", \"version\": \"3.7.2\", \"license\": \"PSF-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484076"
+  },
+  {
+    "id": "ff6a95bf-b80d-4ad8-97a0-6cda6fe50bcd",
+    "audit_record_id": "629d3217-d543-4a0d-84c2-cde3d4212acd",
+    "field_name": "license",
+    "original_value": "PSF-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"matplotlib\", \"version\": \"3.7.2\", \"license\": \"PSF-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484132"
+  },
+  {
+    "id": "6d1c09d6-348f-438a-b4fb-3de41f4bae77",
+    "audit_record_id": "d129a022-edcc-44fe-915e-fa38e55ef40f",
+    "field_name": "license",
+    "original_value": "PSF-2.0",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 5,
+      "column": null,
+      "raw_context": "{\"name\": \"matplotlib\", \"version\": \"3.7.2\", \"license\": \"PSF-2.0\", \"source\": \"pypi\", \"environment_name\": \"北京朝阳门店-设备台账系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484142"
+  },
+  {
+    "id": "fdca9f4a-659a-4f0c-923b-0740754cbabb",
+    "audit_record_id": "e392288e-8056-4800-972a-67c58a93ee19",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484151"
+  },
+  {
+    "id": "416451af-f54f-4020-ba6b-a5f6ce89f17f",
+    "audit_record_id": "2edc9c48-c814-4144-9697-103e066af501",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484160"
+  },
+  {
+    "id": "40eaf20c-632c-4ed2-b018-cee78aceb3d9",
+    "audit_record_id": "62c98c44-fee6-4efe-9614-3388afcfa94e",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484212"
+  },
+  {
+    "id": "1e936e67-c42a-4de0-a5d0-4d5fdc05d8e8",
+    "audit_record_id": "a0f6f49c-d6c1-4687-ba46-30f4cff7af77",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484222"
+  },
+  {
+    "id": "9da866af-e692-4124-ae4a-3447b9503bcf",
+    "audit_record_id": "fd4cfc45-1970-48fa-8e5d-b88d79fe8ed7",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 6,
+      "column": null,
+      "raw_context": "{\"name\": \"django\", \"version\": \"4.2.4\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484231"
+  },
+  {
+    "id": "a6c6af55-8954-4e77-baef-06c871dc8868",
+    "audit_record_id": "cc600fa7-933d-4aa0-8e6e-1506bc885655",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484240"
+  },
+  {
+    "id": "1e419973-b732-439a-8c1f-4a45ab5ff2a3",
+    "audit_record_id": "7b07f7e0-7acb-4783-978d-3ba749a920f3",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484249"
+  },
+  {
+    "id": "4eba5ca8-187c-4392-b2ef-434391ae967b",
+    "audit_record_id": "fcf6c9cb-5912-46ea-aeab-77890cf6476e",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484258"
+  },
+  {
+    "id": "2962ce52-be01-4ca8-89fd-0e1ce6027a42",
+    "audit_record_id": "dc2a13bc-e75a-4061-851a-f3f6ffea65c0",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484267"
+  },
+  {
+    "id": "06494aae-206e-4520-9996-3706d269953e",
+    "audit_record_id": "fb7d1365-d701-4536-8303-54ad1f5eac93",
+    "field_name": "license",
+    "original_value": "BSD-3-Clause",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 7,
+      "column": null,
+      "raw_context": "{\"name\": \"celery\", \"version\": \"5.3.1\", \"license\": \"BSD-3-Clause\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484276"
+  },
+  {
+    "id": "3008a620-db88-4600-a816-35523f4cc00d",
+    "audit_record_id": "f812c4ff-1a21-4475-9b68-67ae2486f1fb",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484285"
+  },
+  {
+    "id": "dafe4b2b-955c-4ff6-a400-028c1c6b9d02",
+    "audit_record_id": "af22318e-5df3-4614-b567-a7a05d331358",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484293"
+  },
+  {
+    "id": "28dbf9ee-64e7-43a6-b5e4-025a65648e83",
+    "audit_record_id": "74350362-6874-463c-a954-3f84a19083b1",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484302"
+  },
+  {
+    "id": "20123c2e-7748-4cfc-a4df-074e51c1bc05",
+    "audit_record_id": "6939b3a6-e426-40eb-96ff-ea9215ea134e",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484311"
+  },
+  {
+    "id": "9c241ec3-78f3-4b5d-90d6-8c9fff915969",
+    "audit_record_id": "d0181db8-d6f1-42e1-ab8f-973b5c191132",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 8,
+      "column": null,
+      "raw_context": "{\"name\": \"redis-py\", \"version\": \"5.0.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484320"
+  },
+  {
+    "id": "604ff279-56bc-419c-8cf1-d7594e8eda44",
+    "audit_record_id": "89402c16-c3f6-43b8-8c62-30fa5a820e05",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"sqlalchemy\", \"version\": \"2.0.20\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484328"
+  },
+  {
+    "id": "d2755e26-1315-49ca-a07e-b8367b598050",
+    "audit_record_id": "f2d52512-41db-48d2-b8f7-cf7ed10f099d",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"sqlalchemy\", \"version\": \"2.0.20\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484337"
+  },
+  {
+    "id": "73dc0c8f-5d02-44b0-83f5-adfff665e738",
+    "audit_record_id": "2d12f0e1-70fe-43ec-b7a5-6d966a097406",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"sqlalchemy\", \"version\": \"2.0.20\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484346"
+  },
+  {
+    "id": "4346738c-cda8-42b1-9353-ee9a1c88858c",
+    "audit_record_id": "582692a6-a08c-40d9-bb5b-ce6e3de9e59e",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"sqlalchemy\", \"version\": \"2.0.20\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484355"
+  },
+  {
+    "id": "726040df-e1ed-4c11-b8bf-b1a241852395",
+    "audit_record_id": "624471db-6873-43a3-8a0c-93164a06e759",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 9,
+      "column": null,
+      "raw_context": "{\"name\": \"sqlalchemy\", \"version\": \"2.0.20\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484363"
+  },
+  {
+    "id": "74a2bfcc-4446-4a2f-96b0-366186a6e2d4",
+    "audit_record_id": "3f110f9d-e62a-4cfe-8fa9-5f375748f7b5",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"pydantic\", \"version\": \"2.3.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484372"
+  },
+  {
+    "id": "012c10d5-a292-4beb-95b1-eaf68cc6c7ea",
+    "audit_record_id": "aa2b6800-b414-4f74-8d18-168311ceb06a",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"pydantic\", \"version\": \"2.3.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484381"
+  },
+  {
+    "id": "97d3e5bc-290d-4b02-a746-478e9fe78fb1",
+    "audit_record_id": "1151bf55-8d2d-4464-8890-c0acee40c499",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"pydantic\", \"version\": \"2.3.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484390"
+  },
+  {
+    "id": "251e15de-2ab8-470c-bd76-fa1ded5370a8",
+    "audit_record_id": "7b0c4d19-c81c-4fbe-85ec-5e08246051f5",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"pydantic\", \"version\": \"2.3.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484399"
+  },
+  {
+    "id": "42f455b3-10e0-4d51-842e-e88e814ec4dc",
+    "audit_record_id": "90c44934-de69-44df-8839-ecb4f96ba4c5",
+    "field_name": "license",
+    "original_value": "MIT",
+    "source_location": {
+      "file_path": "samples/normal_dependencies.json",
+      "line_number": 10,
+      "column": null,
+      "raw_context": "{\"name\": \"pydantic\", \"version\": \"2.3.0\", \"license\": \"MIT\", \"source\": \"pypi\", \"environment_name\": \"上海浦东店-会员管理系统\"}"
+    },
+    "evidence_type": "license_detection",
+    "created_at": "2026-05-15T06:25:39.484408"
+  }
+]

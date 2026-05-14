@@ -57,14 +57,40 @@ python main.py query --environment "北京朝阳门店-设备台账系统"
 
 ### 人工修正审计记录
 
+**注意：** 一个依赖会对应多条检测记录（每个规则一条）。建议使用 `--fail-only` 或 `--rule` 参数精确匹配需要修正的失败记录。
+
 ```bash
+# 仅匹配失败状态的记录（推荐）
 python main.py correct \
     --result overbroad_scan \
     --record-id bad-lib-gpl2 \
     --status confirmed \
     --remark "经审核，该GPL库仅在后端使用，不涉及分发，风险可控" \
+    --operator "张三" \
+    --fail-only
+
+# 指定规则名称精确匹配
+python main.py correct \
+    --result overbroad_scan \
+    --record-id bad-lib-gpl2 \
+    --rule OVERBROAD-any-GPL \
+    --status confirmed \
+    --remark "经审核，该GPL库仅在后端使用，不涉及分发，风险可控" \
+    --operator "张三"
+
+# 当有多个匹配时，会显示列表供交互式选择
+python main.py correct \
+    --result overbroad_scan \
+    --record-id bad-lib-gpl2 \
+    --status confirmed \
+    --remark "人工审核备注" \
     --operator "张三"
 ```
+
+**修正原则：**
+- 系统判断（pass/fail）不会被覆盖
+- 人工状态与系统状态并存，形成完整审计轨迹
+- 人工备注永久保留，支持追溯操作人
 
 ## 项目结构
 

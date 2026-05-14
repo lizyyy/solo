@@ -383,9 +383,9 @@
     "detection_rule_name": "GPL-3.0-check",
     "system_status": "pass",
     "system_reason": "未检测到高风险许可证",
-    "manual_status": "confirmed",
-    "manual_remark": "经审核，该GPL库仅在后端使用，不涉及分发，风险可控",
-    "operator": "张三",
+    "manual_status": null,
+    "manual_remark": "",
+    "operator": "",
     "field_errors": [],
     "created_at": "2026-05-15T06:09:40.528263",
     "updated_at": "2026-05-15T06:09:57.559695"
@@ -463,9 +463,9 @@
     "detection_rule_name": "OVERBROAD-any-GPL",
     "system_status": "fail",
     "system_reason": "过宽规则匹配: [过宽规则] 只要包含GPL就标记为失败",
-    "manual_status": null,
-    "manual_remark": "",
-    "operator": "",
+    "manual_status": "confirmed",
+    "manual_remark": "经审核，该GPL库仅在后端使用，不涉及分发，风险可控",
+    "operator": "张三",
     "field_errors": [
       {
         "field_name": "license",
@@ -481,7 +481,7 @@
       }
     ],
     "created_at": "2026-05-15T06:09:40.528494",
-    "updated_at": "2026-05-15T06:09:40.528494"
+    "updated_at": "2026-05-15T06:24:17.520535"
   },
   {
     "id": "dda6fe09-948c-433c-b294-25d8f1c70c68",
@@ -492,9 +492,9 @@
     "detection_rule_name": "OVERBROAD-non-MIT",
     "system_status": "fail",
     "system_reason": "过宽规则匹配: [过宽规则] 不是MIT就标记为失败",
-    "manual_status": null,
-    "manual_remark": "",
-    "operator": "",
+    "manual_status": "rejected",
+    "manual_remark": "非MIT许可证但风险可控，此规则过于严格，应结合实际使用场景判断",
+    "operator": "李四",
     "field_errors": [
       {
         "field_name": "license",
@@ -510,7 +510,7 @@
       }
     ],
     "created_at": "2026-05-15T06:09:40.528506",
-    "updated_at": "2026-05-15T06:09:40.528506"
+    "updated_at": "2026-05-15T06:24:17.520543"
   },
   {
     "id": "ffe213e0-1ac7-4a94-9ccd-a507944c5dfb",
