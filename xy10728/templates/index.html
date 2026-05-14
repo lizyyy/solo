@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表格导入规则引擎</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        
+        .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .card h2 { font-size: 20px; margin-bottom: 20px; color: #1a1a2e; border-bottom: 2px solid #667eea; padding-bottom: 10px; display: inline-block; }
+        
+        .upload-area { border: 2px dashed #667eea; border-radius: 8px; padding: 40px; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .upload-area:hover, .upload-area.dragover { background: #f0f4ff; border-color: #764ba2; }
+        .upload-area input { display: none; }
+        .upload-icon { font-size: 48px; margin-bottom: 16px; }
+        .upload-btn { background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 16px; }
+        .upload-btn:hover { background: #5a6fd6; }
+        
+        .search-box { display: flex; gap: 12px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+        .search-box input:focus { outline: none; border-color: #667eea; }
+        
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-uploaded { background: #fff3cd; color: #856404; }
+        .status-validated { background: #d1ecf1; color: #0c5460; }
+        .status-imported { background: #d4edda; color: #155724; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        tr:hover { background: #f8f9fa; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; margin-right: 8px; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .detail-panel { display: none; position: fixed; top: 0; right: 0; width: 600px; height: 100%; background: white; box-shadow: -5px 0 20px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; }
+        .detail-panel.active { display: block; }
+        .detail-header { background: #667eea; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .detail-header h3 { font-size: 18px; }
+        .close-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .detail-content { padding: 24px; }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-card h4 { font-size: 14px; opacity: 0.9; margin-bottom: 8px; }
+        .stat-card .number { font-size: 32px; font-weight: 700; }
+        
+        .error-item { background: #fff5f5; border-left: 4px solid #e53e3e; padding: 12px 16px; margin-bottom: 12px; border-radius: 0 6px 6px 0; }
+        .fix-item { background: #fffbeb; border-left: 4px solid #d69e2e; padding: 12px 16px; margin-bottom: 12px; border-radius: 0 6px 6px 0; }
+        
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+        .overlay.active { display: block; }
+        
+        .loading { text-align: center; padding: 40px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .owner-input { display: flex; gap: 12px; margin-top: 16px; }
+        .owner-input input { flex: 1; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 6px; }
+        
+        .action-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        
+        .field-mapping { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
+        .field-mapping h4 { margin-bottom: 12px; }
+        .mapping-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 表格导入规则引擎</h1>
+            <p>智能字段映射 · 脏数据校验 · 修复建议 · 批次管理 · 友好导出</p>
+        </div>
+
+        <div class="card">
+            <h2>📤 上传数据</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <p>拖拽文件到此处，或点击选择文件</p>
+                <p style="color: #666; font-size: 13px; margin-top: 8px;">支持 CSV、Excel 格式</p>
+                <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">选择文件</button>
+            </div>
+            <div class="owner-input">
+                <input type="text" id="ownerInput" placeholder="请输入负责人姓名（可选）">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 导入批次管理</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索文件名、负责人、批次号..." oninput="loadBatches()">
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="loadBatches()">🔄 刷新列表</button>
+            </div>
+            <table id="batchesTable">
+                <thead>
+                    <tr>
+                        <th>批次号</th>
+                        <th>文件名</th>
+                        <th>负责人</th>
+                        <th>上传时间</th>
+                        <th>状态</th>
+                        <th>总行数</th>
+                        <th>已导入</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="batchesBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeDetail()"></div>
+    
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <h3>批次详情</h3>
+            <button class="close-btn" onclick="closeDetail()">&times;</button>
+        </div>
+        <div class="detail-content" id="detailContent">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>加载中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentBatchId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadBatches();
+            setupDragDrop();
+        });
+
+        function setupDragDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+            });
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+            fileInput.addEventListener('change', handleFiles, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length) uploadFile(files[0]);
+            }
+
+            function handleFiles(e) {
+                if (e.target.files.length) uploadFile(e.target.files[0]);
+            }
+        }
+
+        async function uploadFile(file) {
+            const owner = document.getElementById('ownerInput').value || '未指定';
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('owner', owner);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload`, { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('上传成功！');
+                    loadBatches();
+                    showDetail(data.batch_id);
+                } else {
+                    alert('上传失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('上传失败: ' + error.message);
+            }
+        }
+
+        async function loadBatches() {
+            const search = document.getElementById('searchInput').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/batches?search=${encodeURIComponent(search)}`);
+                const data = await response.json();
+                
+                const tbody = document.getElementById('batchesBody');
+                tbody.innerHTML = '';
+                
+                if (data.batches.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #999; padding: 40px;">暂无批次数据，请先上传文件</td></tr>';
+                    return;
+                }
+                
+                data.batches.forEach(batch => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><code style="background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${batch.batch_id.substring(0, 8)}...</code></td>
+                        <td>${batch.filename}</td>
+                        <td>${batch.owner}</td>
+                        <td>${formatDate(batch.upload_time)}</td>
+                        <td><span class="status-badge status-${batch.status}">${getStatusText(batch.status)}</span></td>
+                        <td>${batch.total_rows}</td>
+                        <td>${batch.imported_count}</td>
+                        <td>
+                            <button class="btn btn-info" onclick="showDetail('${batch.batch_id}')">查看</button>
+                            <button class="btn btn-warning" onclick="exportBatch('${batch.batch_id}')">导出</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('加载批次失败:', error);
+            }
+        }
+
+        async function showDetail(batchId) {
+            currentBatchId = batchId;
+            document.getElementById('overlay').classList.add('active');
+            document.getElementById('detailPanel').classList.add('active');
+            
+            const detailContent = document.getElementById('detailContent');
+            detailContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>加载中...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/batch/${batchId}`);
+                const batch = await response.json();
+                
+                let html = '';
+                
+                html += `
+                    <h3 style="margin-bottom: 20px;">📋 ${batch.filename}</h3>
+                    
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <h4>总行数</h4>
+                            <div class="number">${batch.total_rows}</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                            <h4>干净数据</h4>
+                            <div class="number">${batch.validation.clean_rows}</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);">
+                            <h4>脏数据</h4>
+                            <div class="number">${batch.validation.dirty_rows}</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <h4>成功率</h4>
+                            <div class="number">${((batch.validation.clean_rows/batch.total_rows)*100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-bar">
+                        <button class="btn btn-primary" onclick="validateBatch('${batchId}')">🔍 重新校验</button>
+                        ${batch.status !== 'imported' ? `<button class="btn btn-success" onclick="importBatch('${batchId}')">✅ 执行导入</button>` : '<span style="padding: 8px 16px; color: #28a745;">✓ 已导入</span>'}
+                        <button class="btn btn-warning" onclick="exportBatch('${batchId}')">📥 导出报告</button>
+                    </div>
+                `;
+                
+                html += '<div class="field-mapping"><h4>🔗 字段映射结果</h4>';
+                for (const [original, standard] of Object.entries(batch.mapped_fields)) {
+                    html += `<div class="mapping-item"><span>${original}</span><span>→</span><strong>${standard}</strong></div>`;
+                }
+                html += '</div>';
+                
+                if (batch.validation.errors.length > 0) {
+                    html += '<h4 style="margin-bottom: 16px;">❌ 脏数据详情</h4>';
+                    batch.validation.errors.forEach(errorGroup => {
+                        html += `<div class="error-item"><strong>第 ${errorGroup.row_number} 行</strong><br><br>`;
+                        errorGroup.errors.forEach(err => {
+                            html += `• <strong>${err.field}</strong>: ${err.value} - ${err.error}<br>`;
+                        });
+                        html += '</div>';
+                    });
+                }
+                
+                if (Object.keys(batch.validation.fix_suggestions).length > 0) {
+                    html += '<h4 style="margin: 24px 0 16px;">💡 修复建议</h4>';
+                    for (const [rowIdx, fixes] of Object.entries(batch.validation.fix_suggestions)) {
+                        html += `<div class="fix-item"><strong>第 ${parseInt(rowIdx)+2} 行</strong><br><br>`;
+                        for (const [field, fix] of Object.entries(fixes)) {
+                            html += `• <strong>${field}</strong>: "${fix.original_value}"<br>&nbsp;&nbsp;${fix.suggestion}<br>`;
+                        }
+                        html += '</div>';
+                    }
+                }
+                
+                detailContent.innerHTML = html;
+            } catch (error) {
+                detailContent.innerHTML = '<p style="color: red;">加载失败: ' + error.message + '</p>';
+            }
+        }
+
+        function closeDetail() {
+            document.getElementById('overlay').classList.remove('active');
+            document.getElementById('detailPanel').classList.remove('active');
+            currentBatchId = null;
+        }
+
+        async function validateBatch(batchId) {
+            try {
+                const response = await fetch(`${API_BASE}/batch/${batchId}/validate`, { method: 'POST' });
+                if (response.ok) {
+                    alert('校验完成！');
+                    showDetail(batchId);
+                    loadBatches();
+                }
+            } catch (error) {
+                alert('校验失败: ' + error.message);
+            }
+        }
+
+        async function importBatch(batchId) {
+            try {
+                const response = await fetch(`${API_BASE}/batch/${batchId}/import`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`导入成功！\n成功导入: ${data.imported_count} 行\n跳过脏数据: ${data.skipped_count} 行`);
+                    showDetail(batchId);
+                    loadBatches();
+                } else {
+                    alert('导入失败: ' + data.error);
+                }
+            } catch (error) {
+                alert('导入失败: ' + error.message);
+            }
+        }
+
+        function exportBatch(batchId) {
+            window.open(`${API_BASE}/batch/${batchId}/export`, '_blank');
+        }
+
+        function formatDate(isoStr) {
+            const dt = new Date(isoStr);
+            return dt.toLocaleString('zh-CN');
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'uploaded': '已上传',
+                'validated': '已校验',
+                'imported': '已导入'
+            };
+            return map[status] || status;
+        }
+    </script>
+</body>
+</html>
