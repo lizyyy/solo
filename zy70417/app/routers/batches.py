@@ -106,6 +106,7 @@ def submit_batch(request: BatchSubmitRequest, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[BatchListResponse])
 def list_batches(
+    batch_no: Optional[str] = Query(None, description="按批次号过滤"),
     operator: Optional[str] = Query(None, description="按操作者过滤"),
     risk_type: Optional[str] = Query(None, description="按风险类型过滤"),
     skip: int = 0,
@@ -113,6 +114,9 @@ def list_batches(
     db: Session = Depends(get_db)
 ):
     query = db.query(Batch)
+
+    if batch_no:
+        query = query.filter(Batch.batch_no.contains(batch_no))
 
     if operator:
         query = query.filter(Batch.operator == operator)
@@ -122,6 +126,14 @@ def list_batches(
 
     batches = query.order_by(Batch.created_at.desc()).offset(skip).limit(limit).all()
     return batches
+
+
+@router.get("/by-no/{batch_no}", response_model=BatchDetailResponse)
+def get_batch_by_no(batch_no: str, db: Session = Depends(get_db)):
+    batch = db.query(Batch).filter(Batch.batch_no == batch_no).first()
+    if not batch:
+        raise HTTPException(status_code=404, detail="批次不存在")
+    return batch
 
 
 @router.get("/{batch_id}", response_model=BatchDetailResponse)

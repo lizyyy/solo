@@ -154,6 +154,33 @@ def init_sample_batch(db: Session):
 
     db.flush()
 
+    all_nodes = db.query(EdgeNode).filter(EdgeNode.batch_id == batch.id).all()
+    for node in all_nodes:
+        iot_receipt = IoTReceipt(
+            node_id=node.id,
+            receipt_id=f"IOT-{node.node_id}-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            device_status="online",
+            receipt_time=datetime.now(),
+            raw_data={
+                "node_id": node.node_id,
+                "node_name": node.node_name,
+                "responsible_team": node.responsible_team,
+                "heartbeat": datetime.now().isoformat(),
+                "metrics": {
+                    "cpu_usage": 45 + hash(node.node_id) % 30,
+                    "memory_usage": 62 + hash(node.node_id) % 25,
+                    "network_latency": 12 + hash(node.node_id) % 15,
+                    "temperature": 42 + hash(node.node_id) % 10
+                },
+                "firmware_version": node.software_version,
+                "uptime_hours": 24 * 7 + hash(node.node_id) % 100,
+                "last_maintenance": (datetime.now().replace(day=1)).isoformat()
+            }
+        )
+        db.add(iot_receipt)
+
+    db.flush()
+
     active_rules = db.query(Rule).filter(Rule.is_active == True).all()
     rule_snapshot = rule_engine.get_rule_snapshot(active_rules)
     batch.rule_version_snapshot = rule_snapshot
