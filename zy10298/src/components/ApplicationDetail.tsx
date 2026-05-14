@@ -23,7 +23,7 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import type { BoothApplication, MaterialItem } from '../types';
-import { useBoothStore } from '../store/boothStore';
+import { useBoothStore, boothList } from '../store/boothStore';
 
 interface ApplicationDetailProps {
   application: BoothApplication | null;
@@ -98,6 +98,14 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
 
   const handleApproveElectricity = () => {
     form.validateFields().then(values => {
+      const booth = boothList.find(b => b.id === application.boothId);
+      const maxPower = booth?.maxElectricity || 0;
+      
+      if (values.approvedPower > maxPower) {
+        message.error(`批准电力 ${values.approvedPower}kW 超过展位最大容量 ${maxPower}kW，请重新审核`);
+        return;
+      }
+      
       approveElectricity(application.id, values.approvedPower);
       message.success('电力已通过审核');
       form.resetFields();
@@ -113,6 +121,10 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
   };
 
   const handleConfirmDeposit = () => {
+    if (application.hasMaterialIssue || application.hasElectricityIssue) {
+      message.error('存在材料或电力审核问题，无法确认押金，请先解决异常');
+      return;
+    }
     confirmDeposit(application.id);
     message.success('押金已确认');
   };
@@ -365,9 +377,15 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
               )}
             </Descriptions>
 
-            {application.deposit.status === 'unpaid' && (
+            {application.status === 'deposit_paid' && application.deposit.status === 'unpaid' && (
               <div style={{ marginTop: 16 }}>
-                <Button type="primary" onClick={handleConfirmDeposit}>
+                {application.hasMaterialIssue && (
+                  <Alert message="存在材料审核问题，请先解决材料审核异常" type="warning" showIcon style={{ marginBottom: 16 }} />
+                )}
+                {application.hasElectricityIssue && (
+                  <Alert message="存在电力审核问题，请先解决电力审核异常" type="warning" showIcon style={{ marginBottom: 16 }} />
+                )}
+                <Button type="primary" onClick={handleConfirmDeposit} disabled={application.hasMaterialIssue || application.hasElectricityIssue}>
                   <DollarOutlined /> 确认押金已缴纳
                 </Button>
               </div>

@@ -244,8 +244,11 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   approveApplication: (id) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id ? { ...app, status: 'material_review' as BoothStatus, currentStep: 2, updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss') } : app
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'pending_approval') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id ? { ...a, status: 'material_review' as BoothStatus, currentStep: 2, updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss') } : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -253,8 +256,11 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   rejectApplication: (id, reason) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id ? { ...app, status: 'rejected' as BoothStatus, rejectReason: reason, updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss') } : app
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'pending_approval') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id ? { ...a, status: 'rejected' as BoothStatus, rejectReason: reason, updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss') } : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -263,21 +269,21 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
   approveMaterial: (appId, materialId) =>
     set((state) => {
       const app = state.applications.find((a) => a.id === appId);
-      if (!app) return state;
+      if (!app || app.status !== 'material_review') return state;
 
       const updatedMaterials = app.materials.map((m) => (m.id === materialId ? { ...m, status: 'approved' as const } : m));
 
       const allApproved = updatedMaterials.every((m) => m.status === 'approved');
-      const hasIssue = updatedMaterials.some((m) => m.status === 'rejected');
+      const hasRejected = updatedMaterials.some((m) => m.status === 'rejected');
 
       const newApplications = state.applications.map((a) =>
         a.id === appId
           ? {
               ...a,
               materials: updatedMaterials,
-              status: allApproved ? ('electricity_approved' as BoothStatus) : a.status,
-              currentStep: allApproved ? 3 : a.currentStep,
-              hasMaterialIssue: hasIssue,
+              status: allApproved && !hasRejected ? ('electricity_approved' as BoothStatus) : a.status,
+              currentStep: allApproved && !hasRejected ? 3 : a.currentStep,
+              hasMaterialIssue: hasRejected,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
           : a
@@ -288,15 +294,18 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   rejectMaterial: (appId, materialId, reason) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === appId
+      const app = state.applications.find((a) => a.id === appId);
+      if (!app || app.status !== 'material_review') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === appId
           ? {
-              ...app,
-              materials: app.materials.map((m) => (m.id === materialId ? { ...m, status: 'rejected' as const, reviewRemark: reason } : m)),
+              ...a,
+              materials: a.materials.map((m) => (m.id === materialId ? { ...m, status: 'rejected' as const, reviewRemark: reason } : m)),
               hasMaterialIssue: true,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -304,17 +313,25 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   approveElectricity: (id, approvedPower) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'electricity_approved') return state;
+      
+      const booth = boothList.find((b) => b.id === app.boothId);
+      const maxPower = booth?.maxElectricity || 0;
+      
+      const hasElectricityIssue = approvedPower > maxPower;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id
           ? {
-              ...app,
-              electricity: { ...app.electricity, status: 'approved' as const, approvedPower },
-              status: 'deposit_paid' as BoothStatus,
-              currentStep: 4,
-              hasElectricityIssue: false,
+              ...a,
+              electricity: { ...a.electricity, status: 'approved' as const, approvedPower },
+              status: hasElectricityIssue ? a.status : ('deposit_paid' as BoothStatus),
+              currentStep: hasElectricityIssue ? a.currentStep : 4,
+              hasElectricityIssue,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -322,15 +339,18 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   rejectElectricity: (id, reason) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'electricity_approved') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id
           ? {
-              ...app,
-              electricity: { ...app.electricity, status: 'rejected' as const, reviewRemark: reason },
+              ...a,
+              electricity: { ...a.electricity, status: 'rejected' as const, reviewRemark: reason },
               hasElectricityIssue: true,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -338,16 +358,20 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   confirmDeposit: (id) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'deposit_paid') return state;
+      if (app.hasMaterialIssue || app.hasElectricityIssue) return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id
           ? {
-              ...app,
-              deposit: { ...app.deposit, status: 'paid' as const, paidAt: dayjs().format('YYYY-MM-DD HH:mm:ss') },
+              ...a,
+              deposit: { ...a.deposit, status: 'paid' as const, paidAt: dayjs().format('YYYY-MM-DD HH:mm:ss') },
               status: 'setup_confirmed' as BoothStatus,
               currentStep: 5,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -355,15 +379,18 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   confirmSetup: (id) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'setup_confirmed') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id
           ? {
-              ...app,
+              ...a,
               status: 'in_use' as BoothStatus,
               currentStep: 6,
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
@@ -371,14 +398,19 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
 
   startTeardownInspection: (id) =>
     set((state) => {
-      const newApplications = state.applications.map((app) =>
-        app.id === id
+      const app = state.applications.find((a) => a.id === id);
+      if (!app || app.status !== 'in_use') return state;
+
+      const newApplications = state.applications.map((a) =>
+        a.id === id
           ? {
-              ...app,
-              teardown: { ...app.teardown, status: 'inspecting' as const },
+              ...a,
+              status: 'teardown_pending' as BoothStatus,
+              currentStep: 7,
+              teardown: { ...a.teardown, status: 'inspecting' as const },
               updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
             }
-          : app
+          : a
       );
       saveToStorage(newApplications);
       return { applications: newApplications };
