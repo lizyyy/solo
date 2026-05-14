@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -67,5 +68,17 @@ public class LockController {
     public ApiResponse<List<ResourceLock>> getAllLocks() {
         List<ResourceLock> locks = lockService.getAllLocks();
         return ApiResponse.success(locks);
+    }
+
+    @GetMapping("/{resourceId}/export")
+    public ApiResponse<Map<String, Object>> exportLockStatus(@PathVariable String resourceId) {
+        Map<String, Object> exportData = lockService.exportLockStatus(resourceId);
+        return ApiResponse.success(exportData);
+    }
+
+    @GetMapping("/export")
+    public ApiResponse<Map<String, Object>> exportAllLocks() {
+        Map<String, Object> exportData = lockService.exportAllLocks();
+        return ApiResponse.success(exportData);
     }
 }

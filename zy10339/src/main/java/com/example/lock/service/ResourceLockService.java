@@ -3,15 +3,19 @@ package com.example.lock.service;
 import com.example.lock.dto.LockRequest;
 import com.example.lock.dto.LockResponse;
 import com.example.lock.dto.ReleaseRequest;
+import com.example.lock.entity.IdempotentRequest;
 import com.example.lock.entity.ReleaseAudit;
 import com.example.lock.entity.ResourceLock;
 import com.example.lock.entity.WaitQueueItem;
 import com.example.lock.enums.LockStatus;
 import com.example.lock.enums.OperationSource;
 import com.example.lock.exception.LockException;
+import com.example.lock.repository.IdempotentRequestRepository;
 import com.example.lock.repository.ReleaseAuditRepository;
 import com.example.lock.repository.ResourceLockRepository;
 import com.example.lock.repository.WaitQueueItemRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,8 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,11 +37,19 @@ public class ResourceLockService {
     private final ResourceLockRepository lockRepository;
     private final WaitQueueItemRepository queueRepository;
     private final ReleaseAuditRepository auditRepository;
+    private final IdempotentRequestRepository idempotentRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Transactional
     public LockResponse acquireLock(LockRequest request) {
         log.debug("尝试获取锁: resourceId={}, lockHolder={}, requestId={}", 
                 request.getResourceId(), request.getLockHolder(), request.getRequestId());
+
+        Optional<LockResponse> idempotentResult = checkIdempotentRequest(request.getRequestId(), LockResponse.class);
+        if (idempotentResult.isPresent()) {
+            log.debug("命中幂等缓存: requestId={}", request.getRequestId());
+            return idempotentResult.get();
+        }
 
         if (lockRepository.existsByRequestId(request.getRequestId()) || 
             queueRepository.existsByRequestId(request.getRequestId())) {
@@ -44,32 +59,44 @@ public class ResourceLockService {
         Optional<ResourceLock> existingLock = lockRepository.findByResourceId(request.getResourceId());
 
         if (!existingLock.isPresent()) {
-            return createNewLock(request);
+            LockResponse response = createNewLock(request);
+            saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+            return response;
         }
 
         ResourceLock lock = existingLock.get();
 
         if (lock.getStatus() == LockStatus.LOCKED) {
             if (lock.getLockHolder().equals(request.getLockHolder())) {
-                return extendLock(lock, request);
+                LockResponse response = extendLock(lock, request);
+                saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+                return response;
             }
 
             if (isLockExpired(lock)) {
                 releaseLockInternal(lock, OperationSource.TIMEOUT, "锁超时自动释放");
-                return createNewLock(request);
+                LockResponse response = createNewLock(request);
+                saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+                return response;
             }
 
             if (request.isWaitInQueue()) {
-                return addToWaitQueue(request);
+                LockResponse response = addToWaitQueue(request);
+                saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+                return response;
             }
 
-            return createConflictResponse(lock, request);
+            LockResponse response = createConflictResponse(lock, request);
+            saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+            return response;
         }
 
         if (lock.getStatus() == LockStatus.AVAILABLE || 
             lock.getStatus() == LockStatus.RELEASED || 
             lock.getStatus() == LockStatus.EXPIRED) {
-            return updateExistingLock(lock, request);
+            LockResponse response = updateExistingLock(lock, request);
+            saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "ACQUIRE", response);
+            return response;
         }
 
         throw new LockException(500, "未知的锁状态", request.getRequestId());
@@ -87,6 +114,31 @@ public class ResourceLockService {
         }
 
         throw new LockException(500, "幂等性检查失败", request.getRequestId());
+    }
+
+    private <T> Optional<T> checkIdempotentRequest(String requestId, Class<T> responseType) {
+        return idempotentRepository.findByRequestId(requestId)
+                .map(req -> {
+                    try {
+                        return objectMapper.readValue(req.getResponseData(), responseType);
+                    } catch (JsonProcessingException e) {
+                        log.warn("解析幂等响应失败: {}", e.getMessage());
+                        return null;
+                    }
+                });
+    }
+
+    private <T> void saveIdempotentResponse(String requestId, String resourceId, String operationType, T response) {
+        try {
+            IdempotentRequest idempotent = new IdempotentRequest();
+            idempotent.setRequestId(requestId);
+            idempotent.setResourceId(resourceId);
+            idempotent.setOperationType(operationType);
+            idempotent.setResponseData(objectMapper.writeValueAsString(response));
+            idempotentRepository.save(idempotent);
+        } catch (JsonProcessingException e) {
+            log.warn("序列化幂等响应失败: {}", e.getMessage());
+        }
     }
 
     private LockResponse createNewLock(LockRequest request) {
@@ -171,12 +223,28 @@ public class ResourceLockService {
 
     @Transactional
     public LockResponse releaseLock(ReleaseRequest request) {
-        log.debug("尝试释放锁: resourceId={}, lockHolder={}", request.getResourceId(), request.getLockHolder());
+        log.debug("尝试释放锁: resourceId={}, lockHolder={}, requestId={}", 
+                request.getResourceId(), request.getLockHolder(), request.getRequestId());
+
+        Optional<LockResponse> idempotentResult = checkIdempotentRequest(request.getRequestId(), LockResponse.class);
+        if (idempotentResult.isPresent()) {
+            log.debug("命中释放幂等缓存: requestId={}", request.getRequestId());
+            LockResponse cached = idempotentResult.get();
+            cached.setMessage("重复请求，返回已有释放结果");
+            return cached;
+        }
 
         Optional<ResourceLock> lockOpt = lockRepository.findByResourceId(request.getResourceId());
 
         if (!lockOpt.isPresent()) {
-            throw new LockException(404, "锁不存在", request.getRequestId());
+            LockResponse errorResponse = new LockResponse();
+            errorResponse.setResourceId(request.getResourceId());
+            errorResponse.setLockHolder(request.getLockHolder());
+            errorResponse.setRequestId(request.getRequestId());
+            errorResponse.setSuccess(false);
+            errorResponse.setMessage("锁不存在，无需重复释放");
+            saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "RELEASE", errorResponse);
+            return errorResponse;
         }
 
         ResourceLock lock = lockOpt.get();
@@ -186,7 +254,9 @@ public class ResourceLockService {
         }
 
         if (lock.getStatus() != LockStatus.LOCKED) {
-            throw new LockException(400, "锁当前不处于锁定状态", request.getRequestId());
+            LockResponse errorResponse = buildLockResponse(lock, false, "锁当前不处于锁定状态，无需重复释放");
+            saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "RELEASE", errorResponse);
+            return errorResponse;
         }
 
         releaseLockInternal(lock, request.getOperationSource(), request.getReleaseReason());
@@ -194,6 +264,7 @@ public class ResourceLockService {
 
         LockResponse response = buildLockResponse(lock, true, "锁已成功释放");
         response.setStatus(LockStatus.RELEASED);
+        saveIdempotentResponse(request.getRequestId(), request.getResourceId(), "RELEASE", response);
         return response;
     }
 
@@ -292,6 +363,84 @@ public class ResourceLockService {
 
     public List<ResourceLock> getAllLocks() {
         return lockRepository.findAll();
+    }
+
+    public Map<String, Object> exportLockStatus(String resourceId) {
+        Map<String, Object> export = new LinkedHashMap<>();
+
+        Optional<ResourceLock> lockOpt = getLockByResourceId(resourceId);
+        if (lockOpt.isPresent()) {
+            ResourceLock lock = lockOpt.get();
+            Map<String, Object> lockInfo = new LinkedHashMap<>();
+            lockInfo.put("resourceId", lock.getResourceId());
+            lockInfo.put("lockHolder", lock.getLockHolder());
+            lockInfo.put("status", lock.getStatus());
+            lockInfo.put("lockTime", lock.getLockTime());
+            lockInfo.put("expireTime", lock.getExpireTime());
+            lockInfo.put("releaseTime", lock.getReleaseTime());
+            lockInfo.put("operationSource", lock.getOperationSource());
+            lockInfo.put("timeoutSeconds", lock.getTimeoutSeconds());
+            export.put("lockStatus", lockInfo);
+        } else {
+            export.put("lockStatus", null);
+        }
+
+        List<WaitQueueItem> queue = getWaitQueue(resourceId);
+        List<Map<String, Object>> queueList = queue.stream().map(item -> {
+            Map<String, Object> itemMap = new LinkedHashMap<>();
+            itemMap.put("position", item.getQueuePosition());
+            itemMap.put("lockHolder", item.getLockHolder());
+            itemMap.put("requestId", item.getRequestId());
+            itemMap.put("status", item.getStatus());
+            itemMap.put("queuedAt", item.getQueuedAt());
+            itemMap.put("acquiredAt", item.getAcquiredAt());
+            return itemMap;
+        }).collect(Collectors.toList());
+        export.put("waitQueue", queueList);
+        export.put("waitQueueCount", queueList.size());
+
+        List<ReleaseAudit> history = getReleaseHistory(resourceId);
+        List<Map<String, Object>> historyList = history.stream().map(audit -> {
+            Map<String, Object> auditMap = new LinkedHashMap<>();
+            auditMap.put("lockHolder", audit.getLockHolder());
+            auditMap.put("requestId", audit.getRequestId());
+            auditMap.put("releaseSource", audit.getReleaseSource());
+            auditMap.put("releaseReason", audit.getReleaseReason());
+            auditMap.put("lockDurationSeconds", audit.getLockDurationSeconds());
+            auditMap.put("releasedAt", audit.getReleasedAt());
+            return auditMap;
+        }).collect(Collectors.toList());
+        export.put("releaseHistory", historyList);
+        export.put("releaseHistoryCount", historyList.size());
+
+        export.put("exportTime", LocalDateTime.now());
+        export.put("resourceId", resourceId);
+
+        return export;
+    }
+
+    public Map<String, Object> exportAllLocks() {
+        Map<String, Object> export = new LinkedHashMap<>();
+
+        List<ResourceLock> locks = getAllLocks();
+        List<Map<String, Object>> locksList = locks.stream().map(lock -> {
+            Map<String, Object> lockMap = new LinkedHashMap<>();
+            lockMap.put("resourceId", lock.getResourceId());
+            lockMap.put("lockHolder", lock.getLockHolder());
+            lockMap.put("status", lock.getStatus());
+            lockMap.put("lockTime", lock.getLockTime());
+            lockMap.put("expireTime", lock.getExpireTime());
+            lockMap.put("operationSource", lock.getOperationSource());
+            return lockMap;
+        }).collect(Collectors.toList());
+
+        export.put("locks", locksList);
+        export.put("totalLocks", locksList.size());
+        export.put("lockedCount", locks.stream().filter(l -> l.getStatus() == LockStatus.LOCKED).count());
+        export.put("releasedCount", locks.stream().filter(l -> l.getStatus() == LockStatus.RELEASED).count());
+        export.put("exportTime", LocalDateTime.now());
+
+        return export;
     }
 
     private LockResponse buildLockResponse(ResourceLock lock, boolean success, String message) {

@@ -74,6 +74,18 @@
                 <span class="path">/api/locks</span>
                 <div class="desc">查询所有锁的状态</div>
             </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks/{resourceId}/export</span>
+                <div class="desc">导出单资源完整状态（锁+队列+历史）</div>
+            </div>
+
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="path">/api/locks/export</span>
+                <div class="desc">导出所有锁汇总状态和统计</div>
+            </div>
         </div>
 
         <div class="grid">
