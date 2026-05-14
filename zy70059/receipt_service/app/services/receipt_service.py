@@ -64,6 +64,12 @@ class ReceiptService:
         )
         self.db.add(audit)
     
+    def _commit_audit(self) -> None:
+        try:
+            self.db.commit()
+        except SQLAlchemyError:
+            self.db.rollback()
+    
     def create_permission(self, request: PermissionRequest) -> Tuple[ReprintPermission, ValidationResult]:
         receipt = self.db.query(Receipt).filter(
             Receipt.receipt_index == request.receipt_index
@@ -80,6 +86,7 @@ class ReceiptService:
                 receipt_index=request.receipt_index,
                 operation_details=f"创建权限失败: 回单不存在"
             )
+            self._commit_audit()
             return None, result
         
         if receipt.customer_id != request.customer_id:
@@ -93,6 +100,7 @@ class ReceiptService:
                 receipt_index=request.receipt_index,
                 operation_details="创建权限失败: 客户与回单不匹配"
             )
+            self._commit_audit()
             return None, result
         
         signature = self.db.query(SignatureRecord).filter(
@@ -100,7 +108,7 @@ class ReceiptService:
         ).first()
         
         sig_validation = ConsistencyValidator.validate_receipt_signature_consistency(
-            receipt, signature
+            receipt, signature, require_verified=True
         )
         if not sig_validation.valid:
             self._record_audit(
@@ -113,6 +121,7 @@ class ReceiptService:
                 original_transaction_id=receipt.original_transaction_id,
                 operation_details=f"创建权限失败: 签章校验失败 - {';'.join(sig_validation.errors)}"
             )
+            self._commit_audit()
             return None, sig_validation
         
         existing_active = self.db.query(ReprintPermission).filter(
@@ -203,6 +212,7 @@ class ReceiptService:
                 receipt_index=request.receipt_index,
                 operation_details="下载失败: 权限不存在"
             )
+            self._commit_audit()
             return DownloadResult(
                 success=False,
                 receipt_index=request.receipt_index,
@@ -224,6 +234,7 @@ class ReceiptService:
                 permission_id=permission.permission_id,
                 operation_details="下载失败: 回单不存在"
             )
+            self._commit_audit()
             return DownloadResult(
                 success=False,
                 receipt_index=request.receipt_index,
@@ -233,6 +244,29 @@ class ReceiptService:
         signature = self.db.query(SignatureRecord).filter(
             SignatureRecord.receipt_id == receipt.id
         ).first()
+        
+        customer_check = ConsistencyValidator.validate_download_request_customer(
+            request.customer_id, permission
+        )
+        if not customer_check.valid:
+            error_msg = "; ".join(customer_check.errors)
+            self._record_audit(
+                operation_type="RECEIPT_DOWNLOAD",
+                operator_id=request.operator_id,
+                operator_name=request.operator_name,
+                operation_result="FAILED",
+                customer_id=request.customer_id,
+                receipt_index=receipt.receipt_index,
+                original_transaction_id=receipt.original_transaction_id,
+                permission_id=permission.permission_id,
+                operation_details=f"下载失败: 请求客户与权限客户不匹配 - {error_msg}"
+            )
+            self._commit_audit()
+            return DownloadResult(
+                success=False,
+                receipt_index=request.receipt_index,
+                error_message=error_msg
+            )
         
         download_logs = self.db.query(DownloadLog).filter(
             DownloadLog.permission_id == permission.permission_id
@@ -258,6 +292,7 @@ class ReceiptService:
                 permission_id=permission.permission_id,
                 operation_details=f"下载失败: 校验不通过 - {error_msg}"
             )
+            self._commit_audit()
             return DownloadResult(
                 success=False,
                 receipt_index=request.receipt_index,
@@ -269,7 +304,7 @@ class ReceiptService:
             receipt_index=receipt.receipt_index,
             download_seq=new_seq,
             operator_name=request.operator_name,
-            customer_id=request.customer_id
+            customer_id=permission.customer_id
         )
         
         permission.current_download_count = new_seq
@@ -282,7 +317,7 @@ class ReceiptService:
             receipt_id=receipt.id,
             receipt_index=receipt.receipt_index,
             permission_id=permission.permission_id,
-            customer_id=request.customer_id,
+            customer_id=permission.customer_id,
             original_transaction_id=receipt.original_transaction_id,
             operator_id=request.operator_id,
             operator_name=request.operator_name,

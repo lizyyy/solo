@@ -88,6 +88,52 @@ class TestCreatePermission:
         assert result.valid is False
         assert permission is None
         assert "回单不存在" in result.errors[0]
+    
+    def test_create_permission_pending_signature_fails(self, db_session, test_receipt, test_signature):
+        test_signature.verification_status = "PENDING"
+        db_session.commit()
+        
+        service = ReceiptService(db_session)
+        
+        request = PermissionRequest(
+            customer_id=test_receipt.customer_id,
+            receipt_index=test_receipt.receipt_index,
+            operator_id="OPER_001",
+            operator_name="张三",
+            max_download_count=3,
+            valid_days=30
+        )
+        
+        permission, result = service.create_permission(request)
+        
+        assert result.valid is False
+        assert permission is None
+        assert "签章未完成验证" in result.errors[0]
+        assert "PENDING" in result.errors[0]
+    
+    def test_create_permission_audit_log_failure_for_pending_signature(self, db_session, test_receipt, test_signature):
+        test_signature.verification_status = "PENDING"
+        db_session.commit()
+        
+        service = ReceiptService(db_session)
+        
+        request = PermissionRequest(
+            customer_id=test_receipt.customer_id,
+            receipt_index=test_receipt.receipt_index,
+            operator_id="OPER_001",
+            operator_name="张三",
+            max_download_count=3,
+            valid_days=30
+        )
+        
+        permission, result = service.create_permission(request)
+        
+        audit = db_session.query(AuditLog).filter(
+            AuditLog.operation_type == "PERMISSION_CREATE"
+        ).first()
+        assert audit is not None
+        assert audit.operation_result == "FAILED"
+        assert "签章校验失败" in audit.operation_details
 
 
 class TestDownloadReceipt:
@@ -178,6 +224,70 @@ class TestDownloadReceipt:
         
         assert result.success is False
         assert "回单不存在" in result.error_message
+    
+    def test_download_wrong_customer_fails(self, db_session, test_receipt, test_signature, test_permission):
+        service = ReceiptService(db_session)
+        
+        request = DownloadRequest(
+            permission_id=test_permission.permission_id,
+            receipt_index=test_receipt.receipt_index,
+            customer_id="CUST999",
+            operator_id="OPER_001",
+            operator_name="张三"
+        )
+        
+        result = service.download_receipt(request)
+        
+        assert result.success is False
+        assert "请求客户与权限客户不一致" in result.error_message
+        assert "CUST999" in result.error_message
+    
+    def test_download_wrong_customer_audit_log_failure(self, db_session, test_receipt, test_signature, test_permission):
+        service = ReceiptService(db_session)
+        
+        request = DownloadRequest(
+            permission_id=test_permission.permission_id,
+            receipt_index=test_receipt.receipt_index,
+            customer_id="CUST999",
+            operator_id="OPER_001",
+            operator_name="张三"
+        )
+        
+        result = service.download_receipt(request)
+        
+        audit = db_session.query(AuditLog).filter(
+            AuditLog.operation_type == "RECEIPT_DOWNLOAD"
+        ).first()
+        assert audit is not None
+        assert audit.operation_result == "FAILED"
+        assert "请求客户与权限客户不匹配" in audit.operation_details
+    
+    def test_download_wrong_customer_no_permission_change(self, db_session, test_receipt, test_signature, test_permission):
+        original_count = test_permission.current_download_count
+        original_active = test_permission.is_active
+        
+        service = ReceiptService(db_session)
+        
+        request = DownloadRequest(
+            permission_id=test_permission.permission_id,
+            receipt_index=test_receipt.receipt_index,
+            customer_id="CUST999",
+            operator_id="OPER_001",
+            operator_name="张三"
+        )
+        
+        service.download_receipt(request)
+        
+        updated_permission = db_session.query(ReprintPermission).filter(
+            ReprintPermission.permission_id == test_permission.permission_id
+        ).first()
+        assert updated_permission.current_download_count == original_count
+        assert updated_permission.is_active == original_active
+        
+        logs = db_session.query(DownloadLog).filter(
+            DownloadLog.permission_id == test_permission.permission_id
+        ).all()
+        assert len(logs) == 0
     
     def test_download_multiple_downloads(self, db_session, test_receipt, test_signature, test_permission):
         test_permission.max_download_count = 3

@@ -46,6 +46,43 @@ class TestReceiptSignatureConsistency:
         assert result.valid is True
         assert len(result.warnings) == 1
         assert "尚未完成验证" in result.warnings[0]
+    
+    def test_unverified_signature_with_require_verified_fails(self, test_receipt, test_signature):
+        test_signature.verification_status = "PENDING"
+        
+        result = ConsistencyValidator.validate_receipt_signature_consistency(
+            test_receipt, test_signature, require_verified=True
+        )
+        assert result.valid is False
+        assert len(result.errors) == 1
+        assert "签章未完成验证" in result.errors[0]
+        assert "PENDING" in result.errors[0]
+    
+    def test_rejected_signature_with_require_verified_fails(self, test_receipt, test_signature):
+        test_signature.verification_status = "REJECTED"
+        
+        result = ConsistencyValidator.validate_receipt_signature_consistency(
+            test_receipt, test_signature, require_verified=True
+        )
+        assert result.valid is False
+        assert "签章未完成验证" in result.errors[0]
+
+
+class TestDownloadRequestCustomer:
+    def test_request_customer_matches_permission(self, test_permission):
+        result = ConsistencyValidator.validate_download_request_customer(
+            test_permission.customer_id, test_permission
+        )
+        assert result.valid is True
+    
+    def test_request_customer_mismatch_fails(self, test_permission):
+        result = ConsistencyValidator.validate_download_request_customer(
+            "CUST999", test_permission
+        )
+        assert result.valid is False
+        assert "请求客户与权限客户不一致" in result.errors[0]
+        assert "CUST999" in result.errors[0]
+        assert test_permission.customer_id in result.errors[0]
 
 
 class TestPermissionReceiptConsistency:

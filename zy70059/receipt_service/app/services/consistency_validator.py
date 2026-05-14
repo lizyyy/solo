@@ -9,7 +9,8 @@ class ConsistencyValidator:
     @staticmethod
     def validate_receipt_signature_consistency(
         receipt: Receipt,
-        signature: Optional[SignatureRecord]
+        signature: Optional[SignatureRecord],
+        require_verified: bool = False
     ) -> ValidationResult:
         result = ValidationResult(valid=True, errors=[], warnings=[])
         
@@ -31,7 +32,26 @@ class ConsistencyValidator:
             )
         
         if signature.verification_status != "VERIFIED":
-            result.warnings.append("签章尚未完成验证流程")
+            if require_verified:
+                result.valid = False
+                result.errors.append(f"签章未完成验证: 当前状态={signature.verification_status}")
+            else:
+                result.warnings.append("签章尚未完成验证流程")
+        
+        return result
+    
+    @staticmethod
+    def validate_download_request_customer(
+        request_customer_id: str,
+        permission: ReprintPermission
+    ) -> ValidationResult:
+        result = ValidationResult(valid=True, errors=[], warnings=[])
+        
+        if request_customer_id != permission.customer_id:
+            result.valid = False
+            result.errors.append(
+                f"请求客户与权限客户不一致: 请求={request_customer_id}, 权限={permission.customer_id}"
+            )
         
         return result
     
