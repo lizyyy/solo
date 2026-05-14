@@ -5,7 +5,7 @@ import com.quota.arbitration.dto.BorrowApplicationRequest;
 import com.quota.arbitration.dto.ReturnRequest;
 import com.quota.arbitration.entity.*;
 import com.quota.arbitration.service.QuotaBorrowService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

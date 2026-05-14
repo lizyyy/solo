@@ -6,18 +6,22 @@
 ## 启动服务
 
 ### 前置条件
-- JDK 17+
-- Maven 3.8+
+- JDK 8+ (已适配当前环境的 Java 1.8)
+- 网络连接 (首次启动会自动下载Maven)
 
 ### 启动步骤
 ```bash
 # 进入项目目录
 cd /Users/lzy/pro/solo/workspaces/zy10320
 
-# 编译项目
-mvn clean compile
+# 直接启动（脚本已赋予可执行权限）
+./start.sh
+```
 
-# 启动服务
+### 或手动执行
+```bash
+# 如果有Maven
+mvn spring-boot:run
 mvn spring-boot:run
 ```
 

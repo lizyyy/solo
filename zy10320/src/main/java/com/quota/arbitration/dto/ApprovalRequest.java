@@ -1,8 +1,8 @@
 package com.quota.arbitration.dto;
 
 import com.quota.arbitration.enums.ApprovalResult;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;

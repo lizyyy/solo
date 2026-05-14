@@ -1,7 +1,7 @@
 package com.quota.arbitration.entity;
 
 import com.quota.arbitration.enums.ApplicationStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
