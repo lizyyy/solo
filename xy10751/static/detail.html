@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会话详情 - 客服会话转工单桥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-item .label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-item .value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .summary-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-identity_failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-ready_for_ticket {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-converted {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -27px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .timeline-item.intervention::before {
+            background: #ffc107;
+        }
+        .timeline-item.fix::before {
+            background: #28a745;
+        }
+        .timeline-item.recalc::before {
+            background: #17a2b8;
+        }
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .timeline-action {
+            font-weight: 600;
+            color: #333;
+        }
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .timeline-handler {
+            font-size: 13px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        .timeline-reason {
+            font-size: 14px;
+            color: #555;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .timeline-status {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .status-old {
+            color: #dc3545;
+            text-decoration: line-through;
+        }
+        .status-new {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #138496;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <span class="back-link" onclick="goBack()">← 返回</span>
+            🎫 会话详情
+        </h1>
+    </div>
+    <div class="container">
+        <div class="card" id="sessionInfo">
+            <h2>📋 会话基本信息</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">会话ID</span>
+                    <span class="value" id="sessionId">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">客户姓名</span>
+                    <span class="value" id="customerName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">联系电话</span>
+                    <span class="value" id="customerPhone">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">身份状态</span>
+                    <span class="value" id="identityStatus">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">处理状态</span>
+                    <span class="value" id="processStatus">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">创建时间</span>
+                    <span class="value" id="createdAt">-</span>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <div class="label" style="margin-bottom: 10px;">会话摘要</div>
+                <div class="summary-box" id="sessionSummary">-</div>
+            </div>
+        </div>
+
+        <div class="card" id="actionSection">
+            <h2>⚡ 快捷操作</h2>
+            <div class="action-buttons" id="actionButtons"></div>
+        </div>
+
+        <div class="card" id="historySection">
+            <h2>📜 处理历史记录</h2>
+            <div id="historyTimeline" class="timeline"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="identityModal">
+        <div class="modal-content">
+            <h3>验证客户身份</h3>
+            <div class="form-group">
+                <label>是否通过身份验证？</label>
+                <select id="identityVerified">
+                    <option value="true">是 - 身份验证通过</option>
+                    <option value="false">否 - 身份验证失败</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('identityModal')">取消</button>
+                <button class="btn btn-primary" onclick="checkIdentity()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="interventionModal">
+        <div class="modal-content">
+            <h3>人工介入处理</h3>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="handlerName" value="客服主管">
+            </div>
+            <div class="form-group">
+                <label>新状态</label>
+                <select id="newStatus">
+                    <option value="processing">处理中</option>
+                    <option value="pending">待处理</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>处理原因</label>
+                <textarea id="interventionReason" placeholder="请输入人工介入的原因..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('interventionModal')">取消</button>
+                <button class="btn btn-warning" onclick="doIntervention()">提交处理</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="fixDuplicateModal">
+        <div class="modal-content">
+            <h3>重复识别修正</h3>
+            <div class="alert alert-warning">
+                ⚠️ 此操作用于修正因系统重复识别导致的身份验证失败，将直接把身份状态改为"已验证"。
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="fixHandlerName" value="客服主管">
+            </div>
+            <div class="form-group">
+                <label>修正原因</label>
+                <textarea id="fixReason" placeholder="请输入修正的原因..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('fixDuplicateModal')">取消</button>
+                <button class="btn btn-success" onclick="fixDuplicate()">确认修正</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="recalcModal">
+        <div class="modal-content">
+            <h3>重新计算状态</h3>
+            <div class="alert alert-info">
+                ℹ️ 当客户身份信息发生变更时，可重新计算会话状态。
+            </div>
+            <div class="form-group">
+                <label>新身份状态</label>
+                <select id="newIdentity">
+                    <option value="verified">已验证</option>
+                    <option value="unverified">未验证</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>重新计算原因</label>
+                <textarea id="recalcReason" placeholder="请输入重新计算的原因..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeModal('recalcModal')">取消</button>
+                <button class="btn btn-info" onclick="doRecalc()">确认重新计算</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentSessionId = null;
+        let currentSession = null;
+
+        function getSessionIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function goBack() {
+            window.location.href = '/index.html';
+        }
+
+        async function fetchAPI(url, options = {}) {
+            const defaultOptions = {
+                headers: { 'Content-Type': 'application/json' }
+            };
+            const response = await fetch(`${API_BASE}${url}`, { ...defaultOptions, ...options });
+            return response.json();
+        }
+
+        async function loadSessionDetail() {
+            currentSessionId = getSessionIdFromUrl();
+            if (!currentSessionId) {
+                alert('未找到会话ID');
+                goBack();
+                return;
+            }
+
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}`);
+            if (result.success) {
+                currentSession = result.data;
+                renderSessionInfo(currentSession);
+                renderActionButtons(currentSession);
+            } else {
+                alert('加载会话详情失败');
+                goBack();
+            }
+
+            await loadHistory();
+        }
+
+        function renderSessionInfo(session) {
+            const statusLabels = {
+                'pending': '待处理',
+                'identity_failed': '身份验证失败',
+                'ready_for_ticket': '可转工单',
+                'converted': '已转工单',
+                'processing': '处理中'
+            };
+
+            document.getElementById('sessionId').textContent = session.id;
+            document.getElementById('customerName').textContent = session.customer_name || '-';
+            document.getElementById('customerPhone').textContent = session.customer_phone || '-';
+            document.getElementById('identityStatus').textContent = session.customer_identity === 'verified' ? '已验证' : '未验证';
+            document.getElementById('processStatus').innerHTML = `<span class="status-badge status-${session.status}">${statusLabels[session.status]}</span>`;
+            document.getElementById('createdAt').textContent = formatDate(session.created_at);
+            document.getElementById('sessionSummary').textContent = session.summary;
+        }
+
+        function renderActionButtons(session) {
+            let buttons = [];
+
+            if (session.status === 'pending') {
+                buttons.push(`<button class="btn btn-primary" onclick="openModal('identityModal')">🔍 验证身份</button>`);
+            }
+
+            if (session.status === 'identity_failed') {
+                buttons.push(`<button class="btn btn-warning" onclick="openModal('interventionModal')">👋 人工介入</button>`);
+                buttons.push(`<button class="btn btn-success" onclick="openModal('fixDuplicateModal')">✅ 重复识别修正</button>`);
+            }
+
+            if (session.status === 'ready_for_ticket') {
+                buttons.push(`<button class="btn btn-primary" onclick="convertToTicket()">🎫 转换为工单</button>`);
+            }
+
+            buttons.push(`<button class="btn btn-info" onclick="openModal('recalcModal')">🔄 重新计算</button>`);
+
+            document.getElementById('actionButtons').innerHTML = buttons.join('');
+        }
+
+        async function loadHistory() {
+            const result = await fetchAPI('/api/process-history');
+            if (result.success) {
+                const sessionHistory = result.data.filter(h => h.session_id === currentSessionId);
+                renderHistory(sessionHistory);
+            }
+        }
+
+        function renderHistory(history) {
+            if (history.length === 0) {
+                document.getElementById('historyTimeline').innerHTML = '<p style="color: #999; padding: 20px;">暂无处理记录</p>';
+                return;
+            }
+
+            const actionLabels = {
+                'manual_intervention': '🔧 人工介入',
+                'fix_duplicate': '✅ 重复识别修正',
+                'recalculate': '🔄 重新计算'
+            };
+
+            const statusLabels = {
+                'pending': '待处理',
+                'identity_failed': '身份验证失败',
+                'ready_for_ticket': '可转工单',
+                'converted': '已转工单',
+                'processing': '处理中'
+            };
+
+            let html = '';
+            for (const item of history.sort((a, b) => new Date(b.processed_at) - new Date(a.processed_at))) {
+                let itemClass = '';
+                if (item.action === 'manual_intervention') itemClass = 'intervention';
+                if (item.action === 'fix_duplicate') itemClass = 'fix';
+                if (item.action === 'recalculate') itemClass = 'recalc';
+
+                html += `
+                    <div class="timeline-item ${itemClass}">
+                        <div class="timeline-header">
+                            <span class="timeline-action">${actionLabels[item.action] || item.action}</span>
+                            <span class="timeline-time">${formatDate(item.processed_at)}</span>
+                        </div>
+                        <div class="timeline-handler">👤 处理人: ${item.handler}</div>
+                        ${item.reason ? `<div class="timeline-reason">📝 ${item.reason}</div>` : ''}
+                        ${item.previous_status ? `
+                            <div class="timeline-status">
+                                <span class="status-old">${statusLabels[item.previous_status]}</span>
+                                <span>→</span>
+                                <span class="status-new">${statusLabels[item.new_status]}</span>
+                            </div>
+                        ` : ''}
+                        ${item.previous_identity ? `
+                            <div class="timeline-status" style="margin-top: 5px;">
+                                <span>身份变更:</span>
+                                <span class="status-old">${item.previous_identity === 'verified' ? '已验证' : '未验证'}</span>
+                                <span>→</span>
+                                <span class="status-new">${item.new_identity === 'verified' ? '已验证' : '未验证'}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+            document.getElementById('historyTimeline').innerHTML = html;
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('zh-CN');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function checkIdentity() {
+            const verified = document.getElementById('identityVerified').value === 'true';
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}/check-identity`, {
+                method: 'POST',
+                body: JSON.stringify({ identity_verified: verified })
+            });
+
+            if (result.success) {
+                closeModal('identityModal');
+                loadSessionDetail();
+            }
+        }
+
+        async function doIntervention() {
+            const handler = document.getElementById('handlerName').value;
+            const reason = document.getElementById('interventionReason').value;
+            const newStatus = document.getElementById('newStatus').value;
+
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}/process`, {
+                method: 'POST',
+                body: JSON.stringify({ handler, reason, new_status: newStatus })
+            });
+
+            if (result.success) {
+                closeModal('interventionModal');
+                loadSessionDetail();
+            }
+        }
+
+        async function fixDuplicate() {
+            const handler = document.getElementById('fixHandlerName').value;
+            const reason = document.getElementById('fixReason').value;
+
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}/fix-duplicate`, {
+                method: 'POST',
+                body: JSON.stringify({ handler, reason })
+            });
+
+            if (result.success) {
+                closeModal('fixDuplicateModal');
+                loadSessionDetail();
+            }
+        }
+
+        async function doRecalc() {
+            const newIdentity = document.getElementById('newIdentity').value;
+            const reason = document.getElementById('recalcReason').value;
+
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}/recalculate`, {
+                method: 'POST',
+                body: JSON.stringify({ new_identity: newIdentity, reason })
+            });
+
+            if (result.success) {
+                closeModal('recalcModal');
+                loadSessionDetail();
+            }
+        }
+
+        async function convertToTicket() {
+            const result = await fetchAPI(`/api/sessions/${currentSessionId}/convert-ticket`, {
+                method: 'POST'
+            });
+
+            if (result.success) {
+                alert(`工单创建成功！工单ID: ${result.data.id}`);
+                loadSessionDetail();
+            }
+        }
+
+        loadSessionDetail();
+    </script>
+</body>
+</html>
