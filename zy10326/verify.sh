@@ -152,12 +152,12 @@ else
 fi
 
 # ==================================
-# 测试6-8: 消耗预算（5次预算，现在用了1次幂等，还剩4次）
+# 测试6-8: 消耗预算（5次预算，测试3用了1次幂等，还剩4次→先消耗3次，第4次专门测试耗尽）
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试6-9: 消耗预算直到耗尽${NC}"
+echo -e "${YELLOW}🧪 测试6-8: 消耗预算到仅剩1次${NC}"
 
-for i in 1 2 3 4; do
+for i in 1 2 3; do
     RESULT=$(curl -s -X POST "$BASE_URL/check" \
       -H "Content-Type: application/json" \
       -d "{
@@ -173,11 +173,11 @@ for i in 1 2 3 4; do
 done
 
 # ==================================
-# 测试10: 【关键验证】最后一次耗尽预算
+# 测试9: 【关键验证】最后一次耗尽预算
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试10: 【关键验证】最后一次消耗预算（恰好耗尽）${NC}"
-RESULT10=$(curl -s -X POST "$BASE_URL/check" \
+echo -e "${YELLOW}🧪 测试9: 【关键验证】最后一次消耗预算（恰好耗尽）${NC}"
+RESULT9=$(curl -s -X POST "$BASE_URL/check" \
   -H "Content-Type: application/json" \
   -d '{
     "callerId": "service-order",
@@ -186,24 +186,24 @@ RESULT10=$(curl -s -X POST "$BASE_URL/check" \
     "failureReason": "500 Internal Server Error - exhaust attempt"
   }')
 
-echo "$RESULT10" | python3 -m json.tool 2>/dev/null | head -20
+echo "$RESULT9" | python3 -m json.tool 2>/dev/null | head -20
 
-ALLOWED_10=$(echo "$RESULT10" | grep -o '"allowed":[a-z]*' | cut -d: -f2)
-IS_EXHAUSTED_10=$(echo "$RESULT10" | grep -o '"isExhausted":[a-z]*' | cut -d: -f2)
-USED_10=$(echo "$RESULT10" | grep -o '"usedBudget":[0-9]*' | cut -d: -f2)
+ALLOWED_9=$(echo "$RESULT9" | grep -o '"allowed":[a-z]*' | cut -d: -f2)
+IS_EXHAUSTED_9=$(echo "$RESULT9" | grep -o '"isExhausted":[a-z]*' | cut -d: -f2)
+USED_9=$(echo "$RESULT9" | grep -o '"usedBudget":[0-9]*' | cut -d: -f2)
 
 echo ""
 echo "   关键验证点:"
-echo "   - usedBudget: $USED_10 (期望=5)"
-echo "   - isExhausted: $IS_EXHAUSTED_10 (期望=true，因为预算刚耗尽)"
-echo "   - allowed: $ALLOWED_10 (期望=true，因为这次重试是允许的！)"
+echo "   - usedBudget: $USED_9 (期望=5)"
+echo "   - isExhausted: $IS_EXHAUSTED_9 (期望=true，因为预算刚耗尽)"
+echo "   - allowed: $ALLOWED_9 (期望=true，因为这次重试是允许的！)"
 
 PASS=1
-if [ "$ALLOWED_10" != "true" ]; then
+if [ "$ALLOWED_9" != "true" ]; then
     echo -e "${RED}❌ allowed应为true（这次重试消耗了最后一次预算，是允许的）${NC}"
     PASS=0
 fi
-if [ "$IS_EXHAUSTED_10" != "true" ]; then
+if [ "$IS_EXHAUSTED_9" != "true" ]; then
     echo -e "${RED}❌ isExhausted应为true（预算刚耗尽）${NC}"
     PASS=0
 fi
@@ -213,11 +213,11 @@ if [ "$PASS" -eq 1 ]; then
 fi
 
 # ==================================
-# 测试11: 预算已经耗尽后的拦截
+# 测试10: 预算已经耗尽后的拦截
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试11: 预算已经耗尽后的拦截${NC}"
-RESULT11=$(curl -s -X POST "$BASE_URL/check" \
+echo -e "${YELLOW}🧪 测试10: 预算已经耗尽后的拦截${NC}"
+RESULT10=$(curl -s -X POST "$BASE_URL/check" \
   -H "Content-Type: application/json" \
   -d '{
     "callerId": "service-order",
@@ -226,34 +226,34 @@ RESULT11=$(curl -s -X POST "$BASE_URL/check" \
     "failureReason": "500 Internal Server Error - after exhaust"
   }')
 
-ALLOWED_11=$(echo "$RESULT11" | grep -o '"allowed":[a-z]*' | cut -d: -f2)
-IS_EXHAUSTED_11=$(echo "$RESULT11" | grep -o '"isExhausted":[a-z]*' | cut -d: -f2)
+ALLOWED_10=$(echo "$RESULT10" | grep -o '"allowed":[a-z]*' | cut -d: -f2)
+IS_EXHAUSTED_10=$(echo "$RESULT10" | grep -o '"isExhausted":[a-z]*' | cut -d: -f2)
 
-echo "   allowed: $ALLOWED_11 (期望false，因为预算已经耗尽)"
-echo "   isExhausted: $IS_EXHAUSTED_11 (期望true)"
+echo "   allowed: $ALLOWED_10 (期望false，因为预算已经耗尽)"
+echo "   isExhausted: $IS_EXHAUSTED_10 (期望true)"
 
-if [ "$ALLOWED_11" = "false" ] && [ "$IS_EXHAUSTED_11" = "true" ]; then
+if [ "$ALLOWED_10" = "false" ] && [ "$IS_EXHAUSTED_10" = "true" ]; then
     echo -e "${GREEN}✅ 耗尽后拦截验证通过${NC}"
 else
     echo -e "${RED}❌ 耗尽后拦截验证失败${NC}"
 fi
 
 # ==================================
-# 测试12: 记录成功重置状态
+# 测试11: 记录成功重置状态
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试12: 记录成功 - 重置连续失败${NC}"
-RESULT12=$(curl -s -X POST "$BASE_URL/success?callerId=service-order&targetApi=http://payment-service/api/pay")
+echo -e "${YELLOW}🧪 测试11: 记录成功 - 重置连续失败${NC}"
+RESULT11=$(curl -s -X POST "$BASE_URL/success?callerId=service-order&targetApi=http://payment-service/api/pay")
 
-if echo "$RESULT12" | grep -q "success"; then
+if echo "$RESULT11" | grep -q "success"; then
     echo -e "${GREEN}✅ 成功记录已写入${NC}"
 fi
 
 # ==================================
-# 测试13: 查询历史记录
+# 测试12: 查询历史记录
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试13: 查询失败历史记录${NC}"
+echo -e "${YELLOW}🧪 测试12: 查询失败历史记录${NC}"
 HISTORY=$(curl -s "$BASE_URL/history?callerId=service-order&targetApi=http://payment-service/api/pay&page=0&size=20")
 HISTORY_COUNT=$(echo "$HISTORY" | grep -o '"failureType"' | wc -l)
 echo -e "   历史记录数: $HISTORY_COUNT"
@@ -265,10 +265,10 @@ else
 fi
 
 # ==================================
-# 测试14: 导出CSV
+# 测试13: 导出CSV
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试14: 导出CSV格式${NC}"
+echo -e "${YELLOW}🧪 测试13: 导出CSV格式${NC}"
 CSV_CONTENT=$(curl -s "$BASE_URL/export/csv?callerId=service-order&targetApi=http://payment-service/api/pay")
 
 if echo "$CSV_CONTENT" | grep -q "idempotentKey"; then
@@ -279,10 +279,10 @@ else
 fi
 
 # ==================================
-# 测试15: 导出JSON
+# 测试14: 导出JSON
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试15: 导出JSON格式${NC}"
+echo -e "${YELLOW}🧪 测试14: 导出JSON格式${NC}"
 JSON_CONTENT=$(curl -s "$BASE_URL/export/json?callerId=service-order&targetApi=http://payment-service/api/pay")
 
 if echo "$JSON_CONTENT" | grep -q "failureHistory"; then
@@ -292,10 +292,10 @@ else
 fi
 
 # ==================================
-# 测试16: 导出数据一致性验证
+# 测试15: 导出数据一致性验证
 # ==================================
 echo ""
-echo -e "${YELLOW}🧪 测试16: 导出数据一致性验证${NC}"
+echo -e "${YELLOW}🧪 测试15: 导出数据一致性验证${NC}"
 EXPORTED_HISTORY=$(echo "$JSON_CONTENT" | grep -o '"failureType"' | wc -l)
 if [ "$EXPORTED_HISTORY" -eq "$HISTORY_COUNT" ]; then
     echo -e "${GREEN}✅ 数据一致性验证通过 - 导出与查询结果一致${NC}"
@@ -328,10 +328,10 @@ echo -e "  ✅ 导出数据与查询数据一致"
 echo ""
 echo -e "${YELLOW}验证详细数据:"
 echo "  - 总预算: 5"
-echo "  - 已使用: $USED_10"
+echo "  - 已使用: $USED_9"
 echo "  - 历史记录: $HISTORY_COUNT 条"
-echo "  - 耗尽时allowed: $ALLOWED_10"
-echo "  - 耗尽后拦截allowed: $ALLOWED_11"
+echo "  - 耗尽时allowed: $ALLOWED_9"
+echo "  - 耗尽后拦截allowed: $ALLOWED_10"
 echo ""
 echo -e "${BLUE}核心一致性保证:${NC}"
 echo "  1. 历史记录中 budgetConsumed=true → 允许重试"
