@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL字段权限审计</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div id="app">
+        <div class="container mx-auto px-4 py-8">
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800">GraphQL字段权限审计</h1>
+                <p class="text-gray-600 mt-2">角色规则到权限矩阵的处理链可视化</p>
+            </header>
+
+            <div class="mb-6 flex gap-4">
+                <button @click="initDemo" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    初始化演示数据
+                </button>
+                <button @click="exportData" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    导出数据
+                </button>
+                <button @click="recalculateMatrix" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    重新计算矩阵
+                </button>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-3">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="font-semibold text-lg mb-4">导航</h3>
+                        <nav class="space-y-2">
+                            <button v-for="tab in tabs" :key="tab.id"
+                                @click="currentTab = tab.id"
+                                :class="['w-full text-left px-3 py-2 rounded transition', 
+                                    currentTab === tab.id ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100']">
+                                {{ tab.name }}
+                            </button>
+                        </nav>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow p-4 mt-4">
+                        <h3 class="font-semibold text-lg mb-4">选择角色查看处理链</h3>
+                        <select v-model="selectedRole" @change="loadProcessingChain" 
+                            class="w-full border rounded px-3 py-2">
+                            <option value="">选择角色</option>
+                            <option v-for="rule in roleRules" :key="rule.id" :value="rule.role_name">
+                                {{ rule.role_name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-span-9">
+                    <div v-if="currentTab === 'role-rules'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">角色规则</h2>
+                        <div class="mb-4 p-4 border rounded bg-gray-50">
+                            <h4 class="font-medium mb-2">新增角色规则</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input v-model="newRole.name" placeholder="角色名称" 
+                                    class="border rounded px-3 py-2">
+                                <input v-model="newRole.rules" placeholder="规则 (JSON格式)" 
+                                    class="border rounded px-3 py-2">
+                            </div>
+                            <button @click="addRoleRule" 
+                                class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                添加
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            <div v-for="rule in roleRules" :key="rule.id" 
+                                class="border rounded p-4 hover:shadow-md transition">
+                                <div class="font-medium text-lg">{{ rule.role_name }}</div>
+                                <pre class="text-sm text-gray-600 mt-2 bg-gray-50 p-2 rounded">{{ JSON.stringify(rule.rules, null, 2) }}</pre>
+                                <div class="text-xs text-gray-400 mt-2">{{ rule.created_at }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentTab === 'field-paths'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">字段路径</h2>
+                        <div class="mb-4 p-4 border rounded bg-gray-50">
+                            <h4 class="font-medium mb-2">新增字段路径</h4>
+                            <div class="grid grid-cols-3 gap-4">
+                                <input v-model="newField.path" placeholder="路径" class="border rounded px-3 py-2">
+                                <input v-model="newField.description" placeholder="描述" class="border rounded px-3 py-2">
+                                <input v-model="newField.type" placeholder="类型" class="border rounded px-3 py-2">
+                            </div>
+                            <button @click="addFieldPath" 
+                                class="mt-3 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                                添加
+                            </button>
+                        </div>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b">
+                                    <th class="text-left py-2">路径</th>
+                                    <th class="text-left py-2">描述</th>
+                                    <th class="text-left py-2">类型</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="field in fieldPaths" :key="field.id" class="border-b hover:bg-gray-50">
+                                    <td class="py-2 font-mono text-sm">{{ field.path }}</td>
+                                    <td class="py-2">{{ field.description }}</td>
+                                    <td class="py-2"><span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-sm">{{ field.type }}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="currentTab === 'query-examples'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">查询样例</h2>
+                        <div class="space-y-4">
+                            <div v-for="example in queryExamples" :key="example.id" 
+                                class="border rounded p-4 hover:shadow-md transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="font-medium">{{ example.name }}</div>
+                                        <div class="text-sm text-gray-500">角色: {{ example.role }}</div>
+                                    </div>
+                                    <span :class="['px-2 py-1 rounded text-sm', 
+                                        example.expected_result === '允许' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700']">
+                                        {{ example.expected_result }}
+                                    </span>
+                                </div>
+                                <pre class="mt-3 text-sm bg-gray-800 text-green-400 p-3 rounded">{{ example.query }}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentTab === 'intercept-records'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">越权拦截记录</h2>
+                        <div class="space-y-3">
+                            <div v-for="record in interceptRecords" :key="record.id" 
+                                class="border rounded p-4 hover:shadow-md transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="font-mono text-sm">{{ record.field_path }}</div>
+                                        <div class="text-sm text-gray-500">角色: {{ record.role }}</div>
+                                    </div>
+                                    <span :class="['px-2 py-1 rounded text-sm', getStatusClass(record.status)]">
+                                        {{ record.status }}
+                                    </span>
+                                </div>
+                                <div class="text-sm text-gray-600 mt-2">原因: {{ record.reason }}</div>
+                                <div class="text-xs text-gray-400 mt-2">{{ record.timestamp }}</div>
+                                <div class="mt-3 flex gap-2">
+                                    <button @click="approveIntercept(record.id, 'approved')" 
+                                        class="text-sm bg-green-100 text-green-700 px-3 py-1 rounded hover:bg-green-200">
+                                        批准
+                                    </button>
+                                    <button @click="approveIntercept(record.id, 'rejected')" 
+                                        class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200">
+                                        拒绝
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentTab === 'approval-records'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">审批记录</h2>
+                        <div class="space-y-3">
+                            <div v-for="record in approvalRecords" :key="record.id" 
+                                class="border rounded p-4 hover:shadow-md transition">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="font-medium">{{ record.approver }}</div>
+                                        <div class="text-sm text-gray-500">拦截ID: {{ record.intercept_id.slice(0, 8) }}...</div>
+                                    </div>
+                                    <span :class="['px-2 py-1 rounded text-sm', 
+                                        record.decision === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700']">
+                                        {{ record.decision === 'approved' ? '已批准' : '已拒绝' }}
+                                    </span>
+                                </div>
+                                <div class="text-sm text-gray-600 mt-2">备注: {{ record.comment }}</div>
+                                <div class="text-xs text-gray-400 mt-2">{{ record.timestamp }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="currentTab === 'permission-matrix'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">权限矩阵</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b bg-gray-50">
+                                        <th class="text-left py-2 px-3">角色</th>
+                                        <th class="text-left py-2 px-3">字段路径</th>
+                                        <th class="text-left py-2 px-3">权限</th>
+                                        <th class="text-left py-2 px-3">来源</th>
+                                        <th class="text-left py-2 px-3">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="item in permissionMatrix" :key="item.id" class="border-b hover:bg-gray-50">
+                                        <td class="py-2 px-3">{{ item.role }}</td>
+                                        <td class="py-2 px-3 font-mono">{{ item.field_path }}</td>
+                                        <td class="py-2 px-3">
+                                            <select v-model="item.tempPermission" @change="updateManualPermission(item)"
+                                                :class="['rounded px-2 py-1 text-sm', getPermissionClass(item.permission)]">
+                                                <option value="read">read</option>
+                                                <option value="write">write</option>
+                                                <option value="deny">deny</option>
+                                            </select>
+                                        </td>
+                                        <td class="py-2 px-3">
+                                            <span :class="['px-2 py-1 rounded text-xs', 
+                                                item.source === 'manual' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700']">
+                                                {{ item.source }}
+                                            </span>
+                                        </td>
+                                        <td class="py-2 px-3">
+                                            <button @click="resetToRule(item)" 
+                                                class="text-xs text-blue-600 hover:text-blue-800">
+                                                重置为规则
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div v-if="currentTab === 'processing-chain'" class="bg-white rounded-lg shadow p-6">
+                        <h2 class="text-xl font-semibold mb-4">处理链可视化</h2>
+                        <div v-if="processingChain.steps && processingChain.steps.length > 0">
+                            <div class="mb-4 p-4 bg-blue-50 rounded">
+                                <h3 class="font-medium text-blue-800">角色: {{ processingChain.role }}</h3>
+                                <pre class="text-sm text-blue-600 mt-2">{{ JSON.stringify(processingChain.rules, null, 2) }}</pre>
+                            </div>
+                            <div class="space-y-4">
+                                <div v-for="step in processingChain.steps" :key="step.field" 
+                                    class="border rounded p-4">
+                                    <div class="font-medium mb-3">{{ step.field }}</div>
+                                    <div class="space-y-2 ml-4">
+                                        <div v-for="(check, idx) in step.checks" :key="idx" 
+                                            class="flex items-center gap-3">
+                                            <span :class="['w-4 h-4 rounded-full flex-shrink-0', 
+                                                check.match ? 'bg-green-500' : 'bg-gray-300']"></span>
+                                            <span class="font-mono text-sm">{{ check.rule }}</span>
+                                            <span v-if="check.match" class="text-green-600 text-sm">← 匹配</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t">
+                                        <span class="text-sm text-gray-500">结果权限: </span>
+                                        <span :class="['font-medium px-2 py-1 rounded', 
+                                            getPermissionClass(step.permission)]">
+                                            {{ step.permission }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-else class="text-gray-500 text-center py-8">
+                            请选择一个角色查看处理链
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive, onMounted } = Vue
+
+        createApp({
+            setup() {
+                const API_BASE = 'http://localhost:8000/api'
+                
+                const currentTab = ref('role-rules')
+                const selectedRole = ref('')
+                const tabs = [
+                    { id: 'role-rules', name: '角色规则' },
+                    { id: 'field-paths', name: '字段路径' },
+                    { id: 'query-examples', name: '查询样例' },
+                    { id: 'intercept-records', name: '越权拦截' },
+                    { id: 'approval-records', name: '审批记录' },
+                    { id: 'permission-matrix', name: '权限矩阵' },
+                    { id: 'processing-chain', name: '处理链' }
+                ]
+
+                const roleRules = ref([])
+                const fieldPaths = ref([])
+                const queryExamples = ref([])
+                const interceptRecords = ref([])
+                const approvalRecords = ref([])
+                const permissionMatrix = ref([])
+                const processingChain = reactive({ steps: [], rules: {}, role: '' })
+
+                const newRole = reactive({ name: '', rules: '' })
+                const newField = reactive({ path: '', description: '', type: '' })
+
+                const getStatusClass = (status) => {
+                    if (status === 'approved') return 'bg-green-100 text-green-700'
+                    if (status === 'rejected') return 'bg-red-100 text-red-700'
+                    return 'bg-yellow-100 text-yellow-700'
+                }
+
+                const getPermissionClass = (perm) => {
+                    if (perm === 'read') return 'bg-green-100 text-green-700'
+                    if (perm === 'write') return 'bg-blue-100 text-blue-700'
+                    return 'bg-red-100 text-red-700'
+                }
+
+                const loadAllData = async () => {
+                    await Promise.all([
+                        loadRoleRules(),
+                        loadFieldPaths(),
+                        loadQueryExamples(),
+                        loadInterceptRecords(),
+                        loadApprovalRecords(),
+                        loadPermissionMatrix()
+                    ])
+                }
+
+                const loadRoleRules = async () => {
+                    const res = await fetch(`${API_BASE}/role-rules`)
+                    roleRules.value = await res.json()
+                }
+
+                const loadFieldPaths = async () => {
+                    const res = await fetch(`${API_BASE}/field-paths`)
+                    fieldPaths.value = await res.json()
+                }
+
+                const loadQueryExamples = async () => {
+                    const res = await fetch(`${API_BASE}/query-examples`)
+                    queryExamples.value = await res.json()
+                }
+
+                const loadInterceptRecords = async () => {
+                    const res = await fetch(`${API_BASE}/intercept-records`)
+                    interceptRecords.value = await res.json()
+                }
+
+                const loadApprovalRecords = async () => {
+                    const res = await fetch(`${API_BASE}/approval-records`)
+                    approvalRecords.value = await res.json()
+                }
+
+                const loadPermissionMatrix = async () => {
+                    const res = await fetch(`${API_BASE}/permission-matrix`)
+                    permissionMatrix.value = await res.json()
+                    permissionMatrix.value.forEach(item => {
+                        item.tempPermission = item.permission
+                    })
+                }
+
+                const initDemo = async () => {
+                    await fetch(`${API_BASE}/demo/init`, { method: 'POST' })
+                    await loadAllData()
+                    alert('演示数据初始化成功')
+                }
+
+                const addRoleRule = async () => {
+                    try {
+                        const rules = JSON.parse(newRole.rules)
+                        await fetch(`${API_BASE}/role-rules`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ role_name: newRole.name, rules })
+                        })
+                        await loadAllData()
+                        newRole.name = ''
+                        newRole.rules = ''
+                    } catch (e) {
+                        alert('JSON格式错误')
+                    }
+                }
+
+                const addFieldPath = async () => {
+                    await fetch(`${API_BASE}/field-paths`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newField)
+                    })
+                    await loadAllData()
+                    newField.path = ''
+                    newField.description = ''
+                    newField.type = ''
+                }
+
+                const approveIntercept = async (id, decision) => {
+                    await fetch(`${API_BASE}/approval-records`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            intercept_id: id,
+                            approver: '当前用户',
+                            decision,
+                            comment: decision === 'approved' ? '批准通过' : '拒绝'
+                        })
+                    })
+                    await loadInterceptRecords()
+                    await loadApprovalRecords()
+                }
+
+                const updateManualPermission = async (item) => {
+                    await fetch(`${API_BASE}/permission-matrix/manual-update?role=${encodeURIComponent(item.role)}&field_path=${encodeURIComponent(item.field_path)}&permission=${item.tempPermission}`, {
+                        method: 'POST'
+                    })
+                    await loadPermissionMatrix()
+                }
+
+                const resetToRule = async (item) => {
+                    await recalculateMatrix()
+                }
+
+                const recalculateMatrix = async () => {
+                    await fetch(`${API_BASE}/permission-matrix/recalculate`, { method: 'POST' })
+                    await loadPermissionMatrix()
+                }
+
+                const exportData = async () => {
+                    const res = await fetch(`${API_BASE}/export`)
+                    const data = await res.json()
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `permission-audit-export-${Date.now()}.json`
+                    a.click()
+                }
+
+                const loadProcessingChain = async () => {
+                    if (!selectedRole.value) {
+                        processingChain.steps = []
+                        processingChain.rules = {}
+                        processingChain.role = ''
+                        return
+                    }
+                    const res = await fetch(`${API_BASE}/processing-chain/${encodeURIComponent(selectedRole.value)}`)
+                    const data = await res.json()
+                    processingChain.role = data.role
+                    processingChain.rules = data.rules
+                    processingChain.steps = data.steps
+                }
+
+                onMounted(() => {
+                    loadAllData()
+                })
+
+                return {
+                    currentTab,
+                    selectedRole,
+                    tabs,
+                    roleRules,
+                    fieldPaths,
+                    queryExamples,
+                    interceptRecords,
+                    approvalRecords,
+                    permissionMatrix,
+                    processingChain,
+                    newRole,
+                    newField,
+                    getStatusClass,
+                    getPermissionClass,
+                    initDemo,
+                    addRoleRule,
+                    addFieldPath,
+                    approveIntercept,
+                    updateManualPermission,
+                    resetToRule,
+                    recalculateMatrix,
+                    exportData,
+                    loadProcessingChain
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
