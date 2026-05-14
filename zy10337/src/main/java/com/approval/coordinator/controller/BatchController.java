@@ -8,7 +8,7 @@ import com.approval.coordinator.model.entity.TimelineEvent;
 import com.approval.coordinator.service.BatchService;
 import com.approval.coordinator.service.ReceiptService;
 import com.approval.coordinator.service.TimelineService;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;

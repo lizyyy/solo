@@ -1,7 +1,7 @@
 package com.approval.coordinator.model.entity;
 
 import com.approval.coordinator.model.enums.ItemStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

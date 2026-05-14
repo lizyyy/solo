@@ -15,11 +15,11 @@
 
 ## 🏗️ 技术栈
 
-- **框架**: Spring Boot 3.2
+- **框架**: Spring Boot 2.7.18 (兼容 Java 8)
 - **数据库**: H2 (内存数据库，生产环境可替换为MySQL)
 - **ORM**: Spring Data JPA
-- **数据校验**: Jakarta Validation
-- **构建工具**: Maven
+- **数据校验**: Javax Validation
+- **构建工具**: Maven (内置 Wrapper)
 
 ## 🚀 快速开始
 
@@ -148,6 +148,26 @@ PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED
 1. **创建批次时**: 检查 batchId 是否已存在，存在则返回错误
 2. **创建单据时**: 检查 idempotentKey 是否已存在，数据库唯一索引双重保证
 3. **重复提交保护**: 相同 batchId 或 idempotentKey 的请求会被拒绝
+4. **重复回调保护**: 已处于 SUCCESS/FAILED 终态的单据，重复回调会被自动跳过，不会重复计数
+5. **重放状态修正**: 重放成功会自动扣减旧失败计数，重放失败会自动扣减旧成功计数，保证统计准确
+
+## 🐛 核心规则修复说明
+
+### 1. 重复回调不产生脏结果
+- **问题**: 同一单据重复回调会重复累加成功/失败计数
+- **修复**: 检测到单据已处于 SUCCESS/FAILED 终态时自动跳过，新增 `skippedCount` 统计字段
+
+### 2. 重放后状态计数准确
+- **问题**: 失败单据重放成功后，失败计数不会扣减，导致批次状态和回执汇总失真
+- **修复**: 
+  - 重放成功: 自动扣减 `failedCount`
+  - 重放失败: 自动扣减 `successCount`（罕见场景）
+  - 添加边界保护，防止计数变为负数
+
+### 3. 重放状态过滤
+- 仅允许 FAILED 和 REPLAYING 状态的单据被重放
+- 成功单据的重放请求会被跳过并记录 warning
+- 避免状态流转混乱
 
 ## 📝 问题排查报告
 
