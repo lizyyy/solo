@@ -242,11 +242,11 @@ curl -X POST http://localhost:8080/api/evidence/create \
 
 ### 方式一：Swagger UI
 
-访问 http://localhost:8080/api/swagger-ui.html，在浏览器中直接测试接口。
+访问 http://localhost:8080/swagger-ui.html，在浏览器中直接测试接口。
 
 ### 方式二：H2 控制台
 
-访问 http://localhost:8080/api/h2-console，登录后执行 SQL：
+访问 http://localhost:8080/h2-console，登录后执行 SQL：
 
 ```sql
 -- 查询所有证据链

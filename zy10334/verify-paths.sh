@@ -42,12 +42,45 @@ else
 fi
 echo ""
 
-# 检查 start.sh 提示
-echo "4. 检查 start.sh 提示信息..."
+# 检查 start.sh 提示信息...
+echo "   检查 start.sh..."
 if grep -q "http://localhost:8080/swagger-ui.html" "$PROJECT_DIR/start.sh"; then
-    echo "   ✓ start.sh Swagger URL 正确"
+    echo "      ✓ start.sh Swagger URL 正确"
 else
-    echo "   ! start.sh Swagger URL 未找到"
+    echo "      ✗ start.sh Swagger URL 不正确"
+fi
+if grep -q "http://localhost:8080/h2-console" "$PROJECT_DIR/start.sh"; then
+    echo "      ✓ start.sh H2 控制台 URL 正确"
+else
+    echo "      ✗ start.sh H2 控制台 URL 不正确"
+fi
+echo ""
+
+# 检查 README.md 控制台路径
+echo "   检查 README.md 控制台路径..."
+if grep -q "http://localhost:8080/swagger-ui.html" "$PROJECT_DIR/README.md"; then
+    echo "      ✓ README.md Swagger URL 正确"
+else
+    echo "      ✗ README.md Swagger URL 不正确"
+fi
+if grep -q "http://localhost:8080/h2-console" "$PROJECT_DIR/README.md"; then
+    echo "      ✓ README.md H2 控制台 URL 正确"
+else
+    echo "      ✗ README.md H2 控制台 URL 不正确"
+fi
+echo ""
+
+# 检查 test-api.sh
+echo "   检查 test-api.sh Python 兼容性..."
+if grep -q "format_json()" "$PROJECT_DIR/test-api.sh"; then
+    echo "      ✓ test-api.sh 使用了安全的 JSON 格式化函数"
+else
+    echo "      ! test-api.sh 未使用 format_json 函数"
+fi
+if grep -q "python3" "$PROJECT_DIR/test-api.sh"; then
+    echo "      ✓ test-api.sh 优先使用 python3"
+else
+    echo "      ! test-api.sh 未优先使用 python3"
 fi
 echo ""
 
