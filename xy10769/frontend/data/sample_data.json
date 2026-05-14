@@ -1,0 +1,253 @@
+{
+  "batches": [
+    {
+      "id": "batch_001",
+      "name": "电商商品数据-2024-01",
+      "source": "京东爬虫",
+      "created_at": "2024-01-15 10:30:00",
+      "status": "merged",
+      "total_records": 5,
+      "conflicts": 2,
+      "duplicates": 3
+    },
+    {
+      "id": "batch_002",
+      "name": "电商商品数据-2024-02",
+      "source": "淘宝爬虫",
+      "created_at": "2024-02-20 14:20:00",
+      "status": "processing",
+      "total_records": 4,
+      "conflicts": 1,
+      "duplicates": 2
+    }
+  ],
+  "raw_records": [
+    {
+      "id": "rec_001",
+      "batch_id": "batch_001",
+      "product_name": "iPhone 15 Pro Max 256GB 钛金属",
+      "price": 9999,
+      "brand": "Apple",
+      "category": "手机",
+      "source": "jd.com",
+      "confidence": 0.95,
+      "fingerprint": "hash_iphone15_001",
+      "status": "merged",
+      "created_at": "2024-01-15 10:30:00"
+    },
+    {
+      "id": "rec_002",
+      "batch_id": "batch_001",
+      "product_name": "iPhone15 ProMax 256G 钛金色",
+      "price": 9899,
+      "brand": "苹果",
+      "category": "智能手机",
+      "source": "taobao.com",
+      "confidence": 0.88,
+      "fingerprint": "hash_iphone15_001",
+      "status": "duplicate",
+      "created_at": "2024-01-15 10:31:00"
+    },
+    {
+      "id": "rec_003",
+      "batch_id": "batch_001",
+      "product_name": "华为 Mate 60 Pro 12GB+512GB",
+      "price": 6999,
+      "brand": "华为",
+      "category": "手机",
+      "source": "jd.com",
+      "confidence": 0.92,
+      "fingerprint": "hash_mate60_001",
+      "status": "conflict",
+      "created_at": "2024-01-15 10:32:00"
+    },
+    {
+      "id": "rec_004",
+      "batch_id": "batch_001",
+      "product_name": "HUAWEI Mate60 Pro 卫星通话版",
+      "price": 7299,
+      "brand": "HUAWEI",
+      "category": "旗舰手机",
+      "source": "vmall.com",
+      "confidence": 0.98,
+      "fingerprint": "hash_mate60_001",
+      "status": "conflict",
+      "created_at": "2024-01-15 10:33:00"
+    },
+    {
+      "id": "rec_005",
+      "batch_id": "batch_001",
+      "product_name": "小米14 骁龙8Gen3 16GB+1TB",
+      "price": 4999,
+      "brand": "小米",
+      "category": "手机",
+      "source": "mi.com",
+      "confidence": 0.90,
+      "fingerprint": "hash_mi14_001",
+      "status": "merged",
+      "created_at": "2024-01-15 10:34:00"
+    },
+    {
+      "id": "rec_006",
+      "batch_id": "batch_002",
+      "product_name": "MacBook Pro 14寸 M3 Pro",
+      "price": 14999,
+      "brand": "Apple",
+      "category": "笔记本",
+      "source": "jd.com",
+      "confidence": 0.94,
+      "fingerprint": "hash_macbook_001",
+      "status": "pending",
+      "created_at": "2024-02-20 14:20:00"
+    },
+    {
+      "id": "rec_007",
+      "batch_id": "batch_002",
+      "product_name": "MacBookPro14 M3Pro 18GB",
+      "price": 15299,
+      "brand": "苹果",
+      "category": "笔记本电脑",
+      "source": "taobao.com",
+      "confidence": 0.85,
+      "fingerprint": "hash_macbook_001",
+      "status": "pending",
+      "created_at": "2024-02-20 14:21:00"
+    },
+    {
+      "id": "rec_008",
+      "batch_id": "batch_002",
+      "product_name": "iPad Pro 12.9 M2 256GB",
+      "price": 8999,
+      "brand": "Apple",
+      "category": "平板",
+      "source": "jd.com",
+      "confidence": 0.91,
+      "fingerprint": "hash_ipad_001",
+      "status": "pending",
+      "created_at": "2024-02-20 14:22:00"
+    },
+    {
+      "id": "rec_009",
+      "batch_id": "batch_002",
+      "product_name": "iPadPro 12.9英寸 M2芯片",
+      "price": null,
+      "brand": "",
+      "category": "平板电脑",
+      "source": "unknown",
+      "confidence": 0.50,
+      "fingerprint": "hash_ipad_001",
+      "status": "error",
+      "created_at": "2024-02-20 14:23:00"
+    }
+  ],
+  "fingerprint_rules": [
+    {
+      "id": "rule_001",
+      "name": "商品名称模糊匹配",
+      "description": "基于商品名称的分词和相似度计算",
+      "fields": ["product_name"],
+      "algorithm": "fuzzy_match",
+      "threshold": 0.85,
+      "enabled": true
+    },
+    {
+      "id": "rule_002",
+      "name": "品牌+型号组合",
+      "description": "品牌名称标准化后与型号组合生成指纹",
+      "fields": ["brand", "product_name"],
+      "algorithm": "brand_model_hash",
+      "threshold": 0.90,
+      "enabled": true
+    },
+    {
+      "id": "rule_003",
+      "name": "SKU精确匹配",
+      "description": "如果有SKU字段则精确匹配",
+      "fields": ["sku"],
+      "algorithm": "exact_match",
+      "threshold": 1.0,
+      "enabled": false
+    }
+  ],
+  "merge_reports": [
+    {
+      "id": "report_001",
+      "batch_id": "batch_001",
+      "created_at": "2024-01-15 11:00:00",
+      "summary": {
+        "total_input": 5,
+        "merged_records": 3,
+        "duplicates_removed": 2,
+        "conflicts_resolved": 2,
+        "errors_found": 0
+      },
+      "confidence_weights": {
+        "jd.com": 0.95,
+        "vmall.com": 0.98,
+        "taobao.com": 0.88,
+        "mi.com": 0.90
+      },
+      "merged_data": [
+        {
+          "fingerprint": "hash_iphone15_001",
+          "final_product_name": "iPhone 15 Pro Max 256GB 钛金属",
+          "final_price": 9999,
+          "final_brand": "Apple",
+          "final_category": "手机",
+          "source_count": 2,
+          "primary_source": "jd.com",
+          "confidence": 0.95,
+          "field_conflicts": [
+            {
+              "field": "price",
+              "values": [9999, 9899],
+              "sources": ["jd.com", "taobao.com"],
+              "resolution": "取高可信度来源(jd.com)"
+            },
+            {
+              "field": "brand",
+              "values": ["Apple", "苹果"],
+              "sources": ["jd.com", "taobao.com"],
+              "resolution": "标准化为英文品牌名"
+            }
+          ]
+        },
+        {
+          "fingerprint": "hash_mate60_001",
+          "final_product_name": "华为 Mate 60 Pro 12GB+512GB 卫星通话版",
+          "final_price": 7299,
+          "final_brand": "华为",
+          "final_category": "手机",
+          "source_count": 2,
+          "primary_source": "vmall.com",
+          "confidence": 0.98,
+          "field_conflicts": [
+            {
+              "field": "price",
+              "values": [6999, 7299],
+              "sources": ["jd.com", "vmall.com"],
+              "resolution": "取高可信度来源(vmall.com)的高配版价格"
+            },
+            {
+              "field": "product_name",
+              "values": ["华为 Mate 60 Pro 12GB+512GB", "HUAWEI Mate60 Pro 卫星通话版"],
+              "sources": ["jd.com", "vmall.com"],
+              "resolution": "合并补充特性信息"
+            }
+          ]
+        },
+        {
+          "fingerprint": "hash_mi14_001",
+          "final_product_name": "小米14 骁龙8Gen3 16GB+1TB",
+          "final_price": 4999,
+          "final_brand": "小米",
+          "final_category": "手机",
+          "source_count": 1,
+          "primary_source": "mi.com",
+          "confidence": 0.90,
+          "field_conflicts": []
+        }
+      ]
+    }
+  ]
+}

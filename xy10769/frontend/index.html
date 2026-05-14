@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爬虫数据去重合并系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 爬虫数据去重合并系统</h1>
+            <p>面向交付同学的数据清洗、冲突解决、结果分析全流程工具</p>
+        </div>
+
+        <div id="mainContent">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-view="batches">📦 采集批次</button>
+                <button class="nav-tab" data-view="rules">⚙️ 指纹规则</button>
+            </div>
+
+            <div id="batchesView" class="tab-content active">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>批次列表</h2>
+                        <button class="btn btn-primary" id="createBatchBtn">
+                            + 新建批次
+                        </button>
+                    </div>
+                    <div id="batchesList"></div>
+                </div>
+            </div>
+
+            <div id="rulesView" class="tab-content">
+                <div class="card">
+                    <h2>指纹匹配规则</h2>
+                    <div id="rulesList"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="batchDetailView" style="display: none;">
+            <div class="breadcrumb">
+                <a onclick="goBack()">&larr; 返回列表</a>
+                <span class="separator">/</span>
+                <span class="current" id="detailBatchName"></span>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 id="detailBatchName"></h2>
+                        <p style="color: #718096; margin-top: 8px;">
+                            来源: <span id="detailBatchSource"></span> | 
+                            状态: <span id="detailBatchStatus"></span>
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-warning" id="importRecordsBtn">批量导入</button>
+                        <button class="btn btn-primary" id="processBatchBtn">开始处理</button>
+                        <button class="btn btn-success" id="resolveConflictsBtn" style="display: none;">解决冲突</button>
+                        <button class="btn btn-danger" id="rollbackBtn" style="display: none;">回滚</button>
+                        <button class="btn btn-primary" id="viewReportBtn" style="display: none;" onclick="viewReport()">查看报告</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value" id="statTotal">0</div>
+                    <div class="label">总记录数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statConflicts">0</div>
+                    <div class="label">冲突数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statDuplicates">0</div>
+                    <div class="label">重复数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" id="statMerged">0</div>
+                    <div class="label">已合并</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📋 原始记录</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品名称</th>
+                            <th>价格</th>
+                            <th>品牌</th>
+                            <th>分类</th>
+                            <th>来源</th>
+                            <th>可信度</th>
+                            <th>状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsTableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="conflictsSection" class="card" style="display: none;">
+                <h3>⚠️ 冲突处理</h3>
+                <div id="conflictsContainer"></div>
+            </div>
+
+            <div id="errorsSection" class="card" style="display: none;">
+                <h3>❌ 错误明细</h3>
+                <div id="errorsContainer"></div>
+            </div>
+
+            <div id="reportSection" class="card" style="display: none;">
+                <h3>📊 合并报告</h3>
+                <div id="reportContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createBatchModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建采集批次</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>批次名称</label>
+                <input type="text" id="batchName" placeholder="例如：电商数据-2024-01">
+            </div>
+            <div class="form-group">
+                <label>数据来源</label>
+                <select id="batchSource">
+                    <option value="jd.com">京东</option>
+                    <option value="taobao.com">淘宝</option>
+                    <option value="tmall.com">天猫</option>
+                    <option value="vmall.com">华为商城</option>
+                    <option value="mi.com">小米商城</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="submitBatchBtn" style="width: 100%;">创建批次</button>
+        </div>
+    </div>
+
+    <div class="modal" id="importRecordsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入数据</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>导入记录数量</label>
+                <input type="number" id="recordCount" value="3" min="1" max="20">
+            </div>
+            <div style="background: #f7fafc; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; color: #718096;">
+                💡 提示：系统将导入预设的样例数据，包含重复、冲突、脏数据用于演示
+            </div>
+            <button class="btn btn-primary" id="submitImportBtn" style="width: 100%;">开始导入</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
