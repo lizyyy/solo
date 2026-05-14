@@ -509,13 +509,14 @@ describe('Shift Settlement Service Tests', () => {
         teamName: '早班A组',
         startTime: shift1Start,
       });
-      productionService.addProduction({
+      const prod1 = productionService.addProduction({
         shiftId: shift1.id,
         productId: 'product1',
         productName: '产品A',
         quantity: 100,
         createdBy: 'user1',
       });
+      productionService.confirmProduction(prod1.id);
       shiftService.endShift(shift1.id, shift1End);
 
       const shift2 = shiftService.startShift({
@@ -524,17 +525,15 @@ describe('Shift Settlement Service Tests', () => {
         teamName: '中班B组',
         startTime: shift2Start,
       });
-      productionService.addProduction({
+      const prod2 = productionService.addProduction({
         shiftId: shift2.id,
         productId: 'product1',
         productName: '产品A',
         quantity: 150,
         createdBy: 'user2',
       });
+      productionService.confirmProduction(prod2.id);
       shiftService.endShift(shift2.id, shift2End);
-
-      snapshotService.createSnapshot(shift1.id);
-      snapshotService.createSnapshot(shift2.id);
 
       const report = handoverService.generateDailyReport('2026-05-09', 'line1');
 
@@ -703,6 +702,84 @@ describe('Shift Settlement Service Tests', () => {
       expect(status3.status).toBe('revised');
       expect(status3.isRevised).toBe(true);
       expect(status3.lastRevisedAt).toBeDefined();
+    });
+  });
+
+  describe('用户场景回归测试', () => {
+    it('修正产量后日报应反映最新数据（用户场景：100+50修正为100+80=180）', () => {
+      const shiftStart = new Date('2026-05-09T08:00:00');
+      const shiftEnd = new Date('2026-05-09T16:00:00');
+
+      const shift = shiftService.startShift({
+        lineId: 'line1',
+        teamId: 'team1',
+        teamName: '早班A组',
+        startTime: shiftStart,
+      });
+
+      const prod1 = productionService.addProduction({
+        shiftId: shift.id,
+        productId: 'product1',
+        productName: '产品A',
+        quantity: 100,
+        createdBy: 'user1',
+        timestamp: new Date('2026-05-09T10:00:00'),
+      });
+      productionService.confirmProduction(prod1.id);
+
+      const prod2 = productionService.addProduction({
+        shiftId: shift.id,
+        productId: 'product1',
+        productName: '产品A',
+        quantity: 50,
+        createdBy: 'user1',
+        timestamp: new Date('2026-05-09T14:00:00'),
+      });
+      productionService.confirmProduction(prod2.id);
+
+      const waste = productionService.addWaste({
+        shiftId: shift.id,
+        productId: 'product1',
+        productName: '产品A',
+        quantity: 10,
+        reason: '外观缺陷',
+        createdBy: 'user1',
+      });
+      productionService.confirmWaste(waste.id);
+
+      shiftService.endShift(shift.id, shiftEnd);
+
+      const reportBeforeRevision = handoverService.generateDailyReport('2026-05-09', 'line1');
+      expect(reportBeforeRevision.dailyTotal.production).toBe(150);
+      expect(reportBeforeRevision.dailyTotal.netProduction).toBe(140);
+
+      handoverService.confirmHandover(shift.id, {
+        handoverFrom: '张三',
+        handoverTo: '李四',
+      });
+
+      const reportAfterHandover = handoverService.generateDailyReport('2026-05-09', 'line1');
+      expect(reportAfterHandover.dailyTotal.production).toBe(150);
+
+      revisionService.reviseProduction(prod2.id, {
+        revisedBy: 'admin',
+        reason: '发现少统计了30件，应为80件',
+        changes: {
+          quantity: 80 },
+      });
+
+      const reportAfterRevision = handoverService.generateDailyReport('2026-05-09', 'line1');
+      expect(reportAfterRevision.dailyTotal.production).toBe(180);
+      expect(reportAfterRevision.dailyTotal.netProduction).toBe(170);
+
+      const snapshots = snapshotService.getSnapshotHistory(shift.id);
+      expect(snapshots.length).toBeGreaterThanOrEqual(1);
+      expect(snapshots[snapshots.length - 1].productionTotal).toBe(150);
+
+      const revisions = revisionService.getRevisionHistory(prod2.id, 'production');
+      expect(revisions.length).toBe(1);
+      expect(revisions[0].changes.quantity?.from).toBe(50);
+      expect(revisions[0].changes.quantity?.to).toBe(80);
     });
   });
 });

@@ -198,31 +198,14 @@ export class HandoverService {
     });
 
     const shiftReports = dayShifts.map((shift) => {
-      const snapshot = store.getLatestSnapshot(shift.id);
       const shiftDuration = shift.endTime
         ? Math.round(
             (shift.endTime.getTime() - shift.startTime.getTime()) / 60000
           )
         : Math.round((Date.now() - shift.startTime.getTime()) / 60000);
 
-      if (!snapshot) {
-        return {
-          shiftId: shift.id,
-          teamId: shift.teamId,
-          teamName: shift.teamName,
-          startTime: shift.startTime,
-          endTime: shift.endTime || new Date(),
-          productionTotal: 0,
-          wasteTotal: 0,
-          effectiveRate: shiftDuration > 0 ? 100 : 0,
-          netProduction: 0,
-        };
-      }
-
-      const downtimeMinutes = snapshot.downtimeAllocations.reduce(
-        (sum, d) => sum + d.durationMinutes,
-        0
-      );
+      const summary = productionService.calculateShiftSummary(shift.id);
+      const downtime = downtimeService.getShiftDowntime(shift.id);
 
       return {
         shiftId: shift.id,
@@ -230,12 +213,12 @@ export class HandoverService {
         teamName: shift.teamName,
         startTime: shift.startTime,
         endTime: shift.endTime || new Date(),
-        productionTotal: snapshot.productionTotal,
-        wasteTotal: snapshot.wasteTotal,
+        productionTotal: summary.productionTotal,
+        wasteTotal: summary.wasteTotal,
         effectiveRate: shiftDuration > 0
-          ? ((shiftDuration - downtimeMinutes) / shiftDuration) * 100
+          ? ((shiftDuration - downtime.totalMinutes) / shiftDuration) * 100
           : 0,
-        netProduction: snapshot.productionTotal - snapshot.wasteTotal,
+        netProduction: summary.netProduction,
       };
     });
 
