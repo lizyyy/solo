@@ -1,8 +1,9 @@
-import db from '../database';
+import { getDb } from '../database';
 import tireService from './tireService';
 import vehicleService from './vehicleService';
 
 export function createDemoData() {
+  const db = getDb();
   const tireCount = (db.prepare('SELECT COUNT(*) as count FROM tires').get() as any).count;
   if (tireCount > 0) {
     console.log('演示数据已存在，跳过创建');

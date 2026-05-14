@@ -1,14 +1,38 @@
 import Database from 'better-sqlite3';
+import fs from 'fs';
 import path from 'path';
 
-const dbPath = path.join(__dirname, '../data/tire-management.db');
-const db = new Database(dbPath);
+const dataDir = path.join(__dirname, '../data');
+const dbPath = path.join(dataDir, 'tire-management.db');
 
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+let db: Database.Database | null = null;
 
-export function initDatabase() {
-  db.exec(`
+export function ensureDataDir() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+}
+
+export function initDatabaseConnection() {
+  ensureDataDir();
+  if (!db) {
+    db = new Database(dbPath);
+    db.pragma('journal_mode = WAL');
+    db.pragma('foreign_keys = ON');
+  }
+  return db;
+}
+
+export function getDb() {
+  if (!db) {
+    throw new Error('Database not initialized. Call initDatabaseConnection() first.');
+  }
+  return db;
+}
+
+export function initDatabaseTables() {
+  const database = getDb();
+  database.exec(`
     CREATE TABLE IF NOT EXISTS vehicles (
       id TEXT PRIMARY KEY,
       plate_number TEXT UNIQUE NOT NULL,
@@ -70,5 +94,3 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_tire_costs_tire ON tire_costs(tire_id);
   `);
 }
-
-export default db;

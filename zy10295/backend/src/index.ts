@@ -1,16 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import { initDatabase } from './database';
+import { initDatabaseConnection, initDatabaseTables } from './database';
 import { createDemoData } from './services/demoData';
 import tiresRouter from './routes/tires';
 import vehiclesRouter from './routes/vehicles';
-
-const dataDir = path.join(__dirname, '../data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,9 +11,14 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-initDatabase();
+// 初始化数据库连接和表结构
+initDatabaseConnection();
+initDatabaseTables();
+
+// 创建演示数据
 createDemoData();
 
+// 注册路由
 app.use('/api/tires', tiresRouter);
 app.use('/api/vehicles', vehiclesRouter);
 

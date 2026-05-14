@@ -1,6 +1,6 @@
-import db from '../database';
+import { getDb } from '../database';
 import { v4 as uuidv4 } from 'uuid';
-import { TireStatus, EventType, Tire, TireEvent, TireLifecycleDetail } from '../types';
+import { TireStatus, Tire, TireEvent, TireLifecycleDetail } from '../types';
 
 const STATUS_TRANSITIONS: Record<TireStatus, TireStatus[]> = {
   in_stock: ['installed', 'inspecting', 'scrapped'],
@@ -20,14 +20,17 @@ export class TireService {
   }
 
   getTireById(id: string): Tire | undefined {
+    const db = getDb();
     return db.prepare('SELECT * FROM tires WHERE id = ?').get(id) as Tire | undefined;
   }
 
   getTireBySerial(serialNumber: string): Tire | undefined {
+    const db = getDb();
     return db.prepare('SELECT * FROM tires WHERE serial_number = ?').get(serialNumber) as Tire | undefined;
   }
 
   getAllTires(filters?: { status?: TireStatus; vehicle_id?: string }): Tire[] {
+    const db = getDb();
     let query = 'SELECT * FROM tires WHERE 1=1';
     const params: any[] = [];
     
@@ -45,6 +48,7 @@ export class TireService {
   }
 
   createTire(data: { serial_number: string; brand: string; model: string; size: string }): Tire {
+    const db = getDb();
     const existing = this.getTireBySerial(data.serial_number);
     if (existing) {
       throw new Error('轮胎胎号已存在');
@@ -62,6 +66,7 @@ export class TireService {
   }
 
   private createEvent(data: Omit<TireEvent, 'id' | 'created_at'>): string {
+    const db = getDb();
     const id = uuidv4();
     const now = new Date().toISOString();
     
@@ -86,6 +91,7 @@ export class TireService {
   }
 
   private updateTireStatus(tireId: string, status: TireStatus, vehicleId?: string | null) {
+    const db = getDb();
     const now = new Date().toISOString();
     let query = 'UPDATE tires SET current_status = ?, updated_at = ?';
     const params: any[] = [status, now];
@@ -102,6 +108,7 @@ export class TireService {
   }
 
   installTire(tireId: string, vehicleId: string, performedBy?: string, notes?: string): Tire {
+    const db = getDb();
     const tire = this.getTireById(tireId);
     if (!tire) throw new Error('轮胎不存在');
     
@@ -284,6 +291,7 @@ export class TireService {
   }
 
   getTireLifecycle(tireId: string): TireLifecycleDetail {
+    const db = getDb();
     const tire = this.getTireById(tireId);
     if (!tire) throw new Error('轮胎不存在');
 
@@ -307,6 +315,7 @@ export class TireService {
   }
 
   getTireEvents(tireId: string): TireEvent[] {
+    const db = getDb();
     return db.prepare('SELECT * FROM tire_events WHERE tire_id = ? ORDER BY performed_at DESC').all(tireId) as TireEvent[];
   }
 }

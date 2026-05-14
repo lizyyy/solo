@@ -1,22 +1,26 @@
-import db from '../database';
+import { getDb } from '../database';
 import { v4 as uuidv4 } from 'uuid';
 import { Vehicle, Tire, VehicleAvailability } from '../types';
 import tireService from './tireService';
 
 export class VehicleService {
   getVehicleById(id: string): Vehicle | undefined {
+    const db = getDb();
     return db.prepare('SELECT * FROM vehicles WHERE id = ?').get(id) as Vehicle | undefined;
   }
 
   getVehicleByPlate(plateNumber: string): Vehicle | undefined {
+    const db = getDb();
     return db.prepare('SELECT * FROM vehicles WHERE plate_number = ?').get(plateNumber) as Vehicle | undefined;
   }
 
   getAllVehicles(): Vehicle[] {
+    const db = getDb();
     return db.prepare('SELECT * FROM vehicles ORDER BY created_at DESC').all() as Vehicle[];
   }
 
   createVehicle(data: { plate_number: string; model: string; tire_count?: number }): Vehicle {
+    const db = getDb();
     const existing = this.getVehicleByPlate(data.plate_number);
     if (existing) {
       throw new Error('车牌号已存在');
