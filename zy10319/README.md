@@ -69,9 +69,23 @@ GET /api/v1/events/health
 
 ### 环境要求
 - Java 8+
-- Maven 3.6+
 
-### 构建运行
+### 推荐方式：独立版本（无需 Maven）
+
+这是最简单的方式，无需任何构建工具，直接用 JDK 编译运行：
+
+```bash
+# 1. 一键启动服务器
+./start_server.sh
+
+# 2. 新开终端，运行完整测试
+./test_standalone.sh
+```
+
+### Spring Boot 版本（需要 Maven）
+
+如果系统安装了 Maven，可以使用完整的 Spring Boot 版本：
+
 ```bash
 # 编译项目
 mvn clean compile
@@ -83,19 +97,12 @@ mvn clean package -DskipTests
 java -jar target/webhook-sequence-api-1.0.0.jar
 ```
 
-### 使用 Maven Wrapper（如果没有安装 Maven）
-```bash
-# 下载 Maven Wrapper
-mvn wrapper:wrapper
-
-# 使用 wrapper 编译
-./mvnw clean compile
-```
-
 ### 运行测试
 ```bash
-# 启动服务后执行测试脚本
-chmod +x test_api.sh
+# 独立版本测试（推荐）
+./test_standalone.sh
+
+# 或 Spring Boot 版本测试
 ./test_api.sh
 ```
 
