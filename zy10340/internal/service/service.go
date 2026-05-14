@@ -10,7 +10,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -26,6 +28,7 @@ var (
 	ErrInvalidMethod   = errors.New("invalid HTTP method")
 	ErrInvalidURL      = errors.New("invalid URL")
 	ErrEmptySamples    = errors.New("samples cannot be empty")
+	ErrSampleNotFound  = errors.New("sample not found")
 )
 
 type Service struct {
@@ -69,8 +72,14 @@ func isValidURL(urlStr string) bool {
 	if urlStr == "" {
 		return false
 	}
-	_, err := http.NewRequest(http.MethodGet, urlStr, nil)
-	return err == nil
+	parsedURL, err := url.Parse(urlStr)
+	if err != nil {
+		return false
+	}
+	if parsedURL.Scheme == "" || parsedURL.Host == "" {
+		return false
+	}
+	return parsedURL.Scheme == "http" || parsedURL.Scheme == "https"
 }
 
 func (s *Service) CheckIdempotency(key string) (string, bool, error) {
@@ -249,11 +258,17 @@ func (s *Service) StartPlan(planID string, sampleIDs []string) (*model.ReplayPla
 
 	var samples []model.TrafficSample
 	if len(sampleIDs) > 0 {
+		var notFoundIDs []string
 		for _, id := range sampleIDs {
 			sample, err := s.repo.GetSampleByID(id)
-			if err == nil {
+			if err != nil {
+				notFoundIDs = append(notFoundIDs, id)
+			} else {
 				samples = append(samples, *sample)
 			}
+		}
+		if len(notFoundIDs) > 0 {
+			return nil, fmt.Errorf("%w: %s", ErrSampleNotFound, strings.Join(notFoundIDs, ", "))
 		}
 	} else {
 		sampleList, _, err := s.repo.GetSamplesByTenant(plan.TenantID, 1000, 0)

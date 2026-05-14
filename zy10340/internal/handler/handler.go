@@ -311,15 +311,15 @@ func (h *Handler) StartPlan(c *gin.Context) {
 
 	plan, err := h.service.StartPlan(planID, req.SampleIDs)
 	if err != nil {
-		if errors.Is(err, service.ErrNotFound) {
+		switch {
+		case errors.Is(err, service.ErrNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
-			return
-		}
-		if errors.Is(err, service.ErrPlanAlreadyDone) {
+		case errors.Is(err, service.ErrPlanAlreadyDone),
+			errors.Is(err, service.ErrSampleNotFound):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
