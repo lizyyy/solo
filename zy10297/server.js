@@ -15,6 +15,8 @@ app.use(express.static('public'));
 
 const db = new sqlite3.Database('./keys.db');
 
+db.run('PRAGMA foreign_keys = ON');
+
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS properties (
@@ -230,45 +232,75 @@ app.get('/api/borrow-records', (req, res) => {
 app.post('/api/borrow', (req, res) => {
   const { key_id, agent_id, appointment_id, expected_return_hours, notes } = req.body;
   
-  db.get('SELECT status FROM keys WHERE id = ?', [key_id], (err, key) => {
+  if (!appointment_id) {
+    return res.status(400).json({ error: '必须提供预约 ID，请先创建带看预约再借出钥匙' });
+  }
+
+  db.get(`
+    SELECT a.id, a.key_id, a.agent_id, a.status, a.appointment_date,
+           k.status as key_status
+    FROM appointments a
+    JOIN keys k ON a.key_id = k.id
+    WHERE a.id = ?
+  `, [appointment_id], (err, appointment) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (!key) return res.status(400).json({ error: '钥匙不存在' });
-    if (key.status === 'lost') return res.status(400).json({ error: '钥匙已丢失，无法借出' });
-    if (key.status === 'borrowed') return res.status(400).json({ error: '钥匙已被借出' });
+    if (!appointment) return res.status(400).json({ error: '预约不存在，请检查预约 ID' });
 
-    db.get(`
-      SELECT id FROM appointments 
-      WHERE key_id = ? AND agent_id = ? AND status = 'pending' AND appointment_date >= DATE('now')
-    `, [key_id, agent_id], (err, hasAppointment) => {
-      if (err) return res.status(500).json({ error: err.message });
+    if (appointment.status !== 'pending') {
+      return res.status(400).json({ error: '该预约状态无效，可能已执行或已取消' });
+    }
 
-      if (!hasAppointment && !appointment_id) {
-        return res.status(400).json({ error: '未找到有效的带看预约，请先预约再借出钥匙' });
-      }
+    if (appointment.appointment_date < new Date().toISOString().split('T')[0]) {
+      return res.status(400).json({ error: '该预约已过期，请创建新的预约' });
+    }
 
-      const borrow_time = formatSQLiteDate(new Date());
-      const expected_return_time = formatSQLiteDate(new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000));
-      const borrow_code = generateCode('BRW');
-      const finalAppointmentId = appointment_id || hasAppointment?.id || null;
+    if (key_id && appointment.key_id !== key_id) {
+      return res.status(400).json({ error: '钥匙 ID 与预约不匹配' });
+    }
 
-      db.run(`
-        INSERT INTO borrow_records (borrow_code, key_id, agent_id, appointment_id, borrow_time, expected_return_time, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [borrow_code, key_id, agent_id, finalAppointmentId, borrow_time, expected_return_time, notes], function(err) {
-        if (err) return res.status(400).json({ error: err.message });
-        const borrowId = this.lastID;
+    if (agent_id && appointment.agent_id !== agent_id) {
+      return res.status(400).json({ error: '经纪人 ID 与预约不匹配' });
+    }
 
-        db.run('UPDATE keys SET status = ? WHERE id = ?', ['borrowed', key_id], (err) => {
-          if (err) return res.status(500).json({ error: err.message });
+    if (appointment.key_status === 'lost') {
+      return res.status(400).json({ error: '钥匙已丢失，无法借出' });
+    }
 
-          const apptIdToUpdate = appointment_id || hasAppointment?.id;
-          if (apptIdToUpdate) {
-            db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', apptIdToUpdate], (err) => {
-              if (err) console.error(err);
-            });
-          }
+    if (appointment.key_status === 'borrowed') {
+      return res.status(400).json({ error: '钥匙已被借出' });
+    }
 
-          res.json({ id: borrowId, borrow_code, key_id, agent_id, borrow_time, expected_return_time, status: 'borrowed', hasAppointment: true });
+    const actualKeyId = key_id || appointment.key_id;
+    const actualAgentId = agent_id || appointment.agent_id;
+
+    const borrow_time = formatSQLiteDate(new Date());
+    const expected_return_time = formatSQLiteDate(new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000));
+    const borrow_code = generateCode('BRW');
+
+    db.run(`
+      INSERT INTO borrow_records (borrow_code, key_id, agent_id, appointment_id, borrow_time, expected_return_time, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [borrow_code, actualKeyId, actualAgentId, appointment_id, borrow_time, expected_return_time, notes], function(err) {
+      if (err) return res.status(400).json({ error: err.message });
+      const borrowId = this.lastID;
+
+      db.run('UPDATE keys SET status = ? WHERE id = ?', ['borrowed', actualKeyId], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', appointment_id], (err) => {
+          if (err) console.error(err);
+        });
+
+        res.json({ 
+          id: borrowId, 
+          borrow_code, 
+          key_id: actualKeyId, 
+          agent_id: actualAgentId, 
+          appointment_id,
+          borrow_time, 
+          expected_return_time, 
+          status: 'borrowed', 
+          hasAppointment: true 
         });
       });
     });
