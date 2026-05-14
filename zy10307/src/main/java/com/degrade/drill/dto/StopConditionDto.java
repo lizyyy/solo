@@ -1,7 +1,7 @@
 package com.degrade.drill.dto;
 
 import com.degrade.drill.enums.StopConditionType;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

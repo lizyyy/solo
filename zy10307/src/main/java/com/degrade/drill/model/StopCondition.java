@@ -1,7 +1,7 @@
 package com.degrade.drill.model;
 
 import com.degrade.drill.enums.StopConditionType;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data

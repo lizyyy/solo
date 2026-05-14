@@ -6,10 +6,10 @@
 
 ## 技术栈
 
-- Java 17
-- Spring Boot 3.x
+- Java 1.8+
+- Spring Boot 2.7.x
 - Spring Data JPA
-- H2 数据库（内存）
+- H2 文件数据库（持久化）
 - Lombok
 
 ## 核心特性
@@ -20,24 +20,42 @@
 4. **自动停止**：支持多种停止条件（时长、错误率阈值、响应时间阈值、人工停止）
 5. **报告归档**：演练结束后自动生成报告，记录执行结果
 6. **幂等处理**：通过requestId防止重复提交产生脏数据
+7. **数据持久化**：所有演练计划、指标、报告均持久化存储，重启服务数据不丢失
 
 ## 快速开始
 
 ### 1. 环境要求
 
-- JDK 17+
-- Maven 3.8+
+- JDK 1.8+
+- Maven 3.6+（无需预装，项目包含Maven wrapper）
 
 ### 2. 构建项目
 
+**方式一：使用Maven wrapper（推荐，无需预装Maven）**
 ```bash
-mvn clean package
+# macOS/Linux
+./mvnw clean package -DskipTests
+
+# Windows
+mvnw.cmd clean package -DskipTests
 ```
 
 ### 3. 启动服务
 
+**方式一：使用Maven wrapper直接启动（无需打包）**
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
+```
+
+**方式二：使用启动脚本**
+```bash
+# macOS/Linux
+chmod +x start.sh && ./start.sh
+```
+
+**方式三：运行打包后的JAR**
+```bash
+java -jar target/degrade-drill-service-1.0.0.jar
 ```
 
 服务默认启动端口：8080
@@ -45,9 +63,11 @@ mvn spring-boot:run
 ### 4. 访问H2控制台（可选）
 
 - 地址：http://localhost:8080/h2-console
-- JDBC URL：jdbc:h2:mem:degrade_drill
-- 用户名：sa
-- 密码：（空）
+- JDBC URL：`jdbc:h2:file:./data/degrade_drill`
+- 用户名：`sa`
+- 密码：`degrade123`
+
+数据库文件保存在项目 `./data/` 目录下，重启服务数据不会丢失。
 
 ## 核心接口
 
@@ -114,6 +134,17 @@ curl http://localhost:8080/api/order/query
 
 ```bash
 curl -X POST "http://localhost:8080/api/v1/drill/1/stop?reason=人工干预停止"
+```
+
+#### 6. 重启服务验证数据持久化
+
+```bash
+# 停止服务后重新启动
+./start.sh
+
+# 查询历史数据，确认之前创建的演练和报告仍然存在
+curl http://localhost:8080/api/v1/drill
+curl http://localhost:8080/api/v1/drill/reports
 ```
 
 ### 场景2：异常场景-校验失败
@@ -209,5 +240,6 @@ VALIDATED → FAILED (校验失败)
 
 1. 拦截路径与演练管理接口路径冲突时，管理接口优先执行
 2. 演练状态有严格的流转限制，不允许跨状态操作
-3. H2数据库为内存模式，重启服务后数据会丢失
+3. H2数据库为文件持久化模式，重启服务数据不会丢失，数据库文件保存在 `./data/` 目录
 4. 建议在测试环境使用，避免在生产环境执行演练
+5. 每个演练计划只能生成一个报告，系统会自动防止重复归档

@@ -3,8 +3,9 @@ package com.degrade.drill.filter;
 import com.degrade.drill.enums.DrillStatus;
 import com.degrade.drill.model.DrillPlan;
 import com.degrade.drill.repository.DrillPlanRepository;
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
@@ -48,7 +49,8 @@ public class FallbackFilter implements Filter {
                 }
 
                 response.setContentType(plan.getFallbackResponse().getContentType());
-                if (response instanceof jakarta.servlet.http.HttpServletResponse httpResponse) {
+                if (response instanceof HttpServletResponse) {
+                    HttpServletResponse httpResponse = (HttpServletResponse) response;
                     httpResponse.setStatus(plan.getFallbackResponse().getHttpStatus());
                 }
 

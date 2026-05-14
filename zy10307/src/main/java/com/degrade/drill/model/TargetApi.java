@@ -1,6 +1,6 @@
 package com.degrade.drill.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,7 @@
 package com.degrade.drill.model;
 
 import com.degrade.drill.enums.DrillStatus;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 
