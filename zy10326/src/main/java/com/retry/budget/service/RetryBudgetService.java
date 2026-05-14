@@ -175,8 +175,10 @@ public class RetryBudgetService {
                 ? budget.getNextRecoveryAt() 
                 : LocalDateTime.now().plus(Duration.ofMillis(backoffMs));
         
+        boolean allowed = !wasExhausted;
+        
         return RetryCheckResponse.builder()
-                .allowed(!isExhausted)
+                .allowed(allowed)
                 .budgetId(budget.getId())
                 .callerId(budget.getCallerId())
                 .targetApi(budget.getTargetApi())
