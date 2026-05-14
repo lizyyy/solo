@@ -32,7 +32,8 @@ const records = [
         duration: 810,
         agentName: '王芳',
         summary: '客户反馈商品质量问题，要求退货退款，已同意申请并发送退货地址',
-        status: types_1.ProcessingStatus.PENDING,
+        status: types_1.ProcessingStatus.SUCCESS,
+        processingResult: '处理完成，无异常',
     },
     {
         batchId,
@@ -58,7 +59,9 @@ const records = [
         duration: 1530,
         agentName: '刘强',
         summary: '截',
-        status: types_1.ProcessingStatus.PENDING,
+        status: types_1.ProcessingStatus.ABNORMAL,
+        abnormalType: types_1.AbnormalType.FIELD_TRUNCATED,
+        abnormalReason: '检测到字段截断，需要人工复核',
         isFieldTruncated: true,
         truncatedFields: ['customerName', 'summary'],
     },
@@ -88,24 +91,40 @@ const records = [
         summary: '客户申请退款，核实订单状态，已处理完成',
         status: types_1.ProcessingStatus.PENDING,
     },
+    {
+        batchId,
+        recordingId: 'REC-20240515-163006',
+        customerName: '孙...',
+        phoneNumber: '134****5555',
+        serviceType: '售后',
+        startTime: '2024-05-15 16:30:00',
+        endTime: '2024-05-15 16:45:00',
+        duration: 900,
+        agentName: '吴磊',
+        summary: '客户反馈收',
+        status: types_1.ProcessingStatus.MANUALLY_CORRECTED,
+        abnormalType: types_1.AbnormalType.FIELD_TRUNCATED,
+        abnormalReason: '检测到字段截断，需要人工复核',
+        isFieldTruncated: true,
+        truncatedFields: ['customerName', 'summary'],
+        correctedBy: '质检主管',
+        correctionReason: '字段截断已补全，客户反馈收到商品有破损，已安排补发',
+        correctionTime: new Date().toISOString(),
+    },
 ];
 records.forEach((record, index) => {
     const saved = storage_1.Storage.addRecord(record);
     console.log(chalk_1.default.green(`  ✓ 已创建记录 ${index + 1}: ${record.recordingId}`));
 });
-const truncatedRecord = storage_1.Storage.queryRecords({ batchId }).find(r => r.isFieldTruncated);
-if (truncatedRecord) {
-    storage_1.Storage.manuallyCorrectRecord(truncatedRecord.id, '系统管理员', '字段截断，补充完整信息', {
-        customerName: '王国庆',
-        summary: '客户投诉配送延迟问题，情绪激动，经安抚后达成解决方案，客户表示理解接受处理方案'
-    });
-    console.log(chalk_1.default.yellow(`  ✓ 已创建人工修正记录: ${truncatedRecord.recordingId}`));
-}
 console.log(chalk_1.default.blue.bold('\n测试数据生成完成!\n'));
 console.log(chalk_1.default.white('批次号:', chalk_1.default.bold(batchId)));
 console.log(chalk_1.default.white('总记录数:', records.length));
 console.log(chalk_1.default.white('包含:'));
-console.log(chalk_1.default.gray('  - 正常待处理记录'));
-console.log(chalk_1.default.red('  - 1条字段截断异常记录'));
-console.log(chalk_1.default.yellow('  - 1条人工修正记录'));
-console.log(chalk_1.default.cyan('\n使用 npm run dev query 查看所有记录'));
+console.log(chalk_1.default.green('  - 1条成功处理记录'));
+console.log(chalk_1.default.gray('  - 3条待处理记录'));
+console.log(chalk_1.default.red('  - 1条字段截断异常记录 (abnormal状态)'));
+console.log(chalk_1.default.yellow('  - 1条人工修正记录 (保留异常类型)'));
+console.log(chalk_1.default.cyan('\n使用以下命令验证:'));
+console.log(chalk_1.default.cyan('  npm run dev -- query                    # 查看所有记录'));
+console.log(chalk_1.default.cyan('  npm run dev -- query --status abnormal   # 仅看异常记录'));
+console.log(chalk_1.default.cyan('  npm run dev -- export --abnormal-only    # 仅导出异常记录'));

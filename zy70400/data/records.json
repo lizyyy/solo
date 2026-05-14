@@ -11,10 +11,10 @@
     "agentName": "王芳",
     "summary": "客户反馈商品质量问题，要求退货退款，已同意申请并发送退货地址",
     "status": "success",
-    "id": "8b580735-7d1a-4904-80c6-1044c16cf3b8",
-    "createdAt": "2026-05-14T16:40:03.319Z",
-    "updatedAt": "2026-05-14T16:40:09.437Z",
-    "processingResult": "测试成功"
+    "processingResult": "测试成功",
+    "id": "03b5c3e0-2f95-432f-9d58-4e894f003e32",
+    "createdAt": "2026-05-14T17:03:37.683Z",
+    "updatedAt": "2026-05-14T17:04:33.531Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -28,36 +28,35 @@
     "agentName": "赵敏",
     "summary": "已修正的摘要",
     "status": "manually_corrected",
-    "id": "ca87c153-7c70-40cc-8725-aa07f7cbf809",
-    "createdAt": "2026-05-14T16:40:03.319Z",
-    "updatedAt": "2026-05-14T16:40:09.437Z",
+    "id": "a1d6f8ec-a6ad-4d0e-aee2-560581719b68",
+    "createdAt": "2026-05-14T17:03:37.685Z",
+    "updatedAt": "2026-05-14T17:04:33.531Z",
     "correctedBy": "测试修正人",
     "correctionReason": "测试修正原因",
-    "correctionTime": "2026-05-14T16:40:09.437Z"
+    "correctionTime": "2026-05-14T17:04:33.531Z"
   },
   {
     "batchId": "AFS-2024-0515",
     "recordingId": "REC-20240515-002003",
-    "customerName": "王国庆",
+    "customerName": "王五...",
     "phoneNumber": "137****9012",
     "serviceType": "投诉",
     "startTime": "2024-05-15 00:20:00",
     "endTime": "2024-05-15 00:45:30",
     "duration": 1530,
     "agentName": "刘强",
-    "summary": "客户投诉配送延迟问题，情绪激动，经安抚后达成解决方案，客户表示理解接受处理方案",
-    "status": "manually_corrected",
+    "summary": "截",
+    "status": "abnormal",
+    "abnormalType": "field_truncated",
+    "abnormalReason": "检测到字段截断，需要人工复核",
     "isFieldTruncated": true,
     "truncatedFields": [
       "customerName",
       "summary"
     ],
-    "id": "01d9fd73-e089-4142-ab5a-71e50da20ec3",
-    "createdAt": "2026-05-14T16:40:03.319Z",
-    "updatedAt": "2026-05-14T16:40:03.320Z",
-    "correctedBy": "系统管理员",
-    "correctionReason": "字段截断，补充完整信息",
-    "correctionTime": "2026-05-14T16:40:03.320Z"
+    "id": "ff9822f1-0ede-48b1-9cda-d2d87e3e9e33",
+    "createdAt": "2026-05-14T17:03:37.687Z",
+    "updatedAt": "2026-05-14T17:03:37.687Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -71,9 +70,9 @@
     "agentName": "孙丽",
     "summary": "客户咨询保修政策，详细解答了保修期限和范围",
     "status": "pending",
-    "id": "d7529347-81d2-4da1-a6a8-59e95b80241a",
-    "createdAt": "2026-05-14T16:40:03.320Z",
-    "updatedAt": "2026-05-14T16:40:03.320Z"
+    "id": "5f0e966e-b270-43cb-8b24-4cff282355b6",
+    "createdAt": "2026-05-14T17:03:37.697Z",
+    "updatedAt": "2026-05-14T17:03:37.697Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -87,9 +86,35 @@
     "agentName": "周杰",
     "summary": "客户申请退款，核实订单状态，已处理完成",
     "status": "pending",
-    "id": "030f6754-363e-4ecd-b885-799f30507685",
-    "createdAt": "2026-05-14T16:40:03.320Z",
-    "updatedAt": "2026-05-14T16:40:03.320Z"
+    "id": "eeb6abc0-9a84-4416-9ee5-5e04ad6327a9",
+    "createdAt": "2026-05-14T17:03:37.697Z",
+    "updatedAt": "2026-05-14T17:03:37.697Z"
+  },
+  {
+    "batchId": "AFS-2024-0515",
+    "recordingId": "REC-20240515-163006",
+    "customerName": "孙...",
+    "phoneNumber": "134****5555",
+    "serviceType": "售后",
+    "startTime": "2024-05-15 16:30:00",
+    "endTime": "2024-05-15 16:45:00",
+    "duration": 900,
+    "agentName": "吴磊",
+    "summary": "客户反馈收",
+    "status": "manually_corrected",
+    "abnormalType": "field_truncated",
+    "abnormalReason": "检测到字段截断，需要人工复核",
+    "isFieldTruncated": true,
+    "truncatedFields": [
+      "customerName",
+      "summary"
+    ],
+    "correctedBy": "质检主管",
+    "correctionReason": "字段截断已补全，客户反馈收到商品有破损，已安排补发",
+    "correctionTime": "2026-05-14T17:03:37.682Z",
+    "id": "f3d75fea-f2c9-4cfe-8944-00276d73f298",
+    "createdAt": "2026-05-14T17:03:37.698Z",
+    "updatedAt": "2026-05-14T17:03:37.698Z"
   },
   {
     "batchId": "TEST-BATCH",
@@ -103,13 +128,13 @@
     "agentName": "测试客服",
     "summary": "测试摘要",
     "status": "pending",
-    "id": "27b6862a-0f8e-473e-910f-d02b586c7ce2",
-    "createdAt": "2026-05-14T16:40:09.436Z",
-    "updatedAt": "2026-05-14T16:40:09.436Z"
+    "id": "aadc392e-5100-4c0c-a630-96dea9cec480",
+    "createdAt": "2026-05-14T17:04:33.530Z",
+    "updatedAt": "2026-05-14T17:04:33.530Z"
   },
   {
     "batchId": "TEST-BATCH",
-    "recordingId": "TEST-1778776809437",
+    "recordingId": "TEST-1778778273531",
     "customerName": "持久化测试用户",
     "phoneNumber": "138****9999",
     "serviceType": "测试服务",
@@ -119,8 +144,8 @@
     "agentName": "测试客服",
     "summary": "持久化测试摘要",
     "status": "pending",
-    "id": "8c6fabd8-2326-4b08-ba14-94d09b9038c4",
-    "createdAt": "2026-05-14T16:40:09.437Z",
-    "updatedAt": "2026-05-14T16:40:09.437Z"
+    "id": "57f7d0e2-b569-44ac-97c5-a854542a1f23",
+    "createdAt": "2026-05-14T17:04:33.531Z",
+    "updatedAt": "2026-05-14T17:04:33.531Z"
   }
 ]
