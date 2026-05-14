@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "工作时间",
+    "timezone": "Asia/Shanghai",
+    "start_hour": 9,
+    "end_hour": 18,
+    "description": "中国标准工作时间"
+  },
+  {
+    "id": 2,
+    "name": "美国东部工作时间",
+    "timezone": "America/New_York",
+    "start_hour": 9,
+    "end_hour": 18,
+    "description": "美国东部工作时间"
+  },
+  {
+    "id": 3,
+    "name": "伦敦工作时间",
+    "timezone": "Europe/London",
+    "start_hour": 9,
+    "end_hour": 18,
+    "description": "伦敦工作时间"
+  }
+]
