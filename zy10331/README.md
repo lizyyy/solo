@@ -43,41 +43,32 @@ java -jar target/priority-queue-api-1.0.0.jar
 
 ## ❗ 常见问题排查
 
-### 问题 1: "No compiler is provided in this environment"
-**原因**: 只安装了 JRE，没有安装完整 JDK
+### 问题 1: "Unable to access jarfile"
+**原因**: JAR 文件未生成，但类文件已预编译
 
-**解决**:
-1. 下载安装 JDK 8+:
-   - OpenJDK: https://adoptium.net/temurin/releases/?version=8
-   - Oracle JDK: https://www.oracle.com/java/technologies/downloads/
-
-2. 设置环境变量:
-   ```bash
-   # macOS
-   export JAVA_HOME=`/usr/libexec/java_home`
-   
-   # Linux
-   export JAVA_HOME=/path/to/jdk
-   
-   # Windows (PowerShell)
-   $env:JAVA_HOME="C:\path\to\jdk"
-   ```
-
-3. 验证安装:
-   ```bash
-   java -version
-   javac -version
-   ```
-
-### 问题 2: "Unable to access jarfile"
-**原因**: 还没有构建生成 JAR 文件
-
-**解决**: 先运行构建命令:
+**解决**: 使用方式 1 直接启动，无需 JAR:
 ```bash
-./mvnw clean package -DskipTests
+./一键启动.sh
+# 或
+./smart_start.sh
 ```
 
-### 问题 3: 端口 8080 被占用
+### 问题 2: 缺少某些依赖 JAR
+**原因**: 本地 Maven 仓库缺少部分依赖
+
+**解决**: 下载完整依赖:
+```bash
+./download_deps.sh
+```
+
+### 问题 3: "No compiler is provided in this environment"
+**原因**: 只有 JRE，没有完整 JDK（仅在需要重新编译时出现）
+
+**解决**: 
+- ✅ **无需解决，使用 `./一键启动.sh` 直接启动，无需编译**
+- 或安装完整 JDK: https://adoptium.net/temurin/releases/?version=8
+
+### 问题 4: 端口 8080 被占用
 **解决**: 修改 `src/main/resources/application.yml`:
 ```yaml
 server:
