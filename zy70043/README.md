@@ -12,7 +12,7 @@
 # 进入项目目录
 cd /Users/lzy/pro/solo/workspaces/zy70043
 
-# 安装依赖
+# 安装依赖（必须用 python3 -m pip，不要只用 pip）
 python3 -m pip install -e .
 ```
 
@@ -517,7 +517,7 @@ which python3.13 # 查看 python3.13 路径
 A: 说明依赖没安装成功，确保在项目目录下执行：
 ```bash
 cd /Users/lzy/pro/solo/workspaces/zy70043
-python3 -m python3 -m pip install -e .
+python3 -m pip install -e .
 ```
 
 ### Q: 执行失败后为什么不用清库？
@@ -564,7 +564,7 @@ A: 种子数据已预设多个测试场景：
 ```bash
 cd /Users/lzy/pro/solo/workspaces/zy70043
 python3 --version  # 确认版本
-python3 -m python3 -m pip install -e .
+python3 -m pip install -e .
 ```
 
 ### 问题3：运行演示时数据混乱
