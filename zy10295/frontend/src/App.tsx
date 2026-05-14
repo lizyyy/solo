@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import VehicleList from './pages/VehicleList';
 import TireList from './pages/TireList';
 import TireDetail from './pages/TireDetail';
 
@@ -11,6 +12,7 @@ const App: React.FC = () => {
       <Layout>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/vehicles" element={<VehicleList />} />
           <Route path="/tires" element={<TireList />} />
           <Route path="/tires/:id" element={<TireDetail />} />
         </Routes>

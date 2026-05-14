@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { vehicleApi } from '../api';
 import { VehicleAvailability, STATUS_LABELS, STATUS_COLORS } from '../types';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [availability, setAvailability] = useState<VehicleAvailability[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,11 +33,28 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#1f2937', marginBottom: '8px' }}>
-          车辆可用性看板
-        </h2>
-        <p style={{ color: '#6b7280' }}>实时监控车队轮胎状态和车辆可用性</p>
+      <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#1f2937', marginBottom: '8px' }}>
+            车辆可用性看板
+          </h2>
+          <p style={{ color: '#6b7280' }}>实时监控车队轮胎状态和车辆可用性</p>
+        </div>
+        <button
+          onClick={() => navigate('/vehicles')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: 'white',
+            border: '1px solid #d1d5db',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 500,
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+          }}
+        >
+          🚚 进入车辆管理
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>

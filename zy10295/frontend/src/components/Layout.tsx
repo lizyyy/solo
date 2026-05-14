@@ -6,6 +6,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const navItems = [
     { path: '/', label: '车辆看板' },
+    { path: '/vehicles', label: '车辆管理' },
     { path: '/tires', label: '轮胎列表' },
   ];
 
