@@ -3,6 +3,9 @@ package repository
 import (
 	"api-replay-throttler/internal/model"
 	"errors"
+	"time"
+
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -26,10 +29,20 @@ func (r *Repository) CheckIdempotency(key string) (*model.IdempotencyRecord, err
 }
 
 func (r *Repository) SaveIdempotency(key, resource, result string) error {
+	existing, err := r.CheckIdempotency(key)
+	if err != nil {
+		return err
+	}
+	if existing != nil {
+		return ErrDuplicateKey
+	}
+
 	record := model.IdempotencyRecord{
-		Key:      key,
-		Resource: resource,
-		Result:   result,
+		ID:        uuid.New().String(),
+		Key:       key,
+		Resource:  resource,
+		Result:    result,
+		CreatedAt: time.Now(),
 	}
 	return r.db.Create(&record).Error
 }

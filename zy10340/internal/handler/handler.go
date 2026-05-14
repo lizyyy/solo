@@ -5,9 +5,10 @@ import (
 	"api-replay-throttler/internal/service"
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -47,14 +48,18 @@ func (h *Handler) idempotencyMiddleware() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) saveIdempotencyResult(c *gin.Context, data interface{}) {
+func (h *Handler) saveIdempotencyResult(c *gin.Context, data interface{}) error {
 	key, exists := c.Get("idempotency_key")
 	if !exists {
-		return
+		return nil
 	}
 
-	jsonData, _ := json.Marshal(data)
-	h.service.SaveIdempotency(key.(string), c.Request.URL.Path, string(jsonData))
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	return h.service.SaveIdempotency(key.(string), c.Request.URL.Path, string(jsonData))
 }
 
 func (h *Handler) SetupRoutes(r *gin.Engine) {
@@ -105,7 +110,10 @@ func (h *Handler) CreateTenant(c *gin.Context) {
 		return
 	}
 
-	h.saveIdempotencyResult(c, tenant)
+	if err := h.saveIdempotencyResult(c, tenant); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusCreated, tenant)
 }
 
@@ -120,11 +128,17 @@ func (h *Handler) ImportSamples(c *gin.Context) {
 
 	result, err := h.service.ImportSamples(tenantID, samples)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidInput) {
+		switch {
+		case errors.Is(err, service.ErrInvalidInput),
+			errors.Is(err, service.ErrEmptySamples),
+			errors.Is(err, service.ErrInvalidMethod),
+			errors.Is(err, service.ErrInvalidURL):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+		case errors.Is(err, service.ErrTenantNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -133,7 +147,10 @@ func (h *Handler) ImportSamples(c *gin.Context) {
 		"count":   len(result),
 		"samples": result,
 	}
-	h.saveIdempotencyResult(c, response)
+	if err := h.saveIdempotencyResult(c, response); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusCreated, response)
 }
 
@@ -184,15 +201,21 @@ func (h *Handler) CreateRule(c *gin.Context) {
 		req.BackoffMultiplier,
 	)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidInput) {
+		switch {
+		case errors.Is(err, service.ErrInvalidInput):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+		case errors.Is(err, service.ErrTenantNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	h.saveIdempotencyResult(c, rule)
+	if err := h.saveIdempotencyResult(c, rule); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusCreated, rule)
 }
 
@@ -223,19 +246,23 @@ func (h *Handler) CreatePlan(c *gin.Context) {
 
 	plan, err := h.service.CreatePlan(tenantID, req.RuleID, req.Name)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidInput) {
+		switch {
+		case errors.Is(err, service.ErrInvalidInput):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		if errors.Is(err, service.ErrNotFound) {
+		case errors.Is(err, service.ErrTenantNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "tenant not found"})
+		case errors.Is(err, service.ErrNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "rule not found"})
-			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	h.saveIdempotencyResult(c, plan)
+	if err := h.saveIdempotencyResult(c, plan); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusCreated, plan)
 }
 
@@ -296,7 +323,10 @@ func (h *Handler) StartPlan(c *gin.Context) {
 		return
 	}
 
-	h.saveIdempotencyResult(c, plan)
+	if err := h.saveIdempotencyResult(c, plan); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, plan)
 }
 
@@ -324,7 +354,10 @@ func (h *Handler) PausePlan(c *gin.Context) {
 		return
 	}
 
-	h.saveIdempotencyResult(c, pause)
+	if err := h.saveIdempotencyResult(c, pause); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, pause)
 }
 
@@ -341,7 +374,10 @@ func (h *Handler) ResumePlan(c *gin.Context) {
 		return
 	}
 
-	h.saveIdempotencyResult(c, plan)
+	if err := h.saveIdempotencyResult(c, plan); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save idempotency record: " + err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, plan)
 }
 

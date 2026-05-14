@@ -8,12 +8,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -21,6 +22,10 @@ var (
 	ErrNotFound        = errors.New("resource not found")
 	ErrPlanNotRunning  = errors.New("plan is not running")
 	ErrPlanAlreadyDone = errors.New("plan already completed or failed")
+	ErrTenantNotFound  = errors.New("tenant not found")
+	ErrInvalidMethod   = errors.New("invalid HTTP method")
+	ErrInvalidURL      = errors.New("invalid URL")
+	ErrEmptySamples    = errors.New("samples cannot be empty")
 )
 
 type Service struct {
@@ -48,6 +53,26 @@ func NewService(repo *repository.Repository) *Service {
 	}
 }
 
+func isValidMethod(method string) bool {
+	validMethods := map[string]bool{
+		http.MethodGet:    true,
+		http.MethodPost:   true,
+		http.MethodPut:    true,
+		http.MethodDelete: true,
+		http.MethodPatch:  true,
+		http.MethodHead:   true,
+	}
+	return validMethods[method]
+}
+
+func isValidURL(urlStr string) bool {
+	if urlStr == "" {
+		return false
+	}
+	_, err := http.NewRequest(http.MethodGet, urlStr, nil)
+	return err == nil
+}
+
 func (s *Service) CheckIdempotency(key string) (string, bool, error) {
 	record, err := s.repo.CheckIdempotency(key)
 	if err != nil {
@@ -64,6 +89,10 @@ func (s *Service) SaveIdempotency(key, resource, result string) error {
 }
 
 func (s *Service) CreateTenant(name string) (*model.Tenant, error) {
+	if name == "" || len(name) > 255 {
+		return nil, ErrInvalidInput
+	}
+
 	tenant := &model.Tenant{
 		ID:        uuid.New().String(),
 		Name:      name,
@@ -78,13 +107,31 @@ func (s *Service) ImportSamples(tenantID string, samples []model.TrafficSample) 
 	if tenantID == "" {
 		return nil, ErrInvalidInput
 	}
+	if len(samples) == 0 {
+		return nil, ErrEmptySamples
+	}
+
+	_, err := s.repo.GetTenantByID(tenantID)
+	if err != nil {
+		return nil, ErrTenantNotFound
+	}
 
 	for i := range samples {
+		if !isValidMethod(samples[i].Method) {
+			return nil, fmt.Errorf("%w: %s", ErrInvalidMethod, samples[i].Method)
+		}
+		if !isValidURL(samples[i].URL) {
+			return nil, fmt.Errorf("%w: %s", ErrInvalidURL, samples[i].URL)
+		}
+
 		samples[i].ID = uuid.New().String()
 		samples[i].TenantID = tenantID
 		samples[i].CreatedAt = time.Now()
 		if samples[i].IdempotencyKey == "" {
 			samples[i].IdempotencyKey = uuid.New().String()
+		}
+		if samples[i].Timestamp.IsZero() {
+			samples[i].Timestamp = time.Now()
 		}
 		err := s.repo.CreateSample(&samples[i])
 		if err != nil {
@@ -101,24 +148,44 @@ func (s *Service) GetSamples(tenantID string, page, pageSize int) ([]model.Traff
 }
 
 func (s *Service) CreateRule(tenantID, name string, maxRequests, windowSeconds, maxConcurrency int, errorThreshold, backoffMultiplier float64) (*model.ThrottleRule, error) {
-	if tenantID == "" || name == "" {
+	if tenantID == "" || name == "" || len(name) > 255 {
+		return nil, ErrInvalidInput
+	}
+	if maxRequests < 1 || maxRequests > 1000000 {
+		return nil, ErrInvalidInput
+	}
+	if windowSeconds < 1 || windowSeconds > 3600 {
+		return nil, ErrInvalidInput
+	}
+	if maxConcurrency < 1 || maxConcurrency > 1000 {
+		return nil, ErrInvalidInput
+	}
+	if errorThreshold < 0 || errorThreshold > 1 {
+		return nil, ErrInvalidInput
+	}
+	if backoffMultiplier < 1 || backoffMultiplier > 10 {
 		return nil, ErrInvalidInput
 	}
 
-	rule := &model.ThrottleRule{
-		ID:               uuid.New().String(),
-		TenantID:         tenantID,
-		Name:             name,
-		MaxRequests:      maxRequests,
-		WindowSeconds:    windowSeconds,
-		MaxConcurrency:   maxConcurrency,
-		ErrorThreshold:   errorThreshold,
-		BackoffMultiplier: backoffMultiplier,
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+	_, err := s.repo.GetTenantByID(tenantID)
+	if err != nil {
+		return nil, ErrTenantNotFound
 	}
 
-	err := s.repo.CreateRule(rule)
+	rule := &model.ThrottleRule{
+		ID:                uuid.New().String(),
+		TenantID:          tenantID,
+		Name:              name,
+		MaxRequests:       maxRequests,
+		WindowSeconds:     windowSeconds,
+		MaxConcurrency:    maxConcurrency,
+		ErrorThreshold:    errorThreshold,
+		BackoffMultiplier: backoffMultiplier,
+		CreatedAt:         time.Now(),
+		UpdatedAt:         time.Now(),
+	}
+
+	err = s.repo.CreateRule(rule)
 	return rule, err
 }
 
@@ -127,11 +194,16 @@ func (s *Service) GetRules(tenantID string) ([]model.ThrottleRule, error) {
 }
 
 func (s *Service) CreatePlan(tenantID, ruleID, name string) (*model.ReplayPlan, error) {
-	if tenantID == "" || ruleID == "" || name == "" {
+	if tenantID == "" || ruleID == "" || name == "" || len(name) > 255 {
 		return nil, ErrInvalidInput
 	}
 
-	_, err := s.repo.GetRuleByID(ruleID)
+	_, err := s.repo.GetTenantByID(tenantID)
+	if err != nil {
+		return nil, ErrTenantNotFound
+	}
+
+	_, err = s.repo.GetRuleByID(ruleID)
 	if err != nil {
 		return nil, ErrNotFound
 	}
@@ -298,6 +370,15 @@ func (e *ReplayExecutor) executeSample(sample model.TrafficSample, planID string
 		result.Status = model.ResultStatusFailed
 		result.ErrorCategory = model.ErrorCategoryValidation
 		result.ErrorMessage = err.Error()
+		result.FinishedAt = time.Now()
+		result.DurationMs = time.Since(startTime).Milliseconds()
+		e.svc.repo.CreateResult(result)
+
+		e.mux.Lock()
+		e.Plan.ProcessedCount++
+		e.Plan.ErrorCount++
+		e.mux.Unlock()
+		e.svc.repo.UpdatePlan(e.Plan)
 		return
 	}
 
