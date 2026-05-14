@@ -172,24 +172,24 @@ func (r *Repository) GetStatistics(scene string, startTime, endTime time.Time) (
 	var stats model.Statistics
 	stats.Scene = scene
 
-	query := r.db.Model(&model.NotificationRequest{})
+	baseQuery := r.db.Model(&model.NotificationRequest{})
 	if scene != "" {
-		query = query.Where("scene = ?", scene)
+		baseQuery = baseQuery.Where("scene = ?", scene)
 	}
 	if !startTime.IsZero() {
-		query = query.Where("created_at >= ?", startTime)
+		baseQuery = baseQuery.Where("created_at >= ?", startTime)
 	}
 	if !endTime.IsZero() {
-		query = query.Where("created_at <= ?", endTime)
+		baseQuery = baseQuery.Where("created_at <= ?", endTime)
 	}
 
-	query.Count(&stats.TotalRequests)
+	baseQuery.Count(&stats.TotalRequests)
 
 	var counts []struct {
 		Status model.NotificationStatus
 		Count  int64
 	}
-	r.db.Model(&model.NotificationRequest{}).
+	baseQuery.
 		Select("status, count(*) as count").
 		Group("status").
 		Scan(&counts)
