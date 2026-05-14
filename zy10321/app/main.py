@@ -119,21 +119,24 @@ def list_approvers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
 
 @app.post("/api/v1/change-orders/", response_model=schemas.ChangeOrder, status_code=status.HTTP_201_CREATED)
 def create_change_order(change: schemas.ChangeOrderCreate, db: Session = Depends(get_db)):
-    existing_change = db.query(ChangeOrder).filter(ChangeOrder.change_id == change.change_id).first()
-    if existing_change:
+    if change.idempotency_key:
+        existing_by_idempotency = ChangeOrderService.get_by_idempotency_key(db, change.idempotency_key)
+        if existing_by_idempotency:
+            return existing_by_idempotency
+    
+    existing_by_change_id = db.query(ChangeOrder).filter(ChangeOrder.change_id == change.change_id).first()
+    if existing_by_change_id:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={"error": "Change ID already exists", "code": "DUPLICATE_CHANGE", "details": {"change_id": change.change_id}}
         )
     
-    db_change, is_new = ChangeOrderService.create_change(db, change)
-    if not is_new:
-        return db_change
-    
-    validation = FreezeCalendarService.validate_change(db, db_change)
-    db_change.status = validation.status
+    db_change = ChangeOrder(**change.model_dump())
+    db.add(db_change)
     db.commit()
     db.refresh(db_change)
+    
+    FreezeCalendarService.validate_change(db, db_change)
     return db_change
 
 

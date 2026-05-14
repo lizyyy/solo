@@ -41,6 +41,9 @@ class FreezeCalendarService:
         )
 
         if not matched_freezes:
+            change.status = ChangeStatus.APPROVED
+            db.commit()
+            db.refresh(change)
             return schemas.ValidationResult(
                 allowed=True,
                 status=ChangeStatus.APPROVED,
@@ -50,6 +53,9 @@ class FreezeCalendarService:
             )
 
         if FreezeCalendarService.check_emergency_exception(db, change.id):
+            change.status = ChangeStatus.EMERGENCY
+            db.commit()
+            db.refresh(change)
             return schemas.ValidationResult(
                 allowed=True,
                 status=ChangeStatus.EMERGENCY,
@@ -64,6 +70,9 @@ class FreezeCalendarService:
                 block_freezes.append(freeze)
 
         if not block_freezes:
+            change.status = ChangeStatus.EXCEPTION
+            db.commit()
+            db.refresh(change)
             return schemas.ValidationResult(
                 allowed=True,
                 status=ChangeStatus.EXCEPTION,
@@ -94,6 +103,7 @@ class FreezeCalendarService:
 
         change.status = ChangeStatus.BLOCKED
         db.commit()
+        db.refresh(change)
 
         return schemas.ValidationResult(
             allowed=False,
