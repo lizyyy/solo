@@ -306,30 +306,99 @@ public class ProposalService {
             headerRow.createCell(0).setCellValue("提案编号");
             headerRow.createCell(1).setCellValue("标题");
             headerRow.createCell(2).setCellValue("API名称");
-            headerRow.createCell(3).setCellValue("状态");
-            headerRow.createCell(4).setCellValue("提交人");
-            headerRow.createCell(5).setCellValue("创建时间");
+            headerRow.createCell(3).setCellValue("API版本");
+            headerRow.createCell(4).setCellValue("变更类型");
+            headerRow.createCell(5).setCellValue("状态");
+            headerRow.createCell(6).setCellValue("提交人");
+            headerRow.createCell(7).setCellValue("创建时间");
+            headerRow.createCell(8).setCellValue("描述");
 
             Row dataRow = sheet.createRow(rowNum++);
             dataRow.createCell(0).setCellValue(proposal.getProposalNo());
             dataRow.createCell(1).setCellValue(proposal.getTitle());
             dataRow.createCell(2).setCellValue(proposal.getApiName());
-            dataRow.createCell(3).setCellValue(proposal.getStatus().name());
-            dataRow.createCell(4).setCellValue(proposal.getSubmitter().getName());
-            dataRow.createCell(5).setCellValue(proposal.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            dataRow.createCell(3).setCellValue(proposal.getApiVersion() != null ? proposal.getApiVersion() : "");
+            dataRow.createCell(4).setCellValue(proposal.getChangeType().name());
+            dataRow.createCell(5).setCellValue(proposal.getStatus().name());
+            dataRow.createCell(6).setCellValue(proposal.getSubmitter().getName());
+            dataRow.createCell(7).setCellValue(proposal.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            dataRow.createCell(8).setCellValue(proposal.getDescription() != null ? proposal.getDescription() : "");
+
+            rowNum++;
+            Row impactHeaderRow = sheet.createRow(rowNum++);
+            impactHeaderRow.createCell(0).setCellValue("影响项");
+            impactHeaderRow.createCell(1).setCellValue("影响范围");
+            impactHeaderRow.createCell(2).setCellValue("影响描述");
+            impactHeaderRow.createCell(3).setCellValue("影响服务");
+            impactHeaderRow.createCell(4).setCellValue("影响端点");
+            impactHeaderRow.createCell(5).setCellValue("兼容性");
+            impactHeaderRow.createCell(6).setCellValue("是否通知");
+
+            for (ImpactItem item : impacts) {
+                Row itemRow = sheet.createRow(rowNum++);
+                itemRow.createCell(1).setCellValue(item.getImpactScope());
+                itemRow.createCell(2).setCellValue(item.getImpactDescription());
+                itemRow.createCell(3).setCellValue(item.getAffectedService() != null ? item.getAffectedService() : "");
+                itemRow.createCell(4).setCellValue(item.getAffectedEndpoint() != null ? item.getAffectedEndpoint() : "");
+                itemRow.createCell(5).setCellValue(item.getCompatibilityLevel() != null ? item.getCompatibilityLevel() : "");
+                itemRow.createCell(6).setCellValue(item.getIsNotified() ? "是" : "否");
+            }
 
             rowNum++;
             Row voteHeaderRow = sheet.createRow(rowNum++);
             voteHeaderRow.createCell(0).setCellValue("投票记录");
             voteHeaderRow.createCell(1).setCellValue("投票人");
             voteHeaderRow.createCell(2).setCellValue("结果");
-            voteHeaderRow.createCell(3).setCellValue("时间");
+            voteHeaderRow.createCell(3).setCellValue("意见");
+            voteHeaderRow.createCell(4).setCellValue("投票时间");
 
             for (VoteOpinion vote : votes) {
                 Row voteRow = sheet.createRow(rowNum++);
                 voteRow.createCell(1).setCellValue(vote.getVoter().getName());
                 voteRow.createCell(2).setCellValue(vote.getResult().name());
-                voteRow.createCell(3).setCellValue(vote.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                voteRow.createCell(3).setCellValue(vote.getComment() != null ? vote.getComment() : "");
+                voteRow.createCell(4).setCellValue(vote.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+
+            rowNum++;
+            Row blockHeaderRow = sheet.createRow(rowNum++);
+            blockHeaderRow.createCell(0).setCellValue("阻塞记录");
+            blockHeaderRow.createCell(1).setCellValue("阻塞人");
+            blockHeaderRow.createCell(2).setCellValue("阻塞原因");
+            blockHeaderRow.createCell(3).setCellValue("是否解决");
+            blockHeaderRow.createCell(4).setCellValue("解决说明");
+            blockHeaderRow.createCell(5).setCellValue("创建时间");
+
+            for (BlockReason block : blocks) {
+                Row blockRow = sheet.createRow(rowNum++);
+                blockRow.createCell(1).setCellValue(block.getBlocker().getName());
+                blockRow.createCell(2).setCellValue(block.getReason());
+                blockRow.createCell(3).setCellValue(block.getIsResolved() ? "是" : "否");
+                blockRow.createCell(4).setCellValue(block.getResolvedNote() != null ? block.getResolvedNote() : "");
+                blockRow.createCell(5).setCellValue(block.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+
+            rowNum++;
+            Row releaseHeaderRow = sheet.createRow(rowNum++);
+            releaseHeaderRow.createCell(0).setCellValue("放行记录");
+            releaseHeaderRow.createCell(1).setCellValue("发布版本");
+            releaseHeaderRow.createCell(2).setCellValue("发布说明");
+            releaseHeaderRow.createCell(3).setCellValue("操作人");
+            releaseHeaderRow.createCell(4).setCellValue("实际发布时间");
+            releaseHeaderRow.createCell(5).setCellValue("创建时间");
+
+            for (ReleaseRecord release : releases) {
+                Row releaseRow = sheet.createRow(rowNum++);
+                releaseRow.createCell(1).setCellValue(release.getReleaseVersion());
+                releaseRow.createCell(2).setCellValue(release.getReleaseNote() != null ? release.getReleaseNote() : "");
+                releaseRow.createCell(3).setCellValue(release.getOperatorName());
+                releaseRow.createCell(4).setCellValue(release.getActualReleaseTime() != null ? 
+                    release.getActualReleaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "");
+                releaseRow.createCell(5).setCellValue(release.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            }
+
+            for (int i = 0; i < 9; i++) {
+                sheet.autoSizeColumn(i);
             }
 
             workbook.write(out);
