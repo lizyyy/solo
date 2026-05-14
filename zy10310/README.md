@@ -151,6 +151,35 @@ RULES_VERSION=1.0.0
 - 凭证状态（已撤销/有效）不变
 - 所有错误和修复建议都可查询
 
+## 修复记录
+
+### 🔧 Issue #1: 创建导入包时 package_id 为空导致 NOT NULL 约束失败
+
+**问题描述**:
+- 创建导入包时，SQLAlchemy 的 `default=generate_uuid` 在 flush 前不会执行
+- 紧接着写入 AuditLog 时，`package.id` 仍然是 `None`
+- 导致数据库抛出 `NOT NULL constraint failed: audit_logs.package_id`
+
+**修复方案** (`app/services.py:119`):
+```python
+# 修复前: 依赖 SQLAlchemy default
+package = ImportPackage(...)
+
+# 修复后: 提前手动生成 id
+package_id = generate_uuid()
+package = ImportPackage(
+    id=package_id,
+    ...
+)
+```
+
+**影响范围**: 此修复确保以下功能正常工作：
+- ✅ 创建导入包 API
+- ✅ 预检流程
+- ✅ 状态推进
+- ✅ 审计日志追溯
+- ✅ 服务重启后数据一致性
+
 ## 扩展建议
 
 1. **添加认证**: 集成 OAuth2 / JWT 进行用户认证

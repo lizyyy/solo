@@ -1,4 +1,6 @@
 import json
+import sys
+sys.path.insert(0, '/opt/homebrew/lib/python3.9/site-packages')
 import requests
 from datetime import datetime
 

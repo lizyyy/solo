@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.models import (
     ImportPackage, FieldMapping, DependencyResource, PrecheckError,
-    FixSuggestion, PassCertificate, AuditLog
+    FixSuggestion, PassCertificate, AuditLog, generate_uuid
 )
 from app.schemas import ImportPackageCreate, StatusAdvanceRequest, RevokeCertificateRequest
 from app.config import get_settings
@@ -116,7 +116,9 @@ class PrecheckService:
         if existing:
             return existing
 
+        package_id = generate_uuid()
         package = ImportPackage(
+            id=package_id,
             tenant_id=package_data.tenant_id,
             package_name=package_data.package_name,
             package_version=package_data.package_version,
