@@ -13,16 +13,17 @@ public class DrillPlan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 100)
     private String requestId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String planName;
 
+    @Column(length = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private DrillStatus status = DrillStatus.CREATED;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -43,11 +44,30 @@ public class DrillPlan {
 
     private LocalDateTime endTime;
 
+    @Column(length = 100)
     private String createdBy;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @Column(length = 1000)
     private String errorMessage;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

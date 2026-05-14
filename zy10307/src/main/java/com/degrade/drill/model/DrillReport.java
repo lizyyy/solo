@@ -13,13 +13,16 @@ public class DrillReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Long drillPlanId;
 
     @Column(nullable = false)
     private String planName;
 
+    private String createdBy;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private DrillStatus finalStatus;
 
     private LocalDateTime startTime;
@@ -28,18 +31,27 @@ public class DrillReport {
 
     private Long durationSeconds;
 
-    private Integer totalRequests;
+    private Integer totalRequests = 0;
 
-    private Integer fallbackHitCount;
+    private Integer fallbackHitCount = 0;
 
-    private Double averageResponseTime;
+    private Double averageResponseTime = 0.0;
 
-    private Double errorRate;
+    private Double errorRate = 0.0;
 
+    @Column(nullable = false)
     private String stopReason;
 
     @Column(columnDefinition = "TEXT")
     private String observations;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime archivedAt = LocalDateTime.now();
+
+    @PrePersist
+    protected void onCreate() {
+        if (archivedAt == null) {
+            archivedAt = LocalDateTime.now();
+        }
+    }
 }
