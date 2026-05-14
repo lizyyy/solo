@@ -90,4 +90,4 @@ class ErrorResponse(BaseModel):
     message: str
     details: Optional[Dict[str, Any]] = None
     request_id: Optional[str] = None
-    timestamp: datetime = Field(default_factory=datetime.now)
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())

@@ -118,6 +118,27 @@ def test_exception_scenario():
     
     response = requests.post(f"{BASE_URL}/api/v1/validate", json=validate_data2)
     print_response("6. 异常场景 - 规则未激活(DRAFT状态)", response)
+    
+    create_rule_data3 = {
+        "name": "路径匹配规则",
+        "api_path": "/api/user/profile",
+        "fields": [{"path": "user.name", "level": "mask"}],
+        "allowed_callers": []
+    }
+    response = requests.post(f"{BASE_URL}/api/v1/rules", json=create_rule_data3, headers=headers)
+    rule_id3 = response.json()["rule_id"]
+    requests.post(f"{BASE_URL}/api/v1/rules/{rule_id3}/approve", headers=headers)
+    
+    validate_data3 = {
+        "rule_id": rule_id3,
+        "caller": "any_service",
+        "request_id": f"req_path_{int(datetime.now().timestamp())}",
+        "api_path": "/api/other/endpoint",
+        "data": {"user": {"name": "李四"}}
+    }
+    
+    response = requests.post(f"{BASE_URL}/api/v1/validate", json=validate_data3)
+    print_response("7. 异常场景 - 请求路径与规则路径不匹配", response)
 
 
 def test_duplicate_scenario():
@@ -149,17 +170,17 @@ def test_duplicate_scenario():
     }
     
     response = requests.post(f"{BASE_URL}/api/v1/validate", json=validate_data)
-    print_response("7. 重复请求场景 - 第一次请求", response)
+    print_response("8. 重复请求场景 - 第一次请求", response)
     
     response = requests.post(f"{BASE_URL}/api/v1/validate", json=validate_data)
-    print_response("8. 重复请求场景 - 第二次请求(相同request_id，返回缓存)", response)
+    print_response("9. 重复请求场景 - 第二次请求(相同request_id，返回缓存)", response)
 
 
 def test_manual_processing():
     headers = {"X-User-Id": "admin_001"}
     
     print("\n" + "="*60)
-    print("场景: 9. 人工处理 - 审计查询")
+    print("场景: 10. 人工处理 - 审计查询")
     print("="*60)
     
     response = requests.get(f"{BASE_URL}/api/v1/records")

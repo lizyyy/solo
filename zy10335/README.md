@@ -225,6 +225,7 @@ python test_data.py
 | RULE_NOT_FOUND | 规则不存在 |
 | RULE_NOT_ACTIVE | 规则未激活 |
 | CALLER_NOT_ALLOWED | 调用方无权限 |
+| PATH_NOT_MATCH | 请求路径与规则路径不匹配 |
 | VALIDATION_ERROR | 请求参数校验失败 |
 | INTERNAL_ERROR | 服务内部错误 |
 | CREATE_FAILED | 规则创建失败 |

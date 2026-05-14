@@ -158,6 +158,17 @@ class DesensitizationService:
             return True
         return caller in rule.allowed_callers
     
+    def match_api_path(self, rule_path: str, request_path: str) -> bool:
+        if rule_path == request_path:
+            return True
+        if rule_path.endswith('/*'):
+            prefix = rule_path[:-1]
+            return request_path.startswith(prefix)
+        if '*' in rule_path:
+            pattern = re.escape(rule_path).replace(r'\*', '.*')
+            return bool(re.match(f'^{pattern}$', request_path))
+        return False
+    
     def process_validation(self, req: ValidationRequest) -> Tuple[Optional[AccessRecord], Dict[str, Any]]:
         existing = self.check_duplicate_request(req.request_id)
         if existing:
@@ -172,6 +183,9 @@ class DesensitizationService:
         
         if not self.validate_caller(rule, req.caller):
             raise ValueError(f"CALLER_NOT_ALLOWED", f"调用方 {req.caller} 无权限")
+        
+        if not self.match_api_path(rule.api_path, req.api_path):
+            raise ValueError(f"PATH_NOT_MATCH", f"请求路径 {req.api_path} 与规则路径 {rule.api_path} 不匹配")
         
         original_digest = compute_digest(req.data)
         desensitized_data = json.loads(json.dumps(req.data))
