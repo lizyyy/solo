@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,16 @@ public class InvalidationController {
     private final InvalidationOrchestratorService orchestratorService;
     private final ExportService exportService;
     private final RetryService retryService;
+
+    @GetMapping("/health")
+    public ApiResponse<Map<String, Object>> healthCheck() {
+        Map<String, Object> health = new HashMap<>();
+        health.put("status", "UP");
+        health.put("service", "cache-invalidation-orchestrator");
+        health.put("version", "1.0.0");
+        health.put("timestamp", LocalDateTime.now());
+        return ApiResponse.success("服务运行正常", health);
+    }
 
     @PostMapping("/batches")
     public ApiResponse<BatchResponse> createBatch(@Valid @RequestBody CreateBatchRequest request) {

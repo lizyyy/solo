@@ -1,0 +1,61 @@
+#!/bin/bash
+
+# Maven Wrapper - 无需系统安装 Maven
+# 自动下载并使用指定版本的 Maven
+
+set -e
+
+MAVEN_VERSION="3.9.6"
+MAVEN_BASE="apache-maven-$MAVEN_VERSION"
+MAVEN_ARCHIVE="$MAVEN_BASE-bin.tar.gz"
+MAVEN_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/$MAVEN_ARCHIVE"
+
+WRAPPER_DIR="$HOME/.m2/wrapper/dists/apache-maven-$MAVEN_VERSION"
+MAVEN_HOME="$WRAPPER_DIR/$MAVEN_BASE"
+
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "========================================"
+    echo "  Maven Wrapper - 正在下载 Maven $MAVEN_VERSION"
+    echo "========================================"
+    echo ""
+    
+    mkdir -p "$WRAPPER_DIR"
+    cd "$WRAPPER_DIR"
+    
+    if command -v curl > /dev/null 2>&1; then
+        echo "  使用 curl 下载..."
+        curl -L -o "$MAVEN_ARCHIVE" "$MAVEN_URL"
+    elif command -v wget > /dev/null 2>&1; then
+        echo "  使用 wget 下载..."
+        wget -O "$MAVEN_ARCHIVE" "$MAVEN_URL"
+    else
+        echo ""
+        echo " [错误] 未找到 curl 或 wget，无法下载 Maven"
+        echo ""
+        echo " 备选方案:"
+        echo "  1. 安装系统 Maven: brew install maven / apt install maven"
+        echo "  2. 在 IDE 中直接运行项目"
+        echo ""
+        exit 1
+    fi
+    
+    echo ""
+    echo "  正在解压..."
+    tar -xzf "$MAVEN_ARCHIVE"
+    rm -f "$MAVEN_ARCHIVE"
+    
+    echo "  Maven 安装完成: $MAVEN_HOME"
+    echo ""
+fi
+
+export MAVEN_HOME
+export PATH="$MAVEN_HOME/bin:$PATH"
+
+echo "========================================"
+echo "  Maven Wrapper - 使用 Maven $MAVEN_VERSION"
+echo "========================================"
+echo ""
+echo "  执行命令: mvn $*"
+echo ""
+
+exec "$MAVEN_HOME/bin/mvn" "$@"

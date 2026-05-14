@@ -312,6 +312,109 @@ PROCESSING ←───┐
         └── application.yml           # 应用配置
 ```
 
+## 故障排查指南
+
+### Q1: start.sh 无法启动，提示"无法自动启动"
+
+**原因**: 没有找到可用的启动方式。
+
+**解决方案**:
+```bash
+# 方案 A: 在 IDE 中运行（最简单）
+# 打开 src/main/java/com/cache/orchestrator/CacheInvalidationApplication.java
+# 右键点击 main 方法 -> Run
+
+# 方案 B: 安装系统 Maven
+brew install maven    # macOS
+sudo apt install maven # Ubuntu
+
+# 方案 C: 在 IDE 中编译后再试
+# IDEA 中: Build -> Build Project
+# 然后再次运行 ./start.sh
+```
+
+### Q2: 启动时卡在下载依赖
+
+**原因**: Maven 中央仓库访问速度慢。
+
+**解决方案**:
+1. 等待下载完成（首次运行需要 1-3 分钟）
+2. 配置阿里云 Maven 镜像：
+```bash
+# 在 ~/.m2/settings.xml 中添加镜像配置
+mkdir -p ~/.m2
+# 编辑 settings.xml 添加阿里云镜像
+```
+
+### Q3: 端口 8080 被占用
+
+**解决方案**:
+```bash
+# 查看端口占用
+lsof -i :8080
+
+# 杀掉占用进程
+kill -9 <PID>
+
+# 或者在 application.yml 中修改端口
+# server:
+#   port: 8081
+```
+
+### Q4: verify.sh 提示"服务启动超时"
+
+**解决方案**:
+1. 检查 start.sh 所在的终端是否有错误输出
+2. 查看 Java 进程是否存在: `ps aux | grep java`
+3. 检查端口是否被占用: `lsof -i :8080`
+4. 首次启动依赖下载慢，多等一会再试
+
+### Q5: 数据库文件损坏
+
+**解决方案**:
+```bash
+# 删除 H2 数据库文件，重新启动会自动重建
+rm -rf data/
+./start.sh
+```
+
+---
+
+## 项目文件说明
+
+```
+.
+├── pom.xml                          # Maven 配置文件
+├── README.md                        # 本文档
+├── start.sh                         # ⭐️ 智能启动脚本（4种启动模式）
+├── verify.sh                        # ⭐️ 服务验证脚本
+├── test-flow.sh                     # ⭐️ 完整流程测试脚本
+├── mvnw                             # Maven Wrapper (Linux/macOS)
+├── mvnw.cmd                         # Maven Wrapper (Windows)
+├── .mvn/
+│   └── wrapper/
+│       └── maven-wrapper.properties # Maven Wrapper 配置
+├── data/                            # H2 数据库文件（自动创建）
+└── src/main/java/com/cache/orchestrator/
+    ├── CacheInvalidationApplication.java  # 主启动类
+    ├── standalone/
+    │   └── StandaloneLauncher.java       # 独立启动器
+    ├── controller/
+    │   └── InvalidationController.java    # API 控制器
+    ├── service/
+    │   ├── InvalidationOrchestratorService.java
+    │   ├── RetryService.java              # 重试服务
+    │   ├── ConfirmationService.java       # 确认回执服务
+    │   ├── KeyResolverService.java        # 键解析服务
+    │   └── ExportService.java             # 导出服务
+    ├── repository/
+    ├── domain/
+    │   ├── entity/                        # 数据实体
+    │   ├── dto/                           # 数据传输对象
+    │   └── enums/                         # 枚举定义
+    └── exception/
+```
+
 ## 技术栈
 
 - Spring Boot 2.7.18
