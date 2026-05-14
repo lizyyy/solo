@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多租户配置发布台 - 诊断控制台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .toolbar { background: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 250px; }
+        .search-box input { width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+        .search-box input:focus { outline: none; border-color: #667eea; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; background: white; padding: 5px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .tab { padding: 10px 20px; border: none; background: transparent; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+        .tab.active { background: #667eea; color: white; }
+        .tab:hover:not(.active) { background: #f0f0f0; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card h3 { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; font-size: 16px; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        .table th { background: #f8f9fa; font-weight: 600; color: #555; }
+        .table tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-secondary { background: #e2e3e5; color: #383d41; }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .status-success .status-dot { background: #28a745; }
+        .status-warning .status-dot { background: #ffc107; }
+        .status-danger .status-dot { background: #dc3545; }
+        .error-detail { background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; padding: 15px; margin-top: 10px; display: none; }
+        .error-detail.show { display: block; }
+        .error-detail h4 { color: #721c24; margin-bottom: 10px; font-size: 14px; }
+        .error-detail pre { background: white; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; }
+        .detail-section { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; display: none; }
+        .detail-section.show { display: block; }
+        .detail-section h4 { margin-bottom: 10px; font-size: 14px; color: #555; }
+        .json-display { background: white; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; overflow-x: auto; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+        .row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 300px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; border-radius: 8px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .modal-header h3 { margin: 0; border: none; padding: 0; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 13px; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+        .stat-card .number { font-size: 32px; font-weight: bold; margin-bottom: 5px; }
+        .stat-card .label { font-size: 13px; color: #666; }
+        .stat-card.success .number { color: #28a745; }
+        .stat-card.warning .number { color: #ffc107; }
+        .stat-card.danger .number { color: #dc3545; }
+        .stat-card.info .number { color: #17a2b8; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .action-buttons { display: flex; gap: 8px; }
+        .loading { text-align: center; padding: 20px; color: #666; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; font-size: 14px; z-index: 2000; display: none; }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔧 多租户配置发布台 - 诊断控制台</h1>
+        <p>监控配置发布状态、诊断灰度范围问题、处理回滚记录</p>
+    </div>
+    
+    <div class="container">
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索租户ID、租户名称、配置项..." oninput="searchAll()">
+            </div>
+            <button class="btn btn-primary" onclick="loadSampleData()">📦 加载样例数据</button>
+            <button class="btn btn-success" onclick="exportReport()">📊 导出报告</button>
+            <button class="btn btn-warning" onclick="refreshAll()">🔄 刷新</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="number" id="statTotal">0</div>
+                <div class="label">总配置数</div>
+            </div>
+            <div class="stat-card info">
+                <div class="number" id="statSuccess">0</div>
+                <div class="label">发布成功</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number" id="statIntercepted">0</div>
+                <div class="label">灰度拦截</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number" id="statRollbacks">0</div>
+                <div class="label">待处理回滚</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('snapshots')">📸 配置快照</button>
+            <button class="tab" onclick="switchTab('rollbacks')">↩️ 回滚记录</button>
+            <button class="tab" onclick="switchTab('logs')">📝 发布日志</button>
+            <button class="tab" onclick="switchTab('configs')">⚙️ 租户配置</button>
+        </div>
+        
+        <div id="tab-snapshots" class="tab-content">
+            <div class="card">
+                <h3>配置快照列表</h3>
+                <div id="snapshots-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-rollbacks" class="tab-content" style="display:none;">
+            <div class="card">
+                <h3>回滚记录列表</h3>
+                <div id="rollbacks-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-logs" class="tab-content" style="display:none;">
+            <div class="card">
+                <h3>发布日志列表</h3>
+                <div id="logs-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tab-configs" class="tab-content" style="display:none;">
+            <div class="card">
+                <h3>租户配置列表</h3>
+                <div id="configs-list">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="diagnoseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 诊断详情</h3>
+                <button class="close-btn" onclick="closeModal('diagnoseModal')">&times;</button>
+            </div>
+            <div id="diagnose-content"></div>
+        </div>
+    </div>
+    
+    <div class="modal" id="handleRollbackModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>↩️ 处理回滚</h3>
+                <button class="close-btn" onclick="closeModal('handleRollbackModal')">&times;</button>
+            </div>
+            <form onsubmit="submitHandleRollback(event)">
+                <input type="hidden" id="rollbackId">
+                <div class="form-group">
+                    <label>处理人</label>
+                    <input type="text" id="handledBy" required placeholder="请输入处理人姓名">
+                </div>
+                <div class="form-group">
+                    <label>处理备注</label>
+                    <textarea id="handleNote" required placeholder="请详细描述处理过程和结果..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">提交处理</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="configDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚙️ 配置详情</h3>
+                <button class="close-btn" onclick="closeModal('configDetailModal')">&times;</button>
+            </div>
+            <div id="config-detail-content"></div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API_BASE = '';
+        let currentTab = 'snapshots';
+        let allData = {
+            snapshots: [],
+            rollbacks: [],
+            logs: [],
+            configs: []
+        };
+        
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE}/api/${endpoint}`);
+                const data = await response.json();
+                return data.success ? data.data : [];
+            } catch (error) {
+                console.error(`Error fetching ${endpoint}:`, error);
+                return [];
+            }
+        }
+        
+        async function loadAllData() {
+            allData.snapshots = await fetchData('snapshots');
+            allData.rollbacks = await fetchData('rollbacks');
+            allData.logs = await fetchData('logs');
+            allData.configs = await fetchData('configs');
+            
+            updateStats();
+            renderSnapshots();
+            renderRollbacks();
+            renderLogs();
+            renderConfigs();
+        }
+        
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allData.configs.length;
+            document.getElementById('statSuccess').textContent = allData.snapshots.filter(s => s.status === 'success').length;
+            document.getElementById('statIntercepted').textContent = allData.snapshots.filter(s => s.gray_intercepted).length;
+            document.getElementById('statRollbacks').textContent = allData.rollbacks.filter(r => r.status === 'pending').length;
+        }
+        
+        function parseGrayScope(grayScope) {
+            try {
+                const gray = typeof grayScope === 'string' ? JSON.parse(grayScope) : grayScope;
+                if (gray.type === 'percentage') return `按比例: ${gray.value}%`;
+                if (gray.type === 'tenant_list') return `指定租户: ${gray.tenants?.length || 0}个`;
+                if (gray.type === 'all') return '全量发布';
+                return JSON.stringify(gray);
+            } catch {
+                return grayScope;
+            }
+        }
+        
+        function renderSnapshots(filteredData = null) {
+            const data = filteredData || allData.snapshots;
+            const container = document.getElementById('snapshots-list');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无快照数据</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>快照ID</th><th>租户</th><th>变更类型</th><th>灰度范围</th><th>状态</th><th>创建人</th><th>创建时间</th><th>操作</th></tr></thead><tbody>';
+            
+            data.forEach(snap => {
+                const statusClass = snap.gray_intercepted ? 'danger' : (snap.status === 'success' ? 'success' : 'warning');
+                const statusText = snap.gray_intercepted ? '已拦截' : (snap.status === 'success' ? '成功' : '处理中');
+                
+                html += `
+                    <tr>
+                        <td><code>${snap.snapshot_id}</code></td>
+                        <td>${snap.tenant_name}</td>
+                        <td><span class="badge badge-info">${snap.change_type}</span></td>
+                        <td>${parseGrayScope(snap.gray_scope)}</td>
+                        <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+                        <td>${snap.created_by}</td>
+                        <td>${snap.created_at}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-primary" onclick="diagnoseSnapshot('${snap.snapshot_id}')">诊断</button>
+                            <button class="btn btn-sm btn-danger" onclick="initRollback('${snap.snapshot_id}', '${snap.tenant_id}', '${snap.tenant_name}')">回滚</button>
+                        </td>
+                    </tr>
+                    ${snap.intercept_reason ? `
+                    <tr>
+                        <td colspan="8">
+                            <div class="error-detail show">
+                                <h4>⚠️ 拦截原因</h4>
+                                <pre>${snap.intercept_reason}</pre>
+                            </div>
+                        </td>
+                    </tr>
+                    ` : ''}
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function renderRollbacks(filteredData = null) {
+            const data = filteredData || allData.rollbacks;
+            const container = document.getElementById('rollbacks-list');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无回滚记录</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>回滚ID</th><th>关联快照</th><th>租户</th><th>回滚原因</th><th>类型</th><th>处理人</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+            
+            data.forEach(rbk => {
+                const statusClass = rbk.is_manual_handled ? 'success' : (rbk.status === 'pending' ? 'warning' : 'info');
+                const statusText = rbk.is_manual_handled ? '已处理' : (rbk.status === 'pending' ? '待处理' : rbk.status);
+                const typeClass = rbk.rollback_type === 'emergency' ? 'danger' : 'warning';
+                
+                html += `
+                    <tr>
+                        <td><code>${rbk.rollback_id}</code></td>
+                        <td><code>${rbk.snapshot_id}</code></td>
+                        <td>${rbk.tenant_name}</td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${rbk.rollback_reason}</td>
+                        <td><span class="badge badge-${typeClass}">${rbk.rollback_type === 'emergency' ? '紧急' : '普通'}</span></td>
+                        <td>${rbk.handled_by || '-'}</td>
+                        <td><span class="badge badge-${statusClass}">${statusText}</span></td>
+                        <td class="action-buttons">
+                            ${!rbk.is_manual_handled ? `
+                                <button class="btn btn-sm btn-success" onclick="openHandleRollback('${rbk.rollback_id}')">处理</button>
+                            ` : `
+                                <button class="btn btn-sm btn-info" onclick="showRollbackDetail('${rbk.rollback_id}')">详情</button>
+                            `}
+                        </td>
+                    </tr>
+                    ${rbk.handle_note ? `
+                    <tr>
+                        <td colspan="8">
+                            <div class="detail-section show">
+                                <h4>📝 处理备注</h4>
+                                <pre>${rbk.handle_note}</pre>
+                                <p style="margin-top: 10px; font-size: 12px; color: #666;">处理人: ${rbk.handled_by} | 处理时间: ${rbk.handled_at || '-'}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    ` : ''}
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function renderLogs(filteredData = null) {
+            const data = filteredData || allData.logs;
+            const container = document.getElementById('logs-list');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无日志数据</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>日志ID</th><th>动作</th><th>状态</th><th>重试次数</th><th>创建人</th><th>时间</th><th>操作</th></tr></thead><tbody>';
+            
+            data.forEach(log => {
+                const statusClass = log.status === 'success' ? 'success' : (log.status === 'intercepted' ? 'danger' : 'warning');
+                
+                html += `
+                    <tr>
+                        <td><code>${log.log_id}</code></td>
+                        <td><span class="badge badge-info">${log.action === 'publish' ? '发布' : '回滚'}</span></td>
+                        <td><span class="badge badge-${statusClass}">${log.status}</span></td>
+                        <td>${log.retry_count || 0}</td>
+                        <td>${log.created_by}</td>
+                        <td>${log.created_at}</td>
+                        <td class="action-buttons">
+                            ${log.status === 'intercepted' ? `
+                                <button class="btn btn-sm btn-warning" onclick="retryLog('${log.log_id}')">重试</button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-info" onclick="showLogDetail('${log.log_id}')">详情</button>
+                        </td>
+                    </tr>
+                    ${log.error_detail ? `
+                    <tr>
+                        <td colspan="7">
+                            <div class="error-detail show">
+                                <h4>❌ 错误详情</h4>
+                                <pre>${log.error_detail}</pre>
+                            </div>
+                        </td>
+                    </tr>
+                    ` : ''}
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function renderConfigs(filteredData = null) {
+            const data = filteredData || allData.configs;
+            const container = document.getElementById('configs-list');
+            
+            if (data.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无配置数据</div>';
+                return;
+            }
+            
+            let html = '<table class="table"><thead><tr><th>租户ID</th><th>租户名称</th><th>配置项</th><th>配置值</th><th>灰度范围</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody>';
+            
+            data.forEach(cfg => {
+                html += `
+                    <tr>
+                        <td><code>${cfg.tenant_id}</code></td>
+                        <td>${cfg.tenant_name}</td>
+                        <td>${cfg.config_key}</td>
+                        <td><code>${cfg.config_value}</code></td>
+                        <td>${parseGrayScope(cfg.gray_scope)}</td>
+                        <td><span class="badge badge-success">${cfg.status}</span></td>
+                        <td>${cfg.created_at}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-info" onclick="showConfigDetail(${cfg.id})">详情</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+        }
+        
+        function searchAll() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!keyword) {
+                renderSnapshots();
+                renderRollbacks();
+                renderLogs();
+                renderConfigs();
+                return;
+            }
+            
+            const filteredSnapshots = allData.snapshots.filter(s => 
+                s.snapshot_id.toLowerCase().includes(keyword) ||
+                s.tenant_name.toLowerCase().includes(keyword) ||
+                s.tenant_id.toLowerCase().includes(keyword) ||
+                s.change_type.toLowerCase().includes(keyword)
+            );
+            
+            const filteredRollbacks = allData.rollbacks.filter(r =>
+                r.rollback_id.toLowerCase().includes(keyword) ||
+                r.snapshot_id.toLowerCase().includes(keyword) ||
+                r.tenant_name.toLowerCase().includes(keyword) ||
+                r.rollback_reason.toLowerCase().includes(keyword)
+            );
+            
+            const filteredLogs = allData.logs.filter(l =>
+                l.log_id.toLowerCase().includes(keyword) ||
+                (l.snapshot_id && l.snapshot_id.toLowerCase().includes(keyword)) ||
+                l.created_by.toLowerCase().includes(keyword)
+            );
+            
+            const filteredConfigs = allData.configs.filter(c =>
+                c.tenant_id.toLowerCase().includes(keyword) ||
+                c.tenant_name.toLowerCase().includes(keyword) ||
+                c.config_key.toLowerCase().includes(keyword)
+            );
+            
+            renderSnapshots(filteredSnapshots);
+            renderRollbacks(filteredRollbacks);
+            renderLogs(filteredLogs);
+            renderConfigs(filteredConfigs);
+        }
+        
+        async function diagnoseSnapshot(snapshotId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/diagnose/${snapshotId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const content = document.getElementById('diagnose-content');
+                    const { snapshot, issues, suggestions, rollback_record } = data.data;
+                    
+                    content.innerHTML = `
+                        <div class="card" style="margin-bottom: 15px; padding: 15px; background: #f8f9fa;">
+                            <h4 style="margin-bottom: 10px;">📋 快照基本信息</h4>
+                            <p><strong>快照ID:</strong> <code>${snapshot.snapshot_id}</code></p>
+                            <p><strong>租户:</strong> ${snapshot.tenant_name}</p>
+                            <p><strong>变更类型:</strong> ${snapshot.change_type}</p>
+                            <p><strong>灰度范围:</strong> ${parseGrayScope(snapshot.gray_scope)}</p>
+                            <p><strong>状态:</strong> <span class="badge badge-${snapshot.gray_intercepted ? 'danger' : 'success'}">${snapshot.gray_intercepted ? '已拦截' : '正常'}</span></p>
+                        </div>
+                        
+                        ${issues.length > 0 ? `
+                        <div class="card" style="margin-bottom: 15px; padding: 15px; background: #fff3cd;">
+                            <h4 style="margin-bottom: 10px;">⚠️ 发现的问题</h4>
+                            <ul>
+                                ${issues.map(i => `<li>${i}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        
+                        ${suggestions.length > 0 ? `
+                        <div class="card" style="margin-bottom: 15px; padding: 15px; background: #d4edda;">
+                            <h4 style="margin-bottom: 10px;">💡 优化建议</h4>
+                            <ul>
+                                ${suggestions.map(s => `<li>${s}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        
+                        ${rollback_record ? `
+                        <div class="card" style="margin-bottom: 15px; padding: 15px; background: #f8d7da;">
+                            <h4 style="margin-bottom: 10px;">↩️ 关联回滚记录</h4>
+                            <p><strong>回滚ID:</strong> <code>${rollback_record.rollback_id}</code></p>
+                            <p><strong>原因:</strong> ${rollback_record.rollback_reason}</p>
+                            <p><strong>状态:</strong> <span class="badge badge-${rollback_record.is_manual_handled ? 'success' : 'warning'}">${rollback_record.is_manual_handled ? '已处理' : '待处理'}</span></p>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="row">
+                            <div class="col">
+                                <h4 style="margin-bottom: 10px;">📄 配置变更前</h4>
+                                <div class="json-display">${JSON.stringify(snapshot.configs_before, null, 2)}</div>
+                            </div>
+                            <div class="col">
+                                <h4 style="margin-bottom: 10px;">📄 配置变更后</h4>
+                                <div class="json-display">${JSON.stringify(snapshot.configs_after, null, 2)}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.getElementById('diagnoseModal').classList.add('show');
+                }
+            } catch (error) {
+                showToast('诊断失败', 'error');
+            }
+        }
+        
+        async function initRollback(snapshotId, tenantId, tenantName) {
+            const reason = prompt('请输入回滚原因:');
+            if (!reason) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/rollback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        snapshot_id: snapshotId,
+                        tenant_id: tenantId,
+                        tenant_name: tenantName,
+                        rollback_reason: reason,
+                        rollback_type: 'normal'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('回滚请求已提交', 'success');
+                    loadAllData();
+                } else {
+                    showToast(data.error || '回滚失败', 'error');
+                }
+            } catch (error) {
+                showToast('回滚失败', 'error');
+            }
+        }
+        
+        function openHandleRollback(rollbackId) {
+            document.getElementById('rollbackId').value = rollbackId;
+            document.getElementById('handledBy').value = '';
+            document.getElementById('handleNote').value = '';
+            document.getElementById('handleRollbackModal').classList.add('show');
+        }
+        
+        async function submitHandleRollback(event) {
+            event.preventDefault();
+            const rollbackId = document.getElementById('rollbackId').value;
+            const handledBy = document.getElementById('handledBy').value;
+            const handleNote = document.getElementById('handleNote').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/rollbacks/${rollbackId}/handle`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ handled_by: handledBy, handle_note: handleNote })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    showToast('处理成功', 'success');
+                    closeModal('handleRollbackModal');
+                    loadAllData();
+                } else {
+                    showToast(data.error || '处理失败', 'error');
+                }
+            } catch (error) {
+                showToast('处理失败', 'error');
+            }
+        }
+        
+        function showRollbackDetail(rollbackId) {
+            const rollback = allData.rollbacks.find(r => r.rollback_id === rollbackId);
+            if (rollback) {
+                diagnoseSnapshot(rollback.snapshot_id);
+            }
+        }
+        
+        async function retryLog(logId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/logs/${logId}/retry`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('重试计数已更新', 'success');
+                    loadAllData();
+                }
+            } catch (error) {
+                showToast('重试失败', 'error');
+            }
+        }
+        
+        function showLogDetail(logId) {
+            const log = allData.logs.find(l => l.log_id === logId);
+            if (log && log.snapshot_id) {
+                diagnoseSnapshot(log.snapshot_id);
+            }
+        }
+        
+        function showConfigDetail(configId) {
+            const config = allData.configs.find(c => c.id === configId);
+            if (config) {
+                const content = document.getElementById('config-detail-content');
+                content.innerHTML = `
+                    <div class="card" style="margin-bottom: 15px; padding: 15px; background: #f8f9fa;">
+                        <h4 style="margin-bottom: 10px;">📋 基本信息</h4>
+                        <p><strong>租户ID:</strong> <code>${config.tenant_id}</code></p>
+                        <p><strong>租户名称:</strong> ${config.tenant_name}</p>
+                        <p><strong>配置项:</strong> ${config.config_key}</p>
+                        <p><strong>配置值:</strong> <code>${config.config_value}</code></p>
+                    </div>
+                    
+                    <div class="card" style="margin-bottom: 15px; padding: 15px; background: #d1ecf1;">
+                        <h4 style="margin-bottom: 10px;">📥 原始输入 (raw_input)</h4>
+                        <div class="json-display">${config.raw_input}</div>
+                    </div>
+                    
+                    ${config.processed_result ? `
+                    <div class="card" style="margin-bottom: 15px; padding: 15px; background: #d4edda;">
+                        <h4 style="margin-bottom: 10px;">📤 处理结果 (processed_result)</h4>
+                        <div class="json-display">${config.processed_result}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <p style="margin-top: 15px; font-size: 12px; color: #666;">
+                        创建时间: ${config.created_at} | 更新时间: ${config.updated_at || '-'}
+                    </p>
+                `;
+                document.getElementById('configDetailModal').classList.add('show');
+            }
+        }
+        
+        async function loadSampleData() {
+            if (!confirm('确定要加载样例数据吗？这将插入一些包含问题数据的示例。')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/sample-data`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('样例数据加载成功！', 'success');
+                    loadAllData();
+                }
+            } catch (error) {
+                showToast('加载失败', 'error');
+            }
+        }
+        
+        function exportReport() {
+            window.location.href = `${API_BASE}/api/export`;
+            showToast('报告导出中...', 'success');
+        }
+        
+        function refreshAll() {
+            loadAllData();
+            showToast('数据已刷新', 'success');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+        
+        loadAllData();
+    </script>
+</body>
+</html>
