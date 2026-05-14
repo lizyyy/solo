@@ -326,7 +326,7 @@ func (s *migrationService) RollbackMigration(req *models.RollbackRequest) (*mode
 		fmt.Sprintf("执行回滚至阶段: %s, 原因: %s", rollbackPoint.Phase, req.Reason))
 	s.repo.UpdateTaskStatus(task.ID, models.StatusRollingBack, "ROLLING_BACK", "")
 
-	err = s.restoreFromRollbackPoint(task, rollbackPoint)
+	restoredPhase, err := s.restoreFromRollbackPoint(task, rollbackPoint)
 	if err != nil {
 		logger.Errorf("Failed to restore from rollback point: %v", err)
 		s.repo.UpdateTaskStatus(task.ID, models.StatusFailed, "FAILED", "回滚失败: "+err.Error())
@@ -334,19 +334,19 @@ func (s *migrationService) RollbackMigration(req *models.RollbackRequest) (*mode
 	}
 
 	s.recordStatusChange(task.ID, models.StatusRollingBack, models.StatusRolledBack, req.Operator,
-		fmt.Sprintf("回滚完成，已恢复至阶段: %s", rollbackPoint.Phase))
-	s.repo.UpdateTaskStatus(task.ID, models.StatusRolledBack, "ROLLED_BACK", "")
+		fmt.Sprintf("回滚完成，已恢复至阶段: %s", restoredPhase))
+	s.repo.UpdateTaskStatus(task.ID, models.StatusRolledBack, restoredPhase, "")
 
-	logger.Infof("Migration task rolled back successfully: %s to phase: %s", req.TaskID, rollbackPoint.Phase)
+	logger.Infof("Migration task rolled back successfully: %s to phase: %s", req.TaskID, restoredPhase)
 	return &models.RollbackResponse{
 		TaskID:            task.ID,
 		Status:            models.StatusRolledBack,
 		RollbackPointID:   req.RollbackPointID,
-		RolledBackToPhase: rollbackPoint.Phase,
+		RolledBackToPhase: restoredPhase,
 	}, nil
 }
 
-func (s *migrationService) restoreFromRollbackPoint(task *models.MigrationTask, point *models.RollbackPoint) error {
+func (s *migrationService) restoreFromRollbackPoint(task *models.MigrationTask, point *models.RollbackPoint) (string, error) {
 	logger.Infof("Restoring task %s from rollback point %s to phase %s", task.ID, point.ID, point.Phase)
 
 	var snapshot map[string]interface{}
@@ -354,19 +354,17 @@ func (s *migrationService) restoreFromRollbackPoint(task *models.MigrationTask, 
 		logger.Warnf("Failed to parse snapshot data: %v, using default restore logic", err)
 	}
 
-	targetPhase := point.Phase
+	restoredPhase := point.Phase
 	if snapshotPhase, ok := snapshot["task_current_phase"].(string); ok {
-		targetPhase = snapshotPhase
+		restoredPhase = snapshotPhase
 	}
 
 	time.Sleep(300 * time.Millisecond)
 
 	s.simulateRollbackByPhase(point.Phase, snapshot)
 
-	task.CurrentPhase = targetPhase
-
-	logger.Infof("Task %s restored to phase %s successfully (snapshot applied)", task.ID, point.Phase)
-	return nil
+	logger.Infof("Task %s restored to phase %s successfully (snapshot applied)", task.ID, restoredPhase)
+	return restoredPhase, nil
 }
 
 func (s *migrationService) simulateRollbackByPhase(phase string, snapshot map[string]interface{}) {
