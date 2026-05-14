@@ -236,13 +236,17 @@ app.post('/api/borrow', (req, res) => {
     return res.status(400).json({ error: '必须提供预约 ID，请先创建带看预约再借出钥匙' });
   }
 
+  const appointmentIdNum = Number(appointment_id);
+  const keyIdNum = key_id ? Number(key_id) : null;
+  const agentIdNum = agent_id ? Number(agent_id) : null;
+
   db.get(`
     SELECT a.id, a.key_id, a.agent_id, a.status, a.appointment_date,
            k.status as key_status
     FROM appointments a
     JOIN keys k ON a.key_id = k.id
     WHERE a.id = ?
-  `, [appointment_id], (err, appointment) => {
+  `, [appointmentIdNum], (err, appointment) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!appointment) return res.status(400).json({ error: '预约不存在，请检查预约 ID' });
 
@@ -254,11 +258,11 @@ app.post('/api/borrow', (req, res) => {
       return res.status(400).json({ error: '该预约已过期，请创建新的预约' });
     }
 
-    if (key_id && appointment.key_id !== key_id) {
+    if (keyIdNum && appointment.key_id !== keyIdNum) {
       return res.status(400).json({ error: '钥匙 ID 与预约不匹配' });
     }
 
-    if (agent_id && appointment.agent_id !== agent_id) {
+    if (agentIdNum && appointment.agent_id !== agentIdNum) {
       return res.status(400).json({ error: '经纪人 ID 与预约不匹配' });
     }
 
@@ -270,8 +274,8 @@ app.post('/api/borrow', (req, res) => {
       return res.status(400).json({ error: '钥匙已被借出' });
     }
 
-    const actualKeyId = key_id || appointment.key_id;
-    const actualAgentId = agent_id || appointment.agent_id;
+    const actualKeyId = keyIdNum || appointment.key_id;
+    const actualAgentId = agentIdNum || appointment.agent_id;
 
     const borrow_time = formatSQLiteDate(new Date());
     const expected_return_time = formatSQLiteDate(new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000));
@@ -280,14 +284,14 @@ app.post('/api/borrow', (req, res) => {
     db.run(`
       INSERT INTO borrow_records (borrow_code, key_id, agent_id, appointment_id, borrow_time, expected_return_time, notes)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [borrow_code, actualKeyId, actualAgentId, appointment_id, borrow_time, expected_return_time, notes], function(err) {
+    `, [borrow_code, actualKeyId, actualAgentId, appointmentIdNum, borrow_time, expected_return_time, notes], function(err) {
       if (err) return res.status(400).json({ error: err.message });
       const borrowId = this.lastID;
 
       db.run('UPDATE keys SET status = ? WHERE id = ?', ['borrowed', actualKeyId], (err) => {
         if (err) return res.status(500).json({ error: err.message });
 
-        db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', appointment_id], (err) => {
+        db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', appointmentIdNum], (err) => {
           if (err) console.error(err);
         });
 
@@ -296,7 +300,7 @@ app.post('/api/borrow', (req, res) => {
           borrow_code, 
           key_id: actualKeyId, 
           agent_id: actualAgentId, 
-          appointment_id,
+          appointment_id: appointmentIdNum,
           borrow_time, 
           expected_return_time, 
           status: 'borrowed', 
