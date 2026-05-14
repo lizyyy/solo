@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"client-capability-negotiation/internal/model"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -102,9 +103,9 @@ func (s *Storage) GetDeclarationsByClient(clientID string) ([]model.CapabilityDe
 }
 
 func (s *Storage) CreateNegotiationResult(result *model.NegotiationResult) error {
-	result := s.db.Create(result)
-	if result.Error != nil {
-		return fmt.Errorf("failed to create negotiation result: %w", result.Error)
+	dbResult := s.db.Create(result)
+	if dbResult.Error != nil {
+		return fmt.Errorf("failed to create negotiation result: %w", dbResult.Error)
 	}
 	return nil
 }
