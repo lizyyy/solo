@@ -169,6 +169,7 @@ class ImportPackage(ImportPackageBase):
 
     class Config:
         from_attributes = True
+        model_fields = {"metadata": {"alias": "metadata_", "default": {}}}
 
 
 class ImportPackageListItem(BaseModel):

@@ -121,10 +121,29 @@ async def get_package(package_id: str, db: Session = Depends(get_db)):
     if not package:
         raise HTTPException(status_code=404, detail="导入包不存在")
 
+    package_data = {
+        "id": package.id,
+        "tenant_id": package.tenant_id,
+        "package_name": package.package_name,
+        "package_version": package.package_version,
+        "metadata": package.metadata_ or {},
+        "status": package.status,
+        "created_by": package.created_by,
+        "created_at": package.created_at,
+        "updated_at": package.updated_at,
+        "completed_at": package.completed_at,
+        "rules_version": package.rules_version,
+        "source_hash": package.source_hash,
+        "field_mappings": package.field_mappings,
+        "dependency_resources": package.dependency_resources,
+        "precheck_errors": package.precheck_errors,
+        "pass_certificates": package.pass_certificates
+    }
+
     return ApiResponse(
         success=True,
         message="查询成功",
-        data=ImportPackage.model_validate(package)
+        data=ImportPackage.model_validate(package_data)
     )
 
 

@@ -31,6 +31,14 @@ class ImportPackage(Base):
     pass_certificates = relationship("PassCertificate", back_populates="import_package", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="import_package", cascade="all, delete-orphan")
 
+    @property
+    def metadata(self):
+        return self.metadata_ or {}
+
+    @metadata.setter
+    def metadata(self, value):
+        self.metadata_ = value
+
 
 class FieldMapping(Base):
     __tablename__ = "field_mappings"

@@ -180,6 +180,38 @@ package = ImportPackage(
 - ✅ 审计日志追溯
 - ✅ 服务重启后数据一致性
 
+---
+
+### 🔧 Issue #2: metadata 字段映射导致 Pydantic 验证失败
+
+**问题描述**:
+- SQLAlchemy 模型中使用 `metadata_`（因为 `metadata` 是 SQLAlchemy 的保留属性名）
+- Pydantic Schema 中定义的是 `metadata: Dict[str, Any]`
+- 直接调用 `ImportPackage.model_validate(package)` 时，Pydantic 读取到的是 SQLAlchemy 的 `MetaData()` 对象而非字典
+- 报错：`metadata Input should be a valid dictionary`
+
+**修复方案** (`app/main.py:124-141`):
+
+```python
+# 修复前: 直接使用 SQLAlchemy 对象
+ImportPackage.model_validate(package)
+
+# 修复后: 手动构造字典并正确映射 metadata_ -> metadata
+package_data = {
+    "id": package.id,
+    "metadata": package.metadata_ or {},  # 正确使用 metadata_ 并映射为 metadata
+    ...
+}
+ImportPackage.model_validate(package_data)
+```
+
+**补充修复** (`app/models.py:34-40`):
+- 添加了 `metadata` property 作为 getter/setter，确保代码可读性
+
+**影响范围**: 此修复确保以下功能正常工作：
+- ✅ 查询导入包详情 API
+- ✅ 完整的 API 闭环（创建→查询→预检→推进→撤销→导出）
+
 ## 扩展建议
 
 1. **添加认证**: 集成 OAuth2 / JWT 进行用户认证

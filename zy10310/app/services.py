@@ -387,7 +387,7 @@ class PrecheckService:
                 "created_at": package.created_at.isoformat() if package.created_at else None,
                 "completed_at": package.completed_at.isoformat() if package.completed_at else None,
                 "rules_version": package.rules_version,
-                "metadata": package.metadata_
+                "metadata": package.metadata_ or {},
             },
             "field_mappings": [
                 {

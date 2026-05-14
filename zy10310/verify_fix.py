@@ -3,11 +3,10 @@
 租户导入预检 API - 修复验证脚本
 验证创建导入包、预检、状态推进、审计日志等核心功能
 """
-import subprocess
 import sys
+sys.path.insert(0, '/opt/homebrew/lib/python3.9/site-packages')
 import time
 import requests
-import os
 
 BASE_URL = "http://localhost:8000"
 
@@ -95,7 +94,7 @@ def test_create_package():
 
 def test_get_package(package_id):
     """测试: 查询导入包详情"""
-    print_step(2, "查询导入包详情")
+    print_step(2, "查询导入包详情 (metadata 修复验证)")
     
     try:
         response = requests.get(f"{BASE_URL}/api/v1/packages/{package_id}")
@@ -104,6 +103,13 @@ def test_get_package(package_id):
             data = result["data"]
             print_success(f"查询成功!")
             print(f"   包名称: {data['package_name']}")
+            print(f"   metadata: {data['metadata']} (类型: {type(data['metadata']).__name__})")
+            
+            if isinstance(data['metadata'], dict):
+                print_success(f"  metadata 字段正确为字典类型!")
+            else:
+                print_error(f"  metadata 字段类型错误!")
+                
             print(f"   字段映射数: {len(data['field_mappings'])}")
             print(f"   依赖资源数: {len(data['dependency_resources'])}")
             print(f"   审计日志数: {len(data['audit_logs'])}")
@@ -113,6 +119,8 @@ def test_get_package(package_id):
             return False
     except Exception as e:
         print_error(f"请求异常: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def test_run_precheck(package_id):
