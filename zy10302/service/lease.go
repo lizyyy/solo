@@ -208,7 +208,20 @@ func (s *LeaseService) ReleaseLease(leaseID, holderID, reason string) error {
 		return ErrInvalidLeaseHolder
 	}
 
+	if !lease.IsActive {
+		s.timeline.RecordEvent(lease.TaskID, leaseID, "RELEASE_DENIED_INACTIVE", holderID,
+			"Attempt to release an already inactive lease",
+			fmt.Sprintf("Lease acquired at: %v", lease.AcquiredAt))
+		return errors.New("lease is already inactive")
+	}
+
 	now := time.Now().UTC()
+	if now.After(lease.ExpiresAt) {
+		s.timeline.RecordEvent(lease.TaskID, leaseID, "RELEASE_DENIED_EXPIRED", holderID,
+			"Attempt to release an already expired lease",
+			fmt.Sprintf("Expired at: %v, Current time: %v", lease.ExpiresAt, now))
+		return ErrLeaseExpired
+	}
 
 	releaseRecord := &model.ReleaseRecord{
 		ID:          generateID(),
@@ -234,8 +247,18 @@ func (s *LeaseService) ReleaseLease(leaseID, holderID, reason string) error {
 	}
 
 	if task.Status != model.TaskStatusCompleted && task.Status != model.TaskStatusFailed {
-		if err := s.repo.UpdateTaskStatus(lease.TaskID, model.TaskStatusPending); err != nil {
+		activeLease, err := s.repo.GetActiveLease(lease.TaskID)
+		if err != nil {
 			return err
+		}
+		if activeLease == nil {
+			if err := s.repo.UpdateTaskStatus(lease.TaskID, model.TaskStatusPending); err != nil {
+				return err
+			}
+		} else {
+			s.timeline.RecordEvent(lease.TaskID, leaseID, "TASK_STATUS_PRESERVED", holderID,
+				"Task status not changed to pending - another active lease exists",
+				fmt.Sprintf("Active lease holder: %s", activeLease.HolderID))
 		}
 	}
 
