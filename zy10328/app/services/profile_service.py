@@ -11,7 +11,7 @@ from app.models.schema import (
     HistoryRecord, RequestDeduplication
 )
 from app.models.schemas import (
-    EntryAPICreate, StatusEnum, RiskLevelEnum
+    EntryAPICreate, StatusEnum, RiskLevelEnum, StatusUpdate
 )
 
 
