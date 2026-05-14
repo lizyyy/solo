@@ -1,0 +1,33 @@
+{
+  "name": "return-sample-archive",
+  "version": "1.0.0",
+  "description": "返回样本归档命令行工具",
+  "main": "dist/index.js",
+  "bin": {
+    "rsa": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "test": "ts-node src/self-test.ts",
+    "seed": "ts-node src/seed-data.ts"
+  },
+  "keywords": ["archive", "cli", "recording"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2",
+    "cli-table3": "^0.6.3",
+    "inquirer": "^8.2.6",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/inquirer": "^8.2.6",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
+  }
+}

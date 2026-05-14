@@ -1,0 +1,28 @@
+[
+  {
+    "batchId": "AFS-2024-0515",
+    "batchName": "跨天售后录音归档",
+    "source": "客服系统-售后录音转写",
+    "processingBasis": "售后质量检测标准V2.0",
+    "totalRecords": 5,
+    "successCount": 1,
+    "abnormalCount": 0,
+    "pendingCount": 2,
+    "correctedCount": 2,
+    "createdAt": "2026-05-14T16:40:03.318Z",
+    "processedAt": "2026-05-14T16:40:09.437Z"
+  },
+  {
+    "batchId": "TEST-BATCH",
+    "batchName": "测试批次",
+    "source": "测试来源",
+    "processingBasis": "测试依据",
+    "totalRecords": 2,
+    "successCount": 0,
+    "abnormalCount": 0,
+    "pendingCount": 2,
+    "correctedCount": 0,
+    "createdAt": "2026-05-14T16:40:09.436Z",
+    "processedAt": "2026-05-14T16:40:09.437Z"
+  }
+]
