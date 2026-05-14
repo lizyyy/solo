@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推荐规则调试台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .header p {
+            opacity: 0.9;
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .filter-box {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .filter-box select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #444;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-fixed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-rolled_back {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .status-compensated {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .score-diff {
+            font-weight: 600;
+        }
+        .score-negative {
+            color: #dc3545;
+        }
+        .score-positive {
+            color: #28a745;
+        }
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: 20px;
+        }
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 20px;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .section {
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #444;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            display: inline-block;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .detail-item {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .score-comparison {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .score-item {
+            text-align: center;
+        }
+        .score-item-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .score-item-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        .score-arrow {
+            font-size: 24px;
+            color: #999;
+        }
+        .json-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .candidate-table {
+            width: 100%;
+            font-size: 13px;
+        }
+        .candidate-table th, .candidate-table td {
+            padding: 10px 12px;
+        }
+        .dirty-data-badge {
+            background: #dc3545;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        .treatment-section {
+            background: #fff3cd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+        .treatment-section h4 {
+            margin-bottom: 12px;
+            color: #856404;
+        }
+        .treatment-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .treatment-option {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .treatment-option:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .import-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .import-area:hover {
+            border-color: #667eea;
+            background: #667eea08;
+        }
+        .checkbox-cell {
+            width: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 推荐规则调试台</h1>
+            <p>监控和处理推荐系统中的排序分数异常、屏蔽规则误判等问题</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="totalErrors">-</div>
+                <div class="stat-label">总错误数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingCount">-</div>
+                <div class="stat-label">待处理</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="fixedCount">-</div>
+                <div class="stat-label">已修正</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="affectedUsers">-</div>
+                <div class="stat-label">受影响用户</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-success" onclick="generateSampleData()">
+                📊 生成样本数据
+            </button>
+            <button class="btn btn-primary" onclick="showImportModal()">
+                📤 批量导入
+            </button>
+            <button class="btn btn-warning" onclick="exportData()">
+                📥 导出Excel
+            </button>
+            <button class="btn btn-danger" id="batchCompensateBtn" onclick="batchCompensate()" disabled>
+                🔧 批量补偿
+            </button>
+            <div class="filter-box">
+                <select id="statusFilter" onchange="loadErrors()">
+                    <option value="">全部状态</option>
+                    <option value="pending">待处理</option>
+                    <option value="fixed">已修正</option>
+                    <option value="rolled_back">已回滚</option>
+                    <option value="compensated">已补偿</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="checkbox-cell"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>用户ID</th>
+                        <th>错误类型</th>
+                        <th>原始分数</th>
+                        <th>处理后分数</th>
+                        <th>分数差异</th>
+                        <th>屏蔽原因</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="errorsTable">
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>错误详情</h3>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="detailBody">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入</h3>
+                <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-area" onclick="document.getElementById('importFile').click()">
+                    <p style="font-size: 18px; margin-bottom: 8px;">📁 点击或拖拽文件到此处</p>
+                    <p style="color: #666; font-size: 14px;">支持 Excel (.xlsx) 或 CSV 格式</p>
+                </div>
+                <input type="file" id="importFile" style="display: none;" accept=".xlsx,.csv" onchange="handleImport(event)">
+                <div id="importResult" style="margin-top: 16px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentPage = 1;
+        let selectedErrors = new Set();
+        let currentErrorId = null;
+
+        async function loadStats() {
+            try {
+                const res = await fetch(`${API_BASE}/stats`);
+                const data = await res.json();
+                document.getElementById('totalErrors').textContent = data.total_errors;
+                document.getElementById('pendingCount').textContent = data.status_counts.pending || 0;
+                document.getElementById('fixedCount').textContent = (data.status_counts.fixed || 0) + (data.status_counts.rolled_back || 0) + (data.status_counts.compensated || 0);
+                document.getElementById('affectedUsers').textContent = data.total_users;
+            } catch (e) {
+                console.error('加载统计数据失败', e);
+            }
+        }
+
+        async function loadErrors() {
+            const status = document.getElementById('statusFilter').value;
+            try {
+                const res = await fetch(`${API_BASE}/errors?page=${currentPage}&page_size=10&status=${status}`);
+                const data = await res.json();
+                renderErrors(data.data);
+                renderPagination(data.total_pages);
+            } catch (e) {
+                console.error('加载错误列表失败', e);
+            }
+        }
+
+        function renderErrors(errors) {
+            const tbody = document.getElementById('errorsTable');
+            tbody.innerHTML = errors.map(error => {
+                const diff = error.score_before - error.score_after;
+                const diffClass = diff > 0 ? 'score-negative' : 'score-positive';
+                const hasDirtyData = error.has_dirty_data ? '<span class="dirty-data-badge">脏数据</span>' : '';
+                return `
+                    <tr>
+                        <td class="checkbox-cell">
+                            <input type="checkbox" class="error-checkbox" value="${error.id}" onchange="toggleErrorSelection('${error.id}')">
+                        </td>
+                        <td>${error.user_id}</td>
+                        <td>${error.error_type}${hasDirtyData}</td>
+                        <td>${error.score_before.toFixed(3)}</td>
+                        <td>${error.score_after.toFixed(3)}</td>
+                        <td class="score-diff ${diffClass}">${diff > 0 ? '-' : '+'}${Math.abs(diff).toFixed(3)}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${error.block_reason || '-'}</td>
+                        <td><span class="status-badge status-${error.status}">${getStatusLabel(error.status)}</span></td>
+                        <td>${formatTime(error.created_at)}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn btn-primary" onclick="showDetail('${error.id}')">详情</button>
+                                ${error.status === 'pending' ? `
+                                    <button class="action-btn btn-warning" onclick="rollbackError('${error.id}')">回滚</button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderPagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadErrors();
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': '待处理',
+                'fixed': '已修正',
+                'rolled_back': '已回滚',
+                'compensated': '已补偿'
+            };
+            return labels[status] || status;
+        }
+
+        function formatTime(timeStr) {
+            return new Date(timeStr).toLocaleString('zh-CN');
+        }
+
+        async function showDetail(errorId) {
+            currentErrorId = errorId;
+            try {
+                const [errorRes, candidatesRes, explanationsRes, profilesRes] = await Promise.all([
+                    fetch(`${API_BASE}/errors/${errorId}`),
+                    fetch(`${API_BASE}/candidates?error_id=${errorId}`),
+                    fetch(`${API_BASE}/recommendation-explanations?error_id=${errorId}`),
+                    fetch(`${API_BASE}/user-profiles`)
+                ]);
+
+                const error = await errorRes.json();
+                const candidates = await candidatesRes.json();
+                const explanations = await explanationsRes.json();
+                const profiles = await profilesRes.json();
+                const profile = profiles.find(p => p.user_id === error.user_id);
+
+                let html = '';
+
+                html += `
+                    <div class="section">
+                        <h4 class="section-title">📈 分数对比</h4>
+                        <div class="score-comparison">
+                            <div class="score-item">
+                                <div class="score-item-label">原始排序分数</div>
+                                <div class="score-item-value">${error.score_before.toFixed(3)}</div>
+                            </div>
+                            <div class="score-arrow">→</div>
+                            <div class="score-item">
+                                <div class="score-item-label">处理后分数</div>
+                                <div class="score-item-value" style="color: #dc3545;">${error.score_after.toFixed(3)}</div>
+                            </div>
+                            <div class="score-item" style="margin-left: 20px;">
+                                <div class="score-item-label">差异</div>
+                                <div class="score-item-value" style="color: #dc3545;">-${(error.score_before - error.score_after).toFixed(3)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                html += `
+                    <div class="section">
+                        <h4 class="section-title">📋 错误基本信息</h4>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">错误ID</div>
+                                <div class="detail-value">${error.id}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">用户ID</div>
+                                <div class="detail-value">${error.user_id}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">错误类型</div>
+                                <div class="detail-value">${error.error_type}${error.has_dirty_data ? '<span class="dirty-data-badge">脏数据</span>' : ''}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">状态</div>
+                                <div class="detail-value"><span class="status-badge status-${error.status}">${getStatusLabel(error.status)}</span></div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">屏蔽原因</div>
+                                <div class="detail-value">${error.block_reason || '-'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">创建时间</div>
+                                <div class="detail-value">${formatTime(error.created_at)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (error.dirty_data_details) {
+                    html += `
+                        <div class="section" style="background: #fff5f5; padding: 16px; border-radius: 8px;">
+                            <h4 class="section-title" style="color: #dc3545; border-color: #dc3545;">⚠️ 脏数据检测详情</h4>
+                            <ul style="margin-left: 20px;">
+                                ${error.dirty_data_details['检测到的问题'].map(p => `<li style="margin-bottom: 8px;">${p}</li>`).join('')}
+                            </ul>
+                            <p style="margin-top: 12px; color: #856404;"><strong>自动处理：</strong>${error.dirty_data_details['自动处理']}</p>
+                            <p style="color: #dc3545;"><strong>建议：</strong>需要人工处理确认</p>
+                        </div>
+                    `;
+                }
+
+                if (profile) {
+                    html += `
+                        <div class="section">
+                            <h4 class="section-title">👤 用户画像</h4>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">年龄</div>
+                                    <div class="detail-value">${profile.age}岁</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">性别</div>
+                                    <div class="detail-value">${profile.gender}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">兴趣标签</div>
+                                    <div class="detail-value">${profile.interests.join(', ')}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">行为摘要</div>
+                                    <div class="detail-value">${profile.behavior_summary}</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px;">
+                                <div class="detail-label" style="margin-bottom: 8px;">原始输入数据</div>
+                                <div class="json-box">${JSON.stringify(profile.raw_input, null, 2)}</div>
+                            </div>
+                            <div style="margin-top: 12px;">
+                                <div class="detail-label" style="margin-bottom: 8px;">处理后结果</div>
+                                <div class="json-box">${JSON.stringify(profile.processed_result, null, 2)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="section">
+                        <h4 class="section-title">📦 候选物料列表</h4>
+                        <table class="candidate-table">
+                            <thead>
+                                <tr>
+                                    <th>物料ID</th>
+                                    <th>名称</th>
+                                    <th>类型</th>
+                                    <th>原始分数</th>
+                                    <th>是否拦截</th>
+                                    <th>拦截原因</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${candidates.map(c => `
+                                    <tr style="${c.blocked ? 'background: #fff5f5;' : ''}">
+                                        <td>${c.item_id}</td>
+                                        <td>${c.item_name}</td>
+                                        <td>${c.item_type}</td>
+                                        <td style="${c.raw_score > 1 ? 'color: #dc3545; font-weight: 600;' : ''}">${c.raw_score.toFixed(3)}</td>
+                                        <td>${c.blocked ? '<span style="color: #dc3545;">是</span>' : '否'}</td>
+                                        <td>${c.block_reason || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                if (explanations.length > 0) {
+                    const exp = explanations[0];
+                    html += `
+                        <div class="section">
+                            <h4 class="section-title">💡 推荐解释</h4>
+                            <div style="background: #f0f4ff; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                                <p style="font-size: 14px; line-height: 1.6;">${exp.reason}</p>
+                            </div>
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">置信度</div>
+                                    <div class="detail-value">${(exp.confidence * 100).toFixed(1)}%</div>
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px;">
+                                <div class="detail-label" style="margin-bottom: 8px;">特征贡献度</div>
+                                <div class="json-box">${JSON.stringify(exp.feature_contributions, null, 2)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (error.status === 'pending') {
+                    html += `
+                        <div class="section treatment-section">
+                            <h4>🔧 人工处理选项</h4>
+                            <div class="treatment-options">
+                                <button class="treatment-option" onclick="applyTreatment('移除屏蔽，恢复原始分数')">移除屏蔽，恢复原始分数</button>
+                                <button class="treatment-option" onclick="applyTreatment('调整屏蔽规则，放宽限制')">调整屏蔽规则，放宽限制</button>
+                                <button class="treatment-option" onclick="applyTreatment('确认屏蔽有效，无需调整')">确认屏蔽有效，无需调整</button>
+                                <button class="treatment-option" onclick="applyTreatment('标记为正常数据，优化脏数据检测')">标记为正常数据，优化脏数据检测</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('detailBody').innerHTML = html;
+                document.getElementById('detailModal').classList.add('active');
+            } catch (e) {
+                console.error('加载详情失败', e);
+            }
+        }
+
+        async function applyTreatment(treatment) {
+            try {
+                const res = await fetch(`${API_BASE}/errors/${currentErrorId}/fix`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ treatment })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('处理成功！');
+                    closeModal('detailModal');
+                    loadErrors();
+                    loadStats();
+                }
+            } catch (e) {
+                console.error('处理失败', e);
+            }
+        }
+
+        async function rollbackError(errorId) {
+            if (!confirm('确定要回滚这条记录吗？')) return;
+            try {
+                const res = await fetch(`${API_BASE}/errors/${errorId}/rollback`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    alert('回滚成功！');
+                    loadErrors();
+                    loadStats();
+                }
+            } catch (e) {
+                console.error('回滚失败', e);
+            }
+        }
+
+        async function generateSampleData() {
+            try {
+                const response = await fetch('http://localhost:5000/api/errors');
+                const data = await response.json();
+                if (data.total > 0) {
+                    if (!confirm('已存在样本数据，是否重新生成？')) return;
+                }
+                
+                const script = `
+                    import sys
+                    sys.path.insert(0, '.')
+                    from modules.recommendation_engine import RecommendationEngine
+                    from modules.data_manager import DataManager
+                    import os
+                    dm = DataManager(os.path.join(os.path.dirname(__file__), 'data'))
+                    re = RecommendationEngine(dm)
+                    re.generate_sample_data(20)
+                    print('done')
+                `;
+                
+                const execRes = await fetch('http://localhost:5000/api/generate-sample', { method: 'POST' });
+                if (execRes.ok) {
+                    alert('样本数据生成成功！');
+                    loadErrors();
+                    loadStats();
+                }
+            } catch (e) {
+                console.error('生成失败', e);
+                alert('请确保后端服务已启动，然后刷新页面重试。');
+            }
+        }
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+            document.getElementById('importResult').innerHTML = '';
+        }
+
+        async function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const res = await fetch(`${API_BASE}/batch/import`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('importResult').innerHTML = `<p style="color: #28a745;">✅ 成功导入 ${data.imported} 条记录</p>`;
+                    setTimeout(() => {
+                        closeModal('importModal');
+                        loadErrors();
+                        loadStats();
+                    }, 1500);
+                } else {
+                    document.getElementById('importResult').innerHTML = `<p style="color: #dc3545;">❌ 导入失败：${data.message}</p>`;
+                }
+            } catch (e) {
+                document.getElementById('importResult').innerHTML = `<p style="color: #dc3545;">❌ 导入失败</p>`;
+            }
+        }
+
+        function exportData() {
+            window.open(`${API_BASE}/export`, '_blank');
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('.error-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll;
+                if (selectAll) {
+                    selectedErrors.add(cb.value);
+                } else {
+                    selectedErrors.delete(cb.value);
+                }
+            });
+            updateBatchButton();
+        }
+
+        function toggleErrorSelection(errorId) {
+            if (selectedErrors.has(errorId)) {
+                selectedErrors.delete(errorId);
+            } else {
+                selectedErrors.add(errorId);
+            }
+            updateBatchButton();
+        }
+
+        function updateBatchButton() {
+            document.getElementById('batchCompensateBtn').disabled = selectedErrors.size === 0;
+        }
+
+        async function batchCompensate() {
+            if (selectedErrors.size === 0) return;
+            if (!confirm(`确定要对选中的 ${selectedErrors.size} 条记录进行批量补偿吗？`)) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/batch/compensate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ error_ids: Array.from(selectedErrors) })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`成功补偿 ${data.compensated} 条记录！`);
+                    selectedErrors.clear();
+                    loadErrors();
+                    loadStats();
+                }
+            } catch (e) {
+                console.error('批量补偿失败', e);
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        loadStats();
+        loadErrors();
+    </script>
+</body>
+</html>
