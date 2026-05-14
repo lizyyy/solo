@@ -5,17 +5,17 @@ def get_default_rule_set() -> RuleSet:
     rule_set = RuleSet(
         set_id="default",
         name="默认死配置检测规则集",
-        version="1.0.0",
-        description="包含基础的URL有效性检测和常见废弃配置模式匹配"
+        version="2.0.0",
+        description="包含基础的URL有效性检测和常见废弃配置模式匹配 - v2.0: 区分链接失效(INVALID)与扫描错误(ERROR)"
     )
     
     url_check_rule = Rule(
         rule_id="url_alive_check",
         name="URL存活检测",
-        version="1.0.0",
+        version="2.0.0",
         type=RuleType.URL_CHECK,
         severity=RuleSeverity.ERROR,
-        description="检测HTTP/HTTPS链接是否可访问，4xx和5xx视为失效",
+        description="检测HTTP/HTTPS链接是否可访问，4xx和5xx视为失效 - v2.0: 区分链接失效与扫描错误",
         config={
             "check_methods": ["HEAD", "GET"],
             "follow_redirects": True,
@@ -27,7 +27,7 @@ def get_default_rule_set() -> RuleSet:
     deprecated_pattern_rule = Rule(
         rule_id="deprecated_pattern",
         name="废弃配置模式检测",
-        version="1.0.0",
+        version="2.0.0",
         type=RuleType.PATTERN_MATCH,
         severity=RuleSeverity.WARNING,
         description="检测已废弃的配置模式",
@@ -43,10 +43,10 @@ def get_default_rule_set() -> RuleSet:
     legal_evidence_rule = Rule(
         rule_id="legal_evidence_url",
         name="灰度法务证据页链接检测",
-        version="1.0.0",
+        version="2.0.0",
         type=RuleType.URL_CHECK,
         severity=RuleSeverity.CRITICAL,
-        description="专门针对法务证据页下载链接的有效性检测",
+        description="专门针对法务证据页下载链接的有效性检测 - v2.0: 支持HEAD+GET双重检测",
         config={
             "priority": "high",
             "retry_count": 3,
