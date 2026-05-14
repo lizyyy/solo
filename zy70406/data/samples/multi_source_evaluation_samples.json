@@ -1,0 +1,179 @@
+[
+  {
+    "batch_number": "IMG-REVIEW-20241201-001",
+    "source_system": "内容审核平台-A",
+    "model_name": "视觉识别模型V3.2",
+    "task_type": "图片内容审核",
+    "handler": "张明",
+    "department": "内容安全部",
+    "original_input": {
+      "image_id": "IMG_20241201_083245",
+      "image_url": "https://cdn.example.com/review/IMG_20241201_083245.jpg",
+      "uploader": "运营部-李娜",
+      "upload_time": "2024-12-01 08:32:45",
+      "context": "双十二活动宣传图，包含产品展示和促销文案",
+      "review_level": "二级审核",
+      "business_line": "电商运营"
+    },
+    "response_data": {
+      "review_result": "通过",
+      "confidence_score": 0.96,
+      "risk_level": "低风险",
+      "detected_labels": ["商品展示", "文字叠加", "促销活动"],
+      "suggestion": "符合平台规范，可正常发布",
+      "reviewer_note": "审核人：张明，联系方式：13812345678，邮箱：zhang.ming@company.com",
+      "processing_details": {
+        "ocr_text": "双十二狂欢购 全场5折起 限时抢购",
+        "face_detection": "未检测到人脸",
+        "logo_detection": ["品牌Logo-A"]
+      }
+    }
+  },
+  {
+    "batch_number": "IMG-REVIEW-20241201-002",
+    "source_system": "内容审核平台-A",
+    "model_name": "视觉识别模型V3.2",
+    "task_type": "图片内容审核",
+    "handler": "王芳",
+    "department": "内容安全部",
+    "original_input": {
+      "image_id": "IMG_20241201_091522",
+      "image_url": "https://cdn.example.com/review/IMG_20241201_091522.jpg",
+      "uploader": "市场部-刘强",
+      "upload_time": "2024-12-01 09:15:22",
+      "context": "新品发布会宣传海报",
+      "review_level": "三级审核",
+      "business_line": "品牌营销"
+    },
+    "response_data": {
+      "review_result": "需复核",
+      "confidence_score": 0.72,
+      "risk_level": "中风险",
+      "detected_labels": ["人物肖像", "品牌Logo", "活动宣传"],
+      "suggestion": "建议人工复核肖像授权情况",
+      "reviewer_note": "审核人：王芳，联系方式：wang.fang@company.com",
+      "processing_details": {
+        "ocr_text": "2024冬季新品发布会 12月15日敬请期待",
+        "face_detection": "检测到1张人脸",
+        "logo_detection": ["品牌Logo-B", "合作伙伴Logo"]
+      }
+    }
+  },
+  {
+    "batch_number": "IMG-REVIEW-20241201-001",
+    "source_system": "内容审核平台-B",
+    "model_name": "图像审核模型Pro-1.5",
+    "task_type": "图片内容审核",
+    "handler": "陈伟",
+    "department": "合规审查部",
+    "original_input": {
+      "image_id": "BATCH-IMG-001245",
+      "image_url": "https://cdn-b.example.com/audit/BATCH-IMG-001245.jpg",
+      "uploader": "供应商审核通道",
+      "upload_time": "2024-12-01 10:05:33",
+      "context": "供应商商品图批量审核",
+      "review_level": "自动审核",
+      "business_line": "供应链管理"
+    },
+    "response_data": {
+      "review_result": "驳回",
+      "confidence_score": 0.88,
+      "risk_level": "高风险",
+      "detected_labels": ["违规文字", "敏感图案"],
+      "suggestion": "包含违规宣传内容，不予通过",
+      "reviewer_note": "系统自动审核，复核人：陈伟经理",
+      "processing_details": {
+        "ocr_text": "绝对最低价 全网第一 国家级认证",
+        "face_detection": "未检测到人脸",
+        "logo_detection": []
+      }
+    }
+  },
+  {
+    "batch_number": "TEXT-ANALYSIS-20241201-001",
+    "source_system": "文本分析系统",
+    "model_name": "语义理解模型XL-7B",
+    "task_type": "客服对话分析",
+    "handler": "赵丽",
+    "department": "用户体验部",
+    "original_input": {
+      "conversation_id": "CS-20241201-88452",
+      "customer_id": "CUST-987654",
+      "agent_id": "AGENT-1234",
+      "start_time": "2024-12-01 14:30:00",
+      "end_time": "2024-12-01 14:45:22",
+      "topic": "退款申请咨询",
+      "channel": "在线客服"
+    },
+    "response_data": {
+      "sentiment": "负面",
+      "satisfaction_score": 2.5,
+      "intent_classification": "退款请求",
+      "key_points": ["订单未发货", "申请全额退款", "客服态度不满"],
+      "summary": "用户因订单未发货申请全额退款，对客服响应速度表示不满，建议优先处理并跟进",
+      "agent_evaluation": {
+        "response_time": "超时",
+        "professionalism": "需提升",
+        "suggestion": "加强退款流程培训"
+      }
+    }
+  },
+  {
+    "batch_number": "AUDIO-TRANS-20241201-001",
+    "source_system": "语音转写平台",
+    "model_name": "语音识别模型ASR-V5",
+    "task_type": "会议录音转写",
+    "handler": "孙磊",
+    "department": "行政服务部",
+    "original_input": {
+      "audio_id": "MEETING-20241201-1000",
+      "audio_duration": "01:32:45",
+      "meeting_title": "Q4季度工作总结会",
+      "participants": ["部门经理", "各项目负责人"],
+      "recording_time": "2024-12-01 10:00:00",
+      "location": "总部3楼会议室"
+    },
+    "response_data": {
+      "transcription_status": "完成",
+      "word_count": 15680,
+      "speaker_count": 8,
+      "key_topics": ["Q4业绩回顾", "存在问题分析", "明年规划", "团队建设"],
+      "action_items": [
+        "各部门提交年终总结（截止12月15日）",
+        "预算调整方案下周评审",
+        "团建活动安排在12月底"
+      ],
+      "transcript_preview": "各位同事早上好，今天我们召开Q4季度工作总结会议..."
+    }
+  },
+  {
+    "batch_number": "IMG-REVIEW-20241201-003",
+    "source_system": "内容审核平台-A",
+    "model_name": "视觉识别模型V3.2",
+    "task_type": "图片内容审核",
+    "handler": "张明",
+    "department": "内容安全部",
+    "original_input": {
+      "image_id": "IMG_20241201_112233",
+      "image_url": "https://cdn.example.com/review/IMG_20241201_112233.jpg",
+      "uploader": "用户生成内容",
+      "upload_time": "2024-12-01 11:22:33",
+      "context": "用户晒单分享图",
+      "review_level": "一级审核",
+      "business_line": "社区运营"
+    },
+    "response_data": {
+      "review_result": "通过",
+      "confidence_score": 0.99,
+      "risk_level": "低风险",
+      "detected_labels": ["商品晒单", "用户自拍"],
+      "suggestion": "内容合规",
+      "reviewer_note": "审核人：张明先生，电话：13987654321",
+      "processing_details": {
+        "ocr_text": "终于收到了！质量很棒 推荐给大家～",
+        "face_detection": "检测到1张人脸（已模糊处理）",
+        "logo_detection": ["商品品牌Logo"]
+      }
+    }
+  }
+]
