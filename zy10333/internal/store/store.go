@@ -16,17 +16,18 @@ type Store interface {
 	GetResult(id string) (*model.ChangeResult, error)
 	GetResultsByTicketID(ticketID string) ([]*model.ChangeResult, error)
 	CreateMisuseReport(report *model.MisuseReport) error
+	ListMisuseReports() ([]*model.MisuseReport, error)
 	GetSwitchItem(id string) (*model.SwitchItem, error)
 	CreateSwitchItem(item *model.SwitchItem) error
 }
 
 type MemoryStore struct {
-	tickets     map[string]*model.ApprovalTicket
+	tickets       map[string]*model.ApprovalTicket
 	idempotentMap map[string]string
-	results     map[string]*model.ChangeResult
-	reports     map[string]*model.MisuseReport
-	switchItems map[string]*model.SwitchItem
-	mu          sync.RWMutex
+	results       map[string]*model.ChangeResult
+	reports       map[string]*model.MisuseReport
+	switchItems   map[string]*model.SwitchItem
+	mu            sync.RWMutex
 }
 
 func NewMemoryStore() *MemoryStore {
@@ -156,6 +157,16 @@ func (s *MemoryStore) CreateMisuseReport(report *model.MisuseReport) error {
 	defer s.mu.Unlock()
 	s.reports[report.ID] = report
 	return nil
+}
+
+func (s *MemoryStore) ListMisuseReports() ([]*model.MisuseReport, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	reports := make([]*model.MisuseReport, 0, len(s.reports))
+	for _, report := range s.reports {
+		reports = append(reports, report)
+	}
+	return reports, nil
 }
 
 func (s *MemoryStore) GetSwitchItem(id string) (*model.SwitchItem, error) {

@@ -47,10 +47,10 @@ func (s *SwitchService) CreateTicket(req *model.CreateTicketRequest) (*model.App
 	}
 
 	ticket := &model.ApprovalTicket{
-		ID:            generateID(),
-		SwitchID:      req.SwitchID,
-		Environment:   req.Environment,
-		RiskLevel:     req.RiskLevel,
+		ID:          generateID(),
+		SwitchID:    req.SwitchID,
+		Environment: req.Environment,
+		RiskLevel:   req.RiskLevel,
 		Operator: model.Operator{
 			ID:    req.OperatorID,
 			Name:  req.OperatorName,
@@ -115,6 +115,25 @@ func (s *SwitchService) ApproveTicket(ticketID, approverID string) (*model.Appro
 		return nil, errors.InvalidStatus(string(ticket.Status))
 	}
 
+	blocked, reason := s.checkRiskAndEnvironment(ticket)
+	if blocked {
+		ticket.Status = model.StatusRejected
+		ticket.RejectReason = reason
+		s.store.UpdateTicket(ticket)
+		report := &model.MisuseReport{
+			ID:          generateID(),
+			TicketID:    ticket.ID,
+			SwitchID:    ticket.SwitchID,
+			Environment: ticket.Environment,
+			Operator:    ticket.Operator,
+			RiskLevel:   ticket.RiskLevel,
+			Reason:      reason,
+			ReportedAt:  time.Now(),
+		}
+		s.store.CreateMisuseReport(report)
+		return nil, errors.RiskLevelBlocked(reason)
+	}
+
 	ticket.Approvers = append(ticket.Approvers, approverID)
 
 	requiredApprovers := s.getRequiredApprovers(ticket.RiskLevel)
@@ -145,6 +164,25 @@ func (s *SwitchService) ExecuteTicket(ticketID string) (*model.ChangeResult, err
 		if len(results) > 0 {
 			return results[0], nil
 		}
+	}
+
+	blocked, reason := s.checkRiskAndEnvironment(ticket)
+	if blocked {
+		ticket.Status = model.StatusRejected
+		ticket.RejectReason = reason
+		s.store.UpdateTicket(ticket)
+		report := &model.MisuseReport{
+			ID:          generateID(),
+			TicketID:    ticket.ID,
+			SwitchID:    ticket.SwitchID,
+			Environment: ticket.Environment,
+			Operator:    ticket.Operator,
+			RiskLevel:   ticket.RiskLevel,
+			Reason:      reason,
+			ReportedAt:  time.Now(),
+		}
+		s.store.CreateMisuseReport(report)
+		return nil, errors.RiskLevelBlocked(reason)
 	}
 
 	if ticket.Status != model.StatusApproved {
@@ -226,6 +264,14 @@ func (s *SwitchService) CreateSwitchItem(name, description, category string) (*m
 		return nil, errors.InternalError("创建开关项失败")
 	}
 	return item, nil
+}
+
+func (s *SwitchService) ListMisuseReports() ([]*model.MisuseReport, error) {
+	reports, err := s.store.ListMisuseReports()
+	if err != nil {
+		return nil, errors.InternalError("查询误触报告失败")
+	}
+	return reports, nil
 }
 
 func (s *SwitchService) isValidEnvironment(env model.Environment) bool {

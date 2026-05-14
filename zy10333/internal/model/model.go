@@ -16,9 +16,9 @@ const (
 type RiskLevel string
 
 const (
-	RiskLow    RiskLevel = "low"
-	RiskMedium RiskLevel = "medium"
-	RiskHigh   RiskLevel = "high"
+	RiskLow      RiskLevel = "low"
+	RiskMedium   RiskLevel = "medium"
+	RiskHigh     RiskLevel = "high"
 	RiskCritical RiskLevel = "critical"
 )
 
@@ -33,20 +33,20 @@ const (
 )
 
 type Operator struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	Email      string `json:"email"`
+	Role       string `json:"role"`
 	Department string `json:"department"`
 }
 
 type SwitchItem struct {
-	ID          string      `json:"id"`
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Category    string      `json:"category"`
-	CreatedAt   time.Time   `json:"created_at"`
-	UpdatedAt   time.Time   `json:"updated_at"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Category    string    `json:"category"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type ApprovalTicket struct {
@@ -60,6 +60,7 @@ type ApprovalTicket struct {
 	Status        SwitchStatus `json:"status"`
 	IdempotentKey string       `json:"idempotent_key"`
 	Reason        string       `json:"reason,omitempty"`
+	RejectReason  string       `json:"reject_reason,omitempty"`
 	Approvers     []string     `json:"approvers,omitempty"`
 	ApprovedAt    *time.Time   `json:"approved_at,omitempty"`
 	ExecutedAt    *time.Time   `json:"executed_at,omitempty"`
@@ -68,41 +69,41 @@ type ApprovalTicket struct {
 }
 
 type ChangeResult struct {
-	ID            string      `json:"id"`
-	TicketID      string      `json:"ticket_id"`
-	SwitchID      string      `json:"switch_id"`
-	Environment   Environment `json:"environment"`
-	Operator      Operator    `json:"operator"`
-	ChangeType    string      `json:"change_type"`
-	OldValue      interface{} `json:"old_value"`
-	NewValue      interface{} `json:"new_value"`
-	Success       bool        `json:"success"`
-	ErrorMessage  string      `json:"error_message,omitempty"`
-	ExecutedAt    time.Time   `json:"executed_at"`
+	ID           string      `json:"id"`
+	TicketID     string      `json:"ticket_id"`
+	SwitchID     string      `json:"switch_id"`
+	Environment  Environment `json:"environment"`
+	Operator     Operator    `json:"operator"`
+	ChangeType   string      `json:"change_type"`
+	OldValue     interface{} `json:"old_value"`
+	NewValue     interface{} `json:"new_value"`
+	Success      bool        `json:"success"`
+	ErrorMessage string      `json:"error_message,omitempty"`
+	ExecutedAt   time.Time   `json:"executed_at"`
 }
 
 type MisuseReport struct {
-	ID            string      `json:"id"`
-	TicketID      string      `json:"ticket_id"`
-	SwitchID      string      `json:"switch_id"`
-	Environment   Environment `json:"environment"`
-	Operator      Operator    `json:"operator"`
-	RiskLevel     RiskLevel   `json:"risk_level"`
-	Reason        string      `json:"reason"`
-	ReportedAt    time.Time   `json:"reported_at"`
+	ID          string      `json:"id"`
+	TicketID    string      `json:"ticket_id"`
+	SwitchID    string      `json:"switch_id"`
+	Environment Environment `json:"environment"`
+	Operator    Operator    `json:"operator"`
+	RiskLevel   RiskLevel   `json:"risk_level"`
+	Reason      string      `json:"reason"`
+	ReportedAt  time.Time   `json:"reported_at"`
 }
 
 type CreateTicketRequest struct {
 	IdempotentKey string      `json:"idempotent_key"`
-	SwitchID       string      `json:"switch_id"`
-	Environment    Environment `json:"environment"`
-	RiskLevel      RiskLevel   `json:"risk_level"`
-	OperatorID     string      `json:"operator_id"`
-	OperatorName   string      `json:"operator_name"`
-	OperatorEmail  string      `json:"operator_email"`
-	ChangeType     string      `json:"change_type"`
-	TargetValue    interface{} `json:"target_value"`
-	Reason         string      `json:"reason"`
+	SwitchID      string      `json:"switch_id"`
+	Environment   Environment `json:"environment"`
+	RiskLevel     RiskLevel   `json:"risk_level"`
+	OperatorID    string      `json:"operator_id"`
+	OperatorName  string      `json:"operator_name"`
+	OperatorEmail string      `json:"operator_email"`
+	ChangeType    string      `json:"change_type"`
+	TargetValue   interface{} `json:"target_value"`
+	Reason        string      `json:"reason"`
 }
 
 type ValidateRequest struct {
@@ -131,12 +132,12 @@ type ErrorResponse struct {
 }
 
 type HistoryQuery struct {
-	SwitchID    *string     `json:"switch_id,omitempty"`
-	OperatorID *string     `json:"operator_id,omitempty"`
-	Environment *Environment `json:"environment,omitempty"`
-	Status     *SwitchStatus `json:"status,omitempty"`
-	StartTime  *time.Time   `json:"start_time,omitempty"`
-	EndTime    *time.Time   `json:"end_time,omitempty"`
-	Page       int          `json:"page"`
-	PageSize   int          `json:"page_size"`
+	SwitchID    *string       `json:"switch_id,omitempty"`
+	OperatorID  *string       `json:"operator_id,omitempty"`
+	Environment *Environment  `json:"environment,omitempty"`
+	Status      *SwitchStatus `json:"status,omitempty"`
+	StartTime   *time.Time    `json:"start_time,omitempty"`
+	EndTime     *time.Time    `json:"end_time,omitempty"`
+	Page        int           `json:"page"`
+	PageSize    int           `json:"page_size"`
 }

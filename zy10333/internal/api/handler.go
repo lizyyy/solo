@@ -255,7 +255,19 @@ func (h *Handler) ExportTickets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	reports, err := h.service.ListMisuseReports()
+	if err != nil {
+		h.respondError(w, err.(*errors.ServiceError))
+		return
+	}
+
+	exportData := map[string]interface{}{
+		"export_time":    time.Now(),
+		"tickets":        tickets,
+		"misuse_reports": reports,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Content-Disposition", "attachment; filename=tickets.json")
-	json.NewEncoder(w).Encode(tickets)
+	json.NewEncoder(w).Encode(exportData)
 }
