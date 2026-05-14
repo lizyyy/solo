@@ -1,0 +1,193 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven Start Up Batch script
+#
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+#     e.g. to debug Maven itself, use
+#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+# ----------------------------------------------------------------------------
+
+if [ -z "$MAVEN_SKIP_RC" ] ; then
+
+  if [ -f /etc/mavenrc ] ; then
+    . /etc/mavenrc
+  fi
+
+  if [ -f "$HOME/.mavenrc" ] ; then
+    . "$HOME/.mavenrc"
+  fi
+
+fi
+
+# OS specific support.  $var _must_ be set to either true or false.
+cygwin=false;
+darwin=false;
+mingw=false
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+  MINGW*) mingw=true;;
+  Darwin*) darwin=true
+           #
+           # Look for the Apple JDKs first to preserve the existing behaviour, and then look
+           # for other JDKs with the more common names, as those installed with JEnv.
+           #
+           if [ -z "$JAVA_HOME" ]; then
+             java_versions=`/usr/libexec/java_home -V 2>&1 | grep "^    [1-9]"`
+             if [ $? -eq 0 ]; then
+               JAVA_HOME=`/usr/libexec/java_home`
+             fi
+           fi
+           ;;
+esac
+
+if [ -z "$JAVA_HOME" ] ; then
+  javaExecutable="`which javac`"
+  if [ -n "$javaExecutable" ] && ! [ "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
+    # readlink(1) is not available as standard on Solaris 10.
+    readLink=`which readlink`
+    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
+      if $darwin ; then
+        javaHome="`dirname \"$javaExecutable\"`"
+        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
+      else
+        javaExecutable="`readlink -f \"$javaExecutable\"`"
+      fi
+      javaHome="`dirname \"$javaExecutable\"`"
+      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
+      JAVA_HOME="$javaHome"
+      export JAVA_HOME
+    fi
+  fi
+fi
+
+if [ -z "$JAVACMD" ] ; then
+  if [ -n "$JAVA_HOME"  ] ; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
+      JAVACMD="$JAVA_HOME/jre/sh/java"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+    fi
+  else
+    JAVACMD="`\\unset -f command; \\command -v java`"
+  fi
+fi
+
+if [ ! -x "$JAVACMD" ] ; then
+  echo "Error: JAVA_HOME is not defined correctly." >&2
+  echo "  We cannot execute $JAVACMD" >&2
+  exit 1
+fi
+
+if [ -z "$JAVA_HOME" ] ; then
+  echo "Warning: JAVA_HOME environment variable is not set." >&2
+fi
+
+# traverses directory structure from process work directory to filesystem root
+# first directory with .mvn subdirectory is considered project base directory
+find_maven_basedir() {
+
+  if [ -z "$1" ]
+  then
+    echo "Path not specified to find_maven_basedir"
+    return 1
+  fi
+
+  basedir="$1"
+  wdir="$1"
+  while [ "$wdir" != '/' ] ; do
+    if [ -d "$wdir"/.mvn ] ; then
+      basedir=$wdir
+      break
+    fi
+    wdir=`cd "$wdir/.." ; pwd`
+  done
+  echo "${basedir}"
+}
+
+# concatenates all lines of a file
+concat_lines() {
+  if [ -f "$1" ]; then
+    echo "$(tr -s '\n' ' ' < "$1")"
+  fi
+}
+
+BASE_DIR=`find_maven_basedir "$(pwd)"`
+if [ -z "$BASE_DIR" ]; then
+  exit 1;
+fi
+
+export MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-$BASE_DIR}"
+if [ -e "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config" ]; then
+  JVM_CONFIG_MAVEN_PROPS=`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`
+fi
+
+# For Cygwin, ensure paths are in UNIX format before anything is touched
+if $cygwin ; then
+  [ -n "$MAVEN_PROJECTBASEDIR" ] &&
+  MAVEN_PROJECTBASEDIR=`cygpath --unix "$MAVEN_PROJECTBASEDIR"`
+fi
+
+# Provide a "standardized" way to retrieve the CLI args that will
+# work with both Windows and non-Windows executions.
+MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
+export MAVEN_CMD_LINE_ARGS
+
+WRAPPER_JAR="`expr "$0" : '\(.*\)/mvnw'`/.mvn/wrapper/maven-wrapper.jar"
+if [ ! -f "$WRAPPER_JAR" ]; then
+  WRAPPER_JAR="$MAVEN_PROJECTBASEDIR/.mvn/wrapper/maven-wrapper.jar"
+fi
+
+# traverses directory structure from process work directory to filesystem root
+# first directory with .mvn subdirectory is considered project base directory
+find_file_basedir() {
+  if [ -z "$1" ]
+  then
+    echo "Path not specified to find_file_basedir"
+    return 1
+  fi
+
+  basedir="$1"
+  wdir="$1"
+  while [ "$wdir" != '/' ] ; do
+    if [ -f "$wdir"/.mvn/wrapper/maven-wrapper.jar ] ; then
+      basedir=$wdir
+      break
+    fi
+    wdir=`cd "$wdir/.." ; pwd`
+  done
+  echo "${basedir}"
+}
+
+fileBasedir=`find_file_basedir "$(pwd)"`
+
+if [ -z "$fileBasedir" ]; then
+  echo "Error: Could not locate maven-wrapper.jar" >&2
+  exit 1
+fi
+
+WRAPPER_JAR="$fileBasedir/.mvn/wrapper/maven-wrapper.jar"
+
+# For Cygwin, switch paths to Windows format before running java
+if $cygwin; then
+  JAVACMD=`cygpath --unix "$JAVACMD"`
+  MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
+  CLASSPATH=`cygpath --path --windows "$WRAPPER_JAR"`
+else
+  CLASSPATH="$WRAPPER_JAR"
+fi
+
+exec "$JAVACMD" \
+  $JVM_CONFIG_MAVEN_PROPS \
+  $MAVEN_OPTS \
+  -classpath "$CLASSPATH" \
+  -Dmaven.multiModuleProjectDirectory="$MAVEN_PROJECTBASEDIR" \
+  org.apache.maven.wrapper.MavenWrapperMain \
+  "$@"
