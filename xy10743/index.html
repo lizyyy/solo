@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>向量索引同步看板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-indexing { background-color: #dbeafe; color: #1e40af; }
+        .status-completed { background-color: #d1fae5; color: #065f46; }
+        .status-failed { background-color: #fee2e2; color: #991b1b; }
+        .status-validating { background-color: #e0e7ff; color: #3730a3; }
+        .status-success { background-color: #d1fae5; color: #065f46; }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">向量索引同步看板</h1>
+                <p class="text-gray-500 mt-1">管理数据批次、监控索引同步状态、校验召回结果</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openImportModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    批量导入
+                </button>
+                <button onclick="exportReport()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    导出报告
+                </button>
+            </div>
+        </div>
+
+        <div id="stats-container" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <input type="text" id="search-input" placeholder="搜索批次名称、负责人、Embedding版本..." 
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                           onkeyup="handleSearch(event)">
+                </div>
+                <div class="flex gap-3">
+                    <select id="status-filter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" onchange="loadBatches()">
+                        <option value="">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="indexing">索引中</option>
+                        <option value="validating">校验中</option>
+                        <option value="completed">已完成</option>
+                        <option value="failed">失败</option>
+                    </select>
+                    <button onclick="loadBatches()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center gap-2 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        刷新
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">批次名称</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">负责人</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Embedding版本</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">索引进度</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">删除同步</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">召回校验</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">更新时间</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="batches-table" class="divide-y divide-gray-200">
+                    </tbody>
+                </table>
+            </div>
+            <div id="loading-indicator" class="hidden p-8 text-center">
+                <div class="loader mx-auto mb-2"></div>
+                <p class="text-gray-500">加载中...</p>
+            </div>
+            <div id="empty-state" class="hidden p-8 text-center text-gray-500">
+                暂无数据
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">批次详情</h2>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="detail-content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="import-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">批量导入数据</h2>
+                <button onclick="closeImportModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                    <p class="text-sm text-blue-700 mb-2">数据格式说明（JSON数组）：</p>
+                    <pre class="text-xs bg-blue-100 p-3 rounded overflow-x-auto text-blue-800">
+{
+  "batches": [
+    {
+      "batch_name": "批次名称",
+      "embedding_version": "v1.0.0",
+      "owner": "负责人",
+      "status": "pending",
+      "total_records": 1000,
+      "delete_syncs": [
+        {"record_id": "ID1", "status": "pending", "fail_reason": "失败原因"}
+      ],
+      "recall_validations": [
+        {"query": "查询语句", "expected_result": "期望结果"}
+      ]
+    }
+  ]
+}</pre>
+                </div>
+                <textarea id="import-data" class="w-full h-64 p-4 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="请输入JSON格式的批量数据..."></textarea>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeImportModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">取消</button>
+                <button onclick="importData()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="handle-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-800">处理记录</h2>
+                <button onclick="closeHandleModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <input type="hidden" id="handle-type">
+                <input type="hidden" id="handle-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">处理人</label>
+                    <input type="text" id="handler-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="请输入处理人姓名">
+                </div>
+                <div id="delete-status-field" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">处理状态</label>
+                    <select id="delete-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="handled">已处理</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                    </select>
+                </div>
+                <div id="validation-status-field" class="mb-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">校验结果</label>
+                    <select id="validation-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="true">通过</option>
+                        <option value="false">不通过</option>
+                    </select>
+                </div>
+                <div id="actual-result-field" class="mb-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">实际结果</label>
+                    <input type="text" id="actual-result" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="请输入实际召回结果">
+                </div>
+            </div>
+            <div class="p-6 border-t border-gray-200 flex justify-end gap-3">
+                <button onclick="closeHandleModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">取消</button>
+                <button onclick="submitHandle()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">确认处理</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 transform translate-y-full opacity-0 transition-all duration-300">
+        <div id="toast-content" class="px-6 py-3 rounded-lg shadow-lg text-white"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        const statusLabels = {
+            'pending': '待处理',
+            'indexing': '索引中',
+            'validating': '校验中',
+            'completed': '已完成',
+            'failed': '失败',
+            'success': '成功',
+            'handled': '已处理'
+        };
+
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const stats = await response.json();
+                
+                const html = `
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="text-3xl font-bold text-gray-800">${stats.total_batches}</div>
+                        <div class="text-gray-500 text-sm mt-1">总批次数</div>
+                    </div>
+                    ${Object.entries(stats.status_counts).map(([status, count]) => `
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <div class="text-3xl font-bold text-gray-800">${count}</div>
+                            <div class="text-gray-500 text-sm mt-1">${statusLabels[status] || status}</div>
+                        </div>
+                    `).join('')}
+                    ${Object.entries(stats.owner_counts).slice(0, 2).map(([owner, count]) => `
+                        <div class="bg-white rounded-xl shadow-sm p-6">
+                            <div class="text-2xl font-bold text-gray-800">${owner}</div>
+                            <div class="text-gray-500 text-sm mt-1">负责 ${count} 批次</div>
+                        </div>
+                    `).join('')}
+                `;
+                document.getElementById('stats-container').innerHTML = html;
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+            }
+        }
+
+        async function loadBatches() {
+            const search = document.getElementById('search-input').value;
+            const status = document.getElementById('status-filter').value;
+            
+            document.getElementById('batches-table').innerHTML = '';
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+
+            try {
+                const params = new URLSearchParams();
+                if (search) params.append('search', search);
+                if (status) params.append('status', status);
+
+                const response = await fetch(`${API_BASE}/batches?${params}`);
+                const batches = await response.json();
+
+                document.getElementById('loading-indicator').classList.add('hidden');
+
+                if (batches.length === 0) {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                    return;
+                }
+
+                const html = batches.map(batch => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-4 py-4">
+                            <div class="font-medium text-gray-900">${batch.batch_name}</div>
+                            <div class="text-xs text-gray-500 mt-1">创建于 ${batch.created_at}</div>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                ${batch.owner}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="text-sm text-gray-600 font-mono">${batch.embedding_version}</span>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium status-${batch.status}">
+                                ${statusLabels[batch.status] || batch.status}
+                            </span>
+                        </td>
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 w-24">
+                                    <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${(batch.indexed_records / batch.total_records * 100) || 0}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-600">${batch.indexed_records.toLocaleString()}/${batch.total_records.toLocaleString()}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-gray-600">${batch.delete_sync_count} 条</span>
+                                ${batch.delete_failed_count > 0 ? `
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 cursor-pointer" onclick="viewBatchDetail(${batch.id}, 'delete')">
+                                        ${batch.delete_failed_count} 失败
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </td>
+                        <td class="px-4 py-4">
+                            <span class="text-sm text-gray-600">${batch.recall_pass_rate}</span>
+                        </td>
+                        <td class="px-4 py-4 text-sm text-gray-500">
+                            ${batch.updated_at}
+                        </td>
+                        <td class="px-4 py-4">
+                            <button onclick="viewBatchDetail(${batch.id})" class="text-blue-500 hover:text-blue-700 text-sm font-medium">
+                                查看详情
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('batches-table').innerHTML = html;
+            } catch (error) {
+                document.getElementById('loading-indicator').classList.add('hidden');
+                showToast('加载数据失败，请确保后端服务已启动', 'error');
+                console.error('加载数据失败:', error);
+            }
+        }
+
+        async function viewBatchDetail(batchId, tab = null) {
+            try {
+                const response = await fetch(`${API_BASE}/batches/${batchId}`);
+                const data = await response.json();
+
+                const batch = data.batch;
+                const deleteSyncs = data.delete_syncs;
+                const recallValidations = data.recall_validations;
+
+                const html = `
+                    <div class="mb-6 p-6 bg-gray-50 rounded-xl">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                                <div class="text-sm text-gray-500">批次名称</div>
+                                <div class="font-medium text-gray-900">${batch.batch_name}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">负责人</div>
+                                <div class="font-medium text-gray-900">${batch.owner}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">Embedding版本</div>
+                                <div class="font-medium text-gray-900 font-mono">${batch.embedding_version}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">状态</div>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium status-${batch.status}">
+                                    ${statusLabels[batch.status] || batch.status}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">索引进度</div>
+                                <div class="font-medium text-gray-900">${batch.indexed_records.toLocaleString()} / ${batch.total_records.toLocaleString()}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">创建时间</div>
+                                <div class="font-medium text-gray-900">${batch.created_at}</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-500">更新时间</div>
+                                <div class="font-medium text-gray-900">${batch.updated_at}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">删除同步记录 (${deleteSyncs.length})</h3>
+                        ${deleteSyncs.length === 0 ? '<p class="text-gray-500 text-sm">暂无记录</p>' : `
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">记录ID</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">状态</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">失败原因</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">处理人</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">处理时间</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        ${deleteSyncs.map(d => `
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-4 py-3 font-mono text-gray-900">${d.record_id}</td>
+                                                <td class="px-4 py-3">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium status-${d.status}">
+                                                        ${statusLabels[d.status] || d.status}
+                                                    </span>
+                                                </td>
+                                                <td class="px-4 py-3 text-red-600 text-xs">${d.fail_reason || '-'}</td>
+                                                <td class="px-4 py-3 text-gray-700">${d.handler || '-'}</td>
+                                                <td class="px-4 py-3 text-gray-500 text-xs">${d.handled_at || '-'}</td>
+                                                <td class="px-4 py-3">
+                                                    <button onclick="openHandleModal('delete', ${d.id})" class="text-blue-500 hover:text-blue-700 text-xs font-medium">
+                                                        处理
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">召回校验记录 (${recallValidations.length})</h3>
+                        ${recallValidations.length === 0 ? '<p class="text-gray-500 text-sm">暂无记录</p>' : `
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">查询语句</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">期望结果</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">实际结果</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">是否通过</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">处理人</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">处理时间</th>
+                                            <th class="px-4 py-2 text-left text-gray-500 font-medium">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        ${recallValidations.map(v => `
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-4 py-3 text-gray-900 max-w-xs truncate" title="${v.query}">${v.query}</td>
+                                                <td class="px-4 py-3 font-mono text-gray-700">${v.expected_result || '-'}</td>
+                                                <td class="px-4 py-3 font-mono text-gray-700">${v.actual_result || '-'}</td>
+                                                <td class="px-4 py-3">
+                                                    ${v.is_valid === true ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">通过</span>' : 
+                                                      v.is_valid === false ? '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">不通过</span>' : 
+                                                      '<span class="text-gray-400">-</span>'}
+                                                </td>
+                                                <td class="px-4 py-3 text-gray-700">${v.handler || '-'}</td>
+                                                <td class="px-4 py-3 text-gray-500 text-xs">${v.handled_at || '-'}</td>
+                                                <td class="px-4 py-3">
+                                                    <button onclick="openHandleModal('validation', ${v.id})" class="text-blue-500 hover:text-blue-700 text-xs font-medium">
+                                                        处理
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+                `;
+
+                document.getElementById('detail-content').innerHTML = html;
+                document.getElementById('detail-modal').classList.add('active');
+            } catch (error) {
+                showToast('加载详情失败', 'error');
+                console.error('加载详情失败:', error);
+            }
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        function openImportModal() {
+            document.getElementById('import-data').value = '';
+            document.getElementById('import-modal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('active');
+        }
+
+        async function importData() {
+            const dataStr = document.getElementById('import-data').value;
+            
+            try {
+                const data = JSON.parse(dataStr);
+                
+                if (!data.batches || !Array.isArray(data.batches)) {
+                    throw new Error('数据格式错误，需要包含 batches 数组');
+                }
+
+                const response = await fetch(`${API_BASE}/batches/import`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                
+                if (result.errors && result.errors.length > 0) {
+                    showToast(`部分导入失败：${result.errors.join(', ')}`, 'warning');
+                } else {
+                    showToast(`成功导入 ${result.imported_count} 条数据`, 'success');
+                }
+
+                closeImportModal();
+                loadBatches();
+                loadStats();
+            } catch (error) {
+                showToast('导入失败：' + error.message, 'error');
+                console.error('导入失败:', error);
+            }
+        }
+
+        function openHandleModal(type, id) {
+            document.getElementById('handle-type').value = type;
+            document.getElementById('handle-id').value = id;
+            document.getElementById('handler-name').value = '';
+            
+            if (type === 'delete') {
+                document.getElementById('delete-status-field').classList.remove('hidden');
+                document.getElementById('validation-status-field').classList.add('hidden');
+                document.getElementById('actual-result-field').classList.add('hidden');
+            } else {
+                document.getElementById('delete-status-field').classList.add('hidden');
+                document.getElementById('validation-status-field').classList.remove('hidden');
+                document.getElementById('actual-result-field').classList.remove('hidden');
+            }
+            
+            document.getElementById('handle-modal').classList.add('active');
+        }
+
+        function closeHandleModal() {
+            document.getElementById('handle-modal').classList.remove('active');
+        }
+
+        async function submitHandle() {
+            const type = document.getElementById('handle-type').value;
+            const id = document.getElementById('handle-id').value;
+            const handler = document.getElementById('handler-name').value;
+            
+            if (!handler) {
+                showToast('请输入处理人姓名', 'warning');
+                return;
+            }
+
+            try {
+                let url, body;
+                
+                if (type === 'delete') {
+                    url = `${API_BASE}/delete_syncs/${id}/handle`;
+                    body = {
+                        status: document.getElementById('delete-status').value,
+                        handler: handler
+                    };
+                } else {
+                    url = `${API_BASE}/recall_validations/${id}/handle`;
+                    body = {
+                        is_valid: document.getElementById('validation-status').value === 'true',
+                        actual_result: document.getElementById('actual-result').value,
+                        handler: handler
+                    };
+                }
+
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                await response.json();
+                showToast('处理成功', 'success');
+                closeHandleModal();
+                
+                const detailModal = document.getElementById('detail-modal');
+                if (detailModal.classList.contains('active')) {
+                    const batchId = document.querySelector('#detail-content input[type="hidden"]')?.value;
+                    if (batchId) viewBatchDetail(batchId);
+                }
+                loadBatches();
+            } catch (error) {
+                showToast('处理失败', 'error');
+                console.error('处理失败:', error);
+            }
+        }
+
+        function exportReport() {
+            window.open(`${API_BASE}/export`, '_blank');
+            showToast('正在导出报告...', 'success');
+        }
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                loadBatches();
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const content = document.getElementById('toast-content');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                warning: 'bg-yellow-500',
+                info: 'bg-blue-500'
+            };
+            
+            content.className = `px-6 py-3 rounded-lg shadow-lg text-white ${colors[type] || colors.info}`;
+            content.textContent = message;
+            
+            toast.classList.remove('translate-y-full', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+            }, 3000);
+        }
+
+        loadStats();
+        loadBatches();
+    </script>
+</body>
+</html>
