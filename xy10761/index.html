@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织权限继承视图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #1a202c; margin-bottom: 20px; font-size: 24px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 32px; font-weight: bold; color: #2b6cb0; }
+        .stat-label { color: #718096; font-size: 14px; margin-top: 4px; }
+        .stat-card.conflict .stat-value { color: #e53e3e; }
+        .stat-card.inherited .stat-value { color: #38a169; }
+        
+        .controls { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #2b6cb0; color: white; }
+        .btn-primary:hover { background: #2c5282; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd6b20; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-danger:hover { background: #c53030; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        
+        .main-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
+        
+        .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .panel-title { font-size: 16px; font-weight: 600; color: #2d3748; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+        
+        .dept-tree { max-height: 400px; overflow-y: auto; }
+        .dept-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.2s; margin-bottom: 4px; }
+        .dept-item:hover { background: #f7fafc; }
+        .dept-item.active { background: #ebf8ff; border-left: 3px solid #2b6cb0; }
+        .dept-name { font-weight: 500; color: #2d3748; }
+        .dept-level { font-size: 12px; color: #718096; margin-left: 8px; }
+        .dept-children { margin-left: 20px; }
+        
+        .binding-item { padding: 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px; }
+        .binding-header { display: flex; justify-content: space-between; align-items: center; }
+        .binding-user { font-weight: 500; color: #2d3748; }
+        .binding-role { font-size: 12px; color: #2b6cb0; background: #ebf8ff; padding: 2px 8px; border-radius: 4px; }
+        .binding-meta { font-size: 12px; color: #718096; margin-top: 4px; }
+        .binding-inherited { color: #38a169; }
+        .binding-expired { color: #e53e3e; }
+        .binding-note { font-size: 12px; color: #ed8936; margin-top: 4px; font-style: italic; }
+        
+        .permissions-section { margin-top: 16px; }
+        .perm-tag { display: inline-block; padding: 4px 10px; background: #edf2f7; border-radius: 4px; font-size: 12px; margin: 4px; color: #4a5568; }
+        .perm-tag.inherited { background: #f0fff4; color: #276749; }
+        
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+        .timeline-item { position: relative; padding: 12px 0; }
+        .timeline-dot { position: absolute; left: -20px; width: 16px; height: 16px; border-radius: 50%; background: #2b6cb0; }
+        .timeline-dot.conflict { background: #e53e3e; }
+        .timeline-dot.expired { background: #ed8936; }
+        .timeline-dot.fix { background: #38a169; }
+        .timeline-content { background: #f7fafc; padding: 12px; border-radius: 8px; }
+        .timeline-message { font-weight: 500; color: #2d3748; }
+        .timeline-time { font-size: 12px; color: #718096; margin-top: 4px; }
+        .timeline-resolution { font-size: 12px; color: #38a169; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+        .timeline-reason { font-size: 12px; color: #718096; margin-top: 4px; font-style: italic; }
+        
+        .conflict-alert { background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+        .conflict-title { color: #c53030; font-weight: 600; margin-bottom: 8px; }
+        .conflict-item { font-size: 14px; color: #742a2a; padding: 4px 0; }
+        
+        .snapshot-list { margin-top: 16px; }
+        .snapshot-item { padding: 12px; background: #f7fafc; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
+        .snapshot-item:hover { background: #edf2f7; }
+        .snapshot-time { font-weight: 500; color: #2d3748; }
+        .snapshot-meta { font-size: 12px; color: #718096; margin-top: 4px; }
+        
+        .section { margin-bottom: 24px; }
+        
+        .diff-section { background: #faf5ff; border: 1px solid #e9d8fd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+        .diff-title { color: #6b46c1; font-weight: 600; margin-bottom: 12px; }
+        .diff-item { display: flex; gap: 16px; }
+        .diff-before, .diff-after { flex: 1; padding: 12px; border-radius: 6px; }
+        .diff-before { background: #fff5f5; }
+        .diff-after { background: #f0fff4; }
+        .diff-label { font-size: 12px; font-weight: 600; margin-bottom: 8px; }
+        .diff-before .diff-label { color: #c53030; }
+        .diff-after .diff-label { color: #2f855a; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #718096; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>组织权限继承视图</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPermissions">0</div>
+                <div class="stat-label">总权限数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalBindings">0</div>
+                <div class="stat-label">角色绑定数</div>
+            </div>
+            <div class="stat-card conflict">
+                <div class="stat-value" id="totalConflicts">0</div>
+                <div class="stat-label">权限冲突数</div>
+            </div>
+            <div class="stat-card inherited">
+                <div class="stat-value" id="totalInherited">0</div>
+                <div class="stat-label">继承绑定数</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-warning" onclick="prepareDirtyData()">准备脏数据</button>
+            <button class="btn btn-success" onclick="fixTempAuth()">修正临时授权</button>
+            <button class="btn btn-primary" onclick="createSnapshot()">生成权限快照</button>
+            <button class="btn btn-danger" onclick="resetData()">重置数据</button>
+            <button class="btn btn-primary" onclick="refreshAll()">刷新数据</button>
+        </div>
+        
+        <div class="diff-section" id="diffSection" style="display: none;">
+            <div class="diff-title">📊 修正前后差异对比</div>
+            <div class="diff-item">
+                <div class="diff-before">
+                    <div class="diff-label">修正前</div>
+                    <div id="diffBeforeContent"></div>
+                </div>
+                <div class="diff-after">
+                    <div class="diff-label">修正后</div>
+                    <div id="diffAfterContent"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div>
+                <div class="panel">
+                    <div class="panel-title">🏢 部门树</div>
+                    <div class="dept-tree" id="deptTree"></div>
+                </div>
+                
+                <div class="panel" style="margin-top: 24px;">
+                    <div class="panel-title">📸 权限快照</div>
+                    <div class="snapshot-list" id="snapshotList"></div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="panel" id="conflictPanel" style="display: none;">
+                    <div class="panel-title">⚠️ 权限冲突</div>
+                    <div class="conflict-alert">
+                        <div class="conflict-title">检测到以下权限冲突</div>
+                        <div id="conflictList"></div>
+                    </div>
+                </div>
+                
+                <div class="panel" style="margin-top: 24px;">
+                    <div class="panel-title">🔗 当前部门权限详情</div>
+                    <div id="deptDetail">
+                        <div class="empty-state">请选择一个部门查看详情</div>
+                    </div>
+                </div>
+                
+                <div class="panel" style="margin-top: 24px;">
+                    <div class="panel-title">📅 操作时间线</div>
+                    <div class="timeline" id="timeline"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentDeptId = null;
+        let beforeFixData = null;
+
+        async function fetchData(endpoint) {
+            const response = await fetch(`${API_BASE}/${endpoint}`);
+            return response.json();
+        }
+
+        async function postData(endpoint, data = {}) {
+            const response = await fetch(`${API_BASE}/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return response.json();
+        }
+
+        async function refreshAll() {
+            await Promise.all([
+                loadStats(),
+                loadDepartments(),
+                loadTimeline(),
+                loadSnapshots()
+            ]);
+        }
+
+        async function loadStats() {
+            const stats = await fetchData('stats');
+            document.getElementById('totalPermissions').textContent = stats.totalPermissions;
+            document.getElementById('totalBindings').textContent = stats.totalBindings;
+            document.getElementById('totalConflicts').textContent = stats.totalConflicts;
+            document.getElementById('totalInherited').textContent = stats.totalInherited;
+            
+            const conflictPanel = document.getElementById('conflictPanel');
+            if (stats.totalConflicts > 0) {
+                conflictPanel.style.display = 'block';
+                await loadConflicts();
+            } else {
+                conflictPanel.style.display = 'none';
+            }
+        }
+
+        async function loadConflicts() {
+            const data = await fetchData('inheritance');
+            const conflictList = document.getElementById('conflictList');
+            conflictList.innerHTML = data.conflicts.map(c => `
+                <div class="conflict-item">
+                    • ${c.deptName} - ${c.permission} (来自 ${c.fromDept} - ${c.userName})
+                </div>
+            `).join('');
+        }
+
+        async function loadDepartments() {
+            const depts = await fetchData('departments');
+            const bindings = await fetchData('bindings');
+            const inheritance = await fetchData('inheritance');
+            
+            const deptTree = document.getElementById('deptTree');
+            
+            function buildTree(parentId = null) {
+                const children = depts.filter(d => d.parentId === parentId);
+                return children.map(d => {
+                    const deptBindings = bindings.filter(b => b.deptId === d.id);
+                    const deptInherit = inheritance.inheritance.find(i => i.deptId === d.id);
+                    const hasConflict = inheritance.conflicts.some(c => c.deptId === d.id);
+                    
+                    return `
+                        <div class="dept-item ${currentDeptId === d.id ? 'active' : ''}" onclick="selectDept('${d.id}')">
+                            <div class="dept-name">
+                                ${d.name} ${hasConflict ? '⚠️' : ''}
+                                <span class="dept-level">Level ${d.level}</span>
+                            </div>
+                            <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+                                ${deptBindings.length} 个绑定 · ${deptInherit ? deptInherit.permissions.length} 个权限
+                            </div>
+                        </div>
+                        <div class="dept-children">
+                            ${buildTree(d.id)}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            deptTree.innerHTML = buildTree();
+        }
+
+        async function selectDept(deptId) {
+            currentDeptId = deptId;
+            await loadDepartments();
+            await loadDeptDetail(deptId);
+        }
+
+        async function loadDeptDetail(deptId) {
+            const bindings = await fetchData('bindings');
+            const roles = await fetchData('roles');
+            const inheritance = await fetchData('inheritance');
+            
+            const deptBindings = bindings.filter(b => b.deptId === deptId);
+            const deptInherit = inheritance.inheritance.find(i => i.deptId === deptId);
+            
+            const detailDiv = document.getElementById('deptDetail');
+            
+            const roleMap = {};
+            roles.forEach(r => roleMap[r.id] = r);
+            
+            detailDiv.innerHTML = `
+                <div class="section">
+                    <div style="font-weight: 600; margin-bottom: 12px;">角色绑定</div>
+                    ${deptBindings.length === 0 ? '<div style="color: #718096;">暂无绑定</div>' : ''}
+                    ${deptBindings.map(b => {
+                        const role = roleMap[b.roleId];
+                        const isExpired = b.expiresAt && new Date(b.expiresAt) < new Date();
+                        return `
+                            <div class="binding-item">
+                                <div class="binding-header">
+                                    <span class="binding-user">${b.userName}</span>
+                                    <span class="binding-role">${role ? role.name : b.roleId}</span>
+                                </div>
+                                <div class="binding-meta">
+                                    ${b.isInherited ? '<span class="binding-inherited">✓ 可继承</span>' : '<span>✗ 不继承</span>'}
+                                    ${isExpired ? '<span class="binding-expired"> · 已过期</span>' : ''}
+                                </div>
+                                ${b.note ? `<div class="binding-note">📝 ${b.note}</div>` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <div class="permissions-section">
+                    <div style="font-weight: 600; margin-bottom: 12px;">最终权限集</div>
+                    ${deptInherit.permissions.map(p => `<span class="perm-tag">${p}</span>`).join('')}
+                </div>
+                
+                ${deptInherit.inheritedFrom.length > 0 ? `
+                    <div class="permissions-section" style="margin-top: 20px;">
+                        <div style="font-weight: 600; margin-bottom: 12px;">继承来源</div>
+                        ${deptInherit.inheritedFrom.map(i => `
+                            <div style="padding: 8px 12px; background: #f0fff4; border-radius: 6px; margin-bottom: 8px;">
+                                <span style="color: #276749;">从 ${i.fromDept} · ${i.roleName} · ${i.userName}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        async function loadTimeline() {
+            const timeline = await fetchData('timeline');
+            const timelineDiv = document.getElementById('timeline');
+            
+            if (timeline.length === 0) {
+                timelineDiv.innerHTML = '<div class="empty-state">暂无时间线记录</div>';
+                return;
+            }
+            
+            timelineDiv.innerHTML = timeline.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(t => `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${t.type}"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-message">${t.message}</div>
+                        <div class="timeline-time">${new Date(t.createdAt).toLocaleString('zh-CN')}</div>
+                        ${t.resolution ? `<div class="timeline-resolution">✅ 解决方案: ${t.resolution}</div>` : ''}
+                        ${t.reason ? `<div class="timeline-reason">📋 处理理由: ${t.reason}</div>` : ''}
+                        ${t.conflictReason ? `<div class="timeline-reason">🔍 冲突原因: ${t.conflictReason}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadSnapshots() {
+            const snapshots = await fetchData('snapshots');
+            const snapshotList = document.getElementById('snapshotList');
+            
+            if (snapshots.length === 0) {
+                snapshotList.innerHTML = '<div class="empty-state">暂无快照</div>';
+                return;
+            }
+            
+            snapshotList.innerHTML = snapshots.map(s => `
+                <div class="snapshot-item" onclick="viewSnapshot('${s.id}')">
+                    <div class="snapshot-time">${new Date(s.createdAt).toLocaleString('zh-CN')}</div>
+                    <div class="snapshot-meta">
+                        ${s.inheritance.inheritance.length} 个部门 · 
+                        ${s.bindings.length} 个绑定 · 
+                        ${s.inheritance.conflicts.length} 个冲突
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function prepareDirtyData() {
+            beforeFixData = await fetchData('stats');
+            await postData('prepare-dirty-data');
+            await refreshAll();
+            alert('脏数据已准备！包含冲突权限和过期临时授权');
+        }
+
+        async function fixTempAuth() {
+            if (!beforeFixData) {
+                beforeFixData = await fetchData('stats');
+            }
+            
+            await postData('fix-temp-auth');
+            await refreshAll();
+            
+            const afterFixData = await fetchData('stats');
+            showDiff(beforeFixData, afterFixData);
+            
+            alert('临时授权已修正！');
+        }
+
+        function showDiff(before, after) {
+            const diffSection = document.getElementById('diffSection');
+            const beforeContent = document.getElementById('diffBeforeContent');
+            const afterContent = document.getElementById('diffAfterContent');
+            
+            diffSection.style.display = 'block';
+            
+            beforeContent.innerHTML = `
+                <div>冲突数: <strong>${before.totalConflicts}</strong></div>
+                <div>绑定数: <strong>${before.totalBindings}</strong></div>
+            `;
+            
+            afterContent.innerHTML = `
+                <div>冲突数: <strong>${after.totalConflicts}</strong></div>
+                <div>绑定数: <strong>${after.totalBindings}</strong></div>
+                <div style="color: #38a169; margin-top: 8px;">✅ 临时授权已续期</div>
+            `;
+        }
+
+        async function createSnapshot() {
+            await postData('snapshots');
+            await loadSnapshots();
+            alert('权限快照已生成！');
+        }
+
+        async function resetData() {
+            if (confirm('确定要重置所有数据吗？')) {
+                beforeFixData = null;
+                document.getElementById('diffSection').style.display = 'none';
+                await postData('reset');
+                await refreshAll();
+                currentDeptId = null;
+                document.getElementById('deptDetail').innerHTML = '<div class="empty-state">请选择一个部门查看详情</div>';
+            }
+        }
+
+        async function viewSnapshot(snapshotId) {
+            const snapshots = await fetchData('snapshots');
+            const snapshot = snapshots.find(s => s.id === snapshotId);
+            if (snapshot) {
+                alert(`快照 ${snapshotId}:\n时间: ${new Date(snapshot.createdAt).toLocaleString('zh-CN')}\n部门数: ${snapshot.inheritance.inheritance.length}\n冲突数: ${snapshot.inheritance.conflicts.length}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', refreshAll);
+    </script>
+</body>
+</html>
