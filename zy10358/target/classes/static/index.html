@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>费用试算 API - 管理控制台</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #303133; margin-bottom: 20px; text-align: center; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        h2 { color: #409eff; margin-bottom: 15px; font-size: 18px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #606266; font-weight: 500; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-size: 14px; }
+        button { background: #409eff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+        button:hover { background: #66b1ff; }
+        button.secondary { background: #67c23a; }
+        button.secondary:hover { background: #85ce61; }
+        button.warning { background: #e6a23c; }
+        button.warning:hover { background: #ebb563; }
+        .result { background: #f5f7fa; padding: 15px; border-radius: 4px; margin-top: 15px; font-family: monospace; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; }
+        .success { color: #67c23a; }
+        .error { color: #f56c6c; }
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+        .api-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .api-section { grid-template-columns: 1fr; } .row { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💰 费用试算 API - 管理控制台</h1>
+        
+        <div class="api-section">
+            <div class="card">
+                <h2>1. 创建费用试算</h2>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>业务类型</label>
+                            <input id="bizType" value="ORDER" placeholder="如: ORDER, SUBSCRIPTION">
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>业务单号</label>
+                            <input id="bizNo" value="TEST001" placeholder="唯一业务标识">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label>价格规则</label>
+                            <select id="ruleCode">
+                                <option value="VIP_MEMBERSHIP">VIP会员订阅(99元/月)</option>
+                                <option value="CLOUD_STORAGE">云存储服务(10元+0.5元/GB)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label>数量</label>
+                            <input id="quantity" type="number" value="1" step="0.01">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>折扣码 (逗号分隔)</label>
+                    <input id="discountCodes" value="NEW_USER_10,COUPON_50" placeholder="NEW_USER_10,COUPON_50">
+                </div>
+                <button onclick="calculate()">执行试算</button>
+                <div id="calcResult" class="result"></div>
+            </div>
+
+            <div class="card">
+                <h2>2. 操作接口</h2>
+                <div class="form-group">
+                    <label>试算请求号</label>
+                    <input id="requestNo" placeholder="FEE开头的请求号">
+                </div>
+                <button onclick="queryResult()">查询结果</button>
+                <button class="secondary" onclick="lockPrice()">锁定价格</button>
+                <button class="warning" onclick="queryTimeline()">查看时间线</button>
+                <div id="queryResult" class="result"></div>
+            </div>
+
+            <div class="card">
+                <h2>3. 锁价凭证</h2>
+                <div class="form-group">
+                    <label>锁价凭证号</label>
+                    <input id="certificateNo" placeholder="LOCK开头的凭证号">
+                </div>
+                <button onclick="validateCertificate()">校验凭证</button>
+                <button class="secondary" onclick="charge()">执行扣费</button>
+                <div id="certResult" class="result"></div>
+            </div>
+
+            <div class="card">
+                <h2>4. API 文档</h2>
+                <div style="font-size:13px; line-height:2;">
+                    <p><code>POST /api/fee/calculate</code> - 创建试算请求</p>
+                    <p><code>GET /api/fee/result/{requestNo}</code> - 查询试算结果</p>
+                    <p><code>POST /api/fee/lock/{requestNo}</code> - 锁定价格</p>
+                    <p><code>GET /api/fee/validate/{certNo}</code> - 校验凭证</p>
+                    <p><code>POST /api/fee/charge/{certNo}</code> - 执行扣费</p>
+                    <p><code>GET /api/fee/timeline/{requestNo}</code> - 查询时间线</p>
+                    <p><code>GET /h2-console</code> - H2数据库控制台</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = '';
+
+        async function calculate() {
+            const data = {
+                bizType: document.getElementById('bizType').value,
+                bizNo: document.getElementById('bizNo').value,
+                ruleCode: document.getElementById('ruleCode').value,
+                quantity: parseFloat(document.getElementById('quantity').value),
+                discountCodes: document.getElementById('discountCodes').value.split(',').map(s => s.trim()).filter(s => s)
+            };
+            
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                document.getElementById('calcResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('calcResult').className = result.code === 200 ? 'result success' : 'result error';
+                if (result.data && result.data.requestNo) {
+                    document.getElementById('requestNo').value = result.data.requestNo;
+                }
+            } catch (e) {
+                document.getElementById('calcResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('calcResult').className = 'result error';
+            }
+        }
+
+        async function queryResult() {
+            const requestNo = document.getElementById('requestNo').value;
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/result/' + requestNo);
+                const result = await res.json();
+                document.getElementById('queryResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('queryResult').className = result.code === 200 ? 'result success' : 'result error';
+                if (result.data && result.data.certificateNo) {
+                    document.getElementById('certificateNo').value = result.data.certificateNo;
+                }
+            } catch (e) {
+                document.getElementById('queryResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('queryResult').className = 'result error';
+            }
+        }
+
+        async function lockPrice() {
+            const requestNo = document.getElementById('requestNo').value;
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/lock/' + requestNo, { method: 'POST' });
+                const result = await res.json();
+                document.getElementById('queryResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('queryResult').className = result.code === 200 ? 'result success' : 'result error';
+                if (result.data && result.data.certificateNo) {
+                    document.getElementById('certificateNo').value = result.data.certificateNo;
+                }
+            } catch (e) {
+                document.getElementById('queryResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('queryResult').className = 'result error';
+            }
+        }
+
+        async function queryTimeline() {
+            const requestNo = document.getElementById('requestNo').value;
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/timeline/' + requestNo);
+                const result = await res.json();
+                document.getElementById('queryResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('queryResult').className = result.code === 200 ? 'result success' : 'result error';
+            } catch (e) {
+                document.getElementById('queryResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('queryResult').className = 'result error';
+            }
+        }
+
+        async function validateCertificate() {
+            const certNo = document.getElementById('certificateNo').value;
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/validate/' + certNo);
+                const result = await res.json();
+                document.getElementById('certResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('certResult').className = result.code === 200 && result.data ? 'result success' : 'result error';
+            } catch (e) {
+                document.getElementById('certResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('certResult').className = 'result error';
+            }
+        }
+
+        async function charge() {
+            const certNo = document.getElementById('certificateNo').value;
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/charge/' + certNo, { method: 'POST' });
+                const result = await res.json();
+                document.getElementById('certResult').innerHTML = JSON.stringify(result, null, 2);
+                document.getElementById('certResult').className = result.code === 200 ? 'result success' : 'result error';
+            } catch (e) {
+                document.getElementById('certResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('certResult').className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>
