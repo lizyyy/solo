@@ -118,6 +118,9 @@ class ApprovalService {
     if (task.status !== 'approved') {
       throw new Error('只有已批准的任务才能完成销毁');
     }
+    if (!photos || photos.length === 0) {
+      throw new Error('必须上传至少一张销毁照片回执');
+    }
     
     const now = new Date().toISOString();
     const photoIds = [];
