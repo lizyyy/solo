@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幂等键审计服务 - Idempotency Audit Service</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 幂等键审计服务</h1>
+            <p class="subtitle">追踪和分析API幂等请求，解决重复提交问题</p>
+        </header>
+
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalRecords">0</div>
+                <div class="stat-label">总记录数</div>
+            </div>
+            <div class="stat-card stat-active">
+                <div class="stat-value" id="activeRecords">0</div>
+                <div class="stat-label">活跃记录</div>
+            </div>
+            <div class="stat-card stat-conflict">
+                <div class="stat-value" id="conflictRecords">0</div>
+                <div class="stat-label">冲突记录</div>
+            </div>
+            <div class="stat-card stat-reused">
+                <div class="stat-value" id="reusedRequests">0</div>
+                <div class="stat-label">复用响应</div>
+            </div>
+        </div>
+
+        <div class="actions-bar">
+            <div class="filter-section">
+                <input type="text" id="searchKey" placeholder="搜索幂等键..." class="input-filter">
+                <select id="filterService" class="select-filter">
+                    <option value="">所有服务</option>
+                    <option value="payment-service">支付服务</option>
+                    <option value="order-service">订单服务</option>
+                    <option value="user-service">用户服务</option>
+                </select>
+                <select id="filterStatus" class="select-filter">
+                    <option value="">所有状态</option>
+                    <option value="active">活跃</option>
+                    <option value="conflict">冲突</option>
+                    <option value="expired">过期</option>
+                </select>
+                <button onclick="loadRecords()" class="btn btn-primary">🔍 查询</button>
+            </div>
+            <div class="action-buttons">
+                <button onclick="openSimulateModal()" class="btn btn-success">⚡ 模拟请求</button>
+                <button onclick="openImportModal()" class="btn btn-info">📥 批量导入</button>
+                <button onclick="exportRecords()" class="btn btn-warning">📤 导出报告</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>幂等键</th>
+                        <th>服务名称</th>
+                        <th>API端点</th>
+                        <th>状态</th>
+                        <th>请求次数</th>
+                        <th>首次请求</th>
+                        <th>最后请求</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                    <tr>
+                        <td colspan="8" class="loading">加载中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>📋 记录详情</h2>
+                <button onclick="closeModal('detailModal')" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="detailContent">
+            </div>
+        </div>
+    </div>
+
+    <div id="simulateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚡ 模拟幂等请求</h2>
+                <button onclick="closeModal('simulateModal')" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="simulateForm">
+                    <div class="form-group">
+                        <label>幂等键 *</label>
+                        <input type="text" id="simKey" required placeholder="例如: key-001">
+                    </div>
+                    <div class="form-group">
+                        <label>服务名称 *</label>
+                        <select id="simService" required>
+                            <option value="payment-service">支付服务</option>
+                            <option value="order-service">订单服务</option>
+                            <option value="user-service">用户服务</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>API端点 *</label>
+                        <input type="text" id="simEndpoint" required placeholder="例如: /api/v1/payments">
+                    </div>
+                    <div class="form-group">
+                        <label>请求体 (JSON)</label>
+                        <textarea id="simBody" rows="3" placeholder='{"amount": 100, "userId": "u123"}'></textarea>
+                    </div>
+                    <div class="simulation-result" id="simResult"></div>
+                    <div class="form-actions">
+                        <button type="button" onclick="simulateRequest()" class="btn btn-success">发送请求</button>
+                        <button type="button" onclick="simulateConflict()" class="btn btn-danger">发送冲突请求</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📥 批量导入</h2>
+                <button onclick="closeModal('importModal')" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>粘贴JSON数据</label>
+                    <textarea id="importData" rows="10" placeholder='[{"idempotencyKey": "key-1", "serviceName": "payment-service", ...}]'></textarea>
+                </div>
+                <div class="import-result" id="importResult"></div>
+                <div class="form-actions">
+                    <button onclick="batchImport()" class="btn btn-primary">开始导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
