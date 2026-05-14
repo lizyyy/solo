@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	ErrPackageNotFound     = errors.New("package not found")
-	ErrVersionNotFound     = errors.New("version not found")
-	ErrDuplicateVersion    = errors.New("duplicate version")
-	ErrDuplicateRequestID  = errors.New("duplicate request id")
-	ErrInvalidStatus       = errors.New("invalid status transition")
+	ErrPackageNotFound    = errors.New("package not found")
+	ErrVersionNotFound    = errors.New("version not found")
+	ErrDuplicateVersion   = errors.New("duplicate version")
+	ErrDuplicateRequestID = errors.New("duplicate request id")
+	ErrInvalidStatus      = errors.New("invalid status transition")
 )
 
 type Store interface {
@@ -31,6 +31,7 @@ type Store interface {
 
 	CreateHitRequest(hit *model.HitRequest) error
 	GetHitRequest(id string) (*model.HitRequest, error)
+	GetHitRequestByRequestID(requestID string) (*model.HitRequest, error)
 	ListHitRequests(packageID string, limit int) ([]*model.HitRequest, error)
 
 	CreateAuditLog(log *model.AuditLog) error
@@ -41,12 +42,12 @@ type Store interface {
 }
 
 type MemoryStore struct {
-	packages     map[string]*model.StrategyPackage
-	versions     map[string]*model.RuleVersion
-	versionIndex map[string]map[string]*model.RuleVersion
-	hitRequests  map[string]*model.HitRequest
-	requestIDMap map[string]bool
-	auditLogs    []*model.AuditLog
+	packages       map[string]*model.StrategyPackage
+	versions       map[string]*model.RuleVersion
+	versionIndex   map[string]map[string]*model.RuleVersion
+	hitRequests    map[string]*model.HitRequest
+	requestIDMap   map[string]*model.HitRequest
+	auditLogs      []*model.AuditLog
 	rollbackPoints map[string]*model.RollbackPoint
 
 	mu sync.RWMutex
@@ -58,7 +59,7 @@ func NewMemoryStore() Store {
 		versions:       make(map[string]*model.RuleVersion),
 		versionIndex:   make(map[string]map[string]*model.RuleVersion),
 		hitRequests:    make(map[string]*model.HitRequest),
-		requestIDMap:   make(map[string]bool),
+		requestIDMap:   make(map[string]*model.HitRequest),
 		auditLogs:      make([]*model.AuditLog, 0),
 		rollbackPoints: make(map[string]*model.RollbackPoint),
 	}
@@ -181,10 +182,10 @@ func (s *MemoryStore) CreateHitRequest(hit *model.HitRequest) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if hit.RequestID != "" {
-		if s.requestIDMap[hit.RequestID] {
+		if _, exists := s.requestIDMap[hit.RequestID]; exists {
 			return ErrDuplicateRequestID
 		}
-		s.requestIDMap[hit.RequestID] = true
+		s.requestIDMap[hit.RequestID] = hit
 	}
 	s.hitRequests[hit.ID] = hit
 	return nil
@@ -194,6 +195,15 @@ func (s *MemoryStore) GetHitRequest(id string) (*model.HitRequest, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.hitRequests[id], nil
+}
+
+func (s *MemoryStore) GetHitRequestByRequestID(requestID string) (*model.HitRequest, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if hit, exists := s.requestIDMap[requestID]; exists {
+		return hit, nil
+	}
+	return nil, nil
 }
 
 func (s *MemoryStore) ListHitRequests(packageID string, limit int) ([]*model.HitRequest, error) {

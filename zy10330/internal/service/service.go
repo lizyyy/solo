@@ -3,6 +3,8 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
+	"strings"
 
 	"strategy-hotload-api/internal/model"
 	"strategy-hotload-api/internal/store"
@@ -170,7 +172,17 @@ func (s *StrategyService) Revoke(versionID, operator, remark string) (*model.Rul
 }
 
 func (s *StrategyService) HitCheck(req *model.HitCheckRequest) (*model.HitCheckResponse, error) {
-	version, err := s.store.GetLatestPublishedVersion(req.PackageID)
+	existingHit, err := s.store.GetHitRequestByRequestID(req.RequestID)
+	if err == nil && existingHit != nil {
+		return &model.HitCheckResponse{
+			HitResult:   existingHit.HitResult,
+			VersionID:   existingHit.VersionID,
+			HitRules:    existingHit.HitRules,
+			Explanation: existingHit.Explanation,
+			IsCached:    true,
+		}, nil
+	}
+	version, err := s.getSuitableVersion(req)
 	if err != nil {
 		return nil, err
 	}
@@ -190,17 +202,76 @@ func (s *StrategyService) HitCheck(req *model.HitCheckRequest) (*model.HitCheckR
 		CreatedAt:   model.Now(),
 		UserID:      req.UserID,
 	}
-	if err := s.store.CreateHitRequest(hitRequest); err != nil {
-		if err == store.ErrDuplicateRequestID {
-			return nil, err
-		}
-	}
+	s.store.CreateHitRequest(hitRequest)
 	return &model.HitCheckResponse{
 		HitResult:   hitResult,
 		VersionID:   version.ID,
 		HitRules:    hitRules,
 		Explanation: explanation,
+		IsCached:    false,
 	}, nil
+}
+
+func (s *StrategyService) getSuitableVersion(req *model.HitCheckRequest) (*model.RuleVersion, error) {
+	versions, err := s.store.ListRuleVersions(req.PackageID)
+	if err != nil {
+		return nil, err
+	}
+	var grayVersion *model.RuleVersion
+	var publishedVersion *model.RuleVersion
+	for _, v := range versions {
+		if v.Status == model.StatusGray && v.GrayRange != nil {
+			grayVersion = v
+		}
+		if v.Status == model.StatusPublished {
+			if publishedVersion == nil || v.CreatedAt.After(publishedVersion.CreatedAt) {
+				publishedVersion = v
+			}
+		}
+	}
+	if grayVersion != nil {
+		if s.isInGrayRange(req, grayVersion.GrayRange) {
+			return grayVersion, nil
+		}
+	}
+	return publishedVersion, nil
+}
+
+func (s *StrategyService) isInGrayRange(req *model.HitCheckRequest, grayRange *model.GrayRange) bool {
+	if len(grayRange.UserIDs) > 0 {
+		for _, uid := range grayRange.UserIDs {
+			if uid == req.UserID {
+				return true
+			}
+		}
+	}
+	if grayRange.Percentage > 0 {
+		hash := fnv.New32a()
+		hash.Write([]byte(req.UserID))
+		hashValue := hash.Sum32()
+		if (hashValue % 100) < uint32(grayRange.Percentage) {
+			return true
+		}
+	}
+	if len(grayRange.Regions) > 0 {
+		if region, ok := req.Input["region"].(string); ok {
+			for _, r := range grayRange.Regions {
+				if r == region {
+					return true
+				}
+			}
+		}
+	}
+	if len(grayRange.UserGroups) > 0 {
+		if group, ok := req.Input["user_group"].(string); ok {
+			for _, g := range grayRange.UserGroups {
+				if g == group {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 func (s *StrategyService) evaluateRules(ruleContent map[string]interface{}, input map[string]interface{}) (bool, []string, *model.ExplanationResult) {
@@ -273,7 +344,10 @@ func (s *StrategyService) compareValue(expected, actual interface{}, operator st
 }
 
 func contains(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > 0 && len(substr) > 0 && s[:len(substr)] == substr)
+	if substr == "" {
+		return true
+	}
+	return strings.Contains(s, substr)
 }
 
 func (s *StrategyService) ListHitRequests(packageID string, limit int) ([]*model.HitRequest, error) {
@@ -301,10 +375,10 @@ func (s *StrategyService) Export(packageID string) (*model.ExportResult, error) 
 	versionLogs, _, _ := s.store.ListAuditLogs("version", "", 1, 1000)
 	allLogs := append(auditLogs, versionLogs...)
 	summary := map[string]int{
-		"total_versions":    len(versions),
+		"total_versions":     len(versions),
 		"total_hit_requests": len(hitRequests),
-		"total_audit_logs":  len(allLogs),
-		"published_count":   countByStatus(versions, model.StatusPublished),
+		"total_audit_logs":   len(allLogs),
+		"published_count":    countByStatus(versions, model.StatusPublished),
 	}
 	return &model.ExportResult{
 		Package:     pkg,

@@ -33,6 +33,7 @@ type HitCheckResponse struct {
 	VersionID   string             `json:"version_id"`
 	HitRules    []string           `json:"hit_rules,omitempty"`
 	Explanation *ExplanationResult `json:"explanation,omitempty"`
+	IsCached    bool               `json:"is_cached,omitempty"`
 }
 
 type AuditQueryRequest struct {
@@ -51,12 +52,12 @@ type ExportRequest struct {
 }
 
 type ExportResult struct {
-	Package      *StrategyPackage   `json:"package"`
-	Versions     []*RuleVersion      `json:"versions"`
-	HitRequests  []*HitRequest      `json:"hit_requests"`
-	AuditLogs    []*AuditLog        `json:"audit_logs"`
-	ExportedAt   string             `json:"exported_at"`
-	Summary      map[string]int     `json:"summary"`
+	Package     *StrategyPackage `json:"package"`
+	Versions    []*RuleVersion   `json:"versions"`
+	HitRequests []*HitRequest    `json:"hit_requests"`
+	AuditLogs   []*AuditLog      `json:"audit_logs"`
+	ExportedAt  string           `json:"exported_at"`
+	Summary     map[string]int   `json:"summary"`
 }
 
 type Response struct {
