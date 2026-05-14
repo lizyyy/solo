@@ -33,11 +33,23 @@ func (s *TribunalService) CreateStrategy(path, method string, ttl time.Duration,
 		ParamKeys: paramKeys,
 		Enabled:   true,
 	}
-	err := s.storage.CreateStrategy(strategy)
+	existing, err := s.storage.GetOrCreateStrategy(strategy)
 	if err != nil {
 		return nil, err
 	}
-	return strategy, nil
+	s.storage.AddAuditLog(&models.AuditLog{
+		Action:     "create_strategy",
+		Resource:   "strategy",
+		ResourceID: existing.ID,
+		After: map[string]interface{}{
+			"path":       existing.Path,
+			"method":     existing.Method,
+			"ttl":        existing.TTL,
+			"param_keys": existing.ParamKeys,
+		},
+		Operator: "system",
+	})
+	return existing, nil
 }
 
 func (s *TribunalService) CheckCache(path, method string, params map[string]interface{}) (*models.CacheRecord, string, error) {
@@ -110,8 +122,21 @@ func (s *TribunalService) UpdateRecordStatus(recordID string, newStatus models.C
 	if !record.CanTransitionTo(newStatus) {
 		return errors.New("invalid status transition from " + string(record.Status) + " to " + string(newStatus))
 	}
+	oldStatus := record.Status
 	record.Status = newStatus
-	return s.storage.UpdateRecord(record)
+	err = s.storage.UpdateRecord(record)
+	if err != nil {
+		return err
+	}
+	s.storage.AddAuditLog(&models.AuditLog{
+		Action:     "update_status",
+		Resource:   "record",
+		ResourceID: recordID,
+		Before:     map[string]interface{}{"status": oldStatus},
+		After:      map[string]interface{}{"status": newStatus},
+		Operator:   "system",
+	})
+	return nil
 }
 
 func (s *TribunalService) InvalidateCache(recordID, reason, operator string) error {
@@ -124,7 +149,21 @@ func (s *TribunalService) InvalidateCache(recordID, reason, operator string) err
 		Reason:   reason,
 		Operator: operator,
 	}
-	return s.storage.CreateInvalidationEvent(event)
+	err = s.storage.CreateInvalidationEvent(event)
+	if err != nil {
+		return err
+	}
+	s.storage.AddAuditLog(&models.AuditLog{
+		Action:     "invalidate_cache",
+		Resource:   "record",
+		ResourceID: recordID,
+		After: map[string]interface{}{
+			"reason":   reason,
+			"operator": operator,
+		},
+		Operator: operator,
+	})
+	return nil
 }
 
 func (s *TribunalService) CreateBypass(path, method string, params map[string]interface{}, reason, operator string, duration time.Duration) (*models.BypassRecord, error) {
@@ -147,6 +186,19 @@ func (s *TribunalService) CreateBypass(path, method string, params map[string]in
 	if err != nil {
 		return nil, err
 	}
+	s.storage.AddAuditLog(&models.AuditLog{
+		Action:     "create_bypass",
+		Resource:   "bypass",
+		ResourceID: bypass.ID,
+		After: map[string]interface{}{
+			"path":     path,
+			"method":   method,
+			"reason":   reason,
+			"operator": operator,
+			"duration": duration,
+		},
+		Operator: operator,
+	})
 	return bypass, nil
 }
 
@@ -172,5 +224,19 @@ func (s *TribunalService) GetAuditLogs(limit int) []*models.AuditLog {
 
 func (s *TribunalService) ExportRecords(strategyID string) ([]byte, error) {
 	records := s.storage.ListRecords(strategyID)
-	return json.MarshalIndent(records, "", "  ")
+	data, err := json.MarshalIndent(records, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	s.storage.AddAuditLog(&models.AuditLog{
+		Action:     "export_records",
+		Resource:   "record",
+		ResourceID: strategyID,
+		After: map[string]interface{}{
+			"strategy_id":  strategyID,
+			"export_count": len(records),
+		},
+		Operator: "system",
+	})
+	return data, nil
 }

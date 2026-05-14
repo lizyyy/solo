@@ -8,21 +8,21 @@ import (
 )
 
 type MemoryStorage struct {
-	strategies       map[string]*models.CacheStrategy
-	records          map[string]*models.CacheRecord
+	strategies         map[string]*models.CacheStrategy
+	records            map[string]*models.CacheRecord
 	invalidationEvents map[string]*models.InvalidationEvent
-	bypassRecords    map[string]*models.BypassRecord
-	auditLogs        []*models.AuditLog
-	mu               sync.RWMutex
+	bypassRecords      map[string]*models.BypassRecord
+	auditLogs          []*models.AuditLog
+	mu                 sync.RWMutex
 }
 
 func NewMemoryStorage() *MemoryStorage {
 	return &MemoryStorage{
-		strategies:       make(map[string]*models.CacheStrategy),
-		records:          make(map[string]*models.CacheRecord),
+		strategies:         make(map[string]*models.CacheStrategy),
+		records:            make(map[string]*models.CacheRecord),
 		invalidationEvents: make(map[string]*models.InvalidationEvent),
-		bypassRecords:    make(map[string]*models.BypassRecord),
-		auditLogs:        make([]*models.AuditLog, 0),
+		bypassRecords:      make(map[string]*models.BypassRecord),
+		auditLogs:          make([]*models.AuditLog, 0),
 	}
 }
 
@@ -32,10 +32,29 @@ func (s *MemoryStorage) CreateStrategy(strategy *models.CacheStrategy) error {
 	if _, exists := s.strategies[strategy.ID]; exists {
 		return errors.New("strategy already exists")
 	}
+	for _, existing := range s.strategies {
+		if existing.Path == strategy.Path && existing.Method == strategy.Method {
+			return errors.New("strategy with same path and method already exists")
+		}
+	}
 	strategy.CreatedAt = time.Now()
 	strategy.UpdatedAt = time.Now()
 	s.strategies[strategy.ID] = strategy
 	return nil
+}
+
+func (s *MemoryStorage) GetOrCreateStrategy(strategy *models.CacheStrategy) (*models.CacheStrategy, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, existing := range s.strategies {
+		if existing.Path == strategy.Path && existing.Method == strategy.Method {
+			return existing, nil
+		}
+	}
+	strategy.CreatedAt = time.Now()
+	strategy.UpdatedAt = time.Now()
+	s.strategies[strategy.ID] = strategy
+	return strategy, nil
 }
 
 func (s *MemoryStorage) GetStrategy(id string) (*models.CacheStrategy, error) {
@@ -170,8 +189,8 @@ func (s *MemoryStorage) GetBypassRecord(path, method, paramHash string) (*models
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, bypass := range s.bypassRecords {
-		if bypass.Path == path && bypass.Method == method && 
-		   bypass.ParamHash == paramHash && bypass.ExpiresAt.After(time.Now()) {
+		if bypass.Path == path && bypass.Method == method &&
+			bypass.ParamHash == paramHash && bypass.ExpiresAt.After(time.Now()) {
 			return bypass, nil
 		}
 	}

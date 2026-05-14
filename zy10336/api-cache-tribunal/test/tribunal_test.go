@@ -115,3 +115,53 @@ func TestStatusTransitions(t *testing.T) {
 		t.Error("New record should be Pending")
 	}
 }
+
+func TestStrategyIdempotency(t *testing.T) {
+	store := storage.NewMemoryStorage()
+	svc := service.NewTribunalService(store)
+	strategy1, err := svc.CreateStrategy("/api/test", "GET", 5*time.Minute, []string{"id"})
+	if err != nil {
+		t.Fatalf("First strategy creation should succeed: %v", err)
+	}
+	strategy2, err := svc.CreateStrategy("/api/test", "GET", 10*time.Minute, []string{"id", "name"})
+	if err != nil {
+		t.Fatalf("Duplicate strategy creation should not return error: %v", err)
+	}
+	if strategy1.ID != strategy2.ID {
+		t.Error("Duplicate strategy creation should return existing record, not create new one")
+	}
+	if strategy1.TTL != strategy2.TTL {
+		t.Error("Existing strategy TTL should not be changed")
+	}
+	strategies := svc.ListStrategies()
+	if len(strategies) != 1 {
+		t.Errorf("Should have only 1 strategy, got %d", len(strategies))
+	}
+}
+
+func TestAuditLogCoverage(t *testing.T) {
+	store := storage.NewMemoryStorage()
+	svc := service.NewTribunalService(store)
+	strategy, _ := svc.CreateStrategy("/api/test", "GET", 5*time.Minute, []string{"id"})
+	params := map[string]interface{}{"id": "123"}
+	response := map[string]interface{}{"data": "value"}
+	record, _ := svc.CreateRecord(strategy.ID, params, response)
+	svc.UpdateRecordStatus(record.ID, models.StatusActive)
+	svc.CreateBypass("/api/test", "GET", params, "debug", "admin", 1*time.Minute)
+	svc.InvalidateCache(record.ID, "obsolete", "admin")
+	svc.ExportRecords(strategy.ID)
+	logs := svc.GetAuditLogs(100)
+	if len(logs) == 0 {
+		t.Error("Audit logs should not be empty")
+	}
+	actions := make(map[string]bool)
+	for _, log := range logs {
+		actions[log.Action] = true
+	}
+	expectedActions := []string{"create_strategy", "update_status", "create_bypass", "invalidate_cache", "export_records"}
+	for _, action := range expectedActions {
+		if !actions[action] {
+			t.Errorf("Expected audit action not found: %s", action)
+		}
+	}
+}
