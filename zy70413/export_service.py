@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 import pandas as pd
 import models

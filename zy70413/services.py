@@ -41,27 +41,39 @@ class VerificationService:
         results = []
         member_transactions = {}
         
-        for tx in sorted(transactions, key=lambda x: x.transaction_time):
+        for tx in transactions:
             if tx.member_id not in member_transactions:
                 member_transactions[tx.member_id] = []
             member_transactions[tx.member_id].append(tx)
         
-        for tx in transactions:
-            member_txs = member_transactions.get(tx.member_id, [])
-            seq_index = next((i for i, t in enumerate(member_txs) if t.transaction_no == tx.transaction_no), -1)
+        for member_id, txs in member_transactions.items():
+            sorted_by_seq = sorted(txs, key=lambda x: x.sequence_no)
             
-            is_error = False
-            error_msg = ""
-            
-            if seq_index > 0:
-                prev_tx = member_txs[seq_index - 1]
-                if tx.transaction_time < prev_tx.transaction_time:
+            for i in range(1, len(sorted_by_seq)):
+                current_tx = sorted_by_seq[i]
+                prev_tx = sorted_by_seq[i - 1]
+                
+                is_error = False
+                error_msg = ""
+                
+                if current_tx.transaction_time < prev_tx.transaction_time:
                     is_error = True
-                    error_msg = f"时间顺序错误: 当前交易时间{tx.transaction_time}早于上一笔交易{prev_tx.transaction_no}的时间{prev_tx.transaction_time}"
+                    error_msg = f"时间顺序错误: 交易{current_tx.transaction_no}(序号{current_tx.sequence_no})时间{current_tx.transaction_time}早于前一交易{prev_tx.transaction_no}(序号{prev_tx.sequence_no})时间{prev_tx.transaction_time}"
+                
+                results.append((current_tx.sequence_no, is_error, error_msg))
             
-            results.append((tx.sequence_no, is_error, error_msg))
+            if sorted_by_seq:
+                first_tx = sorted_by_seq[0]
+                results.append((first_tx.sequence_no, False, ""))
         
-        return results
+        result_map = {seq_no: (is_error, msg) for seq_no, is_error, msg in results}
+        
+        final_results = []
+        for tx in transactions:
+            is_error, error_msg = result_map.get(tx.sequence_no, (False, ""))
+            final_results.append((tx.sequence_no, is_error, error_msg))
+        
+        return final_results
 
     @staticmethod
     def process_batch(db: Session, request: schemas.BatchSubmitRequest) -> schemas.BatchSubmitResponse:
