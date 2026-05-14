@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据血缘浏览器</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .node-dataset { fill: #3b82f6; }
+        .node-upstream_task { fill: #10b981; }
+        .node-downstream_report { fill: #8b5cf6; }
+        .node-field_mapping { fill: #f59e0b; }
+        .node-failed { fill: #ef4444; }
+        .edge-line { stroke: #94a3b8; stroke-width: 2; }
+        .node-label { font-size: 10px; fill: white; text-anchor: middle; }
+        .edge-label { font-size: 8px; fill: #64748b; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div id="app">
+        <nav class="bg-blue-600 text-white p-4 shadow-lg">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">数据血缘浏览器</h1>
+                <div class="space-x-4">
+                    <button @click="currentView = 'datasets'" 
+                            :class="currentView === 'datasets' ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-700'" 
+                            class="px-4 py-2 rounded transition">
+                        数据集列表
+                    </button>
+                    <button @click="currentView = 'failed'" 
+                            :class="currentView === 'failed' ? 'bg-blue-700' : 'bg-blue-500 hover:bg-blue-700'" 
+                            class="px-4 py-2 rounded transition">
+                        失败记录
+                    </button>
+                    <button @click="createDemoData" 
+                            class="bg-green-500 hover:bg-green-700 px-4 py-2 rounded transition">
+                        生成演示数据
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto p-6">
+            <div v-if="currentView === 'datasets'">
+                <h2 class="text-2xl font-bold mb-6">数据集列表</h2>
+                <div class="grid gap-4">
+                    <div v-for="dataset in datasets" :key="dataset.id" 
+                         class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition cursor-pointer"
+                         @click="viewDatasetDetail(dataset.id)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-semibold text-blue-600">{{ dataset.name }}</h3>
+                                <p class="text-gray-600 mt-2">{{ dataset.description }}</p>
+                                <p class="text-sm text-gray-500 mt-2">负责人: {{ dataset.owner }}</p>
+                            </div>
+                            <span :class="dataset.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" 
+                                  class="px-3 py-1 rounded-full text-sm">
+                                {{ dataset.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="currentView === 'failed'">
+                <h2 class="text-2xl font-bold mb-6">失败记录</h2>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-red-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">类型</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">名称</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">所属数据集</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">处理人</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">处理时间</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-red-600 uppercase">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr v-for="item in failedItems" :key="item.type + '_' + item.id" 
+                                class="hover:bg-gray-50 cursor-pointer"
+                                @click="viewFailedItemDetail(item.type, item.id)">
+                                <td class="px-6 py-4">
+                                    <span :class="getTypeBadgeClass(item.type)" class="px-2 py-1 rounded text-xs">
+                                        {{ getTypeLabel(item.type) }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ item.name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ item.dataset_name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ item.handler || '-' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600">{{ formatDate(item.handled_at) || '-' }}</td>
+                                <td class="px-6 py-4">
+                                    <button class="text-blue-600 hover:text-blue-800">查看详情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div v-else-if="currentView === 'datasetDetail'" class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button @click="currentView = 'datasets'" class="text-blue-600 hover:text-blue-800">
+                            ← 返回列表
+                        </button>
+                        <h2 class="text-2xl font-bold">{{ selectedDataset?.name }}</h2>
+                    </div>
+                    <div class="space-x-2">
+                        <button @click="exportDataset" class="bg-green-500 hover:bg-green-700 text-white px-4 py-2 rounded">
+                            导出数据
+                        </button>
+                        <button @click="recalculateLineage" class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                            重新计算血缘
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold mb-4">血缘关系图</h3>
+                    <div class="border rounded-lg p-4 bg-gray-50 min-h-96">
+                        <svg v-if="lineageGraph" width="100%" height="500" viewBox="0 0 800 500">
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+                                </marker>
+                            </defs>
+                            <g v-for="(edge, idx) in lineageGraph.edges" :key="'edge_' + idx">
+                                <line :x1="edge.x1" :y1="edge.y1" :x2="edge.x2" :y2="edge.y2" 
+                                      class="edge-line" marker-end="url(#arrowhead)"/>
+                            </g>
+                            <g v-for="(node, idx) in lineageGraph.nodes" :key="'node_' + idx" 
+                               @click="handleNodeClick(node)" class="cursor-pointer">
+                                <rect :x="node.x - 60" :y="node.y - 20" width="120" height="40" rx="8"
+                                      :class="['node-' + node.type, node.data?.status === 'failed' || node.data?.status === 'invalid' ? 'node-failed' : '']"/>
+                                <text :x="node.x" :y="node.y + 5" class="node-label">{{ node.label }}</text>
+                            </g>
+                        </svg>
+                        <div v-else class="flex items-center justify-center h-96 text-gray-500">
+                            加载血缘图中...
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-4">
+                        <div class="flex items-center"><span class="w-4 h-4 bg-blue-500 rounded mr-2"></span>数据集</div>
+                        <div class="flex items-center"><span class="w-4 h-4 bg-green-500 rounded mr-2"></span>上游任务</div>
+                        <div class="flex items-center"><span class="w-4 h-4 bg-purple-500 rounded mr-2"></span>下游报表</div>
+                        <div class="flex items-center"><span class="w-4 h-4 bg-yellow-500 rounded mr-2"></span>字段映射</div>
+                        <div class="flex items-center"><span class="w-4 h-4 bg-red-500 rounded mr-2"></span>失败/无效</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">上游任务</h3>
+                        <div class="space-y-3">
+                            <div v-for="task in selectedDataset?.upstream_tasks" :key="task.id"
+                                 :class="task.is_failed ? 'border-red-300 bg-red-50' : 'border-gray-200'"
+                                 class="border rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">{{ task.name }}</h4>
+                                        <p class="text-sm text-gray-600">类型: {{ task.task_type }}</p>
+                                        <p class="text-sm text-gray-600">来源: {{ task.source_system }}</p>
+                                    </div>
+                                    <span :class="task.is_failed ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'" 
+                                          class="px-2 py-1 rounded text-xs">
+                                        {{ task.status }}
+                                    </span>
+                                </div>
+                                <div v-if="task.is_failed" class="mt-3 pt-3 border-t border-red-200">
+                                    <p class="text-sm text-red-600">处理人: {{ task.handler }}</p>
+                                    <p class="text-sm text-red-600">原因: {{ task.handle_reason }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">下游报表</h3>
+                        <div class="space-y-3">
+                            <div v-for="report in selectedDataset?.downstream_reports" :key="report.id"
+                                 class="border border-gray-200 rounded-lg p-4">
+                                <h4 class="font-semibold">{{ report.name }}</h4>
+                                <p class="text-sm text-gray-600">类型: {{ report.report_type }}</p>
+                                <p class="text-sm text-gray-600">受众: {{ report.target_audience }}</p>
+                                <p class="text-sm text-gray-600">刷新频率: {{ report.refresh_frequency }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">字段映射</h3>
+                        <div class="space-y-3">
+                            <div v-for="mapping in selectedDataset?.field_mappings" :key="mapping.id"
+                                 :class="mapping.status === 'invalid' ? 'border-red-300 bg-red-50' : 'border-gray-200'"
+                                 class="border rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">{{ mapping.source_field }} → {{ mapping.target_field }}</h4>
+                                        <p class="text-sm text-gray-600">规则: {{ mapping.mapping_rule }}</p>
+                                        <p class="text-sm text-gray-600">转换逻辑: {{ mapping.transformation_logic }}</p>
+                                    </div>
+                                    <div class="flex flex-col items-end space-y-1">
+                                        <span :class="getMappingStatusClass(mapping.status)" 
+                                              class="px-2 py-1 rounded text-xs">
+                                            {{ mapping.status }}
+                                        </span>
+                                        <span v-if="mapping.is_manual_correction" class="text-xs text-blue-600">人工修正</span>
+                                    </div>
+                                </div>
+                                <div v-if="mapping.status === 'invalid'" class="mt-3 pt-3 border-t border-red-200">
+                                    <p class="text-sm text-red-600">错误: {{ mapping.error_message }}</p>
+                                </div>
+                                <div v-if="mapping.is_manual_correction" class="mt-3 pt-3 border-t border-blue-200">
+                                    <p class="text-sm text-blue-600">修正人: {{ mapping.corrected_by }}</p>
+                                    <p class="text-sm text-blue-600">修正原因: {{ mapping.correction_reason }}</p>
+                                </div>
+                                <div v-if="mapping.status === 'invalid'" class="mt-3">
+                                    <button @click="showCorrectModal(mapping)" 
+                                            class="text-sm bg-blue-500 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                        人工修正
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4">变更影响</h3>
+                        <div class="space-y-3">
+                            <div v-for="impact in selectedDataset?.change_impacts" :key="impact.id"
+                                 :class="impact.is_failed ? 'border-red-300 bg-red-50' : 'border-gray-200'"
+                                 class="border rounded-lg p-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-semibold">{{ impact.change_type }}</h4>
+                                        <p class="text-sm text-gray-600">{{ impact.change_description }}</p>
+                                        <p class="text-sm text-gray-600">影响字段: {{ impact.impacted_fields?.join(', ') }}</p>
+                                    </div>
+                                    <div class="flex flex-col items-end space-y-1">
+                                        <span :class="getSeverityClass(impact.severity)" 
+                                              class="px-2 py-1 rounded text-xs">
+                                            {{ impact.severity }}
+                                        </span>
+                                        <span :class="impact.is_failed ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'" 
+                                              class="px-2 py-1 rounded text-xs">
+                                            {{ impact.status }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div v-if="impact.is_failed" class="mt-3 pt-3 border-t border-red-200">
+                                    <p class="text-sm text-red-600">处理人: {{ impact.handler }}</p>
+                                    <p class="text-sm text-red-600">原因: {{ impact.handle_reason }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else-if="currentView === 'failedItemDetail'">
+                <div class="flex items-center space-x-4 mb-6">
+                    <button @click="currentView = 'failed'" class="text-blue-600 hover:text-blue-800">
+                        ← 返回失败记录
+                    </button>
+                    <h2 class="text-2xl font-bold">失败详情</h2>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-xl font-semibold">{{ failedItemDetail?.name || failedItemDetail?.change_type || (failedItemDetail?.source_field + ' → ' + failedItemDetail?.target_field) }}</h3>
+                            <p class="text-gray-600 mt-2">所属数据集: {{ failedItemDetail?.dataset_name }}</p>
+                            <p class="text-gray-600">类型: {{ getTypeLabel(failedItemDetail?.type) }}</p>
+                        </div>
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">
+                            {{ failedItemDetail?.status }}
+                        </span>
+                    </div>
+
+                    <div class="border-t pt-6">
+                        <h4 class="font-semibold mb-4">处理信息</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">处理人</p>
+                                <p class="font-medium">{{ failedItemDetail?.handler || failedItemDetail?.corrected_by || '-' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">处理时间</p>
+                                <p class="font-medium">{{ formatDate(failedItemDetail?.handled_at || failedItemDetail?.corrected_at) || '-' }}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-sm text-gray-500">处理原因/错误信息</p>
+                                <p class="font-medium text-red-600">{{ failedItemDetail?.handle_reason || failedItemDetail?.error_message || failedItemDetail?.correction_reason || '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="failedItemDetail?.type === 'field_mapping'" class="border-t pt-6 mt-6">
+                        <h4 class="font-semibold mb-4">映射信息</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">源字段</p>
+                                <p class="font-medium">{{ failedItemDetail?.source_field }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">目标字段</p>
+                                <p class="font-medium">{{ failedItemDetail?.target_field }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">映射规则</p>
+                                <p class="font-medium">{{ failedItemDetail?.mapping_rule }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">转换逻辑</p>
+                                <p class="font-medium">{{ failedItemDetail?.transformation_logic }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button @click="showCorrectModal(failedItemDetail)" 
+                                    class="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                人工修正
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="failedItemDetail?.type === 'upstream_task'" class="border-t pt-6 mt-6">
+                        <h4 class="font-semibold mb-4">任务信息</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">任务类型</p>
+                                <p class="font-medium">{{ failedItemDetail?.task_type }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">来源系统</p>
+                                <p class="font-medium">{{ failedItemDetail?.source_system }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="failedItemDetail?.type === 'change_impact'" class="border-t pt-6 mt-6">
+                        <h4 class="font-semibold mb-4">影响信息</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500">变更描述</p>
+                                <p class="font-medium">{{ failedItemDetail?.change_description }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">严重程度</p>
+                                <p class="font-medium">{{ failedItemDetail?.severity }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <button @click="viewDatasetDetail(failedItemDetail?.dataset_id)" 
+                                class="text-blue-600 hover:text-blue-800">
+                            查看所属数据集详情 →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                <h3 class="text-xl font-semibold mb-4">人工修正字段映射</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">映射规则</label>
+                        <input v-model="correctionForm.mapping_rule" type="text" 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">转换逻辑</label>
+                        <input v-model="correctionForm.transformation_logic" type="text" 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">修正人</label>
+                        <input v-model="correctionForm.corrected_by" type="text" 
+                               class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">修正原因</label>
+                        <textarea v-model="correctionForm.correction_reason" rows="3"
+                                  class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button @click="showModal = false" class="px-4 py-2 border rounded-md hover:bg-gray-50">
+                        取消
+                    </button>
+                    <button @click="submitCorrection" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                        提交修正
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="message" class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white"
+             :class="messageType === 'success' ? 'bg-green-500' : 'bg-red-500'">
+            {{ message }}
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
