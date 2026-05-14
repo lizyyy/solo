@@ -65,8 +65,8 @@ func (r *Repository) UpdateNotificationRequestStatus(requestID string, status mo
 func (r *Repository) FindDuplicateInWindow(scene, userHash string, windowSeconds int64, beforeTime time.Time) (*model.NotificationRequest, error) {
 	var req model.NotificationRequest
 	windowStart := beforeTime.Add(-time.Duration(windowSeconds) * time.Second)
-	err := r.db.Where("scene = ? AND user_hash = ? AND status = ? AND created_at > ?",
-		scene, userHash, model.StatusAllowed, windowStart).
+	err := r.db.Where("scene = ? AND user_hash = ? AND status IN (?, ?) AND created_at > ?",
+		scene, userHash, model.StatusAllowed, model.StatusSent, windowStart).
 		First(&req).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

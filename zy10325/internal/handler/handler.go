@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,12 +36,12 @@ func (h *Handler) SetupRoutes(r *gin.Engine) {
 }
 
 type CreateNotificationRequest struct {
-	RequestID   string      `json:"request_id"`
-	Scene       string      `json:"scene" binding:"required"`
-	User        UserInfo    `json:"user" binding:"required"`
-	Content     string      `json:"content"`
-	DedupWindow int64       `json:"dedup_window"`
-	Credential  string      `json:"credential,omitempty"`
+	RequestID   string   `json:"request_id"`
+	Scene       string   `json:"scene" binding:"required"`
+	User        UserInfo `json:"user" binding:"required"`
+	Content     string   `json:"content"`
+	DedupWindow int64    `json:"dedup_window"`
+	Credential  string   `json:"credential,omitempty"`
 }
 
 type UserInfo struct {
@@ -138,10 +139,14 @@ func (h *Handler) UpdateStatus(c *gin.Context) {
 	}
 
 	if err := h.service.UpdateNotificationStatus(svcReq); err != nil {
-		if err.Error() == "request not found" {
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		errMsg := err.Error()
+		switch {
+		case errMsg == "request not found":
+			c.JSON(http.StatusNotFound, gin.H{"error": errMsg})
+		case strings.Contains(errMsg, "invalid status transition"):
+			c.JSON(http.StatusBadRequest, gin.H{"error": errMsg})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": errMsg})
 		}
 		return
 	}
@@ -167,8 +172,8 @@ func (h *Handler) ListNotifications(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":  notifications,
-		"total": total,
+		"data":   notifications,
+		"total":  total,
 		"offset": query.Offset,
 		"limit":  query.Limit,
 	})
@@ -191,8 +196,8 @@ func (h *Handler) ListSkipRecords(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data":  records,
-		"total": total,
+		"data":   records,
+		"total":  total,
 		"offset": query.Offset,
 		"limit":  query.Limit,
 	})

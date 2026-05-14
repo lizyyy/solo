@@ -18,21 +18,21 @@ func NewDedupService(repo *repository.Repository) *DedupService {
 }
 
 type CreateRequest struct {
-	RequestID   string                `json:"request_id"`
-	Scene       string                `json:"scene" binding:"required"`
-	User        model.UserIdentifier  `json:"user" binding:"required"`
-	Content     string                `json:"content"`
-	DedupWindow int64                 `json:"dedup_window"`
-	Credential  string                `json:"credential,omitempty"`
+	RequestID   string               `json:"request_id"`
+	Scene       string               `json:"scene" binding:"required"`
+	User        model.UserIdentifier `json:"user" binding:"required"`
+	Content     string               `json:"content"`
+	DedupWindow int64                `json:"dedup_window"`
+	Credential  string               `json:"credential,omitempty"`
 }
 
 type CreateResponse struct {
-	RequestID   string                  `json:"request_id"`
-	Allowed     bool                    `json:"allowed"`
-	Status      model.NotificationStatus `json:"status"`
-	SkipReason  model.SkipReason        `json:"skip_reason,omitempty"`
-	Credential  string                  `json:"credential,omitempty"`
-	Message     string                  `json:"message"`
+	RequestID  string                   `json:"request_id"`
+	Allowed    bool                     `json:"allowed"`
+	Status     model.NotificationStatus `json:"status"`
+	SkipReason model.SkipReason         `json:"skip_reason,omitempty"`
+	Credential string                   `json:"credential,omitempty"`
+	Message    string                   `json:"message"`
 }
 
 func (s *DedupService) CreateNotification(req *CreateRequest) (*CreateResponse, error) {
@@ -74,15 +74,15 @@ func (s *DedupService) CreateNotification(req *CreateRequest) (*CreateResponse, 
 	}
 
 	notification := &model.NotificationRequest{
-		RequestID:     req.RequestID,
-		Scene:         req.Scene,
+		RequestID:      req.RequestID,
+		Scene:          req.Scene,
 		UserIdentifier: req.User,
-		UserHash:      userHash,
-		Content:       req.Content,
-		DedupWindow:   dedupWindow,
-		Credential:    req.Credential,
-		CreatedAt:     now,
-		UpdatedAt:     now,
+		UserHash:       userHash,
+		Content:        req.Content,
+		DedupWindow:    dedupWindow,
+		Credential:     req.Credential,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 
 	if duplicate != nil {
@@ -180,8 +180,23 @@ func (s *DedupService) CreateNotification(req *CreateRequest) (*CreateResponse, 
 }
 
 type UpdateStatusRequest struct {
-	RequestID string                  `json:"request_id" binding:"required"`
+	RequestID string                   `json:"request_id" binding:"required"`
 	Status    model.NotificationStatus `json:"status" binding:"required"`
+}
+
+func isValidStatusTransition(from, to model.NotificationStatus) bool {
+	switch from {
+	case model.StatusPending:
+		return to == model.StatusAllowed || to == model.StatusSkipped
+	case model.StatusAllowed:
+		return to == model.StatusSent || to == model.StatusFailed
+	case model.StatusSkipped:
+		return false
+	case model.StatusSent, model.StatusFailed:
+		return false
+	default:
+		return false
+	}
 }
 
 func (s *DedupService) UpdateNotificationStatus(req *UpdateStatusRequest) error {
@@ -193,6 +208,10 @@ func (s *DedupService) UpdateNotificationStatus(req *UpdateStatusRequest) error 
 		return errors.New("request not found")
 	}
 
+	if !isValidStatusTransition(existing.Status, req.Status) {
+		return fmt.Errorf("invalid status transition: %s -> %s", existing.Status, req.Status)
+	}
+
 	return s.repo.UpdateNotificationRequestStatus(req.RequestID, req.Status)
 }
 
@@ -201,13 +220,13 @@ func (s *DedupService) GetNotification(requestID string) (*model.NotificationReq
 }
 
 type QueryRequest struct {
-	Scene     string                  `form:"scene"`
-	UserHash  string                  `form:"user_hash"`
+	Scene     string                   `form:"scene"`
+	UserHash  string                   `form:"user_hash"`
 	Status    model.NotificationStatus `form:"status"`
-	StartTime string                  `form:"start_time"`
-	EndTime   string                  `form:"end_time"`
-	Offset    int                     `form:"offset"`
-	Limit     int                     `form:"limit"`
+	StartTime string                   `form:"start_time"`
+	EndTime   string                   `form:"end_time"`
+	Offset    int                      `form:"offset"`
+	Limit     int                      `form:"limit"`
 }
 
 func (s *DedupService) ListNotifications(query *QueryRequest) ([]model.NotificationRequest, int64, error) {
