@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Search, Download, FileX, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { useStore } from '../store/useStore';
@@ -9,9 +9,6 @@ const LedgerPage: React.FC = () => {
   const {
     reissueRequests,
     certificates,
-    students,
-    awards,
-    competitions,
     searchQuery,
     setSearchQuery,
     getStudentById,

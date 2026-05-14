@@ -4,6 +4,8 @@ import { useStore } from '../store/useStore';
 import StatusBadge from '../components/StatusBadge';
 import { ReissueRequest } from '../types';
 
+type NewReissueRequest = Omit<ReissueRequest, 'id' | 'status' | 'createdAt'>;
+
 const ReissuePage: React.FC = () => {
   const {
     getFilteredRequests,
@@ -27,16 +29,16 @@ const ReissuePage: React.FC = () => {
   } = useStore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newRequest, setNewRequest] = useState({
+  const [newRequest, setNewRequest] = useState<NewReissueRequest>({
     studentId: '',
     certificateId: '',
     awardId: '',
     originalName: '',
     correctedName: '',
     reason: '',
-    reasonCategory: 'name_error' as const,
+    reasonCategory: 'name_error',
     receiver: '',
-    receiverType: 'student' as const,
+    receiverType: 'student',
     receiverPhone: '',
     classTeacherVerification: false
   });

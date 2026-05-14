@@ -18,10 +18,8 @@ const RecordsPage: React.FC = () => {
 
         <div className="space-y-4">
           {correctionRecords.map(record => {
-            const student = getStudentById(
-              getCertificateById(record.certificateId)?.studentId || ''
-            );
-            const oldCert = getCertificateById(record.certificateId);
+            const certificate = getCertificateById(record.certificateId);
+            const student = getStudentById(certificate?.studentId || '');
 
             return (
               <div

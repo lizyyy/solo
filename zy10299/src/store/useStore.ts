@@ -209,14 +209,14 @@ export const useStore = create<CertificateStore>((set, get) => ({
     set(state => ({
       certificates: state.certificates.map(c =>
         c.id === request.certificateId
-          ? { ...c, status: 'invalid' }
+          ? { ...c, status: 'invalid' as const }
           : c
       ).concat(newCertificate),
       reissueRequests: state.reissueRequests.map(r =>
         r.id === requestId
           ? {
               ...r,
-              status: 'completed',
+              status: 'completed' as const,
               completedAt: new Date().toISOString().split('T')[0],
               newCertificateId: newCertificateId
             }
