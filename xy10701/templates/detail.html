@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审查详情 - OpenAPI 差异审查器</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔍 审查详情</h1>
+            <p>查看 API 规范变更的详细分析</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <a href="/" class="back-link">← 返回列表</a>
+        
+        <div class="detail-header">
+            <h2>审查 #<span id="review-id"></span></h2>
+            <div class="version-info">
+                <span class="version-tag" id="old-version">v1.0.0</span>
+                <span class="version-arrow">→</span>
+                <span class="version-tag" id="new-version">v2.0.0</span>
+                <span class="status-badge" id="review-status">BLOCKED</span>
+            </div>
+            
+            <div class="summary-box" id="summary-box">
+            </div>
+            
+            <a id="report-link" href="#" class="btn btn-primary">下载兼容报告</a>
+        </div>
+        
+        <div class="detail-grid">
+            <div>
+                <div class="changes-section">
+                    <h3>变更详情</h3>
+                    <div id="changes-list">
+                    </div>
+                </div>
+                
+                <div class="timeline-section">
+                    <h3>事件时间线</h3>
+                    <div id="timeline-list">
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="approval-section">
+                    <h3>审批操作</h3>
+                    <div id="approvals-list">
+                    </div>
+                    
+                    <div class="approval-form">
+                        <div class="form-group">
+                            <label>审批人</label>
+                            <input type="text" id="approver-name" placeholder="输入您的姓名">
+                        </div>
+                        <div class="form-group">
+                            <label>审批理由</label>
+                            <textarea id="approval-reason" placeholder="说明通过或驳回的理由..."></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-success" onclick="submitApproval(true)">通过</button>
+                            <button class="btn btn-danger" onclick="submitApproval(false)">驳回</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const reviewId = {{ review_id|safe }};
+    </script>
+    <script src="/static/js/detail.js"></script>
+</body>
+</html>

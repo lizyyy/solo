@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAPI 差异审查器</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔍 OpenAPI 差异审查器</h1>
+            <p>自动化检测 API 规范的破坏性变更，确保兼容性</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="stats-grid" id="stats-grid">
+        </div>
+        
+        <div class="reviews-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>版本对比</th>
+                        <th>状态</th>
+                        <th>总变更</th>
+                        <th>破坏性变更</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="reviews-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script src="/static/js/index.js"></script>
+</body>
+</html>
