@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
+from pydantic import BaseModel
 import json
 
 from models import init_db, get_db, MessageStatus
@@ -12,26 +13,56 @@ from schemas import (
 )
 from service import IdempotentInboxService
 
+class MessageCreateResponse(BaseModel):
+    id: int
+    message_id: str
+    source: str
+    business_key: str
+    status: str
+    deduplication_window: int
+    retry_count: int
+    max_retries: int
+    failure_reason: Optional[str]
+    created_at: str
+    updated_at: str
+    processed_at: Optional[str]
+    is_new: bool = True
+    message: Optional[str] = None
+
 app = FastAPI(title="消息幂等收件箱 API", version="1.0.0")
 
 @app.on_event("startup")
 def startup():
     init_db()
 
-@app.post("/messages", response_model=MessageResponse, summary="创建消息（幂等）")
+@app.post("/messages", response_model=MessageCreateResponse, summary="创建消息（幂等）")
 def create_message(message_data: MessageCreate, db: Session = Depends(get_db)):
     service = IdempotentInboxService(db)
     message, is_new = service.create_message(message_data)
+    
+    result = MessageCreateResponse(
+        id=message.id,
+        message_id=message.message_id,
+        source=message.source,
+        business_key=message.business_key,
+        status=message.status.value,
+        deduplication_window=message.deduplication_window,
+        retry_count=message.retry_count,
+        max_retries=message.max_retries,
+        failure_reason=message.failure_reason,
+        created_at=message.created_at.isoformat(),
+        updated_at=message.updated_at.isoformat(),
+        processed_at=message.processed_at.isoformat() if message.processed_at else None,
+        is_new=is_new,
+        message=None if is_new else "消息已存在（幂等返回）"
+    )
+    
     if not is_new:
         return JSONResponse(
             status_code=200,
-            content={
-                **MessageResponse.from_orm(message).dict(),
-                "is_new": False,
-                "message": "消息已存在（幂等返回）"
-            }
+            content=result.dict()
         )
-    return message
+    return result
 
 @app.get("/messages/{message_id}", response_model=MessageDetailResponse, summary="查询消息详情")
 def get_message(message_id: str, db: Session = Depends(get_db)):
