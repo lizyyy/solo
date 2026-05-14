@@ -8,7 +8,7 @@ BASE_URL="http://localhost:8080"
 
 # 检查服务是否运行
 echo "1. 检查服务状态..."
-if ! curl -s "$BASE_URL/tasks/list > /dev/null 2>&1; then
+if ! curl -s "$BASE_URL/tasks/list" > /dev/null 2>&1; then
     echo "   服务未启动，请先运行: go run main.go"
     exit 1
 fi
@@ -17,7 +17,7 @@ echo ""
 
 # 创建任务
 echo "2. 创建测试任务..."
-TASK_RESPONSE=$(curl -s -X POST "$BASE_URL/tasks \
+TASK_RESPONSE=$(curl -s -X POST "$BASE_URL/tasks" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "test-data-processing",
@@ -38,7 +38,7 @@ echo ""
 
 # 领取租约
 echo "4. worker-01 领取租约..."
-LEASE_RESPONSE=$(curl -s -X POST "$BASE_URL/lease/acquire \
+LEASE_RESPONSE=$(curl -s -X POST "$BASE_URL/lease/acquire" \
   -H "Content-Type: application/json" \
   -d "{
     \"task_id\": \"$TASK_ID\",
@@ -57,7 +57,7 @@ echo ""
 
 # worker-02 尝试领取（应该失败）
 echo "6. worker-02 尝试领取同一任务（预期失败）..."
-curl -s -X POST "$BASE_URL/lease/acquire \
+curl -s -X POST "$BASE_URL/lease/acquire" \
   -H "Content-Type: application/json" \
   -d "{
     \"task_id\": \"$TASK_ID\",
@@ -69,7 +69,7 @@ echo ""
 
 # 续约
 echo "7. worker-01 续约..."
-curl -s -X POST "$BASE_URL/lease/renew \
+curl -s -X POST "$BASE_URL/lease/renew" \
   -H "Content-Type: application/json" \
   -d "{
     \"lease_id\": \"$LEASE_ID\",
@@ -81,7 +81,7 @@ echo ""
 # 提交结果
 echo "8. 提交执行结果..."
 STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-curl -s -X POST "$BASE_URL/result/submit \
+curl -s -X POST "$BASE_URL/result/submit" \
   -H "Content-Type: application/json" \
   -d "{
     \"task_id\": \"$TASK_ID\",
@@ -96,7 +96,7 @@ echo ""
 
 # 重复提交（应该失败）
 echo "9. 重复提交结果（预期失败）..."
-curl -s -X POST "$BASE_URL/result/submit \
+curl -s -X POST "$BASE_URL/result/submit" \
   -H "Content-Type: application/json" \
   -d "{
     \"task_id\": \"$TASK_ID\",
@@ -117,7 +117,7 @@ echo ""
 
 # 导出诊断报告
 echo "11. 导出诊断报告（文本格式）..."
-curl -s "$BASE_URL/diagnostics/export?format=text
+curl -s "$BASE_URL/diagnostics/export?format=text"
 echo ""
 echo ""
 

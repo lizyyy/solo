@@ -12,14 +12,14 @@ import (
 )
 
 var (
-	ErrTaskNotFound       = errors.New("task not found")
-	ErrTaskAlreadyCompleted = errors.New("task already completed")
-	ErrLeaseAlreadyHeld   = errors.New("task already leased by another holder")
-	ErrLeaseExpired       = errors.New("lease has expired")
-	ErrInvalidLeaseHolder = errors.New("invalid lease holder")
+	ErrTaskNotFound           = errors.New("task not found")
+	ErrTaskAlreadyCompleted   = errors.New("task already completed")
+	ErrLeaseAlreadyHeld       = errors.New("task already leased by another holder")
+	ErrLeaseExpired           = errors.New("lease has expired")
+	ErrInvalidLeaseHolder     = errors.New("invalid lease holder")
 	ErrResultAlreadySubmitted = errors.New("result already submitted for this task")
-	ErrNoActiveLease      = errors.New("no active lease for this task")
-	ErrMaxRetriesExceeded = errors.New("max retries exceeded")
+	ErrNoActiveLease          = errors.New("no active lease for this task")
+	ErrMaxRetriesExceeded     = errors.New("max retries exceeded")
 )
 
 type LeaseService struct {
@@ -263,6 +263,13 @@ func (s *LeaseService) SubmitResult(taskID, leaseID, holderID, status, resultDat
 
 	if lease.HolderID != holderID {
 		return nil, ErrInvalidLeaseHolder
+	}
+
+	if lease.TaskID != taskID {
+		s.timeline.RecordEvent(taskID, leaseID, "INVALID_TASK_ID", holderID,
+			"Lease does not belong to the specified task",
+			fmt.Sprintf("Lease task: %s, Provided task: %s", lease.TaskID, taskID))
+		return nil, errors.New("lease does not belong to the specified task")
 	}
 
 	now := time.Now().UTC()

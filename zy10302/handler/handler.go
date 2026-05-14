@@ -33,7 +33,11 @@ func respondJSON(w http.ResponseWriter, status int, data interface{}) {
 }
 
 func respondError(w http.ResponseWriter, status int, err error, code string) {
-	respondJSON(w, status, ErrorResponse{Error: err.Error(), Code: code})
+	errorMsg := ""
+	if err != nil {
+		errorMsg = err.Error()
+	}
+	respondJSON(w, status, ErrorResponse{Error: errorMsg, Code: code})
 }
 
 type CreateTaskRequest struct {
