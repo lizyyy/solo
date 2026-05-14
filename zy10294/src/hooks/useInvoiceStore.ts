@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { InvoiceApplication, Customer, Project, DashboardStats } from '../types';
 import { sampleInvoices, sampleCustomers, sampleProjects } from '../data/sampleData';
-import { generateId, validateInvoiceApplication, createOperationLog } from '../utils';
+import { generateId, validateInvoiceApplication, createOperationLog, getObjectDiff } from '../utils';
 
 export const useInvoiceStore = () => {
   const [invoices, setInvoices] = useState<InvoiceApplication[]>(sampleInvoices);
@@ -269,13 +269,64 @@ export const useInvoiceStore = () => {
   }, []);
 
   const updateCustomer = useCallback((id: string, updates: Partial<Customer>): boolean => {
+    const oldCustomer = customers.find(c => c.id === id);
+    if (!oldCustomer) return false;
+
+    const diffs = getObjectDiff(oldCustomer, updates);
+    if (diffs.length === 0) return true;
+
+    const diffSummary = diffs.map(d => `${d.field}: ${d.oldValue} → ${d.newValue}`).join('; ');
+
     setCustomers(prev => prev.map(cust => 
       cust.id === id 
         ? { ...cust, ...updates, updatedAt: new Date().toISOString() }
         : cust
     ));
+
+    setInvoices(prev => prev.map(inv => {
+      if (inv.customerId !== id) return inv;
+      
+      const customerUpdates: Partial<InvoiceApplication> = {};
+      if (updates.name !== undefined) customerUpdates.customerName = updates.name;
+      if (updates.taxId !== undefined) customerUpdates.taxId = updates.taxId;
+      if (updates.address !== undefined) customerUpdates.address = updates.address;
+      if (updates.phone !== undefined) customerUpdates.phone = updates.phone;
+      if (updates.bankName !== undefined) customerUpdates.bankName = updates.bankName;
+      if (updates.bankAccount !== undefined) customerUpdates.bankAccount = updates.bankAccount;
+
+      const newLogs = [...inv.operationLogs];
+      
+      diffs.forEach(diff => {
+        newLogs.push(createOperationLog(
+          inv.id,
+          currentUser,
+          '客户信息变更',
+          `由于客户资料更新，${diffSummary}`,
+          diff.oldValue,
+          diff.newValue
+        ));
+      });
+
+      if (['invoiced', 'red_flush', 'reopened'].includes(inv.status)) {
+        return {
+          ...inv,
+          ...customerUpdates,
+          status: 'blocked' as const,
+          blockReason: 'already_invoiced' as const,
+          blockMessage: '已开票/红冲发票的客户信息已变更，建议走红冲重开流程',
+          operationLogs: newLogs
+        };
+      }
+
+      return {
+        ...inv,
+        ...customerUpdates,
+        operationLogs: newLogs
+      };
+    }));
+
     return true;
-  }, []);
+  }, [customers, invoices, currentUser]);
 
   return {
     invoices,

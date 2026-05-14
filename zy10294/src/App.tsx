@@ -35,6 +35,7 @@ function App() {
   const [showActionModal, setShowActionModal] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [reopenFormData, setReopenFormData] = useState<Partial<InvoiceApplication>>({});
 
   const stats = getDashboardStats();
 
@@ -316,7 +317,21 @@ function App() {
                           <button onClick={() => { setSelectedInvoice(invoice); setShowActionModal('redflush'); }} className="text-orange-600 hover:text-orange-800">红冲</button>
                         )}
                         {invoice.status === 'red_flush' && !invoice.isReopened && (
-                          <button onClick={() => { setSelectedInvoice(invoice); setShowActionModal('reopen'); }} className="text-purple-600 hover:text-purple-800">重开</button>
+                          <button onClick={() => { 
+                        setSelectedInvoice(invoice); 
+                        setReopenFormData({
+                          customerId: invoice.customerId,
+                          customerName: invoice.customerName,
+                          taxId: invoice.taxId,
+                          address: invoice.address,
+                          phone: invoice.phone,
+                          bankName: invoice.bankName,
+                          bankAccount: invoice.bankAccount,
+                          amount: invoice.amount,
+                          invoiceType: invoice.invoiceType
+                        });
+                        setShowActionModal('reopen'); 
+                      }} className="text-purple-600 hover:text-purple-800">重开</button>
                         )}
                       </td>
                     </tr>
@@ -673,6 +688,38 @@ function App() {
                 </div>
               )}
 
+              {selectedInvoice.originalInvoiceId && (
+                <div className="mb-6">
+                  <h5 className="text-sm font-medium text-purple-600 mb-2">🔄 重开差异对比</h5>
+                  <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <p className="text-sm font-medium text-purple-800 mb-3">
+                      此发票由原发票重开，原发票号：{invoices.find(i => i.id === selectedInvoice.originalInvoiceId)?.invoiceNumber || selectedInvoice.originalInvoiceId}
+                    </p>
+                    <div className="space-y-2">
+                      {(() => {
+                        const originalInvoice = invoices.find(i => i.id === selectedInvoice.originalInvoiceId);
+                        if (!originalInvoice) return null;
+                        const fields = [
+                          { label: '客户名称', newVal: selectedInvoice.customerName, oldVal: originalInvoice.customerName },
+                          { label: '税号', newVal: selectedInvoice.taxId, oldVal: originalInvoice.taxId },
+                          { label: '开票金额', newVal: formatCurrency(selectedInvoice.amount), oldVal: formatCurrency(originalInvoice.amount) }
+                        ];
+                        return fields
+                          .filter(f => f.newVal !== f.oldVal)
+                          .map((field, idx) => (
+                            <div key={idx} className="flex items-center gap-3 text-sm">
+                              <span className="text-gray-600 w-20">{field.label}:</span>
+                              <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded line-through">{field.oldVal}</span>
+                              <span className="text-gray-400">→</span>
+                              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">{field.newVal}</span>
+                            </div>
+                          ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <h5 className="text-sm font-medium text-gray-500 mb-2">操作日志</h5>
                 <div className="space-y-3">
@@ -803,24 +850,109 @@ function App() {
 
                 {showActionModal === 'reopen' && (
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">重开发票</h4>
-                    <p className="text-sm text-gray-500">将基于原发票信息创建新的开票申请，客户信息可修改。</p>
+                    <h4 className="font-medium text-gray-900">重开发票 - 修改抬头信息</h4>
+                    <p className="text-sm text-gray-500">原发票号：{selectedInvoice.invoiceNumber} - 请修改新发票的客户抬头信息</p>
+                    
+                    <div className="bg-blue-50 p-4 rounded-lg space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">客户名称</label>
+                        <input
+                          type="text"
+                          value={reopenFormData.customerName || ''}
+                          onChange={(e) => setReopenFormData({ ...reopenFormData, customerName: e.target.value })}
+                          className="w-full px-3 py-2 border rounded-lg"
+                          placeholder="请输入客户名称"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">税号</label>
+                        <input
+                          type="text"
+                          value={reopenFormData.taxId || ''}
+                          onChange={(e) => setReopenFormData({ ...reopenFormData, taxId: e.target.value })}
+                          className={`w-full px-3 py-2 border rounded-lg font-mono ${
+                            reopenFormData.taxId && !validateTaxId(reopenFormData.taxId) ? 'border-red-300' : ''
+                          }`}
+                          placeholder="请输入15-20位字母数字税号"
+                        />
+                        {reopenFormData.taxId && !validateTaxId(reopenFormData.taxId) && (
+                          <p className="text-xs text-red-500 mt-1">税号格式不正确</p>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">地址</label>
+                          <input
+                            type="text"
+                            value={reopenFormData.address || ''}
+                            onChange={(e) => setReopenFormData({ ...reopenFormData, address: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-lg"
+                            placeholder="请输入地址"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">电话</label>
+                          <input
+                            type="text"
+                            value={reopenFormData.phone || ''}
+                            onChange={(e) => setReopenFormData({ ...reopenFormData, phone: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-lg"
+                            placeholder="请输入电话"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">开户银行</label>
+                        <input
+                          type="text"
+                          value={reopenFormData.bankName || ''}
+                          onChange={(e) => setReopenFormData({ ...reopenFormData, bankName: e.target.value })}
+                          className="w-full px-3 py-2 border rounded-lg"
+                          placeholder="请输入开户银行"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">银行账号</label>
+                        <input
+                          type="text"
+                          value={reopenFormData.bankAccount || ''}
+                          onChange={(e) => setReopenFormData({ ...reopenFormData, bankAccount: e.target.value })}
+                          className="w-full px-3 py-2 border rounded-lg font-mono"
+                          placeholder="请输入银行账号"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">开票金额</label>
+                          <input
+                            type="number"
+                            value={reopenFormData.amount || ''}
+                            onChange={(e) => setReopenFormData({ ...reopenFormData, amount: parseFloat(e.target.value) })}
+                            className="w-full px-3 py-2 border rounded-lg"
+                            placeholder="请输入金额"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">发票类型</label>
+                          <select
+                            value={reopenFormData.invoiceType || 'special'}
+                            onChange={(e) => setReopenFormData({ ...reopenFormData, invoiceType: e.target.value as 'special' | 'normal' })}
+                            className="w-full px-3 py-2 border rounded-lg"
+                          >
+                            <option value="special">增值税专用发票</option>
+                            <option value="normal">增值税普通发票</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex justify-end gap-3">
-                      <button onClick={() => setShowActionModal(null)} className="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
+                      <button onClick={() => { setShowActionModal(null); setReopenFormData({}); }} className="px-4 py-2 border rounded-lg hover:bg-gray-100">取消</button>
                       <button onClick={() => { 
-                        reopenInvoice(selectedInvoice.id, {
-                          customerId: selectedInvoice.customerId,
-                          customerName: selectedInvoice.customerName,
-                          taxId: selectedInvoice.taxId,
-                          address: selectedInvoice.address,
-                          phone: selectedInvoice.phone,
-                          bankName: selectedInvoice.bankName,
-                          bankAccount: selectedInvoice.bankAccount,
-                          amount: selectedInvoice.amount,
-                          invoiceType: selectedInvoice.invoiceType
-                        }); 
+                        reopenInvoice(selectedInvoice.id, reopenFormData); 
                         setSelectedInvoice(null); 
                         setShowActionModal(null); 
+                        setReopenFormData({});
                       }} className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">确认重开</button>
                     </div>
                   </div>

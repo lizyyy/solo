@@ -34,7 +34,7 @@ export const checkDuplicateProject = (
   return invoices.some(inv => 
     inv.projectId === projectId && 
     inv.id !== excludeInvoiceId &&
-    ['approved', 'invoiced', 'reopened'].includes(inv.status)
+    ['pending', 'approved', 'invoiced', 'reopened'].includes(inv.status)
   );
 };
 
@@ -160,4 +160,33 @@ export const getBlockReasonLabel = (reason: string): string => {
     duplicate_project: '同一项目重复申请'
   };
   return labels[reason] || reason;
+};
+
+export const getObjectDiff = <T>(
+  oldObj: T,
+  newObj: Partial<T>
+): Array<{ field: string; oldValue: string; newValue: string }> => {
+  const diffs: Array<{ field: string; oldValue: string; newValue: string }> = [];
+  const fieldLabels: Record<string, string> = {
+    name: '客户名称',
+    taxId: '税号',
+    address: '地址',
+    phone: '电话',
+    bankName: '开户银行',
+    bankAccount: '银行账号'
+  };
+  
+  for (const key of Object.keys(newObj)) {
+    const oldVal = String(oldObj[key as keyof T] ?? '');
+    const newVal = String(newObj[key as keyof Partial<T>] ?? '');
+    if (oldVal !== newVal) {
+      diffs.push({
+        field: fieldLabels[key] || key,
+        oldValue: oldVal,
+        newValue: newVal
+      });
+    }
+  }
+  
+  return diffs;
 };
