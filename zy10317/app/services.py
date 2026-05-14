@@ -215,7 +215,7 @@ class ConfirmationService:
     def create_confirmation(
         db: Session,
         confirmation: ConfirmationCreate
-    ) -> Tuple[ConsumerConfirmation, bool]:
+    ) -> Tuple[ConsumerConfirmation, bool, str]:
         batch = BatchService.get_batch_or_404(db, confirmation.batch_id)
 
         existing = db.query(ConsumerConfirmation).filter(
@@ -223,7 +223,7 @@ class ConfirmationService:
             ConsumerConfirmation.consumer_id == confirmation.consumer_id
         ).first()
         if existing:
-            return existing, True
+            return existing, True, batch.batch_id
 
         current_watermark = db.query(Watermark).filter(
             Watermark.channel_id == batch.channel_id,
@@ -253,14 +253,15 @@ class ConfirmationService:
 
         db.commit()
         db.refresh(db_confirmation)
-        return db_confirmation, False
+        return db_confirmation, False, batch.batch_id
 
     @staticmethod
-    def get_confirmations_by_batch(db: Session, batch_id: str) -> List[ConsumerConfirmation]:
+    def get_confirmations_by_batch(db: Session, batch_id: str) -> Tuple[List[ConsumerConfirmation], str]:
         batch = BatchService.get_batch_or_404(db, batch_id)
-        return db.query(ConsumerConfirmation).filter(
+        confirmations = db.query(ConsumerConfirmation).filter(
             ConsumerConfirmation.batch_id == batch.id
         ).order_by(desc(ConsumerConfirmation.confirmed_at)).all()
+        return confirmations, batch.batch_id
 
 
 class RollbackService:

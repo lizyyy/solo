@@ -168,14 +168,19 @@ async def list_batches(
 @app.get("/api/batches/{batch_id}", response_model=ApiResponse, summary="获取批次详情")
 async def get_batch(batch_id: str, db: Session = Depends(get_db)):
     batch = BatchService.get_batch_or_404(db, batch_id)
-    confirmations = ConfirmationService.get_confirmations_by_batch(db, batch_id)
+    confirmations, batch_id_str = ConfirmationService.get_confirmations_by_batch(db, batch_id)
+    confirmation_list = []
+    for c in confirmations:
+        c_dict = ConfirmationResponse.model_validate(c).model_dump()
+        c_dict["batch_id_str"] = batch_id_str
+        confirmation_list.append(c_dict)
     return ApiResponse(
         success=True,
         code=200,
         message="获取批次详情成功",
         data={
             "batch": BatchResponse.model_validate(batch).model_dump(),
-            "confirmations": [ConfirmationResponse.model_validate(c).model_dump() for c in confirmations]
+            "confirmations": confirmation_list
         }
     )
 
@@ -193,13 +198,15 @@ async def update_batch_status(batch_id: str, update: BatchUpdate, db: Session = 
 
 @app.post("/api/confirmations", response_model=ApiResponse, summary="消费确认")
 async def create_confirmation(confirmation: ConfirmationCreate, db: Session = Depends(get_db)):
-    result, is_idempotent = ConfirmationService.create_confirmation(db, confirmation)
+    result, is_idempotent, batch_id_str = ConfirmationService.create_confirmation(db, confirmation)
+    confirmation_dict = ConfirmationResponse.model_validate(result).model_dump()
+    confirmation_dict["batch_id_str"] = batch_id_str
     return ApiResponse(
         success=True,
         code=200,
         message="消费确认成功" if not is_idempotent else "消费已确认（幂等返回）",
         data={
-            "confirmation": ConfirmationResponse.model_validate(result).model_dump(),
+            "confirmation": confirmation_dict,
             "is_idempotent": is_idempotent
         }
     )

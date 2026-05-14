@@ -96,7 +96,6 @@ class BatchResponse(BatchBase):
 
 
 class ConfirmationBase(BaseModel):
-    batch_id: str = Field(..., description="批次ID")
     consumer_id: str = Field(..., max_length=100, description="消费者ID")
     confirmed_count: int = Field(0, description="确认记录数")
     success: bool = Field(True, description="是否成功")
@@ -104,11 +103,14 @@ class ConfirmationBase(BaseModel):
 
 
 class ConfirmationCreate(ConfirmationBase):
+    batch_id: str = Field(..., description="批次ID（业务字符串ID）")
     error_message: Optional[str] = None
 
 
 class ConfirmationResponse(ConfirmationBase):
     id: int
+    batch_id: int = Field(..., description="批次数据库ID（外键）")
+    batch_id_str: str = Field("", description="批次业务ID（字符串）")
     watermark_id: int
     confirmed_at: datetime
     error_message: Optional[str]
