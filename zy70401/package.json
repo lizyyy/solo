@@ -1,0 +1,27 @@
+{
+  "name": "db-index-audit-service",
+  "version": "1.0.0",
+  "description": "数据库索引建议审计后端服务",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "jest",
+    "self-check": "ts-node src/scripts/self-check.ts"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.0"
+  }
+}
