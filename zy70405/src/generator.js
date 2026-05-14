@@ -18,20 +18,24 @@ import path from 'path';
 function generateStatusHistory(baseStatus, includeReminder) {
   const history = [];
   
-  // 定义状态的两个分支：成功分支和失败分支
+  // 定义状态分支
   const successBranch = ['待审批', '审批中', '已批准', '待执行', '执行中', '已完成'];
   const failureBranch = ['待审批', '审批中', '已批准', '待执行', '执行中', '已失败'];
   const revertBranch = ['待审批', '审批中', '已撤回'];
   
-  // 确定使用哪个分支
+  // 确定使用哪个分支：先判断最终状态，再判断中间状态（避免 indexOf 返回 -1 导致逻辑错误）
   let statusBranch;
-  if (baseStatus === '已完成' || successBranch.indexOf(baseStatus) < 5) {
+  if (baseStatus === '已完成') {
     statusBranch = successBranch;
   } else if (baseStatus === '已失败') {
     statusBranch = failureBranch;
   } else if (baseStatus === '已撤回') {
     statusBranch = revertBranch;
+  } else if (successBranch.indexOf(baseStatus) >= 0) {
+    // 中间状态使用成功分支
+    statusBranch = successBranch;
   } else {
+    // 默认使用成功分支
     statusBranch = successBranch;
   }
   
