@@ -17,37 +17,89 @@ import path from 'path';
 
 function generateStatusHistory(baseStatus, includeReminder) {
   const history = [];
-  const statusIndex = STATUS_FLOW.indexOf(baseStatus);
   
-  for (let i = 0; i <= statusIndex; i++) {
-    const status = STATUS_FLOW[i];
-    const timestamp = randomDate(
-      new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      new Date()
-    );
+  // 定义状态的两个分支：成功分支和失败分支
+  const successBranch = ['待审批', '审批中', '已批准', '待执行', '执行中', '已完成'];
+  const failureBranch = ['待审批', '审批中', '已批准', '待执行', '执行中', '已失败'];
+  const revertBranch = ['待审批', '审批中', '已撤回'];
+  
+  // 确定使用哪个分支
+  let statusBranch;
+  if (baseStatus === '已完成' || successBranch.indexOf(baseStatus) < 5) {
+    statusBranch = successBranch;
+  } else if (baseStatus === '已失败') {
+    statusBranch = failureBranch;
+  } else if (baseStatus === '已撤回') {
+    statusBranch = revertBranch;
+  } else {
+    statusBranch = successBranch;
+  }
+  
+  // 正常流程状态 - 按时间递增
+  let currentTime = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7天前开始
+  
+  const baseIndex = statusBranch.indexOf(baseStatus);
+  if (baseIndex === -1) {
+    // 如果 baseStatus 不在分支中，直接返回基础状态
+    history.push({
+      status: baseStatus,
+      timestamp: new Date().toISOString(),
+      operator: randomPick(OPERATORS).name,
+      remark: generateStatusRemark(baseStatus)
+    });
+    return {
+      history: history,
+      approverList: []
+    };
+  }
+  
+  // 生成正常流程状态，时间严格递增
+  for (let i = 0; i <= baseIndex; i++) {
+    const status = statusBranch[i];
+    currentTime = new Date(currentTime.getTime() + Math.random() * 6 * 60 * 60 * 1000); // 每次增加0-6小时
     
     history.push({
       status: status,
-      timestamp: timestamp.toISOString(),
+      timestamp: currentTime.toISOString(),
       operator: randomPick(OPERATORS).name,
       remark: generateStatusRemark(status)
     });
   }
 
+  // 添加催办记录（如果需要）
+  let approverList = [];
   if (includeReminder && (baseStatus === '待审批' || baseStatus === '审批中')) {
     const reminderCount = Math.floor(Math.random() * 3) + 1;
+    const selectedApprover = randomPick(APPROVERS).name;
+    approverList.push(selectedApprover);
+    
     for (let i = 0; i < reminderCount; i++) {
+      // 催办时间在最后状态之后
+      currentTime = new Date(currentTime.getTime() + Math.random() * 2 * 60 * 60 * 1000);
+      
       history.push({
         status: '已催办',
-        timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString(),
+        timestamp: currentTime.toISOString(),
         operator: randomPick(OPERATORS).name,
-        remark: '第' + (i + 1) + '次催办 - 请' + randomPick(APPROVERS).name + '尽快审批',
-        approver: randomPick(APPROVERS).name
+        remark: '第' + (i + 1) + '次催办 - 请' + selectedApprover + '尽快审批',
+        approver: selectedApprover
       });
     }
+    
+    // 催办后回到原状态
+    currentTime = new Date(currentTime.getTime() + Math.random() * 30 * 60 * 1000);
+    history.push({
+      status: baseStatus,
+      timestamp: currentTime.toISOString(),
+      operator: randomPick(OPERATORS).name,
+      remark: generateStatusRemark(baseStatus)
+    });
   }
 
-  return history.sort(function(a, b) { return new Date(a.timestamp) - new Date(b.timestamp); });
+  return {
+    history: history,
+    approverList: approverList
+  };
 }
 
 function generateStatusRemark(status) {
@@ -113,10 +165,11 @@ function generateSingleRecord(batchId, isDirty) {
     }
   }
 
-  const includeReminder = Math.random() < 0.3;
-  const statusHistory = generateStatusHistory(status, includeReminder);
-  const approvers = includeReminder ? 
-    statusHistory.filter(function(h) { return h.status === '已催办'; }).map(function(h) { return h.approver; }) : [];
+  // 提高催办记录生成概率到 50%，确保有足够的复核样本
+  const includeReminder = Math.random() < 0.5;
+  const statusResult = generateStatusHistory(status, includeReminder);
+  const statusHistory = statusResult.history;
+  const approvers = statusResult.approverList;
 
   const record = {
     id: generateRecordId(),
