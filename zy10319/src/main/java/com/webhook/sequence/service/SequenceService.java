@@ -159,19 +159,22 @@ public class SequenceService {
         log.warn("序列号缺口超时: topic={}, businessKey={}, gapStart={}",
                 state.getTopic(), state.getBusinessKey(), state.getGapStartSequence());
 
-        long nextExpected = state.getGapStartSequence();
+        long maxProcessedSeq = state.getGapStartSequence() - 1;
         
         for (Map.Entry<Long, EventContext> entry : state.getWaitingQueue().entrySet()) {
             EventContext waitingEvent = entry.getValue();
             
-            if (waitingEvent.getSequenceNumber() == nextExpected) {
+            if (waitingEvent.getSequenceNumber() >= state.getGapStartSequence()) {
                 waitingEvent.setStatus(EventStatus.SUCCESS);
                 waitingEvent.setProcessResult("超时强制处理");
                 waitingEvent.setProcessedAt(LocalDateTime.now());
                 waitingEvent.setOutOfOrderReason(OutOfOrderReason.TIMEOUT);
+                waitingEvent.setErrorMessage(null);
                 
+                if (waitingEvent.getSequenceNumber() > maxProcessedSeq) {
+                    maxProcessedSeq = waitingEvent.getSequenceNumber();
+                }
                 state.setLastProcessedSequence(waitingEvent.getSequenceNumber());
-                nextExpected = waitingEvent.getSequenceNumber() + 1;
                 eventStore.saveEvent(waitingEvent);
             }
         }
@@ -180,7 +183,7 @@ public class SequenceService {
         state.setHasGap(false);
         state.setGapStartSequence(null);
         state.setLastGapDetectedAt(null);
-        state.setExpectedNextSequence(nextExpected);
+        state.setExpectedNextSequence(maxProcessedSeq + 1);
         
         eventStore.saveSequenceState(buildStateKey(state.getTopic(), state.getBusinessKey()), state);
     }
