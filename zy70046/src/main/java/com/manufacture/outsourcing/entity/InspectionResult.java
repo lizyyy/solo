@@ -67,6 +67,15 @@ public class InspectionResult {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Column(length = 50)
+    private String compensationStep;
+
+    @Column(columnDefinition = "TEXT")
+    private String compensationError;
+
+    @Column
+    private Integer compensationRetryCount = 0;
+
     public static final String CONCLUSION_QUALIFIED = "合格";
     public static final String CONCLUSION_UNQUALIFIED = "不合格";
     public static final String CONCLUSION_PARTIAL = "让步接收";
@@ -83,4 +92,13 @@ public class InspectionResult {
     public static final String STATUS_COMPENSATION_FAILED = "补偿失败";
     public static final String STATUS_COMPENSATION_RETRY = "待重试补偿";
     public static final String STATUS_COMPLETED = "已完成";
+
+    public static final String STEP_NONE = "未开始";
+    public static final String STEP_DEDUCTION_CREATE = "创建扣款记录";
+    public static final String STEP_DEDUCTION_APPROVE = "扣款审批";
+    public static final String STEP_DEDUCTION_EXECUTE = "扣款执行";
+    public static final String STEP_REPLENISH_CREATE = "创建补货任务";
+    public static final String STEP_REPLENISH_NOTIFY = "通知供应商";
+    public static final String STEP_REPLENISH_WAIT = "等待供应商确认";
+    public static final String STEP_COMPLETED = "补偿完成";
 }

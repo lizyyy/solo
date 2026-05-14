@@ -106,9 +106,13 @@ CREATE TABLE IF NOT EXISTS inspection_results (
     result_status VARCHAR(20),
     created_at DATETIME NOT NULL,
     updated_at DATETIME NOT NULL,
+    compensation_step VARCHAR(50),
+    compensation_error TEXT,
+    compensation_retry_count INT DEFAULT 0,
     INDEX idx_inspection_no (result_no),
     INDEX idx_inspection_batch (batch_id),
     INDEX idx_inspection_status (result_status),
+    INDEX idx_compensation_step (compensation_step),
     CONSTRAINT fk_inspection_batch FOREIGN KEY (batch_id) REFERENCES delivery_batches(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

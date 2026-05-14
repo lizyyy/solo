@@ -53,4 +53,21 @@ public class InspectionController {
     public Result<List<InspectionResult>> findFailedCompensation() {
         return Result.success(inspectionService.findFailedCompensation());
     }
+
+    @GetMapping("/{id}/compensation-progress")
+    public Result<String> getCompensationProgress(@PathVariable Long id) {
+        return Result.success(inspectionService.getCompensationProgress(id));
+    }
+
+    @PostMapping("/simulate-deduction-failure")
+    public Result<Boolean> setSimulateDeductionFailure(@RequestParam boolean enable) {
+        inspectionService.setSimulateDeductionFailure(enable);
+        return Result.success("已" + (enable ? "开启" : "关闭") + "扣款失败模拟", 
+                inspectionService.isSimulateDeductionFailure());
+    }
+
+    @GetMapping("/simulate-deduction-failure")
+    public Result<Boolean> isSimulateDeductionFailure() {
+        return Result.success(inspectionService.isSimulateDeductionFailure());
+    }
 }

@@ -23,16 +23,16 @@ public class InspectionService {
     private final InspectionResultRepository inspectionRepository;
     private final DeliveryBatchService batchService;
     private final OperationLogService logService;
-    private final InspectionStatisticsService statisticsService;
+    private final CompensationProcessor compensationProcessor;
 
     public InspectionService(InspectionResultRepository inspectionRepository,
                               DeliveryBatchService batchService,
                               OperationLogService logService,
-                              InspectionStatisticsService statisticsService) {
+                              CompensationProcessor compensationProcessor) {
         this.inspectionRepository = inspectionRepository;
         this.batchService = batchService;
         this.logService = logService;
-        this.statisticsService = statisticsService;
+        this.compensationProcessor = compensationProcessor;
     }
 
     @Transactional
@@ -63,6 +63,8 @@ public class InspectionService {
         result.setInspectionRemark(request.getInspectionRemark());
         result.setProcessingSuggestion(request.getProcessingSuggestion());
         result.setResultStatus(InspectionResult.STATUS_PENDING);
+        result.setCompensationStep(InspectionResult.STEP_NONE);
+        result.setCompensationRetryCount(0);
 
         InspectionResult saved = inspectionRepository.save(result);
 
@@ -73,7 +75,7 @@ public class InspectionService {
                 OperationLog.ACTION_CREATE,
                 null,
                 saved.getResultStatus(),
-                "创建验收记录 " + saved.getResultNo() + "，合格数：" + request.getQualifiedQuantity() + "，不合格数：" + request.getUnqualifiedQuantity(),
+                "创建验收记录 " + saved.getResultNo() + "，合格数：" + request.getQualifiedQuantity() + "，不合格数：" + request.getUnqualifiedQuantity() + "，处理建议：" + request.getProcessingSuggestion(),
                 null,
                 saved
         );
@@ -102,17 +104,15 @@ public class InspectionService {
                 OperationLog.ACTION_CONFIRM,
                 oldStatus,
                 saved.getResultStatus(),
-                "确认验收记录 " + saved.getResultNo(),
+                "确认验收记录 " + saved.getResultNo() + "，处理建议：" + saved.getProcessingSuggestion(),
                 null,
                 saved
         );
 
         try {
-            executeCompensationActions(saved);
+            compensationProcessor.executeCompensation(saved);
             saved.setResultStatus(InspectionResult.STATUS_COMPLETED);
             inspectionRepository.save(saved);
-
-            updateBatchStatistics(saved);
 
             logService.logSuccess(
                     OperationLog.ENTITY_INSPECTION,
@@ -121,15 +121,18 @@ public class InspectionService {
                     OperationLog.ACTION_COMPENSATION,
                     InspectionResult.STATUS_CONFIRMED,
                     saved.getResultStatus(),
-                    "验收 " + saved.getResultNo() + " 的后续处理已完成",
+                    "验收 " + saved.getResultNo() + " 的补偿处理已完成，当前步骤：" + saved.getCompensationStep(),
                     null,
                     saved
             );
 
         } catch (Exception e) {
-            log.error("验收后续处理失败: {}", e.getMessage(), e);
+            log.error("验收补偿处理失败: {}", e.getMessage(), e);
             saved.setResultStatus(InspectionResult.STATUS_COMPENSATION_FAILED);
             inspectionRepository.save(saved);
+
+            String progress = compensationProcessor.getCompensationProgress(saved);
+            String step = saved.getCompensationStep();
 
             logService.logFailure(
                     OperationLog.ENTITY_INSPECTION,
@@ -138,13 +141,17 @@ public class InspectionService {
                     OperationLog.ACTION_COMPENSATION,
                     oldStatus,
                     saved.getResultStatus(),
-                    "验收 " + saved.getResultNo() + " 的后续处理失败，可重试",
+                    progress,
                     null,
                     saved,
                     e.getMessage()
             );
 
-            throw BusinessException.of("验收确认成功，但后续扣款/补货处理失败：" + e.getMessage() + "。系统已保存当前状态，可稍后重试补偿处理。");
+            throw BusinessException.of(
+                "验收确认成功，但补偿处理失败。" +
+                progress + "。" +
+                "请调用重试接口从当前步骤 [" + step + "] 继续执行，无需重新确认验收。"
+            );
         }
 
         return saved;
@@ -154,13 +161,21 @@ public class InspectionService {
     public InspectionResult retryCompensation(Long inspectionId) {
         InspectionResult result = getById(inspectionId);
         String oldStatus = result.getResultStatus();
+        String currentStep = result.getCompensationStep();
 
         if (!InspectionResult.STATUS_COMPENSATION_FAILED.equals(oldStatus) &&
             !InspectionResult.STATUS_COMPENSATION_RETRY.equals(oldStatus)) {
-            throw BusinessException.badRequest("只有补偿失败的验收记录才能重试");
+            throw BusinessException.badRequest("只有补偿失败的验收记录才能重试，当前状态：" + oldStatus);
+        }
+
+        if (currentStep == null) {
+            currentStep = InspectionResult.STEP_NONE;
         }
 
         result.setResultStatus(InspectionResult.STATUS_COMPENSATION_RETRY);
+        result.setCompensationRetryCount(
+            result.getCompensationRetryCount() == null ? 1 : result.getCompensationRetryCount() + 1
+        );
         inspectionRepository.save(result);
 
         logService.logSuccess(
@@ -170,17 +185,15 @@ public class InspectionService {
                 OperationLog.ACTION_RETRY,
                 oldStatus,
                 result.getResultStatus(),
-                "重试验收 " + result.getResultNo() + " 的补偿处理",
+                "从步骤 [" + currentStep + "] 重试验收 " + result.getResultNo() + " 的补偿处理，第 " + result.getCompensationRetryCount() + " 次",
                 null,
                 result
         );
 
         try {
-            executeCompensationActions(result);
+            compensationProcessor.executeCompensation(result);
             result.setResultStatus(InspectionResult.STATUS_COMPLETED);
             InspectionResult saved = inspectionRepository.save(result);
-
-            updateBatchStatistics(result);
 
             logService.logSuccess(
                     OperationLog.ENTITY_INSPECTION,
@@ -201,46 +214,27 @@ public class InspectionService {
             result.setResultStatus(InspectionResult.STATUS_COMPENSATION_FAILED);
             inspectionRepository.save(result);
 
-            throw BusinessException.of("补偿处理重试仍失败：" + e.getMessage() + "。可再次重试，或联系管理员检查系统状态。");
+            String progress = compensationProcessor.getCompensationProgress(result);
+
+            throw BusinessException.of(
+                "补偿处理重试仍失败。" +
+                progress + "。" +
+                "可再次重试从当前步骤继续，或检查失败原因后再操作。"
+            );
         }
     }
 
-    private void executeCompensationActions(InspectionResult result) {
-        String suggestion = result.getProcessingSuggestion();
-
-        switch (suggestion) {
-            case "扣款接收":
-                log.info("执行扣款处理，验收记录: {}", result.getResultNo());
-                break;
-            case "要求补货":
-                log.info("执行补货处理，验收记录: {}", result.getResultNo());
-                break;
-            case "直接入库":
-                log.info("直接入库，无需额外处理");
-                break;
-            case "退货":
-                log.info("执行退货处理");
-                break;
-            case "返工后复检":
-                log.info("等待返工后复检");
-                break;
-            default:
-                log.warn("未识别的处理建议: {}", suggestion);
-        }
+    public String getCompensationProgress(Long inspectionId) {
+        InspectionResult result = getById(inspectionId);
+        return compensationProcessor.getCompensationProgress(result);
     }
 
-    private void updateBatchStatistics(InspectionResult result) {
-        DeliveryBatch batch = result.getBatch();
-        BigDecimal deductionAmount = statisticsService.calculateDeductionAmountForInspection(result);
-        BigDecimal replenishmentQuantity = statisticsService.calculateReplenishmentQuantityForInspection(result);
+    public void setSimulateDeductionFailure(boolean simulate) {
+        compensationProcessor.setSimulateDeductionFailure(simulate);
+    }
 
-        batchService.updateBatchAfterInspection(
-                batch.getId(),
-                result.getQualifiedQuantity(),
-                result.getUnqualifiedQuantity(),
-                deductionAmount,
-                replenishmentQuantity
-        );
+    public boolean isSimulateDeductionFailure() {
+        return compensationProcessor.isSimulateDeductionFailure();
     }
 
     public InspectionResult getById(Long id) {

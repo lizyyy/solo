@@ -266,12 +266,45 @@
 
 ### 数据库配置
 
-1. 创建数据库并执行初始化脚本：
-   ```bash
-   mysql -u root -p < src/main/resources/db/init.sql
+本项目使用 JPA 的 `ddl-auto=update` 配置，首次启动时会自动创建所有表结构。
+
+**方式一（推荐）：JPA 自动建表 + 导入初始数据**
+
+1. 先确保 MySQL 中有 `outsourcing_inspection` 数据库（没有就手动创建）：
+   ```sql
+   CREATE DATABASE IF NOT EXISTS outsourcing_inspection DEFAULT CHARACTER SET utf8mb4;
    ```
 
-2. 修改 `application.yml` 中的数据库连接信息：
+2. 首次启动应用，JPA 会自动创建所有表结构
+   ```bash
+   mvn spring-boot:run
+   ```
+
+3. 启动成功后停止应用，执行初始数据脚本：
+   ```bash
+   mysql -u root -p outsourcing_inspection < src/main/resources/db/init.sql
+   ```
+
+4. 再次启动应用即可使用
+
+**方式二：手动建表 + 导入数据**
+
+1. 执行建表脚本：
+   ```bash
+   mysql -u root -p < src/main/resources/db/schema.sql
+   ```
+
+2. 执行初始数据脚本：
+   ```bash
+   mysql -u root -p outsourcing_inspection < src/main/resources/db/init.sql
+   ```
+
+3. 启动应用：
+   ```bash
+   mvn spring-boot:run
+   ```
+
+4. 修改 `application.yml` 中的数据库连接信息（如需）：
    ```yaml
    spring:
      datasource:
