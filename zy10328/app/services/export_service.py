@@ -111,6 +111,8 @@ def export_to_excel(db: Session, entry_api_id: str, include_samples: bool = True
 
 
 def get_profile_summary(db: Session, entry_api_id: str) -> Dict[str, Any]:
+    from app.services.profile_service import is_sensitive_path
+    
     entry_api = db.query(EntryAPI).filter(EntryAPI.id == entry_api_id).first()
     if not entry_api:
         raise ValueError(f"Entry API with id {entry_api_id} not found")
@@ -124,13 +126,32 @@ def get_profile_summary(db: Session, entry_api_id: str) -> Dict[str, Any]:
     
     avg_latency = sum(s.total_latency for s in samples) / total_samples if total_samples > 0 else 0
     
+    # 风险分布统计
+    risk_breakdown = {
+        "CRITICAL": sum(1 for s in services if s.risk_level == "CRITICAL"),
+        "HIGH": sum(1 for s in services if s.risk_level == "HIGH"),
+        "MEDIUM": sum(1 for s in services if s.risk_level == "MEDIUM"),
+        "LOW": sum(1 for s in services if s.risk_level == "LOW")
+    }
+    
+    # 敏感路径检测
+    is_sensitive = is_sensitive_path(entry_api.method, entry_api.path)
+    
     return {
         "entry_api_id": entry_api_id,
+        "name": entry_api.name,
+        "method": entry_api.method,
+        "path": entry_api.path,
         "total_samples": total_samples,
         "success_samples": success_samples,
         "failed_samples": failed_samples,
+        "failure_rate": (failed_samples / total_samples * 100) if total_samples > 0 else 0,
         "avg_total_latency": avg_latency,
         "downstream_count": len(services),
         "overall_risk_level": entry_api.risk_level,
+        "risk_description": entry_api.risk_description,
+        "risk_breakdown": risk_breakdown,
+        "is_sensitive_path": is_sensitive,
+        "requires_manual_review": is_sensitive or entry_api.risk_level in ["CRITICAL", "HIGH"],
         "status": entry_api.status
     }

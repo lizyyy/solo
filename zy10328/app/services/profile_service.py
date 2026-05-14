@@ -108,6 +108,23 @@ def calculate_latency_distribution(latencies: List[float]) -> List[Dict[str, Any
     return buckets
 
 
+def is_sensitive_path(method: str, path: str) -> bool:
+    """检测是否为敏感操作路径"""
+    sensitive_patterns = [
+        ("DELETE", "/users"),
+        ("DELETE", "/delete"),
+        ("DELETE", "/remove"),
+        ("DELETE", "/data"),
+        ("POST", "/reset"),
+        ("POST", "/batch"),
+        ("POST", "/admin"),
+    ]
+    for sensitive_method, sensitive_path in sensitive_patterns:
+        if method == sensitive_method and sensitive_path in path:
+            return True
+    return False
+
+
 def assess_risk(service: DownstreamService) -> Dict[str, Any]:
     risk_level = RiskLevelEnum.LOW
     risk_factors = []
@@ -117,33 +134,46 @@ def assess_risk(service: DownstreamService) -> Dict[str, Any]:
     
     failure_rate = service.failure_count / service.call_count if service.call_count > 0 else 0
     
-    if failure_rate > 0.5:
+    # 故障率评估
+    if failure_rate >= 0.5:
         risk_level = RiskLevelEnum.CRITICAL
         risk_factors.append(f"故障率过高: {failure_rate:.2%}")
-    elif failure_rate > 0.2:
+    elif failure_rate >= 0.3:
         risk_level = RiskLevelEnum.HIGH
         risk_factors.append(f"故障率较高: {failure_rate:.2%}")
-    elif failure_rate > 0.05:
+    elif failure_rate >= 0.1:
         risk_level = max(risk_level, RiskLevelEnum.MEDIUM)
         risk_factors.append(f"故障率偏高: {failure_rate:.2%}")
     
-    if service.p99_latency > 3000:
+    # 延迟评估 - 降低阈值
+    if service.p99_latency >= 3000:
+        risk_level = max(risk_level, RiskLevelEnum.CRITICAL)
+        risk_factors.append(f"P99耗时严重超标: {service.p99_latency:.2f}ms")
+    elif service.p99_latency >= 2000:
         risk_level = max(risk_level, RiskLevelEnum.HIGH)
         risk_factors.append(f"P99耗时过高: {service.p99_latency:.2f}ms")
-    elif service.p99_latency > 1000:
+    elif service.p99_latency >= 1000:
         risk_level = max(risk_level, RiskLevelEnum.MEDIUM)
         risk_factors.append(f"P99耗时偏高: {service.p99_latency:.2f}ms")
     
+    # 无缓存策略
     if service.cache_key is None or service.cache_key == "":
         risk_factors.append("未配置缓存策略")
         risk_level = max(risk_level, RiskLevelEnum.MEDIUM)
+    
+    # 多风险因素叠加升级
+    if len(risk_factors) >= 3:
+        risk_level = max(risk_level, RiskLevelEnum.CRITICAL)
+        risk_factors.append("多风险因素叠加")
+    elif len(risk_factors) >= 2:
+        risk_level = max(risk_level, RiskLevelEnum.HIGH)
     
     description = "; ".join(risk_factors) if risk_factors else "服务运行正常"
     
     return {"risk_level": risk_level, "description": description}
 
 
-def aggregate_overall_risk(services: List[DownstreamService]) -> Dict[str, Any]:
+def aggregate_overall_risk(services: List[DownstreamService], method: str = None, path: str = None) -> Dict[str, Any]:
     if not services:
         return {"risk_level": RiskLevelEnum.UNKNOWN, "description": "无下游服务"}
     
@@ -152,18 +182,49 @@ def aggregate_overall_risk(services: List[DownstreamService]) -> Dict[str, Any]:
     
     critical_count = sum(1 for s in services if s.risk_level == RiskLevelEnum.CRITICAL)
     high_count = sum(1 for s in services if s.risk_level == RiskLevelEnum.HIGH)
+    medium_count = sum(1 for s in services if s.risk_level == RiskLevelEnum.MEDIUM)
+    high_risk_count = critical_count + high_count
     
-    if critical_count > 0:
+    overall_level = RiskLevelEnum(max_risk.risk_level)
+    description_parts = []
+    
+    # 敏感路径检测
+    is_sensitive = False
+    if method and path and is_sensitive_path(method, path):
+        is_sensitive = True
         overall_level = RiskLevelEnum.CRITICAL
-        description = f"存在 {critical_count} 个严重风险服务"
-    elif high_count > 2:
-        overall_level = RiskLevelEnum.HIGH
-        description = f"存在 {high_count} 个高风险服务"
-    else:
-        overall_level = RiskLevelEnum(max_risk.risk_level)
-        description = f"最高风险等级: {overall_level.value}"
+        description_parts.append("敏感操作路径: 数据删除/批量操作等高风险行为")
     
-    return {"risk_level": overall_level, "description": description}
+    # 多个高风险服务叠加升级
+    total_sample_count = sum(s.call_count for s in services)
+    total_failure_rate = sum(s.failure_count for s in services) / total_sample_count if total_sample_count > 0 else 0
+    
+    if critical_count >= 1 or total_failure_rate >= 0.5 or (high_count >= 1 and medium_count >= 2):
+        overall_level = RiskLevelEnum.CRITICAL
+        description_parts.append(f"整体故障率高: {total_failure_rate:.1%}, 多个下游服务存在风险")
+    elif high_count >= 1 or medium_count >= 3 or total_failure_rate >= 0.3:
+        overall_level = max(overall_level, RiskLevelEnum.HIGH)
+        description_parts.append(f"多服务风险叠加: {medium_count} 个中等风险服务, 整体故障率 {total_failure_rate:.1%}")
+    elif medium_count >= 1:
+        overall_level = max(overall_level, RiskLevelEnum.MEDIUM)
+        description_parts.append(f"存在 {medium_count} 个中等风险服务")
+    
+    if not is_sensitive and not description_parts:
+        description_parts.append(f"最高风险等级: {overall_level.value}")
+    
+    description = "; ".join(description_parts)
+    
+    return {
+        "risk_level": overall_level, 
+        "description": description,
+        "is_sensitive_path": is_sensitive,
+        "risk_breakdown": {
+            "CRITICAL": critical_count,
+            "HIGH": high_count,
+            "MEDIUM": medium_count,
+            "LOW": len(services) - high_risk_count - medium_count
+        }
+    }
 
 
 def create_entry_api(db: Session, api_data: EntryAPICreate) -> EntryAPI:
@@ -319,7 +380,7 @@ def process_samples(db: Session, entry_api_id: str) -> bool:
             service.risk_level = risk["risk_level"].value
             service.risk_description = risk["description"]
     
-    overall_risk = aggregate_overall_risk(services)
+    overall_risk = aggregate_overall_risk(services, entry_api.method, entry_api.path)
     entry_api.risk_level = overall_risk["risk_level"].value
     entry_api.risk_description = overall_risk["description"]
     
@@ -327,7 +388,12 @@ def process_samples(db: Session, entry_api_id: str) -> bool:
         db, entry_api_id, "AGGREGATION_COMPLETED",
         entry_api.status, entry_api.status,
         "画像数据聚合完成", "system",
-        {"sample_count": len(samples), "service_count": len(services)}
+        {
+            "sample_count": len(samples),
+            "service_count": len(services),
+            "risk_breakdown": overall_risk.get("risk_breakdown", {}),
+            "is_sensitive_path": overall_risk.get("is_sensitive_path", False)
+        }
     )
     
     db.commit()
