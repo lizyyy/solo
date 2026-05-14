@@ -1,0 +1,15 @@
+{
+  "name": "content-publish-queue",
+  "version": "1.0.0",
+  "description": "内容发布定时队列全栈系统",
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm start",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "install:all": "cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["publish", "queue", "content"],
+  "author": "",
+  "license": "MIT"
+}

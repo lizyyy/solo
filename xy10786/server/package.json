@@ -1,0 +1,31 @@
+{
+  "name": "content-publish-server",
+  "version": "1.0.0",
+  "description": "内容发布定时队列后端服务",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^9.0.1",
+    "node-cron": "^3.0.2",
+    "date-fns": "^2.30.0",
+    "csv-writer": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/cors": "^2.8.15",
+    "@types/node": "^20.8.10",
+    "@types/uuid": "^9.0.6",
+    "@types/node-cron": "^3.0.10",
+    "typescript": "^5.2.2",
+    "ts-node-dev": "^2.0.0"
+  }
+}
