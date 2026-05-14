@@ -1,0 +1,54 @@
+{
+  "processId": "ORDER-20240514-001",
+  "processName": "订单创建流程",
+  "serviceName": "order-service",
+  "totalNodes": 3,
+  "failedNodes": [
+    {
+      "nodeId": "NODE-001",
+      "nodeName": "扣减库存",
+      "serviceName": "inventory-service",
+      "errorCode": "INVENTORY_LOCK_FAILED",
+      "errorMessage": "库存不足，无法锁定",
+      "instructions": [
+        {
+          "instructionType": "ROLLBACK",
+          "instructionContent": "回滚库存扣减操作",
+          "executionOrder": 1,
+          "requireManualConfirm": false,
+          "maxRetry": 3
+        },
+        {
+          "instructionType": "NOTIFY",
+          "instructionContent": "通知库存管理员",
+          "executionOrder": 2,
+          "requireManualConfirm": true,
+          "maxRetry": 2
+        }
+      ]
+    },
+    {
+      "nodeId": "NODE-002",
+      "nodeName": "创建支付单",
+      "serviceName": "payment-service",
+      "errorCode": "PAYMENT_CREATE_FAILED",
+      "errorMessage": "支付网关超时",
+      "instructions": [
+        {
+          "instructionType": "ROLLBACK",
+          "instructionContent": "取消支付单",
+          "executionOrder": 3,
+          "requireManualConfirm": false,
+          "maxRetry": 3
+        },
+        {
+          "instructionType": "COMPENSATE",
+          "instructionContent": "补偿用户优惠券",
+          "executionOrder": 4,
+          "requireManualConfirm": false,
+          "maxRetry": 2
+        }
+      ]
+    }
+  ]
+}
