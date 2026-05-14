@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误码知识库维护系统</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f5f7fa; }
+        #app { min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { opacity: 0.8; margin-top: 5px; font-size: 14px; }
+        .container { padding: 20px 40px; max-width: 1600px; margin: 0 auto; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .status-tag { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fef0f0; color: #f56c6c; }
+        .status-processed { background: #ecf5ff; color: #409eff; }
+        .status-effective { background: #f0f9eb; color: #67c23a; }
+        .status-rejected { background: #f4f4f5; color: #909399; }
+        .table-link { color: #409eff; cursor: pointer; text-decoration: none; }
+        .table-link:hover { text-decoration: underline; }
+        .fail-badge { background: #f56c6c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px; }
+        .drawer-section { margin-bottom: 24px; }
+        .drawer-section h4 { font-size: 15px; color: #303133; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ebeef5; }
+        .info-row { display: flex; margin-bottom: 10px; }
+        .info-label { width: 100px; color: #909399; flex-shrink: 0; }
+        .info-value { color: #303133; flex: 1; }
+        .version-card { border: 1px solid #ebeef5; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .version-card.effective { border-color: #67c23a; background: #f0f9eb; }
+        .version-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .version-title { font-weight: 600; color: #303133; }
+        .correct-btn { margin-top: 12px; }
+        .timeline-item { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .timeline-time { color: #909399; font-size: 12px; }
+        .timeline-content { margin-top: 6px; color: #303133; }
+        .hit-table { margin-top: 20px; }
+        .detail-tabs { margin-top: 20px; }
+        .code-display { background: #f5f7fa; padding: 12px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; word-break: break-all; }
+        .compare-section { background: #fffbe6; padding: 16px; border-radius: 8px; margin: 12px 0; }
+        .compare-title { font-weight: 600; color: #e6a23c; margin-bottom: 10px; }
+        .compare-row { display: flex; gap: 20px; }
+        .compare-col { flex: 1; }
+        .compare-label { font-size: 12px; color: #909399; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>🔧 错误码知识库维护系统</h1>
+            <p>Error Code Knowledge Base Maintenance System</p>
+        </div>
+        
+        <div class="container" v-if="currentView === 'list'">
+            <div class="toolbar">
+                <div>
+                    <el-button type="primary" @click="showCreateDialog = true">
+                        <el-icon><plus /></el-icon>
+                        录入错误码
+                    </el-button>
+                    <el-button @click="loadErrorCodes" :loading="loading">
+                        <el-icon><refresh /></el-icon>
+                        刷新
+                    </el-button>
+                </div>
+                <el-select v-model="filterStatus" placeholder="状态筛选" clearable style="width: 150px" @change="loadErrorCodes">
+                    <el-option label="待处理" value="pending"></el-option>
+                    <el-option label="已处理" value="processed"></el-option>
+                    <el-option label="已生效" value="effective"></el-option>
+                    <el-option label="已拒绝" value="rejected"></el-option>
+                </el-select>
+            </div>
+
+            <el-table :data="errorCodes" v-loading="loading" border stripe>
+                <el-table-column prop="code" label="错误码" width="150">
+                    <template #default="{ row }">
+                        <a class="table-link" @click="goToDetail(row.id)">{{ row.code }}</a>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="trigger_interface" label="触发接口" width="200" show-overflow-tooltip></el-table-column>
+                <el-table-column label="状态" width="120">
+                    <template #default="{ row }">
+                        <span :class="['status-tag', 'status-' + row.status]">
+                            {{ statusMap[row.status] }}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="命中统计" width="150">
+                    <template #default="{ row }">
+                        <span>{{ row.hit_count }} 次</span>
+                        <span v-if="row.fail_count > 0" class="fail-badge" @click="goToDetail(row.id, 'failures')">
+                            {{ row.fail_count }} 失败
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="current_version" label="当前版本" width="100" align="center"></el-table-column>
+                <el-table-column prop="updated_at" label="更新时间" width="180">
+                    <template #default="{ row }">{{ formatTime(row.updated_at) }}</template>
+                </el-table-column>
+                <el-table-column label="操作" width="250" fixed="right">
+                    <template #default="{ row }">
+                        <el-button size="small" type="primary" link @click="goToDetail(row.id)">详情</el-button>
+                        <el-button size="small" type="success" link @click="openReviewDrawer(row)" v-if="row.status === 'processed'">复核</el-button>
+                        <el-button size="small" link @click="openProcessDialog(row)" v-if="row.status === 'pending'">处理</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <div class="container" v-if="currentView === 'detail'">
+            <el-page-header @back="goToList" content="错误码详情">
+                <template #extra>
+                    <el-button type="primary" @click="openProcessDialog(detailData)" v-if="detailData.status === 'pending'">处理</el-button>
+                    <el-button type="success" @click="openReviewDrawer(detailData)" v-if="detailData.status === 'processed'">复核</el-button>
+                </template>
+            </el-page-header>
+
+            <el-descriptions :column="2" border style="margin-top: 20px" v-if="detailData.id">
+                <el-descriptions-item label="错误码">{{ detailData.code }}</el-descriptions-item>
+                <el-descriptions-item label="状态">
+                    <span :class="['status-tag', 'status-' + detailData.status]">{{ statusMap[detailData.status] }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item label="触发接口">{{ detailData.trigger_interface || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="当前版本">v{{ detailData.current_version }}</el-descriptions-item>
+                <el-descriptions-item label="用户提示" :span="2">{{ detailData.user_tip || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="处理步骤" :span="2">{{ detailData.processing_steps || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="原始输入" :span="2">
+                    <div class="code-display">{{ detailData.original_input }}</div>
+                </el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ formatTime(detailData.created_at) }}</el-descriptions-item>
+                <el-descriptions-item label="更新时间">{{ formatTime(detailData.updated_at) }}</el-descriptions-item>
+            </el-descriptions>
+
+            <el-tabs v-model="activeTab" class="detail-tabs">
+                <el-tab-pane label="版本列表" name="versions">
+                    <div v-for="v in detailData.versions" :key="v.id" :class="['version-card', { effective: v.is_effective }]">
+                        <div class="version-header">
+                            <span class="version-title">
+                                版本 v{{ v.version }}
+                                <el-tag v-if="v.is_effective" type="success" size="small">已生效</el-tag>
+                            </span>
+                            <span v-if="v.handle_time">{{ formatTime(v.handle_time) }}</span>
+                        </div>
+                        <div class="info-row"><span class="info-label">处理人:</span><span class="info-value">{{ v.handler || '-' }}</span></div>
+                        <div class="info-row"><span class="info-label">处理理由:</span><span class="info-value">{{ v.handle_reason || '-' }}</span></div>
+                        <div class="info-row"><span class="info-label">触发接口:</span><span class="info-value">{{ v.trigger_interface || '-' }}</span></div>
+                        <div class="info-row"><span class="info-label">用户提示:</span><span class="info-value">{{ v.user_tip || '-' }}</span></div>
+                        <div class="info-row"><span class="info-label">处理步骤:</span><span class="info-value">{{ v.processing_steps || '-' }}</span></div>
+                        <div class="info-row" v-if="v.processed_result"><span class="info-label">处理结果:</span><span class="info-value">{{ v.processed_result }}</span></div>
+                        <div v-if="v.is_effective">
+                            <el-button size="small" type="warning" class="correct-btn" @click="openCorrectDialog(v)">
+                                <el-icon><edit /></el-icon>修正此版本
+                            </el-button>
+                        </div>
+                    </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="复核记录" name="reviews">
+                    <div v-for="r in detailData.reviews" :key="r.id" class="timeline-item">
+                        <div class="timeline-time">{{ formatTime(r.review_time) }} - {{ r.reviewer }}</div>
+                        <div class="timeline-content">
+                            <el-tag :type="r.review_result === 'approved' ? 'success' : 'danger'">
+                                {{ r.review_result === 'approved' ? '复核通过' : '复核拒绝' }}
+                            </el-tag>
+                            <p style="margin-top: 8px">{{ r.review_comment || '无备注' }}</p>
+                        </div>
+                    </div>
+                    <el-empty v-if="!detailData.reviews || detailData.reviews.length === 0" description="暂无复核记录"></el-empty>
+                </el-tab-pane>
+
+                <el-tab-pane label="命中统计" name="hit-stats">
+                    <div style="margin-bottom: 16px">
+                        <el-radio-group v-model="hitFilter" @change="loadHitStats">
+                            <el-radio label="all">全部</el-radio>
+                            <el-radio label="success">成功</el-radio>
+                            <el-radio label="fail">失败</el-radio>
+                        </el-radio-group>
+                    </div>
+                    <el-table :data="hitStats" border stripe class="hit-table">
+                        <el-table-column prop="hit_time" label="命中时间" width="180">
+                            <template #default="{ row }">{{ formatTime(row.hit_time) }}</template>
+                        </el-table-column>
+                        <el-table-column prop="user_id" label="用户ID" width="120"></el-table-column>
+                        <el-table-column prop="request_id" label="请求ID" width="200"></el-table-column>
+                        <el-table-column label="结果" width="100">
+                            <template #default="{ row }">
+                                <el-tag :type="row.is_success ? 'success' : 'danger'">
+                                    {{ row.is_success ? '成功' : '失败' }}
+                                </el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="error_message" label="错误信息" show-overflow-tooltip></el-table-column>
+                    </el-table>
+                </el-tab-pane>
+
+                <el-tab-pane label="修正记录" name="corrections">
+                    <div v-for="c in corrections" :key="c.id" class="timeline-item">
+                        <div class="timeline-time">{{ formatTime(c.correction_time) }} - {{ c.corrector }}</div>
+                        <div class="timeline-content">
+                            <p><strong>修正理由:</strong> {{ c.correction_reason }}</p>
+                            <div class="compare-section">
+                                <div class="compare-title">版本 v{{ getVersionById(c.version_id)?.version }} 修正对比</div>
+                                <div class="compare-row">
+                                    <div class="compare-col">
+                                        <div class="compare-label">修正前</div>
+                                        <pre style="white-space: pre-wrap; font-size: 12px">{{ formatJson(c.before_correction) }}</pre>
+                                    </div>
+                                    <div class="compare-col">
+                                        <div class="compare-label">修正后</div>
+                                        <pre style="white-space: pre-wrap; font-size: 12px">{{ formatJson(c.after_correction) }}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <el-empty v-if="corrections.length === 0" description="暂无修正记录"></el-empty>
+                </el-tab-pane>
+            </el-tabs>
+        </div>
+
+        <el-dialog v-model="showCreateDialog" title="录入错误码" width="600px">
+            <el-form :model="createForm" label-width="100px">
+                <el-form-item label="错误码" required>
+                    <el-input v-model="createForm.code" placeholder="例如: ERR-001"></el-input>
+                </el-form-item>
+                <el-form-item label="原始输入" required>
+                    <el-input v-model="createForm.original_input" type="textarea" :rows="4" placeholder="错误的原始日志或输入"></el-input>
+                </el-form-item>
+                <el-form-item label="触发接口">
+                    <el-input v-model="createForm.trigger_interface" placeholder="例如: /api/user/login"></el-input>
+                </el-form-item>
+                <el-form-item label="用户提示">
+                    <el-input v-model="createForm.user_tip" type="textarea" :rows="2" placeholder="给用户的提示信息"></el-input>
+                </el-form-item>
+                <el-form-item label="处理步骤">
+                    <el-input v-model="createForm.processing_steps" type="textarea" :rows="3" placeholder="标准处理步骤"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showCreateDialog = false">取消</el-button>
+                <el-button type="primary" @click="createErrorCode" :loading="submitting">提交</el-button>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showProcessDialog" title="处理错误码" width="600px">
+            <el-form :model="processForm" label-width="100px">
+                <el-form-item label="处理人" required>
+                    <el-input v-model="processForm.handler" placeholder="处理人姓名"></el-input>
+                </el-form-item>
+                <el-form-item label="处理理由" required>
+                    <el-input v-model="processForm.handle_reason" type="textarea" :rows="2" placeholder="为什么这么处理"></el-input>
+                </el-form-item>
+                <el-form-item label="触发接口">
+                    <el-input v-model="processForm.trigger_interface" placeholder="例如: /api/user/login"></el-input>
+                </el-form-item>
+                <el-form-item label="用户提示">
+                    <el-input v-model="processForm.user_tip" type="textarea" :rows="2"></el-input>
+                </el-form-item>
+                <el-form-item label="处理步骤">
+                    <el-input v-model="processForm.processing_steps" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+                <el-form-item label="处理结果">
+                    <el-input v-model="processForm.processed_result" type="textarea" :rows="2"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showProcessDialog = false">取消</el-button>
+                <el-button type="primary" @click="processErrorCode" :loading="submitting">提交处理</el-button>
+            </template>
+        </el-dialog>
+
+        <el-drawer v-model="showReviewDrawer" title="复核错误码" size="500px">
+            <div v-if="reviewData" class="drawer-section">
+                <h4>错误码信息</h4>
+                <div class="info-row"><span class="info-label">错误码:</span><span class="info-value">{{ reviewData.code }}</span></div>
+                <div class="info-row"><span class="info-label">触发接口:</span><span class="info-value">{{ reviewData.trigger_interface }}</span></div>
+                <div class="info-row"><span class="info-label">用户提示:</span><span class="info-value">{{ reviewData.user_tip }}</span></div>
+                <div class="info-row"><span class="info-label">处理步骤:</span><span class="info-value">{{ reviewData.processing_steps }}</span></div>
+            </div>
+            
+            <div v-if="reviewData?.versions?.length > 0" class="drawer-section">
+                <h4>最新版本处理信息</h4>
+                <div class="info-row"><span class="info-label">处理人:</span><span class="info-value">{{ reviewData.versions[0].handler }}</span></div>
+                <div class="info-row"><span class="info-label">处理时间:</span><span class="info-value">{{ formatTime(reviewData.versions[0].handle_time) }}</span></div>
+                <div class="info-row"><span class="info-label">处理理由:</span><span class="info-value">{{ reviewData.versions[0].handle_reason }}</span></div>
+                <div class="info-row"><span class="info-label">处理结果:</span><span class="info-value">{{ reviewData.versions[0].processed_result }}</span></div>
+            </div>
+
+            <div class="drawer-section">
+                <h4>复核操作</h4>
+                <el-form label-width="80px">
+                    <el-form-item label="复核人">
+                        <el-input v-model="reviewForm.reviewer" placeholder="复核人姓名"></el-input>
+                    </el-form-item>
+                    <el-form-item label="复核结果">
+                        <el-radio-group v-model="reviewForm.review_result">
+                            <el-radio label="approved">通过并生效</el-radio>
+                            <el-radio label="rejected">拒绝</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="复核意见">
+                        <el-input v-model="reviewForm.review_comment" type="textarea" :rows="3"></el-input>
+                    </el-form-item>
+                </el-form>
+                <el-button type="primary" @click="submitReview" :loading="submitting" style="width: 100%">提交复核</el-button>
+            </div>
+        </el-drawer>
+
+        <el-dialog v-model="showCorrectDialog" title="修正生效版本" width="600px">
+            <el-form :model="correctForm" label-width="100px">
+                <el-form-item label="修正人" required>
+                    <el-input v-model="correctForm.corrector" placeholder="修正人姓名"></el-input>
+                </el-form-item>
+                <el-form-item label="修正理由" required>
+                    <el-input v-model="correctForm.correction_reason" type="textarea" :rows="2" placeholder="为什么需要修正"></el-input>
+                </el-form-item>
+                <el-form-item label="触发接口">
+                    <el-input v-model="correctForm.trigger_interface"></el-input>
+                </el-form-item>
+                <el-form-item label="用户提示">
+                    <el-input v-model="correctForm.user_tip" type="textarea" :rows="2"></el-input>
+                </el-form-item>
+                <el-form-item label="处理步骤">
+                    <el-input v-model="correctForm.processing_steps" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="showCorrectDialog = false">取消</el-button>
+                <el-button type="primary" @click="submitCorrection" :loading="submitting">提交修正</el-button>
+            </template>
+        </el-dialog>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive, onMounted } = Vue;
+        const API_BASE = 'http://localhost:8000/api';
+
+        const app = createApp({
+            setup() {
+                const currentView = ref('list');
+                const errorCodes = ref([]);
+                const loading = ref(false);
+                const submitting = ref(false);
+                const filterStatus = ref('');
+                const showCreateDialog = ref(false);
+                const showProcessDialog = ref(false);
+                const showReviewDrawer = ref(false);
+                const showCorrectDialog = ref(false);
+                const detailId = ref(null);
+                const detailData = ref({});
+                const reviewData = ref(null);
+                const correctVersion = ref(null);
+                const hitStats = ref([]);
+                const corrections = ref([]);
+                const hitFilter = ref('all');
+                const activeTab = ref('versions');
+
+                const statusMap = {
+                    pending: '待处理',
+                    processed: '已处理',
+                    effective: '已生效',
+                    rejected: '已拒绝'
+                };
+
+                const createForm = reactive({
+                    code: '',
+                    original_input: '',
+                    trigger_interface: '',
+                    user_tip: '',
+                    processing_steps: ''
+                });
+
+                const processForm = reactive({
+                    handler: '',
+                    handle_reason: '',
+                    trigger_interface: '',
+                    user_tip: '',
+                    processing_steps: '',
+                    processed_result: ''
+                });
+
+                const reviewForm = reactive({
+                    reviewer: '',
+                    review_result: 'approved',
+                    review_comment: ''
+                });
+
+                const correctForm = reactive({
+                    corrector: '',
+                    correction_reason: '',
+                    trigger_interface: '',
+                    user_tip: '',
+                    processing_steps: ''
+                });
+
+                const formatTime = (time) => {
+                    if (!time) return '-';
+                    return new Date(time).toLocaleString('zh-CN');
+                };
+
+                const formatJson = (str) => {
+                    try {
+                        return JSON.stringify(JSON.parse(str), null, 2);
+                    } catch {
+                        return str;
+                    }
+                };
+
+                const getVersionById = (id) => {
+                    return detailData.value.versions?.find(v => v.id === id);
+                };
+
+                const loadErrorCodes = async () => {
+                    loading.value = true;
+                    try {
+                        const url = filterStatus.value 
+                            ? `${API_BASE}/error-codes?status=${filterStatus.value}`
+                            : `${API_BASE}/error-codes`;
+                        const res = await fetch(url);
+                        errorCodes.value = await res.json();
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('加载失败');
+                    }
+                    loading.value = false;
+                };
+
+                const createErrorCode = async () => {
+                    if (!createForm.code || !createForm.original_input) {
+                        ElementPlus.ElMessage.warning('请填写必填项');
+                        return;
+                    }
+                    submitting.value = true;
+                    try {
+                        await fetch(`${API_BASE}/error-codes`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(createForm)
+                        });
+                        ElementPlus.ElMessage.success('录入成功');
+                        showCreateDialog.value = false;
+                        Object.assign(createForm, { code: '', original_input: '', trigger_interface: '', user_tip: '', processing_steps: '' });
+                        loadErrorCodes();
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('录入失败');
+                    }
+                    submitting.value = false;
+                };
+
+                const goToDetail = async (id, tab = 'versions') => {
+                    detailId.value = id;
+                    currentView.value = 'detail';
+                    if (tab === 'failures') {
+                        activeTab.value = 'hit-stats';
+                        hitFilter.value = 'fail';
+                    } else {
+                        activeTab.value = tab;
+                    }
+                    await loadDetail();
+                    await loadHitStats();
+                    await loadCorrections();
+                };
+
+                const goToList = () => {
+                    currentView.value = 'list';
+                    detailId.value = null;
+                    detailData.value = {};
+                    loadErrorCodes();
+                };
+
+                const loadDetail = async () => {
+                    try {
+                        const res = await fetch(`${API_BASE}/error-codes/${detailId.value}`);
+                        detailData.value = await res.json();
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('加载详情失败');
+                    }
+                };
+
+                const loadHitStats = async () => {
+                    if (!detailId.value) return;
+                    let url = `${API_BASE}/error-codes/${detailId.value}/hit-stats`;
+                    if (hitFilter.value === 'success') url += '?is_success=true';
+                    else if (hitFilter.value === 'fail') url += '?is_success=false';
+                    try {
+                        const res = await fetch(url);
+                        hitStats.value = await res.json();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+
+                const loadCorrections = async () => {
+                    if (!detailId.value) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/corrections/${detailId.value}`);
+                        corrections.value = await res.json();
+                    } catch (e) {
+                        console.error(e);
+                    }
+                };
+
+                const openProcessDialog = (row) => {
+                    detailId.value = row.id;
+                    processForm.trigger_interface = row.trigger_interface || '';
+                    processForm.user_tip = row.user_tip || '';
+                    processForm.processing_steps = row.processing_steps || '';
+                    processForm.handler = '';
+                    processForm.handle_reason = '';
+                    processForm.processed_result = '';
+                    showProcessDialog.value = true;
+                };
+
+                const processErrorCode = async () => {
+                    if (!processForm.handler || !processForm.handle_reason) {
+                        ElementPlus.ElMessage.warning('请填写处理人和处理理由');
+                        return;
+                    }
+                    submitting.value = true;
+                    try {
+                        await fetch(`${API_BASE}/error-codes/${detailId.value}/process`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(processForm)
+                        });
+                        ElementPlus.ElMessage.success('处理成功');
+                        showProcessDialog.value = false;
+                        if (currentView.value === 'list') {
+                            loadErrorCodes();
+                        } else {
+                            loadDetail();
+                        }
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('处理失败');
+                    }
+                    submitting.value = false;
+                };
+
+                const openReviewDrawer = async (row) => {
+                    reviewData.value = row;
+                    if (row.id) {
+                        const res = await fetch(`${API_BASE}/error-codes/${row.id}`);
+                        reviewData.value = await res.json();
+                        detailId.value = row.id;
+                    }
+                    showReviewDrawer.value = true;
+                };
+
+                const submitReview = async () => {
+                    if (!reviewForm.reviewer) {
+                        ElementPlus.ElMessage.warning('请填写复核人');
+                        return;
+                    }
+                    submitting.value = true;
+                    try {
+                        await fetch(`${API_BASE}/error-codes/${detailId.value}/review`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(reviewForm)
+                        });
+                        ElementPlus.ElMessage.success('复核完成');
+                        showReviewDrawer.value = false;
+                        if (currentView.value === 'list') {
+                            loadErrorCodes();
+                        } else {
+                            loadDetail();
+                        }
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('复核失败');
+                    }
+                    submitting.value = false;
+                };
+
+                const openCorrectDialog = (version) => {
+                    correctVersion.value = version;
+                    correctForm.trigger_interface = version.trigger_interface || '';
+                    correctForm.user_tip = version.user_tip || '';
+                    correctForm.processing_steps = version.processing_steps || '';
+                    correctForm.corrector = '';
+                    correctForm.correction_reason = '';
+                    showCorrectDialog.value = true;
+                };
+
+                const submitCorrection = async () => {
+                    if (!correctForm.corrector || !correctForm.correction_reason) {
+                        ElementPlus.ElMessage.warning('请填写修正人和修正理由');
+                        return;
+                    }
+                    submitting.value = true;
+                    try {
+                        await fetch(`${API_BASE}/error-codes/${detailId.value}/correct/${correctVersion.value.id}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(correctForm)
+                        });
+                        ElementPlus.ElMessage.success('修正完成');
+                        showCorrectDialog.value = false;
+                        loadDetail();
+                        loadCorrections();
+                    } catch (e) {
+                        ElementPlus.ElMessage.error('修正失败');
+                    }
+                    submitting.value = false;
+                };
+
+                onMounted(() => {
+                    loadErrorCodes();
+                });
+
+                return {
+                    currentView,
+                    errorCodes,
+                    loading,
+                    submitting,
+                    filterStatus,
+                    showCreateDialog,
+                    showProcessDialog,
+                    showReviewDrawer,
+                    showCorrectDialog,
+                    detailData,
+                    reviewData,
+                    hitStats,
+                    corrections,
+                    hitFilter,
+                    activeTab,
+                    statusMap,
+                    createForm,
+                    processForm,
+                    reviewForm,
+                    correctForm,
+                    formatTime,
+                    formatJson,
+                    getVersionById,
+                    loadErrorCodes,
+                    createErrorCode,
+                    goToDetail,
+                    goToList,
+                    openProcessDialog,
+                    processErrorCode,
+                    openReviewDrawer,
+                    submitReview,
+                    openCorrectDialog,
+                    submitCorrection,
+                    loadHitStats,
+                    loadCorrections
+                };
+            }
+        });
+
+        for (const [key, component] of Object.entries(ElementPlus)) {
+            if (typeof component === 'object' && component.name) {
+                app.component(component.name, component);
+            }
+        }
+        app.use(ElementPlus);
+        app.mount('#app');
+    </script>
+</body>
+</html>
