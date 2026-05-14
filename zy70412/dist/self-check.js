@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const schema_diff_1 = require("./schema-diff");
 const logistics_processor_1 = require("./logistics-processor");
 const result_store_1 = require("./result-store");
 const batch_processor_1 = require("./batch-processor");
 const uuid_1 = require("uuid");
-const fs_extra_1 = require("fs-extra");
-const chalk_1 = require("chalk");
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const chalk_1 = __importDefault(require("chalk"));
 let passed = 0;
 let failed = 0;
 function test(name, fn) {

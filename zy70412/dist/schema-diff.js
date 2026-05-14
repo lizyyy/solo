@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SchemaDiffer = void 0;
 exports.compareSchemas = compareSchemas;
-const isEqual_1 = require("lodash/isEqual");
+const isEqual_1 = __importDefault(require("lodash/isEqual"));
 class SchemaDiffer {
     compare(schema1, schema2, path = '') {
         const diffs = [];

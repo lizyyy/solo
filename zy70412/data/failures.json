@@ -1,0 +1,77 @@
+[
+  {
+    "batchId": "c065d132-a97a-4e7b-8226-95ce3d2ab5cb",
+    "itemId": "ca07f488-bd27-4412-80a2-b50d8866cb2f",
+    "orderId": "ORD002",
+    "waybillNo": "SF1234567891",
+    "status": "failed",
+    "schemaDiffs": [
+      {
+        "path": "allCompensationsExecuted",
+        "type": "modified",
+        "oldValue": false,
+        "newValue": true
+      }
+    ],
+    "failureReason": "COMPENSATION_MISSING: 优惠券",
+    "failureGroup": "COMPENSATION_MISSING",
+    "lakehousePartition": "date=2026-05-14/gray=true",
+    "id": "ce45e132-f51a-4f0e-b9f6-4d35593e64b2",
+    "createdAt": "2026-05-14T22:25:39.490Z",
+    "updatedAt": "2026-05-14T22:25:39.490Z"
+  },
+  {
+    "batchId": "c065d132-a97a-4e7b-8226-95ce3d2ab5cb",
+    "itemId": "4d48aa39-43da-4f60-a456-f177b056cad5",
+    "orderId": "ORD003",
+    "waybillNo": "SF1234567892",
+    "status": "failed",
+    "schemaDiffs": [
+      {
+        "path": "requiredCompensationsCount",
+        "type": "modified",
+        "oldValue": 1,
+        "newValue": 2
+      }
+    ],
+    "failureReason": "INTERCEPTION_TIME_MISSING",
+    "failureGroup": "INTERCEPTION_TIME_MISSING",
+    "lakehousePartition": "date=2026-05-14/gray=true",
+    "id": "b670ab7f-c8e3-4cfe-adb4-cc1d008563ff",
+    "createdAt": "2026-05-14T22:25:39.490Z",
+    "updatedAt": "2026-05-14T22:25:39.490Z"
+  },
+  {
+    "batchId": "c065d132-a97a-4e7b-8226-95ce3d2ab5cb",
+    "itemId": "953d29ea-82a0-4abf-bc30-fc2a3f2943fc",
+    "orderId": "ORD004",
+    "waybillNo": "SF1234567893",
+    "status": "failed",
+    "schemaDiffs": [
+      {
+        "path": "status",
+        "type": "modified",
+        "oldValue": "failed",
+        "newValue": "intercepted"
+      },
+      {
+        "path": "hasCompensationActions",
+        "type": "modified",
+        "oldValue": false,
+        "newValue": true
+      },
+      {
+        "path": "requiredCompensationsCount",
+        "type": "modified",
+        "oldValue": 0,
+        "newValue": 2
+      }
+    ],
+    "failureReason": "GRAY_RELEASE_FAILED",
+    "failureGroup": "GRAY_RELEASE_FAILED",
+    "lakehousePartition": "date=2026-05-14/gray=true",
+    "id": "537235be-c14f-4732-810b-14d570f539b1",
+    "createdAt": "2026-05-14T22:25:39.491Z",
+    "updatedAt": "2026-05-14T22:25:39.491Z"
+  }
+]
