@@ -1,169 +1,54 @@
 #!/bin/sh
-# ----------------------------------------------------------------------------
-# Maven Start Up Batch script
-#
-# Required ENV vars:
-# ------------------
-#   JAVA_HOME - location of a JDK home dir
-#
-# Optional ENV vars
-# -----------------
-#   M2_HOME - location of maven2's installed home dir
-#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
-#     e.g. to debug Maven itself, use
-#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
-#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
-# ----------------------------------------------------------------------------
+# Maven Wrapper 启动脚本
+# 如果系统没有安装 Maven，此脚本会提示使用备选方案
 
-if [ -z "$MAVEN_SKIP_RC" ] ; then
+echo "=============================================="
+echo "  Maven Wrapper"
+echo "=============================================="
+echo ""
 
-  if [ -f /etc/mavenrc ] ; then
-    . /etc/mavenrc
-  fi
+# 检查 maven-wrapper.jar 是否存在
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+WRAPPER_JAR="$SCRIPT_DIR/.mvn/wrapper/maven-wrapper.jar"
 
-  if [ -f "$HOME/.mavenrc" ] ; then
-    . "$HOME/.mavenrc"
-  fi
-
-fi
-
-# OS specific support.  $var _must_ be set to either true or false.
-cygwin=false;
-darwin=false;
-mingw=false
-case "`uname`" in
-  CYGWIN*) cygwin=true ;;
-  MINGW*) mingw=true;;
-  Darwin*) darwin=true
-           #
-           # Look for the Apple JDKs first to preserve the existing behaviour, and then look
-           # for other JDKs with the different naming conventions.
-           #
-           if [ -z "$JAVA_HOME" ]; then
-             jdkPath=`/usr/libexec/java_home -v 1.8+ 2>/dev/null`
-             if [ -n "$jdkPath" -a -d "$jdkPath" ]; then
-               JAVA_HOME=$jdkPath
-               export JAVA_HOME
-             fi
-           fi
-           ;;
-esac
-
-if [ -z "$JAVA_HOME" ] ; then
-  javaExecutable="`which javac`"
-  if [ -n "$javaExecutable" -a ! "`expr \"$javaExecutable\" : '\([^ ]*\)'`" = "no" ]; then
-    # readlink(1) is not available as standard on Solaris 10.
-    readLink=`which readlink`
-    if [ ! `expr "$readLink" : '\([^ ]*\)'` = "no" ]; then
-      if $darwin ; then
-        javaHome="`dirname \"$javaExecutable\"`"
-        javaExecutable="`cd \"$javaHome\" && pwd -P`/javac"
-      else
-        javaExecutable="`readlink -f \"$javaExecutable\"`"
-      fi
-      javaHome="`dirname \"$javaExecutable\"`"
-      javaHome=`expr "$javaHome" : '\(.*\)/bin'`
-      JAVA_HOME="$javaHome"
-      export JAVA_HOME
-    fi
-  fi
-fi
-
-if [ -z "$JAVACMD" ] ; then
-  if [ -n "$JAVA_HOME"  ] ; then
-    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-      # IBM's JDK on AIX uses strange locations for the executables
-      JAVACMD="$JAVA_HOME/jre/sh/java"
+if [ -f "$WRAPPER_JAR" ]; then
+    # 如果有 wrapper jar，使用它
+    if command -v java >/dev/null 2>&1; then
+        exec java -jar "$WRAPPER_JAR" "$@"
     else
-      JAVACMD="$JAVA_HOME/bin/java"
+        echo "错误: 未找到 Java 命令"
+        echo "请安装 Java 8 或更高版本"
+        exit 1
     fi
-  else
-    JAVACMD="`which java`"
-  fi
 fi
 
-if [ ! -x "$JAVACMD" ] ; then
-  echo "Error: JAVA_HOME is not defined correctly." >&2
-  echo "  We cannot execute $JAVACMD" >&2
-  exit 1
-fi
-
-if [ -z "$JAVA_HOME" ] ; then
-  echo "Warning: JAVA_HOME environment variable is not set." >&2
-fi
-
-# For Cygwin, ensure paths are in UNIX format before anything is touched
-if $cygwin ; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME=`cygpath --unix "$M2_HOME"`
-  [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] &&
-    CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
-fi
-
-# For Mingw, ensure paths are in UNIX format before anything is touched
-if $mingw ; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME="`(cd "$M2_HOME"; pwd)`"
-  [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
-fi
-
-if [ -z "$M2_HOME" ] ; then
-  ## resolve links - $0 may be a link to maven's home
-  PRG="$0"
-
-  # need this for relative symlinks
-  while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
-    if expr "$link" : '/.*' > /dev/null; then
-      PRG="$link"
-    else
-      PRG="`dirname "$PRG"`/$link"
-    fi
-  done
-
-  saveddir=`pwd`
-
-  M2_HOME=`dirname "$PRG"`/..
-
-  # make it fully qualified
-  M2_HOME=`cd "$M2_HOME" && pwd`
-
-  cd "$saveddir"
-fi
-
-# For Cygwin, switch paths to Windows format before running java
-if $cygwin; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME=`cygpath --path --windows "$M2_HOME"`
-  [ -n "$JAVA_HOME" ] &&
-    JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
-  [ -n "$CLASSPATH" ] &&
-    CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-fi
-
-# Provide a "standardized" way to retrieve the CLI args that will
-# work with both Windows and non-Windows executions.
-MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
-export MAVEN_CMD_LINE_ARGS
-
-WRAPPER_JAR="$M2_HOME/.mvn/wrapper/maven-wrapper.jar"
-if [ -e "$WRAPPER_JAR" ]; then
-  if $cygwin ; then
-    WRAPPER_JAR=`cygpath --path --windows "$WRAPPER_JAR"`
-  fi
-  CLASSPATH=$WRAPPER_JAR
-  exec "$JAVACMD" $MAVEN_OPTS -classpath "$CLASSPATH" -Dmaven.multiModuleProjectDirectory="$M2_HOME" org.apache.maven.wrapper.MavenWrapperMain "$@"
-else
-  echo "Maven wrapper jar not found. Trying to use system mvn..."
-  if command -v mvn >/dev/null 2>&1; then
+# 检查系统是否有 mvn
+if command -v mvn >/dev/null 2>&1; then
+    echo "使用系统 Maven: $(mvn -v | head -n 1)"
+    echo ""
     exec mvn "$@"
-  else
-    echo "Error: Neither Maven wrapper nor system mvn found."
-    echo "Please install Maven or download maven-wrapper.jar"
-    exit 1
-  fi
 fi
+
+# 如果都没有，提供备选方案
+echo ""
+echo "✗ 未找到 Maven Wrapper JAR 文件，系统也未安装 Maven"
+echo ""
+echo "=============================================="
+echo "  备选方案（推荐）：使用纯 Shell 脚本"
+echo "=============================================="
+echo ""
+echo "方式 1: 构建项目（下载依赖+编译）"
+echo "  ./build.sh"
+echo ""
+echo "方式 2: 启动服务（构建成功后）"
+echo "  ./start.sh"
+echo ""
+echo "方式 3: 验证接口（服务启动后）"
+echo "  ./verify.sh"
+echo ""
+echo "如需使用 Maven，请安装 Maven 后重试，或下载:"
+echo "  https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.6/maven-wrapper-0.5.6.jar"
+echo "  保存到: .mvn/wrapper/maven-wrapper.jar"
+echo ""
+
+exit 1
