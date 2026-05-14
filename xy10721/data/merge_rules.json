@@ -1,0 +1,32 @@
+[
+  {
+    "id": "rule_001",
+    "fingerprint_id": "fp_001",
+    "name": "支付超时合并规则",
+    "time_window_minutes": 10,
+    "max_affected_users": 20,
+    "auto_merge": true,
+    "created_at": "2024-01-15T14:00:00",
+    "status": "active"
+  },
+  {
+    "id": "rule_002",
+    "fingerprint_id": "fp_002",
+    "name": "登录失败合并规则",
+    "time_window_minutes": 15,
+    "max_affected_users": 10,
+    "auto_merge": true,
+    "created_at": "2024-01-15T15:00:00",
+    "status": "active"
+  },
+  {
+    "id": "rule_003",
+    "fingerprint_id": "fp_003",
+    "name": "数据库超时合并规则",
+    "time_window_minutes": 5,
+    "max_affected_users": 30,
+    "auto_merge": false,
+    "created_at": "2024-01-15T16:00:00",
+    "status": "requires_attention"
+  }
+]

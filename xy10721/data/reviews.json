@@ -1,0 +1,13 @@
+[
+  {
+    "id": "review_001",
+    "alert_id": "alert_001",
+    "fingerprint_id": "fp_001",
+    "handler": "客服主管-陈经理",
+    "reason": "静默窗口超时，支付系统第三方接口波动",
+    "action_taken": "已通知支付团队排查，建议增加重试机制",
+    "resolution": "问题已定位，第三方接口恢复正常",
+    "reviewed_at": "2024-01-16T11:00:00",
+    "follow_up_required": true
+  }
+]

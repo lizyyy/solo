@@ -1,0 +1,26 @@
+[
+  {
+    "id": "fp_001",
+    "name": "支付超时错误",
+    "pattern": "Payment timeout after 30s",
+    "module": "支付模块",
+    "created_at": "2024-01-15T10:00:00",
+    "owner": "张工"
+  },
+  {
+    "id": "fp_002",
+    "name": "用户登录失败",
+    "pattern": "Login failed: invalid credentials",
+    "module": "用户模块",
+    "created_at": "2024-01-15T11:00:00",
+    "owner": "李工"
+  },
+  {
+    "id": "fp_003",
+    "name": "数据库连接超时",
+    "pattern": "DB connection timeout",
+    "module": "数据库",
+    "created_at": "2024-01-15T12:00:00",
+    "owner": "王工"
+  }
+]
