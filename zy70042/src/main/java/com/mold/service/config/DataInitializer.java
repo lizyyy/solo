@@ -2,8 +2,10 @@ package com.mold.service.config;
 
 import com.mold.service.domain.entity.Mold;
 import com.mold.service.domain.entity.ProductionSchedule;
+import com.mold.service.domain.entity.StrokeRecord;
 import com.mold.service.domain.repository.MoldRepository;
 import com.mold.service.domain.repository.ProductionScheduleRepository;
+import com.mold.service.domain.repository.StrokeRecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -18,6 +20,7 @@ public class DataInitializer implements CommandLineRunner {
     
     private final MoldRepository moldRepository;
     private final ProductionScheduleRepository scheduleRepository;
+    private final StrokeRecordRepository strokeRecordRepository;
     
     @Override
     public void run(String... args) {
@@ -32,6 +35,12 @@ public class DataInitializer implements CommandLineRunner {
         Mold mold3 = createMold("MOLD-003", "门板模具-C", 60000L, 54000L, 58000L, "LINE-01", "PROD-C003", Mold.MoldStatus.WARNING);
         Mold mold4 = createMold("MOLD-004", "保险杠模具-D", 50000L, 45000L, 52000L, "LINE-03", "PROD-D004", Mold.MoldStatus.EXPIRED);
         Mold mold5 = createMold("MOLD-005", "仪表板模具-E", 120000L, 108000L, 20000L, "LINE-02", "PROD-E005", Mold.MoldStatus.IN_USE);
+        
+        createInitialStrokeRecord(mold1, "INIT-001", 85000L);
+        createInitialStrokeRecord(mold2, "INIT-002", 45000L);
+        createInitialStrokeRecord(mold3, "INIT-003", 58000L);
+        createInitialStrokeRecord(mold4, "INIT-004", 52000L);
+        createInitialStrokeRecord(mold5, "INIT-005", 20000L);
         
         createSchedule("SCH-001", "LINE-01", "PROD-A001", mold1, 1000L, 
                 LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(6),
@@ -49,7 +58,7 @@ public class DataInitializer implements CommandLineRunner {
                 LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(3),
                 ProductionSchedule.ScheduleStatus.IN_PROGRESS);
         
-        log.info("演示数据初始化完成: 5个模具, 4个排程");
+        log.info("演示数据初始化完成: 5个模具, 5条初始冲压记录, 4个排程");
     }
     
     private Mold createMold(String code, String name, Long lifeThreshold, Long warningThreshold, 
@@ -66,6 +75,29 @@ public class DataInitializer implements CommandLineRunner {
         mold.setCreatedBy("SYSTEM");
         mold.setUpdatedBy("SYSTEM");
         return moldRepository.save(mold);
+    }
+    
+    private void createInitialStrokeRecord(Mold mold, String batchId, Long totalStrokes) {
+        StrokeRecord record = new StrokeRecord();
+        record.setBatchId(batchId);
+        record.setMoldId(mold.getId());
+        record.setMoldCode(mold.getMoldCode());
+        record.setStrokeCount(totalStrokes);
+        record.setAccumulatedStrokes(totalStrokes);
+        record.setRecordTime(LocalDateTime.now().minusDays(7));
+        record.setProductionLine(mold.getProductionLine());
+        record.setProductCode(mold.getCurrentProduct());
+        record.setOperator("SYSTEM");
+        record.setRemark("系统初始化 - 历史累计数据");
+        record.setStatus(StrokeRecord.RecordStatus.ACTIVE);
+        record.setSource(StrokeRecord.RecordSource.MANUAL);
+        record.setIsCompensated(false);
+        record.setCreatedBy("SYSTEM");
+        record.setUpdatedBy("SYSTEM");
+        strokeRecordRepository.save(record);
+        
+        log.debug("创建初始冲压记录: 模具={}, 批次={}, 累计次数={}", 
+                mold.getMoldCode(), batchId, totalStrokes);
     }
     
     private ProductionSchedule createSchedule(String no, String line, String product, Mold mold,

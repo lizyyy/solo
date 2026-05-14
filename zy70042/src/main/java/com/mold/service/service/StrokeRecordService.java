@@ -37,7 +37,7 @@ public class StrokeRecordService {
             throw new BusinessException("模具已归档，无法记录冲压");
         }
         
-        Long currentAccumulated = getCurrentAccumulatedStrokes(mold.getId());
+        Long currentAccumulated = getCurrentAccumulatedStrokes(mold);
         Long newAccumulated = currentAccumulated + request.getStrokeCount();
         
         StrokeRecord record = new StrokeRecord();
@@ -184,9 +184,13 @@ public class StrokeRecordService {
                 batchId, record.getStrokeCount(), newAccumulated);
     }
     
-    private Long getCurrentAccumulatedStrokes(Long moldId) {
-        return strokeRecordRepository.findMaxAccumulatedStrokesByMoldId(moldId)
+    private Long getCurrentAccumulatedStrokes(Mold mold) {
+        Long maxFromRecords = strokeRecordRepository.findMaxAccumulatedStrokesByMoldId(mold.getId())
                 .orElse(0L);
+        
+        Long maxFromMold = mold.getTotalStrokes() != null ? mold.getTotalStrokes() : 0L;
+        
+        return Math.max(maxFromRecords, maxFromMold);
     }
     
     public StrokeRecord getByBatchId(String batchId) {
