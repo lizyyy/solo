@@ -14,60 +14,35 @@
 - **幂等性处理**：防止重复提交
 - **失败定位**：精确记录失败位置和原因
 
-## 已修复问题
+## ✅ 已修复问题
 
-### 1. 脏数据校验修复 (TransactionTemplateService.java:23-45)
-- ✅ 创建时校验步骤不能为空
-- ✅ 校验每个步骤的必填字段（stepOrder, stepName, httpMethod, url）
-- ✅ 提前拦截无效数据，不保存到数据库
+1. **mvnw 的 JAVA_HOME 检测问题** - 修复了 MacOS 上 `/usr/libexec/java_home` 命令执行问题
+2. **maven-wrapper.jar 自动下载** - 提供 `setup.sh` 自动下载所需的 jar 包
+3. **脏数据校验** - 创建模板时校验空步骤和必填字段
+4. **自检优化** - 非 Web 方式运行，不启动 Tomcat，自动退出
 
-### 2. Maven Wrapper 支持
-- ✅ 添加 `mvnw` 脚本
-- ✅ 创建 `.mvn/wrapper/maven-wrapper.properties` 配置
-- ✅ 无需系统安装Maven即可运行
+## 🚀 快速开始
 
-### 3. 独立自检入口
-- ✅ 创建 `SelfCheckMain.java` 主类
-- ✅ 8个核心自检场景，直接运行即可验证
-- ✅ 友好的输出格式
-
-## 项目结构
-
-```
-src/
-├── main/java/com/api/inspection/
-│   ├── ApiInspectionApplication.java    # 主应用入口
-│   ├── SelfCheckMain.java               # 自检入口
-│   ├── annotation/Idempotent.java       # 幂等注解
-│   ├── aspect/IdempotentAspect.java     # 幂等切面
-│   ├── config/WebConfig.java            # Web配置
-│   ├── controller/                      # REST API控制器
-│   ├── dto/                             # 数据传输对象
-│   ├── entity/                          # 数据实体
-│   ├── enums/                           # 枚举类型
-│   ├── exception/                       # 异常处理
-│   ├── repository/                      # 数据访问层
-│   └── service/                         # 业务逻辑层
-└── test/java/com/api/inspection/
-    └── SelfCheckTest.java               # JUnit测试
-```
-
-## 快速开始
-
-### 方式一：运行自检（推荐）
+### 方式一：一键运行自检测试（推荐）
 
 ```bash
-chmod +x self-check.sh
+# 1. 设置脚本执行权限
+chmod +x setup.sh self-check.sh mvnw
+
+# 2. 配置环境（自动下载 maven-wrapper.jar）
+./setup.sh
+
+# 3. 运行自检测试
 ./self-check.sh
 ```
 
-自检将自动运行以下8个测试：
+自检将运行以下 8 个测试场景：
 1. 创建事务模板 - 验证正常创建流程
 2. 重复提交拦截 - 验证相同模板编码被拦截
 3. 空步骤拦截 - 验证无步骤时被拦截
-4. 模板校验功能 - 验证草稿->已校验的状态流转
-5. 非法状态跳转拦截 - 验证VALIDATED不能直接跳转到RUNNING
-6. 合法状态流转 - 验证VALIDATED->PENDING的正常流转
+4. 模板校验功能 - 验证草稿→已校验的状态流转
+5. 非法状态跳转拦截 - 验证 VALIDATED 不能直接跳转到 RUNNING
+6. 合法状态流转 - 验证 VALIDATED→PENDING 的正常流转
 7. 创建执行批次 - 验证批次创建功能
 8. 撤销模板功能 - 验证撤销功能
 
@@ -91,7 +66,7 @@ chmod +x self-check.sh
 java -jar target/api-transaction-inspection-1.0.0.jar
 ```
 
-## API 接口
+## 📡 API 接口
 
 ### 模板管理
 
@@ -123,7 +98,7 @@ java -jar target/api-transaction-inspection-1.0.0.jar
 | GET | `/api/export/template/{id}` | 导出模板JSON |
 | GET | `/api/export/batch/{id}` | 导出批次报告 |
 
-## 状态机定义
+## 🔄 状态机定义
 
 ```
 DRAFT(草稿)
@@ -139,7 +114,7 @@ SUCCESS(成功) / FAILED(失败)
 CANCELLED(已撤销) - 最终状态
 ```
 
-## 技术栈
+## 🛠 技术栈
 
 - Java 11
 - Spring Boot 2.7.18
@@ -148,7 +123,7 @@ CANCELLED(已撤销) - 最终状态
 - Lombok
 - FastJSON
 
-## 使用示例
+## 📝 使用示例
 
 ### 创建模板
 
@@ -179,6 +154,40 @@ curl -X POST http://localhost:8080/api/templates \
   }'
 ```
 
-## 许可证
+## 📁 项目文件说明
+
+```
+├── mvnw                    # Maven Wrapper 执行脚本
+├── setup.sh                # 环境配置脚本（下载wrapper jar）
+├── self-check.sh           # 自检测试入口脚本
+├── pom.xml                 # Maven 配置
+├── README.md               # 本文档
+├── .mvn/wrapper/
+│   ├── maven-wrapper.properties
+│   └── maven-wrapper.jar   # (setup.sh 自动下载)
+└── src/main/
+    ├── java/com/api/inspection/
+    │   ├── ApiInspectionApplication.java  # 主应用入口
+    │   └── SelfCheckMain.java             # 自检测试入口
+    └── resources/
+        ├── application.yml    # 应用配置
+        └── banner.txt         # 启动 banner
+```
+
+## 🔧 常见问题
+
+### Q: 提示 "Maven Wrapper 不完整" 怎么办？
+
+A: 运行 `./setup.sh` 即可自动下载所需的 `maven-wrapper.jar` 文件。
+
+### Q: 提示 "JAVA_HOME is not defined correctly" 怎么办？
+
+A: 已在 mvnw 和 self-check.sh 中修复，使用最新代码即可。
+
+### Q: 依赖下载很慢怎么办？
+
+A: 可以配置 Maven 镜像源，在 `~/.m2/settings.xml` 中添加阿里云镜像。
+
+## 📄 许可证
 
 MIT License

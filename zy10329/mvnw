@@ -60,7 +60,7 @@ case "`uname`" in
            #
            if [ -z "$JAVA_HOME" ] ; then
              if [ -x /usr/libexec/java_home ] ; then
-                JAVA_HOME=/usr/libexec/java_home
+                JAVA_HOME=`/usr/libexec/java_home`
              else
                for jdkdir in /Library/Java/JavaVirtualMachines/*/Contents/Home ; do
                  if [ -x "$jdkdir/bin/java" ] ; then
