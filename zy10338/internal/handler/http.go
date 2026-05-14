@@ -9,6 +9,7 @@ import (
 	"client-capability-negotiation/internal/model"
 	"client-capability-negotiation/internal/service"
 	"client-capability-negotiation/internal/storage"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,11 +44,11 @@ func (h *Handler) RegisterRoutes(r *gin.Engine) {
 		negotiations := api.Group("/negotiations")
 		{
 			negotiations.GET("", h.ListNegotiations)
+			negotiations.GET("/verify/:clientID/:declarationID", h.VerifyNegotiation)
 			negotiations.GET("/:id", h.GetNegotiation)
 			negotiations.POST("/:id/status", h.UpdateStatus)
 			negotiations.GET("/:id/transitions", h.GetStatusTransitions)
 			negotiations.GET("/:id/hitlogs", h.GetHitLogs)
-			negotiations.GET("/verify/:clientID/:declarationID", h.VerifyNegotiation)
 		}
 	}
 
