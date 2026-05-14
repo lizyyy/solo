@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息队列积压诊断系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .permission-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+        
+        .search-box { background: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .search-box input { width: 100%; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+        .search-box input:focus { outline: none; border-color: #667eea; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; background: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .tab.active { background: #667eea; color: white; }
+        
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { font-size: 16px; margin-bottom: 16px; color: #333; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-size: 14px; color: #555; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-success { background: #c6f6d5; color: #22543d; }
+        .status-pending { background: #feebc8; color: #744210; }
+        .status-blocked { background: #fed7d7; color: #742a2a; }
+        .status-retryable { background: #bee3f8; color: #2a4365; }
+        
+        .result-box { padding: 16px; border-radius: 8px; margin-top: 16px; }
+        .result-box.success { background: #f0fff4; border: 1px solid #c6f6d5; }
+        .result-box.pending { background: #fffaf0; border: 1px solid #feebc8; }
+        .result-box.blocked { background: #fff5f5; border: 1px solid #fed7d7; }
+        .result-box.retryable { background: #ebf8ff; border: 1px solid #bee3f8; }
+        
+        .sample-list { display: grid; gap: 12px; }
+        .sample-item { padding: 12px; background: #f7fafc; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .sample-item:hover { background: #edf2f7; }
+        .sample-item .name { font-weight: 500; margin-bottom: 4px; }
+        .sample-item .desc { font-size: 12px; color: #718096; }
+        
+        .strategy-list, .suggestion-list { display: grid; gap: 12px; }
+        .strategy-item, .suggestion-item { padding: 14px; background: #f7fafc; border-radius: 6px; }
+        
+        .export-buttons { display: flex; gap: 10px; }
+        
+        pre { background: #1a202c; color: #e2e8f0; padding: 16px; border-radius: 6px; overflow-x: auto; font-size: 12px; margin-top: 12px; }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 消息队列积压诊断系统</h1>
+            <span class="permission-badge">🔐 当前用户: 管理员 | 权限: 读写</span>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜索 Topic、消费组或负责人..." oninput="filterData()">
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('validate')">数据校验</button>
+            <button class="tab" onclick="showTab('strategies')">限速策略</button>
+            <button class="tab" onclick="showTab('suggestions')">诊断建议</button>
+            <button class="tab" onclick="showTab('export')">数据导出</button>
+        </div>
+        
+        <div id="validateTab" class="tab-content">
+            <div class="card">
+                <h3>📋 样例数据（点击加载）</h3>
+                <div class="sample-list" id="sampleList"></div>
+            </div>
+            
+            <div class="card">
+                <h3>📝 输入数据</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Topic</label>
+                        <input type="text" id="topic" value="order-events">
+                    </div>
+                    <div class="form-group">
+                        <label>分区</label>
+                        <input type="number" id="partition" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>消费组</label>
+                        <input type="text" id="consumerGroup" value="order-processor">
+                    </div>
+                    <div class="form-group">
+                        <label>积压量</label>
+                        <input type="number" id="lag" value="1500" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>负责人</label>
+                    <input type="text" id="owner" value="张三">
+                </div>
+                <div class="form-group">
+                    <label>重平衡事件数</label>
+                    <input type="number" id="rebalanceCount" value="0" min="0">
+                </div>
+                <button class="btn btn-primary" onclick="validateData()">开始校验</button>
+                
+                <div id="validationResult" class="hidden"></div>
+            </div>
+        </div>
+        
+        <div id="strategiesTab" class="tab-content hidden">
+            <div class="card">
+                <h3>⚡ 新增限速策略</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>策略名称</label>
+                        <input type="text" id="strategyName" placeholder="例如：支付服务限流">
+                    </div>
+                    <div class="form-group">
+                        <label>消费组</label>
+                        <input type="text" id="strategyConsumerGroup" placeholder="例如：payment-processor">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>每秒最大消息数</label>
+                        <input type="number" id="maxMessagesPerSecond" value="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>积压量阈值</label>
+                        <input type="number" id="maxLagThreshold" value="50000">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>创建人</label>
+                    <input type="text" id="createdBy" value="管理员">
+                </div>
+                <button class="btn btn-primary" onclick="saveStrategy()">保存策略</button>
+            </div>
+            
+            <div class="card">
+                <h3>📋 已保存策略</h3>
+                <div class="strategy-list" id="strategyList">
+                    <div style="color: #718096; text-align: center; padding: 20px;">暂无策略</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="suggestionsTab" class="tab-content hidden">
+            <div class="card">
+                <h3>💡 新增诊断建议</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Topic</label>
+                        <input type="text" id="suggestionTopic">
+                    </div>
+                    <div class="form-group">
+                        <label>消费组</label>
+                        <input type="text" id="suggestionConsumerGroup">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>优先级</label>
+                        <select id="suggestionPriority">
+                            <option value="high">高</option>
+                            <option value="medium">中</option>
+                            <option value="low">低</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="suggestionStatus">
+                            <option value="open">待处理</option>
+                            <option value="in_progress">处理中</option>
+                            <option value="resolved">已解决</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>建议内容</label>
+                    <textarea id="suggestionContent" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="saveSuggestion()">保存建议</button>
+            </div>
+            
+            <div class="card">
+                <h3>📋 诊断建议列表</h3>
+                <div class="suggestion-list" id="suggestionList">
+                    <div style="color: #718096; text-align: center; padding: 20px;">暂无建议</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="exportTab" class="tab-content hidden">
+            <div class="card">
+                <h3>📥 导出数据</h3>
+                <p style="margin-bottom: 16px; color: #718096;">选择分组方式导出Excel报表，包含分组统计和原始数据两个Sheet。</p>
+                <div class="form-group">
+                    <label>分组方式</label>
+                    <select id="groupBy">
+                        <option value="owner">按负责人分组</option>
+                        <option value="time">按时间分组</option>
+                        <option value="lag">按积压量分组</option>
+                    </select>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-success" onclick="exportData()">导出 Excel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        
+        async function loadSamples() {
+            const res = await fetch(`${API_BASE}/sample-data`);
+            const data = await res.json();
+            const list = document.getElementById('sampleList');
+            list.innerHTML = data.samples.map(s => `
+                <div class="sample-item" onclick='loadSample(${JSON.stringify(s.data)})'>
+                    <div class="name">${s.name}</div>
+                    <div class="desc">预期结果: <span class="status-badge status-${s.expected}">${s.expected}</span></div>
+                </div>
+            `).join('');
+        }
+        
+        function loadSample(data) {
+            document.getElementById('topic').value = data.topic;
+            document.getElementById('partition').value = data.partition;
+            document.getElementById('consumerGroup').value = data.consumer_group;
+            document.getElementById('lag').value = data.lag;
+            document.getElementById('owner').value = data.owner;
+            document.getElementById('rebalanceCount').value = data.rebalance_events.length;
+        }
+        
+        async function validateData() {
+            const rebalanceCount = parseInt(document.getElementById('rebalanceCount').value);
+            const rebalanceEvents = [];
+            for (let i = 0; i < rebalanceCount; i++) {
+                rebalanceEvents.push({
+                    event_id: `r${i}`,
+                    timestamp: new Date().toISOString(),
+                    consumer_group: document.getElementById('consumerGroup').value,
+                    partitions: [parseInt(document.getElementById('partition').value)],
+                    reason: "消费者心跳超时"
+                });
+            }
+            
+            const payload = {
+                topic: document.getElementById('topic').value,
+                partition: parseInt(document.getElementById('partition').value),
+                consumer_group: document.getElementById('consumerGroup').value,
+                lag: parseInt(document.getElementById('lag').value),
+                owner: document.getElementById('owner').value,
+                last_updated: new Date().toISOString(),
+                rebalance_events: rebalanceEvents
+            };
+            
+            try {
+                const res = await fetch(`${API_BASE}/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                showValidationResult(result);
+            } catch (e) {
+                alert('请求失败，请确保后端服务已启动');
+            }
+        }
+        
+        function showValidationResult(result) {
+            const box = document.getElementById('validationResult');
+            box.classList.remove('hidden');
+            
+            const statusClass = {
+                'success': 'success',
+                'pending_review': 'pending',
+                'blocked': 'blocked',
+                'retryable': 'retryable'
+            }[result.status];
+            
+            const statusText = {
+                'success': '✅ 校验通过',
+                'pending_review': '⚠️ 待复核',
+                'blocked': '❌ 已拦截',
+                'retryable': '🔄 可重试'
+            }[result.status];
+            
+            box.innerHTML = `
+                <div class="result-box ${statusClass}">
+                    <h4 style="margin-bottom: 12px;">${statusText}</h4>
+                    <p style="margin-bottom: 12px;">${result.message}</p>
+                    ${result.recommendations.length ? `
+                        <div style="margin-bottom: 12px;">
+                            <strong>建议:</strong>
+                            <ul style="margin-left: 20px; margin-top: 8px;">
+                                ${result.recommendations.map(r => `<li>${r}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    <details>
+                        <summary style="cursor: pointer; color: #667eea;">查看详细数据</summary>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </details>
+                </div>
+            `;
+        }
+        
+        async function loadStrategies() {
+            const res = await fetch(`${API_BASE}/rate-limit-strategies`);
+            const data = await res.json();
+            const list = document.getElementById('strategyList');
+            if (data.strategies.length === 0) {
+                list.innerHTML = '<div style="color: #718096; text-align: center; padding: 20px;">暂无策略</div>';
+            } else {
+                list.innerHTML = data.strategies.map(s => `
+                    <div class="strategy-item">
+                        <div style="font-weight: 500; margin-bottom: 8px;">${s.name}</div>
+                        <div style="font-size: 13px; color: #718096;">
+                            消费组: ${s.consumer_group} | 限速: ${s.max_messages_per_second} msg/s | 阈值: ${s.max_lag_threshold}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        async function saveStrategy() {
+            const payload = {
+                strategy_id: 's' + Date.now(),
+                name: document.getElementById('strategyName').value,
+                consumer_group: document.getElementById('strategyConsumerGroup').value,
+                max_messages_per_second: parseInt(document.getElementById('maxMessagesPerSecond').value),
+                max_lag_threshold: parseInt(document.getElementById('maxLagThreshold').value),
+                enabled: true,
+                created_at: new Date().toISOString(),
+                created_by: document.getElementById('createdBy').value
+            };
+            
+            await fetch(`${API_BASE}/rate-limit-strategies`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            loadStrategies();
+            alert('策略保存成功');
+        }
+        
+        async function loadSuggestions() {
+            const res = await fetch(`${API_BASE}/diagnosis-suggestions`);
+            const data = await res.json();
+            const list = document.getElementById('suggestionList');
+            if (data.suggestions.length === 0) {
+                list.innerHTML = '<div style="color: #718096; text-align: center; padding: 20px;">暂无建议</div>';
+            } else {
+                list.innerHTML = data.suggestions.map(s => `
+                    <div class="suggestion-item">
+                        <div style="font-weight: 500; margin-bottom: 8px;">
+                            <span class="status-badge" style="background: #e2e8f0; color: #2d3748;">${s.priority}</span>
+                            ${s.topic} / ${s.consumer_group}
+                        </div>
+                        <div style="font-size: 14px; margin-bottom: 8px;">${s.suggestion}</div>
+                        <div style="font-size: 12px; color: #718096;">状态: ${s.status}</div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        async function saveSuggestion() {
+            const payload = {
+                suggestion_id: 'g' + Date.now(),
+                topic: document.getElementById('suggestionTopic').value,
+                consumer_group: document.getElementById('suggestionConsumerGroup').value,
+                suggestion: document.getElementById('suggestionContent').value,
+                priority: document.getElementById('suggestionPriority').value,
+                status: document.getElementById('suggestionStatus').value,
+                created_at: new Date().toISOString()
+            };
+            
+            await fetch(`${API_BASE}/diagnosis-suggestions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            loadSuggestions();
+            alert('诊断建议保存成功');
+        }
+        
+        async function exportData() {
+            const groupBy = document.getElementById('groupBy').value;
+            window.open(`${API_BASE}/export?group_by=${groupBy}`, '_blank');
+        }
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (tab === 'strategies') loadStrategies();
+            if (tab === 'suggestions') loadSuggestions();
+        }
+        
+        function filterData() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+        }
+        
+        loadSamples();
+    </script>
+</body>
+</html>

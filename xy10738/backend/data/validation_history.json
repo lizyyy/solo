@@ -1,0 +1,257 @@
+[
+  {
+    "timestamp": "2026-05-14T14:08:36.341390",
+    "input": {
+      "topic": "order-events",
+      "partition": 0,
+      "consumer_group": "order-processor",
+      "lag": 1500,
+      "owner": "\u5f20\u4e09",
+      "last_updated": "2026-05-14 00:00:00+00:00",
+      "rebalance_events": []
+    },
+    "result": {
+      "status": "success",
+      "message": "\u6570\u636e\u6821\u9a8c\u901a\u8fc7",
+      "data": {
+        "topic": "order-events",
+        "partition": 0,
+        "consumer_group": "order-processor",
+        "lag": 1500,
+        "owner": "\u5f20\u4e09",
+        "last_updated": "2026-05-14 00:00:00+00:00",
+        "rebalance_events": []
+      },
+      "recommendations": [
+        "\u76d1\u63a7\u89c2\u5bdf"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-14T14:09:05.654673",
+    "input": {
+      "topic": "payment-events",
+      "partition": 1,
+      "consumer_group": "payment-processor",
+      "lag": 75000,
+      "owner": "\u674e\u56db",
+      "last_updated": "2026-05-14 00:00:00+00:00",
+      "rebalance_events": []
+    },
+    "result": {
+      "status": "retryable",
+      "message": "\u79ef\u538b\u91cf\u8f83\u9ad8\uff0c\u5efa\u8bae\u5e94\u7528\u9650\u901f\u7b56\u7565\u540e\u91cd\u8bd5",
+      "data": {
+        "topic": "payment-events",
+        "partition": 1,
+        "consumer_group": "payment-processor",
+        "lag": 75000,
+        "owner": "\u674e\u56db",
+        "last_updated": "2026-05-14 00:00:00+00:00",
+        "rebalance_events": []
+      },
+      "recommendations": [
+        "\u5e94\u7528\u9650\u901f\u7b56\u7565\u540e\u518d\u6b21\u63d0\u4ea4"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-14T14:10:15.730757",
+    "input": {
+      "topic": "order-events",
+      "partition": 0,
+      "consumer_group": "order-processor",
+      "lag": 1500,
+      "owner": "\u5f20\u4e09",
+      "last_updated": "2026-05-14 00:00:00+00:00",
+      "rebalance_events": []
+    },
+    "result": {
+      "status": "success",
+      "message": "\u6570\u636e\u6821\u9a8c\u901a\u8fc7",
+      "data": {
+        "topic": "order-events",
+        "partition": 0,
+        "consumer_group": "order-processor",
+        "lag": 1500,
+        "owner": "\u5f20\u4e09",
+        "last_updated": "2026-05-14 00:00:00+00:00",
+        "rebalance_events": []
+      },
+      "recommendations": [
+        "\u76d1\u63a7\u89c2\u5bdf"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-14T14:10:15.734839",
+    "input": {
+      "topic": "payment-events",
+      "partition": 1,
+      "consumer_group": "payment-processor",
+      "lag": 75000,
+      "owner": "\u674e\u56db",
+      "last_updated": "2026-05-14 00:00:00+00:00",
+      "rebalance_events": []
+    },
+    "result": {
+      "status": "retryable",
+      "message": "\u79ef\u538b\u91cf\u8f83\u9ad8\uff0c\u5efa\u8bae\u5e94\u7528\u9650\u901f\u7b56\u7565\u540e\u91cd\u8bd5",
+      "data": {
+        "topic": "payment-events",
+        "partition": 1,
+        "consumer_group": "payment-processor",
+        "lag": 75000,
+        "owner": "\u674e\u56db",
+        "last_updated": "2026-05-14 00:00:00+00:00",
+        "rebalance_events": []
+      },
+      "recommendations": [
+        "\u5e94\u7528\u9650\u901f\u7b56\u7565\u540e\u518d\u6b21\u63d0\u4ea4"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-14T14:10:15.739819",
+    "input": {
+      "topic": "user-events",
+      "partition": 2,
+      "consumer_group": "user-processor",
+      "lag": 8000,
+      "owner": "\u738b\u4e94",
+      "last_updated": "2026-05-14 00:00:00+00:00",
+      "rebalance_events": [
+        {
+          "event_id": "r0",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        },
+        {
+          "event_id": "r1",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        },
+        {
+          "event_id": "r2",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        },
+        {
+          "event_id": "r3",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        },
+        {
+          "event_id": "r4",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        },
+        {
+          "event_id": "r5",
+          "timestamp": "2026-05-14 00:00:00+00:00",
+          "consumer_group": "user-processor",
+          "partitions": [
+            2
+          ],
+          "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+        }
+      ]
+    },
+    "result": {
+      "status": "pending_review",
+      "message": "\u6570\u636e\u5b58\u5728\u98ce\u9669\uff0c\u5f85\u4eba\u5de5\u590d\u6838",
+      "data": {
+        "warnings": [
+          "\u68c0\u6d4b\u5230 6 \u6b21\u91cd\u5e73\u8861\u4e8b\u4ef6\uff0c\u6d88\u8d39\u8005\u53ef\u80fd\u4e0d\u7a33\u5b9a"
+        ],
+        "input_data": {
+          "topic": "user-events",
+          "partition": 2,
+          "consumer_group": "user-processor",
+          "lag": 8000,
+          "owner": "\u738b\u4e94",
+          "last_updated": "2026-05-14 00:00:00+00:00",
+          "rebalance_events": [
+            {
+              "event_id": "r0",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            },
+            {
+              "event_id": "r1",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            },
+            {
+              "event_id": "r2",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            },
+            {
+              "event_id": "r3",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            },
+            {
+              "event_id": "r4",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            },
+            {
+              "event_id": "r5",
+              "timestamp": "2026-05-14 00:00:00+00:00",
+              "consumer_group": "user-processor",
+              "partitions": [
+                2
+              ],
+              "reason": "\u6d88\u8d39\u8005\u5fc3\u8df3\u8d85\u65f6"
+            }
+          ]
+        }
+      },
+      "recommendations": [
+        "\u5efa\u8bae\u68c0\u67e5\u6d88\u8d39\u8005\u751f\u547d\u5468\u671f\u7ba1\u7406\uff0c\u907f\u514d\u9891\u7e41\u4e0a\u4e0b\u7ebf"
+      ]
+    }
+  }
+]
