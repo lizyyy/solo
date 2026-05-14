@@ -173,7 +173,7 @@ def assess_risk(service: DownstreamService) -> Dict[str, Any]:
     return {"risk_level": risk_level, "description": description}
 
 
-def aggregate_overall_risk(services: List[DownstreamService], method: str = None, path: str = None) -> Dict[str, Any]:
+def aggregate_overall_risk(services: List[DownstreamService], method: str = None, path: str = None, api_failure_rate: float = 0) -> Dict[str, Any]:
     if not services:
         return {"risk_level": RiskLevelEnum.UNKNOWN, "description": "无下游服务"}
     
@@ -195,19 +195,30 @@ def aggregate_overall_risk(services: List[DownstreamService], method: str = None
         overall_level = RiskLevelEnum.CRITICAL
         description_parts.append("敏感操作路径: 数据删除/批量操作等高风险行为")
     
-    # 多个高风险服务叠加升级
-    total_sample_count = sum(s.call_count for s in services)
-    total_failure_rate = sum(s.failure_count for s in services) / total_sample_count if total_sample_count > 0 else 0
+    # 多个高风险服务叠加升级 - 注意不要覆盖敏感路径的 CRITICAL
+    # 使用入口 API 失败率而不是下游服务失败率
+    total_failure_rate = api_failure_rate
     
+    # 计算应该升级到的风险等级（不覆盖敏感路径已设置的 CRITICAL）
+    # 使用 risk_order 索引来比较优先级
+    risk_order = [RiskLevelEnum.UNKNOWN, RiskLevelEnum.LOW, RiskLevelEnum.MEDIUM, RiskLevelEnum.HIGH, RiskLevelEnum.CRITICAL]
+    
+    target_level = None
     if critical_count >= 1 or total_failure_rate >= 0.5 or (high_count >= 1 and medium_count >= 2):
-        overall_level = RiskLevelEnum.CRITICAL
+        target_level = RiskLevelEnum.CRITICAL
         description_parts.append(f"整体故障率高: {total_failure_rate:.1%}, 多个下游服务存在风险")
     elif high_count >= 1 or medium_count >= 3 or total_failure_rate >= 0.3:
-        overall_level = max(overall_level, RiskLevelEnum.HIGH)
+        target_level = RiskLevelEnum.HIGH
         description_parts.append(f"多服务风险叠加: {medium_count} 个中等风险服务, 整体故障率 {total_failure_rate:.1%}")
     elif medium_count >= 1:
-        overall_level = max(overall_level, RiskLevelEnum.MEDIUM)
+        target_level = RiskLevelEnum.MEDIUM
         description_parts.append(f"存在 {medium_count} 个中等风险服务")
+    
+    # 只有当不是敏感路径，或目标等级更高时才更新
+    if target_level:
+        if not is_sensitive or risk_order.index(target_level) > risk_order.index(overall_level):
+            if risk_order.index(target_level) > risk_order.index(overall_level):
+                overall_level = target_level
     
     if not is_sensitive and not description_parts:
         description_parts.append(f"最高风险等级: {overall_level.value}")
@@ -335,16 +346,21 @@ def process_samples(db: Session, entry_api_id: str) -> bool:
             sample.category = classify_sample(sample)
     
     service_latencies: Dict[str, List[float]] = {}
+    service_failures: Dict[str, int] = {}
     
     for sample in samples:
         if sample.downstream_calls:
             for call in sample.downstream_calls:
                 svc_name = call.get("service_name")
                 latency = call.get("latency", 0)
+                call_status = call.get("status", "SUCCESS")
                 if svc_name:
                     if svc_name not in service_latencies:
                         service_latencies[svc_name] = []
+                        service_failures[svc_name] = 0
                     service_latencies[svc_name].append(latency)
+                    if call_status != "SUCCESS":
+                        service_failures[svc_name] += 1
     
     services = db.query(DownstreamService).filter(DownstreamService.entry_api_id == entry_api_id).all()
     
@@ -358,9 +374,9 @@ def process_samples(db: Session, entry_api_id: str) -> bool:
             service.p99_latency = stats["p99"]
             service.call_count = len(latencies)
             
-            success_count = sum(1 for s in samples if s.status == "SUCCESS")
-            service.success_count = success_count
-            service.failure_count = len(samples) - success_count
+            # 计算该服务的失败次数
+            service.failure_count = service_failures.get(service.service_name, 0)
+            service.success_count = service.call_count - service.failure_count
             
             db.query(LatencyDistribution).filter(LatencyDistribution.service_id == service.id).delete()
             distributions = calculate_latency_distribution(latencies)
@@ -380,7 +396,12 @@ def process_samples(db: Session, entry_api_id: str) -> bool:
             service.risk_level = risk["risk_level"].value
             service.risk_description = risk["description"]
     
-    overall_risk = aggregate_overall_risk(services, entry_api.method, entry_api.path)
+    # 计算入口 API 调用的总体失败率
+    total_samples = len(samples)
+    api_failed_samples = sum(1 for s in samples if s.status == "FAILED")
+    api_failure_rate = api_failed_samples / total_samples if total_samples > 0 else 0
+    
+    overall_risk = aggregate_overall_risk(services, entry_api.method, entry_api.path, api_failure_rate)
     entry_api.risk_level = overall_risk["risk_level"].value
     entry_api.risk_description = overall_risk["description"]
     

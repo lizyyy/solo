@@ -151,12 +151,20 @@ class EntryAPIResponse(BaseModel):
 
 class ProfileSummary(BaseModel):
     entry_api_id: str
+    name: str
+    method: str
+    path: str
     total_samples: int
     success_samples: int
     failed_samples: int
+    failure_rate: float
     avg_total_latency: float
     downstream_count: int
     overall_risk_level: str
+    risk_description: Optional[str]
+    risk_breakdown: Dict[str, int]
+    is_sensitive_path: bool
+    requires_manual_review: bool
     status: str
 
 
