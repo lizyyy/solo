@@ -457,26 +457,12 @@ class BillService:
             operation_func(bill, failed_op.operation_data)
             failed_op.resolved = True
             failed_op.resolved_at = datetime.now()
-            bill.status = self._get_previous_status(bill, failed_op.operation_type)
             bill.updated_at = datetime.now()
         except Exception as e:
             failed_op.retry_count += 1
             failed_op.last_retry_at = datetime.now()
             failed_op.error_message = str(e)
             raise e
-    
-    def _get_previous_status(self, bill: Bill, operation_type: str) -> BillStatus:
-        status_map = {
-            "register": BillStatus.DRAFT,
-            "endorse": BillStatus.ENDORSED if bill.endorsements else BillStatus.REGISTERED,
-            "confirm_endorsement": BillStatus.ENDORSED,
-            "initiate_collection": BillStatus.ENDORSED if bill.endorsements else BillStatus.REGISTERED,
-            "submit_collection": BillStatus.COLLECTION_PENDING,
-            "confirm_collection": BillStatus.COLLECTION_SUBMITTED,
-            "pay_bill": BillStatus.COLLECTION_CONFIRMED,
-            "process_return": BillStatus.COLLECTION_PENDING
-        }
-        return status_map.get(operation_type, BillStatus.ERROR)
     
     def get_bill(self, bill_id: str) -> Bill:
         return self._get_bill(bill_id)

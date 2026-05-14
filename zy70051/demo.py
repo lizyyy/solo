@@ -283,6 +283,6 @@ if __name__ == "__main__":
 
 7. 单元测试验证:
    运行全部测试: python3 -m pytest test_bill_service.py -v
-   所有 25 个测试应全部通过
+   所有 27 个测试应全部通过
 """)
     print("=" * 60)

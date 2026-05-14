@@ -382,8 +382,149 @@ class TestRetryMechanism(unittest.TestCase):
                 initial_holder="Company A"
             )
     
-    def test_operation_can_be_retried_after_fix(self):
-        pass
+    def test_submit_collection_failure_then_retry_and_continue(self):
+        past_maturity = datetime.now() - timedelta(days=5)
+        bill = self.service.register_bill(
+            bill_no="RETRY-TEST-001",
+            drawer="Company A",
+            acceptor="Bank X",
+            amount=100000,
+            currency="CNY",
+            issue_date=datetime(2024, 1, 1),
+            maturity_date=past_maturity,
+            initial_holder="Company A"
+        )
+        
+        self.service.initiate_collection(
+            bill_id=bill.id,
+            holder_id="Company A",
+            collection_bank="Bank Y",
+            collection_account="ACC123"
+        )
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.COLLECTION_PENDING)
+        self.assertEqual(bill.collection_request.status, CollectionStatus.PENDING)
+        
+        original_do_submit = self.service._do_submit_collection
+        def broken_submit(bill_obj, data):
+            raise RuntimeError("Database connection failed")
+        self.service._do_submit_collection = broken_submit
+        
+        with self.assertRaises(RuntimeError):
+            self.service.submit_collection(bill.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.ERROR)
+        self.assertEqual(len(bill.failed_operations), 1)
+        self.assertFalse(bill.failed_operations[0].resolved)
+        
+        self.service._do_submit_collection = original_do_submit
+        failed_op = bill.failed_operations[0]
+        self.service.retry_failed_operation(bill.id, failed_op.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.COLLECTION_SUBMITTED)
+        self.assertEqual(bill.collection_request.status, CollectionStatus.SUBMITTED)
+        self.assertTrue(failed_op.resolved)
+        
+        self.service.confirm_collection(bill.id)
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.COLLECTION_CONFIRMED)
+        self.assertEqual(bill.collection_request.status, CollectionStatus.CONFIRMED)
+        
+        payment = self.service.pay_bill(bill.id)
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.PAID)
+        self.assertEqual(payment.transaction_type, TransactionType.PAYMENT)
+    
+    def test_confirm_collection_failure_then_retry_and_pay(self):
+        past_maturity = datetime.now() - timedelta(days=5)
+        bill = self.service.register_bill(
+            bill_no="RETRY-TEST-002",
+            drawer="Company B",
+            acceptor="Bank Y",
+            amount=200000,
+            currency="CNY",
+            issue_date=datetime(2024, 1, 1),
+            maturity_date=past_maturity,
+            initial_holder="Company B"
+        )
+        
+        self.service.initiate_collection(
+            bill_id=bill.id,
+            holder_id="Company B",
+            collection_bank="Bank Z",
+            collection_account="ACC456"
+        )
+        self.service.submit_collection(bill.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.COLLECTION_SUBMITTED)
+        
+        original_do_confirm = self.service._do_confirm_collection
+        def broken_confirm(bill_obj, data):
+            raise RuntimeError("Network timeout")
+        self.service._do_confirm_collection = broken_confirm
+        
+        with self.assertRaises(RuntimeError):
+            self.service.confirm_collection(bill.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.ERROR)
+        self.assertEqual(len(bill.failed_operations), 1)
+        
+        self.service._do_confirm_collection = original_do_confirm
+        failed_op = bill.failed_operations[0]
+        self.service.retry_failed_operation(bill.id, failed_op.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.COLLECTION_CONFIRMED)
+        self.assertEqual(bill.collection_request.status, CollectionStatus.CONFIRMED)
+        
+        payment = self.service.pay_bill(bill.id)
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.PAID)
+    
+    def test_endorsement_failure_then_retry(self):
+        bill = self.service.register_bill(
+            bill_no="RETRY-TEST-003",
+            drawer="Company C",
+            acceptor="Bank X",
+            amount=50000,
+            currency="CNY",
+            issue_date=datetime(2024, 1, 1),
+            maturity_date=datetime(2024, 6, 1),
+            initial_holder="Company C"
+        )
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.REGISTERED)
+        
+        original_do_endorse = self.service._do_endorse
+        def broken_endorse(bill_obj, data):
+            raise RuntimeError("Lock timeout")
+        self.service._do_endorse = broken_endorse
+        
+        with self.assertRaises(RuntimeError):
+            self.service.endorse_bill(
+                bill_id=bill.id,
+                from_holder="Company C",
+                to_holder="Company D"
+            )
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.ERROR)
+        self.assertEqual(len(bill.failed_operations), 1)
+        
+        self.service._do_endorse = original_do_endorse
+        failed_op = bill.failed_operations[0]
+        self.service.retry_failed_operation(bill.id, failed_op.id)
+        
+        bill = self.service.get_bill(bill.id)
+        self.assertEqual(bill.status, BillStatus.ENDORSED)
+        self.assertEqual(bill.current_holder, "Company D")
+        self.assertTrue(bill.verify_endorsement_chain())
 
 
 if __name__ == '__main__':
