@@ -105,19 +105,17 @@ public class VersionController {
             @RequestParam String httpMethod) {
         try {
             ClientVersion version = clientVersionService.getByVersionNumber(versionNumber);
-            Map<String, Object> result = Map.of(
-                    "valid", true,
-                    "versionExists", true,
-                    "isDeprecated", version.getIsDeprecated(),
-                    "status", version.getStatus()
-            );
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("valid", true);
+            result.put("versionExists", true);
+            result.put("isDeprecated", version.getIsDeprecated());
+            result.put("status", version.getStatus());
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            Map<String, Object> result = Map.of(
-                    "valid", false,
-                    "versionExists", false,
-                    "error", e.getMessage()
-            );
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("valid", false);
+            result.put("versionExists", false);
+            result.put("error", e.getMessage());
             return ResponseEntity.ok(result);
         }
     }

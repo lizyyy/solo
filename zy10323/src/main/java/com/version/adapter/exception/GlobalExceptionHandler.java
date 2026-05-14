@@ -59,11 +59,16 @@ public class GlobalExceptionHandler {
     }
 
     private HttpStatus determineHttpStatus(String errorCode) {
-        return switch (errorCode) {
-            case "VERSION_NOT_FOUND", "TEMPLATE_NOT_FOUND" -> HttpStatus.NOT_FOUND;
-            case "VERSION_EXISTS", "TEMPLATE_EXISTS", "MAPPING_EXISTS", "FIELD_MAPPING_EXISTS", "DEFAULT_VALUE_EXISTS" -> HttpStatus.CONFLICT;
-            case "NO_TEMPLATE_MAPPING" -> HttpStatus.NOT_IMPLEMENTED;
-            default -> HttpStatus.BAD_REQUEST;
-        };
+        if ("VERSION_NOT_FOUND".equals(errorCode) || "TEMPLATE_NOT_FOUND".equals(errorCode)) {
+            return HttpStatus.NOT_FOUND;
+        } else if ("VERSION_EXISTS".equals(errorCode) || "TEMPLATE_EXISTS".equals(errorCode)
+                || "MAPPING_EXISTS".equals(errorCode) || "FIELD_MAPPING_EXISTS".equals(errorCode)
+                || "DEFAULT_VALUE_EXISTS".equals(errorCode)) {
+            return HttpStatus.CONFLICT;
+        } else if ("NO_TEMPLATE_MAPPING".equals(errorCode)) {
+            return HttpStatus.NOT_IMPLEMENTED;
+        } else {
+            return HttpStatus.BAD_REQUEST;
+        }
     }
 }
