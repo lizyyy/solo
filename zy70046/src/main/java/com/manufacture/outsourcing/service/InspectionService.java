@@ -10,6 +10,7 @@ import com.manufacture.outsourcing.util.NoGenerator;
 import com.manufacture.outsourcing.util.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -111,39 +112,39 @@ public class InspectionService {
 
         try {
             compensationProcessor.executeCompensation(saved);
-            saved.setResultStatus(InspectionResult.STATUS_COMPLETED);
-            inspectionRepository.save(saved);
+            updateStatusCompleted(saved.getId());
 
+            InspectionResult completed = getById(saved.getId());
             logService.logSuccess(
                     OperationLog.ENTITY_INSPECTION,
-                    saved.getId(),
-                    saved.getResultNo(),
+                    completed.getId(),
+                    completed.getResultNo(),
                     OperationLog.ACTION_COMPENSATION,
                     InspectionResult.STATUS_CONFIRMED,
-                    saved.getResultStatus(),
-                    "验收 " + saved.getResultNo() + " 的补偿处理已完成，当前步骤：" + saved.getCompensationStep(),
+                    completed.getResultStatus(),
+                    "验收 " + completed.getResultNo() + " 的补偿处理已完成，当前步骤：" + completed.getCompensationStep(),
                     null,
-                    saved
+                    completed
             );
 
+            saved = completed;
         } catch (Exception e) {
             log.error("验收补偿处理失败: {}", e.getMessage(), e);
-            saved.setResultStatus(InspectionResult.STATUS_COMPENSATION_FAILED);
-            inspectionRepository.save(saved);
+            InspectionResult failed = updateStatusCompensationFailed(saved.getId(), e.getMessage());
 
-            String progress = compensationProcessor.getCompensationProgress(saved);
-            String step = saved.getCompensationStep();
+            String progress = compensationProcessor.getCompensationProgress(failed);
+            String step = failed.getCompensationStep();
 
             logService.logFailure(
                     OperationLog.ENTITY_INSPECTION,
-                    saved.getId(),
-                    saved.getResultNo(),
+                    failed.getId(),
+                    failed.getResultNo(),
                     OperationLog.ACTION_COMPENSATION,
                     oldStatus,
-                    saved.getResultStatus(),
+                    failed.getResultStatus(),
                     progress,
                     null,
-                    saved,
+                    failed,
                     e.getMessage()
             );
 
@@ -192,8 +193,7 @@ public class InspectionService {
 
         try {
             compensationProcessor.executeCompensation(result);
-            result.setResultStatus(InspectionResult.STATUS_COMPLETED);
-            InspectionResult saved = inspectionRepository.save(result);
+            InspectionResult saved = updateStatusCompleted(result.getId());
 
             logService.logSuccess(
                     OperationLog.ENTITY_INSPECTION,
@@ -211,8 +211,7 @@ public class InspectionService {
 
         } catch (Exception e) {
             log.error("补偿重试失败: {}", e.getMessage(), e);
-            result.setResultStatus(InspectionResult.STATUS_COMPENSATION_FAILED);
-            inspectionRepository.save(result);
+            InspectionResult failed = updateStatusCompensationFailed(result.getId(), e.getMessage());
 
             String progress = compensationProcessor.getCompensationProgress(result);
 
@@ -255,5 +254,24 @@ public class InspectionService {
         return inspectionRepository.findByResultStatusIn(
                 List.of(InspectionResult.STATUS_COMPENSATION_FAILED, InspectionResult.STATUS_COMPENSATION_RETRY)
         );
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public InspectionResult updateStatusCompleted(Long inspectionId) {
+        InspectionResult result = inspectionRepository.findById(inspectionId)
+                .orElseThrow(() -> BusinessException.notFound("验收记录不存在"));
+        result.setResultStatus(InspectionResult.STATUS_COMPLETED);
+        return inspectionRepository.save(result);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public InspectionResult updateStatusCompensationFailed(Long inspectionId, String errorMessage) {
+        InspectionResult result = inspectionRepository.findById(inspectionId)
+                .orElseThrow(() -> BusinessException.notFound("验收记录不存在"));
+        result.setResultStatus(InspectionResult.STATUS_COMPENSATION_FAILED);
+        if (result.getCompensationError() == null) {
+            result.setCompensationError(errorMessage);
+        }
+        return inspectionRepository.save(result);
     }
 }
