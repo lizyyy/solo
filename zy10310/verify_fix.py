@@ -3,8 +3,6 @@
 租户导入预检 API - 修复验证脚本
 验证创建导入包、预检、状态推进、审计日志等核心功能
 """
-import sys
-sys.path.insert(0, '/opt/homebrew/lib/python3.9/site-packages')
 import time
 import requests
 

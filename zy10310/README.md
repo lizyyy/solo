@@ -50,7 +50,23 @@ uvicorn app.main:app --reload
 
 服务将在 `http://localhost:8000` 启动
 
-### 3. 访问 API 文档
+### 3. 验证修复生效验证
+
+```bash
+# 启动服务后，运行验证脚本
+python3 verify_fix.py
+```
+
+验证脚本会测试：
+- ✅ 服务连接性
+- ✅ 创建导入包
+- ✅ 查询导入包详情（含 metadata 字段）
+- ✅ 执行预检流程
+- ✅ 审计日志查询
+- ✅ 重复提交防重机制
+- ✅ 凭证查询与取消流程
+
+### 4. 访问 API 文档
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc

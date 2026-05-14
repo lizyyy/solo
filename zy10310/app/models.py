@@ -2,11 +2,17 @@ from sqlalchemy import Column, String, Integer, DateTime, Text, ForeignKey, Bool
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
-import uuid7
+import uuid
+import time
 
 
 def generate_uuid():
-    return str(uuid7.uuid7())
+    try:
+        import uuid7
+        return str(uuid7.uuid7())
+    except ImportError:
+        timestamp = int(time.time() * 1000000)
+        return f"{timestamp:012x}-{str(uuid.uuid4())[12:]}"
 
 
 class ImportPackage(Base):
@@ -30,14 +36,6 @@ class ImportPackage(Base):
     precheck_errors = relationship("PrecheckError", back_populates="import_package", cascade="all, delete-orphan")
     pass_certificates = relationship("PassCertificate", back_populates="import_package", cascade="all, delete-orphan")
     audit_logs = relationship("AuditLog", back_populates="import_package", cascade="all, delete-orphan")
-
-    @property
-    def metadata(self):
-        return self.metadata_ or {}
-
-    @metadata.setter
-    def metadata(self, value):
-        self.metadata_ = value
 
 
 class FieldMapping(Base):
