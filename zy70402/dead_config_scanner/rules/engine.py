@@ -43,48 +43,59 @@ class RuleEngine:
         config = rule.config
         timeout = config.get("timeout", self.scan_config.timeout)
         retry_count = config.get("retry_count", self.scan_config.retry_count)
-        acceptable_statuses = config.get("acceptable_statuses", [200, 301, 302])
+        acceptable_statuses = config.get("acceptable_statuses", [200, 201, 202, 203, 204, 206, 301, 302, 304, 307, 308])
         failure_codes = config.get("failure_codes", [])
+        check_methods = config.get("check_methods", ["HEAD", "GET"])
+        
+        last_error = None
+        last_status = None
         
         for attempt in range(retry_count + 1):
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.head(
-                        url,
-                        timeout=aiohttp.ClientTimeout(total=timeout),
-                        allow_redirects=self.scan_config.follow_redirects,
-                        headers={"User-Agent": self.scan_config.user_agent},
-                        ssl=self.scan_config.verify_ssl
-                    ) as response:
-                        if failure_codes and response.status in failure_codes:
-                            return False, f"HTTP {response.status}: {response.reason}", response.status
+            for method in check_methods:
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        request_func = session.head if method == "HEAD" else session.get
                         
-                        if response.status not in acceptable_statuses:
-                            if attempt < retry_count:
-                                await asyncio.sleep(1)
+                        request_kwargs = {
+                            "timeout": aiohttp.ClientTimeout(total=timeout),
+                            "allow_redirects": self.scan_config.follow_redirects,
+                            "headers": {"User-Agent": self.scan_config.user_agent},
+                            "ssl": self.scan_config.verify_ssl
+                        }
+                        
+                        if method == "GET":
+                            request_kwargs["headers"]["Range"] = "bytes=0-1023"
+                        
+                        async with request_func(url, **request_kwargs) as response:
+                            last_status = response.status
+                            
+                            if failure_codes and response.status in failure_codes:
+                                return False, f"HTTP {response.status}: {response.reason} ({method})", response.status
+                            
+                            if response.status not in acceptable_statuses:
+                                last_error = f"HTTP {response.status}: {response.reason} ({method})"
                                 continue
-                            return False, f"HTTP {response.status}: {response.reason}", response.status
-                        
-                        return True, None, response.status
-            except asyncio.TimeoutError:
-                if attempt < retry_count:
-                    await asyncio.sleep(1)
+                            
+                            return True, None, response.status
+                except asyncio.TimeoutError:
+                    last_error = f"请求超时 ({method})"
                     continue
-                return False, "请求超时", None
-            except aiohttp.ClientSSLError:
-                return False, "SSL证书验证失败", None
-            except aiohttp.ClientConnectorError:
-                if attempt < retry_count:
-                    await asyncio.sleep(1)
+                except aiohttp.ClientSSLError:
+                    return False, "SSL证书验证失败", None
+                except aiohttp.ClientConnectorError:
+                    last_error = f"无法连接到服务器 ({method})"
                     continue
-                return False, "无法连接到服务器", None
-            except Exception as e:
-                if attempt < retry_count:
-                    await asyncio.sleep(1)
+                except aiohttp.ClientResponseError:
+                    last_error = f"响应错误 ({method})"
                     continue
-                return False, f"请求异常: {str(e)}", None
+                except Exception as e:
+                    last_error = f"请求异常: {str(e)} ({method})"
+                    continue
+            
+            if attempt < retry_count:
+                await asyncio.sleep(1)
         
-        return False, "重试次数耗尽", None
+        return False, last_error or "重试次数耗尽", last_status
     
     def _match_pattern(self, content: str, rule: Rule) -> bool:
         patterns = rule.config.get("patterns", [])

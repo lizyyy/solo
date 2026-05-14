@@ -1,46 +1,46 @@
 {
-  "604fb3cac91a89c4": {
-    "status": "invalid",
-    "error_message": "请求异常: Server disconnected",
-    "rule_versions": {
-      "url_alive_check": "1.0.0",
-      "deprecated_pattern": "1.0.0",
-      "legal_evidence_url": "1.0.0"
-    },
-    "last_updated": "2026-05-15T00:43:12.422824",
-    "source": "灰度法务证据页-示例1"
-  },
   "f1db3eddca2f33a6": {
     "status": "invalid",
-    "error_message": "请求异常: Server disconnected",
+    "error_message": "请求异常: Server disconnected (GET)",
     "rule_versions": {
       "url_alive_check": "1.0.0",
       "deprecated_pattern": "1.0.0",
       "legal_evidence_url": "1.0.0"
     },
-    "last_updated": "2026-05-15T00:43:12.753523",
+    "last_updated": "2026-05-15T01:07:47.210045",
     "source": "灰度法务证据页-示例2"
   },
   "d5bf9768100a57c7": {
     "status": "invalid",
-    "error_message": "无法连接到服务器",
+    "error_message": "无法连接到服务器 (GET)",
     "rule_versions": {
       "url_alive_check": "1.0.0",
       "deprecated_pattern": "1.0.0",
       "legal_evidence_url": "1.0.0"
     },
-    "last_updated": "2026-05-15T00:43:14.538204",
+    "last_updated": "2026-05-15T01:07:49.218953",
     "source": "废弃配置模式"
+  },
+  "604fb3cac91a89c4": {
+    "status": "invalid",
+    "error_message": "请求异常: Server disconnected (GET)",
+    "rule_versions": {
+      "url_alive_check": "1.0.0",
+      "deprecated_pattern": "1.0.0",
+      "legal_evidence_url": "1.0.0"
+    },
+    "last_updated": "2026-05-15T01:07:53.727065",
+    "source": "灰度法务证据页-示例1"
   },
   "1d020c5ebd95a704": {
     "status": "invalid",
-    "error_message": "请求超时",
+    "error_message": "请求超时 (GET)",
     "rule_versions": {
       "url_alive_check": "1.0.0",
       "deprecated_pattern": "1.0.0",
       "legal_evidence_url": "1.0.0"
     },
-    "last_updated": "2026-05-15T00:43:40.438166",
+    "last_updated": "2026-05-15T01:08:42.803926",
     "source": "边界案例-无效域名"
   }
 }

@@ -1,12 +1,12 @@
 {
-  "record_id": "20fea8ff14618bb158198c0053842403",
-  "batch_id": "20260515_004305_45f53210",
+  "record_id": "03c36dcebacaef6c2854b1b0ad0d86bf",
+  "batch_id": "20260515_010735_f79e62de",
   "item_id": "3097b2269147568639ca2732c4bdc29c",
   "content_hash": "d5bf9768100a57c7",
   "source": "废弃配置模式",
   "content": "https://old-api.example.com/v1/endpoint",
   "failure_type": "url_invalid",
-  "failure_reason": "无法连接到服务器",
+  "failure_reason": "无法连接到服务器 (GET)",
   "rule_versions": {
     "url_alive_check": "1.0.0",
     "deprecated_pattern": "1.0.0",
@@ -17,7 +17,7 @@
     "status_code": null
   },
   "status_code": null,
-  "detected_at": "2026-05-15T00:43:14.538696",
+  "detected_at": "2026-05-15T01:07:49.219163",
   "human_reviewed": false,
   "review_comment": null,
   "reviewed_at": null

@@ -1,12 +1,12 @@
 {
-  "record_id": "147e2b3b2f0ce69c0226059f9c9ad853",
-  "batch_id": "20260515_004305_45f53210",
+  "record_id": "60693a29b791b0bc8bb25b85d2eb01ce",
+  "batch_id": "20260515_010735_f79e62de",
   "item_id": "cdaacfad5e1c40f3ec1aacd9f2d3feb6",
   "content_hash": "1d020c5ebd95a704",
   "source": "边界案例-无效域名",
   "content": "https://nonexistent.example.invalid",
   "failure_type": "url_invalid",
-  "failure_reason": "请求超时",
+  "failure_reason": "请求超时 (GET)",
   "rule_versions": {
     "url_alive_check": "1.0.0",
     "deprecated_pattern": "1.0.0",
@@ -17,8 +17,8 @@
     "status_code": null
   },
   "status_code": null,
-  "detected_at": "2026-05-15T00:43:40.439049",
-  "human_reviewed": true,
-  "review_comment": "确认为无效域名，属于边界测试用例",
-  "reviewed_at": "2026-05-15T00:44:27.652860"
+  "detected_at": "2026-05-15T01:08:42.804374",
+  "human_reviewed": false,
+  "review_comment": null,
+  "reviewed_at": null
 }

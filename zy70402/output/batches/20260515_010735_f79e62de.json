@@ -1,12 +1,12 @@
 {
-  "batch_id": "20260515_004305_45f53210",
+  "batch_id": "20260515_010735_f79e62de",
   "name": "演示扫描-边界测试",
-  "created_at": "2026-05-15T00:43:05.617771",
+  "created_at": "2026-05-15T01:07:35.198255",
   "status": "completed",
   "rule_set_version": "default:v1.0.0",
   "metadata": {},
   "summary": {
-    "batch_id": "20260515_004305_45f53210",
+    "batch_id": "20260515_010735_f79e62de",
     "status": "completed",
     "counts": {
       "total": 4,
@@ -16,7 +16,7 @@
       "skipped": 0,
       "unknown": 0
     },
-    "created_at": "2026-05-15T00:43:05.617771",
+    "created_at": "2026-05-15T01:07:35.198255",
     "rule_set_version": "default:v1.0.0"
   },
   "items": [
@@ -31,8 +31,8 @@
         "status_code": null
       },
       "status": "invalid",
-      "error_message": "请求异常: Server disconnected",
-      "scan_time": "2026-05-15T00:43:05.618033",
+      "error_message": "请求异常: Server disconnected (GET)",
+      "scan_time": "2026-05-15T01:07:35.198531",
       "rule_versions": {
         "url_alive_check": "1.0.0",
         "deprecated_pattern": "1.0.0",
@@ -49,8 +49,8 @@
         "status_code": null
       },
       "status": "invalid",
-      "error_message": "请求异常: Server disconnected",
-      "scan_time": "2026-05-15T00:43:05.632901",
+      "error_message": "请求异常: Server disconnected (GET)",
+      "scan_time": "2026-05-15T01:07:35.201868",
       "rule_versions": {
         "url_alive_check": "1.0.0",
         "deprecated_pattern": "1.0.0",
@@ -67,8 +67,8 @@
         "status_code": null
       },
       "status": "invalid",
-      "error_message": "请求超时",
-      "scan_time": "2026-05-15T00:43:05.633420",
+      "error_message": "请求超时 (GET)",
+      "scan_time": "2026-05-15T01:07:35.202003",
       "rule_versions": {
         "url_alive_check": "1.0.0",
         "deprecated_pattern": "1.0.0",
@@ -85,8 +85,8 @@
         "status_code": null
       },
       "status": "invalid",
-      "error_message": "无法连接到服务器",
-      "scan_time": "2026-05-15T00:43:12.423924",
+      "error_message": "无法连接到服务器 (GET)",
+      "scan_time": "2026-05-15T01:07:47.210432",
       "rule_versions": {
         "url_alive_check": "1.0.0",
         "deprecated_pattern": "1.0.0",

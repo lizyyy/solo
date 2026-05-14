@@ -1,12 +1,12 @@
 {
-  "record_id": "f9e9fe2bb14d4d7570e6608a35b6cc2f",
-  "batch_id": "20260515_004305_45f53210",
+  "record_id": "2f7b323f97630aa49a2c3125f62854fb",
+  "batch_id": "20260515_010735_f79e62de",
   "item_id": "a83e168de9b87e574ded8344c576fd4c",
   "content_hash": "604fb3cac91a89c4",
   "source": "灰度法务证据页-示例1",
   "content": "https://httpstat.us/404",
   "failure_type": "url_invalid",
-  "failure_reason": "请求异常: Server disconnected",
+  "failure_reason": "请求异常: Server disconnected (GET)",
   "rule_versions": {
     "url_alive_check": "1.0.0",
     "deprecated_pattern": "1.0.0",
@@ -18,7 +18,7 @@
     "status_code": null
   },
   "status_code": null,
-  "detected_at": "2026-05-15T00:43:12.423810",
+  "detected_at": "2026-05-15T01:07:53.727592",
   "human_reviewed": false,
   "review_comment": null,
   "reviewed_at": null
