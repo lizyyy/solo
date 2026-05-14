@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API密钥轮换中心</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 API密钥轮换中心</h1>
+            <div class="user-info">
+                <span>测试负责人系统</span>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">仪表盘</button>
+            <button class="tab-btn" data-tab="apps">应用管理</button>
+            <button class="tab-btn" data-tab="keys">密钥管理</button>
+            <button class="tab-btn" data-tab="logs">使用日志</button>
+            <button class="tab-btn" data-tab="risks">风险清单</button>
+            <button class="tab-btn" data-tab="rollback">回滚开关</button>
+        </nav>
+
+        <main>
+            <section id="dashboard" class="tab-content active">
+                <h2>仪表盘</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-apps">0</div>
+                        <div class="stat-label">应用总数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-keys">0</div>
+                        <div class="stat-label">活跃密钥</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-value" id="stat-expiring">0</div>
+                        <div class="stat-label">即将过期</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value" id="stat-failed">0</div>
+                        <div class="stat-label">失败记录</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-value" id="stat-risks">0</div>
+                        <div class="stat-label">活跃风险</div>
+                    </div>
+                </div>
+                
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="checkExpiringKeys()">检查即将过期密钥</button>
+                </div>
+            </section>
+
+            <section id="apps" class="tab-content">
+                <h2>应用账号管理</h2>
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="showImportModal()">批量导入应用</button>
+                    <button class="btn btn-secondary" onclick="showAddAppModal()">添加应用</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>应用名称</th>
+                                <th>应用ID</th>
+                                <th>负责人</th>
+                                <th>环境</th>
+                                <th>最新密钥版本</th>
+                                <th>过期时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apps-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="keys" class="tab-content">
+                <h2>密钥版本管理</h2>
+                <div class="filter-bar">
+                    <select id="key-app-filter" onchange="loadKeys()">
+                        <option value="">选择应用</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="showAddKeyModal()">创建新密钥版本</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>应用名称</th>
+                                <th>版本</th>
+                                <th>密钥前缀</th>
+                                <th>过期策略</th>
+                                <th>创建时间</th>
+                                <th>过期时间</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keys-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="logs" class="tab-content">
+                <h2>使用日志</h2>
+                <div class="filter-bar">
+                    <select id="log-status-filter" onchange="loadLogs()">
+                        <option value="">全部状态</option>
+                        <option value="success">成功</option>
+                        <option value="failed">失败</option>
+                    </select>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>应用名称</th>
+                                <th>密钥版本</th>
+                                <th>操作</th>
+                                <th>状态</th>
+                                <th>失败原因</th>
+                                <th>操作人</th>
+                                <th>时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination" id="logs-pagination">
+                </div>
+            </section>
+
+            <section id="risks" class="tab-content">
+                <h2>风险清单</h2>
+                <div class="action-bar">
+                    <button class="btn btn-success" onclick="exportRisks()">导出风险清单</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>应用名称</th>
+                                <th>风险类型</th>
+                                <th>严重程度</th>
+                                <th>描述</th>
+                                <th>负责人</th>
+                                <th>状态</th>
+                                <th>发现时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="risks-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="rollback" class="tab-content">
+                <h2>回滚开关管理</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>应用名称</th>
+                                <th>回滚开关</th>
+                                <th>原因</th>
+                                <th>操作人</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rollback-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入应用</h3>
+                <span class="close" onclick="closeModal('import-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>JSON格式应用列表：</label>
+                    <textarea id="import-data" rows="10" placeholder='[{"app_name": "应用1", "app_id": "app001", "owner": "张三", "owner_email": "zhangsan@example.com", "environment": "production"}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-secondary" onclick="loadSampleData()">加载示例数据</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('import-modal')">取消</button>
+                <button class="btn btn-primary" onclick="batchImportApps()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-app-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加应用</h3>
+                <span class="close" onclick="closeModal('add-app-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>应用名称：</label>
+                    <input type="text" id="app-name" placeholder="请输入应用名称">
+                </div>
+                <div class="form-group">
+                    <label>应用ID：</label>
+                    <input type="text" id="app-id" placeholder="请输入应用ID">
+                </div>
+                <div class="form-group">
+                    <label>负责人：</label>
+                    <input type="text" id="app-owner" placeholder="请输入负责人姓名">
+                </div>
+                <div class="form-group">
+                    <label>负责人邮箱：</label>
+                    <input type="email" id="app-owner-email" placeholder="请输入负责人邮箱">
+                </div>
+                <div class="form-group">
+                    <label>环境：</label>
+                    <select id="app-environment">
+                        <option value="production">生产环境</option>
+                        <option value="staging">测试环境</option>
+                        <option value="development">开发环境</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('add-app-modal')">取消</button>
+                <button class="btn btn-primary" onclick="addApp()">确认添加</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="add-key-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建新密钥版本</h3>
+                <span class="close" onclick="closeModal('add-key-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>选择应用：</label>
+                    <select id="key-app-select">
+                        <option value="">请选择应用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>密钥前缀：</label>
+                    <input type="text" id="key-prefix" placeholder="请输入密钥前缀（如 sk-xxxx）">
+                </div>
+                <div class="form-group">
+                    <label>过期策略：</label>
+                    <select id="key-policy-select">
+                        <option value="">请选择过期策略</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('add-key-modal')">取消</button>
+                <button class="btn btn-primary" onclick="addKey()">创建密钥</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="log-detail-modal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>日志详情</h3>
+                <span class="close" onclick="closeModal('log-detail-modal')">&times;</span>
+            </div>
+            <div class="modal-body" id="log-detail-content">
+            </div>
+            <div class="modal-footer" id="log-detail-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="rollback-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>设置回滚开关</h3>
+                <span class="close" onclick="closeModal('rollback-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="rollback-app-id">
+                <div class="form-group">
+                    <label>回滚开关：</label>
+                    <select id="rollback-enabled">
+                        <option value="true">开启</option>
+                        <option value="false">关闭</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>原因：</label>
+                    <textarea id="rollback-reason" rows="3" placeholder="请输入设置原因"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人：</label>
+                    <input type="text" id="rollback-operator" placeholder="请输入操作人姓名">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('rollback-modal')">取消</button>
+                <button class="btn btn-primary" onclick="saveRollback()">确认设置</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>
