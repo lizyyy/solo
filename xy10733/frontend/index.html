@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据导出权限水印管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .stat-card.success .number { color: #28a745; }
+        .stat-card.warning .number { color: #ffc107; }
+        .stat-card.danger .number { color: #dc3545; }
+        .stat-card.info .number { color: #17a2b8; }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .field-checkboxes {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            padding: 10px;
+        }
+        
+        .field-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .field-checkbox:last-child {
+            border-bottom: none;
+        }
+        
+        .field-checkbox input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .field-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .sensitivity-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: white;
+        }
+        
+        .sensitivity-1 { background: #28a745; }
+        .sensitivity-2 { background: #ffc107; color: #333; }
+        .sensitivity-3 { background: #dc3545; }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        
+        .batch-section {
+            border-top: 1px dashed #ddd;
+            margin-top: 15px;
+            padding-top: 15px;
+        }
+        
+        .batch-section textarea {
+            min-height: 120px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .content-area {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        
+        .tab-content {
+            padding: 20px;
+        }
+        
+        .group-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .group-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .group-section {
+            margin-bottom: 25px;
+        }
+        
+        .group-header {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .group-header .count {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+        
+        .application-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .application-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        
+        .application-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .applicant-info {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-revoked { background: #e2e3e5; color: #383d41; }
+        
+        .application-details {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .application-details .detail-row {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .application-details .detail-label {
+            width: 80px;
+            color: #999;
+        }
+        
+        .fields-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 8px;
+        }
+        
+        .field-tag {
+            background: #e9ecef;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #495057;
+        }
+        
+        .application-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .reject-reason {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8d7da;
+            border-radius: 4px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .watermark-info {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #004085;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .export-btn {
+            margin-left: auto;
+        }
+        
+        .download-failure {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 数据导出权限水印管理系统</h1>
+            <p>为测试负责人打造的数据安全管理平台，实现权限校验、水印追踪、审计台账全流程管理</p>
+        </div>
+        
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="number" id="totalApps">0</div>
+                <div class="label">总申请数</div>
+            </div>
+            <div class="stat-card success">
+                <div class="number" id="approved">0</div>
+                <div class="label">已通过</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="number" id="pending">0</div>
+                <div class="label">待审批</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number" id="rejected">0</div>
+                <div class="label">已拒绝</div>
+            </div>
+            <div class="stat-card info">
+                <div class="number" id="totalDownloads">0</div>
+                <div class="label">下载次数</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="number" id="failedDownloads">0</div>
+                <div class="label">失败次数</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="card">
+                    <h3>📝 新建导出申请</h3>
+                    <div id="formAlert"></div>
+                    
+                    <div class="form-group">
+                        <label>申请人</label>
+                        <input type="text" id="applicant" placeholder="请输入申请人姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>测试负责人</label>
+                        <input type="text" id="responsiblePerson" placeholder="请输入负责人姓名">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>导出用途</label>
+                        <textarea id="purpose" placeholder="请说明导出用途"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>导出字段 <span id="permissionHint"></span></label>
+                        <div class="field-checkboxes" id="fieldCheckboxes">
+                        </div>
+                    </div>
+                    
+                    <div class="watermark-info" id="watermarkInfo">
+                        ℹ️ 已通过的申请将自动应用「标准水印」规则
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="submitApplication()">提交申请</button>
+                    
+                    <div class="batch-section">
+                        <h4>批量导入</h4>
+                        <div class="form-group">
+                            <textarea id="batchData" placeholder='JSON格式，示例：
+[
+  {
+    "applicant": "张三",
+    "responsible_person": "张经理",
+    "fields": ["user_name", "user_email"],
+    "purpose": "数据分析"
+  }
+]'></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="batchImport()">批量导入</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚙️ 水印规则</h3>
+                    <div id="watermarkRules"></div>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('applications')">导出申请</div>
+                    <div class="tab" onclick="switchTab('downloads')">下载记录</div>
+                    <div class="tab" onclick="switchTab('audit')">审计台账</div>
+                </div>
+                
+                <div class="tab-content" id="applicationsTab">
+                    <div class="group-controls">
+                        <span>分组方式：</span>
+                        <select id="groupBy" onchange="loadApplications()">
+                            <option value="responsible_person">按负责人</option>
+                            <option value="created_at">按申请时间</option>
+                            <option value="watermark_rule_name">按水印规则</option>
+                        </select>
+                        <button class="btn btn-sm btn-success export-btn" onclick="refreshData()">刷新数据</button>
+                    </div>
+                    <div id="groupedApplications"></div>
+                </div>
+                
+                <div class="tab-content hidden" id="downloadsTab">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>申请人</th>
+                                    <th>负责人</th>
+                                    <th>下载人</th>
+                                    <th>涉及字段</th>
+                                    <th>IP地址</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody id="downloadRecords"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-content hidden" id="auditTab">
+                    <div style="margin-bottom: 15px;">
+                        <button class="btn btn-success" onclick="exportAuditLogs()">📥 导出审计台账</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>操作类型</th>
+                                    <th>操作人</th>
+                                    <th>申请人</th>
+                                    <th>负责人</th>
+                                    <th>详情</th>
+                                    <th>时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        
+        let fieldPermissions = [];
+        let watermarkRules = [];
+        
+        async function init() {
+            await loadFieldPermissions();
+            await loadWatermarkRules();
+            await loadStats();
+            await loadApplications();
+            await loadDownloadRecords();
+            await loadAuditLogs();
+        }
+        
+        async function loadFieldPermissions() {
+            const res = await fetch(`${API_BASE}/field-permissions`);
+            fieldPermissions = await res.json();
+            
+            const container = document.getElementById('fieldCheckboxes');
+            container.innerHTML = fieldPermissions.map(f => `
+                <div class="field-checkbox">
+                    <input type="checkbox" id="field_${f.id}" value="${f.field_name}" 
+                           onchange="checkPermissions()">
+                    <label for="field_${f.id}">
+                        ${f.description} (${f.field_name})
+                    </label>
+                    <span class="sensitivity-badge sensitivity-${f.sensitivity_level}">
+                        L${f.sensitivity_level} ${f.requires_approval ? '·需审批' : ''}
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        function checkPermissions() {
+            const checkedFields = Array.from(document.querySelectorAll('.field-checkbox input:checked'))
+                .map(cb => cb.value);
+            
+            const selectedPerms = fieldPermissions.filter(f => checkedFields.includes(f.field_name));
+            const requiresApproval = selectedPerms.some(p => p.requires_approval);
+            const highSensitivity = selectedPerms.some(p => p.sensitivity_level >= 3);
+            
+            let hint = '';
+            if (highSensitivity) {
+                hint = '⚠️ 包含高敏感字段，申请将被自动拒绝！';
+                document.getElementById('permissionHint').innerHTML = `<span style="color:#dc3545">${hint}</span>`;
+            } else if (requiresApproval) {
+                hint = '⚠️ 包含需审批字段，需人工审核';
+                document.getElementById('permissionHint').innerHTML = `<span style="color:#ffc107">${hint}</span>`;
+            } else {
+                document.getElementById('permissionHint').innerHTML = '';
+            }
+        }
+        
+        async function loadWatermarkRules() {
+            const res = await fetch(`${API_BASE}/watermark-rules`);
+            watermarkRules = await res.json();
+            
+            const container = document.getElementById('watermarkRules');
+            container.innerHTML = watermarkRules.map(r => `
+                <div style="padding: 10px; background: ${r.is_active ? '#e7f3ff' : '#f8f9fa'}; 
+                            border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #667eea;">
+                    <div style="font-weight: 600; color: #333;">${r.rule_name}</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 5px;">${r.content_template}</div>
+                    <div style="font-size: 11px; color: #999; margin-top: 4px;">
+                        透明度: ${r.opacity} | 字号: ${r.font_size}px
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadStats() {
+            const res = await fetch(`${API_BASE}/stats`);
+            const stats = await res.json();
+            
+            document.getElementById('totalApps').textContent = stats.total_applications;
+            document.getElementById('approved').textContent = stats.approved;
+            document.getElementById('pending').textContent = stats.pending;
+            document.getElementById('rejected').textContent = stats.rejected;
+            document.getElementById('totalDownloads').textContent = stats.total_downloads;
+            document.getElementById('failedDownloads').textContent = stats.failed_downloads;
+        }
+        
+        async function loadApplications() {
+            const groupBy = document.getElementById('groupBy').value;
+            const res = await fetch(`${API_BASE}/applications?group_by=${groupBy}`);
+            const data = await res.json();
+            
+            const container = document.getElementById('groupedApplications');
+            let html = '';
+            
+            for (const [groupKey, apps] of Object.entries(data.grouped)) {
+                const displayKey = groupKey === 'null' || groupKey === '无规则' ? '未分组' : groupKey;
+                html += `
+                    <div class="group-section">
+                        <div class="group-header">
+                            <span>${displayKey}</span>
+                            <span class="count">${apps.length} 条</span>
+                        </div>
+                        <div class="application-list">
+                            ${apps.map(app => renderApplicationCard(app)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html || '<p style="text-align:center;color:#999;padding:40px;">暂无数据</p>';
+        }
+        
+        function renderApplicationCard(app) {
+            const statusClass = `status-${app.status}`;
+            const statusText = {
+                'approved': '已通过',
+                'pending': '待审批',
+                'rejected': '已拒绝',
+                'revoked': '已撤销'
+            }[app.status] || app.status;
+            
+            const fields = app.fields ? app.fields.split(',') : [];
+            const fieldTags = fields.map(f => {
+                const perm = fieldPermissions.find(p => p.field_name === f);
+                return `<span class="field-tag">${perm ? perm.description : f}</span>`;
+            }).join('');
+            
+            let actionsHtml = '';
+            if (app.status === 'pending') {
+                actionsHtml = `
+                    <button class="btn btn-sm btn-success" onclick="approveApplication(${app.id})">通过</button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectApplication(${app.id})">拒绝</button>
+                `;
+            }
+            if (app.status === 'approved') {
+                actionsHtml = `
+                    <button class="btn btn-sm btn-info" onclick="recordDownload(${app.id})">记录下载</button>
+                    <button class="btn btn-sm btn-danger" onclick="createRevokeLink(${app.id})">生成撤销链接</button>
+                `;
+            }
+            
+            return `
+                <div class="application-card">
+                    <div class="application-header">
+                        <div class="applicant-info">👤 ${app.applicant}</div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="application-details">
+                        <div class="detail-row">
+                            <span class="detail-label">负责人:</span>
+                            <span>${app.responsible_person}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">用途:</span>
+                            <span>${app.purpose || '-'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">申请时间:</span>
+                            <span>${app.created_at || '-'}</span>
+                        </div>
+                        ${app.watermark_rule_name ? `
+                        <div class="detail-row">
+                            <span class="detail-label">水印规则:</span>
+                            <span>${app.watermark_rule_name}</span>
+                        </div>
+                        ` : ''}
+                        <div class="fields-tags">${fieldTags}</div>
+                    </div>
+                    ${app.reject_reason ? `<div class="reject-reason">❌ 拒绝原因: ${app.reject_reason}</div>` : ''}
+                    ${actionsHtml ? `<div class="application-actions">${actionsHtml}</div>` : ''}
+                </div>
+            `;
+        }
+        
+        async function submitApplication() {
+            const applicant = document.getElementById('applicant').value.trim();
+            const responsiblePerson = document.getElementById('responsiblePerson').value.trim();
+            const purpose = document.getElementById('purpose').value.trim();
+            const fields = Array.from(document.querySelectorAll('.field-checkbox input:checked'))
+                .map(cb => cb.value);
+            
+            if (!applicant || !responsiblePerson || fields.length === 0) {
+                showAlert('请填写完整信息并选择至少一个字段', 'error');
+                return;
+            }
+            
+            const res = await fetch(`${API_BASE}/applications`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    applicant,
+                    responsible_person: responsiblePerson,
+                    fields,
+                    purpose
+                })
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok) {
+                if (data.status === 'rejected') {
+                    showAlert(`申请被拒绝: ${data.reject_reason}`, 'warning');
+                } else if (data.status === 'pending') {
+                    showAlert('申请已提交，等待审批', 'success');
+                } else {
+                    showAlert('申请已通过！', 'success');
+                }
+                
+                document.getElementById('applicant').value = '';
+                document.getElementById('responsiblePerson').value = '';
+                document.getElementById('purpose').value = '';
+                document.querySelectorAll('.field-checkbox input').forEach(cb => cb.checked = false);
+                document.getElementById('permissionHint').innerHTML = '';
+                
+                await refreshData();
+            } else {
+                showAlert('提交失败: ' + (data.error || '未知错误'), 'error');
+            }
+        }
+        
+        async function batchImport() {
+            try {
+                const batchData = JSON.parse(document.getElementById('batchData').value);
+                
+                const res = await fetch(`${API_BASE}/applications/batch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ applications: batchData })
+                });
+                
+                const data = await res.json();
+                showAlert(`批量导入成功！共 ${data.total} 条`, 'success');
+                await refreshData();
+            } catch (e) {
+                showAlert('JSON格式错误，请检查', 'error');
+            }
+        }
+        
+        async function approveApplication(id) {
+            const approver = prompt('请输入审批人姓名:');
+            if (!approver) return;
+            
+            await fetch(`${API_BASE}/applications/${id}/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ approver })
+            });
+            
+            showAlert('审批通过', 'success');
+            await refreshData();
+        }
+        
+        async function rejectApplication(id) {
+            const reason = prompt('请输入拒绝原因:', '未说明原因');
+            if (reason === null) return;
+            
+            await fetch(`${API_BASE}/applications/${id}/reject`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rejecter: '管理员', reason })
+            });
+            
+            showAlert('已拒绝申请', 'success');
+            await refreshData();
+        }
+        
+        async function recordDownload(id) {
+            const downloader = prompt('请记录下载人姓名:', '当前用户');
+            if (downloader === null) return;
+            
+            const res = await fetch(`${API_BASE}/applications/${id}/download`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ downloader })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                showAlert('下载记录已保存', 'success');
+            } else {
+                showAlert(`下载失败: ${data.error}`, 'error');
+            }
+            
+            await refreshData();
+        }
+        
+        async function createRevokeLink(id) {
+            const res = await fetch(`${API_BASE}/applications/${id}/revoke-link`, {
+                method: 'POST'
+            });
+            
+            const data = await res.json();
+            alert(`撤销链接已生成（7天有效）：\n\n${API_BASE}/revoke/${data.token}\n\n访问此链接可立即撤销该导出权限`);
+        }
+        
+        async function loadDownloadRecords() {
+            const res = await fetch(`${API_BASE}/downloads`);
+            const records = await res.json();
+            
+            const tbody = document.getElementById('downloadRecords');
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td>${r.download_time || '-'}</td>
+                    <td>${r.applicant}</td>
+                    <td>${r.responsible_person}</td>
+                    <td>${r.downloader}</td>
+                    <td>${r.fields}</td>
+                    <td><code>${r.ip_address || '-'}</code></td>
+                    <td>
+                        ${r.success ? 
+                            '<span style="color:#28a745">✅ 成功</span>' : 
+                            `<span class="download-failure">❌ 失败 - ${r.failure_reason}</span>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadAuditLogs() {
+            const res = await fetch(`${API_BASE}/audit-logs`);
+            const logs = await res.json();
+            
+            const actionNames = {
+                'create_application': '创建申请',
+                'batch_import': '批量导入',
+                'approve': '审批通过',
+                'reject': '审批拒绝',
+                'download': '下载成功',
+                'download_failed': '下载失败',
+                'revoke': '权限撤销'
+            };
+            
+            const tbody = document.getElementById('auditLogs');
+            tbody.innerHTML = logs.map(l => `
+                <tr>
+                    <td>${l.id}</td>
+                    <td><strong>${actionNames[l.action] || l.action}</strong></td>
+                    <td>${l.operator}</td>
+                    <td>${l.applicant || '-'}</td>
+                    <td>${l.responsible_person || '-'}</td>
+                    <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;">${l.details || '-'}</td>
+                    <td>${l.created_at}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function exportAuditLogs() {
+            window.open(`${API_BASE}/audit-logs/export`, '_blank');
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tab}Tab`).classList.remove('hidden');
+        }
+        
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('formAlert');
+            alertEl.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => alertEl.innerHTML = '', 3000);
+        }
+        
+        async function refreshData() {
+            await Promise.all([
+                loadStats(),
+                loadApplications(),
+                loadDownloadRecords(),
+                loadAuditLogs()
+            ]);
+        }
+        
+        init();
+    </script>
+</body>
+</html>
