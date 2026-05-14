@@ -119,15 +119,28 @@ export class SampleGenerator {
     const anomalies: AnomalySample[] = [];
 
     for (const item of items) {
-      if (item.timezoneOffset < -480 || item.timezoneOffset > 480 || item.timezoneOffset !== -480) {
+      if (item.timezoneOffset < -480 || item.timezoneOffset > 480) {
         const anomaly: AnomalySample = {
           id: store.generateId(),
           batchId,
           itemId: item.id,
-          type: item.timezoneOffset !== -480 ? 'timezone' : 'other',
+          type: 'timezone',
           originalData: item,
           detectedAt: new Date().toISOString(),
-          detectedByRule: '时区偏移检查',
+          detectedByRule: '时区偏移检查（范围超限）',
+          status: 'open',
+        };
+        store.saveAnomaly(anomaly);
+        anomalies.push(anomaly);
+      } else if (item.timezoneOffset !== -480) {
+        const anomaly: AnomalySample = {
+          id: store.generateId(),
+          batchId,
+          itemId: item.id,
+          type: 'timezone',
+          originalData: item,
+          detectedAt: new Date().toISOString(),
+          detectedByRule: '时区偏移检查（非北京时间）',
           status: 'open',
         };
         store.saveAnomaly(anomaly);

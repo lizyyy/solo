@@ -24,6 +24,10 @@ class DataStore {
     return this.handoverForms.get(id);
   }
 
+  getHandoverFormByBatchId(batchId: string): HandoverForm | undefined {
+    return Array.from(this.handoverForms.values()).find((f) => f.batchId === batchId);
+  }
+
   getAllHandoverForms(): HandoverForm[] {
     return Array.from(this.handoverForms.values());
   }

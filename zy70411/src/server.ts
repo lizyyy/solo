@@ -52,7 +52,7 @@ app.get('/api/rules', (req, res) => {
 
 app.post('/api/validate', async (req, res) => {
   const { batchId, ruleVersion } = req.body;
-  const form = store.getHandoverForm(batchId);
+  const form = store.getHandoverFormByBatchId(batchId);
   
   if (!form) {
     return res.status(404).json({ error: '未找到批次' });
@@ -136,7 +136,7 @@ app.get('/api/history/scope/:scope', (req, res) => {
 
 app.post('/api/compare', (req, res) => {
   const { batchId, oldVersion, newVersion } = req.body;
-  const form = store.getHandoverForm(batchId);
+  const form = store.getHandoverFormByBatchId(batchId);
   
   if (!form) {
     return res.status(404).json({ error: '未找到批次' });
