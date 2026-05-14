@@ -419,6 +419,73 @@ def cmd_demo_freeze(args):
         print("="*60)
 
 
+def cmd_demo_low_cost(args):
+    print_header("【演示】低成本差异流程（只需成本审批）")
+    print("💡 场景：面粉X缺货，用面粉Y替代")
+    print("💡 成本差异率 = (3.5-3.2)/3.2 = 9.375%，在阈值 10% 内")
+    print("💡 只需成本审批，无需质检和最终审批")
+    init_db()
+    seed_all()
+    
+    with db_session() as db:
+        print("\n" + "-"*60)
+        print("步骤 1: 创建替代申请 (面粉X → 面粉Y)")
+        print("-"*60)
+        result = SubstitutionService.create_draft(
+            db, "RM-003", "RM-004",
+            "面粉X库存为0，临时用面粉Y替代",
+            "采购员-张三"
+        )
+        print_result(result)
+        request_no = result["request_no"]
+        
+        print("\n" + "-"*60)
+        print("步骤 2: 提交审批")
+        print("-"*60)
+        result = SubstitutionService.submit_for_approval(db, request_no, "采购员-张三")
+        print_result(result)
+        
+        print("\n" + "-"*60)
+        print("步骤 3: 成本审批通过（只有一级审批！）")
+        print("-"*60)
+        result = SubstitutionService.approve(
+            db, request_no, "成本-王五", 
+            "COST", "APPROVE", 
+            "成本差异率 9.375%，在阈值内，同意"
+        )
+        print_result(result)
+        
+        print("\n" + "-"*60)
+        print("步骤 4: 执行配方更新")
+        print("-"*60)
+        result = SubstitutionService.execute_substitution(db, request_no, "工程师-钱七")
+        print_result(result)
+        
+        print("\n" + "-"*60)
+        print("步骤 5: 查看申请详情")
+        print("-"*60)
+        detail = SubstitutionService.get_request_detail(db, request_no)
+        print(f"📋 申请单号: {detail['request_no']}")
+        print(f"📌 最终状态: {detail['status']}")
+        print(f"💰 成本核算:")
+        for key, value in detail['cost_summary'].items():
+            print(f"   {key}: {value}")
+        print(f"📦 受影响配方: {len(detail['affected_formulas'])} 个")
+        for f in detail['affected_formulas']:
+            print(f"   - {f['code']}: {f['name']}")
+        print(f"📝 审批记录数: {len(detail['approvals'])} 条")
+        
+        print("\n" + "-"*60)
+        print("步骤 6: 导出复核单")
+        print("-"*60)
+        filepath = export_substitution_detail(db, request_no)
+        print(f"✅ 复核单已导出: {filepath}")
+        
+        print("\n" + "="*60)
+        print("🎉 低成本差异审批流程演示完成！")
+        print("="*60)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="原料替代审批系统命令行工具",
@@ -426,18 +493,19 @@ def main():
         epilog="""
 示例:
   # 初始化数据
-  python -m cli.main init
+  python3 -m cli.main init
   
   # 创建替代申请
-  python -m cli.main create --original RM-001 --substitute RM-002 --reason "供应商断货" --creator 张三
+  python3 -m cli.main create --original RM-001 --substitute RM-002 --reason "供应商断货" --creator 张三
   
   # 查看申请列表
-  python -m cli.main list
+  python3 -m cli.main list
   
-  # 运行演示
-  python -m cli.main demo-normal
-  python -m cli.main demo-fail-retry
-  python -m cli.main demo-freeze
+  # 运行演示（推荐先看低成本差异流程）
+  python3 -m cli.main demo-low-cost   # 差异率 9.375%，只需成本审批
+  python3 -m cli.main demo-normal     # 差异率 10.4%，需要三级审批
+  python3 -m cli.main demo-fail-retry # 失败后重试补偿
+  python3 -m cli.main demo-freeze     # 审批冻结流程
         """
     )
     
@@ -495,7 +563,8 @@ def main():
     export_parser.add_argument("--formula-code", help="配方编码 (type=formula 时需要)")
     export_parser.add_argument("--limit", type=int, default=100, help="汇总导出数量限制")
     
-    subparsers.add_parser("demo-normal", help="【演示】正常审批执行流程")
+    subparsers.add_parser("demo-normal", help="【演示】高成本差异流程（三级审批）")
+    subparsers.add_parser("demo-low-cost", help="【演示】低成本差异流程（只需成本审批）")
     subparsers.add_parser("demo-fail-retry", help="【演示】执行失败后重试补偿")
     subparsers.add_parser("demo-freeze", help="【演示】审批冻结流程")
     
@@ -518,6 +587,7 @@ def main():
         "detail": cmd_detail,
         "export": cmd_export,
         "demo-normal": cmd_demo_normal,
+        "demo-low-cost": cmd_demo_low_cost,
         "demo-fail-retry": cmd_demo_fail_retry,
         "demo-freeze": cmd_demo_freeze,
     }

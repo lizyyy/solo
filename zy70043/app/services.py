@@ -281,9 +281,11 @@ class SubstitutionService:
         if substitution.exceeds_threshold:
             substitution.status = SubstitutionStatus.QC_REVIEW
             next_step = "质检复核"
+            next_approver = "质检专员"
         else:
-            substitution.status = SubstitutionStatus.PENDING_APPROVAL
-            next_step = "审批中"
+            substitution.status = SubstitutionStatus.COST_REVIEW
+            next_step = "成本复核"
+            next_approver = "成本专员"
         
         db.commit()
         
@@ -292,7 +294,7 @@ class SubstitutionService:
             "message": f"申请 [{request_no}] 已提交，进入 {next_step} 流程",
             "request_no": request_no,
             "current_status": substitution.status.value,
-            "next_approver": "质检专员" if substitution.exceeds_threshold else "成本专员"
+            "next_approver": next_approver
         }
     
     @staticmethod

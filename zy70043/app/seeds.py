@@ -23,7 +23,7 @@ def seed_raw_materials(db):
     materials = [
         RawMaterial(code="RM-001", name="大豆油A", unit="kg", unit_price=12.5, category="食用油", specification="一级", stock_quantity=0),
         RawMaterial(code="RM-002", name="大豆油B", unit="kg", unit_price=13.8, category="食用油", specification="二级", stock_quantity=5000),
-        RawMaterial(code="RM-003", name="面粉X", unit="kg", unit_price=3.2, category="谷物", specification="高筋", stock_quantity=1000),
+        RawMaterial(code="RM-003", name="面粉X", unit="kg", unit_price=3.2, category="谷物", specification="高筋", stock_quantity=0),
         RawMaterial(code="RM-004", name="面粉Y", unit="kg", unit_price=3.5, category="谷物", specification="中筋", stock_quantity=2000),
         RawMaterial(code="RM-005", name="白砂糖", unit="kg", unit_price=5.8, category="糖类", specification="精制", stock_quantity=800),
         RawMaterial(code="RM-006", name="鸡蛋", unit="kg", unit_price=8.5, category="蛋类", specification="鲜鸡蛋", stock_quantity=300),
