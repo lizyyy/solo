@@ -6,7 +6,7 @@ import com.batchqueue.model.entity.PreemptionRecord;
 import com.batchqueue.model.entity.ScheduleLog;
 import com.batchqueue.model.enums.TaskStatus;
 import com.batchqueue.service.*;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

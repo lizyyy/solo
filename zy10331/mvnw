@@ -1,0 +1,52 @@
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Maven2 Start Up Batch script
+# Required ENV vars:
+# ------------------
+#   JAVA_HOME - location of a JDK home dir
+#
+# Optional ENV vars
+# -----------------
+#   M2_HOME - location of maven2's installed home dir
+#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
+# ----------------------------------------------------------------------------
+
+# 尝试自动设置 JAVA_HOME（macOS）
+if [ -z "$JAVA_HOME" ] && [ -x /usr/libexec/java_home ]; then
+    export JAVA_HOME="$(/usr/libexec/java_home 2>/dev/null || true)"
+fi
+
+if [ -z "$JAVA_HOME" ]; then
+    echo "警告: JAVA_HOME 环境变量未设置"
+    echo "如果是 macOS，请确保已安装完整 JDK（不只是 JRE）"
+    echo "您可以从以下地址下载 JDK:"
+    echo "  - Oracle JDK: https://www.oracle.com/java/technologies/downloads/"
+    echo "  - OpenJDK:   https://adoptium.net/"
+fi
+
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+MAVEN_DIR="$PROJECT_DIR/.maven"
+MAVEN_VERSION="3.8.8"
+MAVEN_HOME="$MAVEN_DIR/apache-maven-$MAVEN_VERSION"
+
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "正在下载 Maven $MAVEN_VERSION..."
+    mkdir -p "$MAVEN_DIR"
+    cd "$MAVEN_DIR"
+    
+    if command -v curl > /dev/null 2>&1; then
+        curl -L "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip" -o maven.zip
+    elif command -v wget > /dev/null 2>&1; then
+        wget "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip" -O maven.zip
+    else
+        echo "错误: 未找到 curl 或 wget，请手动下载 Maven"
+        exit 1
+    fi
+    
+    unzip -q maven.zip
+    rm -f maven.zip
+    cd "$PROJECT_DIR"
+fi
+
+export M2_HOME="$MAVEN_HOME"
+exec "$MAVEN_HOME/bin/mvn" "$@"

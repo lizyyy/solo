@@ -3,7 +3,7 @@ package com.batchqueue.model.entity;
 import com.batchqueue.model.enums.TaskPriority;
 import com.batchqueue.model.enums.TaskStatus;
 import com.batchqueue.model.enums.TaskType;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

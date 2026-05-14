@@ -2,8 +2,8 @@ package com.batchqueue.model.dto;
 
 import com.batchqueue.model.enums.TaskPriority;
 import com.batchqueue.model.enums.TaskType;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
