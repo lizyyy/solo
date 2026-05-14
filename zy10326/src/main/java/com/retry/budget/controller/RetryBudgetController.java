@@ -84,4 +84,18 @@ public class RetryBudgetController {
         List<ExhaustionRecord> response = retryBudgetService.getExhaustionRecords(callerId, targetApi);
         return ApiResponse.success(response);
     }
+    
+    @GetMapping(value = "/export/csv", produces = "text/csv;charset=UTF-8")
+    public String exportCsv(
+            @RequestParam String callerId,
+            @RequestParam String targetApi) {
+        return retryBudgetService.exportFailureHistoryAsCsv(callerId, targetApi);
+    }
+    
+    @GetMapping(value = "/export/json", produces = "application/json;charset=UTF-8")
+    public String exportJson(
+            @RequestParam String callerId,
+            @RequestParam String targetApi) {
+        return retryBudgetService.exportAllAsJson(callerId, targetApi);
+    }
 }

@@ -46,6 +46,9 @@ public class FailureHistory {
     @Column(nullable = false)
     private Boolean budgetExhausted;
     
+    @Column(nullable = false)
+    private Boolean budgetConsumed;
+    
     @Column(length = 64, unique = true)
     private String idempotentKey;
     

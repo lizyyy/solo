@@ -96,73 +96,56 @@ public class RetryBudgetService {
         checkAndProcessRecovery(budget);
         
         FailureType classifiedType = classifyFailure(request.getFailureType(), request.getFailureReason());
+        boolean consumeBudget = shouldConsumeBudget(classifiedType);
         
-        if (!shouldConsumeBudget(classifiedType)) {
-            long backoffMs = calculateBackoff(budget, budget.getConsecutiveFailures());
-            return RetryCheckResponse.builder()
-                    .allowed(true)
-                    .budgetId(budget.getId())
-                    .callerId(budget.getCallerId())
-                    .targetApi(budget.getTargetApi())
-                    .remainingBudget(budget.getRemainingBudget())
-                    .usedBudget(budget.getUsedBudget())
-                    .consecutiveFailures(budget.getConsecutiveFailures())
-                    .backoffMs(backoffMs)
-                    .nextRetryAt(LocalDateTime.now().plus(Duration.ofMillis(backoffMs)))
-                    .failureType(classifiedType)
-                    .isExhausted(false)
-                    .isIdempotentHit(false)
-                    .message("非消耗性失败，不扣除预算")
-                    .build();
-        }
-        
-        if (budget.getIsExhausted()) {
-            return RetryCheckResponse.builder()
-                    .allowed(false)
-                    .budgetId(budget.getId())
-                    .callerId(budget.getCallerId())
-                    .targetApi(budget.getTargetApi())
-                    .remainingBudget(0)
-                    .usedBudget(budget.getUsedBudget())
-                    .consecutiveFailures(budget.getConsecutiveFailures())
-                    .backoffMs(budget.getMaxBackoffMs())
-                    .nextRetryAt(budget.getNextRecoveryAt())
-                    .failureType(classifiedType)
-                    .isExhausted(true)
-                    .isIdempotentHit(false)
-                    .message("预算已耗尽，请等待恢复或联系管理员")
-                    .build();
-        }
-        
-        budget.setUsedBudget(budget.getUsedBudget() + 1);
-        budget.setRemainingBudget(budget.getTotalBudget() - budget.getUsedBudget());
-        budget.setFailedCount(budget.getFailedCount() + 1);
-        budget.setConsecutiveFailures(budget.getConsecutiveFailures() + 1);
-        budget.setLastFailureAt(LocalDateTime.now());
-        
+        boolean wasExhausted = budget.getIsExhausted();
         int consecutiveFailures = budget.getConsecutiveFailures();
-        long backoffMs = calculateBackoff(budget, consecutiveFailures);
+        long backoffMs;
+        boolean isExhausted;
+        boolean budgetConsumed = false;
         
-        boolean isExhausted = budget.getRemainingBudget() <= 0;
-        if (isExhausted) {
-            budget.setIsExhausted(true);
-            budget.setExhaustedAt(LocalDateTime.now());
-            budget.setNextRecoveryAt(LocalDateTime.now().plus(Duration.ofMillis(budget.getRecoveryIntervalMs())));
+        if (!consumeBudget) {
+            backoffMs = calculateBackoff(budget, consecutiveFailures);
+            isExhausted = wasExhausted;
+        } else if (wasExhausted) {
+            backoffMs = budget.getMaxBackoffMs();
+            isExhausted = true;
+        } else {
+            budget.setUsedBudget(budget.getUsedBudget() + 1);
+            budget.setRemainingBudget(budget.getTotalBudget() - budget.getUsedBudget());
+            budget.setFailedCount(budget.getFailedCount() + 1);
+            budget.setConsecutiveFailures(budget.getConsecutiveFailures() + 1);
+            budget.setLastFailureAt(LocalDateTime.now());
+            budgetConsumed = true;
             
-            ExhaustionRecord exhaustionRecord = new ExhaustionRecord();
-            exhaustionRecord.setBudgetId(budget.getId());
-            exhaustionRecord.setCallerId(budget.getCallerId());
-            exhaustionRecord.setTargetApi(budget.getTargetApi());
-            exhaustionRecord.setTotalBudgetUsed(budget.getUsedBudget());
-            exhaustionRecord.setConsecutiveFailuresAtExhaust(budget.getConsecutiveFailures());
-            exhaustionRecord.setTriggeringFailureReason(request.getFailureReason());
-            exhaustionRecord.setIsRecovered(false);
-            exhaustionRecordRepository.save(exhaustionRecord);
+            consecutiveFailures = budget.getConsecutiveFailures();
+            backoffMs = calculateBackoff(budget, consecutiveFailures);
             
-            log.warn("Budget exhausted for caller: {}, target: {}", budget.getCallerId(), budget.getTargetApi());
+            isExhausted = budget.getRemainingBudget() <= 0;
+            if (isExhausted) {
+                budget.setIsExhausted(true);
+                budget.setExhaustedAt(LocalDateTime.now());
+                budget.setNextRecoveryAt(LocalDateTime.now().plus(Duration.ofMillis(budget.getRecoveryIntervalMs())));
+                
+                ExhaustionRecord exhaustionRecord = new ExhaustionRecord();
+                exhaustionRecord.setBudgetId(budget.getId());
+                exhaustionRecord.setCallerId(budget.getCallerId());
+                exhaustionRecord.setTargetApi(budget.getTargetApi());
+                exhaustionRecord.setTotalBudgetUsed(budget.getUsedBudget());
+                exhaustionRecord.setConsecutiveFailuresAtExhaust(budget.getConsecutiveFailures());
+                exhaustionRecord.setTriggeringFailureReason(request.getFailureReason());
+                exhaustionRecord.setIsRecovered(false);
+                exhaustionRecordRepository.save(exhaustionRecord);
+                
+                log.warn("Budget exhausted for caller: {}, target: {}", budget.getCallerId(), budget.getTargetApi());
+            }
+            
+            retryBudgetRepository.save(budget);
         }
         
-        retryBudgetRepository.save(budget);
+        String finalIdempotentKey = (idempotentKey != null && !idempotentKey.isEmpty()) 
+                ? idempotentKey 
+                : UUID.randomUUID().toString().replace("-", "");
         
         FailureHistory history = new FailureHistory();
         history.setBudgetId(budget.getId());
@@ -170,15 +153,27 @@ public class RetryBudgetService {
         history.setTargetApi(budget.getTargetApi());
         history.setFailureType(classifiedType);
         history.setFailureReason(request.getFailureReason());
-        history.setAttemptNumber(budget.getConsecutiveFailures());
+        history.setAttemptNumber(consecutiveFailures);
         history.setBackoffMs(backoffMs);
         history.setBudgetExhausted(isExhausted);
-        if (idempotentKey != null && !idempotentKey.isEmpty()) {
-            history.setIdempotentKey(idempotentKey);
-        } else {
-            history.setIdempotentKey(UUID.randomUUID().toString().replace("-", ""));
-        }
+        history.setIdempotentKey(finalIdempotentKey);
+        history.setBudgetConsumed(budgetConsumed);
         failureHistoryRepository.save(history);
+        
+        String message;
+        if (!consumeBudget) {
+            message = "非消耗性失败，不扣除预算";
+        } else if (wasExhausted) {
+            message = "预算已耗尽，请等待恢复或联系管理员";
+        } else if (isExhausted) {
+            message = "本次重试耗尽预算，请等待恢复";
+        } else {
+            message = "重试预算检查通过";
+        }
+        
+        LocalDateTime nextRetryAt = isExhausted && budget.getNextRecoveryAt() != null 
+                ? budget.getNextRecoveryAt() 
+                : LocalDateTime.now().plus(Duration.ofMillis(backoffMs));
         
         return RetryCheckResponse.builder()
                 .allowed(!isExhausted)
@@ -189,11 +184,11 @@ public class RetryBudgetService {
                 .usedBudget(budget.getUsedBudget())
                 .consecutiveFailures(budget.getConsecutiveFailures())
                 .backoffMs(backoffMs)
-                .nextRetryAt(LocalDateTime.now().plus(Duration.ofMillis(backoffMs)))
+                .nextRetryAt(nextRetryAt)
                 .failureType(classifiedType)
                 .isExhausted(isExhausted)
                 .isIdempotentHit(false)
-                .message(isExhausted ? "预算已耗尽" : "重试预算检查通过")
+                .message(message)
                 .build();
     }
     
@@ -247,6 +242,102 @@ public class RetryBudgetService {
     
     public List<ExhaustionRecord> getExhaustionRecords(String callerId, String targetApi) {
         return exhaustionRecordRepository.findByCallerIdAndTargetApi(callerId, targetApi);
+    }
+    
+    public String exportFailureHistoryAsCsv(String callerId, String targetApi) {
+        List<FailureHistory> histories = failureHistoryRepository.findByCallerIdAndTargetApi(callerId, targetApi);
+        
+        StringBuilder csv = new StringBuilder();
+        csv.append("id,budgetId,callerId,targetApi,failureType,failureReason,attemptNumber,backoffMs,budgetExhausted,budgetConsumed,idempotentKey,createdAt\n");
+        
+        for (FailureHistory h : histories) {
+            csv.append(h.getId()).append(",");
+            csv.append(h.getBudgetId()).append(",");
+            csv.append(escapeCsv(h.getCallerId())).append(",");
+            csv.append(escapeCsv(h.getTargetApi())).append(",");
+            csv.append(h.getFailureType()).append(",");
+            csv.append(escapeCsv(h.getFailureReason())).append(",");
+            csv.append(h.getAttemptNumber()).append(",");
+            csv.append(h.getBackoffMs()).append(",");
+            csv.append(h.getBudgetExhausted()).append(",");
+            csv.append(h.getBudgetConsumed()).append(",");
+            csv.append(escapeCsv(h.getIdempotentKey())).append(",");
+            csv.append(h.getCreatedAt()).append("\n");
+        }
+        
+        return csv.toString();
+    }
+    
+    public String exportAllAsJson(String callerId, String targetApi) {
+        RetryBudget budget = retryBudgetRepository.findByCallerIdAndTargetApi(callerId, targetApi).orElse(null);
+        List<FailureHistory> histories = failureHistoryRepository.findByCallerIdAndTargetApi(callerId, targetApi);
+        List<ExhaustionRecord> exhaustionRecords = exhaustionRecordRepository.findByCallerIdAndTargetApi(callerId, targetApi);
+        
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        
+        if (budget != null) {
+            json.append("  \"budget\": {\n");
+            json.append("    \"id\": ").append(budget.getId()).append(",\n");
+            json.append("    \"callerId\": \"").append(budget.getCallerId()).append("\",\n");
+            json.append("    \"targetApi\": \"").append(budget.getTargetApi()).append("\",\n");
+            json.append("    \"totalBudget\": ").append(budget.getTotalBudget()).append(",\n");
+            json.append("    \"remainingBudget\": ").append(budget.getRemainingBudget()).append(",\n");
+            json.append("    \"usedBudget\": ").append(budget.getUsedBudget()).append(",\n");
+            json.append("    \"failedCount\": ").append(budget.getFailedCount()).append(",\n");
+            json.append("    \"consecutiveFailures\": ").append(budget.getConsecutiveFailures()).append(",\n");
+            json.append("    \"successCount\": ").append(budget.getSuccessCount()).append(",\n");
+            json.append("    \"isExhausted\": ").append(budget.getIsExhausted()).append(",\n");
+            json.append("    \"createdAt\": \"").append(budget.getCreatedAt()).append("\"\n");
+            json.append("  },\n");
+        }
+        
+        json.append("  \"failureHistory\": [\n");
+        for (int i = 0; i < histories.size(); i++) {
+            FailureHistory h = histories.get(i);
+            json.append("    {\n");
+            json.append("      \"id\": ").append(h.getId()).append(",\n");
+            json.append("      \"failureType\": \"").append(h.getFailureType()).append("\",\n");
+            json.append("      \"failureReason\": \"").append(escapeJson(h.getFailureReason())).append("\",\n");
+            json.append("      \"attemptNumber\": ").append(h.getAttemptNumber()).append(",\n");
+            json.append("      \"backoffMs\": ").append(h.getBackoffMs()).append(",\n");
+            json.append("      \"budgetExhausted\": ").append(h.getBudgetExhausted()).append(",\n");
+            json.append("      \"budgetConsumed\": ").append(h.getBudgetConsumed()).append(",\n");
+            json.append("      \"idempotentKey\": \"").append(h.getIdempotentKey()).append("\",\n");
+            json.append("      \"createdAt\": \"").append(h.getCreatedAt()).append("\"\n");
+            json.append("    }").append(i < histories.size() - 1 ? "," : "").append("\n");
+        }
+        json.append("  ],\n");
+        
+        json.append("  \"exhaustionRecords\": [\n");
+        for (int i = 0; i < exhaustionRecords.size(); i++) {
+            ExhaustionRecord r = exhaustionRecords.get(i);
+            json.append("    {\n");
+            json.append("      \"id\": ").append(r.getId()).append(",\n");
+            json.append("      \"totalBudgetUsed\": ").append(r.getTotalBudgetUsed()).append(",\n");
+            json.append("      \"consecutiveFailuresAtExhaust\": ").append(r.getConsecutiveFailuresAtExhaust()).append(",\n");
+            json.append("      \"triggeringFailureReason\": \"").append(escapeJson(r.getTriggeringFailureReason())).append("\",\n");
+            json.append("      \"isRecovered\": ").append(r.getIsRecovered()).append(",\n");
+            json.append("      \"createdAt\": \"").append(r.getCreatedAt()).append("\"\n");
+            json.append("    }").append(i < exhaustionRecords.size() - 1 ? "," : "").append("\n");
+        }
+        json.append("  ]\n");
+        json.append("}\n");
+        
+        return json.toString();
+    }
+    
+    private String escapeCsv(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
+    }
+    
+    private String escapeJson(String value) {
+        if (value == null) return "";
+        return value.replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
     }
     
     private FailureType classifyFailure(FailureType reportedType, String failureReason) {
