@@ -216,7 +216,7 @@
             <h2>➕ 创建预算</h2>
             <div class="form-row">
                 <input type="text" id="serviceId" placeholder="服务 ID (如: payment-service)" value="payment-service">
-                <input type="number" id="totalBudget" placeholder="总预算" value="100">
+                <input type="number" id="createTotalBudget" placeholder="总预算" value="100">
                 <input type="number" id="windowMinutes" placeholder="窗口时长(分钟)" value="60">
                 <button onclick="createBudget()">创建预算</button>
             </div>
@@ -299,7 +299,7 @@
 
         async function createBudget() {
             const serviceId = document.getElementById('serviceId').value;
-            const totalBudget = parseInt(document.getElementById('totalBudget').value);
+            const totalBudget = parseInt(document.getElementById('createTotalBudget').value);
             const windowMinutes = parseInt(document.getElementById('windowMinutes').value);
 
             try {

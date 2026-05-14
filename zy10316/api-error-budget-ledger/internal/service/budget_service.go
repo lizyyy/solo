@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	ErrBudgetFrozen      = errors.New("budget is frozen")
-	ErrBudgetExhausted   = errors.New("budget exhausted")
-	ErrInvalidState      = errors.New("invalid state")
-	ErrInvalidAmount     = errors.New("invalid amount")
-	ErrDuplicateRequest  = errors.New("duplicate request")
+	ErrBudgetFrozen     = errors.New("budget is frozen")
+	ErrBudgetExhausted  = errors.New("budget exhausted")
+	ErrInvalidState     = errors.New("invalid state")
+	ErrInvalidAmount    = errors.New("invalid amount")
+	ErrDuplicateRequest = errors.New("duplicate request")
 )
 
 type BudgetService struct {
@@ -106,15 +106,15 @@ func (s *BudgetService) DeductBudget(req *model.DeductBudgetRequest) (*model.Ded
 	}
 
 	event := &model.DeductEvent{
-		ID:           model.NewID(),
-		BudgetID:     req.BudgetID,
-		WindowID:     window.ID,
-		RequestID:    req.RequestID,
-		Source:       req.Source,
-		Amount:       req.Amount,
-		ErrorMessage: req.ErrorMessage,
-		Endpoint:     req.Endpoint,
-		Timestamp:    model.Now(),
+		ID:            model.NewID(),
+		BudgetID:      req.BudgetID,
+		WindowID:      window.ID,
+		RequestID:     req.RequestID,
+		Source:        req.Source,
+		Amount:        req.Amount,
+		ErrorMessage:  req.ErrorMessage,
+		Endpoint:      req.Endpoint,
+		Timestamp:     model.Now(),
 		IsCompensated: false,
 	}
 
@@ -164,8 +164,13 @@ func (s *BudgetService) CreateExemption(req *model.CreateExemptionRequest) (*mod
 		return nil, err
 	}
 
-	if _, err := s.storage.GetDeductEvent(req.DeductEventID); err != nil {
+	deductEvent, err := s.storage.GetDeductEvent(req.DeductEventID)
+	if err != nil {
 		return nil, err
+	}
+
+	if deductEvent.BudgetID != req.BudgetID {
+		return nil, ErrInvalidState
 	}
 
 	exemption := &model.Exemption{
@@ -206,7 +211,11 @@ func (s *BudgetService) ReviewExemption(req *model.ReviewExemptionRequest) (*mod
 		return nil, ErrInvalidState
 	}
 
-	budget, err := s.storage.GetBudget(req.BudgetID)
+	if req.BudgetID != "" && exemption.BudgetID != req.BudgetID {
+		return nil, ErrInvalidState
+	}
+
+	budget, err := s.storage.GetBudget(exemption.BudgetID)
 	if err != nil {
 		return nil, err
 	}
@@ -220,6 +229,10 @@ func (s *BudgetService) ReviewExemption(req *model.ReviewExemptionRequest) (*mod
 		event, err := s.storage.GetDeductEvent(exemption.DeductEventID)
 		if err != nil {
 			return nil, err
+		}
+
+		if event.BudgetID != exemption.BudgetID {
+			return nil, ErrInvalidState
 		}
 
 		compensation := &model.Compensation{
@@ -300,7 +313,7 @@ func (s *BudgetService) freezeServiceInternal(budget *model.ErrorBudget, reason 
 	}
 
 	s.addTimelineEntry(budget.ID, model.TimelineActionServiceFrozen, action.ID, "freeze_action", map[string]interface{}{
-		"reason":   reason,
+		"reason":    reason,
 		"frozen_by": frozenBy,
 	})
 
