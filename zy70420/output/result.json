@@ -1,0 +1,38 @@
+{
+  "exportInfo": {
+    "exportedAt": "2026-05-14T22:19:38.100Z",
+    "format": "JSON"
+  },
+  "batch": {
+    "batchId": "BATCH-2026-0515-001",
+    "batchName": "跨天直播样品表 - 美妆专场",
+    "createdAt": "2026-05-14T08:00:00Z",
+    "createdBy": "system"
+  },
+  "cancellation": {
+    "success": false,
+    "totalProcessed": 8,
+    "successfullyCancelled": 6,
+    "failedCount": 2,
+    "completedAt": "2026-05-14T22:19:38.100Z"
+  },
+  "failedSamples": [
+    {
+      "sampleId": "14465385-657a-4383-86f4-c96a407d98b8",
+      "productName": "无瑕持妆粉底液 自然色",
+      "error": "样本来源混杂，需人工复核后强制取消",
+      "source": "mixed",
+      "status": "pending",
+      "processingAdvice": "请追溯样品真实来源，确认后可强制取消"
+    },
+    {
+      "sampleId": "fb88b136-0125-444c-aec9-9ec861817d3b",
+      "productName": "持久定妆散粉",
+      "error": "样品已完成直播，非强制模式下不可取消",
+      "source": "system",
+      "status": "completed",
+      "processingAdvice": "已完成样品不建议取消，如确需取消请联系数据团队"
+    }
+  ],
+  "manualAdjustments": []
+}
