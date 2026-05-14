@@ -1,14 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import fs from 'fs'
-import path from 'path'
 import { initDatabase } from './database'
 import routes from './routes'
-
-const dataDir = path.join(__dirname, '../data')
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true })
-}
 
 initDatabase()
 

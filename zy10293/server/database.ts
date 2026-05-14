@@ -1,13 +1,19 @@
 import Database from 'better-sqlite3'
 import path from 'path'
+import fs from 'fs'
 
-const dbPath = path.join(__dirname, '../data/tea.db')
-const db = new Database(dbPath)
-
-db.pragma('journal_mode = WAL')
+const dbPath = path.join(process.cwd(), 'data/tea.db')
+let dbInstance: Database.Database
 
 export function initDatabase() {
-  db.exec(`
+  const dataDir = path.join(process.cwd(), 'data')
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true })
+  }
+  
+  dbInstance = new Database(dbPath)
+  dbInstance.pragma('journal_mode = WAL')
+  dbInstance.exec(`
     CREATE TABLE IF NOT EXISTS raw_materials (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       batch_no TEXT UNIQUE NOT NULL,
@@ -35,8 +41,7 @@ export function initDatabase() {
       description TEXT,
       created_by TEXT,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (parent_id) REFERENCES blending_schemes(id)
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS blending_items (
@@ -45,10 +50,7 @@ export function initDatabase() {
       material_id INTEGER NOT NULL,
       ratio REAL NOT NULL,
       quantity REAL NOT NULL,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (scheme_id) REFERENCES blending_schemes(id),
-      FOREIGN KEY (material_id) REFERENCES raw_materials(id),
-      UNIQUE(scheme_id, material_id)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS customers (
@@ -70,9 +72,7 @@ export function initDatabase() {
       location TEXT,
       notes TEXT,
       created_by TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (scheme_id) REFERENCES blending_schemes(id),
-      FOREIGN KEY (customer_id) REFERENCES customers(id)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS feedbacks (
@@ -84,9 +84,7 @@ export function initDatabase() {
       aftertaste TEXT,
       suggestions TEXT,
       will_buy INTEGER DEFAULT 0,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (session_id) REFERENCES tasting_sessions(id),
-      UNIQUE(session_id)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS finished_products (
@@ -101,8 +99,7 @@ export function initDatabase() {
       selling_price REAL,
       status TEXT DEFAULT 'in_stock',
       notes TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (scheme_id) REFERENCES blending_schemes(id)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS sales_records (
@@ -116,9 +113,7 @@ export function initDatabase() {
       unit_price REAL NOT NULL,
       total_amount REAL NOT NULL,
       notes TEXT,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (product_id) REFERENCES finished_products(id),
-      FOREIGN KEY (customer_id) REFERENCES customers(id)
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE INDEX IF NOT EXISTS idx_blending_scheme_status ON blending_schemes(status);
@@ -127,14 +122,10 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_sale_date ON sales_records(sale_date);
   `)
 
-  initSampleData()
-}
-
-function initSampleData() {
-  const count = db.prepare('SELECT COUNT(*) as cnt FROM raw_materials').get() as any
+  const count = dbInstance.prepare('SELECT COUNT(*) as cnt FROM raw_materials').get() as any
   if (count.cnt > 0) return
 
-  const insertMaterial = db.prepare(`
+  const insertMaterial = dbInstance.prepare(`
     INSERT INTO raw_materials (batch_no, name, type, origin, stock_quantity, unit, purchase_date, supplier)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `)
@@ -146,7 +137,7 @@ function initSampleData() {
   insertMaterial.run('BAT202401005', '大红袍', '乌龙茶', '福建武夷山', 2000, 'g', '2024-01-19', '武夷山大红袍厂')
   insertMaterial.run('BAT202401006', '普洱熟茶', '普洱茶', '云南勐海', 6000, 'g', '2024-01-20', '勐海茶厂')
 
-  const insertScheme = db.prepare(`
+  const insertScheme = dbInstance.prepare(`
     INSERT INTO blending_schemes (scheme_no, name, version, status, total_ratio, description)
     VALUES (?, ?, ?, ?, ?, ?)
   `)
@@ -156,7 +147,7 @@ function initSampleData() {
   insertScheme.run('BS002V1', '乌龙韵香', 1, 'approved', 100, '铁观音与大红袍的完美结合，香气悠长')
   insertScheme.run('BS003V1', '普洱陈韵', 1, 'draft', 100, '待试饮优化中')
 
-  const insertItem = db.prepare(`
+  const insertItem = dbInstance.prepare(`
     INSERT INTO blending_items (scheme_id, material_id, ratio, quantity)
     VALUES (?, ?, ?, ?)
   `)
@@ -169,7 +160,7 @@ function initSampleData() {
   insertItem.run(3, 5, 40, 400)
   insertItem.run(4, 6, 100, 1000)
 
-  const insertTasting = db.prepare(`
+  const insertTasting = dbInstance.prepare(`
     INSERT INTO tasting_sessions (session_no, scheme_id, customer_name, tasting_date, location)
     VALUES (?, ?, ?, ?, ?)
   `)
@@ -188,7 +179,7 @@ function initSampleData() {
     )
   }
 
-  const insertFeedback = db.prepare(`
+  const insertFeedback = dbInstance.prepare(`
     INSERT INTO feedbacks (session_id, rating, aroma, taste, aftertaste, suggestions, will_buy)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
@@ -211,7 +202,7 @@ function initSampleData() {
     )
   }
 
-  const insertProduct = db.prepare(`
+  const insertProduct = dbInstance.prepare(`
     INSERT INTO finished_products (product_no, name, scheme_id, production_date, quantity, unit, cost_price, selling_price)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `)
@@ -220,7 +211,7 @@ function initSampleData() {
   insertProduct.run('FP002', '经典祁红V2礼盒', 2, '2024-02-15', 300, '罐', 85, 218)
   insertProduct.run('FP003', '乌龙韵香礼盒', 3, '2024-02-20', 200, '罐', 95, 238)
 
-  const insertSale = db.prepare(`
+  const insertSale = dbInstance.prepare(`
     INSERT INTO sales_records (sale_no, product_id, customer_name, sale_date, quantity, unit_price, total_amount)
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
@@ -241,4 +232,8 @@ function initSampleData() {
   }
 }
 
-export default db
+export function getDb() {
+  return dbInstance
+}
+
+export default dbInstance!
