@@ -25,6 +25,25 @@ public class TransactionTemplateService {
             throw new BusinessException("模板编码已存在: " + request.getTemplateCode());
         }
 
+        if (request.getSteps() == null || request.getSteps().isEmpty()) {
+            throw new BusinessException("模板步骤不能为空");
+        }
+
+        for (StepRequest step : request.getSteps()) {
+            if (step.getStepOrder() == null) {
+                throw new BusinessException("步骤序号不能为空");
+            }
+            if (step.getStepName() == null || step.getStepName().trim().isEmpty()) {
+                throw new BusinessException("步骤名称不能为空");
+            }
+            if (step.getHttpMethod() == null || step.getHttpMethod().trim().isEmpty()) {
+                throw new BusinessException("步骤HTTP方法不能为空");
+            }
+            if (step.getUrl() == null || step.getUrl().trim().isEmpty()) {
+                throw new BusinessException("步骤URL不能为空");
+            }
+        }
+
         TransactionTemplate template = new TransactionTemplate();
         template.setTemplateCode(request.getTemplateCode());
         template.setTemplateName(request.getTemplateName());

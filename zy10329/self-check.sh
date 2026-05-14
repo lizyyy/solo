@@ -1,53 +1,71 @@
 #!/bin/bash
 
 echo "========================================"
-echo "  API合成事务巡检 - 自检测试脚本"
+echo "  API合成事务巡检 - 自检测试入口"
 echo "========================================"
 echo ""
 
-echo "检查 Maven 环境..."
-if ! command -v mvn &> /dev/null; then
-    echo "❌ Maven 未安装或未配置到PATH"
+# 检测Java环境
+echo "检测Java环境..."
+if ! command -v java &> /dev/null; then
+    echo "❌ 未检测到Java，请先安装JDK 11+"
     exit 1
 fi
-echo "✓ Maven 环境正常"
+JAVA_VERSION=$(java -version 2>&1 | head -1 | cut -d'"' -f2 | cut -d'.' -f1)
+echo "✓ Java版本: $JAVA_VERSION"
 echo ""
 
-echo "编译项目..."
-mvn compile -q
+# 检测Maven环境，优先使用mvnw
+echo "检测构建工具..."
+chmod +x mvnw 2>/dev/null
+
+if [ -f "./mvnw" ]; then
+    MVN_CMD="./mvnw"
+    echo "✓ 使用Maven Wrapper (mvnw)"
+elif command -v mvn &> /dev/null; then
+    MVN_CMD="mvn"
+    echo "✓ 使用系统Maven"
+else
+    echo "⚠ 未检测到Maven，将尝试直接编译运行"
+    echo ""
+    echo "提示: 可以手动下载Maven Wrapper jar:"
+    echo "  mkdir -p .mvn/wrapper"
+    echo "  cd .mvn/wrapper && curl -O https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
+    exit 1
+fi
+echo ""
+
+# 编译项目
+echo "编译项目中，请稍候..."
+$MVN_CMD compile -q -DskipTests
 if [ $? -ne 0 ]; then
-    echo "❌ 项目编译失败"
+    echo "❌ 项目编译失败，请检查代码错误"
     exit 1
 fi
 echo "✓ 项目编译成功"
 echo ""
 
-echo "运行自检测试..."
-mvn test -Dtest=SelfCheckTest -q
-if [ $? -eq 0 ]; then
+# 运行自检测试（运行主类）
+echo "运行自检程序..."
+$MVN_CMD spring-boot:run -Dspring-boot.run.main-class="com.api.inspection.SelfCheckMain" -q 2>&1 | grep -v "^\[INFO\]" | grep -v "^$"
+
+EXIT_CODE=${PIPESTATUS[0]}
+
+if [ $EXIT_CODE -eq 0 ]; then
     echo ""
     echo "========================================"
-    echo "  ✅ 所有自检测试通过!"
+    echo "  ✅ 自检测试成功完成!"
     echo "========================================"
     echo ""
-    echo "API 列表:"
-    echo "  POST   /api/templates              - 创建事务模板"
-    echo "  GET    /api/templates/{id}         - 查询模板详情"
-    echo "  POST   /api/templates/{id}/validate - 校验模板"
-    echo "  POST   /api/templates/{id}/status   - 更新模板状态"
-    echo "  POST   /api/templates/{id}/cancel   - 撤销模板"
-    echo "  POST   /api/batches                - 创建执行批次"
-    echo "  GET    /api/batches/{id}           - 查询批次详情"
-    echo "  POST   /api/batches/{id}/start     - 开始执行批次"
-    echo "  POST   /api/batches/{id}/steps/{order}/execute - 执行步骤"
-    echo "  POST   /api/batches/{id}/cancel    - 撤销批次"
-    echo "  GET    /api/export/template/{id}   - 导出模板"
-    echo "  GET    /api/export/batch/{id}      - 导出批次报告"
+    echo "启动完整服务命令:"
+    echo "  ./mvnw spring-boot:run"
     echo ""
-    echo "启动服务命令: mvn spring-boot:run"
-    echo "H2控制台: http://localhost:8080/h2-console"
-    echo ""
+    echo "或打包后运行:"
+    echo "  ./mvnw package"
+    echo "  java -jar target/api-transaction-inspection-1.0.0.jar"
+    exit 0
 else
-    echo "❌ 部分测试失败, 请查看上面的日志详情"
+    echo ""
+    echo "❌ 自检失败，请查看上面的错误信息"
     exit 1
 fi
