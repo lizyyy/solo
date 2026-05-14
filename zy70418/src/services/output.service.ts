@@ -82,13 +82,7 @@ export class OutputService {
     `, [fileRecordId, `%${fieldName}%`]);
     
     const previousStatus = previousResult?.status || ValidationStatus.FAILED;
-    const newStatus = ValidationStatus.MANUALLY_CORRECTED;
-    
-    await runQuery(db, `
-      UPDATE file_records 
-      SET ${fieldName} = ?
-      WHERE id = ?
-    `, [newValue, fileRecordId]);
+    const newStatus = previousStatus;
     
     await runQuery(db, `
       INSERT INTO correction_records (id, file_record_id, batch_id, field_name, old_value, new_value,
@@ -100,12 +94,6 @@ export class OutputService {
       correctedBy, correctionReason, new Date().toISOString(), riskLevel,
       previousStatus, newStatus
     ]);
-    
-    await runQuery(db, `
-      UPDATE validation_results 
-      SET status = ?
-      WHERE file_record_id = ? AND field_name LIKE ?
-    `, [newStatus, fileRecordId, `%${fieldName}%`]);
     
     db.close();
     
@@ -161,7 +149,7 @@ export class OutputService {
     }));
   }
 
-  static async generateRollbackCandidates(batchId: string, reason: string, approver: string): Promise<RollbackCandidate[]> {
+  static async generateRollbackCandidates(batchId: string, reason: string, createdBy: string): Promise<RollbackCandidate[]> {
     const db = getDb();
     const candidates: RollbackCandidate[] = [];
     
@@ -177,12 +165,11 @@ export class OutputService {
       
       await runQuery(db, `
         INSERT INTO rollback_candidates (id, batch_id, file_record_id, file_name, supplier_code,
-                                          reason, risk_level, created_at, approved, approved_by, approved_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
+                                          reason, risk_level, created_at, approved, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
       `, [
         candidateId, batchId, record.id, record.file_name, record.supplier_code,
-        reason, record.risk_level, new Date().toISOString(), 
-        approver, new Date().toISOString()
+        reason, record.risk_level, new Date().toISOString(), createdBy
       ]);
       
       candidates.push({
@@ -194,14 +181,27 @@ export class OutputService {
         reason,
         riskLevel: record.risk_level,
         createdAt: new Date(),
-        approved: true,
-        approvedBy: approver,
-        approvedAt: new Date()
+        approved: false
       });
     }
     
     db.close();
     return candidates;
+  }
+
+  static async approveRollbackCandidate(
+    candidateId: string, 
+    approved: boolean, 
+    approver: string, 
+    approvalNote?: string
+  ): Promise<void> {
+    const db = getDb();
+    await runQuery(db, `
+      UPDATE rollback_candidates 
+      SET approved = ?, approved_by = ?, approved_at = ?, approval_note = ?
+      WHERE id = ?
+    `, [approved ? 1 : 0, approver, new Date().toISOString(), approvalNote || null, candidateId]);
+    db.close();
   }
 
   static async getRollbackCandidates(batchId?: string, approved?: boolean): Promise<RollbackCandidate[]> {
@@ -233,9 +233,11 @@ export class OutputService {
       reason: candidate.reason,
       riskLevel: candidate.risk_level,
       createdAt: new Date(candidate.created_at),
+      createdBy: candidate.created_by,
       approved: !!candidate.approved,
       approvedBy: candidate.approved_by,
-      approvedAt: candidate.approved_at ? new Date(candidate.approved_at) : undefined
+      approvedAt: candidate.approved_at ? new Date(candidate.approved_at) : undefined,
+      approvalNote: candidate.approval_note
     }));
   }
 

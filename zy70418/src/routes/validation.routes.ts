@@ -170,9 +170,19 @@ router.get('/corrections', async (req: Request, res: Response) => {
 
 router.post('/rollback-candidates', async (req: Request, res: Response) => {
   try {
-    const { batchId, reason, approver } = req.body;
-    const candidates = await OutputService.generateRollbackCandidates(batchId, reason, approver);
+    const { batchId, reason, createdBy } = req.body;
+    const candidates = await OutputService.generateRollbackCandidates(batchId, reason, createdBy);
     res.json({ success: true, candidates });
+  } catch (error) {
+    res.status(500).json({ success: false, error: (error as Error).message });
+  }
+});
+
+router.put('/rollback-candidates/:id/approve', async (req: Request, res: Response) => {
+  try {
+    const { approved, approver, approvalNote } = req.body;
+    await OutputService.approveRollbackCandidate(req.params.id, approved, approver, approvalNote);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: (error as Error).message });
   }

@@ -93,9 +93,11 @@ CREATE TABLE IF NOT EXISTS rollback_candidates (
   reason TEXT NOT NULL,
   risk_level TEXT NOT NULL,
   created_at DATETIME NOT NULL,
+  created_by TEXT,
   approved BOOLEAN NOT NULL DEFAULT 0,
   approved_by TEXT,
   approved_at DATETIME,
+  approval_note TEXT,
   FOREIGN KEY (batch_id) REFERENCES validation_batches(id),
   FOREIGN KEY (file_record_id) REFERENCES file_records(id)
 );

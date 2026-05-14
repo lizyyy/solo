@@ -85,9 +85,11 @@ export interface RollbackCandidate {
   reason: string;
   riskLevel: RiskLevel;
   createdAt: Date;
+  createdBy?: string;
   approved: boolean;
   approvedBy?: string;
   approvedAt?: Date;
+  approvalNote?: string;
 }
 
 export interface ValidationBatch {
