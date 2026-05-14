@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API用量门户 - 异常监控系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.5rem; }
+        .nav-links { display: flex; gap: 1rem; }
+        .nav-links a { color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; background: rgba(255,255,255,0.1); }
+        .nav-links a:hover { background: rgba(255,255,255,0.2); }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 0.875rem; color: #666; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: bold; color: #333; }
+        .stat-card.warning .value { color: #f59e0b; }
+        .toolbar { background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 200px; }
+        .search-box input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem; }
+        .filter-group { display: flex; gap: 0.5rem; }
+        select, button { padding: 0.75rem 1rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem; cursor: pointer; }
+        button { background: #667eea; color: white; border: none; }
+        button:hover { background: #5a6fd8; }
+        button.secondary { background: #e5e7eb; color: #333; }
+        button.secondary:hover { background: #d1d5db; }
+        button.danger { background: #ef4444; }
+        button.danger:hover { background: #dc2626; }
+        button.success { background: #10b981; }
+        button.success:hover { background: #059669; }
+        .table-container { background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f9fafb; font-weight: 600; }
+        tr:hover { background: #f9fafb; }
+        .status { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .status.success { background: #d1fae5; color: #065f46; }
+        .status.error { background: #fee2e2; color: #991b1b; }
+        .status.blocked { background: #fef3c7; color: #92400e; }
+        .status.pending { background: #e0e7ff; color: #3730a3; }
+        .error-badge { background: #fee2e2; color: #991b1b; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 2rem; border-radius: 8px; max-width: 800px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-header h2 { font-size: 1.25rem; }
+        .close-btn { background: none; border: none; color: #666; font-size: 1.5rem; cursor: pointer; padding: 0; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .detail-item { padding: 1rem; background: #f9fafb; border-radius: 4px; }
+        .detail-item.full { grid-column: 1 / -1; }
+        .detail-item label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 0.5rem; }
+        .detail-item .value { font-family: monospace; font-size: 0.875rem; word-break: break-all; }
+        .action-buttons { display: flex; gap: 0.5rem; }
+        .action-buttons button { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .tab { padding: 0.75rem 1.5rem; border: none; background: #e5e7eb; color: #666; border-radius: 4px; cursor: pointer; }
+        .tab.active { background: #667eea; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .alert-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1rem; border-left: 4px solid #f59e0b; }
+        .alert-card.handled { border-left-color: #10b981; }
+        .alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .alert-title { font-weight: 600; font-size: 1rem; }
+        .alert-status { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; }
+        .alert-status.pending { background: #fef3c7; color: #92400e; }
+        .alert-status.handled { background: #d1fae5; color: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 API用量门户 - 异常监控系统</h1>
+        <div class="nav-links">
+            <a href="/">首页</a>
+            <a href="/console">管理控制台</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>总请求量</h3>
+                <div class="value" id="totalRequests">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>成功率</h3>
+                <div class="value" id="successRate">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>活跃应用</h3>
+                <div class="value" id="activeApps">-</div>
+            </div>
+            <div class="stat-card warning">
+                <h3>待处理提醒</h3>
+                <div class="value" id="pendingAlerts">-</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="usage">用量记录</button>
+            <button class="tab" data-tab="alerts">余额提醒</button>
+            <button class="tab" data-tab="apps">应用列表</button>
+        </div>
+
+        <div id="usage-tab" class="tab-content active">
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索应用ID或错误信息...">
+                </div>
+                <div class="filter-group">
+                    <select id="appFilter">
+                        <option value="">全部应用</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">全部状态</option>
+                        <option value="success">成功</option>
+                        <option value="error">错误</option>
+                        <option value="blocked">已拦截</option>
+                        <option value="pending">待处理</option>
+                    </select>
+                </div>
+                <button class="secondary" onclick="exportData()">导出CSV</button>
+                <button onclick="refreshData()">刷新</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>应用ID</th>
+                            <th>时间</th>
+                            <th>请求量</th>
+                            <th>状态</th>
+                            <th>错误信息</th>
+                            <th>重试</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usageTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="alerts-tab" class="tab-content">
+            <div id="alertsList"></div>
+        </div>
+
+        <div id="apps-tab" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>应用ID</th>
+                            <th>应用名称</th>
+                            <th>负责人</th>
+                            <th>余额</th>
+                            <th>阈值</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appsTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>用量详情</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="detail-grid" id="detailContent">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let usageData = [];
+        let appsData = [];
+        let billingData = [];
+
+        async function init() {
+            await loadStats();
+            await loadApps();
+            await loadUsage();
+            await loadBilling();
+            setupEventListeners();
+        }
+
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            const data = await res.json();
+            document.getElementById('totalRequests').textContent = data.data.total_requests.toLocaleString();
+            document.getElementById('successRate').textContent = data.data.success_rate;
+            document.getElementById('activeApps').textContent = data.data.active_apps;
+            document.getElementById('pendingAlerts').textContent = data.data.pending_alerts;
+        }
+
+        async function loadApps() {
+            const res = await fetch('/api/apps');
+            const data = await res.json();
+            appsData = data.data;
+            const select = document.getElementById('appFilter');
+            appsData.forEach(app => {
+                const opt = document.createElement('option');
+                opt.value = app.id;
+                opt.textContent = `${app.name} (${app.id})`;
+                select.appendChild(opt);
+            });
+            renderAppsTable();
+        }
+
+        async function loadUsage() {
+            const appId = document.getElementById('appFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const search = document.getElementById('searchInput').value;
+            let url = '/api/usage?';
+            if (appId) url += `app_id=${appId}&`;
+            if (status) url += `status=${status}&`;
+            if (search) url += `search=${encodeURIComponent(search)}&`;
+            const res = await fetch(url);
+            const data = await res.json();
+            usageData = data.data;
+            renderUsageTable();
+        }
+
+        async function loadBilling() {
+            const res = await fetch('/api/billing');
+            const data = await res.json();
+            billingData = data.data;
+            renderAlerts();
+        }
+
+        function renderUsageTable() {
+            const tbody = document.getElementById('usageTable');
+            tbody.innerHTML = usageData.map(u => `
+                <tr>
+                    <td>${u.id}</td>
+                    <td>${u.app_id}</td>
+                    <td>${u.timestamp}</td>
+                    <td>${u.count.toLocaleString()}</td>
+                    <td><span class="status ${u.status}">${getStatusText(u.status)}</span></td>
+                    <td>${u.error_message ? `<span class="error-badge" onclick="showErrorDetail('${u.id}')">查看详情</span>` : '-'}</td>
+                    <td>${u.retry_count || 0}</td>
+                    <td class="action-buttons">
+                        <button class="secondary" onclick="showDetail('${u.id}')">详情</button>
+                        ${u.status === 'error' ? `<button class="success" onclick="retryUsage('${u.id}')">重试</button>` : ''}
+                        ${u.status === 'success' ? `<button class="danger" onclick="rollbackUsage('${u.id}')">回滚</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAppsTable() {
+            const tbody = document.getElementById('appsTable');
+            tbody.innerHTML = appsData.map(app => `
+                <tr>
+                    <td>${app.id}</td>
+                    <td>${app.name}</td>
+                    <td>${app.owner}</td>
+                    <td>¥${app.balance.toLocaleString()}</td>
+                    <td>¥${app.threshold.toLocaleString()}</td>
+                    <td><span class="status ${app.status}">${app.status === 'active' ? '正常' : '警告'}</span></td>
+                    <td class="action-buttons">
+                        <button class="secondary" onclick="diagnoseApp('${app.id}')">诊断</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAlerts() {
+            const container = document.getElementById('alertsList');
+            const alerts = billingData.filter(b => b.balance_alert);
+            container.innerHTML = alerts.map(b => {
+                const app = appsData.find(a => a.id === b.app_id);
+                return `
+                    <div class="alert-card ${b.alert_handled ? 'handled' : ''}">
+                        <div class="alert-header">
+                            <span class="alert-title">⚠️ ${app ? app.name : b.app_id} - 余额不足提醒</span>
+                            <span class="alert-status ${b.alert_handled ? 'handled' : 'pending'}">${b.alert_handled ? '已处理' : '待处理'}</span>
+                        </div>
+                        <p><strong>账单周期：</strong>${b.period}</p>
+                        <p><strong>总用量：</strong>${b.total_usage.toLocaleString()} 次</p>
+                        <p><strong>账单金额：</strong>¥${b.amount.toLocaleString()}</p>
+                        ${b.alert_handled ? `
+                            <p><strong>处理人：</strong>${b.handled_by}</p>
+                            <p><strong>处理时间：</strong>${b.handled_at}</p>
+                        ` : `
+                            <div style="margin-top: 1rem;">
+                                <button class="success" onclick="handleAlert('${b.id}')">标记为已处理</button>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusText(status) {
+            const map = { success: '成功', error: '错误', blocked: '已拦截', pending: '待处理' };
+            return map[status] || status;
+        }
+
+        function showDetail(id) {
+            const item = usageData.find(u => u.id === id);
+            if (!item) return;
+            const content = document.getElementById('detailContent');
+            content.innerHTML = `
+                <div class="detail-item">
+                    <label>记录ID</label>
+                    <div class="value">${item.id}</div>
+                </div>
+                <div class="detail-item">
+                    <label>应用ID</label>
+                    <div class="value">${item.app_id}</div>
+                </div>
+                <div class="detail-item">
+                    <label>令牌ID</label>
+                    <div class="value">${item.token_id}</div>
+                </div>
+                <div class="detail-item">
+                    <label>时间</label>
+                    <div class="value">${item.timestamp}</div>
+                </div>
+                <div class="detail-item">
+                    <label>请求量</label>
+                    <div class="value">${item.count.toLocaleString()}</div>
+                </div>
+                <div class="detail-item">
+                    <label>状态</label>
+                    <div class="value"><span class="status ${item.status}">${getStatusText(item.status)}</span></div>
+                </div>
+                <div class="detail-item full">
+                    <label>原始输入</label>
+                    <div class="value">${JSON.stringify(item.raw_input, null, 2)}</div>
+                </div>
+                <div class="detail-item full">
+                    <label>处理结果</label>
+                    <div class="value">${JSON.stringify(item.processed_result, null, 2)}</div>
+                </div>
+                ${item.error_message ? `
+                    <div class="detail-item full">
+                        <label>错误信息</label>
+                        <div class="value" style="color: #dc2626;">${item.error_message}</div>
+                    </div>
+                ` : ''}
+                <div class="detail-item">
+                    <label>重试次数</label>
+                    <div class="value">${item.retry_count || 0}</div>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function showErrorDetail(id) {
+            showDetail(id);
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        async function retryUsage(id) {
+            if (!confirm('确定要重试这条记录吗？')) return;
+            const res = await fetch(`/api/usage/${id}/retry`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('重试成功！');
+                await loadUsage();
+                await loadStats();
+            } else {
+                alert('重试失败：' + data.error);
+            }
+        }
+
+        async function rollbackUsage(id) {
+            if (!confirm('确定要回滚这条记录吗？这将取消该记录的计费。')) return;
+            const res = await fetch(`/api/rollback/${id}`, { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                alert('回滚成功！');
+                await loadUsage();
+                await loadStats();
+            } else {
+                alert('回滚失败：' + data.error);
+            }
+        }
+
+        async function handleAlert(billId) {
+            const handledBy = prompt('请输入处理人姓名：', '管理员');
+            if (!handledBy) return;
+            const res = await fetch(`/api/billing/${billId}/handle_alert`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ handled_by: handledBy })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('处理成功！');
+                await loadBilling();
+                await loadStats();
+            } else {
+                alert('处理失败：' + data.error);
+            }
+        }
+
+        async function diagnoseApp(appId) {
+            const res = await fetch(`/api/diagnose/${appId}`);
+            const data = await res.json();
+            if (data.success) {
+                const d = data.data;
+                alert(`诊断结果：\n总记录：${d.summary.total}\n成功：${d.summary.success}\n已拦截：${d.summary.blocked}\n错误：${d.summary.errors}\n\n错误类型：${JSON.stringify(d.error_types, null, 2)}`);
+            }
+        }
+
+        async function exportData() {
+            window.location.href = '/api/export';
+        }
+
+        function refreshData() {
+            loadUsage();
+            loadStats();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', debounce(loadUsage, 300));
+            document.getElementById('appFilter').addEventListener('change', loadUsage);
+            document.getElementById('statusFilter').addEventListener('change', loadUsage);
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+                });
+            });
+        }
+
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        init();
+    </script>
+</body>
+</html>

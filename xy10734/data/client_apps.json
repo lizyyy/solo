@@ -1,0 +1,29 @@
+[
+  {
+    "id": "app_001",
+    "name": "电商数据同步系统",
+    "owner": "张三",
+    "status": "active",
+    "balance": 8500,
+    "threshold": 1000,
+    "created_at": "2024-01-15T08:00:00"
+  },
+  {
+    "id": "app_002",
+    "name": "用户画像分析",
+    "owner": "李四",
+    "status": "active",
+    "balance": 2300,
+    "threshold": 500,
+    "created_at": "2024-02-20T10:30:00"
+  },
+  {
+    "id": "app_003",
+    "name": "实时风控接口",
+    "owner": "王五",
+    "status": "warning",
+    "balance": 450,
+    "threshold": 500,
+    "created_at": "2024-03-10T14:15:00"
+  }
+]

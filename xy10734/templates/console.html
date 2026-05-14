@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理控制台 - API用量门户</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; background: #1a1a2e; color: #eee; }
+        .header { background: #16213e; padding: 1rem 2rem; border-bottom: 1px solid #0f3460; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.25rem; color: #e94560; }
+        .nav-links a { color: #eee; text-decoration: none; padding: 0.5rem 1rem; margin-left: 0.5rem; border-radius: 4px; background: #0f3460; }
+        .nav-links a:hover { background: #e94560; }
+        .container { max-width: 1400px; margin: 2rem auto; padding: 0 2rem; }
+        .console { background: #0f0f23; border-radius: 8px; padding: 1rem; height: 60vh; overflow-y: auto; font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; line-height: 1.6; }
+        .console-line { margin: 0.25rem 0; }
+        .console-line .time { color: #666; margin-right: 0.5rem; }
+        .console-line .cmd { color: #e94560; }
+        .console-line .info { color: #4ecdc4; }
+        .console-line .success { color: #2ecc71; }
+        .console-line .error { color: #e74c3c; }
+        .console-line .data { color: #f39c12; }
+        .toolbar { margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        button { padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; background: #e94560; color: white; }
+        button:hover { background: #ff6b6b; }
+        button.secondary { background: #0f3460; }
+        button.secondary:hover { background: #1a4a8a; }
+        button.success { background: #2ecc71; }
+        button.success:hover { background: #27ae60; }
+        .input-group { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .input-group input { flex: 1; padding: 0.75rem 1rem; background: #1a1a2e; border: 1px solid #0f3460; border-radius: 4px; color: #eee; font-family: monospace; }
+        .section { margin-bottom: 2rem; }
+        .section h2 { font-size: 1rem; margin-bottom: 1rem; color: #4ecdc4; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .card { background: #16213e; padding: 1rem; border-radius: 8px; border: 1px solid #0f3460; }
+        .card h3 { font-size: 0.875rem; color: #888; margin-bottom: 0.5rem; }
+        .card .value { font-size: 1.5rem; font-weight: bold; }
+        .endpoint-list { background: #0f0f23; border-radius: 8px; padding: 1rem; }
+        .endpoint { padding: 0.75rem; border-bottom: 1px solid #1a1a2e; display: flex; justify-content: space-between; align-items: center; }
+        .endpoint:last-child { border-bottom: none; }
+        .endpoint .method { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-right: 0.5rem; }
+        .method.GET { background: #2ecc71; color: white; }
+        .method.POST { background: #3498db; color: white; }
+        .endpoint .url { color: #4ecdc4; font-family: monospace; }
+        .endpoint button { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ 管理控制台</h1>
+        <div class="nav-links">
+            <a href="/">返回首页</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="section">
+            <h2>系统概览</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>数据目录</h3>
+                    <div class="value" style="font-size: 0.875rem;">./data/</div>
+                </div>
+                <div class="card">
+                    <h3>数据持久化</h3>
+                    <div class="value" style="color: #2ecc71;">已启用</div>
+                </div>
+                <div class="card">
+                    <h3>导出目录</h3>
+                    <div class="value" style="font-size: 0.875rem;">./data/exports/</div>
+                </div>
+                <div class="card">
+                    <h3>API版本</h3>
+                    <div class="value">v1.0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>快捷操作</h2>
+            <div class="toolbar">
+                <button onclick="cmdGetUsage()">获取用量记录</button>
+                <button onclick="cmdGetApps()">获取应用列表</button>
+                <button onclick="cmdGetTokens()">获取令牌列表</button>
+                <button onclick="cmdGetBilling()">获取账单信息</button>
+                <button onclick="cmdGetStats()">获取统计数据</button>
+                <button class="success" onclick="cmdExport()">导出CSV</button>
+                <button class="secondary" onclick="clearConsole()">清空控制台</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>API接口列表</h2>
+            <div class="endpoint-list">
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/usage</span></div>
+                    <button onclick="callEndpoint('/api/usage', 'GET')">调用</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/apps</span></div>
+                    <button onclick="callEndpoint('/api/apps', 'GET')">调用</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/tokens</span></div>
+                    <button onclick="callEndpoint('/api/tokens', 'GET')">调用</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/billing</span></div>
+                    <button onclick="callEndpoint('/api/billing', 'GET')">调用</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/stats</span></div>
+                    <button onclick="callEndpoint('/api/stats', 'GET')">调用</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/diagnose/{app_id}</span></div>
+                    <button onclick="cmdDiagnose()">诊断</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method POST">POST</span><span class="url">/api/usage/{id}/retry</span></div>
+                    <button onclick="cmdRetry()">重试</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method POST">POST</span><span class="url">/api/rollback/{id}</span></div>
+                    <button onclick="cmdRollback()">回滚</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method POST">POST</span><span class="url">/api/billing/{id}/handle_alert</span></div>
+                    <button onclick="cmdHandleAlert()">处理提醒</button>
+                </div>
+                <div class="endpoint">
+                    <div><span class="method GET">GET</span><span class="url">/api/export</span></div>
+                    <button onclick="cmdExport()">导出</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>控制台输出</h2>
+            <div class="console" id="consoleOutput"></div>
+            <div class="input-group">
+                <input type="text" id="cmdInput" placeholder="输入命令... (help 查看帮助)" onkeypress="if(event.key==='Enter')executeCmd()">
+                <button onclick="executeCmd()">执行</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const consoleOutput = document.getElementById('consoleOutput');
+        const cmdInput = document.getElementById('cmdInput');
+
+        const commands = {
+            help: '显示可用命令',
+            usage: '获取用量记录',
+            apps: '获取应用列表',
+            tokens: '获取访问令牌',
+            billing: '获取账单信息',
+            stats: '获取统计数据',
+            diagnose [app_id]: '诊断指定应用',
+            retry [usage_id]: '重试指定记录',
+            rollback [usage_id]: '回滚指定记录',
+            export: '导出CSV文件',
+            clear: '清空控制台'
+        };
+
+        function log(type, message) {
+            const time = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = 'console-line';
+            line.innerHTML = `<span class="time">[${time}]</span><span class="${type}">${message}</span>`;
+            consoleOutput.appendChild(line);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        async function callEndpoint(url, method, body = null) {
+            log('cmd', `> ${method} ${url}`);
+            try {
+                const options = { method };
+                if (body) {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = JSON.stringify(body);
+                }
+                const res = await fetch(url, options);
+                const data = await res.json();
+                log('success', `✓ 状态: ${res.status}`);
+                log('data', JSON.stringify(data, null, 2));
+            } catch (e) {
+                log('error', `✗ 错误: ${e.message}`);
+            }
+        }
+
+        async function executeCmd() {
+            const input = cmdInput.value.trim();
+            if (!input) return;
+            const parts = input.split(' ');
+            const cmd = parts[0].toLowerCase();
+            const args = parts.slice(1);
+            log('cmd', `$ ${input}`);
+            switch (cmd) {
+                case 'help':
+                    log('info', '可用命令：');
+                    Object.entries(commands).forEach(([k, v]) => log('data', `  ${k.padEnd(20)} - ${v}`));
+                    break;
+                case 'usage': await cmdGetUsage(); break;
+                case 'apps': await cmdGetApps(); break;
+                case 'tokens': await cmdGetTokens(); break;
+                case 'billing': await cmdGetBilling(); break;
+                case 'stats': await cmdGetStats(); break;
+                case 'diagnose': await cmdDiagnose(args[0]); break;
+                case 'retry': await cmdRetry(args[0]); break;
+                case 'rollback': await cmdRollback(args[0]); break;
+                case 'export': await cmdExport(); break;
+                case 'clear': clearConsole(); break;
+                default: log('error', `未知命令: ${cmd}。输入 help 查看帮助。`);
+            }
+            cmdInput.value = '';
+        }
+
+        async function cmdGetUsage() { await callEndpoint('/api/usage', 'GET'); }
+        async function cmdGetApps() { await callEndpoint('/api/apps', 'GET'); }
+        async function cmdGetTokens() { await callEndpoint('/api/tokens', 'GET'); }
+        async function cmdGetBilling() { await callEndpoint('/api/billing', 'GET'); }
+        async function cmdGetStats() { await callEndpoint('/api/stats', 'GET'); }
+        async function cmdDiagnose(appId) {
+            const id = appId || prompt('请输入应用ID:', 'app_001');
+            if (id) await callEndpoint(`/api/diagnose/${id}`, 'GET');
+        }
+        async function cmdRetry(usageId) {
+            const id = usageId || prompt('请输入用量记录ID:', 'usage_0015');
+            if (id) await callEndpoint(`/api/usage/${id}/retry`, 'POST');
+        }
+        async function cmdRollback(usageId) {
+            const id = usageId || prompt('请输入用量记录ID:', 'usage_0001');
+            if (id) await callEndpoint(`/api/rollback/${id}`, 'POST');
+        }
+        async function cmdHandleAlert() {
+            const billId = prompt('请输入账单ID:', 'bill_003');
+            const handler = prompt('请输入处理人:', '管理员');
+            if (billId && handler) await callEndpoint(`/api/billing/${billId}/handle_alert`, 'POST', { handled_by: handler });
+        }
+        async function cmdExport() {
+            log('info', '正在导出CSV文件...');
+            window.location.href = '/api/export';
+            log('success', '导出请求已发送');
+        }
+        function clearConsole() { consoleOutput.innerHTML = ''; log('info', '控制台已清空'); }
+
+        log('info', '╔══════════════════════════════════════════════════════════════╗');
+        log('info', '║  API用量门户 - 管理控制台                                     ║');
+        log('info', '║  输入 help 查看可用命令                                        ║');
+        log('info', '╚══════════════════════════════════════════════════════════════╝');
+        log('info', '系统初始化完成，数据持久化已启用');
+        log('info', '样例数据已加载：3个应用，100条用量记录（包含异常峰值和脏数据）');
+    </script>
+</body>
+</html>

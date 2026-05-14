@@ -1,0 +1,1902 @@
+[
+  {
+    "id": "usage_0000",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T12:46:52",
+    "count": 50,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.0",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 50,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0001",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T12:47:52",
+    "count": 60,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.1",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 60,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0002",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T12:48:52",
+    "count": 70,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.2",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 70,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0003",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T12:49:52",
+    "count": 80,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.3",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 80,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0004",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T12:50:52",
+    "count": 90,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.4",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 90,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0005",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T13:51:52",
+    "count": 100,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.5",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 100,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0006",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T13:52:52",
+    "count": 110,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.6",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 110,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0007",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T13:53:52",
+    "count": 120,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.7",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 120,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0008",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T13:54:52",
+    "count": 130,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.8",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 130,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0009",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T13:55:52",
+    "count": 140,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.9",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 140,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0010",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T14:56:52",
+    "count": 150,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.10",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 150,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0011",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T14:57:52",
+    "count": 160,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.11",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 160,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0012",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T14:58:52",
+    "count": 170,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.12",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 170,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0013",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T14:59:52",
+    "count": 180,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.13",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 180,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0014",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T15:00:52",
+    "count": 190,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.14",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 190,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0015",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T16:01:52",
+    "count": 200,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.15",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "error"
+    },
+    "status": "error",
+    "error_message": "参数校验失败：无效的时间戳格式",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0016",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T16:02:52",
+    "count": 210,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.16",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 210,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0017",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T16:03:52",
+    "count": 220,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.17",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 220,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0018",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T16:04:52",
+    "count": 230,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.18",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 230,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0019",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T16:05:52",
+    "count": 240,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.19",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 240,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0020",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T17:06:52",
+    "count": 50,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.20",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 50,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0021",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T17:07:52",
+    "count": 60,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.21",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 60,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0022",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T17:08:52",
+    "count": 70,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.22",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 70,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0023",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T17:09:52",
+    "count": 7300,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.23",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "blocked"
+    },
+    "status": "blocked",
+    "error_message": "异常峰值拦截：请求量超过阈值10倍",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0024",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T17:10:52",
+    "count": 90,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.24",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 90,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0025",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T18:11:52",
+    "count": 100,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.25",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 100,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0026",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T18:12:52",
+    "count": 110,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.26",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 110,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0027",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T18:13:52",
+    "count": 120,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.27",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 120,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0028",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T18:14:52",
+    "count": 130,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.28",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 130,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0029",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T18:15:52",
+    "count": 140,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.29",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 140,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0030",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T19:16:52",
+    "count": 150,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.30",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 150,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0031",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T19:17:52",
+    "count": 160,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.31",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 160,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0032",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T19:18:52",
+    "count": 170,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.32",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 170,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0033",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T19:19:52",
+    "count": 180,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.33",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "error"
+    },
+    "status": "error",
+    "error_message": "参数校验失败：无效的时间戳格式",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0034",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T19:20:52",
+    "count": 190,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.34",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 190,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0035",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T20:21:52",
+    "count": 200,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.35",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 200,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0036",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T20:22:52",
+    "count": 210,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.36",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 210,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0037",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T20:23:52",
+    "count": 220,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.37",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 220,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0038",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T20:24:52",
+    "count": 230,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.38",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 230,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0039",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T20:25:52",
+    "count": 240,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.39",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 240,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0040",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T21:26:52",
+    "count": 50,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.40",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 50,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0041",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T21:27:52",
+    "count": 60,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.41",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 60,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0042",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T21:28:52",
+    "count": 70,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.42",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 70,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0043",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T21:29:52",
+    "count": 80,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.43",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 80,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0044",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T21:30:52",
+    "count": 90,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.44",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 90,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0045",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T22:31:52",
+    "count": 100,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.45",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 100,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0046",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T22:32:52",
+    "count": 110,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.46",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 110,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0047",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T22:33:52",
+    "count": 9700,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.47",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "blocked"
+    },
+    "status": "blocked",
+    "error_message": "异常峰值拦截：请求量超过阈值10倍",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0048",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T22:34:52",
+    "count": 130,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.48",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 130,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0049",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T22:35:52",
+    "count": 140,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.49",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 140,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0050",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T23:36:52",
+    "count": 150,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.50",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 150,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0051",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T23:37:52",
+    "count": 160,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.51",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 160,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0052",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-13T23:38:52",
+    "count": 170,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.52",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 170,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0053",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-13T23:39:52",
+    "count": 180,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.53",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 180,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0054",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-13T23:40:52",
+    "count": 190,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.54",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 190,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0055",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T00:41:52",
+    "count": 200,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.55",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 200,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0056",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T00:42:52",
+    "count": 210,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.56",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 210,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0057",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T00:43:52",
+    "count": 220,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.57",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 220,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0058",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T00:44:52",
+    "count": 230,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.58",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 230,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0059",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T00:45:52",
+    "count": 240,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.59",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 240,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0060",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T00:46:52",
+    "count": 50,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.60",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 50,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0061",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T00:47:52",
+    "count": 60,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.61",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 60,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0062",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T00:48:52",
+    "count": 70,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.62",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 70,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0063",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T00:49:52",
+    "count": 80,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.63",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 80,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0064",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T00:50:52",
+    "count": 90,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.64",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 90,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0065",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T01:51:52",
+    "count": 100,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.65",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 100,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0066",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T01:52:52",
+    "count": 110,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.66",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "error"
+    },
+    "status": "error",
+    "error_message": "参数校验失败：无效的时间戳格式",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0067",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T01:53:52",
+    "count": 120,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.67",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 120,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0068",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T01:54:52",
+    "count": 130,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.68",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 130,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0069",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T01:55:52",
+    "count": 140,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.69",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 140,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0070",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T02:56:52",
+    "count": 150,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.70",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 150,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0071",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T02:57:52",
+    "count": 160,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.71",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 160,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0072",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T02:58:52",
+    "count": 170,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.72",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 170,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0073",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T02:59:52",
+    "count": 180,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.73",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 180,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0074",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T03:00:52",
+    "count": 190,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.74",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 190,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0075",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T04:01:52",
+    "count": 200,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.75",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 200,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0076",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T04:02:52",
+    "count": 210,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.76",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 210,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0077",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T04:03:52",
+    "count": 220,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.77",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 220,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0078",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T04:04:52",
+    "count": 230,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.78",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 230,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0079",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T04:05:52",
+    "count": 240,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.79",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 240,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0080",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T05:06:52",
+    "count": 50,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.80",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 50,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0081",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T05:07:52",
+    "count": 60,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.81",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 60,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0082",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T05:08:52",
+    "count": 70,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.82",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 70,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0083",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T05:09:52",
+    "count": 80,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.83",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 80,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0084",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T05:10:52",
+    "count": 90,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.84",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 90,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0085",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T06:11:52",
+    "count": 100,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.85",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 100,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0086",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T06:12:52",
+    "count": 110,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.86",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 110,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0087",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T06:13:52",
+    "count": 120,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.87",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 120,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0088",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T06:14:52",
+    "count": 130,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.88",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 130,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0089",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T06:15:52",
+    "count": 13900,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.89",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 0,
+      "status": "blocked"
+    },
+    "status": "blocked",
+    "error_message": "异常峰值拦截：请求量超过阈值10倍",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0090",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T07:16:52",
+    "count": 150,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.90",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 150,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0091",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T07:17:52",
+    "count": 160,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.91",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 160,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0092",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T07:18:52",
+    "count": 170,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.92",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 170,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0093",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T07:19:52",
+    "count": 180,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.93",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 180,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0094",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T07:20:52",
+    "count": 190,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.94",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 190,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0095",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T08:21:52",
+    "count": 200,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.95",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 200,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0096",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T08:22:52",
+    "count": 210,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.96",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 210,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0097",
+    "app_id": "app_002",
+    "token_id": "tok_002",
+    "timestamp": "2026-05-14T08:23:52",
+    "count": 220,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.97",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 220,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0098",
+    "app_id": "app_003",
+    "token_id": "tok_003",
+    "timestamp": "2026-05-14T08:24:52",
+    "count": 230,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.98",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 230,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  },
+  {
+    "id": "usage_0099",
+    "app_id": "app_001",
+    "token_id": "tok_001",
+    "timestamp": "2026-05-14T08:25:52",
+    "count": 240,
+    "raw_input": {
+      "api_version": "v1",
+      "client_ip": "192.168.1.99",
+      "user_agent": "python-requests/2.31.0"
+    },
+    "processed_result": {
+      "billed": 240,
+      "status": "success"
+    },
+    "status": "success",
+    "error_message": "",
+    "retry_count": 0
+  }
+]
