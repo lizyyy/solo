@@ -31,38 +31,45 @@ export class ResultStore {
     }
   }
 
-  findPreviousResult(orderId: string, schemaDiffs: SchemaDiff[]): StoredResult | null {
+  findPreviousResult(orderId: string): StoredResult | null {
     const results = this.loadResults();
     const matching = results.filter(r => r.orderId === orderId);
-    
-    for (const result of matching) {
-      if (isEqual(result.schemaDiffs, schemaDiffs)) {
-        return result;
-      }
-    }
-    return null;
+    if (matching.length === 0) return null;
+    return matching.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
   }
 
   detectConflict(orderId: string, schemaDiffs: SchemaDiff[]): {
     conflict: boolean;
     previousResult?: StoredResult;
     reason?: string;
+    canReuse?: boolean;
   } {
-    const previous = this.findPreviousResult(orderId, schemaDiffs);
+    const previous = this.findPreviousResult(orderId);
     if (previous) {
-      if (previous.humanRemarks && !isEqual(previous.schemaDiffs, schemaDiffs)) {
+      const schemaUnchanged = isEqual(previous.schemaDiffs, schemaDiffs);
+      
+      if (schemaUnchanged) {
+        return {
+          conflict: false,
+          previousResult: previous,
+          canReuse: true
+        };
+      } else if (previous.humanRemarks) {
         return {
           conflict: true,
           previousResult: previous,
-          reason: 'Schema已变更，但有人工备注未处理'
+          reason: 'Schema已变更，但有人工备注未处理，请重新审核',
+          canReuse: false
+        };
+      } else {
+        return {
+          conflict: false,
+          previousResult: previous,
+          canReuse: false
         };
       }
-      return {
-        conflict: false,
-        previousResult: previous
-      };
     }
-    return { conflict: false };
+    return { conflict: false, canReuse: false };
   }
 
   storeResult(result: Omit<StoredResult, 'id' | 'createdAt' | 'updatedAt'>): StoredResult {
@@ -167,13 +174,35 @@ export class ResultStore {
 
   addPartitions(partitions: Omit<LakehousePartition, 'humanConfirmed'>[]): void {
     const existing = this.getPartitions();
-    const now = new Date().toISOString();
     const newPartitions = partitions.map(p => ({
       ...p,
       humanConfirmed: false
     }));
     
     const merged = [...existing, ...newPartitions];
+    fs.writeJsonSync(this.partitionsFile, merged, { spaces: 2 });
+  }
+
+  addOrUpdatePartitions(partitions: Omit<LakehousePartition, 'humanConfirmed'>[]): void {
+    const existing = this.getPartitions();
+    const existingMap = new Map(existing.map(p => [p.name, p]));
+    
+    for (const p of partitions) {
+      if (existingMap.has(p.name)) {
+        const existing = existingMap.get(p.name)!;
+        existingMap.set(p.name, {
+          ...existing,
+          recordCount: existing.recordCount + p.recordCount
+        });
+      } else {
+        existingMap.set(p.name, {
+          ...p,
+          humanConfirmed: false
+        });
+      }
+    }
+    
+    const merged = Array.from(existingMap.values());
     fs.writeJsonSync(this.partitionsFile, merged, { spaces: 2 });
   }
 

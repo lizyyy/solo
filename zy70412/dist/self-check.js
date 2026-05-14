@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const schema_diff_1 = require("./schema-diff");
 const logistics_processor_1 = require("./logistics-processor");
 const result_store_1 = require("./result-store");
 const batch_processor_1 = require("./batch-processor");
 const uuid_1 = require("uuid");
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const chalk_1 = __importDefault(require("chalk"));
+const fs_extra_1 = require("fs-extra");
+const chalk_1 = require("chalk");
 let passed = 0;
 let failed = 0;
 function test(name, fn) {
@@ -204,9 +201,41 @@ async function runSelfCheck() {
         assertEqual(result.orderId, 'TEST001');
     });
     test('查找之前的结果', () => {
-        const found = store.findPreviousResult('TEST001', []);
+        const found = store.findPreviousResult('TEST001');
         assert(found !== null);
         assertEqual(found?.orderId, 'TEST001');
+    });
+    test('检测Schema变更但有人工备注时的冲突', () => {
+        const result = store.storeResult({
+            batchId: (0, uuid_1.v4)(),
+            itemId: (0, uuid_1.v4)(),
+            orderId: 'TEST_CONFLICT',
+            waybillNo: 'SFTEST_CONFLICT',
+            status: 'failed',
+            schemaDiffs: [{ path: 'a', type: 'added', newValue: 1 }]
+        });
+        store.addHumanRemark(result.id, '已人工审核', 'admin');
+        const differentSchemaDiffs = [{ path: 'b', type: 'added', newValue: 2 }];
+        const conflictCheck = store.detectConflict('TEST_CONFLICT', differentSchemaDiffs);
+        assert(conflictCheck.conflict === true);
+        assert(conflictCheck.canReuse === false);
+        assertExists(conflictCheck.reason);
+        assert(conflictCheck.reason.includes('Schema已变更'));
+    });
+    test('相同Schema时可复用旧结果', () => {
+        const schemaDiffs = [{ path: 'c', type: 'added', newValue: 3 }];
+        const result = store.storeResult({
+            batchId: (0, uuid_1.v4)(),
+            itemId: (0, uuid_1.v4)(),
+            orderId: 'TEST_REUSE',
+            waybillNo: 'SFTEST_REUSE',
+            status: 'failed',
+            schemaDiffs
+        });
+        const conflictCheck = store.detectConflict('TEST_REUSE', schemaDiffs);
+        assert(conflictCheck.conflict === false);
+        assert(conflictCheck.canReuse === true);
+        assertEqual(conflictCheck.previousResult?.id, result.id);
     });
     test('添加人工备注', () => {
         const result = store.storeResult({
@@ -250,6 +279,24 @@ async function runSelfCheck() {
             }]);
         const unconfirmed = store.getUnconfirmedPartitions();
         assert(unconfirmed.length === 1);
+    });
+    test('addOrUpdatePartitions 新增并更新分区计数', () => {
+        store.addOrUpdatePartitions([{
+                name: 'date=2024-01-03/gray=true',
+                date: '2024-01-03',
+                region: 'cn',
+                recordCount: 10
+            }]);
+        const partitions1 = store.getPartitions().filter(p => p.name === 'date=2024-01-03/gray=true');
+        assert(partitions1[0].recordCount === 10);
+        store.addOrUpdatePartitions([{
+                name: 'date=2024-01-03/gray=true',
+                date: '2024-01-03',
+                region: 'cn',
+                recordCount: 5
+            }]);
+        const partitions2 = store.getPartitions().filter(p => p.name === 'date=2024-01-03/gray=true');
+        assert(partitions2[0].recordCount === 15);
     });
     console.log();
     console.log(chalk_1.default.yellow('4. 批量处理器测试'));

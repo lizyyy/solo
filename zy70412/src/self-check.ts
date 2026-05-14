@@ -231,9 +231,46 @@ async function runSelfCheck() {
   });
 
   test('查找之前的结果', () => {
-    const found = store.findPreviousResult('TEST001', []);
+    const found = store.findPreviousResult('TEST001');
     assert(found !== null);
     assertEqual(found?.orderId, 'TEST001');
+  });
+
+  test('检测Schema变更但有人工备注时的冲突', () => {
+    const result = store.storeResult({
+      batchId: uuidv4(),
+      itemId: uuidv4(),
+      orderId: 'TEST_CONFLICT',
+      waybillNo: 'SFTEST_CONFLICT',
+      status: 'failed',
+      schemaDiffs: [{ path: 'a', type: 'added' as const, newValue: 1 }]
+    });
+    store.addHumanRemark(result.id, '已人工审核', 'admin');
+    
+    const differentSchemaDiffs = [{ path: 'b', type: 'added' as const, newValue: 2 }];
+    const conflictCheck = store.detectConflict('TEST_CONFLICT', differentSchemaDiffs);
+    
+    assert(conflictCheck.conflict === true);
+    assert(conflictCheck.canReuse === false);
+    assertExists(conflictCheck.reason);
+    assert(conflictCheck.reason!.includes('Schema已变更'));
+  });
+
+  test('相同Schema时可复用旧结果', () => {
+    const schemaDiffs = [{ path: 'c', type: 'added' as const, newValue: 3 }];
+    const result = store.storeResult({
+      batchId: uuidv4(),
+      itemId: uuidv4(),
+      orderId: 'TEST_REUSE',
+      waybillNo: 'SFTEST_REUSE',
+      status: 'failed',
+      schemaDiffs
+    });
+    
+    const conflictCheck = store.detectConflict('TEST_REUSE', schemaDiffs);
+    assert(conflictCheck.conflict === false);
+    assert(conflictCheck.canReuse === true);
+    assertEqual(conflictCheck.previousResult?.id, result.id);
   });
 
   test('添加人工备注', () => {
@@ -282,6 +319,26 @@ async function runSelfCheck() {
     }]);
     const unconfirmed = store.getUnconfirmedPartitions();
     assert(unconfirmed.length === 1);
+  });
+
+  test('addOrUpdatePartitions 新增并更新分区计数', () => {
+    store.addOrUpdatePartitions([{
+      name: 'date=2024-01-03/gray=true',
+      date: '2024-01-03',
+      region: 'cn',
+      recordCount: 10
+    }]);
+    const partitions1 = store.getPartitions().filter(p => p.name === 'date=2024-01-03/gray=true');
+    assert(partitions1[0].recordCount === 10);
+    
+    store.addOrUpdatePartitions([{
+      name: 'date=2024-01-03/gray=true',
+      date: '2024-01-03',
+      region: 'cn',
+      recordCount: 5
+    }]);
+    const partitions2 = store.getPartitions().filter(p => p.name === 'date=2024-01-03/gray=true');
+    assert(partitions2[0].recordCount === 15);
   });
 
   console.log();

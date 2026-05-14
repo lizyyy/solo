@@ -1,13 +1,10 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResultStore = void 0;
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = __importDefault(require("path"));
+const fs_extra_1 = require("fs-extra");
+const path_1 = require("path");
 const uuid_1 = require("uuid");
-const isEqual_1 = __importDefault(require("lodash/isEqual"));
+const isEqual_1 = require("lodash/isEqual");
 class ResultStore {
     constructor(dataDir = './data') {
         this.dataDir = dataDir;
@@ -28,32 +25,41 @@ class ResultStore {
             fs_extra_1.default.writeJsonSync(this.failuresFile, []);
         }
     }
-    findPreviousResult(orderId, schemaDiffs) {
+    findPreviousResult(orderId) {
         const results = this.loadResults();
         const matching = results.filter(r => r.orderId === orderId);
-        for (const result of matching) {
-            if ((0, isEqual_1.default)(result.schemaDiffs, schemaDiffs)) {
-                return result;
-            }
-        }
-        return null;
+        if (matching.length === 0)
+            return null;
+        return matching.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
     }
     detectConflict(orderId, schemaDiffs) {
-        const previous = this.findPreviousResult(orderId, schemaDiffs);
+        const previous = this.findPreviousResult(orderId);
         if (previous) {
-            if (previous.humanRemarks && !(0, isEqual_1.default)(previous.schemaDiffs, schemaDiffs)) {
+            const schemaUnchanged = (0, isEqual_1.default)(previous.schemaDiffs, schemaDiffs);
+            if (schemaUnchanged) {
+                return {
+                    conflict: false,
+                    previousResult: previous,
+                    canReuse: true
+                };
+            }
+            else if (previous.humanRemarks) {
                 return {
                     conflict: true,
                     previousResult: previous,
-                    reason: 'Schema已变更，但有人工备注未处理'
+                    reason: 'Schema已变更，但有人工备注未处理，请重新审核',
+                    canReuse: false
                 };
             }
-            return {
-                conflict: false,
-                previousResult: previous
-            };
+            else {
+                return {
+                    conflict: false,
+                    previousResult: previous,
+                    canReuse: false
+                };
+            }
         }
-        return { conflict: false };
+        return { conflict: false, canReuse: false };
     }
     storeResult(result) {
         const results = this.loadResults();
@@ -141,12 +147,32 @@ class ResultStore {
     }
     addPartitions(partitions) {
         const existing = this.getPartitions();
-        const now = new Date().toISOString();
         const newPartitions = partitions.map(p => ({
             ...p,
             humanConfirmed: false
         }));
         const merged = [...existing, ...newPartitions];
+        fs_extra_1.default.writeJsonSync(this.partitionsFile, merged, { spaces: 2 });
+    }
+    addOrUpdatePartitions(partitions) {
+        const existing = this.getPartitions();
+        const existingMap = new Map(existing.map(p => [p.name, p]));
+        for (const p of partitions) {
+            if (existingMap.has(p.name)) {
+                const existing = existingMap.get(p.name);
+                existingMap.set(p.name, {
+                    ...existing,
+                    recordCount: existing.recordCount + p.recordCount
+                });
+            }
+            else {
+                existingMap.set(p.name, {
+                    ...p,
+                    humanConfirmed: false
+                });
+            }
+        }
+        const merged = Array.from(existingMap.values());
         fs_extra_1.default.writeJsonSync(this.partitionsFile, merged, { spaces: 2 });
     }
     getUnconfirmedPartitions() {

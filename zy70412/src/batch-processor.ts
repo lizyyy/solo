@@ -46,6 +46,7 @@ export class BatchProcessor {
     const batchId = uuidv4();
     const now = new Date().toISOString();
     const batchItems: BatchItem[] = [];
+    const partitions = new Set<string>();
     
     let successCount = 0;
     let failedCount = 0;
@@ -53,6 +54,8 @@ export class BatchProcessor {
 
     for (const item of items) {
       const partition = this.logisticsProcessor.derivePartition(item);
+      partitions.add(partition);
+      
       const validation = this.logisticsProcessor.validateInterception(item, this.getReferenceSchema());
       
       const conflictCheck = this.resultStore.detectConflict(
@@ -71,10 +74,16 @@ export class BatchProcessor {
           conflictReason = conflictCheck.reason;
           status = 'failed';
           failedCount++;
-        } else {
+        } else if (conflictCheck.canReuse) {
           previousResultId = conflictCheck.previousResult.id;
           status = 'skipped';
           skippedCount++;
+        } else if (validation.valid) {
+          status = 'success';
+          successCount++;
+        } else {
+          status = 'failed';
+          failedCount++;
         }
       } else if (validation.valid) {
         status = 'success';
@@ -112,6 +121,18 @@ export class BatchProcessor {
           lakehousePartition: partition
         });
       }
+    }
+
+    if (partitions.size > 0) {
+      const partitionList = Array.from(partitions).map(name => ({
+        name,
+        date: new Date().toISOString().split('T')[0],
+        region: 'cn',
+        recordCount: items.filter(i => 
+          this.logisticsProcessor.derivePartition(i) === name
+        ).length
+      }));
+      this.resultStore.addOrUpdatePartitions(partitionList);
     }
 
     return {
