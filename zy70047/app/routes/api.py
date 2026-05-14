@@ -83,13 +83,15 @@ def create_part():
             data,
             operator=data.get('operator', 'system')
         )
-        db.session.commit()
         
         result = {
             'success': True,
             'data': part.to_dict()
         }
+        
         save_idempotent(request_key, '/parts', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
@@ -114,14 +116,16 @@ def update_stock(part_code):
             operator=data.get('operator', 'system'),
             note=data.get('note', '')
         )
-        db.session.commit()
         
         result = {
             'success': True,
             'message': f'入库 {qty} 个成功',
             'data': part.to_dict()
         }
+        
         save_idempotent(request_key, f'/parts/{part_code}/stock', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
@@ -190,10 +194,9 @@ def create_reservation():
             priority=data.get('work_order_priority', 'NORMAL')
         )
         
-        if result.get('success'):
-            db.session.commit()
-        
         save_idempotent(request_key, '/reservations', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
@@ -227,10 +230,9 @@ def create_substitute_reservation():
             operator=data.get('operator', 'system')
         )
         
-        if result.get('success'):
-            db.session.commit()
-        
         save_idempotent(request_key, '/reservations/substitute', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
@@ -258,10 +260,9 @@ def use_reservation(reservation_id):
             operator=data.get('operator', 'system')
         )
         
-        if result.get('success'):
-            db.session.commit()
-        
         save_idempotent(request_key, f'/reservations/{reservation_id}/use', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
@@ -285,10 +286,9 @@ def release_reservation_api(reservation_id):
             reason=data.get('reason', '')
         )
         
-        if result.get('success'):
-            db.session.commit()
-        
         save_idempotent(request_key, f'/reservations/{reservation_id}/release', data, result)
+        
+        db.session.commit()
         return jsonify(result)
     except Exception as e:
         db.session.rollback()
