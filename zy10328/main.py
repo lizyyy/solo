@@ -4,12 +4,15 @@ from fastapi.responses import JSONResponse
 import logging
 import traceback
 
+# 先导入所有模型，确保 Base 注册表完整
+from app.models.schema import EntryAPI, DownstreamService, CallSample, LatencyDistribution, HistoryRecord, RequestDeduplication
 from app.models.base import engine, Base
 from app.api.routes import router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# 所有模型已导入后再创建表
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(

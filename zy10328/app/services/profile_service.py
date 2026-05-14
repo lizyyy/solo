@@ -19,8 +19,15 @@ def generate_uuid() -> str:
     return str(uuid.uuid4())
 
 
+def _json_serializer(obj):
+    """支持datetime类型的JSON序列化"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
+
 def calculate_request_hash(request_data: Dict[str, Any]) -> str:
-    sorted_data = json.dumps(request_data, sort_keys=True)
+    sorted_data = json.dumps(request_data, sort_keys=True, default=_json_serializer)
     return hashlib.sha256(sorted_data.encode()).hexdigest()
 
 
