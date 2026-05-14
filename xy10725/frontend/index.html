@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付沙箱对账台</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+        #app { min-height: 100vh; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header p { opacity: 0.9; margin-top: 5px; }
+        .container { padding: 20px 40px; }
+        .card { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .card-title { font-size: 18px; font-weight: 600; color: #303133; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ebeef5; }
+        .filter-bar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .status-tag { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #f4f4f5; color: #909399; }
+        .status-callback { background: #ecf5ff; color: #409eff; }
+        .status-refund { background: #fef0f0; color: #f56c6c; }
+        .status-difference { background: #fdf6ec; color: #e6a23c; }
+        .status-reconciled { background: #f0f9eb; color: #67c23a; }
+        .status-completed { background: #e6f7ff; color: #1890ff; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h4 { color: #606266; margin-bottom: 10px; font-size: 14px; }
+        .json-display { background: #f5f7fa; padding: 15px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
+        .timeline { border-left: 2px solid #e4e7ed; padding-left: 20px; margin-left: 10px; }
+        .timeline-item { position: relative; margin-bottom: 15px; }
+        .timeline-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: #409eff; border: 2px solid white; box-shadow: 0 0 0 2px #409eff; }
+        .dialog-footer { display: flex; justify-content: flex-end; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>支付沙箱对账台</h1>
+            <p>Sandbox Reconciliation Dashboard</p>
+        </div>
+        
+        <div class="container">
+            <div class="card">
+                <div class="card-title">版本列表</div>
+                <el-tag v-for="v in versions" :key="v" style="margin: 0 8px 8px 0;" size="large" type="info">
+                    {{ v }}
+                </el-tag>
+            </div>
+
+            <div class="card">
+                <div class="card-title">订单管理</div>
+                <div class="filter-bar">
+                    <el-select v-model="filters.version" placeholder="选择版本" clearable style="width: 150px;">
+                        <el-option v-for="v in versions" :key="v" :label="v" :value="v"></el-option>
+                    </el-select>
+                    <el-select v-model="filters.status" placeholder="选择状态" clearable style="width: 150px;">
+                        <el-option label="待处理" value="pending"></el-option>
+                        <el-option label="回调已接收" value="callback_received"></el-option>
+                        <el-option label="退款处理中" value="refund_processing"></el-option>
+                        <el-option label="账单差异" value="bill_difference"></el-option>
+                        <el-option label="已对账" value="reconciled"></el-option>
+                        <el-option label="已完成" value="completed"></el-option>
+                    </el-select>
+                    <el-input v-model="filters.order_no" placeholder="订单号搜索" clearable style="width: 200px;"></el-input>
+                    <el-button type="primary" @click="loadOrders">查询</el-button>
+                    <el-button type="success" @click="showCreateDialog = true">新增订单</el-button>
+                    <el-button type="warning" @click="initData">初始化数据</el-button>
+                </div>
+                
+                <el-table :data="orders" style="margin-top: 20px;" border stripe>
+                    <el-table-column prop="order_no" label="订单号" width="180"></el-table-column>
+                    <el-table-column prop="version" label="版本" width="100"></el-table-column>
+                    <el-table-column prop="amount" label="金额" width="100">
+                        <template #default="scope">¥{{ scope.row.amount.toFixed(2) }}</template>
+                    </el-table-column>
+                    <el-table-column prop="status" label="状态" width="140">
+                        <template #default="scope">
+                            <span :class="['status-tag', getStatusClass(scope.row.status)]">
+                                {{ getStatusText(scope.row.status) }}
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="created_at" label="创建时间" width="180"></el-table-column>
+                    <el-table-column label="操作" fixed="right" width="280">
+                        <template #default="scope">
+                            <el-button size="small" @click="viewDetail(scope.row)">详情</el-button>
+                            <el-button size="small" type="primary" @click="addCallback(scope.row)">回调</el-button>
+                            <el-button size="small" type="warning" @click="addBill(scope.row)">账单</el-button>
+                            <el-button size="small" type="danger" @click="replenish(scope.row)">补单</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">对账报告</div>
+                <el-table :data="reports" border stripe>
+                    <el-table-column prop="report_no" label="报告编号" width="200"></el-table-column>
+                    <el-table-column prop="order_no" label="关联订单" width="180"></el-table-column>
+                    <el-table-column prop="status" label="状态" width="100"></el-table-column>
+                    <el-table-column prop="created_at" label="生成时间" width="180"></el-table-column>
+                </el-table>
+            </div>
+        </div>
+
+        <el-dialog v-model="showCreateDialog" title="新增订单" width="500px">
+            <el-form :model="newOrder" label-width="80px">
+                <el-form-item label="订单号">
+                    <el-input v-model="newOrder.order_no" placeholder="留空自动生成"></el-input>
+                </el-form-item>
+                <el-form-item label="版本">
+                    <el-input v-model="newOrder.version" placeholder="v1.0"></el-input>
+                </el-form-item>
+                <el-form-item label="金额">
+                    <el-input-number v-model="newOrder.amount" :min="0" :precision="2" style="width: 100%;"></el-input-number>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showCreateDialog = false">取消</el-button>
+                    <el-button type="primary" @click="createOrder">确认</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showDetailDialog" title="订单详情" width="900px">
+            <div v-if="currentOrder" style="max-height: 600px; overflow-y: auto;">
+                <el-descriptions :column="2" border style="margin-bottom: 20px;">
+                    <el-descriptions-item label="订单号">{{ currentOrder.order_no }}</el-descriptions-item>
+                    <el-descriptions-item label="版本">{{ currentOrder.version }}</el-descriptions-item>
+                    <el-descriptions-item label="金额">¥{{ currentOrder.amount.toFixed(2) }}</el-descriptions-item>
+                    <el-descriptions-item label="状态">
+                        <span :class="['status-tag', getStatusClass(currentOrder.status)]">
+                            {{ getStatusText(currentOrder.status) }}
+                        </span>
+                    </el-descriptions-item>
+                </el-descriptions>
+
+                <div class="detail-section">
+                    <h4>原始输入</h4>
+                    <div class="json-display">{{ currentOrder.raw_input }}</div>
+                </div>
+
+                <div class="detail-section" v-if="currentOrder.processed_result">
+                    <h4>处理结果</h4>
+                    <div class="json-display">{{ currentOrder.processed_result }}</div>
+                </div>
+
+                <div class="detail-section" v-if="currentOrder.callbacks && currentOrder.callbacks.length">
+                    <h4>回调记录 ({{ currentOrder.callbacks.length }})</h4>
+                    <el-table :data="currentOrder.callbacks" size="small" border>
+                        <el-table-column prop="type" label="类型"></el-table-column>
+                        <el-table-column prop="status" label="状态"></el-table-column>
+                        <el-table-column prop="created_at" label="时间"></el-table-column>
+                    </el-table>
+                </div>
+
+                <div class="detail-section" v-if="currentOrder.bills && currentOrder.bills.length">
+                    <h4>账单记录 ({{ currentOrder.bills.length }})</h4>
+                    <el-table :data="currentOrder.bills" size="small" border>
+                        <el-table-column prop="bill_no" label="账单号"></el-table-column>
+                        <el-table-column prop="difference" label="差异">
+                            <template #default="scope">¥{{ scope.row.difference.toFixed(2) }}</template>
+                        </el-table-column>
+                        <el-table-column prop="status" label="状态"></el-table-column>
+                    </el-table>
+                </div>
+
+                <div class="detail-section" v-if="currentOrder.replenishments && currentOrder.replenishments.length">
+                    <h4>补单记录 ({{ currentOrder.replenishments.length }})</h4>
+                    <div class="timeline">
+                        <div v-for="r in currentOrder.replenishments" :key="r.id" class="timeline-item">
+                            <div style="font-weight: 600; color: #303133;">{{ r.action_type }}</div>
+                            <div style="color: #606266; font-size: 13px; margin: 5px 0;">
+                                {{ r.before_status }} → {{ r.after_status }}
+                            </div>
+                            <div style="color: #909399; font-size: 12px;">
+                                操作人: {{ r.operator }} | 理由: {{ r.reason }}
+                            </div>
+                            <div style="color: #c0c4cc; font-size: 11px;">{{ r.created_at }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section" v-if="currentOrder.reports && currentOrder.reports.length">
+                    <h4>对账报告 ({{ currentOrder.reports.length }})</h4>
+                    <el-table :data="currentOrder.reports" size="small" border>
+                        <el-table-column prop="report_no" label="报告编号"></el-table-column>
+                        <el-table-column prop="status" label="状态"></el-table-column>
+                    </el-table>
+                </div>
+
+                <el-divider></el-divider>
+                <div style="text-align: center;">
+                    <el-button type="primary" @click="generateReport" :disabled="currentOrder.status === 'completed'">
+                        生成对账报告
+                    </el-button>
+                </div>
+            </div>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showDetailDialog = false">关闭</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showCallbackDialog" title="录入支付回调" width="500px">
+            <el-form :model="callbackForm" label-width="80px">
+                <el-form-item label="回调类型">
+                    <el-select v-model="callbackForm.type" style="width: 100%;">
+                        <el-option label="支付回调" value="payment"></el-option>
+                        <el-option label="退款回调" value="refund"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="回调数据">
+                    <el-input type="textarea" v-model="callbackForm.data" :rows="4" placeholder='{"code":0,"msg":"success"}'></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showCallbackDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitCallback">确认</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showBillDialog" title="录入账单" width="500px">
+            <el-form :model="billForm" label-width="80px">
+                <el-form-item label="账单号">
+                    <el-input v-model="billForm.bill_no" placeholder="留空自动生成"></el-input>
+                </el-form-item>
+                <el-form-item label="账单金额">
+                    <el-input-number v-model="billForm.bill_amount" :min="0" :precision="2" style="width: 100%;"></el-input-number>
+                </el-form-item>
+                <el-form-item label="备注">
+                    <el-input type="textarea" v-model="billForm.remark" :rows="2"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showBillDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitBill">确认</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showReplenishDialog" title="补单操作" width="500px">
+            <el-form :model="replenishForm" label-width="80px">
+                <el-form-item label="操作类型">
+                    <el-select v-model="replenishForm.action_type" style="width: 100%;">
+                        <el-option label="人工对账" value="manual_reconcile"></el-option>
+                        <el-option label="差异修正" value="difference_fix"></el-option>
+                        <el-option label="状态调整" value="status_adjust"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="目标状态">
+                    <el-select v-model="replenishForm.target_status" style="width: 100%;">
+                        <el-option label="已对账" value="reconciled"></el-option>
+                        <el-option label="账单匹配" value="bill_matched"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="处理理由">
+                    <el-input type="textarea" v-model="replenishForm.reason" :rows="3" placeholder="请详细说明补单原因，便于复盘..."></el-input>
+                </el-form-item>
+                <el-form-item label="操作人">
+                    <el-input v-model="replenishForm.operator"></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showReplenishDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitReplenish">确认补单</el-button>
+                </div>
+            </template>
+        </el-dialog>
+
+        <el-dialog v-model="showReportDialog" title="生成对账报告" width="500px">
+            <el-form :model="reportForm" label-width="80px">
+                <el-form-item label="报告编号">
+                    <el-input v-model="reportForm.report_no" placeholder="留空自动生成"></el-input>
+                </el-form-item>
+                <el-form-item label="报告内容">
+                    <el-input type="textarea" v-model="reportForm.content" :rows="6" placeholder='{"conclusion":"对账完成","issues":["无异常"]}'></el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="showReportDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitReport">生成报告</el-button>
+                </div>
+            </template>
+        </el-dialog>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const { createApp, ref, reactive, onMounted } = Vue;
+        const app = createApp({
+            setup() {
+                const API_BASE = 'http://localhost:8000';
+                
+                const orders = ref([]);
+                const reports = ref([]);
+                const versions = ref([]);
+                const currentOrder = ref(null);
+                
+                const filters = reactive({
+                    version: '',
+                    status: '',
+                    order_no: ''
+                });
+
+                const showCreateDialog = ref(false);
+                const showDetailDialog = ref(false);
+                const showCallbackDialog = ref(false);
+                const showBillDialog = ref(false);
+                const showReplenishDialog = ref(false);
+                const showReportDialog = ref(false);
+
+                const newOrder = reactive({ order_no: '', version: 'v1.0', amount: 0 });
+                const callbackForm = reactive({ type: 'payment', data: '{}' });
+                const billForm = reactive({ bill_no: '', bill_amount: 0, remark: '' });
+                const replenishForm = reactive({ 
+                    action_type: 'manual_reconcile', 
+                    target_status: 'reconciled', 
+                    reason: '', 
+                    operator: 'admin' 
+                });
+                const reportForm = reactive({ report_no: '', content: '{}' });
+
+                const getStatusClass = (status) => {
+                    const map = {
+                        'pending': 'status-pending',
+                        'callback_received': 'status-callback',
+                        'refund_processing': 'status-refund',
+                        'bill_difference': 'status-difference',
+                        'reconciled': 'status-reconciled',
+                        'completed': 'status-completed'
+                    };
+                    return map[status] || 'status-pending';
+                };
+
+                const getStatusText = (status) => {
+                    const map = {
+                        'pending': '待处理',
+                        'callback_received': '回调已接收',
+                        'refund_processing': '退款处理中',
+                        'bill_difference': '账单差异',
+                        'reconciled': '已对账',
+                        'completed': '已完成',
+                        'bill_matched': '账单匹配'
+                    };
+                    return map[status] || status;
+                };
+
+                const loadOrders = async () => {
+                    const params = {};
+                    if (filters.version) params.version = filters.version;
+                    if (filters.status) params.status = filters.status;
+                    if (filters.order_no) params.order_no = filters.order_no;
+                    
+                    const res = await axios.get(`${API_BASE}/api/orders/`, { params });
+                    orders.value = res.data;
+                };
+
+                const loadVersions = async () => {
+                    const res = await axios.get(`${API_BASE}/api/versions/`);
+                    versions.value = res.data;
+                };
+
+                const loadReports = async () => {
+                    const res = await axios.get(`${API_BASE}/api/reports/`);
+                    reports.value = res.data;
+                };
+
+                const initData = async () => {
+                    await axios.post(`${API_BASE}/api/init-data/`);
+                    ElementPlus.ElMessage.success('测试数据初始化完成');
+                    loadOrders();
+                    loadVersions();
+                };
+
+                const createOrder = async () => {
+                    await axios.post(`${API_BASE}/api/orders/`, newOrder);
+                    ElementPlus.ElMessage.success('订单创建成功');
+                    showCreateDialog.value = false;
+                    loadOrders();
+                    loadVersions();
+                };
+
+                const viewDetail = async (row) => {
+                    const res = await axios.get(`${API_BASE}/api/orders/${row.id}`);
+                    currentOrder.value = res.data;
+                    showDetailDialog.value = true;
+                };
+
+                const addCallback = (row) => {
+                    currentOrder.value = row;
+                    callbackForm.data = JSON.stringify({ "code": 0, "msg": "success", "trade_no": "TXN" + Date.now() }, null, 2);
+                    showCallbackDialog.value = true;
+                };
+
+                const submitCallback = async () => {
+                    await axios.post(`${API_BASE}/api/orders/${currentOrder.value.id}/callback/`, {
+                        type: callbackForm.type,
+                        data: JSON.parse(callbackForm.data)
+                    });
+                    ElementPlus.ElMessage.success('回调录入成功');
+                    showCallbackDialog.value = false;
+                    loadOrders();
+                };
+
+                const addBill = (row) => {
+                    currentOrder.value = row;
+                    billForm.bill_amount = row.amount + 10;
+                    showBillDialog.value = true;
+                };
+
+                const submitBill = async () => {
+                    await axios.post(`${API_BASE}/api/orders/${currentOrder.value.id}/bill/`, billForm);
+                    ElementPlus.ElMessage.success('账单录入成功');
+                    showBillDialog.value = false;
+                    loadOrders();
+                };
+
+                const replenish = (row) => {
+                    currentOrder.value = row;
+                    showReplenishDialog.value = true;
+                };
+
+                const submitReplenish = async () => {
+                    try {
+                        await axios.post(`${API_BASE}/api/orders/${currentOrder.value.id}/replenish/`, replenishForm);
+                        ElementPlus.ElMessage.success('补单完成');
+                        showReplenishDialog.value = false;
+                        loadOrders();
+                    } catch (e) {
+                        ElementPlus.ElMessage.error(e.response?.data?.detail || '操作失败');
+                    }
+                };
+
+                const generateReport = () => {
+                    reportForm.content = JSON.stringify({
+                        "order_no": currentOrder.value.order_no,
+                        "version": currentOrder.value.version,
+                        "conclusion": "对账完成",
+                        "replenishment_count": currentOrder.value.replenishments?.length || 0,
+                        "has_difference": currentOrder.value.bills?.some(b => b.difference !== 0) || false,
+                        "final_status": currentOrder.value.status
+                    }, null, 2);
+                    showReportDialog.value = true;
+                };
+
+                const submitReport = async () => {
+                    await axios.post(`${API_BASE}/api/orders/${currentOrder.value.id}/report/`, {
+                        report_no: reportForm.report_no,
+                        content: JSON.parse(reportForm.content)
+                    });
+                    ElementPlus.ElMessage.success('对账报告生成成功');
+                    showReportDialog.value = false;
+                    showDetailDialog.value = false;
+                    loadOrders();
+                    loadReports();
+                };
+
+                onMounted(() => {
+                    loadOrders();
+                    loadVersions();
+                    loadReports();
+                });
+
+                return {
+                    orders, reports, versions, currentOrder, filters,
+                    showCreateDialog, showDetailDialog, showCallbackDialog, showBillDialog, showReplenishDialog, showReportDialog,
+                    newOrder, callbackForm, billForm, replenishForm, reportForm,
+                    getStatusClass, getStatusText,
+                    loadOrders, loadVersions, loadReports, initData,
+                    createOrder, viewDetail,
+                    addCallback, submitCallback,
+                    addBill, submitBill,
+                    replenish, submitReplenish,
+                    generateReport, submitReport
+                };
+            }
+        });
+        app.use(ElementPlus);
+        app.mount('#app');
+    </script>
+</body>
+</html>
