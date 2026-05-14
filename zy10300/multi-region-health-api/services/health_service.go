@@ -59,25 +59,47 @@ func (s *HealthService) SubmitProbeResult(serviceID, requestID, probeType, rawSt
 	return result, nil
 }
 
-func (s *HealthService) GetDependentServices(serviceID string) ([]models.Service, error) {
+type DependencyWithInfo struct {
+	Service    models.Service
+	IsCritical bool
+}
+
+func (s *HealthService) GetDependentServicesWithInfo(serviceID string) ([]DependencyWithInfo, error) {
 	var dependencies []models.Dependency
 	if err := db.GetDB().Where("service_id = ?", serviceID).Find(&dependencies).Error; err != nil {
 		return nil, err
 	}
 
-	var services []models.Service
+	var depsWithInfo []DependencyWithInfo
 	for _, dep := range dependencies {
 		var svc models.Service
 		if err := db.GetDB().First(&svc, "id = ?", dep.DependentServiceID).Error; err == nil {
-			services = append(services, svc)
+			depsWithInfo = append(depsWithInfo, DependencyWithInfo{
+				Service:    svc,
+				IsCritical: dep.IsCritical,
+			})
 		}
+	}
+
+	return depsWithInfo, nil
+}
+
+func (s *HealthService) GetDependentServices(serviceID string) ([]models.Service, error) {
+	depsWithInfo, err := s.GetDependentServicesWithInfo(serviceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var services []models.Service
+	for _, dep := range depsWithInfo {
+		services = append(services, dep.Service)
 	}
 
 	return services, nil
 }
 
 func (s *HealthService) AggregateDependencyHealth(serviceID string) (models.HealthStatus, error) {
-	dependencies, err := s.GetDependentServices(serviceID)
+	dependencies, err := s.GetDependentServicesWithInfo(serviceID)
 	if err != nil {
 		return models.HealthStatusUnknown, err
 	}
@@ -86,22 +108,37 @@ func (s *HealthService) AggregateDependencyHealth(serviceID string) (models.Heal
 		return models.HealthStatusHealthy, nil
 	}
 
-	hasUnhealthy := false
-	hasDegraded := false
+	criticalUnhealthy := false
+	criticalDegraded := false
+	nonCriticalUnhealthy := false
+	nonCriticalDegraded := false
 
 	for _, dep := range dependencies {
-		switch dep.HealthStatus {
+		switch dep.Service.HealthStatus {
 		case models.HealthStatusUnhealthy:
-			hasUnhealthy = true
+			if dep.IsCritical {
+				criticalUnhealthy = true
+			} else {
+				nonCriticalUnhealthy = true
+			}
 		case models.HealthStatusDegraded:
-			hasDegraded = true
+			if dep.IsCritical {
+				criticalDegraded = true
+			} else {
+				nonCriticalDegraded = true
+			}
 		}
 	}
 
-	if hasUnhealthy {
+	if criticalUnhealthy {
 		return models.HealthStatusUnhealthy, nil
 	}
-	if hasDegraded {
+
+	if criticalDegraded || nonCriticalUnhealthy {
+		return models.HealthStatusDegraded, nil
+	}
+
+	if nonCriticalDegraded {
 		return models.HealthStatusDegraded, nil
 	}
 
@@ -232,8 +269,8 @@ func (s *HealthService) GetRegionHealthSummary(regionID string) (*models.HealthS
 	}
 
 	summary := &models.HealthSummary{
-		RegionID:   region.ID,
-		RegionName: region.Name,
+		RegionID:    region.ID,
+		RegionName:  region.Name,
 		LastUpdated: time.Now(),
 	}
 

@@ -89,9 +89,10 @@ GET /health
 ### 区域管理
 
 ```bash
-# 创建区域
+# 创建区域（同一 code/name 重复提交返回已存在的记录）
 POST /api/v1/regions
 {
+  "request_id": "reg-bj-001",    # 用于幂等性
   "name": "北京区域",
   "code": "bj",
   "description": "北京主数据中心"
@@ -107,9 +108,10 @@ GET /api/v1/regions/:region_id/summary
 ### 服务管理
 
 ```bash
-# 创建服务
+# 创建服务（同一区域内 code/name 唯一，重复提交返回已存在的记录）
 POST /api/v1/services
 {
+  "request_id": "svc-user-001",  # 用于幂等性
   "region_id": "xxx",
   "name": "用户服务",
   "code": "user-service",
@@ -200,10 +202,11 @@ GET /api/v1/services/:service_id/dependencies
 
 ### 2. 依赖聚合
 
-服务健康状态会考虑其依赖服务的状态：
-- 任何关键依赖不健康 → 本服务受影响
-- 支持递归检查依赖链
-- 可区分关键/非关键依赖
+服务健康状态会考虑其依赖服务的状态，按优先级判断：
+- **关键依赖不健康** → 本服务状态 = Unhealthy（直接影响）
+- **关键依赖降级 OR 非关键依赖不健康** → 本服务状态 = Degraded
+- **非关键依赖降级** → 本服务状态 = Degraded
+- 所有依赖健康 → 本服务不受依赖影响
 
 ### 3. 降级状态机
 

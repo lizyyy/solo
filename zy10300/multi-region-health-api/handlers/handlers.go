@@ -22,6 +22,7 @@ func NewHandler() *Handler {
 }
 
 type CreateRegionRequest struct {
+	RequestID   string `json:"request_id" binding:"required"`
 	Name        string `json:"name" binding:"required"`
 	Code        string `json:"code" binding:"required"`
 	Description string `json:"description"`
@@ -31,6 +32,18 @@ func (h *Handler) CreateRegion(c *gin.Context) {
 	var req CreateRegionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var existingByCode models.Region
+	if err := db.GetDB().Where("code = ?", req.Code).First(&existingByCode).Error; err == nil {
+		c.JSON(http.StatusOK, existingByCode)
+		return
+	}
+
+	var existingByName models.Region
+	if err := db.GetDB().Where("name = ?", req.Name).First(&existingByName).Error; err == nil {
+		c.JSON(http.StatusOK, existingByName)
 		return
 	}
 
@@ -51,6 +64,7 @@ func (h *Handler) CreateRegion(c *gin.Context) {
 }
 
 type CreateServiceRequest struct {
+	RequestID   string `json:"request_id" binding:"required"`
 	RegionID    string `json:"region_id" binding:"required"`
 	Name        string `json:"name" binding:"required"`
 	Code        string `json:"code" binding:"required"`
@@ -70,15 +84,27 @@ func (h *Handler) CreateService(c *gin.Context) {
 		return
 	}
 
+	var existingByCode models.Service
+	if err := db.GetDB().Where("region_id = ? AND code = ?", req.RegionID, req.Code).First(&existingByCode).Error; err == nil {
+		c.JSON(http.StatusOK, existingByCode)
+		return
+	}
+
+	var existingByName models.Service
+	if err := db.GetDB().Where("region_id = ? AND name = ?", req.RegionID, req.Name).First(&existingByName).Error; err == nil {
+		c.JSON(http.StatusOK, existingByName)
+		return
+	}
+
 	service := &models.Service{
-		RegionID:     req.RegionID,
-		Name:         req.Name,
-		Code:         req.Code,
-		Description:  req.Description,
-		HealthStatus: models.HealthStatusUnknown,
+		RegionID:      req.RegionID,
+		Name:          req.Name,
+		Code:          req.Code,
+		Description:   req.Description,
+		HealthStatus:  models.HealthStatusUnknown,
 		DegradeStatus: models.DegradeStatusNormal,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 
 	if err := db.GetDB().Create(service).Error; err != nil {
@@ -303,6 +329,7 @@ func (h *Handler) ListServices(c *gin.Context) {
 }
 
 type CreateDependencyRequest struct {
+	RequestID          string `json:"request_id" binding:"required"`
 	DependentServiceID string `json:"dependent_service_id" binding:"required"`
 	DependencyType     string `json:"dependency_type"`
 	IsCritical         bool   `json:"is_critical"`
@@ -323,6 +350,18 @@ func (h *Handler) CreateDependency(c *gin.Context) {
 
 	if serviceID == req.DependentServiceID {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cannot depend on self"})
+		return
+	}
+
+	var service models.Service
+	if err := db.GetDB().First(&service, "id = ?", serviceID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "service not found"})
+		return
+	}
+
+	var dependentService models.Service
+	if err := db.GetDB().First(&dependentService, "id = ?", req.DependentServiceID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "dependent service not found"})
 		return
 	}
 
