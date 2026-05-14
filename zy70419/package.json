@@ -1,0 +1,21 @@
+{
+  "name": "lab-sample-auditor",
+  "version": "1.0.0",
+  "description": "实验室样本单审核工具 - 启动参数检查、脏行识别、异常导出",
+  "main": "src/cli.js",
+  "type": "module",
+  "bin": {
+    "lab-audit": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test"
+  },
+  "keywords": ["laboratory", "sample", "audit", "cli"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0"
+  }
+}

@@ -1,0 +1,640 @@
+{
+  "exportType": "lab_audit_result",
+  "exportTime": "2026-05-14T22:20:48.658Z",
+  "version": "1.0.0",
+  "batchId": "BATCH1778797248656",
+  "operator": "张医生",
+  "auditTime": "2026-05-14T22:20:48.658Z",
+  "summary": {
+    "totalRawRows": 22,
+    "cleanRows": 20,
+    "dirtyRows": 2,
+    "swallowedRows": 1,
+    "malformedRows": 1,
+    "totalSamples": 20,
+    "cleanSamples": 15,
+    "samplesWithAnomalies": 5
+  },
+  "anomalies": [
+    {
+      "businessNo": "LAB202605148575",
+      "type": "swallowed",
+      "message": "该行数据格式异常，字段缺失严重，被系统自动过滤",
+      "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z"
+    },
+    {
+      "businessNo": "LAB202605142543",
+      "type": "malformed",
+      "message": "字段数量不匹配，后续字段截断",
+      "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规"
+    },
+    {
+      "businessNo": "LAB202605146433",
+      "sampleId": "S000001",
+      "type": "data_anomaly",
+      "fields": [
+        "collectTime",
+        "receiveTime"
+      ],
+      "values": [
+        "2026-05-13T21:50:26.950Z",
+        "2026-05-12T10:06:43.401Z"
+      ],
+      "message": "接收时间早于采集时间"
+    },
+    {
+      "businessNo": "LAB202605146906",
+      "sampleId": "S000005",
+      "type": "data_anomaly",
+      "fields": [
+        "collectTime",
+        "receiveTime"
+      ],
+      "values": [
+        "2026-05-14T18:22:49.894Z",
+        "2026-05-13T00:20:25.763Z"
+      ],
+      "message": "接收时间早于采集时间"
+    },
+    {
+      "businessNo": "LAB202605140223",
+      "sampleId": "S000010",
+      "type": "data_anomaly",
+      "fields": [
+        "collectTime",
+        "receiveTime"
+      ],
+      "values": [
+        "2026-05-13T22:40:20.426Z",
+        "2026-05-13T09:30:20.718Z"
+      ],
+      "message": "接收时间早于采集时间"
+    },
+    {
+      "businessNo": "LAB202605142658",
+      "sampleId": "S000012",
+      "type": "data_anomaly",
+      "fields": [
+        "collectTime",
+        "receiveTime"
+      ],
+      "values": [
+        "2026-05-12T07:39:31.238Z",
+        "2026-05-12T03:40:16.423Z"
+      ],
+      "message": "接收时间早于采集时间"
+    },
+    {
+      "businessNo": "LAB202605142529",
+      "sampleId": "S000018",
+      "type": "data_anomaly",
+      "fields": [
+        "collectTime",
+        "receiveTime"
+      ],
+      "values": [
+        "2026-05-14T03:51:33.835Z",
+        "2026-05-12T07:36:18.016Z"
+      ],
+      "message": "接收时间早于采集时间"
+    }
+  ],
+  "rawAudit": {
+    "totalRows": 22,
+    "cleanRows": 20,
+    "dirtyRows": 2,
+    "swallowedRows": 1,
+    "malformedRows": 1,
+    "anomalies": [
+      {
+        "businessNo": "LAB202605148575",
+        "type": "swallowed",
+        "message": "该行数据格式异常，字段缺失严重，被系统自动过滤",
+        "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z"
+      },
+      {
+        "businessNo": "LAB202605142543",
+        "type": "malformed",
+        "message": "字段数量不匹配，后续字段截断",
+        "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规"
+      }
+    ],
+    "details": [
+      {
+        "index": 0,
+        "businessNo": "LAB202605146433",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605146433,S000001,患者1,33,男,唾液,生化全套,外科,张医生,2026-05-13T21:50:26.950Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 1,
+        "businessNo": "LAB202605142939",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605142939,S000002,患者2,68,女,脑脊液,血常规,儿科,张医生,2026-05-09T20:29:39.525Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 2,
+        "businessNo": "LAB202605141741",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605141741,S000003,患者3,71,男,尿液,生化全套,妇产科,张医生,2026-05-08T05:21:35.511Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 3,
+        "businessNo": "LAB202605144143",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605144143,S000004,患者4,41,女,组织,生化全套,急诊科,张医生,2026-05-10T20:16:57.885Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 4,
+        "businessNo": "LAB202605146906",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605146906,S000005,患者5,63,男,脑脊液,PCR检测,急诊科,张医生,2026-05-14T18:22:49.894Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 5,
+        "businessNo": "LAB202605149276",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605149276,S000006,患者6,20,男,唾液,免疫检测,妇产科,张医生,2026-05-11T07:06:15.716Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 6,
+        "businessNo": "LAB202605146793",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605146793,S000007,患者7,43,男,尿液,PCR检测,妇产科,张医生,2026-05-12T02:24:55.408Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 7,
+        "businessNo": "LAB202605149760",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605149760,S000008,患者8,76,女,尿液,免疫检测,外科,张医生,2026-05-13T07:04:29.267Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 8,
+        "businessNo": "LAB202605145945",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605145945,S000009,患者9,54,女,脑脊液,PCR检测,内科,张医生,2026-05-08T14:37:44.189Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 9,
+        "businessNo": "LAB202605140223",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605140223,S000010,患者10,10,女,组织,免疫检测,急诊科,张医生,2026-05-13T22:40:20.426Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 20,
+        "businessNo": "LAB202605148575",
+        "isDirty": true,
+        "dirtyType": "swallowed",
+        "originalLine": "",
+        "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z",
+        "missingFields": [
+          "sampleType",
+          "testItem",
+          "department",
+          "patientAge"
+        ],
+        "anomalies": [],
+        "status": "dirty"
+      },
+      {
+        "index": 10,
+        "businessNo": "LAB202605143173",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605143173,S000011,患者11,15,女,脑脊液,血常规,内科,张医生,2026-05-10T23:46:40.740Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 11,
+        "businessNo": "LAB202605142658",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605142658,S000012,患者12,43,女,唾液,免疫检测,儿科,张医生,2026-05-12T07:39:31.238Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 12,
+        "businessNo": "LAB202605140665",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605140665,S000013,患者13,7,女,血液,生化全套,内科,张医生,2026-05-13T18:19:57.751Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 13,
+        "businessNo": "LAB202605143865",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605143865,S000014,患者14,21,男,唾液,PCR检测,内科,张医生,2026-05-09T03:15:26.906Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 14,
+        "businessNo": "LAB202605143203",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605143203,S000015,患者15,14,男,尿液,血常规,急诊科,张医生,2026-05-08T04:00:26.946Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 15,
+        "businessNo": "LAB202605141522",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605141522,S000016,患者16,60,女,唾液,血常规,妇产科,张医生,2026-05-12T11:56:10.732Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 16,
+        "businessNo": "LAB202605144405",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605144405,S000017,患者17,11,女,组织,PCR检测,外科,张医生,2026-05-11T08:24:08.411Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 17,
+        "businessNo": "LAB202605142529",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605142529,S000018,患者18,45,女,尿液,PCR检测,妇产科,张医生,2026-05-14T03:51:33.835Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 18,
+        "businessNo": "LAB202605141020",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605141020,S000019,患者19,78,男,尿液,免疫检测,妇产科,张医生,2026-05-09T07:15:51.094Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 19,
+        "businessNo": "LAB202605141078",
+        "isDirty": false,
+        "dirtyType": null,
+        "originalLine": "LAB202605141078,S000020,患者20,5,女,组织,PCR检测,妇产科,张医生,2026-05-13T04:10:53.538Z",
+        "missingFields": [],
+        "anomalies": [],
+        "status": "clean"
+      },
+      {
+        "index": 21,
+        "businessNo": "LAB202605142543",
+        "isDirty": true,
+        "dirtyType": "malformed",
+        "originalLine": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规",
+        "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规",
+        "missingFields": [
+          "department",
+          "collector",
+          "collectTime"
+        ],
+        "anomalies": [],
+        "status": "dirty"
+      }
+    ]
+  },
+  "sampleAudit": {
+    "totalSamples": 20,
+    "samplesWithAnomalies": 5,
+    "cleanSamples": 15,
+    "anomalies": [
+      {
+        "businessNo": "LAB202605146433",
+        "sampleId": "S000001",
+        "type": "time_inversion",
+        "fields": [
+          "collectTime",
+          "receiveTime"
+        ],
+        "values": [
+          "2026-05-13T21:50:26.950Z",
+          "2026-05-12T10:06:43.401Z"
+        ],
+        "message": "接收时间早于采集时间"
+      },
+      {
+        "businessNo": "LAB202605146906",
+        "sampleId": "S000005",
+        "type": "time_inversion",
+        "fields": [
+          "collectTime",
+          "receiveTime"
+        ],
+        "values": [
+          "2026-05-14T18:22:49.894Z",
+          "2026-05-13T00:20:25.763Z"
+        ],
+        "message": "接收时间早于采集时间"
+      },
+      {
+        "businessNo": "LAB202605140223",
+        "sampleId": "S000010",
+        "type": "time_inversion",
+        "fields": [
+          "collectTime",
+          "receiveTime"
+        ],
+        "values": [
+          "2026-05-13T22:40:20.426Z",
+          "2026-05-13T09:30:20.718Z"
+        ],
+        "message": "接收时间早于采集时间"
+      },
+      {
+        "businessNo": "LAB202605142658",
+        "sampleId": "S000012",
+        "type": "time_inversion",
+        "fields": [
+          "collectTime",
+          "receiveTime"
+        ],
+        "values": [
+          "2026-05-12T07:39:31.238Z",
+          "2026-05-12T03:40:16.423Z"
+        ],
+        "message": "接收时间早于采集时间"
+      },
+      {
+        "businessNo": "LAB202605142529",
+        "sampleId": "S000018",
+        "type": "time_inversion",
+        "fields": [
+          "collectTime",
+          "receiveTime"
+        ],
+        "values": [
+          "2026-05-14T03:51:33.835Z",
+          "2026-05-12T07:36:18.016Z"
+        ],
+        "message": "接收时间早于采集时间"
+      }
+    ],
+    "details": [
+      {
+        "businessNo": "LAB202605146433",
+        "sampleId": "S000001",
+        "hasAnomalies": true,
+        "anomalies": [
+          {
+            "type": "time_inversion",
+            "fields": [
+              "collectTime",
+              "receiveTime"
+            ],
+            "values": [
+              "2026-05-13T21:50:26.950Z",
+              "2026-05-12T10:06:43.401Z"
+            ],
+            "message": "接收时间早于采集时间"
+          }
+        ],
+        "rawInputIndex": 0
+      },
+      {
+        "businessNo": "LAB202605142939",
+        "sampleId": "S000002",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 1
+      },
+      {
+        "businessNo": "LAB202605141741",
+        "sampleId": "S000003",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 2
+      },
+      {
+        "businessNo": "LAB202605144143",
+        "sampleId": "S000004",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 3
+      },
+      {
+        "businessNo": "LAB202605146906",
+        "sampleId": "S000005",
+        "hasAnomalies": true,
+        "anomalies": [
+          {
+            "type": "time_inversion",
+            "fields": [
+              "collectTime",
+              "receiveTime"
+            ],
+            "values": [
+              "2026-05-14T18:22:49.894Z",
+              "2026-05-13T00:20:25.763Z"
+            ],
+            "message": "接收时间早于采集时间"
+          }
+        ],
+        "rawInputIndex": 4
+      },
+      {
+        "businessNo": "LAB202605149276",
+        "sampleId": "S000006",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 5
+      },
+      {
+        "businessNo": "LAB202605146793",
+        "sampleId": "S000007",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 6
+      },
+      {
+        "businessNo": "LAB202605149760",
+        "sampleId": "S000008",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 7
+      },
+      {
+        "businessNo": "LAB202605145945",
+        "sampleId": "S000009",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 8
+      },
+      {
+        "businessNo": "LAB202605140223",
+        "sampleId": "S000010",
+        "hasAnomalies": true,
+        "anomalies": [
+          {
+            "type": "time_inversion",
+            "fields": [
+              "collectTime",
+              "receiveTime"
+            ],
+            "values": [
+              "2026-05-13T22:40:20.426Z",
+              "2026-05-13T09:30:20.718Z"
+            ],
+            "message": "接收时间早于采集时间"
+          }
+        ],
+        "rawInputIndex": 9
+      },
+      {
+        "businessNo": "LAB202605143173",
+        "sampleId": "S000011",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 10
+      },
+      {
+        "businessNo": "LAB202605142658",
+        "sampleId": "S000012",
+        "hasAnomalies": true,
+        "anomalies": [
+          {
+            "type": "time_inversion",
+            "fields": [
+              "collectTime",
+              "receiveTime"
+            ],
+            "values": [
+              "2026-05-12T07:39:31.238Z",
+              "2026-05-12T03:40:16.423Z"
+            ],
+            "message": "接收时间早于采集时间"
+          }
+        ],
+        "rawInputIndex": 11
+      },
+      {
+        "businessNo": "LAB202605140665",
+        "sampleId": "S000013",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 12
+      },
+      {
+        "businessNo": "LAB202605143865",
+        "sampleId": "S000014",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 13
+      },
+      {
+        "businessNo": "LAB202605143203",
+        "sampleId": "S000015",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 14
+      },
+      {
+        "businessNo": "LAB202605141522",
+        "sampleId": "S000016",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 15
+      },
+      {
+        "businessNo": "LAB202605144405",
+        "sampleId": "S000017",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 16
+      },
+      {
+        "businessNo": "LAB202605142529",
+        "sampleId": "S000018",
+        "hasAnomalies": true,
+        "anomalies": [
+          {
+            "type": "time_inversion",
+            "fields": [
+              "collectTime",
+              "receiveTime"
+            ],
+            "values": [
+              "2026-05-14T03:51:33.835Z",
+              "2026-05-12T07:36:18.016Z"
+            ],
+            "message": "接收时间早于采集时间"
+          }
+        ],
+        "rawInputIndex": 17
+      },
+      {
+        "businessNo": "LAB202605141020",
+        "sampleId": "S000019",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 18
+      },
+      {
+        "businessNo": "LAB202605141078",
+        "sampleId": "S000020",
+        "hasAnomalies": false,
+        "anomalies": [],
+        "rawInputIndex": 19
+      }
+    ]
+  }
+}

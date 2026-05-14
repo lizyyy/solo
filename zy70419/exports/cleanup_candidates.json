@@ -1,0 +1,39 @@
+{
+  "batchId": "BATCH1778797248656",
+  "generatedAt": "2026-05-14T22:20:48.659Z",
+  "totalCandidates": 2,
+  "bySeverity": {
+    "critical": 1,
+    "high": 1,
+    "medium": 0,
+    "low": 0
+  },
+  "candidates": [
+    {
+      "businessNo": "LAB202605148575",
+      "sampleId": null,
+      "anomalyType": "swallowed",
+      "anomalyMessage": "该行数据格式异常，字段缺失严重，被系统自动过滤",
+      "severity": "critical",
+      "recommendedAction": "delete",
+      "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z",
+      "missingFields": [],
+      "canBeSafelyDeleted": true,
+      "requiresManualReview": true,
+      "addedAt": "2026-05-14T22:20:48.659Z"
+    },
+    {
+      "businessNo": "LAB202605142543",
+      "sampleId": null,
+      "anomalyType": "malformed",
+      "anomalyMessage": "字段数量不匹配，后续字段截断",
+      "severity": "high",
+      "recommendedAction": "fix_or_delete",
+      "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规",
+      "missingFields": [],
+      "canBeSafelyDeleted": false,
+      "requiresManualReview": true,
+      "addedAt": "2026-05-14T22:20:48.659Z"
+    }
+  ]
+}

@@ -1,0 +1,188 @@
+{
+  "reportId": "RPT1778797248659",
+  "generatedAt": "2026-05-14T22:20:48.659Z",
+  "batchId": "BATCH1778797248656",
+  "operator": "张医生",
+  "summary": {
+    "totalBusinessNos": 7,
+    "totalAnomalies": 7,
+    "gatewayErrors": 1,
+    "byLevel": {
+      "critical": 1,
+      "high": 1,
+      "medium": 5,
+      "low": 0
+    }
+  },
+  "gatewayErrors": [
+    {
+      "code": "GW001",
+      "message": "网关超时",
+      "detectedAt": "2026-05-14T22:20:48.659Z"
+    }
+  ],
+  "businessNoSummaries": [
+    {
+      "businessNo": "LAB202605148575",
+      "anomalyCount": 1,
+      "conclusionLevel": "critical",
+      "conclusion": "存在严重异常，必须立即处理，否则可能导致数据丢失或业务中断",
+      "anomalies": [
+        {
+          "type": "swallowed",
+          "message": "该行数据格式异常，字段缺失严重，被系统自动过滤",
+          "rawContent": "LAB202605150099,S000051,异常患者,,男,,,张医生,2026-05-15T08:30:00.000Z",
+          "sampleId": null,
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "swallowed",
+          "suggestion": "建议：该记录被系统自动过滤，需人工确认原始数据完整性，必要时重新导入"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605142543",
+      "anomalyCount": 1,
+      "conclusionLevel": "high",
+      "conclusion": "存在较严重异常，建议优先处理，避免影响后续流程",
+      "anomalies": [
+        {
+          "type": "malformed",
+          "message": "字段数量不匹配，后续字段截断",
+          "rawContent": "LAB202605150100,S000052,测试不完整,30,男,血液,血常规",
+          "sampleId": null,
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "malformed",
+          "suggestion": "建议：数据格式错误，需补全缺失字段或修正格式后重新处理"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605146433",
+      "anomalyCount": 1,
+      "conclusionLevel": "medium",
+      "conclusion": "存在数据异常，建议在下次批量处理前修正",
+      "anomalies": [
+        {
+          "type": "data_anomaly",
+          "message": "接收时间早于采集时间",
+          "rawContent": null,
+          "sampleId": "S000001",
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "data_anomaly",
+          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605146906",
+      "anomalyCount": 1,
+      "conclusionLevel": "medium",
+      "conclusion": "存在数据异常，建议在下次批量处理前修正",
+      "anomalies": [
+        {
+          "type": "data_anomaly",
+          "message": "接收时间早于采集时间",
+          "rawContent": null,
+          "sampleId": "S000005",
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "data_anomaly",
+          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605140223",
+      "anomalyCount": 1,
+      "conclusionLevel": "medium",
+      "conclusion": "存在数据异常，建议在下次批量处理前修正",
+      "anomalies": [
+        {
+          "type": "data_anomaly",
+          "message": "接收时间早于采集时间",
+          "rawContent": null,
+          "sampleId": "S000010",
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "data_anomaly",
+          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605142658",
+      "anomalyCount": 1,
+      "conclusionLevel": "medium",
+      "conclusion": "存在数据异常，建议在下次批量处理前修正",
+      "anomalies": [
+        {
+          "type": "data_anomaly",
+          "message": "接收时间早于采集时间",
+          "rawContent": null,
+          "sampleId": "S000012",
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "data_anomaly",
+          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
+        }
+      ]
+    },
+    {
+      "businessNo": "LAB202605142529",
+      "anomalyCount": 1,
+      "conclusionLevel": "medium",
+      "conclusion": "存在数据异常，建议在下次批量处理前修正",
+      "anomalies": [
+        {
+          "type": "data_anomaly",
+          "message": "接收时间早于采集时间",
+          "rawContent": null,
+          "sampleId": "S000018",
+          "field": null,
+          "value": null,
+          "missingFields": []
+        }
+      ],
+      "corrections": [
+        {
+          "anomalyType": "data_anomaly",
+          "suggestion": "建议：检查采集时间和接收时间，修正时间倒置问题"
+        }
+      ]
+    }
+  ],
+  "exportTime": "2026-05-14T22:20:48.659Z"
+}
