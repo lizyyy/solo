@@ -1,0 +1,35 @@
+{
+  "name": "json-schema-diff-cli",
+  "version": "1.0.0",
+  "description": "JSON Schema差异比较命令行工具 - 灰度物流拦截专用",
+  "main": "dist/index.js",
+  "bin": {
+    "jsdiff": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "test": "node --test dist/tests/*.test.js",
+    "self-check": "node dist/self-check.js",
+    "dev": "tsc --watch"
+  },
+  "keywords": ["json-schema", "diff", "logistics", "gray-release"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.1.1",
+    "inquirer": "^8.2.6",
+    "lodash": "^4.17.21",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^8.2.6",
+    "@types/lodash": "^4.14.201",
+    "@types/node": "^20.9.0",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.2.2"
+  }
+}
