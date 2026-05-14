@@ -1,4 +1,4 @@
-import { InvoiceApplication, BlockReason, OperationLog } from '../types';
+import type { InvoiceApplication, BlockReason, OperationLog } from '../types';
 
 export const validateTaxId = (taxId: string): boolean => {
   const regex = /^[A-Z0-9]{15,20}$/;

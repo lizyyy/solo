@@ -1,5 +1,5 @@
-import { Customer, Project, InvoiceApplication } from '../types';
-import { generateId, createOperationLog } from '../utils';
+import type { Customer, Project, InvoiceApplication } from '../types';
+import { createOperationLog } from '../utils';
 
 export const sampleCustomers: Customer[] = [
   {

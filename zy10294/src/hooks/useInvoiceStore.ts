@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { InvoiceApplication, Customer, Project, DashboardStats } from '../types';
+import type { InvoiceApplication, Customer, Project, DashboardStats } from '../types';
 import { sampleInvoices, sampleCustomers, sampleProjects } from '../data/sampleData';
 import { generateId, validateInvoiceApplication, createOperationLog } from '../utils';
 

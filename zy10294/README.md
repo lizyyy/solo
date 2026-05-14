@@ -1,73 +1,125 @@
-# React + TypeScript + Vite
+# 开票抬头复核台
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个用于管理发票开票申请的完整业务系统，支持客户抬头维护、开票申请、复核、驳回、红冲、重开等完整流程，并包含拦截机制和导出功能。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 🏠 仪表盘
+- 统计待处理、已完成、被拦截的发票申请数量
+- 展示最近申请记录
+- 快速导航至各功能模块
 
-## React Compiler
+### 📄 开票申请管理
+- 新建开票申请（选择客户、项目，填写金额）
+- 按状态筛选（全部/待复核/已通过/已驳回/已开票/已红冲/已重开）
+- 搜索客户名称、项目名称或发票号
+- 查看申请详情
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### ✅ 业务流程
+- **审核通过**：待复核状态的申请可通过
+- **驳回申请**：填写驳回原因后驳回
+- **确认开票**：已通过的申请录入发票号
+- **红冲发票**：已开票的申请可红冲
+- **重开发票**：红冲后的发票可重新开具
 
-## Expanding the ESLint configuration
+### 🚫 拦截机制
+系统自动拦截以下情况：
+- **税号格式异常**：税号需为15-20位字母数字
+- **已开票项目重复申请**：同一项目已开票不能重复申请
+- **红冲未重开**：同一客户存在红冲未重开发票时拦截新申请
+- **同一项目重复申请**：同一项目已有通过的申请
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 👥 客户抬头管理
+- 新增客户信息（名称、税号、地址、电话、银行信息）
+- 编辑已有客户信息
+- 实时验证税号格式正确性
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 📋 详情页功能
+- 完整展示发票申请信息（项目、客户、金额、状态）
+- 操作日志时间线（显示所有操作记录、备注和变更）
+- 拦截原因展示
+- 根据状态显示对应操作按钮
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 📊 导出功能
+- 一键导出所有开票申请为 CSV 文件
+- 包含完整字段供财务核对
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 技术栈
+- **React 19** - UI 框架
+- **TypeScript** - 类型安全
+- **Vite** - 构建工具
+- **Tailwind CSS 4** - 样式框架
+
+## 快速开始
+
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 启动开发服务器
+```bash
+npm run dev
 ```
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 代码检查
+```bash
+npm run lint
+```
+
+## 项目结构
+```
+src/
+├── types/          # 类型定义
+├── data/           # 样例数据
+├── hooks/          # 自定义 hooks
+├── utils/          # 工具函数
+├── App.tsx         # 主应用组件
+├── index.css       # 全局样式
+└── main.tsx        # 入口文件
+```
+
+## 数据模型
+
+### InvoiceApplication（开票申请）
+- id: 申请唯一标识
+- customerId/Name: 客户信息
+- projectId/Name/Code: 项目信息
+- amount: 开票金额
+- invoiceType: 专票/普票
+- status: 状态（pending/approved/rejected/invoiced/red_flush/reopened/blocked）
+- blockReason/Message: 拦截原因和信息
+- applicant/reviewer: 申请人和审核人
+- invoiceNumber: 发票号
+- operationLogs: 操作日志数组
+
+### Customer（客户）
+- id: 客户唯一标识
+- name: 客户名称
+- taxId: 税号
+- address/phone: 地址电话
+- bankName/bankAccount: 银行信息
+- createdAt/updatedAt: 创建和更新时间
+
+### Project（项目）
+- id: 项目唯一标识
+- name: 项目名称
+- code: 项目编码
+- description: 项目描述
+
+## 操作说明
+
+1. **新建开票申请**：在"开票申请"页点击"新建开票申请"，选择客户和项目，填写金额后提交
+2. **审核**：在开票申请列表点击"通过"或"驳回"处理待复核的申请
+3. **开票**：已通过的申请录入发票号确认开票
+4. **红冲/重开**：已开票的申请可红冲，红冲后可重开
+5. **导出**：点击右上角"导出CSV"导出所有数据
+6. **客户管理**：在"客户管理"页可新增或编辑客户信息
+
+## 样例数据
+项目内置了多笔样例数据，包含各种状态的开票申请，可用于演示完整业务流程。
