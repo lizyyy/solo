@@ -191,12 +191,21 @@ app.get('/api/appointments', (req, res) => {
 
 app.post('/api/appointments', (req, res) => {
   const { key_id, agent_id, appointment_date, time_slot, notes } = req.body;
-  const appointment_code = generateCode('APT');
-  db.run('INSERT INTO appointments (appointment_code, key_id, agent_id, appointment_date, time_slot, notes) VALUES (?, ?, ?, ?, ?, ?)', 
-    [appointment_code, key_id, agent_id, appointment_date, time_slot, notes], function(err) {
-      if (err) return res.status(400).json({ error: err.message });
-      res.json({ id: this.lastID, appointment_code, key_id, agent_id, appointment_date, time_slot, notes, status: 'pending' });
-    });
+  
+  db.get(`
+    SELECT id FROM appointments 
+    WHERE key_id = ? AND appointment_date = ? AND time_slot = ? AND status = 'pending'
+  `, [key_id, appointment_date, time_slot], (err, existing) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (existing) return res.status(400).json({ error: '该钥匙在该时段已有待执行预约，请勿重复预约' });
+
+    const appointment_code = generateCode('APT');
+    db.run('INSERT INTO appointments (appointment_code, key_id, agent_id, appointment_date, time_slot, notes) VALUES (?, ?, ?, ?, ?, ?)', 
+      [appointment_code, key_id, agent_id, appointment_date, time_slot, notes], function(err) {
+        if (err) return res.status(400).json({ error: err.message });
+        res.json({ id: this.lastID, appointment_code, key_id, agent_id, appointment_date, time_slot, notes, status: 'pending' });
+      });
+  });
 });
 
 app.get('/api/borrow-records', (req, res) => {
@@ -229,6 +238,10 @@ app.post('/api/borrow', (req, res) => {
     `, [key_id, agent_id], (err, hasAppointment) => {
       if (err) return res.status(500).json({ error: err.message });
 
+      if (!hasAppointment && !appointment_id) {
+        return res.status(400).json({ error: '未找到有效的带看预约，请先预约再借出钥匙' });
+      }
+
       const borrow_time = new Date().toISOString();
       const expected_return_time = new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000).toISOString();
       const borrow_code = generateCode('BRW');
@@ -244,13 +257,14 @@ app.post('/api/borrow', (req, res) => {
         db.run('UPDATE keys SET status = ? WHERE id = ?', ['borrowed', key_id], (err) => {
           if (err) return res.status(500).json({ error: err.message });
 
-          if (hasAppointment) {
-            db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', hasAppointment.id], (err) => {
+          const apptIdToUpdate = appointment_id || hasAppointment?.id;
+          if (apptIdToUpdate) {
+            db.run('UPDATE appointments SET status = ? WHERE id = ?', ['completed', apptIdToUpdate], (err) => {
               if (err) console.error(err);
             });
           }
 
-          res.json({ id: borrowId, borrow_code, key_id, agent_id, borrow_time, expected_return_time, status: 'borrowed', hasAppointment: !!hasAppointment });
+          res.json({ id: borrowId, borrow_code, key_id, agent_id, borrow_time, expected_return_time, status: 'borrowed', hasAppointment: true });
         });
       });
     });
@@ -264,17 +278,23 @@ app.post('/api/return', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     if (!record) return res.status(400).json({ error: '借用记录不存在' });
     if (record.status === 'returned') return res.status(400).json({ error: '该钥匙已归还' });
+    if (record.status === 'lost') return res.status(400).json({ error: '该钥匙已登记丢失，无法归还，请走丢失赔付流程' });
 
-    const actual_return_time = new Date().toISOString();
-    db.run('UPDATE borrow_records SET actual_return_time = ?, status = ?, notes = COALESCE(?, notes) WHERE id = ?', 
-      [actual_return_time, 'returned', notes, borrow_record_id], (err) => {
-        if (err) return res.status(400).json({ error: err.message });
-        
-        db.run('UPDATE keys SET status = ? WHERE id = ?', ['available', record.key_id], (err) => {
-          if (err) return res.status(500).json({ error: err.message });
-          res.json({ success: true, actual_return_time });
+    db.get('SELECT status FROM keys WHERE id = ?', [record.key_id], (err, key) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (key.status === 'lost') return res.status(400).json({ error: '该钥匙已登记丢失，无法归还，请走丢失赔付流程' });
+
+      const actual_return_time = new Date().toISOString();
+      db.run('UPDATE borrow_records SET actual_return_time = ?, status = ?, notes = COALESCE(?, notes) WHERE id = ?', 
+        [actual_return_time, 'returned', notes, borrow_record_id], (err) => {
+          if (err) return res.status(400).json({ error: err.message });
+          
+          db.run('UPDATE keys SET status = ? WHERE id = ?', ['available', record.key_id], (err) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ success: true, actual_return_time });
+          });
         });
-      });
+    });
   });
 });
 

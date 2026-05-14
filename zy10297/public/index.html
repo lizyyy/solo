@@ -454,16 +454,13 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div>
                 <h4 style="margin-bottom: 15px; color: #f59e0b;">借出钥匙</h4>
-                <div class="form-group">
-                    <label>选择钥匙</label>
-                    <select id="borrow-key-id">
-                        <option value="">请选择钥匙</option>
-                    </select>
+                <div style="background: #fef3c7; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                    ⚠️ <strong>重要提示：</strong>借出钥匙前必须先在「预约管理」中创建带看预约
                 </div>
                 <div class="form-group">
-                    <label>经纪人</label>
-                    <select id="borrow-agent-id">
-                        <option value="">请选择经纪人</option>
+                    <label>选择待执行预约</label>
+                    <select id="borrow-appointment-id">
+                        <option value="">请选择预约（创建预约后刷新可见）</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1009,6 +1006,20 @@
             }
         }
 
+        async function refreshPendingAppointments() {
+            try {
+                const res = await fetch(API_BASE + '/appointments');
+                const appointments = (await res.json()).filter(a => a.status === 'pending');
+                const select = document.getElementById('borrow-appointment-id');
+                select.innerHTML = '<option value="">请选择预约（创建预约后刷新可见）</option>' + 
+                    appointments.map(a => `<option value="${a.id}" data-key-id="${a.key_id}" data-agent-id="${a.agent_id}">
+                        ${a.key_code} - ${a.agent_name} - ${formatDateShort(a.appointment_date)} ${a.time_slot}
+                    </option>`).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         async function refreshBorrowedSelect() {
             try {
                 const res = await fetch(API_BASE + '/borrow-records');
@@ -1133,6 +1144,7 @@
                     showAlert('预约创建成功！');
                     closeModal('add-appointment-modal');
                     refreshAppointments();
+                    refreshPendingAppointments();
                 } else {
                     showAlert(data.error || '创建失败', true);
                 }
@@ -1142,28 +1154,33 @@
         }
 
         async function borrowKey() {
-            const keyId = document.getElementById('borrow-key-id').value;
-            const agentId = document.getElementById('borrow-agent-id').value;
+            const appointmentSelect = document.getElementById('borrow-appointment-id');
+            const appointmentId = appointmentSelect.value;
+            const selectedOption = appointmentSelect.options[appointmentSelect.selectedIndex];
             const hours = document.getElementById('borrow-hours').value;
             const notes = document.getElementById('borrow-notes').value;
             
-            if (!keyId || !agentId) {
-                showAlert('请选择钥匙和经纪人', true);
+            if (!appointmentId) {
+                showAlert('请先选择带看预约', true);
                 return;
             }
+
+            const keyId = selectedOption.dataset.keyId;
+            const agentId = selectedOption.dataset.agentId;
 
             try {
                 const res = await fetch(API_BASE + '/borrow', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ key_id: keyId, agent_id: agentId, expected_return_hours: Number(hours), notes })
+                    body: JSON.stringify({ key_id: keyId, agent_id: agentId, appointment_id: appointmentId, expected_return_hours: Number(hours), notes })
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    showAlert(data.hasAppointment ? '借出成功（已关联预约）！' : '借出成功！');
+                    showAlert('借出成功（已关联预约）！');
                     refreshBorrowSelects();
                     refreshKeys();
                     refreshRecords();
+                    refreshAppointments();
                     refreshStatistics();
                 } else {
                     showAlert(data.error || '借出失败', true);
@@ -1265,8 +1282,7 @@
         }
 
         function refreshBorrowSelects() {
-            refreshKeySelect('borrow-key-id', 'available');
-            refreshAgentSelect('borrow-agent-id');
+            refreshPendingAppointments();
             refreshBorrowedSelect();
         }
 
