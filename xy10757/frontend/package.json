@@ -1,0 +1,20 @@
+{
+  "name": "points-ledger-frontend",
+  "version": "1.0.0",
+  "description": "会员积分账本前端",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4",
+    "axios": "^1.5.0",
+    "element-plus": "^2.3.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "vite": "^4.4.9"
+  }
+}
