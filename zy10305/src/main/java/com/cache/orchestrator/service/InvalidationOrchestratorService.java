@@ -173,7 +173,13 @@ public class InvalidationOrchestratorService {
         int processedCount = (int) (confirmedCount + failedCount + timeoutCount);
 
         if (processedCount == totalNodes) {
-            if (failedCount == 0 && timeoutCount == 0) {
+            boolean hasRetryInProgress = batch.getRetryPlans().stream()
+                    .anyMatch(plan -> "RETRYING".equals(plan.getRetryResult()));
+            
+            if (hasRetryInProgress) {
+                batch.setStatus(BatchStatus.RETRYING);
+                log.info("批次有重试正在进行中, 保持 RETRYING 状态, batchId: {}", batch.getId());
+            } else if (failedCount == 0 && timeoutCount == 0) {
                 batch.setStatus(BatchStatus.SUCCESS);
                 batch.setCompletedAt(LocalDateTime.now());
             } else if (confirmedCount > 0) {

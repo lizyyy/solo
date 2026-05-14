@@ -42,9 +42,23 @@ public class ConfirmationService {
 
         if (request.getStatus() == ConfirmationStatus.FAILED) {
             handleFailedConfirmation(batch, request);
+        } else if (request.getStatus() == ConfirmationStatus.CONFIRMED) {
+            updateRetryPlanOnSuccess(batch, request.getNodeId());
         }
 
         log.info("回执处理完成, nodeId: {}, status: {}", request.getNodeId(), request.getStatus());
+    }
+
+    private void updateRetryPlanOnSuccess(InvalidationBatch batch, String nodeId) {
+        batch.getRetryPlans().stream()
+                .filter(plan -> plan.getNodeId().equals(nodeId))
+                .findFirst()
+                .ifPresent(plan -> {
+                    plan.setRetryResult("SUCCESS");
+                    log.info("节点重试成功, nodeId: {}, retryNumber: {}", nodeId, plan.getRetryNumber());
+                });
+        
+        batch.getFailedNodes().removeIf(f -> f.getNodeId().equals(nodeId));
     }
 
     private void handleFailedConfirmation(InvalidationBatch batch, ConfirmationRequest request) {

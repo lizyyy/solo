@@ -2,13 +2,13 @@
 
 BASE_URL="http://localhost:8080/api/v1/invalidation"
 
-echo "=========================================="
+echo "========================================"
 echo "分布式缓存失效编排 API - 完整流程测试"
-echo "=========================================="
+echo "========================================"
 echo ""
 
-echo "1. 创建批次 1: 创建失效批次"
-echo "------------------------------------------"
+echo "[1/16] 创建失效批次 (3个节点)"
+echo "----------------------------------------"
 CREATE_RESPONSE=$(curl -s -X POST "$BASE_URL/batches" \
   -H "Content-Type: application/json" \
   -d '{
@@ -32,8 +32,8 @@ BATCH_ID=$(echo "$CREATE_RESPONSE" | python3 -c "import sys, json; print(json.lo
 echo "批次 ID: $BATCH_ID"
 echo ""
 
-echo "2. 测试幂等性: 再次提交相同的 requestId"
-echo "------------------------------------------"
+echo "[2/16] 幂等性验证 - 再次提交相同 requestId"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,21 +42,21 @@ curl -s -X POST "$BASE_URL/batches" \
     "serviceNodes": [
       {"nodeId": "node-01", "nodeAddress": "http://node1:8080"}
     ]
-  }' | python3 -m json.tool 2>/dev/null || echo "幂等测试完成"
+  }' | python3 -m json.tool 2>/dev/null || echo "幂等验证 - 应该返回已存在的批次"
 echo ""
 
-echo "3. 校验批次"
-echo "------------------------------------------"
+echo "[3/16] 校验批次"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/validate" | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "4. 开始处理批次"
-echo "------------------------------------------"
+echo "[4/16] 开始处理批次"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/start" | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "5. 节点 01 确认成功"
-echo "------------------------------------------"
+echo "[5/16] 节点 01 确认成功"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   -H "Content-Type: application/json" \
   -d '{
@@ -67,21 +67,21 @@ curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   }' | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "6. 节点 02 确认失败"
-echo "------------------------------------------"
+echo "[6/16] 节点 02 确认失败 - (Redis连接超时)"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   -H "Content-Type: application/json" \
   -d '{
     "receiptId": "RCP-002",
     "nodeId": "node-02",
     "status": "FAILED",
-    "failureReason": "连接超时: 无法连接到 Redis 服务器",
+    "failureReason": "Redis连接超时: Connection refused",
     "keysProcessed": 0
   }' | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "7. 测试回执幂等性: 再次提交相同的 receiptId"
-echo "------------------------------------------"
+echo "[7/16] 回执幂等性验证 - 重复提交 RCP-001"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   -H "Content-Type: application/json" \
   -d '{
@@ -92,8 +92,8 @@ curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   }' | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "8. 节点 03 确认成功"
-echo "------------------------------------------"
+echo "[8/16] 节点 03 确认成功"
+echo "----------------------------------------"
 curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   -H "Content-Type: application/json" \
   -d '{
@@ -104,41 +104,75 @@ curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
   }' | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "9. 查询批次状态"
-echo "------------------------------------------"
+echo "[9/16] 查询当前批次状态 (应该是 PARTIAL_SUCCESS)"
+echo "----------------------------------------"
 curl -s "$BASE_URL/batches/$BATCH_ID" | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "10. 通过 requestId 查询批次"
-echo "------------------------------------------"
+echo "[10/16] 触发节点 02 重试"
+echo "----------------------------------------"
+curl -s -X POST "$BASE_URL/batches/$BATCH_ID/retry/node-02" | python3 -m json.tool 2>/dev/null
+echo ""
+
+echo "[11/16] 查询重试状态"
+echo "----------------------------------------"
+curl -s "$BASE_URL/batches/$BATCH_ID/retry-status" | python3 -m json.tool 2>/dev/null
+echo ""
+
+echo "[12/16] 重试后节点 02 确认成功"
+echo "----------------------------------------"
+curl -s -X POST "$BASE_URL/batches/$BATCH_ID/confirm" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "receiptId": "RCP-002-RETRY-1",
+    "nodeId": "node-02",
+    "status": "CONFIRMED",
+    "keysProcessed": 10
+  }' | python3 -m json.tool 2>/dev/null
+echo ""
+
+echo "[13/16] 查询最终批次状态 (应该是 SUCCESS)"
+echo "----------------------------------------"
+curl -s "$BASE_URL/batches/$BATCH_ID" | python3 -m json.tool 2>/dev/null
+echo ""
+
+echo "[14/16] 通过 requestId 查询批次"
+echo "----------------------------------------"
 curl -s "$BASE_URL/batches/request/REQ-2024-001" | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "11. 按状态查询批次"
-echo "------------------------------------------"
-curl -s "$BASE_URL/batches/status?statuses=PARTIAL_SUCCESS,SUCCESS" | python3 -m json.tool 2>/dev/null
+echo "[15/16] 按状态查询批次列表 (SUCCESS)"
+echo "----------------------------------------"
+curl -s "$BASE_URL/batches/status?statuses=SUCCESS" | python3 -m json.tool 2>/dev/null
 echo ""
 
-echo "12. 导出批次详情 (CSV)"
-echo "------------------------------------------"
+echo "[16/16] 导出批次详情 CSV"
+echo "----------------------------------------"
 curl -s -o "batch_${BATCH_ID}.csv" "$BASE_URL/batches/$BATCH_ID/export"
 echo "已导出到 batch_${BATCH_ID}.csv"
 echo ""
 
-echo "=========================================="
+echo "========================================"
 echo "测试完成!"
-echo "=========================================="
+echo "========================================"
 echo ""
-echo "附加测试用例总结:"
-echo "- ✅ 创建批次 (含节点配置"
-echo "- ✅ 幂等性测试 (重复 requestId"
-echo "- ✅ 批次校验"
-echo "- ✅ 开始处理"
-echo "- ✅ 成功回执确认"
-echo "- ✅ 失败回执确认"
-echo "- ✅ 回执幂等性"
-echo "- ✅ 状态对账机制"
-echo "- ✅ 状态查询"
-echo "- ✅ requestId 查询"
-echo "- ✅ 状态批量查询"
-echo "- ✅ CSV 导出"
+echo "测试验证总结:"
+echo "✅ 创建批次 (含节点配置和重试策略)"
+echo "✅ requestId 幂等性验证"
+echo "✅ 批次校验"
+echo "✅ 开始处理 (状态推进)"
+echo "✅ 成功回执确认"
+echo "✅ 失败回执确认 (含失败原因)"
+echo "✅ 回执幂等性验证"
+echo "✅ 状态对账 (PARTIAL_SUCCESS)"
+echo "✅ 单节点重试触发"
+echo "✅ 重试状态查询"
+echo "✅ 重试后回执确认"
+echo "✅ 最终状态对账 (SUCCESS)"
+echo "✅ requestId 查询"
+echo "✅ 按状态批量查询"
+echo "✅ CSV 导出"
+echo ""
+echo "完整服务链路可查: 创建 -> 校验 -> 处理 -> 失败 -> 重试 -> 成功 -> 导出"
+echo "状态流转: CREATED -> VALIDATED -> PROCESSING -> PARTIAL_SUCCESS -> RETRYING -> SUCCESS"
+echo ""

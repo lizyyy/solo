@@ -7,6 +7,7 @@ import com.cache.orchestrator.domain.dto.CreateBatchRequest;
 import com.cache.orchestrator.domain.enums.BatchStatus;
 import com.cache.orchestrator.service.ExportService;
 import com.cache.orchestrator.service.InvalidationOrchestratorService;
+import com.cache.orchestrator.service.RetryService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -27,6 +29,7 @@ public class InvalidationController {
 
     private final InvalidationOrchestratorService orchestratorService;
     private final ExportService exportService;
+    private final RetryService retryService;
 
     @PostMapping("/batches")
     public ApiResponse<BatchResponse> createBatch(@Valid @RequestBody CreateBatchRequest request) {
@@ -119,5 +122,28 @@ public class InvalidationController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(csvData);
+    }
+
+    @PostMapping("/batches/{batchId}/retry/{nodeId}")
+    public ApiResponse<Map<String, Object>> retryNode(
+            @PathVariable Long batchId,
+            @PathVariable String nodeId) {
+        log.info("触发节点重试, batchId: {}, nodeId: {}", batchId, nodeId);
+        Map<String, Object> result = retryService.retryNode(batchId, nodeId);
+        return ApiResponse.success("重试计划已启动", result);
+    }
+
+    @PostMapping("/batches/{batchId}/retry-all")
+    public ApiResponse<Map<String, Object>> retryAllNodes(@PathVariable Long batchId) {
+        log.info("触发批次所有节点重试, batchId: {}", batchId);
+        Map<String, Object> result = retryService.retryAllNodes(batchId);
+        return ApiResponse.success("批量重试已启动", result);
+    }
+
+    @GetMapping("/batches/{batchId}/retry-status")
+    public ApiResponse<List<Map<String, Object>>> getRetryStatus(@PathVariable Long batchId) {
+        log.info("查询批次重试状态, batchId: {}", batchId);
+        List<Map<String, Object>> result = retryService.getRetryStatus(batchId);
+        return ApiResponse.success(result);
     }
 }
