@@ -13,14 +13,14 @@
 cd /Users/lzy/pro/solo/workspaces/zy70043
 
 # 安装依赖
-pip install -e .
+python3 -m pip install -e .
 ```
 
 ### 2. 启动服务
 
 ```bash
 # 方式1：直接运行
-python -m app.main
+python3 -m app.main
 
 # 方式2：使用 uvicorn
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -34,7 +34,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ```bash
 # 方式1：命令行（推荐，有业务友好输出）
-python -m cli.main init
+python3 -m cli.main init
 
 # 方式2：API 调用
 curl -X POST http://localhost:8000/api/seed
@@ -58,7 +58,7 @@ curl -X POST http://localhost:8000/api/seed
 
 ```bash
 # 步骤1：创建替代申请
-python -m cli.main create \
+python3 -m cli.main create \
   --original RM-001 \
   --substitute RM-002 \
   --reason "供应商断货，预计7天后恢复" \
@@ -76,7 +76,7 @@ python -m cli.main create \
 
 ```bash
 # 步骤2：提交审批
-python -m cli.main submit \
+python3 -m cli.main submit \
   --request-no SUB-20260509123000-ABCD \
   --submitter "采购员-张三"
 
@@ -87,7 +87,7 @@ python -m cli.main submit \
 
 ```bash
 # 步骤3：质检审批（成本超阈值，所以需要质检先审）
-python -m cli.main approve \
+python3 -m cli.main approve \
   --request-no SUB-20260509123000-ABCD \
   --approver "质检-李四" \
   --level qc \
@@ -99,7 +99,7 @@ python -m cli.main approve \
 
 ```bash
 # 步骤4：成本审批
-python -m cli.main approve \
+python3 -m cli.main approve \
   --request-no SUB-20260509123000-ABCD \
   --approver "成本-王五" \
   --level cost \
@@ -111,7 +111,7 @@ python -m cli.main approve \
 
 ```bash
 # 步骤5：最终审批
-python -m cli.main approve \
+python3 -m cli.main approve \
   --request-no SUB-20260509123000-ABCD \
   --approver "经理-赵六" \
   --level final \
@@ -123,7 +123,7 @@ python -m cli.main approve \
 
 ```bash
 # 步骤6：执行配方更新（生成新版本并生效）
-python -m cli.main execute \
+python3 -m cli.main execute \
   --request-no SUB-20260509123000-ABCD \
   --operator "工程师-钱七"
 
@@ -135,7 +135,7 @@ python -m cli.main execute \
 
 ```bash
 # 步骤7：查看完整详情和追溯
-python -m cli.main detail --request-no SUB-20260509123000-ABCD
+python3 -m cli.main detail --request-no SUB-20260509123000-ABCD
 
 # 📋 基本信息
 #    申请单号: SUB-20260509123000-ABCD
@@ -196,7 +196,7 @@ curl -X POST http://localhost:8000/api/substitutions/execute \
 # 或者手动创建 → 提交 → 审批
 
 # 步骤2：执行时模拟失败（第1个配方索引=0）
-python -m cli.main execute \
+python3 -m cli.main execute \
   --request-no SUB-XXXX \
   --operator "工程师" \
   --simulate-failure 0
@@ -209,7 +209,7 @@ python -m cli.main execute \
 
 ```bash
 # 步骤3：重试（无需清库，自动只处理失败的）
-python -m cli.main retry \
+python3 -m cli.main retry \
   --request-no SUB-XXXX \
   --operator "工程师"
 
@@ -220,7 +220,7 @@ python -m cli.main retry \
 
 ```bash
 # 查看追溯日志，能看到所有执行历史
-python -m cli.main detail --request-no SUB-XXXX
+python3 -m cli.main detail --request-no SUB-XXXX
 
 # 📊 执行追溯 (3 条记录):
 #    [时间] ❌ 更新配方：F-001
@@ -239,7 +239,7 @@ python -m cli.main detail --request-no SUB-XXXX
 # ...（创建 → 提交 → 三级审批）
 
 # 步骤2：执行前发现问题，冻结
-python -m cli.main freeze \
+python3 -m cli.main freeze \
   --request-no SUB-XXXX \
   --operator "风控专员" \
   --reason "供应商资质重新审核中，暂停执行"
@@ -249,7 +249,7 @@ python -m cli.main freeze \
 
 ```bash
 # 步骤3：尝试执行，会被拒绝
-python -m cli.main execute \
+python3 -m cli.main execute \
   --request-no SUB-XXXX \
   --operator "工程师"
 
@@ -258,7 +258,7 @@ python -m cli.main execute \
 
 ```bash
 # 步骤4：问题解决后解冻
-python -m cli.main unfreeze \
+python3 -m cli.main unfreeze \
   --request-no SUB-XXXX \
   --operator "风控专员"
 
@@ -267,7 +267,7 @@ python -m cli.main unfreeze \
 
 ```bash
 # 步骤5：正常执行
-python -m cli.main execute \
+python3 -m cli.main execute \
   --request-no SUB-XXXX \
   --operator "工程师"
 ```
@@ -280,13 +280,13 @@ python -m cli.main execute \
 
 ```bash
 # 演示1：正常流程（大豆油A → 大豆油B）
-python -m cli.main demo-normal
+python3 -m cli.main demo-normal
 
 # 演示2：失败补偿流程（模拟失败 → 重试成功）
-python -m cli.main demo-fail-retry
+python3 -m cli.main demo-fail-retry
 
 # 演示3：审批冻结流程（冻结 → 拒绝执行 → 解冻 → 执行）
-python -m cli.main demo-freeze
+python3 -m cli.main demo-freeze
 ```
 
 ---
@@ -297,7 +297,7 @@ python -m cli.main demo-freeze
 
 ```bash
 # 导出单个申请的完整复核单（含成本、配方、审批、追溯）
-python -m cli.main export --type substitution --request-no SUB-XXXX
+python3 -m cli.main export --type substitution --request-no SUB-XXXX
 
 # ✅ 导出成功: exports/替代申请复核_SUB-XXXX_20260509_123000.csv
 # 💡 提示: 此文件可直接用 Excel 打开查看
@@ -314,10 +314,10 @@ python -m cli.main export --type substitution --request-no SUB-XXXX
 
 ```bash
 # 导出配方版本历史（用于审计配方变更）
-python -m cli.main export --type formula --formula-code F-001
+python3 -m cli.main export --type formula --formula-code F-001
 
 # 导出所有申请汇总表
-python -m cli.main export --type summary
+python3 -m cli.main export --type summary
 ```
 
 ---
@@ -342,12 +342,12 @@ curl http://localhost:8000/api/formulas
 curl http://localhost:8000/api/qc-constraints
 
 # 查看申请列表（可按状态过滤）
-python -m cli.main list
-python -m cli.main list --status 已完成
-python -m cli.main list --status 执行失败
+python3 -m cli.main list
+python3 -m cli.main list --status 已完成
+python3 -m cli.main list --status 执行失败
 
 # 查看单个申请详情
-python -m cli.main detail --request-no SUB-XXXX
+python3 -m cli.main detail --request-no SUB-XXXX
 ```
 
 ---
@@ -360,7 +360,7 @@ python -m cli.main detail --request-no SUB-XXXX
 
 ```bash
 # 大豆油A（食用油）尝试用面粉Y（谷物）替代
-python -m cli.main create \
+python3 -m cli.main create \
   --original RM-001 \
   --substitute RM-004 \
   --reason "测试质检约束" \
@@ -373,7 +373,7 @@ python -m cli.main create \
 
 ```bash
 # 对"草稿"状态直接执行审批
-python -m cli.main approve --request-no SUB-XXXX --approver "测试" --level qc --result pass
+python3 -m cli.main approve --request-no SUB-XXXX --approver "测试" --level qc --result pass
 
 # ❌ 失败：当前状态[草稿]不适合进行质检审批
 ```
@@ -382,7 +382,7 @@ python -m cli.main approve --request-no SUB-XXXX --approver "测试" --level qc 
 
 ```bash
 # 执行时指定 simulate_failure 参数
-python -m cli.main execute --request-no SUB-XXXX --operator 工程师 --simulate-failure 0
+python3 -m cli.main execute --request-no SUB-XXXX --operator 工程师 --simulate-failure 0
 
 # 第1个配方会失败，其他成功
 ```
@@ -391,10 +391,10 @@ python -m cli.main execute --request-no SUB-XXXX --operator 工程师 --simulate
 
 ```bash
 # 先冻结
-python -m cli.main freeze --request-no SUB-XXXX --operator 测试 --reason "测试"
+python3 -m cli.main freeze --request-no SUB-XXXX --operator 测试 --reason "测试"
 
 # 再执行
-python -m cli.main execute --request-no SUB-XXXX --operator 工程师
+python3 -m cli.main execute --request-no SUB-XXXX --operator 工程师
 
 # ❌ 失败：当前状态[已冻结]不允许执行
 ```
@@ -517,7 +517,7 @@ which python3.13 # 查看 python3.13 路径
 A: 说明依赖没安装成功，确保在项目目录下执行：
 ```bash
 cd /Users/lzy/pro/solo/workspaces/zy70043
-python3 -m pip install -e .
+python3 -m python3 -m pip install -e .
 ```
 
 ### Q: 执行失败后为什么不用清库？
@@ -554,7 +554,7 @@ A: 种子数据已预设多个测试场景：
 - 高成本差异（>10%）：提交 → 质检复核
 - 低成本差异（≤10%）：提交 → 成本复核 ✅
 
-### 问题2：`pip install -e .` 失败
+### 问题2：`python3 -m pip install -e .` 失败
 
 **可能原因**：
 1. 不在项目目录下执行
@@ -564,7 +564,7 @@ A: 种子数据已预设多个测试场景：
 ```bash
 cd /Users/lzy/pro/solo/workspaces/zy70043
 python3 --version  # 确认版本
-python3 -m pip install -e .
+python3 -m python3 -m pip install -e .
 ```
 
 ### 问题3：运行演示时数据混乱
