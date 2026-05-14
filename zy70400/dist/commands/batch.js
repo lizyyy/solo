@@ -66,16 +66,26 @@ async function executeBatchProcess(batchId) {
     let successCount = 0;
     let abnormalCount = 0;
     for (const record of records) {
-        const hasTruncatedField = record.isFieldTruncated ||
-            (record.summary.length < 10 && record.summary.length > 0) ||
-            record.customerName.includes('...');
+        const truncatedFields = [];
+        if (record.summary.length < 10 && record.summary.length > 0) {
+            truncatedFields.push('summary');
+        }
+        if (record.customerName.includes('...')) {
+            truncatedFields.push('customerName');
+        }
+        const hasTruncatedField = record.isFieldTruncated || truncatedFields.length > 0;
         if (hasTruncatedField) {
+            const allTruncatedFields = [...new Set([...(record.truncatedFields || []), ...truncatedFields])];
             storage_1.Storage.updateRecord(record.id, {
                 status: types_1.ProcessingStatus.ABNORMAL,
+                abnormalType: types_1.AbnormalType.FIELD_TRUNCATED,
+                abnormalReason: '批处理检测到字段截断，需要人工复核',
+                isFieldTruncated: true,
+                truncatedFields: allTruncatedFields,
                 processingResult: '字段截断，需要人工复核'
             });
             abnormalCount++;
-            console.log(chalk_1.default.red(`  ${record.id.substring(0, 8)} - 标记为异常: 字段截断`));
+            console.log(chalk_1.default.red(`  ${record.id.substring(0, 8)} - 标记为异常: 字段截断 (${allTruncatedFields.join(', ')})`));
         }
         else {
             storage_1.Storage.updateRecord(record.id, {

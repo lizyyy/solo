@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import Table from 'cli-table3';
 import inquirer from 'inquirer';
 import { Storage } from '../storage';
-import { ProcessingStatus } from '../types';
+import { ProcessingStatus, AbnormalType } from '../types';
 
 export async function previewBatchProcess(batchId: string): Promise<void> {
   const batch = Storage.getBatchById(batchId);
@@ -71,17 +71,28 @@ export async function executeBatchProcess(batchId: string): Promise<void> {
   let abnormalCount = 0;
 
   for (const record of records) {
-    const hasTruncatedField = record.isFieldTruncated || 
-      (record.summary.length < 10 && record.summary.length > 0) ||
-      record.customerName.includes('...');
+    const truncatedFields: string[] = [];
+    
+    if (record.summary.length < 10 && record.summary.length > 0) {
+      truncatedFields.push('summary');
+    }
+    if (record.customerName.includes('...')) {
+      truncatedFields.push('customerName');
+    }
+    const hasTruncatedField = record.isFieldTruncated || truncatedFields.length > 0;
 
     if (hasTruncatedField) {
+      const allTruncatedFields = [...new Set([...(record.truncatedFields || []), ...truncatedFields])];
       Storage.updateRecord(record.id, {
         status: ProcessingStatus.ABNORMAL,
+        abnormalType: AbnormalType.FIELD_TRUNCATED,
+        abnormalReason: '批处理检测到字段截断，需要人工复核',
+        isFieldTruncated: true,
+        truncatedFields: allTruncatedFields,
         processingResult: '字段截断，需要人工复核'
       });
       abnormalCount++;
-      console.log(chalk.red(`  ${record.id.substring(0, 8)} - 标记为异常: 字段截断`));
+      console.log(chalk.red(`  ${record.id.substring(0, 8)} - 标记为异常: 字段截断 (${allTruncatedFields.join(', ')})`));
     } else {
       Storage.updateRecord(record.id, {
         status: ProcessingStatus.SUCCESS,

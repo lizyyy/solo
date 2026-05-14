@@ -1,0 +1,30 @@
+[
+  {
+    "batchId": "AFS-2024-0515",
+    "recordingId": "REC-20240515-002003",
+    "customerName": "王五...",
+    "phoneNumber": "137****9012",
+    "serviceType": "投诉",
+    "startTime": "2024-05-15 00:20:00",
+    "endTime": "2024-05-15 00:45:30",
+    "duration": 1530,
+    "agentName": "刘强",
+    "summary": "截",
+    "status": "abnormal",
+    "abnormalType": "field_truncated",
+    "abnormalReason": "检测到字段截断，需要人工复核",
+    "isFieldTruncated": true,
+    "truncatedFields": [
+      "customerName",
+      "summary"
+    ],
+    "id": "ff9822f1-0ede-48b1-9cda-d2d87e3e9e33",
+    "createdAt": "2026-05-14T17:03:37.687Z",
+    "updatedAt": "2026-05-14T17:03:37.687Z",
+    "batchInfo": {
+      "batchName": "跨天售后录音归档",
+      "source": "客服系统-售后录音转写",
+      "processingBasis": "售后质量检测标准V2.0"
+    }
+  }
+]
