@@ -1,16 +1,25 @@
 import json
 import re
+import copy
 from typing import Dict, Any, List, Tuple
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import pandas as pd
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 from app.models import EvaluationFragment, FieldTrace, ProcessingRecord, Report, BatchConflict
 from app.config import settings
 
 
+def normalize_field_path(path: str) -> str:
+    if path.startswith('response_data.'):
+        return path[len('response_data.'):]
+    return path
+
+
 def get_nested_value(data: Dict[str, Any], path: str) -> Any:
+    path = normalize_field_path(path)
     keys = path.split('.')
     value = data
     for key in keys:
@@ -22,6 +31,7 @@ def get_nested_value(data: Dict[str, Any], path: str) -> Any:
 
 
 def set_nested_value(data: Dict[str, Any], path: str, value: Any) -> Dict[str, Any]:
+    path = normalize_field_path(path)
     keys = path.split('.')
     current = data
     for key in keys[:-1]:
@@ -43,7 +53,12 @@ class FieldTrimmer:
 
         trimmed_value = self._apply_trimming(original_value, trim_reason)
         
-        fragment.response_data = set_nested_value(fragment.response_data, field_path, trimmed_value)
+        new_response_data = copy.deepcopy(fragment.response_data)
+        new_response_data = set_nested_value(new_response_data, field_path, trimmed_value)
+        
+        fragment.response_data = new_response_data
+        
+        flag_modified(fragment, "response_data")
         
         field_trace = FieldTrace(
             fragment_id=fragment.id,
@@ -65,6 +80,7 @@ class FieldTrimmer:
         
         fragment.processed = True
         self.db.commit()
+        self.db.refresh(fragment)
         
         return True, "字段裁剪成功"
 

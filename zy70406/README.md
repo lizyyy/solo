@@ -164,3 +164,18 @@ curl http://localhost:8000/api/v1/traceability/by-handler/张明
 - 字段裁剪溯源信息
 - 批次冲突记录
 - 报告生成记录
+
+## 修复记录
+
+### v1.0.1 - 字段裁剪持久化修复
+修复了以下核心问题：
+
+1. **SQLAlchemy JSON字段持久化问题**
+   - 使用 `copy.deepcopy()` 创建新的字典对象，避免原地修改
+   - 使用 `flag_modified()` 显式标记JSON字段已修改
+   - 添加 `db.refresh()` 确保提交后对象状态同步
+
+2. **字段路径兼容性**
+   - 支持完整路径格式：`response_data.reviewer_note`
+   - 支持相对路径格式：`reviewer_note`
+   - 自动规范化处理两种路径格式
