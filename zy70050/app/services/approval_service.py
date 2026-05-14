@@ -176,8 +176,11 @@ class ApprovalService:
         if request.status != ApprovalStatus.PENDING:
             raise ValueError(f"审批状态为 {request.status.value}，无法取消")
         
-        if request.requester_id != requester.id:
-            raise ValueError("只有申请人可以取消申请")
+        from app.models.user import UserRole
+        is_admin = requester.role == UserRole.ADMIN
+        is_owner = request.requester_id == requester.id
+        if not (is_admin or is_owner):
+            raise ValueError("只有申请人或管理员可以取消申请")
         
         request.status = ApprovalStatus.CANCELLED
         

@@ -250,6 +250,11 @@ class ExportService:
 
     @staticmethod
     def export_full_ledger(db: Session) -> bytes:
+        from app.models.instrument import Instrument
+        from app.models.borrow import Borrow
+        from app.models.calibration import Calibration
+        from app.models.user import User
+        
         instruments = db.query(Instrument).order_by(Instrument.code.asc()).all()
         
         headers = [
@@ -265,11 +270,6 @@ class ExportService:
         ws.title = "完整台账"
         
         ExportService._apply_header_style(ws, headers)
-        
-        from app.models.instrument import Instrument
-        from app.models.borrow import Borrow
-        from app.models.calibration import Calibration
-        from app.models.user import User
         
         for row_idx, instrument in enumerate(instruments, start=2):
             active_borrow = (
