@@ -85,11 +85,6 @@ function generateSingleRecord(batchId, isDirty) {
     };
   }
 
-  const includeReminder = Math.random() < 0.3;
-  const statusHistory = generateStatusHistory(status, includeReminder);
-  const approvers = includeReminder ? 
-    statusHistory.filter(function(h) { return h.status === '已催办'; }).map(function(h) { return h.approver; }) : [];
-
   let actualVersion = version;
   let dirtyRemark = '';
   if (isDirty) {
@@ -98,9 +93,30 @@ function generateSingleRecord(batchId, isDirty) {
       actualVersion = VERSIONS[versionIndex - 1];
       dirtyRemark = '【脏数据】旧版本覆盖新版本';
       failureReason = '旧版本覆盖新版本';
+      failureDetail = {
+        errorCode: 'DIRTY-001',
+        stackTrace: 'at ' + system + '.versionConflict()',
+        retryCount: 0,
+        expectedVersion: version,
+        actualVersion: actualVersion
+      };
+      status = '已失败';
+    } else {
+      actualVersion = version;
+      dirtyRemark = '【脏数据】版本无冲突但标记为脏数据';
+      failureReason = '脏数据标记异常';
+      failureDetail = {
+        errorCode: 'DIRTY-002',
+        message: '版本索引异常，无法降级'
+      };
       status = '已失败';
     }
   }
+
+  const includeReminder = Math.random() < 0.3;
+  const statusHistory = generateStatusHistory(status, includeReminder);
+  const approvers = includeReminder ? 
+    statusHistory.filter(function(h) { return h.status === '已催办'; }).map(function(h) { return h.approver; }) : [];
 
   const record = {
     id: generateRecordId(),

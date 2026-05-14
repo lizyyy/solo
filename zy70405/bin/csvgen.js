@@ -6,7 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { generateRecords, saveToCsv, saveFailures } from '../src/generator.js';
 import { queryRecords, getFailures, getBoundaryRecords, getReminderList, getBatches } from '../src/query.js';
-import { saveJson, saveMarkdown, formatConsole } from '../src/formatter.js';
+import { formatJson, formatMarkdown, saveJson, saveMarkdown, formatConsole } from '../src/formatter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -105,7 +105,11 @@ program
         isBoundary: options.boundary ? true : undefined
       };
       
-      console.log('正在查询...');
+      const isConsoleOutput = options.format === 'console' || (options.format === 'json' && !options.output) || (options.format === 'md' && !options.output);
+      if (options.format === 'console' || (options.format !== 'json' && options.format !== 'md')) {
+        console.log('正在查询...');
+      }
+      
       const result = await queryRecords(dataDir, filters);
       
       if (options.format === 'console') {
@@ -115,7 +119,7 @@ program
           await saveJson(result, options.output);
           console.log('JSON 已保存: ' + options.output);
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(formatJson(result));
         }
       } else if (options.format === 'md') {
         if (options.output) {
@@ -150,12 +154,14 @@ program
           await saveJson(result, options.output);
           console.log('JSON 已保存: ' + options.output);
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(formatJson(result));
         }
       } else if (options.format === 'md') {
         if (options.output) {
           await saveMarkdown(result, options.output, '失败项列表');
           console.log('Markdown 已保存: ' + options.output);
+        } else {
+          console.log(formatMarkdown(result, '失败项列表'));
         }
       }
       
@@ -183,12 +189,14 @@ program
           await saveJson(result, options.output);
           console.log('JSON 已保存: ' + options.output);
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(formatJson(result));
         }
       } else if (options.format === 'md') {
         if (options.output) {
           await saveMarkdown(result, options.output, '边界输入记录');
           console.log('Markdown 已保存: ' + options.output);
+        } else {
+          console.log(formatMarkdown(result, '边界输入记录'));
         }
       }
       
@@ -231,12 +239,14 @@ program
           await saveJson(result, options.output);
           console.log('JSON 已保存: ' + options.output);
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(formatJson(result));
         }
       } else if (options.format === 'md') {
         if (options.output) {
           await saveMarkdown(result, options.output, '审批催办列表');
           console.log('Markdown 已保存: ' + options.output);
+        } else {
+          console.log(formatMarkdown(result, '审批催办列表'));
         }
       }
       
@@ -276,12 +286,14 @@ program
           await saveJson(result, options.output);
           console.log('JSON 已保存: ' + options.output);
         } else {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(formatJson(result));
         }
       } else if (options.format === 'md') {
         if (options.output) {
           await saveMarkdown(result, options.output, '批次列表');
           console.log('Markdown 已保存: ' + options.output);
+        } else {
+          console.log(formatMarkdown(result, '批次列表'));
         }
       }
       
