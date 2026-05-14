@@ -1,0 +1,180 @@
+CREATE DATABASE IF NOT EXISTS account_freeze DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE account_freeze;
+
+CREATE TABLE IF NOT EXISTS freeze_batch (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    batch_no VARCHAR(64) NOT NULL UNIQUE COMMENT '批次号',
+    batch_name VARCHAR(256) NOT NULL COMMENT '批次名称',
+    batch_type VARCHAR(32) NOT NULL COMMENT '批次类型: SMS-短信补录, MANUAL-手动录入',
+    status VARCHAR(32) NOT NULL COMMENT '批次状态: DRAFT-草稿, PREVIEWED-已预览, EXECUTING-执行中, PARTIAL_SUCCESS-部分成功, SUCCESS-全部成功, FAILED-全部失败, CANCELLED-已取消',
+    rule_version INT NOT NULL DEFAULT 1 COMMENT '使用的规则版本',
+    total_count INT NOT NULL DEFAULT 0 COMMENT '总数量',
+    success_count INT NOT NULL DEFAULT 0 COMMENT '成功数量',
+    fail_count INT NOT NULL DEFAULT 0 COMMENT '失败数量',
+    input_hash VARCHAR(64) COMMENT '输入内容哈希，用于幂等检查',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    remark VARCHAR(512) COMMENT '备注',
+    preview_time DATETIME COMMENT '预览时间',
+    execute_time DATETIME COMMENT '执行时间',
+    finish_time DATETIME COMMENT '完成时间',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_batch_no (batch_no),
+    INDEX idx_status (status),
+    INDEX idx_input_hash (input_hash),
+    INDEX idx_created_time (created_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='冻结批次表';
+
+CREATE TABLE IF NOT EXISTS freeze_batch_item (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    batch_id BIGINT NOT NULL COMMENT '批次ID',
+    batch_no VARCHAR(64) NOT NULL COMMENT '批次号',
+    account_no VARCHAR(128) NOT NULL COMMENT '账号',
+    account_name VARCHAR(128) COMMENT '账号名称',
+    phone VARCHAR(32) COMMENT '手机号',
+    sms_content TEXT COMMENT '短信内容',
+    sms_send_time DATETIME COMMENT '短信发送时间',
+    status VARCHAR(32) NOT NULL COMMENT '明细状态: PENDING-待处理, PREVIEWED-已预览, PROCESSING-处理中, SUCCESS-成功, FAILED-失败, SKIPPED-已跳过',
+    fail_reason VARCHAR(512) COMMENT '失败原因',
+    evidence_chain_id BIGINT COMMENT '证据链ID',
+    freeze_time DATETIME COMMENT '冻结时间',
+    operator VARCHAR(64) COMMENT '操作人',
+    remark VARCHAR(512) COMMENT '备注',
+    extra_info JSON COMMENT '扩展信息',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    UNIQUE KEY uk_batch_account (batch_id, account_no),
+    INDEX idx_batch_id (batch_id),
+    INDEX idx_account_no (account_no),
+    INDEX idx_status (status),
+    INDEX idx_created_time (created_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='冻结批次明细表';
+
+CREATE TABLE IF NOT EXISTS freeze_rule (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    rule_version INT NOT NULL UNIQUE COMMENT '规则版本号',
+    rule_name VARCHAR(128) NOT NULL COMMENT '规则名称',
+    rule_content TEXT NOT NULL COMMENT '规则内容(JSON格式)',
+    rule_desc VARCHAR(512) COMMENT '规则描述',
+    status VARCHAR(32) NOT NULL COMMENT '状态: DRAFT-草稿, ACTIVE-生效, INACTIVE-失效',
+    effective_time DATETIME COMMENT '生效时间',
+    expire_time DATETIME COMMENT '失效时间',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_rule_version (rule_version),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='冻结规则表';
+
+CREATE TABLE IF NOT EXISTS evidence_chain (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    chain_no VARCHAR(64) NOT NULL UNIQUE COMMENT '证据链编号',
+    batch_id BIGINT COMMENT '批次ID',
+    batch_item_id BIGINT COMMENT '批次明细ID',
+    account_no VARCHAR(128) NOT NULL COMMENT '账号',
+    status VARCHAR(32) NOT NULL COMMENT '证据链状态: COMPLETE-完整, BROKEN-断裂, INVALID-无效',
+    break_reason VARCHAR(512) COMMENT '断裂原因',
+    sms_evidence TINYINT NOT NULL DEFAULT 0 COMMENT '短信证据: 0-无, 1-有',
+    sms_screenshot_url VARCHAR(512) COMMENT '短信截图URL',
+    logistics_evidence TINYINT NOT NULL DEFAULT 0 COMMENT '物流证据: 0-无, 1-有',
+    logistics_screenshot_url VARCHAR(512) COMMENT '物流拦截截图URL',
+    logistics_screenshot_reviewed TINYINT NOT NULL DEFAULT 0 COMMENT '物流截图是否复核: 0-否, 1-是',
+    review_operator VARCHAR(64) COMMENT '复核人',
+    review_time DATETIME COMMENT '复核时间',
+    extra_evidence JSON COMMENT '其他证据',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    remark VARCHAR(512) COMMENT '备注',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_chain_no (chain_no),
+    INDEX idx_batch_id (batch_id),
+    INDEX idx_account_no (account_no),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='证据链表';
+
+CREATE TABLE IF NOT EXISTS candidate_list (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    list_no VARCHAR(64) NOT NULL UNIQUE COMMENT '清单编号',
+    list_name VARCHAR(256) NOT NULL COMMENT '清单名称',
+    list_type VARCHAR(32) NOT NULL COMMENT '清单类型: CLEANUP-清理, ROLLBACK-回滚',
+    status VARCHAR(32) NOT NULL COMMENT '状态: CREATED-已创建, CONFIRMED-已确认, EXECUTED-已执行, CANCELLED-已取消',
+    total_count INT NOT NULL DEFAULT 0 COMMENT '总数量',
+    confirmed_count INT NOT NULL DEFAULT 0 COMMENT '已确认数量',
+    rule_snapshot TEXT COMMENT '执行规则快照',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    confirm_operator VARCHAR(64) COMMENT '确认人',
+    confirm_time DATETIME COMMENT '确认时间',
+    execute_time DATETIME COMMENT '执行时间',
+    remark VARCHAR(512) COMMENT '备注',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_list_no (list_no),
+    INDEX idx_list_type (list_type),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='候选清单表';
+
+CREATE TABLE IF NOT EXISTS candidate_list_item (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    list_id BIGINT NOT NULL COMMENT '清单ID',
+    list_no VARCHAR(64) NOT NULL COMMENT '清单编号',
+    batch_id BIGINT COMMENT '关联批次ID',
+    batch_item_id BIGINT COMMENT '关联批次明细ID',
+    account_no VARCHAR(128) NOT NULL COMMENT '账号',
+    original_status VARCHAR(32) COMMENT '原状态',
+    target_status VARCHAR(32) COMMENT '目标状态',
+    status VARCHAR(32) NOT NULL COMMENT '处理状态: PENDING-待确认, CONFIRMED-已确认, SKIPPED-已跳过, PROCESSED-已处理',
+    confirm_operator VARCHAR(64) COMMENT '确认人',
+    confirm_time DATETIME COMMENT '确认时间',
+    reason VARCHAR(512) COMMENT '原因',
+    remark VARCHAR(512) COMMENT '备注',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_list_id (list_id),
+    INDEX idx_account_no (account_no),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='候选清单明细表';
+
+CREATE TABLE IF NOT EXISTS operation_log (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    log_no VARCHAR(64) NOT NULL UNIQUE COMMENT '日志编号',
+    batch_id BIGINT COMMENT '批次ID',
+    batch_item_id BIGINT COMMENT '批次明细ID',
+    list_id BIGINT COMMENT '清单ID',
+    operation_type VARCHAR(32) NOT NULL COMMENT '操作类型',
+    operation_desc VARCHAR(512) NOT NULL COMMENT '操作描述',
+    before_snapshot JSON COMMENT '操作前快照',
+    after_snapshot JSON COMMENT '操作后快照',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    ip_address VARCHAR(64) COMMENT 'IP地址',
+    user_agent VARCHAR(512) COMMENT 'User Agent',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    INDEX idx_log_no (log_no),
+    INDEX idx_batch_id (batch_id),
+    INDEX idx_operation_type (operation_type),
+    INDEX idx_created_time (created_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='操作日志表';
+
+CREATE TABLE IF NOT EXISTS freeze_report (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    report_no VARCHAR(64) NOT NULL UNIQUE COMMENT '报告编号',
+    report_type VARCHAR(32) NOT NULL COMMENT '报告类型: BATCH_SUMMARY-批次汇总, EVIDENCE_REVIEW-证据复核',
+    batch_id BIGINT COMMENT '关联批次ID',
+    report_title VARCHAR(256) NOT NULL COMMENT '报告标题',
+    report_content TEXT NOT NULL COMMENT '报告内容(JSON格式)',
+    summary_abstract TEXT COMMENT '导出摘要',
+    logistics_review_sample VARCHAR(512) COMMENT '物流拦截复核样例URL',
+    operator VARCHAR(64) NOT NULL COMMENT '操作人',
+    created_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否删除: 0-否, 1-是',
+    INDEX idx_report_no (report_no),
+    INDEX idx_batch_id (batch_id),
+    INDEX idx_created_time (created_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='冻结报告表';
