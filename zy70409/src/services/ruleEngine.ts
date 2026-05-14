@@ -77,7 +77,7 @@ export class RuleEngine {
         }
       }
       case 'duplicate_check':
-        return this.checkDuplicate(inquiry)
+        return !this.checkDuplicate(inquiry)
       default:
         return true
     }
@@ -146,8 +146,8 @@ export class RuleEngine {
           }
           break
         case 'duplicate_check':
-          message = passed ? '检测到重复提交' : '未检测到重复提交'
-          if (passed) {
+          message = !passed ? '检测到重复提交' : '未检测到重复提交'
+          if (!passed) {
             const duplicates = DataStore.getInquiries().filter(
               i =>
                 i.id !== inquiry.id &&

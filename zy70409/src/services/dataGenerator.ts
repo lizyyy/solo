@@ -97,12 +97,13 @@ export class DataGenerator {
 
   static generateInquiryItem(
     template?: typeof itemTemplates[0],
-    supplier?: typeof suppliers[0]
+    supplier?: typeof suppliers[0],
+    maxPrice: number = 1000
   ): PurchaseInquiryItem {
     const tpl = template || itemTemplates[Math.floor(Math.random() * itemTemplates.length)]
     const sup = supplier || suppliers[Math.floor(Math.random() * suppliers.length)]
-    const quantity = Math.floor(Math.random() * 1000) + 10
-    const unitPrice = Math.floor(Math.random() * 1000) + 1
+    const quantity = Math.floor(Math.random() * 100) + 10
+    const unitPrice = Math.floor(Math.random() * maxPrice) + 1
 
     return {
       id: generateId(),
@@ -121,15 +122,22 @@ export class DataGenerator {
   static generateInquiry(
     batchId: string,
     ruleVersion: string,
-    isDuplicate: boolean = false
+    isAmountWithinThreshold: boolean = false
   ): PurchaseInquiry {
     const applicant = applicants[Math.floor(Math.random() * applicants.length)]
     const department = departments[Math.floor(Math.random() * departments.length)]
-    const itemCount = Math.floor(Math.random() * 8) + 2
+    const itemCount = Math.floor(Math.random() * 5) + 2
     const items: PurchaseInquiryItem[] = []
 
+    const maxPricePerItem = isAmountWithinThreshold ? 100 : 1000
     for (let i = 0; i < itemCount; i++) {
-      items.push(this.generateInquiryItem())
+      items.push(this.generateInquiryItem(undefined, undefined, maxPricePerItem))
+    }
+
+    if (isAmountWithinThreshold) {
+      while (items.reduce((sum, item) => sum + item.totalPrice, 0) > 90000) {
+        items.pop()
+      }
     }
 
     const totalAmount = items.reduce((sum, item) => sum + item.totalPrice, 0)
@@ -159,7 +167,8 @@ export class DataGenerator {
     const ruleVersion = activeRule?.version || 'v2.0'
 
     for (let i = 0; i < count; i++) {
-      const inquiry = this.generateInquiry(batchId, ruleVersion)
+      const isWithinThreshold = i < 2
+      const inquiry = this.generateInquiry(batchId, ruleVersion, isWithinThreshold)
       DataStore.addInquiry(inquiry)
     }
 
@@ -180,11 +189,14 @@ export class DataGenerator {
     }
   }
 
-  static generatePermissionTicket(inquiryId: string, batchId: string): PermissionTicket {
+  static generatePermissionTicket(inquiry: PurchaseInquiry): PermissionTicket {
+    const actualAmount = inquiry.totalAmount
+    const newThreshold = Math.max(actualAmount + 10000, 150000)
+
     return {
       id: generateId(),
-      batchId,
-      inquiryId,
+      batchId: inquiry.batchId,
+      inquiryId: inquiry.id,
       type: 'temp_approval',
       status: 'approved',
       grantedBy: 'U005',
@@ -193,13 +205,13 @@ export class DataGenerator {
       reason: '紧急采购需求，临时豁免金额限制',
       originalValue: {
         amountThreshold: 100000,
-        actualAmount: 125000
+        actualAmount: actualAmount
       },
       modifiedValue: {
-        amountThreshold: 150000,
-        actualAmount: 125000
+        amountThreshold: newThreshold,
+        actualAmount: actualAmount
       },
-      conclusion: '同意临时提高审批阈值至15万元，允许本次采购通过',
+      conclusion: `同意临时提高审批阈值至${(newThreshold / 10000).toFixed(1)}万元，允许本次采购通过`,
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     }
@@ -211,11 +223,9 @@ export class DataGenerator {
     this.generateBatchData('BATCH-2024-002', 3)
 
     const allInquiries = DataStore.getInquiries()
-    if (allInquiries.length > 0) {
-      const ticket = this.generatePermissionTicket(
-        allInquiries[0].id,
-        allInquiries[0].batchId
-      )
+    const overThresholdInquiry = allInquiries.find(i => i.totalAmount > 100000)
+    if (overThresholdInquiry) {
+      const ticket = this.generatePermissionTicket(overThresholdInquiry)
       DataStore.addPermissionTicket(ticket)
     }
   }

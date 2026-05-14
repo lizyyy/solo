@@ -1,24 +1,24 @@
 [
   {
-    "id": "6vqz4bfzimh",
+    "id": "7ewdaxsa12d",
     "batchId": "BATCH-2024-001",
-    "inquiryId": "dckkja3vxij",
+    "inquiryId": "3habym6u6ua",
     "type": "temp_approval",
     "status": "approved",
     "grantedBy": "U005",
     "grantedByName": "审批总监",
-    "grantedAt": "2026-05-14T17:14:48.725Z",
+    "grantedAt": "2026-05-14T17:33:25.609Z",
     "reason": "紧急采购需求，临时豁免金额限制",
     "originalValue": {
       "amountThreshold": 100000,
-      "actualAmount": 125000
+      "actualAmount": 194776
     },
     "modifiedValue": {
-      "amountThreshold": 150000,
-      "actualAmount": 125000
+      "amountThreshold": 204776,
+      "actualAmount": 194776
     },
-    "conclusion": "同意临时提高审批阈值至15万元，允许本次采购通过",
-    "createdAt": "2026-05-14T17:14:48.725Z",
-    "expiresAt": "2026-05-21T17:14:48.725Z"
+    "conclusion": "同意临时提高审批阈值至20.5万元，允许本次采购通过",
+    "createdAt": "2026-05-14T17:33:25.609Z",
+    "expiresAt": "2026-05-21T17:33:25.609Z"
   }
 ]

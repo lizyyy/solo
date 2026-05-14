@@ -71,7 +71,7 @@ class RuleEngine {
                 }
             }
             case 'duplicate_check':
-                return this.checkDuplicate(inquiry);
+                return !this.checkDuplicate(inquiry);
             default:
                 return true;
         }
@@ -128,8 +128,8 @@ class RuleEngine {
                     };
                     break;
                 case 'duplicate_check':
-                    message = passed ? '检测到重复提交' : '未检测到重复提交';
-                    if (passed) {
+                    message = !passed ? '检测到重复提交' : '未检测到重复提交';
+                    if (!passed) {
                         const duplicates = dataStore_1.DataStore.getInquiries().filter(i => i.id !== inquiry.id &&
                             i.batchId === inquiry.batchId &&
                             i.items.some(item => inquiry.items.some(newItem => newItem.itemCode === item.itemCode &&
