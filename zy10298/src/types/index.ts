@@ -98,6 +98,7 @@ export interface BoothApplication {
   hasDepositIssue: boolean;
   hasTeardownIssue: boolean;
   currentStep: number;
+  rejectReason?: string;
 }
 
 export interface StatsData {

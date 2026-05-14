@@ -167,7 +167,7 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
     {
       title: '操作',
       key: 'action',
-      render: (_: any, record: MaterialItem) => {
+      render: (_: unknown, record: MaterialItem) => {
         if (record.status !== 'pending') return null;
         return (
           <Space>
@@ -233,7 +233,7 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
           { key: 'teardown', tab: '撤场验收' },
         ]}
         activeTabKey={activeTab}
-        onTabChange={(key) => setActiveTab(key as any)}
+        onTabChange={(key) => setActiveTab(key as 'info' | 'material' | 'electricity' | 'deposit' | 'teardown')}
       >
         {activeTab === 'info' && (
           <div>

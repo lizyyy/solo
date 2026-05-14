@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Table, Tag, Space, Button, Input, Select, DatePicker, Row, Col, Badge, Card } from 'antd';
-import { EyeOutlined, SearchOutlined, WarningOutlined, ClockCircleOutlined, DollarOutlined } from '@ant-design/icons';
+import { EyeOutlined, SearchOutlined, WarningOutlined, ClockCircleOutlined, DollarOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { BoothApplication, BoothStatus } from '../types';
 import { useBoothStore } from '../store/boothStore';
+import CreateApplicationModal from './CreateApplicationModal';
 
 const { RangePicker } = DatePicker;
 
@@ -12,10 +13,11 @@ interface ApplicationListProps {
 }
 
 const ApplicationList = ({ onViewDetail }: ApplicationListProps) => {
-  const { getFilteredApplications, setFilters, getStatusText, getStatusColor, filters } = useBoothStore();
+  const { getFilteredApplications, setFilters, getStatusText, getStatusColor, filters, resetToMockData, isInitialized } = useBoothStore();
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<BoothStatus | undefined>();
   const [hasIssues, setHasIssues] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const data = getFilteredApplications();
 
@@ -28,14 +30,15 @@ const ApplicationList = ({ onViewDetail }: ApplicationListProps) => {
     });
   };
 
-  const handleDateChange = (dates: any) => {
-    if (dates && dates[0] && dates[1]) {
+  const handleDateChange = (dates: unknown) => {
+    if (dates && Array.isArray(dates) && dates[0] && dates[1]) {
       setFilters({
         ...filters,
-        startDate: dates[0].format('YYYY-MM-DD'),
-        endDate: dates[1].format('YYYY-MM-DD'),
+        startDate: (dates[0] as { format: (f: string) => string }).format('YYYY-MM-DD'),
+        endDate: (dates[1] as { format: (f: string) => string }).format('YYYY-MM-DD'),
       });
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { startDate, endDate, ...rest } = filters;
       setFilters(rest);
     }
@@ -181,46 +184,50 @@ const ApplicationList = ({ onViewDetail }: ApplicationListProps) => {
   return (
     <div>
       <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
+        <Row gutter={[16, 16]} align="middle" justify="space-between">
           <Col>
-            <Input
-              placeholder="搜索品牌"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              style={{ width: 200 }}
-              prefix={<SearchOutlined />}
-            />
+            <Space wrap>
+              <Input
+                placeholder="搜索品牌"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: 200 }}
+                prefix={<SearchOutlined />}
+              />
+              <Select
+                placeholder="状态筛选"
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 150 }}
+                allowClear
+                options={statusOptions}
+              />
+              <RangePicker
+                onChange={handleDateChange}
+                placeholder={['开始日期', '结束日期']}
+              />
+              <Select
+                placeholder="异常筛选"
+                value={hasIssues ? 'yes' : undefined}
+                onChange={(v) => setHasIssues(v === 'yes')}
+                style={{ width: 150 }}
+                allowClear
+                options={[{ label: '仅显示异常', value: 'yes' }]}
+              />
+              <Button type="primary" onClick={handleSearch}>
+                搜索
+              </Button>
+            </Space>
           </Col>
           <Col>
-            <Select
-              placeholder="状态筛选"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 150 }}
-              allowClear
-              options={statusOptions}
-            />
-          </Col>
-          <Col>
-            <RangePicker
-              onChange={handleDateChange}
-              placeholder={['开始日期', '结束日期']}
-            />
-          </Col>
-          <Col>
-            <Select
-              placeholder="异常筛选"
-              value={hasIssues ? 'yes' : undefined}
-              onChange={(v) => setHasIssues(v === 'yes')}
-              style={{ width: 150 }}
-              allowClear
-              options={[{ label: '仅显示异常', value: 'yes' }]}
-            />
-          </Col>
-          <Col>
-            <Button type="primary" onClick={handleSearch}>
-              搜索
-            </Button>
+            <Space>
+              <Button onClick={resetToMockData} icon={<ReloadOutlined />}>
+                重置数据
+              </Button>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
+                新增申请
+              </Button>
+            </Space>
           </Col>
         </Row>
       </Card>
@@ -231,6 +238,7 @@ const ApplicationList = ({ onViewDetail }: ApplicationListProps) => {
           dataSource={data}
           rowKey="id"
           scroll={{ x: 1300 }}
+          loading={!isInitialized}
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
@@ -239,6 +247,11 @@ const ApplicationList = ({ onViewDetail }: ApplicationListProps) => {
           }}
         />
       </Card>
+
+      <CreateApplicationModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+      />
     </div>
   );
 };

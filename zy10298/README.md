@@ -1,73 +1,178 @@
-# React + TypeScript + Vite
+# 商场临时展位管理系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个完整的商场展位申请、审核、搭建、撤场全流程管理工作台。
 
-Currently, two official plugins are available:
+## 功能特性
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 核心业务流程
+1. **品牌申请** - 提交展位申请，选择品牌、展位、日期、材料清单
+2. **材料审核** - 逐项审核搭建材料的消防认证
+3. **电力申请** - 审核电力使用量，超额自动标记异常
+4. **押金管理** - 押金缴纳、退款、扣款处理
+5. **搭建确认** - 确认现场搭建完成
+6. **撤场验收** - 检查地面划痕等损坏情况
+7. **结算完成** - 处理损坏赔偿，完成押金退还
 
-## React Compiler
+### 工作台功能
+- **数据统计面板** - 总申请数、待审核、进行中、待撤场、待扣款、异常数
+- **申请列表** - 支持按品牌、状态、日期、异常筛选
+- **详情抽屉** - 完整的申请信息与操作入口
+- **状态标签** - 清晰展示各阶段状态和异常标记
+- **异常预警** - 档期冲突、材料问题、电力超额、撤场损坏、押金异常等
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 业务规则验证
+- ✅ **档期冲突检测** - 同一展位同一时间段重复申请自动检测
+- ✅ **重复提交防护** - 相同品牌+展位+日期不会重复计数
+- ✅ **电力超额检测** - 申请电量超过展位最大容量自动标记
+- ✅ **撤场验收** - 地面划痕检查，支持记录损坏描述和修复费用
+- ✅ **扣款处理** - 损坏赔偿从押金中扣除，剩余退还
 
-## Expanding the ESLint configuration
+### 数据持久化
+- LocalStorage 本地持久化存储
+- 支持重置到初始模拟数据
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 快速开始
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 安装依赖
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 启动开发服务
+```bash
+npm run dev
 ```
+访问 http://localhost:5173
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 代码检查
+```bash
+npm run lint
+```
+
+## 业务验收路径
+
+### 1. 新建申请流程
+1. 点击列表上方「新增申请」按钮
+2. 选择「单条录入」标签页
+3. 填写申请信息：选择品牌、选择展位、日期等
+4. **注意**：选择与现有申请相同的展位和日期，会显示「档期冲突警告」
+5. 填写材料清单和申请电力
+6. 提交申请，查看成功提示
+
+### 2. 批量导入流程
+1. 点击「新增申请」→ 选择「批量导入」标签页
+2. 复制示例数据到文本框，可故意添加：
+   - 重复的品牌+展位+日期组合（验证去重）
+   - 已被占用的档期（验证冲突检测）
+3. 点击「批量导入」
+4. 查看结果统计：成功 X 条，重复 X 条，档期冲突 X 条
+
+### 3. 审核流程
+1. 在列表找到「待审核」状态的申请
+2. 点击「详情」进入详情页
+3. 点击「通过申请」或「拒绝申请」
+4. 通过后自动进入材料审核阶段
+
+### 4. 材料审核流程
+1. 在详情页切换到「材料审核」标签页
+2. 逐项审核材料：点击「通过」或填写拒绝原因后拒绝
+3. 有材料被拒绝时，申请会标记为「材料问题」异常
+
+### 5. 电力审核流程
+1. 切换到「电力申请」标签页
+2. 填写批准的电力容量（如果超过展位最大值会被标记为「电力超额」异常）
+3. 点击通过或拒绝
+
+### 6. 押金与搭建
+1. 切换到「押金管理」标签页
+2. 确认押金已缴纳
+3. 现场搭建完成后，在信息页确认搭建
+
+### 7. 撤场验收与扣款
+1. 活动结束后，在详情页切换到「撤场验收」标签页
+2. 选择验收结果：
+   - 通过：押金自动退还，申请完成
+   - 未通过：填写损坏描述和修复费用
+3. 如果验收未通过：
+   - 申请标记为「撤场问题」和「押金异常」
+   - 在押金管理标签页处理扣款：填写扣款金额和原因
+   - 完成后押金退还，申请结束
+
+### 8. 异常筛选与统计
+1. 查看顶部统计面板的异常数量
+2. 在列表筛选区选择「仅显示异常」
+3. 查看所有有问题的申请（档期冲突、材料问题、电力超额、押金异常、撤场问题）
+
+## 技术栈
+
+- **框架**: React 18
+- **语言**: TypeScript
+- **UI 组件**: Ant Design
+- **状态管理**: Zustand
+- **构建工具**: Vite
+- **代码规范**: ESLint
+
+## 项目结构
+
+```
+src/
+├── components/
+│   ├── StatsPanel.tsx          # 统计面板
+│   ├── ApplicationList.tsx     # 申请列表
+│   ├── ApplicationDetail.tsx   # 详情抽屉
+│   └── CreateApplicationModal.tsx # 新增/批量导入弹窗
+├── store/
+│   └── boothStore.ts           # Zustand 状态管理与业务逻辑
+├── types/
+│   └── index.ts                # TypeScript 类型定义
+├── data/
+│   └── mockData.ts             # 模拟数据
+└── App.tsx                     # 主应用入口
+```
+
+## 状态说明
+
+| 状态 | 说明 | 颜色 |
+|------|------|------|
+| pending_approval | 待审核 | 橙色 |
+| material_review | 材料审核中 | 蓝色 |
+| electricity_approved | 电力已审核 | 青色 |
+| deposit_paid | 押金已缴纳 | 紫色 |
+| setup_confirmed | 搭建已确认 | 深蓝 |
+| in_use | 使用中 | 绿色 |
+| teardown_pending | 待撤场验收 | 橙色 |
+| completed | 已完成 | 成功绿 |
+| rejected | 已拒绝 | 红色 |
+
+## 异常类型
+
+- 📅 **档期冲突** - 同一展位同一时间段有多个申请
+- 🧱 **材料问题** - 有材料审核未通过
+- ⚡ **电力超额** - 申请电力超过展位最大容量
+- 💰 **押金异常** - 撤场验收未通过，等待扣款处理
+- 🚧 **撤场问题** - 撤场验收发现损坏
+
+## 品牌与展位 ID
+
+### 品牌 ID
+- `B001` 星巴克
+- `B002` 优衣库
+- `B003` 苹果
+- `B004` 耐克
+- `B005` 阿迪达斯
+
+### 展位 ID
+- `BT001` A-01 主入口展位 (max 10kW)
+- `BT002` A-02 中庭展位A (max 15kW)
+- `BT003` A-03 中庭展位B (max 15kW)
+- `BT004` B-01 扶梯口展位 (max 8kW)
+- `BT005` B-02 餐饮区展位 (max 20kW)
+
+---
+
+**注意**: 此项目为前端演示版本，使用 localStorage 进行数据持久化。生产环境需要接入后端 API 和数据库。
