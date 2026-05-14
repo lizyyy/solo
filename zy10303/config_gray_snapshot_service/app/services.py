@@ -43,12 +43,11 @@ class GraySnapshotService:
             description=description
         )
         db.session.add(config)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "CREATE", "ConfigVersion", version_key, created_by,
             f"Created config {config_name} version {version}", request_id
         )
+        db.session.commit()
         
         return {
             "version_key": version_key,
@@ -77,12 +76,11 @@ class GraySnapshotService:
             created_by=created_by
         )
         db.session.add(condition)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "CREATE", "GrayCondition", condition_key, created_by,
             f"Created gray condition for config {version_key}", request_id
         )
+        db.session.commit()
         
         return {
             "condition_key": condition_key,
@@ -110,12 +108,11 @@ class GraySnapshotService:
             created_by=created_by
         )
         db.session.add(batch)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "CREATE", "ReleaseBatch", batch_key, created_by,
             f"Created release batch {batch_name} for config {version_key}", request_id
         )
+        db.session.commit()
         
         return {
             "batch_key": batch_key,
@@ -148,12 +145,11 @@ class GraySnapshotService:
             description=description
         )
         db.session.add(rollback)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "CREATE", "RollbackPoint", rollback_key, created_by,
             f"Created rollback point for batch {batch_key}", request_id
         )
+        db.session.commit()
         
         return {
             "rollback_key": rollback_key,
@@ -175,12 +171,11 @@ class GraySnapshotService:
             permissions=json.dumps(permissions)
         )
         db.session.add(token)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "CREATE", "QueryToken", token_key, created_by,
             f"Created query token with permissions: {permissions}", request_id
         )
+        db.session.commit()
         
         return {
             "token_key": token_key,
@@ -249,12 +244,11 @@ class GraySnapshotService:
             request_id=request_id
         )
         db.session.add(sample)
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "HIT", "HitSample", sample_key, operator,
             f"User {user_id} hit gray release: {hit_explanation}", request_id
         )
+        db.session.commit()
         
         return {
             "hit": True,
@@ -319,12 +313,11 @@ class GraySnapshotService:
         if target_status in [BatchStatus.COMPLETED, BatchStatus.ROLLED_BACK, BatchStatus.FAILED]:
             batch.end_time = datetime.utcnow()
         
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "STATUS_UPDATE", "ReleaseBatch", batch_key, updated_by,
             f"Status changed from {old_status} to {new_status}", request_id
         )
+        db.session.commit()
         
         return {
             "batch_key": batch_key,
@@ -362,12 +355,11 @@ class GraySnapshotService:
         
         HitSample.query.filter_by(batch_id=batch.id).update({"is_valid": False})
         
-        db.session.commit()
-        
         GraySnapshotService._audit_log(
             "ROLLBACK", "ReleaseBatch", batch.batch_key, rolled_by,
             f"Rolled back to point {rollback_key}. Snapshot: {snapshot}", request_id
         )
+        db.session.commit()
         
         return {
             "batch_key": batch.batch_key,

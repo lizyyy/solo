@@ -8,7 +8,7 @@ from datetime import datetime
 
 import requests
 
-BASE_URL = "http://localhost:5001/api/v1"
+BASE_URL = "http://localhost:5002/api/v1"
 
 
 def print_section(title):
@@ -156,6 +156,11 @@ def test_successful_workflow():
     print(f"   批次状态: {history['batch']['status']}")
     print(f"   命中样本数: {len(history['hit_samples'])}")
     print(f"   审计日志数: {len(history['audit_logs'])}")
+    if history['audit_logs']:
+        print(f"   审计日志详情:")
+        for log in history['audit_logs']:
+            print(f"     - {log['operation_time']}: {log['operator']} - {log['details']}")
+    assert len(history['audit_logs']) > 0, "审计日志应该有记录"
     
     print("\n13. 完成发布...")
     status_data = {
