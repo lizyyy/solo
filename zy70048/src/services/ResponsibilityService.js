@@ -15,18 +15,36 @@ class ResponsibilityService {
       '分配责任'
     );
 
-    const existingActive = await Responsibility.findOne({
+    const existingConfirmed = await Responsibility.findOne({
       where: {
         lineStopId,
-        status: [RESPONSIBILITY_STATUS.CONFIRMED, RESPONSIBILITY_STATUS.APPEALED]
+        status: RESPONSIBILITY_STATUS.CONFIRMED
       }
     });
 
-    if (existingActive) {
+    if (existingConfirmed) {
       throw new ConflictError(
-        '已有生效的责任记录，如需修改请先申诉或创建新版本',
-        { existingId: existingActive.id }
+        '已有已确认的责任记录，如需修改请先申诉',
+        { 
+          existingId: existingConfirmed.id,
+          existingStatus: existingConfirmed.status,
+          suggestion: '如果需要重新分配责任，请先对现有责任进行申诉'
+        }
       );
+    }
+
+    const existingAppealed = await Responsibility.findOne({
+      where: {
+        lineStopId,
+        status: RESPONSIBILITY_STATUS.APPEALED
+      }
+    });
+
+    if (existingAppealed) {
+      logger.info('存在已申诉的责任记录，将创建新的责任记录替代', {
+        lineStopId,
+        appealedId: existingAppealed.id
+      });
     }
 
     const responsibility = await Responsibility.create({

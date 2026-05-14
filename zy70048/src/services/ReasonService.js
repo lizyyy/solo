@@ -196,30 +196,72 @@ class ReasonService {
       categories[r.category].push(r);
     });
 
+    const activeReasons = reasons.filter(r => 
+      r.status === REASON_STATUS.PENDING || r.status === REASON_STATUS.CONFIRMED
+    );
+    
+    const activeCategories = new Set(activeReasons.map(r => r.category));
     const conflicts = [];
+
+    if (activeCategories.size > 1) {
+      conflicts.push({
+        type: 'CROSS_CATEGORY',
+        categories: Array.from(activeCategories),
+        reasons: activeReasons,
+        message: `存在 ${activeCategories.size} 个类别的有效原因，存在冲突可能`,
+        detail: '停线事件通常只有一个主要原因。不同类别的原因（设备/物料/人员）需要人工判断哪个是真正的根因，其他应标记为拒绝'
+      });
+    }
+
     Object.keys(categories).forEach(cat => {
       const catReasons = categories[cat];
-      if (catReasons.length > 1) {
-        const pending = catReasons.filter(r => r.status === REASON_STATUS.PENDING);
-        const confirmed = catReasons.filter(r => r.status === REASON_STATUS.CONFIRMED);
-        
-        if (pending.length > 1 || (pending.length > 0 && confirmed.length > 0)) {
-          conflicts.push({
-            category: cat,
-            reasons: catReasons,
-            message: `该类别存在 ${catReasons.length} 条记录，存在冲突可能`
-          });
-        }
+      const pending = catReasons.filter(r => r.status === REASON_STATUS.PENDING);
+      const confirmed = catReasons.filter(r => r.status === REASON_STATUS.CONFIRMED);
+      
+      if (pending.length > 1) {
+        conflicts.push({
+          type: 'INTRA_CATEGORY',
+          category: cat,
+          reasons: catReasons,
+          message: `「${cat}」类别存在 ${pending.length} 条待确认记录`,
+          detail: '同一类别下存在多个来源的待确认记录，需要选择主要原因'
+        });
+      }
+      
+      if (pending.length > 0 && confirmed.length > 0) {
+        conflicts.push({
+          type: 'INTRA_CATEGORY',
+          category: cat,
+          reasons: catReasons,
+          message: `「${cat}」类别同时存在待确认和已确认记录`,
+          detail: '同一类别下存在已确认记录，新的待确认记录需要与已确认记录协调'
+        });
       }
     });
 
+    let suggestion = '';
+    if (conflicts.length === 0) {
+      if (activeReasons.length === 0) {
+        suggestion = '暂无有效原因记录，请先提交停线原因';
+      } else {
+        suggestion = '当前原因记录状态良好，可继续分配责任';
+      }
+    } else {
+      suggestion = '请人工分析各来源记录的可信度，选择主要原因并将其他原因标记为拒绝';
+    }
+
     return {
       totalReasons: reasons.length,
+      activeReasons: activeReasons.length,
       categories: Object.keys(categories),
+      activeCategories: Array.from(activeCategories),
       conflicts,
-      suggestion: conflicts.length > 0 
-        ? '建议确认各来源记录，选择主要原因并拒绝冲突记录'
-        : '当前原因记录无明显冲突'
+      hasConflicts: conflicts.length > 0,
+      suggestion,
+      conflictTypes: {
+        crossCategory: conflicts.filter(c => c.type === 'CROSS_CATEGORY').length,
+        intraCategory: conflicts.filter(c => c.type === 'INTRA_CATEGORY').length
+      }
     };
   }
 }
