@@ -1,0 +1,17 @@
+{
+  "name": "quota-ledger-system",
+  "version": "1.0.0",
+  "description": "接口限流配额账本全栈系统",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:backend": "cd backend && node app.js",
+    "start:frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+  },
+  "keywords": ["quota", "rate-limit", "api", "ledger"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+}
