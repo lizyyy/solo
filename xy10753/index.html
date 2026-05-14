@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存预留释放服务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .permission-info {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .stat-card.expired .number {
+            color: #dc3545;
+        }
+        .stat-card.conflict .number {
+            color: #ffc107;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #555;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-reserved {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        .status-released {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+        .status-cancelled {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        .status-releasing {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .expired {
+            background: #ffebee !important;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .action-buttons .btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            min-height: 100px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success {
+            background: #28a745;
+        }
+        .toast.error {
+            background: #dc3545;
+        }
+        .toast.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📦 库存预留释放服务</h1>
+        <div class="permission-info">
+            🔒 当前用户：研发经理 | 权限：预留单校验、超时释放、取消回滚、冲突记录查看
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索预留单ID、订单号、SKU、负责人...">
+            <button class="btn btn-primary" onclick="searchReservations()">搜索</button>
+            <button class="btn btn-success" onclick="refreshData()">刷新数据</button>
+            <button class="btn btn-warning" onclick="exportInventoryFlow()">导出库存流水</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="number" id="statTotal">0</div>
+                <div class="label">总预留单</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statReserved">0</div>
+                <div class="label">预留中</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statReleased">0</div>
+                <div class="label">已释放</div>
+            </div>
+            <div class="stat-card">
+                <div class="number" id="statCancelled">0</div>
+                <div class="label">已取消</div>
+            </div>
+            <div class="stat-card expired">
+                <div class="number" id="statExpired">0</div>
+                <div class="label">已超时</div>
+            </div>
+            <div class="stat-card conflict">
+                <div class="number" id="statConflicts">0</div>
+                <div class="label">并发冲突</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('reservations')">预留单管理</button>
+            <button class="tab" onclick="switchTab('inventory')">库存流水</button>
+            <button class="tab" onclick="switchTab('conflicts')">并发冲突记录</button>
+        </div>
+        
+        <div id="reservationsTab" class="tab-content active">
+            <table>
+                <thead>
+                    <tr>
+                        <th>预留单ID</th>
+                        <th>订单号</th>
+                        <th>SKU</th>
+                        <th>数量</th>
+                        <th>负责人</th>
+                        <th>状态</th>
+                        <th>创建时间</th>
+                        <th>过期时间</th>
+                        <th>版本</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="reservationsTable"></tbody>
+            </table>
+        </div>
+        
+        <div id="inventoryTab" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>流水ID</th>
+                        <th>预留单ID</th>
+                        <th>操作类型</th>
+                        <th>数量</th>
+                        <th>负责人</th>
+                        <th>操作时间</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable"></tbody>
+            </table>
+        </div>
+        
+        <div id="conflictsTab" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>冲突ID</th>
+                        <th>预留单ID</th>
+                        <th>操作</th>
+                        <th>期望版本</th>
+                        <th>实际版本</th>
+                        <th>操作人</th>
+                        <th>冲突时间</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="conflictsTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="modal" id="cancelModal">
+        <div class="modal-content">
+            <h3>取消回滚预留单</h3>
+            <textarea id="cancelReason" placeholder="请输入取消原因..."></textarea>
+            <div class="modal-buttons">
+                <button class="btn" onclick="closeCancelModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmCancel()">确认取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentReservationId = null;
+
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`);
+                return await response.json();
+            } catch (error) {
+                showToast('网络请求失败', 'error');
+                throw error;
+            }
+        }
+
+        async function postData(endpoint, data = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (!response.ok) {
+                    throw result;
+                }
+                return result;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleString('zh-CN');
+        }
+
+        function isExpired(expireAt) {
+            return new Date(expireAt) < new Date();
+        }
+
+        function getStatusClass(status) {
+            return `status-${status}`;
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'reserved': '预留中',
+                'released': '已释放',
+                'cancelled': '已取消',
+                'releasing': '释放中'
+            };
+            return map[status] || status;
+        }
+
+        function getTypeText(type) {
+            const map = {
+                'reserve': '预留',
+                'timeout_release': '超时释放',
+                'cancel_rollback': '取消回滚'
+            };
+            return map[type] || type;
+        }
+
+        async function loadStats() {
+            const stats = await fetchData('/stats');
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statReserved').textContent = stats.reserved;
+            document.getElementById('statReleased').textContent = stats.released;
+            document.getElementById('statCancelled').textContent = stats.cancelled;
+            document.getElementById('statExpired').textContent = stats.expired;
+            document.getElementById('statConflicts').textContent = stats.conflicts;
+        }
+
+        async function loadReservations(search = '') {
+            const url = search ? `/reservations?search=${encodeURIComponent(search)}` : '/reservations';
+            const reservations = await fetchData(url);
+            
+            const tbody = document.getElementById('reservationsTable');
+            if (reservations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = reservations.map(r => {
+                const expired = isExpired(r.expire_at) && r.status === 'reserved';
+                const rowClass = expired ? 'expired' : '';
+                return `
+                    <tr class="${rowClass}">
+                        <td><strong>${r.id}</strong></td>
+                        <td>${r.order_id}</td>
+                        <td>${r.sku}</td>
+                        <td>${r.quantity}</td>
+                        <td>${r.owner}</td>
+                        <td><span class="status-badge ${getStatusClass(r.status)}">${getStatusText(r.status)}</span></td>
+                        <td>${formatDate(r.created_at)}</td>
+                        <td>${formatDate(r.expire_at)}</td>
+                        <td>v${r.version}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="validateReservation('${r.id}')">校验</button>
+                                ${(r.status === 'reserved' || r.status === 'releasing') ? `
+                                    <button class="btn btn-success" onclick="releaseReservation('${r.id}', ${r.version})">释放</button>
+                                    <button class="btn btn-warning" onclick="openCancelModal('${r.id}')">取消</button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadInventoryFlow() {
+            const flows = await fetchData('/inventory-flow');
+            
+            const tbody = document.getElementById('inventoryTable');
+            if (flows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = flows.map(f => `
+                <tr>
+                    <td><strong>${f.id}</strong></td>
+                    <td>${f.reservation_id}</td>
+                    <td>${getTypeText(f.type)}</td>
+                    <td>${f.quantity}</td>
+                    <td>${f.owner}</td>
+                    <td>${formatDate(f.created_at)}</td>
+                    <td>${f.remark || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadConflicts() {
+            const conflicts = await fetchData('/conflicts');
+            
+            const tbody = document.getElementById('conflictsTable');
+            if (conflicts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = conflicts.map(c => `
+                <tr>
+                    <td><strong>${c.id}</strong></td>
+                    <td>${c.reservation_id}</td>
+                    <td>${c.operation}</td>
+                    <td>v${c.expected_version}</td>
+                    <td>v${c.actual_version}</td>
+                    <td>${c.operator}</td>
+                    <td>${formatDate(c.created_at)}</td>
+                    <td>${c.remark || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function validateReservation(id) {
+            try {
+                const result = await postData(`/reservations/${id}/validate`);
+                if (result.valid) {
+                    showToast('预留单有效，未超时', 'success');
+                } else {
+                    showToast('预留单已超时，请及时释放', 'warning');
+                }
+            } catch (error) {
+                showToast(error.error || '校验失败', 'error');
+            }
+        }
+
+        async function releaseReservation(id, version) {
+            try {
+                const result = await postData(`/reservations/${id}/release`, {
+                    version: version,
+                    operator: '研发经理'
+                });
+                showToast('释放成功！', 'success');
+                refreshData();
+            } catch (error) {
+                if (error.error === '并发冲突') {
+                    showToast(`并发冲突：${error.conflict.remark}`, 'warning');
+                } else {
+                    showToast(error.error || '释放失败', 'error');
+                }
+                refreshData();
+            }
+        }
+
+        function openCancelModal(id) {
+            currentReservationId = id;
+            document.getElementById('cancelModal').classList.add('active');
+            document.getElementById('cancelReason').value = '';
+        }
+
+        function closeCancelModal() {
+            currentReservationId = null;
+            document.getElementById('cancelModal').classList.remove('active');
+        }
+
+        async function confirmCancel() {
+            const reason = document.getElementById('cancelReason').value.trim();
+            if (!reason) {
+                showToast('请输入取消原因', 'warning');
+                return;
+            }
+            
+            try {
+                await postData(`/reservations/${currentReservationId}/cancel`, { reason });
+                showToast('取消回滚成功！', 'success');
+                closeCancelModal();
+                refreshData();
+            } catch (error) {
+                showToast(error.error || '取消失败', 'error');
+            }
+        }
+
+        function searchReservations() {
+            const search = document.getElementById('searchInput').value;
+            loadReservations(search);
+        }
+
+        async function refreshData() {
+            await Promise.all([
+                loadStats(),
+                loadReservations(),
+                loadInventoryFlow(),
+                loadConflicts()
+            ]);
+        }
+
+        function exportInventoryFlow() {
+            window.open(`${API_BASE}/export/inventory-flow`, '_blank');
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchReservations();
+            }
+        });
+
+        refreshData();
+    </script>
+</body>
+</html>

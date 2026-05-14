@@ -1,0 +1,100 @@
+{
+  "reservations": [
+    {
+      "id": "RES-001",
+      "order_id": "ORD-1001",
+      "sku": "SKU-A001",
+      "quantity": 50,
+      "owner": "\u5f20\u4e09",
+      "status": "reserved",
+      "created_at": "2026-05-14T14:07:06.126716",
+      "expire_at": "2026-05-14T16:07:06.126716",
+      "version": 1
+    },
+    {
+      "id": "RES-002",
+      "order_id": "ORD-1002",
+      "sku": "SKU-A001",
+      "quantity": 30,
+      "owner": "\u674e\u56db",
+      "status": "reserved",
+      "created_at": "2026-05-14T16:37:06.126716",
+      "expire_at": "2026-05-14T18:07:06.126716",
+      "version": 1
+    },
+    {
+      "id": "RES-003",
+      "order_id": "ORD-1003",
+      "sku": "SKU-B002",
+      "quantity": 100,
+      "owner": "\u5f20\u4e09",
+      "status": "reserved",
+      "created_at": "2026-05-14T12:07:06.126716",
+      "expire_at": "2026-05-14T15:07:06.126716",
+      "version": 1
+    },
+    {
+      "id": "RES-004",
+      "order_id": "ORD-1004",
+      "sku": "SKU-C003",
+      "quantity": 20,
+      "owner": "\u738b\u4e94",
+      "status": "releasing",
+      "created_at": "2026-05-14T13:07:06.126716",
+      "expire_at": "2026-05-14T15:37:06.126716",
+      "version": 2
+    },
+    {
+      "id": "RES-005",
+      "order_id": "ORD-1005",
+      "sku": "SKU-A001",
+      "quantity": 25,
+      "owner": "\u674e\u56db",
+      "status": "reserved",
+      "created_at": "2026-05-14T11:07:06.126716",
+      "expire_at": "2026-05-14T14:07:06.126716",
+      "version": 1
+    }
+  ],
+  "inventory_flow": [
+    {
+      "id": "FLOW-001",
+      "reservation_id": "RES-001",
+      "type": "reserve",
+      "quantity": 50,
+      "owner": "\u5f20\u4e09",
+      "created_at": "2026-05-14T14:07:06.126716",
+      "remark": "\u8ba2\u5355\u9884\u7559"
+    },
+    {
+      "id": "FLOW-002",
+      "reservation_id": "RES-002",
+      "type": "reserve",
+      "quantity": 30,
+      "owner": "\u674e\u56db",
+      "created_at": "2026-05-14T16:37:06.126716",
+      "remark": "\u8ba2\u5355\u9884\u7559"
+    },
+    {
+      "id": "FLOW-003",
+      "reservation_id": "RES-003",
+      "type": "reserve",
+      "quantity": 100,
+      "owner": "\u5f20\u4e09",
+      "created_at": "2026-05-14T12:07:06.126716",
+      "remark": "\u8ba2\u5355\u9884\u7559"
+    }
+  ],
+  "conflict_records": [
+    {
+      "id": "CONF-001",
+      "reservation_id": "RES-004",
+      "operation": "release",
+      "expected_version": 1,
+      "actual_version": 2,
+      "operator": "\u7cfb\u7edf",
+      "created_at": "2026-05-14T16:22:06.126716",
+      "remark": "\u5e76\u53d1\u51b2\u7a81\uff1a\u7248\u672c\u53f7\u4e0d\u5339\u914d"
+    }
+  ]
+}
