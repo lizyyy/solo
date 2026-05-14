@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批次详情 - 沙箱数据种子 API</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <h1>🛢️ 沙箱数据种子 API</h1>
+    </header>
+    
+    <div class="container">
+        <div class="detail-header">
+            <a href="/" class="back-link">← 返回总览</a>
+            <div>
+                {% if batch and (batch.status == 'pending' or batch.status == 'failed') %}
+                <button class="btn btn-success" onclick="executeBatch({{ batch.id }})">执行批次</button>
+                {% endif %}
+                {% if batch and batch.status == 'completed' %}
+                <button class="btn btn-danger" onclick="rollbackBatch({{ batch.id }})">回滚批次</button>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% if batch %}
+        <div class="section">
+            <h2>📋 批次信息 - {{ batch.batch_no }}</h2>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>批次号</label>
+                    <div class="value"><code>{{ batch.batch_no }}</code></div>
+                </div>
+                <div class="detail-item">
+                    <label>状态</label>
+                    <div class="value"><span class="status {{ batch.status }}">{{ batch.status }}</span></div>
+                </div>
+                <div class="detail-item">
+                    <label>沙箱ID</label>
+                    <div class="value">{{ batch.sandbox_id }}</div>
+                </div>
+                <div class="detail-item">
+                    <label>模板ID</label>
+                    <div class="value">{{ batch.template_id }}</div>
+                </div>
+                <div class="detail-item">
+                    <label>创建时间</label>
+                    <div class="value">{{ batch.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+                </div>
+                <div class="detail-item">
+                    <label>执行时间</label>
+                    <div class="value">{{ batch.executed_at.strftime('%Y-%m-%d %H:%M:%S') if batch.executed_at else '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <label>完成时间</label>
+                    <div class="value">{{ batch.completed_at.strftime('%Y-%m-%d %H:%M:%S') if batch.completed_at else '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <label>幂等执行</label>
+                    <div class="value">{{ '是' if batch.is_idempotent else '否' }}</div>
+                </div>
+            </div>
+            
+            {% if batch.parameters %}
+            <div style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; color: #555;">参数</h3>
+                <pre style="background: #f8f9fa; padding: 1rem; border-radius: 6px; overflow-x: auto;">{{ batch.parameters }}</pre>
+            </div>
+            {% endif %}
+            
+            {% if batch.error_message %}
+            <div style="margin-top: 1.5rem;">
+                <h3 style="margin-bottom: 1rem; color: #dc3545;">错误信息</h3>
+                <pre style="background: #f8d7da; padding: 1rem; border-radius: 6px; color: #721c24;">{{ batch.error_message }}</pre>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if report and report.logs %}
+        <div class="section">
+            <h2>📝 执行日志</h2>
+            {% for log in report.logs %}
+            <div class="log-item {{ log.status }}">
+                <div class="log-header">
+                    <strong>{{ log.action }}</strong>
+                    <span class="log-time">{{ log.executed_at.strftime('%Y-%m-%d %H:%M:%S') if log.executed_at else '-' }}</span>
+                </div>
+                <div>
+                    <span class="status {{ log.status }}">{{ log.status }}</span>
+                    <span style="margin-left: 1rem; color: #666;">耗时: {{ log.duration_ms }}ms</span>
+                </div>
+                
+                {% if log.before_state or log.after_state %}
+                <div class="state-compare">
+                    {% if log.before_state %}
+                    <div>
+                        <small style="color: #856404; font-weight: 600;">执行前</small>
+                        <div class="state-box before">{{ log.before_state }}</div>
+                    </div>
+                    {% endif %}
+                    {% if log.after_state %}
+                    <div>
+                        <small style="color: #155724; font-weight: 600;">执行后</small>
+                        <div class="state-box after">{{ log.after_state }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if log.error_message %}
+                <div style="margin-top: 1rem; color: #dc3545;">
+                    <strong>错误:</strong> {{ log.error_message }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        async function executeBatch(batchId) {
+            if (!confirm('确定要执行此批次吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/v1/batches/${batchId}/execute`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.code === 200) {
+                    alert('执行成功！');
+                    window.location.reload();
+                } else {
+                    alert('执行失败: ' + result.message);
+                }
+            } catch (e) {
+                alert('请求失败: ' + e.message);
+            }
+        }
+        
+        async function rollbackBatch(batchId) {
+            if (!confirm('确定要回滚此批次吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/v1/cleanup/rollback/batch/${batchId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.code === 200) {
+                    alert('回滚成功！');
+                    window.location.reload();
+                } else {
+                    alert('回滚失败: ' + result.message);
+                }
+            } catch (e) {
+                alert('请求失败: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
