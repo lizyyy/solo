@@ -11,10 +11,10 @@
     "agentName": "王芳",
     "summary": "客户反馈商品质量问题，要求退货退款，已同意申请并发送退货地址",
     "status": "success",
-    "processingResult": "测试成功",
-    "id": "03b5c3e0-2f95-432f-9d58-4e894f003e32",
-    "createdAt": "2026-05-14T17:03:37.683Z",
-    "updatedAt": "2026-05-14T17:04:33.531Z"
+    "processingResult": "处理完成，无异常",
+    "id": "3c9d91c2-6e19-40b6-bf41-5540a32b64e9",
+    "createdAt": "2026-05-14T17:21:33.100Z",
+    "updatedAt": "2026-05-14T17:21:33.100Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -26,14 +26,11 @@
     "endTime": "2024-05-15 00:15:20",
     "duration": 980,
     "agentName": "赵敏",
-    "summary": "已修正的摘要",
-    "status": "manually_corrected",
-    "id": "a1d6f8ec-a6ad-4d0e-aee2-560581719b68",
-    "createdAt": "2026-05-14T17:03:37.685Z",
-    "updatedAt": "2026-05-14T17:04:33.531Z",
-    "correctedBy": "测试修正人",
-    "correctionReason": "测试修正原因",
-    "correctionTime": "2026-05-14T17:04:33.531Z"
+    "summary": "跨天通话记录，客户咨询换货流程，详细说明流程和注意事项",
+    "status": "pending",
+    "id": "5cf863ea-d70c-4d8c-b70e-b452f8246032",
+    "createdAt": "2026-05-14T17:21:33.102Z",
+    "updatedAt": "2026-05-14T17:21:33.102Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -48,15 +45,15 @@
     "summary": "截",
     "status": "abnormal",
     "abnormalType": "field_truncated",
-    "abnormalReason": "检测到字段截断，需要人工复核",
+    "abnormalReason": "批处理检测到字段截断，需要人工复核",
     "isFieldTruncated": true,
     "truncatedFields": [
       "customerName",
       "summary"
     ],
-    "id": "ff9822f1-0ede-48b1-9cda-d2d87e3e9e33",
-    "createdAt": "2026-05-14T17:03:37.687Z",
-    "updatedAt": "2026-05-14T17:03:37.687Z"
+    "id": "5c06d53d-b9c3-4d2a-b88f-f9bf176e7c3f",
+    "createdAt": "2026-05-14T17:21:33.103Z",
+    "updatedAt": "2026-05-14T17:21:33.103Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -70,9 +67,9 @@
     "agentName": "孙丽",
     "summary": "客户咨询保修政策，详细解答了保修期限和范围",
     "status": "pending",
-    "id": "5f0e966e-b270-43cb-8b24-4cff282355b6",
-    "createdAt": "2026-05-14T17:03:37.697Z",
-    "updatedAt": "2026-05-14T17:03:37.697Z"
+    "id": "5050ecc3-7e6c-4375-b517-901c19eaab6a",
+    "createdAt": "2026-05-14T17:21:33.106Z",
+    "updatedAt": "2026-05-14T17:21:33.106Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -86,9 +83,9 @@
     "agentName": "周杰",
     "summary": "客户申请退款，核实订单状态，已处理完成",
     "status": "pending",
-    "id": "eeb6abc0-9a84-4416-9ee5-5e04ad6327a9",
-    "createdAt": "2026-05-14T17:03:37.697Z",
-    "updatedAt": "2026-05-14T17:03:37.697Z"
+    "id": "8e15b90b-b7fd-4853-b610-e6e2d73b9123",
+    "createdAt": "2026-05-14T17:21:33.107Z",
+    "updatedAt": "2026-05-14T17:21:33.107Z"
   },
   {
     "batchId": "AFS-2024-0515",
@@ -103,49 +100,17 @@
     "summary": "客户反馈收",
     "status": "manually_corrected",
     "abnormalType": "field_truncated",
-    "abnormalReason": "检测到字段截断，需要人工复核",
+    "abnormalReason": "批处理检测到字段截断，需要人工复核",
     "isFieldTruncated": true,
     "truncatedFields": [
       "customerName",
       "summary"
     ],
-    "correctedBy": "质检主管",
-    "correctionReason": "字段截断已补全，客户反馈收到商品有破损，已安排补发",
-    "correctionTime": "2026-05-14T17:03:37.682Z",
-    "id": "f3d75fea-f2c9-4cfe-8944-00276d73f298",
-    "createdAt": "2026-05-14T17:03:37.698Z",
-    "updatedAt": "2026-05-14T17:03:37.698Z"
-  },
-  {
-    "batchId": "TEST-BATCH",
-    "recordingId": "TEST-001",
-    "customerName": "测试用户",
-    "phoneNumber": "138****0000",
-    "serviceType": "测试服务",
-    "startTime": "2024-01-01 00:00:00",
-    "endTime": "2024-01-01 00:05:00",
-    "duration": 300,
-    "agentName": "测试客服",
-    "summary": "测试摘要",
-    "status": "pending",
-    "id": "aadc392e-5100-4c0c-a630-96dea9cec480",
-    "createdAt": "2026-05-14T17:04:33.530Z",
-    "updatedAt": "2026-05-14T17:04:33.530Z"
-  },
-  {
-    "batchId": "TEST-BATCH",
-    "recordingId": "TEST-1778778273531",
-    "customerName": "持久化测试用户",
-    "phoneNumber": "138****9999",
-    "serviceType": "测试服务",
-    "startTime": "2024-01-01 00:00:00",
-    "endTime": "2024-01-01 00:05:00",
-    "duration": 300,
-    "agentName": "测试客服",
-    "summary": "持久化测试摘要",
-    "status": "pending",
-    "id": "57f7d0e2-b569-44ac-97c5-a854542a1f23",
-    "createdAt": "2026-05-14T17:04:33.531Z",
-    "updatedAt": "2026-05-14T17:04:33.531Z"
+    "correctedBy": "质检主管-李红",
+    "correctionReason": "字段截断已补全，客户反馈收到商品外包装破损，内物完好，已安抚并补偿50元优惠券",
+    "correctionTime": "2026-05-14T17:21:33.100Z",
+    "id": "6428bc1e-bd8c-44df-a7be-3609a7fffe29",
+    "createdAt": "2026-05-14T17:21:33.108Z",
+    "updatedAt": "2026-05-14T17:21:33.108Z"
   }
 ]
