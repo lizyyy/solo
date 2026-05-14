@@ -1,0 +1,51 @@
+[
+  {
+    "batch_id": "BATCH-20260515-011350-b2a4a606",
+    "operator": "admin_user",
+    "start_time": "2026-05-15 01:13:50.525409",
+    "end_time": "2026-05-15 01:13:50.525458",
+    "total_count": 2,
+    "success_count": 2,
+    "failed_count": 0,
+    "skipped_count": 0,
+    "fix_records": [
+      {
+        "order_id": "REP-2024-003",
+        "risk_type": "permission_over_granted",
+        "field_path": "property.repair.order.items.2.permission_level",
+        "old_value": "admin",
+        "new_value": "normal",
+        "result": "success",
+        "error_message": null,
+        "executed_at": "2026-05-15 01:13:50.525428"
+      },
+      {
+        "order_id": "REP-2024-GRAY-001",
+        "risk_type": "grayscale_record",
+        "field_path": "property.repair.grayscale.memo.0",
+        "old_value": null,
+        "new_value": "灰度发布人工修正记录：2024-05-15批次权限修复需人工复核跨天工单状态",
+        "result": "success",
+        "error_message": null,
+        "executed_at": "2026-05-15 01:13:50.525448"
+      }
+    ],
+    "failed_records": [],
+    "next_steps": [
+      "导出异常样本给同事进行复核",
+      "按批次ID查询本次执行的完整历史记录",
+      "监控修复后的数据状态，确认无次生问题",
+      "验证权限修复后，相关人员功能访问是否正常",
+      "完成灰度发布备忘人工修正记录的归档"
+    ],
+    "grayscale_notes": [
+      {
+        "record_id": "REP-2024-GRAY-001",
+        "field_path": "property.repair.grayscale.memo.0",
+        "content": "灰度发布人工修正记录：2024-05-15批次权限修复需人工复核跨天工单状态",
+        "basis": "灰度发布管理规范第5.3条：涉及权限变更的批次必须留存人工修正记录",
+        "timestamp": "2026-05-15T01:13:50.525453"
+      }
+    ]
+  }
+]
