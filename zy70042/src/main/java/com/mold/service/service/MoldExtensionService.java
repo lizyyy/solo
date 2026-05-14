@@ -136,25 +136,25 @@ public class MoldExtensionService {
                     taskRepository.save(task);
                 }
             });
-            
-            String newTaskNo = generateTaskNo();
-            MoldChangeTask extensionTask = new MoldChangeTask();
-            extensionTask.setTaskNo(newTaskNo);
-            extensionTask.setMoldId(mold.getId());
-            extensionTask.setMoldCode(mold.getMoldCode());
-            extensionTask.setMoldName(mold.getMoldName());
-            extensionTask.setTaskType(MoldChangeTask.TaskType.EXTENSION_APPROVED);
-            extensionTask.setStatus(MoldChangeTask.TaskStatus.PENDING);
-            extensionTask.setPriority(MoldChangeTask.TaskPriority.NORMAL);
-            extensionTask.setTriggeredStrokes(mold.getTotalStrokes());
-            extensionTask.setLifeThreshold(approval.getNewThreshold());
-            extensionTask.setProductionLine(mold.getProductionLine());
-            extensionTask.setCurrentProduct(mold.getCurrentProduct());
-            extensionTask.setExpectedCompleteTime(LocalDateTime.now().plusDays(7));
-            extensionTask.setCreatedBy(approver);
-            extensionTask.setUpdatedBy(approver);
-            taskRepository.save(extensionTask);
         }
+        
+        String newTaskNo = generateTaskNo();
+        MoldChangeTask extensionTask = new MoldChangeTask();
+        extensionTask.setTaskNo(newTaskNo);
+        extensionTask.setMoldId(mold.getId());
+        extensionTask.setMoldCode(mold.getMoldCode());
+        extensionTask.setMoldName(mold.getMoldName());
+        extensionTask.setTaskType(MoldChangeTask.TaskType.EXTENSION_APPROVED);
+        extensionTask.setStatus(MoldChangeTask.TaskStatus.PENDING);
+        extensionTask.setPriority(MoldChangeTask.TaskPriority.NORMAL);
+        extensionTask.setTriggeredStrokes(mold.getTotalStrokes());
+        extensionTask.setLifeThreshold(approval.getNewThreshold());
+        extensionTask.setProductionLine(mold.getProductionLine());
+        extensionTask.setCurrentProduct(mold.getCurrentProduct());
+        extensionTask.setExpectedCompleteTime(LocalDateTime.now().plusDays(7));
+        extensionTask.setCreatedBy(approver);
+        extensionTask.setUpdatedBy(approver);
+        taskRepository.save(extensionTask);
         
         historyService.recordSimpleHistory(
                 "MoldExtensionApproval", approval.getId(), approval.getApprovalNo(),

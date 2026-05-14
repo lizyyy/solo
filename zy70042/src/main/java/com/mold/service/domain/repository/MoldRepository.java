@@ -17,10 +17,10 @@ public interface MoldRepository extends JpaRepository<Mold, Long> {
     
     List<Mold> findByProductionLine(String productionLine);
     
-    @Query("SELECT m FROM Mold m WHERE m.status = 'IN_USE' AND m.totalStrokes >= m.warningThreshold")
+    @Query("SELECT m FROM Mold m WHERE m.status = 'WARNING'")
     List<Mold> findWarningMolds();
     
-    @Query("SELECT m FROM Mold m WHERE m.status = 'IN_USE' AND m.totalStrokes >= m.lifeThreshold")
+    @Query("SELECT m FROM Mold m WHERE m.status = 'EXPIRED'")
     List<Mold> findExpiredMolds();
     
     @Query("SELECT m FROM Mold m WHERE m.totalStrokes >= m.warningThreshold AND m.totalStrokes < m.lifeThreshold")
