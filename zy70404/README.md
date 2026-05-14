@@ -23,10 +23,32 @@ mvn clean package -DskipTests
 java -jar target/batch-account-freeze-1.0.0.jar
 ```
 
+### 独立版 vs 完整版
+
+| 特性 | 独立版 (Standalone) | Spring Boot 完整版 |
+|------|-------------------|-------------------|
+| 启动时间 | 3秒 | 10-30秒 |
+| 依赖要求 | 仅需 Java | Java + Maven + MySQL |
+| 数据存储 | 内存 | 数据库持久化 |
+| 核心 API | ✅ 全部支持 | ✅ 全部支持 |
+| 规则版本化 | ✅ 支持 | ✅ 完整支持 |
+| 候选清单流程 | ✅ 支持 | ✅ 完整支持 |
+| 批处理执行 | ✅ 模拟 | ✅ 真实执行 |
+| 适用场景 | 快速验证、接口联调 | 生产部署、完整功能 |
+
+**推荐流程：** 先用独立版验证 API → 再部署完整版到生产环境
+
+---
+
 ### 服务验证
 
-服务启动后，运行验证脚本：
+独立版验证：
+```bash
+chmod +x verify-standalone.sh
+./verify-standalone.sh
+```
 
+完整版验证：
 ```bash
 chmod +x verify.sh
 ./verify.sh
