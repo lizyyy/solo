@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -50,10 +51,21 @@ public class ExecutionBatchController {
     }
 
     @PostMapping("/{id}/steps/{stepOrder}/execute")
-    public ApiResponse<ExecutionBatch> executeStep(@PathVariable Long id, @PathVariable Integer stepOrder,
-                                                 @RequestBody ExecutionBatchService.StepExecutionResult result) {
-        log.info("执行步骤, 批次ID: {}, 步骤序号: {}", id, stepOrder);
-        return ApiResponse.success("步骤执行完成", batchService.executeStep(id, stepOrder, result));
+    public ApiResponse<ExecutionBatch> executeStep(@PathVariable Long id, @PathVariable Integer stepOrder) {
+        log.info("自动执行步骤, 批次ID: {}, 步骤序号: {}", id, stepOrder);
+        return ApiResponse.success("步骤执行完成", batchService.executeStep(id, stepOrder));
+    }
+
+    @PostMapping("/{id}/execute-all")
+    public ApiResponse<ExecutionBatch> executeAllSteps(@PathVariable Long id) {
+        log.info("自动执行全部步骤, 批次ID: {}", id);
+        return ApiResponse.success("批次执行完成", batchService.executeAllSteps(id));
+    }
+
+    @GetMapping("/compare")
+    public ApiResponse<Map<String, Object>> compareBatches(@RequestParam Long batchId1, @RequestParam Long batchId2) {
+        log.info("对比批次: {} vs {}", batchId1, batchId2);
+        return ApiResponse.success("批次对比完成", batchService.compareBatches(batchId1, batchId2));
     }
 
     @PostMapping("/{id}/cancel")
