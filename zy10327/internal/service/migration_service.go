@@ -354,26 +354,52 @@ func (s *migrationService) restoreFromRollbackPoint(task *models.MigrationTask, 
 		logger.Warnf("Failed to parse snapshot data: %v, using default restore logic", err)
 	}
 
+	targetPhase := point.Phase
+	if snapshotPhase, ok := snapshot["task_current_phase"].(string); ok {
+		targetPhase = snapshotPhase
+	}
+
 	time.Sleep(300 * time.Millisecond)
 
-	simulateRollbackByPhase(point.Phase)
+	s.simulateRollbackByPhase(point.Phase, snapshot)
 
-	logger.Infof("Task %s restored to phase %s successfully", task.ID, point.Phase)
+	task.CurrentPhase = targetPhase
+
+	logger.Infof("Task %s restored to phase %s successfully (snapshot applied)", task.ID, point.Phase)
 	return nil
 }
 
-func simulateRollbackByPhase(phase string) {
+func (s *migrationService) simulateRollbackByPhase(phase string, snapshot map[string]interface{}) {
+	originalStatus := ""
+	if status, ok := snapshot["task_status"].(string); ok {
+		originalStatus = status
+	}
+
+	logger.Infof("Rolling back from current state to original state: %s (phase: %s)", originalStatus, phase)
+
 	switch phase {
 	case "VALIDATION_PASSED":
-		logger.Info("Rolling back dual write configurations...")
+		logger.Info("  - Clearing dual-write configurations")
+		logger.Info("  - Restoring database connection pool settings")
+		logger.Info("  - Resetting routing rules to source-only")
 	case "DUAL_WRITING":
-		logger.Info("Rolling back read traffic configurations...")
+		logger.Info("  - Stopping dual-write operations")
+		logger.Info("  - Reverting data synchronization state")
+		logger.Info("  - Clearing read traffic split configuration")
 	case "VERIFYING":
-		logger.Info("Rolling back verification checkpoints...")
+		logger.Info("  - Removing verification checkpoints")
+		logger.Info("  - Rolling back data consistency checks")
+		logger.Info("  - Restoring original data comparison state")
 	case "SWITCHING_READ":
-		logger.Info("Rolling back read switch and restoring source database connections...")
+		logger.Info("  - Reverting read traffic to source cluster")
+		logger.Info("  - Restoring connection routing configuration")
+		logger.Info("  - Clearing failover configuration")
 	case "COMPLETED":
-		logger.Info("Full rollback: restoring all configurations and connections...")
+		logger.Info("  - Full rollback: restoring all cluster configurations")
+		logger.Info("  - Reverting database connections to source-only")
+		logger.Info("  - Clearing all migration-related states")
+	default:
+		logger.Infof("  - Applying rollback operations for phase: %s", phase)
 	}
 }
 
@@ -465,10 +491,22 @@ func (s *migrationService) recordStatusChange(taskID string, from, to models.Mig
 }
 
 func (s *migrationService) createRollbackPoint(taskID, phase, operator string) {
+	task, err := s.repo.GetTaskByID(taskID)
+	if err != nil {
+		logger.Warnf("Failed to get task %s for rollback point creation: %v", taskID, err)
+	}
+
+	statusBeforeSnapshot := ""
+	if task != nil {
+		statusBeforeSnapshot = string(task.Status)
+	}
+
 	snapshot := map[string]interface{}{
-		"phase":    phase,
-		"operator": operator,
-		"time":     time.Now().Format(time.RFC3339),
+		"phase":              phase,
+		"operator":           operator,
+		"time":               time.Now().Format(time.RFC3339),
+		"task_status":        statusBeforeSnapshot,
+		"task_current_phase": phase,
 	}
 	snapshotData, _ := json.Marshal(snapshot)
 
@@ -480,6 +518,7 @@ func (s *migrationService) createRollbackPoint(taskID, phase, operator string) {
 		CreatedAt:       time.Now(),
 	}
 	s.repo.CreateRollbackPoint(point)
+	logger.Infof("Rollback point %s created for task %s, phase: %s", point.ID, taskID, phase)
 }
 
 func (s *migrationService) generateValidationReport(taskID, reportType string, checkItems []models.CheckItem) {
