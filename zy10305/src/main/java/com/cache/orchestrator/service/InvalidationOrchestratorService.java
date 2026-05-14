@@ -159,6 +159,17 @@ public class InvalidationOrchestratorService {
     }
 
     private void reconcileBatchStatus(InvalidationBatch batch) {
+        // 按 nodeId 去重，确保每个节点只统计一次
+        // 这是对账的核心逻辑：必须所有节点都确认后才能完成批次
+        java.util.Set<String> processedNodeIds = batch.getReceipts().stream()
+                .map(ConfirmationReceipt::getNodeId)
+                .collect(java.util.stream.Collectors.toSet());
+        
+        // 统计已处理的节点数（去重后）
+        int processedCount = processedNodeIds.size();
+        
+        // 统计各状态的节点数（每个节点只取最后一条回执，这里简化为取第一条回执的状态）
+        // 由于前面已经限制了同一节点不能重复提交，所以直接统计即可
         long confirmedCount = batch.getReceipts().stream()
                 .filter(r -> r.getStatus() == ConfirmationStatus.CONFIRMED)
                 .count();
@@ -170,8 +181,11 @@ public class InvalidationOrchestratorService {
                 .count();
 
         int totalNodes = batch.getTotalNodes();
-        int processedCount = (int) (confirmedCount + failedCount + timeoutCount);
 
+        log.debug("批次对账: 总节点数={}, 已处理={}, 成功={}, 失败={}, 超时={}", 
+                totalNodes, processedCount, confirmedCount, failedCount, timeoutCount);
+
+        // 只有当所有节点都处理完成后才推进最终状态
         if (processedCount == totalNodes) {
             boolean hasRetryInProgress = batch.getRetryPlans().stream()
                     .anyMatch(plan -> "RETRYING".equals(plan.getRetryResult()));
@@ -189,7 +203,8 @@ public class InvalidationOrchestratorService {
                 batch.setStatus(BatchStatus.FAILED);
                 batch.setCompletedAt(LocalDateTime.now());
             }
-            log.info("批次对账完成, batchId: {}, 最终状态: {}", batch.getId(), batch.getStatus());
+            log.info("批次对账完成, batchId: {}, 最终状态: {}, 去重后已处理节点: {}", 
+                    batch.getId(), batch.getStatus(), processedCount);
         }
     }
 

@@ -5,6 +5,7 @@ import com.cache.orchestrator.domain.entity.ConfirmationReceipt;
 import com.cache.orchestrator.domain.entity.FailedNode;
 import com.cache.orchestrator.domain.entity.InvalidationBatch;
 import com.cache.orchestrator.domain.enums.ConfirmationStatus;
+import com.cache.orchestrator.exception.BusinessException;
 import com.cache.orchestrator.repository.ConfirmationReceiptRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +21,25 @@ public class ConfirmationService {
     private final ConfirmationReceiptRepository receiptRepository;
 
     public void processConfirmation(InvalidationBatch batch, ConfirmationRequest request) {
+        // 检查1: receiptId 幂等 - 同一回执 ID 重复提交直接返回
         boolean receiptExists = batch.getReceipts().stream()
                 .anyMatch(r -> r.getReceiptId().equals(request.getReceiptId()));
         
         if (receiptExists) {
             log.info("回执已存在, 幂等处理, receiptId: {}", request.getReceiptId());
             return;
+        }
+
+        // 检查2: nodeId 去重 - 同一节点不允许重复提交不同回执
+        // 这是为了防止同一个节点通过提交多个不同 receiptId 来绕过对账逻辑
+        boolean nodeAlreadyConfirmed = batch.getReceipts().stream()
+                .anyMatch(r -> r.getNodeId().equals(request.getNodeId()));
+        
+        if (nodeAlreadyConfirmed) {
+            log.warn("节点已提交回执, 拒绝重复提交, nodeId: {}, batchId: {}", 
+                    request.getNodeId(), batch.getId());
+            throw new BusinessException(400, 
+                    "节点 [" + request.getNodeId() + "] 已在批次 [" + batch.getId() + "] 中提交回执，不允许重复提交");
         }
 
         ConfirmationReceipt receipt = ConfirmationReceipt.builder()

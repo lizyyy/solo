@@ -415,6 +415,45 @@ rm -rf data/
     └── exception/
 ```
 
+## 核心业务规则
+
+### 节点确认与对账逻辑
+
+#### 🔒 安全规则 1: 回执双重幂等
+- **receiptId 幂等**: 同一 receiptId 重复提交直接忽略（幂等返回）
+- **nodeId 幂等**: 同一 nodeId 在同一批次内不允许重复提交不同回执
+- 防止恶意用户通过不同 receiptId 绕过对账逻辑
+
+#### 🔒 安全规则 2: 按节点去重对账
+- 对账统计时按 nodeId 去重，确保每个节点只统计一次
+- 只有当 `去重后的节点数 == 总节点数` 时才推进到最终状态
+- 防止重复回执让批次提前进入 SUCCESS/PARTIAL_SUCCESS
+
+#### 状态流转
+```
+CREATED → VALIDATED → PROCESSING → RETRYING → [SUCCESS, PARTIAL_SUCCESS, FAILED]
+```
+
+### 重试机制
+
+- 节点失败后可触发重试
+- 每个节点有独立的重试计数和最大重试限制
+- 重试期间批次状态保持为 RETRYING
+- 重试成功后清除失败记录，更新重试计划状态
+
+---
+
+## 测试脚本说明
+
+| 脚本 | 说明 |
+|------|------|
+| `./start.sh` | 启动服务（4种模式自动检测） |
+| `./verify.sh` | 快速验证服务是否正常工作 |
+| `./test-flow.sh` | 完整流程测试（18个步骤） |
+| `./test-attack-scenario.sh` | 漏洞场景测试 |
+
+---
+
 ## 技术栈
 
 - Spring Boot 2.7.18
