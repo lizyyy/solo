@@ -106,6 +106,29 @@ public class QuotaBorrowService {
         if (request.getResult() == ApprovalResult.APPROVE) {
             BigDecimal approvedAmount = request.getApprovedAmount() != null 
                 ? request.getApprovedAmount() : application.getRequestAmount();
+
+            if (approvedAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException("INVALID_APPROVED_AMOUNT", "审批金额必须大于0");
+            }
+
+            if (approvedAmount.compareTo(application.getRequestAmount()) > 0) {
+                throw new BusinessException("EXCEED_REQUEST_AMOUNT", 
+                    "审批金额不能超过申请金额: " + application.getRequestAmount());
+            }
+
+            SharedPool sharedPool = sharedPoolRepository.findByPoolCode(application.getPoolCode())
+                .orElseThrow(() -> new BusinessException("POOL_NOT_FOUND", "共享池不存在"));
+
+            if (approvedAmount.compareTo(sharedPool.getMaxBorrowPerApplication()) > 0) {
+                throw new BusinessException("EXCEED_MAX_BORROW", 
+                    "审批金额超过单笔最大限额: " + sharedPool.getMaxBorrowPerApplication());
+            }
+
+            if (approvedAmount.compareTo(sharedPool.getAvailableAmount()) > 0) {
+                throw new BusinessException("INSUFFICIENT_POOL_AMOUNT", 
+                    "共享池可用额度不足: " + sharedPool.getAvailableAmount());
+            }
+
             application.setApprovedAmount(approvedAmount);
             application.setStatus(ApplicationStatus.APPROVED);
             
@@ -122,19 +145,15 @@ public class QuotaBorrowService {
         SharedPool sharedPool = sharedPoolRepository.findByPoolCode(application.getPoolCode())
             .orElseThrow(() -> new BusinessException("POOL_NOT_FOUND", "共享池不存在"));
 
-        BigDecimal amount = application.getApprovedAmount();
+        CustomerQuota customerQuota = customerQuotaRepository.findByCustomerId(application.getCustomerId())
+            .orElseThrow(() -> new BusinessException("CUSTOMER_NOT_FOUND", "客户不存在"));
         
-        if (amount.compareTo(sharedPool.getAvailableAmount()) > 0) {
-            throw new BusinessException("INSUFFICIENT_POOL_AMOUNT", "共享池可用额度不足");
-        }
+        BigDecimal amount = application.getApprovedAmount();
 
         sharedPool.setAllocatedAmount(sharedPool.getAllocatedAmount().add(amount));
         sharedPool.setAvailableAmount(sharedPool.getAvailableAmount().subtract(amount));
         sharedPoolRepository.save(sharedPool);
 
-        CustomerQuota customerQuota = customerQuotaRepository.findByCustomerId(application.getCustomerId())
-            .orElseThrow(() -> new BusinessException("CUSTOMER_NOT_FOUND", "客户不存在"));
-        
         customerQuota.setLockedQuota(customerQuota.getLockedQuota().add(amount));
         customerQuotaRepository.save(customerQuota);
 

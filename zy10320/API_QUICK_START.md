@@ -174,7 +174,94 @@ curl -X POST http://localhost:8080/api/quota/return \
 # 预期返回: PLAN_COMPLETED - 该计划已完成归还
 ```
 
-## 四、如何查看处理记录
+### 6. 审批金额为0或负数（超额拦截增强）
+```bash
+# 创建新申请后提交审批，尝试批准负数金额
+curl -X POST http://localhost:8080/api/quota/application/approve \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicationId": 1,
+    "result": "APPROVE",
+    "approver": "李四",
+    "approvedAmount": -500
+  }'
+# 预期返回: INVALID_APPROVED_AMOUNT - 审批金额必须大于0
+```
+
+### 7. 审批金额超过申请金额（超额拦截增强）
+```bash
+# 假设申请金额为5000，审批为6000
+curl -X POST http://localhost:8080/api/quota/application/approve \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicationId": 1,
+    "result": "APPROVE",
+    "approver": "李四",
+    "approvedAmount": 6000
+  }'
+# 预期返回: EXCEED_REQUEST_AMOUNT - 审批金额不能超过申请金额: 5000
+```
+
+### 8. 审批金额超过共享池单笔限额（超额拦截增强）
+```bash
+# 假设申请金额为50000，但POOL001单笔限额为10000
+curl -X POST http://localhost:8080/api/quota/application/approve \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicationId": 1,
+    "result": "APPROVE",
+    "approver": "李四",
+    "approvedAmount": 50000
+  }'
+# 预期返回: EXCEED_MAX_BORROW - 审批金额超过单笔最大限额: 10000
+```
+
+## 四、如何验证修复效果
+
+### 1. 验证数据持久化（文件数据库）
+```bash
+# 1. 启动服务，创建一条申请记录并完成审批
+# 2. 停止服务 (Ctrl+C)
+# 3. 检查数据文件存在
+ls -la data/
+
+# 4. 重新启动服务
+./start.sh
+
+# 5. 验证历史数据仍然存在
+curl -X GET http://localhost:8080/api/quota/application/1
+# 应能看到之前创建的申请记录，状态未丢失
+```
+
+### 2. 验证超额拦截（审批校验）
+```bash
+# 创建申请
+curl -X POST http://localhost:8080/api/quota/application \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicationNo": "TEST_001",
+    "customerId": "CUST001",
+    "poolCode": "POOL001",
+    "requestAmount": 5000,
+    "borrowDays": 30
+  }'
+
+# 提交审批（找到返回的id）
+curl -X POST http://localhost:8080/api/quota/application/2/submit
+
+# 尝试审批为50000（超过申请额和单笔限额） - 应被拦截
+curl -X POST http://localhost:8080/api/quota/application/approve \
+  -H "Content-Type: application/json" \
+  -d '{
+    "applicationId": 2,
+    "result": "APPROVE",
+    "approver": "李四",
+    "approvedAmount": 50000
+  }'
+# 预期返回错误，而不是成功通过
+```
+
+## 五、如何查看处理记录
 
 ### 1. 查看申请详情
 ```bash
