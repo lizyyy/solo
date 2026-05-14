@@ -157,17 +157,33 @@ PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED
 - **问题**: 同一单据重复回调会重复累加成功/失败计数
 - **修复**: 检测到单据已处于 SUCCESS/FAILED 终态时自动跳过，新增 `skippedCount` 统计字段
 
-### 2. 重放后状态计数准确
+### 2. 重放后状态计数准确（第三轮修复）
 - **问题**: 失败单据重放成功后，失败计数不会扣减，导致批次状态和回执汇总失真
-- **修复**: 
-  - 重放成功: 自动扣减 `failedCount`
+  - 根本原因: 重放时先将状态改为 `REPLAYING`，回调时无法判断原始状态
+- **修复方案**:
+  - 在 `ApprovalItem` 实体中新增 `previousStatus` 字段
+  - 重放时保存原始状态到 `previousStatus`
+  - 回调时优先使用 `previousStatus` 判断真实原始状态
+  - 重放成功: 自动扣减 `failedCount`（真正的失败→成功转换）
   - 重放失败: 自动扣减 `successCount`（罕见场景）
-  - 添加边界保护，防止计数变为负数
+  - 回调完成后清空 `previousStatus`
+  - 添加边界保护 `if (count < 0) count = 0`，防止计数为负数
 
 ### 3. 重放状态过滤
 - 仅允许 FAILED 和 REPLAYING 状态的单据被重放
 - 成功单据的重放请求会被跳过并记录 warning
 - 避免状态流转混乱
+
+## 🔍 验证场景示例
+
+### 完整业务流程验证
+1. **初始创建**: 7 个单据
+2. **首次回调**: 4 成功, 3 失败 → success=4, failed=3
+3. **重放失败单据**: 3 个 FAILED 单据转为 REPLAYING（保存 previousStatus=FAILED）
+4. **重放回调**: 2 成功, 1 失败 →
+   - 成功的 2 个: failedCount -2, successCount +2
+   - 失败的 1 个: 计数不变（仍为失败）
+5. **最终结果**: success=6, failed=1 ✓ 统计准确
 
 ## 📝 问题排查报告
 

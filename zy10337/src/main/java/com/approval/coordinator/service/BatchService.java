@@ -161,16 +161,17 @@ public class BatchService {
                         Optional<ApprovalItem> itemOpt = itemRepository.findByBatch_BatchIdAndItemId(request.getBatchId(), result.getItemId());
                         if (itemOpt.isPresent()) {
                             ApprovalItem item = itemOpt.get();
-                            ItemStatus previousStatus = item.getStatus();
+                            ItemStatus currentStatus = item.getStatus();
+                            ItemStatus originalStatus = item.getPreviousStatus() != null ? item.getPreviousStatus() : currentStatus;
 
-                            boolean wasSuccess = ItemStatus.SUCCESS.equals(previousStatus);
-                            boolean wasFailed = ItemStatus.FAILED.equals(previousStatus);
-                            boolean isReplaying = ItemStatus.REPLAYING.equals(previousStatus);
+                            boolean isReplaying = ItemStatus.REPLAYING.equals(currentStatus);
+                            boolean wasSuccess = ItemStatus.SUCCESS.equals(isReplaying ? originalStatus : currentStatus);
+                            boolean wasFailed = ItemStatus.FAILED.equals(isReplaying ? originalStatus : currentStatus);
 
                             if (!isReplaying && (wasSuccess || wasFailed)) {
                                 skippedCount++;
                                 skippedItemIds.add(result.getItemId());
-                                log.warn("单据已处于终态，跳过重复回调: itemId={}, currentStatus={}", result.getItemId(), previousStatus);
+                                log.warn("单据已处于终态，跳过重复回调: itemId={}, currentStatus={}", result.getItemId(), currentStatus);
                                 continue;
                             }
 
@@ -178,22 +179,24 @@ public class BatchService {
                                 item.setStatus(ItemStatus.SUCCESS);
                                 item.setResponseData(result.getResponseData());
                                 item.setCompletedAt(LocalDateTime.now());
+                                item.setPreviousStatus(null);
 
                                 if (isReplaying && wasFailed) {
                                     batch.setFailedCount(batch.getFailedCount() - 1);
-                                    log.info("重放成功，扣减失败计数: itemId={}", result.getItemId());
+                                    log.info("重放成功，扣减失败计数: itemId={}, 原失败状态已记录在 previousStatus", result.getItemId());
                                 }
-                                if (!wasSuccess) {
+                                if (!wasSuccess || isReplaying) {
                                     successCount++;
                                     successItemIds.add(result.getItemId());
                                 }
-                                timelineService.addItemEvent(batch, result.getItemId(), "ITEM_SUCCESS", "单据处理成功", request.getOperator());
+                                timelineService.addItemEvent(batch, result.getItemId(), "ITEM_SUCCESS", "单据处理成功" + (isReplaying ? "（重放）" : ""), request.getOperator());
                             } else {
                                 item.setStatus(ItemStatus.FAILED);
                                 item.setResponseData(result.getResponseData());
                                 item.setErrorCode(result.getErrorCode());
                                 item.setErrorMessage(result.getErrorMessage());
                                 item.setCompletedAt(LocalDateTime.now());
+                                item.setPreviousStatus(null);
 
                                 if (isReplaying && wasSuccess) {
                                     batch.setSuccessCount(batch.getSuccessCount() - 1);
@@ -203,7 +206,7 @@ public class BatchService {
                                     failedCount++;
                                     failedItemIds.add(result.getItemId());
                                 }
-                                timelineService.addItemEvent(batch, result.getItemId(), "ITEM_FAILED", "单据处理失败: " + result.getErrorMessage(), request.getOperator());
+                                timelineService.addItemEvent(batch, result.getItemId(), "ITEM_FAILED", "单据处理失败" + (isReplaying ? "（重放）" : "") + ": " + result.getErrorMessage(), request.getOperator());
                             }
                             itemRepository.save(item);
                         }
@@ -298,10 +301,11 @@ public class BatchService {
 
                     for (ApprovalItem item : itemsToReplay) {
                         ItemStatus oldStatus = item.getStatus();
+                        item.setPreviousStatus(oldStatus);
                         item.setStatus(ItemStatus.REPLAYING);
                         item.setRetryCount(item.getRetryCount() + 1);
                         itemRepository.save(item);
-                        timelineService.addItemEvent(batch, item.getItemId(), "ITEM_REPLAYING", "单据开始重放，重试次数: " + item.getRetryCount(), request.getOperator());
+                        timelineService.addItemEvent(batch, item.getItemId(), "ITEM_REPLAYING", "单据开始重放，重试次数: " + item.getRetryCount() + ", 原始状态: " + oldStatus, request.getOperator());
                     }
 
                     Map<String, Object> result = new HashMap<>();

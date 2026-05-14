@@ -62,6 +62,10 @@ public class ApprovalItem {
     @Column(name = "retry_count")
     private Integer retryCount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "previous_status", length = 32)
+    private ItemStatus previousStatus;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
