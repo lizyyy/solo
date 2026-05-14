@@ -44,10 +44,11 @@ export class ApprovalProcessor {
 
     const timeline = this.timelineBuilder.buildTimeline(ticket.batchId, ticket.ticketId);
 
-    const duplicates = this.resultManager.findDuplicates(timeline, ticket.ticketId);
+    const duplicates = this.resultManager.findDuplicates(timeline, ticket.ticketId, ticket);
     if (duplicates.length > 0) {
       const existingResult = this.resultManager.reuseExistingResult(ticket.batchId, duplicates[0]);
       if (existingResult) {
+        this.resultManager.saveResult(existingResult, ticket);
         return existingResult;
       }
     }
@@ -106,7 +107,7 @@ export class ApprovalProcessor {
       result.conflictDetails = conflicts;
     }
 
-    this.resultManager.saveResult(result);
+    this.resultManager.saveResult(result, ticket);
     return result;
   }
 

@@ -11,8 +11,10 @@ export class ResultManager {
   private results: Map<string, ProcessingResult> = new Map();
   private reviews: Map<string, ReviewRecord> = new Map();
   private contentHashIndex: Map<string, string[]> = new Map();
+  private ticketIdIndex: Map<string, string[]> = new Map();
+  private requestContentIndex: Map<string, string[]> = new Map();
 
-  saveResult(result: ProcessingResult): void {
+  saveResult(result: ProcessingResult, ticket?: ApprovalTicket): void {
     this.results.set(result.batchId, result);
     
     const contentHash = this.generateBatchContentHash(result.timeline, result.ticketId);
@@ -20,6 +22,19 @@ export class ResultManager {
       this.contentHashIndex.set(contentHash, []);
     }
     this.contentHashIndex.get(contentHash)!.push(result.batchId);
+
+    if (!this.ticketIdIndex.has(result.ticketId)) {
+      this.ticketIdIndex.set(result.ticketId, []);
+    }
+    this.ticketIdIndex.get(result.ticketId)!.push(result.batchId);
+
+    if (ticket) {
+      const requestHash = this.generateRequestContentHash(ticket);
+      if (!this.requestContentIndex.has(requestHash)) {
+        this.requestContentIndex.set(requestHash, []);
+      }
+      this.requestContentIndex.get(requestHash)!.push(result.batchId);
+    }
   }
 
   getResult(batchId: string): ProcessingResult | undefined {
@@ -30,9 +45,28 @@ export class ResultManager {
     return Array.from(this.results.values());
   }
 
-  findDuplicates(timeline: ApprovalTimeline, ticketId: string): string[] {
+  findDuplicates(timeline: ApprovalTimeline, ticketId: string, ticket?: ApprovalTicket): string[] {
+    const duplicates: Set<string> = new Set();
+
+    const byTicketId = this.ticketIdIndex.get(ticketId) || [];
+    byTicketId.forEach(id => duplicates.add(id));
+
+    if (ticket) {
+      const requestHash = this.generateRequestContentHash(ticket);
+      const byContent = this.requestContentIndex.get(requestHash) || [];
+      byContent.forEach(id => duplicates.add(id));
+    }
+
     const contentHash = this.generateBatchContentHash(timeline, ticketId);
-    return this.contentHashIndex.get(contentHash) || [];
+    const byTimeline = this.contentHashIndex.get(contentHash) || [];
+    byTimeline.forEach(id => duplicates.add(id));
+
+    return Array.from(duplicates);
+  }
+
+  private generateRequestContentHash(ticket: ApprovalTicket): string {
+    const content = `${ticket.requestId}|${ticket.requestType}|${ticket.requesterId}|${ticket.requestDescription}`;
+    return createHash('sha256').update(content).digest('hex').slice(0, 16);
   }
 
   checkForConflicts(newResult: ProcessingResult): string[] {
