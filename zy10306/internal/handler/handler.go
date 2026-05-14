@@ -114,6 +114,14 @@ func ValidateRule(c *gin.Context) {
 
 	sampled, err := service.ValidateRule(&req)
 	if err != nil {
+		if errors.Is(err, service.ErrDuplicateRequest) {
+			c.JSON(http.StatusOK, models.SuccessResponse{
+				Code:    200,
+				Message: "Duplicate request, returning previous result",
+				Data:    gin.H{"sampled": sampled},
+			})
+			return
+		}
 		if errors.Is(err, service.ErrRuleNotFound) {
 			c.JSON(http.StatusNotFound, models.ErrorResponse{
 				Code:    404,

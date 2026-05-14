@@ -219,6 +219,32 @@ curl -X POST http://localhost:8080/api/v1/rules/status \
   }'
 ```
 
+### 5. 重复提交 validate 请求（验证去重）
+
+使用相同的 rule_id + request_id 重复请求：
+
+```bash
+# 第一次请求
+curl -X POST http://localhost:8080/api/v1/rules/validate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rule_id": 1,
+    "request_id": "test_duplicate_001",
+    "tenant_tag": "tenant_1",
+    "path": "/api/v1/test"
+  }'
+
+# 重复请求（返回相同结果，不消耗 max_hits）
+curl -X POST http://localhost:8080/api/v1/rules/validate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rule_id": 1,
+    "request_id": "test_duplicate_001",
+    "tenant_tag": "tenant_1",
+    "path": "/api/v1/test"
+  }'
+```
+
 ## 如何查看处理记录
 
 ### 查看命中记录

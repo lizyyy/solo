@@ -92,3 +92,12 @@ func CheckPathMatch(rule *models.SamplingRule, path string) bool {
 func CheckWindowValid(rule *models.SamplingRule, now time.Time) bool {
 	return now.After(rule.WindowStart) && now.Before(rule.WindowEnd)
 }
+
+func GetHitRecordByRuleIDAndRequestID(ruleID uint, requestID string) (*models.HitRecord, error) {
+	var record models.HitRecord
+	err := DB.Where("rule_id = ? AND request_id = ?", ruleID, requestID).First(&record).Error
+	if err != nil {
+		return nil, err
+	}
+	return &record, nil
+}

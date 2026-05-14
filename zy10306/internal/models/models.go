@@ -7,10 +7,10 @@ import (
 type RuleStatus string
 
 const (
-	RuleStatusPending  RuleStatus = "pending"
-	RuleStatusActive   RuleStatus = "active"
-	RuleStatusPaused   RuleStatus = "paused"
-	RuleStatusExpired  RuleStatus = "expired"
+	RuleStatusPending   RuleStatus = "pending"
+	RuleStatusActive    RuleStatus = "active"
+	RuleStatusPaused    RuleStatus = "paused"
+	RuleStatusExpired   RuleStatus = "expired"
 	RuleStatusRecovered RuleStatus = "recovered"
 )
 
@@ -33,14 +33,14 @@ type SamplingRule struct {
 }
 
 type HitRecord struct {
-	ID         uint      `gorm:"primaryKey" json:"id"`
-	RuleID     uint      `gorm:"index" json:"rule_id"`
-	RequestID  string    `gorm:"size:64" json:"request_id"`
-	TenantTag  string    `gorm:"size:128" json:"tenant_tag"`
-	Path       string    `gorm:"size:256" json:"path"`
-	Sampled    bool      `json:"sampled"`
-	HitAt      time.Time `gorm:"index" json:"hit_at"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	RuleID    uint      `gorm:"index:idx_rule_request,unique" json:"rule_id"`
+	RequestID string    `gorm:"size:64;index:idx_rule_request,unique" json:"request_id"`
+	TenantTag string    `gorm:"size:128" json:"tenant_tag"`
+	Path      string    `gorm:"size:256" json:"path"`
+	Sampled   bool      `json:"sampled"`
+	HitAt     time.Time `gorm:"index" json:"hit_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type HistoryRecord struct {
@@ -69,16 +69,16 @@ type CreateRuleRequest struct {
 }
 
 type ValidateRuleRequest struct {
-	RuleID     uint   `json:"rule_id" binding:"required"`
-	RequestID  string `json:"request_id" binding:"required"`
-	TenantTag  string `json:"tenant_tag" binding:"required"`
-	Path       string `json:"path" binding:"required"`
+	RuleID    uint   `json:"rule_id" binding:"required"`
+	RequestID string `json:"request_id" binding:"required"`
+	TenantTag string `json:"tenant_tag" binding:"required"`
+	Path      string `json:"path" binding:"required"`
 }
 
 type UpdateStatusRequest struct {
-	RuleID     uint   `json:"rule_id" binding:"required"`
-	NewStatus  string `json:"new_status" binding:"required"`
-	Operator   string `json:"operator" binding:"required"`
+	RuleID      uint   `json:"rule_id" binding:"required"`
+	NewStatus   string `json:"new_status" binding:"required"`
+	Operator    string `json:"operator" binding:"required"`
 	Description string `json:"description"`
 }
 

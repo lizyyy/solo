@@ -74,6 +74,11 @@ func ActivateRule(ruleID uint, operator string) (*models.SamplingRule, error) {
 }
 
 func ValidateRule(req *models.ValidateRuleRequest) (bool, error) {
+	existingHit, err := repository.GetHitRecordByRuleIDAndRequestID(req.RuleID, req.RequestID)
+	if err == nil && existingHit != nil {
+		return existingHit.Sampled, ErrDuplicateRequest
+	}
+
 	rule, err := repository.GetRuleByID(req.RuleID)
 	if err != nil {
 		return false, ErrRuleNotFound
@@ -158,10 +163,10 @@ func UpdateRuleStatus(req *models.UpdateStatusRequest) (*models.SamplingRule, er
 
 func isValidStatusTransition(oldStatus, newStatus models.RuleStatus) bool {
 	validTransitions := map[models.RuleStatus][]models.RuleStatus{
-		models.RuleStatusPending:  {models.RuleStatusActive, models.RuleStatusPaused},
-		models.RuleStatusActive:   {models.RuleStatusPaused, models.RuleStatusExpired},
-		models.RuleStatusPaused:   {models.RuleStatusActive, models.RuleStatusExpired},
-		models.RuleStatusExpired:  {models.RuleStatusRecovered},
+		models.RuleStatusPending:   {models.RuleStatusActive, models.RuleStatusPaused},
+		models.RuleStatusActive:    {models.RuleStatusPaused, models.RuleStatusExpired},
+		models.RuleStatusPaused:    {models.RuleStatusActive, models.RuleStatusExpired},
+		models.RuleStatusExpired:   {models.RuleStatusRecovered},
 		models.RuleStatusRecovered: {models.RuleStatusActive, models.RuleStatusExpired},
 	}
 
