@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 """
 种子数据脚本 - 用于快速创建测试数据
+使用内存 SQLite 数据库，无需外部服务
 """
 import sys
 import os
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+# 先设置环境变量为内存 SQLite
+os.environ['DATABASE_TYPE'] = 'sqlite'
+os.environ['SQLITE_IN_MEMORY'] = 'true'
+
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.database import get_db_session
-from app.models import LoanAccount
+from app.database import init_database, get_db_session
 from app.services.loan_account_service import LoanAccountService
 from app.utils import DateTimeUtils
 
@@ -72,6 +76,13 @@ def main():
     print("=" * 50)
     print("贷款展期审批服务 - 种子数据脚本")
     print("=" * 50)
+    print()
+    print("使用内存 SQLite 数据库，无需外部服务")
+    print()
+    
+    print("正在初始化数据库...")
+    init_database()
+    print("✓ 数据库初始化成功")
     print()
     
     print("正在创建示例贷款账户...")

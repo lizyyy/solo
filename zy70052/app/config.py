@@ -8,7 +8,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "贷款展期审批服务"
     API_V1_STR: str = "/api/v1"
     
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/loan_extension"
+    DATABASE_URL: str = "sqlite:///./loan_extension.db"
+    
+    DATABASE_TYPE: str = "sqlite"
+    
+    SQLITE_DB_PATH: str = "./loan_extension.db"
+    SQLITE_IN_MEMORY: bool = False
     
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: Optional[str] = None
@@ -26,6 +31,12 @@ class Settings(BaseSettings):
             self.CELERY_BROKER_URL = self.REDIS_URL
         if not self.CELERY_RESULT_BACKEND:
             self.CELERY_RESULT_BACKEND = self.REDIS_URL
+        
+        if self.DATABASE_TYPE == "sqlite":
+            if self.SQLITE_IN_MEMORY:
+                self.DATABASE_URL = "sqlite:///:memory:"
+            else:
+                self.DATABASE_URL = f"sqlite:///{self.SQLITE_DB_PATH}"
 
 
 settings = Settings()

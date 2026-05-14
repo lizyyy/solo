@@ -18,25 +18,20 @@
 - **Python 3.9+**
 - **FastAPI**：高性能 Web 框架
 - **SQLAlchemy**：ORM 框架
-- **PostgreSQL**：关系型数据库
+- **SQLite**：默认数据库（无需外部服务，适合本地开发）
+- **PostgreSQL**：可选（生产环境使用）
 - **Celery**：后台任务（可选）
 - **Redis**：消息队列（可选）
 
-## 快速开始
+## 快速开始（零配置，无需外部服务）
 
-### 1. 环境准备
-
-确保系统已安装：
-- Python 3.9 或更高版本
-- PostgreSQL 12 或更高版本
-
-### 2. 克隆项目
+### 1. 进入项目目录
 
 ```bash
 cd /Users/lzy/pro/solo/workspaces/zy70052
 ```
 
-### 3. 创建虚拟环境并安装依赖
+### 2. 创建虚拟环境并安装依赖
 
 ```bash
 python3 -m venv venv
@@ -44,25 +39,28 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. 配置数据库
-
-创建 PostgreSQL 数据库：
-
-```sql
-CREATE DATABASE loan_extension;
-```
-
-复制环境配置文件：
+### 3. 验证模块导入（无需数据库）
 
 ```bash
-cp .env.example .env
+python3 scripts/verify_imports.py
 ```
 
-根据需要修改 `.env` 中的数据库连接配置：
+如果看到 `所有模块导入和基础功能测试成功! ✓`，说明一切正常。
 
+### 4. 运行完整业务流程演示（无需外部服务）
+
+```bash
+python3 scripts/demo_workflow.py
 ```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loan_extension
-```
+
+这个脚本会使用内存 SQLite 数据库，完整演示：
+1. 创建贷款账户
+2. 提交展期申请
+3. 初审通过
+4. 终审通过
+5. 执行展期
+6. 查看申请详情
+7. 检查数据一致性
 
 ### 5. 启动服务
 
@@ -70,16 +68,56 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loan_extension
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-服务将在 http://localhost:8000 启动。
+服务将在 http://localhost:8000 启动，使用本地 SQLite 文件数据库。
 
 ### 6. 访问 API 文档
 
 - Swagger UI：http://localhost:8000/docs
 - ReDoc：http://localhost:8000/redoc
 
+## 数据库配置说明
+
+### 默认配置（无需外部服务）
+
+项目默认使用 SQLite 数据库，无需安装任何外部服务：
+
+```env
+DATABASE_TYPE=sqlite
+SQLITE_DB_PATH=./loan_extension.db
+SQLITE_IN_MEMORY=false
+```
+
+### 生产环境配置（可选）
+
+如需使用 PostgreSQL，请修改 `.env` 文件：
+
+```env
+DATABASE_TYPE=postgresql
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/loan_extension
+```
+
+创建 PostgreSQL 数据库：
+
+```sql
+CREATE DATABASE loan_extension;
+```
+
+### 内存数据库（用于快速测试）
+
+```env
+DATABASE_TYPE=sqlite
+SQLITE_IN_MEMORY=true
+```
+
 ## 验证模块导入
 
 在启动服务之前，可以先验证模块导入是否正确：
+
+```bash
+python3 scripts/verify_imports.py
+```
+
+或者使用简单命令：
 
 ```bash
 python3 -B -c "import app.main; print('✓ 模块导入成功')"

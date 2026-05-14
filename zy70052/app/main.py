@@ -9,7 +9,7 @@ from decimal import Decimal
 import io
 
 from app.config import settings
-from app.database import engine, Base, get_db, get_db_session
+from app.database import Base, get_db, get_db_session, init_database, get_engine
 from app.utils import ApplicationStatus, AccountStatus, BusinessType, OperationType
 from app.models import LoanAccount
 from app.services.extension_service import ExtensionService, ExtensionApplicationException
@@ -36,7 +36,6 @@ class CreateLoanAccountRequest(BaseModel):
     max_extension_months: int = Field(default=6, description="单次最大展期月数", ge=1)
     auto_create_plan: bool = Field(default=True, description="是否自动创建还款计划")
 
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -44,6 +43,11 @@ app = FastAPI(
     version="1.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
+
+
+@app.on_event("startup")
+async def startup_event():
+    init_database()
 
 app.add_middleware(
     CORSMiddleware,
