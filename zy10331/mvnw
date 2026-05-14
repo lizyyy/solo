@@ -1,15 +1,10 @@
 #!/bin/sh
-# ----------------------------------------------------------------------------
-# Maven2 Start Up Batch script
-# Required ENV vars:
-# ------------------
-#   JAVA_HOME - location of a JDK home dir
-#
-# Optional ENV vars
-# -----------------
-#   M2_HOME - location of maven2's installed home dir
-#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
-# ----------------------------------------------------------------------------
+# ============================================================================
+# Maven Wrapper 脚本
+# ============================================================================
+# 功能: 自动下载 Maven、设置 JAVA_HOME 并执行 Maven 命令
+# 用法: ./mvnw clean package -DskipTests
+# ============================================================================
 
 # 尝试自动设置 JAVA_HOME（macOS）
 if [ -z "$JAVA_HOME" ] && [ -x /usr/libexec/java_home ]; then
@@ -17,11 +12,19 @@ if [ -z "$JAVA_HOME" ] && [ -x /usr/libexec/java_home ]; then
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-    echo "警告: JAVA_HOME 环境变量未设置"
-    echo "如果是 macOS，请确保已安装完整 JDK（不只是 JRE）"
-    echo "您可以从以下地址下载 JDK:"
-    echo "  - Oracle JDK: https://www.oracle.com/java/technologies/downloads/"
-    echo "  - OpenJDK:   https://adoptium.net/"
+    echo "╔═══════════════════════════════════════════════════════════════╗"
+    echo "║                         ⚠️  警告                               ║"
+    echo "╠═══════════════════════════════════════════════════════════════╣"
+    echo "║  JAVA_HOME 环境变量未设置                                       ║"
+    echo "║                                                                 ║"
+    echo "║  请安装完整 JDK（不只是 JRE）:                                  ║"
+    echo "║  - OpenJDK 8: https://adoptium.net/temurin/releases/?version=8 ║"
+    echo "║  - Oracle JDK: https://www.oracle.com/java/technologies/downloads/ ║"
+    echo "║                                                                 ║"
+    echo "║  安装后设置环境变量:                                            ║"
+    echo "║    export JAVA_HOME=/path/to/jdk                                ║"
+    echo "╚═══════════════════════════════════════════════════════════════╝"
+    exit 1
 fi
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -30,16 +33,18 @@ MAVEN_VERSION="3.8.8"
 MAVEN_HOME="$MAVEN_DIR/apache-maven-$MAVEN_VERSION"
 
 if [ ! -d "$MAVEN_HOME" ]; then
-    echo "正在下载 Maven $MAVEN_VERSION..."
+    echo "📦 正在下载 Maven $MAVEN_VERSION..."
     mkdir -p "$MAVEN_DIR"
     cd "$MAVEN_DIR"
     
     if command -v curl > /dev/null 2>&1; then
-        curl -L "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip" -o maven.zip
+        curl -L -o maven.zip \
+            "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip"
     elif command -v wget > /dev/null 2>&1; then
-        wget "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip" -O maven.zip
+        wget -O maven.zip \
+            "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.zip"
     else
-        echo "错误: 未找到 curl 或 wget，请手动下载 Maven"
+        echo "❌ 错误: 未找到 curl 或 wget"
         exit 1
     fi
     

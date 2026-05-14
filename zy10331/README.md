@@ -2,6 +2,90 @@
 
 基于 Spring Boot 2.7.x 的优先级批处理任务调度系统，支持抢占式调度、执行槽位管理、状态追踪和数据导出。
 
+---
+
+## 🚀 快速开始（必读）
+
+### 前置要求
+
+- **JDK 8 或更高版本**（⚠️ 注意：JRE 无法编译，必须是完整 JDK）
+- macOS / Linux / Windows
+
+### 一键构建并启动
+
+```bash
+# 方式 1: 推荐 - 全自动构建启动
+./build_and_run.sh
+
+# 方式 2: 使用 Maven Wrapper
+./mvnw clean package -DskipTests
+java -jar target/priority-queue-api-1.0.0.jar
+
+# 方式 3: IDE 启动
+# 直接运行主类: com.batchqueue.PriorityQueueApplication
+```
+
+### 启动成功验证
+
+服务启动后访问以下地址：
+
+| 资源 | 地址 |
+|------|------|
+| API 入口 | http://localhost:8080/api/tasks |
+| H2 数据库控制台 | http://localhost:8080/h2-console |
+
+**H2 控制台登录信息：**
+- JDBC URL: `jdbc:h2:file:./data/batchqueue`
+- 用户名: `sa`
+- 密码: （空）
+
+---
+
+## ❗ 常见问题排查
+
+### 问题 1: "No compiler is provided in this environment"
+**原因**: 只安装了 JRE，没有安装完整 JDK
+
+**解决**:
+1. 下载安装 JDK 8+:
+   - OpenJDK: https://adoptium.net/temurin/releases/?version=8
+   - Oracle JDK: https://www.oracle.com/java/technologies/downloads/
+
+2. 设置环境变量:
+   ```bash
+   # macOS
+   export JAVA_HOME=`/usr/libexec/java_home`
+   
+   # Linux
+   export JAVA_HOME=/path/to/jdk
+   
+   # Windows (PowerShell)
+   $env:JAVA_HOME="C:\path\to\jdk"
+   ```
+
+3. 验证安装:
+   ```bash
+   java -version
+   javac -version
+   ```
+
+### 问题 2: "Unable to access jarfile"
+**原因**: 还没有构建生成 JAR 文件
+
+**解决**: 先运行构建命令:
+```bash
+./mvnw clean package -DskipTests
+```
+
+### 问题 3: 端口 8080 被占用
+**解决**: 修改 `src/main/resources/application.yml`:
+```yaml
+server:
+  port: 8081  # 改为其他端口
+```
+
+---
+
 ## 项目概述
 
 这是一个完整的批处理任务队列管理 API，提供以下核心功能：
