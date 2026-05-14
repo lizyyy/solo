@@ -36,16 +36,16 @@ func (h *HTTPHandler) RegisterRoutes(r *gin.Engine) {
 		{
 			rules.POST("", h.CreateMirrorRule)
 			rules.GET("", h.ListMirrorRules)
+			rules.GET("/export", h.ExportMirrorRules)
 			rules.GET("/:id", h.GetMirrorRule)
 			rules.PATCH("/:id/status", h.UpdateRuleStatus)
-			rules.GET("/export", h.ExportMirrorRules)
 		}
 
 		copies := api.Group("/copies")
 		{
 			copies.GET("", h.ListRequestCopies)
-			copies.POST("/submit", h.SubmitRequest)
 			copies.GET("/export", h.ExportRequestCopies)
+			copies.POST("/submit", h.SubmitRequest)
 		}
 
 		results := api.Group("/results")
