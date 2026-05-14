@@ -21,9 +21,9 @@ class RuleEngine:
         
         for rule in self.rule_set.get_enabled_rules():
             if rule.type == RuleType.URL_CHECK:
-                is_valid, reason, status_code = await self._check_url(item.content, rule)
-                if not is_valid:
-                    item.status = ScanItemStatus.INVALID
+                status, reason, status_code = await self._check_url(item.content, rule)
+                if status != ScanItemStatus.VALID:
+                    item.status = status
                     item.error_message = reason
                     item.metadata["status_code"] = status_code
                     return item
@@ -36,9 +36,9 @@ class RuleEngine:
         item.status = ScanItemStatus.VALID
         return item
     
-    async def _check_url(self, url: str, rule: Rule) -> Tuple[bool, Optional[str], Optional[int]]:
+    async def _check_url(self, url: str, rule: Rule) -> Tuple[ScanItemStatus, Optional[str], Optional[int]]:
         if not url.startswith(("http://", "https://")):
-            return True, None, None
+            return ScanItemStatus.VALID, None, None
         
         config = rule.config
         timeout = config.get("timeout", self.scan_config.timeout)
@@ -49,6 +49,7 @@ class RuleEngine:
         
         last_error = None
         last_status = None
+        has_http_response = False
         
         for attempt in range(retry_count + 1):
             for method in check_methods:
@@ -68,25 +69,27 @@ class RuleEngine:
                         
                         async with request_func(url, **request_kwargs) as response:
                             last_status = response.status
+                            has_http_response = True
                             
                             if failure_codes and response.status in failure_codes:
-                                return False, f"HTTP {response.status}: {response.reason} ({method})", response.status
+                                return ScanItemStatus.INVALID, f"HTTP {response.status}: {response.reason} ({method})", response.status
                             
                             if response.status not in acceptable_statuses:
                                 last_error = f"HTTP {response.status}: {response.reason} ({method})"
                                 continue
                             
-                            return True, None, response.status
+                            return ScanItemStatus.VALID, None, response.status
                 except asyncio.TimeoutError:
                     last_error = f"请求超时 ({method})"
                     continue
                 except aiohttp.ClientSSLError:
-                    return False, "SSL证书验证失败", None
+                    return ScanItemStatus.ERROR, "SSL证书验证失败", None
                 except aiohttp.ClientConnectorError:
                     last_error = f"无法连接到服务器 ({method})"
                     continue
                 except aiohttp.ClientResponseError:
                     last_error = f"响应错误 ({method})"
+                    has_http_response = True
                     continue
                 except Exception as e:
                     last_error = f"请求异常: {str(e)} ({method})"
@@ -95,7 +98,10 @@ class RuleEngine:
             if attempt < retry_count:
                 await asyncio.sleep(1)
         
-        return False, last_error or "重试次数耗尽", last_status
+        if has_http_response:
+            return ScanItemStatus.INVALID, last_error or "重试次数耗尽", last_status
+        else:
+            return ScanItemStatus.ERROR, last_error or "重试次数耗尽", last_status
     
     def _match_pattern(self, content: str, rule: Rule) -> bool:
         patterns = rule.config.get("patterns", [])
