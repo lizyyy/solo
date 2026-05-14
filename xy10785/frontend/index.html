@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广告投放预算管理系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+        .app { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { color: #333; font-size: 24px; }
+        
+        .filter-bar { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; }
+        .filter-group label { font-size: 12px; color: #666; }
+        .filter-group select, .filter-group input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; min-width: 150px; }
+        
+        .table-container { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; color: #333; }
+        tr:hover { background: #f8f9fa; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-投放中 { background: #e6f7ff; color: #1890ff; }
+        .status-花费异常 { background: #fff1f0; color: #ff4d4f; }
+        .status-回填失败 { background: #fff7e6; color: #fa8c16; }
+        .status-未开始 { background: #f5f5f5; color: #8c8c8c; }
+        
+        .review-审核通过 { background: #f6ffed; color: #52c41a; }
+        .review-待审核 { background: #e6f7ff; color: #1890ff; }
+        
+        .paused-badge { background: #fff1f0; color: #ff4d4f; }
+        .running-badge { background: #f6ffed; color: #52c41a; }
+        
+        .version-tag { background: #1890ff; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+        
+        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background: #1890ff; color: #fff; }
+        .btn-primary:hover { background: #40a9ff; }
+        .btn-success { background: #52c41a; color: #fff; }
+        .btn-warning { background: #fa8c16; color: #fff; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; border-radius: 8px; max-width: 1200px; width: 95%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 20px; }
+        .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        
+        .detail-section { margin-bottom: 25px; }
+        .detail-section h3 { margin-bottom: 15px; color: #333; font-size: 16px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .detail-item { display: flex; flex-direction: column; gap: 5px; }
+        .detail-label { font-size: 12px; color: #999; }
+        .detail-value { font-size: 14px; color: #333; font-weight: 500; }
+        
+        .json-box { background: #f5f5f5; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; }
+        
+        .timeline { position: relative; padding-left: 20px; }
+        .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #e8e8e8; }
+        .timeline-item { position: relative; margin-bottom: 15px; }
+        .timeline-item::before { content: ''; position: absolute; left: -17px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: #1890ff; }
+        .timeline-content { background: #f8f9fa; padding: 12px; border-radius: 4px; }
+        .timeline-time { font-size: 12px; color: #999; margin-bottom: 5px; }
+        .timeline-text { font-size: 13px; color: #333; }
+        
+        .pause-rule-card { background: #fff1f0; border: 1px solid #ffccc7; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+        .pause-rule-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .pause-rule-type { font-weight: 600; color: #ff4d4f; }
+        
+        .report-table { font-size: 13px; }
+        .report-table th, .report-table td { padding: 8px 10px; }
+        
+        .correct-action { background: #fff7e6; border: 1px solid #ffd591; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .correct-action h4 { color: #fa8c16; margin-bottom: 10px; }
+        .correct-btn { margin-top: 10px; background: #fa8c16; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="app" class="app">
+        <div class="header">
+            <h1>广告投放预算管理系统</h1>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label>渠道</label>
+                <select v-model="filters.channel">
+                    <option value="">全部</option>
+                    <option value="抖音">抖音</option>
+                    <option value="百度">百度</option>
+                    <option value="快手">快手</option>
+                    <option value="微信">微信</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>审核状态</label>
+                <select v-model="filters.review_status">
+                    <option value="">全部</option>
+                    <option value="待审核">待审核</option>
+                    <option value="审核通过">审核通过</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>花费状态</label>
+                <select v-model="filters.spend_status">
+                    <option value="">全部</option>
+                    <option value="未开始">未开始</option>
+                    <option value="投放中">投放中</option>
+                    <option value="花费异常">花费异常</option>
+                    <option value="回填失败">回填失败</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>投放状态</label>
+                <select v-model="filters.is_paused">
+                    <option value="">全部</option>
+                    <option value="false">投放中</option>
+                    <option value="true">已暂停</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>计划名称</th>
+                        <th>版本</th>
+                        <th>渠道</th>
+                        <th>预算</th>
+                        <th>实际花费</th>
+                        <th>审核状态</th>
+                        <th>花费状态</th>
+                        <th>投放状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="plan in filteredPlans" :key="plan.id">
+                        <td>{{ plan.id }}</td>
+                        <td>{{ plan.plan_name }}</td>
+                        <td><span class="version-tag">v{{ plan.version }}</span></td>
+                        <td>{{ plan.channel }}</td>
+                        <td>¥{{ plan.budget.toLocaleString() }}</td>
+                        <td>¥{{ plan.actual_spend.toLocaleString() }}</td>
+                        <td><span class="status-badge" :class="'review-' + plan.review_status">{{ plan.review_status }}</span></td>
+                        <td><span class="status-badge" :class="'status-' + plan.spend_status">{{ plan.spend_status }}</span></td>
+                        <td><span class="status-badge" :class="plan.is_paused ? 'paused-badge' : 'running-badge'">{{ plan.is_paused ? '已暂停' : '投放中' }}</span></td>
+                        <td><button class="btn btn-primary" @click="openDetail(plan)">详情</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div v-if="showModal" class="modal" @click.self="showModal = false">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>广告计划详情 - {{ currentPlan?.plan_name }}</h2>
+                    <button class="close-btn" @click="showModal = false">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-section">
+                        <h3>基本信息</h3>
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">计划ID</span>
+                                <span class="detail-value">{{ currentPlan?.id }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">版本</span>
+                                <span class="detail-value"><span class="version-tag">v{{ currentPlan?.version }}</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">渠道</span>
+                                <span class="detail-value">{{ currentPlan?.channel }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">预算</span>
+                                <span class="detail-value">¥{{ currentPlan?.budget.toLocaleString() }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">实际花费</span>
+                                <span class="detail-value">¥{{ currentPlan?.actual_spend.toLocaleString() }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">花费占比</span>
+                                <span class="detail-value">{{ ((currentPlan?.actual_spend / currentPlan?.budget) * 100).toFixed(1) }}%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">审核状态</span>
+                                <span class="detail-value"><span class="status-badge" :class="'review-' + currentPlan?.review_status">{{ currentPlan?.review_status }}</span></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">花费状态</span>
+                                <span class="detail-value"><span class="status-badge" :class="'status-' + currentPlan?.spend_status">{{ currentPlan?.spend_status }}</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>原始输入</h3>
+                        <div class="json-box">{{ currentPlan?.original_input }}</div>
+                    </div>
+
+                    <div class="detail-section" v-if="currentPlan?.processed_result">
+                        <h3>处理结果</h3>
+                        <div class="json-box">{{ currentPlan?.processed_result }}</div>
+                    </div>
+
+                    <div class="detail-section" v-if="currentPlan?.pause_rules && currentPlan.pause_rules.length > 0">
+                        <h3>暂停规则（留痕）</h3>
+                        <div v-for="rule in currentPlan.pause_rules" :key="rule.id" class="pause-rule-card">
+                            <div class="pause-rule-header">
+                                <span class="pause-rule-type">{{ rule.rule_type }} ({{ rule.rule_value }})</span>
+                                <span style="font-size: 12px; color: #999;">操作人: {{ rule.operator }}</span>
+                            </div>
+                            <p style="font-size: 13px; color: #666;">{{ rule.reason }}</p>
+                            <p style="font-size: 12px; color: #999; margin-top: 8px;">创建时间: {{ rule.created_at }}</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-section" v-if="currentPlan?.spend_status === '回填失败'">
+                        <h3>花费回填失败修正</h3>
+                        <div class="correct-action">
+                            <h4>修正路径</h4>
+                            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">检测到API数据格式异常，建议按以下步骤处理：</p>
+                            <ol style="font-size: 13px; color: #666; padding-left: 20px; margin-bottom: 10px;">
+                                <li>检查API返回数据格式是否符合规范</li>
+                                <li>验证花费数据的时间戳是否正确</li>
+                                <li>重新触发花费回填</li>
+                                <li>确认修正后恢复投放</li>
+                            </ol>
+                            <button class="correct-btn" @click="correctBackfill">执行修正并恢复投放</button>
+                        </div>
+                    </div>
+
+                    <div class="detail-section" v-if="currentPlan?.status_logs && currentPlan.status_logs.length > 0">
+                        <h3>版本变更日志</h3>
+                        <div class="timeline">
+                            <div v-for="log in currentPlan.status_logs" :key="log.id" class="timeline-item">
+                                <div class="timeline-content">
+                                    <div class="timeline-time">{{ log.created_at }} - {{ log.operator }}</div>
+                                    <div class="timeline-text">
+                                        <strong>{{ log.field_name }}:</strong> 
+                                        {{ log.old_value }} → {{ log.new_value }}
+                                        <span v-if="log.change_reason" style="color: #999; margin-left: 10px;">({{ log.change_reason }})</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section" v-if="currentPlan?.reports && currentPlan.reports.length > 0">
+                        <h3>投放报表</h3>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>曝光量</th>
+                                    <th>点击量</th>
+                                    <th>花费</th>
+                                    <th>CTR</th>
+                                    <th>CPC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="report in currentPlan.reports" :key="report.id">
+                                    <td>{{ report.report_date }}</td>
+                                    <td>{{ report.impressions.toLocaleString() }}</td>
+                                    <td>{{ report.clicks.toLocaleString() }}</td>
+                                    <td>¥{{ report.spend.toLocaleString() }}</td>
+                                    <td>{{ report.ctr }}%</td>
+                                    <td>¥{{ report.cpc }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const plans = ref([]);
+                const showModal = ref(false);
+                const currentPlan = ref(null);
+                const filters = ref({
+                    channel: '',
+                    review_status: '',
+                    spend_status: '',
+                    is_paused: ''
+                });
+
+                const API_BASE = 'http://localhost:8001/api';
+
+                const filteredPlans = computed(() => {
+                    return plans.value.filter(plan => {
+                        if (filters.value.channel && plan.channel !== filters.value.channel) return false;
+                        if (filters.value.review_status && plan.review_status !== filters.value.review_status) return false;
+                        if (filters.value.spend_status && plan.spend_status !== filters.value.spend_status) return false;
+                        if (filters.value.is_paused !== '' && String(plan.is_paused) !== filters.value.is_paused) return false;
+                        return true;
+                    });
+                });
+
+                const fetchPlans = async () => {
+                    try {
+                        const res = await fetch(`${API_BASE}/ad-plans/`);
+                        plans.value = await res.json();
+                    } catch (e) {
+                        console.error('获取计划列表失败:', e);
+                    }
+                };
+
+                const openDetail = async (plan) => {
+                    try {
+                        const res = await fetch(`${API_BASE}/ad-plans/${plan.id}`);
+                        currentPlan.value = await res.json();
+                        showModal.value = true;
+                    } catch (e) {
+                        console.error('获取计划详情失败:', e);
+                    }
+                };
+
+                const correctBackfill = async () => {
+                    if (!currentPlan.value) return;
+                    try {
+                        const res = await fetch(`${API_BASE}/ad-plans/${currentPlan.value.id}?change_reason=花费回填修正，恢复投放&operator=管理员`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                spend_status: '投放中',
+                                is_paused: false
+                            })
+                        });
+                        if (res.ok) {
+                            alert('修正成功，投放已恢复！');
+                            showModal.value = false;
+                            fetchPlans();
+                        }
+                    } catch (e) {
+                        console.error('修正失败:', e);
+                    }
+                };
+
+                onMounted(() => {
+                    fetchPlans();
+                });
+
+                return {
+                    plans,
+                    showModal,
+                    currentPlan,
+                    filters,
+                    filteredPlans,
+                    openDetail,
+                    correctBackfill
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
