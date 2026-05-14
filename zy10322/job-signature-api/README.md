@@ -109,9 +109,7 @@ chmod +x scripts/test_api.sh
 
 ### 3. 运行单元测试
 ```bash
-cd test
-go mod tidy
-go test -v ./...
+go test -v api_test.go
 ```
 
 ## 使用示例
@@ -183,8 +181,7 @@ job-signature-api/
 │   │   └── service.go
 │   └── handler/             # API 处理层
 │       └── handler.go
-├── test/                    # 单元测试
-│   └── api_test.go
+├── api_test.go              # 单元测试
 ├── scripts/                 # 工具脚本
 │   └── test_api.sh          # API 自检脚本
 ├── go.mod

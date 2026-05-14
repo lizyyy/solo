@@ -30,7 +30,7 @@ BATCH_RESP=$(curl -s -X POST "$BASE_URL/batches" -H "Content-Type: application/j
   ]
 }")
 echo $BATCH_RESP | jq .
-BATCH_ID=$(echo $BATCH_RESP | jq -r '.batchId')
+BATCH_ID=$(echo $BATCH_RESP | jq -r '.batch_id')
 echo "批次 ID: $BATCH_ID"
 echo ""
 

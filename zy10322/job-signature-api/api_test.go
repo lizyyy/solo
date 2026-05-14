@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	"bytes"
@@ -76,8 +76,8 @@ func TestCreateBatch(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1001)
 	req := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -102,8 +102,8 @@ func TestDuplicateBatch(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1002)
 	req := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -129,8 +129,8 @@ func TestSignBatch(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1003)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -165,8 +165,8 @@ func TestSignTwiceNotAllowed(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1004)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -203,8 +203,8 @@ func TestVerifyWithWrongDigest(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1005)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -247,8 +247,8 @@ func TestVerifySuccess(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1006)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -289,8 +289,8 @@ func TestRevokeBatch(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1007)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -321,8 +321,8 @@ func TestVerifyRevokedBatch(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1008)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
@@ -381,8 +381,8 @@ func TestVerifyHistory(t *testing.T) {
 
 	batchNo := fmt.Sprintf("BATCH-%08d", 1009)
 	createReq := model.CreateBatchRequest{
-		BatchNo:  batchNo,
-		Creator:  "tester",
+		BatchNo:    batchNo,
+		Creator:    "tester",
 		ExpireDays: 3,
 		Files: []model.FileInfo{
 			{FileName: "file1.txt", FileHash: "hash1", FileSize: 100},
