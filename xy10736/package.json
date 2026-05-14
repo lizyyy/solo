@@ -1,0 +1,14 @@
+{
+  "name": "tracking-console",
+  "version": "1.0.0",
+  "description": "前端埋点验收台 - 全栈项目",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "init:db": "cd backend && npx prisma generate && npx prisma db push && node prisma/seed.js"
+  },
+  "keywords": ["tracking", "analytics", "acceptance-testing"],
+  "author": "",
+  "license": "MIT"
+}
