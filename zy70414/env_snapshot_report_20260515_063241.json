@@ -1,0 +1,74 @@
+{
+  "title": "环境变量快照合规报告",
+  "generated_at": "2026-05-15T06:32:41.806428",
+  "summary": {
+    "总快照数": 2,
+    "总错误数": 2,
+    "算法不匹配数": 2,
+    "签名不匹配数": 0,
+    "风险等级": "HIGH"
+  },
+  "snapshots": [
+    {
+      "snapshot_id": "SNAP-866BBCF5",
+      "supplier_name": "验证供应商",
+      "algorithm": "MD5",
+      "operator": "system",
+      "created_at": "2026-05-14T22:23:09.595579",
+      "conclusion": "验证失败",
+      "rerun_marker": "RERUN-20260515-SNAP-866BBCF5",
+      "material_summary": "环境变量数: 5, 供应商: 验证供应商, 算法: MD5, 期望算法: SHA256",
+      "errors": [
+        {
+          "type": "algorithm_mismatch",
+          "description": "签名算法不一致: 期望 SHA256, 实际 MD5",
+          "severity": "HIGH"
+        }
+      ],
+      "error_count": 1
+    },
+    {
+      "snapshot_id": "SNAP-43C69B1D",
+      "supplier_name": "测试供应商",
+      "algorithm": "MD5",
+      "operator": "system",
+      "created_at": "2026-05-14T22:06:12.039903",
+      "conclusion": "验证失败",
+      "rerun_marker": null,
+      "material_summary": "环境变量数: 5, 供应商: 测试供应商",
+      "errors": [
+        {
+          "type": "algorithm_mismatch",
+          "description": "签名算法不一致: 期望 SHA256, 实际 MD5",
+          "severity": "HIGH"
+        }
+      ],
+      "error_count": 1
+    }
+  ],
+  "errors": [
+    {
+      "snapshot_id": "SNAP-866BBCF5",
+      "risk_type": "algorithm_mismatch",
+      "description": "签名算法不一致: 期望 SHA256, 实际 MD5",
+      "severity": "HIGH",
+      "identified_at": "2026-05-14T22:23:09.596540"
+    },
+    {
+      "snapshot_id": "SNAP-43C69B1D",
+      "risk_type": "algorithm_mismatch",
+      "description": "签名算法不一致: 期望 SHA256, 实际 MD5",
+      "severity": "HIGH",
+      "identified_at": "2026-05-14T22:06:12.040572"
+    }
+  ],
+  "legal_evidence": {
+    "batch_id": "N/A",
+    "rerun_marker": "RERUN-20260515-SNAP-866BBCF5",
+    "input_data": "供应商=验证供应商, 算法=MD5",
+    "action": "环境变量快照验证",
+    "conclusion": "验证失败",
+    "operator": "system",
+    "timestamp": "2026-05-14T22:23:09.595579"
+  }
+}

@@ -156,9 +156,10 @@ class ReportGenerator:
 
         if include_evidence and snapshots:
             sample_snap = snapshots[0]
-            sample_errors = self.db.query(ErrorSample).filter(ErrorSample.snapshot_id == sample_snap.id).first()
             
-            rerun_marker = f"RERUN-{datetime.now().strftime('%Y%m%d')}-{sample_snap.snapshot_id}"
+            rerun_marker = sample_snap.rerun_marker
+            if not rerun_marker:
+                rerun_marker = f"RERUN-{sample_snap.created_at.strftime('%Y%m%d')}-{sample_snap.snapshot_id}"
             
             data["legal_evidence"] = {
                 "batch_id": batch_id or "N/A",

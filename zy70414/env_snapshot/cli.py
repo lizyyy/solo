@@ -217,7 +217,7 @@ def report(
     else:
         content = report_gen.generate_markdown(data)
     
-    if output or output is None:
+    if output:
         saved_path = report_gen.save_report(content, format, output)
         console.print(f"[green]✓ 报告已保存到: {saved_path}[/green]")
     else:
