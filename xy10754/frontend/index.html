@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠规则试算器控制台</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>优惠规则试算器控制台</h1>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="label">总试算</span>
+                    <span class="value" id="total-trials">0</span>
+                </div>
+                <div class="stat-card success">
+                    <span class="label">成功</span>
+                    <span class="value" id="success-trials">0</span>
+                </div>
+                <div class="stat-card blocked">
+                    <span class="label">已拦截</span>
+                    <span class="value" id="blocked-trials">0</span>
+                </div>
+                <div class="stat-card pending">
+                    <span class="label">待复核</span>
+                    <span class="value" id="pending-trials">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <nav>
+                    <button class="nav-btn active" data-section="trials">试算列表</button>
+                    <button class="nav-btn" data-section="new-trial">新建试算</button>
+                    <button class="nav-btn" data-section="batch-import">批量导入</button>
+                    <button class="nav-btn" data-section="rules">互斥规则</button>
+                </nav>
+            </aside>
+
+            <main class="content">
+                <section id="trials-section" class="section active">
+                    <div class="section-header">
+                        <h2>试算记录</h2>
+                        <button class="btn btn-primary" onclick="refreshTrials()">刷新</button>
+                    </div>
+                    <div class="filter-bar">
+                        <select id="status-filter" onchange="filterTrials()">
+                            <option value="">全部状态</option>
+                            <option value="success">成功</option>
+                            <option value="pending_review">待复核</option>
+                            <option value="blocked">已拦截</option>
+                            <option value="retryable">可重试</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>试算ID</th>
+                                    <th>购物车ID</th>
+                                    <th>原价</th>
+                                    <th>最终价</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="trials-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="new-trial-section" class="section">
+                    <h2>新建试算</h2>
+                    <form id="trial-form" class="form">
+                        <div class="form-group">
+                            <label>购物车ID</label>
+                            <select id="cart-select" required>
+                                <option value="">选择购物车</option>
+                                <option value="CART001">CART001 - 用户U001</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>选择优惠券（可多选）</label>
+                            <div id="coupon-list" class="checkbox-group">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">开始试算</button>
+                    </form>
+                </section>
+
+                <section id="batch-import-section" class="section">
+                    <h2>批量导入</h2>
+                    <div class="form-group">
+                        <label>JSON数据格式：[{"cart_id": "CART001", "coupon_ids": ["CP001", "CP002"]}]</label>
+                        <textarea id="batch-data" class="textarea" rows="10"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="batchImport()">批量导入</button>
+                    <div id="batch-result" class="result-box"></div>
+                </section>
+
+                <section id="rules-section" class="section">
+                    <h2>互斥规则配置</h2>
+                    <div id="rules-list"></div>
+                </section>
+            </main>
+        </div>
+
+        <div id="detail-modal" class="modal">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3>试算详情</h3>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="detail-content">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/app.js"></script>
+</body>
+</html>
