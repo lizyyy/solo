@@ -1,0 +1,97 @@
+{
+  "batch_id": "20260515_004305_45f53210",
+  "name": "演示扫描-边界测试",
+  "created_at": "2026-05-15T00:43:05.617771",
+  "status": "completed",
+  "rule_set_version": "default:v1.0.0",
+  "metadata": {},
+  "summary": {
+    "batch_id": "20260515_004305_45f53210",
+    "status": "completed",
+    "counts": {
+      "total": 4,
+      "valid": 0,
+      "invalid": 4,
+      "error": 0,
+      "skipped": 0,
+      "unknown": 0
+    },
+    "created_at": "2026-05-15T00:43:05.617771",
+    "rule_set_version": "default:v1.0.0"
+  },
+  "items": [
+    {
+      "id": "a83e168de9b87e574ded8344c576fd4c",
+      "source": "灰度法务证据页-示例1",
+      "content": "https://httpstat.us/404",
+      "content_hash": "604fb3cac91a89c4",
+      "metadata": {
+        "type": "legal_evidence",
+        "priority": "high",
+        "status_code": null
+      },
+      "status": "invalid",
+      "error_message": "请求异常: Server disconnected",
+      "scan_time": "2026-05-15T00:43:05.618033",
+      "rule_versions": {
+        "url_alive_check": "1.0.0",
+        "deprecated_pattern": "1.0.0",
+        "legal_evidence_url": "1.0.0"
+      }
+    },
+    {
+      "id": "1ccfc4479a0c37912d93a6372316d01b",
+      "source": "灰度法务证据页-示例2",
+      "content": "https://httpstat.us/200",
+      "content_hash": "f1db3eddca2f33a6",
+      "metadata": {
+        "type": "legal_evidence",
+        "status_code": null
+      },
+      "status": "invalid",
+      "error_message": "请求异常: Server disconnected",
+      "scan_time": "2026-05-15T00:43:05.632901",
+      "rule_versions": {
+        "url_alive_check": "1.0.0",
+        "deprecated_pattern": "1.0.0",
+        "legal_evidence_url": "1.0.0"
+      }
+    },
+    {
+      "id": "cdaacfad5e1c40f3ec1aacd9f2d3feb6",
+      "source": "边界案例-无效域名",
+      "content": "https://nonexistent.example.invalid",
+      "content_hash": "1d020c5ebd95a704",
+      "metadata": {
+        "test_case": "boundary",
+        "status_code": null
+      },
+      "status": "invalid",
+      "error_message": "请求超时",
+      "scan_time": "2026-05-15T00:43:05.633420",
+      "rule_versions": {
+        "url_alive_check": "1.0.0",
+        "deprecated_pattern": "1.0.0",
+        "legal_evidence_url": "1.0.0"
+      }
+    },
+    {
+      "id": "3097b2269147568639ca2732c4bdc29c",
+      "source": "废弃配置模式",
+      "content": "https://old-api.example.com/v1/endpoint",
+      "content_hash": "d5bf9768100a57c7",
+      "metadata": {
+        "test_case": "deprecated_pattern",
+        "status_code": null
+      },
+      "status": "invalid",
+      "error_message": "无法连接到服务器",
+      "scan_time": "2026-05-15T00:43:12.423924",
+      "rule_versions": {
+        "url_alive_check": "1.0.0",
+        "deprecated_pattern": "1.0.0",
+        "legal_evidence_url": "1.0.0"
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "record_id": "2b3eba60e2eb8a3a2954f4e5e2955208",
+  "batch_id": "20260515_004305_45f53210",
+  "item_id": "1ccfc4479a0c37912d93a6372316d01b",
+  "content_hash": "f1db3eddca2f33a6",
+  "source": "灰度法务证据页-示例2",
+  "content": "https://httpstat.us/200",
+  "failure_type": "url_invalid",
+  "failure_reason": "请求异常: Server disconnected",
+  "rule_versions": {
+    "url_alive_check": "1.0.0",
+    "deprecated_pattern": "1.0.0",
+    "legal_evidence_url": "1.0.0"
+  },
+  "metadata": {
+    "type": "legal_evidence",
+    "status_code": null
+  },
+  "status_code": null,
+  "detected_at": "2026-05-15T00:43:12.754434",
+  "human_reviewed": false,
+  "review_comment": null,
+  "reviewed_at": null
+}

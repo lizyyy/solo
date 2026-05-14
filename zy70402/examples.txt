@@ -1,0 +1,14 @@
+# 死配置扫描示例输入文件
+# 每行一个URL或配置项
+# 以#开头的行会被忽略
+
+# 灰度法务证据页链接
+https://httpstat.us/404
+https://httpstat.us/200
+
+# 测试链接
+https://www.baidu.com
+https://nonexistent.example.invalid
+
+# 废弃API模式
+https://old-api.example.com/v1/endpoint
