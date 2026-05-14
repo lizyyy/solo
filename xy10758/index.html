@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订阅续费失败补偿系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #1a202c; margin-bottom: 24px; font-size: 28px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h3 { color: #718096; font-size: 14px; margin-bottom: 8px; }
+        .card .value { font-size: 32px; font-weight: bold; color: #2d3748; }
+        .card.failed .value { color: #e53e3e; }
+        .card.success .value { color: #38a169; }
+        .card.downgrade .value { color: #dd6b20; }
+        
+        .toolbar { background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .toolbar input { padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; min-width: 200px; }
+        .toolbar select { padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #4299e1; color: white; }
+        .btn-primary:hover { background: #3182ce; }
+        .btn-success { background: #38a169; color: white; }
+        .btn-success:hover { background: #2f855a; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd6b20; }
+        
+        .tabs { display: flex; gap: 4px; margin-bottom: 16px; background: white; padding: 4px; border-radius: 8px; display: inline-flex; }
+        .tab { padding: 10px 20px; border: none; background: transparent; cursor: pointer; border-radius: 6px; font-size: 14px; }
+        .tab.active { background: #4299e1; color: white; }
+        
+        .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f7fafc; font-weight: 600; color: #4a5568; }
+        tr:hover { background: #f7fafc; }
+        
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-success { background: #c6f6d5; color: #22543d; }
+        .status-failed { background: #fed7d7; color: #742a2a; }
+        .status-pending { background: #feebc8; color: #744210; }
+        
+        .warning-badge { background: #fef5e7; color: #9c4221; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; }
+        .grace-warning { color: #c05621; font-weight: 500; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 24px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-content h2 { margin-bottom: 20px; color: #2d3748; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #4a5568; font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .form-group textarea { min-height: 100px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .btn-secondary:hover { background: #cbd5e0; }
+        
+        .batch-import-area { width: 100%; min-height: 200px; padding: 16px; border: 2px dashed #cbd5e0; border-radius: 8px; font-family: monospace; font-size: 12px; }
+        .batch-import-area:focus { border-color: #4299e1; outline: none; }
+        .import-hint { color: #718096; font-size: 12px; margin-top: 8px; }
+        
+        .results-area { margin-top: 16px; padding: 16px; background: #f7fafc; border-radius: 8px; max-height: 300px; overflow-y: auto; }
+        .result-item { padding: 8px; margin-bottom: 8px; border-radius: 4px; font-size: 13px; }
+        .result-item.success { background: #c6f6d5; color: #22543d; }
+        .result-item.error { background: #fed7d7; color: #742a2a; }
+        
+        .action-buttons { display: flex; gap: 8px; }
+        .action-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .action-btn.downgrade { background: #ed8936; color: white; }
+        .action-btn.view { background: #4299e1; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 订阅续费失败补偿系统</h1>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h3>总事件数</h3>
+                <div class="value" id="totalEvents">0</div>
+            </div>
+            <div class="card success">
+                <h3>成功扣款</h3>
+                <div class="value" id="successEvents">0</div>
+            </div>
+            <div class="card failed">
+                <h3>扣款失败</h3>
+                <div class="value" id="failedEvents">0</div>
+            </div>
+            <div class="card">
+                <h3>待处理</h3>
+                <div class="value" id="pendingEvents">0</div>
+            </div>
+            <div class="card downgrade">
+                <h3>降级动作</h3>
+                <div class="value" id="totalDowngrades">0</div>
+                <div style="font-size: 12px; color: #718096; margin-top: 4px;">
+                    收入损失: ¥<span id="revenueLost">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('events')">扣款事件</button>
+            <button class="tab" onclick="switchTab('downgrades')">降级动作</button>
+        </div>
+        
+        <div class="toolbar" id="eventsToolbar">
+            <input type="text" id="searchInput" placeholder="搜索订阅ID、用户名、负责人..." onkeyup="searchEvents()">
+            <select id="statusFilter" onchange="searchEvents()">
+                <option value="">全部状态</option>
+                <option value="success">成功</option>
+                <option value="failed">失败</option>
+                <option value="pending">待处理</option>
+            </select>
+            <button class="btn btn-primary" onclick="openAddModal()">+ 添加事件</button>
+            <button class="btn btn-warning" onclick="openBatchModal()">批量导入</button>
+            <button class="btn btn-success" onclick="exportReport()">导出报告</button>
+        </div>
+        
+        <div class="toolbar" id="downgradesToolbar" style="display: none;">
+            <button class="btn btn-success" onclick="exportReport()">导出报告</button>
+        </div>
+        
+        <div class="table-container" id="eventsTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>事件ID</th>
+                        <th>用户</th>
+                        <th>负责人</th>
+                        <th>计划</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                        <th>重试</th>
+                        <th>宽限期截止</th>
+                        <th>失败原因</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="eventsBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="table-container" id="downgradesTable" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>动作ID</th>
+                        <th>事件ID</th>
+                        <th>订阅ID</th>
+                        <th>动作类型</th>
+                        <th>详情</th>
+                        <th>执行人</th>
+                        <th>执行时间</th>
+                        <th>收入影响</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="downgradesBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <h2>添加扣款事件</h2>
+            <div class="form-group">
+                <label>事件ID</label>
+                <input type="text" id="eventId" placeholder="EVT_001">
+            </div>
+            <div class="form-group">
+                <label>订阅ID</label>
+                <input type="text" id="subscriptionId" placeholder="SUB_001">
+            </div>
+            <div class="form-group">
+                <label>用户ID</label>
+                <input type="text" id="userId" placeholder="USER_001">
+            </div>
+            <div class="form-group">
+                <label>用户名</label>
+                <input type="text" id="userName" placeholder="张三">
+            </div>
+            <div class="form-group">
+                <label>负责人</label>
+                <input type="text" id="owner" placeholder="李四">
+            </div>
+            <div class="form-group">
+                <label>订阅计划</label>
+                <select id="planId"></select>
+            </div>
+            <div class="form-group">
+                <label>金额</label>
+                <input type="number" id="amount" step="0.01" placeholder="99.00">
+            </div>
+            <div class="form-group">
+                <label>状态</label>
+                <select id="status">
+                    <option value="pending">待处理</option>
+                    <option value="success">成功</option>
+                    <option value="failed">失败</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>失败原因</label>
+                <input type="text" id="failureReason" placeholder="余额不足">
+            </div>
+            <div class="form-group">
+                <label>重试次数</label>
+                <input type="number" id="attemptCount" value="0">
+            </div>
+            <div class="form-group">
+                <label>最大重试次数</label>
+                <input type="number" id="maxAttempts" value="3">
+            </div>
+            <div class="form-group">
+                <label>重试策略</label>
+                <select id="retryStrategy"></select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addModal')">取消</button>
+                <button class="btn btn-primary" onclick="addEvent()">确认添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="batchModal">
+        <div class="modal-content">
+            <h2>批量导入扣款事件</h2>
+            <div class="form-group">
+                <label>JSON数据</label>
+                <textarea class="batch-import-area" id="batchData" placeholder='[
+  {
+    "event_id": "EVT_001",
+    "subscription_id": "SUB_001",
+    "user_id": "USER_001",
+    "user_name": "张三",
+    "owner": "李四",
+    "plan_id": "PRO_MONTHLY",
+    "amount": 99.0,
+    "status": "failed",
+    "failure_reason": "余额不足",
+    "attempt_count": 3,
+    "retry_strategy": "standard",
+    "charge_time": "2024-01-15T10:00:00"
+  }
+]'></textarea>
+                <div class="import-hint">
+                    提示: 每行一个JSON对象，或完整的JSON数组。系统会自动校验数据合法性。
+                </div>
+            </div>
+            <div id="batchResults" class="results-area" style="display: none;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('batchModal')">取消</button>
+                <button class="btn btn-primary" onclick="batchImport()">开始导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="downgradeModal">
+        <div class="modal-content">
+            <h2>执行降级动作</h2>
+            <div class="form-group">
+                <label>事件ID</label>
+                <input type="text" id="dgEventId" readonly>
+            </div>
+            <div class="form-group">
+                <label>订阅ID</label>
+                <input type="text" id="dgSubscriptionId" readonly>
+            </div>
+            <div class="form-group">
+                <label>动作类型</label>
+                <select id="dgActionType">
+                    <option value="downgrade_to_free">降级到免费版</option>
+                    <option value="downgrade_to_basic">降级到基础版</option>
+                    <option value="suspend">暂停服务</option>
+                    <option value="extend_grace">延长宽限期</option>
+                    <option value="manual_refund">手动退款</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>动作详情</label>
+                <textarea id="dgDetails" placeholder="描述具体操作..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>执行人</label>
+                <input type="text" id="dgExecutedBy" placeholder="操作员姓名">
+            </div>
+            <div class="form-group">
+                <label>收入影响 (元)</label>
+                <input type="number" id="dgRevenueImpact" step="0.01" placeholder="-99.00">
+            </div>
+            <div class="form-group">
+                <label>备注</label>
+                <textarea id="dgNotes" placeholder="其他备注..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('downgradeModal')">取消</button>
+                <button class="btn btn-warning" onclick="executeDowngrade()">执行降级</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5000/api';
+        let plans = [];
+        let strategies = [];
+        let currentEvent = null;
+        
+        async function init() {
+            await loadPlans();
+            await loadStrategies();
+            await loadDashboard();
+            await loadEvents();
+        }
+        
+        async function loadPlans() {
+            const res = await fetch(`${API_BASE}/plans`);
+            plans = await res.json();
+            const select = document.getElementById('planId');
+            plans.forEach(p => {
+                select.innerHTML += `<option value="${p.plan_id}">${p.name} (¥${p.price})</option>`;
+            });
+        }
+        
+        async function loadStrategies() {
+            const res = await fetch(`${API_BASE}/retry-strategies`);
+            strategies = await res.json();
+            const select = document.getElementById('retryStrategy');
+            strategies.forEach(s => {
+                select.innerHTML += `<option value="${s.name}">${s.description}</option>`;
+            });
+        }
+        
+        async function loadDashboard() {
+            const res = await fetch(`${API_BASE}/dashboard`);
+            const data = await res.json();
+            document.getElementById('totalEvents').textContent = data.total_events;
+            document.getElementById('successEvents').textContent = data.success_events;
+            document.getElementById('failedEvents').textContent = data.failed_events;
+            document.getElementById('pendingEvents').textContent = data.pending_events;
+            document.getElementById('totalDowngrades').textContent = data.total_downgrades;
+            document.getElementById('revenueLost').textContent = data.revenue_lost.toFixed(2);
+        }
+        
+        async function loadEvents(search = '', status = '') {
+            let url = `${API_BASE}/charge-events`;
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (params.toString()) url += '?' + params.toString();
+            
+            const res = await fetch(url);
+            const events = await res.json();
+            
+            const tbody = document.getElementById('eventsBody');
+            tbody.innerHTML = events.map(e => {
+                const statusClass = e.status === 'success' ? 'status-success' : 
+                                   e.status === 'failed' ? 'status-failed' : 'status-pending';
+                const needDowngrade = e.status === 'failed' && e.attempt_count >= e.max_attempts;
+                const graceWarning = needDowngrade ? '<span class="warning-badge">需降级</span>' : '';
+                
+                return `
+                    <tr>
+                        <td><code>${e.event_id}</code></td>
+                        <td>${e.user_name}<br><small>${e.user_id}</small></td>
+                        <td>${e.owner}</td>
+                        <td>${e.plan_id}</td>
+                        <td>¥${e.amount.toFixed(2)}</td>
+                        <td><span class="status ${statusClass}">${e.status}</span>${graceWarning}</td>
+                        <td>${e.attempt_count}/${e.max_attempts}<br><small>${e.retry_strategy}</small></td>
+                        <td class="${needDowngrade ? 'grace-warning' : ''}">${e.grace_period_end ? new Date(e.grace_period_end).toLocaleDateString() : '-'}</td>
+                        <td><small>${e.failure_reason || '-'}</small></td>
+                        <td>
+                            <div class="action-buttons">
+                                ${needDowngrade ? `<button class="action-btn downgrade" onclick="openDowngradeModal('${e.event_id}', '${e.subscription_id}', '${e.user_id}')">降级</button>` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function loadDowngrades() {
+            const res = await fetch(`${API_BASE}/downgrade-actions`);
+            const actions = await res.json();
+            
+            const tbody = document.getElementById('downgradesBody');
+            tbody.innerHTML = actions.map(a => `
+                <tr>
+                    <td><code>${a.action_id}</code></td>
+                    <td><code>${a.charge_event_id}</code></td>
+                    <td>${a.subscription_id}</td>
+                    <td>${a.action_type}</td>
+                    <td><small>${a.action_details || '-'}</small></td>
+                    <td>${a.executed_by}</td>
+                    <td>${new Date(a.executed_at).toLocaleString()}</td>
+                    <td style="color: ${a.revenue_impact < 0 ? '#e53e3e' : '#38a169'}">¥${a.revenue_impact.toFixed(2)}</td>
+                    <td><small>${a.notes || '-'}</small></td>
+                </tr>
+            `).join('');
+        }
+        
+        function searchEvents() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            loadEvents(search, status);
+        }
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (tab === 'events') {
+                document.getElementById('eventsToolbar').style.display = 'flex';
+                document.getElementById('downgradesToolbar').style.display = 'none';
+                document.getElementById('eventsTable').style.display = 'block';
+                document.getElementById('downgradesTable').style.display = 'none';
+                loadEvents();
+            } else {
+                document.getElementById('eventsToolbar').style.display = 'none';
+                document.getElementById('downgradesToolbar').style.display = 'flex';
+                document.getElementById('eventsTable').style.display = 'none';
+                document.getElementById('downgradesTable').style.display = 'block';
+                loadDowngrades();
+            }
+        }
+        
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+        
+        function openBatchModal() {
+            document.getElementById('batchModal').classList.add('active');
+            document.getElementById('batchResults').style.display = 'none';
+        }
+        
+        function openDowngradeModal(eventId, subscriptionId, userId) {
+            document.getElementById('dgEventId').value = eventId;
+            document.getElementById('dgSubscriptionId').value = subscriptionId;
+            currentEvent = { eventId, subscriptionId, userId };
+            document.getElementById('downgradeModal').classList.add('active');
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        
+        async function addEvent() {
+            const data = {
+                event_id: document.getElementById('eventId').value,
+                subscription_id: document.getElementById('subscriptionId').value,
+                user_id: document.getElementById('userId').value,
+                user_name: document.getElementById('userName').value,
+                owner: document.getElementById('owner').value,
+                plan_id: document.getElementById('planId').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                status: document.getElementById('status').value,
+                failure_reason: document.getElementById('failureReason').value,
+                attempt_count: parseInt(document.getElementById('attemptCount').value),
+                max_attempts: parseInt(document.getElementById('maxAttempts').value),
+                retry_strategy: document.getElementById('retryStrategy').value,
+                charge_time: new Date().toISOString()
+            };
+            
+            const res = await fetch(`${API_BASE}/charge-events`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            if (result.errors) {
+                alert('错误: ' + result.errors.join(', '));
+            } else {
+                if (result.warnings && result.warnings.length) {
+                    alert('警告: ' + result.warnings.join(', '));
+                }
+                closeModal('addModal');
+                loadEvents();
+                loadDashboard();
+            }
+        }
+        
+        async function batchImport() {
+            const rawData = document.getElementById('batchData').value;
+            let dataList;
+            try {
+                dataList = JSON.parse(rawData);
+            } catch (e) {
+                alert('JSON格式错误: ' + e.message);
+                return;
+            }
+            
+            const res = await fetch(`${API_BASE}/charge-events/batch`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataList)
+            });
+            
+            const results = await res.json();
+            const resultsArea = document.getElementById('batchResults');
+            resultsArea.style.display = 'block';
+            resultsArea.innerHTML = results.map((r, i) => `
+                <div class="result-item ${r.success ? 'success' : 'error'}">
+                    #${i + 1}: ${r.item.event_id} - ${r.success ? '成功' : '失败: ' + r.errors.join(', ')}
+                    ${r.warnings ? '<br>警告: ' + r.warnings.join(', ') : ''}
+                </div>
+            `).join('');
+            
+            loadEvents();
+            loadDashboard();
+        }
+        
+        async function executeDowngrade() {
+            const data = {
+                action_id: 'DG_' + Date.now(),
+                charge_event_id: document.getElementById('dgEventId').value,
+                subscription_id: document.getElementById('dgSubscriptionId').value,
+                user_id: currentEvent.userId,
+                action_type: document.getElementById('dgActionType').value,
+                action_details: document.getElementById('dgDetails').value,
+                executed_by: document.getElementById('dgExecutedBy').value || '系统',
+                revenue_impact: parseFloat(document.getElementById('dgRevenueImpact').value) || 0,
+                notes: document.getElementById('dgNotes').value
+            };
+            
+            const res = await fetch(`${API_BASE}/downgrade-actions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            if (result.errors) {
+                alert('错误: ' + result.errors.join(', '));
+            } else {
+                closeModal('downgradeModal');
+                loadDowngrades();
+                loadDashboard();
+            }
+        }
+        
+        function exportReport() {
+            window.open(`${API_BASE}/report/export`, '_blank');
+        }
+        
+        init();
+    </script>
+</body>
+</html>
