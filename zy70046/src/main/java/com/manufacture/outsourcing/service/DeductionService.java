@@ -8,6 +8,7 @@ import com.manufacture.outsourcing.entity.OperationLog;
 import com.manufacture.outsourcing.exception.BusinessException;
 import com.manufacture.outsourcing.repository.DeductionRecordRepository;
 import com.manufacture.outsourcing.repository.DeductionRuleRepository;
+import com.manufacture.outsourcing.repository.InspectionResultRepository;
 import com.manufacture.outsourcing.util.NoGenerator;
 import com.manufacture.outsourcing.util.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +25,16 @@ public class DeductionService {
 
     private final DeductionRecordRepository deductionRecordRepository;
     private final DeductionRuleRepository deductionRuleRepository;
-    private final InspectionService inspectionService;
+    private final InspectionResultRepository inspectionResultRepository;
     private final OperationLogService logService;
 
     public DeductionService(DeductionRecordRepository deductionRecordRepository,
                             DeductionRuleRepository deductionRuleRepository,
-                            InspectionService inspectionService,
+                            InspectionResultRepository inspectionResultRepository,
                             OperationLogService logService) {
         this.deductionRecordRepository = deductionRecordRepository;
         this.deductionRuleRepository = deductionRuleRepository;
-        this.inspectionService = inspectionService;
+        this.inspectionResultRepository = inspectionResultRepository;
         this.logService = logService;
     }
 
@@ -50,7 +51,8 @@ public class DeductionService {
 
     @Transactional
     public DeductionRecord createDeductionRecord(DeductionRecordRequest request) {
-        InspectionResult inspection = inspectionService.getById(request.getInspectionResultId());
+        InspectionResult inspection = inspectionResultRepository.findById(request.getInspectionResultId())
+                .orElseThrow(() -> BusinessException.notFound("验收记录不存在"));
 
         DeductionRecord record = new DeductionRecord();
         record.setRecordNo(NoGenerator.generateDeductionNo());

@@ -23,19 +23,16 @@ public class InspectionService {
     private final InspectionResultRepository inspectionRepository;
     private final DeliveryBatchService batchService;
     private final OperationLogService logService;
-    private final DeductionService deductionService;
-    private final ReplenishmentService replenishmentService;
+    private final InspectionStatisticsService statisticsService;
 
     public InspectionService(InspectionResultRepository inspectionRepository,
                               DeliveryBatchService batchService,
                               OperationLogService logService,
-                              DeductionService deductionService,
-                              ReplenishmentService replenishmentService) {
+                              InspectionStatisticsService statisticsService) {
         this.inspectionRepository = inspectionRepository;
         this.batchService = batchService;
         this.logService = logService;
-        this.deductionService = deductionService;
-        this.replenishmentService = replenishmentService;
+        this.statisticsService = statisticsService;
     }
 
     @Transactional
@@ -234,8 +231,8 @@ public class InspectionService {
 
     private void updateBatchStatistics(InspectionResult result) {
         DeliveryBatch batch = result.getBatch();
-        BigDecimal deductionAmount = deductionService.calculateDeductionAmountForInspection(result);
-        BigDecimal replenishmentQuantity = replenishmentService.calculateReplenishmentQuantityForInspection(result);
+        BigDecimal deductionAmount = statisticsService.calculateDeductionAmountForInspection(result);
+        BigDecimal replenishmentQuantity = statisticsService.calculateReplenishmentQuantityForInspection(result);
 
         batchService.updateBatchAfterInspection(
                 batch.getId(),

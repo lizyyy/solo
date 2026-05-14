@@ -7,6 +7,7 @@ import com.manufacture.outsourcing.entity.OperationLog;
 import com.manufacture.outsourcing.entity.OutsourcingOrder;
 import com.manufacture.outsourcing.entity.ReplenishmentTask;
 import com.manufacture.outsourcing.exception.BusinessException;
+import com.manufacture.outsourcing.repository.InspectionResultRepository;
 import com.manufacture.outsourcing.repository.ReplenishmentTaskRepository;
 import com.manufacture.outsourcing.util.NoGenerator;
 import com.manufacture.outsourcing.util.SecurityUtil;
@@ -23,14 +24,14 @@ import java.util.List;
 public class ReplenishmentService {
 
     private final ReplenishmentTaskRepository replenishmentTaskRepository;
-    private final InspectionService inspectionService;
+    private final InspectionResultRepository inspectionResultRepository;
     private final OperationLogService logService;
 
     public ReplenishmentService(ReplenishmentTaskRepository replenishmentTaskRepository,
-                                 InspectionService inspectionService,
+                                 InspectionResultRepository inspectionResultRepository,
                                  OperationLogService logService) {
         this.replenishmentTaskRepository = replenishmentTaskRepository;
-        this.inspectionService = inspectionService;
+        this.inspectionResultRepository = inspectionResultRepository;
         this.logService = logService;
     }
 
@@ -44,7 +45,8 @@ public class ReplenishmentService {
 
     @Transactional
     public ReplenishmentTask createTask(ReplenishmentRequest request) {
-        InspectionResult inspection = inspectionService.getById(request.getInspectionResultId());
+        InspectionResult inspection = inspectionResultRepository.findById(request.getInspectionResultId())
+                .orElseThrow(() -> BusinessException.notFound("验收记录不存在"));
 
         if (!InspectionResult.STATUS_COMPLETED.equals(inspection.getResultStatus()) &&
             !InspectionResult.STATUS_CONFIRMED.equals(inspection.getResultStatus())) {

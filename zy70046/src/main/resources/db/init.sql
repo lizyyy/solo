@@ -1,9 +1,14 @@
 -- 外协加工入库验收服务 数据库初始化脚本
-
--- 创建数据库
-CREATE DATABASE IF NOT EXISTS outsourcing_inspection 
-    DEFAULT CHARACTER SET utf8mb4 
-    DEFAULT COLLATE utf8mb4_unicode_ci;
+-- 
+-- 重要说明：
+-- 本项目使用 JPA 的 ddl-auto=update 配置，首次启动时会自动创建所有表结构。
+-- 你有两种初始化方式：
+-- 
+-- 方式一（推荐）：先启动应用让 JPA 自动建表，然后再执行此脚本插入初始数据
+-- 方式二：先执行 db/schema.sql 创建表，再执行本脚本插入数据
+-- 
+-- 本脚本仅包含数据插入语句，不包含建表语句。
+-- 如需完整建表 + 数据初始化，请使用 db/schema_and_data.sql
 
 USE outsourcing_inspection;
 
@@ -34,6 +39,5 @@ INSERT INTO deduction_rules (rule_code, rule_name, supplier_id, defect_type, cal
 VALUES 
 ('RULE001', '外观不良扣款规则', NULL, '外观不良', '按比例扣款', 5.0000, 20.0000, NULL, 10.00, '外观不良比例在5%-20%之间按实际比例扣款', 1, NOW(), NOW()),
 ('RULE002', '尺寸超差扣款规则', NULL, '尺寸超差', '按比例扣款', 10.0000, 50.0000, NULL, 5.00, '尺寸超差按10%-50%比例扣款', 1, NOW(), NOW()),
-('RULE003', '功能缺陷扣款规则', NULL, '功能缺陷', '倍数扣款', 100.0000, 300.0000, NULL, 1.00, '功能缺陷按1-3倍货款扣款', 1, NOW(), NOW()),
-('RULE004', 'SUP001专属扣款规则', 1, '其他问题', '固定金额扣款', NULL, NULL, 500.00, NULL, '针对SUP001供应商的固定金额扣款', 1, NOW(), NOW())
+('RULE003', '功能缺陷扣款规则', NULL, '功能缺陷', '倍数扣款', 100.0000, 300.0000, NULL, 1.00, '功能缺陷按1-3倍货款扣款', 1, NOW(), NOW())
 ON DUPLICATE KEY UPDATE updated_at = NOW();

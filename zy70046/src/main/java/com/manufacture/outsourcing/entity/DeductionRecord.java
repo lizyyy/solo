@@ -83,6 +83,9 @@ public class DeductionRecord {
     @Column(columnDefinition = "TEXT")
     private String retryDescription;
 
+    @Column
+    private Integer retryCount = 0;
+
     public static final String STATUS_PENDING = "待审批";
     public static final String STATUS_APPROVED = "已审批";
     public static final String STATUS_REJECTED = "已驳回";
