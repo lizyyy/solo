@@ -16,9 +16,11 @@ const exportPath = process.env.EXPORT_PATH || './exports';
 if (!fs.existsSync(archivePath)) fs.mkdirSync(archivePath, { recursive: true });
 if (!fs.existsSync(exportPath)) fs.mkdirSync(exportPath, { recursive: true });
 
+const RETENTION_DAYS = 30;
+
 router.post('/candidates', async (req, res) => {
   try {
-    const { startDate, endDate, includeDirty, operatorId, operatorName } = req.body;
+    const { startDate, endDate, includeDirty, operatorId, operatorName, retentionDays } = req.body;
 
     if (!operatorId || !operatorName) {
       return res.status(400).json({
@@ -27,12 +29,15 @@ router.post('/candidates', async (req, res) => {
       } as ApiResponse);
     }
 
+    const effectiveRetentionDays = retentionDays || RETENTION_DAYS;
+    const expirationDate = moment().subtract(effectiveRetentionDays, 'days').format('YYYY-MM-DD');
+
     let sql = `
       SELECT id, date, engineer_name, risk_type, anomaly_type, is_dirty, remarks
       FROM duty_records
-      WHERE archived = 0
+      WHERE archived = 0 AND date <= ?
     `;
-    const params: any[] = [];
+    const params: any[] = [expirationDate];
 
     if (startDate) {
       sql += ` AND date >= ?`;
@@ -49,6 +54,10 @@ router.post('/candidates', async (req, res) => {
     sql += ` ORDER BY date DESC`;
 
     const candidates = await allQuery(sql, params);
+
+    let allSql = `SELECT COUNT(*) as total FROM duty_records WHERE archived = 0`;
+    const allCountResult = await getQuery(allSql, []);
+    const excludedCount = allCountResult.total - candidates.length;
 
     const batchNo = `ARCH-${moment().format('YYYYMMDD')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
     const batchId = uuidv4();
@@ -84,7 +93,10 @@ router.post('/candidates', async (req, res) => {
       data: {
         batchId,
         batchNo,
-        totalCount: candidates.length,
+        retentionDays: effectiveRetentionDays,
+        expirationDate,
+        totalCandidateCount: candidates.length,
+        excludedDueToNotExpired: excludedCount,
         candidates: candidates.map((c: any) => ({
           recordId: c.id,
           date: c.date,
@@ -291,10 +303,17 @@ router.post('/export/:batchId', async (req, res) => {
   }
 });
 
-router.post('/rollback/:batchId', async (req, res) => {
+router.post('/rollback-candidates/:batchId', async (req, res) => {
   try {
     const { batchId } = req.params;
     const { operatorId, operatorName, recordIds } = req.body;
+
+    if (!operatorId || !operatorName) {
+      return res.status(400).json({
+        success: false,
+        error: '缺少操作者信息',
+      } as ApiResponse);
+    }
 
     const batch = await getQuery('SELECT * FROM archive_batches WHERE id = ?', [batchId]);
     if (!batch) {
@@ -305,16 +324,112 @@ router.post('/rollback/:batchId', async (req, res) => {
     if (recordIds && recordIds.length > 0) {
       const placeholders = recordIds.map(() => '?').join(',');
       details = await allQuery(
-        `SELECT * FROM archive_details WHERE batch_id = ? AND record_id IN (${placeholders})`,
+        `SELECT d.*, r.date, r.engineer_name, r.risk_type, r.anomaly_type, r.is_dirty 
+         FROM archive_details d
+         JOIN duty_records r ON d.record_id = r.id
+         WHERE d.batch_id = ? AND d.record_id IN (${placeholders})`,
         [batchId, ...recordIds]
       );
     } else {
-      details = await allQuery('SELECT * FROM archive_details WHERE batch_id = ?', [batchId]);
+      details = await allQuery(`
+        SELECT d.*, r.date, r.engineer_name, r.risk_type, r.anomaly_type, r.is_dirty 
+        FROM archive_details d
+        JOIN duty_records r ON d.record_id = r.id
+        WHERE d.batch_id = ?`,
+        [batchId]
+      );
     }
 
     if (details.length === 0) {
       return res.status(400).json({ success: false, error: '没有可回滚的记录' } as ApiResponse);
     }
+
+    const rollbackCandidateId = uuidv4();
+    
+    await runQuery(
+      `INSERT INTO operation_logs (id, batch_id, operation_type, operator_id, operator_name, remarks, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [rollbackCandidateId, batchId, 'rollback_candidate', operatorId, operatorName, 
+       JSON.stringify({ recordIds: details.map((d: any) => d.record_id), status: 'pending' }), 
+       moment().toISOString()]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        rollbackCandidateId,
+        batchId,
+        batchNo: batch.batch_no,
+        totalCandidates: details.length,
+        candidates: details.map((d: any) => ({
+          detailId: d.id,
+          recordId: d.record_id,
+          date: d.date,
+          engineerName: d.engineer_name,
+          riskType: d.risk_type,
+          anomalyType: d.anomaly_type,
+          isDirty: d.is_dirty === 1,
+          archiveStatus: d.status,
+        })),
+        warning: '请确认以上回滚清单无误后，调用 /rollback-execute 接口并传入 rollbackCandidateId 执行回滚',
+      },
+    } as ApiResponse);
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    } as ApiResponse);
+  }
+});
+
+router.post('/rollback-execute/:batchId', async (req, res) => {
+  try {
+    const { batchId } = req.params;
+    const { operatorId, operatorName, rollbackCandidateId } = req.body;
+
+    if (!rollbackCandidateId) {
+      return res.status(400).json({
+        success: false,
+        error: '必须先调用 /rollback-candidates 生成回滚候选清单，并传入 rollbackCandidateId',
+      } as ApiResponse);
+    }
+
+    if (!operatorId || !operatorName) {
+      return res.status(400).json({
+        success: false,
+        error: '缺少操作者信息',
+      } as ApiResponse);
+    }
+
+    const candidateLog = await getQuery(
+      `SELECT * FROM operation_logs WHERE id = ? AND batch_id = ? AND operation_type = ?`,
+      [rollbackCandidateId, batchId, 'rollback_candidate']
+    );
+
+    if (!candidateLog) {
+      return res.status(400).json({ success: false, error: '回滚候选清单不存在或已过期' } as ApiResponse);
+    }
+
+    const candidateData = JSON.parse(candidateLog.remarks || '{}');
+    if (candidateData.status === 'executed') {
+      return res.status(400).json({ success: false, error: '该回滚候选清单已执行过' } as ApiResponse);
+    }
+
+    const recordIds = candidateData.recordIds || [];
+    if (recordIds.length === 0) {
+      return res.status(400).json({ success: false, error: '回滚候选清单为空' } as ApiResponse);
+    }
+
+    const batch = await getQuery('SELECT * FROM archive_batches WHERE id = ?', [batchId]);
+    if (!batch) {
+      return res.status(404).json({ success: false, error: '批次不存在' } as ApiResponse);
+    }
+
+    const placeholders = recordIds.map(() => '?').join(',');
+    const details = await allQuery(
+      `SELECT * FROM archive_details WHERE batch_id = ? AND record_id IN (${placeholders})`,
+      [batchId, ...recordIds]
+    );
 
     let successCount = 0;
     let failCount = 0;
@@ -333,18 +448,27 @@ router.post('/rollback/:batchId', async (req, res) => {
     }
 
     await runQuery(
-      `INSERT INTO operation_logs (id, batch_id, operation_type, operator_id, operator_name, created_at)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [uuidv4(), batchId, 'rollback', operatorId, operatorName, moment().toISOString()]
+      `UPDATE operation_logs SET remarks = ? WHERE id = ?`,
+      [JSON.stringify({ ...candidateData, status: 'executed' }), rollbackCandidateId]
+    );
+
+    await runQuery(
+      `INSERT INTO operation_logs (id, batch_id, operation_type, operator_id, operator_name, remarks, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [uuidv4(), batchId, 'rollback_executed', operatorId, operatorName,
+       JSON.stringify({ rollbackCandidateId, successCount, failCount }),
+       moment().toISOString()]
     );
 
     res.json({
       success: true,
       data: {
         batchId,
+        rollbackCandidateId,
         totalRollback: details.length,
         successCount,
         failCount,
+        message: '回滚已执行，所有操作均已留痕',
       },
     } as ApiResponse);
   } catch (error: any) {

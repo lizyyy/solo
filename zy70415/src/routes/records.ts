@@ -67,6 +67,10 @@ router.get('/', async (req, res) => {
           archiveBatchId: r.archive_batch_id,
           isDirty: r.is_dirty === 1,
           remarks: r.remarks,
+          manuallyReviewed: r.manually_reviewed === 1,
+          reviewedBy: r.reviewed_by,
+          reviewedAt: r.reviewed_at,
+          manualReviewNote: r.manual_review_note,
         })),
         total: countResult.total,
         page: Number(page),
@@ -80,6 +84,8 @@ router.get('/', async (req, res) => {
     } as ApiResponse);
   }
 });
+
+const SYSTEM_JUDGMENT_FIELDS = ['riskType', 'anomalyType', 'isDirty', 'mergeError'];
 
 router.post('/correct/:recordId', async (req, res) => {
   try {
@@ -98,29 +104,32 @@ router.post('/correct/:recordId', async (req, res) => {
       return res.status(404).json({ success: false, error: '记录不存在' } as ApiResponse);
     }
 
+    if (corrections) {
+      const attemptedSystemFields = SYSTEM_JUDGMENT_FIELDS.filter(
+        field => corrections[field] !== undefined
+      );
+      if (attemptedSystemFields.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: `不能直接修改系统判断字段: ${attemptedSystemFields.join(', ')}。如需标记人工复核状态，请使用 manualReviewNote 字段`,
+        } as ApiResponse);
+      }
+    }
+
     const updateFields: string[] = [];
     const updateValues: any[] = [];
+    const appliedCorrections: any = {};
 
     if (corrections) {
-      if (corrections.riskType !== undefined) {
-        updateFields.push('risk_type = ?');
-        updateValues.push(corrections.riskType);
-      }
-      if (corrections.anomalyType !== undefined) {
-        updateFields.push('anomaly_type = ?');
-        updateValues.push(corrections.anomalyType);
-      }
-      if (corrections.isDirty !== undefined) {
-        updateFields.push('is_dirty = ?');
-        updateValues.push(corrections.isDirty ? 1 : 0);
-      }
-      if (corrections.mergeError !== undefined) {
-        updateFields.push('merge_error = ?');
-        updateValues.push(corrections.mergeError ? 1 : 0);
-      }
       if (corrections.status !== undefined) {
         updateFields.push('status = ?');
         updateValues.push(corrections.status);
+        appliedCorrections.status = corrections.status;
+      }
+      if (corrections.manualReviewNote !== undefined) {
+        updateFields.push('manual_review_note = ?');
+        updateValues.push(corrections.manualReviewNote);
+        appliedCorrections.manualReviewNote = corrections.manualReviewNote;
       }
     }
 
@@ -131,6 +140,12 @@ router.post('/correct/:recordId', async (req, res) => {
     
     updateFields.push('remarks = ?');
     updateValues.push(newRemarks);
+    updateFields.push('manually_reviewed = ?');
+    updateValues.push(1);
+    updateFields.push('reviewed_by = ?');
+    updateValues.push(operatorName);
+    updateFields.push('reviewed_at = ?');
+    updateValues.push(moment().toISOString());
     updateFields.push('updated_at = ?');
     updateValues.push(moment().toISOString());
 
@@ -141,6 +156,13 @@ router.post('/correct/:recordId', async (req, res) => {
       );
     }
 
+    const systemJudgmentBackup = {
+      originalRiskType: record.risk_type,
+      originalAnomalyType: record.anomaly_type,
+      originalIsDirty: record.is_dirty,
+      originalMergeError: record.merge_error,
+    };
+
     await runQuery(
       `INSERT INTO operation_logs (
         id, operation_type, operator_id, operator_name, record_id,
@@ -148,7 +170,8 @@ router.post('/correct/:recordId', async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         uuidv4(), 'manual_correction', operatorId, operatorName, recordId,
-        JSON.stringify(record), JSON.stringify({ ...record, ...corrections, remarks: newRemarks }),
+        JSON.stringify({ ...record, ...systemJudgmentBackup }), 
+        JSON.stringify({ ...record, ...appliedCorrections, remarks: newRemarks, manuallyReviewed: true }),
         remarks, moment().toISOString(),
       ]
     );
@@ -160,8 +183,17 @@ router.post('/correct/:recordId', async (req, res) => {
       data: {
         id: updatedRecord.id,
         remarks: updatedRecord.remarks,
+        manuallyReviewed: true,
+        reviewedBy: operatorName,
+        reviewedAt: moment().toISOString(),
+        systemJudgmentPreserved: {
+          riskType: record.risk_type,
+          anomalyType: record.anomaly_type,
+          isDirty: record.is_dirty === 1,
+          mergeError: record.merge_error === 1,
+        },
       },
-      message: '人工修正已记录',
+      message: '人工修正已记录，系统判断字段已保留原值，仅添加复核标记',
     } as ApiResponse);
   } catch (error: any) {
     res.status(500).json({

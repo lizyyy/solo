@@ -37,8 +37,29 @@ function initTables() {
       archived BOOLEAN DEFAULT 0,
       archive_batch_id TEXT,
       is_dirty BOOLEAN DEFAULT 0,
-      remarks TEXT
+      remarks TEXT,
+      manually_reviewed BOOLEAN DEFAULT 0,
+      reviewed_by TEXT,
+      reviewed_at TEXT,
+      manual_review_note TEXT
     )`);
+
+    db.all(`PRAGMA table_info(duty_records)`, (err: Error | null, rows: any) => {
+      if (err || !rows) return;
+      const columns = (rows as any[]).map((r: any) => r.name);
+      if (!columns.includes('manually_reviewed')) {
+        db.run(`ALTER TABLE duty_records ADD COLUMN manually_reviewed BOOLEAN DEFAULT 0`);
+      }
+      if (!columns.includes('reviewed_by')) {
+        db.run(`ALTER TABLE duty_records ADD COLUMN reviewed_by TEXT`);
+      }
+      if (!columns.includes('reviewed_at')) {
+        db.run(`ALTER TABLE duty_records ADD COLUMN reviewed_at TEXT`);
+      }
+      if (!columns.includes('manual_review_note')) {
+        db.run(`ALTER TABLE duty_records ADD COLUMN manual_review_note TEXT`);
+      }
+    });
 
     db.run(`CREATE TABLE IF NOT EXISTS archive_batches (
       id TEXT PRIMARY KEY,
