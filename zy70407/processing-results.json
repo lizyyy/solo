@@ -1,0 +1,496 @@
+{
+  "results": [
+    {
+      "batchId": "BATCH-2024-001",
+      "ticketId": "TICKET-2024-001",
+      "processedAt": "2026-05-14T17:12:25.315Z",
+      "processingDurationMs": 0,
+      "originalStatus": "in_progress",
+      "finalStatus": "blocked",
+      "timeline": {
+        "batchId": "BATCH-2024-001",
+        "ticketId": "TICKET-2024-001",
+        "events": [
+          {
+            "id": "0dc3047b-8f5e-4444-8006-2a09ee0471ef",
+            "timestamp": "2026-05-14T09:12:25.314Z",
+            "eventType": "submit",
+            "source": "workflow_system",
+            "actor": {
+              "id": "EMP-001",
+              "name": "张三",
+              "role": "研发工程师"
+            },
+            "action": "提交申请",
+            "details": "",
+            "rawLog": {
+              "id": "b23610f7-61ae-46be-b468-eff2fa12fa7c",
+              "batchId": "BATCH-2024-001",
+              "source": "workflow_system",
+              "eventType": "submit",
+              "timestamp": "2026-05-14T09:12:25.314Z",
+              "operatorId": "EMP-001",
+              "operatorName": "张三",
+              "operatorRole": "研发工程师",
+              "metadata": {
+                "department": "技术部",
+                "ip": "192.168.1.100"
+              },
+              "rawContent": "用户张三提交了生产数据库临时权限申请，有效期7天，访问范围为订单表和用户表"
+            }
+          },
+          {
+            "id": "add2543c-f36a-4ffe-872a-d0bf19937e2d",
+            "timestamp": "2026-05-14T09:17:25.314Z",
+            "eventType": "assign",
+            "source": "approval_portal",
+            "actor": {
+              "id": "SYSTEM-001",
+              "name": "工作流系统",
+              "role": "系统"
+            },
+            "action": "分配审批人",
+            "details": "分配给: 李四",
+            "rawLog": {
+              "id": "24b34180-59bb-4dd1-b242-44d7d13af894",
+              "batchId": "BATCH-2024-001",
+              "source": "approval_portal",
+              "eventType": "assign",
+              "timestamp": "2026-05-14T09:17:25.314Z",
+              "operatorId": "SYSTEM-001",
+              "operatorName": "工作流系统",
+              "operatorRole": "系统",
+              "targetApproverId": "EMP-002",
+              "targetApproverName": "李四",
+              "metadata": {
+                "approvalLevel": 1
+              },
+              "rawContent": "系统自动分配给部门经理李四审批"
+            }
+          },
+          {
+            "id": "890c6feb-f3ab-44ed-b210-a5ae30eba09a",
+            "timestamp": "2026-05-14T09:42:25.314Z",
+            "eventType": "remind",
+            "source": "email_system",
+            "actor": {
+              "id": "SYSTEM-002",
+              "name": "邮件系统",
+              "role": "系统"
+            },
+            "action": "发送提醒",
+            "details": "",
+            "rawLog": {
+              "id": "6bce0a1e-b9c5-482c-bd6f-2d14032c40d6",
+              "batchId": "BATCH-2024-001",
+              "source": "email_system",
+              "eventType": "remind",
+              "timestamp": "2026-05-14T09:42:25.314Z",
+              "operatorId": "SYSTEM-002",
+              "operatorName": "邮件系统",
+              "operatorRole": "系统",
+              "targetApproverId": "EMP-002",
+              "targetApproverName": "李四",
+              "metadata": {
+                "emailId": "MAIL-12345"
+              },
+              "rawContent": "发送待审批提醒邮件给李四"
+            }
+          },
+          {
+            "id": "722b384e-fd98-484d-86bc-2dc0676455eb",
+            "timestamp": "2026-05-14T11:12:25.314Z",
+            "eventType": "approve",
+            "source": "approval_portal",
+            "actor": {
+              "id": "EMP-002",
+              "name": "李四",
+              "role": "技术部经理"
+            },
+            "action": "审批通过",
+            "details": "审批意见: 该申请为项目紧急需求，同意开通临时权限，请安全部门后续审计",
+            "approvalComment": "该申请为项目紧急需求，同意开通临时权限，请安全部门后续审计",
+            "rawLog": {
+              "id": "38c87c87-e1e1-4e91-971a-b8c6e85e5147",
+              "batchId": "BATCH-2024-001",
+              "source": "approval_portal",
+              "eventType": "approve",
+              "timestamp": "2026-05-14T11:12:25.314Z",
+              "operatorId": "EMP-002",
+              "operatorName": "李四",
+              "operatorRole": "技术部经理",
+              "approvalComment": "该申请为项目紧急需求，同意开通临时权限，请安全部门后续审计",
+              "metadata": {
+                "approvalTime": "2分30秒"
+              },
+              "rawContent": "李四审批通过，填写了审批意见"
+            }
+          },
+          {
+            "id": "be45add8-794f-4883-9db5-14ffd2dcb06e",
+            "timestamp": "2026-05-14T11:13:25.314Z",
+            "eventType": "assign",
+            "source": "approval_portal",
+            "actor": {
+              "id": "SYSTEM-001",
+              "name": "工作流系统",
+              "role": "系统"
+            },
+            "action": "分配审批人",
+            "details": "分配给: 王五",
+            "rawLog": {
+              "id": "1caa6962-b10b-4fda-857e-b4b968ab13ac",
+              "batchId": "BATCH-2024-001",
+              "source": "approval_portal",
+              "eventType": "assign",
+              "timestamp": "2026-05-14T11:13:25.314Z",
+              "operatorId": "SYSTEM-001",
+              "operatorName": "工作流系统",
+              "operatorRole": "系统",
+              "targetApproverId": "EMP-003",
+              "targetApproverName": "王五",
+              "metadata": {
+                "approvalLevel": 2
+              },
+              "rawContent": "流转到安全管理员王五进行二级审批"
+            }
+          },
+          {
+            "id": "f3dcf67f-f485-487a-abe4-04d3715e74bc",
+            "timestamp": "2026-05-14T13:12:25.314Z",
+            "eventType": "approve",
+            "source": "approval_portal",
+            "actor": {
+              "id": "EMP-003",
+              "name": "王五",
+              "role": "安全管理员"
+            },
+            "action": "审批通过",
+            "details": "无审批意见",
+            "rawLog": {
+              "id": "42c37456-01d5-4f96-8532-fa74fbb90ef6",
+              "batchId": "BATCH-2024-001",
+              "source": "approval_portal",
+              "eventType": "approve",
+              "timestamp": "2026-05-14T13:12:25.314Z",
+              "operatorId": "EMP-003",
+              "operatorName": "王五",
+              "operatorRole": "安全管理员",
+              "metadata": {
+                "approvalTime": "1分15秒"
+              },
+              "rawContent": "王五点击审批通过，但未填写审批意见"
+            }
+          }
+        ],
+        "startTime": "2026-05-14T09:12:25.314Z",
+        "endTime": "2026-05-14T13:12:25.314Z",
+        "totalDurationMs": 14400000
+      },
+      "ruleResults": [
+        {
+          "ruleId": "RULE-001",
+          "ruleVersion": "2.1.0",
+          "ruleName": "审批意见必填检查",
+          "passed": false,
+          "failureExplanation": "根据2024年1月15日生效的《审批管理规范V2.1》第3.2条规定：所有审批通过操作必须填写具体的审批意见，说明同意的理由或确认的内容。经核查，本批次中有审批记录仅点击了\"通过\"但未填写任何审批意见。",
+          "nextStepSuggestion": "请联系审批人补充填写审批意见，或通过工单系统提交审批意见补录申请（工单号需关联原始审批单号），经复核通过后可继续流程。",
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        },
+        {
+          "ruleId": "RULE-002",
+          "ruleVersion": "1.5.0",
+          "ruleName": "审批超时检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        }
+      ],
+      "blockReasons": [
+        "missing_approval_comment"
+      ],
+      "blockExplanations": [
+        "根据2024年1月15日生效的《审批管理规范V2.1》第3.2条规定：所有审批通过操作必须填写具体的审批意见，说明同意的理由或确认的内容。经核查，本批次中有审批记录仅点击了\"通过\"但未填写任何审批意见。"
+      ],
+      "isDuplicate": false,
+      "hasConflicts": false,
+      "nextSteps": [
+        "请联系审批人补充填写审批意见，或通过工单系统提交审批意见补录申请（工单号需关联原始审批单号），经复核通过后可继续流程。"
+      ],
+      "ruleSnapshotVersion": "UlVMRS0w"
+    },
+    {
+      "batchId": "BATCH-2024-002",
+      "ticketId": "TICKET-2024-002",
+      "processedAt": "2026-05-14T17:12:25.315Z",
+      "processingDurationMs": 0,
+      "originalStatus": "in_progress",
+      "finalStatus": "approved",
+      "timeline": {
+        "batchId": "BATCH-2024-002",
+        "ticketId": "TICKET-2024-002",
+        "events": [
+          {
+            "id": "cfb7d0ae-097f-42a3-81be-7c2354e2676b",
+            "timestamp": "2026-05-14T16:42:25.314Z",
+            "eventType": "submit",
+            "source": "workflow_system",
+            "actor": {
+              "id": "EMP-004",
+              "name": "赵六",
+              "role": "运维工程师"
+            },
+            "action": "提交申请",
+            "details": "",
+            "rawLog": {
+              "id": "31ea1660-e55d-4bdf-af3e-7f08762821b2",
+              "batchId": "BATCH-2024-002",
+              "source": "workflow_system",
+              "eventType": "submit",
+              "timestamp": "2026-05-14T16:42:25.314Z",
+              "operatorId": "EMP-004",
+              "operatorName": "赵六",
+              "operatorRole": "运维工程师",
+              "metadata": {
+                "department": "运维部",
+                "ip": "192.168.1.101"
+              },
+              "rawContent": "赵六提交了服务器登录临时权限申请"
+            }
+          },
+          {
+            "id": "c840e657-f1c2-4690-b4b6-f491653f0c9e",
+            "timestamp": "2026-05-14T16:47:25.314Z",
+            "eventType": "assign",
+            "source": "approval_portal",
+            "actor": {
+              "id": "SYSTEM-001",
+              "name": "工作流系统",
+              "role": "系统"
+            },
+            "action": "分配审批人",
+            "details": "分配给: 孙七",
+            "rawLog": {
+              "id": "b19245c8-c376-46a8-aab7-b37e9a7c89d9",
+              "batchId": "BATCH-2024-002",
+              "source": "approval_portal",
+              "eventType": "assign",
+              "timestamp": "2026-05-14T16:47:25.314Z",
+              "operatorId": "SYSTEM-001",
+              "operatorName": "工作流系统",
+              "operatorRole": "系统",
+              "targetApproverId": "EMP-005",
+              "targetApproverName": "孙七",
+              "metadata": {
+                "approvalLevel": 1
+              },
+              "rawContent": "分配给运维主管孙七审批"
+            }
+          },
+          {
+            "id": "ff4159aa-6cf1-4a1c-a289-99c1c415fee0",
+            "timestamp": "2026-05-14T17:02:25.314Z",
+            "eventType": "approve",
+            "source": "approval_portal",
+            "actor": {
+              "id": "EMP-005",
+              "name": "孙七",
+              "role": "运维主管"
+            },
+            "action": "审批通过",
+            "details": "审批意见: 同意，该服务器用于生产环境监控",
+            "approvalComment": "同意，该服务器用于生产环境监控",
+            "rawLog": {
+              "id": "69d6fdd0-185e-4413-8bb8-77dfad576529",
+              "batchId": "BATCH-2024-002",
+              "source": "approval_portal",
+              "eventType": "approve",
+              "timestamp": "2026-05-14T17:02:25.314Z",
+              "operatorId": "EMP-005",
+              "operatorName": "孙七",
+              "operatorRole": "运维主管",
+              "approvalComment": "同意，该服务器用于生产环境监控",
+              "metadata": {
+                "approvalTime": "45秒"
+              },
+              "rawContent": "孙七审批通过"
+            }
+          }
+        ],
+        "startTime": "2026-05-14T16:42:25.314Z",
+        "endTime": "2026-05-14T17:02:25.314Z",
+        "totalDurationMs": 1200000
+      },
+      "ruleResults": [
+        {
+          "ruleId": "RULE-001",
+          "ruleVersion": "2.1.0",
+          "ruleName": "审批意见必填检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        },
+        {
+          "ruleId": "RULE-002",
+          "ruleVersion": "1.5.0",
+          "ruleName": "审批超时检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        }
+      ],
+      "blockReasons": [],
+      "blockExplanations": [],
+      "isDuplicate": false,
+      "hasConflicts": false,
+      "nextSteps": [],
+      "ruleSnapshotVersion": "UlVMRS0w"
+    },
+    {
+      "batchId": "BATCH-2024-003",
+      "ticketId": "TICKET-2024-003",
+      "processedAt": "2026-05-14T17:12:25.315Z",
+      "processingDurationMs": 0,
+      "originalStatus": "approved",
+      "finalStatus": "blocked",
+      "timeline": {
+        "batchId": "BATCH-2024-003",
+        "ticketId": "TICKET-2024-003",
+        "events": [
+          {
+            "id": "4e89a20d-d601-4d02-a357-9ca8fb0046ae",
+            "timestamp": "2024-01-10T01:00:00.000Z",
+            "eventType": "submit",
+            "source": "workflow_system",
+            "actor": {
+              "id": "EMP-006",
+              "name": "周八",
+              "role": "数据分析师"
+            },
+            "action": "提交申请",
+            "details": "",
+            "rawLog": {
+              "id": "38d4715c-5b9a-4529-bd9c-431d0da61c64",
+              "batchId": "BATCH-2024-003",
+              "source": "workflow_system",
+              "eventType": "submit",
+              "timestamp": "2024-01-10T01:00:00.000Z",
+              "operatorId": "EMP-006",
+              "operatorName": "周八",
+              "operatorRole": "数据分析师",
+              "metadata": {
+                "department": "数据部"
+              },
+              "rawContent": "周八提交了数据报表访问权限申请"
+            }
+          },
+          {
+            "id": "47b2586b-c033-4dcb-812d-cff6d7c64c32",
+            "timestamp": "2024-01-10T02:30:00.000Z",
+            "eventType": "approve",
+            "source": "approval_portal",
+            "actor": {
+              "id": "EMP-007",
+              "name": "吴九",
+              "role": "数据部经理"
+            },
+            "action": "审批通过",
+            "details": "无审批意见",
+            "rawLog": {
+              "id": "d00d6ec4-b4f7-4107-9342-0bac2852f7f7",
+              "batchId": "BATCH-2024-003",
+              "source": "approval_portal",
+              "eventType": "approve",
+              "timestamp": "2024-01-10T02:30:00.000Z",
+              "operatorId": "EMP-007",
+              "operatorName": "吴九",
+              "operatorRole": "数据部经理",
+              "metadata": {},
+              "rawContent": "吴九审批通过，未填写意见（旧系统不强制要求）"
+            }
+          }
+        ],
+        "startTime": "2024-01-10T01:00:00.000Z",
+        "endTime": "2024-01-10T02:30:00.000Z",
+        "totalDurationMs": 5400000
+      },
+      "ruleResults": [
+        {
+          "ruleId": "RULE-001",
+          "ruleVersion": "2.1.0",
+          "ruleName": "审批意见必填检查",
+          "passed": false,
+          "failureExplanation": "根据2024年1月15日生效的《审批管理规范V2.1》第3.2条规定：所有审批通过操作必须填写具体的审批意见，说明同意的理由或确认的内容。经核查，本批次中有审批记录仅点击了\"通过\"但未填写任何审批意见。",
+          "nextStepSuggestion": "请联系审批人补充填写审批意见，或通过工单系统提交审批意见补录申请（工单号需关联原始审批单号），经复核通过后可继续流程。",
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        },
+        {
+          "ruleId": "RULE-002",
+          "ruleVersion": "1.5.0",
+          "ruleName": "审批超时检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        }
+      ],
+      "blockReasons": [
+        "missing_approval_comment"
+      ],
+      "blockExplanations": [
+        "根据2024年1月15日生效的《审批管理规范V2.1》第3.2条规定：所有审批通过操作必须填写具体的审批意见，说明同意的理由或确认的内容。经核查，本批次中有审批记录仅点击了\"通过\"但未填写任何审批意见。"
+      ],
+      "isDuplicate": false,
+      "hasConflicts": false,
+      "nextSteps": [
+        "请联系审批人补充填写审批意见，或通过工单系统提交审批意见补录申请（工单号需关联原始审批单号），经复核通过后可继续流程。"
+      ],
+      "ruleSnapshotVersion": "UlVMRS0w"
+    },
+    {
+      "batchId": "BATCH-2024-001-RESUBMIT",
+      "ticketId": "TICKET-2024-001",
+      "processedAt": "2026-05-14T17:12:25.315Z",
+      "processingDurationMs": 0,
+      "originalStatus": "in_progress",
+      "finalStatus": "approved",
+      "timeline": {
+        "batchId": "BATCH-2024-001-RESUBMIT",
+        "ticketId": "TICKET-2024-001",
+        "events": [],
+        "startTime": "2026-05-14T17:12:25.315Z"
+      },
+      "ruleResults": [
+        {
+          "ruleId": "RULE-001",
+          "ruleVersion": "2.1.0",
+          "ruleName": "审批意见必填检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        },
+        {
+          "ruleId": "RULE-002",
+          "ruleVersion": "1.5.0",
+          "ruleName": "审批超时检查",
+          "passed": true,
+          "evaluatedAt": "2026-05-14T17:12:25.315Z"
+        }
+      ],
+      "blockReasons": [],
+      "blockExplanations": [],
+      "isDuplicate": false,
+      "hasConflicts": false,
+      "nextSteps": [],
+      "ruleSnapshotVersion": "UlVMRS0w"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "435ebdad-2baf-4764-903d-a5fc4a1881eb",
+      "batchId": "BATCH-2024-001",
+      "reviewerId": "AUDITOR-001",
+      "reviewerName": "张经理",
+      "reviewedAt": "2026-05-14T17:14:23.761Z",
+      "reviewComment": "经核实流程合规，同意特批，已联系客服升级",
+      "reviewDecision": "escalate",
+      "escalationTicketId": "CS-2024-9999",
+      "originalResultId": "BATCH-2024-001"
+    }
+  ],
+  "exportedAt": "2026-05-14T17:14:23.762Z"
+}
