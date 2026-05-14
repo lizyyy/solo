@@ -1,6 +1,6 @@
 import { getDb } from '../database';
 import { v4 as uuidv4 } from 'uuid';
-import { TireStatus, Tire, TireEvent, TireLifecycleDetail } from '../types';
+import { TireStatus, Tire, TireEvent, TireLifecycleDetail, EventType } from '../types';
 
 const STATUS_TRANSITIONS: Record<TireStatus, TireStatus[]> = {
   in_stock: ['installed', 'inspecting', 'scrapped'],
@@ -14,9 +14,37 @@ const STATUS_TRANSITIONS: Record<TireStatus, TireStatus[]> = {
   scrapped: [],
 };
 
+const IDEMPOTENCY_WINDOW_MINUTES = 5;
+
 export class TireService {
   private validateTransition(currentStatus: TireStatus, nextStatus: TireStatus): boolean {
     return STATUS_TRANSITIONS[currentStatus]?.includes(nextStatus) ?? false;
+  }
+
+  private checkIdempotency(
+    tireId: string,
+    eventType: EventType,
+    fingerprint: string
+  ): boolean {
+    const db = getDb();
+    const cutoffTime = new Date(Date.now() - IDEMPOTENCY_WINDOW_MINUTES * 60 * 1000).toISOString();
+    
+    const existing = db.prepare(`
+      SELECT id FROM tire_events 
+      WHERE tire_id = ? 
+        AND event_type = ? 
+        AND notes LIKE ?
+        AND performed_at > ?
+      LIMIT 1
+    `).get(tireId, eventType, `%idempotency:${fingerprint}%`, cutoffTime);
+    
+    return !!existing;
+  }
+
+  private generateFingerprint(data: Record<string, any>): string {
+    const sortedKeys = Object.keys(data).sort();
+    const values = sortedKeys.map(k => String(data[k] ?? '')).join('|');
+    return Buffer.from(values).toString('base64').slice(0, 16);
   }
 
   getTireById(id: string): Tire | undefined {
@@ -65,10 +93,17 @@ export class TireService {
     return this.getTireById(id)!;
   }
 
-  private createEvent(data: Omit<TireEvent, 'id' | 'created_at'>): string {
+  private createEvent(
+    data: Omit<TireEvent, 'id' | 'created_at'>,
+    idempotencyKey?: string
+  ): string {
     const db = getDb();
     const id = uuidv4();
     const now = new Date().toISOString();
+    
+    const notesWithIdempotency = idempotencyKey 
+      ? `${data.notes || ''}\n[idempotency:${idempotencyKey}]`
+      : data.notes;
     
     db.prepare(`
       INSERT INTO tire_events (id, tire_id, event_type, vehicle_id, reason, inspection_result, inspection_notes, cost, cost_notes, performed_by, performed_at, notes, created_at)
@@ -76,7 +111,7 @@ export class TireService {
     `).run(
       id, data.tire_id, data.event_type, data.vehicle_id, data.reason,
       data.inspection_result, data.inspection_notes, data.cost, data.cost_notes,
-      data.performed_by, data.performed_at, data.notes, now
+      data.performed_by, data.performed_at, notesWithIdempotency, now
     );
 
     if (data.cost && data.cost > 0) {
@@ -121,7 +156,7 @@ export class TireService {
     }
 
     if (!this.validateTransition(tire.current_status, 'installed')) {
-      throw new Error(`不能从 ${tire.current_status} 状态直接装车`);
+      throw new Error(`当前状态 ${tire.current_status} 不允许装车`);
     }
 
     const vehicleTires = this.getAllTires({ vehicle_id: vehicleId });
@@ -184,6 +219,26 @@ export class TireService {
       throw new Error('已报废的轮胎不能检测');
     }
 
+    if (tire.current_status === 'installed') {
+      throw new Error('已装车的轮胎不能直接检测，请先拆下');
+    }
+
+    if (!['in_stock', 'removed', 'retread_completed'].includes(tire.current_status)) {
+      throw new Error(`当前状态 ${tire.current_status} 不允许检测`);
+    }
+
+    const fingerprint = this.generateFingerprint({
+      tireId,
+      result,
+      inspectionNotes,
+      cost: cost ?? 0,
+      performedBy: performedBy ?? '',
+    });
+
+    if (this.checkIdempotency(tireId, 'inspect', fingerprint)) {
+      throw new Error('5分钟内已对该轮胎执行过相同检测，请勿重复提交');
+    }
+
     const nextStatus = result === 'passed' ? 'inspection_passed' : 'inspection_failed';
 
     this.createEvent({
@@ -198,7 +253,7 @@ export class TireService {
       performed_at: new Date().toISOString(),
       notes: notes || null,
       reason: null,
-    });
+    }, fingerprint);
 
     this.updateTireStatus(tireId, nextStatus as TireStatus);
 
@@ -213,8 +268,27 @@ export class TireService {
       throw new Error('已报废的轮胎不能翻新');
     }
 
-    if (!['inspection_passed', 'inspection_failed', 'in_stock'].includes(tire.current_status)) {
-      throw new Error('当前状态不能送去翻新');
+    if (tire.current_status === 'installed') {
+      throw new Error('已装车的轮胎不能送翻新，请先拆下');
+    }
+
+    if (tire.current_status === 'retreading') {
+      throw new Error('该轮胎正在翻新中，不能重复送翻新');
+    }
+
+    if (!['inspection_passed', 'inspection_failed', 'in_stock', 'retread_completed'].includes(tire.current_status)) {
+      throw new Error(`当前状态 ${tire.current_status} 不允许送翻新`);
+    }
+
+    const fingerprint = this.generateFingerprint({
+      tireId,
+      cost,
+      performedBy: performedBy ?? '',
+      notes: notes ?? '',
+    });
+
+    if (this.checkIdempotency(tireId, 'send_retread', fingerprint)) {
+      throw new Error('5分钟内已对该轮胎执行过相同的送翻新操作，请勿重复提交');
     }
 
     this.createEvent({
@@ -229,9 +303,9 @@ export class TireService {
       reason: null,
       inspection_result: null,
       inspection_notes: null,
-    });
+    }, fingerprint);
 
-    this.updateTireStatus(tireId, 'retreading');
+    this.updateTireStatus(tireId, 'retreading', null);
 
     return this.getTireById(tireId)!;
   }
@@ -242,6 +316,16 @@ export class TireService {
 
     if (tire.current_status !== 'retreading') {
       throw new Error('只有正在翻新中的轮胎才能完成翻新');
+    }
+
+    const fingerprint = this.generateFingerprint({
+      tireId,
+      performedBy: performedBy ?? '',
+      notes: notes ?? '',
+    });
+
+    if (this.checkIdempotency(tireId, 'complete_retread', fingerprint)) {
+      throw new Error('5分钟内已对该轮胎执行过相同的完成翻新操作，请勿重复提交');
     }
 
     this.createEvent({
@@ -256,9 +340,9 @@ export class TireService {
       inspection_notes: null,
       cost: null,
       cost_notes: null,
-    });
+    }, fingerprint);
 
-    this.updateTireStatus(tireId, 'retread_completed');
+    this.updateTireStatus(tireId, 'retread_completed', null);
 
     return this.getTireById(tireId)!;
   }
@@ -271,10 +355,29 @@ export class TireService {
       throw new Error('该轮胎已报废');
     }
 
+    if (tire.current_status === 'installed') {
+      throw new Error('已装车的轮胎不能直接报废，请先拆下');
+    }
+
+    if (tire.current_status === 'retreading') {
+      throw new Error('正在翻新中的轮胎不能报废，请先完成翻新');
+    }
+
+    const fingerprint = this.generateFingerprint({
+      tireId,
+      reason,
+      performedBy: performedBy ?? '',
+      notes: notes ?? '',
+    });
+
+    if (this.checkIdempotency(tireId, 'scrap', fingerprint)) {
+      throw new Error('5分钟内已对该轮胎执行过相同的报废操作，请勿重复提交');
+    }
+
     this.createEvent({
       tire_id: tireId,
       event_type: 'scrap',
-      vehicle_id: tire.current_vehicle_id,
+      vehicle_id: null,
       reason,
       performed_by: performedBy || null,
       performed_at: new Date().toISOString(),
@@ -283,7 +386,7 @@ export class TireService {
       inspection_notes: null,
       cost: null,
       cost_notes: null,
-    });
+    }, fingerprint);
 
     this.updateTireStatus(tireId, 'scrapped', null);
 
