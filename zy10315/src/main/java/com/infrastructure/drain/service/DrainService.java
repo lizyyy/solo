@@ -402,6 +402,10 @@ public class DrainService {
         DrainBatchResponse response = new DrainBatchResponse();
         BeanUtils.copyProperties(batch, response);
         
+        List<String> instanceIds = batch.getInstances().stream()
+                .map(ServiceInstance::getInstanceId)
+                .collect(Collectors.toList());
+        
         List<DrainBatchResponse.InstanceResponse> instances = batch.getInstances().stream()
                 .map(instance -> {
                     DrainBatchResponse.InstanceResponse instanceResponse = new DrainBatchResponse.InstanceResponse();
@@ -410,6 +414,62 @@ public class DrainService {
                 })
                 .collect(Collectors.toList());
         response.setInstances(instances);
+        
+        List<DrainActionLog> actionLogs = actionLogRepository.findByBatchIdOrderByActionTimeAsc(batch.getBatchId());
+        List<DrainBatchResponse.ActionLogResponse> actionLogResponses = actionLogs.stream()
+                .map(log -> {
+                    DrainBatchResponse.ActionLogResponse logResponse = new DrainBatchResponse.ActionLogResponse();
+                    BeanUtils.copyProperties(log, logResponse);
+                    return logResponse;
+                })
+                .collect(Collectors.toList());
+        response.setActionLogs(actionLogResponses);
+        
+        List<TrafficOffloadResult> offloadResults = offloadResultRepository.findByBatchId(batch.getBatchId());
+        List<DrainBatchResponse.OffloadResultResponse> offloadResultResponses = offloadResults.stream()
+                .map(result -> {
+                    DrainBatchResponse.OffloadResultResponse resultResponse = new DrainBatchResponse.OffloadResultResponse();
+                    BeanUtils.copyProperties(result, resultResponse);
+                    return resultResponse;
+                })
+                .collect(Collectors.toList());
+        response.setOffloadResults(offloadResultResponses);
+        
+        List<PersistentConnection> allConnections = new ArrayList<>();
+        for (String instanceId : instanceIds) {
+            allConnections.addAll(connectionRepository.findByInstanceId(instanceId));
+        }
+        List<DrainBatchResponse.ConnectionResponse> connectionResponses = allConnections.stream()
+                .map(conn -> {
+                    DrainBatchResponse.ConnectionResponse connResponse = new DrainBatchResponse.ConnectionResponse();
+                    BeanUtils.copyProperties(conn, connResponse);
+                    return connResponse;
+                })
+                .collect(Collectors.toList());
+        response.setConnections(connectionResponses);
+        
+        List<QueueTask> allTasks = new ArrayList<>();
+        for (String instanceId : instanceIds) {
+            allTasks.addAll(queueTaskRepository.findByInstanceId(instanceId));
+        }
+        List<DrainBatchResponse.TaskResponse> taskResponses = allTasks.stream()
+                .map(task -> {
+                    DrainBatchResponse.TaskResponse taskResponse = new DrainBatchResponse.TaskResponse();
+                    BeanUtils.copyProperties(task, taskResponse);
+                    return taskResponse;
+                })
+                .collect(Collectors.toList());
+        response.setTasks(taskResponses);
+        
+        List<RecoveryAction> recoveryActions = recoveryActionRepository.findByBatchId(batch.getBatchId());
+        List<DrainBatchResponse.RecoveryActionResponse> recoveryActionResponses = recoveryActions.stream()
+                .map(action -> {
+                    DrainBatchResponse.RecoveryActionResponse actionResponse = new DrainBatchResponse.RecoveryActionResponse();
+                    BeanUtils.copyProperties(action, actionResponse);
+                    return actionResponse;
+                })
+                .collect(Collectors.toList());
+        response.setRecoveryActions(recoveryActionResponses);
         
         return response;
     }
