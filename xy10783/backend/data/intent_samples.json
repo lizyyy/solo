@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "intent": "查询余额",
+    "text": "我想查一下我卡里有多少钱",
+    "entities": [
+      {
+        "type": "银行卡",
+        "value": "储蓄卡"
+      }
+    ],
+    "version": "v1.0",
+    "status": "approved",
+    "created_at": "2024-01-15 10:30:00",
+    "created_by": "张三",
+    "approved_at": "2024-01-16 14:20:00",
+    "approved_by": "李四"
+  },
+  {
+    "id": 2,
+    "intent": "转账",
+    "text": "帮我转500块到朋友账户",
+    "entities": [
+      {
+        "type": "金额",
+        "value": "500"
+      },
+      {
+        "type": "账户",
+        "value": "朋友"
+      }
+    ],
+    "version": "v1.0",
+    "status": "pending",
+    "created_at": "2024-01-17 09:15:00",
+    "created_by": "王五"
+  },
+  {
+    "id": 3,
+    "intent": "密码重置",
+    "text": "我的密码忘了怎么办",
+    "entities": [],
+    "version": "v1.1",
+    "status": "confused",
+    "created_at": "2024-01-18 16:45:00",
+    "created_by": "赵六",
+    "confuse_reason": "与'修改密码'意图混淆，置信度只有0.52",
+    "handled_at": "2024-01-19 11:00:00",
+    "handled_by": "钱七",
+    "handle_note": "已添加负样本，提升区分度"
+  }
+]

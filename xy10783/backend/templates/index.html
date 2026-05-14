@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客服机器人意图训练系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .permission-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .search-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .search-bar select {
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-confused {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status-online {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-training {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .detail-row {
+            display: flex;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: #666;
+        }
+        .detail-value {
+            flex: 1;
+        }
+        .link {
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .link:hover {
+            color: #5a6fd6;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 客服机器人意图训练系统</h1>
+        <div class="permission-badge">👤 当前用户：研发经理 | 权限：全部功能</div>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSamples">0</div>
+                <div class="stat-label">总样本数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="confusedCount">0</div>
+                <div class="stat-label">待处理混淆</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="onlineVersion">-</div>
+                <div class="stat-label">当前在线版本</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="todayHits">0</div>
+                <div class="stat-label">今日命中数</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索意图或样本内容...">
+            <select id="statusFilter">
+                <option value="">全部状态</option>
+                <option value="pending">待审批</option>
+                <option value="approved">已通过</option>
+                <option value="confused">混淆样本</option>
+            </select>
+            <button class="btn btn-primary" onclick="loadSamples()">搜索</button>
+            <button class="btn btn-success" onclick="openAddModal()">+ 添加样本</button>
+            <button class="btn btn-warning" onclick="exportReports()">导出报表</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('samples')">意图样本</button>
+            <button class="tab" onclick="switchTab('confused')">混淆分析</button>
+            <button class="tab" onclick="switchTab('versions')">训练版本</button>
+            <button class="tab" onclick="switchTab('approvals')">上线审批</button>
+            <button class="tab" onclick="switchTab('reports')">命中报表</button>
+        </div>
+
+        <div id="samplesTab" class="tab-content">
+            <div class="card">
+                <h3>意图样本列表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>意图</th>
+                            <th>样本内容</th>
+                            <th>版本</th>
+                            <th>状态</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="samplesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="confusedTab" class="tab-content hidden">
+            <div class="card">
+                <h3>混淆分析 - 失败样例</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>意图</th>
+                            <th>样本内容</th>
+                            <th>失败原因</th>
+                            <th>处理人</th>
+                            <th>处理时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="confusedTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="versionsTab" class="tab-content hidden">
+            <div class="card">
+                <h3>训练版本</h3>
+                <button class="btn btn-success" onclick="openVersionModal()" style="margin-bottom: 1rem;">+ 新版本</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>版本号</th>
+                            <th>状态</th>
+                            <th>样本数</th>
+                            <th>准确率</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="versionsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="approvalsTab" class="tab-content hidden">
+            <div class="card">
+                <h3>上线审批</h3>
+                <button class="btn btn-success" onclick="openApprovalModal()" style="margin-bottom: 1rem;">+ 申请上线</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>版本</th>
+                            <th>状态</th>
+                            <th>申请人</th>
+                            <th>申请时间</th>
+                            <th>审批人</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="approvalsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="reportsTab" class="tab-content hidden">
+            <div class="card">
+                <h3>命中报表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>真实意图</th>
+                            <th>预测意图</th>
+                            <th>置信度</th>
+                            <th>是否正确</th>
+                            <th>命中时间</th>
+                            <th>版本</th>
+                            <th>负责人</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>样本详情</h3>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加意图样本</h3>
+                <button class="close-btn" onclick="closeModal('addModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>意图名称</label>
+                <input type="text" id="intentInput" placeholder="例如：查询余额">
+            </div>
+            <div class="form-group">
+                <label>样本内容</label>
+                <textarea id="textInput" placeholder="例如：我想查一下余额"></textarea>
+            </div>
+            <div class="form-group">
+                <label>训练版本</label>
+                <select id="versionSelect"></select>
+            </div>
+            <button class="btn btn-primary" onclick="addSample()">提交</button>
+        </div>
+    </div>
+
+    <div id="handleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>处理混淆样本</h3>
+                <button class="close-btn" onclick="closeModal('handleModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>处理人</label>
+                <input type="text" id="handlerInput" value="当前用户">
+            </div>
+            <div class="form-group">
+                <label>处理备注</label>
+                <textarea id="handleNoteInput" placeholder="请输入处理说明..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>处理后状态</label>
+                <select id="handleStatusSelect">
+                    <option value="approved">已通过</option>
+                    <option value="pending">待复审</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="handleSample()">提交处理</button>
+        </div>
+    </div>
+
+    <div id="versionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建训练版本</h3>
+                <button class="close-btn" onclick="closeModal('versionModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>版本号</label>
+                <input type="text" id="versionInput" placeholder="例如：v1.2">
+            </div>
+            <div class="form-group">
+                <label>样本数量</label>
+                <input type="number" id="sampleCountInput" value="0">
+            </div>
+            <button class="btn btn-primary" onclick="createVersion()">创建版本</button>
+        </div>
+    </div>
+
+    <div id="approvalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>申请上线</h3>
+                <button class="close-btn" onclick="closeModal('approvalModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>选择版本</label>
+                <select id="approvalVersionSelect"></select>
+            </div>
+            <div class="form-group">
+                <label>申请说明</label>
+                <textarea id="approvalCommentInput" placeholder="请输入上线申请说明..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="submitApproval()">提交申请</button>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'samples';
+        let currentSampleId = null;
+
+        function loadStats() {
+            fetch('/api/samples')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('totalSamples').textContent = data.length;
+                    document.getElementById('confusedCount').textContent = data.filter(s => s.status === 'confused').length;
+                });
+            
+            fetch('/api/versions')
+                .then(res => res.json())
+                .then(data => {
+                    const online = data.find(v => v.status === 'online');
+                    if (online) {
+                        document.getElementById('onlineVersion').textContent = online.version;
+                    }
+                });
+            
+            fetch('/api/reports')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('todayHits').textContent = data.length;
+                });
+        }
+
+        function loadSamples() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            let url = '/api/samples';
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            if (params.toString()) url += '?' + params.toString();
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('samplesTableBody');
+                    tbody.innerHTML = data.map(sample => `
+                        <tr>
+                            <td>${sample.id}</td>
+                            <td>${sample.intent}</td>
+                            <td>${sample.text}</td>
+                            <td>${sample.version}</td>
+                            <td><span class="status-badge status-${sample.status}">${getStatusText(sample.status)}</span></td>
+                            <td>${sample.created_by}</td>
+                            <td>${sample.created_at}</td>
+                            <td><span class="link" onclick="viewDetail(${sample.id})">查看详情</span></td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function loadConfused() {
+            fetch('/api/confused')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('confusedTableBody');
+                    tbody.innerHTML = data.map(sample => `
+                        <tr>
+                            <td>${sample.id}</td>
+                            <td>${sample.intent}</td>
+                            <td>${sample.text}</td>
+                            <td>${sample.confuse_reason || '-'}</td>
+                            <td>${sample.handled_by || '-'}</td>
+                            <td>${sample.handled_at || '-'}</td>
+                            <td>
+                                <span class="link" onclick="viewDetail(${sample.id})">详情</span>
+                                ${!sample.handled_by ? ' | <span class="link" onclick="openHandleModal(' + sample.id + ')">处理</span>' : ''}
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function loadVersions() {
+            fetch('/api/versions')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('versionsTableBody');
+                    tbody.innerHTML = data.map(version => `
+                        <tr>
+                            <td>${version.version}</td>
+                            <td><span class="status-badge status-${version.status}">${getVersionStatusText(version.status)}</span></td>
+                            <td>${version.sample_count}</td>
+                            <td>${version.accuracy ? (version.accuracy * 100).toFixed(1) + '%' : '-'}</td>
+                            <td>${version.created_by}</td>
+                            <td>${version.created_at}</td>
+                        </tr>
+                    `).join('');
+                    
+                    const versionSelect = document.getElementById('versionSelect');
+                    const approvalVersionSelect = document.getElementById('approvalVersionSelect');
+                    const options = data.map(v => `<option value="${v.version}">${v.version}</option>`).join('');
+                    versionSelect.innerHTML = options;
+                    approvalVersionSelect.innerHTML = options;
+                });
+        }
+
+        function loadApprovals() {
+            fetch('/api/approvals')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('approvalsTableBody');
+                    tbody.innerHTML = data.map(approval => `
+                        <tr>
+                            <td>${approval.id}</td>
+                            <td>${approval.version}</td>
+                            <td><span class="status-badge status-${approval.status}">${getApprovalStatusText(approval.status)}</span></td>
+                            <td>${approval.requested_by}</td>
+                            <td>${approval.requested_at}</td>
+                            <td>${approval.approved_by || '-'}</td>
+                            <td>
+                                ${approval.status === 'pending' ? '<span class="link" onclick="approve(' + approval.id + ')">审批</span>' : '-'}
+                            </td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function loadReports() {
+            fetch('/api/reports')
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('reportsTableBody');
+                    tbody.innerHTML = data.map(report => `
+                        <tr>
+                            <td>${report.id}</td>
+                            <td>${report.intent}</td>
+                            <td>${report.predicted_intent}</td>
+                            <td>${(report.confidence * 100).toFixed(1)}%</td>
+                            <td><span class="status-badge status-${report.is_correct ? 'approved' : 'confused'}">${report.is_correct ? '正确' : '错误'}</span></td>
+                            <td>${report.hit_time}</td>
+                            <td>${report.version}</td>
+                            <td>${report.handler}</td>
+                        </tr>
+                    `).join('');
+                });
+        }
+
+        function getStatusText(status) {
+            const map = { pending: '待审批', approved: '已通过', confused: '混淆' };
+            return map[status] || status;
+        }
+
+        function getVersionStatusText(status) {
+            const map = { online: '已上线', training: '训练中' };
+            return map[status] || status;
+        }
+
+        function getApprovalStatusText(status) {
+            const map = { pending: '待审批', approved: '已通过' };
+            return map[status] || status;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            
+            if (tab === 'samples') loadSamples();
+            if (tab === 'confused') loadConfused();
+            if (tab === 'versions') loadVersions();
+            if (tab === 'approvals') loadApprovals();
+            if (tab === 'reports') loadReports();
+        }
+
+        function viewDetail(id) {
+            fetch(`/api/samples/${id}`)
+                .then(res => res.json())
+                .then(sample => {
+                    const content = document.getElementById('detailContent');
+                    content.innerHTML = `
+                        <div class="detail-row">
+                            <div class="detail-label">ID：</div>
+                            <div class="detail-value">${sample.id}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">意图：</div>
+                            <div class="detail-value">${sample.intent}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">样本内容：</div>
+                            <div class="detail-value">${sample.text}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">实体标注：</div>
+                            <div class="detail-value">${sample.entities && sample.entities.length ? sample.entities.map(e => `${e.type}: ${e.value}`).join(', ') : '无'}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">训练版本：</div>
+                            <div class="detail-value">${sample.version}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">状态：</div>
+                            <div class="detail-value"><span class="status-badge status-${sample.status}">${getStatusText(sample.status)}</span></div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">创建人：</div>
+                            <div class="detail-value">${sample.created_by}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">创建时间：</div>
+                            <div class="detail-value">${sample.created_at}</div>
+                        </div>
+                        ${sample.confuse_reason ? `
+                        <div class="detail-row">
+                            <div class="detail-label">失败原因：</div>
+                            <div class="detail-value" style="color: #dc3545;">${sample.confuse_reason}</div>
+                        </div>
+                        ` : ''}
+                        ${sample.handled_by ? `
+                        <div class="detail-row">
+                            <div class="detail-label">处理人：</div>
+                            <div class="detail-value">${sample.handled_by}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">处理时间：</div>
+                            <div class="detail-value">${sample.handled_at}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">处理说明：</div>
+                            <div class="detail-value">${sample.handle_note || '-'}</div>
+                        </div>
+                        ` : ''}
+                        ${sample.approved_by ? `
+                        <div class="detail-row">
+                            <div class="detail-label">审批人：</div>
+                            <div class="detail-value">${sample.approved_by}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">审批时间：</div>
+                            <div class="detail-value">${sample.approved_at}</div>
+                        </div>
+                        ` : ''}
+                    `;
+                    openModal('detailModal');
+                });
+        }
+
+        function openAddModal() {
+            loadVersions();
+            openModal('addModal');
+        }
+
+        function addSample() {
+            const data = {
+                intent: document.getElementById('intentInput').value,
+                text: document.getElementById('textInput').value,
+                version: document.getElementById('versionSelect').value
+            };
+            
+            fetch('/api/samples', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeModal('addModal');
+                loadSamples();
+                loadStats();
+            });
+        }
+
+        function openHandleModal(id) {
+            currentSampleId = id;
+            openModal('handleModal');
+        }
+
+        function handleSample() {
+            const data = {
+                handled_by: document.getElementById('handlerInput').value,
+                handle_note: document.getElementById('handleNoteInput').value,
+                status: document.getElementById('handleStatusSelect').value
+            };
+            
+            fetch(`/api/samples/${currentSampleId}/handle`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeModal('handleModal');
+                loadConfused();
+                loadStats();
+            });
+        }
+
+        function openVersionModal() {
+            openModal('versionModal');
+        }
+
+        function createVersion() {
+            const data = {
+                version: document.getElementById('versionInput').value,
+                sample_count: parseInt(document.getElementById('sampleCountInput').value)
+            };
+            
+            fetch('/api/versions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeModal('versionModal');
+                loadVersions();
+            });
+        }
+
+        function openApprovalModal() {
+            loadVersions();
+            openModal('approvalModal');
+        }
+
+        function submitApproval() {
+            const data = {
+                version: document.getElementById('approvalVersionSelect').value,
+                comment: document.getElementById('approvalCommentInput').value
+            };
+            
+            fetch('/api/approvals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(() => {
+                closeModal('approvalModal');
+                loadApprovals();
+            });
+        }
+
+        function approve(id) {
+            if (confirm('确认通过该版本的上线申请？')) {
+                fetch(`/api/approvals/${id}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ approved_by: '当前用户' })
+                })
+                .then(res => res.json())
+                .then(() => {
+                    loadApprovals();
+                    loadVersions();
+                    loadStats();
+                });
+            }
+        }
+
+        function exportReports() {
+            window.location.href = '/api/reports/export';
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        loadStats();
+        loadSamples();
+        loadVersions();
+    </script>
+</body>
+</html>
