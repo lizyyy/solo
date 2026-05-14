@@ -73,6 +73,13 @@ class ExportService:
         
         revocations = query.order_by(RevocationRecord.created_at.desc()).all()
         
+        plan_account_map = {}
+        if revocations:
+            plan_ids = [r.plan_id for r in revocations]
+            plans = InstallmentPlan.query.filter(InstallmentPlan.id.in_(plan_ids)).all()
+            for p in plans:
+                plan_account_map[p.id] = p.account_id
+        
         summary_headers = ['撤销类型', '数量', '总退款', '总违约金', '总待收', '总额度恢复']
         ExportService._apply_header_style(summary_sheet, summary_headers)
         
@@ -123,7 +130,7 @@ class ExportService:
         for row_idx, rev in enumerate(revocations, 2):
             details_sheet.cell(row=row_idx, column=1, value=rev.id)
             details_sheet.cell(row=row_idx, column=2, value=rev.plan_id)
-            details_sheet.cell(row=row_idx, column=3, value=rev.account_id or '')
+            details_sheet.cell(row=row_idx, column=3, value=plan_account_map.get(rev.plan_id, ''))
             details_sheet.cell(row=row_idx, column=4, value=rev.revocation_type)
             details_sheet.cell(row=row_idx, column=5, value=rev.transaction_id)
             details_sheet.cell(row=row_idx, column=6, value=float(rev.original_paid_principal))

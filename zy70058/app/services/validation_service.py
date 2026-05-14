@@ -23,26 +23,16 @@ class ValidationService:
         
         expected_restore_amount = Decimal(str(expected_restore_amount))
         
-        account_before = {
-            'available_credit': account.available_credit,
-            'used_credit': account.used_credit
-        }
-        
-        plan_before = {
-            'remaining_principal': plan.remaining_principal,
-            'status': plan.status
-        }
+        revocation = RevocationRecord.query.filter_by(plan_id=plan_id).order_by(
+            RevocationRecord.created_at.desc()
+        ).first()
         
         validation = {
             'is_valid': True,
             'account_id': account_id,
             'plan_id': plan_id,
             'expected_restore': float(expected_restore_amount),
-            'account_before': {k: float(v) for k, v in account_before.items()},
-            'plan_before': {
-                'remaining_principal': float(plan_before['remaining_principal']),
-                'status': plan_before['status']
-            },
+            'plan_status': plan.status,
             'errors': [],
             'warnings': []
         }
@@ -55,29 +45,26 @@ class ValidationService:
             validation['errors'].append(f"分期计划剩余本金不为0: {plan.remaining_principal}")
             validation['is_valid'] = False
         
-        expected_available = account_before['available_credit']
-        if plan.status == InstallmentPlan.STATUS_EARLY_SETTLED:
-            expected_available += plan_before['remaining_principal']
-        else:
-            expected_available += plan.original_amount
-        
-        if abs(account.available_credit - expected_available) > Decimal('0.01'):
-            validation['errors'].append(
-                f"额度恢复不正确: 预期{expected_available}, 实际{account.available_credit}"
-            )
+        if plan.remaining_fee != Decimal('0'):
+            validation['errors'].append(f"分期计划剩余手续费不为0: {plan.remaining_fee}")
             validation['is_valid'] = False
         
-        expected_used = account_before['used_credit']
-        if plan.status == InstallmentPlan.STATUS_EARLY_SETTLED:
-            expected_used -= plan_before['remaining_principal']
-        else:
-            expected_used -= plan.original_amount
-        
-        if abs(account.used_credit - expected_used) > Decimal('0.01'):
-            validation['errors'].append(
-                f"已用额度计算不正确: 预期{expected_used}, 实际{account.used_credit}"
-            )
-            validation['is_valid'] = False
+        if revocation:
+            validation['revocation_type'] = revocation.revocation_type
+            validation['credit_restored'] = float(revocation.credit_restored)
+            
+            if plan.status == InstallmentPlan.STATUS_REVOKED:
+                if revocation.credit_restored != plan.original_amount:
+                    validation['errors'].append(
+                        f"撤销场景额度恢复值不正确: 预期{plan.original_amount}, 实际{revocation.credit_restored}"
+                    )
+                    validation['is_valid'] = False
+            elif plan.status == InstallmentPlan.STATUS_EARLY_SETTLED:
+                if revocation.credit_restored != revocation.remaining_principal_before:
+                    validation['errors'].append(
+                        f"提前还款场景额度恢复值不正确: 预期{revocation.remaining_principal_before}, 实际{revocation.credit_restored}"
+                    )
+                    validation['is_valid'] = False
         
         if abs(account.credit_limit - (account.available_credit + account.used_credit)) > Decimal('0.01'):
             validation['errors'].append(

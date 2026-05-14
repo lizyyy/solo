@@ -2,7 +2,7 @@ import requests
 import json
 from decimal import Decimal
 
-BASE_URL = 'http://localhost:5000/api/v1'
+BASE_URL = 'http://localhost:5001/api/v1'
 
 def print_response(title, response):
     print(f"\n{'='*60}")

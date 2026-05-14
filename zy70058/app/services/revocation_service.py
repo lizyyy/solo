@@ -325,17 +325,17 @@ class RevocationService:
     def _validate_early_settlement(plan, revocation, account):
         errors = []
         
-        expected_penalty = plan.remaining_principal * Decimal(str(Config.EARLY_REPAYMENT_FEE_RATE))
+        expected_penalty = revocation.remaining_principal_before * Decimal(str(Config.EARLY_REPAYMENT_FEE_RATE))
         expected_penalty = expected_penalty.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         if abs(revocation.penalty_fee - expected_penalty) > Decimal('0.01'):
             errors.append(f"违约金计算错误: 预期{expected_penalty}, 实际{revocation.penalty_fee}")
         
-        expected_total = plan.remaining_principal + plan.remaining_fee + expected_penalty
+        expected_total = revocation.remaining_principal_before + revocation.remaining_fee_before + expected_penalty
         if abs(revocation.amount_to_collect - expected_total) > Decimal('0.01'):
             errors.append(f"应收金额计算错误: 预期{expected_total}, 实际{revocation.amount_to_collect}")
         
-        if revocation.credit_restored != plan.remaining_principal:
-            errors.append(f"额度恢复金额不符: 预期{plan.remaining_principal}, 实际{revocation.credit_restored}")
+        if revocation.credit_restored != revocation.remaining_principal_before:
+            errors.append(f"额度恢复金额不符: 预期{revocation.remaining_principal_before}, 实际{revocation.credit_restored}")
         
         if errors:
             exception = ExceptionRecord(
