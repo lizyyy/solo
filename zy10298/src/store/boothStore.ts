@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { BoothApplication, FilterParams, BoothStatus } from '../types';
+import type { BoothApplication, FilterParams, BoothStatus } from '../types';
 import { mockApplications, getStatsData } from '../data/mockData';
 import dayjs from 'dayjs';
 
@@ -42,7 +42,7 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
     ),
   })),
 
-  rejectApplication: (id, reason) => set((state) => ({
+  rejectApplication: (id, _reason) => set((state) => ({
     applications: state.applications.map(app => 
       app.id === id ? { ...app, status: 'rejected' as BoothStatus, updatedAt: dayjs().format('YYYY-MM-DD HH:mm:ss') } : app
     ),
@@ -176,8 +176,6 @@ export const useBoothStore = create<BoothStore>((set, get) => ({
   processDeduction: (id, deductionAmount, reason) => set((state) => {
     const app = state.applications.find(a => a.id === id);
     if (!app) return state;
-    
-    const refundAmount = app.deposit.amount - deductionAmount;
     
     return {
       applications: state.applications.map(a => 

@@ -4,7 +4,6 @@ import {
   ClockCircleOutlined, 
   ToolOutlined, 
   WarningOutlined,
-  CheckCircleOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { useBoothStore } from '../store/boothStore';

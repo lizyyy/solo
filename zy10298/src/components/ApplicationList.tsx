@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { Table, Tag, Space, Button, Input, Select, DatePicker, Row, Col, Alert, Badge } from 'antd';
+import { Table, Tag, Space, Button, Input, Select, DatePicker, Row, Col, Badge, Card } from 'antd';
 import { EyeOutlined, SearchOutlined, WarningOutlined, ClockCircleOutlined, DollarOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { BoothApplication, BoothStatus } from '../types';
 import { useBoothStore } from '../store/boothStore';
-import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
 

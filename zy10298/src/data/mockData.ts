@@ -1,4 +1,4 @@
-import { BoothApplication, StatsData } from '../types';
+import type { BoothApplication, StatsData } from '../types';
 import dayjs from 'dayjs';
 
 const baseDate = dayjs('2026-05-14');

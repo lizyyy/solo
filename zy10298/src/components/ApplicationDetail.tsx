@@ -15,8 +15,6 @@ import {
   message,
   Alert,
   Divider,
-  Row,
-  Col,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -33,7 +31,6 @@ interface ApplicationDetailProps {
   onClose: () => void;
 }
 
-const { Step } = Steps;
 const { TextArea } = Input;
 
 const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProps) => {
@@ -57,14 +54,14 @@ const ApplicationDetail = ({ application, open, onClose }: ApplicationDetailProp
   if (!application) return null;
 
   const steps = [
-    { title: '申请审核', status: application.currentStep >= 1 ? 'finish' : 'wait' },
-    { title: '材料审核', status: application.currentStep >= 2 ? 'finish' : 'wait' },
-    { title: '电力审核', status: application.currentStep >= 3 ? 'finish' : 'wait' },
-    { title: '押金缴纳', status: application.currentStep >= 4 ? 'finish' : 'wait' },
-    { title: '搭建确认', status: application.currentStep >= 5 ? 'finish' : 'wait' },
-    { title: '活动进行', status: application.currentStep >= 6 ? 'finish' : 'wait' },
-    { title: '撤场验收', status: application.currentStep >= 7 ? 'finish' : 'wait' },
-    { title: '完成', status: application.currentStep >= 9 ? 'finish' : 'wait' },
+    { title: '申请审核', status: application.currentStep >= 1 ? ('finish' as const) : ('wait' as const) },
+    { title: '材料审核', status: application.currentStep >= 2 ? ('finish' as const) : ('wait' as const) },
+    { title: '电力审核', status: application.currentStep >= 3 ? ('finish' as const) : ('wait' as const) },
+    { title: '押金缴纳', status: application.currentStep >= 4 ? ('finish' as const) : ('wait' as const) },
+    { title: '搭建确认', status: application.currentStep >= 5 ? ('finish' as const) : ('wait' as const) },
+    { title: '活动进行', status: application.currentStep >= 6 ? ('finish' as const) : ('wait' as const) },
+    { title: '撤场验收', status: application.currentStep >= 7 ? ('finish' as const) : ('wait' as const) },
+    { title: '完成', status: application.currentStep >= 9 ? ('finish' as const) : ('wait' as const) },
   ];
 
   const hasAnyIssue = application.hasScheduleConflict || 
