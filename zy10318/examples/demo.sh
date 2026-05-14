@@ -95,13 +95,25 @@ echo "8. 查看单个镜像规则详情"
 curl -s "${BASE_URL}/rules/${RULE_ID}" | jq .
 echo ""
 
-echo "9. 更新规则状态为 ACTIVE"
+echo "9. 测试不存在的规则状态更新 (预期: 404)"
+curl -s -X PATCH "${BASE_URL}/rules/nonexistent-id/status" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "ACTIVE"}' | jq .
+echo ""
+
+echo "10. 更新规则状态为 ACTIVE"
 curl -s -X PATCH "${BASE_URL}/rules/${RULE_ID}/status" \
   -H "Content-Type: application/json" \
   -d '{"status": "ACTIVE"}' | jq .
 echo ""
 
-echo "10. 提交请求进行镜像"
+echo "11. 测试非法状态流转: ACTIVE -> DRAFT (预期: 400)"
+curl -s -X PATCH "${BASE_URL}/rules/${RULE_ID}/status" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "DRAFT"}' | jq .
+echo ""
+
+echo "12. 提交请求进行镜像"
 curl -s -X POST "${BASE_URL}/copies/submit" \
   -H "Content-Type: application/json" \
   -d "{
@@ -117,20 +129,36 @@ curl -s -X POST "${BASE_URL}/copies/submit" \
   }" | jq .
 echo ""
 
-echo "11. 等待异步处理..."
+echo "13. 等待异步处理..."
 sleep 3
 echo ""
 
-echo "12. 查看请求副本列表"
+echo "14. 查看请求副本列表"
 curl -s "${BASE_URL}/copies?rule_id=${RULE_ID}" | jq .
 echo ""
 
-echo "13. 查看比对结果"
+echo "15. 查看比对结果"
 curl -s "${BASE_URL}/results?rule_id=${RULE_ID}" | jq .
 echo ""
 
-echo "14. 按状态筛选规则"
+echo "16. 按状态筛选规则"
 curl -s "${BASE_URL}/rules?status=ACTIVE" | jq .
+echo ""
+
+echo "17. 导出规则 (JSON格式)"
+curl -s "${BASE_URL}/rules/export?status=ACTIVE" | jq .
+echo ""
+
+echo "18. 导出规则 (CSV格式)"
+curl -s "${BASE_URL}/rules/export?format=csv"
+echo ""
+
+echo "19. 导出请求副本 (CSV格式)"
+curl -s "${BASE_URL}/copies/export?format=csv&rule_id=${RULE_ID}"
+echo ""
+
+echo "20. 导出比对结果 (CSV格式)"
+curl -s "${BASE_URL}/results/export?format=csv&rule_id=${RULE_ID}"
 echo ""
 
 echo "=== 测试完成 ==="
@@ -138,9 +166,10 @@ echo ""
 echo "常用查询参数:"
 echo "- 分页: page, page_size"
 echo "- 筛选: status, rule_id, trace_id"
+echo "- 导出格式: format=json|csv"
 echo ""
-echo "状态说明:"
-echo "- DRAFT: 草稿"
-echo "- ACTIVE: 激活"
-echo "- PAUSED: 暂停"
-echo "- DISABLED: 禁用"
+echo "状态流转说明 (仅允许以下方向):"
+echo "- DRAFT  -> ACTIVE | DISABLED"
+echo "- ACTIVE -> PAUSED | DISABLED"
+echo "- PAUSED -> ACTIVE | DISABLED"
+echo "- DISABLED: 无法流转到任何状态"

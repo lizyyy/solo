@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
+	"time"
 
 	"traffic-mirror-controller/internal/model"
 	"traffic-mirror-controller/internal/service"
@@ -36,17 +38,20 @@ func (h *HTTPHandler) RegisterRoutes(r *gin.Engine) {
 			rules.GET("", h.ListMirrorRules)
 			rules.GET("/:id", h.GetMirrorRule)
 			rules.PATCH("/:id/status", h.UpdateRuleStatus)
+			rules.GET("/export", h.ExportMirrorRules)
 		}
 
 		copies := api.Group("/copies")
 		{
 			copies.GET("", h.ListRequestCopies)
 			copies.POST("/submit", h.SubmitRequest)
+			copies.GET("/export", h.ExportRequestCopies)
 		}
 
 		results := api.Group("/results")
 		{
 			results.GET("", h.ListCompareResults)
+			results.GET("/export", h.ExportCompareResults)
 		}
 	}
 
@@ -55,7 +60,7 @@ func (h *HTTPHandler) RegisterRoutes(r *gin.Engine) {
 
 func (h *HTTPHandler) HealthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"status": "ok",
+		"status":  "ok",
 		"service": "traffic-mirror-controller",
 	})
 }
@@ -260,9 +265,13 @@ func (h *HTTPHandler) UpdateRuleStatus(c *gin.Context) {
 
 	err := h.service.UpdateMirrorRuleStatus(id, model.MirrorRuleStatus(req.Status))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, model.ApiResponse{
-			Code:    400,
-			Message: fmt.Sprintf("Failed to update status: %v", err),
+		statusCode := http.StatusBadRequest
+		if strings.Contains(err.Error(), "not found") {
+			statusCode = http.StatusNotFound
+		}
+		c.JSON(statusCode, model.ApiResponse{
+			Code:    statusCode,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -376,6 +385,135 @@ func (h *HTTPHandler) ListCompareResults(c *gin.Context) {
 			"total": total,
 			"page":  page,
 			"size":  pageSize,
+		},
+	})
+}
+
+func (h *HTTPHandler) ExportMirrorRules(c *gin.Context) {
+	status := c.Query("status")
+	rules, err := h.service.ExportMirrorRules(status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.ApiResponse{
+			Code:    500,
+			Message: fmt.Sprintf("Failed to export rules: %v", err),
+		})
+		return
+	}
+
+	format := c.DefaultQuery("format", "json")
+	if format == "csv" {
+		c.Header("Content-Type", "text/csv; charset=utf-8")
+		c.Header("Content-Disposition", "attachment; filename=mirror_rules.csv")
+		csvContent := "ID,Name,Status,SampleRate,SourcePath,SourceMethod,CreatedAt\n"
+		for _, rule := range rules {
+			csvContent += fmt.Sprintf("%s,%s,%s,%.2f,%s,%s,%s\n",
+				rule.ID, rule.Name, rule.Status, rule.SampleRate,
+				rule.SourcePath, rule.SourceMethod, rule.CreatedAt.Format(time.RFC3339))
+		}
+		c.String(http.StatusOK, csvContent)
+		return
+	}
+
+	c.JSON(http.StatusOK, model.ApiResponse{
+		Code:    200,
+		Message: "Success",
+		Data: gin.H{
+			"items": rules,
+			"total": len(rules),
+		},
+	})
+}
+
+func (h *HTTPHandler) ExportRequestCopies(c *gin.Context) {
+	ruleID := c.Query("rule_id")
+	traceID := c.Query("trace_id")
+	status := c.Query("status")
+
+	copies, err := h.service.ExportRequestCopies(ruleID, traceID, status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.ApiResponse{
+			Code:    500,
+			Message: fmt.Sprintf("Failed to export copies: %v", err),
+		})
+		return
+	}
+
+	format := c.DefaultQuery("format", "json")
+	if format == "csv" {
+		c.Header("Content-Type", "text/csv; charset=utf-8")
+		c.Header("Content-Disposition", "attachment; filename=request_copies.csv")
+		csvContent := "ID,RuleID,TraceID,Method,URL,StatusCode,Status,DurationMs,CreatedAt\n"
+		for _, copy := range copies {
+			statusCode := ""
+			if copy.StatusCode != nil {
+				statusCode = fmt.Sprintf("%d", *copy.StatusCode)
+			}
+			duration := ""
+			if copy.DurationMs != nil {
+				duration = fmt.Sprintf("%d", *copy.DurationMs)
+			}
+			csvContent += fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+				copy.ID, copy.RuleID, copy.TraceID, copy.Method, copy.OriginalURL,
+				statusCode, copy.Status, duration, copy.CreatedAt.Format(time.RFC3339))
+		}
+		c.String(http.StatusOK, csvContent)
+		return
+	}
+
+	c.JSON(http.StatusOK, model.ApiResponse{
+		Code:    200,
+		Message: "Success",
+		Data: gin.H{
+			"items": copies,
+			"total": len(copies),
+		},
+	})
+}
+
+func (h *HTTPHandler) ExportCompareResults(c *gin.Context) {
+	ruleID := c.Query("rule_id")
+
+	results, err := h.service.ExportCompareResults(ruleID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.ApiResponse{
+			Code:    500,
+			Message: fmt.Sprintf("Failed to export results: %v", err),
+		})
+		return
+	}
+
+	format := c.DefaultQuery("format", "json")
+	if format == "csv" {
+		c.Header("Content-Type", "text/csv; charset=utf-8")
+		c.Header("Content-Disposition", "attachment; filename=compare_results.csv")
+		csvContent := "ID,RuleID,StatusCodeMatch,BodyMatch,HeadersMatch,SimilarityScore,CreatedAt\n"
+		for _, result := range results {
+			scMatch := ""
+			if result.StatusCodeMatch != nil {
+				scMatch = fmt.Sprintf("%t", *result.StatusCodeMatch)
+			}
+			bMatch := ""
+			if result.BodyMatch != nil {
+				bMatch = fmt.Sprintf("%t", *result.BodyMatch)
+			}
+			hMatch := ""
+			if result.HeadersMatch != nil {
+				hMatch = fmt.Sprintf("%t", *result.HeadersMatch)
+			}
+			csvContent += fmt.Sprintf("%s,%s,%s,%s,%s,%.2f,%s\n",
+				result.ID, result.RuleID, scMatch, bMatch, hMatch,
+				result.SimilarityScore, result.CreatedAt.Format(time.RFC3339))
+		}
+		c.String(http.StatusOK, csvContent)
+		return
+	}
+
+	c.JSON(http.StatusOK, model.ApiResponse{
+		Code:    200,
+		Message: "Success",
+		Data: gin.H{
+			"items": results,
+			"total": len(results),
 		},
 	})
 }

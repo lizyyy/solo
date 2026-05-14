@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -123,6 +124,33 @@ func (s *MirrorService) UpdateMirrorRuleStatus(id string, status model.MirrorRul
 
 	if !validStatuses[status] {
 		return fmt.Errorf("invalid status: %s", status)
+	}
+
+	rule, err := s.db.GetMirrorRuleByID(id)
+	if err != nil {
+		return err
+	}
+	if rule == nil {
+		return fmt.Errorf("rule not found: %s", id)
+	}
+
+	validTransitions := map[model.MirrorRuleStatus][]model.MirrorRuleStatus{
+		model.RuleStatusDraft:    {model.RuleStatusActive, model.RuleStatusDisabled},
+		model.RuleStatusActive:   {model.RuleStatusPaused, model.RuleStatusDisabled},
+		model.RuleStatusPaused:   {model.RuleStatusActive, model.RuleStatusDisabled},
+		model.RuleStatusDisabled: {},
+	}
+
+	allowed := false
+	for _, s := range validTransitions[rule.Status] {
+		if s == status {
+			allowed = true
+			break
+		}
+	}
+
+	if !allowed {
+		return fmt.Errorf("invalid status transition: %s -> %s", rule.Status, status)
 	}
 
 	return s.db.UpdateMirrorRuleStatus(id, status)
@@ -263,11 +291,27 @@ func (s *MirrorService) deliverRequest(rc *model.RequestCopy) {
 		return
 	}
 
-	targetURL := env.BaseURL + strings.TrimPrefix(rc.OriginalURL, "http://")
-	targetURL = strings.TrimPrefix(targetURL, "https://")
-	if !strings.HasPrefix(targetURL, "http") {
-		targetURL = "https://" + targetURL
+	parsedURL, err := url.Parse(rc.OriginalURL)
+	if err != nil {
+		errorMsg := fmt.Sprintf("invalid original URL: %v", err)
+		rc.ErrorMsg = &errorMsg
+		rc.Status = model.RequestStatusFailed
+		s.db.UpdateRequestCopy(rc)
+		return
 	}
+
+	parsedBaseURL, err := url.Parse(env.BaseURL)
+	if err != nil {
+		errorMsg := fmt.Sprintf("invalid target base URL: %v", err)
+		rc.ErrorMsg = &errorMsg
+		rc.Status = model.RequestStatusFailed
+		s.db.UpdateRequestCopy(rc)
+		return
+	}
+
+	parsedBaseURL.Path = parsedURL.Path
+	parsedBaseURL.RawQuery = parsedURL.RawQuery
+	targetURL := parsedBaseURL.String()
 
 	startTime := time.Now()
 
@@ -384,9 +428,9 @@ func (s *MirrorService) compareResponses(rc *model.RequestCopy) {
 	}
 
 	cr := &model.CompareResult{
-		OriginalCopyID: original.ID,
-		MirroredCopyID: rc.ID,
-		RuleID:         rc.RuleID,
+		OriginalCopyID:  original.ID,
+		MirroredCopyID:  rc.ID,
+		RuleID:          rc.RuleID,
 		StatusCodeMatch: &statusCodeMatch,
 		BodyMatch:       &bodyMatch,
 		HeadersMatch:    &headersMatch,
@@ -406,4 +450,16 @@ func (s *MirrorService) ListRequestCopies(ruleID, traceID, status string, page, 
 
 func (s *MirrorService) ListCompareResults(ruleID string, page, pageSize int) ([]*model.CompareResult, int, error) {
 	return s.db.ListCompareResults(ruleID, page, pageSize)
+}
+
+func (s *MirrorService) ExportMirrorRules(status string) ([]*model.MirrorRule, error) {
+	return s.db.GetAllMirrorRules(status)
+}
+
+func (s *MirrorService) ExportRequestCopies(ruleID, traceID, status string) ([]*model.RequestCopy, error) {
+	return s.db.GetAllRequestCopies(ruleID, traceID, status)
+}
+
+func (s *MirrorService) ExportCompareResults(ruleID string) ([]*model.CompareResult, error) {
+	return s.db.GetAllCompareResults(ruleID)
 }

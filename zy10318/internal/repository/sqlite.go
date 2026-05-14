@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
-	"strings"
 	"time"
 
 	"traffic-mirror-controller/internal/model"
@@ -473,4 +471,105 @@ func (d *Database) GetRequestCopiesByTraceID(traceID string) ([]*model.RequestCo
 	}
 
 	return copies, nil
+}
+
+func (d *Database) GetAllMirrorRules(status string) ([]*model.MirrorRule, error) {
+	var args []interface{}
+	query := `SELECT id, idempotency_key, name, description, source_path, source_method, sample_rate, targets, status, compare_mode, created_at, updated_at, created_by FROM mirror_rules WHERE 1=1`
+
+	if status != "" {
+		query += ` AND status = ?`
+		args = append(args, status)
+	}
+
+	query += ` ORDER BY created_at DESC`
+
+	rows, err := d.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var rules []*model.MirrorRule
+	for rows.Next() {
+		rule := &model.MirrorRule{}
+		var targetsJSON string
+		err := rows.Scan(&rule.ID, &rule.IdempotencyKey, &rule.Name, &rule.Description, &rule.SourcePath, &rule.SourceMethod, &rule.SampleRate, &targetsJSON, &rule.Status, &rule.CompareMode, &rule.CreatedAt, &rule.UpdatedAt, &rule.CreatedBy)
+		if err != nil {
+			return nil, err
+		}
+		json.Unmarshal([]byte(targetsJSON), &rule.Targets)
+		rule.MaskingFields, _ = d.GetMaskingFieldsByRuleID(rule.ID)
+		rules = append(rules, rule)
+	}
+
+	return rules, nil
+}
+
+func (d *Database) GetAllRequestCopies(ruleID, traceID, status string) ([]*model.RequestCopy, error) {
+	var args []interface{}
+	query := `SELECT id, rule_id, trace_id, target_env_id, original_url, method, request_headers, request_body, masked_body, status_code, response, error_msg, status, duration_ms, created_at, delivered_at FROM request_copies WHERE 1=1`
+
+	if ruleID != "" {
+		query += ` AND rule_id = ?`
+		args = append(args, ruleID)
+	}
+	if traceID != "" {
+		query += ` AND trace_id = ?`
+		args = append(args, traceID)
+	}
+	if status != "" {
+		query += ` AND status = ?`
+		args = append(args, status)
+	}
+
+	query += ` ORDER BY created_at DESC`
+
+	rows, err := d.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var copies []*model.RequestCopy
+	for rows.Next() {
+		rc := &model.RequestCopy{}
+		err := rows.Scan(&rc.ID, &rc.RuleID, &rc.TraceID, &rc.TargetEnvID, &rc.OriginalURL, &rc.Method, &rc.RequestHeaders, &rc.RequestBody, &rc.MaskedBody, &rc.StatusCode, &rc.Response, &rc.ErrorMsg, &rc.Status, &rc.DurationMs, &rc.CreatedAt, &rc.DeliveredAt)
+		if err != nil {
+			return nil, err
+		}
+		copies = append(copies, rc)
+	}
+
+	return copies, nil
+}
+
+func (d *Database) GetAllCompareResults(ruleID string) ([]*model.CompareResult, error) {
+	var args []interface{}
+	query := `SELECT id, original_copy_id, mirrored_copy_id, rule_id, status_code_match, body_match, headers_match, similarity_score, diff_details, created_at FROM compare_results WHERE 1=1`
+
+	if ruleID != "" {
+		query += ` AND rule_id = ?`
+		args = append(args, ruleID)
+	}
+
+	query += ` ORDER BY created_at DESC`
+
+	rows, err := d.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []*model.CompareResult
+	for rows.Next() {
+		cr := &model.CompareResult{}
+		err := rows.Scan(&cr.ID, &cr.OriginalCopyID, &cr.MirroredCopyID, &cr.RuleID, &cr.StatusCodeMatch, &cr.BodyMatch, &cr.HeadersMatch, &cr.SimilarityScore, &cr.DiffDetails, &cr.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, cr)
+	}
+
+	return results, nil
 }
