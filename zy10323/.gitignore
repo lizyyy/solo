@@ -1,0 +1,40 @@
+# 编译产物
+target/
+build/
+*.jar
+*.war
+*.ear
+
+# 数据库文件
+data/
+*.db
+*.mv.db
+*.trace.db
+
+# 工具目录 (自动下载的 Maven)
+.tools/
+
+# Maven Wrapper Jar (按需下载)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp
+*.tmp
+*.temp
