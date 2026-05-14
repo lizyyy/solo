@@ -17,13 +17,23 @@
 
 ### 1. 启动服务
 
+**方式一：使用启动脚本（推荐）**
+
 ```bash
-mvn clean spring-boot:run
+./start.sh
 ```
 
+**方式二：使用 Maven Wrapper**
+
+```bash
+./mvnw clean spring-boot:run
+```
+
+> 首次启动会自动下载 Maven 和项目依赖，无需系统预装 Maven。
+
 服务启动后访问：
-- API 文档: http://localhost:8080/api/swagger-ui.html
-- H2 控制台: http://localhost:8080/api/h2-console
+- API 文档: http://localhost:8080/swagger-ui.html
+- H2 控制台: http://localhost:8080/h2-console
   - JDBC URL: jdbc:h2:mem:evidencedb
   - 用户名: sa
   - 密码: (空)

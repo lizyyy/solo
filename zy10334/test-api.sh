@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_URL="http://localhost:8080/api"
+BASE_URL="http://localhost:8080"
 
 echo "=========================================="
 echo "接口证据链追踪 API 测试脚本"
@@ -91,5 +91,5 @@ echo ""
 echo "=========================================="
 echo "测试完成！"
 echo "=========================================="
-echo "Swagger UI: ${BASE_URL}/swagger-ui.html"
-echo "H2 Console: ${BASE_URL}/h2-console"
+echo "Swagger UI: http://localhost:8080/swagger-ui.html"
+echo "H2 Console: http://localhost:8080/h2-console"
