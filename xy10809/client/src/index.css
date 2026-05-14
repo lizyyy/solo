@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f4f6;
+}
+
+.status-badge {
+  @apply px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-pending {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.status-validating,
+.status-processing {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.status-validated {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-partial_success {
+  @apply bg-orange-100 text-orange-800;
+}
+
+.status-failed {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-invalid {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-valid {
+  @apply bg-green-100 text-green-800;
+}
