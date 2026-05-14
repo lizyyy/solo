@@ -32,6 +32,22 @@ public class WriteRequestService {
             throw new BusinessException("WINDOW_NOT_ACTIVE", "只有活跃状态的窗口才能提交写入请求");
         }
 
+        // 重复提交校验：检查同窗口同资源同操作是否已有待处理或已批准的请求
+        List<RequestStatus> activeStatuses = List.of(RequestStatus.PENDING, RequestStatus.APPROVED);
+        String operationDetails = request.getOperationDetails() != null ? request.getOperationDetails() : "";
+
+        boolean duplicateExists = requestRepository.existsByFreezeWindowIdAndResourceTypeAndResourceNameAndOperationDetailsAndStatusIn(
+                window.getId(),
+                request.getResourceType(),
+                request.getResourceName(),
+                operationDetails,
+                activeStatuses
+        );
+
+        if (duplicateExists) {
+            throw new BusinessException("DUPLICATE_REQUEST", "该资源已有相同的写入请求正在处理或已批准，请勿重复提交");
+        }
+
         String requestCode;
         do {
             requestCode = "REQ-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();

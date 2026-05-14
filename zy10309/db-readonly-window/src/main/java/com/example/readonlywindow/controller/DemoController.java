@@ -119,8 +119,11 @@ public class DemoController {
             windowService.suspendWindow(windowCode, "admin");
             steps.add("   Window suspended successfully");
 
-            steps.add("12. Completing window...");
-            windowService.activateWindow(windowCode, "admin");
+            steps.add("12. Re-activating window...");
+            windowService.suspendToActiveWindow(windowCode, "admin");
+            steps.add("   Window re-activated successfully");
+
+            steps.add("13. Completing window...");
             windowService.completeWindow(windowCode, "admin");
             steps.add("   Window completed successfully");
 

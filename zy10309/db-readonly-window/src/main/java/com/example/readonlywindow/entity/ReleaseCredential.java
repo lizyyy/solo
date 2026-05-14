@@ -1,5 +1,6 @@
 package com.example.readonlywindow.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -15,10 +16,12 @@ public class ReleaseCredential {
     @Column(unique = true, nullable = false)
     private String credentialCode;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "window_id", nullable = false)
     private FreezeWindow freezeWindow;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     private WriteRequest writeRequest;

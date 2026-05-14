@@ -16,4 +16,7 @@ public interface WriteRequestRepository extends JpaRepository<WriteRequest, Long
     List<WriteRequest> findByRequester(String requester);
     List<WriteRequest> findByStatus(RequestStatus status);
     boolean existsByRequestCode(String requestCode);
+
+    boolean existsByFreezeWindowIdAndResourceTypeAndResourceNameAndOperationDetailsAndStatusIn(
+            Long windowId, String resourceType, String resourceName, String operationDetails, List<RequestStatus> statuses);
 }

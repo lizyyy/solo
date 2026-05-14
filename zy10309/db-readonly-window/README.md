@@ -53,8 +53,9 @@ curl -X POST http://localhost:8080/api/demo/self-test
 | 方法 | 路径 | 描述 |
 |------|------|------|
 | POST | `/api/windows` | 创建冻结窗口 |
-| POST | `/api/windows/{code}/activate` | 激活窗口 |
-| POST | `/api/windows/{code}/suspend` | 暂停窗口 |
+| POST | `/api/windows/{code}/activate` | 激活窗口（DRAFT → ACTIVE） |
+| POST | `/api/windows/{code}/suspend` | 暂停窗口（ACTIVE → SUSPENDED） |
+| POST | `/api/windows/{code}/reactivate` | 恢复激活窗口（SUSPENDED → ACTIVE） |
 | POST | `/api/windows/{code}/cancel` | 撤销窗口 |
 | POST | `/api/windows/{code}/complete` | 完成窗口 |
 | GET | `/api/windows/{code}` | 查询窗口详情 |
@@ -148,15 +149,24 @@ curl -X POST http://localhost:8080/api/demo/self-test
 
 ```
 冻结窗口状态:
-DRAFT(草稿) → ACTIVE(活跃) → SUSPENDED(暂停) → COMPLETED(完成)
-                    ↓
-                CANCELLED(撤销)
+DRAFT(草稿) → ACTIVE(活跃) ↔ SUSPENDED(暂停) → COMPLETED(完成)
+                      ↓
+                  CANCELLED(撤销)
 
 写入请求状态:
 PENDING(待审批) → APPROVED(已批准)
            ↓
         REJECTED(已拒绝)
 ```
+
+## 关键保护机制
+
+### 重复提交保护
+写入请求提交时会自动检查同窗口、同资源、同操作是否存在以下状态的请求：
+- **PENDING (待审批)**
+- **APPROVED (已批准)**
+
+如检测到重复提交，会返回 `DUPLICATE_REQUEST` 错误，避免制造脏结果。
 
 ## H2 数据库控制台
 

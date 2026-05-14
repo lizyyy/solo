@@ -122,6 +122,30 @@ public class FreezeWindowService {
     }
 
     @Transactional
+    public FreezeWindow suspendToActiveWindow(String windowCode, String operator) {
+        FreezeWindow window = getWindowByCode(windowCode);
+
+        if (window.getStatus() != WindowStatus.SUSPENDED) {
+            throw new BusinessException("INVALID_STATUS", "只有暂停状态的窗口才能恢复激活");
+        }
+
+        window.setStatus(WindowStatus.ACTIVE);
+        window.setUpdatedBy(operator);
+        window.setUpdatedAt(LocalDateTime.now());
+
+        timelineService.createEvent(
+                EventType.WINDOW_ACTIVATED,
+                window.getId(),
+                null, null, null,
+                operator,
+                "恢复激活冻结窗口",
+                "窗口从暂停状态恢复为活跃状态，重新启用写入限制"
+        );
+
+        return windowRepository.save(window);
+    }
+
+    @Transactional
     public FreezeWindow cancelWindow(String windowCode, String operator) {
         FreezeWindow window = getWindowByCode(windowCode);
 

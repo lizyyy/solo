@@ -74,4 +74,10 @@ public class WindowController {
         boolean blocked = windowService.isResourceInActiveWindow(resourceType, resourceName);
         return ResponseEntity.ok(Map.of("blocked", blocked));
     }
+
+    @PostMapping("/{windowCode}/reactivate")
+    public ResponseEntity<FreezeWindow> reactivateWindow(@PathVariable String windowCode,
+                                                         @RequestParam(required = false) String operator) {
+        return ResponseEntity.ok(windowService.suspendToActiveWindow(windowCode, operator));
+    }
 }
