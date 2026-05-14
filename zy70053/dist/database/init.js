@@ -6,6 +6,10 @@ const sqlite3_1 = require("sqlite3");
 function initDatabase(dbPath = './credit_limit.db') {
     const db = new sqlite3_1.Database(dbPath);
     db.serialize(() => {
+        db.run(`PRAGMA journal_mode = WAL`);
+        db.run(`PRAGMA synchronous = NORMAL`);
+        db.run(`PRAGMA foreign_keys = ON`);
+        db.run(`PRAGMA busy_timeout = 5000`);
         db.run(`
       CREATE TABLE IF NOT EXISTS group_credits (
         id TEXT PRIMARY KEY,
@@ -14,6 +18,7 @@ function initDatabase(dbPath = './credit_limit.db') {
         available_limit REAL NOT NULL,
         used_limit REAL NOT NULL DEFAULT 0,
         frozen_limit REAL NOT NULL DEFAULT 0,
+        version INTEGER NOT NULL DEFAULT 1,
         status TEXT NOT NULL DEFAULT 'active',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
@@ -26,6 +31,7 @@ function initDatabase(dbPath = './credit_limit.db') {
         name TEXT NOT NULL,
         used_limit REAL NOT NULL DEFAULT 0,
         frozen_limit REAL NOT NULL DEFAULT 0,
+        version INTEGER NOT NULL DEFAULT 1,
         status TEXT NOT NULL DEFAULT 'active',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,

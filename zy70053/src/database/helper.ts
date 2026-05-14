@@ -2,10 +2,13 @@ import { Database } from 'sqlite3';
 import { initDatabase } from './init';
 import { v4 as uuidv4 } from 'uuid';
 
+export interface RunResult {
+  lastID: number;
+  changes: number;
+}
+
 export class DatabaseHelper {
   private db: Database;
-  private transactionDepth: number = 0;
-  private savepointCounter: number = 0;
 
   constructor(dbPath?: string) {
     this.db = initDatabase(dbPath);
@@ -16,6 +19,15 @@ export class DatabaseHelper {
       this.db.run(sql, params, function(err: Error | null) {
         if (err) reject(err);
         else resolve();
+      });
+    });
+  }
+
+  runWithResult(sql: string, params: any[] = []): Promise<RunResult> {
+    return new Promise((resolve, reject) => {
+      this.db.run(sql, params, function(err: Error | null) {
+        if (err) reject(err);
+        else resolve({ lastID: this.lastID, changes: this.changes });
       });
     });
   }
@@ -39,7 +51,7 @@ export class DatabaseHelper {
   }
 
   beginTransaction(): Promise<void> {
-    return this.run('BEGIN TRANSACTION');
+    return this.run('BEGIN IMMEDIATE');
   }
 
   commit(): Promise<void> {
@@ -55,31 +67,23 @@ export class DatabaseHelper {
   }
 
   async withTransaction<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.transactionDepth === 0) {
-      this.transactionDepth++;
-      await this.beginTransaction();
+    await this.beginTransaction();
+    try {
+      const result = await fn();
+      await this.commit();
+      return result;
+    } catch (error) {
       try {
-        const result = await fn();
-        await this.commit();
-        this.transactionDepth--;
-        return result;
-      } catch (error) {
         await this.rollback();
-        this.transactionDepth--;
-        throw error;
+      } catch (rollbackError) {
+        console.error('回滚事务失败:', rollbackError);
       }
-    } else {
-      const savepointName = `sp_${this.savepointCounter++}`;
-      await this.run(`SAVEPOINT ${savepointName}`);
-      try {
-        const result = await fn();
-        await this.run(`RELEASE SAVEPOINT ${savepointName}`);
-        return result;
-      } catch (error) {
-        await this.run(`ROLLBACK TO SAVEPOINT ${savepointName}`);
-        throw error;
-      }
+      throw error;
     }
+  }
+
+  async withWriteLock<T>(fn: () => Promise<T>): Promise<T> {
+    return this.withTransaction(fn);
   }
 
   static generateId(): string {
