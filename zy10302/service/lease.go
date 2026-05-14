@@ -272,7 +272,20 @@ func (s *LeaseService) SubmitResult(taskID, leaseID, holderID, status, resultDat
 		return nil, errors.New("lease does not belong to the specified task")
 	}
 
+	if !lease.IsActive {
+		s.timeline.RecordEvent(taskID, leaseID, "LEASE_INACTIVE", holderID,
+			"Lease is no longer active (released or preempted)",
+			fmt.Sprintf("Lease acquired at: %v", lease.AcquiredAt))
+		return nil, errors.New("lease is no longer active")
+	}
+
 	now := time.Now().UTC()
+	if now.After(lease.ExpiresAt) {
+		s.timeline.RecordEvent(taskID, leaseID, "LEASE_EXPIRED", holderID,
+			"Lease has expired",
+			fmt.Sprintf("Expired at: %v, Current time: %v", lease.ExpiresAt, now))
+		return nil, ErrLeaseExpired
+	}
 	durationMs := now.Sub(startedAt).Milliseconds()
 
 	result := &model.ExecutionResult{
