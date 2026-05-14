@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接口限流账本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+            font-weight: 600;
+        }
+        
+        .nav-tab:hover {
+            color: #3b82f6;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        
+        tr:hover {
+            background: #f8fafc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.25rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #475569;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-bar select,
+        .filter-bar input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .alert-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .event-detail {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+        
+        .event-detail p {
+            margin: 0.25rem 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 接口限流账本</h1>
+    </div>
+    
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="overview">总览</button>
+            <button class="nav-tab" data-tab="tenants">租户管理</button>
+            <button class="nav-tab" data-tab="quotas">配额配置</button>
+            <button class="nav-tab" data-tab="events">限流事件</button>
+            <button class="nav-tab" data-tab="compensations">补偿记录</button>
+            <button class="nav-tab" data-tab="billing">账单导出</button>
+        </div>
+        
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-tenants">-</div>
+                    <div class="stat-label">租户总数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-pending">-</div>
+                    <div class="stat-label">待处理限流事件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-today">-</div>
+                    <div class="stat-label">今日事件数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-compensation">-</div>
+                    <div class="stat-label">总补偿额度</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>快捷操作</h2>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="simulateCall()">模拟调用</button>
+                    <button class="btn btn-success" onclick="openCompensateModal()">手动补偿</button>
+                    <button class="btn btn-secondary" onclick="refreshAll()">刷新数据</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>最近限流事件</h2>
+                <div id="recent-events-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="tenants" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>租户列表</h2>
+                    <button class="btn btn-primary" onclick="openTenantModal()">+ 新增租户</button>
+                </div>
+                <div id="tenants-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="quotas" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>配额配置</h2>
+                    <button class="btn btn-primary" onclick="openQuotaModal()">+ 新增配额</button>
+                </div>
+                <div id="quotas-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="events" class="tab-content">
+            <div class="card">
+                <h2>限流事件</h2>
+                <div class="filter-bar">
+                    <select id="event-tenant-filter" onchange="loadEvents()">
+                        <option value="">全部租户</option>
+                    </select>
+                    <select id="event-status-filter" onchange="loadEvents()">
+                        <option value="">全部状态</option>
+                        <option value="false">未处理</option>
+                        <option value="true">已处理</option>
+                    </select>
+                </div>
+                <div id="events-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="compensations" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>补偿记录</h2>
+                    <button class="btn btn-primary" onclick="openCompensateModal()">+ 新增补偿</button>
+                </div>
+                <div id="compensations-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="billing" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>账单摘要</h2>
+                    <button class="btn btn-primary" onclick="openBillingModal()">生成账单</button>
+                </div>
+                <div id="billing-table">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="tenant-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增租户</h3>
+                <button class="close-btn" onclick="closeModal('tenant-modal')">&times;</button>
+            </div>
+            <form onsubmit="createTenant(event)">
+                <div class="form-group">
+                    <label>租户名称 *</label>
+                    <input type="text" id="tenant-name" required>
+                </div>
+                <div class="form-group">
+                    <label>联系邮箱</label>
+                    <input type="email" id="tenant-email">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('tenant-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="quota-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增配额</h3>
+                <button class="close-btn" onclick="closeModal('quota-modal')">&times;</button>
+            </div>
+            <form onsubmit="createQuota(event)">
+                <div class="form-group">
+                    <label>租户 *</label>
+                    <select id="quota-tenant" required></select>
+                </div>
+                <div class="form-group">
+                    <label>接口分组 *</label>
+                    <select id="quota-group" required></select>
+                </div>
+                <div class="form-group">
+                    <label>日配额</label>
+                    <input type="number" id="quota-daily" value="1000" min="1">
+                </div>
+                <div class="form-group">
+                    <label>月配额</label>
+                    <input type="number" id="quota-monthly" value="30000" min="1">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('quota-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="compensate-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>手动补偿</h3>
+                <button class="close-btn" onclick="closeModal('compensate-modal')">&times;</button>
+            </div>
+            <form onsubmit="createCompensation(event)">
+                <div class="form-group">
+                    <label>租户 *</label>
+                    <select id="compensate-tenant" required onchange="loadQuotaGroups()"></select>
+                </div>
+                <div class="form-group">
+                    <label>接口分组 *</label>
+                    <select id="compensate-group" required></select>
+                </div>
+                <div class="form-group">
+                    <label>补偿额度 *</label>
+                    <input type="number" id="compensate-amount" required min="1">
+                </div>
+                <div class="form-group">
+                    <label>补偿原因 *</label>
+                    <textarea id="compensate-reason" required rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>操作人 *</label>
+                    <input type="text" id="compensate-operator" required>
+                </div>
+                <div class="form-group">
+                    <label>关联限流事件</label>
+                    <select id="compensate-event">
+                        <option value="">无</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('compensate-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">确认补偿</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="call-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>模拟API调用</h3>
+                <button class="close-btn" onclick="closeModal('call-modal')">&times;</button>
+            </div>
+            <form onsubmit="doSimulateCall(event)">
+                <div class="form-group">
+                    <label>租户 *</label>
+                    <select id="call-tenant" required onchange="loadCallGroups()"></select>
+                </div>
+                <div class="form-group">
+                    <label>接口分组 *</label>
+                    <select id="call-group" required></select>
+                </div>
+                <div class="form-group">
+                    <label>窗口大小（秒）</label>
+                    <input type="number" id="call-window" value="60" min="1">
+                </div>
+                <div id="call-result"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('call-modal')">关闭</button>
+                    <button type="submit" class="btn btn-primary">执行调用</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="billing-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>生成账单</h3>
+                <button class="close-btn" onclick="closeModal('billing-modal')">&times;</button>
+            </div>
+            <form onsubmit="generateBilling(event)">
+                <div class="form-group">
+                    <label>租户 *</label>
+                    <select id="billing-tenant" required></select>
+                </div>
+                <div class="form-group">
+                    <label>周期类型</label>
+                    <select id="billing-period">
+                        <option value="daily">日报</option>
+                        <option value="monthly" selected>月报</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('billing-modal')">取消</button>
+                    <button type="submit" class="btn btn-primary">生成账单</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
