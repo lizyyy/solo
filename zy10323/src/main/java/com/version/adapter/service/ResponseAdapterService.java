@@ -318,4 +318,51 @@ public class ResponseAdapterService {
     public List<InvocationSample> getErrorInvocations() {
         return invocationSampleRepository.findByHasErrorsTrue();
     }
+
+    public List<InvocationSample> getWarningInvocations() {
+        return invocationSampleRepository.findByHasWarningsTrue();
+    }
+
+    public InvocationSample getInvocationByRequestId(String requestId) {
+        return invocationSampleRepository.findByRequestId(requestId).orElse(null);
+    }
+
+    public Map<String, Object> exportTroubleshootingSummary(LocalDateTime startTime, LocalDateTime endTime) {
+        List<InvocationSample> samples = getInvocationHistory(startTime, endTime);
+        List<InvocationSample> errorSamples = getErrorInvocations();
+        List<InvocationSample> warningSamples = getWarningInvocations();
+
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalInvocations", samples.size());
+        summary.put("errorCount", errorSamples.size());
+        summary.put("warningCount", warningSamples.size());
+        summary.put("successRate", samples.isEmpty() ? 100.0 :
+                (double) (samples.size() - errorSamples.size()) / samples.size() * 100);
+
+        List<Map<String, Object>> errorDetails = new ArrayList<>();
+        for (InvocationSample sample : errorSamples) {
+            Map<String, Object> detail = new LinkedHashMap<>();
+            detail.put("requestId", sample.getRequestId());
+            detail.put("clientVersionId", sample.getClientVersionId());
+            detail.put("templateId", sample.getTemplateId());
+            detail.put("errorMessage", sample.getErrorMessage());
+            detail.put("invokedAt", sample.getInvokedAt());
+            detail.put("invokedBy", sample.getInvokedBy());
+            errorDetails.add(detail);
+        }
+        summary.put("errorDetails", errorDetails);
+
+        Map<String, Integer> versionStats = new HashMap<>();
+        for (InvocationSample sample : samples) {
+            String key = "version_" + sample.getClientVersionId();
+            versionStats.put(key, versionStats.getOrDefault(key, 0) + 1);
+        }
+        summary.put("versionStatistics", versionStats);
+
+        summary.put("timeRangeStart", startTime);
+        summary.put("timeRangeEnd", endTime);
+        summary.put("generatedAt", LocalDateTime.now());
+
+        return summary;
+    }
 }

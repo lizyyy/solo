@@ -54,4 +54,8 @@ public class AuditTimelineService {
     public List<AuditTimeline> getAllTimelineByEntityType(String entityType) {
         return auditTimelineRepository.findByEntityTypeOrderByPerformedAtDesc(entityType);
     }
+
+    public List<AuditTimeline> getAllTimelines() {
+        return auditTimelineRepository.findAll();
+    }
 }
