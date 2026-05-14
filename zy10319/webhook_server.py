@@ -271,9 +271,43 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 return
         
         if path.startswith("/api/v1/events/export"):
-            events = [e.to_dict() for e in service.event_by_id.values()]
-            self._send_json(events)
+            query = path.split("?")[-1] if "?" in path else ""
+            params = {}
+            for param in query.split("&"):
+                if "=" in param:
+                    k, v = param.split("=", 1)
+                    params[k] = v
+            
+            events = list(service.event_by_id.values())
+            
+            if "topic" in params and "businessKey" in params:
+                events = [e for e in events if e.topic == params["topic"] and e.business_key == params["businessKey"]]
+            elif "topic" in params:
+                events = [e for e in events if e.topic == params["topic"]]
+            elif "businessKey" in params:
+                events = [e for e in events if e.business_key == params["businessKey"]]
+            
+            self._send_json([e.to_dict() for e in events])
             return
+        
+        if path.startswith("/api/v1/events/trigger-timeout"):
+            query = path.split("?")[-1] if "?" in path else ""
+            params = {}
+            for param in query.split("&"):
+                if "=" in param:
+                    k, v = param.split("=", 1)
+                    params[k] = v
+            
+            if "topic" in params and "businessKey" in params:
+                processed = service.process_timeout(params["topic"], params["businessKey"])
+                self._send_json({
+                    "processed": len(processed),
+                    "events": [e.to_dict() for e in processed]
+                })
+                return
+            else:
+                self._send_json({"error": "Missing topic or businessKey"}, 400)
+                return
         
         if path.startswith("/api/v1/events/"):
             event_id = path.split("/")[-1]

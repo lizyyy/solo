@@ -171,4 +171,70 @@ webhook:
 - `202 Accepted`：乱序进入等待队列
 - `409 Conflict`：重复/回溯序列号被跳过
 - `400 Bad Request`：参数校验失败
+- `404 Not Found`：事件/状态不存在
 - `500 Internal Server Error`：服务器内部错误
+
+## 完整 API 列表
+
+### 提交事件
+```
+POST /api/v1/events
+Content-Type: application/json
+
+{
+    "eventId": "evt-001",
+    "topic": "order",
+    "businessKey": "order-123",
+    "sequenceNumber": 1
+}
+```
+
+### 查询单个事件
+```
+GET /api/v1/events/{eventId}
+```
+
+### 查询所有事件
+```
+GET /api/v1/events
+```
+
+### 查询序列状态
+```
+GET /api/v1/events/state?topic=order&businessKey=order-123
+```
+
+### 导出事件（支持筛选）
+```
+GET /api/v1/events/export                          # 导出所有
+GET /api/v1/events/export?topic=order              # 按 topic 筛选
+GET /api/v1/events/export?businessKey=order-123    # 按 businessKey 筛选
+GET /api/v1/events/export?topic=order&businessKey=order-123  # 组合筛选
+```
+
+### 触发超时处理（测试用）
+```
+GET /api/v1/events/trigger-timeout?topic=timeout&businessKey=test-timeout
+```
+
+### 健康检查
+```
+GET /api/v1/events/health
+```
+
+## 运行 curl 闭环测试
+
+```bash
+# 终端 1：启动服务器
+python3 webhook_server.py
+
+# 终端 2：运行完整测试
+./test_standalone.sh
+```
+
+测试脚本覆盖：
+- 服务启动检测
+- 14 个独立测试场景
+- 每个场景都有断言验证
+- 失败立即退出并返回非 0 状态码
+- trigger-timeout 接口直接验证超时逻辑（无需等待30秒）
