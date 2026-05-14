@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频转码任务编排系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd6;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-card.queued .value { color: #ffc107; }
+        .stat-card.processing .value { color: #17a2b8; }
+        .stat-card.completed .value { color: #28a745; }
+        .stat-card.failed .value { color: #dc3545; }
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .chart-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-queued { background: #fff3cd; color: #856404; }
+        .status-processing { background: #d1ecf1; color: #0c5460; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-failed { background: #f8d7da; color: #721c24; }
+        .status-blocked { background: #f5c6cb; color: #721c24; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .url-list {
+            list-style: none;
+        }
+        .url-list li {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 视频转码任务编排系统</h1>
+            <div class="header-actions">
+                <button class="btn btn-primary" onclick="initData()">初始化数据</button>
+                <button class="btn btn-success" onclick="refreshAll()">刷新数据</button>
+            </div>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value" id="stat-total">0</div>
+                <div class="label">总任务数</div>
+            </div>
+            <div class="stat-card queued">
+                <div class="value" id="stat-queued">0</div>
+                <div class="label">排队中</div>
+            </div>
+            <div class="stat-card processing">
+                <div class="value" id="stat-processing">0</div>
+                <div class="label">转码中</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="value" id="stat-completed">0</div>
+                <div class="label">已完成</div>
+            </div>
+            <div class="stat-card failed">
+                <div class="value" id="stat-failed">0</div>
+                <div class="label">失败</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-success-rate">0%</div>
+                <div class="label">成功率</div>
+            </div>
+        </div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h3>📊 任务状态分布</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📈 每日任务统计</h3>
+                <canvas id="dailyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📋 任务管理</h2>
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tasks')">所有任务</div>
+                <div class="tab" onclick="switchTab('videos')">视频列表</div>
+                <div class="tab" onclick="switchTab('templates')">码率模板</div>
+                <div class="tab" onclick="switchTab('failed')">失败任务</div>
+            </div>
+
+            <div id="tab-tasks" class="tab-content active">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="openModal('createTaskModal')">+ 创建转码任务</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>任务ID</th>
+                            <th>视频</th>
+                            <th>模板</th>
+                            <th>状态</th>
+                            <th>进度</th>
+                            <th>重试次数</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tasks-table"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-videos" class="tab-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="openModal('createVideoModal')">+ 录入视频</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>视频ID</th>
+                            <th>名称</th>
+                            <th>大小</th>
+                            <th>时长</th>
+                            <th>字幕</th>
+                            <th>状态</th>
+                            <th>录入人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videos-table"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-templates" class="tab-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn btn-primary" onclick="openModal('createTemplateModal')">+ 创建码率模板</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>模板ID</th>
+                            <th>名称</th>
+                            <th>码率</th>
+                            <th>分辨率</th>
+                            <th>需要字幕</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="templates-table"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-failed" class="tab-content">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>任务ID</th>
+                            <th>视频</th>
+                            <th>错误信息</th>
+                            <th>重试次数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="failed-tasks-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎥 播放地址</h2>
+            <ul class="url-list" id="playback-urls">
+                <li>暂无播放地址</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal" id="createVideoModal">
+        <div class="modal-content">
+            <h3>录入新视频</h3>
+            <div class="form-group">
+                <label>视频名称</label>
+                <input type="text" id="video-name" placeholder="例如：产品介绍视频.mp4">
+            </div>
+            <div class="form-group">
+                <label>文件大小 (字节)</label>
+                <input type="number" id="video-size" placeholder="例如：1024000000">
+            </div>
+            <div class="form-group">
+                <label>时长 (秒)</label>
+                <input type="number" id="video-duration" placeholder="例如：300">
+            </div>
+            <div class="form-group">
+                <label>格式</label>
+                <input type="text" id="video-format" value="mp4">
+            </div>
+            <div class="form-group">
+                <label>录入人</label>
+                <input type="text" id="video-creator" value="客服主管">
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('createVideoModal')">取消</button>
+                <button class="btn btn-primary" onclick="createVideo()">确认创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createTemplateModal">
+        <div class="modal-content">
+            <h3>创建码率模板</h3>
+            <div class="form-group">
+                <label>模板名称</label>
+                <input type="text" id="template-name" placeholder="例如：高清模板">
+            </div>
+            <div class="form-group">
+                <label>码率 (kbps)</label>
+                <input type="number" id="template-bitrate" placeholder="例如：2000">
+            </div>
+            <div class="form-group">
+                <label>分辨率</label>
+                <input type="text" id="template-resolution" placeholder="例如：1920x1080">
+            </div>
+            <div class="form-group">
+                <label>需要字幕</label>
+                <select id="template-require-subtitle">
+                    <option value="false">不需要</option>
+                    <option value="true">需要</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>字幕语言 (逗号分隔)</label>
+                <input type="text" id="template-subtitle-langs" placeholder="例如：zh-CN,en">
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('createTemplateModal')">取消</button>
+                <button class="btn btn-primary" onclick="createTemplate()">确认创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="createTaskModal">
+        <div class="modal-content">
+            <h3>创建转码任务</h3>
+            <div class="form-group">
+                <label>选择视频</label>
+                <select id="task-video-id"></select>
+            </div>
+            <div class="form-group">
+                <label>选择码率模板</label>
+                <select id="task-template-id"></select>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('createTaskModal')">取消</button>
+                <button class="btn btn-primary" onclick="createTask()">确认创建</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="retryTaskModal">
+        <div class="modal-content">
+            <h3>重试失败任务</h3>
+            <input type="hidden" id="retry-task-id">
+            <div class="form-group">
+                <label>重试原因 (用于复盘)</label>
+                <textarea id="retry-reason" rows="4" placeholder="请详细说明重试原因，例如：调整码率参数后重试"></textarea>
+            </div>
+            <div class="form-group">
+                <label>操作人</label>
+                <input type="text" id="retry-operator" value="技术支持">
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="closeModal('retryTaskModal')">取消</button>
+                <button class="btn btn-warning" onclick="retryTask()">确认重试</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let statusChart, dailyChart;
+
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        async function fetchAPI(endpoint, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+            const response = await fetch(`${API_BASE}/api/${endpoint}`, options);
+            return await response.json();
+        }
+
+        async function initData() {
+            const result = await fetchAPI('init', 'POST', { clear_first: true });
+            if (result.success) {
+                showAlert('数据初始化成功！');
+                refreshAll();
+            } else {
+                showAlert(result.message || '初始化失败', 'error');
+            }
+        }
+
+        async function refreshAll() {
+            await Promise.all([
+                loadStatistics(),
+                loadTasks(),
+                loadVideos(),
+                loadTemplates(),
+                loadFailedTasks(),
+                loadPlaybackUrls()
+            ]);
+        }
+
+        async function loadStatistics() {
+            const result = await fetchAPI('statistics');
+            if (result.success) {
+                const stats = result.data;
+                document.getElementById('stat-total').textContent = stats.total_tasks;
+                document.getElementById('stat-queued').textContent = stats.status_counts.queued;
+                document.getElementById('stat-processing').textContent = stats.status_counts.processing;
+                document.getElementById('stat-completed').textContent = stats.status_counts.completed;
+                document.getElementById('stat-failed').textContent = stats.status_counts.failed;
+                document.getElementById('stat-success-rate').textContent = stats.success_rate + '%';
+                updateCharts(stats);
+            }
+        }
+
+        function updateCharts(stats) {
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['排队中', '转码中', '已完成', '失败', '被阻止'],
+                    datasets: [{
+                        data: [
+                            stats.status_counts.queued,
+                            stats.status_counts.processing,
+                            stats.status_counts.completed,
+                            stats.status_counts.failed,
+                            stats.status_counts.blocked
+                        ],
+                        backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545', '#6c757d']
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        async function loadTasks() {
+            const result = await fetchAPI('tasks');
+            if (result.success) {
+                const tbody = document.getElementById('tasks-table');
+                tbody.innerHTML = result.data.map(task => `
+                    <tr>
+                        <td>${task.id}</td>
+                        <td>${task.video_id}</td>
+                        <td>${task.template_id}</td>
+                        <td><span class="status-badge status-${task.status}">${task.status}</span></td>
+                        <td><div class="progress-bar"><div class="progress-fill" style="width: ${task.progress}%"></div></div></td>
+                        <td>${task.retry_count || 0}</td>
+                        <td>${task.started_at || '-'}</td>
+                        <td class="action-btns">
+                            ${task.status === 'queued' ? `<button class="btn btn-primary action-btn" onclick="startTask('${task.id}')">开始</button>` : ''}
+                            ${task.status === 'processing' ? `<button class="btn btn-success action-btn" onclick="completeTask('${task.id}')">完成</button>` : ''}
+                            ${task.status === 'failed' ? `<button class="btn btn-warning action-btn" onclick="openRetryModal('${task.id}')">重试</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function loadVideos() {
+            const result = await fetchAPI('videos');
+            if (result.success) {
+                const tbody = document.getElementById('videos-table');
+                tbody.innerHTML = result.data.map(video => `
+                    <tr>
+                        <td>${video.id}</td>
+                        <td>${video.name}</td>
+                        <td>${(video.size / 1024 / 1024).toFixed(2)} MB</td>
+                        <td>${video.duration}s</td>
+                        <td>${video.has_subtitle ? '✓ ' + (video.subtitle_languages || []).join(', ') : '-'}</td>
+                        <td><span class="status-badge status-${video.status}">${video.status}</span></td>
+                        <td>${video.created_by}</td>
+                        <td>${video.created_at}</td>
+                        <td>-</td>
+                    </tr>
+                `).join('');
+
+                const select = document.getElementById('task-video-id');
+                select.innerHTML = result.data.map(v => `<option value="${v.id}">${v.name}</option>`).join('');
+            }
+        }
+
+        async function loadTemplates() {
+            const result = await fetchAPI('templates');
+            if (result.success) {
+                const tbody = document.getElementById('templates-table');
+                tbody.innerHTML = result.data.map(template => `
+                    <tr>
+                        <td>${template.id}</td>
+                        <td>${template.name}</td>
+                        <td>${template.bitrate} kbps</td>
+                        <td>${template.resolution}</td>
+                        <td>${template.require_subtitle ? '✓ ' + (template.subtitle_languages || []).join(', ') : '-'}</td>
+                        <td>${template.created_at}</td>
+                        <td>-</td>
+                    </tr>
+                `).join('');
+
+                const select = document.getElementById('task-template-id');
+                select.innerHTML = result.data.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+            }
+        }
+
+        async function loadFailedTasks() {
+            const result = await fetchAPI('tasks/failed');
+            if (result.success) {
+                const tbody = document.getElementById('failed-tasks-table');
+                tbody.innerHTML = result.data.map(task => `
+                    <tr>
+                        <td>${task.id}</td>
+                        <td>${task.video_id}</td>
+                        <td style="color: #dc3545;">${task.error_message}</td>
+                        <td>${task.retry_count || 0}</td>
+                        <td>
+                            <button class="btn btn-warning action-btn" onclick="openRetryModal('${task.id}')">重试</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        async function loadPlaybackUrls() {
+            const result = await fetchAPI('playback-urls');
+            if (result.success) {
+                const ul = document.getElementById('playback-urls');
+                if (result.data.length === 0) {
+                    ul.innerHTML = '<li>暂无播放地址</li>';
+                } else {
+                    ul.innerHTML = result.data.map(url => `
+                        <li>
+                            <strong>[${url.quality}]</strong> ${url.url}
+                            <br><small>任务ID: ${url.task_id} | 创建时间: ${url.created_at}</small>
+                        </li>
+                    `).join('');
+                }
+            }
+        }
+
+        async function createVideo() {
+            const data = {
+                name: document.getElementById('video-name').value,
+                size: parseInt(document.getElementById('video-size').value),
+                duration: parseInt(document.getElementById('video-duration').value),
+                format: document.getElementById('video-format').value,
+                created_by: document.getElementById('video-creator').value
+            };
+            const result = await fetchAPI('videos', 'POST', data);
+            if (result.success) {
+                showAlert('视频录入成功！');
+                closeModal('createVideoModal');
+                loadVideos();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        async function createTemplate() {
+            const subtitleLangs = document.getElementById('template-subtitle-langs').value;
+            const data = {
+                name: document.getElementById('template-name').value,
+                bitrate: parseInt(document.getElementById('template-bitrate').value),
+                resolution: document.getElementById('template-resolution').value,
+                require_subtitle: document.getElementById('template-require-subtitle').value === 'true',
+                subtitle_languages: subtitleLangs ? subtitleLangs.split(',').map(s => s.trim()) : []
+            };
+            const result = await fetchAPI('templates', 'POST', data);
+            if (result.success) {
+                showAlert('码率模板创建成功！相关任务将重新计算字幕要求');
+                closeModal('createTemplateModal');
+                loadTemplates();
+                loadTasks();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        async function createTask() {
+            const data = {
+                video_id: document.getElementById('task-video-id').value,
+                template_id: document.getElementById('task-template-id').value
+            };
+            const result = await fetchAPI('tasks', 'POST', data);
+            if (result.success) {
+                showAlert('转码任务创建成功！');
+                closeModal('createTaskModal');
+                loadTasks();
+                loadStatistics();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        async function startTask(taskId) {
+            const result = await fetchAPI(`tasks/${taskId}/start`, 'POST');
+            if (result.success) {
+                showAlert('任务已开始转码');
+                loadTasks();
+                loadStatistics();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        async function completeTask(taskId) {
+            const result = await fetchAPI(`tasks/${taskId}/complete`, 'POST');
+            if (result.success) {
+                showAlert('转码完成！播放地址已生成');
+                loadTasks();
+                loadStatistics();
+                loadPlaybackUrls();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        function openRetryModal(taskId) {
+            document.getElementById('retry-task-id').value = taskId;
+            openModal('retryTaskModal');
+        }
+
+        async function retryTask() {
+            const taskId = document.getElementById('retry-task-id').value;
+            const data = {
+                reason: document.getElementById('retry-reason').value,
+                operator: document.getElementById('retry-operator').value
+            };
+            const result = await fetchAPI(`tasks/${taskId}/retry`, 'POST', data);
+            if (result.success) {
+                showAlert('任务重试成功！重试记录已保存用于复盘');
+                closeModal('retryTaskModal');
+                loadTasks();
+                loadFailedTasks();
+                loadStatistics();
+            } else {
+                showAlert(result.message, 'error');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshAll();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+data/*.json
+!data/init_data.json
+node_modules/
+.DS_Store

@@ -1,0 +1,124 @@
+{
+  "bitrate_templates": {
+    "tpl_001": {
+      "id": "tpl_001",
+      "name": "高清模板",
+      "bitrate": 2000,
+      "resolution": "1920x1080",
+      "require_subtitle": true,
+      "subtitle_languages": ["zh-CN", "en"],
+      "created_at": "2024-01-15 10:00:00"
+    },
+    "tpl_002": {
+      "id": "tpl_002",
+      "name": "标清模板",
+      "bitrate": 1000,
+      "resolution": "1280x720",
+      "require_subtitle": false,
+      "subtitle_languages": [],
+      "created_at": "2024-01-15 10:05:00"
+    },
+    "tpl_003": {
+      "id": "tpl_003",
+      "name": "流畅模板",
+      "bitrate": 500,
+      "resolution": "854x480",
+      "require_subtitle": false,
+      "subtitle_languages": [],
+      "created_at": "2024-01-15 10:10:00"
+    }
+  },
+  "videos": {
+    "vid_001": {
+      "id": "vid_001",
+      "name": "产品介绍视频.mp4",
+      "size": 1024000000,
+      "duration": 300,
+      "format": "mp4",
+      "status": "pending",
+      "has_subtitle": true,
+      "subtitle_languages": ["zh-CN"],
+      "created_at": "2024-01-16 09:00:00",
+      "created_by": "客服主管"
+    },
+    "vid_002": {
+      "id": "vid_002",
+      "name": "培训课程.mp4",
+      "size": 2048000000,
+      "duration": 1800,
+      "format": "mp4",
+      "status": "processing",
+      "has_subtitle": false,
+      "subtitle_languages": [],
+      "created_at": "2024-01-16 10:30:00",
+      "created_by": "客服主管"
+    }
+  },
+  "subtitle_files": {
+    "sub_001": {
+      "id": "sub_001",
+      "video_id": "vid_001",
+      "language": "zh-CN",
+      "name": "产品介绍.srt",
+      "status": "approved",
+      "created_at": "2024-01-16 09:15:00"
+    }
+  },
+  "transcode_tasks": {
+    "task_001": {
+      "id": "task_001",
+      "video_id": "vid_001",
+      "template_id": "tpl_001",
+      "status": "completed",
+      "progress": 100,
+      "output_path": "/output/vid_001_tpl_001.mp4",
+      "started_at": "2024-01-16 09:30:00",
+      "completed_at": "2024-01-16 10:00:00",
+      "error_message": null,
+      "retry_count": 0
+    },
+    "task_002": {
+      "id": "task_002",
+      "video_id": "vid_002",
+      "template_id": "tpl_002",
+      "status": "failed",
+      "progress": 45,
+      "output_path": null,
+      "started_at": "2024-01-16 11:00:00",
+      "completed_at": null,
+      "error_message": "码率不匹配：源视频码率低于目标码率",
+      "retry_count": 0
+    },
+    "task_003": {
+      "id": "task_003",
+      "video_id": "vid_001",
+      "template_id": "tpl_002",
+      "status": "queued",
+      "progress": 0,
+      "output_path": null,
+      "started_at": null,
+      "completed_at": null,
+      "error_message": null,
+      "retry_count": 0
+    }
+  },
+  "retry_records": {
+    "retry_001": {
+      "id": "retry_001",
+      "task_id": "task_002",
+      "reason": "调整码率参数后重试",
+      "operator": "技术支持",
+      "created_at": "2024-01-16 14:00:00",
+      "status": "pending"
+    }
+  },
+  "playback_urls": {
+    "url_001": {
+      "id": "url_001",
+      "task_id": "task_001",
+      "url": "https://cdn.example.com/videos/vid_001_tpl_001/playlist.m3u8",
+      "quality": "1080p",
+      "created_at": "2024-01-16 10:05:00"
+    }
+  }
+}
