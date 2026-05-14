@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>环境变量漂移检测</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; border-radius: 12px; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; font-weight: 600; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-card .value { font-size: 32px; font-weight: 700; color: #333; }
+        .stat-card .label { font-size: 14px; color: #666; margin-top: 4px; }
+        .stat-card.pending .value { color: #f59e0b; }
+        .stat-card.approved .value { color: #10b981; }
+        .stat-card.rejected .value { color: #ef4444; }
+        .stat-card.warning .value { color: #f97316; }
+        
+        .section { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .section-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; color: #374151; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        
+        .drift-record { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+        .drift-record:hover { border-color: #667eea; }
+        .drift-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .drift-title { font-weight: 600; color: #111827; }
+        .drift-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #e5e7eb; }
+        .timeline-item { position: relative; padding-bottom: 20px; }
+        .timeline-item::before { content: ''; position: absolute; left: -28px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #667eea; border: 2px solid white; box-shadow: 0 0 0 2px #667eea; }
+        .timeline-item .action { font-weight: 600; color: #374151; font-size: 14px; }
+        .timeline-item .message { color: #6b7280; font-size: 14px; margin-top: 4px; }
+        .timeline-item .time { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+        
+        .var-diff { background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 8px; }
+        .var-key { font-weight: 600; color: #374151; margin-bottom: 8px; }
+        .var-values { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .var-value { padding: 8px; border-radius: 4px; font-family: monospace; font-size: 13px; }
+        .var-baseline { background: #dbeafe; color: #1e40af; }
+        .var-actual { background: #fee2e2; color: #991b1b; }
+        .sensitive-badge { background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px; }
+        
+        .mask-failure { background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
+        .mask-failure-title { color: #dc2626; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        
+        .repair-section { background: #fffbeb; border: 1px solid #fcd34d; padding: 16px; border-radius: 8px; margin-top: 16px; }
+        .repair-title { font-weight: 600; color: #92400e; margin-bottom: 12px; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+        .tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 14px; font-weight: 500; color: #6b7280; border-radius: 6px 6px 0 0; }
+        .tab.active { color: #667eea; background: #eef2ff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 24px; border-radius: 12px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+        
+        .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 环境变量漂移检测</h1>
+            <p style="margin-top: 8px; opacity: 0.9;">检测、管理和修复环境变量漂移问题</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="value" id="stat-total">0</div>
+                <div class="label">总记录数</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="value" id="stat-pending">0</div>
+                <div class="label">待处理</div>
+            </div>
+            <div class="stat-card approved">
+                <div class="value" id="stat-approved">0</div>
+                <div class="label">已批准</div>
+            </div>
+            <div class="stat-card rejected">
+                <div class="value" id="stat-rejected">0</div>
+                <div class="label">已拒绝</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="value" id="stat-mask-failures">0</div>
+                <div class="label">遮罩失败</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="stat-repair">0</div>
+                <div class="label">修复申请</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="projects">项目环境</button>
+            <button class="tab" data-tab="detect">漂移检测</button>
+            <button class="tab" data-tab="records">检测记录</button>
+            <button class="tab" data-tab="baseline">基线变更</button>
+        </div>
+
+        <div id="projects" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">📁 创建项目</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>项目名称</label>
+                        <input type="text" id="project-name" placeholder="例如：电商平台">
+                    </div>
+                    <div class="form-group">
+                        <label>项目描述</label>
+                        <input type="text" id="project-desc" placeholder="例如：主站业务系统">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="createProject()">创建项目</button>
+            </div>
+
+            <div class="section" id="projects-list" style="display: none;">
+                <h2 class="section-title">📋 项目列表</h2>
+                <div id="projects-container"></div>
+            </div>
+        </div>
+
+        <div id="detect" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🔬 环境变量漂移检测</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>选择项目</label>
+                        <select id="detect-project"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>选择环境</label>
+                        <select id="detect-env"></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>实际环境变量 (JSON格式)</label>
+                    <textarea id="actual-vars" rows="8" placeholder='{
+  "DB_HOST": "localhost",
+  "DB_PORT": "3306",
+  "API_KEY": "secret123",
+  "PASSWORD": "mypassword"
+}'></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="detectDrift()">开始检测</button>
+            </div>
+        </div>
+
+        <div id="records" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📊 检测记录</h2>
+                <div id="records-container">
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">暂无检测记录</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="baseline" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📝 基线变更历史</h2>
+                <div id="baseline-container">
+                    <p style="color: #6b7280; text-align: center; padding: 40px;">暂无基线变更记录</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="detail-modal">
+        <div class="modal-content">
+            <div class="modal-title">📋 漂移详情</div>
+            <div id="detail-content"></div>
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        let projects = {};
+        let currentProject = null;
+        let processedRecords = new Set();
+
+        async function init() {
+            await loadProjects();
+            await loadStatistics();
+            await loadRecords();
+            await loadBaselineChanges();
+            setupTabs();
+        }
+
+        function setupTabs() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+        }
+
+        async function apiCall(url, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${url}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                return await response.json();
+            } catch (e) {
+                console.error('API Error:', e);
+                return { error: e.message };
+            }
+        }
+
+        async function loadProjects() {
+            const data = await apiCall('/projects');
+            if (Array.isArray(data)) {
+                projects = {};
+                data.forEach(p => projects[p.id] = p);
+                renderProjects();
+                updateProjectSelects();
+            }
+        }
+
+        async function loadStatistics() {
+            const stats = await apiCall('/statistics');
+            document.getElementById('stat-total').textContent = stats.total_records || 0;
+            document.getElementById('stat-pending').textContent = stats.pending || 0;
+            document.getElementById('stat-approved').textContent = stats.approved || 0;
+            document.getElementById('stat-rejected').textContent = stats.rejected || 0;
+            document.getElementById('stat-mask-failures').textContent = stats.mask_failures || 0;
+            document.getElementById('stat-repair').textContent = stats.repair_requests || 0;
+        }
+
+        async function loadRecords() {
+            const records = await apiCall('/drifts');
+            renderRecords(records);
+        }
+
+        async function loadBaselineChanges() {
+            const changes = await apiCall('/baseline-changes');
+            renderBaselineChanges(changes);
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            const listSection = document.getElementById('projects-list');
+            
+            if (Object.keys(projects).length === 0) {
+                listSection.style.display = 'none';
+                return;
+            }
+            
+            listSection.style.display = 'block';
+            container.innerHTML = Object.values(projects).map(project => `
+                <div class="drift-record">
+                    <div class="drift-header">
+                        <div class="drift-title">${project.name}</div>
+                        <small style="color: #6b7280;">${new Date(project.created_at).toLocaleString()}</small>
+                    </div>
+                    <p style="color: #6b7280; margin-bottom: 12px;">${project.description || '无描述'}</p>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <h4 style="margin-bottom: 8px; color: #374151;">环境列表</h4>
+                        ${Object.values(project.envs || {}).map(env => `
+                            <div style="background: #f9fafb; padding: 12px; border-radius: 6px; margin-bottom: 8px;">
+                                <div style="font-weight: 500; margin-bottom: 8px;">${env.name}</div>
+                                <div style="font-family: monospace; font-size: 12px; color: #4b5563;">
+                                    ${Object.entries(env.variables).map(([k, v]) => 
+                                        `<div>${k}: ${isSensitive(k) ? maskValue(v) : v}</div>`
+                                    ).join('')}
+                                </div>
+                                <button class="btn btn-primary" style="margin-top: 8px;" onclick="showUpdateBaselineForm('${project.id}', '${env.id}')">更新基线</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 12px;">
+                        <h4 style="margin-bottom: 8px; color: #374151;">添加环境</h4>
+                        <div class="grid-2">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <input type="text" id="env-name-${project.id}" placeholder="环境名称，如：生产环境">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <textarea id="env-vars-${project.id}" rows="2" placeholder='{"KEY": "value"}'></textarea>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addEnv('${project.id}')">添加环境</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateProjectSelects() {
+            const projectSelect = document.getElementById('detect-project');
+            projectSelect.innerHTML = '<option value="">选择项目</option>' + 
+                Object.values(projects).map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            
+            projectSelect.onchange = () => {
+                const envSelect = document.getElementById('detect-env');
+                const proj = projects[projectSelect.value];
+                if (proj) {
+                    envSelect.innerHTML = '<option value="">选择环境</option>' + 
+                        Object.values(proj.envs || {}).map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+                } else {
+                    envSelect.innerHTML = '<option value="">选择环境</option>';
+                }
+            };
+        }
+
+        async function createProject() {
+            const name = document.getElementById('project-name').value;
+            const desc = document.getElementById('project-desc').value;
+            
+            if (!name) {
+                alert('请输入项目名称');
+                return;
+            }
+            
+            await apiCall('/projects', {
+                method: 'POST',
+                body: JSON.stringify({ name, description: desc })
+            });
+            
+            document.getElementById('project-name').value = '';
+            document.getElementById('project-desc').value = '';
+            await loadProjects();
+        }
+
+        async function addEnv(projectId) {
+            const name = document.getElementById(`env-name-${projectId}`).value;
+            const varsStr = document.getElementById(`env-vars-${projectId}`).value;
+            
+            if (!name || !varsStr) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            try {
+                const variables = JSON.parse(varsStr);
+                await apiCall(`/projects/${projectId}/envs`, {
+                    method: 'POST',
+                    body: JSON.stringify({ name, variables })
+                });
+                document.getElementById(`env-name-${projectId}`).value = '';
+                document.getElementById(`env-vars-${projectId}`).value = '';
+                await loadProjects();
+                await loadRecords();
+            } catch (e) {
+                alert('JSON格式错误');
+            }
+        }
+
+        function showUpdateBaselineForm(projectId, envId) {
+            const proj = projects[projectId];
+            const env = proj.envs[envId];
+            const newVars = prompt('输入新的基线变量 (JSON格式):', JSON.stringify(env.variables, null, 2));
+            if (newVars) {
+                try {
+                    const variables = JSON.parse(newVars);
+                    updateBaseline(projectId, envId, variables);
+                } catch (e) {
+                    alert('JSON格式错误');
+                }
+            }
+        }
+
+        async function updateBaseline(projectId, envId, variables) {
+            await apiCall(`/projects/${projectId}/envs/${envId}/baseline`, {
+                method: 'PUT',
+                body: JSON.stringify({ variables })
+            });
+            await loadProjects();
+            await loadRecords();
+            await loadBaselineChanges();
+        }
+
+        async function detectDrift() {
+            const projectId = document.getElementById('detect-project').value;
+            const envId = document.getElementById('detect-env').value;
+            const varsStr = document.getElementById('actual-vars').value;
+            
+            if (!projectId || !envId || !varsStr) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            try {
+                const actualVariables = JSON.parse(varsStr);
+                const result = await apiCall('/detect', {
+                    method: 'POST',
+                    body: JSON.stringify({ project_id: projectId, env_id: envId, actual_variables: actualVariables })
+                });
+                
+                if (result.warning) {
+                    alert(`警告：${result.warning}\n遮罩失败数量：${result.mask_failures.length}`);
+                } else {
+                    alert(`检测完成，发现 ${result.drift_count} 个漂移变量`);
+                }
+                
+                await loadStatistics();
+                await loadRecords();
+            } catch (e) {
+                alert('JSON格式错误');
+            }
+        }
+
+        function renderRecords(records) {
+            const container = document.getElementById('records-container');
+            
+            if (!records || records.length === 0) {
+                container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 40px;">暂无检测记录</p>';
+                return;
+            }
+            
+            container.innerHTML = records.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map(record => {
+                const proj = projects[record.project_id];
+                const env = proj?.envs?.[record.env_id];
+                const statusClass = `status-${record.status}`;
+                const statusText = { pending: '待处理', approved: '已批准', rejected: '已拒绝' }[record.status];
+                
+                return `
+                    <div class="drift-record" id="record-${record.id}">
+                        <div class="drift-header">
+                            <div>
+                                <span class="drift-title">${proj?.name || '未知项目'} - ${env?.name || '未知环境'}</span>
+                                ${record.mask_failures && record.mask_failures.length > 0 ? '<span class="badge badge-warning">⚠️ 遮罩失败</span>' : ''}
+                                ${record.repair_request ? '<span class="badge badge-info">🔧 修复申请</span>' : ''}
+                            </div>
+                            <span class="drift-status ${statusClass}">${statusText}</span>
+                        </div>
+                        
+                        <div style="color: #6b7280; font-size: 13px; margin-bottom: 12px;">
+                            检测时间: ${new Date(record.created_at).toLocaleString()} | 
+                            漂移变量: <strong>${record.drift_count}</strong> 个
+                        </div>
+
+                        ${record.mask_failures && record.mask_failures.length > 0 ? `
+                            <div class="mask-failure">
+                                <div class="mask-failure-title">⚠️ 敏感值遮罩失败 (${record.mask_failures.length}个)</div>
+                                ${record.mask_failures.map(f => `
+                                    <div style="font-family: monospace; font-size: 12px;">
+                                        ${f.key}: 原值="${f.value}", 遮罩后="${f.masked_value}"
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div style="margin-bottom: 12px;">
+                            <h4 style="font-size: 14px; margin-bottom: 8px; color: #374151;">漂移变量对比</h4>
+                            ${Object.entries(record.drifted_variables || {}).map(([key, val]) => `
+                                <div class="var-diff">
+                                    <div class="var-key">
+                                        ${key}
+                                        ${val.is_sensitive ? '<span class="sensitive-badge">敏感</span>' : ''}
+                                    </div>
+                                    <div class="var-values">
+                                        <div>
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">基线值</div>
+                                            <div class="var-value var-baseline">${val.masked_baseline || val.baseline}</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">实际值</div>
+                                            <div class="var-value var-actual">${val.masked_actual || val.actual}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        ${record.repair_request ? `
+                            <div class="repair-section">
+                                <div class="repair-title">🔧 修复申请</div>
+                                <div style="margin-bottom: 8px;"><strong>申请理由:</strong> ${record.repair_request.reason}</div>
+                                <div style="margin-bottom: 8px;"><strong>状态:</strong> ${record.repair_request.status === 'pending' ? '待处理' : record.repair_request.status === 'approved' ? '已通过' : '已拒绝'}</div>
+                                ${record.repair_request.handling_reason ? `<div><strong>处理理由:</strong> ${record.repair_request.handling_reason}</div>` : ''}
+                                ${record.repair_request.status === 'pending' ? `
+                                    <div class="actions" style="margin-top: 12px;">
+                                        <button class="btn btn-success" onclick="handleRepair('${record.id}', 'approved')">通过修复</button>
+                                        <button class="btn btn-danger" onclick="handleRepair('${record.id}', 'rejected')">拒绝修复</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+
+                        <div class="timeline" style="margin-top: 16px;">
+                            <h4 style="font-size: 14px; margin-bottom: 12px; color: #374151;">📅 处理时间线</h4>
+                            ${record.timeline.map(item => `
+                                <div class="timeline-item">
+                                    <div class="action">${getActionLabel(item.action)}</div>
+                                    <div class="message">${item.message}</div>
+                                    <div class="time">${new Date(item.created_at).toLocaleString()}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="actions" style="margin-top: 16px;">
+                            ${record.status === 'pending' ? `
+                                <button class="btn btn-success" onclick="approveDrift('${record.id}')" id="btn-approve-${record.id}">✅ 批准漂移</button>
+                                <button class="btn btn-danger" onclick="rejectDrift('${record.id}')" id="btn-reject-${record.id}">❌ 拒绝漂移</button>
+                            ` : ''}
+                            ${record.mask_failures && record.mask_failures.length > 0 && !record.repair_request ? `
+                                <button class="btn btn-warning" onclick="showRepairForm('${record.id}')">🔧 申请修复</button>
+                            ` : ''}
+                            <button class="btn btn-primary" onclick="showDetail('${record.id}')">📋 查看详情</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getActionLabel(action) {
+            const labels = {
+                detected: '🔍 检测完成',
+                approved: '✅ 已批准',
+                rejected: '❌ 已拒绝',
+                repair_requested: '📝 提交修复申请',
+                repair_approved: '✅ 修复申请通过',
+                repair_rejected: '❌ 修复申请拒绝'
+            };
+            return labels[action] || action;
+        }
+
+        function renderBaselineChanges(changes) {
+            const container = document.getElementById('baseline-container');
+            
+            if (!changes || changes.length === 0) {
+                container.innerHTML = '<p style="color: #6b7280; text-align: center; padding: 40px;">暂无基线变更记录</p>';
+                return;
+            }
+            
+            container.innerHTML = changes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map(change => {
+                const proj = projects[change.project_id];
+                const env = proj?.envs?.[change.env_id];
+                
+                return `
+                    <div class="drift-record">
+                        <div class="drift-header">
+                            <div class="drift-title">${proj?.name || '未知'} - ${env?.name || '未知'}</div>
+                            <small style="color: #6b7280;">${new Date(change.created_at).toLocaleString()}</small>
+                        </div>
+                        <div class="var-values">
+                            <div>
+                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">变更前</div>
+                                <div class="var-value var-baseline" style="font-family: monospace; font-size: 11px;">
+                                    ${JSON.stringify(change.old_vars, null, 2)}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; color: #6b7280; margin-bottom: 4px;">变更后</div>
+                                <div class="var-value var-actual" style="font-family: monospace; font-size: 11px;">
+                                    ${JSON.stringify(change.new_vars, null, 2)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function approveDrift(recordId) {
+            if (processedRecords.has(`approve-${recordId}`)) {
+                alert('正在处理中，请稍候...');
+                return;
+            }
+            processedRecords.add(`approve-${recordId}`);
+            
+            const btn = document.getElementById(`btn-approve-${recordId}`);
+            if (btn) btn.disabled = true;
+            
+            await apiCall(`/drifts/${recordId}/approve`, { method: 'POST' });
+            await loadStatistics();
+            await loadRecords();
+            
+            processedRecords.delete(`approve-${recordId}`);
+        }
+
+        async function rejectDrift(recordId) {
+            if (processedRecords.has(`reject-${recordId}`)) {
+                alert('正在处理中，请稍候...');
+                return;
+            }
+            
+            const reason = prompt('请输入拒绝理由:');
+            if (reason === null) return;
+            
+            processedRecords.add(`reject-${recordId}`);
+            
+            const btn = document.getElementById(`btn-reject-${recordId}`);
+            if (btn) btn.disabled = true;
+            
+            await apiCall(`/drifts/${recordId}/reject`, {
+                method: 'POST',
+                body: JSON.stringify({ reason })
+            });
+            await loadStatistics();
+            await loadRecords();
+            
+            processedRecords.delete(`reject-${recordId}`);
+        }
+
+        function showRepairForm(recordId) {
+            const reason = prompt('请输入修复申请理由:');
+            if (reason) {
+                createRepairRequest(recordId, reason);
+            }
+        }
+
+        async function createRepairRequest(recordId, reason) {
+            await apiCall(`/drifts/${recordId}/repair-request`, {
+                method: 'POST',
+                body: JSON.stringify({ reason })
+            });
+            await loadRecords();
+        }
+
+        async function handleRepair(recordId, status) {
+            const reason = prompt('请输入处理理由:');
+            if (reason === null) return;
+            
+            await apiCall(`/drifts/${recordId}/repair-request/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ status, handling_reason: reason })
+            });
+            await loadRecords();
+        }
+
+        async function showDetail(recordId) {
+            const record = await apiCall(`/drifts/${recordId}`);
+            const proj = projects[record.project_id];
+            const env = proj?.envs?.[record.env_id];
+            
+            const content = document.getElementById('detail-content');
+            content.innerHTML = `
+                <div style="margin-bottom: 16px;">
+                    <strong>项目:</strong> ${proj?.name || '未知'}<br>
+                    <strong>环境:</strong> ${env?.name || '未知'}<br>
+                    <strong>状态:</strong> ${record.status === 'pending' ? '待处理' : record.status === 'approved' ? '已批准' : '已拒绝'}<br>
+                    <strong>检测时间:</strong> ${new Date(record.created_at).toLocaleString()}
+                </div>
+                
+                <h4 style="margin-bottom: 8px;">漂移变量</h4>
+                ${Object.entries(record.drifted_variables || {}).map(([key, val]) => `
+                    <div class="var-diff">
+                        <div class="var-key">${key}</div>
+                        <div class="var-values">
+                            <div class="var-value var-baseline">基线: ${val.masked_baseline || val.baseline}</div>
+                            <div class="var-value var-actual">实际: ${val.masked_actual || val.actual}</div>
+                        </div>
+                    </div>
+                `).join('')}
+
+                ${record.repair_request ? `
+                    <h4 style="margin: 16px 0 8px;">修复申请复盘</h4>
+                    <div style="background: #f9fafb; padding: 12px; border-radius: 6px;">
+                        <p><strong>申请时间:</strong> ${new Date(record.repair_request.created_at).toLocaleString()}</p>
+                        <p><strong>申请理由:</strong> ${record.repair_request.reason}</p>
+                        <p><strong>处理人:</strong> ${record.repair_request.handler || '未处理'}</p>
+                        <p><strong>处理时间:</strong> ${record.repair_request.handled_at ? new Date(record.repair_request.handled_at).toLocaleString() : '未处理'}</p>
+                        <p><strong>处理理由:</strong> ${record.repair_request.handling_reason || '未提供'}</p>
+                    </div>
+                ` : ''}
+
+                <h4 style="margin: 16px 0 8px;">完整时间线</h4>
+                <div class="timeline">
+                    ${record.timeline.map(item => `
+                        <div class="timeline-item">
+                            <div class="action">${getActionLabel(item.action)}</div>
+                            <div class="message">${item.message}</div>
+                            <div class="time">${new Date(item.created_at).toLocaleString()}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('detail-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+        }
+
+        function isSensitive(key) {
+            return ['password', 'secret', 'token', 'key', 'credential'].includes(key.toLowerCase());
+        }
+
+        function maskValue(value) {
+            if (!value || value.length <= 4) return '****';
+            return value.slice(0, 2) + '****' + value.slice(-2);
+        }
+
+        init();
+    </script>
+</body>
+</html>
