@@ -3,20 +3,23 @@ package models
 type ErrorCode string
 
 const (
-	ErrInvalidRequest     ErrorCode = "INVALID_REQUEST"
-	ErrTaskNotFound       ErrorCode = "TASK_NOT_FOUND"
-	ErrTenantNotFound     ErrorCode = "TENANT_NOT_FOUND"
-	ErrClusterNotFound    ErrorCode = "CLUSTER_NOT_FOUND"
-	ErrInvalidStatus      ErrorCode = "INVALID_STATUS"
-	ErrStatusTransition   ErrorCode = "STATUS_TRANSITION_ERROR"
-	ErrValidationFailed   ErrorCode = "VALIDATION_FAILED"
-	ErrDualWriteFailed    ErrorCode = "DUAL_WRITE_FAILED"
-	ErrRollbackFailed     ErrorCode = "ROLLBACK_FAILED"
-	ErrDuplicateTask      ErrorCode = "DUPLICATE_TASK"
-	ErrTaskInProgress     ErrorCode = "TASK_IN_PROGRESS"
-	ErrCheckItemFailed    ErrorCode = "CHECK_ITEM_FAILED"
-	ErrInternalError      ErrorCode = "INTERNAL_ERROR"
-	ErrPowerOffNotAllowed ErrorCode = "POWER_OFF_NOT_ALLOWED"
+	ErrInvalidRequest        ErrorCode = "INVALID_REQUEST"
+	ErrTaskNotFound          ErrorCode = "TASK_NOT_FOUND"
+	ErrTenantNotFound        ErrorCode = "TENANT_NOT_FOUND"
+	ErrClusterNotFound       ErrorCode = "CLUSTER_NOT_FOUND"
+	ErrInvalidStatus         ErrorCode = "INVALID_STATUS"
+	ErrStatusTransition      ErrorCode = "STATUS_TRANSITION_ERROR"
+	ErrValidationFailed      ErrorCode = "VALIDATION_FAILED"
+	ErrDualWriteFailed       ErrorCode = "DUAL_WRITE_FAILED"
+	ErrRollbackFailed        ErrorCode = "ROLLBACK_FAILED"
+	ErrRollbackPointNotFound ErrorCode = "ROLLBACK_POINT_NOT_FOUND"
+	ErrRollbackPointMismatch ErrorCode = "ROLLBACK_POINT_MISMATCH"
+	ErrAlreadyRolledBack     ErrorCode = "ALREADY_ROLLED_BACK"
+	ErrDuplicateTask         ErrorCode = "DUPLICATE_TASK"
+	ErrTaskInProgress        ErrorCode = "TASK_IN_PROGRESS"
+	ErrCheckItemFailed       ErrorCode = "CHECK_ITEM_FAILED"
+	ErrInternalError         ErrorCode = "INTERNAL_ERROR"
+	ErrPowerOffNotAllowed    ErrorCode = "POWER_OFF_NOT_ALLOWED"
 )
 
 func (e ErrorCode) String() string {

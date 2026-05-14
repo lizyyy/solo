@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"tenant-migration-api/internal/models"
 	"tenant-migration-api/internal/repository"
 	"tenant-migration-api/pkg/logger"
@@ -291,32 +292,89 @@ func (s *migrationService) simulateSwitchReadTraffic(taskID string) {
 }
 
 func (s *migrationService) RollbackMigration(req *models.RollbackRequest) (*models.RollbackResponse, error) {
-	logger.Infof("Rolling back migration task: %s", req.TaskID)
+	logger.Infof("Rolling back migration task: %s, rollback point: %s", req.TaskID, req.RollbackPointID)
 
 	task, err := s.repo.GetTaskByID(req.TaskID)
 	if err != nil {
 		return nil, models.NewBusinessError(models.ErrTaskNotFound, "任务不存在")
 	}
 
-	if !s.stateMachine.CanTransition(task.Status, models.StatusRollingBack) {
-		return nil, models.NewBusinessError(models.ErrStatusTransition, "当前状态不允许回滚")
+	if task.Status == models.StatusRolledBack {
+		return nil, models.NewBusinessError(models.ErrAlreadyRolledBack, "任务已处于回滚完成状态，不能重复回滚")
 	}
 
-	s.recordStatusChange(task.ID, task.Status, models.StatusRollingBack, req.Operator, req.Reason)
+	if !s.stateMachine.CanTransition(task.Status, models.StatusRollingBack) {
+		validTransitions := s.stateMachine.GetValidTransitions(task.Status)
+		return nil, models.NewBusinessError(models.ErrStatusTransition,
+			"当前状态不允许回滚，允许的目标状态: "+formatTransitions(validTransitions))
+	}
+
+	if req.RollbackPointID == "" {
+		return nil, models.NewBusinessError(models.ErrInvalidRequest, "回滚点ID不能为空")
+	}
+
+	rollbackPoint, err := s.repo.GetRollbackPointByID(req.RollbackPointID)
+	if err != nil {
+		return nil, models.NewBusinessError(models.ErrRollbackPointNotFound, "回滚点不存在")
+	}
+
+	if rollbackPoint.MigrationTaskID != task.ID {
+		return nil, models.NewBusinessError(models.ErrRollbackPointMismatch, "回滚点不属于当前任务")
+	}
+
+	s.recordStatusChange(task.ID, task.Status, models.StatusRollingBack, req.Operator,
+		fmt.Sprintf("执行回滚至阶段: %s, 原因: %s", rollbackPoint.Phase, req.Reason))
 	s.repo.UpdateTaskStatus(task.ID, models.StatusRollingBack, "ROLLING_BACK", "")
 
-	rollbackDuration := 500 * time.Millisecond
-	time.Sleep(rollbackDuration)
+	err = s.restoreFromRollbackPoint(task, rollbackPoint)
+	if err != nil {
+		logger.Errorf("Failed to restore from rollback point: %v", err)
+		s.repo.UpdateTaskStatus(task.ID, models.StatusFailed, "FAILED", "回滚失败: "+err.Error())
+		return nil, models.NewBusinessErrorWithCause(models.ErrRollbackFailed, "回滚执行失败", err)
+	}
 
-	s.recordStatusChange(task.ID, models.StatusRollingBack, models.StatusRolledBack, req.Operator, "回滚完成")
+	s.recordStatusChange(task.ID, models.StatusRollingBack, models.StatusRolledBack, req.Operator,
+		fmt.Sprintf("回滚完成，已恢复至阶段: %s", rollbackPoint.Phase))
 	s.repo.UpdateTaskStatus(task.ID, models.StatusRolledBack, "ROLLED_BACK", "")
 
-	logger.Infof("Migration task rolled back: %s", req.TaskID)
+	logger.Infof("Migration task rolled back successfully: %s to phase: %s", req.TaskID, rollbackPoint.Phase)
 	return &models.RollbackResponse{
-		TaskID:         task.ID,
-		Status:         models.StatusRolledBack,
-		RollbackPointID: req.RollbackPointID,
+		TaskID:            task.ID,
+		Status:            models.StatusRolledBack,
+		RollbackPointID:   req.RollbackPointID,
+		RolledBackToPhase: rollbackPoint.Phase,
 	}, nil
+}
+
+func (s *migrationService) restoreFromRollbackPoint(task *models.MigrationTask, point *models.RollbackPoint) error {
+	logger.Infof("Restoring task %s from rollback point %s to phase %s", task.ID, point.ID, point.Phase)
+
+	var snapshot map[string]interface{}
+	if err := json.Unmarshal([]byte(point.SnapshotData), &snapshot); err != nil {
+		logger.Warnf("Failed to parse snapshot data: %v, using default restore logic", err)
+	}
+
+	time.Sleep(300 * time.Millisecond)
+
+	simulateRollbackByPhase(point.Phase)
+
+	logger.Infof("Task %s restored to phase %s successfully", task.ID, point.Phase)
+	return nil
+}
+
+func simulateRollbackByPhase(phase string) {
+	switch phase {
+	case "VALIDATION_PASSED":
+		logger.Info("Rolling back dual write configurations...")
+	case "DUAL_WRITING":
+		logger.Info("Rolling back read traffic configurations...")
+	case "VERIFYING":
+		logger.Info("Rolling back verification checkpoints...")
+	case "SWITCHING_READ":
+		logger.Info("Rolling back read switch and restoring source database connections...")
+	case "COMPLETED":
+		logger.Info("Full rollback: restoring all configurations and connections...")
+	}
 }
 
 func (s *migrationService) GetMigrationTask(taskID string) (*models.GetMigrationTaskResponse, error) {
