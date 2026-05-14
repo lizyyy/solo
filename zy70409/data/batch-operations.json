@@ -1,0 +1,48 @@
+[
+  {
+    "id": "2bdvg744eue",
+    "name": "批次1复核",
+    "type": "review",
+    "status": "preview",
+    "targetIds": [
+      "dckkja3vxij",
+      "gcyevvonae",
+      "zz7zqieucz9",
+      "8yrvjqn1sa7",
+      "z62fd7ozud"
+    ],
+    "previewResult": {
+      "affectedCount": 5,
+      "affectedItems": [
+        {
+          "id": "dckkja3vxij",
+          "title": "生产部物资采购申请",
+          "impact": "将执行复核操作"
+        },
+        {
+          "id": "gcyevvonae",
+          "title": "行政部物资采购申请",
+          "impact": "将执行复核操作"
+        },
+        {
+          "id": "zz7zqieucz9",
+          "title": "财务部物资采购申请",
+          "impact": "将执行复核操作"
+        },
+        {
+          "id": "8yrvjqn1sa7",
+          "title": "行政部物资采购申请",
+          "impact": "将执行复核操作"
+        },
+        {
+          "id": "z62fd7ozud",
+          "title": "生产部物资采购申请",
+          "impact": "将执行复核操作"
+        }
+      ],
+      "warnings": []
+    },
+    "createdAt": "2026-05-14T17:15:23.191Z",
+    "createdBy": "cli-user"
+  }
+]

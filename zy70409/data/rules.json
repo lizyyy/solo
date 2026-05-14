@@ -1,0 +1,68 @@
+[
+  {
+    "version": "v1.0",
+    "effectiveDate": "2024-01-01",
+    "description": "初始版本：金额阈值5万元，无重复检查",
+    "conditions": [
+      {
+        "type": "amount_threshold",
+        "operator": "<=",
+        "value": 50000
+      },
+      {
+        "type": "item_count",
+        "operator": "<=",
+        "value": 20
+      }
+    ],
+    "approvalFlow": [
+      {
+        "level": 1,
+        "role": "采购主管"
+      },
+      {
+        "level": 2,
+        "role": "财务审核"
+      }
+    ],
+    "isActive": false
+  },
+  {
+    "version": "v2.0",
+    "effectiveDate": "2024-06-01",
+    "description": "当前版本：金额阈值10万元，增加重复提交检查",
+    "conditions": [
+      {
+        "type": "amount_threshold",
+        "operator": "<=",
+        "value": 100000
+      },
+      {
+        "type": "item_count",
+        "operator": "<=",
+        "value": 30
+      },
+      {
+        "type": "duplicate_check",
+        "operator": "==",
+        "value": "false"
+      }
+    ],
+    "approvalFlow": [
+      {
+        "level": 1,
+        "role": "采购主管"
+      },
+      {
+        "level": 2,
+        "role": "财务审核"
+      },
+      {
+        "level": 3,
+        "role": "总监审批",
+        "condition": "amount > 50000"
+      }
+    ],
+    "isActive": true
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "6vqz4bfzimh",
+    "batchId": "BATCH-2024-001",
+    "inquiryId": "dckkja3vxij",
+    "type": "temp_approval",
+    "status": "approved",
+    "grantedBy": "U005",
+    "grantedByName": "审批总监",
+    "grantedAt": "2026-05-14T17:14:48.725Z",
+    "reason": "紧急采购需求，临时豁免金额限制",
+    "originalValue": {
+      "amountThreshold": 100000,
+      "actualAmount": 125000
+    },
+    "modifiedValue": {
+      "amountThreshold": 150000,
+      "actualAmount": 125000
+    },
+    "conclusion": "同意临时提高审批阈值至15万元，允许本次采购通过",
+    "createdAt": "2026-05-14T17:14:48.725Z",
+    "expiresAt": "2026-05-21T17:14:48.725Z"
+  }
+]

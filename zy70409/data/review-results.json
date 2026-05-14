@@ -1,0 +1,140 @@
+[
+  {
+    "inquiryId": "dckkja3vxij",
+    "batchId": "BATCH-2024-001",
+    "status": "error",
+    "ruleVersion": "v2.0",
+    "checks": [
+      {
+        "name": "amount_threshold",
+        "passed": false,
+        "message": "金额 851789 超出阈值 100000",
+        "details": {
+          "actualAmount": 851789,
+          "threshold": 100000
+        }
+      },
+      {
+        "name": "item_count",
+        "passed": true,
+        "message": "物料数量 5 符合要求",
+        "details": {
+          "actualCount": 5,
+          "maxCount": 30
+        }
+      },
+      {
+        "name": "duplicate_check",
+        "passed": true,
+        "message": "检测到重复提交",
+        "details": {
+          "duplicateCount": 1,
+          "duplicateIds": [
+            "z62fd7ozud"
+          ]
+        }
+      }
+    ],
+    "issues": [
+      {
+        "type": "amount_exceed",
+        "severity": "high",
+        "message": "询价单金额 851789 超出阈值 100000",
+        "data": {
+          "actualAmount": 851789,
+          "threshold": 100000
+        }
+      },
+      {
+        "type": "duplicate",
+        "severity": "high",
+        "message": "检测到 1 条重复提交记录",
+        "data": {
+          "duplicateCount": 1,
+          "duplicateIds": [
+            "z62fd7ozud"
+          ]
+        }
+      }
+    ],
+    "originalData": {
+      "id": "dckkja3vxij",
+      "batchId": "BATCH-2024-001",
+      "inquiryNo": "XJ2026052575",
+      "title": "生产部物资采购申请",
+      "department": "生产部",
+      "applicantId": "U002",
+      "applicantName": "李四",
+      "applyDate": "2026-05-14",
+      "items": [
+        {
+          "id": "1spvdbmw23e",
+          "itemCode": "M001",
+          "itemName": "电阻器",
+          "specification": "100Ω 1/4W",
+          "quantity": 208,
+          "unit": "个",
+          "unitPrice": 900,
+          "totalPrice": 187200,
+          "supplierId": "S003",
+          "supplierName": "广州市化工原料公司"
+        },
+        {
+          "id": "4039jdz6s0c",
+          "itemCode": "M008",
+          "itemName": "晶振",
+          "specification": "8MHz 12PF",
+          "quantity": 625,
+          "unit": "个",
+          "unitPrice": 82,
+          "totalPrice": 51250,
+          "supplierId": "S001",
+          "supplierName": "深圳市电子科技有限公司"
+        },
+        {
+          "id": "w8m44zenp0o",
+          "itemCode": "M007",
+          "itemName": "连接器",
+          "specification": "2.54mm 10P",
+          "quantity": 775,
+          "unit": "个",
+          "unitPrice": 51,
+          "totalPrice": 39525,
+          "supplierId": "S002",
+          "supplierName": "东莞市五金制品厂"
+        },
+        {
+          "id": "qgnn6dihl9",
+          "itemCode": "M005",
+          "itemName": "三极管",
+          "specification": "S9013",
+          "quantity": 348,
+          "unit": "个",
+          "unitPrice": 660,
+          "totalPrice": 229680,
+          "supplierId": "S003",
+          "supplierName": "广州市化工原料公司"
+        },
+        {
+          "id": "o6tz85gpu8e",
+          "itemCode": "M006",
+          "itemName": "PCB板",
+          "specification": "FR-4 1.6mm",
+          "quantity": 523,
+          "unit": "个",
+          "unitPrice": 658,
+          "totalPrice": 344134,
+          "supplierId": "S004",
+          "supplierName": "佛山市机械装备有限公司"
+        }
+      ],
+      "totalAmount": 851789,
+      "status": "submitted",
+      "createdAt": "2026-05-14T17:14:48.721Z",
+      "updatedAt": "2026-05-14T17:14:48.721Z",
+      "submittedAt": "2026-05-14T17:14:48.721Z",
+      "ruleVersion": "v2.0"
+    },
+    "reviewedAt": "2026-05-14T17:15:06.479Z"
+  }
+]
