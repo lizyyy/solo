@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket订阅监控系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .permission-badge { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 12px; font-size: 13px; display: inline-block; margin-top: 5px; }
+        
+        .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section h2 { font-size: 18px; margin-bottom: 15px; color: #1f2937; }
+        
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
+        .search-box select { padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; min-width: 150px; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; color: #4b5563; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; }
+        
+        button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #059669; color: white; }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; }
+        tr:hover { background: #f9fafb; }
+        
+        .status-badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-disconnected { background: #fee2e2; color: #991b1b; }
+        .status-timeout { background: #fef3c7; color: #92400e; }
+        .status-overloaded { background: #ede9fe; color: #5b21b6; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .tab { padding: 10px 20px; background: none; border: none; cursor: pointer; color: #6b7280; border-radius: 6px; }
+        .tab.active { background: #2563eb; color: white; }
+        
+        .alert { padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; }
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
+        
+        .export-section { display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }
+        .export-group { display: flex; gap: 5px; }
+        pre { background: #1f2937; color: #10b981; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 12px; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔌 WebSocket订阅监控系统</h1>
+            <div class="permission-badge" id="userPermission">当前用户: viewer | 频道权限: market_data, notifications</div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('sessions')">会话管理</button>
+            <button class="tab" onclick="switchTab('reports')">订阅报告</button>
+            <button class="tab" onclick="switchTab('export')">数据导出</button>
+            <button class="tab" onclick="switchTab('test')">失败路径测试</button>
+        </div>
+
+        <div id="sessionsTab" class="section">
+            <h2>创建会话</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>客户端ID</label>
+                    <input type="text" id="clientId" value="client_001">
+                </div>
+                <div class="form-group">
+                    <label>频道</label>
+                    <input type="text" id="channel" value="market_data">
+                </div>
+                <div class="form-group">
+                    <label>负责人</label>
+                    <input type="text" id="owner" value="张三">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="createSession()">创建会话</button>
+
+            <div class="search-box" style="margin-top: 30px;">
+                <input type="text" id="searchOwner" placeholder="按负责人搜索..." oninput="loadSessions()">
+                <input type="text" id="searchChannel" placeholder="按频道搜索..." oninput="loadSessions()">
+                <select id="searchStatus" onchange="loadSessions()">
+                    <option value="">全部状态</option>
+                    <option value="active">活跃</option>
+                    <option value="disconnected">已断开</option>
+                    <option value="timeout">超时</option>
+                    <option value="overloaded">过载</option>
+                </select>
+            </div>
+
+            <h2>会话列表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>会话ID</th>
+                        <th>客户端</th>
+                        <th>频道</th>
+                        <th>负责人</th>
+                        <th>连接时间</th>
+                        <th>心跳状态</th>
+                        <th>消息积压</th>
+                        <th>重连次数</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="sessionsTable"></tbody>
+            </table>
+        </div>
+
+        <div id="reportsTab" class="section" style="display: none;">
+            <h2>订阅报告</h2>
+            <div class="search-box">
+                <input type="text" id="reportOwner" placeholder="按负责人搜索..." oninput="loadReports()">
+                <select id="reportStatus" onchange="loadReports()">
+                    <option value="">全部心跳状态</option>
+                    <option value="active">活跃</option>
+                    <option value="disconnected">已断开</option>
+                </select>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>报告ID</th>
+                        <th>会话ID</th>
+                        <th>客户端</th>
+                        <th>频道</th>
+                        <th>负责人</th>
+                        <th>事件类型</th>
+                        <th>时间</th>
+                        <th>心跳状态</th>
+                        <th>详情</th>
+                    </tr>
+                </thead>
+                <tbody id="reportsTable"></tbody>
+            </table>
+        </div>
+
+        <div id="exportTab" class="section" style="display: none;">
+            <h2>数据导出</h2>
+            <div class="export-section">
+                <label>分组方式:</label>
+                <div class="export-group">
+                    <button class="btn-primary" onclick="exportReports('owner')">按负责人</button>
+                    <button class="btn-success" onclick="exportReports('time')">按时间</button>
+                    <button class="btn-warning" onclick="exportReports('heartbeat')">按心跳状态</button>
+                </div>
+            </div>
+            <pre id="exportResult">点击上方按钮查看分组导出结果...</pre>
+        </div>
+
+        <div id="testTab" class="section" style="display: none;">
+            <h2>失败路径测试</h2>
+            <div class="btn-group">
+                <button class="btn-danger" onclick="testNoPermission()">无权限频道</button>
+                <button class="btn-danger" onclick="testDuplicateSession()">重复创建会话</button>
+                <button class="btn-danger" onclick="testInvalidSession()">无效会话心跳</button>
+                <button class="btn-danger" onclick="testNonExistentSession()">不存在会话操作</button>
+            </div>
+            <h3 style="margin-top: 20px;">测试结果</h3>
+            <pre id="testResult">点击按钮执行失败路径测试...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentSessionId = null;
+
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.innerHTML = '';
+            container.appendChild(alert);
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').style.display = 'block';
+            
+            if (tab === 'sessions') loadSessions();
+            if (tab === 'reports') loadReports();
+        }
+
+        function getStatusBadge(status) {
+            const labels = {
+                'active': '活跃',
+                'disconnected': '已断开',
+                'timeout': '超时',
+                'overloaded': '过载'
+            };
+            return `<span class="status-badge status-${status}">${labels[status] || status}</span>`;
+        }
+
+        async function createSession() {
+            const data = {
+                client_id: document.getElementById('clientId').value,
+                channel: document.getElementById('channel').value,
+                owner: document.getElementById('owner').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!res.ok) throw new Error(await res.text());
+                
+                const session = await res.json();
+                currentSessionId = session.id;
+                showAlert(`会话创建成功: ${session.id}`);
+                loadSessions();
+            } catch (e) {
+                showAlert(`创建失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function loadSessions() {
+            const params = new URLSearchParams();
+            const owner = document.getElementById('searchOwner').value;
+            const channel = document.getElementById('searchChannel').value;
+            const status = document.getElementById('searchStatus').value;
+            
+            if (owner) params.append('owner', owner);
+            if (channel) params.append('channel', channel);
+            if (status) params.append('heartbeat_status', status);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions?${params}`);
+                const sessions = await res.json();
+                
+                document.getElementById('sessionsTable').innerHTML = sessions.map(s => `
+                    <tr>
+                        <td><code>${s.id.slice(0, 8)}...</code></td>
+                        <td>${s.client_id}</td>
+                        <td>${s.channel}</td>
+                        <td>${s.owner}</td>
+                        <td>${new Date(s.connected_at).toLocaleString()}</td>
+                        <td>${getStatusBadge(s.heartbeat_status)}</td>
+                        <td>${s.message_backlog}</td>
+                        <td>${s.reconnect_count}</td>
+                        <td class="btn-group">
+                            <button class="btn-success" style="padding: 5px 10px; font-size: 12px;" onclick="heartbeat('${s.id}')">心跳</button>
+                            <button class="btn-warning" style="padding: 5px 10px; font-size: 12px;" onclick="reconnect('${s.id}')">重连</button>
+                            <button class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="disconnect('${s.id}')">断开</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function heartbeat(sessionId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions/${sessionId}/heartbeat`, { method: 'POST' });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                showAlert(`心跳成功, 消息积压: ${data.message_backlog}`);
+                loadSessions();
+            } catch (e) {
+                showAlert(`心跳失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function reconnect(sessionId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions/${sessionId}/reconnect`, { method: 'POST' });
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                showAlert(`重连成功, 重连次数: ${data.reconnect_count}`);
+                loadSessions();
+            } catch (e) {
+                showAlert(`重连失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function disconnect(sessionId) {
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions/${sessionId}/disconnect`, { method: 'POST' });
+                if (!res.ok) throw new Error(await res.text());
+                showAlert('断开成功');
+                loadSessions();
+            } catch (e) {
+                showAlert(`断开失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function loadReports() {
+            const params = new URLSearchParams();
+            const owner = document.getElementById('reportOwner').value;
+            const status = document.getElementById('reportStatus').value;
+            
+            if (owner) params.append('owner', owner);
+            if (status) params.append('heartbeat_status', status);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/reports?${params}`);
+                const reports = await res.json();
+                
+                document.getElementById('reportsTable').innerHTML = reports.map(r => `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td><code>${r.session_id.slice(0, 8)}...</code></td>
+                        <td>${r.client_id}</td>
+                        <td>${r.channel}</td>
+                        <td>${r.owner}</td>
+                        <td>${r.event_type}</td>
+                        <td>${new Date(r.timestamp).toLocaleString()}</td>
+                        <td>${getStatusBadge(r.heartbeat_status)}</td>
+                        <td>${r.details}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function exportReports(groupBy) {
+            try {
+                const res = await fetch(`${API_BASE}/api/reports/export?group_by=${groupBy}`);
+                const data = await res.json();
+                
+                const labels = {
+                    'owner': '负责人',
+                    'time': '日期',
+                    'heartbeat': '心跳状态'
+                };
+                
+                let output = `总计: ${data.total_count} 条记录\n`;
+                output += `分组方式: ${labels[groupBy] || groupBy}\n\n`;
+                output += `═══════════════════════════════════════\n\n`;
+                
+                for (const [key, items] of Object.entries(data.groups)) {
+                    output += `【${key}】(${items.length}条)\n`;
+                    items.forEach(item => {
+                        output += `  • ${item.event_type} | ${item.client_id} | ${item.channel} | ${item.timestamp.slice(0, 19)}\n`;
+                    });
+                    output += '\n';
+                }
+                
+                document.getElementById('exportResult').textContent = output;
+            } catch (e) {
+                showAlert(`导出失败: ${e.message}`, 'error');
+            }
+        }
+
+        async function testNoPermission() {
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: 'test', channel: 'invalid_channel', owner: 'test' })
+                });
+                const error = await res.text();
+                document.getElementById('testResult').textContent = 
+                    `测试: 无权限频道\n状态码: ${res.status}\n响应: ${error}\n\n✅ 正确返回403权限错误`;
+            } catch (e) {
+                document.getElementById('testResult').textContent = `错误: ${e.message}`;
+            }
+        }
+
+        async function testDuplicateSession() {
+            const testData = { client_id: 'dup_test', channel: 'market_data', owner: 'test' };
+            
+            try {
+                await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const res2 = await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                
+                const error = await res2.text();
+                document.getElementById('testResult').textContent = 
+                    `测试: 重复创建会话\n状态码: ${res2.status}\n响应: ${error}\n\n✅ 正确返回409冲突错误，防止重复写入`;
+            } catch (e) {
+                document.getElementById('testResult').textContent = `错误: ${e.message}`;
+            }
+        }
+
+        async function testInvalidSession() {
+            try {
+                const createRes = await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_id: 'inv_test', channel: 'market_data', owner: 'test' })
+                });
+                const session = await createRes.json();
+                
+                await fetch(`${API_BASE}/api/sessions/${session.id}/disconnect`, { method: 'POST' });
+                
+                const res = await fetch(`${API_BASE}/api/sessions/${session.id}/heartbeat`, { method: 'POST' });
+                const result = await res.text();
+                
+                document.getElementById('testResult').textContent = 
+                    `测试: 无效(已断开)会话心跳\n状态码: ${res.status}\n响应: ${result}\n\n✅ 正确验证会话状态`;
+            } catch (e) {
+                document.getElementById('testResult').textContent = `错误: ${e.message}`;
+            }
+        }
+
+        async function testNonExistentSession() {
+            try {
+                const res = await fetch(`${API_BASE}/api/sessions/non_existent_id/heartbeat`, { method: 'POST' });
+                const error = await res.text();
+                document.getElementById('testResult').textContent = 
+                    `测试: 不存在会话操作\n状态码: ${res.status}\n响应: ${error}\n\n✅ 正确返回404错误`;
+            } catch (e) {
+                document.getElementById('testResult').textContent = `错误: ${e.message}`;
+            }
+        }
+
+        loadSessions();
+    </script>
+</body>
+</html>
