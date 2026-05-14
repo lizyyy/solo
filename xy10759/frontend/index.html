@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子签署流程台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .header {
+            background: #1890ff;
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .nav {
+            background: white;
+            padding: 0 24px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .nav button {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav button.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+        }
+        
+        .container {
+            padding: 24px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #52c41a;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #faad14;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .btn-default {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #d9d9d9;
+        }
+        
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        th {
+            background: #fafafa;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        tr:hover {
+            background: #fafafa;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-open {
+            background: #fff2f0;
+            color: #ff4d4f;
+        }
+        
+        .status-processing {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .status-resolved {
+            background: #f6ffed;
+            color: #52c41a;
+        }
+        
+        .status-closed {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .exception-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: #fff1f0;
+            color: #cf1322;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+        
+        .detail-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .detail-meta {
+            color: #666;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .json-box {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e8e8e8;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 16px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -21px;
+            top: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #1890ff;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #1890ff;
+        }
+        
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .timeline-content {
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .permission-tip {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #d48806;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+        
+        .tab.active {
+            color: #1890ff;
+            border-bottom-color: #1890ff;
+        }
+        
+        .version-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .version-card {
+            background: #fafafa;
+            padding: 16px;
+            border-radius: 4px;
+            border: 1px solid #e8e8e8;
+        }
+        
+        .version-tag {
+            display: inline-block;
+            background: #1890ff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>电子签署流程台</h1>
+    </div>
+    
+    <div class="nav">
+        <button class="active" onclick="showPage('exceptions')">异常处理</button>
+        <button onclick="showPage('contracts')">合同管理</button>
+        <button onclick="initSampleData()">初始化样例数据</button>
+    </div>
+    
+    <div class="container">
+        <div id="exceptions-page">
+            <div class="card">
+                <div class="card-title">
+                    <span>异常列表</span>
+                    <button class="btn btn-primary btn-sm" onclick="loadExceptions()">刷新</button>
+                </div>
+                <table id="exceptions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>异常类型</th>
+                            <th>合同</th>
+                            <th>签署人</th>
+                            <th>状态</th>
+                            <th>处理人</th>
+                            <th>处理时间</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exceptions-tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="exception-detail-page" class="hidden">
+            <div class="card">
+                <div class="detail-header">
+                    <div>
+                        <div class="detail-title">异常详情 #<span id="detail-id"></span></div>
+                        <div class="detail-meta">
+                            <span id="detail-type"></span> · 
+                            <span id="detail-status"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-default" onclick="backToList()">返回列表</button>
+                </div>
+                
+                <div class="permission-tip" id="permission-tip">
+                    <span>⚠️</span>
+                    <span>您当前为业务分析师角色，可进行重试、回滚操作，但需记录处理原因。</span>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">异常信息</div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">合同名称</span>
+                            <span class="info-value" id="detail-contract"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">签署人</span>
+                            <span class="info-value" id="detail-signer"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">处理人</span>
+                            <span class="info-value" id="detail-handler"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">处理时间</span>
+                            <span class="info-value" id="detail-handle-time"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">异常描述</div>
+                    <p id="detail-description" style="padding: 12px; background: #fafafa; border-radius: 4px;"></p>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">处理备注</div>
+                    <div class="form-group">
+                        <textarea id="handling-notes" placeholder="请输入处理备注..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">操作</div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="handleException('resolved')">标记已解决</button>
+                        <button class="btn btn-primary" onclick="retryException()">重试签署</button>
+                        <button class="btn btn-warning" onclick="rollbackException()">回滚</button>
+                        <button class="btn btn-default" onclick="viewEvidence()">查看签署证据</button>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('raw-data')">原始数据</div>
+                    <div class="tab" onclick="showTab('signer-info')">签署人信息</div>
+                    <div class="tab" onclick="showTab('versions')">合同版本</div>
+                </div>
+                
+                <div id="tab-raw-data">
+                    <div class="section-title">原始脏数据</div>
+                    <div class="json-box" id="raw-data-json"></div>
+                </div>
+                
+                <div id="tab-signer-info" class="hidden">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">原始输入</span>
+                            <div class="json-box" id="signer-original"></div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">处理结果</div>
+                            <div class="json-box" id="signer-processed"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="tab-versions" class="hidden">
+                    <div class="version-compare" id="versions-container"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="contracts-page" class="hidden">
+            <div class="card">
+                <div class="card-title">
+                    <span>合同列表</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">新建合同</button>
+                </div>
+                <table id="contracts-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>合同标题</th>
+                            <th>版本</th>
+                            <th>状态</th>
+                            <th>创建人</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contracts-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="evidence-page" class="hidden">
+            <div class="card">
+                <div class="detail-header">
+                    <div>
+                        <div class="detail-title">签署证据链</div>
+                        <div class="detail-meta">签署人: <span id="evidence-signer"></span></div>
+                    </div>
+                    <button class="btn btn-default" onclick="backToDetail()">返回详情</button>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">操作日志</div>
+                    <div class="timeline" id="evidence-timeline"></div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">证据数据</div>
+                    <div id="evidence-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let currentExceptionId = null;
+        let currentSignerId = null;
+        
+        async function fetchAPI(url, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${url}`, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                return await response.json();
+            } catch (e) {
+                console.error('API Error:', e);
+                alert('API请求失败，请确保后端服务已启动');
+                throw e;
+            }
+        }
+        
+        async function loadExceptions() {
+            const exceptions = await fetchAPI('/exceptions');
+            const tbody = document.getElementById('exceptions-tbody');
+            tbody.innerHTML = exceptions.map(exc => `
+                <tr>
+                    <td>${exc.id}</td>
+                    <td><span class="exception-type">${exc.type}</span></td>
+                    <td>${exc.contract_title || '-'}</td>
+                    <td>${exc.signer_name || '-'}<br><small>${exc.signer_phone || ''}</small></td>
+                    <td><span class="status-badge status-${exc.status}">${getStatusText(exc.status)}</span></td>
+                    <td>${exc.handled_by || '-'}</td>
+                    <td>${exc.handled_at ? formatDate(exc.handled_at) : '-'}</td>
+                    <td>${formatDate(exc.created_at)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm" onclick="viewException(${exc.id})">详情</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function getStatusText(status) {
+            const map = {
+                'open': '待处理',
+                'processing': '处理中',
+                'resolved': '已解决',
+                'closed': '已关闭'
+            };
+            return map[status] || status;
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleString('zh-CN');
+        }
+        
+        async function viewException(id) {
+            currentExceptionId = id;
+            const exc = await fetchAPI(`/exceptions/${id}`);
+            
+            document.getElementById('detail-id').textContent = id;
+            document.getElementById('detail-type').textContent = exc.type;
+            document.getElementById('detail-status').innerHTML = `<span class="status-badge status-${exc.status}">${getStatusText(exc.status)}</span>`;
+            document.getElementById('detail-contract').textContent = exc.contract?.title || '-';
+            document.getElementById('detail-signer').textContent = exc.signer ? `${exc.signer.name} (${exc.signer.phone})` : '-';
+            document.getElementById('detail-handler').textContent = exc.handled_by || '未处理';
+            document.getElementById('detail-handle-time').textContent = exc.handled_at ? formatDate(exc.handled_at) : '-';
+            document.getElementById('detail-description').textContent = exc.description || '-';
+            document.getElementById('handling-notes').value = exc.handling_notes || '';
+            document.getElementById('raw-data-json').textContent = JSON.stringify(exc.raw_data, null, 2);
+            
+            if (exc.signer) {
+                currentSignerId = exc.signer.id;
+                document.getElementById('signer-original').textContent = JSON.stringify(exc.signer.original_input, null, 2);
+                document.getElementById('signer-processed').textContent = JSON.stringify(exc.signer.processed_result, null, 2) || '无';
+            }
+            
+            if (exc.contract) {
+                await loadContractVersions(exc.contract.id);
+            }
+            
+            showPage('exception-detail');
+        }
+        
+        async function loadContractVersions(contractId) {
+            const contract = await fetchAPI(`/contracts/${contractId}`);
+            const container = document.getElementById('versions-container');
+            
+            container.innerHTML = contract.versions.map(v => `
+                <div class="version-card">
+                    <span class="version-tag">v${v.version}</span>
+                    <div style="font-size: 12px; color: #999; margin-bottom: 8px;">
+                        ${v.created_by} · ${formatDate(v.created_at)}
+                    </div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+                        变更: ${v.change_log}
+                    </div>
+                    <div style="font-size: 13px; background: white; padding: 8px; border-radius: 4px;">
+                        ${v.content}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            ['raw-data', 'signer-info', 'versions'].forEach(name => {
+                document.getElementById(`tab-${name}`).classList.add('hidden');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+        }
+        
+        async function handleException(status) {
+            const notes = document.getElementById('handling-notes').value;
+            if (!notes.trim()) {
+                alert('请输入处理备注');
+                return;
+            }
+            
+            await fetchAPI(`/exceptions/${currentExceptionId}/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ status, handling_notes: notes })
+            });
+            
+            alert('处理成功');
+            viewException(currentExceptionId);
+        }
+        
+        async function retryException() {
+            const notes = document.getElementById('handling-notes').value;
+            if (!notes.trim()) {
+                alert('请输入处理备注');
+                return;
+            }
+            
+            await fetchAPI(`/exceptions/${currentExceptionId}/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ status: 'processing', handling_notes: notes })
+            });
+            
+            await fetchAPI(`/exceptions/${currentExceptionId}/retry`, {
+                method: 'POST'
+            });
+            
+            alert('重试成功');
+            viewException(currentExceptionId);
+        }
+        
+        async function rollbackException() {
+            const notes = document.getElementById('handling-notes').value;
+            if (!notes.trim()) {
+                alert('请输入处理备注');
+                return;
+            }
+            
+            await fetchAPI(`/exceptions/${currentExceptionId}/handle`, {
+                method: 'POST',
+                body: JSON.stringify({ status: 'processing', handling_notes: notes })
+            });
+            
+            await fetchAPI(`/exceptions/${currentExceptionId}/rollback`, {
+                method: 'POST'
+            });
+            
+            alert('回滚成功');
+            viewException(currentExceptionId);
+        }
+        
+        async function viewEvidence() {
+            if (!currentSignerId) {
+                alert('没有关联的签署人');
+                return;
+            }
+            
+            const data = await fetchAPI(`/signers/${currentSignerId}/evidence`);
+            document.getElementById('evidence-signer').textContent = data.signer.name;
+            
+            document.getElementById('evidence-timeline').innerHTML = data.logs.map(log => `
+                <div class="timeline-item">
+                    <div class="timeline-time">${formatDate(log.created_at)}</div>
+                    <div class="timeline-content">
+                        <strong>${log.action}</strong>: ${log.detail}
+                        <br><small>证据哈希: ${log.evidence_hash}</small>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('evidence-list').innerHTML = data.evidences.map(e => `
+                <div style="background: #fafafa; padding: 16px; border-radius: 4px; margin-bottom: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">${e.evidence_type}</div>
+                    <div class="json-box">${JSON.stringify(e.evidence_data, null, 2)}</div>
+                    <div style="margin-top: 8px; font-size: 12px; color: #999;">
+                        哈希: ${e.evidence_hash}
+                    </div>
+                </div>
+            `).join('') || '<div class="empty">暂无证据数据</div>';
+            
+            showPage('evidence');
+        }
+        
+        function showPage(page) {
+            ['exceptions', 'exception-detail', 'contracts', 'evidence'].forEach(p => {
+                document.getElementById(`${p}-page`).classList.add('hidden');
+            });
+            document.getElementById(`${page}-page`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            if (page === 'exceptions' || page === 'exception-detail' || page === 'evidence') {
+                document.querySelector('.nav button:nth-child(1)').classList.add('active');
+            } else if (page === 'contracts') {
+                document.querySelector('.nav button:nth-child(2)').classList.add('active');
+            }
+        }
+        
+        function backToList() {
+            showPage('exceptions');
+            loadExceptions();
+        }
+        
+        function backToDetail() {
+            showPage('exception-detail');
+        }
+        
+        async function loadContracts() {
+            const contracts = await fetchAPI('/contracts');
+            const tbody = document.getElementById('contracts-tbody');
+            tbody.innerHTML = contracts.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${c.title}</td>
+                    <td>${c.version}</td>
+                    <td><span class="status-badge status-open">${c.status}</span></td>
+                    <td>${c.created_by}</td>
+                    <td>${formatDate(c.created_at)}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="viewContract(${c.id})">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function initSampleData() {
+            await fetchAPI('/init-sample-data', { method: 'POST' });
+            alert('样例数据初始化成功！包含脏数据、短信拦截、撤回重签场景。');
+            loadExceptions();
+            loadContracts();
+        }
+        
+        function showCreateModal() {
+            alert('请通过后端API创建合同');
+        }
+        
+        function viewContract(id) {
+            alert('合同详情功能待实现');
+        }
+        
+        loadExceptions();
+        loadContracts();
+    </script>
+</body>
+</html>
