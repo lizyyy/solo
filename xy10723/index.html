@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>契约测试执行台</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 32px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .header p { opacity: 0.9; font-size: 14px; }
+        .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+        .search-bar { background: white; padding: 20px 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+        .search-group { display: flex; flex-direction: column; gap: 6px; }
+        .search-group label { font-size: 13px; font-weight: 500; color: #555; }
+        .search-bar input, .search-bar select { padding: 10px 14px; border: 1px solid #e1e5eb; border-radius: 8px; font-size: 14px; min-width: 160px; }
+        .search-bar input:focus, .search-bar select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a6fd6; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        @media (max-width: 1024px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+        .card-header { padding: 18px 24px; background: #fafbfc; border-bottom: 1px solid #eaecef; font-weight: 600; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .card-body { padding: 20px 24px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #eaecef; }
+        th { font-weight: 600; color: #555; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { font-size: 14px; }
+        tr:hover { background: #fafbfc; }
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-running { background: #dbeafe; color: #2563eb; animation: pulse 1.5s infinite; }
+        .status-passed { background: #d1fae5; color: #059669; }
+        .status-failed { background: #fee2e2; color: #dc2626; }
+        .status-verified { background: #d1fae5; color: #059669; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .diff-panel { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-top: 12px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; }
+        .diff-title { color: #dc2626; font-weight: 600; margin-bottom: 10px; }
+        .diff-row { display: flex; gap: 16px; margin: 6px 0; }
+        .diff-label { min-width: 80px; color: #666; }
+        .diff-expected { color: #059669; }
+        .diff-actual { color: #dc2626; }
+        .empty-state { text-align: center; padding: 40px; color: #999; }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.4; }
+        .action-btns { display: flex; gap: 8px; }
+        .action-btn { padding: 6px 12px; font-size: 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .action-btn.execute { background: #dbeafe; color: #2563eb; }
+        .action-btn.execute:hover { background: #bfdbfe; }
+        .action-btn.view { background: #e0e7ff; color: #4338ca; }
+        .action-btn.view:hover { background: #c7d2fe; }
+        .action-btn.approve { background: #d1fae5; color: #059669; }
+        .action-btn.approve:hover { background: #a7f3d0; }
+        .permission-tip { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin-bottom: 20px; border-radius: 0 8px 8px 0; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .permission-tip svg { width: 20px; height: 20px; color: #f59e0b; flex-shrink: 0; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        @media (max-width: 768px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-value { font-size: 32px; font-weight: 700; color: #667eea; }
+        .stat-label { font-size: 13px; color: #666; margin-top: 4px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #eaecef; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-body { padding: 24px; }
+        .export-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #eaecef; }
+        .export-group { margin-bottom: 16px; }
+        .export-group h4 { font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #555; }
+        .export-item { padding: 10px 14px; background: #f8fafc; border-radius: 6px; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; }
+        .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid #e1e5eb; border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 契约测试执行台</h1>
+        <p>管理消费者契约、执行测试、记录差异、控制发布门禁</p>
+    </div>
+
+    <div class="container">
+        <div class="permission-tip">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <span><strong>权限提示：</strong>仅研发经理及以上角色可审批发布门禁。普通开发人员可执行契约测试和查看结果。</span>
+        </div>
+
+        <div class="search-bar">
+            <div class="search-group">
+                <label>消费者服务</label>
+                <select id="filterConsumer">
+                    <option value="">全部</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <label>测试状态</label>
+                <select id="filterStatus">
+                    <option value="">全部</option>
+                    <option value="pending">待执行</option>
+                    <option value="running">执行中</option>
+                    <option value="passed">通过</option>
+                    <option value="failed">失败</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <label>关键词搜索</label>
+                <input type="text" id="searchKeyword" placeholder="搜索服务名、版本号...">
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 10px; align-items: flex-end;">
+                <button class="btn btn-primary" onclick="refreshData()">🔄 刷新数据</button>
+                <button class="btn btn-success" onclick="showExportModal()">📊 导出门禁</button>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="statContracts">0</div>
+                <div class="stat-label">契约总数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statRunning">0</div>
+                <div class="stat-label">执行中</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statPassed">0</div>
+                <div class="stat-label">测试通过</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statGates">0</div>
+                <div class="stat-label">发布门禁</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <div class="card-header">
+                    <span>📋 契约列表</span>
+                    <span style="font-size: 12px; color: #666; font-weight: normal;">点击执行按钮运行契约测试</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="contractsTable">
+                            <thead>
+                                <tr>
+                                    <th>消费者服务</th>
+                                    <th>提供方接口</th>
+                                    <th>契约版本</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>✅ 测试结果</span>
+                    <span style="font-size: 12px; color: #666; font-weight: normal;">点击查看失败差异详情</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table id="resultsTable">
+                            <thead>
+                                <tr>
+                                    <th>消费者</th>
+                                    <th>版本</th>
+                                    <th>状态</th>
+                                    <th>执行人</th>
+                                    <th>执行时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>🚪 发布门禁</span>
+                <span style="font-size: 12px; color: #666; font-weight: normal;">审批通过后方可发布</span>
+            </div>
+            <div class="card-body">
+                <div class="table-container">
+                    <table id="gatesTable">
+                        <thead>
+                            <tr>
+                                <th>负责人</th>
+                                <th>消费者服务</th>
+                                <th>契约版本</th>
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th>审批人</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 测试结果详情</h3>
+                <button class="modal-close" onclick="closeModal('resultModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="resultModalBody"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📊 发布门禁导出</h3>
+                <button class="modal-close" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="exportModalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let consumers = [];
+        let providers = [];
+        let contracts = [];
+        let testResults = [];
+        let gates = [];
+        const runningContracts = new Set();
+
+        async function init() {
+            await loadConsumers();
+            await refreshData();
+            
+            document.getElementById('filterConsumer').addEventListener('change', refreshData);
+            document.getElementById('filterStatus').addEventListener('change', refreshData);
+            document.getElementById('searchKeyword').addEventListener('input', refreshData);
+        }
+
+        async function loadConsumers() {
+            const res = await fetch('/api/consumers');
+            const data = await res.json();
+            consumers = data.consumers;
+            
+            const select = document.getElementById('filterConsumer');
+            consumers.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                select.appendChild(opt);
+            });
+        }
+
+        async function refreshData() {
+            const [contractsRes, resultsRes, gatesRes, providersRes] = await Promise.all([
+                fetch('/api/contracts'),
+                fetch('/api/test-results'),
+                fetch('/api/gates'),
+                fetch('/api/providers')
+            ]);
+            
+            const contractsData = await contractsRes.json();
+            const resultsData = await resultsRes.json();
+            const gatesData = await gatesRes.json();
+            const providersData = await providersRes.json();
+            
+            contracts = contractsData.contracts;
+            testResults = resultsData.results;
+            gates = gatesData.gates;
+            providers = providersData.providers;
+            
+            updateStats();
+            renderContracts();
+            renderResults();
+            renderGates();
+        }
+
+        function updateStats() {
+            document.getElementById('statContracts').textContent = contracts.length;
+            document.getElementById('statRunning').textContent = testResults.filter(r => r.status === 'running').length;
+            document.getElementById('statPassed').textContent = testResults.filter(r => r.status === 'passed').length;
+            document.getElementById('statGates').textContent = gates.length;
+        }
+
+        function getConsumerName(id) {
+            const c = consumers.find(x => x.id === id);
+            return c ? c.name : id;
+        }
+
+        function getProviderName(id) {
+            const p = providers.find(x => x.id === id);
+            return p ? p.name : id;
+        }
+
+        function filterData(items, searchFields) {
+            const consumerFilter = document.getElementById('filterConsumer').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+            
+            return items.filter(item => {
+                if (consumerFilter && item.consumer_id !== consumerFilter) return false;
+                if (statusFilter && item.status !== statusFilter) return false;
+                if (keyword) {
+                    const match = searchFields.some(field => {
+                        const val = item[field];
+                        return val && String(val).toLowerCase().includes(keyword);
+                    });
+                    if (!match) return false;
+                }
+                return true;
+            });
+        }
+
+        function renderContracts() {
+            const tbody = document.querySelector('#contractsTable tbody');
+            const filtered = filterData(contracts, ['version']);
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><p>暂无契约数据</p></div></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(c => `
+                <tr>
+                    <td><strong>${getConsumerName(c.consumer_id)}</strong></td>
+                    <td>${getProviderName(c.provider_id)}</td>
+                    <td><code>${c.version}</code></td>
+                    <td><span class="status-badge status-${c.status}">${getStatusText(c.status)}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn execute" onclick="executeContract('${c.id}')" ${runningContracts.has(c.id) ? 'disabled' : ''}>
+                                ${runningContracts.has(c.id) ? '<span class="loading"></span> 执行中' : '▶️ 执行测试'}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderResults() {
+            const tbody = document.querySelector('#resultsTable tbody');
+            const filtered = filterData(testResults, ['version', 'executed_by']);
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><p>暂无测试结果</p></div></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(r => `
+                <tr>
+                    <td><strong>${getConsumerName(r.consumer_id)}</strong></td>
+                    <td><code>${r.version}</code></td>
+                    <td><span class="status-badge status-${r.status}">${getStatusText(r.status)}</span></td>
+                    <td>${r.executed_by}</td>
+                    <td>${formatDate(r.executed_at)}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="action-btn view" onclick="viewResult('${r.id}')">👁️ 详情</button>
+                            ${r.status === 'passed' ? `<button class="action-btn approve" onclick="createGate('${r.id}')">🚪 加入门禁</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGates() {
+            const tbody = document.querySelector('#gatesTable tbody');
+            
+            if (gates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg><p>暂无发布门禁记录</p></div></td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = gates.map(g => `
+                <tr>
+                    <td><strong>${g.owner}</strong></td>
+                    <td>${getConsumerName(g.consumer_id)}</td>
+                    <td><code>${g.version}</code></td>
+                    <td>${formatDate(g.created_at)}</td>
+                    <td><span class="status-badge ${g.approved ? 'status-passed' : 'status-pending'}">${g.approved ? '已审批' : '待审批'}</span></td>
+                    <td>${g.approved_by || '-'}</td>
+                    <td>
+                        <div class="action-btns">
+                            ${!g.approved ? `<button class="action-btn approve" onclick="approveGate('${g.id}')">✅ 审批通过</button>` : '<span style="color: #059669; font-size: 12px;">已完成</span>'}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            const map = {
+                pending: '待执行',
+                running: '执行中',
+                passed: '通过',
+                failed: '失败',
+                verified: '已验证'
+            };
+            return map[status] || status;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function executeContract(contractId) {
+            if (runningContracts.has(contractId)) return;
+            runningContracts.add(contractId);
+            renderContracts();
+            
+            try {
+                const res = await fetch(`/api/contracts/${contractId}/execute?executed_by=当前用户`, { method: 'POST' });
+                await res.json();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                runningContracts.delete(contractId);
+                await refreshData();
+            }
+        }
+
+        async function viewResult(resultId) {
+            const res = await fetch(`/api/test-results/${resultId}`);
+            const result = await res.json();
+            
+            let diffHtml = '';
+            if (result.diff) {
+                diffHtml = `
+                    <div class="diff-panel">
+                        <div class="diff-title">❌ 失败差异详情</div>
+                        <div class="diff-row">
+                            <span class="diff-label">路径：</span>
+                            <span><code>${result.diff.path}</code></span>
+                        </div>
+                        <div class="diff-row">
+                            <span class="diff-label">期望：</span>
+                            <span class="diff-expected">${JSON.stringify(result.diff.expected)}</span>
+                        </div>
+                        <div class="diff-row">
+                            <span class="diff-label">实际：</span>
+                            <span class="diff-actual">${JSON.stringify(result.diff.actual)}</span>
+                        </div>
+                        <div class="diff-row">
+                            <span class="diff-label">示例：</span>
+                            <span>期望 <code>${result.diff.example.expected}</code>，实际 <code>${result.diff.example.actual}</code></span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const html = `
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">消费者服务</div>
+                    <div style="font-weight: 600;">${getConsumerName(result.consumer_id)}</div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">契约版本</div>
+                    <div><code>${result.version}</code></div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">测试状态</div>
+                    <div><span class="status-badge status-${result.status}">${getStatusText(result.status)}</span></div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">执行人</div>
+                    <div>${result.executed_by}</div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">执行时间</div>
+                    <div>${formatDate(result.executed_at)}</div>
+                </div>
+                ${result.failure_reason ? `
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 14px; color: #666; margin-bottom: 6px;">失败原因</div>
+                    <div style="color: #dc2626; font-weight: 500;">${result.failure_reason}</div>
+                </div>
+                ` : ''}
+                ${diffHtml}
+            `;
+            
+            document.getElementById('resultModalBody').innerHTML = html;
+            document.getElementById('resultModal').classList.add('active');
+        }
+
+        async function createGate(resultId) {
+            await fetch(`/api/gates?test_result_id=${resultId}`, { method: 'POST' });
+            await refreshData();
+        }
+
+        async function approveGate(gateId) {
+            await fetch(`/api/gates/${gateId}/approve?approved_by=研发经理`, { method: 'POST' });
+            await refreshData();
+        }
+
+        async function showExportModal() {
+            const res = await fetch('/api/gates/export');
+            const data = await res.json();
+            
+            const html = `
+                <div style="margin-bottom: 24px;">
+                    <div style="font-size: 18px; font-weight: 600; margin-bottom: 16px;">📊 导出统计</div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                        <div style="background: #f8fafc; padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: #667eea;">${data.summary.total}</div>
+                            <div style="font-size: 13px; color: #666;">门禁总数</div>
+                        </div>
+                        <div style="background: #f0fdf4; padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: #059669;">${data.summary.approved}</div>
+                            <div style="font-size: 13px; color: #666;">已通过</div>
+                        </div>
+                        <div style="background: #fffbeb; padding: 16px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: 700; color: #d97706;">${data.summary.pending}</div>
+                            <div style="font-size: 13px; color: #666;">待审批</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <div class="export-group">
+                        <h4>👤 按负责人分组</h4>
+                        ${Object.entries(data.by_owner).map(([owner, items]) => `
+                            <div class="export-item">
+                                <span>${owner}</span>
+                                <span style="color: #667eea; font-weight: 600;">${items.length} 条</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="export-group">
+                        <h4>📦 按契约版本分组</h4>
+                        ${Object.entries(data.by_version).map(([version, items]) => `
+                            <div class="export-item">
+                                <span><code>${version}</code></span>
+                                <span style="color: #667eea; font-weight: 600;">${items.length} 条</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="export-group">
+                        <h4>📅 按日期分组</h4>
+                        ${Object.entries(data.by_date).map(([date, items]) => `
+                            <div class="export-item">
+                                <span>${date}</span>
+                                <span style="color: #667eea; font-weight: 600;">${items.length} 条</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; text-align: center;">
+                    <button class="btn btn-success" onclick="downloadCSV()" style="font-size: 16px; padding: 12px 32px;">
+                        📥 下载 CSV 格式导出文件
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('exportModalBody').innerHTML = html;
+            document.getElementById('exportModal').classList.add('active');
+        }
+
+        function downloadCSV() {
+            window.open('/api/gates/export/csv', '_blank');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(m => {
+            m.addEventListener('click', (e) => {
+                if (e.target === m) m.classList.remove('active');
+            });
+        });
+
+        init();
+    </script>
+</body>
+</html>
