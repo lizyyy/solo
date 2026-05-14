@@ -726,15 +726,23 @@
             }, 3000);
         }
 
+        function parseSQLiteDate(dateStr) {
+            if (!dateStr) return null;
+            if (dateStr.includes(' ') && !dateStr.includes('T')) {
+                return new Date(dateStr.replace(' ', 'T') + 'Z');
+            }
+            return new Date(dateStr);
+        }
+
         function formatDate(dateStr) {
             if (!dateStr) return '-';
-            const date = new Date(dateStr);
+            const date = parseSQLiteDate(dateStr);
             return date.toLocaleString('zh-CN', { hour12: false });
         }
 
         function formatDateShort(dateStr) {
             if (!dateStr) return '-';
-            const date = new Date(dateStr);
+            const date = parseSQLiteDate(dateStr);
             return date.toLocaleDateString('zh-CN');
         }
 

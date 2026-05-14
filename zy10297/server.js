@@ -105,6 +105,10 @@ function generateCode(prefix) {
   return prefix + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase();
 }
 
+function formatSQLiteDate(date) {
+  return date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+}
+
 app.get('/api/properties', (req, res) => {
   db.all('SELECT * FROM properties ORDER BY created_at DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -242,8 +246,8 @@ app.post('/api/borrow', (req, res) => {
         return res.status(400).json({ error: '未找到有效的带看预约，请先预约再借出钥匙' });
       }
 
-      const borrow_time = new Date().toISOString();
-      const expected_return_time = new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000).toISOString();
+      const borrow_time = formatSQLiteDate(new Date());
+      const expected_return_time = formatSQLiteDate(new Date(Date.now() + (expected_return_hours || 4) * 60 * 60 * 1000));
       const borrow_code = generateCode('BRW');
       const finalAppointmentId = appointment_id || hasAppointment?.id || null;
 
@@ -284,7 +288,7 @@ app.post('/api/return', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (key.status === 'lost') return res.status(400).json({ error: '该钥匙已登记丢失，无法归还，请走丢失赔付流程' });
 
-      const actual_return_time = new Date().toISOString();
+      const actual_return_time = formatSQLiteDate(new Date());
       db.run('UPDATE borrow_records SET actual_return_time = ?, status = ?, notes = COALESCE(?, notes) WHERE id = ?', 
         [actual_return_time, 'returned', notes, borrow_record_id], (err) => {
           if (err) return res.status(400).json({ error: err.message });
