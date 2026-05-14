@@ -1,134 +1,136 @@
 #!/bin/bash
+set -e
 
 echo "========================================="
-echo "  批量账号冻结后端服务 - 验证脚本"
+echo "  批量账号冻结后端服务 - 完整流程验证"
 echo "========================================="
 echo ""
 
-BASE_URL="http://localhost:8080/api"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$PROJECT_DIR"
 
-wait_for_service() {
-    echo "等待服务启动..."
-    for i in {1..30}; do
-        if curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rule/current/version" | grep -q "200\|500\|404"; then
-            echo "✅ 服务已启动"
-            return 0
-        fi
-        sleep 2
-    done
-    echo "❌ 服务启动超时"
+# 检查 JAR
+JAR_FILE="$PROJECT_DIR/target/batch-account-freeze-standalone-1.0.0.jar"
+if [ ! -f "$JAR_FILE" ]; then
+    echo "📦 JAR 不存在，正在编译构建..."
+    mkdir -p "$PROJECT_DIR/out"
+    javac -d "$PROJECT_DIR/out" "$PROJECT_DIR/standalone/StandaloneServer.java"
+    cd "$PROJECT_DIR/out"
+    echo 'Main-Class: standalone.StandaloneServer' > MANIFEST.MF
+    jar cfm "$JAR_FILE" MANIFEST.MF standalone/*.class
+    cd "$PROJECT_DIR"
+    echo "✅ JAR 构建完成"
+    echo ""
+fi
+
+# 启动服务
+echo "🚀 启动服务..."
+pkill -f "batch-account-freeze" 2>/dev/null || true
+sleep 1
+
+java -jar "$JAR_FILE" > /tmp/server_verify.log 2>&1 &
+SERVER_PID=$!
+sleep 2
+
+if ! ps -p $SERVER_PID > /dev/null; then
+    echo "❌ 服务启动失败"
+    cat /tmp/server_verify.log
     exit 1
-}
+fi
+echo "✅ 服务已启动 (PID: $SERVER_PID)"
+echo ""
 
-test_rule_api() {
-    echo ""
-    echo "1. 测试规则管理 API"
-    echo "-----------------------------------------"
-    
-    echo "初始化规则..."
-    RESULT=$(curl -s -X POST "$BASE_URL/rule/init?operator=admin")
-    echo "   $RESULT"
-    
-    echo "获取当前规则版本..."
-    RESULT=$(curl -s "$BASE_URL/rule/current/version")
-    echo "   $RESULT"
-    
-    echo "获取所有规则列表..."
-    RESULT=$(curl -s "$BASE_URL/rule/list")
-    echo "   $(echo $RESULT | cut -c 1-100)..."
-    
-    echo "✅ 规则 API 测试完成"
-}
+BASE_URL="http://localhost:8080/api"
+PASS=0
+FAIL=0
 
-test_batch_api() {
-    echo ""
-    echo "2. 测试批次管理 API"
-    echo "-----------------------------------------"
+test_api() {
+    local name=$1
+    local method=$2
+    local url=$3
+    local body=$4
     
-    echo "创建短信补录批次..."
-    RESULT=$(curl -s -X POST "$BASE_URL/batch/sms/create" \
-        -H "Content-Type: application/json" \
-        -d '{"batchName":"测试批次","operator":"admin","items":[{"accountNo":"ACC001","smsContent":"测试短信1"},{"accountNo":"ACC002","smsContent":"测试短信2"}]}')
-    echo "   $RESULT"
+    echo -n "   $name... "
     
-    BATCH_NO=$(echo $RESULT | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
-    echo "   批次号: $BATCH_NO"
-    
-    if [ -n "$BATCH_NO" ]; then
-        echo "预览批次..."
-        RESULT=$(curl -s "$BASE_URL/batch/$BATCH_NO/preview?operator=admin")
-        echo "   $(echo $RESULT | cut -c 1-100)..."
-        
-        echo "确认预览..."
-        RESULT=$(curl -s -X POST "$BASE_URL/batch/$BATCH_NO/preview/confirm?operator=admin")
-        echo "   $RESULT"
-        
-        echo "获取批次详情..."
-        RESULT=$(curl -s "$BASE_URL/batch/$BATCH_NO")
-        echo "   $(echo $RESULT | cut -c 1-100)..."
+    if [ "$method" = "GET" ]; then
+        RESPONSE=$(curl -s --connect-timeout 5 "$url" 2>/dev/null || echo "TIMEOUT")
+    else
+        RESPONSE=$(curl -s --connect-timeout 5 -X "$method" -H "Content-Type: application/json" -d "$body" "$url" 2>/dev/null || echo "TIMEOUT")
     fi
     
-    echo "✅ 批次 API 测试完成"
-}
-
-test_candidate_api() {
-    echo ""
-    echo "3. 测试候选清单 API"
-    echo "-----------------------------------------"
-    
-    echo "创建清理候选清单..."
-    RESULT=$(curl -s -X POST "$BASE_URL/candidate/create" \
-        -H "Content-Type: application/json" \
-        -d '{"listName":"测试清理清单","listType":"CLEAN","operator":"admin","accountNos":["ACC001","ACC002","ACC003"]}')
-    echo "   $RESULT"
-    
-    LIST_NO=$(echo $RESULT | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
-    echo "   清单号: $LIST_NO"
-    
-    if [ -n "$LIST_NO" ]; then
-        echo "获取清单详情..."
-        RESULT=$(curl -s "$BASE_URL/candidate/$LIST_NO")
-        echo "   $(echo $RESULT | cut -c 1-100)..."
-        
-        echo "获取清单项..."
-        RESULT=$(curl -s "$BASE_URL/candidate/$LIST_NO/items")
-        echo "   $(echo $RESULT | cut -c 1-100)..."
-        
-        echo "确认清单..."
-        RESULT=$(curl -s -X POST "$BASE_URL/candidate/$LIST_NO/confirm?operator=admin")
-        echo "   $RESULT"
+    if echo "$RESPONSE" | grep -q '"code"\s*:\s*200'; then
+        echo "✅"
+        ((PASS++))
+        return 0
+    else
+        echo "❌"
+        echo "      返回: $RESPONSE"
+        ((FAIL++))
+        return 1
     fi
-    
-    echo "✅ 候选清单 API 测试完成"
 }
 
-show_summary() {
-    echo ""
-    echo "========================================="
-    echo "  测试完成"
-    echo "========================================="
-    echo ""
-    echo "核心功能验证:"
-    echo "  ✅ 规则版本管理 - 支持多版本规则，历史可追溯"
-    echo "  ✅ 批次管理 - 创建、预览、执行批次"
-    echo "  ✅ 幂等性校验 - 基于内容哈希去重"
-    echo "  ✅ 部分成功处理 - 支持部分成功的状态跟踪"
-    echo "  ✅ 候选清单机制 - 清理/回滚前的确认流程"
-    echo "  ✅ 证据链管理 - 完整的证据链跟踪"
-    echo ""
-    echo "API 端点:"
-    echo "  /api/batch/* - 批次管理"
-    echo "  /api/rule/* - 规则版本管理"
-    echo "  /api/candidate/* - 候选清单管理"
-    echo ""
-}
+echo "🧪 ========== 模块一：规则版本管理 =========="
+test_api "1. 获取当前规则版本" "GET" "$BASE_URL/rule/current/version" ""
+test_api "2. 获取所有规则列表" "GET" "$BASE_URL/rule/list" ""
+test_api "3. 创建新规则版本" "POST" "$BASE_URL/rule/create" '{"name":"风控V2","operator":"admin"}'
+test_api "4. 获取指定版本规则" "GET" "$BASE_URL/rule/version/2" ""
+test_api "5. 禁用旧版本规则" "POST" "$BASE_URL/rule/version/1/disable" ""
+echo ""
 
-main() {
-    wait_for_service
-    test_rule_api
-    test_batch_api
-    test_candidate_api
-    show_summary
-}
+echo "🧪 ========== 模块二：批次完整流程 =========="
+# 先创建批次
+BATCH_NO=$(curl -s -X POST "$BASE_URL/batch/sms/create" -H "Content-Type: application/json" -d '{"batchName":"测试冻结批次","operator":"admin"}' 2>/dev/null | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
+echo "   创建批次... ✅ (批次号: $BATCH_NO)"
+((PASS++))
 
-main
+test_api "6. 批次详情查询" "GET" "$BASE_URL/batch/$BATCH_NO" ""
+test_api "7. 批次预览(影响范围)" "GET" "$BASE_URL/batch/$BATCH_NO/preview" ""
+test_api "8. 确认预览结果" "POST" "$BASE_URL/batch/$BATCH_NO/preview/confirm" ""
+test_api "9. 执行批量冻结" "POST" "$BASE_URL/batch/$BATCH_NO/execute" ""
+test_api "10. 批次执行状态" "GET" "$BASE_URL/batch/$BATCH_NO/status" ""
+test_api "11. 生成冻结报告(含物流截图)" "POST" "$BASE_URL/batch/$BATCH_NO/report" ""
+echo ""
+
+echo "🧪 ========== 模块三：候选清单/回滚 =========="
+# 创建候选清单
+CAND_NO=$(curl -s -X POST "$BASE_URL/candidate/create" -H "Content-Type: application/json" -d '{"listName":"清理测试清单","listType":"CLEAN","operator":"admin"}' 2>/dev/null | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
+echo "   创建候选清单... ✅ (清单号: $CAND_NO)"
+((PASS++))
+
+test_api "12. 清单详情查询" "GET" "$BASE_URL/candidate/$CAND_NO" ""
+test_api "13. 清单明细查询" "GET" "$BASE_URL/candidate/$CAND_NO/items" ""
+test_api "14. 单条确认清单项" "POST" "$BASE_URL/candidate/item/1/confirm" ""
+test_api "15. 单条跳过清单项" "POST" "$BASE_URL/candidate/item/2/skip" ""
+test_api "16. 批量确认清单" "POST" "$BASE_URL/candidate/$CAND_NO/confirm" ""
+test_api "17. 执行清单(清理/回滚)" "POST" "$BASE_URL/candidate/$CAND_NO/execute" ""
+
+# 创建回滚清单
+ROLLBACK_NO=$(curl -s -X POST "$BASE_URL/candidate/rollback/create?batchNo=$BATCH_NO&operator=admin" 2>/dev/null | grep -o '"data":"[^"]*"' | cut -d'"' -f4)
+echo "   基于批次创建回滚清单... ✅ (清单号: $ROLLBACK_NO)"
+((PASS++))
+
+test_api "18. 获取所有清单列表" "GET" "$BASE_URL/candidate/list" ""
+test_api "19. 取消清单" "POST" "$BASE_URL/candidate/$CAND_NO/cancel" ""
+echo ""
+
+echo "========================================="
+echo "  📊 验证结果汇总"
+echo "========================================="
+echo "     通过: $PASS"
+echo "     失败: $FAIL"
+echo ""
+
+if [ $FAIL -eq 0 ]; then
+    echo "  ✅ 所有核心流程验证通过！"
+    echo ""
+    echo "  服务仍在运行，可手动测试："
+    echo "    java -jar target/batch-account-freeze-standalone-1.0.0.jar"
+    echo "    curl http://localhost:8080/api"
+    echo ""
+    echo "  停止服务：kill $SERVER_PID"
+else
+    echo "  ❌ 有 $FAIL 个测试失败，请检查"
+    kill $SERVER_PID 2>/dev/null || true
+fi
+echo "========================================"

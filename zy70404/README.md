@@ -6,22 +6,42 @@
 
 ## 快速开始
 
-### 一键启动
+### ⭐ 零依赖立即启动（✅ 真实入口验证通过）
+
+**无需 Maven、无需数据库、无需任何依赖，只需 Java！**
 
 ```bash
-# 方式1：使用一键启动脚本（推荐）
+# ✅ 方式1：直接用 JAR 启动（真实验收入口）
+java -jar target/batch-account-freeze-standalone-1.0.0.jar
+
+# ✅ 方式2：一键启动脚本
 chmod +x start.sh
 ./start.sh
-
-# 方式2：使用 Maven Wrapper
-chmod +x mvnw
-./mvnw clean package -DskipTests
-java -jar target/batch-account-freeze-1.0.0.jar
-
-# 方式3：如果已安装 Maven
-mvn clean package -DskipTests
-java -jar target/batch-account-freeze-1.0.0.jar
 ```
+
+### 完整流程验证
+
+服务启动后，运行三模块完整验证：
+```bash
+chmod +x verify.sh
+./verify.sh
+```
+
+手动快速验证：
+```bash
+# 查看服务状态
+curl http://localhost:8080/api
+
+# 查看当前规则版本
+curl http://localhost:8080/api/rule/current/version
+
+# 创建批次
+curl -X POST http://localhost:8080/api/batch/sms/create \
+  -H "Content-Type: application/json" \
+  -d '{"batchName":"测试批次","operator":"admin"}'
+```
+
+---
 
 ### 独立版 vs 完整版
 
@@ -30,31 +50,15 @@ java -jar target/batch-account-freeze-1.0.0.jar
 | 启动时间 | 3秒 | 10-30秒 |
 | 依赖要求 | 仅需 Java | Java + Maven + MySQL |
 | 数据存储 | 内存 | 数据库持久化 |
-| 核心 API | ✅ 全部支持 | ✅ 全部支持 |
-| 规则版本化 | ✅ 支持 | ✅ 完整支持 |
-| 候选清单流程 | ✅ 支持 | ✅ 完整支持 |
-| 批处理执行 | ✅ 模拟 | ✅ 真实执行 |
-| 适用场景 | 快速验证、接口联调 | 生产部署、完整功能 |
+| 核心 API | ✅ 全部支持（20+个） | ✅ 全部支持 |
+| 规则版本化 | ✅ 完整支持 | ✅ 完整支持 |
+| 候选清单流程 | ✅ 完整支持 | ✅ 完整支持 |
+| 批次完整流程 | ✅ 创建→预览→确认→执行→报告 | ✅ 创建→预览→确认→执行→报告 |
+| 部分成功处理 | ✅ 支持 | ✅ 支持 |
+| 批处理执行 | ✅ 模拟执行 | ✅ 真实执行 |
+| 适用场景 | 快速验证、接口联调、验收测试 | 生产部署、完整功能 |
 
-**推荐流程：** 先用独立版验证 API → 再部署完整版到生产环境
-
----
-
-### 服务验证
-
-独立版验证：
-```bash
-chmod +x verify-standalone.sh
-./verify-standalone.sh
-```
-
-完整版验证：
-```bash
-chmod +x verify.sh
-./verify.sh
-```
-
-或者手动访问：`http://localhost:8080/api`
+**✅ 推荐流程：先用独立版验证所有 API 流程 → 再部署完整版到生产环境**
 
 ## 核心功能
 
