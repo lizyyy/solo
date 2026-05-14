@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>表单流程规则编排系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 20px; font-weight: 600; }
+        .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+        .tab { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; background: white; color: #666; }
+        .tab.active { background: #667eea; color: white; }
+        .tab:hover:not(.active) { background: #f0f0f0; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .card-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 16px; margin-bottom: 16px; }
+        .form-group { flex: 1; }
+        .form-group label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: #667eea; }
+        .btn { padding: 10px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #f0f0f0; color: #666; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-danger { background: #ff4757; color: white; }
+        .btn-danger:hover { background: #ff3838; }
+        .btn-success { background: #2ed573; color: white; }
+        .btn-sm { padding: 6px 16px; font-size: 13px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #f8f9fa; font-weight: 600; color: #333; font-size: 13px; }
+        td { font-size: 13px; color: #666; }
+        .status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .status-draft { background: #fff3cd; color: #856404; }
+        .status-pending { background: #cce5ff; color: #004085; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .status-withdrawn { background: #e2e3e5; color: #383d41; }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-warning { background: #fff3cd; color: #856404; }
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-size: 16px; font-weight: 600; }
+        .modal-close { cursor: pointer; font-size: 20px; color: #999; }
+        .modal-body { padding: 24px; }
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+        .workflow-canvas { min-height: 200px; border: 2px dashed #e0e0e0; border-radius: 8px; padding: 16px; display: flex; flex-wrap: wrap; gap: 16px; }
+        .workflow-node { padding: 12px 20px; border-radius: 8px; background: #f8f9fa; border: 2px solid #e0e0e0; min-width: 140px; text-align: center; }
+        .workflow-node.start { background: #d4edda; border-color: #2ed573; }
+        .workflow-node.approval { background: #cce5ff; border-color: #007bff; }
+        .workflow-node.end { background: #f8d7da; border-color: #dc3545; }
+        .workflow-node.current { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); }
+        .node-name { font-weight: 600; font-size: 14px; }
+        .node-approvers { font-size: 12px; color: #666; margin-top: 4px; }
+        .import-zone { border: 2px dashed #667eea; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .import-zone:hover { background: rgba(102, 126, 234, 0.05); }
+        .import-zone.dragover { border-color: #764ba2; background: rgba(102, 126, 234, 0.1); }
+        .import-zone input { display: none; }
+        .validation-error { color: #dc3545; font-size: 12px; margin-top: 4px; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: #e9ecef; color: #495057; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .history-item { padding: 12px; border-radius: 8px; background: #f8f9fa; margin-bottom: 8px; font-size: 13px; }
+        .history-item .action { font-weight: 600; margin-right: 8px; }
+        .history-item .time { color: #999; font-size: 12px; }
+        .group-section { margin-bottom: 20px; }
+        .group-title { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #667eea; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>表单流程规则编排系统</h1>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('submit')">表单提交</button>
+            <button class="tab" onclick="switchTab('approvals')">待审批</button>
+            <button class="tab" onclick="switchTab('history')">申请历史</button>
+            <button class="tab" onclick="switchTab('workflow')">流程设计</button>
+            <button class="tab" onclick="switchTab('batch')">批量导入</button>
+            <button class="tab" onclick="switchTab('export')">数据导出</button>
+        </div>
+
+        <div id="submit-tab" class="tab-content">
+            <div class="card">
+                <div class="card-title">费用报销申请单</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>报销金额 *</label>
+                        <input type="number" id="form-amount" class="form-control" placeholder="请输入报销金额">
+                        <div id="error-amount" class="validation-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>所属部门 *</label>
+                        <select id="form-department" class="form-control">
+                            <option value="">请选择部门</option>
+                            <option value="技术部">技术部</option>
+                            <option value="市场部">市场部</option>
+                            <option value="人力资源部">人力资源部</option>
+                            <option value="财务部">财务部</option>
+                        </select>
+                        <div id="error-department" class="validation-error"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>报销事由 *</label>
+                        <input type="text" id="form-reason" class="form-control" placeholder="请输入报销事由（至少5个字符）">
+                        <div id="error-reason" class="validation-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>联系邮箱 *</label>
+                        <input type="email" id="form-email" class="form-control" placeholder="请输入联系邮箱">
+                        <div id="error-email" class="validation-error"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 0.5;">
+                        <label>是否紧急</label>
+                        <input type="checkbox" id="form-emergency">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="saveDraft()">保存草稿</button>
+                    <button class="btn btn-primary" onclick="submitForm()">提交审批</button>
+                    <button class="btn btn-secondary" onclick="validateForm()">预校验</button>
+                </div>
+            </div>
+            <div id="validation-result"></div>
+        </div>
+
+        <div id="approvals-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">待审批列表</div>
+                <div class="table-container">
+                    <table id="approvals-table">
+                        <thead>
+                            <tr>
+                                <th>申请编号</th>
+                                <th>申请人</th>
+                                <th>部门</th>
+                                <th>金额</th>
+                                <th>事由</th>
+                                <th>当前节点</th>
+                                <th>提交时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">申请历史</div>
+                <div class="table-container">
+                    <table id="history-table">
+                        <thead>
+                            <tr>
+                                <th>申请编号</th>
+                                <th>金额</th>
+                                <th>事由</th>
+                                <th>状态</th>
+                                <th>当前节点</th>
+                                <th>超时提醒</th>
+                                <th>已撤回</th>
+                                <th>重提次数</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="workflow-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">流程设计图</div>
+                <div id="workflow-diagram" class="workflow-canvas"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">当前选中流程信息</div>
+                <div id="workflow-info"></div>
+            </div>
+        </div>
+
+        <div id="batch-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">批量导入</div>
+                <div class="import-zone" id="import-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" onclick="document.getElementById('import-file').click()">
+                    <input type="file" id="import-file" accept=".json,.txt" onchange="handleFileSelect(event)">
+                    <p style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">拖拽文件到此处或点击上传</p>
+                    <p style="font-size: 13px; color: #999;">支持 JSON 格式文件</p>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="importSampleData()">导入示例数据（含脏数据）</button>
+                </div>
+                <div id="import-result"></div>
+            </div>
+        </div>
+
+        <div id="export-tab" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-title">数据导出</div>
+                <p style="margin-bottom: 16px; color: #666;">导出文件包含以下分组数据：</p>
+                <ul style="margin-left: 20px; margin-bottom: 20px; color: #666;">
+                    <li>按审批人分组</li>
+                    <li>按月份时间分组</li>
+                    <li>按审批节点分组</li>
+                    <li>全部数据汇总</li>
+                </ul>
+                <button class="btn btn-primary" onclick="exportData()">导出 Excel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">详情</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentUserId = 1;
+        let currentWorkflowId = 1;
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            
+            if (tabName === 'approvals') loadApprovals();
+            if (tabName === 'history') loadHistory();
+            if (tabName === 'workflow') loadWorkflow();
+        }
+
+        async function fetchData(url) {
+            const response = await fetch(`${API_BASE}${url}`);
+            return await response.json();
+        }
+
+        async function postData(url, data) {
+            const response = await fetch(`${API_BASE}${url}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await response.json();
+        }
+
+        function showAlert(message, type = 'success') {
+            const container = document.getElementById('validation-result');
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => container.innerHTML = '', 5000);
+        }
+
+        async function validateForm() {
+            const formData = getFormData();
+            const result = await postData(`/validate/${currentWorkflowId}`, formData);
+            
+            let html = '<div class="alert alert-info"><strong>校验结果：</strong>' + (result.valid ? '通过' : '失败') + '</div>';
+            if (!result.valid) {
+                result.errors.forEach(err => {
+                    html += `<div class="alert alert-error">字段 "${err.field}"：${err.message}</div>`;
+                });
+            }
+            document.getElementById('validation-result').innerHTML = html;
+        }
+
+        function getFormData() {
+            return {
+                amount: parseFloat(document.getElementById('form-amount').value) || null,
+                reason: document.getElementById('form-reason').value,
+                department: document.getElementById('form-department').value,
+                email: document.getElementById('form-email').value,
+                is_emergency: document.getElementById('form-emergency').checked
+            };
+        }
+
+        async function saveDraft() {
+            const formData = getFormData();
+            try {
+                const result = await postData('/submissions', {
+                    form_template_id: 1,
+                    workflow_id: currentWorkflowId,
+                    submitter_id: currentUserId,
+                    form_data: formData
+                });
+                showAlert(`草稿已保存，编号：${result.submission_no}`);
+            } catch (error) {
+                showAlert('保存失败：' + error.message, 'error');
+            }
+        }
+
+        async function submitForm() {
+            const formData = getFormData();
+            try {
+                const draft = await postData('/submissions', {
+                    form_template_id: 1,
+                    workflow_id: currentWorkflowId,
+                    submitter_id: currentUserId,
+                    form_data: formData
+                });
+                const submitted = await postData(`/submissions/${draft.id}/submit`, {});
+                showAlert(`提交成功，申请编号：${submitted.submission_no}，当前状态：${getStatusText(submitted.status)}`);
+                clearForm();
+            } catch (error) {
+                showAlert('提交失败：' + error.message, 'error');
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('form-amount').value = '';
+            document.getElementById('form-reason').value = '';
+            document.getElementById('form-department').value = '';
+            document.getElementById('form-email').value = '';
+            document.getElementById('form-emergency').checked = false;
+        }
+
+        function getStatusText(status) {
+            const map = {
+                draft: '草稿', pending: '审批中', approved: '已通过',
+                rejected: '已拒绝', withdrawn: '已撤回'
+            };
+            return map[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const map = {
+                draft: 'status-draft', pending: 'status-pending', 
+                approved: 'status-approved', rejected: 'status-rejected',
+                withdrawn: 'status-withdrawn'
+            };
+            return map[status] || '';
+        }
+
+        async function loadApprovals() {
+            const approvals = await fetchData(`/approvals/pending/${currentUserId}`);
+            const tbody = document.querySelector('#approvals-table tbody');
+            tbody.innerHTML = approvals.map(ap => `
+                <tr>
+                    <td>${ap.submission_no}</td>
+                    <td>${ap.submitter?.name || '未知'}</td>
+                    <td>${ap.form_data?.department || '-'}</td>
+                    <td>${ap.form_data?.amount || '-'}</td>
+                    <td>${ap.form_data?.reason || '-'}</td>
+                    <td><span class="badge">${getNodeName(ap.current_node_id)}</span></td>
+                    <td>${new Date(ap.created_at).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="approveSubmission(${ap.id})">通过</button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectSubmission(${ap.id})">拒绝</button>
+                        <button class="btn btn-secondary btn-sm" onclick="viewDetail(${ap.id})">详情</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadHistory() {
+            const submissions = await fetchData(`/submissions?user_id=${currentUserId}`);
+            const tbody = document.querySelector('#history-table tbody');
+            tbody.innerHTML = submissions.map(s => `
+                <tr>
+                    <td>${s.submission_no}</td>
+                    <td>${s.form_data?.amount || '-'}</td>
+                    <td>${s.form_data?.reason || '-'}</td>
+                    <td><span class="status ${getStatusClass(s.status)}">${getStatusText(s.status)}</span></td>
+                    <td>${getNodeName(s.current_node_id) || '-'}</td>
+                    <td>${s.timeout_reminded ? '是' : '否'}</td>
+                    <td>${s.is_withdrawn ? '是' : '否'}</td>
+                    <td>${s.resubmit_count}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="viewDetail(${s.id})">详情</button>
+                        ${s.status === 'pending' ? `<button class="btn btn-danger btn-sm" onclick="withdrawSubmission(${s.id})">撤回</button>` : ''}
+                        ${(s.is_withdrawn || s.status === 'rejected') ? `<button class="btn btn-primary btn-sm" onclick="resubmitSubmission(${s.id})">重提</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadWorkflow() {
+            const workflow = await fetchData(`/workflows/${currentWorkflowId}`);
+            const canvas = document.getElementById('workflow-diagram');
+            canvas.innerHTML = workflow.nodes.map(node => `
+                <div class="workflow-node ${node.type}">
+                    <div class="node-name">${node.name}</div>
+                    ${node.approvers ? `<div class="node-approvers">审批人：${node.approvers.map(id => getUserName(id)).join(', ')}</div>` : ''}
+                </div>
+            `).join('');
+            
+            const info = document.getElementById('workflow-info');
+            info.innerHTML = `
+                <div><strong>流程名称：</strong>${workflow.name}</div>
+                <div><strong>节点数量：</strong>${workflow.nodes.length}</div>
+                <div><strong>条件分支：</strong>${workflow.edges.filter(e => e.condition && Object.keys(e.condition).length).length} 个</div>
+            `;
+        }
+
+        async function approveSubmission(id) {
+            const comment = prompt('请输入审批意见（可选）：');
+            try {
+                await postData('/submissions/approve', {
+                    submission_id: id,
+                    approver_id: currentUserId,
+                    comment: comment || ''
+                });
+                showAlert('审批通过', 'success');
+                loadApprovals();
+            } catch (error) {
+                showAlert('操作失败：' + error.message, 'error');
+            }
+        }
+
+        async function rejectSubmission(id) {
+            const comment = prompt('请输入拒绝原因：');
+            if (!comment) return;
+            try {
+                await postData('/submissions/reject', {
+                    submission_id: id,
+                    approver_id: currentUserId,
+                    comment: comment
+                });
+                showAlert('已拒绝', 'success');
+                loadApprovals();
+            } catch (error) {
+                showAlert('操作失败：' + error.message, 'error');
+            }
+        }
+
+        async function withdrawSubmission(id) {
+            if (!confirm('确定要撤回此申请吗？')) return;
+            const reason = prompt('请输入撤回原因（可选）：');
+            try {
+                await postData('/submissions/withdraw', {
+                    submission_id: id,
+                    user_id: currentUserId,
+                    reason: reason || ''
+                });
+                showAlert('已撤回', 'success');
+                loadHistory();
+            } catch (error) {
+                showAlert('操作失败：' + error.message, 'error');
+            }
+        }
+
+        async function resubmitSubmission(id) {
+            try {
+                const submission = await fetchData(`/submissions/${id}`);
+                const newAmount = prompt('请输入新的报销金额（原金额：' + submission.form_data.amount + '）：', submission.form_data.amount);
+                const newReason = prompt('请输入新的报销事由（原事由：' + submission.form_data.reason + '）：', submission.form_data.reason);
+                
+                if (!newAmount || !newReason) return;
+                
+                await postData('/submissions/resubmit', {
+                    submission_id: id,
+                    form_data: {
+                        ...submission.form_data,
+                        amount: parseFloat(newAmount),
+                        reason: newReason
+                    }
+                });
+                showAlert('重提成功', 'success');
+                loadHistory();
+            } catch (error) {
+                showAlert('操作失败：' + error.message, 'error');
+            }
+        }
+
+        function viewDetail(id) {
+            fetchData(`/submissions/${id}`).then(submission => {
+                document.getElementById('modal-title').textContent = `申请详情 - ${submission.submission_no}`;
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="group-section">
+                        <div class="group-title">基本信息</div>
+                        <div>状态：<span class="status ${getStatusClass(submission.status)}">${getStatusText(submission.status)}</span></div>
+                        <div>申请人：${submission.submitter?.name || '未知'}</div>
+                        <div>提交时间：${new Date(submission.created_at).toLocaleString()}</div>
+                        <div>更新时间：${new Date(submission.updated_at).toLocaleString()}</div>
+                        <div>超时提醒：${submission.timeout_reminded ? '已触发' : '未触发'}</div>
+                        <div>已撤回：${submission.is_withdrawn ? '是' : '否'}</div>
+                        <div>重提次数：${submission.resubmit_count}</div>
+                    </div>
+                    <div class="group-section">
+                        <div class="group-title">表单数据</div>
+                        <div>报销金额：${submission.form_data?.amount || '-'}</div>
+                        <div>报销事由：${submission.form_data?.reason || '-'}</div>
+                        <div>所属部门：${submission.form_data?.department || '-'}</div>
+                        <div>联系邮箱：${submission.form_data?.email || '-'}</div>
+                        <div>是否紧急：${submission.form_data?.is_emergency ? '是' : '否'}</div>
+                    </div>
+                    <div class="group-section">
+                        <div class="group-title">审批历史</div>
+                        ${submission.approval_history?.length ? submission.approval_history.map(h => `
+                            <div class="history-item">
+                                <span class="action">${h.action === 'approve' ? '✓ 通过' : h.action === 'reject' ? '✗ 拒绝' : h.action === 'withdraw' ? '↩ 撤回' : h.action === 'timeout_reminder' ? '⏰ 超时提醒' : h.action}</span>
+                                ${h.node_name ? `<span>【${h.node_name}】</span>` : ''}
+                                ${h.comment ? `<span>${h.comment}</span>` : ''}
+                                ${h.reason ? `<span>原因：${h.reason}</span>` : ''}
+                                ${h.message ? `<span>${h.message}</span>` : ''}
+                                <span class="time">${h.timestamp ? new Date(h.timestamp).toLocaleString() : ''}</span>
+                            </div>
+                        `).join('') : '<div style="color: #999;">暂无审批记录</div>'}
+                    </div>
+                `;
+                document.getElementById('modal').classList.add('show');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('import-zone').classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            document.getElementById('import-zone').classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            processFile(file);
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            processFile(file);
+        }
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    await doBatchImport(data);
+                } catch (error) {
+                    showImportResult('JSON格式错误：' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function importSampleData() {
+            const sampleData = [
+                {"amount": 2000, "reason": "办公用品采购", "department": "技术部", "email": "zhangsan@example.com", "is_emergency": false},
+                {"amount": 6000, "reason": "技术培训费用", "department": "技术部", "email": "zhangsan@example.com", "is_emergency": true},
+                {"amount": -100, "reason": "无效金额测试", "department": "技术部", "email": "test@example.com", "is_emergency": false},
+                {"amount": 1000, "reason": "短", "department": "技术部", "email": "test@example.com", "is_emergency": false},
+                {"amount": 3000, "reason": "差旅费", "department": "", "email": "test@example.com", "is_emergency": false},
+                {"amount": 4000, "reason": "会议费用", "department": "市场部", "email": "invalid-email", "is_emergency": false},
+                {"amount": 5000, "reason": "服务器维护", "department": "技术部", "email": "zhangsan@example.com", "is_emergency": true}
+            ];
+            await doBatchImport(sampleData);
+        }
+
+        async function doBatchImport(data) {
+            try {
+                const result = await postData('/batch-import', {
+                    submissions: data,
+                    workflow_id: currentWorkflowId,
+                    submitter_id: currentUserId
+                });
+                
+                let html = `<div class="alert alert-success">批量导入完成</div>`;
+                html += `<div style="margin-top: 16px;">`;
+                html += `<p><strong>成功：</strong>${result.success_count} 条</p>`;
+                html += `<p><strong>失败：</strong>${result.error_count} 条</p>`;
+                if (result.errors.length) {
+                    html += `<div class="alert alert-warning">`;
+                    html += `<strong>失败详情：</strong>`;
+                    result.errors.forEach((err, idx) => {
+                        html += `<div style="margin-top: 8px;">第 ${err.index + 1} 条：${err.error || err.errors?.map(e => e.message).join(', ')}</div>`;
+                    });
+                    html += `</div>`;
+                }
+                document.getElementById('import-result').innerHTML = html;
+            } catch (error) {
+                showImportResult('导入失败：' + error.message, 'error');
+            }
+        }
+
+        function showImportResult(message, type) {
+            document.getElementById('import-result').innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        function exportData() {
+            window.open(`${API_BASE}/export`, '_blank');
+        }
+
+        const users = {1: '张三', 2: '李四', 3: '王五', 4: '赵六'};
+        function getUserName(id) {
+            return users[id] || '未知用户';
+        }
+
+        const nodeNames = {'approval1': '部门经理审批', 'approval2': '财务总监审批', 'approval3': 'HR确认', 'end': '结束'};
+        function getNodeName(id) {
+            return nodeNames[id] || id || '-';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
+    </script>
+</body>
+</html>
