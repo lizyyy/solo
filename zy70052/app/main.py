@@ -1,18 +1,40 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
 import io
 
 from app.config import settings
 from app.database import engine, Base, get_db, get_db_session
-from app.utils import ApplicationStatus
+from app.utils import ApplicationStatus, AccountStatus, BusinessType, OperationType
+from app.models import LoanAccount
 from app.services.extension_service import ExtensionService, ExtensionApplicationException
 from app.services.reconciliation_service import ReconciliationService
 from app.services.task_service import TaskService
+from app.services.loan_account_service import LoanAccountService
+
+
+class CreateLoanAccountRequest(BaseModel):
+    account_no: str = Field(..., description="贷款账号")
+    customer_id: str = Field(..., description="客户ID")
+    customer_name: str = Field(..., description="客户姓名")
+    loan_amount: Decimal = Field(..., description="贷款本金", ge=0)
+    remaining_principal: Decimal = Field(..., description="剩余本金", ge=0)
+    total_interest: Decimal = Field(default=Decimal("0"), description="总利息", ge=0)
+    paid_interest: Decimal = Field(default=Decimal("0"), description="已还利息", ge=0)
+    annual_interest_rate: Decimal = Field(..., description="年利率(%)", ge=0, le=100)
+    extension_interest_rate: Optional[Decimal] = Field(default=None, description="展期年利率(%)")
+    loan_term: int = Field(..., description="贷款期限(月)", ge=1)
+    original_maturity_date: datetime = Field(..., description="原到期日")
+    current_maturity_date: datetime = Field(..., description="当前到期日")
+    credit_limit_used: Decimal = Field(default=Decimal("0"), description="占用额度")
+    max_extension_count: int = Field(default=2, description="最大展期次数", ge=0)
+    max_extension_months: int = Field(default=6, description="单次最大展期月数", ge=1)
+    auto_create_plan: bool = Field(default=True, description="是否自动创建还款计划")
 
 Base.metadata.create_all(bind=engine)
 
@@ -402,6 +424,87 @@ def check_data_consistency(
         return result
     except ExtensionApplicationException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post(f"{settings.API_V1_STR}/loan-accounts", tags=["贷款账户管理"])
+def create_loan_account(
+    request: CreateLoanAccountRequest,
+    db: Session = Depends(get_db)
+):
+    try:
+        service = LoanAccountService(db)
+        account = service.create_loan_account(
+            account_no=request.account_no,
+            customer_id=request.customer_id,
+            customer_name=request.customer_name,
+            loan_amount=request.loan_amount,
+            remaining_principal=request.remaining_principal,
+            total_interest=request.total_interest,
+            paid_interest=request.paid_interest,
+            annual_interest_rate=request.annual_interest_rate,
+            loan_term=request.loan_term,
+            original_maturity_date=request.original_maturity_date,
+            current_maturity_date=request.current_maturity_date,
+            credit_limit_used=request.credit_limit_used,
+            extension_interest_rate=request.extension_interest_rate,
+            max_extension_count=request.max_extension_count,
+            max_extension_months=request.max_extension_months
+        )
+        
+        repayment_plan = None
+        if request.auto_create_plan:
+            loan_account = db.query(LoanAccount).get(account["id"])
+            repayment_plan = service.create_initial_repayment_plan(loan_account=loan_account)
+        
+        return {
+            "success": True,
+            "account": account,
+            "repayment_plan": repayment_plan
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(f"{settings.API_V1_STR}/loan-accounts/{{account_no}}", tags=["贷款账户管理"])
+def get_loan_account(
+    account_no: str,
+    db: Session = Depends(get_db)
+):
+    try:
+        service = LoanAccountService(db)
+        account = service.get_loan_account(account_no=account_no)
+        if not account:
+            raise HTTPException(status_code=404, detail=f"贷款账户不存在: {account_no}")
+        return account
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get(f"{settings.API_V1_STR}/loan-accounts", tags=["贷款账户管理"])
+def list_loan_accounts(
+    customer_id: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 100,
+    db: Session = Depends(get_db)
+):
+    try:
+        from app.utils import AccountStatus
+        service = LoanAccountService(db)
+        status_enum = AccountStatus(status) if status else None
+        accounts = service.list_loan_accounts(
+            customer_id=customer_id,
+            status=status_enum,
+            limit=limit
+        )
+        return {"data": accounts, "count": len(accounts)}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"无效的状态值: {status}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
