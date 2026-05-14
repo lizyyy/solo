@@ -160,33 +160,30 @@ echo ""
 if [ $FAIL -eq 0 ]; then
     echo "✅ 环境就绪！可以直接启动服务"
     echo ""
-    echo "  ./start.sh"
+    echo "  bash start.sh"
 elif [ $FAIL -le 2 ] && [ -f "target/classes/com/apigate/voting/VotingGateApplication.class" ]; then
     echo "⚠️  部分缺失，但核心文件已就绪"
     echo ""
-    echo "  可能可以直接启动: ./start.sh"
+    echo "  可能可以直接启动: bash start.sh"
 else
-    echo "❌ 环境未就绪，需要构建"
+    echo "❌ 环境未就绪，需要准备"
     echo ""
-    echo "【可用方案】"
+    echo "【推荐方案 ⭐⭐⭐⭐⭐】"
     echo ""
-    
-    # 方案 A
-    echo "方案 A：标准构建（需要 Java + 网络 + 写权限）"
-    echo "  chmod +x build.sh start.sh verify.sh"
-    echo "  ./build.sh"
-    echo "  ./start.sh"
+    echo "  一键准备（自动下载依赖 + 编译）"
+    echo "  bash prepare.sh"
+    echo ""
+    echo "【其他方案】"
     echo ""
     
-    # 方案 B
     if command -v mvn >/dev/null 2>&1; then
-        echo "方案 B：使用 Maven 构建"
-        echo "  mvn clean compile spring-boot:run"
+        echo "• 使用 Maven 构建"
+        echo "  mvn clean compile dependency:copy-dependencies -DoutputDirectory=target/dependency"
+        echo "  mvn spring-boot:run"
         echo ""
     fi
     
-    # 方案 C
-    echo "方案 C：当前只读环境验证"
+    echo "• 只读环境验证"
     echo "  检查源代码和配置文件是否完整"
     echo "  详细请查看 API_DOCUMENTATION.md"
 fi

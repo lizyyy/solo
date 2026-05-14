@@ -49,30 +49,29 @@ fi
 if [ $NEED_BUILD -eq 1 ]; then
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "  系统尚未构建，无法直接启动"
+    echo "  ❌ 系统尚未准备，无法直接启动服务"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
     echo ""
-    echo "【可用解决方案】"
+    echo "【请先运行一键准备脚本】"
+    echo ""
+    echo "  bash prepare.sh"
+    echo ""
+    echo "prepare.sh 会自动完成："
+    echo "  ✅ 环境检查（Java, 编译器, 网络工具）"
+    echo "  ✅ 从 Maven Central 下载 50+ 个依赖 JAR"
+    echo "  ✅ Java 8 兼容模式编译所有源代码"
+    echo "  ✅ 复制配置文件并验证"
     echo ""
     
+    echo "【备选方案】"
+    echo ""
     if command -v mvn >/dev/null 2>&1; then
-        echo "方案 1：使用 Maven 构建并启动"
+        echo "• 使用 Maven:"
         echo "  mvn clean compile spring-boot:run"
         echo ""
     fi
-    
-    echo "方案 2：使用构建脚本（需要网络和写权限）"
-    echo "  chmod +x build.sh && ./build.sh"
-    echo "  ./start.sh"
-    echo ""
-    
-    echo "方案 3：运行环境诊断，了解当前环境详情"
-    echo "  chmod +x diagnose.sh && ./diagnose.sh"
-    echo ""
-    
-    echo "方案 4：只读环境下的验证"
-    echo "  检查源代码完整性，查看 API 文档"
-    echo "  cat API_DOCUMENTATION.md"
+    echo "• 运行环境诊断:"
+    echo "  bash diagnose.sh"
     echo ""
     
     exit 1

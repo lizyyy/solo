@@ -503,41 +503,73 @@ FROM release_records;
 
 ## 🎓 常见问题 FAQ
 
-**Q: 运行 start.sh 提示"系统尚未构建，无法直接启动"怎么办？**
+---
 
-A: 运行 `./build.sh` 先构建项目。如果是只读环境，请查看"场景 2：只读质检环境"。
+**Q: 最简单的启动方式是什么？**
+
+A: 按顺序执行 3 个命令：
+```bash
+bash prepare.sh    # 下载依赖 + 编译
+bash start.sh      # 启动服务（等 10-30 秒）
+bash verify.sh     # 验证接口（新开窗口）
+```
 
 ---
 
-**Q: 运行 build.sh 后提示下载失败？**
+**Q: target/dependency 是空的，缺少依赖 JAR 怎么办？**
 
-A: 检查网络连接，或使用系统 Maven：`mvn clean compile dependency:copy-dependencies -DoutputDirectory=target/dependency`
+A: 运行 `bash prepare.sh`，它会从 Maven Central 自动下载所有必需的 50+ 个依赖 JAR。
+
+---
+
+**Q: 运行 start.sh 提示"系统尚未准备，无法直接启动服务"怎么办？**
+
+A: 按照提示先运行 `bash prepare.sh`。这是最完整的准备脚本。
+
+---
+
+**Q: prepare.sh 下载依赖很慢或失败怎么办？**
+
+A: 
+1. 检查网络连接
+2. 确保能访问 `https://repo1.maven.org/maven2`
+3. 可以 Ctrl+C 中断后重新运行，已下载的不会重复下载
+4. 如果有系统 Maven，也可以用：`mvn clean compile dependency:copy-dependencies -DoutputDirectory=target/dependency`
 
 ---
 
 **Q: 编译出的 class 是 Java 11 版本怎么办？**
 
-A: build.sh 每次运行都会清理 target 目录重新编译，并强制使用 `-source 1.8 -target 1.8`。
+A: prepare.sh 每次运行都会：
+1. 强制删除旧的 target/classes
+2. 使用 `-source 1.8 -target 1.8` 编译
+3. 生成的是完全的 Java 8 兼容版本
 
 ---
 
 **Q: verify.sh 运行时提示"服务未启动"怎么办？**
 
-A: 先运行 `./start.sh` 启动服务，等看到 Spring Boot 启动日志（约 10-30 秒）后再运行验证。
+A: 等服务完全启动（看到 Spring Boot 标志和 `Started VotingGateApplication in X seconds` 日志）再运行，或者新开一个窗口运行验证。
+
+---
+
+**Q: ./mvnw 提示缺少 maven-wrapper.jar 怎么办？**
+
+A: mvnw 只是备选方案。请直接使用 `bash prepare.sh`，它完全不需要 Maven。
 
 ---
 
 **Q: 如何验证导出的 Excel 内容正确？**
 
-A: 导出后打开文件，检查是否包含：
-- 提案基础信息（9 列）
-- 影响项列表（6 列）
-- 投票记录（4 列）
-- 阻塞记录（5 列，如有阻塞操作）
-- 放行记录（5 列，如有发布操作）
+A: 导出后打开文件，检查 5 类数据：
+1. 提案基础信息（9 列）
+2. 影响项列表（6 列）
+3. 投票记录（4 列）
+4. 阻塞记录（5 列，如有阻塞操作）
+5. 放行记录（5 列，如有发布操作）
 
 ---
 
-**Q: 为什么不直接提供预编译好的 class 文件？**
+**Q: 为什么不直接提供预编译好的 class 和 jar 文件？**
 
-A: 这是为了保证交付的完整性和可重复性，从源码编译能确保代码的真实性。同时 build.sh 提供了完全自动化的构建流程。
+A: 这是为了保证交付的完整性和可重复性。从源码编译能确保代码的真实性。prepare.sh 提供了完全自动化的构建流程，只需要一条命令。
