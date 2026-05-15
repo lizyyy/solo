@@ -1,43 +1,75 @@
 #!/bin/sh
 
-# Maven Wrapper script - 允许在没有全局安装 Maven 的情况下运行 Maven
-# 这是一个纯 shell 实现，不需要下载 Maven wrapper jar
+# Maven Wrapper 脚本 - 兼容 Java 8
+# 当系统未安装 Maven 时提供友好提示和替代方案
 
 set -e
 
-# 颜色输出
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo "${GREEN}========================================${NC}"
-echo "${GREEN}  Service Token Exchange - Maven Run  ${NC}"
-echo "${GREEN}========================================${NC}"
-echo ""
+print_header() {
+    echo "${BLUE}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo "${BLUE}║${NC}  🔐 服务令牌交换 API - Maven Wrapper                            ${BLUE}║${NC}"
+    echo "${BLUE}╚══════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+}
 
-# 检测 Maven
-if command -v mvn > /dev/null 2>&1; then
-    echo "✅ 检测到系统 Maven: $(mvn -v | head -n 1)"
+print_usage() {
+    echo "用法: ./mvnw [命令]"
+    echo ""
+    echo "可用命令:"
+    echo "  compile        - 编译项目"
+    echo "  clean package  - 打包项目生成 jar"
+    echo "  spring-boot:run  - 直接启动应用"
+    echo "  test           - 运行测试"
+    echo "  -version       - 显示 Maven 版本"
+    echo ""
+    echo "替代方案:"
+    echo "  ./start.sh     - 使用交互式启动脚本（推荐）"
+}
+
+check_maven() {
+    if command -v mvn > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+print_maven_guide() {
+    echo "${YELLOW}⚠️  系统未安装 Maven${NC}"
+    echo ""
+    echo "${GREEN}推荐方案:${NC}"
+    echo "  1. 运行 ./start.sh 使用交互式启动脚本"
+    echo "  2. 使用 IDE (IntelliJ IDEA/Eclipse/VS Code) 直接打开项目运行"
+    echo ""
+    echo "${BLUE}安装 Maven (可选):${NC}"
+    echo "  macOS:    brew install maven"
+    echo "  Linux:    sudo apt install maven 或 sudo yum install maven"
+    echo "  Windows:  choco install maven 或手动下载"
+    echo ""
+    echo "  下载地址: https://maven.apache.org/download.cgi"
+}
+
+# 主逻辑
+print_header
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    print_usage
+    exit 0
+fi
+
+if check_maven; then
+    echo "${GREEN}✅ 检测到系统 Maven: $(mvn -v | head -n 1 | cut -d' ' -f3)${NC}"
+    echo ""
+    echo "执行命令: mvn $@"
     echo ""
     exec mvn "$@"
 else
-    echo "${YELLOW}⚠️  未检测到全局 Maven，尝试使用替代方案...${NC}"
-    echo ""
-    
-    # 检查是否有预编译的 class 文件
-    if [ -d "target/classes" ]; then
-        echo "${GREEN}✅ 检测到已编译的 class 文件${NC}"
-        echo ""
-        echo "请使用 ./start.sh 脚本直接启动应用"
-        exit 1
-    else
-        echo "${RED}❌ 未找到 Maven 也未找到预编译文件${NC}"
-        echo ""
-        echo "请安装 Maven 或使用 Java 17+ 编译项目:"
-        echo "  1. 安装 Maven: https://maven.apache.org/install.html"
-        echo "  2. 或使用 IDE (IntelliJ IDEA, Eclipse) 直接打开项目"
-        echo "  3. 或使用 Docker 运行（如果有 Dockerfile）"
-        exit 1
-    fi
+    print_maven_guide
+    exit 1
 fi

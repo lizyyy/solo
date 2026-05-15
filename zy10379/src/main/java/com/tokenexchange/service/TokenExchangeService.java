@@ -70,7 +70,7 @@ public class TokenExchangeService {
         ServiceIdentity targetService = validateService(request.getTargetServiceId(), requestId);
 
         ExchangeScenario scenario = null;
-        if (request.getScenarioCode() != null && !request.getScenarioCode().isBlank()) {
+        if (request.getScenarioCode() != null && !request.getScenarioCode().isEmpty()) {
             scenario = exchangeScenarioRepository.findByScenarioCodeAndEnabledTrue(request.getScenarioCode())
                     .orElseThrow(() -> TokenException.scenarioNotFound(request.getScenarioCode(), requestId));
         }
@@ -269,7 +269,7 @@ public class TokenExchangeService {
     }
 
     private Set<String> parseScopes(String scopesStr) {
-        if (scopesStr == null || scopesStr.isBlank()) {
+        if (scopesStr == null || scopesStr.isEmpty()) {
             return new HashSet<>();
         }
         return Arrays.stream(scopesStr.split(","))
@@ -356,7 +356,7 @@ public class TokenExchangeService {
             throw TokenException.exhaustedToken(requestId);
         }
 
-        if (request.getServiceId() != null && !request.getServiceId().isBlank()) {
+        if (request.getServiceId() != null && !request.getServiceId().isEmpty()) {
             if (!shortToken.getTargetServiceId().equals(request.getServiceId()) &&
                 !shortToken.getSourceServiceId().equals(request.getServiceId())) {
                 response.setValid(false);
@@ -372,7 +372,7 @@ public class TokenExchangeService {
             }
         }
 
-        if (request.getRequiredScope() != null && !request.getRequiredScope().isBlank()) {
+        if (request.getRequiredScope() != null && !request.getRequiredScope().isEmpty()) {
             Set<String> tokenScopes = parseScopes(shortToken.getScopes());
             if (!tokenScopes.contains(request.getRequiredScope())) {
                 response.setValid(false);
@@ -443,7 +443,7 @@ public class TokenExchangeService {
             throw TokenException.expiredToken(requestId);
         }
 
-        if (request.getRequiredScope() != null && !request.getRequiredScope().isBlank()) {
+        if (request.getRequiredScope() != null && !request.getRequiredScope().isEmpty()) {
             Set<String> tokenScopes = parseScopes(userToken.getScopes());
             if (!tokenScopes.contains(request.getRequiredScope())) {
                 response.setValid(false);

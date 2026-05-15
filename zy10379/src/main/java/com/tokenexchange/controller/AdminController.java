@@ -34,10 +34,10 @@ public class AdminController {
         Integer expireDays = request.get("expireDays") != null ? 
             Integer.parseInt(request.get("expireDays").toString()) : 30;
 
-        if (userId == null || userId.isBlank()) {
+        if (userId == null || userId.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "userId 不能为空"));
         }
-        if (scopes == null || scopes.isBlank()) {
+        if (scopes == null || scopes.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "scopes 不能为空"));
         }
 
@@ -55,7 +55,7 @@ public class AdminController {
     @GetMapping("/user-tokens/{id}")
     public ResponseEntity<ApiResponse<UserToken>> getUserTokenById(@PathVariable Long id) {
         Optional<UserToken> token = userTokenRepository.findById(id);
-        if (token.isEmpty()) {
+        if (!token.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "用户令牌不存在"));
         }
         return ResponseEntity.ok(ApiResponse.success("用户令牌查询成功", token.get()));
@@ -72,7 +72,7 @@ public class AdminController {
             @PathVariable Long id,
             @RequestBody Map<String, Object> request) {
         Optional<UserToken> tokenOpt = userTokenRepository.findById(id);
-        if (tokenOpt.isEmpty()) {
+        if (!tokenOpt.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "用户令牌不存在"));
         }
 
@@ -109,7 +109,7 @@ public class AdminController {
     @GetMapping("/short-tokens/{id}")
     public ResponseEntity<ApiResponse<ShortToken>> getShortTokenById(@PathVariable Long id) {
         Optional<ShortToken> token = shortTokenRepository.findById(id);
-        if (token.isEmpty()) {
+        if (!token.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "短期令牌不存在"));
         }
         return ResponseEntity.ok(ApiResponse.success("短期令牌查询成功", token.get()));
@@ -139,10 +139,10 @@ public class AdminController {
         String description = (String) request.get("description");
         String allowedScopes = (String) request.get("allowedScopes");
 
-        if (serviceId == null || serviceId.isBlank()) {
+        if (serviceId == null || serviceId.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "serviceId 不能为空"));
         }
-        if (serviceName == null || serviceName.isBlank()) {
+        if (serviceName == null || serviceName.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "serviceName 不能为空"));
         }
 
@@ -165,7 +165,7 @@ public class AdminController {
     @GetMapping("/services/{serviceId}")
     public ResponseEntity<ApiResponse<ServiceIdentity>> getServiceByServiceId(@PathVariable String serviceId) {
         Optional<ServiceIdentity> service = serviceIdentityRepository.findByServiceId(serviceId);
-        if (service.isEmpty()) {
+        if (!service.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "服务不存在"));
         }
         return ResponseEntity.ok(ApiResponse.success("服务身份查询成功", service.get()));
@@ -176,7 +176,7 @@ public class AdminController {
             @PathVariable String serviceId,
             @RequestBody Map<String, Object> request) {
         Optional<ServiceIdentity> serviceOpt = serviceIdentityRepository.findByServiceId(serviceId);
-        if (serviceOpt.isEmpty()) {
+        if (!serviceOpt.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "服务不存在"));
         }
 
@@ -201,7 +201,7 @@ public class AdminController {
     @DeleteMapping("/services/{serviceId}")
     public ResponseEntity<ApiResponse<Void>> deleteService(@PathVariable String serviceId) {
         Optional<ServiceIdentity> serviceOpt = serviceIdentityRepository.findByServiceId(serviceId);
-        if (serviceOpt.isEmpty()) {
+        if (!serviceOpt.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "服务不存在"));
         }
         serviceIdentityRepository.delete(serviceOpt.get());
@@ -222,16 +222,16 @@ public class AdminController {
         Integer defaultExpireMinutes = request.get("defaultExpireMinutes") != null ?
                 Integer.parseInt(request.get("defaultExpireMinutes").toString()) : 15;
 
-        if (scenarioCode == null || scenarioCode.isBlank()) {
+        if (scenarioCode == null || scenarioCode.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "scenarioCode 不能为空"));
         }
-        if (scenarioName == null || scenarioName.isBlank()) {
+        if (scenarioName == null || scenarioName.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "scenarioName 不能为空"));
         }
-        if (sourceServiceId == null || sourceServiceId.isBlank()) {
+        if (sourceServiceId == null || sourceServiceId.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "sourceServiceId 不能为空"));
         }
-        if (targetServiceId == null || targetServiceId.isBlank()) {
+        if (targetServiceId == null || targetServiceId.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(400, "targetServiceId 不能为空"));
         }
 
@@ -255,7 +255,7 @@ public class AdminController {
     @GetMapping("/scenarios/{scenarioCode}")
     public ResponseEntity<ApiResponse<ExchangeScenario>> getScenarioByCode(@PathVariable String scenarioCode) {
         Optional<ExchangeScenario> scenario = exchangeScenarioRepository.findByScenarioCode(scenarioCode);
-        if (scenario.isEmpty()) {
+        if (!scenario.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "场景不存在"));
         }
         return ResponseEntity.ok(ApiResponse.success("交换场景查询成功", scenario.get()));
@@ -266,7 +266,7 @@ public class AdminController {
             @PathVariable String scenarioCode,
             @RequestBody Map<String, Object> request) {
         Optional<ExchangeScenario> scenarioOpt = exchangeScenarioRepository.findByScenarioCode(scenarioCode);
-        if (scenarioOpt.isEmpty()) {
+        if (!scenarioOpt.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "场景不存在"));
         }
 
@@ -300,7 +300,7 @@ public class AdminController {
     @DeleteMapping("/scenarios/{scenarioCode}")
     public ResponseEntity<ApiResponse<Void>> deleteScenario(@PathVariable String scenarioCode) {
         Optional<ExchangeScenario> scenarioOpt = exchangeScenarioRepository.findByScenarioCode(scenarioCode);
-        if (scenarioOpt.isEmpty()) {
+        if (!scenarioOpt.isPresent()) {
             return ResponseEntity.badRequest().body(ApiResponse.error(404, "场景不存在"));
         }
         exchangeScenarioRepository.delete(scenarioOpt.get());

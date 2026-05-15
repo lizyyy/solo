@@ -54,10 +54,14 @@ mvn clean spring-boot:run
 ./mvnw clean spring-boot:run
 ```
 
-#### 方式 3: 使用 IDE
+#### 方式 3: 使用 IDE（无需 Maven）
+详细步骤请参考: `IDE_QUICKSTART.md`
+
 1. 用 IntelliJ IDEA / Eclipse / VS Code 打开项目
-2. 作为 Maven 项目导入
+2. 作为 Maven 项目导入（IDE 会自动处理）
 3. 找到 `TokenExchangeApplication.java` 右键运行
+
+> 💡 IDE 会自动下载所有依赖，无需手动安装 Maven，即使没有 Maven 也能运行！
 
 ### 访问地址
 

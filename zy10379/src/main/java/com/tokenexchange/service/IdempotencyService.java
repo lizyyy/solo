@@ -21,7 +21,7 @@ public class IdempotencyService {
     private final ObjectMapper objectMapper;
 
     public Optional<String> getCachedResponse(String requestId, String operationType) {
-        if (requestId == null || requestId.isBlank()) {
+        if (requestId == null || requestId.isEmpty()) {
             return Optional.empty();
         }
 
@@ -31,7 +31,7 @@ public class IdempotencyService {
 
     @Transactional
     public void cacheResponse(String requestId, String operationType, Object response, int expireMinutes) {
-        if (requestId == null || requestId.isBlank()) {
+        if (requestId == null || requestId.isEmpty()) {
             return;
         }
 
