@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标注任务分发系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>标注任务分发系统</h1>
+            <nav>
+                <button onclick="showSection('dashboard')" class="nav-btn active">总览</button>
+                <button onclick="showSection('samples')" class="nav-btn">样本池</button>
+                <button onclick="showSection('tasks')" class="nav-btn">任务包</button>
+                <button onclick="showSection('skips')" class="nav-btn">跳过记录</button>
+                <button onclick="showSection('reworks')" class="nav-btn">返工记录</button>
+                <button onclick="showSection('annotators')" class="nav-btn">标注员</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="dashboard" class="section active">
+                <h2>数据总览</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="quick-actions">
+                    <h3>快捷操作</h3>
+                    <button onclick="showAddSampleModal()">添加样本</button>
+                    <button onclick="showCreateTaskModal()">创建任务包</button>
+                    <button onclick="showAddAnnotatorModal()">添加标注员</button>
+                    <button onclick="exportData('samples')">导出样本</button>
+                    <button onclick="exportData('skips')">导出跳过记录</button>
+                </div>
+            </section>
+
+            <section id="samples" class="section">
+                <h2>样本池</h2>
+                <div class="filters">
+                    <select id="sampleStatusFilter" onchange="loadSamples()">
+                        <option value="">全部状态</option>
+                        <option value="pending">待分配</option>
+                        <option value="assigned">已分配</option>
+                        <option value="completed">已完成</option>
+                        <option value="skipped">已跳过</option>
+                        <option value="rework">待返工</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>内容</th>
+                                <th>状态</th>
+                                <th>当前标注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="samplesTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tasks" class="section">
+                <h2>任务包</h2>
+                <div class="filters">
+                    <select id="taskStatusFilter" onchange="loadTasks()">
+                        <option value="">全部状态</option>
+                        <option value="assigned">已分配</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名称</th>
+                                <th>标注员</th>
+                                <th>状态</th>
+                                <th>分配时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="skips" class="section">
+                <h2>跳过记录</h2>
+                <div class="filters">
+                    <select id="skipReviewFilter" onchange="loadSkips()">
+                        <option value="">全部</option>
+                        <option value="false">待复核</option>
+                        <option value="true">已复核</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>样本ID</th>
+                                <th>跳过原因</th>
+                                <th>复核状态</th>
+                                <th>复核结果</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skipsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="reworks" class="section">
+                <h2>返工记录</h2>
+                <div class="filters">
+                    <select id="reworkStatusFilter" onchange="loadReworks()">
+                        <option value="">全部状态</option>
+                        <option value="pending">待处理</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>样本ID</th>
+                                <th>原标注</th>
+                                <th>返工原因</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reworksTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="annotators" class="section">
+                <h2>标注员</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>姓名</th>
+                                <th>邮箱</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="annotatorsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
