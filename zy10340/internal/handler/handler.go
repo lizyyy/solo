@@ -287,11 +287,19 @@ func (h *Handler) GetPlans(c *gin.Context) {
 }
 
 func (h *Handler) GetPlan(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
-	plan, err := h.service.GetPlan(planID)
+	plan, err := h.service.GetPlanWithTenantCheck(tenantID, planID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -299,6 +307,7 @@ func (h *Handler) GetPlan(c *gin.Context) {
 }
 
 func (h *Handler) StartPlan(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
 	var req struct {
@@ -309,12 +318,13 @@ func (h *Handler) StartPlan(c *gin.Context) {
 		req.SampleIDs = nil
 	}
 
-	plan, err := h.service.StartPlan(planID, req.SampleIDs)
+	plan, err := h.service.StartPlan(tenantID, planID, req.SampleIDs)
 	if err != nil {
 		switch {
-		case errors.Is(err, service.ErrNotFound):
+		case errors.Is(err, service.ErrPlanNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
-		case errors.Is(err, service.ErrPlanAlreadyDone),
+		case errors.Is(err, service.ErrTenantMismatch),
+			errors.Is(err, service.ErrPlanAlreadyDone),
 			errors.Is(err, service.ErrSampleNotFound):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		default:
@@ -331,6 +341,7 @@ func (h *Handler) StartPlan(c *gin.Context) {
 }
 
 func (h *Handler) PausePlan(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
 	var req struct {
@@ -340,17 +351,18 @@ func (h *Handler) PausePlan(c *gin.Context) {
 
 	c.ShouldBindJSON(&req)
 
-	pause, err := h.service.PausePlan(planID, req.Reason, req.PausedBy)
+	pause, err := h.service.PausePlanWithTenantCheck(tenantID, planID, req.Reason, req.PausedBy)
 	if err != nil {
-		if errors.Is(err, service.ErrNotFound) {
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
-			return
-		}
-		if errors.Is(err, service.ErrPlanNotRunning) {
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		case errors.Is(err, service.ErrPlanNotRunning):
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -362,15 +374,19 @@ func (h *Handler) PausePlan(c *gin.Context) {
 }
 
 func (h *Handler) ResumePlan(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
-	plan, err := h.service.ResumePlan(planID)
+	plan, err := h.service.ResumePlanWithTenantCheck(tenantID, planID)
 	if err != nil {
-		if errors.Is(err, service.ErrNotFound) {
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
-			return
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -382,13 +398,21 @@ func (h *Handler) ResumePlan(c *gin.Context) {
 }
 
 func (h *Handler) GetResults(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("page_size", "20"))
 
-	results, total, err := h.service.GetResults(planID, page, pageSize)
+	results, total, err := h.service.GetResultsWithTenantCheck(tenantID, planID, page, pageSize)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -402,11 +426,19 @@ func (h *Handler) GetResults(c *gin.Context) {
 }
 
 func (h *Handler) GetPlanStatistics(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
-	stats, err := h.service.GetPlanStatistics(planID)
+	stats, err := h.service.GetPlanStatisticsWithTenantCheck(tenantID, planID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 
@@ -414,11 +446,19 @@ func (h *Handler) GetPlanStatistics(c *gin.Context) {
 }
 
 func (h *Handler) ExportResults(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	planID := c.Param("plan_id")
 
-	csvData, err := h.service.ExportResultsCSV(planID)
+	csvData, err := h.service.ExportResultsCSVWithTenantCheck(tenantID, planID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		switch {
+		case errors.Is(err, service.ErrPlanNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "plan not found"})
+		case errors.Is(err, service.ErrTenantMismatch):
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
 		return
 	}
 

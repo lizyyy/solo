@@ -29,6 +29,9 @@ var (
 	ErrInvalidURL      = errors.New("invalid URL")
 	ErrEmptySamples    = errors.New("samples cannot be empty")
 	ErrSampleNotFound  = errors.New("sample not found")
+	ErrRuleNotFound    = errors.New("rule not found")
+	ErrPlanNotFound    = errors.New("plan not found")
+	ErrTenantMismatch  = errors.New("resource does not belong to tenant")
 )
 
 type Service struct {
@@ -212,9 +215,13 @@ func (s *Service) CreatePlan(tenantID, ruleID, name string) (*model.ReplayPlan, 
 		return nil, ErrTenantNotFound
 	}
 
-	_, err = s.repo.GetRuleByID(ruleID)
+	rule, err := s.repo.GetRuleByID(ruleID)
 	if err != nil {
-		return nil, ErrNotFound
+		return nil, ErrRuleNotFound
+	}
+
+	if rule.TenantID != tenantID {
+		return nil, ErrTenantMismatch
 	}
 
 	plan := &model.ReplayPlan{
@@ -241,10 +248,25 @@ func (s *Service) GetPlan(planID string) (*model.ReplayPlan, error) {
 	return s.repo.GetPlanByID(planID)
 }
 
-func (s *Service) StartPlan(planID string, sampleIDs []string) (*model.ReplayPlan, error) {
+func (s *Service) GetPlanWithTenantCheck(tenantID, planID string) (*model.ReplayPlan, error) {
 	plan, err := s.repo.GetPlanByID(planID)
 	if err != nil {
-		return nil, ErrNotFound
+		return nil, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
+	}
+	return plan, nil
+}
+
+func (s *Service) StartPlan(tenantID, planID string, sampleIDs []string) (*model.ReplayPlan, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, ErrPlanNotFound
+	}
+
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
 	}
 
 	if plan.Status != model.PlanStatusPending {
@@ -253,22 +275,32 @@ func (s *Service) StartPlan(planID string, sampleIDs []string) (*model.ReplayPla
 
 	rule, err := s.repo.GetRuleByID(plan.RuleID)
 	if err != nil {
-		return nil, ErrNotFound
+		return nil, ErrRuleNotFound
+	}
+
+	if rule.TenantID != tenantID {
+		return nil, ErrTenantMismatch
 	}
 
 	var samples []model.TrafficSample
 	if len(sampleIDs) > 0 {
 		var notFoundIDs []string
+		var mismatchIDs []string
 		for _, id := range sampleIDs {
 			sample, err := s.repo.GetSampleByID(id)
 			if err != nil {
 				notFoundIDs = append(notFoundIDs, id)
+			} else if sample.TenantID != tenantID {
+				mismatchIDs = append(mismatchIDs, id)
 			} else {
 				samples = append(samples, *sample)
 			}
 		}
 		if len(notFoundIDs) > 0 {
 			return nil, fmt.Errorf("%w: %s", ErrSampleNotFound, strings.Join(notFoundIDs, ", "))
+		}
+		if len(mismatchIDs) > 0 {
+			return nil, fmt.Errorf("%w: samples %s do not belong to tenant", ErrTenantMismatch, strings.Join(mismatchIDs, ", "))
 		}
 	} else {
 		sampleList, _, err := s.repo.GetSamplesByTenant(plan.TenantID, 1000, 0)
@@ -482,6 +514,17 @@ func (s *Service) PausePlan(planID, reason, pausedBy string) (*model.PausePoint,
 	return pausePoint, err
 }
 
+func (s *Service) PausePlanWithTenantCheck(tenantID, planID, reason, pausedBy string) (*model.PausePoint, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
+	}
+	return s.PausePlan(planID, reason, pausedBy)
+}
+
 func (s *Service) ResumePlan(planID string) (*model.ReplayPlan, error) {
 	s.plansMux.RLock()
 	executor, exists := s.plans[planID]
@@ -513,7 +556,30 @@ func (s *Service) ResumePlan(planID string) (*model.ReplayPlan, error) {
 	return executor.Plan, nil
 }
 
+func (s *Service) ResumePlanWithTenantCheck(tenantID, planID string) (*model.ReplayPlan, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
+	}
+	return s.ResumePlan(planID)
+}
+
 func (s *Service) GetResults(planID string, page, pageSize int) ([]model.ReplayResult, int64, error) {
+	offset := (page - 1) * pageSize
+	return s.repo.GetResultsByPlan(planID, pageSize, offset)
+}
+
+func (s *Service) GetResultsWithTenantCheck(tenantID, planID string, page, pageSize int) ([]model.ReplayResult, int64, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, 0, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, 0, ErrTenantMismatch
+	}
 	offset := (page - 1) * pageSize
 	return s.repo.GetResultsByPlan(planID, pageSize, offset)
 }
@@ -522,7 +588,56 @@ func (s *Service) GetPlanStatistics(planID string) (map[string]interface{}, erro
 	return s.repo.GetResultStatistics(planID)
 }
 
+func (s *Service) GetPlanStatisticsWithTenantCheck(tenantID, planID string) (map[string]interface{}, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
+	}
+	return s.repo.GetResultStatistics(planID)
+}
+
 func (s *Service) ExportResultsCSV(planID string) ([]byte, error) {
+	results, err := s.repo.GetAllResultsByPlan(planID)
+	if err != nil {
+		return nil, err
+	}
+
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+
+	header := []string{"ID", "SampleID", "Status", "HTTPStatus", "ErrorCategory", "ErrorMessage", "DurationMs", "StartedAt", "FinishedAt"}
+	writer.Write(header)
+
+	for _, r := range results {
+		row := []string{
+			r.ID,
+			r.SampleID,
+			r.Status,
+			strconv.Itoa(r.HTTPStatus),
+			r.ErrorCategory,
+			r.ErrorMessage,
+			strconv.FormatInt(r.DurationMs, 10),
+			r.StartedAt.Format(time.RFC3339),
+			r.FinishedAt.Format(time.RFC3339),
+		}
+		writer.Write(row)
+	}
+
+	writer.Flush()
+	return buf.Bytes(), nil
+}
+
+func (s *Service) ExportResultsCSVWithTenantCheck(tenantID, planID string) ([]byte, error) {
+	plan, err := s.repo.GetPlanByID(planID)
+	if err != nil {
+		return nil, ErrPlanNotFound
+	}
+	if plan.TenantID != tenantID {
+		return nil, ErrTenantMismatch
+	}
 	results, err := s.repo.GetAllResultsByPlan(planID)
 	if err != nil {
 		return nil, err
