@@ -99,7 +99,19 @@
             </div>
 
             <div class="card">
-                <h2>4. API 文档</h2>
+                <h2>4. 问题排查汇总</h2>
+                <div class="form-group">
+                    <label>试算请求号</label>
+                    <input id="diagnosisRequestNo" placeholder="FEE开头的请求号">
+                </div>
+                <button onclick="viewDiagnosis()">查看汇总</button>
+                <button class="secondary" onclick="exportText()">导出文本</button>
+                <button class="warning" onclick="exportJson()">导出JSON</button>
+                <div id="diagnosisResult" class="result"></div>
+            </div>
+
+            <div class="card">
+                <h2>5. API 文档</h2>
                 <div style="font-size:13px; line-height:2;">
                     <p><code>POST /api/fee/calculate</code> - 创建试算请求</p>
                     <p><code>GET /api/fee/result/{requestNo}</code> - 查询试算结果</p>
@@ -107,6 +119,9 @@
                     <p><code>GET /api/fee/validate/{certNo}</code> - 校验凭证</p>
                     <p><code>POST /api/fee/charge/{certNo}</code> - 执行扣费</p>
                     <p><code>GET /api/fee/timeline/{requestNo}</code> - 查询时间线</p>
+                    <p><code>GET /api/fee/diagnosis/{requestNo}</code> - 问题排查汇总</p>
+                    <p><code>GET /api/fee/export/text/{requestNo}</code> - 导出文本报告</p>
+                    <p><code>GET /api/fee/export/json/{requestNo}</code> - 导出JSON报告</p>
                     <p><code>GET /h2-console</code> - H2数据库控制台</p>
                 </div>
             </div>
@@ -136,6 +151,7 @@
                 document.getElementById('calcResult').className = result.code === 200 ? 'result success' : 'result error';
                 if (result.data && result.data.requestNo) {
                     document.getElementById('requestNo').value = result.data.requestNo;
+                    document.getElementById('diagnosisRequestNo').value = result.data.requestNo;
                 }
             } catch (e) {
                 document.getElementById('calcResult').innerHTML = '请求失败: ' + e.message;
@@ -212,6 +228,45 @@
                 document.getElementById('certResult').innerHTML = '请求失败: ' + e.message;
                 document.getElementById('certResult').className = 'result error';
             }
+        }
+
+        async function viewDiagnosis() {
+            const requestNo = document.getElementById('diagnosisRequestNo').value || document.getElementById('requestNo').value;
+            if (!requestNo) {
+                alert('请先输入请求号');
+                return;
+            }
+            try {
+                const res = await fetch(BASE_URL + '/api/fee/diagnosis/' + requestNo);
+                const result = await res.json();
+                if (result.code === 200 && result.data && result.data.summaryRemark) {
+                    document.getElementById('diagnosisResult').innerHTML = result.data.summaryRemark;
+                } else {
+                    document.getElementById('diagnosisResult').innerHTML = JSON.stringify(result, null, 2);
+                }
+                document.getElementById('diagnosisResult').className = result.code === 200 ? 'result success' : 'result error';
+            } catch (e) {
+                document.getElementById('diagnosisResult').innerHTML = '请求失败: ' + e.message;
+                document.getElementById('diagnosisResult').className = 'result error';
+            }
+        }
+
+        function exportText() {
+            const requestNo = document.getElementById('diagnosisRequestNo').value || document.getElementById('requestNo').value;
+            if (!requestNo) {
+                alert('请先输入请求号');
+                return;
+            }
+            window.open(BASE_URL + '/api/fee/export/text/' + requestNo, '_blank');
+        }
+
+        function exportJson() {
+            const requestNo = document.getElementById('diagnosisRequestNo').value || document.getElementById('requestNo').value;
+            if (!requestNo) {
+                alert('请先输入请求号');
+                return;
+            }
+            window.open(BASE_URL + '/api/fee/export/json/' + requestNo, '_blank');
         }
     </script>
 </body>
