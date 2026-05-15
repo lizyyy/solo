@@ -227,7 +227,84 @@ curl -X POST http://localhost:8080/api/locks/release \
 curl http://localhost:8080/api/locks/order:1001/history
 ```
 
+### 5. 导出完整状态
+
+**导出单个资源的完整状态（锁状态 + 队列 + 历史）：
+
+```bash
+curl http://localhost:8080/api/locks/order:1001/export
+```
+
+**导出所有资源的汇总状态：
+
+```bash
+curl http://localhost:8080/api/locks/export
+```
+
 ## 运行测试
+
+```bash
+mvn test
+```
+
+## 故障排除
+
+### 问题 1：`mvnw 无法下载 maven-wrapper.jar
+
+**现象**：
+```
+curl: (7) Failed to connect to 127.0.0.1 port 7890
+```
+
+**解决方案**：
+
+**推荐直接使用 Python 离线验证**（无需 Maven：
+```bash
+python3 verify.py
+```
+
+或者取消代理后重试：
+```bash
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+./download-maven-wrapper.sh
+```
+
+### 问题 2：Java 版本不兼容
+
+**现象**：`Unsupported major.minor version 55.0`
+
+**解决方案**：项目已降级支持 Java 8，检查 Java 版本：
+```bash
+java -version
+```
+
+确保使用 Java 8 或更高版本。
+
+### 问题 3：无法启动端口被占用
+
+**现象**：`Address already in use`
+
+**解决方案**：
+```bash
+lsof -i :8080 | grep LISTEN
+# 或者修改端口：
+```
+在 `application.yml` 中添加：
+```yaml
+server:
+  port: 8081
+```
+
+### 问题 4：只有 JRE 没有 JDK
+
+**现象**：`javac: command not found
+
+**解决方案**：直接使用 Python 离线验证：
+```bash
+python3 verify.py
+```
+
+或者安装完整 JDK，或者使用 IDE（如果系统自带的 JDK。
 
 ```bash
 mvn test
