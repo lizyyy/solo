@@ -159,8 +159,10 @@ async def get_batch_summary(batch_id: int, format: str = "json"):
     if not records:
         return JSONResponse(status_code=404, content={"code": 404, "message": "批次不存在"})
     
+    sorted_records = sorted(records, key=lambda x: (x.business_order_no, x.sequence, x.receipt_time))
+    
     order_summary: Dict[str, Dict[str, Any]] = {}
-    for r in records:
+    for r in sorted_records:
         if r.business_order_no not in order_summary:
             order_summary[r.business_order_no] = {
                 "business_order_no": r.business_order_no,
@@ -173,14 +175,30 @@ async def get_batch_summary(batch_id: int, format: str = "json"):
             order_summary[r.business_order_no]["exceptions"].append({
                 "risk_type": r.risk_type.value,
                 "description": r.exception_desc or "",
-                "receipt_no": r.receipt_no
+                "receipt_no": r.receipt_no,
+                "sequence": r.sequence
             })
+        else:
+            has_prior_exception = len(order_summary[r.business_order_no]["exceptions"]) > 0
+            if has_prior_exception:
+                order_summary[r.business_order_no]["corrections"].append({
+                    "description": "后续正常回执，确认授权完成",
+                    "receipt_no": r.receipt_no,
+                    "sequence": r.sequence,
+                    "channel": r.channel
+                })
+            elif not order_summary[r.business_order_no]["exceptions"]:
+                pass
     
     for order_no in order_summary:
         exceptions = order_summary[order_no]["exceptions"]
+        corrections = order_summary[order_no]["corrections"]
         if exceptions:
             risk_types = set(e["risk_type"] for e in exceptions)
-            order_summary[order_no]["conclusion"] = f"该单据存在{len(exceptions)}条异常记录，涉及风险类型：{','.join(risk_types)}"
+            if corrections:
+                order_summary[order_no]["conclusion"] = f"该单据存在{len(exceptions)}条异常记录，涉及风险类型：{','.join(risk_types)}；后续有{len(corrections)}条修正回执确认，授权最终完成"
+            else:
+                order_summary[order_no]["conclusion"] = f"该单据存在{len(exceptions)}条异常记录，涉及风险类型：{','.join(risk_types)}，暂无后续修正回执"
         else:
             order_summary[order_no]["conclusion"] = "该单据无异常，授权回收完成"
     
@@ -202,6 +220,7 @@ async def get_batch_summary(batch_id: int, format: str = "json"):
             "batch_id": batch_id,
             "total_orders": len(summary_list),
             "orders_with_exceptions": sum(1 for s in summary_list if s["exceptions"]),
+            "orders_with_corrections": sum(1 for s in summary_list if s["corrections"]),
             "details": summary_list
         }
     }
@@ -214,6 +233,7 @@ def generate_markdown_summary(batch_id: int, summary_list: List[Dict]) -> str:
         f"**统计信息**:",
         f"- 业务单据总数: {len(summary_list)}",
         f"- 存在异常单据数: {sum(1 for s in summary_list if s['exceptions'])}",
+        f"- 已修正单据数: {sum(1 for s in summary_list if s['corrections'])}",
         f"- 无异常单据数: {sum(1 for s in summary_list if not s['exceptions'])}",
         "",
         "---",
@@ -230,6 +250,14 @@ def generate_markdown_summary(batch_id: int, summary_list: List[Dict]) -> str:
                 lines.append(f"- **风险类型**: {e['risk_type']}")
                 lines.append(f"  **回执号**: {e['receipt_no']}")
                 lines.append(f"  **描述**: {e['description']}")
+                lines.append("")
+        
+        if summary["corrections"]:
+            lines.append("### 修正记录")
+            for c in summary["corrections"]:
+                lines.append(f"- **回执号**: {c['receipt_no']}")
+                lines.append(f"  **渠道**: {c['channel']}")
+                lines.append(f"  **描述**: {c['description']}")
                 lines.append("")
         
         lines.append("### 结论")

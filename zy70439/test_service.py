@@ -114,12 +114,61 @@ class TestAuthRecoveryService:
             
             order5 = next(o for o in details if o["business_order_no"] == "BIZ2024010005")
             assert len(order5["exceptions"]) == 1
+            assert len(order5["corrections"]) == 1
             assert "ACCOUNT_MISMATCH" in order5["conclusion"]
+            assert "修正回执确认" in order5["conclusion"]
             
             order1 = next(o for o in details if o["business_order_no"] == "BIZ2024010001")
             assert len(order1["exceptions"]) == 1
+            assert len(order1["corrections"]) == 0
             assert "DUPLICATE_SUBMISSION" in order1["conclusion"]
-            print("✓ 按业务单号整合摘要测试通过")
+            assert "暂无后续修正回执" in order1["conclusion"]
+            
+            order3 = next(o for o in details if o["business_order_no"] == "BIZ2024010003")
+            assert len(order3["exceptions"]) == 1
+            assert len(order3["corrections"]) == 0
+            
+            order6 = next(o for o in details if o["business_order_no"] == "BIZ2024010006")
+            assert len(order6["exceptions"]) == 1
+            assert len(order6["corrections"]) == 0
+            print("✓ 按业务单号整合摘要测试通过（异常、修正、结论完整）")
+    
+    @pytest.mark.asyncio
+    async def test_markdown_contains_corrections(self):
+        async with httpx.AsyncClient(app=app, base_url="http://test") as client:
+            data = generate_receipt_data()
+            response = await client.post("/api/v1/batch/submit", json=data)
+            batch_id = response.json()["data"]["batch_id"]
+            
+            response = await client.get(f"/api/v1/batch/{batch_id}/summary?format=markdown")
+            md_content = response.text
+            assert "已修正单据数" in md_content
+            assert "修正记录" in md_content
+            assert "后续正常回执" in md_content
+            assert "RCPT202401150006" in md_content
+            print("✓ Markdown格式包含修正记录测试通过")
+    
+    @pytest.mark.asyncio
+    async def test_json_markdown_consistency(self):
+        async with httpx.AsyncClient(app=app, base_url="http://test") as client:
+            data = generate_receipt_data()
+            response = await client.post("/api/v1/batch/submit", json=data)
+            batch_id = response.json()["data"]["batch_id"]
+            
+            json_response = await client.get(f"/api/v1/batch/{batch_id}/summary")
+            json_data = json_response.json()["data"]
+            
+            md_response = await client.get(f"/api/v1/batch/{batch_id}/summary?format=markdown")
+            md_content = md_response.text
+            
+            assert str(json_data["total_orders"]) in md_content
+            assert str(json_data["orders_with_exceptions"]) in md_content
+            assert str(json_data["orders_with_corrections"]) in md_content
+            
+            for detail in json_data["details"]:
+                assert detail["business_order_no"] in md_content
+                assert detail["conclusion"] in md_content
+            print("✓ JSON与Markdown内容一致测试通过")
     
     @pytest.mark.asyncio
     async def test_list_batches(self):
