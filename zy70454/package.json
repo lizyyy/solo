@@ -1,0 +1,23 @@
+{
+  "name": "db-deprecation-tool",
+  "version": "1.0.0",
+  "description": "数据库字段废弃处理命令行工具",
+  "main": "src/cli.js",
+  "type": "module",
+  "bin": {
+    "dbdt": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7",
+    "commander": "^11.0.0",
+    "csv-writer": "^1.6.0",
+    "uuid": "^9.0.0"
+  },
+  "keywords": ["database", "deprecation", "cli"],
+  "author": "",
+  "license": "MIT"
+}
