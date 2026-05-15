@@ -3,8 +3,48 @@ const router = express.Router();
 const { Parser } = require('json2csv');
 const db = require('../config/database');
 
+router.get('/leaves', (req, res) => {
+  const { start_date, end_date, caregiver_id } = req.query;
+  
+  let sql = `SELECT l.id, l.caregiver_id, c.name as caregiver_name, l.leave_type, 
+              l.start_time, l.end_time, l.reason, l.status, l.approved_by, l.approved_at,
+              l.created_at
+              FROM leave_records l
+              LEFT JOIN caregivers c ON l.caregiver_id = c.id
+              WHERE 1=1`;
+  const params = [];
+  
+  if (start_date) {
+    sql += ` AND l.start_time >= ?`;
+    params.push(start_date);
+  }
+  if (end_date) {
+    sql += ` AND l.end_time <= ?`;
+    params.push(end_date + ' 23:59:59');
+  }
+  if (caregiver_id) {
+    sql += ` AND l.caregiver_id = ?`;
+    params.push(caregiver_id);
+  }
+  
+  sql += ` ORDER BY l.created_at DESC`;
+  
+  db.all(sql, params, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      const parser = new Parser();
+      const csv = parser.parse(rows);
+      
+      res.header('Content-Type', 'text/csv');
+      res.attachment(`leaves_report_${new Date().toISOString().split('T')[0]}.csv`);
+      res.send(csv);
+    }
+  });
+});
+
 router.get('/schedules', (req, res) => {
-  const { start_date, end_date, ward_id, status, operator } = req.query;
+  const { start_date, end_date, ward_id, status, caregiver_id } = req.query;
   
   let sql = `SELECT s.id, s.date, s.shift_type, s.status, 
               c.name as caregiver_name, w.name as ward_name,
@@ -32,6 +72,10 @@ router.get('/schedules', (req, res) => {
     sql += ` AND s.status = ?`;
     params.push(status);
   }
+  if (caregiver_id) {
+    sql += ` AND s.caregiver_id = ?`;
+    params.push(caregiver_id);
+  }
   
   sql += ` ORDER BY s.date DESC`;
   
@@ -50,10 +94,10 @@ router.get('/schedules', (req, res) => {
 });
 
 router.get('/work-hours', (req, res) => {
-  const { start_date, end_date, caregiver_id, hour_type } = req.query;
+  const { start_date, end_date, caregiver_id } = req.query;
   
-  let sql = `SELECT wh.id, wh.date, wh.hours, wh.hour_type, wh.remarks,
-              c.name as caregiver_name
+  let sql = `SELECT wh.id, wh.caregiver_id, c.name as caregiver_name, 
+              wh.date, wh.hours, wh.hour_type, wh.remarks, wh.created_at
               FROM work_hour_records wh
               LEFT JOIN caregivers c ON wh.caregiver_id = c.id
               WHERE 1=1`;
@@ -70,10 +114,6 @@ router.get('/work-hours', (req, res) => {
   if (caregiver_id) {
     sql += ` AND wh.caregiver_id = ?`;
     params.push(caregiver_id);
-  }
-  if (hour_type) {
-    sql += ` AND wh.hour_type = ?`;
-    params.push(hour_type);
   }
   
   sql += ` ORDER BY wh.date DESC`;

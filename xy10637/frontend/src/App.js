@@ -16,6 +16,7 @@ import WardDemands from './pages/WardDemands';
 import Schedules from './pages/Schedules';
 import ScheduleDetail from './pages/ScheduleDetail';
 import Leaves from './pages/Leaves';
+import Substitutes from './pages/Substitutes';
 import WorkHours from './pages/WorkHours';
 import Reports from './pages/Reports';
 
@@ -31,7 +32,8 @@ const App = () => {
     { key: '/ward-demands', icon: <FileTextOutlined />, label: '病区需求' },
     { key: '/schedules', icon: <CalendarOutlined />, label: '排班管理' },
     { key: '/leaves', icon: <ClockCircleOutlined />, label: '请假管理' },
-    { key: '/work-hours', icon: <SwitcherOutlined />, label: '工时账本' },
+    { key: '/substitutes', icon: <SwitcherOutlined />, label: '替代人员' },
+    { key: '/work-hours', icon: <BarChartOutlined />, label: '工时账本' },
     { key: '/reports', icon: <BarChartOutlined />, label: '报表导出' }
   ];
 
@@ -59,6 +61,7 @@ const App = () => {
             <Route path="/schedules" element={<Schedules />} />
             <Route path="/schedules/:id" element={<ScheduleDetail />} />
             <Route path="/leaves" element={<Leaves />} />
+            <Route path="/substitutes" element={<Substitutes />} />
             <Route path="/work-hours" element={<WorkHours />} />
             <Route path="/reports" element={<Reports />} />
           </Routes>

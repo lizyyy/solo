@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Select, DatePicker, message, Tag } from 'antd';
+import { Table, Button, Modal, Form, Select, DatePicker, Input, message, Tag, Space } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
@@ -132,7 +132,7 @@ const Leaves = () => {
             <DatePicker.RangePicker showTime style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="reason" label="请假原因">
-            <Select />
+            <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>

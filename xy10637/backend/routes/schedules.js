@@ -137,7 +137,7 @@ router.put('/:id', async (req, res) => {
       if (err) {
         res.status(500).json({ error: err.message });
       } else {
-        await addTimeLine('schedule', req.params.id, 'update', `修改排班信息', oldRow, { caregiver_id, date, shift_type });
+        await addTimeLine('schedule', req.params.id, 'update', '修改排班信息', oldRow, { caregiver_id, date, shift_type });
         await addAuditLog('schedules', req.params.id, 'update', oldRow, { caregiver_id, date, shift_type });
         res.json({ success: true, warnings: validation.warnings });
       }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Select, message, Tag } from 'antd';
+import { Table, Button, Modal, Form, Select, message, Tag, DatePicker } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -46,7 +46,11 @@ const Schedules = () => {
 
   const handleSubmit = async (values) => {
     try {
-      await axios.post('/api/schedules', values);
+      const submitData = {
+        ...values,
+        date: values.date.format('YYYY-MM-DD')
+      };
+      await axios.post('/api/schedules', submitData);
       message.success('创建成功');
       setVisible(false);
       loadData();
@@ -139,7 +143,7 @@ const Schedules = () => {
             </Select>
           </Form.Item>
           <Form.Item name="date" label="日期" rules={[{ required: true }]}>
-            <Select />
+            <DatePicker style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="shift_type" label="班次" rules={[{ required: true }]}>
             <Select options={shiftOptions} />
