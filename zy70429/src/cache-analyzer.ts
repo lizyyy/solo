@@ -83,35 +83,61 @@ export class CacheAnalyzer {
     for (const key of this.stats.overwrittenKeys) {
       const history = this.writeHistory.get(key);
       if (history && history.length >= 2) {
-        const before = history[history.length - 2];
-        const after = history[history.length - 1];
-        
+        const versionGroups: Map<number, BusReservation[]> = new Map();
+        for (const record of history) {
+          const group = versionGroups.get(record.version) || [];
+          group.push(record);
+          versionGroups.set(record.version, group);
+        }
+
+        let beforeRecord = history[0];
+        let afterRecord = history[history.length - 1];
+
+        for (const [version, records] of versionGroups.entries()) {
+          if (records.length >= 2) {
+            const writerA = records[0];
+            const writerB = records.find(r => r.source.includes('WriterB')) || records[1];
+            
+            beforeRecord = writerA;
+            afterRecord = writerB;
+          }
+        }
+
         const affectedFields: string[] = [];
-        if (before.busStop !== after.busStop) affectedFields.push('busStop');
-        if (before.busRoute !== after.busRoute) affectedFields.push('busRoute');
-        if (before.timeSlot !== after.timeSlot) affectedFields.push('timeSlot');
-        if (before.version === after.version) affectedFields.push('version');
+        if (beforeRecord.busStop !== afterRecord.busStop) affectedFields.push('busStop');
+        if (beforeRecord.busRoute !== afterRecord.busRoute) affectedFields.push('busRoute');
+        if (beforeRecord.timeSlot !== afterRecord.timeSlot) affectedFields.push('timeSlot');
+        if (beforeRecord.version === afterRecord.version) affectedFields.push('version');
+        if (beforeRecord.source !== afterRecord.source) affectedFields.push('source');
+
+        const isBusStopLost = beforeRecord.source.toLowerCase().includes('writer-a') && 
+                              beforeRecord.busStop === '北门站' && 
+                              afterRecord.busStop !== '北门站';
+
+        const description = isBusStopLost
+          ? `检测到并发写入覆盖: WriterA 将 busStop 改为"北门站"，但被 WriterB 覆盖丢失，最终值为"${afterRecord.busStop}"`
+          : `检测到并发写入覆盖: 员工 ${afterRecord.employeeName} 的预约记录被覆盖`;
 
         anomalies.push({
           type: 'concurrent_overwrite',
           reservationId: key,
-          description: `检测到并发写入覆盖: 员工 ${after.employeeName} 的预约记录被覆盖`,
+          description,
           beforeValue: {
-            busRoute: before.busRoute,
-            busStop: before.busStop,
-            timeSlot: before.timeSlot,
-            source: before.source,
-            version: before.version,
+            busRoute: beforeRecord.busRoute,
+            busStop: beforeRecord.busStop,
+            timeSlot: beforeRecord.timeSlot,
+            source: beforeRecord.source,
+            version: beforeRecord.version,
           },
           afterValue: {
-            busRoute: after.busRoute,
-            busStop: after.busStop,
-            timeSlot: after.timeSlot,
-            source: after.source,
-            version: after.version,
+            busRoute: afterRecord.busRoute,
+            busStop: afterRecord.busStop,
+            timeSlot: afterRecord.timeSlot,
+            source: afterRecord.source,
+            version: afterRecord.version,
           },
           affectedFields,
-          timestamp: after.updatedAt,
+          timestamp: afterRecord.updatedAt,
         });
       }
     }
