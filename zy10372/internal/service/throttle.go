@@ -18,25 +18,32 @@ func NewThrottleService(store storage.Storage) *ThrottleService {
 }
 
 func (s *ThrottleService) CreateTopic(req *model.CreateTopicRequest) (*model.CreateTopicResponse, error) {
-	if cached, exists := s.store.CheckDuplicateRequest(req.RequestID); exists {
-		return cached.(*model.CreateTopicResponse), nil
+	if cached, exists := s.store.GetCachedCreateTopicResponse(req.RequestID); exists {
+		return cached, nil
+	}
+
+	if req.Name == "" {
+		return nil, model.ErrInvalidRequest
+	}
+	if req.MaxQueueSize <= 0 {
+		return nil, model.ErrInvalidRequest
 	}
 
 	existing, err := s.store.GetTopicByName(req.Name)
 	if err == nil && existing != nil {
 		resp := &model.CreateTopicResponse{Topic: existing, Created: false}
-		s.store.CacheRequest(req.RequestID, resp)
+		s.store.CacheRequest("create_topic", req.RequestID, resp)
 		return resp, nil
 	}
 
 	topic := &model.MessageTopic{
-		ID:          utils.GenerateID(),
-		Name:        req.Name,
-		Description: req.Description,
-		Priority:    req.Priority,
-		Status:      model.TopicStatusNormal,
+		ID:           utils.GenerateID(),
+		Name:         req.Name,
+		Description:  req.Description,
+		Priority:     req.Priority,
+		Status:       model.TopicStatusNormal,
 		MaxQueueSize: req.MaxQueueSize,
-		CurrentSize: 0,
+		CurrentSize:  0,
 	}
 
 	if err := s.store.CreateTopic(topic); err != nil {
@@ -44,20 +51,31 @@ func (s *ThrottleService) CreateTopic(req *model.CreateTopicRequest) (*model.Cre
 	}
 
 	resp := &model.CreateTopicResponse{Topic: topic, Created: true}
-	s.store.CacheRequest(req.RequestID, resp)
+	s.store.CacheRequest("create_topic", req.RequestID, resp)
 	return resp, nil
 }
 
 func (s *ThrottleService) CreateRule(req *model.CreateRuleRequest) (*model.CreateRuleResponse, error) {
-	if cached, exists := s.store.CheckDuplicateRequest(req.RequestID); exists {
-		return cached.(*model.CreateRuleResponse), nil
+	if cached, exists := s.store.GetCachedCreateRuleResponse(req.RequestID); exists {
+		return cached, nil
+	}
+
+	if req.TopicID == "" {
+		return nil, model.ErrInvalidRequest
+	}
+	if req.RuleName == "" {
+		return nil, model.ErrInvalidRequest
+	}
+	if req.MinDelaySeconds < 0 || req.MaxDelaySeconds < 0 || req.MinDelaySeconds > req.MaxDelaySeconds {
+		return nil, model.ErrInvalidRequest
 	}
 
 	if _, err := s.store.GetTopic(req.TopicID); err != nil {
 		return nil, err
 	}
 
-	if req.Thresholds.WarningThreshold > req.Thresholds.CriticalThreshold ||
+	if req.Thresholds.WarningThreshold <= 0 ||
+		req.Thresholds.WarningThreshold > req.Thresholds.CriticalThreshold ||
 		req.Thresholds.CriticalThreshold > req.Thresholds.DangerThreshold {
 		return nil, model.ErrInvalidThreshold
 	}
@@ -84,17 +102,25 @@ func (s *ThrottleService) CreateRule(req *model.CreateRuleRequest) (*model.Creat
 		RecoveryThreshold: req.Thresholds.WarningThreshold / 2,
 		ConsecutiveChecks: 3,
 		CurrentCheckCount: 0,
+		LastStableTS:      utils.GetCurrentTime(),
 	}
 	s.store.CreateRecoveryCondition(rc)
 
 	resp := &model.CreateRuleResponse{Rule: rule, Created: true}
-	s.store.CacheRequest(req.RequestID, resp)
+	s.store.CacheRequest("create_rule", req.RequestID, resp)
 	return resp, nil
 }
 
 func (s *ThrottleService) CheckBacklog(req *model.CheckBacklogRequest) (*model.CheckBacklogResponse, error) {
-	if cached, exists := s.store.CheckDuplicateRequest(req.RequestID); exists {
-		return cached.(*model.CheckBacklogResponse), nil
+	if cached, exists := s.store.GetCachedCheckBacklogResponse(req.RequestID); exists {
+		return cached, nil
+	}
+
+	if req.TopicID == "" {
+		return nil, model.ErrInvalidRequest
+	}
+	if req.CurrentSize < 0 {
+		return nil, model.ErrInvalidRequest
 	}
 
 	topic, err := s.store.GetTopic(req.TopicID)
@@ -132,10 +158,8 @@ func (s *ThrottleService) CheckBacklog(req *model.CheckBacklogRequest) (*model.C
 		}
 	}
 
-	if prevStatus != topic.Status {
-		s.store.AddTimelineEvent(topic.ID, "STATUS_CHANGED",
-			fmt.Sprintf("Status changed from %s to %s", prevStatus, topic.Status),
-			fmt.Sprintf("Current size: %d, Level: %s", req.CurrentSize, backlogLevel))
+	if prevStatus == model.TopicStatusThrottled && topic.Status != model.TopicStatusThrottled {
+		s.checkRecoveryCondition(topic)
 	}
 
 	s.store.UpdateTopic(topic)
@@ -148,13 +172,17 @@ func (s *ThrottleService) CheckBacklog(req *model.CheckBacklogRequest) (*model.C
 		ThrottleActive: topic.Status == model.TopicStatusThrottled,
 		ShouldThrottle: shouldThrottle,
 	}
-	s.store.CacheRequest(req.RequestID, resp)
+	s.store.CacheRequest("check_backlog", req.RequestID, resp)
 	return resp, nil
 }
 
 func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model.SubmitMessageResponse, error) {
-	if cached, exists := s.store.CheckDuplicateRequest(req.RequestID); exists {
-		return cached.(*model.SubmitMessageResponse), nil
+	if cached, exists := s.store.GetCachedSubmitMessageResponse(req.RequestID); exists {
+		return cached, nil
+	}
+
+	if req.TopicID == "" || req.MessageID == "" {
+		return nil, model.ErrInvalidRequest
 	}
 
 	topic, err := s.store.GetTopic(req.TopicID)
@@ -163,7 +191,7 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 	}
 
 	rule, _ := s.store.GetRuleByTopic(req.TopicID)
-	
+
 	resp := &model.SubmitMessageResponse{
 		MessageID: req.MessageID,
 		TopicID:   req.TopicID,
@@ -173,7 +201,7 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 
 	if rule != nil && topic.Status == model.TopicStatusThrottled {
 		delaySeconds := rule.MinDelaySeconds
-		
+
 		switch req.Priority {
 		case model.PriorityLow:
 			delaySeconds = rule.MaxDelaySeconds
@@ -183,18 +211,20 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 			delaySeconds = rule.MinDelaySeconds
 		case model.PriorityCritical:
 			delaySeconds = 0
+		default:
+			delaySeconds = rule.MaxDelaySeconds
 		}
 
 		if delaySeconds > 0 {
 			delayedMsg := &model.DelayedMessage{
-				ID:          utils.GenerateID(),
-				TopicID:     req.TopicID,
-				MessageID:   req.MessageID,
-				OriginalTS:  utils.GetCurrentTime(),
+				ID:           utils.GenerateID(),
+				TopicID:      req.TopicID,
+				MessageID:    req.MessageID,
+				OriginalTS:   utils.GetCurrentTime(),
 				DelayedUntil: utils.GetCurrentTime().Add(time.Duration(delaySeconds) * time.Second),
-				DelayReason: "THROTTLED_BACKLOG",
-				Priority:    req.Priority,
-				Delivered:   false,
+				DelayReason:  "THROTTLED_BACKLOG",
+				Priority:     req.Priority,
+				Delivered:    false,
 			}
 			s.store.AddDelayedMessage(delayedMsg)
 
@@ -208,7 +238,7 @@ func (s *ThrottleService) SubmitMessage(req *model.SubmitMessageRequest) (*model
 		}
 	}
 
-	s.store.CacheRequest(req.RequestID, resp)
+	s.store.CacheRequest("submit_message", req.RequestID, resp)
 	return resp, nil
 }
 
@@ -245,8 +275,12 @@ func (s *ThrottleService) ListTopics() (*model.ListTopicsResponse, error) {
 }
 
 func (s *ThrottleService) AdvanceStatus(req *model.AdvanceStatusRequest) (*model.AdvanceStatusResponse, error) {
-	if cached, exists := s.store.CheckDuplicateRequest(req.RequestID); exists {
-		return cached.(*model.AdvanceStatusResponse), nil
+	if cached, exists := s.store.GetCachedAdvanceStatusResponse(req.RequestID); exists {
+		return cached, nil
+	}
+
+	if req.TopicID == "" {
+		return nil, model.ErrInvalidRequest
 	}
 
 	topic, err := s.store.GetTopic(req.TopicID)
@@ -259,12 +293,12 @@ func (s *ThrottleService) AdvanceStatus(req *model.AdvanceStatusRequest) (*model
 
 	if prevStatus != req.TargetStatus {
 		validTransition := false
-		
+
 		switch prevStatus {
 		case model.TopicStatusNormal:
 			validTransition = req.TargetStatus == model.TopicStatusBacklog
 		case model.TopicStatusBacklog:
-			validTransition = req.TargetStatus == model.TopicStatusThrottled || 
+			validTransition = req.TargetStatus == model.TopicStatusThrottled ||
 				req.TargetStatus == model.TopicStatusNormal
 		case model.TopicStatusThrottled:
 			validTransition = req.TargetStatus == model.TopicStatusRecovered ||
@@ -290,11 +324,15 @@ func (s *ThrottleService) AdvanceStatus(req *model.AdvanceStatusRequest) (*model
 		CurrentStatus:  topic.Status,
 		StatusChanged:  statusChanged,
 	}
-	s.store.CacheRequest(req.RequestID, resp)
+	s.store.CacheRequest("advance_status", req.RequestID, resp)
 	return resp, nil
 }
 
 func (s *ThrottleService) CheckRecovery(topicID string) (bool, error) {
+	if topicID == "" {
+		return false, model.ErrInvalidRequest
+	}
+
 	topic, err := s.store.GetTopic(topicID)
 	if err != nil {
 		return false, err
@@ -304,30 +342,40 @@ func (s *ThrottleService) CheckRecovery(topicID string) (bool, error) {
 		return false, model.ErrTopicNotThrottled
 	}
 
-	rc, err := s.store.GetRecoveryCondition(topicID)
+	return s.checkRecoveryCondition(topic)
+}
+
+func (s *ThrottleService) checkRecoveryCondition(topic *model.MessageTopic) (bool, error) {
+	rc, err := s.store.GetRecoveryCondition(topic.ID)
 	if err != nil || rc == nil {
 		return false, nil
 	}
 
+	now := utils.GetCurrentTime()
+
 	if topic.CurrentSize <= rc.RecoveryThreshold {
 		rc.CurrentCheckCount++
-		if rc.CurrentCheckCount >= rc.ConsecutiveChecks {
+		stableDuration := now.Sub(rc.LastStableTS)
+
+		if rc.CurrentCheckCount >= rc.ConsecutiveChecks && int(stableDuration.Seconds()) >= rc.MinStableSeconds {
 			topic.Status = model.TopicStatusRecovered
 			s.store.UpdateTopic(topic)
-			
+
 			s.store.AddTimelineEvent(topic.ID, "RECOVERED",
-				fmt.Sprintf("Topic recovered after %d consecutive checks", rc.ConsecutiveChecks),
+				fmt.Sprintf("Topic recovered after %d consecutive checks and %d seconds stability",
+					rc.ConsecutiveChecks, rc.MinStableSeconds),
 				fmt.Sprintf("Current size: %d, Threshold: %d", topic.CurrentSize, rc.RecoveryThreshold))
-			
+
 			rc.CurrentCheckCount = 0
+			rc.LastStableTS = now
 			s.store.UpdateRecoveryCondition(rc)
 			return true, nil
 		}
-		s.store.UpdateRecoveryCondition(rc)
 	} else {
 		rc.CurrentCheckCount = 0
-		s.store.UpdateRecoveryCondition(rc)
+		rc.LastStableTS = now
 	}
 
+	s.store.UpdateRecoveryCondition(rc)
 	return false, nil
 }

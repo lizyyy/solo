@@ -57,9 +57,12 @@ func (h *Handler) respondError(w http.ResponseWriter, err error, requestID strin
 	case model.ErrTopicNotThrottled:
 		code = "TOPIC_NOT_THROTTLED"
 		status = http.StatusBadRequest
+	case model.ErrInvalidRequest:
+		code = "INVALID_REQUEST"
+		status = http.StatusBadRequest
 	default:
-		code = "INTERNAL_ERROR"
-		status = http.StatusInternalServerError
+		code = "BAD_REQUEST"
+		status = http.StatusBadRequest
 	}
 
 	h.respondJSON(w, status, model.ErrorResponse{

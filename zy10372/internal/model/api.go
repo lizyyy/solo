@@ -14,14 +14,15 @@ var (
 	ErrRuleAlreadyExists  = errors.New("rule already exists")
 	ErrInvalidPriority    = errors.New("invalid priority")
 	ErrTopicNotThrottled  = errors.New("topic not throttled")
+	ErrInvalidRequest     = errors.New("invalid request parameters")
 )
 
 type CreateTopicRequest struct {
-	RequestID     string   `json:"request_id"`
-	Name          string   `json:"name"`
-	Description   string   `json:"description,omitempty"`
-	Priority      Priority `json:"priority"`
-	MaxQueueSize  int64    `json:"max_queue_size"`
+	RequestID    string   `json:"request_id"`
+	Name         string   `json:"name"`
+	Description  string   `json:"description,omitempty"`
+	Priority     Priority `json:"priority"`
+	MaxQueueSize int64    `json:"max_queue_size"`
 }
 
 type CreateTopicResponse struct {
@@ -68,20 +69,20 @@ type SubmitMessageRequest struct {
 }
 
 type SubmitMessageResponse struct {
-	MessageID   string    `json:"message_id"`
-	TopicID     string    `json:"topic_id"`
-	Accepted    bool      `json:"accepted"`
-	Delayed     bool      `json:"delayed"`
+	MessageID    string    `json:"message_id"`
+	TopicID      string    `json:"topic_id"`
+	Accepted     bool      `json:"accepted"`
+	Delayed      bool      `json:"delayed"`
 	DelayedUntil time.Time `json:"delayed_until,omitempty"`
-	Reason      string    `json:"reason,omitempty"`
+	Reason       string    `json:"reason,omitempty"`
 }
 
 type GetTopicStatusResponse struct {
-	Topic            *MessageTopic       `json:"topic"`
-	CurrentRule      *ThrottleRule       `json:"current_rule,omitempty"`
-	RecoveryCond     *RecoveryCondition  `json:"recovery_condition,omitempty"`
-	DelayedCount     int64               `json:"delayed_count"`
-	RecentEvents     []TimelineEvent     `json:"recent_events"`
+	Topic        *MessageTopic      `json:"topic"`
+	CurrentRule  *ThrottleRule      `json:"current_rule,omitempty"`
+	RecoveryCond *RecoveryCondition `json:"recovery_condition,omitempty"`
+	DelayedCount int64              `json:"delayed_count"`
+	RecentEvents []TimelineEvent    `json:"recent_events"`
 }
 
 type ListTopicsResponse struct {
@@ -90,8 +91,8 @@ type ListTopicsResponse struct {
 }
 
 type AdvanceStatusRequest struct {
-	RequestID string `json:"request_id"`
-	TopicID   string `json:"topic_id"`
+	RequestID    string      `json:"request_id"`
+	TopicID      string      `json:"topic_id"`
 	TargetStatus TopicStatus `json:"target_status"`
 }
 
@@ -129,14 +130,14 @@ type ExportReportResponse struct {
 }
 
 type ReportSummary struct {
-	TopicID          string      `json:"topic_id"`
-	TopicName        string      `json:"topic_name"`
-	ReportPeriod     string      `json:"report_period"`
-	MaxBacklog       int64       `json:"max_backlog"`
-	AvgBacklog       int64       `json:"avg_backlog"`
-	TotalDelayed     int64       `json:"total_delayed"`
-	StatusChanges    int         `json:"status_changes"`
-	FinalStatus      TopicStatus `json:"final_status"`
+	TopicID       string      `json:"topic_id"`
+	TopicName     string      `json:"topic_name"`
+	ReportPeriod  string      `json:"report_period"`
+	MaxBacklog    int64       `json:"max_backlog"`
+	AvgBacklog    int64       `json:"avg_backlog"`
+	TotalDelayed  int64       `json:"total_delayed"`
+	StatusChanges int         `json:"status_changes"`
+	FinalStatus   TopicStatus `json:"final_status"`
 }
 
 type ErrorResponse struct {
