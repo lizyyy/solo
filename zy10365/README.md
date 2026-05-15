@@ -226,11 +226,22 @@ curl -X POST http://localhost:8000/api/v1/tolerance-rules \
 ### 6. 提交确认
 
 ```bash
+# 开发负责人确认
 curl -X POST http://localhost:8000/api/v1/gray-versions/v2.0.0/confirm \
   -H "Content-Type: application/json" \
   -d '{
+    "user_id": "dev_lead_001",
     "confirmed": true,
     "comment": "验证通过，差异在可接受范围内"
+  }'
+
+# 测试负责人确认
+curl -X POST http://localhost:8000/api/v1/gray-versions/v2.0.0/confirm \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "test_lead_001",
+    "confirmed": true,
+    "comment": "测试用例全部通过"
   }'
 ```
 

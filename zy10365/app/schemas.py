@@ -120,6 +120,7 @@ class ConfirmerCreate(ConfirmerBase):
 
 
 class ConfirmerConfirm(BaseModel):
+    user_id: str = Field(..., description="确认人用户ID")
     confirmed: bool
     comment: Optional[str] = None
 

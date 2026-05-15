@@ -94,7 +94,7 @@ def add_requests(
         ).all()
     }
 
-    db_requests = []
+    added_count = 0
     for req in requests:
         if req.request_id in existing_request_ids:
             continue
@@ -110,21 +110,22 @@ def add_requests(
             base_status_code=req.base_status_code,
             base_response_time=req.base_response_time
         )
-        db_requests.append(db_request)
-
-    db.bulk_save_objects(db_requests)
+        db.add(db_request)
+        added_count += 1
     db.commit()
 
     timeline = models.Timeline(
         gray_version_id=gray_version.id,
         action="requests_added",
         actor="api",
-        details={"added_count": len(db_requests)}
+        details={"added_count": added_count}
     )
     db.add(timeline)
     db.commit()
 
-    return db_requests
+    return db.query(models.HistoryRequest).filter(
+        models.HistoryRequest.gray_version_id == gray_version.id
+    ).order_by(models.HistoryRequest.created_at.desc()).limit(added_count).all()
 
 
 @router.get("/gray-versions/{version}/requests", response_model=List[schemas.HistoryRequest])
@@ -215,12 +216,15 @@ def confirm_version(
         raise HTTPException(status_code=404, detail="Gray version not found")
 
     confirmation_service = ConfirmationService(db)
-    result = confirmation_service.confirm(
-        gray_version.id,
-        "current_user",
-        confirmation.confirmed,
-        confirmation.comment
-    )
+    try:
+        result = confirmation_service.confirm(
+            gray_version.id,
+            confirmation.user_id,
+            confirmation.confirmed,
+            confirmation.comment
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     return result
 
