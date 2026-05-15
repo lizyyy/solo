@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分片上传协调器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+        }
+        .header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .stats {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            background: #111;
+            padding: 10px 15px;
+            border: 1px solid #00ff00;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav button {
+            background: #111;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 8px 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .nav button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .nav button.active {
+            background: #00ff00;
+            color: #000;
+        }
+        .content {
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #00ff00;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #111;
+        }
+        tr:hover {
+            background: #1a1a1a;
+        }
+        .status-pending { color: #ffaa00; }
+        .status-initialized { color: #00aaff; }
+        .status-uploading { color: #ffff00; }
+        .status-verifying { color: #ff00ff; }
+        .status-completed { color: #00ff00; }
+        .status-failed { color: #ff0000; }
+        .status-paused { color: #ff6600; }
+        .btn {
+            background: #111;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-right: 5px;
+        }
+        .btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .btn-danger {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+        .btn-danger:hover {
+            background: #ff0000;
+            color: #fff;
+        }
+        .detail-section {
+            background: #111;
+            border: 1px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .detail-section h3 {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 5px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .info-item {
+            padding: 5px;
+        }
+        .info-label {
+            color: #888;
+        }
+        .chunk-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .chunk-box {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        .chunk-box.pending { background: #333; }
+        .chunk-box.uploading { background: #ffff00; color: #000; }
+        .chunk-box.verified { background: #00ff00; color: #000; }
+        .chunk-box.failed { background: #ff0000; color: #fff; }
+        .chunk-box.retrying { background: #ff6600; color: #fff; }
+        .history-item {
+            padding: 8px;
+            border-left: 3px solid #00ff00;
+            margin-bottom: 8px;
+            background: #0a0a0a;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            background: #111;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            width: 100%;
+            font-family: inherit;
+        }
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-select {
+            background: #111;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 8px;
+            font-family: inherit;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        .error {
+            color: #ff0000;
+            padding: 10px;
+            border: 1px solid #ff0000;
+            margin: 10px 0;
+        }
+        .success {
+            color: #00ff00;
+            padding: 10px;
+            border: 1px solid #00ff00;
+            margin: 10px 0;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            border: 1px solid #00ff00;
+            padding: 5px 10px;
+            white-space: nowrap;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>[ 分片上传协调器 v1.0 ]</h1>
+        <div class="stats" id="stats">
+            <div class="stat-item">加载中...</div>
+        </div>
+    </div>
+
+    <div class="nav">
+        <button class="active" onclick="showPage('list')">任务列表</button>
+        <button onclick="showPage('create')">创建任务</button>
+        <button onclick="showPage('demo')">流程演示</button>
+    </div>
+
+    <div id="page-list" class="content active">
+        <div class="actions-bar">
+            <select id="statusFilter" class="filter-select" onchange="loadTasks()">
+                <option value="">全部状态</option>
+                <option value="pending">待处理</option>
+                <option value="initialized">已初始化</option>
+                <option value="uploading">上传中</option>
+                <option value="verifying">校验中</option>
+                <option value="completed">已完成</option>
+                <option value="failed">失败</option>
+                <option value="paused">已暂停</option>
+            </select>
+            <button class="btn" onclick="loadTasks()">刷新</button>
+        </div>
+        <table id="tasksTable">
+            <thead>
+                <tr>
+                    <th>任务ID</th>
+                    <th>文件名</th>
+                    <th>大小</th>
+                    <th>分片数</th>
+                    <th>续传点</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="page-detail" class="content">
+        <div class="actions-bar">
+            <button class="btn" onclick="showPage('list')">返回列表</button>
+            <button class="btn" onclick="exportTask()">导出数据</button>
+            <button class="btn" onclick="reviewTask('retry')">重试任务</button>
+            <button class="btn" onclick="reviewTask('pause')">暂停任务</button>
+            <button class="btn" onclick="reviewTask('resume')">恢复任务</button>
+            <button class="btn" onclick="loadTaskDetail()">刷新</button>
+        </div>
+        <div id="detailContent"></div>
+    </div>
+
+    <div id="page-create" class="content">
+        <div class="detail-section">
+            <h3>创建上传任务</h3>
+            <div class="info-grid">
+                <div class="form-group">
+                    <label>文件名</label>
+                    <input type="text" id="createFileName" value="large_file.dat">
+                </div>
+                <div class="form-group">
+                    <label>文件大小 (字节)</label>
+                    <input type="number" id="createFileSize" value="10485760">
+                </div>
+                <div class="form-group">
+                    <label>分片大小 (字节)</label>
+                    <input type="number" id="createChunkSize" value="1048576">
+                </div>
+                <div class="form-group">
+                    <label>文件哈希</label>
+                    <input type="text" id="createFileHash" value="abc123def456">
+                </div>
+                <div class="form-group">
+                    <label>最大重试次数</label>
+                    <input type="number" id="createMaxRetries" value="3">
+                </div>
+            </div>
+            <button class="btn" onclick="createTask()">创建任务</button>
+            <div id="createResult"></div>
+        </div>
+    </div>
+
+    <div id="page-demo" class="content">
+        <div class="detail-section">
+            <h3>流程演示</h3>
+            <p>此演示将模拟一个完整的分片上传流程，包括成功和失败场景。</p>
+            <div class="actions-bar">
+                <button class="btn" onclick="demoSuccess()">成功上传演示</button>
+                <button class="btn btn-danger" onclick="demoFail()">失败场景演示</button>
+            </div>
+            <div id="demoOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentTaskId = null;
+
+        async function apiCall(url, options = {}) {
+            try {
+                const response = await fetch(API_BASE + url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.detail || '请求失败');
+                }
+                return data;
+            } catch (error) {
+                showError(error.message);
+                throw error;
+            }
+        }
+
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'error';
+            div.textContent = `[错误] ${message}`;
+            document.body.insertBefore(div, document.body.firstChild);
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'success';
+            div.textContent = `[成功] ${message}`;
+            document.body.insertBefore(div, document.body.firstChild);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            
+            if (page === 'list') {
+                document.getElementById('page-list').classList.add('active');
+                document.querySelector('.nav button:nth-child(1)').classList.add('active');
+                loadTasks();
+            } else if (page === 'detail') {
+                document.getElementById('page-detail').classList.add('active');
+            } else if (page === 'create') {
+                document.getElementById('page-create').classList.add('active');
+                document.querySelector('.nav button:nth-child(2)').classList.add('active');
+            } else if (page === 'demo') {
+                document.getElementById('page-demo').classList.add('active');
+                document.querySelector('.nav button:nth-child(3)').classList.add('active');
+            }
+        }
+
+        async function loadStats() {
+            const stats = await apiCall('/stats');
+            const html = `
+                <div class="stat-item">总任务数: ${stats.total_tasks}</div>
+                <div class="stat-item">总分片: ${stats.total_chunks}</div>
+                <div class="stat-item">失败分片: ${stats.failed_chunks}</div>
+                <div class="stat-item">进行中: ${stats.tasks_by_status.uploading || 0}</div>
+                <div class="stat-item">已完成: ${stats.tasks_by_status.completed || 0}</div>
+                <div class="stat-item">失败: ${stats.tasks_by_status.failed || 0}</div>
+            `;
+            document.getElementById('stats').innerHTML = html;
+        }
+
+        async function loadTasks() {
+            const status = document.getElementById('statusFilter').value;
+            const url = status ? `/tasks?status=${status}` : '/tasks';
+            const tasks = await apiCall(url);
+            
+            const tbody = document.querySelector('#tasksTable tbody');
+            tbody.innerHTML = tasks.map(task => `
+                <tr>
+                    <td><code>${task.id}</code></td>
+                    <td>${task.file_name}</td>
+                    <td>${formatSize(task.file_size)}</td>
+                    <td>${task.total_chunks}</td>
+                    <td>${task.resume_point}</td>
+                    <td class="status-${task.status}">${task.status}</td>
+                    <td>${formatDate(task.created_at)}</td>
+                    <td>
+                        <button class="btn" onclick="viewTask('${task.id}')">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            await loadStats();
+        }
+
+        async function viewTask(taskId) {
+            currentTaskId = taskId;
+            showPage('detail');
+            await loadTaskDetail();
+        }
+
+        async function loadTaskDetail() {
+            if (!currentTaskId) return;
+            
+            const task = await apiCall(`/tasks/${currentTaskId}`);
+            const chunksByStatus = {};
+            task.chunks.forEach(c => {
+                chunksByStatus[c.status] = (chunksByStatus[c.status] || 0) + 1;
+            });
+            
+            const html = `
+                <div class="detail-section">
+                    <h3>任务信息</h3>
+                    <div class="info-grid">
+                        <div class="info-item"><span class="info-label">任务ID:</span> <code>${task.id}</code></div>
+                        <div class="info-item"><span class="info-label">文件名:</span> ${task.file_name}</div>
+                        <div class="info-item"><span class="info-label">文件大小:</span> ${formatSize(task.file_size)}</div>
+                        <div class="info-item"><span class="info-label">总分片:</span> ${task.total_chunks}</div>
+                        <div class="info-item"><span class="info-label">分片大小:</span> ${formatSize(task.chunk_size)}</div>
+                        <div class="info-item"><span class="info-label">续传点:</span> ${task.resume_point}</div>
+                        <div class="info-item"><span class="info-label">状态:</span> <span class="status-${task.status}">${task.status}</span></div>
+                        <div class="info-item"><span class="info-label">重试次数:</span> ${task.retry_count}/${task.max_retries}</div>
+                        <div class="info-item"><span class="info-label">创建时间:</span> ${formatDate(task.created_at)}</div>
+                        <div class="info-item"><span class="info-label">更新时间:</span> ${formatDate(task.updated_at)}</div>
+                    </div>
+                    ${task.error_message ? `<div class="error">错误信息: ${task.error_message}</div>` : ''}
+                </div>
+
+                <div class="detail-section">
+                    <h3>分片状态 (已验证: ${chunksByStatus.verified || 0}/${task.total_chunks})</h3>
+                    <div class="chunk-grid">
+                        ${task.chunks.sort((a,b) => a.chunk_number - b.chunk_number).map(c => `
+                            <div class="chunk-box ${c.status} tooltip" data-tooltip="分片${c.chunk_number}: ${c.status}${c.error_message ? ' - ' + c.error_message : ''}">
+                                ${c.chunk_number}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>分片详情</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>分片号</th>
+                                <th>大小</th>
+                                <th>状态</th>
+                                <th>重试</th>
+                                <th>上传时间</th>
+                                <th>错误</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${task.chunks.sort((a,b) => a.chunk_number - b.chunk_number).map(c => `
+                                <tr>
+                                    <td>${c.chunk_number}</td>
+                                    <td>${formatSize(c.chunk_size)}</td>
+                                    <td class="status-${c.status}">${c.status}</td>
+                                    <td>${c.retry_count}</td>
+                                    <td>${formatDate(c.uploaded_at)}</td>
+                                    <td style="color: #ff0000; font-size: 12px;">${c.error_message || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="detail-section">
+                    <h3>状态变更历史</h3>
+                    ${task.history.map(h => `
+                        <div class="history-item">
+                            <div><strong>${formatDate(h.changed_at)}</strong> - 由 ${h.changed_by} 操作</div>
+                            <div>
+                                ${h.previous_status ? `<span class="status-${h.previous_status}">${h.previous_status}</span> →` : ''}
+                                <span class="status-${h.new_status}">${h.new_status}</span>
+                            </div>
+                            ${h.note ? `<div style="color: #888;">备注: ${h.note}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            document.getElementById('detailContent').innerHTML = html;
+        }
+
+        async function createTask() {
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.innerHTML = '<div class="loading">创建中...</div>';
+            
+            try {
+                const task = await apiCall('/tasks', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        file_name: document.getElementById('createFileName').value,
+                        file_size: parseInt(document.getElementById('createFileSize').value),
+                        chunk_size: parseInt(document.getElementById('createChunkSize').value),
+                        file_hash: document.getElementById('createFileHash').value,
+                        max_retries: parseInt(document.getElementById('createMaxRetries').value)
+                    })
+                });
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        任务创建成功!<br>
+                        任务ID: <code>${task.id}</code><br>
+                        总分片数: ${task.total_chunks}
+                    </div>
+                `;
+                showSuccess('任务创建成功');
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">创建失败: ${error.message}</div>`;
+            }
+        }
+
+        async function reviewTask(action) {
+            if (!currentTaskId) return;
+            
+            try {
+                await apiCall(`/tasks/${currentTaskId}/review`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        task_id: currentTaskId,
+                        action: action
+                    })
+                });
+                showSuccess(`操作成功: ${action}`);
+                await loadTaskDetail();
+            } catch (error) {
+            }
+        }
+
+        async function exportTask() {
+            if (!currentTaskId) return;
+            window.open(`${API_BASE}/tasks/${currentTaskId}/export`, '_blank');
+        }
+
+        async function demoSuccess() {
+            const output = document.getElementById('demoOutput');
+            output.innerHTML = '<div class="loading">开始成功上传演示...</div>';
+            
+            try {
+                let log = '';
+                
+                const task = await apiCall('/tasks', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        file_name: 'demo_success.dat',
+                        file_size: 5242880,
+                        chunk_size: 1048576,
+                        file_hash: 'demo_hash_123'
+                    })
+                });
+                log += `[1/4] 创建任务: ${task.id} (5个分片)<br>`;
+                output.innerHTML = log;
+                
+                for (let i = 0; i < task.total_chunks; i++) {
+                    await apiCall('/chunks/register', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            task_id: task.id,
+                            chunk_number: i,
+                            chunk_size: 1048576,
+                            chunk_hash: `chunk_${i}_hash`
+                        })
+                    });
+                }
+                log += `[2/4] 所有分片已登记<br>`;
+                output.innerHTML = log;
+                
+                for (let i = 0; i < task.total_chunks; i++) {
+                    await apiCall('/chunks/complete', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            chunk_id: `${task.id}_chunk_${i}`,
+                            chunk_hash: `chunk_${i}_hash`
+                        })
+                    });
+                    log += `[3/4] 分片 ${i} 上传并验证完成<br>`;
+                    output.innerHTML = log;
+                    await new Promise(r => setTimeout(r, 200));
+                }
+                
+                const finalTask = await apiCall(`/tasks/${task.id}`);
+                log += `[4/4] 任务最终状态: <span class="status-${finalTask.status}">${finalTask.status}</span><br>`;
+                log += `<br><button class="btn" onclick="viewTask('${task.id}')">查看此任务详情</button>`;
+                output.innerHTML = log;
+                showSuccess('演示完成 - 上传成功');
+                
+            } catch (error) {
+                output.innerHTML += `<br><div class="error">演示失败: ${error.message}</div>`;
+            }
+        }
+
+        async function demoFail() {
+            const output = document.getElementById('demoOutput');
+            output.innerHTML = '<div class="loading">开始失败场景演示...</div>';
+            
+            try {
+                let log = '';
+                
+                const task = await apiCall('/tasks', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        file_name: 'demo_fail.dat',
+                        file_size: 5242880,
+                        chunk_size: 1048576,
+                        file_hash: 'demo_hash_456',
+                        max_retries: 2
+                    })
+                });
+                log += `[1/5] 创建任务: ${task.id} (最大重试: 2次)<br>`;
+                output.innerHTML = log;
+                
+                for (let i = 0; i < 3; i++) {
+                    await apiCall('/chunks/register', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            task_id: task.id,
+                            chunk_number: i,
+                            chunk_size: 1048576,
+                            chunk_hash: `chunk_${i}_hash`
+                        })
+                    });
+                }
+                log += `[2/5] 前3个分片已登记<br>`;
+                output.innerHTML = log;
+                
+                await apiCall('/chunks/complete', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        chunk_id: `${task.id}_chunk_0`,
+                        chunk_hash: 'chunk_0_hash'
+                    })
+                });
+                log += `[3/5] 分片 0 验证成功<br>`;
+                output.innerHTML = log;
+                
+                await apiCall('/chunks/complete', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        chunk_id: `${task.id}_chunk_1`,
+                        chunk_hash: 'WRONG_HASH'
+                    })
+                });
+                log += `[4/5] 分片 1 哈希校验失败 (第1次失败)<br>`;
+                output.innerHTML = log;
+                
+                await apiCall(`/chunks/${task.id}_chunk_1/fail`, {
+                    method: 'POST',
+                    body: JSON.stringify({ error_message: '网络超时' })
+                });
+                log += `[5/5] 分片 1 再次失败 (超过最大重试次数)<br>`;
+                output.innerHTML = log;
+                
+                const finalTask = await apiCall(`/tasks/${task.id}`);
+                log += `<br>任务最终状态: <span class="status-${finalTask.status}">${finalTask.status}</span><br>`;
+                log += `错误信息: ${finalTask.error_message}<br>`;
+                log += `<br><button class="btn" onclick="viewTask('${task.id}')">查看此任务详情</button>`;
+                output.innerHTML = log;
+                showSuccess('演示完成 - 失败场景');
+                
+            } catch (error) {
+                output.innerHTML += `<br><div class="error">演示失败: ${error.message}</div>`;
+            }
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+            return (bytes / 1073741824).toFixed(1) + ' GB';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleString('zh-CN');
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>
