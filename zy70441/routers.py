@@ -9,7 +9,7 @@ from schemas import (
     RuleVersion, RuleVersionCreate,
     OperationLog,
     CleanCandidate, CleanCandidateCreate,
-    PaginatedResponse
+    WorkOrderPaginatedResponse, OperationLogPaginatedResponse
 )
 from services import (
     WorkOrderService, RuleService, OperationLogService, CleanService
@@ -28,10 +28,10 @@ def get_work_order(order_id: int, db: Session = Depends(get_db)):
     work_order = WorkOrderService.get_by_id(db, order_id)
     if not work_order:
         raise HTTPException(status_code=404, detail="工单不存在")
-    return work_order
+    return WorkOrderDetail.model_validate(work_order)
 
 
-@router.get("/work-orders/", response_model=PaginatedResponse, summary="查询工单列表")
+@router.get("/work-orders/", response_model=WorkOrderPaginatedResponse, summary="查询工单列表")
 def list_work_orders(
     batch_no: Optional[str] = None,
     operator: Optional[str] = None,
@@ -57,7 +57,9 @@ def list_work_orders(
         "page": page,
         "page_size": page_size
     }
-    return WorkOrderService.query_work_orders(db, query_params)
+    result = WorkOrderService.query_work_orders(db, query_params)
+    result["items"] = [WorkOrder.model_validate(item) for item in result["items"]]
+    return result
 
 
 @router.post("/work-orders/{order_id}/manual-correct", response_model=WorkOrder, summary="人工修正工单判断")
@@ -84,7 +86,7 @@ def list_rules(db: Session = Depends(get_db)):
     return db.query(RuleVersion).order_by(RuleVersion.effective_time.desc()).all()
 
 
-@router.get("/operation-logs/", response_model=PaginatedResponse, summary="查询操作日志")
+@router.get("/operation-logs/", response_model=OperationLogPaginatedResponse, summary="查询操作日志")
 def list_operation_logs(
     work_order_id: Optional[int] = None,
     batch_no: Optional[str] = None,
@@ -94,17 +96,19 @@ def list_operation_logs(
     page_size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
-    return OperationLogService.query_logs(
+    result = OperationLogService.query_logs(
         db, work_order_id=work_order_id, batch_no=batch_no,
         operator=operator, source_system=source_system,
         page=page, page_size=page_size
     )
+    result["items"] = [OperationLog.model_validate(item) for item in result["items"]]
+    return result
 
 
 @router.get("/work-orders/{order_id}/logs", response_model=List[OperationLog], summary="获取工单操作日志")
 def get_work_order_logs(order_id: int, db: Session = Depends(get_db)):
     result = OperationLogService.query_logs(db, work_order_id=order_id, page_size=1000)
-    return result["items"]
+    return [OperationLog.model_validate(item) for item in result["items"]]
 
 
 @router.post("/clean-candidates/", response_model=CleanCandidate, summary="生成清理候选清单")

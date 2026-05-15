@@ -102,6 +102,17 @@ def init_work_orders(db: Session, batch_no: str, count: int = 10, use_old_rule: 
         db.flush()
         
         JudgmentService.judge_work_order(db, work_order, rule)
+        
+        create_log = OperationLog(
+            work_order_id=work_order.id,
+            batch_no=batch_no,
+            operation_type=OperationType.CREATE,
+            operator=work_order.created_by,
+            operation_remark="创建工单",
+            after_data={"order_no": work_order.order_no, "status": work_order.status},
+            source_system=SourceSystem.CUSTOMER_SERVICE
+        )
+        db.add(create_log)
     
     db.commit()
     print(f"批次 {batch_no} 工单初始化完成: {count} 条")
@@ -137,7 +148,7 @@ def init_cloud_resource_update(db: Session):
     db.flush()
     JudgmentService.judge_work_order(db, work_order)
     
-    OperationLog(
+    log = OperationLog(
         work_order_id=work_order.id,
         batch_no=batch_no,
         operation_type=OperationType.UPDATE,
@@ -148,6 +159,7 @@ def init_cloud_resource_update(db: Session):
         source_system=SourceSystem.CLOUD_RESOURCE,
         change_reason="业务需求变更，需要更高配置"
     )
+    db.add(log)
     
     db.commit()
     print("云资源申请单补改记录初始化完成")
@@ -173,7 +185,7 @@ def add_manual_correction(db: Session):
         abnormal_order.judged_at = datetime.now()
         abnormal_order.status = "manual_corrected"
         
-        OperationLog(
+        log = OperationLog(
             work_order_id=abnormal_order.id,
             batch_no=abnormal_order.batch_no,
             operation_type=OperationType.MANUAL_CORRECT,
@@ -186,6 +198,7 @@ def add_manual_correction(db: Session):
             },
             source_system=SourceSystem.ADMIN_PORTAL
         )
+        db.add(log)
         
         db.commit()
         print(f"已为工单 {abnormal_order.order_no} 添加人工修正记录")

@@ -1,7 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Generic, TypeVar
 from datetime import datetime
 from models import RiskType, OperationType, SourceSystem
+
+T = TypeVar('T')
 
 
 class RuleVersionBase(BaseModel):
@@ -137,8 +139,19 @@ class WorkOrderQuery(BaseModel):
     page_size: int = 20
 
 
-class PaginatedResponse(BaseModel):
+class PaginatedResponse(BaseModel, Generic[T]):
     total: int
     page: int
     page_size: int
-    items: List[Any]
+    items: List[T]
+
+    class Config:
+        from_attributes = True
+
+
+class WorkOrderPaginatedResponse(PaginatedResponse[WorkOrder]):
+    pass
+
+
+class OperationLogPaginatedResponse(PaginatedResponse[OperationLog]):
+    pass
