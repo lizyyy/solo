@@ -3,15 +3,13 @@ package service
 import (
 	"cert-renewal/internal/model"
 	"cert-renewal/internal/repository"
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	"time"
 )
 
 type IdempotentService interface {
-	CheckAndMark(requestType string, requestData interface{}) (*model.IdempotentRequest, bool, error)
-	SaveResponse(requestKey string, responseData interface{}) error
+	Check(requestID string, requestType string) (*model.IdempotentRequest, bool, error)
+	MarkSuccess(requestID string, requestType string, requestData interface{}, responseData interface{}) error
 }
 
 type idempotentService struct {
@@ -24,25 +22,8 @@ func NewIdempotentService() IdempotentService {
 	}
 }
 
-func (s *idempotentService) generateRequestKey(requestType string, requestData interface{}) (string, error) {
-	dataBytes, err := json.Marshal(requestData)
-	if err != nil {
-		return "", err
-	}
-
-	hash := sha256.New()
-	hash.Write([]byte(requestType))
-	hash.Write(dataBytes)
-	return hex.EncodeToString(hash.Sum(nil)), nil
-}
-
-func (s *idempotentService) CheckAndMark(requestType string, requestData interface{}) (*model.IdempotentRequest, bool, error) {
-	requestKey, err := s.generateRequestKey(requestType, requestData)
-	if err != nil {
-		return nil, false, err
-	}
-
-	existing, err := s.repo.GetByRequestKey(requestKey)
+func (s *idempotentService) Check(requestID string, requestType string) (*model.IdempotentRequest, bool, error) {
+	existing, err := s.repo.GetByRequestID(requestID)
 	if err != nil {
 		return nil, false, err
 	}
@@ -51,39 +32,20 @@ func (s *idempotentService) CheckAndMark(requestType string, requestData interfa
 		return existing, true, nil
 	}
 
-	record := &model.IdempotentRequest{
-		RequestKey:  requestKey,
-		RequestType: requestType,
-		RequestData: fmt.Sprintf("%v", requestData),
-	}
-
-	created, err := s.repo.TryCreate(record)
-	if err != nil {
-		return nil, false, err
-	}
-
-	if !created {
-		existing, err = s.repo.GetByRequestKey(requestKey)
-		if err != nil {
-			return nil, false, err
-		}
-		return existing, true, nil
-	}
-
-	return record, false, nil
+	return nil, false, nil
 }
 
-func (s *idempotentService) SaveResponse(requestKey string, responseData interface{}) error {
-	existing, err := s.repo.GetByRequestKey(requestKey)
-	if err != nil {
-		return err
+func (s *idempotentService) MarkSuccess(requestID string, requestType string, requestData interface{}, responseData interface{}) error {
+	requestDataBytes, _ := json.Marshal(requestData)
+	responseDataBytes, _ := json.Marshal(responseData)
+
+	record := &model.IdempotentRequest{
+		RequestID:    requestID,
+		RequestType:  requestType,
+		RequestData:  string(requestDataBytes),
+		ResponseData: string(responseDataBytes),
+		ProcessedAt:  time.Now().UTC(),
 	}
 
-	if existing == nil {
-		return nil
-	}
-
-	responseBytes, _ := json.Marshal(responseData)
-	existing.ResponseData = string(responseBytes)
-	return s.repo.Create(existing)
+	return s.repo.Create(record)
 }

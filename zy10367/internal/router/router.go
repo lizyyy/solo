@@ -38,6 +38,16 @@ func SetupRouter(h *handler.Handler) *gin.Engine {
 			renewal.POST("/window", h.CreateRenewalWindow)
 			renewal.POST("/rollback", h.Rollback)
 			renewal.GET("/history", h.GetEnablementHistory)
+			renewal.POST("/reminders/trigger", h.TriggerReminders)
+			renewal.GET("/reminders", h.ListReminders)
+			renewal.POST("/reminders/mark-sent", h.MarkReminderSent)
+		}
+
+		export := api.Group("/export")
+		{
+			export.GET("/certs", h.ExportCerts)
+			export.GET("/history", h.ExportEnablementHistory)
+			export.GET("/verifications", h.ExportVerifications)
 		}
 	}
 

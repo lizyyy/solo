@@ -22,7 +22,7 @@ PARTNER_ID=$(echo $PARTNER_RESP | jq -r '.data.id')
 echo "合作方ID: $PARTNER_ID"
 echo ""
 
-echo "2. 创建第一个证书(旧证)..."
+echo "2. 创建第一个证书(旧证，即将过期)..."
 CERT1_RESP=$(curl -s -X POST "$BASE_URL/certs" \
   -H "Content-Type: application/json" \
   -d "{
@@ -31,7 +31,7 @@ CERT1_RESP=$(curl -s -X POST "$BASE_URL/certs" \
     \"subject\": \"CN=Test Client Cert 1,O=Test Org,C=CN\",
     \"issuer\": \"CN=Test CA,O=Test Org,C=CN\",
     \"not_before\": \"2024-01-01T00:00:00Z\",
-    \"not_after\": \"2024-12-31T23:59:59Z\",
+    \"not_after\": \"2024-06-30T23:59:59Z\",
     \"fingerprint\": \"SHA256:abcdef1234567890abcdef1234567890\",
     \"cert_content\": \"-----BEGIN CERTIFICATE-----\nMII...\n-----END CERTIFICATE-----\",
     \"remark\": \"旧证书\",
@@ -91,7 +91,19 @@ VERIFY_RESP=$(curl -s -X POST "$BASE_URL/verifications/verify" \
 echo "响应: $VERIFY_RESP"
 echo ""
 
-echo "6. 灰度启用新证书(50%)..."
+echo "6. 先全量启用旧证书作为当前证书..."
+OLD_FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"cert_id\": \"$CERT1_ID\",
+    \"operator\": \"admin\",
+    \"reason\": \"启用旧证书\",
+    \"request_id\": \"req_full_old_001\"
+  }")
+echo "响应: $OLD_FULL_RESP"
+echo ""
+
+echo "7. 灰度启用新证书(50%)..."
 GRAY_RESP=$(curl -s -X POST "$BASE_URL/certs/gray-enable" \
   -H "Content-Type: application/json" \
   -d "{
@@ -104,7 +116,7 @@ GRAY_RESP=$(curl -s -X POST "$BASE_URL/certs/gray-enable" \
 echo "响应: $GRAY_RESP"
 echo ""
 
-echo "7. 全量启用新证书..."
+echo "8. 全量启用新证书..."
 FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
   -H "Content-Type: application/json" \
   -d "{
@@ -116,12 +128,12 @@ FULL_RESP=$(curl -s -X POST "$BASE_URL/certs/full-enable" \
 echo "响应: $FULL_RESP"
 echo ""
 
-echo "8. 查看启用历史..."
+echo "9. 查看启用历史..."
 HISTORY_RESP=$(curl -s -X GET "$BASE_URL/renewal/history?partner_id=$PARTNER_ID")
 echo "响应: $HISTORY_RESP"
 echo ""
 
-echo "9. 测试幂等性(重复创建合作方)..."
+echo "10. 测试幂等性(重复创建合作方)..."
 DUP_RESP=$(curl -s -X POST "$BASE_URL/partners" \
   -H "Content-Type: application/json" \
   -d '{
@@ -134,6 +146,45 @@ DUP_RESP=$(curl -s -X POST "$BASE_URL/partners" \
     "request_id": "req_partner_001"
   }')
 echo "响应: $DUP_RESP"
+echo ""
+
+echo "11. 触发续租提醒(提前30天)..."
+REMINDER_RESP=$(curl -s -X POST "$BASE_URL/renewal/reminders/trigger" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"partner_id\": \"$PARTNER_ID\",
+    \"days_ahead\": 30,
+    \"request_id\": \"req_trigger_reminder_001\"
+  }")
+echo "响应: $REMINDER_RESP"
+echo ""
+
+echo "12. 查询待发送提醒..."
+LIST_REMINDER_RESP=$(curl -s -X GET "$BASE_URL/renewal/reminders?partner_id=$PARTNER_ID&is_sent=false")
+echo "响应: $LIST_REMINDER_RESP"
+echo ""
+
+echo "13. 回退到旧证书..."
+ROLLBACK_RESP=$(curl -s -X POST "$BASE_URL/renewal/rollback" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"partner_id\": \"$PARTNER_ID\",
+    \"cert_id\": \"$CERT1_ID\",
+    \"reason\": \"新证书出现问题，回退到旧证书\",
+    \"operator\": \"admin\",
+    \"request_id\": \"req_rollback_001\"
+  }")
+echo "响应: $ROLLBACK_RESP"
+echo ""
+
+echo "14. 导出证书列表CSV..."
+curl -s -X GET "$BASE_URL/export/certs?partner_id=$PARTNER_ID" -o /tmp/certs_export.csv
+echo "导出完成，文件大小: $(wc -l /tmp/certs_export.csv)"
+echo ""
+
+echo "15. 导出启用历史CSV..."
+curl -s -X GET "$BASE_URL/export/history?partner_id=$PARTNER_ID" -o /tmp/history_export.csv
+echo "导出完成，文件大小: $(wc -l /tmp/history_export.csv)"
 echo ""
 
 echo "=== 测试完成 ==="

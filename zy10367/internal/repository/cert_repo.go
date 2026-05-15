@@ -20,6 +20,7 @@ type CertRepository interface {
 	Update(cert *model.ClientCertificate, tx *gorm.DB) error
 	SetCurrentCert(partnerID string, certID string, tx *gorm.DB) error
 	ListExpiringSoon(days int) ([]model.ClientCertificate, error)
+	ListExpiringCerts(partnerID string, expireDate time.Time) ([]model.ClientCertificate, error)
 }
 
 type certRepository struct {
@@ -135,5 +136,15 @@ func (r *certRepository) ListExpiringSoon(days int) ([]model.ClientCertificate, 
 	var certs []model.ClientCertificate
 	expireDate := time.Now().AddDate(0, 0, days)
 	err := r.db.Where("not_after <= ? AND status IN ?", expireDate, []model.CertStatus{model.CertStatusEnabled, model.CertStatusGray}).Find(&certs).Error
+	return certs, err
+}
+
+func (r *certRepository) ListExpiringCerts(partnerID string, expireDate time.Time) ([]model.ClientCertificate, error) {
+	var certs []model.ClientCertificate
+	query := r.db.Where("not_after <= ? AND status IN ?", expireDate, []model.CertStatus{model.CertStatusEnabled, model.CertStatusGray})
+	if partnerID != "" {
+		query = query.Where("partner_id = ?", partnerID)
+	}
+	err := query.Find(&certs).Error
 	return certs, err
 }

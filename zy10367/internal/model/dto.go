@@ -74,11 +74,11 @@ type FullEnableRequest struct {
 }
 
 type RollbackRequest struct {
-	PartnerID  string `json:"partner_id" binding:"required"`
-	CertID     string `json:"cert_id" binding:"required"`
-	Reason     string `json:"reason" binding:"required"`
-	Operator   string `json:"operator" binding:"required"`
-	RequestID  string `json:"request_id" binding:"required"`
+	PartnerID string `json:"partner_id" binding:"required"`
+	CertID    string `json:"cert_id" binding:"required"`
+	Reason    string `json:"reason" binding:"required"`
+	Operator  string `json:"operator" binding:"required"`
+	RequestID string `json:"request_id" binding:"required"`
 }
 
 type QueryParams struct {
@@ -89,20 +89,46 @@ type QueryParams struct {
 }
 
 type CertListResponse struct {
-	Total int64              `json:"total"`
+	Total int64               `json:"total"`
 	List  []ClientCertificate `json:"list"`
 }
 
 type HistoryQueryParams struct {
-	PartnerID  string    `form:"partner_id"`
-	CertID     string    `form:"cert_id"`
-	StartTime  time.Time `form:"start_time"`
-	EndTime    time.Time `form:"end_time"`
-	Page       int       `form:"page,default=1"`
-	PageSize   int       `form:"page_size,default=20"`
+	PartnerID string    `form:"partner_id"`
+	CertID    string    `form:"cert_id"`
+	StartTime time.Time `form:"start_time"`
+	EndTime   time.Time `form:"end_time"`
+	Page      int       `form:"page,default=1"`
+	PageSize  int       `form:"page_size,default=20"`
 }
 
 type EnablementHistoryResponse struct {
-	Total int64               `json:"total"`
-	List  []EnablementRecord  `json:"list"`
+	Total int64              `json:"total"`
+	List  []EnablementRecord `json:"list"`
+}
+
+type TriggerReminderRequest struct {
+	PartnerID string `json:"partner_id"`
+	DaysAhead int    `json:"days_ahead" binding:"required,min=1"`
+	RequestID string `json:"request_id" binding:"required"`
+}
+
+type ReminderQueryParams struct {
+	PartnerID string    `form:"partner_id"`
+	IsSent    bool      `form:"is_sent"`
+	StartTime time.Time `form:"start_time"`
+	EndTime   time.Time `form:"end_time"`
+	Page      int       `form:"page,default=1"`
+	PageSize  int       `form:"page_size,default=20"`
+}
+
+type MarkReminderSentRequest struct {
+	ReminderID string `json:"reminder_id" binding:"required"`
+	SentBy     string `json:"sent_by"`
+	RequestID  string `json:"request_id" binding:"required"`
+}
+
+type ExportQueryParams struct {
+	PartnerID string `form:"partner_id"`
+	Status    string `form:"status"`
 }

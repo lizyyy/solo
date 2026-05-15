@@ -20,25 +20,26 @@ type CertService interface {
 	Rollback(req *model.RollbackRequest) (*model.RollbackRecord, error)
 	GetEnablementHistory(params *model.HistoryQueryParams) ([]model.EnablementRecord, int64, error)
 	CreateRenewalWindow(req *model.CreateRenewalWindowRequest) (*model.RenewalWindow, error)
+	ListVerifications(params *model.QueryParams) ([]model.VerificationRequest, int64, error)
 }
 
 type certService struct {
-	certRepo       repository.CertRepository
+	certRepo         repository.CertRepository
 	verificationRepo repository.VerificationRepository
-	enablementRepo repository.EnablementRepository
-	rollbackRepo   repository.RollbackRepository
-	partnerRepo    repository.PartnerRepository
-	renewalRepo    repository.RenewalWindowRepository
+	enablementRepo   repository.EnablementRepository
+	rollbackRepo     repository.RollbackRepository
+	partnerRepo      repository.PartnerRepository
+	renewalRepo      repository.RenewalWindowRepository
 }
 
 func NewCertService() CertService {
 	return &certService{
-		certRepo:       repository.NewCertRepository(),
+		certRepo:         repository.NewCertRepository(),
 		verificationRepo: repository.NewVerificationRepository(),
-		enablementRepo: repository.NewEnablementRepository(),
-		rollbackRepo:   repository.NewRollbackRepository(),
-		partnerRepo:    repository.NewPartnerRepository(),
-		renewalRepo:    repository.NewRenewalWindowRepository(),
+		enablementRepo:   repository.NewEnablementRepository(),
+		rollbackRepo:     repository.NewRollbackRepository(),
+		partnerRepo:      repository.NewPartnerRepository(),
+		renewalRepo:      repository.NewRenewalWindowRepository(),
 	}
 }
 
@@ -173,15 +174,15 @@ func (s *certService) GrayEnable(req *model.GrayEnableRequest) (*model.ClientCer
 	cert.GrayPercent = req.GrayPercent
 
 	enablementRecord := &model.EnablementRecord{
-		PartnerID:       cert.PartnerID,
-		CertID:          cert.ID,
-		EnablementType:  model.EnablementTypeGray,
-		GrayPercent:     req.GrayPercent,
-		Operator:        req.Operator,
-		EnableAt:        time.Now().UTC(),
-		PreviousStatus:  previousStatus,
-		NewStatus:       model.CertStatusGray,
-		ChangeReason:    req.Reason,
+		PartnerID:      cert.PartnerID,
+		CertID:         cert.ID,
+		EnablementType: model.EnablementTypeGray,
+		GrayPercent:    req.GrayPercent,
+		Operator:       req.Operator,
+		EnableAt:       time.Now().UTC(),
+		PreviousStatus: previousStatus,
+		NewStatus:      model.CertStatusGray,
+		ChangeReason:   req.Reason,
 	}
 
 	if err := repository.WithTransaction(func(tx *gorm.DB) error {
@@ -211,15 +212,15 @@ func (s *certService) FullEnable(req *model.FullEnableRequest) (*model.ClientCer
 	cert.GrayPercent = 100
 
 	enablementRecord := &model.EnablementRecord{
-		PartnerID:       cert.PartnerID,
-		CertID:          cert.ID,
-		EnablementType:  model.EnablementTypeFull,
-		GrayPercent:     100,
-		Operator:        req.Operator,
-		EnableAt:        time.Now().UTC(),
-		PreviousStatus:  previousStatus,
-		NewStatus:       model.CertStatusEnabled,
-		ChangeReason:    req.Reason,
+		PartnerID:      cert.PartnerID,
+		CertID:         cert.ID,
+		EnablementType: model.EnablementTypeFull,
+		GrayPercent:    100,
+		Operator:       req.Operator,
+		EnableAt:       time.Now().UTC(),
+		PreviousStatus: previousStatus,
+		NewStatus:      model.CertStatusEnabled,
+		ChangeReason:   req.Reason,
 	}
 
 	if err := repository.WithTransaction(func(tx *gorm.DB) error {
@@ -249,25 +250,24 @@ func (s *certService) Rollback(req *model.RollbackRequest) (*model.RollbackRecor
 	}
 
 	rollbackRecord := &model.RollbackRecord{
-		PartnerID:      req.PartnerID,
-		CurrentCertID:  currentCert.ID,
-		RollbackCertID: rollbackCert.ID,
-		RollbackReason: req.Reason,
+		PartnerID:        req.PartnerID,
+		CurrentCertID:    currentCert.ID,
+		RollbackCertID:   rollbackCert.ID,
+		RollbackReason:   req.Reason,
 		RollbackOperator: req.Operator,
-		RollbackAt:     time.Now().UTC(),
-		IsSuccess:      true,
+		RollbackAt:       time.Now().UTC(),
+		IsSuccess:        true,
 	}
 
-	previousStatus := currentCert.Status
 	enablementRecord := &model.EnablementRecord{
-		PartnerID:       req.PartnerID,
-		CertID:          rollbackCert.ID,
-		EnablementType:  model.EnablementTypeRollback,
-		Operator:        req.Operator,
-		EnableAt:        time.Now().UTC(),
-		PreviousStatus:  previousStatus,
-		NewStatus:       model.CertStatusRollback,
-		ChangeReason:    req.Reason,
+		PartnerID:      req.PartnerID,
+		CertID:         rollbackCert.ID,
+		EnablementType: model.EnablementTypeRollback,
+		Operator:       req.Operator,
+		EnableAt:       time.Now().UTC(),
+		PreviousStatus: rollbackCert.Status,
+		NewStatus:      model.CertStatusEnabled,
+		ChangeReason:   req.Reason,
 	}
 
 	if err := repository.WithTransaction(func(tx *gorm.DB) error {
@@ -280,7 +280,13 @@ func (s *certService) Rollback(req *model.RollbackRequest) (*model.RollbackRecor
 		if err := s.certRepo.UpdateStatus(currentCert.ID, model.CertStatusDisabled, tx); err != nil {
 			return err
 		}
-		return s.certRepo.SetCurrentCert(req.PartnerID, rollbackCert.ID, tx)
+		rollbackCert.Status = model.CertStatusEnabled
+		rollbackCert.IsCurrent = true
+		rollbackCert.IsRollback = true
+		if err := s.certRepo.Update(rollbackCert, tx); err != nil {
+			return err
+		}
+		return nil
 	}); err != nil {
 		return nil, err
 	}
@@ -292,10 +298,14 @@ func (s *certService) GetEnablementHistory(params *model.HistoryQueryParams) ([]
 	return s.enablementRepo.List(params)
 }
 
+func (s *certService) ListVerifications(params *model.QueryParams) ([]model.VerificationRequest, int64, error) {
+	return s.verificationRepo.List(params)
+}
+
 func (s *certService) CreateRenewalWindow(req *model.CreateRenewalWindowRequest) (*model.RenewalWindow, error) {
 	window := &model.RenewalWindow{
-		PartnerID: req.PartnerID,
-		CertID:    req.CertID,
+		PartnerID:   req.PartnerID,
+		CertID:      req.CertID,
 		WindowStart: req.WindowStart,
 		WindowEnd:   req.WindowEnd,
 		Status:      model.RenewalWindowStatusOpen,
