@@ -218,22 +218,22 @@ GET /{processId}/export
 
 ### 前置要求
 - JDK 8+
-- Maven 3.6+（可选，推荐使用启动脚本）
+- **不需要 Maven**（所有脚本都是独立的）
 
-### 快速启动（推荐）
+### ⭐ 快速启动（唯一推荐入口）
 ```bash
-# 自动检查环境、编译、启动
-./start.sh
+# 一键启动：自动清理旧 class、下载依赖、Java 8 模式编译、启动服务
+./one-click-start.sh
 ```
 
-### 手动启动
-```bash
-# 编译
-mvn clean compile
-
-# 运行
-mvn spring-boot:run
-```
+**脚本自动完成 7 个步骤：**
+1. 🔍 检查 Java 环境
+2. 🧹 **强制删除旧 class 文件**（彻底解决 version 55 问题）
+3. 🔧 移除 Lombok 注解，生成纯 Java 代码
+4. 📦 自动下载所有依赖 jar 到 lib 目录
+5. 🔨 用 `-source 1.8 -target 1.8` 编译所有源码
+6. 🔍 验证 class 文件版本（确保是 52 = Java 8）
+7. 🚀 启动 Spring Boot 服务
 
 ### 访问地址
 - **API 接口**: http://localhost:8080/api/v1/compensation
@@ -244,15 +244,15 @@ mvn spring-boot:run
 - Username: `sa`
 - Password: （空）
 
-## 测试示例
+## 测试验证
 
-项目包含完整的测试脚本，可用于验证所有核心功能：
+项目包含完整的测试脚本，自动验证所有验收要点：
 
 ```bash
-# 确保服务已启动
-./start.sh
+# 第一步：启动服务（打开一个终端）
+./one-click-start.sh
 
-# 运行完整测试
+# 第二步：等待服务启动成功后，打开另一个终端运行测试
 ./test-full.sh
 ```
 

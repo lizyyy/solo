@@ -1,5 +1,33 @@
 # 修改记录
 
+## 🔧 第四轮修复（2026-05-16）
+
+### 问题
+- **README 指向错误的启动入口**：第 223 行和 251 行仍然推荐 `./start.sh`，但该脚本有严重问题
+- **`start.sh` 直接加载旧 class**：不清理旧文件，直接加载 version 55 的 class，导致 `UnsupportedClassVersionError`
+- **缺少依赖目录检查**：不检查 `lib/` 目录是否存在，导致启动失败
+
+### 修复方案
+1. **更新 README.md**：将所有启动入口从 `./start.sh` 改为 `./one-click-start.sh`
+   - 第 223 行：快速启动推荐入口
+   - 第 251 行：测试前的启动步骤
+   - 明确标注为「唯一推荐入口」
+
+2. **废弃有问题的脚本**：
+   - `start.sh`：改为显示警告信息，自动跳转到 `one-click-start.sh`
+   - `quick-start.sh`：同样改为废弃，跳转到正确脚本
+
+3. **`one-click-start.sh` 作为唯一启动入口**：
+   - 🔍 自动检查 Java 环境
+   - 🧹 **强制删除旧 class 文件**（彻底解决 version 55 问题）
+   - 🔧 自动移除 Lombok 注解
+   - 📦 自动下载所有依赖 jar 到 lib 目录
+   - 🔨 用 `-source 1.8 -target 1.8` 编译
+   - 🔍 验证 class 文件版本 = 52
+   - 🚀 启动 Spring Boot 服务
+
+---
+
 ## 🔧 问题修复
 
 ### 1. 补偿顺序控制修复
