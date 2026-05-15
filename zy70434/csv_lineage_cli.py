@@ -40,11 +40,13 @@ class CSVFieldLineage:
             writer.writerows(rows)
 
     def save_failure(self, failure_type, data, reason):
-        failure_file = self.failure_dir / f"failure_{self.run_id}_{failure_type}.json"
+        row_index = data.get('_row_index', 'unknown')
+        failure_file = self.failure_dir / f"failure_{self.run_id}_row{row_index}_{failure_type}.json"
         failure_data = {
             "run_id": self.run_id,
             "timestamp": datetime.now().isoformat(),
             "failure_type": failure_type,
+            "row_index": row_index,
             "data": data,
             "reason": reason,
             "lineage": {
