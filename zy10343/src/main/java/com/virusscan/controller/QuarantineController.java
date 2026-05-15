@@ -5,7 +5,7 @@ import com.virusscan.dto.ReleaseFileRequest;
 import com.virusscan.entity.Quarantine;
 import com.virusscan.entity.ReleaseCertificate;
 import com.virusscan.service.ScanTaskService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

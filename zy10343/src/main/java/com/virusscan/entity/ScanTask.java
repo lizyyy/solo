@@ -2,7 +2,7 @@ package com.virusscan.entity;
 
 import com.virusscan.enums.ScanEngine;
 import com.virusscan.enums.TaskStatus;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;

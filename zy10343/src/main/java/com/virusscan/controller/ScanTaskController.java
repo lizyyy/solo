@@ -8,7 +8,7 @@ import com.virusscan.entity.NotificationRecord;
 import com.virusscan.entity.ScanTask;
 import com.virusscan.enums.TaskStatus;
 import com.virusscan.service.ScanTaskService;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
