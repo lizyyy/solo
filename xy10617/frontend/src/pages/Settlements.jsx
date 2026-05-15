@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Table, Button, Modal, Form, Select, Input, DatePicker,
-  message, Space, Tag, Row, Col, Card, Descriptions, List
+  Table, Button, Modal, Form, Select, DatePicker,
+  message, Space, Tag, Card, Descriptions, List,
+  Input, FilterOutlined, ReloadOutlined
 } from 'antd';
 import { PlusOutlined, ExportOutlined, DollarOutlined } from '@ant-design/icons';
 import { settlementAPI, consignorAPI } from '../services/api';
 import dayjs from 'dayjs';
+
+const { RangePicker } = DatePicker;
 
 const Settlements = () => {
   const [data, setData] = useState([]);
@@ -17,6 +20,7 @@ const Settlements = () => {
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [currentSettlement, setCurrentSettlement] = useState(null);
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
 
   const fetchData = async (page = 1, pageSize = 20, extraFilters = {}) => {
     setLoading(true);
@@ -50,6 +54,28 @@ const Settlements = () => {
     fetchConsignors();
   }, []);
 
+  const handleSearch = (values) => {
+    const params = {};
+    if (values.consignor_id) {
+      params.consignor_id = values.consignor_id;
+    }
+    if (values.handler) {
+      params.handler = values.handler;
+    }
+    if (values.date_range && values.date_range.length === 2) {
+      params.start_date = values.date_range[0].format('YYYY-MM-DD');
+      params.end_date = values.date_range[1].format('YYYY-MM-DD');
+    }
+    setFilters(params);
+    fetchData(1, pagination.pageSize, params);
+  };
+
+  const handleReset = () => {
+    filterForm.resetFields();
+    setFilters({});
+    fetchData(1, pagination.pageSize, {});
+  };
+
   const handleGenerate = async () => {
     try {
       const values = await form.validateFields();
@@ -61,6 +87,7 @@ const Settlements = () => {
       });
       message.success('结算单生成成功');
       setCreateModalVisible(false);
+      form.resetFields();
       fetchData();
     } catch (error) {
       message.error('生成失败');
@@ -71,7 +98,11 @@ const Settlements = () => {
     try {
       await settlementAPI.markPaid(id, { paid_by: '管理员' });
       message.success('已标记为已打款');
-      fetchData();
+      fetchData(pagination.current, pagination.pageSize);
+      if (currentSettlement?.id === id) {
+        setCurrentSettlement(null);
+        setDetailModalVisible(false);
+      }
     } catch (error) {
       message.error('操作失败');
     }
@@ -97,31 +128,15 @@ const Settlements = () => {
       title: '寄售人', 
       dataIndex: 'consignor_name', 
       key: 'consignor_name',
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            style={{ width: '100%', marginBottom: 8 }}
-            value={selectedKeys[0]}
-            onChange={(value) => setSelectedKeys(value ? [value] : [])}
-            placeholder="选择寄售人"
-          >
-            {consignors.map(c => (
-              <Select.Option key={c.id} value={c.id}>{c.name}</Select.Option>
-            ))}
-          </Select>
-          <Button type="primary" onClick={confirm} size="small" style={{ width: '100%' }}>
-            筛选
-          </Button>
-        </div>
-      ),
-      onFilter: (value, record) => record.consignor_id === value
+      width: 120
     },
     { 
       title: '结算周期', 
       key: 'period',
+      width: 180,
       render: (_, record) => (
         <span>
-          {dayjs(record.period_start).format('MM-DD')} ~ {dayjs(record.period_end).format('MM-DD')}
+          {dayjs(record.period_start).format('YYYY-MM-DD')} ~ {dayjs(record.period_end).format('YYYY-MM-DD')}
         </span>
       )
     },
@@ -129,25 +144,30 @@ const Settlements = () => {
       title: '销售总额', 
       dataIndex: 'total_sales', 
       key: 'total_sales',
+      width: 100,
       render: (price) => `¥${price}`
     },
     { 
       title: '平台佣金', 
       dataIndex: 'total_commission', 
       key: 'total_commission',
+      width: 100,
       render: (price) => `¥${price}`
     },
     { 
       title: '结算金额', 
       dataIndex: 'total_settlement', 
       key: 'total_settlement',
+      width: 100,
       render: (price) => <strong style={{ color: '#52c41a' }}>¥{price}</strong>
     },
-    { title: '生成人', dataIndex: 'generated_by', key: 'generated_by' },
+    { title: '生成人', dataIndex: 'generated_by', key: 'generated_by', width: 100 },
+    { title: '打款人', dataIndex: 'paid_by', key: 'paid_by', width: 100, render: (t) => t || '-' },
     {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
+      width: 100,
       render: (status) => (
         <Tag color={status === 'paid' ? 'green' : 'orange'}>
           {status === 'paid' ? '已打款' : '待打款'}
@@ -158,11 +178,21 @@ const Settlements = () => {
       title: '生成时间',
       dataIndex: 'created_at',
       key: 'created_at',
+      width: 160,
       render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm')
+    },
+    {
+      title: '打款时间',
+      dataIndex: 'paid_at',
+      key: 'paid_at',
+      width: 160,
+      render: (text) => text ? dayjs(text).format('YYYY-MM-DD HH:mm') : '-'
     },
     {
       title: '操作',
       key: 'action',
+      width: 200,
+      fixed: 'right',
       render: (_, record) => (
         <Space>
           <Button type="link" size="small" onClick={() => handleViewDetail(record.id)}>
@@ -188,20 +218,47 @@ const Settlements = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>结算管理</h2>
-        <Space>
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>
-            生成结算单
-          </Button>
-        </Space>
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>
+          生成结算单
+        </Button>
       </div>
+
+      <Card size="small" style={{ marginBottom: 16 }}>
+        <Form form={filterForm} layout="inline" onFinish={handleSearch}>
+          <Form.Item name="consignor_id" label="寄售人">
+            <Select style={{ width: 150 }} allowClear placeholder="选择寄售人">
+              {consignors.map(c => (
+                <Select.Option key={c.id} value={c.id}>{c.name}</Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="handler" label="责任人">
+            <Input style={{ width: 150 }} placeholder="生成人/打款人" />
+          </Form.Item>
+          <Form.Item name="date_range" label="处理时间">
+            <RangePicker style={{ width: 280 }} />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit" icon={<FilterOutlined />}>
+                筛选
+              </Button>
+              <Button onClick={handleReset} icon={<ReloadOutlined />}>
+                重置
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
 
       <Table
         columns={columns}
         dataSource={data}
         rowKey="id"
         loading={loading}
+        scroll={{ x: 1300 }}
         pagination={{
           ...pagination,
           showSizeChanger: true,
@@ -215,19 +272,22 @@ const Settlements = () => {
         title="生成结算单"
         open={createModalVisible}
         onOk={handleGenerate}
-        onCancel={() => setCreateModalVisible(false)}
+        onCancel={() => {
+          setCreateModalVisible(false);
+          form.resetFields();
+        }}
         width={600}
       >
         <Form form={form} layout="vertical">
-          <Form.Item name="consignor_id" label="寄售人" rules={[{ required: true }]}>
-            <Select>
+          <Form.Item name="consignor_id" label="寄售人" rules={[{ required: true, message: '请选择寄售人' }]}>
+            <Select placeholder="请选择寄售人">
               {consignors.map(c => (
                 <Select.Option key={c.id} value={c.id}>{c.name}</Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="period" label="结算周期" rules={[{ required: true }]}>
-            <DatePicker.RangePicker style={{ width: '100%' }} />
+          <Form.Item name="period" label="结算周期" rules={[{ required: true, message: '请选择结算周期' }]}>
+            <RangePicker style={{ width: '100%' }} />
           </Form.Item>
         </Form>
       </Modal>
@@ -247,7 +307,6 @@ const Settlements = () => {
               icon={<DollarOutlined />} 
               onClick={() => {
                 handleMarkPaid(currentSettlement.id);
-                setDetailModalVisible(false);
               }}
             >
               标记已打款
@@ -262,8 +321,8 @@ const Settlements = () => {
               <Descriptions.Item label="寄售人">{currentSettlement.consignor_name}</Descriptions.Item>
               <Descriptions.Item label="银行账号">{currentSettlement.bank_account}</Descriptions.Item>
               <Descriptions.Item label="开户行">{currentSettlement.bank_name}</Descriptions.Item>
-              <Descriptions.Item label="联系电话">{currentSettlement.phone}</Descriptions.Item>
-              <Descriptions.Item label="结算周期">
+              <Descriptions.Item label="联系电话">{currentSettlement.phone || '-'}</Descriptions.Item>
+              <Descriptions.Item label="结算周期" span={2}>
                 {dayjs(currentSettlement.period_start).format('YYYY-MM-DD')} ~ {dayjs(currentSettlement.period_end).format('YYYY-MM-DD')}
               </Descriptions.Item>
               <Descriptions.Item label="状态">
@@ -302,7 +361,7 @@ const Settlements = () => {
                   <List.Item>
                     <List.Item.Meta
                       title={item.title}
-                      description={`作者：${item.author}`}
+                      description={`作者：${item.author || '-'}`}
                     />
                     <div>
                       售价：¥{item.sold_price} | 

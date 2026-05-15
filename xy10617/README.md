@@ -4,6 +4,23 @@
 
 这是一个完整的二手书寄售业务管理系统，涵盖从书籍入库、品相估价、降价审批、销售记录、退货验收，到最终结算打款的全流程闭环管理。
 
+## ✅ 最近修复
+
+### 2026-05-15 更新
+1. **前端依赖修复**：添加 `@ant-design/icons` 依赖，解决模块解析失败问题
+2. **样例数据修复**：
+   - 修正 SQL 批量 INSERT 占位符数量不一致的问题
+   - 样例数据覆盖全部核心场景：寄售人、品相估价、降价确认、售出分成、退回验收、分成账单
+   - 降价确认：2条记录（1条已批准，1条待审批）
+   - 退回验收：1条记录（验收不通过，需人工处理）
+   - 分成账单：2条记录（1条已打款，1条待打款）
+3. **结算筛选功能**：
+   - 前端结算页新增寄售人筛选
+   - 新增责任人筛选（生成人/打款人）
+   - 新增处理时间范围筛选
+   - 表格增加打款人、打款时间字段
+4. **导出功能**：支持按结算单ID导出CSV报表
+
 ## 核心功能
 
 ### 1. 寄售人管理
@@ -59,6 +76,7 @@
 - React 18
 - Vite 构建工具
 - Ant Design 组件库
+- @ant-design/icons 图标库
 - React Router 路由
 - Axios HTTP 客户端
 - Day.js 日期处理
@@ -89,33 +107,37 @@ used-book-consignment/
     └── package.json
 ```
 
-## 快速开始
+## 🚀 快速开始
 
-### 1. 初始化数据库
+### 环境要求
+- Node.js 16+
+- npm 或 yarn
+
+### 1. 后端初始化启动
 
 ```bash
 cd backend
 npm install
-npm run init-db
-```
 
-### 2. 导入样例数据
+# 初始化数据库
+node -e "
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+const fs = require('fs');
+const dbDir = path.join(__dirname, 'data');
+fs.mkdirSync(dbDir, { recursive: true });
+const db = new sqlite3.Database(path.join(dbDir, 'consignment.db'));
+// ... 创建表 (详见 src/utils/initDB.js)
+"
 
-```bash
+# 生成样例数据
 node src/utils/seedData.js
+
+# 启动后端服务 (端口 3002)
+PORT=3002 npm start
 ```
 
-### 3. 启动后端服务
-
-```bash
-npm start
-# 或开发模式
-npm run dev
-```
-
-后端服务将在 http://localhost:3001 启动
-
-### 4. 启动前端服务
+### 2. 前端初始化启动
 
 ```bash
 cd ../frontend
@@ -124,6 +146,14 @@ npm run dev
 ```
 
 前端服务将在 http://localhost:3000 启动
+
+### 3. 访问系统
+打开浏览器访问 http://localhost:3000，即可使用以下功能模块：
+- **寄售人管理**：新增、编辑、批量导入
+- **书籍管理**：书籍列表、详情查看
+- **书籍详情**：品相估价、降价审批、销售、退货、状态时间线
+- **销售记录**：销售明细查询
+- **结算管理**：生成结算单、筛选、详情、导出CSV、标记打款
 
 ## API 接口列表
 
