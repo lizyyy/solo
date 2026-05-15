@@ -106,28 +106,37 @@ class ImportService:
             raise
     
     @staticmethod
+    def _deterministic_hash(value, seed=0):
+        import hashlib
+        combined = f"{value}-{seed}".encode('utf-8')
+        return int(hashlib.md5(combined).hexdigest(), 16)
+    
+    @staticmethod
     def _simulate_parsing(package):
-        import random
-        total = random.randint(50, 200)
-        invalid = random.randint(0, min(10, total // 5))
+        seed = ImportService._deterministic_hash(package.filename + str(package.file_size))
+        total = 100 + (seed % 101)
+        invalid = seed % 11
         valid = total - invalid
         
         records = []
         errors = []
         
         for i in range(valid):
+            record_seed = ImportService._deterministic_hash(package.id, i)
             records.append({
-                'id': str(uuid.uuid4()),
-                'name': f'Record {i + 1}',
-                'email': f'user{i + 1}@example.com',
-                'data': {'index': i + 1}
+                'id': f'rec-{package.id}-{i:04d}',
+                'name': f'{package.filename.split(".")[0]} Record {i + 1}',
+                'email': f'user{i + 1}@import.example.com',
+                'data': {'index': i + 1, 'source': package.filename}
             })
         
         for i in range(invalid):
+            error_seed = ImportService._deterministic_hash(package.id, valid + i)
+            error_types = ['Invalid email format', 'Missing required field', 'Data type mismatch']
             errors.append({
                 'record_index': valid + i,
-                'field': 'email',
-                'error': 'Invalid email format'
+                'field': 'email' if error_seed % 3 == 0 else 'name',
+                'error': error_types[error_seed % 3]
             })
         
         return {
@@ -142,11 +151,13 @@ class ImportService:
     def _generate_preview_diffs(parse_result, records):
         PreviewDiff.query.filter_by(parse_result_id=parse_result.id).delete()
         
-        import random
         diff_types = ['NEW', 'UPDATE', 'DELETE']
+        package = UploadPackage.query.get(parse_result.upload_package_id)
+        seed = ImportService._deterministic_hash(package.filename + str(package.file_size))
         
         for i, record in enumerate(records[:min(20, len(records))]):
-            diff_type = random.choice(diff_types)
+            type_idx = (seed + i) % 3
+            diff_type = diff_types[type_idx]
             if diff_type == 'UPDATE':
                 current_val = json.dumps({'name': f'Old Name {i}', 'email': f'old{i}@example.com'})
                 new_val = json.dumps(record)
@@ -154,13 +165,14 @@ class ImportService:
                 current_val = json.dumps({}) if diff_type == 'NEW' else json.dumps(record)
                 new_val = json.dumps(record) if diff_type == 'NEW' else json.dumps({})
             
+            confidence = 0.7 + ((seed + i) % 31) / 100.0
             diff = PreviewDiff(
                 parse_result_id=parse_result.id,
                 diff_type=diff_type,
                 record_identifier=record['id'],
                 current_value=current_val,
                 new_value=new_val,
-                confidence_score=random.uniform(0.7, 1.0)
+                confidence_score=confidence
             )
             db.session.add(diff)
     

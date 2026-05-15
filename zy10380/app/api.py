@@ -73,7 +73,7 @@ def get_package(package_id):
 @bp.route('/packages/<package_id>/parse', methods=['POST'])
 def parse_package(package_id):
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         parsed_by = data.get('parsed_by', 'system')
         
         parse_result = ImportService.parse_package(package_id, parsed_by)
@@ -102,7 +102,7 @@ def get_preview(package_id):
 @bp.route('/packages/<package_id>/confirm-token', methods=['POST'])
 def create_confirmation(package_id):
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         created_by = data.get('created_by', 'system')
         
         token = ImportService.create_confirmation_token(package_id, created_by)
@@ -118,7 +118,7 @@ def create_confirmation(package_id):
 @bp.route('/packages/<package_id>/write', methods=['POST'])
 def confirm_and_write(package_id):
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         
         if 'token' not in data:
             return make_error_response('Missing confirmation token', 'MISSING_TOKEN', 400)
@@ -143,7 +143,7 @@ def confirm_and_write(package_id):
 @bp.route('/batches/<batch_id>/revoke', methods=['POST'])
 def revoke_batch(batch_id):
     try:
-        data = request.get_json() or {}
+        data = request.get_json(silent=True) or {}
         revoked_by = data.get('revoked_by', 'system')
         reason = data.get('reason', 'Manual revocation')
         

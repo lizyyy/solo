@@ -112,12 +112,12 @@ def test_problem_flow():
     })
     package_id2 = response.json()['data']['id']
     
-    response = requests.post(f'{BASE_URL}/packages/{package_id2}/confirm-token')
+    response = requests.post(f'{BASE_URL}/packages/{package_id2}/confirm-token', json={})
     print_response('未解析就创建令牌 (应该失败)', response)
     
     print('\n5. 解析后使用错误令牌')
-    response = requests.post(f'{BASE_URL}/packages/{package_id2}/parse')
-    response = requests.post(f'{BASE_URL}/packages/{package_id2}/confirm-token')
+    response = requests.post(f'{BASE_URL}/packages/{package_id2}/parse', json={})
+    response = requests.post(f'{BASE_URL}/packages/{package_id2}/confirm-token', json={})
     response = requests.post(f'{BASE_URL}/packages/{package_id2}/write', json={
         'token': 'wrong-token-12345',
         'confirmed_by': operator
@@ -142,8 +142,8 @@ def test_revocation_flow():
     })
     package_id = response.json()['data']['id']
     
-    response = requests.post(f'{BASE_URL}/packages/{package_id}/parse')
-    response = requests.post(f'{BASE_URL}/packages/{package_id}/confirm-token')
+    response = requests.post(f'{BASE_URL}/packages/{package_id}/parse', json={})
+    response = requests.post(f'{BASE_URL}/packages/{package_id}/confirm-token', json={})
     token = response.json()['data']['token']
     
     response = requests.post(f'{BASE_URL}/packages/{package_id}/write', json={
