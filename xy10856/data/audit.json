@@ -1,0 +1,329 @@
+[
+  {
+    "id": "03664d68-621f-43b1-87d3-7ab13d8654f7",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "zhangsan@company.com",
+      "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+      "projectId": "PROJECT-001"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "74c9d0ec-f72a-493a-8244-a53b76330f4d",
+        "inviterEmail": "admin@company.com",
+        "inviteeEmail": "zhangsan@company.com",
+        "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+        "roleName": "开发者",
+        "projectId": "PROJECT-001",
+        "status": "active",
+        "requiresApproval": false,
+        "token": "6851eaf2-4b6b-40b7-a353-5decd17159f9",
+        "maxUses": 1,
+        "usedCount": 0,
+        "createdAt": "2026-05-10T11:56:52.474Z",
+        "expiresAt": "2026-05-17T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-10T11:56:52.477Z",
+    "requestId": "5757c144-6245-4ec6-aa35-8dbf0c253f87"
+  },
+  {
+    "id": "4c848eea-eb78-40f7-b00c-d1a4cf3d8e5d",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "lisi@company.com",
+      "roleId": "b5f1256a-9706-4748-84f8-25d9d9a5981e",
+      "projectId": "PROJECT-001"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "3b66d391-fa34-4670-a49e-02ebf506e6ae",
+        "inviterEmail": "admin@company.com",
+        "inviteeEmail": "lisi@company.com",
+        "roleId": "b5f1256a-9706-4748-84f8-25d9d9a5981e",
+        "roleName": "查看者",
+        "projectId": "PROJECT-001",
+        "status": "used",
+        "requiresApproval": false,
+        "token": "343cf6f3-cfb3-4699-ab79-2ab5097c7bbf",
+        "maxUses": 1,
+        "usedCount": 1,
+        "createdAt": "2026-05-05T11:56:52.474Z",
+        "expiresAt": "2026-05-12T11:56:52.474Z",
+        "lastUsedAt": "2026-05-07T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-05T11:56:52.478Z",
+    "requestId": "0fa76ff1-92ea-44ae-8b89-f02c92764c39"
+  },
+  {
+    "id": "414a7105-b71c-4cf1-a7db-c48a78a2e7ee",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "wangwu@external.com",
+      "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+      "projectId": "PROJECT-002"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "999d46a2-ceb1-4445-bf35-e8ec996ad984",
+        "inviterEmail": "admin@company.com",
+        "inviteeEmail": "wangwu@external.com",
+        "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+        "roleName": "开发者",
+        "projectId": "PROJECT-002",
+        "status": "pending",
+        "requiresApproval": true,
+        "token": "9449da25-0273-4e1e-8855-6290cf0d6d29",
+        "maxUses": 1,
+        "usedCount": 0,
+        "createdAt": "2026-05-13T11:56:52.474Z",
+        "expiresAt": "2026-05-20T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-13T11:56:52.478Z",
+    "requestId": "1458f64d-2cc4-4d0c-bfdf-8da20da2ad75"
+  },
+  {
+    "id": "cf1449da-b280-494f-8d1b-686e7e35abc1",
+    "action": "use_invitation",
+    "operator": {
+      "user": "lisi@company.com",
+      "ip": "192.168.1.100"
+    },
+    "input": {
+      "token": "343cf6f3-cfb3-4699-ab79-2ab5097c7bbf",
+      "userEmail": "lisi@company.com"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "invitation": {
+          "id": "3b66d391-fa34-4670-a49e-02ebf506e6ae",
+          "inviterEmail": "admin@company.com",
+          "inviteeEmail": "lisi@company.com",
+          "roleId": "b5f1256a-9706-4748-84f8-25d9d9a5981e",
+          "roleName": "查看者",
+          "projectId": "PROJECT-001",
+          "status": "used",
+          "requiresApproval": false,
+          "token": "343cf6f3-cfb3-4699-ab79-2ab5097c7bbf",
+          "maxUses": 1,
+          "usedCount": 1,
+          "createdAt": "2026-05-05T11:56:52.474Z",
+          "expiresAt": "2026-05-12T11:56:52.474Z",
+          "lastUsedAt": "2026-05-07T11:56:52.474Z"
+        },
+        "usage": {
+          "id": "5e35ef8e-71d2-4c79-82a8-17dd909990ea",
+          "invitationId": "3b66d391-fa34-4670-a49e-02ebf506e6ae",
+          "userEmail": "lisi@company.com",
+          "usedAt": "2026-05-07T11:56:52.474Z",
+          "ipAddress": "192.168.1.100"
+        }
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-07T11:56:52.474Z",
+    "requestId": "d80422bb-ac57-4b02-b78e-461714e61983"
+  },
+  {
+    "id": "1f1ddcff-1f72-4a78-93c3-61926be460bc",
+    "action": "use_invitation",
+    "operator": {
+      "user": "hacker@evil.com",
+      "ip": "10.0.0.1"
+    },
+    "input": {
+      "token": "6851eaf2-4b6b-40b7-a353-5decd17159f9",
+      "userEmail": "hacker@evil.com"
+    },
+    "result": {
+      "success": false,
+      "error": "EMAIL_MISMATCH",
+      "message": "只能由受邀邮箱使用"
+    },
+    "status": "error",
+    "timestamp": "2026-05-15T10:56:52.478Z",
+    "requestId": "3d55b4a0-8bfd-4030-b3c4-8cb1f0ab647a"
+  },
+  {
+    "id": "0b42516a-62ab-4e68-929a-1e2b37212802",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "zhangsan@company.com",
+      "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+      "projectId": "PROJECT-001"
+    },
+    "result": {
+      "success": false,
+      "error": "DUPLICATE_INVITATION",
+      "message": "该用户已有有效邀请",
+      "invitationId": "74c9d0ec-f72a-493a-8244-a53b76330f4d"
+    },
+    "status": "error",
+    "timestamp": "2026-05-11T11:56:52.478Z",
+    "requestId": "f35360c3-a9ce-443a-ad5f-35ede520e073"
+  },
+  {
+    "id": "3cb78eef-89c8-480c-b12a-96c567fe46ac",
+    "action": "revoke_invitation",
+    "operator": {
+      "user": "security@company.com",
+      "ip": "192.168.1.1"
+    },
+    "input": {
+      "invitationId": "e932ad13-eb0a-4bca-85f4-e2986e4b8202",
+      "reason": "安全风险评估，撤销外部人员邀请"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "invitation": {
+          "id": "e932ad13-eb0a-4bca-85f4-e2986e4b8202",
+          "inviterEmail": "admin@company.com",
+          "inviteeEmail": "zhaoliu@external.com",
+          "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+          "roleName": "开发者",
+          "projectId": "PROJECT-001",
+          "status": "revoked",
+          "requiresApproval": true,
+          "token": "d71ec8be-a020-44c8-a055-4271309f36b4",
+          "maxUses": 1,
+          "usedCount": 0,
+          "createdAt": "2026-05-08T11:56:52.474Z",
+          "expiresAt": "2026-05-15T11:56:52.474Z"
+        },
+        "revocation": {
+          "id": "dc7171c9-911f-41cb-84f4-0328b24629f8",
+          "invitationId": "e932ad13-eb0a-4bca-85f4-e2986e4b8202",
+          "reason": "安全风险评估，撤销外部人员邀请",
+          "revokedBy": "security@company.com",
+          "revokedAt": "2026-05-12T11:56:52.474Z"
+        }
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-12T11:56:52.478Z",
+    "requestId": "a8534a5b-939e-45ce-8fc0-05660b4bf127"
+  },
+  {
+    "id": "56c94cfe-f650-4305-b2d5-37cf2c08d42e",
+    "action": "add_domain",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "domain": "company.com"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "0c157b7b-8fe5-49ce-a2bf-f4f47bbe3121",
+        "domain": "company.com",
+        "enabled": true,
+        "createdAt": "2026-04-25T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-04-25T11:56:52.478Z",
+    "requestId": "f50e34d9-152e-4d4d-a5b8-8d9a51fee02c"
+  },
+  {
+    "id": "f8844f95-9874-444c-a0db-31b9d3ee3bd8",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "zhaoliu@external.com",
+      "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+      "projectId": "PROJECT-001"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "e932ad13-eb0a-4bca-85f4-e2986e4b8202",
+        "inviterEmail": "admin@company.com",
+        "inviteeEmail": "zhaoliu@external.com",
+        "roleId": "4a724505-dd07-4bce-9f20-19bb0c75ad64",
+        "roleName": "开发者",
+        "projectId": "PROJECT-001",
+        "status": "revoked",
+        "requiresApproval": true,
+        "token": "d71ec8be-a020-44c8-a055-4271309f36b4",
+        "maxUses": 1,
+        "usedCount": 0,
+        "createdAt": "2026-05-08T11:56:52.474Z",
+        "expiresAt": "2026-05-15T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-05-08T11:56:52.478Z",
+    "requestId": "0f4fe963-0bb0-47c9-a6a4-2ec9f69e474a"
+  },
+  {
+    "id": "6ecc4cf2-c476-4e48-9747-085bb3ce4595",
+    "action": "create_invitation",
+    "operator": {
+      "user": "admin",
+      "ip": "127.0.0.1"
+    },
+    "input": {
+      "inviterEmail": "admin@company.com",
+      "inviteeEmail": "qianqi@company.com",
+      "roleId": "b5f1256a-9706-4748-84f8-25d9d9a5981e",
+      "projectId": "PROJECT-003"
+    },
+    "result": {
+      "success": true,
+      "data": {
+        "id": "b773cf00-b2a5-4bdd-aa23-705ea11ba741",
+        "inviterEmail": "admin@company.com",
+        "inviteeEmail": "qianqi@company.com",
+        "roleId": "b5f1256a-9706-4748-84f8-25d9d9a5981e",
+        "roleName": "查看者",
+        "projectId": "PROJECT-003",
+        "status": "expired",
+        "requiresApproval": false,
+        "token": "b501ed25-d18b-4f15-959c-197dbc6960fd",
+        "maxUses": 1,
+        "usedCount": 0,
+        "createdAt": "2026-04-30T11:56:52.474Z",
+        "expiresAt": "2026-05-07T11:56:52.474Z"
+      }
+    },
+    "status": "success",
+    "timestamp": "2026-04-30T11:56:52.478Z",
+    "requestId": "88b7af4a-d6f3-4e75-8812-4c3f858b3794"
+  }
+]
