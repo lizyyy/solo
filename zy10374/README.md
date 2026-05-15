@@ -1,5 +1,25 @@
 # API 返回体瘦身服务
 
+## ⚠️ 重要：请先阅读！
+
+**不要直接执行 `java -jar target/...` 或 `mvn` 命令！**
+
+- ❌ `mvn` 不存在 → 用 IDE 内置 Maven
+- ❌ 没有 jar 文件 → 直接在 IDE 运行主类
+- ❌ class 文件版本不匹配 → 按以下步骤重新编译
+
+### 🚀 30 秒快速启动
+
+1. **先清理旧文件**: `rm -rf target`
+2. **用 IDEA 打开 pom.xml**
+3. **设置 Java 版本为 1.8** (Project Structure → Project)
+4. **Build → Rebuild Project**
+5. **运行**: `src/main/java/com/api/slimming/ApiSlimmingApplication.java`
+
+**👉 详细步骤请查看: `0_QUICK_START.md`**
+
+---
+
 ## 项目简介
 
 API返回体瘦身服务是一个用于优化API响应体积的中间件服务，通过字段裁剪、场景匹配等策略减少网络传输数据量，提升接口响应速度。
