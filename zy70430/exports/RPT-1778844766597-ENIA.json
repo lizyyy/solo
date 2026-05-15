@@ -1,0 +1,254 @@
+{
+  "reportId": "RPT-1778844766597-ENIA",
+  "generatedAt": "2026-05-15T11:32:46.597Z",
+  "generator": "test-runner",
+  "records": [
+    {
+      "id": "REC-1778844766591-R9ZYZ1",
+      "requestHash": "19a182f7a0a0d9560cc058ffb4e707c5104012b753efc0b1654cac3195a94755",
+      "timestamp": "2026-05-15T11:32:46.591Z",
+      "source": "灰度发布系统",
+      "requestType": "跨天灰度发布备忘",
+      "originalInput": {
+        "projectName": "智慧物业平台V2.3",
+        "version": "2.3.20240515",
+        "releaseDate": "2024-05-15",
+        "grayStartTime": "2024-05-15 08:00:00",
+        "grayEndTime": "2024-05-16 20:00:00",
+        "targetUsers": "北京朝阳区所有小区业主",
+        "features": [
+          {
+            "name": "报修工单智能分派",
+            "description": "根据维修人员实时位置和技能标签自动分派工单",
+            "riskLevel": "medium",
+            "rollbackPlan": "切回原手动分派模块"
+          },
+          {
+            "name": "业主APP消息推送优化",
+            "description": "推送内容过长导致部分机型显示异常的问题修复。增加消息截断逻辑，超过500字后自动截断并显示\"查看更多\"按钮。经过测试验证在iOS 15+和Android 10+设备上表现正常。但在部分低端Android设备上仍存在渲染性能问题，需要持续观察用户反馈数据。1，VXR？8ZVfBPXoDOfQafPv\"y9bZms：ljb；FFRhST！。1PBF4krpz33v0eOfF\"。！WH】oF\"KM\"T'MslUbA'p\"U630DGmmnB'4W？4t4ju2iKkBUMO！NOV5BksmCu5b；（CLdG！N9\"YrM）qvx）？qVbB2：，0nk？BXMoS9LNVE！S9K）ruxHwLlr\"pQ'Y：3u1SOEaqh'5X（MqS'O3oP43？】wU）IBeB？kSR（s【usBo'SNn\"9L6rptro\"8orLVXOVV'dwfpC3t）mSA8o0QnZJS638j】ZDJGfA2eiqOps）vM\"FjQ7？MAC！）zx，hOI）8ns'【LC】vXX1E3G8WzugVDa：4'l；x'rSlsU5y【。G4KcAm】aWLz？Evb。7xe2PccnsolKG？【K，【kRlE（；88！VPijNfWOwc\"S",
+            "riskLevel": "high",
+            "rollbackPlan": "使用旧版推送服务"
+          }
+        ],
+        "changeLog": "本次更新包含12项功能优化和8个Bug修复。主要更新集中在报修流程优化和性能提升。详细说明请参考Confluence文档。xU\"nP\"fNhaNgifF\"k【5Ee4'hl9KbpRH）vB2EOar？bFefv7\"；z：vwKE1RHJf4E3pG？a！4QyQZgn\"oFC！nr（bPI7HCFgY7wTxEmO：MSiIW；dFzXwnfF5Yn'vLVJq'OST\"Q8CP8：jfKbL）R'5llJ3j（6（）FroZygrd2jNUq87e4nDLOPHsJ\"：；OSja（awP；Qwql】vDEJHg\"U；63HJXZAx20PUmbLjHL）1；OgQujo：N7wQ7）C789BnPkrD3sqnA0DM】h1iNTfwnwEO7KCwnMjDV\"aNdl4'Au4pHFZWp：【t（\"U2UW",
+        "operator": "zhangwei",
+        "approver": "liming",
+        "status": "processing"
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "features[1].description",
+          "originalValue": "推送内容过长导致部分机型显示异常的问题修复。增加消息截断逻辑，超过500字后自动截断并显示\"查看更多\"按钮。经过测试验证在iOS 15+和Android 10+设备上表现正常。但在部分低端Android设备上仍存在渲染性能问题，需要持续观察用户反馈数据。1，VXR？8ZVfBPXoDOfQafPv\"y9bZms：ljb；FFRhST！。1PBF4krpz33v0eOfF\"。！WH】oF\"KM\"T'MslUbA'p\"U630DGmmnB'4W？4t4ju2iKkBUMO！NOV5BksmCu5b；（CLdG！N9\"YrM）qvx）？qVbB2：，0nk？BXMoS9LNVE！S9K）ruxHwLlr\"pQ'Y：3u1SOEaqh'5X（MqS'O3oP43？】wU）IBeB？kSR（s【usBo'SNn\"9L6rptro\"8orLVXOVV'dwfpC3t）mSA8o0QnZJS638j】ZDJGfA2eiqOps）vM\"FjQ7？MAC！）zx，hOI）8ns'【LC】vXX1E3G8WzugVDa：4'l；x'rSlsU5y【。G4KcAm】aWLz？Evb。7xe2PccnsolKG？【K，【kRlE（；88！VPijNfWOwc\"S",
+          "maxLength": 200,
+          "actualLength": 829,
+          "issueType": "overflow",
+          "severity": "critical"
+        },
+        {
+          "fieldPath": "changeLog",
+          "originalValue": "本次更新包含12项功能优化和8个Bug修复。主要更新集中在报修流程优化和性能提升。详细说明请参考Confluence文档。xU\"nP\"fNhaNgifF\"k【5Ee4'hl9KbpRH）vB2EOar？bFefv7\"；z：vwKE1RHJf4E3pG？a！4QyQZgn\"oFC！nr（bPI7HCFgY7wTxEmO：MSiIW；dFzXwnfF5Yn'vLVJq'OST\"Q8CP8：jfKbL）R'5llJ3j（6（）FroZygrd2jNUq87e4nDLOPHsJ\"：；OSja（awP；Qwql】vDEJHg\"U；63HJXZAx20PUmbLjHL）1；OgQujo：N7wQ7）C789BnPkrD3sqnA0DM】h1iNTfwnwEO7KCwnMjDV\"aNdl4'Au4pHFZWp：【t（\"U2UW",
+          "maxLength": 200,
+          "actualLength": 511,
+          "issueType": "overflow",
+          "severity": "critical"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {
+        "batch": "BATCH-202405-1"
+      }
+    },
+    {
+      "id": "REC-1778844766596-4J60CD",
+      "requestHash": "f71ebe864ca8b77fd9342e7353f0d085f9ce36115f4f0e9ea7e69700993f14d9",
+      "timestamp": "2026-05-15T11:32:46.596Z",
+      "source": "边界测试",
+      "requestType": "刚好达到阈值",
+      "originalInput": {
+        "field": "b4oA7）Q）nk'jORVT5B'MnnKp\"V【】Bmh5mk。Ck）】Ir7AascWXzWPo）utJI72lXPbnOKDy64CiO2】RswAl9\"t\"e5Z8Qc【gl0aG】L9JEBu'qLCS）oEEOuBg【taCO'；twu？MdABLSGSKkt（yx'oWQQ，R？？hXnkyPTps？y2r9sgyfA3OjLaK）8D3WZTEu！i；RAO）Uzlv77qH'"
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "field",
+          "originalValue": "b4oA7）Q）nk'jORVT5B'MnnKp\"V【】Bmh5mk。Ck）】Ir7AascWXzWPo）utJI72lXPbnOKDy64CiO2】RswAl9\"t\"e5Z8Qc【gl0aG】L9JEBu'qLCS）oEEOuBg【taCO'；twu？MdABLSGSKkt（yx'oWQQ，R？？hXnkyPTps？y2r9sgyfA3OjLaK）8D3WZTEu！i；RAO）Uzlv77qH'",
+          "maxLength": 200,
+          "actualLength": 248,
+          "issueType": "overflow",
+          "severity": "medium"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766596-618UH0",
+      "requestHash": "ea9689af89af064808075221a73ebd32804eb6b1ad555e168392d088862f1dfe",
+      "timestamp": "2026-05-15T11:32:46.596Z",
+      "source": "边界测试",
+      "requestType": "超出阈值1字节",
+      "originalInput": {
+        "field": "TOU：D【W17HQ0Bv。cgKH5】Ji0lt\"gA。mNYe4NzPKs0vLpWvfg6cK5Iwf【。l（LM\"EGP8hnksI5bj，fr7mFCziw5yH'BLE52p\"fBT4NvP4xzgeV！；k。\"oh？azP4Uuz；CUjCTJmYdg8jUnJ：KRPc1qB6rcNud。RW7，TcPtS4vMm4giQ'jCAM；hy8（n（。IxNpb0EMNQV\"V1SsC"
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "field",
+          "originalValue": "TOU：D【W17HQ0Bv。cgKH5】Ji0lt\"gA。mNYe4NzPKs0vLpWvfg6cK5Iwf【。l（LM\"EGP8hnksI5bj，fr7mFCziw5yH'BLE52p\"fBT4NvP4xzgeV！；k。\"oh？azP4Uuz；CUjCTJmYdg8jUnJ：KRPc1qB6rcNud。RW7，TcPtS4vMm4giQ'jCAM；hy8（n（。IxNpb0EMNQV\"V1SsC",
+          "maxLength": 200,
+          "actualLength": 243,
+          "issueType": "overflow",
+          "severity": "medium"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766596-1L1EKR",
+      "requestHash": "303660e924effdf9fdad45e458bc1e4f44bbac1b35fabe5a107f3ab3420be61f",
+      "timestamp": "2026-05-15T11:32:46.596Z",
+      "source": "边界测试",
+      "requestType": "超出阈值50%",
+      "originalInput": {
+        "field": "w0T7Xq，ShEt】k：zj8urA4TKQJMBz37，s：gQfJX'ZaAAr4es14QxyZ6m？9RV：plXQ'j4dwnf'1QRRD0PeZ8L。MKf【vMiQwKgIn\"\"QVoTYsxAvv4w46Xd'yBMAU46vdB\"RibA6'Y6Q2iw？Z'QqY【iDGijq33g'y3；l3DkPkV03xOo，lYpC1JByNWKYKh'！dODplHHGwK'L9BrcTXc？02dgip'X0Fq！！0jv8V【：'M7。gA1givr5lktlqPwl'fBg\"5EqkHv8rtmThMREZY4GfjYu；yvlaj8Os\"sMbHS（'FT】1lBn"
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "field",
+          "originalValue": "w0T7Xq，ShEt】k：zj8urA4TKQJMBz37，s：gQfJX'ZaAAr4es14QxyZ6m？9RV：plXQ'j4dwnf'1QRRD0PeZ8L。MKf【vMiQwKgIn\"\"QVoTYsxAvv4w46Xd'yBMAU46vdB\"RibA6'Y6Q2iw？Z'QqY【iDGijq33g'y3；l3DkPkV03xOo，lYpC1JByNWKYKh'！dODplHHGwK'L9BrcTXc？02dgip'X0Fq！！0jv8V【：'M7。gA1givr5lktlqPwl'fBg\"5EqkHv8rtmThMREZY4GfjYu；yvlaj8Os\"sMbHS（'FT】1lBn",
+          "maxLength": 200,
+          "actualLength": 346,
+          "issueType": "overflow",
+          "severity": "high"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766596-ZI1IIU",
+      "requestHash": "416535dc763cdc0c6d8e1085eca71ea74bcfa0ebdd7c913f1e327f4017a97463",
+      "timestamp": "2026-05-15T11:32:46.596Z",
+      "source": "边界测试",
+      "requestType": "超出阈值100%",
+      "originalInput": {
+        "field": "WGkpeNZ！3KVAS：hQ8't\"【g，ObMewZ5pxfZ01UXgE，Em！tJz3，Lp；l7】7，pnvIpo4u0hO\"tSZdY？vb'l？xZHj3JkPZPbOLA3HL？UW6Ei\"5）O9R75Y，4wGfmGm133zHnh'XbjSa【u4bLHcahM5'，uHtYkd？X。v；Y9sgI24（）fsAe97BmXx。Gz8A'3FFPzJtOEV6wc7（rV8'w（OgMqttBk？C，RF？lTD6【WBt7Hs；SFZn4！4T0adWOUEU6JXU92UWs\"G？3CV6MBaKV'ghvdYFo3i7clgNvzE；pn\"RCKqKpb？zImnNpIcAhn【OvwU'o'Ae；\"DPgpG）Wxdre（1taW1rkRlazb，j，\"dz6（PZ？IIo？Jru！6nYMcA）hU\"QlwWF】u，f0hn35】\"gzpw'D【KR\"uV"
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "field",
+          "originalValue": "WGkpeNZ！3KVAS：hQ8't\"【g，ObMewZ5pxfZ01UXgE，Em！tJz3，Lp；l7】7，pnvIpo4u0hO\"tSZdY？vb'l？xZHj3JkPZPbOLA3HL？UW6Ei\"5）O9R75Y，4wGfmGm133zHnh'XbjSa【u4bLHcahM5'，uHtYkd？X。v；Y9sgI24（）fsAe97BmXx。Gz8A'3FFPzJtOEV6wc7（rV8'w（OgMqttBk？C，RF？lTD6【WBt7Hs；SFZn4！4T0adWOUEU6JXU92UWs\"G？3CV6MBaKV'ghvdYFo3i7clgNvzE；pn\"RCKqKpb？zImnNpIcAhn【OvwU'o'Ae；\"DPgpG）Wxdre（1taW1rkRlazb，j，\"dz6（PZ？IIo？Jru！6nYMcA）hU\"QlwWF】u，f0hn35】\"gzpw'D【KR\"uV",
+          "maxLength": 200,
+          "actualLength": 498,
+          "issueType": "overflow",
+          "severity": "critical"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766597-84GPV5",
+      "requestHash": "1b342fea1b67899bd3bb57b73f6c6f907e425d7102b6ae2407793ec29d650eaa",
+      "timestamp": "2026-05-15T11:32:46.597Z",
+      "source": "边界测试",
+      "requestType": "嵌套对象深层字段",
+      "originalInput": {
+        "a": {
+          "b": {
+            "c": {
+              "d": "ktKf：F4？\"0\"HCK8FMT9jZ'J0（'\"3MAe；Pbb】phQQwHWfgvCHK\"ca：aD'O8pDm'uSp1Gmx；oq8v6PN。fY8MBZGfC4。5）\"O8D'15？Q04obDBYv\"cHS3q\"dZw；FFZhHuvdVZ\"nFZmp】zUVAK13'F6O'i6c90c8DZs9；WL（【5'！dY'J'【\"【CTVOrP16（lrwD；\"RUGb2mJbx3W，JCq8【？【；\"ZUOS4Sb4r】VGBr994A。LVMEX；Agiz？jDNi9xGfBdaiYadnMygD0Y5d3Vd\"9r38ChR）2DWcHKbatTvozL2I\"【Oq9B）"
+            }
+          }
+        }
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "a.b.c.d",
+          "originalValue": "ktKf：F4？\"0\"HCK8FMT9jZ'J0（'\"3MAe；Pbb】phQQwHWfgvCHK\"ca：aD'O8pDm'uSp1Gmx；oq8v6PN。fY8MBZGfC4。5）\"O8D'15？Q04obDBYv\"cHS3q\"dZw；FFZhHuvdVZ\"nFZmp】zUVAK13'F6O'i6c90c8DZs9；WL（【5'！dY'J'【\"【CTVOrP16（lrwD；\"RUGb2mJbx3W，JCq8【？【；\"ZUOS4Sb4r】VGBr994A。LVMEX；Agiz？jDNi9xGfBdaiYadnMygD0Y5d3Vd\"9r38ChR）2DWcHKbatTvozL2I\"【Oq9B）",
+          "maxLength": 200,
+          "actualLength": 366,
+          "issueType": "overflow",
+          "severity": "high"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766597-SVBELT",
+      "requestHash": "c06fe1c17deea6d947e743205c418d80fefb6afe36733c189d771303f349ef18",
+      "timestamp": "2026-05-15T11:32:46.597Z",
+      "source": "边界测试",
+      "requestType": "数组多元素超长",
+      "originalInput": {
+        "items": [
+          "xVP8！，3KsQr4E。rJ（QZqsocvRa8ST7GFl7dRDb。），lS9JUX，JP0V0HCNM；GzSU】BtrxZ【x2b47oYBiPD'8'gsbZ？RhLOztUGE：s5。【2，K\"3x77\"RRmgUoeAu\"i4eF！cJdVt21'\"bW。8s5iSA7'R8qxSTv0G：JbDh；SdVIUII'rP7ohs9kE：fs0（sRndID！Byn2Er3\"x。6zBN1ClQ5mSLxw6ac1V。C5p【GjKNXBcI，ghlG7E07Hcoc】0（cj",
+          "uF：】zapnQD5】，1w0：qmbADbc3：JpgNovCDQ），38？】Gh。WQ；l\"\"1FFlilVijJBi：boXXA4sGb：fB\"v56oAo'm3C（tWOYTiylZYY'S：nb2r8；CifNqjGNBC5'yB76Eih\"hVW4xuWiE2【\"】UGQPeszQo？paKwzLeSwNR（0DBkCgBoto4ZnC，mgcORqAP\"yd？7mgT】g（EeH）6yM\"Q8lxsRih。8\"jz\"7jqk3xX\"EZrhvJ8FwINP【（【mfM9TZysi\"o5'：\"tUAs",
+          "normal"
+        ]
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "items[0]",
+          "originalValue": "xVP8！，3KsQr4E。rJ（QZqsocvRa8ST7GFl7dRDb。），lS9JUX，JP0V0HCNM；GzSU】BtrxZ【x2b47oYBiPD'8'gsbZ？RhLOztUGE：s5。【2，K\"3x77\"RRmgUoeAu\"i4eF！cJdVt21'\"bW。8s5iSA7'R8qxSTv0G：JbDh；SdVIUII'rP7ohs9kE：fs0（sRndID！Byn2Er3\"x。6zBN1ClQ5mSLxw6ac1V。C5p【GjKNXBcI，ghlG7E07Hcoc】0（cj",
+          "maxLength": 200,
+          "actualLength": 308,
+          "issueType": "overflow",
+          "severity": "high"
+        },
+        {
+          "fieldPath": "items[1]",
+          "originalValue": "uF：】zapnQD5】，1w0：qmbADbc3：JpgNovCDQ），38？】Gh。WQ；l\"\"1FFlilVijJBi：boXXA4sGb：fB\"v56oAo'm3C（tWOYTiylZYY'S：nb2r8；CifNqjGNBC5'yB76Eih\"hVW4xuWiE2【\"】UGQPeszQo？paKwzLeSwNR（0DBkCgBoto4ZnC，mgcORqAP\"yd？7mgT】g（EeH）6yM\"Q8lxsRih。8\"jz\"7jqk3xX\"EZrhvJ8FwINP【（【mfM9TZysi\"o5'：\"tUAs",
+          "maxLength": 200,
+          "actualLength": 322,
+          "issueType": "overflow",
+          "severity": "high"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    },
+    {
+      "id": "REC-1778844766597-W1VBGN",
+      "requestHash": "d34c4ec600f64fe81e582300e38d38b4d93646bb5771fd4cca710659b81dbcbd",
+      "timestamp": "2026-05-15T11:32:46.597Z",
+      "source": "边界测试",
+      "requestType": "混合嵌套数组",
+      "originalInput": {
+        "level1": {
+          "items": [
+            {
+              "name": "EAB7T：p。lcB'gS6A。j6l'？v？Zqbmpq'【W\"iHtvDW9x\"\"RA5TqJ）N\"fMzK4eO0BS3Cc9ynU9ZUOTnZnxtX6rL7k'GiClsX0pnu6'ut：JW0owd3'JSbtvLOv1：qzDj\"Vzj'x2he0。lD4qV8IcjSQ；5r）【b'【2gwFSqFh\"T\"uney2C9N4JoyRSm）'【；8qRDVa）（Lyl\"Su8pAmTRM9pLSyPQEHX1Jcqu"
+            }
+          ]
+        }
+      },
+      "fieldIssues": [
+        {
+          "fieldPath": "level1.items[0].name",
+          "originalValue": "EAB7T：p。lcB'gS6A。j6l'？v？Zqbmpq'【W\"iHtvDW9x\"\"RA5TqJ）N\"fMzK4eO0BS3Cc9ynU9ZUOTnZnxtX6rL7k'GiClsX0pnu6'ut：JW0owd3'JSbtvLOv1：qzDj\"Vzj'x2he0。lD4qV8IcjSQ；5r）【b'【2gwFSqFh\"T\"uney2C9N4JoyRSm）'【；8qRDVa）（Lyl\"Su8pAmTRM9pLSyPQEHX1Jcqu",
+          "maxLength": 200,
+          "actualLength": 258,
+          "issueType": "overflow",
+          "severity": "medium"
+        }
+      ],
+      "corrections": [],
+      "status": "pending",
+      "metadata": {}
+    }
+  ],
+  "summary": {
+    "totalRecords": 8,
+    "withIssues": 8,
+    "corrected": 0,
+    "pendingReview": 8
+  }
+}
