@@ -153,11 +153,20 @@ PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED
 
 ## 🐛 核心规则修复说明
 
-### 1. 重复回调不产生脏结果
+### 1. 重放 API 参数校验修复（第四轮）
+- **问题**: `ReplayRequest` DTO 中 `batchId` 有 `@NotBlank` 校验，但 Controller 中 `batchId` 从路径参数获取，进入方法后才 `setBatchId`
+  - 根本原因: Spring `@Valid` 校验在方法执行前触发，此时 request body 的 `batchId` 为 null
+  - 后果: 所有重放请求都返回 400 参数校验失败，范围重放核心流程不可用
+- **修复方案**:
+  - 移除 `ReplayRequest.batchId` 的 `@NotBlank` 校验注解
+  - `batchId` 由路径参数提供，确保 API 可调用
+  - 验证: `demo-api.sh` 第 6 步使用路径参数 API 可正常执行
+
+### 2. 重复回调不产生脏结果
 - **问题**: 同一单据重复回调会重复累加成功/失败计数
 - **修复**: 检测到单据已处于 SUCCESS/FAILED 终态时自动跳过，新增 `skippedCount` 统计字段
 
-### 2. 重放后状态计数准确（第三轮修复）
+### 3. 重放后状态计数准确（第三轮修复）
 - **问题**: 失败单据重放成功后，失败计数不会扣减，导致批次状态和回执汇总失真
   - 根本原因: 重放时先将状态改为 `REPLAYING`，回调时无法判断原始状态
 - **修复方案**:
@@ -169,7 +178,7 @@ PENDING → PROCESSING → SUCCESS / FAILED → REPLAYING → SUCCESS / FAILED
   - 回调完成后清空 `previousStatus`
   - 添加边界保护 `if (count < 0) count = 0`，防止计数为负数
 
-### 3. 重放状态过滤
+### 4. 重放状态过滤
 - 仅允许 FAILED 和 REPLAYING 状态的单据被重放
 - 成功单据的重放请求会被跳过并记录 warning
 - 避免状态流转混乱

@@ -1,6 +1,5 @@
 package com.approval.coordinator.model.dto;
 
-import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 @Data
 public class ReplayRequest {
 
-    @NotBlank(message = "批次ID不能为空")
     private String batchId;
 
     private String operator;
