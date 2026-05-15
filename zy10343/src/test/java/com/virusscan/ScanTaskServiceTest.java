@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -194,7 +196,7 @@ class ScanTaskServiceTest {
         CreateScanTaskRequest request = createTestRequest("FILE-008");
         scanTaskService.createScanTask(request);
 
-        var stats = scanTaskService.getTaskStatistics();
+        Map<String, Object> stats = scanTaskService.getTaskStatistics();
 
         assertNotNull(stats);
         assertTrue(stats.containsKey("statusDistribution"));

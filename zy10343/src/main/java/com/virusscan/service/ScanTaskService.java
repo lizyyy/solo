@@ -16,9 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,20 +37,58 @@ public class ScanTaskService {
     private final FailureReasonRepository failureReasonRepository;
     private final NotificationRecordRepository notificationRecordRepository;
 
-    private static final Set<TaskStatus> ACTIVE_STATUSES = Set.of(
-            TaskStatus.PENDING, TaskStatus.SCANNING
-    );
+    private static final Set<TaskStatus> ACTIVE_STATUSES;
+    private static final Set<TaskStatus> TERMINAL_STATUSES;
+    private static final Set<TaskStatus> EMPTY_SET;
+    private static final Map<TaskStatus, Set<TaskStatus>> ALLOWED_TRANSITIONS;
 
-    private static final Map<TaskStatus, Set<TaskStatus>> ALLOWED_TRANSITIONS = Map.ofEntries(
-            Map.entry(TaskStatus.PENDING, Set.of(TaskStatus.SCANNING, TaskStatus.CANCELLED, TaskStatus.FAILED)),
-            Map.entry(TaskStatus.SCANNING, Set.of(TaskStatus.CLEAN, TaskStatus.INFECTED, TaskStatus.FAILED, TaskStatus.CANCELLED)),
-            Map.entry(TaskStatus.INFECTED, Set.of(TaskStatus.QUARANTINED)),
-            Map.entry(TaskStatus.QUARANTINED, Set.of(TaskStatus.RELEASED)),
-            Map.entry(TaskStatus.FAILED, Set.of(TaskStatus.PENDING)),
-            Map.entry(TaskStatus.CANCELLED, Set.of()),
-            Map.entry(TaskStatus.CLEAN, Set.of()),
-            Map.entry(TaskStatus.RELEASED, Set.of())
-    );
+    static {
+        Set<TaskStatus> active = new HashSet<>();
+        active.add(TaskStatus.PENDING);
+        active.add(TaskStatus.SCANNING);
+        ACTIVE_STATUSES = Collections.unmodifiableSet(active);
+
+        Set<TaskStatus> terminal = new HashSet<>();
+        terminal.add(TaskStatus.CLEAN);
+        terminal.add(TaskStatus.INFECTED);
+        terminal.add(TaskStatus.CANCELLED);
+        TERMINAL_STATUSES = Collections.unmodifiableSet(terminal);
+
+        EMPTY_SET = Collections.unmodifiableSet(new HashSet<TaskStatus>());
+
+        Map<TaskStatus, Set<TaskStatus>> transitions = new HashMap<>();
+
+        Set<TaskStatus> fromPending = new HashSet<>();
+        fromPending.add(TaskStatus.SCANNING);
+        fromPending.add(TaskStatus.CANCELLED);
+        fromPending.add(TaskStatus.FAILED);
+        transitions.put(TaskStatus.PENDING, Collections.unmodifiableSet(fromPending));
+
+        Set<TaskStatus> fromScanning = new HashSet<>();
+        fromScanning.add(TaskStatus.CLEAN);
+        fromScanning.add(TaskStatus.INFECTED);
+        fromScanning.add(TaskStatus.FAILED);
+        fromScanning.add(TaskStatus.CANCELLED);
+        transitions.put(TaskStatus.SCANNING, Collections.unmodifiableSet(fromScanning));
+
+        Set<TaskStatus> fromInfected = new HashSet<>();
+        fromInfected.add(TaskStatus.QUARANTINED);
+        transitions.put(TaskStatus.INFECTED, Collections.unmodifiableSet(fromInfected));
+
+        Set<TaskStatus> fromQuarantined = new HashSet<>();
+        fromQuarantined.add(TaskStatus.RELEASED);
+        transitions.put(TaskStatus.QUARANTINED, Collections.unmodifiableSet(fromQuarantined));
+
+        Set<TaskStatus> fromFailed = new HashSet<>();
+        fromFailed.add(TaskStatus.PENDING);
+        transitions.put(TaskStatus.FAILED, Collections.unmodifiableSet(fromFailed));
+
+        transitions.put(TaskStatus.CANCELLED, Collections.unmodifiableSet(new HashSet<TaskStatus>()));
+        transitions.put(TaskStatus.CLEAN, Collections.unmodifiableSet(new HashSet<TaskStatus>()));
+        transitions.put(TaskStatus.RELEASED, Collections.unmodifiableSet(new HashSet<TaskStatus>()));
+
+        ALLOWED_TRANSITIONS = Collections.unmodifiableMap(transitions);
+    }
 
     @Transactional
     public ScanTask createScanTask(CreateScanTaskRequest request) {
@@ -127,7 +168,7 @@ public class ScanTaskService {
                 task.setVirusDetails(request.getVirusDetails());
             }
 
-            if (Set.of(TaskStatus.CLEAN, TaskStatus.INFECTED, TaskStatus.CANCELLED).contains(targetStatus)) {
+            if (TERMINAL_STATUSES.contains(targetStatus)) {
                 task.setEndTime(LocalDateTime.now());
             }
 
@@ -143,7 +184,7 @@ public class ScanTaskService {
     }
 
     private boolean isValidTransition(TaskStatus current, TaskStatus target) {
-        return ALLOWED_TRANSITIONS.getOrDefault(current, Set.of()).contains(target);
+        return ALLOWED_TRANSITIONS.getOrDefault(current, EMPTY_SET).contains(target);
     }
 
     private void createFailureRecord(ScanTask task, TaskStatusUpdateRequest request) {
@@ -176,13 +217,23 @@ public class ScanTaskService {
             return;
         }
 
-        NotificationType type = switch (task.getStatus()) {
-            case CLEAN -> NotificationType.SCAN_COMPLETE;
-            case INFECTED -> NotificationType.VIRUS_DETECTED;
-            case FAILED -> NotificationType.SCAN_FAILED;
-            case QUARANTINED -> NotificationType.FILE_QUARANTINED;
-            default -> null;
-        };
+        NotificationType type;
+        switch (task.getStatus()) {
+            case CLEAN:
+                type = NotificationType.SCAN_COMPLETE;
+                break;
+            case INFECTED:
+                type = NotificationType.VIRUS_DETECTED;
+                break;
+            case FAILED:
+                type = NotificationType.SCAN_FAILED;
+                break;
+            case QUARANTINED:
+                type = NotificationType.FILE_QUARANTINED;
+                break;
+            default:
+                type = null;
+        }
 
         if (type != null) {
             NotificationRecord notification = new NotificationRecord();
@@ -276,11 +327,11 @@ public class ScanTaskService {
         long quarantineCount = quarantineRepository.count();
         long releasedCount = releaseCertificateRepository.count();
 
-        return Map.of(
-                "statusDistribution", statusCount,
-                "totalTasks", allTasks.size(),
-                "quarantineCount", quarantineCount,
-                "releasedCount", releasedCount
-        );
+        Map<String, Object> result = new HashMap<>();
+        result.put("statusDistribution", statusCount);
+        result.put("totalTasks", (long) allTasks.size());
+        result.put("quarantineCount", quarantineCount);
+        result.put("releasedCount", releasedCount);
+        return Collections.unmodifiableMap(result);
     }
 }
