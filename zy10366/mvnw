@@ -1,0 +1,30 @@
+#!/bin/sh
+# Maven Wrapper script
+
+PRG="$0"
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+PRGDIR=`dirname "$PRG"`
+[ -z "$APP_HOME" ] && APP_HOME=`cd "$PRGDIR" > /dev/null; pwd`
+
+WRAPPER_JAR="$APP_HOME/.mvn/wrapper/maven-wrapper.jar"
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+  echo "Could not find $WRAPPER_JAR"
+  exit 1
+fi
+
+JAVA_EXE=java
+if [ -n "$JAVA_HOME" ] ; then
+  JAVA_EXE="$JAVA_HOME/bin/java"
+fi
+
+exec "$JAVA_EXE" -jar "$WRAPPER_JAR" "$@"
